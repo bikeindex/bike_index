@@ -19,6 +19,7 @@
 #
 class Membership < ApplicationRecord
   include ActivePeriodable
+  include StatusHumanizable
 
   LEVEL_ENUM = {basic: 0, plus: 1, patron: 2}
   STATUS_ENUM = {pending: 0, active: 1, ended: 2}
@@ -48,10 +49,6 @@ class Membership < ApplicationRecord
       str&.humanize
     end
 
-    def status_display(str)
-      str&.humanize
-    end
-
     def levels_ordered
       levels.keys.map { level_humanized(_1) }
     end
@@ -68,10 +65,6 @@ class Membership < ApplicationRecord
     self.class.level_humanized(level)
   end
 
-  def status_display
-    self.class.status_display(status)
-  end
-
   def admin_managed?
     creator_id.present?
   end
@@ -85,7 +78,11 @@ class Membership < ApplicationRecord
       raise "Must have a current_stripe_subscription to be able to update from Stripe!"
     end
 
-    current_stripe_subscription.update_from_stripe_subscription!
+    current_stripe_subscription.update_from_stripe!
+  end
+
+  def referral_source
+    current_stripe_subscription&.referral_source || payments.order(:id).first&.referral_source
   end
 
   def set_calculated_attributes

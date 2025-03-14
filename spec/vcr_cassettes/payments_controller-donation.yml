@@ -174,14 +174,14 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=donate&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=MXN&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew&customer_email=user3s%40bikeiasdndex.org
+      string: submit_type=donate&line_items[0][price_data][unit_amount]=4000&line_items[0][price_data][currency]=MXN&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew&customer_email=user4334s%40bikeindex.org
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
       - '{"last_request_metrics":{"request_id":"req_WM40Yfpiw99Zh7","request_duration_ms":0}}'
       Idempotency-Key:
-      - a57c6cd0-b05d-48f9-b3ac-ab70ba2b5e6b
+      - 10937e16-ad25-485b-a1bd-c938ef44131e
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -198,7 +198,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 10 Mar 2025 22:48:13 GMT
+      - Fri, 14 Mar 2025 03:46:13 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -221,19 +221,19 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=NbyO2GLGevOhkKMRMmlKJtEODp5CDrwFCJ1CRMFBmWNGbtWj1mzyEptYhqG-yu4VOfEZ8yXxuCYb-KmI
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=S_qymVMcJm7A-W8dJTXvgPm67CCvEKjktyc0Xz3ZV7-j6chZepouqELCdy_DuZQQib4JkHE2Jzi01Cct
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop"
       Idempotency-Key:
-      - a57c6cd0-b05d-48f9-b3ac-ab70ba2b5e6b
+      - 10937e16-ad25-485b-a1bd-c938ef44131e
       Original-Request:
-      - req_qbzuhH3AdCL9Is
+      - req_gHCRiJjZVYtsgX
       Report-To:
       - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
       Reporting-Endpoints:
       - coop="https://q.stripe.com/coop-report"
       Request-Id:
-      - req_qbzuhH3AdCL9Is
+      - req_gHCRiJjZVYtsgX
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -252,7 +252,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1Hvl08yN0RZbrQD8qZeLt0EN6UAl6RKnwYqQIdl0P9V46Dr2CsE4zRpqx",
+          "id": "cs_test_a1EIy0Vjl4OQVVIAqDBwppeXKSm7Nhb0zlETXW9N7EV1yW9H7rtGMExFhX",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": false
@@ -275,7 +275,7 @@ http_interactions:
           },
           "consent": null,
           "consent_collection": null,
-          "created": 1741646893,
+          "created": 1741923973,
           "currency": "mxn",
           "currency_conversion": null,
           "custom_fields": [],
@@ -289,15 +289,15 @@ http_interactions:
           "customer_creation": "if_required",
           "customer_details": {
             "address": null,
-            "email": "user3s@bikeiasdndex.org",
+            "email": "user4334s@bikeindex.org",
             "name": null,
             "phone": null,
             "tax_exempt": "none",
             "tax_ids": null
           },
-          "customer_email": "user3s@bikeiasdndex.org",
+          "customer_email": "user4334s@bikeindex.org",
           "discounts": [],
-          "expires_at": 1741733293,
+          "expires_at": 1742010373,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -351,7 +351,7 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1Hvl08yN0RZbrQD8qZeLt0EN6UAl6RKnwYqQIdl0P9V46Dr2CsE4zRpqx#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1EIy0Vjl4OQVVIAqDBwppeXKSm7Nhb0zlETXW9N7EV1yW9H7rtGMExFhX#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
-  recorded_at: Mon, 10 Mar 2025 22:48:13 GMT
+  recorded_at: Fri, 14 Mar 2025 03:46:13 GMT
 recorded_with: VCR 6.3.1

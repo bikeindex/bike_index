@@ -93,8 +93,10 @@ VCR.configure do |config|
   }
   config.ignore_hosts("127.0.0.1", "0.0.0.0") # for capybara selenium
 
-  %w[GOOGLE_GEOCODER MAILCHIMP_KEY FACEBOOK_AD_TOKEN CLOUDFLARE_TOKEN MAXMIND_KEY
-    EXCHANGE_RATE_API_KEY].each { |key| config.filter_sensitive_data("<#{key}>") { ENV[key] } }
+  %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
+    MAXMIND_KEY SENDGRID_EMAIL_VALIDATION_KEY].each do |key|
+    config.filter_sensitive_data("<#{key}>") { ENV[key] }
+  end
 
   config.before_record do |i|
     i.response.headers.delete("Set-Cookie")

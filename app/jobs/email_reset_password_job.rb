@@ -22,6 +22,6 @@ class EmailResetPasswordJob < ApplicationJob
     token_time = user.auth_token_time("token_for_password_reset")
     Notification.where(user_id: user.id, kind: NOTIFICATION_KIND)
       .where("created_at > ?", token_time).first ||
-      Notification.new(user_id: user.id, kind: NOTIFICATION_KIND)
+      Notification.create(user_id: user.id, kind: NOTIFICATION_KIND)
   end
 end

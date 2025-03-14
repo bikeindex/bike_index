@@ -47,6 +47,7 @@ class OrganizationRole < ApplicationRecord
   scope :claimed, -> { where.not(claimed_at: nil) }
   scope :created_by_magic_link, -> { where(created_by_magic_link: true) }
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
+  scope :approved_organizations, -> { where(organization: Organization.approved) }
 
   def self.role_types
     ROLE_TYPES

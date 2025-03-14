@@ -27,6 +27,8 @@
 #  index_impound_claims_on_user_id             (user_id)
 #
 class ImpoundClaim < ApplicationRecord
+  include StatusHumanizable
+
   STATUS_ENUM = {
     pending: 0,
     submitting: 1, # TOD: change this to submitted
@@ -137,10 +139,6 @@ class ImpoundClaim < ApplicationRecord
   # Get it unscoped, because unregistered_bike notifications
   def bike_claimed
     @bike_claimed ||= bike_claimed_id.present? ? Bike.unscoped.find_by_id(bike_claimed_id) : nil
-  end
-
-  def status_humanized
-    self.class.status_humanized(status)
   end
 
   # return private images too

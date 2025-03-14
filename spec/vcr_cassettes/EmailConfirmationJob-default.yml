@@ -1,0 +1,127 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://bikeindex.org/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 13 Mar 2025 18:46:54 GMT
+      Content-Type:
+      - text/html; charset=utf-8
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Strict-Transport-Security:
+      - max-age=631139040
+      X-Content-Type-Options:
+      - nosniff
+      Link:
+      - "</assets/revised-d4211ce3e526ba3ee155b9a10a5e40474204effcd3c49ed17ba38c8e32356692.css>;
+        rel=preload; as=style; nopush,</assets/application_revised-59210909bc41de832b59cf0073bd849c506eee4caeccce17b80e92fb23940917.js>;
+        rel=preload; as=script; nopush"
+      Etag:
+      - W/"c38cdb62da3e27a37efd53eab5c1fe1e"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 2eba209b-38bf-4968-bc7f-50d196ca2620
+      X-Runtime:
+      - '0.020465'
+      X-Powered-By:
+      - cloud66
+      Cf-Cache-Status:
+      - DYNAMIC
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=BTT7REjN1ccnGYcOs2OB7z1XhIK2XXdX9GEmJH0iyW563ySCqSO1v4KV6EhObTk57ygi6UWyVOQWm2zcqATalNSK9OERc5xpwjTRY9LuniNHSXcxI3MKNBpiHFGfztE%3D"}],"group":"cf-nel","max_age":604800}'
+      Nel:
+      - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 91fdb25d5c8615be-SJC
+      Server-Timing:
+      - cfL4;desc="?proto=TCP&rtt=8265&min_rtt=8265&rtt_var=4132&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=140&delivery_rate=0&cwnd=224&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:46:54 GMT
+- request:
+    method: head
+    uri: http://bikeindex.org/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 13 Mar 2025 18:46:54 GMT
+      Content-Type:
+      - text/html; charset=utf-8
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Strict-Transport-Security:
+      - max-age=631139040
+      X-Content-Type-Options:
+      - nosniff
+      Link:
+      - "</assets/revised-d4211ce3e526ba3ee155b9a10a5e40474204effcd3c49ed17ba38c8e32356692.css>;
+        rel=preload; as=style; nopush,</assets/application_revised-59210909bc41de832b59cf0073bd849c506eee4caeccce17b80e92fb23940917.js>;
+        rel=preload; as=script; nopush"
+      Etag:
+      - W/"887a514a435d2dd8afb959b4da0c9ef8"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 89812031-d1c8-43b7-8c27-9ff8d7028312
+      X-Runtime:
+      - '0.029881'
+      X-Powered-By:
+      - cloud66
+      Cf-Cache-Status:
+      - DYNAMIC
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=Qg6r86sKhJssvzWxPxYj3Ra8pwGXEoTCu5y37VwFxg2HCgjRDt%2BgvORAPfysOaIprtNGaQpchQmrqTF5gW7h9iqSqAgNSt4yzBlMt9OFpWDJSNKPcEP8bj0MOWdfcRE%3D"}],"group":"cf-nel","max_age":604800}'
+      Nel:
+      - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 91fdb25dddd06799-SJC
+      Server-Timing:
+      - cfL4;desc="?proto=TCP&rtt=6319&min_rtt=6319&rtt_var=3159&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=140&delivery_rate=0&cwnd=249&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:46:54 GMT
+recorded_with: VCR 6.3.1

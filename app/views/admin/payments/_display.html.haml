@@ -50,6 +50,11 @@
               = l payment.paid_at, format: :convert_time
           - else
             %span.text-danger Incomplete!
+      - if payment.stripe? && display_dev_info?
+        %tr
+          %td.only-dev-visible Stripe Status
+          %td
+            %code= payment.stripe_status
       %tr
         %td User
         %td

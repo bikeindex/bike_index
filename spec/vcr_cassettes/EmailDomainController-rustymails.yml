@@ -1,0 +1,513 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:42:20 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:42:20 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:42:20 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:42:20 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:42:35 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:42:35 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:42:36 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:42:36 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:42:58 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:42:58 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:43:00 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:43:00 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:43:05 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:43:05 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:43:06 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:43:06 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:48:25 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:48:25 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 18:48:26 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 18:48:26 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 19:59:01 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 19:59:01 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 19:59:02 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 19:59:02 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 19:59:35 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 19:59:35 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 20:00:37 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 20:00:37 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 20:02:53 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 20:02:53 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 20:05:02 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 20:05:02 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Thu, 13 Mar 2025 20:05:11 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Thu, 13 Mar 2025 20:05:11 GMT
+recorded_with: VCR 6.3.1

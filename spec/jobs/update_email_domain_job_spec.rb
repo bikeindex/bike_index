@@ -1,0 +1,198 @@
+require "rails_helper"
+
+RSpec.describe UpdateEmailDomainJob, type: :lib do
+  include_context :scheduled_job
+  include_examples :scheduled_job_tests
+
+  it "is the correct queue and frequency" do
+    expect(described_class.sidekiq_options["queue"]).to eq "low_priority" # overrides default
+    expect(described_class.frequency).to be > 20.hours
+  end
+
+  describe "perform" do
+    let(:instance) { described_class.new }
+    let!(:user) { FactoryBot.create(:user_confirmed, email: "example@#{user_domain}") }
+    let(:user2) { FactoryBot.create(:user_confirmed, email: "example2@#{user_domain}") }
+    let(:valid_data) do
+      {
+        broader_domain_exists: false,
+        tld: domain,
+        is_tld: true,
+        subdomain_count: 0,
+        domain_resolves: true,
+        tld_resolves: true,
+        bike_count: 0
+      }
+    end
+    let(:domain) { "bikeindex.org" }
+    let(:user_domain) { domain }
+    let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@#{user_domain}") }
+    before { stub_const("EmailDomain::EMAIL_MIN_COUNT", 1) }
+
+    context "bikeindex" do
+      let!(:email_domain_sub) { FactoryBot.create(:email_domain, domain: "@example.#{domain}") }
+      let!(:email_domain_bare) { FactoryBot.create(:email_domain, domain:) }
+
+      it "updates counts in the cache" do
+        VCR.use_cassette("UpdateEmailDomainJob-bikeindex") do
+          instance.perform(email_domain.id)
+          expect(email_domain.reload.user_count).to eq 4 # Because users created for email domains
+          expect(email_domain.status).to eq "permitted"
+          expect(email_domain.tld_matches_subdomains?).to be_falsey
+          expect(email_domain.data).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
+          expect(EmailDomain.tld.pluck(:id)).to match_array([email_domain.id, email_domain_bare.id])
+          expect(EmailDomain.subdomain.pluck(:id)).to match_array([email_domain_sub.id])
+          expect(email_domain.calculated_subdomains.pluck(:id)).to eq([email_domain_sub.id])
+          expect(email_domain_bare.calculated_subdomains.pluck(:id)).to eq([email_domain_sub.id])
+          expect(email_domain_sub.calculated_subdomains.pluck(:id)).to eq([])
+
+          # Verify that setting no_auto_assign_status
+          email_domain_bare.update(data: {no_auto_assign_status: true})
+          expect(email_domain_bare.tld_matches_subdomains?).to be_truthy
+          expect(email_domain_bare.reload.no_auto_assign_status?).to be_truthy
+          instance.perform(email_domain_bare.id)
+          expect(email_domain_bare.reload.no_auto_assign_status?).to be_truthy
+          expect(email_domain_bare.status).to eq "permitted"
+          expect(email_domain_bare.data).to match_hash_indifferently(valid_data.merge(subdomain_count: 1, no_auto_assign_status: true))
+        end
+      end
+    end
+
+    context "@gmail.com" do
+      let(:domain) { "gmail.com" }
+      it "resolves" do
+        VCR.use_cassette("UpdateEmailDomainJob-gmail") do
+          instance.perform(email_domain.id)
+          expect(email_domain.reload.user_count).to eq 1
+          expect(email_domain.has_ban_blockers?).to be_falsey
+          expect(email_domain.spam_score).to eq 4.0
+          expect(email_domain.data).to match_hash_indifferently valid_data.merge
+          expect(email_domain.status).to eq "permitted"
+        end
+      end
+    end
+
+    context "VALIDATE_WITH_SENDGRID" do
+      let(:domain) { "nkk.co.za" }
+      let!(:user2) { FactoryBot.create(:user_confirmed, email: "malaysia_lloyd57@nkk.co.za") }
+      let(:target_data) do
+        {
+          broader_domain_exists: false,
+          tld: "nkk.co.za",
+          is_tld: true,
+          subdomain_count: 0,
+          domain_resolves: false,
+          tld_resolves: false,
+          bike_count: 0
+        }
+      end
+      let(:target_sendgrid_keys) { %w[checks email host ip_address local score source verdict] }
+      before { stub_const("UpdateEmailDomainJob::VALIDATE_WITH_SENDGRID", true) }
+
+      it "doesn't resolve, but bike makes it permitted" do
+        VCR.use_cassette("UpdateEmailDomainJob-co.za") do
+          instance.perform(email_domain.id)
+          expect(email_domain.reload.user_count).to eq 2
+          expect(email_domain.bike_count).to eq 0
+
+          expect(email_domain.data.except("sendgrid_validations")).to match_hash_indifferently target_data
+          expect(email_domain.data.dig("sendgrid_validations", user2.email).keys.sort).to eq target_sendgrid_keys
+          expect(email_domain.spam_score).to eq 0.4
+          expect(email_domain.status).to eq "ban_pending"
+        end
+      end
+    end
+
+    context "@msn.com" do
+      let(:domain) { "msn.com" }
+      let!(:bike) { FactoryBot.create(:bike, owner_email: "something@#{domain}") }
+      let(:msn_data) do
+        valid_data.merge(domain_resolves: false, tld_resolves: false, bike_count: 1)
+      end
+
+      it "doesn't resolve, but bike makes it permitted" do
+        VCR.use_cassette("UpdateEmailDomainJob-msn") do
+          instance.perform(email_domain.id)
+          expect(email_domain.reload.user_count).to eq 1
+          expect(email_domain.bike_count).to eq 1
+          expect(email_domain.data).to match_hash_indifferently msn_data
+          expect(email_domain.status).to eq "permitted"
+        end
+      end
+    end
+
+    context "domain that doesn't resolve" do
+      let(:domain) { "unylix.com" }
+      let(:user_domain) { "sisq.unylix.com" }
+      let(:target_data) do
+        valid_data.merge(is_tld: false,
+          domain_resolves: false,
+          tld_resolves: false)
+      end
+      before { expect(user2).to be_present } # So EMAIL_MIN_COUNT passes
+
+      it "makes ban_pending" do
+        expect(email_domain.reload.calculated_users.count).to eq 2
+
+        VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
+          instance.perform(email_domain.id)
+          expect(email_domain.reload.user_count).to eq 2
+          expect(email_domain.has_ban_blockers?).to be_falsey
+          expect(email_domain.data).to match_hash_indifferently target_data
+          expect(email_domain.status).to eq "ban_pending"
+          expect(described_class).to_not have_enqueued_sidekiq_job
+        end
+      end
+
+      context "create_tld_subdomain_count" do
+        let!(:email_domain_2) { FactoryBot.create(:email_domain, domain: "ffff.#{domain}") }
+        let!(:email_domain_3) { FactoryBot.create(:email_domain, domain: "zsss.#{domain}") }
+        let!(:email_domain_4) { FactoryBot.create(:email_domain, domain: "dd.zs.#{domain}") }
+        it "makes tld domain" do
+          VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
+            expect(EmailDomain.count).to eq 4
+            Sidekiq::Job.clear_all
+            instance.perform(email_domain.id)
+            expect(email_domain.reload.has_ban_blockers?).to be_falsey
+            expect(email_domain.auto_bannable?).to be_truthy
+            expect(email_domain.reload.status).to eq "ban_pending"
+
+            expect(EmailDomain.count).to eq 5
+            email_domain_tld = EmailDomain.order(:id).last
+            expect(EmailDomain.tld_matches_subdomains.pluck(:id)).to eq([email_domain_tld.id])
+            expect(email_domain_tld.status).to eq "permitted"
+            expect(described_class).to have_enqueued_sidekiq_job(email_domain_tld.id)
+            instance.perform(email_domain_tld.id)
+            expect(email_domain_tld.reload.status).to eq "permitted"
+            expect(email_domain_tld.calculated_users.count).to eq 2
+            expect(EmailDomain.count).to eq 5
+            # Update all the other subs to be ban_pending
+            EmailDomain.all.each { |d| d.update(status: "ban_pending") }
+            # if the TLD is banned, delete all the subs and the users
+            email_domain_tld.update(status: "banned")
+            instance.perform(email_domain_tld.id)
+            expect(EmailDomain.count).to eq 1
+            expect(email_domain_tld.reload.calculated_users.count).to eq 0
+          end
+        end
+        context "with @tld" do
+          let!(:email_domain_at) { FactoryBot.create(:email_domain, domain: "@#{domain}") }
+
+          it "makes tld domain" do
+            expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
+            expect(email_domain_at.tld?).to be_truthy
+
+            VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
+              expect(EmailDomain.count).to eq 5
+              instance.perform(email_domain.id)
+
+              expect(email_domain.reload.status).to eq "ban_pending"
+
+              expect(EmailDomain.count).to eq 6
+            end
+          end
+        end
+      end
+    end
+  end
+end

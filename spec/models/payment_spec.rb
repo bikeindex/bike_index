@@ -180,7 +180,7 @@ RSpec.describe Payment, type: :model do
     end
   end
 
-  describe "update_from_stripe_checkout_session" do
+  describe "update_from_stripe!" do
     let(:payment) { Payment.create(stripe_id: "cs_test_a1CtKMVSPmXNJnR683KqoOTff69gPvcdhJA545USuUfYVFwmykgV6KWsQp") }
     let(:target_attrs) do
       {
@@ -194,7 +194,7 @@ RSpec.describe Payment, type: :model do
     end
     it "updates and assigns" do
       VCR.use_cassette("Payment-update_from_stripe_checkout_session", match_requests_on: [:method]) do
-        payment.update_from_stripe_checkout_session!
+        payment.update_from_stripe!
       end
       expect(payment.reload).to match_hash_indifferently target_attrs
       expect(payment.paid_at).to be_present
