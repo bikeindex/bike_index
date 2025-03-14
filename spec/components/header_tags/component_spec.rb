@@ -3,8 +3,7 @@
 require "rails_helper"
 
 RSpec.describe HeaderTags::Component, type: :component do
-  let(:options) { {page_title:, page_obj:, controller_name:, controller_namespace:, action_name:, request_url:, language:, organization_name:} }
-  let(:language) { "en" }
+  let(:options) { {page_title:, page_obj:, controller_name:, controller_namespace:, action_name:, request_url:, organization_name:} }
   let(:request_url) { "https://test.com" }
   let(:page_title) { nil }
   let(:page_obj) { nil }
@@ -16,10 +15,10 @@ RSpec.describe HeaderTags::Component, type: :component do
 
   # Add tests for:
   # - page title & description for welcome choose_registration
-  # - page title & description for bikes new stolen
   # - page title for bikes edit
   # - page title for bike_versions edit
   # - page title for bikes edit
+  # - at least one translation
 
   context "welcome controller" do
     let(:controller_name) { "welcome" }
@@ -28,6 +27,42 @@ RSpec.describe HeaderTags::Component, type: :component do
       expect(component).to be_present
       expect(component.css("title")).to have_text "Bike Index - Bike registration that works"
       expect(component.css('meta[name="description"]').first["content"]).to eq default_description
+    end
+    context "choose registration" do
+      let(:action_name) { "choose_registration" }
+      let(:target_description) do
+        "Register a bike on Bike Index quickly, easily and for free. Create a permanent verified record of your bike to protect it."
+      end
+
+      it "renders" do
+        expect(component).to be_present
+        expect(component.css("title")).to have_text "Register a bike!"
+        expect(component.css('meta[name="description"]').first["content"]).to eq target_description
+      end
+    end
+  end
+
+  context "info" do
+    let(:controller_name) { "info" }
+    let(:action_name) { "about" }
+
+    it "renders" do
+      expect(component).to be_present
+      expect(component.css("title")).to have_text "About Bike Index"
+      expect(component.css('meta[name="description"]').first["content"]).to eq "Why we made Bike Index and who we are"
+      expect(component.to_s).to match('<meta http-equiv="Content-Language" content="en">')
+    end
+
+    context "locale: nl" do
+      before { I18n.locale = :nl }
+      after { I18n.locale = I18n.default_locale }
+
+      it "renders" do
+        expect(component).to be_present
+        expect(component.css("title")).to have_text "Bike Index - de fietsregistratie die werkt"
+        expect(component.css('meta[name="description"]').first["content"]).to eq "Waarom we Bike Index hebben gemaakt en wie we zijn"
+        expect(component.to_s).to match('<meta http-equiv="Content-Language" content="nl">')
+      end
     end
   end
 

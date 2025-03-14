@@ -5,10 +5,9 @@ module HeaderTags
     DEFAULT_IMAGE = "/opengraph.png"
     DEFAULT_TWITTER = "@bikeindex"
 
-    def initialize(controller_name:, action_name:, request_url:, language:, page_title: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil)
+    def initialize(controller_name:, action_name:, request_url:, page_title: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil)
       # TODO: Do any pages need a query string?
       @page_url = request_url.split("?").first
-      @language = language
 
       # TODO: Don't actually need to store @page_key, it's just for page_json_ld
       @page_key = translation_key_for(controller_namespace:, controller_name:, action_name:, page_obj:)

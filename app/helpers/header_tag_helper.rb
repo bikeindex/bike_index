@@ -11,8 +11,7 @@ module HeaderTagHelper
       controller_name:,
       controller_namespace:,
       action_name:,
-      request_url: request.url,
-      language: I18n.locale
+      request_url: request.url
     }
   end
 
