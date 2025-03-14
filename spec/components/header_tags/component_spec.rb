@@ -3,14 +3,16 @@
 require "rails_helper"
 
 RSpec.describe HeaderTags::Component, type: :component do
-  let(:options) { {page_title:, page_obj:, controller_name:, controller_namespace:, action_name:, request_url:, language:} }
+  let(:options) { {page_title:, page_obj:, controller_name:, controller_namespace:, action_name:, request_url:, language:, organization_name:} }
   let(:language) { "en" }
   let(:request_url) { "https://test.com" }
   let(:page_title) { nil }
   let(:page_obj) { nil }
+  let(:organization_name) { nil }
   let(:controller_namespace) { nil }
   let(:action_name) { "index" }
   let(:component) { render_inline(described_class.new(**options)) }
+  let(:default_description) { "The best bike registry: Simple, secure and free." }
 
   # Add tests for:
   # - page title & description for welcome choose_registration
@@ -25,7 +27,28 @@ RSpec.describe HeaderTags::Component, type: :component do
     it "renders" do
       expect(component).to be_present
       expect(component.css("title")).to have_text "Bike Index - Bike registration that works"
-      expect(component.css('meta[name="description"]').first["content"]).to eq "The best bike registry: Simple, secure and free."
+      expect(component.css('meta[name="description"]').first["content"]).to eq default_description
+    end
+  end
+
+  context "admin" do
+    let(:controller_namespace) { "admin" }
+    let(:controller_name) { "dashboard" }
+    it "renders" do
+      expect(component).to be_present
+      expect(component.css("title")).to have_text "🧰 Dashboard"
+      expect(component.css('meta[name="description"]').first["content"]).to eq default_description
+    end
+  end
+
+  context "organized" do
+    let(:controller_namespace) { "organized" }
+    let(:controller_name) { "bikes" }
+    let(:organization_name) { "PSU" }
+    it "renders" do
+      expect(component).to be_present
+      expect(component.css("title")).to have_text "PSU Bikes"
+      expect(component.css('meta[name="description"]').first["content"]).to eq default_description
     end
   end
 

@@ -45,13 +45,5 @@ RSpec.describe HeaderTagHelper, type: :helper do
         expect(header_tags_component_options).to eq target
       end
     end
-
-    context "organized" do
-      it "responds with target"
-    end
-
-    context "admin" do
-      it "responds with target"
-    end
   end
 end

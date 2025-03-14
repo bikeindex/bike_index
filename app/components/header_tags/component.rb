@@ -10,8 +10,8 @@ module HeaderTags
       @page_url = request_url.split("?").first
       @language = language
 
-      # TODO: Don't actually need to store @controller_action, it's just for page_json_ld
-      @controller_action = translation_key_for(controller_name, action_name)
+      # TODO: Don't actually need to store @page_key, it's just for page_json_ld
+      @page_key = translation_key_for(controller_namespace:, controller_name:, action_name:)
       @display_auto_discovery = controller_name == "news"
 
       @page_title = page_title
@@ -22,9 +22,9 @@ module HeaderTags
         assign_blog_attrs(page_obj)
       end
 
-      @page_title ||= translation("meta_titles.#{@controller_action}", organization_name) ||
+      @page_title ||= translation_if_exists("meta_titles.#{@page_key}", organization_name) ||
         auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
-      @page_description ||= translation("meta_descriptions.#{@controller_action}", organization_name) ||
+      @page_description ||= translation_if_exists("meta_descriptions.#{@page_key}", organization_name) ||
         default_description
     end
 
@@ -61,7 +61,7 @@ module HeaderTags
     def page_json_ld
       # ... eventually might want to use Vehicle, but currently would use no properties
       json_ld_type = if @meta_type == "article"
-        (@controller_action == "news_show") ? "BlogPosting" : "Article"
+        (@page_key == "news_show") ? "BlogPosting" : "Article"
       else
         "WebPage"
       end
@@ -89,18 +89,18 @@ module HeaderTags
     # Translation and auto assign methods
     #
 
-    def translation_key_for(controller_name, action_name)
+    def translation_key_for(controller_namespace:, controller_name:, action_name:)
       return "bikes_new" if controller_name == "welcome" && action_name == "choose_registration"
 
       if %w[bikes bike_versions].include?(controller_name)
         return "bikes_new_stolen" if (action_name == "new" || action_name == "create") && @bike&.status_stolen?
       end
 
-      "#{controller_name}_#{action_name}"
+      [controller_namespace, controller_name, action_name].compact.join("_")
     end
 
     # Check I18n.exists first - otherwise translation throws an error
-    def translation(key, organization_name)
+    def translation_if_exists(key, organization_name)
       I18n.exists?(key) ? I18n.t(key, organization: organization_name) : nil
     end
 
