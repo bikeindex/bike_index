@@ -21,8 +21,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
         controller_name:,
         controller_namespace:,
         action_name:,
-        request_url: "http://test.host",
-        language: :en
+        request_url: "http://test.host"
       }
     end
     let(:page_title) { nil }
