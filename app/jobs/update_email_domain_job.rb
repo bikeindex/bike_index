@@ -65,7 +65,8 @@ class UpdateEmailDomainJob < ScheduledJob
       domain_resolves: domain_resolves?(email_domain.domain),
       tld_resolves: domain_resolves?(email_domain.tld),
       bike_count: email_domain.calculated_bikes.count,
-      subdomain_count: email_domain.calculated_subdomains.count
+      subdomain_count: email_domain.calculated_subdomains.count,
+      notification_count: email_domain.calculated_notifications.count
     }
   end
 

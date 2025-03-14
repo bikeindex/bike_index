@@ -121,6 +121,10 @@ class EmailDomain < ApplicationRecord
     data&.dig("bike_count")&.to_i || 0
   end
 
+  def notification_count
+    data&.dig("notification_count")&.to_i || 0
+  end
+
   def broader_domain_exists?
     InputNormalizer.boolean(data&.dig("broader_domain_exists"))
   end
@@ -189,6 +193,10 @@ class EmailDomain < ApplicationRecord
 
   def calculated_bikes
     Bike.matching_domain(domain)
+  end
+
+  def calculated_notifications
+    Notification.where("message_channel_target ILIKE ?", "%#{domain}")
   end
 
   def calculated_subdomains
