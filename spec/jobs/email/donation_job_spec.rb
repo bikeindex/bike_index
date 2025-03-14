@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailDonationJob, type: :job do
+RSpec.describe Email::DonationJob, type: :job do
   let(:subject) { described_class }
   let(:instance) { described_class.new }
   let(:payment) { FactoryBot.create(:payment, kind: "donation") }

@@ -1,4 +1,4 @@
-class AdditionalEmailConfirmationJob < ApplicationJob
+class AdditionalEmail::ConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify"
 
   def perform(user_email_id)

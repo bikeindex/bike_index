@@ -1,13 +1,13 @@
 require "rails_helper"
 
-RSpec.describe EmailImpoundClaimJob, type: :job do
+RSpec.describe Email::ImpoundClaimJob, type: :job do
   let!(:impound_claim) { FactoryBot.create(:impound_claim, status: status) }
   let(:status) { "pending" }
   before { ActionMailer::Base.deliveries = [] }
 
   it "doesn't send an email for pending claims" do
     expect {
-      EmailImpoundClaimJob.new.perform(impound_claim.id)
+      Email::ImpoundClaimJob.new.perform(impound_claim.id)
     }.to change(Notification, :count).by(0)
     expect(ActionMailer::Base.deliveries.count).to eq 0
   end
@@ -17,9 +17,9 @@ RSpec.describe EmailImpoundClaimJob, type: :job do
     it "sends just once" do
       Sidekiq::Job.clear_all
       expect {
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
       }.to change(Notification, :count).by(1)
       expect(AfterUserChangeJob.jobs.count).to eq 1 # To bump user so
       notification = Notification.last
@@ -40,9 +40,9 @@ RSpec.describe EmailImpoundClaimJob, type: :job do
     let(:status) { "approved" }
     it "sends just once" do
       expect {
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
       }.to change(Notification, :count).by(1)
       notification = Notification.last
       expect(impound_claim.reload.notifications.pluck(:id)).to eq([notification.id])
@@ -56,9 +56,9 @@ RSpec.describe EmailImpoundClaimJob, type: :job do
     let(:status) { "denied" }
     it "sends just once" do
       expect {
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
-        EmailImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
+        Email::ImpoundClaimJob.new.perform(impound_claim.id)
       }.to change(Notification, :count).by(1)
       notification = Notification.last
       expect(impound_claim.reload.notifications.pluck(:id)).to eq([notification.id])

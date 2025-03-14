@@ -1,12 +1,12 @@
 require "rails_helper"
 
-RSpec.describe EmailPartialRegistrationJob, type: :job do
+RSpec.describe Email::PartialRegistrationJob, type: :job do
   it "sends a partial registration email" do
     b_param = FactoryBot.create(:b_param)
     expect(b_param.creator_id).to be_present
     expect(Notification.count).to eq 0
     ActionMailer::Base.deliveries = []
-    EmailPartialRegistrationJob.new.perform(b_param.id)
+    Email::PartialRegistrationJob.new.perform(b_param.id)
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
     expect(Notification.count).to eq 1
     notification = Notification.last

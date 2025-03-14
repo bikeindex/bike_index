@@ -113,7 +113,7 @@ class Feedback < ApplicationRecord
       end
     end
     return true if self.class.no_notification_kinds.include?(kind)
-    EmailFeedbackNotificationJob.perform_async(id)
+    Email::FeedbackNotificationJob.perform_async(id)
   end
 
   def delete_request?

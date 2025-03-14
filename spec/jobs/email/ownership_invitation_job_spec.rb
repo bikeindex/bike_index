@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailOwnershipInvitationJob, type: :job do
+RSpec.describe Email::OwnershipInvitationJob, type: :job do
   let(:bike) { FactoryBot.create(:bike, :with_ownership) }
   let(:ownership) { bike.ownerships.first }
   it "sends an email" do
@@ -8,9 +8,9 @@ RSpec.describe EmailOwnershipInvitationJob, type: :job do
     expect(ownership.user).to be_blank
     ActionMailer::Base.deliveries = []
     expect {
-      EmailOwnershipInvitationJob.new.perform(ownership.id)
-      EmailOwnershipInvitationJob.new.perform(ownership.id)
-      EmailOwnershipInvitationJob.new.perform(ownership.id)
+      Email::OwnershipInvitationJob.new.perform(ownership.id)
+      Email::OwnershipInvitationJob.new.perform(ownership.id)
+      Email::OwnershipInvitationJob.new.perform(ownership.id)
     }.to change(Notification, :count).by(1)
     expect(ActionMailer::Base.deliveries.count).to eq 1
     expect(ownership.reload.notifications.count).to eq 1
@@ -28,8 +28,8 @@ RSpec.describe EmailOwnershipInvitationJob, type: :job do
       expect(ownership.reload.notifications.count).to eq 1
       ActionMailer::Base.deliveries = []
       expect {
-        EmailOwnershipInvitationJob.new.perform(ownership.id)
-        EmailOwnershipInvitationJob.new.perform(ownership.id)
+        Email::OwnershipInvitationJob.new.perform(ownership.id)
+        Email::OwnershipInvitationJob.new.perform(ownership.id)
       }.to change(Notification, :count).by(0)
       expect(ActionMailer::Base.deliveries.count).to eq 0
       expect(ownership.reload.notifications.pluck(:id)).to eq([notification.id])
@@ -40,8 +40,8 @@ RSpec.describe EmailOwnershipInvitationJob, type: :job do
         expect(ownership.reload.notifications.count).to eq 1
         ActionMailer::Base.deliveries = []
         expect {
-          EmailOwnershipInvitationJob.new.perform(ownership.id)
-          EmailOwnershipInvitationJob.new.perform(ownership.id)
+          Email::OwnershipInvitationJob.new.perform(ownership.id)
+          Email::OwnershipInvitationJob.new.perform(ownership.id)
         }.to change(Notification, :count).by(0)
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(ownership.reload.notifications.pluck(:id)).to eq([notification.id])
@@ -53,7 +53,7 @@ RSpec.describe EmailOwnershipInvitationJob, type: :job do
     it "does not send an email" do
       ActionMailer::Base.deliveries = []
       expect {
-        EmailOwnershipInvitationJob.new.perform(129291912)
+        Email::OwnershipInvitationJob.new.perform(129291912)
       }.to change(Notification, :count).by(0)
       expect(ActionMailer::Base.deliveries).to be_empty
     end
@@ -65,7 +65,7 @@ RSpec.describe EmailOwnershipInvitationJob, type: :job do
       ownership.reload
       expect(ownership.send_email).to be_truthy
       ActionMailer::Base.deliveries = []
-      EmailOwnershipInvitationJob.new.perform(ownership.id)
+      Email::OwnershipInvitationJob.new.perform(ownership.id)
       expect(ActionMailer::Base.deliveries).to be_empty
       ownership.reload
       expect(ownership.calculated_send_email).to be_falsey
@@ -80,7 +80,7 @@ RSpec.describe EmailOwnershipInvitationJob, type: :job do
       expect(ownership.calculated_send_email).to be_falsey
       expect(ownership.skip_email).to be_falsey
       ActionMailer::Base.deliveries = []
-      EmailOwnershipInvitationJob.new.perform(ownership.id)
+      Email::OwnershipInvitationJob.new.perform(ownership.id)
       expect(ActionMailer::Base.deliveries).to be_empty
       ownership.reload
       expect(ownership.reload.skip_email).to be_truthy
@@ -94,7 +94,7 @@ RSpec.describe EmailOwnershipInvitationJob, type: :job do
       ActionMailer::Base.deliveries = []
       expect(ownership.send_email).to be_truthy
       expect {
-        EmailOwnershipInvitationJob.new.perform(ownership.id)
+        Email::OwnershipInvitationJob.new.perform(ownership.id)
       }.to change(Notification, :count).by(0)
       expect(ActionMailer::Base.deliveries).to be_empty
       ownership.reload
@@ -108,7 +108,7 @@ RSpec.describe EmailOwnershipInvitationJob, type: :job do
       expect(ownership2.organization).to be_blank
       expect(ownership2.calculated_send_email).to be_truthy
       ActionMailer::Base.deliveries = []
-      EmailOwnershipInvitationJob.new.perform(ownership2.id)
+      Email::OwnershipInvitationJob.new.perform(ownership2.id)
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
   end

@@ -173,7 +173,7 @@ class ImpoundClaim < ApplicationRecord
 
   def send_triggered_notifications
     return true if skip_update
-    EmailImpoundClaimJob.perform_async(id)
+    Email::ImpoundClaimJob.perform_async(id)
   end
 
   private

@@ -1,14 +1,14 @@
 require "rails_helper"
 
-RSpec.describe EmailConfirmationJob, type: :job do
-  before { stub_const("EmailConfirmationJob::PROCESS_NEW_EMAIL_DOMAINS", true) }
+RSpec.describe Email::ConfirmationJob, type: :job do
+  before { stub_const("Email::ConfirmationJob::PROCESS_NEW_EMAIL_DOMAINS", true) }
 
   it "sends a welcome email" do
-    VCR.use_cassette("EmailConfirmationJob-default") do
+    VCR.use_cassette("Email::ConfirmationJob-default") do
       user = FactoryBot.create(:user)
       ActionMailer::Base.deliveries = []
       expect do
-        EmailConfirmationJob.new.perform(user.id)
+        Email::ConfirmationJob.new.perform(user.id)
       end.to change(Notification, :count).by 1
       expect(ActionMailer::Base.deliveries.empty?).to be_falsey
     end
@@ -23,7 +23,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
       expect(email_domain.reload.unprocessed?).to be_falsey
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
       expect do
-        EmailConfirmationJob.new.perform(user.id)
+        Email::ConfirmationJob.new.perform(user.id)
       end.to change(Notification, :count).by 1
       expect(ActionMailer::Base.deliveries.empty?).to be_falsey
     end
@@ -34,7 +34,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
         expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
         ActionMailer::Base.deliveries = []
         expect do
-          EmailConfirmationJob.new.perform(user.id)
+          Email::ConfirmationJob.new.perform(user.id)
         end.to change(Notification, :count).by 0
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         expect(User.unscoped.count).to eq 2
@@ -52,7 +52,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
         expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
         ActionMailer::Base.deliveries = []
         expect do
-          EmailConfirmationJob.new.perform(user.id)
+          Email::ConfirmationJob.new.perform(user.id)
         end.to change(Notification, :count).by 0
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         expect(User.unscoped.count).to eq 1
@@ -74,7 +74,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
       expect(user1.id).to be < user2.id
       ActionMailer::Base.deliveries = []
       expect {
-        EmailConfirmationJob.new.perform(user2.id)
+        Email::ConfirmationJob.new.perform(user2.id)
       }.to change(User, :count).by(-1)
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy
     end
@@ -83,7 +83,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
         expect(user1.id).to be < user2.id
         ActionMailer::Base.deliveries = []
         expect {
-          EmailConfirmationJob.new.perform(user1.id)
+          Email::ConfirmationJob.new.perform(user1.id)
         }.to change(User, :count).by(0)
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       end
@@ -96,7 +96,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
       it "doesn't resend" do
         ActionMailer::Base.deliveries = []
         expect {
-          EmailConfirmationJob.new.perform(user.id)
+          Email::ConfirmationJob.new.perform(user.id)
         }.to change(Notification, :count).by(0)
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       end
@@ -105,7 +105,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
         it "resends" do
           ActionMailer::Base.deliveries = []
           expect {
-            EmailConfirmationJob.new.perform(user.id)
+            Email::ConfirmationJob.new.perform(user.id)
           }.to change(Notification, :count).by(1)
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           notification2 = Notification.last
@@ -118,7 +118,7 @@ RSpec.describe EmailConfirmationJob, type: :job do
         it "resends, updates existing notification" do
           ActionMailer::Base.deliveries = []
           expect {
-            EmailConfirmationJob.new.perform(user.id)
+            Email::ConfirmationJob.new.perform(user.id)
           }.to change(Notification, :count).by(0)
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           notification.reload

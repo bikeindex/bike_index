@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailMagicLoginLinkJob, type: :job do
+RSpec.describe Email::MagicLoginLinkJob, type: :job do
   it "sends an email" do
     user = FactoryBot.build(:user)
     user.update_auth_token("magic_link_token")

@@ -7,7 +7,7 @@ class ScheduledBikePossiblyFoundNotificationJob < ScheduledJob
 
   def perform
     bikes_with_matches.each do |bike, match|
-      EmailBikePossiblyFoundNotificationJob
+      Email::BikePossiblyFoundNotificationJob
         .perform_async(bike.id, match.class.to_s, match.id)
     end
   end

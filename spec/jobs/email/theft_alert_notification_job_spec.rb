@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailTheftAlertNotificationJob, type: :job do
+RSpec.describe Email::TheftAlertNotificationJob, type: :job do
   let(:instance) { described_class.new }
 
   describe ".perform" do

@@ -28,7 +28,7 @@ class RegistrationsController < ApplicationController
     @b_param = BParam.new(permitted_params)
     @b_param.errors.add :owner_email, "required" unless @b_param.owner_email.present?
     if @b_param.errors.blank? && @b_param.save
-      EmailPartialRegistrationJob.perform_async(@b_param.id)
+      Email::PartialRegistrationJob.perform_async(@b_param.id)
     else
       @page_errors = @b_param.errors
       render action: :new

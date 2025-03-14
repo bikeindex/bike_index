@@ -144,7 +144,7 @@ class BikeCreator
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
     bike = validate_record(b_param, bike)
     return bike unless bike.present? && bike.id.present?
-    # NOTE: spaminess is recalculated in EmailOwnershipInvitationJob as a failsafe
+    # NOTE: spaminess is recalculated in Email::OwnershipInvitationJob as a failsafe
     if SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
       bike.update(likely_spam: true)
     end

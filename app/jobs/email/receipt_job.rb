@@ -12,6 +12,6 @@ class Email::ReceiptJob < ApplicationJob
     end
     return unless payment.donation?
 
-    EmailDonationJob.perform_in(1.2.hours + (rand(9..55) * 60), payment.id)
+    Email::DonationJob.perform_in(1.2.hours + (rand(9..55) * 60), payment.id)
   end
 end

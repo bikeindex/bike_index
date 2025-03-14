@@ -17,7 +17,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect {
           instance.perform(user.id, "new", user: user)
         }.to change(AfterUserCreateJob.jobs, :count).by 1
-        expect(EmailConfirmationJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
+        expect(Email::ConfirmationJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
         expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
 
@@ -27,7 +27,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
           expect {
             instance.perform(user.id, "new", user: user)
           }.to change(AfterUserCreateJob.jobs, :count).by 1
-          expect(EmailWelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
+          expect(Email::WelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
           expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
         end
       end
@@ -184,13 +184,13 @@ RSpec.describe AfterUserCreateJob, type: :job do
     let(:user) { User.new(id: 69) }
     it "enques enqueues confirmation email" do
       instance.send_welcoming_email(user)
-      expect(EmailConfirmationJob).to have_enqueued_sidekiq_job(69)
+      expect(Email::ConfirmationJob).to have_enqueued_sidekiq_job(69)
     end
     context "confirmed user" do
       it "enques welcome email" do
         allow(user).to receive(:confirmed?) { true }
         instance.send_welcoming_email(user)
-        expect(EmailWelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
+        expect(Email::WelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
       end
     end
   end

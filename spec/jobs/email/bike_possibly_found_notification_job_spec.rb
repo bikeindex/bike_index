@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailBikePossiblyFoundNotificationJob, type: :job do
+RSpec.describe Email::BikePossiblyFoundNotificationJob, type: :job do
   before { ActionMailer::Base.deliveries = [] }
 
   it "triggers an email for the given bike" do
