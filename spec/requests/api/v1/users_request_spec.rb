@@ -133,7 +133,7 @@ RSpec.describe API::V1::UsersController, type: :request do
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         expect {
           post "#{base_url}/send_request", params: serial_request
-        }.to change(EmailFeedbackNotificationJob.jobs, :size).by(0)
+        }.to change(Email::FeedbackNotificationJob.jobs, :size).by(0)
         expect(response.code).to eq("200")
         expect(bike.reload.serial_number).to eq("some new serial")
       end

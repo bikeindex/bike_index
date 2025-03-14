@@ -9,11 +9,11 @@ RSpec.describe ScheduledBikePossiblyFoundNotificationJob, type: :job do
     it "does not enqueue any notification jobs" do
       allow(Bike).to receive(:possibly_found_with_match).and_return([])
       allow(Bike).to receive(:possibly_found_externally_with_match).and_return([])
-      expect(EmailBikePossiblyFoundNotificationJob.jobs.length).to eq(0)
+      expect(Email::BikePossiblyFoundNotificationJob.jobs.length).to eq(0)
 
       described_class.new.perform
 
-      expect(EmailBikePossiblyFoundNotificationJob.jobs.length).to eq(0)
+      expect(Email::BikePossiblyFoundNotificationJob.jobs.length).to eq(0)
     end
   end
 
@@ -23,7 +23,7 @@ RSpec.describe ScheduledBikePossiblyFoundNotificationJob, type: :job do
       abandoned_bike = FactoryBot.create(:bike, serial_number: "hel1o")
       FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification", bike: abandoned_bike)
       FactoryBot.create(:external_registry_bike, serial_number: "he1l0")
-      expect(EmailBikePossiblyFoundNotificationJob.jobs.length).to eq(0)
+      expect(Email::BikePossiblyFoundNotificationJob.jobs.length).to eq(0)
       abandoned_bike.reload
       expect(abandoned_bike.parking_notifications.active.appears_abandoned_notification.any?).to be_truthy
       expect(abandoned_bike.status_abandoned?).to be_truthy
@@ -31,7 +31,7 @@ RSpec.describe ScheduledBikePossiblyFoundNotificationJob, type: :job do
 
       described_class.new.perform
 
-      expect(EmailBikePossiblyFoundNotificationJob.jobs.length).to eq(2)
+      expect(Email::BikePossiblyFoundNotificationJob.jobs.length).to eq(2)
     end
   end
 end

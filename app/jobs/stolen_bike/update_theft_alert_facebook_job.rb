@@ -19,7 +19,7 @@ class StolenBike::UpdateTheftAlertFacebookJob < ScheduledJob
     return true unless theft_alert.notify? &&
       theft_alert.notifications.theft_alert_posted.none?
     # Perform inline rather than re-querying for objects
-    EmailTheftAlertNotificationJob.new.perform(theft_alert_id, "theft_alert_posted", theft_alert)
+    Email::TheftAlertNotificationJob.new.perform(theft_alert_id, "theft_alert_posted", theft_alert)
   end
 
   def enqueue_workers

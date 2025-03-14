@@ -350,7 +350,7 @@ class User < ApplicationRecord
     return false if password_reset_just_sent?
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailResetPasswordJob.perform_async(id)
+    Email::ResetPasswordJob.perform_async(id)
     true
   end
 
@@ -359,7 +359,7 @@ class User < ApplicationRecord
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailMagicLoginLinkJob.perform_async(id)
+    Email::MagicLoginLinkJob.perform_async(id)
   end
 
   def update_last_login(ip_address)

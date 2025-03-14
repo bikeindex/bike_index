@@ -51,9 +51,9 @@ class AfterUserCreateJob < ApplicationJob
   def send_welcoming_email(user)
     # If the user is confirmed, send the welcome email, otherwise send the confirmation email
     if user.confirmed?
-      EmailWelcomeJob.perform_async(user.id)
+      Email::WelcomeJob.perform_async(user.id)
     else
-      EmailConfirmationJob.perform_in(1.second, user.id)
+      Email::ConfirmationJob.perform_in(1.second, user.id)
     end
   end
 

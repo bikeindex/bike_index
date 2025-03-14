@@ -115,7 +115,7 @@ RSpec.describe UsersController, type: :controller do
           Sidekiq::Job.clear_all
           expect {
             post :create, params: {locale: "nl", user: user_attributes}
-          }.to change(EmailConfirmationJob.jobs, :count).by 1
+          }.to change(Email::ConfirmationJob.jobs, :count).by 1
 
           user = User.order(:created_at).last
           expect(User.from_auth(cookies.signed[:auth])).to eq user
@@ -129,7 +129,7 @@ RSpec.describe UsersController, type: :controller do
 
           ActionMailer::Base.deliveries = []
           expect {
-            EmailConfirmationJob.drain
+            Email::ConfirmationJob.drain
           }.to change(ActionMailer::Base.deliveries, :count).by 1
 
           mail = ActionMailer::Base.deliveries.last
@@ -172,7 +172,7 @@ RSpec.describe UsersController, type: :controller do
             AfterUserCreateJob.drain
             bike.reload
             expect(bike.user).to eq user
-          }.to change(EmailWelcomeJob.jobs, :count)
+          }.to change(Email::WelcomeJob.jobs, :count)
         end
       end
       context "with organization_role, partner param" do
@@ -180,13 +180,13 @@ RSpec.describe UsersController, type: :controller do
         it "creates a confirmed user, log in, and send welcome, language header" do
           session[:passive_organization_id] = "0"
           request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
-          allow(EmailWelcomeJob).to receive(:perform_async)
+          allow(Email::WelcomeJob).to receive(:perform_async)
 
           post :create, params: {user: user_attributes, partner: "bikehub"}
 
           expect(response).to redirect_to("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
           user = User.find_by_email("poo@pile.com")
-          expect(EmailWelcomeJob).to have_received(:perform_async).with(user.id)
+          expect(Email::WelcomeJob).to have_received(:perform_async).with(user.id)
           expect(user.partner_sign_up).to eq "bikehub"
           expect(user.email).to eq "poo@pile.com"
 
@@ -259,7 +259,7 @@ RSpec.describe UsersController, type: :controller do
         expect {
           expect {
             post :create, params: {user: user_attributes}
-          }.to_not change(EmailWelcomeJob.jobs, :count)
+          }.to_not change(Email::WelcomeJob.jobs, :count)
         }.to_not change(User, :count)
       end
       context "partner param" do
