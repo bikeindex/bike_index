@@ -1,51 +1,75 @@
 require "rails_helper"
 
 RSpec.describe HeaderTagHelper, type: :helper do
-  before do
-    helper.extend(ControllerHelpers)
-    allow(view).to receive(:controller_name) { controller_name }
-    allow(view).to receive(:action_name) { action_name }
-    # These two methods are defined in application controller
-    allow(view).to receive(:controller_namespace) { controller_namespace }
-    allow(view).to receive(:current_organization) { nil }
-    # allow(view).to receive(:page_id) { [controller_namespace, controller_name, action_name].compact.join("_") }
-  end
-  let(:controller_namespace) { nil }
-  let(:target) do
-    {
-      page_title:,
-      page_description:,
-      page_obj:,
-      updated_at: nil,
-      organization_name: nil,
-      controller_name:,
-      controller_namespace:,
-      action_name:,
-      request_url: "...",
-      language: "en"
-    }
-  end
-  let(:page_title) { nil }
-  let(:page_description) { nil }
-
   describe "header_tags_component_options" do
+    before do
+      helper.extend(ControllerHelpers)
+      allow(view).to receive(:controller_name) { controller_name }
+      allow(view).to receive(:action_name) { action_name }
+      # These two methods are defined in application controller
+      allow(view).to receive(:controller_namespace) { controller_namespace }
+      allow(helper).to receive(:current_organization) { current_organization }
+    end
+    let(:controller_namespace) { nil }
+    let(:action_name) { "index" }
+    let(:target) do
+      {
+        page_title:,
+        page_description:,
+        page_obj:,
+        updated_at: nil,
+        organization_name: nil,
+        controller_name:,
+        controller_namespace:,
+        action_name:,
+        request_url: "http://test.host",
+        language: :en
+      }
+    end
+    let(:page_title) { nil }
+    let(:page_description) { nil }
+    let(:page_obj) { nil }
+    let(:current_organization) { nil }
+
     context "controller_name: info" do
       let(:controller_name) { "info" }
       context "action_name: about" do
         let(:action_name) { "about" }
-        let(:page_title) { "Bike Index - Bike registration that works" }
+        let(:page_title) { "About Bike Index" }
         let(:page_description) { "Why we made Bike Index and who we are" }
-        it "uses the translation" do
+        it "responds with target" do
           expect(header_tags_component_options).to eq target
         end
       end
 
       context "action_name: where" do
-        it "about the translation"
+        let(:action_name) { "where" }
+        let(:page_title) { "Bike Index partners" }
+        let(:page_description) { "Organizations that use Bike Index to search for and register bikes." }
+        it "responds with target" do
+          expect(header_tags_component_options).to eq target
+        end
+        context "with different language" do
+          it "responds with target" do
+          end
+        end
       end
     end
     context "bikes" do
-      it "renders "
+      let(:controller_name) { "bikes" }
+      let(:page_title) { "Search results" }
+      let(:page_description) { "Search for bikes that have been registered on Bike Index" }
+      it "renders" do
+        expect(header_tags_component_options).to eq target
+      end
+    end
+
+    context "organized" do
+       it "responds with target"
+    end
+
+    context "admin" do
+       it "responds with target"
     end
   end
 
