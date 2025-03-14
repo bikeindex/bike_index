@@ -429,7 +429,7 @@ class StolenRecord < ApplicationRecord
   def notify_of_promoted_alert_recovery
     return unless recovered? && theft_alerts.any?
 
-    EmailTheftAlertNotificationJob
+    Email::TheftAlertNotificationJob
       .perform_async(theft_alerts.last.id, "theft_alert_recovered")
   end
 

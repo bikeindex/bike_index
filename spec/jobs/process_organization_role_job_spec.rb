@@ -92,8 +92,8 @@ RSpec.describe ProcessOrganizationRoleJob, type: :job do
         expect(user.organization_roles).to eq([organization_role])
         expect(user.email).to eq email
         expect(user.confirmed?).to be_truthy
-        expect(EmailWelcomeJob.jobs.count).to eq 0
-        expect(EmailConfirmationJob.jobs.count).to eq 0
+        expect(Email::WelcomeJob.jobs.count).to eq 0
+        expect(Email::ConfirmationJob.jobs.count).to eq 0
         # We don't want to send users emails for organizations with passwordless users
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         # There was a bug where users weren't getting the magic link token when it was sent to them. So verify that we create the token

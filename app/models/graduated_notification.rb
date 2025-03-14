@@ -31,6 +31,8 @@
 #  index_graduated_notifications_on_user_id                  (user_id)
 #
 class GraduatedNotification < ApplicationRecord
+  include StatusHumanizable
+
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze
 
@@ -140,10 +142,6 @@ class GraduatedNotification < ApplicationRecord
 
   def message
     nil # for parity with parking_notifications
-  end
-
-  def status_humanized
-    self.class.status_humanized(status)
   end
 
   # Get it unscoped, because we really want it

@@ -26,16 +26,19 @@ RSpec.describe RemoveUnconfirmedUsersJob, type: :job do
     end
 
     context "with banned_email_domain_users" do
-      let!(:user) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "something@example.com") }
+      let!(:user) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "something@zzz.example.com") }
       let!(:user_not_domain) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "other@example.org") }
-      let!(:banned_email_domain) { FactoryBot.create(:banned_email_domain, domain: "@example.com") }
+      let!(:user_pending_domain) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "other@stuff.stuff.com") }
+      let(:creator) { FactoryBot.create(:admin) }
+      let!(:email_domain_banned) { FactoryBot.create(:email_domain, status: "banned", domain: "example.com", creator:) }
+      let!(:email_domain_pending) { FactoryBot.create(:email_domain, status: "ban_pending", domain: "stuff.com", creator:) }
 
       it "removes old unconfirmed" do
         expect do
           instance.perform
         end.to change(User.unscoped, :count).by(-1)
 
-        expect(User.unscoped.pluck(:id)).to match_array([user_not_domain.id, banned_email_domain.creator_id])
+        expect(User.unscoped.pluck(:id)).to match_array([user_not_domain.id, user_pending_domain.id, creator.id])
       end
     end
   end

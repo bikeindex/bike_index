@@ -10,6 +10,7 @@
 #  paid_at                :datetime
 #  payment_method         :integer          default("stripe")
 #  referral_source        :text
+#  stripe_status          :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  invoice_id             :integer
@@ -147,12 +148,14 @@ class Payment < ApplicationRecord
     self.referral_source = self.class.normalize_referral_source(referral_source)
   end
 
-  def update_from_stripe_checkout_session!(stripe_obj = nil)
+  # NOTE: stripe_obj is a stripe checkout session
+  def update_from_stripe!(stripe_obj = nil)
     stripe_obj ||= stripe_checkout_session
 
     self.amount_cents = stripe_obj.amount_total
     # There isn't a paid_at timestamp in the stripe object
     self.paid_at = Time.current if paid_at.blank? && stripe_obj.payment_status == "paid"
+    self.stripe_status = stripe_obj.payment_status # TODO - update this
     self.email ||= stripe_email(stripe_obj) if user.blank?
     save!
 
@@ -161,6 +164,33 @@ class Payment < ApplicationRecord
     end
     self
   end
+
+  def can_assign_to_membership?
+    return false if stripe_subscription? || theft_alert?
+
+    user_id.present? && membership_id.blank? && invoice_id.blank? && organization_id.blank?
+  end
+
+  def can_assign_to_invoice?
+    return false if stripe_subscription? || theft_alert? || !paid?
+
+    membership_id.blank?
+  end
+
+  def stripe_email(stripe_obj = nil)
+    stripe_obj ||= stripe_checkout_session
+    return nil unless stripe_obj.present?
+    return stripe_obj.customer_email if stripe_obj.customer_email.present?
+    if defined?(stripe_obj.customer_details) && stripe_obj.customer_details&.email.present?
+      return stripe_obj.customer_details.email
+    end
+
+    # Sometimes email isn't in the stripe_checkout_session, and needs to be retrieved
+    stripe_customer = Stripe::Customer.retrieve(stripe_obj.customer) if stripe_obj.customer.present?
+    stripe_customer&.email
+  end
+
+  private
 
   def email_or_organization_or_stripe_present
     return if email.present? || organization_id.present? || stripe_id.present?
@@ -172,35 +202,11 @@ class Payment < ApplicationRecord
     return if skip_update
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
     if stripe? && paid? && email.present? && !theft_alert?
-      EmailReceiptJob.perform_async(id)
+      Email::ReceiptJob.perform_async(id)
     end
     return true unless invoice.present?
     invoice.update(updated_at: Time.current) # Manually trigger invoice update
   end
-
-  def can_assign_to_membership?
-    return false if stripe_subscription? || theft_alert?
-
-    user_id.present? && membership_id.blank? && invoice_id.blank? && organization_id.blank?
-  end
-
-  def can_assign_to_invoice?
-    return false if stripe_subscription? || theft_alert?
-
-    membership_id.blank?
-  end
-
-  def stripe_email(stripe_obj = nil)
-    stripe_obj ||= stripe_checkout_session
-    return nil unless stripe_obj.present?
-    return stripe_obj.customer_email if stripe_obj.customer_email.present?
-
-    # Sometimes email isn't in the stripe_checkout_session, and needs to be retrieved
-    stripe_customer = Stripe::Customer.retrieve(stripe_obj.customer) if stripe_obj.customer.present?
-    stripe_customer&.email
-  end
-
-  private
 
   def create_stripe_checkout_session(item_name: nil)
     Stripe::Checkout::Session.create(stripe_checkout_session_hash(item_name:))

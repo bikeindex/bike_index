@@ -1,8 +1,6 @@
-# [![BIKE INDEX][bike-index-logo]][bike-index] [![CircleCI][circleci-badge]][circleci] [![View performance data on Skylight][skylight-badge]][skylight]
+# [![BIKE INDEX][bike-index-logo]][bike-index] [![View performance data on Skylight][skylight-badge]][skylight]
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/bike_index.png?raw=true
-[circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/main
-[circleci-badge]: https://circleci.com/gh/bikeindex/bike_index/tree/main.svg?style=svg
 [skylight]: https://oss.skylight.io/app/applications/j93iQ4K2pxCP
 [skylight-badge]: https://badges.skylight.io/status/j93iQ4K2pxCP.svg
 [bike-index]: https://www.bikeindex.org
@@ -73,13 +71,13 @@ We use [RSpec](https://github.com/rspec/rspec) and
   CREATE EXTENSION fuzzystrmatch;
   ```
 
-We use [`parallel_tests`](https://github.com/grosser/parallel_tests/) to run the test suite in parallel. By default, this will spawn one process per CPU in your computer.
+We use [`turbo_tests`](https://github.com/serpapi/turbo_tests) to run the test suite in parallel. By default, this will spawn one process per CPU in your computer.
 
-- Run all the tests in parallel with `bin/rake parallel:spec`
+- Run all the tests in parallel with `bundle exec turbo_tests`
 
 - Run `bin/rake parallel:prepare` to synchronize the test db schema after migrations (rather than `db:test:prepare`).
 
-- Run specific files or test directories with `bin/parallel_rspec <FILES_OR_FOLDERS>`
+- Run specific files or test directories with `bundle exec turbo_tests <FILES_OR_FOLDERS>`
 
 - Run Guard with parallelism `bin/guard -G Guardfile_parallel`
 

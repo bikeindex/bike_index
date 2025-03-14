@@ -11,7 +11,7 @@ class Bikes::RecoveryController < Bikes::BaseController
 
   def update
     if @stolen_record.add_recovery_information(permitted_params.to_h)
-      EmailRecoveredFromLinkJob.perform_async(@stolen_record.id)
+      Email::RecoveredFromLinkJob.perform_async(@stolen_record.id)
       flash[:success] = translation(:bike_recovered)
     else
       session[:recovery_link_token] = params[:token]

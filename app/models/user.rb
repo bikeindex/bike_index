@@ -63,7 +63,6 @@
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
 #
 class User < ApplicationRecord
-  include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable
   include Geocodeable
 
@@ -105,6 +104,7 @@ class User < ApplicationRecord
   has_many :user_emails, dependent: :destroy
   has_many :user_phones
   has_many :user_alerts
+  has_many :user_likely_spam_reasons, dependent: :destroy
   has_many :superuser_abilities
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
@@ -121,7 +121,8 @@ class User < ApplicationRecord
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
   scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
-  scope :ambassadors, -> { where(id: OrganizationRole.ambassador_organizations.select(:user_id)) }
+  scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
+  scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
   scope :member, -> { includes(:memberships).merge(Membership.active) }
 
@@ -345,10 +346,10 @@ class User < ApplicationRecord
 
   def send_password_reset_email
     # If the auth token was just created, don't create a new one, it's too error prone
-    return false if auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
+    return false if password_reset_just_sent?
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailResetPasswordJob.perform_async(id)
+    Email::ResetPasswordJob.perform_async(id)
     true
   end
 
@@ -357,7 +358,7 @@ class User < ApplicationRecord
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailMagicLoginLinkJob.perform_async(id)
+    Email::MagicLoginLinkJob.perform_async(id)
   end
 
   def update_last_login(ip_address)
@@ -470,6 +471,10 @@ class User < ApplicationRecord
     user_phones.confirmed.limit(1).any?
   end
 
+  def likely_spam?
+    user_likely_spam_reasons.any?
+  end
+
   def set_calculated_attributes
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
@@ -535,6 +540,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def password_reset_just_sent?
+    auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
+  end
 
   def claimed_organization_roles_for(organization_id)
     OrganizationRole.claimed.where(user_id: id, organization_id: organization_id)

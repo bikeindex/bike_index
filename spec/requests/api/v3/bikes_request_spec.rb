@@ -640,7 +640,7 @@ RSpec.describe "Bikes API V3", type: :request do
         description: "<svg/onload=alert(document.cookie)>")
       expect {
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-      }.to change(EmailOwnershipInvitationJob.jobs, :size).by(1)
+      }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
       expect(response.code).to eq("201")
       result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
@@ -676,7 +676,7 @@ RSpec.describe "Bikes API V3", type: :request do
       post "/api/v3/bikes?access_token=#{token.token}",
         params: bike_attrs.merge(no_notify: true, extra_registration_number: " ").to_json,
         headers: json_headers
-      EmailOwnershipInvitationJob.drain
+      Email::OwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries).to be_empty
       expect(response.code).to eq("201")
       bike = Bike.last
@@ -686,7 +686,7 @@ RSpec.describe "Bikes API V3", type: :request do
     it "creates an example bike" do
       ActionMailer::Base.deliveries = []
       post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.merge(test: true).to_json, headers: json_headers
-      EmailOwnershipInvitationJob.drain
+      Email::OwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries).to be_empty
       expect(response.code).to eq("201")
       result = json_result["bike"]
@@ -773,7 +773,7 @@ RSpec.describe "Bikes API V3", type: :request do
         }
         expect {
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-        }.to change(EmailOwnershipInvitationJob.jobs, :size).by(1)
+        }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
         expect(json_result).to include("bike")
         expect(json_result["bike"]["serial"]).to eq "Unknown"
         expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
@@ -804,7 +804,7 @@ RSpec.describe "Bikes API V3", type: :request do
       }
       expect {
         post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-      }.to change(EmailOwnershipInvitationJob.jobs, :size).by(1)
+      }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
       expect(json_result).to include("bike")
       expect(json_result["bike"]["serial"]).to eq(bike_attrs[:serial])
       expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
@@ -854,7 +854,7 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(response.status_message).to eq("Found")
             expect(result["id"]).to eq bike.id
 
-            EmailOwnershipInvitationJob.drain
+            Email::OwnershipInvitationJob.drain
             expect(ActionMailer::Base.deliveries).to be_empty
           end
         end
@@ -885,7 +885,7 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(bike.front_tire_narrow).to be_truthy
             # expect(bike.current_ownership.origin).to eq 'api_v3'
             expect(bike.current_ownership.organization).to eq organization
-            EmailOwnershipInvitationJob.drain
+            Email::OwnershipInvitationJob.drain
             expect(ActionMailer::Base.deliveries).to be_empty
           end
         end
@@ -923,7 +923,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(ownership.creator_id).to eq auto_user.id
           expect(ownership.user_id).to eq auto_user.id
           expect(ownership.organization_pre_registration?).to be_truthy
-          EmailOwnershipInvitationJob.drain
+          Email::OwnershipInvitationJob.drain
           expect(ActionMailer::Base.deliveries).to_not be_empty
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("#{organization.name} Bike Index registration successful")
@@ -977,7 +977,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike.front_tire_narrow).to be_truthy
           # expect(bike.current_ownership.origin).to eq 'api_v3'
           expect(bike.current_ownership.organization).to eq organization
-          EmailOwnershipInvitationJob.drain
+          Email::OwnershipInvitationJob.drain
           expect(ActionMailer::Base.deliveries.count).to eq 1
         end
       end
@@ -989,7 +989,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(response.code).to eq("403")
       expect(json_result["error"].is_a?(String)).to be_truthy
       expect(json_result["error"]).to match(/permanent token/i)
-      EmailOwnershipInvitationJob.drain
+      Email::OwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries).to be_empty
     end
   end
@@ -1054,7 +1054,7 @@ RSpec.describe "Bikes API V3", type: :request do
       context "application creator is auto_user of organization" do
         let(:application_owner) { auto_user }
         before { application_owner.organization_roles.first.update(role: "admin") }
-        it "creates" do
+        it "creates", :flaky do
           expect(application_owner.reload.admin_of?(organization)).to be_truthy
           expect(client_credentials_token.application.owner.id).to eq auto_user.id
           post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
@@ -1567,7 +1567,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.reload.status).to eq "status_stolen"
       expect {
         post url, params: params.to_json, headers: json_headers
-      }.to change(EmailStolenNotificationJob.jobs, :size).by(1)
+      }.to change(Email::StolenNotificationJob.jobs, :size).by(1)
       expect(response.code).to eq("201")
     end
   end

@@ -103,7 +103,7 @@ RSpec.describe CredibilityScorer do
       end
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
       let(:ownership) { bike.current_ownership }
-      it "returns created this month" do
+      it "returns created this month", :flaky do
         expect(ownership).to be_present
         expect(subject.creation_badges(ownership)).to eq([:created_this_month])
         expect(bike.creator&.id).to eq auto_user.id

@@ -111,4 +111,41 @@ RSpec.describe Membership, type: :model do
       end
     end
   end
+
+  describe "current_stripe_subscription" do
+    let(:membership) { FactoryBot.create(:membership, creator: nil) }
+    let!(:stripe_subscription) { FactoryBot.create(:stripe_subscription_active, membership:) }
+    it "is the active subscription" do
+      expect(membership.reload.current_stripe_subscription&.id).to eq stripe_subscription.id
+      expect(membership.current_stripe_subscription.active?).to be_truthy
+      expect(membership.stripe_id).to eq stripe_subscription.stripe_id
+      expect(membership.stripe_managed?).to be_truthy
+      # If there are multiple active subscriptions, return the first
+      FactoryBot.create(:stripe_subscription_active, membership:)
+
+      expect(membership.reload.current_stripe_subscription&.id).to eq stripe_subscription.id
+      expect(membership.stripe_subscriptions.count).to eq 2
+    end
+
+    context "inactive subscription" do
+      let!(:stripe_subscription) { FactoryBot.create(:stripe_subscription, membership:) }
+      it "is the subscription" do
+        expect(membership.reload.current_stripe_subscription&.id).to eq stripe_subscription.id
+        expect(membership.current_stripe_subscription.active?).to be_falsey
+        expect(membership.stripe_id).to eq stripe_subscription.stripe_id
+
+        # If there are multiple inactive stripe_subscriptions, use the last one
+        stripe_subscription_2 = FactoryBot.create(:stripe_subscription, membership:)
+        membership = Membership.find stripe_subscription.membership_id # unmemoize variable
+        expect(membership.current_stripe_subscription&.id).to eq stripe_subscription_2.id
+
+        # return the active subscription if there is one
+        # (update the first one to verify that ID ordering doesn't effect it)
+        stripe_subscription.update(stripe_status: "active")
+        membership = Membership.find stripe_subscription_2.membership_id # unmemoize variable
+        expect(membership.reload.current_stripe_subscription&.id).to eq stripe_subscription.id
+        expect(membership.stripe_subscriptions.count).to eq 2
+      end
+    end
+  end
 end

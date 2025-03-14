@@ -32,11 +32,18 @@ class StripePrice < ApplicationRecord
   validates :amount_cents, presence: true
   validates :interval, presence: true
 
+  scope :active, -> { where(active: true) }
+  scope :inactive, -> { where(active: false) }
+
   def self.interval_default
     "monthly"
   end
 
   def test?
     !live?
+  end
+
+  def inactive?
+    !active?
   end
 end

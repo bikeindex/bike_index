@@ -35,19 +35,31 @@ class Admin::MembershipsController < Admin::BaseController
 
   def show
     @payments = @membership.payments
+    @stripe_subscriptions = @membership.stripe_subscriptions
+  end
+
+  def edit
+    redirect_to admin_membership_path
   end
 
   def update
+    if InputNormalizer.boolean(params[:update_from_stripe])
+      if @membership.update_from_stripe!
+        flash[:success] = "Updated membership from Stripe successfully"
+      end
+      redirect_back(fallback_location: admin_membership_url(@membership)) && return
+    end
+
     if @membership.stripe_managed?
       flash[:error] = "Stripe subscriptions must be edited on stripe"
-      redirect_back(fallback_location: admin_memberships_url) && return
+      redirect_back(fallback_location: admin_membership_url(@membership)) && return
     end
 
     if @membership.update(permitted_update_parameters)
       flash[:success] = "Membership Saved!"
       redirect_to admin_membership_url(@membership)
     else
-      render action: :edit
+      render action: :show
     end
   end
 
@@ -69,6 +81,10 @@ class Admin::MembershipsController < Admin::BaseController
 
   def sortable_columns
     %w[created_at start_at end_at updated_at level user_id].freeze
+  end
+
+  def earliest_period_date
+    Time.at(1738389600) # 2025-02-1
   end
 
   def permitted_create_parameters

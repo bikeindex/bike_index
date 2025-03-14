@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [ -n "$1" ]; then
+  export TRANSLATION_IO_API_KEY="$1"
+fi
+
 set -e
 
 CYAN="\033[0;36m"

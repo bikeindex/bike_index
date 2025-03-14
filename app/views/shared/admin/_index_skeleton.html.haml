@@ -4,6 +4,7 @@
 - skip_charting ||= false
 - render_sortable ||= true
 
+- admin_search_form ||= ""
 - table_view ||= render(partial: "table", locals: {collection:, render_sortable:})
 
 -# time_range_column is only used for graphing
@@ -30,6 +31,9 @@
 
 .mt-2.mb-4
   = render partial: "/shared/period_select"
+
+- if admin_search_form.present?
+  = admin_search_form
 
 = render partial: "/shared/admin/pagination", locals: {collection:, viewing:}
 

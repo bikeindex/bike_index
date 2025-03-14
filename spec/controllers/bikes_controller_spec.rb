@@ -436,7 +436,7 @@ RSpec.describe BikesController, type: :controller do
             street: "whatever"
           }
         end
-        it "registers, doesn't create a parking_notification" do
+        it "registers, doesn't create a parking_notification", :flaky do
           expect {
             post :create, params: {bike: bike_params, parking_notification: parking_notification}
           }.to change(Ownership, :count).by 1

@@ -9,6 +9,8 @@ http_interactions:
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_DnIf17TEjZqmkn","request_duration_ms":0}}'
       Stripe-Version:
       - 2025-01-27.acacia
       Accept-Encoding:
@@ -23,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sun, 02 Feb 2025 18:31:59 GMT
+      - Fri, 07 Mar 2025 23:05:27 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2230'
+      - '2293'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -45,8 +47,8 @@ http_interactions:
       - no-cache, no-store
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
-        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; upgrade-insecure-requests;
-        report-uri https://q.stripe.com/csp-violation?q=IQkklOI2EdbPM2y6AnSaVuT6_fRrCepIuGGuky-roxkok6XNoxgOuOI7FNjX8GkRahUqHf9-n_hg8zel
+        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=8H-tPleMFlSkfpVfpeqeXBgeCMMIoaoVdepwX7H3VkvcLxXrfiudXZbi9ej1C0eLLTyGcX3jnkLBFtR9
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop"
       Report-To:
@@ -54,7 +56,7 @@ http_interactions:
       Reporting-Endpoints:
       - coop="https://q.stripe.com/coop-report"
       Request-Id:
-      - req_2zje8LfpN2gcj7
+      - req_VcJvSkZNGK3Bgy
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -87,6 +89,9 @@ http_interactions:
           "cancel_url": "http://localhost:3001/payments/new",
           "client_reference_id": null,
           "client_secret": null,
+          "collected_information": {
+            "shipping_details": null
+          },
           "consent": null,
           "consent_collection": null,
           "created": 1625248467,
@@ -159,7 +164,7 @@ http_interactions:
           "ui_mode": "hosted",
           "url": null
         }
-  recorded_at: Sun, 02 Feb 2025 18:31:59 GMT
+  recorded_at: Fri, 07 Mar 2025 23:05:27 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/customers/cus_JmPqQDidyY7LDB
@@ -170,7 +175,7 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_2zje8LfpN2gcj7","request_duration_ms":536}}'
+      - '{"last_request_metrics":{"request_id":"req_VcJvSkZNGK3Bgy","request_duration_ms":314}}'
       Stripe-Version:
       - 2025-01-27.acacia
       Accept-Encoding:
@@ -185,7 +190,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sun, 02 Feb 2025 18:32:00 GMT
+      - Fri, 07 Mar 2025 23:05:27 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -207,8 +212,8 @@ http_interactions:
       - no-cache, no-store
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
-        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; upgrade-insecure-requests;
-        report-uri https://q.stripe.com/csp-violation?q=JF20kzjnC6OfVpMM8733X2_t-8rdEeqkmDQHC1EeqHOdkWxCuBmnxjXgXfeuWfAqi2bil5PECQUMIfKu
+        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=8H-tPleMFlSkfpVfpeqeXBgeCMMIoaoVdepwX7H3VkvcLxXrfiudXZbi9ej1C0eLLTyGcX3jnkLBFtR9
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop"
       Report-To:
@@ -216,7 +221,7 @@ http_interactions:
       Reporting-Endpoints:
       - coop="https://q.stripe.com/coop-report"
       Request-Id:
-      - req_H3klIy3US8LbWp
+      - req_bU2DQdKYkbUa7Y
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -268,5 +273,5 @@ http_interactions:
           "tax_exempt": "none",
           "test_clock": null
         }
-  recorded_at: Sun, 02 Feb 2025 18:32:00 GMT
+  recorded_at: Fri, 07 Mar 2025 23:05:27 GMT
 recorded_with: VCR 6.3.1

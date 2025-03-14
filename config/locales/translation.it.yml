@@ -3361,7 +3361,6 @@ it:
     users_new:
     welcome_index:
   meta_titles:
-    about:
     bikes_index:
     bikes_new:
     bikes_new_stolen:
@@ -3372,7 +3371,6 @@ it:
     info_about:
     info_serials:
     info_spokecard:
-    info_stolen_bikes:
     info_where:
     landing_pages_ambassadors_current:
     landing_pages_ambassadors_how_to:
@@ -3386,17 +3384,13 @@ it:
     landing_pages_for_law_enforcement:
     landing_pages_for_schools:
     landing_pages_show:
-    links:
     manufacturers_index:
     news_index:
     payments_create:
     payments_new:
     sessions_create:
     sessions_new:
-    stolen_howworks:
     stolen_index:
-    stolen_merging:
-    tech:
     users_accept_terms:
     users_accept_vendor_terms:
     users_confirm:
@@ -3405,6 +3399,7 @@ it:
     users_request_password_reset:
     welcome_goodbye:
     welcome_index:
+    my_accounts_show:
   money:
     currencies:
       en: USD

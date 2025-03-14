@@ -160,6 +160,14 @@ class BikeVersion < ApplicationRecord
     nil
   end
 
+  def current_impound_record
+    nil
+  end
+
+  def current_stolen_record
+    nil
+  end
+
   def end_at_shown
     end_at.present?
   end

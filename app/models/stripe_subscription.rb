@@ -4,6 +4,7 @@
 #
 #  id                     :bigint           not null, primary key
 #  end_at                 :datetime
+#  referral_source        :text
 #  start_at               :datetime
 #  stripe_status          :string
 #  created_at             :datetime         not null
@@ -38,9 +39,9 @@ class StripeSubscription < ApplicationRecord
   delegate :membership_level, :currency_enum, :interval, :test?, to: :stripe_price, allow_nil: true
 
   class << self
-    def create_for(stripe_price:, user:)
+    def create_for(stripe_price:, user:, referral_source: nil)
       # TODO: check if one exists first
-      stripe_subscription = create(stripe_price:, user:)
+      stripe_subscription = create(stripe_price:, user:, referral_source:)
       stripe_subscription.fetch_stripe_checkout_session_url # triggers creating the stripe_checkout_session
       stripe_subscription
     end
@@ -53,11 +54,11 @@ class StripeSubscription < ApplicationRecord
       end
       stripe_subscription ||= new(stripe_id: stripe_subscription_obj.id)
 
-      stripe_subscription.update_from_stripe_subscription!(stripe_subscription_obj)
+      stripe_subscription.update_from_stripe!(stripe_subscription_obj, skip_membership_update: true)
       if stripe_checkout_session.present?
         stripe_subscription.find_or_create_payment(stripe_checkout_session)
       end
-      stripe_subscription.update_membership! if stripe_subscription.user_id.present?
+      stripe_subscription.update_membership!
 
       stripe_subscription
     end
@@ -86,7 +87,7 @@ class StripeSubscription < ApplicationRecord
     membership
   end
 
-  def update_from_stripe_subscription!(stripe_obj = nil)
+  def update_from_stripe!(stripe_obj = nil, skip_membership_update: false)
     stripe_obj ||= fetch_stripe_subscription_obj
     raise "Unable to find subscription" unless stripe_obj.present?
 
@@ -103,6 +104,8 @@ class StripeSubscription < ApplicationRecord
     end_at_t = stripe_obj.ended_at || stripe_obj.cancel_at
     self.end_at = Time.at(end_at_t) if end_at_t.present?
     save!
+    update_membership! unless skip_membership_update
+    self
   end
 
   def email
@@ -126,11 +129,11 @@ class StripeSubscription < ApplicationRecord
     @stripe_checkout_session_url = payment.stripe_checkout_session.url
   end
 
-  def find_or_create_payment(stripe_checkout_session)
+  def find_or_create_payment(stripe_checkout_session, referral_source: nil)
     payment = payments.find_by(stripe_id: stripe_checkout_session.id) ||
-      payments.build(payment_attrs.merge(stripe_id: stripe_checkout_session.id))
+      payments.build(payment_attrs.merge(stripe_id: stripe_checkout_session.id, referral_source:))
 
-    payment.update_from_stripe_checkout_session!(stripe_checkout_session)
+    payment.update_from_stripe!(stripe_checkout_session)
     update(user_id: payment.user_id) if user_id.blank? && payment.user_id.present?
 
     payment
@@ -146,7 +149,8 @@ class StripeSubscription < ApplicationRecord
   private
 
   def payment_attrs
-    {user_id:, payment_method: "stripe", currency_enum:, amount_cents: stripe_price&.amount_cents}
+    {payment_method: "stripe", amount_cents: stripe_price&.amount_cents, currency_enum:, user_id:,
+     referral_source:}
   end
 
   def fetch_stripe_subscription_obj

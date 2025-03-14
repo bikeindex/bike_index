@@ -19,6 +19,7 @@
 #
 class Membership < ApplicationRecord
   include ActivePeriodable
+  include StatusHumanizable
 
   LEVEL_ENUM = {basic: 0, plus: 1, patron: 2}
   STATUS_ENUM = {pending: 0, active: 1, ended: 2}
@@ -27,20 +28,19 @@ class Membership < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
   has_many :stripe_subscriptions
-  has_one :active_stripe_subscription, -> { active }, class_name: "StripeSubscription"
   has_many :payments
 
   enum :level, LEVEL_ENUM
   enum :status, STATUS_ENUM
 
-  validate :no_active_stripe_subscription_admin_managed
+  validate :no_current_stripe_subscription_admin_managed
   before_validation :set_calculated_attributes
 
   scope :admin_managed, -> { where.not(creator_id: nil) }
   scope :stripe_managed, -> { where(creator_id: nil) }
 
   delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
-    to: :active_stripe_subscription, allow_nil: true
+    to: :current_stripe_subscription, allow_nil: true
 
   attr_accessor :user_email, :set_interval
 
@@ -49,21 +49,20 @@ class Membership < ApplicationRecord
       str&.humanize
     end
 
-    def status_display(str)
-      str&.humanize
-    end
-
     def levels_ordered
       levels.keys.map { level_humanized(_1) }
     end
   end
 
-  def level_humanized
-    self.class.level_humanized(level)
+  def current_stripe_subscription
+    return @current_stripe_subscription if defined?(@current_stripe_subscription)
+
+    subscriptions = stripe_subscriptions.order(:id)
+    @current_stripe_subscription = subscriptions.active.first || subscriptions.last
   end
 
-  def status_display
-    self.class.status_display(status)
+  def level_humanized
+    self.class.level_humanized(level)
   end
 
   def admin_managed?
@@ -72,6 +71,18 @@ class Membership < ApplicationRecord
 
   def stripe_managed?
     !admin_managed?
+  end
+
+  def update_from_stripe!
+    unless stripe_managed? && current_stripe_subscription.present?
+      raise "Must have a current_stripe_subscription to be able to update from Stripe!"
+    end
+
+    current_stripe_subscription.update_from_stripe!
+  end
+
+  def referral_source
+    current_stripe_subscription&.referral_source || payments.order(:id).first&.referral_source
   end
 
   def set_calculated_attributes
@@ -84,7 +95,7 @@ class Membership < ApplicationRecord
   end
 
   def interval
-    active_stripe_subscription&.interval
+    current_stripe_subscription&.interval
   end
 
   private
@@ -99,7 +110,7 @@ class Membership < ApplicationRecord
     end
   end
 
-  def no_active_stripe_subscription_admin_managed
+  def no_current_stripe_subscription_admin_managed
     return if stripe_managed? || period_inactive? || user.blank?
     active_membership_id = user.memberships.active.order(:id).limit(1).pluck(:id).first
     return if [id, nil].include?(active_membership_id)

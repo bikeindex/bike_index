@@ -7,7 +7,7 @@ class Admin::CustomerContactsController < Admin::BaseController
     @customer_contact = CustomerContact.new(permitted_parameters)
     if @customer_contact.save
       flash[:success] = "Email sent successfully!"
-      EmailAdminContactStolenJob.perform_async(@customer_contact.id)
+      Email::AdminContactStolenJob.perform_async(@customer_contact.id)
     else
       flash[:error] = "Email send error!\n#{@customer_contact.errors.full_messages.to_sentence}"
     end

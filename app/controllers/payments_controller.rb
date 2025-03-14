@@ -14,7 +14,7 @@ class PaymentsController < ApplicationController
     end
 
     @payment&.user_id ||= current_user&.id # Stupid, only happens in testing, but whateves
-    @payment&.update_from_stripe_checkout_session!
+    @payment&.update_from_stripe!
   end
 
   def create

@@ -49,7 +49,7 @@ RSpec.describe Payment, type: :model do
       it "enqueues an email job, associates the user" do
         expect {
           payment
-        }.to change(EmailReceiptJob.jobs, :size).by(1)
+        }.to change(Email::ReceiptJob.jobs, :size).by(1)
         payment.reload
         expect(payment.id).to be_present
         expect(payment.user_id).to eq user.id
@@ -60,7 +60,7 @@ RSpec.describe Payment, type: :model do
         it "does not send an extra email" do
           expect {
             payment
-          }.to change(EmailReceiptJob.jobs, :size).by 0
+          }.to change(Email::ReceiptJob.jobs, :size).by 0
           payment.reload
           expect(payment.id).to be_present
           expect(payment.user_id).to eq user.id
@@ -73,7 +73,7 @@ RSpec.describe Payment, type: :model do
       it "does not enqueue an email" do
         expect {
           payment # it is created here
-        }.to_not change(EmailReceiptJob.jobs, :size)
+        }.to_not change(Email::ReceiptJob.jobs, :size)
         expect(payment.valid?).to be_truthy
         payment.reload
         expect(payment.id).to be_present
@@ -153,6 +153,16 @@ RSpec.describe Payment, type: :model do
     end
   end
 
+  describe "stripe_email" do
+    let(:payment) { Payment.new(stripe_id: "cs_test_a1N3sSIlrziLdhZ8Kj2uVhqlMnfMe7KN2W1AsGicX8pEnBL2uuRAPnmkg6") }
+
+    it "returns the stripe email" do
+      VCR.use_cassette("Payment-stripe_email", match_requests_on: [:method]) do
+        expect(payment.stripe_email).to eq "example@example.com"
+      end
+    end
+  end
+
   describe "after_commit" do
     let(:user) { FactoryBot.create(:user) }
     let(:payment) { FactoryBot.create(:payment, kind: "donation", user: user) }
@@ -170,7 +180,7 @@ RSpec.describe Payment, type: :model do
     end
   end
 
-  describe "update_from_stripe_checkout_session" do
+  describe "update_from_stripe!" do
     let(:payment) { Payment.create(stripe_id: "cs_test_a1CtKMVSPmXNJnR683KqoOTff69gPvcdhJA545USuUfYVFwmykgV6KWsQp") }
     let(:target_attrs) do
       {
@@ -184,7 +194,7 @@ RSpec.describe Payment, type: :model do
     end
     it "updates and assigns" do
       VCR.use_cassette("Payment-update_from_stripe_checkout_session", match_requests_on: [:method]) do
-        payment.update_from_stripe_checkout_session!
+        payment.update_from_stripe!
       end
       expect(payment.reload).to match_hash_indifferently target_attrs
       expect(payment.paid_at).to be_present

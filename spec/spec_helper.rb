@@ -1,6 +1,9 @@
 RSpec.configure do |config|
-  # Use color in STDOUT
-  config.color = true
+  # Use the GitHub Annotations formatter for CI
+  if ENV["GITHUB_ACTIONS"] == "true"
+    require "rspec/github"
+    config.add_formatter RSpec::Github::Formatter
+  end
 
   # Use color not only in STDOUT but also in pagers and files
   config.tty = true

@@ -4116,7 +4116,6 @@ nl:
     welcome_index: 'Het beste fietsregister: eenvoudig, veilig en gratis.'
     my_accounts_show: Uw fietsen op Bike Index
   meta_titles:
-    about: FAQ
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
     bikes_new_stolen: Registreer een gestolen fiets
@@ -4127,7 +4126,6 @@ nl:
     info_about: Bike Index - de fietsregistratie die werkt
     info_serials: Framenummers van de fiets
     info_spokecard: Gesproken kaarten - Bike Index
-    info_stolen_bikes: Reageren op diefstal
     info_where: Bike Index-partners
     landing_pages_ambassadors_current: Bike Index Ambassadors
     landing_pages_ambassadors_how_to: Word een ambassadeur van de fietsindex
@@ -4142,17 +4140,13 @@ nl:
     landing_pages_for_law_enforcement: Fietsindex voor wetshandhaving
     landing_pages_for_schools: Fietsindex voor scholen
     landing_pages_show: "%{organization} Fietsregistratie"
-    links: Links
     manufacturers_index: Fietsfabrikanten
     news_index: Bike Index nieuws
     payments_create: Bedankt voor je steun!
     payments_new: Steun de Index!
     sessions_create: Log in
     sessions_new: Log in
-    stolen_howworks: Hoe het werkt
     stolen_index: Fietsregister
-    stolen_merging: Gestolen fietsregister
-    tech: Technologie voor het bestrijden van fietsdiefstal
     users_accept_terms: Gebruiksvoorwaarden - Bike Index
     users_accept_vendor_terms: Organisatievoorwaarden - Bike Index
     users_confirm: Bevestig uw e-mail - Fietsindex
@@ -4161,6 +4155,7 @@ nl:
     users_request_password_reset: Wachtwoord opnieuw instellen - Fietsindex
     welcome_goodbye: Uitgelogd
     welcome_index: Bike Index - Fietsregistratie die werkt
+    my_accounts_show: Jij op Bike Index
   organized:
     ambassador_dashboards:
       getting_started:

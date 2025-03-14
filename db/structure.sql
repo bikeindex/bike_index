@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -326,39 +325,6 @@ CREATE SEQUENCE public.b_params_id_seq
 --
 
 ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
-
-
---
--- Name: banned_email_domains; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.banned_email_domains (
-    id bigint NOT NULL,
-    domain character varying,
-    creator_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    deleted_at timestamp(6) without time zone
-);
-
-
---
--- Name: banned_email_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.banned_email_domains_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: banned_email_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.banned_email_domains_id_seq OWNED BY public.banned_email_domains.id;
 
 
 --
@@ -1080,6 +1046,43 @@ CREATE SEQUENCE public.duplicate_bike_groups_id_seq
 --
 
 ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bike_groups.id;
+
+
+--
+-- Name: email_domains; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_domains (
+    id bigint NOT NULL,
+    domain character varying,
+    creator_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone,
+    status integer DEFAULT 0,
+    user_count integer,
+    status_changed_at timestamp(6) without time zone,
+    data jsonb
+);
+
+
+--
+-- Name: email_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.email_domains_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: email_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.email_domains_id_seq OWNED BY public.email_domains.id;
 
 
 --
@@ -2801,7 +2804,8 @@ CREATE TABLE public.payments (
     referral_source text,
     currency_enum integer,
     membership_id bigint,
-    stripe_subscription_id bigint
+    stripe_subscription_id bigint,
+    stripe_status character varying
 );
 
 
@@ -3254,7 +3258,8 @@ CREATE TABLE public.stripe_subscriptions (
     start_at timestamp(6) without time zone,
     stripe_status character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    referral_source text
 );
 
 
@@ -3602,6 +3607,38 @@ ALTER SEQUENCE public.user_emails_id_seq OWNED BY public.user_emails.id;
 
 
 --
+-- Name: user_likely_spam_reasons; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_likely_spam_reasons (
+    id bigint NOT NULL,
+    user_id bigint,
+    reason integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_likely_spam_reasons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_likely_spam_reasons_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_likely_spam_reasons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_likely_spam_reasons_id_seq OWNED BY public.user_likely_spam_reasons.id;
+
+
+--
 -- Name: user_phones; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3844,13 +3881,6 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
--- Name: banned_email_domains id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.banned_email_domains ALTER COLUMN id SET DEFAULT nextval('public.banned_email_domains_id_seq'::regclass);
-
-
---
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3967,6 +3997,13 @@ ALTER TABLE ONLY public.customer_contacts ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('public.duplicate_bike_groups_id_seq'::regclass);
+
+
+--
+-- Name: email_domains id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_domains ALTER COLUMN id SET DEFAULT nextval('public.email_domains_id_seq'::regclass);
 
 
 --
@@ -4411,6 +4448,13 @@ ALTER TABLE ONLY public.user_emails ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: user_likely_spam_reasons id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_likely_spam_reasons ALTER COLUMN id SET DEFAULT nextval('public.user_likely_spam_reasons_id_seq'::regclass);
+
+
+--
 -- Name: user_phones id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4508,14 +4552,6 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
-
-
---
--- Name: banned_email_domains banned_email_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.banned_email_domains
-    ADD CONSTRAINT banned_email_domains_pkey PRIMARY KEY (id);
 
 
 --
@@ -4652,6 +4688,14 @@ ALTER TABLE ONLY public.customer_contacts
 
 ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: email_domains email_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_domains
+    ADD CONSTRAINT email_domains_pkey PRIMARY KEY (id);
 
 
 --
@@ -5159,6 +5203,14 @@ ALTER TABLE ONLY public.user_emails
 
 
 --
+-- Name: user_likely_spam_reasons user_likely_spam_reasons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_likely_spam_reasons
+    ADD CONSTRAINT user_likely_spam_reasons_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_phones user_phones_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5244,13 +5296,6 @@ CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks U
 --
 
 CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
-
-
---
--- Name: index_banned_email_domains_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_banned_email_domains_on_creator_id ON public.banned_email_domains USING btree (creator_id);
 
 
 --
@@ -5580,6 +5625,13 @@ CREATE INDEX index_components_on_bike_version_id ON public.components USING btre
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON public.components USING btree (manufacturer_id);
+
+
+--
+-- Name: index_email_domains_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_domains_on_creator_id ON public.email_domains USING btree (creator_id);
 
 
 --
@@ -6521,6 +6573,13 @@ CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (use
 
 
 --
+-- Name: index_user_likely_spam_reasons_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_likely_spam_reasons_on_user_id ON public.user_likely_spam_reasons USING btree (user_id);
+
+
+--
 -- Name: index_user_phones_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6626,6 +6685,14 @@ ALTER TABLE ONLY public.active_storage_variant_records
 
 
 --
+-- Name: user_likely_spam_reasons fk_rails_a9be85d50e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_likely_spam_reasons
+    ADD CONSTRAINT fk_rails_a9be85d50e FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: active_storage_attachments fk_rails_c3b3935057; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6648,6 +6715,11 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250313035336'),
+('20250312225116'),
+('20250312171401'),
+('20250311144643'),
+('20250311013102'),
 ('20250227195412'),
 ('20250226182610'),
 ('20250217173339'),

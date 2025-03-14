@@ -87,7 +87,7 @@ RSpec.describe UsersController, type: :request do
       ActionMailer::Base.deliveries = []
       expect {
         post "#{base_url}/resend_confirmation_email", params: {email: "stuff@stuff.com"}
-      }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
+      }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
       expect(response).to redirect_to please_confirm_email_users_path
       expect(flash[:error]).to be_present
       expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -103,7 +103,7 @@ RSpec.describe UsersController, type: :request do
         ActionMailer::Base.deliveries = []
         expect {
           post "#{base_url}/resend_confirmation_email", params: {email: "blah blah blah"}
-        }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
+        }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
         expect(response).to redirect_to please_confirm_email_users_path
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -126,7 +126,7 @@ RSpec.describe UsersController, type: :request do
         ActionMailer::Base.deliveries = []
         expect {
           post "#{base_url}/resend_confirmation_email", params: {email: "test@stuff.com"}
-        }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
+        }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
         expect(response).to redirect_to please_confirm_email_users_path
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -146,7 +146,7 @@ RSpec.describe UsersController, type: :request do
           ActionMailer::Base.deliveries = []
           expect {
             post "#{base_url}/resend_confirmation_email", params: {email: "test@stuff.com"}
-          }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
+          }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
           expect(response).to redirect_to please_confirm_email_users_path
           expect(flash[:error]).to be_present
           expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -187,7 +187,7 @@ RSpec.describe UsersController, type: :request do
       it "redirects back and flash errors if unable to find user" do
         expect {
           post "#{base_url}/send_password_reset_email", params: {email: "some-crazy-email@stuff.com"}
-        }.to_not change(EmailResetPasswordJob.jobs, :size)
+        }.to_not change(Email::ResetPasswordJob.jobs, :size)
         expect(flash[:error]).to match(/email/)
         expect(response).to redirect_to request_password_reset_form_users_path
       end
@@ -200,8 +200,8 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(EmailResetPasswordJob.jobs, :size).by(1)
-        expect(EmailResetPasswordJob).to have_enqueued_sidekiq_job(user.id)
+        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+        expect(Email::ResetPasswordJob).to have_enqueued_sidekiq_job(user.id)
         user.reload
         expect(user.token_for_password_reset).to be_present
       end
@@ -215,10 +215,25 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(EmailResetPasswordJob.jobs, :size).by(1)
+        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
         user.reload
         expect(user.token_for_password_reset).to be_present
         expect(user.confirmed?).to be_falsey
+      end
+    end
+    context "banned user" do
+      let(:user) { FactoryBot.create(:user_confirmed, banned: true) }
+
+      it "enqueues a password reset email job" do
+        expect(user.reload.banned?).to be_truthy
+        expect {
+          post "#{base_url}/send_password_reset_email", params: {email: user.email}
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:send_password_reset_email)
+          expect(flash).to be_blank
+        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+        user.reload
+        expect(user.token_for_password_reset).to be_present
       end
     end
     context "existing password reset token" do
@@ -230,7 +245,7 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_present
-        }.to_not change(EmailResetPasswordJob.jobs, :size)
+        }.to_not change(Email::ResetPasswordJob.jobs, :size)
         user.reload
         expect(user.token_for_password_reset).to eq og_token
       end
@@ -244,7 +259,7 @@ RSpec.describe UsersController, type: :request do
             expect(response.code).to eq("200")
             expect(response).to render_template(:send_password_reset_email)
             expect(flash).to be_blank
-          }.to change(EmailResetPasswordJob.jobs, :size).by(1)
+          }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
           user.reload
           expect(user.token_for_password_reset).to_not eq og_token
         end
@@ -435,11 +450,13 @@ RSpec.describe UsersController, type: :request do
     end
 
     it "shows the page if the user exists and wants to show their page" do
-      user.show_bikes = true
-      user.save
+      user.update(show_bikes: true)
       get "#{base_url}/#{user.username}?page=1&per_page=1"
       expect(response).to render_template :show
       expect(assigns(:per_page)).to eq "1"
+      # Test some header tag properties
+      html_response = response.body
+      expect(html_response).to match(/<title>#{user.name}</)
     end
   end
 

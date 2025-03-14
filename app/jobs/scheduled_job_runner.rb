@@ -55,6 +55,7 @@ class ScheduledJobRunner < ScheduledJob
       TsvCreatorJob,
       # UnusedOwnershipRemovalJob,
       UpdateCountsJob,
+      UpdateEmailDomainJob,
       UpdateExchangeRatesJob,
       UpdateInvoiceJob,
       UpdateManufacturerLogoAndPriorityJob,
