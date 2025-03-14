@@ -39,8 +39,8 @@ class UpdateEmailDomainJob < ScheduledJob
       email_domain.data["sendgrid_validations"][email] = sendgrid_validation(email)
     end
 
-    unless email_domain.no_auto_assign_status? || email_domain.ban_or_pending?
-      email_domain.status = "ban_pending" if email_domain.auto_bannable?
+    unless email_domain.no_auto_assign_status? || email_domain.banned?
+      email_domain.status = email_domain.auto_bannable? ? "ban_pending" : "permitted"
     end
 
     email_domain.save!
@@ -69,7 +69,8 @@ class UpdateEmailDomainJob < ScheduledJob
       user_count_donated: email_domain.calculated_users.donated.count,
       subdomain_count: email_domain.calculated_subdomains.count,
       b_param_count: email_domain.calculated_b_params.count,
-      notification_count: email_domain.calculated_notifications.count
+      notification_count: email_domain.calculated_notifications.count,
+      spam_score: email_domain.spam_score # just stored so we can sort by it
     }
   end
 

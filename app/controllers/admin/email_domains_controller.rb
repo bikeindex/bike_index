@@ -31,7 +31,7 @@ class Admin::EmailDomainsController < Admin::BaseController
 
   def show
     @subdomains = @email_domain.calculated_subdomains
-    unless @email_domain.tld?
+    unless @email_domain.tld_matches_subdomains?
       @matching_tld = EmailDomain.find_matching_domain(@email_domain.tld)
     end
   end
@@ -62,7 +62,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at domain creator_id status user_count bike_count status_changed_at]
+    %w[created_at updated_at domain creator_id status user_count bike_count status_changed_at spam_score]
   end
 
   def searchable_statuses
@@ -72,6 +72,8 @@ class Admin::EmailDomainsController < Admin::BaseController
   def ordered_email_domains
     order_sql = if sort_column == "bike_count"
       Arel.sql("COALESCE((data -> 'bike_count')::integer, 0) #{sort_direction}")
+    elsif sort_column == "spam_score"
+      Arel.sql("COALESCE((data -> 'spam_score')::integer, 0) #{sort_direction}")
     elsif sort_column == "domain"
       Arel.sql("REVERSE(domain) #{sort_direction}")
     else

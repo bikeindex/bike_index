@@ -17,7 +17,7 @@
         %small= sortable "bike_count", "Bikes"
       %th
         %small Notifications
-      %th.small Spam score
+      %th.small= sortable "spam_score"
       %th &nbsp;
 
     %tbody
@@ -51,6 +51,8 @@
           %td
             = admin_number_display(email_domain.notification_count)
           %td
-            = email_domain.spam_score
+            - spam_score = email_domain.spam_score.round(0)
+            %span{class: (spam_score > EmailDomain::SPAM_SCORE_AUTO_BAN ? "text-info" : "")}
+              = email_domain.spam_score.round(0)
           %td
             = render partial: "data_details", locals: {email_domain:}
