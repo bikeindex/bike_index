@@ -44,7 +44,7 @@ RSpec.describe MyAccountsController, type: :request do
             # Test some header tag properties
             html_response = response.body
             # This is from header tag helpers
-            expect(html_response).to match(/<title>Alexandra on Bike Index</)
+            expect(html_response).to match(/<title>You on Bike Index</)
             # This is pulled from the translations file
             expect(html_response).to match(/<meta.*Your bikes on Bike Index/)
           end

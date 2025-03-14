@@ -11,7 +11,7 @@ module HeaderTags
       @language = language
 
       # TODO: Don't actually need to store @page_key, it's just for page_json_ld
-      @page_key = translation_key_for(controller_namespace:, controller_name:, action_name:)
+      @page_key = translation_key_for(controller_namespace:, controller_name:, action_name:, page_obj:)
       @display_auto_discovery = controller_name == "news"
 
       @page_title = page_title
@@ -20,6 +20,8 @@ module HeaderTags
         assign_bike_attrs(page_obj, action_name)
       elsif page_obj.is_a?(Blog)
         assign_blog_attrs(page_obj)
+      elsif @page_key == "users_show"
+        assign_user_attrs(page_obj)
       end
 
       @page_title ||= translation_if_exists("meta_titles.#{@page_key}", organization_name) ||
@@ -89,11 +91,11 @@ module HeaderTags
     # Translation and auto assign methods
     #
 
-    def translation_key_for(controller_namespace:, controller_name:, action_name:)
+    def translation_key_for(controller_namespace:, controller_name:, action_name:, page_obj:)
       return "bikes_new" if controller_name == "welcome" && action_name == "choose_registration"
 
       if %w[bikes bike_versions].include?(controller_name)
-        return "bikes_new_stolen" if (action_name == "new" || action_name == "create") && @bike&.status_stolen?
+        return "bikes_new_stolen" if (action_name == "new" || action_name == "create") && page_obj&.status_stolen?
       end
 
       [controller_namespace, controller_name, action_name].compact.join("_")
@@ -203,6 +205,15 @@ module HeaderTags
         (bike.description.present? ? "#{bike.description}." : nil),
         special_status_string
       ].compact.join(" ")
+    end
+
+    def assign_user_attrs(user)
+      @page_title = InputNormalizer.sanitize(user.name) if user.name.present?
+      @page_description = "Bike Index user account: #{user.title}" if user.title.present?
+
+      if user.avatar && user.avatar.url != "https://files.bikeindex.org/blank.png"
+        @page_image = user.avatar.url
+      end
     end
   end
 end

@@ -435,11 +435,13 @@ RSpec.describe UsersController, type: :request do
     end
 
     it "shows the page if the user exists and wants to show their page" do
-      user.show_bikes = true
-      user.save
+      user.update(show_bikes: true)
       get "#{base_url}/#{user.username}?page=1&per_page=1"
       expect(response).to render_template :show
       expect(assigns(:per_page)).to eq "1"
+      # Test some header tag properties
+      html_response = response.body
+      expect(html_response).to match(/<title>#{user.name}</)
     end
   end
 

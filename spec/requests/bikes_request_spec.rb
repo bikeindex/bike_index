@@ -25,7 +25,7 @@ RSpec.describe BikesController, type: :request do
       expect(bike.stolen_records.last).to be_blank
       expect(response).to render_template(:new)
       expect(response.body).to match("<title>Register a bike!</title>")
-      expect(response.body).to match('<meta name="description" content="Register a stolen bike on Bike Index quickly')
+      expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
       # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
       expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
@@ -59,7 +59,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.stolen_records.last.country_id).to eq Country.united_states.id
         expect(response).to render_template(:new)
         expect(response.body).to match("<title>Register a stolen bike</title>")
-        expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
+        expect(response.body).to match('<meta name="description" content="Register a stolen bike on Bike Index quickly')
         # Make sure it renders without address fields for a stolen bikes
         expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       end

@@ -5,7 +5,7 @@ module HeaderTagHelper
 
     {
       page_title:,
-      page_obj: @page_obj || @blog || @bike,
+      page_obj: @page_obj || @blog || @bike || @user,
       updated_at: @page_updated_at,
       organization_name:,
       controller_name:,
