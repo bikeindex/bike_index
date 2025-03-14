@@ -4380,12 +4380,7 @@ nb:
     users_request_password_reset: Tilbakestill passord - Bike Index
     welcome_goodbye: Logget ut
     welcome_index: Bike Index - Sykkelregistrering som fungerer
-    about: FAQ
-    info_stolen_bikes: Reagerer på tyveri
-    links: lenker
-    stolen_howworks: Hvordan det fungerer
-    stolen_merging: Stjålet sykkelregister
-    tech: Teknologi for å bekjempe sykkeltyveri
+    my_accounts_show: Du på Bike Index
   money:
     currencies:
       en: USD

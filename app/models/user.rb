@@ -63,7 +63,6 @@
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
 #
 class User < ApplicationRecord
-  include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable
   include Geocodeable
 

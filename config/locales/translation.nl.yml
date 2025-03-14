@@ -4155,12 +4155,7 @@ nl:
     users_request_password_reset: Wachtwoord opnieuw instellen - Fietsindex
     welcome_goodbye: Uitgelogd
     welcome_index: Bike Index - Fietsregistratie die werkt
-    about: FAQ
-    info_stolen_bikes: Reageren op diefstal
-    links: koppelingen
-    stolen_howworks: Hoe het werkt
-    stolen_merging: Register voor gestolen fietsen
-    tech: Technologie voor de bestrijding van fietsdiefstal
+    my_accounts_show: Jij op Bike Index
   organized:
     ambassador_dashboards:
       getting_started:

@@ -27,22 +27,27 @@ RSpec.describe "Locale detection", type: :request do
       it "renders the homepage in the requested language" do
         get "/"
         expect(response.body).to match(/bike registration/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="en" />')
 
         current_user.update(preferred_language: :nl)
         get "/"
         expect(response.body).to match(/fietsregistratie/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="nl" />')
 
         current_user.update(preferred_language: :nb)
         get "/"
         expect(response.body).to match(/sykkelregistrering/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="nb" />')
 
         current_user.update(preferred_language: :es)
         get "/"
         expect(response.body).to match(/registro de bicicletas/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="es" />')
 
         # current_user.update(preferred_language: :it)
         # get "/"
         # expect(response.body).to match(/Registrazione della bicicletta/i)
+        # expect(response.body).to match('<meta http-equiv="Content-Language" content="it" />')
       end
     end
 

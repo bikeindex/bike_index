@@ -3399,12 +3399,7 @@ it:
     users_request_password_reset:
     welcome_goodbye:
     welcome_index:
-    about:
-    info_stolen_bikes:
-    links:
-    stolen_howworks:
-    stolen_merging:
-    tech:
+    my_accounts_show:
   money:
     currencies:
       en: USD
