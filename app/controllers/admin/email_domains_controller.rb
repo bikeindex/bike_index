@@ -31,8 +31,8 @@ class Admin::EmailDomainsController < Admin::BaseController
 
   def show
     @subdomains = @email_domain.calculated_subdomains
-    unless @email_domain.tld
-      @matching_tld = EmailDomain.find_matching_domain(@email_domain.tld).first
+    unless @email_domain.tld?
+      @matching_tld = EmailDomain.find_matching_domain(@email_domain.tld)
     end
   end
 
