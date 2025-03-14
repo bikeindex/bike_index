@@ -221,6 +221,21 @@ RSpec.describe UsersController, type: :request do
         expect(user.confirmed?).to be_falsey
       end
     end
+    context "banned user" do
+      let(:user) { FactoryBot.create(:user_confirmed, banned: true) }
+
+      it "enqueues a password reset email job" do
+        expect(user.reload.banned?).to be_truthy
+        expect {
+          post "#{base_url}/send_password_reset_email", params: {email: user.email}
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:send_password_reset_email)
+          expect(flash).to be_blank
+        }.to change(EmailResetPasswordJob.jobs, :size).by(1)
+        user.reload
+        expect(user.token_for_password_reset).to be_present
+      end
+    end
     context "existing password reset token" do
       it "does not resend if just sent" do
         user.send_password_reset_email
