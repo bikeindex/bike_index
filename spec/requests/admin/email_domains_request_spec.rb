@@ -80,11 +80,12 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       let(:status) { "permitted" }
 
       it "responds with not likely spam" do
-        patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
-
-        expect(flash[:error]).to be_present
-        expect(flash[:error]).to_not match("bikes")
-        expect(email_domain.reload.status).to eq "permitted"
+        VCR.use_cassette("EmailDomainController-mails") do
+          patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
+          expect(flash[:error]).to be_present
+          expect(flash[:error]).to_not match("bikes")
+          expect(email_domain.reload.status).to eq "permitted"
+        end
       end
 
       context "with over required user count" do
@@ -107,9 +108,11 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
           before { email_domain.update(data: email_domain.data.merge(bike_count: 10)) }
 
           it "responds with not likely spam" do
-            patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
-            expect(flash[:error]).to match("bikes")
-            expect(email_domain.reload.status).to eq "permitted"
+            VCR.use_cassette("EmailDomainController-fffrustymails") do
+              patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
+              expect(flash[:error]).to match("bikes")
+              expect(email_domain.reload.status).to eq "permitted"
+            end
           end
         end
       end

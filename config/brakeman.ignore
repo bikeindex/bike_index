@@ -363,6 +363,29 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "28616f4cc25f00229e47ee4352af80f905d7452a995ff9cbb76495f1fa980ce4",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/admin/email_domains_controller.rb",
+      "line": 77,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"REVERSE(domain) #{sort_direction}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::EmailDomainsController",
+        "method": "ordered_email_domains"
+      },
+      "user_input": "sort_direction",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "291665b6116d5f36cbc91110dfeb3dce1ba903b78f74b8f0fa455fd99ca49570",
@@ -757,6 +780,29 @@
       "confidence": "Weak",
       "cwe_id": [
         79
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "770a3703fbf8ef4b8ae5ba3a5aa0fb4e120dcf12aaa000ef55d76d9ff05e9841",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/admin/email_domains_controller.rb",
+      "line": 75,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"COALESCE((data -> 'bike_count')::integer, 0) #{sort_direction}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::EmailDomainsController",
+        "method": "ordered_email_domains"
+      },
+      "user_input": "sort_direction",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -1478,7 +1524,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/email_domains_controller.rb",
-      "line": 80,
+      "line": 91,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "EmailDomain.send((params[:search_status] or nil))",
       "render_path": null,

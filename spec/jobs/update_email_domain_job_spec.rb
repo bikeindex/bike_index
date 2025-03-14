@@ -64,8 +64,41 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         VCR.use_cassette("UpdateEmailDomainJob-gmail") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 1
+          expect(email_domain.has_ban_blockers?).to be_falsey
+          expect(email_domain.spam_score).to eq 4.0
           expect(email_domain.data).to match_hash_indifferently valid_data.merge
           expect(email_domain.status).to eq "permitted"
+        end
+      end
+    end
+
+    context "VALIDATE_WITH_SENDGRID" do
+      let(:domain) { "nkk.co.za" }
+      let!(:user2) { FactoryBot.create(:user_confirmed, email: "malaysia_lloyd57@nkk.co.za") }
+      let(:target_data) do
+        {
+          broader_domain_exists: false,
+          tld: "nkk.co.za",
+          is_tld: true,
+          subdomain_count: 0,
+          domain_resolves: false,
+          tld_resolves: false,
+          bike_count: 0
+        }
+      end
+      let(:target_sendgrid_keys) { %w[checks email host ip_address local score source verdict] }
+      before { stub_const("UpdateEmailDomainJob::VALIDATE_WITH_SENDGRID", true) }
+
+      it "doesn't resolve, but bike makes it permitted" do
+        VCR.use_cassette("UpdateEmailDomainJob-co.za") do
+          instance.perform(email_domain.id)
+          expect(email_domain.reload.user_count).to eq 2
+          expect(email_domain.bike_count).to eq 0
+
+          expect(email_domain.data.except("sendgrid_validations")).to match_hash_indifferently target_data
+          expect(email_domain.data.dig("sendgrid_validations", user2.email).keys.sort).to eq target_sendgrid_keys
+          expect(email_domain.spam_score).to eq 0.4
+          expect(email_domain.status).to eq "ban_pending"
         end
       end
     end
@@ -81,7 +114,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         VCR.use_cassette("UpdateEmailDomainJob-msn") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 1
-          expect(email_domain.reload.bike_count).to eq 1
+          expect(email_domain.bike_count).to eq 1
           expect(email_domain.data).to match_hash_indifferently msn_data
           expect(email_domain.status).to eq "permitted"
         end
@@ -100,6 +133,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
 
       it "makes ban_pending" do
         expect(email_domain.reload.calculated_users.count).to eq 2
+
         VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 2
@@ -120,7 +154,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             Sidekiq::Job.clear_all
             instance.perform(email_domain.id)
             expect(email_domain.reload.has_ban_blockers?).to be_falsey
-            expect(described_class.auto_pending_ban?(email_domain)).to be_truthy
+            expect(email_domain.auto_bannable?).to be_truthy
             expect(email_domain.reload.status).to eq "ban_pending"
 
             expect(EmailDomain.count).to eq 5

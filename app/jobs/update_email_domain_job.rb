@@ -1,7 +1,12 @@
+# frozen_string_literal: true
+
 class UpdateEmailDomainJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   CREATE_TLD_SUBDOMAIN_COUNT = 3
+  SENDGRID_VALIDATION_KEY = ENV["SENDGRID_EMAIL_VALIDATION_KEY"].freeze
+  VALIDATE_WITH_SENDGRID = !Rails.env.test? && SENDGRID_VALIDATION_KEY.present?
+  SENDGRID_VALIDATION_URL = "https://api.sendgrid.com/v3/validations/email"
 
   sidekiq_options retry: 1
 
@@ -17,15 +22,25 @@ class UpdateEmailDomainJob < ScheduledJob
     end
   end
 
-  def perform(domain_id = nil, email_domain = nil)
+  def perform(domain_id = nil, email_domain = nil, validate_sendgrid_email_id = nil)
     return enqueue_workers if domain_id.blank?
 
     email_domain ||= EmailDomain.find(domain_id)
     email_domain.user_count = email_domain.calculated_users.count
     email_domain.data.merge!(calculated_data(email_domain).as_json)
+    if validate_with_sendgrid?(email_domain) || validate_sendgrid_email_id.present?
+      email_domain.data["sendgrid_validations"] ||= {}
+      # Grab the second email that was created (if it exists)
+      email = if validate_sendgrid_email_id.present?
+        User.unscoped.find(validate_sendgrid_email_id).email
+      else
+        email_domain.calculated_users.order(:id).limit(2).pluck(:email).last
+      end
+      email_domain.data["sendgrid_validations"][email] = sendgrid_validation(email)
+    end
 
     unless email_domain.no_auto_assign_status? || email_domain.ban_or_pending?
-      email_domain.status = "ban_pending" if self.class.auto_pending_ban?(email_domain)
+      email_domain.status = "ban_pending" if email_domain.auto_bannable?
     end
 
     email_domain.save!
@@ -59,8 +74,8 @@ class UpdateEmailDomainJob < ScheduledJob
       faraday.use FaradayMiddleware::FollowRedirects, limit: 15
       faraday.adapter Faraday.default_adapter
       # Set reasonable timeouts to avoid hanging
-      faraday.options.timeout = 5        # 5 seconds for open/read timeout
-      faraday.options.open_timeout = 2   # 2 seconds for connection timeout
+      faraday.options.timeout = 5 # 5 seconds for open/read timeout
+      faraday.options.open_timeout = 2 # 2 seconds for connection timeout
     end
 
     begin
@@ -84,5 +99,21 @@ class UpdateEmailDomainJob < ScheduledJob
     return false if EmailDomain.matching_domain(tld).count < CREATE_TLD_SUBDOMAIN_COUNT
 
     true
+  end
+
+  def validate_with_sendgrid?(email_domain)
+    return false if !VALIDATE_WITH_SENDGRID || email_domain.has_ban_blockers?
+
+    email_domain.data["sendgrid_validations"].blank?
+  end
+
+  def sendgrid_validation(email)
+    result = Faraday.new(url: SENDGRID_VALIDATION_URL).post do |conn|
+      conn.headers["Content-Type"] = "application/json"
+      conn.headers["Authorization"] = "Bearer #{SENDGRID_VALIDATION_KEY}"
+      conn.body = {email:, source: "EmailDomain"}.to_json
+    end
+
+    JSON.parse(result.body)["result"]
   end
 end

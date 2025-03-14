@@ -23,13 +23,13 @@ http_interactions:
       Location:
       - https://msn.com/
       X-Msedge-Ref:
-      - 'Ref A: 476B6FD64F674E798655B619C13EBC49 Ref B: PAOEDGE0621 Ref C: 2025-03-13T16:58:36Z'
+      - 'Ref A: 13E1438AFBC24DC796FEE45765A74FF6 Ref B: PAOEDGE0606 Ref C: 2025-03-13T21:04:46Z'
       Date:
-      - Thu, 13 Mar 2025 16:58:35 GMT
+      - Thu, 13 Mar 2025 21:04:45 GMT
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 16:58:36 GMT
+  recorded_at: Thu, 13 Mar 2025 21:04:46 GMT
 - request:
     method: head
     uri: https://msn.com/
@@ -58,13 +58,13 @@ http_interactions:
       - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
         Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
       X-Msedge-Ref:
-      - 'Ref A: 8B57C515601D4235823A7DAA37F7CF35 Ref B: BY3EDGE0511 Ref C: 2025-03-13T16:58:36Z'
+      - 'Ref A: 5635AF1DDE314F078BA443A611CEE260 Ref B: BY3EDGE0116 Ref C: 2025-03-13T21:04:46Z'
       Date:
-      - Thu, 13 Mar 2025 16:58:36 GMT
+      - Thu, 13 Mar 2025 21:04:46 GMT
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 16:58:36 GMT
+  recorded_at: Thu, 13 Mar 2025 21:04:46 GMT
 - request:
     method: head
     uri: https://www.msn.com/
@@ -91,27 +91,27 @@ http_interactions:
       - '0'
       X-Fabric-Cluster:
       - pmeprodwus
-      Nel:
-      - '{"report_to":"network-errors","max_age":604800,"success_fraction":0.001,"failure_fraction":0.5}'
       Report-To:
       - '{"group":"network-errors","max_age":604800,"endpoints":[{"url":"https://deff.nelreports.net/api/report?cat=msn"}]},{"group":"csp-endpoint","max_age":86400,"endpoints":[{"url":"https://deff.nelreports.net/api/report"}]}'
+      Nel:
+      - '{"report_to":"network-errors","max_age":604800,"success_fraction":0.001,"failure_fraction":0.5}'
       Strict-Transport-Security:
       - max-age=1209600; includeSubDomains; preload
       X-Ceto-Ref:
-      - 67d30ebc4b2f4e7b8067e6f61c537241|AFD:6BF0E2A095744C0C8E1914AE8A1E02EF|2025-03-13T16:58:36.825Z
+      - 67d3486e924140b09640f80e2704182f|AFD:204870F8DD824E6F87E7DA36B8AF77E2|2025-03-13T21:04:46.268Z
       X-Cache:
       - CONFIG_NOCACHE
       Accept-Ch:
       - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
         Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
       X-Msedge-Ref:
-      - 'Ref A: 6BF0E2A095744C0C8E1914AE8A1E02EF Ref B: PAOEDGE0515 Ref C: 2025-03-13T16:58:36Z'
+      - 'Ref A: 204870F8DD824E6F87E7DA36B8AF77E2 Ref B: CO1EDGE1814 Ref C: 2025-03-13T21:04:46Z'
       Date:
-      - Thu, 13 Mar 2025 16:58:36 GMT
+      - Thu, 13 Mar 2025 21:04:45 GMT
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 16:58:36 GMT
+  recorded_at: Thu, 13 Mar 2025 21:04:46 GMT
 - request:
     method: head
     uri: http://msn.com/
@@ -135,13 +135,13 @@ http_interactions:
       Location:
       - https://msn.com/
       X-Msedge-Ref:
-      - 'Ref A: 3433BDE23B2548C697840A8A634DD98D Ref B: BY3EDGE0413 Ref C: 2025-03-13T16:58:36Z'
+      - 'Ref A: 82F65F68E257404E815301D9AD6ABAD4 Ref B: BY3EDGE0420 Ref C: 2025-03-13T21:04:46Z'
       Date:
-      - Thu, 13 Mar 2025 16:58:35 GMT
+      - Thu, 13 Mar 2025 21:04:45 GMT
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 16:58:36 GMT
+  recorded_at: Thu, 13 Mar 2025 21:04:46 GMT
 - request:
     method: head
     uri: https://msn.com/
@@ -170,13 +170,13 @@ http_interactions:
       - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
         Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
       X-Msedge-Ref:
-      - 'Ref A: 76218443827B4ED9872584905542DBE0 Ref B: PAOEDGE0618 Ref C: 2025-03-13T16:58:37Z'
+      - 'Ref A: 7605E59E40F8493AB298E23AE954DB42 Ref B: BY3EDGE0116 Ref C: 2025-03-13T21:04:46Z'
       Date:
-      - Thu, 13 Mar 2025 16:58:36 GMT
+      - Thu, 13 Mar 2025 21:04:46 GMT
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 16:58:36 GMT
+  recorded_at: Thu, 13 Mar 2025 21:04:46 GMT
 - request:
     method: head
     uri: https://www.msn.com/
@@ -210,18 +210,18 @@ http_interactions:
       Strict-Transport-Security:
       - max-age=1209600; includeSubDomains; preload
       X-Ceto-Ref:
-      - 67d30ebdd05a41c385a5535ad29f2dad|AFD:C5123E6793D34C8E9342915004E2BB11|2025-03-13T16:58:37.104Z
+      - 67d3486ef4594943bb5e4e88af2aa6d1|AFD:8327444D90CA40A3AFF932C7A0C50099|2025-03-13T21:04:46.525Z
       X-Cache:
       - CONFIG_NOCACHE
       Accept-Ch:
       - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
         Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
       X-Msedge-Ref:
-      - 'Ref A: C5123E6793D34C8E9342915004E2BB11 Ref B: BY3EDGE0305 Ref C: 2025-03-13T16:58:37Z'
+      - 'Ref A: 8327444D90CA40A3AFF932C7A0C50099 Ref B: CO1EDGE2819 Ref C: 2025-03-13T21:04:46Z'
       Date:
-      - Thu, 13 Mar 2025 16:58:36 GMT
+      - Thu, 13 Mar 2025 21:04:46 GMT
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 16:58:37 GMT
+  recorded_at: Thu, 13 Mar 2025 21:04:46 GMT
 recorded_with: VCR 6.3.1

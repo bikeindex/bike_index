@@ -126,8 +126,10 @@ class EmailDomain < ApplicationRecord
   end
 
   # Only check for ban_blockers if the domain is not banned
-  def allow_domain_ban?
-    banned? || !has_ban_blockers?
+  def auto_bannable?
+    return false if has_ban_blockers?
+
+    spam_score < 4
   end
 
   def has_ban_blockers?
@@ -143,6 +145,18 @@ class EmailDomain < ApplicationRecord
 
     # Ensure there aren't permitted subdomains
     calculated_subdomains.permitted.count > 0
+  end
+
+  def spam_score
+    return 10 if data.blank? # Don't judge unless data is present
+
+    # 2 points for valid domain (and 2 more for valid subdomain, or being the TLD)
+    base_score = data.slice("domain_resolves", "tld_resolves").count { |_k, v| v } * 2
+    # SendGrid validation appears to be worse than useless, so skipping for now
+    return base_score unless data["sendgrid_validations"].present?
+
+    validation_scores = data["sendgrid_validations"].values.map { |result| result["score"].to_f }
+    (base_score + validation_scores.max).round(1)
   end
 
   # IDK if this is really necessary, but it makes the matching class method easier
