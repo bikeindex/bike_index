@@ -1,4 +1,6 @@
-class EmailImpoundClaimJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::ImpoundClaimJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(impound_claim_id)

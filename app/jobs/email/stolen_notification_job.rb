@@ -1,4 +1,6 @@
-class EmailStolenNotificationJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::StolenNotificationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(stolen_notification_id, force_send = false)

@@ -1,4 +1,6 @@
-class EmailPartialRegistrationJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::PartialRegistrationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   # When we started creating notifications when sending partial registration emails PR#2368

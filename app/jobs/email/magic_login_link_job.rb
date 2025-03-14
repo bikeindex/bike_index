@@ -1,4 +1,6 @@
-class EmailMagicLoginLinkJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::MagicLoginLinkJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(user_id)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class EmailConfirmationJob < ApplicationJob
+class Email::ConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   PROCESS_NEW_EMAIL_DOMAINS = !Rails.env.test?

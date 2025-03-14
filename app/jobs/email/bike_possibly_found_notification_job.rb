@@ -1,4 +1,6 @@
-class EmailBikePossiblyFoundNotificationJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::BikePossiblyFoundNotificationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(bike_id, match_class, match_id)

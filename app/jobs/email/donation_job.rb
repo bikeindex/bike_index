@@ -1,4 +1,6 @@
-class EmailDonationJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::DonationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(id)

@@ -1,4 +1,6 @@
-class EmailAdminContactStolenJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::AdminContactStolenJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(customer_contact_id)

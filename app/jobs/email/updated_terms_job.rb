@@ -1,4 +1,6 @@
-class EmailUpdatedTermsJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::UpdatedTermsJob < ApplicationJob
   sidekiq_options queue: "low_priority"
   sidekiq_options retry: false
 

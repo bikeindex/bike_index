@@ -1,4 +1,6 @@
-class EmailRecoveredFromLinkJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::RecoveredFromLinkJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(stolen_record_id)

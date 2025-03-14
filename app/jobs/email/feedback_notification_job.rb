@@ -1,4 +1,6 @@
-class EmailFeedbackNotificationJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::FeedbackNotificationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 1
 
   def perform(feedback_id)

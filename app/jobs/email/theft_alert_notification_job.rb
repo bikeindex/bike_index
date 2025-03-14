@@ -1,4 +1,6 @@
-class EmailTheftAlertNotificationJob < ApplicationJob
+# frozen_string_literal: true
+
+class Email::TheftAlertNotificationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(theft_alert_id, kind, theft_alert = nil)
