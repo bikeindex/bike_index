@@ -42,9 +42,12 @@
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: email_domain.creator, user_id: email_domain.creator_id, cache: false}
           %td
-            = admin_number_display(email_domain.user_count)
+            = link_to admin_number_display(email_domain.user_count), admin_users_path(search_domain: email_domain.domain, render_chart: true), class: "text-link"
           %td
-            = admin_number_display(email_domain.bike_count)
+            - if email_domain.bike_count > 0
+              = link_to admin_number_display(email_domain.bike_count), admin_bikes_path(search_domain: email_domain.domain, render_chart: true), class: "text-link"
+            - else
+              = admin_number_display(email_domain.bike_count)
           %td
             = admin_number_display(email_domain.notification_count)
           %td

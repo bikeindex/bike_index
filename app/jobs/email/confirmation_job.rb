@@ -11,7 +11,9 @@ class Email::ConfirmationJob < ApplicationJob
     # Don't suffer a witch to live
     if PROCESS_NEW_EMAIL_DOMAINS
       email_domain = EmailDomain.find_or_create_for(user.email, skip_processing: true)
-      email_domain.process! if email_domain.unprocessed?
+      # Async processing for existing domains, inline for new ones
+      email_domain.unprocessed? ? email_domain.process! : email_domain.enqueue_processing_worker
+
       return user.really_destroy! if email_domain.banned?
     end
 
