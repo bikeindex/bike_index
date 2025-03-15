@@ -158,12 +158,12 @@
   }
 
   .full-width-button {
-    padding: (2 * $vertical-height) 0;
+    padding: (2 * $vertical-height) $grid-gutter-width;
 
     .btn {
       display: block;
       margin: 0 auto;
-      max-width: 450px;
+      max-width: 100%;
     }
   }
 
