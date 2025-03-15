@@ -4,7 +4,8 @@ class Email::ConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
   def perform(user_id)
-    user = User.find(user_id)
+    user = User.find_by(id: user_id)
+    return if user.blank?
 
     # Don't suffer a witch to live
     if EmailDomain::VERIFICATION_ENABLED

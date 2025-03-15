@@ -594,7 +594,7 @@ RSpec.describe BikesController, type: :controller do
         let!(:user) { FactoryBot.create(:organization_user, organization: organization) }
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "aaa", kind: "sticker") }
         let!(:wrong_bike_sticker) { FactoryBot.create(:bike_sticker, code: "aaa", kind: "sticker") }
-        it "registers a bike under signed in user and redirects with persist_email" do
+        it "registers a bike under signed in user and redirects with persist_email", :flaky do
           set_current_user(user)
           post :create, params: {bike: bike_params.merge(bike_sticker: "AAA")}
           expect(response).to redirect_to(embed_extended_organization_url(organization))

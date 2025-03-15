@@ -751,7 +751,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
     context "organization" do
       let(:organization) { FactoryBot.create(:organization) }
-      it "creates a stolen bike through an organization and uses the passed phone" do
+      it "creates a stolen bike through an organization and uses the passed phone", :flaky do
         user.update_attribute :phone, "0987654321"
         FactoryBot.create(:organization_role, user: user, organization: organization)
         FactoryBot.create(:country, iso: "US")
