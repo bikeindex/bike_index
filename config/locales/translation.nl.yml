@@ -3371,23 +3371,18 @@ nl:
         hoe en voor welke doeleinden we de informatie die u ons verstrekt verzamelen,
         gebruiken, bewaren, openbaar maken en beveiligen.
     image_resources:
-      basic_logo_alt: Basis logo
-      basic_logo_html: Basislogo (%{svg_link}, %{png_link})
-      basic_logo_in_white_html: Basislogo in wit (%{svg_link}, %{png_link})
       bike_index_image_assets: Bike Index afbeelding activa
       black_background_shown_here: Zwarte achtergrond hier getoond voor zichtbaarheid
       check_out_resources_html: Bekijk %{resources_link} voor extra ontwerpbronnen
       image_has_no_background: afbeelding heeft geen achtergrond, hier weergegeven
         met zwart voor zichtbaarheid
-      logo_with_background_cutout_html: Logo met achtergrondafbeelding (%{svg_link},
-        %{png_link})
-      logo_with_blue_shield_html: Logo met blauw schild en witte tekst (%{svg_link},
-        %{png_link})
       logo_with_cutout: Logo met achtergrondknipsel
       logo_with_stripes: Logo met strepen
       single_color_logo: Eén kleur logo
       single_color_logo_in_white: Wit logo in één kleur
-      striped_logo_html: Gestreept logo (%{svg_link}, %{png_link})
+      logo_with_blue_shield: Logo met blauw schild en witte tekst
+      logo_with_cutout_black: Logo met zwarte achtergrond uitsparing
+      logo_with_links_html: "%{text} (%{svg_link}, %{png_link})"
     lightspeed:
       a_few_things_to_note: 'Een paar dingen om op te merken:'
       a_listing_on_bike_index_will_be_created: Zodra uw Lightspeed Retail-account
