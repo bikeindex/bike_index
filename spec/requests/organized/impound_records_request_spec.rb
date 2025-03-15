@@ -362,7 +362,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           end
           let!(:impound_record_update_approved) { impound_record.impound_record_updates.create(user: current_user, kind: "claim_approved", impound_claim: impound_claim) }
           it "marks retrieved by owner" do
-            expect(Email::ConfirmationJob::PROCESS_NEW_EMAIL_DOMAINS).to be_falsey
+            expect(EmailDomain::VERIFICATION_ENABLED).to be_falsey
             expect(impound_record_update_approved).to be_valid
             expect(MailchimpDatum.count).to eq 0
             impound_claim.reload

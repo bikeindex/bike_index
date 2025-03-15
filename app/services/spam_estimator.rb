@@ -8,6 +8,7 @@ class SpamEstimator
       estimate += 35 if bike.creation_organization&.spam_registrations
       estimate += 0.2 * string_spaminess(bike.frame_model)
       estimate += 0.4 * string_spaminess(bike.manufacturer_other)
+      estimate += domain_estimate(bike.owner_email)
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
       within_bounds(estimate)
@@ -30,6 +31,17 @@ class SpamEstimator
     end
 
     private
+
+    def domain_estimate(email)
+      return 0 unless EmailDomain::VERIFICATION_ENABLED
+
+      email_domain = EmailDomain.find_or_create_for(email)
+
+      return 0 if email_domain.blank? || email_domain.permitted?
+
+      # If it's banned, it's spam - otherwise increase spam likelihood (pending_ban)
+      email_domain.banned? ? 100 : 40
+    end
 
     def estimate_stolen_record(stolen_record)
       estimate = 0
@@ -139,8 +151,7 @@ class SpamEstimator
     end
 
     def within_bounds(num)
-      return 0 if num < 0
-      (num < 100) ? num : 100
+      num.clamp(0, 100)
     end
 
     def downcase_transliterate(str)

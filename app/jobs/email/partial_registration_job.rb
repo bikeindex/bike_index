@@ -8,14 +8,21 @@ class Email::PartialRegistrationJob < ApplicationJob
 
   def perform(b_param_id)
     b_param = BParam.find(b_param_id)
-    if b_param.present?
-      notification = Notification.create(kind: "partial_registration",
-        message_channel: "email",
-        notifiable: b_param)
+    return if b_param.blank?
 
-      notification.track_email_delivery do
-        OrganizedMailer.partial_registration(b_param).deliver_now
-      end
+    if EmailDomain::VERIFICATION_ENABLED
+      email_domain = EmailDomain.find_or_create_for(b_param.owner_email)
+
+      return b_param.destroy if email_domain&.banned?
+      return if email_domain&.provisional_ban?
+    end
+
+    notification = Notification.create(kind: "partial_registration",
+      message_channel: "email",
+      notifiable: b_param)
+
+    notification.track_email_delivery do
+      OrganizedMailer.partial_registration(b_param).deliver_now
     end
   end
 end

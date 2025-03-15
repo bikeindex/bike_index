@@ -124,6 +124,7 @@ class User < ApplicationRecord
   scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
   scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
+  scope :donated, -> { joins(:payments).merge(Payment.paid) }
   scope :member, -> { includes(:memberships).merge(Membership.active) }
 
   validates_uniqueness_of :username, case_sensitive: false
@@ -191,7 +192,7 @@ class User < ApplicationRecord
     end
 
     def matching_domain(str)
-      where("email ILIKE ?", "%#{str.to_s.strip}")
+      where("users.email ILIKE ?", "%#{str.to_s.strip}")
     end
 
     def search_phone(str)

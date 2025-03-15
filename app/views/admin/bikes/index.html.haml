@@ -105,6 +105,12 @@
         %strong sent to
         %code= @search_email
         = link_to "view sent to any emails", url_for(sortable_search_params.merge(search_email: nil)), class: "gray-link small"
+    - if @search_domain.present?
+      %p
+        Viewing only bikes
+        %strong from the domain
+        %code= @search_domain
+        = link_to "view sent to any domain", url_for(sortable_search_params.merge(search_domain: nil)), class: "gray-link small"
     - if params[:search_model_audit_id].present?
       %p
         Viewing only for model audit
@@ -151,7 +157,10 @@
         .form-group.mr-1.mb-2
           = text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control"
         .form-group.mr-1.mb-2
-          = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
+          - if @search_domain.present?
+            = text_field_tag :search_domain, @search_domain, placeholder: "Search bikes by domain", class: "form-control"
+          - else
+            = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
         = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
 = render partial: "/shared/admin/pagination", locals: {collection: @bikes, count: available_bikes.size}

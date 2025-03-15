@@ -22,7 +22,10 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         domain_resolves: true,
         tld_resolves: true,
         bike_count: 0,
-        notification_count: 0
+        b_param_count: 0,
+        notification_count: 0,
+        bike_count_pos: 0,
+        user_count_donated: 0
       }
     end
     let(:domain) { "bikeindex.org" }
@@ -40,7 +43,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.reload.user_count).to eq 4 # Because users created for email domains
           expect(email_domain.status).to eq "permitted"
           expect(email_domain.tld_matches_subdomains?).to be_falsey
-          expect(email_domain.data).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
+          expect(email_domain.data.except("spam_score")).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
           expect(EmailDomain.tld.pluck(:id)).to match_array([email_domain.id, email_domain_bare.id])
           expect(EmailDomain.subdomain.pluck(:id)).to match_array([email_domain_sub.id])
           expect(email_domain.calculated_subdomains.pluck(:id)).to eq([email_domain_sub.id])
@@ -54,21 +57,39 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           instance.perform(email_domain_bare.id)
           expect(email_domain_bare.reload.no_auto_assign_status?).to be_truthy
           expect(email_domain_bare.status).to eq "permitted"
-          expect(email_domain_bare.data).to match_hash_indifferently(valid_data.merge(subdomain_count: 1, no_auto_assign_status: true))
+          expect(email_domain_bare.data.except("spam_score")).to match_hash_indifferently(valid_data.merge(subdomain_count: 1, no_auto_assign_status: true))
         end
       end
     end
 
     context "@gmail.com" do
       let(:domain) { "gmail.com" }
+      let!(:bike2) { FactoryBot.create(:bike_lightspeed_pos, owner_email: "example@#{domain}") }
+      let(:target_data) { valid_data.merge(bike_count: 1, bike_count_pos: 1) }
       it "resolves" do
         VCR.use_cassette("UpdateEmailDomainJob-gmail") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 1
-          expect(email_domain.has_ban_blockers?).to be_falsey
-          expect(email_domain.spam_score).to eq 4.0
-          expect(email_domain.data).to match_hash_indifferently valid_data.merge
+          expect(email_domain.has_ban_blockers?).to be_truthy
+          expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
           expect(email_domain.status).to eq "permitted"
+          expect(email_domain.spam_score).to be > 5
+        end
+      end
+      context "with domain starting out provisional_ban" do
+        before { email_domain.update(status: :provisional_ban) }
+
+        it "marks it permitted" do
+          expect(email_domain.reload.status).to eq "provisional_ban"
+
+          VCR.use_cassette("UpdateEmailDomainJob-gmail") do
+            instance.perform(email_domain.id)
+            expect(email_domain.reload.user_count).to eq 1
+            expect(email_domain.has_ban_blockers?).to be_truthy
+            expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
+            expect(email_domain.status).to eq "permitted"
+            expect(email_domain.spam_score).to be > 5
+          end
         end
       end
     end
@@ -85,11 +106,11 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.reload.user_count).to eq 2
           expect(email_domain.bike_count).to eq 0
 
-          expect(email_domain.data.except("sendgrid_validations"))
+          expect(email_domain.data.except("sendgrid_validations", "spam_score"))
             .to match_hash_indifferently valid_data.merge(domain_resolves: false, tld_resolves: false)
           expect(email_domain.data.dig("sendgrid_validations", user2.email).keys.sort).to eq target_sendgrid_keys
-          expect(email_domain.spam_score).to eq 0.4
-          expect(email_domain.status).to eq "ban_pending"
+          expect(email_domain.spam_score).to be < 2
+          expect(email_domain.status).to eq "provisional_ban"
         end
       end
     end
@@ -97,17 +118,21 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
     context "@msn.com" do
       let(:domain) { "msn.com" }
       let!(:bike) { FactoryBot.create(:bike, owner_email: "something@#{domain}") }
+      let!(:payment) { FactoryBot.create(:payment, user:) }
       let(:msn_data) do
-        valid_data.merge(domain_resolves: false, tld_resolves: false, bike_count: 1)
+        valid_data.merge(domain_resolves: false, tld_resolves: false, bike_count: 1, user_count_donated: 1)
       end
 
       it "doesn't resolve, but bike makes it permitted" do
+        expect(User.donated.pluck(:id)).to eq([user.id])
         VCR.use_cassette("UpdateEmailDomainJob-msn") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 1
           expect(email_domain.bike_count).to eq 1
-          expect(email_domain.data).to match_hash_indifferently msn_data
+          expect(email_domain.data.except("spam_score")).to match_hash_indifferently msn_data
           expect(email_domain.status).to eq "permitted"
+          expect(email_domain.has_ban_blockers?).to be_truthy
+          expect(email_domain.spam_score).to be >= 4
         end
       end
     end
@@ -122,16 +147,17 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
       end
       before { expect(user2).to be_present } # So EMAIL_MIN_COUNT passes
 
-      it "makes ban_pending" do
+      it "makes provisional_ban" do
         expect(email_domain.reload.calculated_users.count).to eq 2
 
         VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 2
           expect(email_domain.has_ban_blockers?).to be_falsey
-          expect(email_domain.data).to match_hash_indifferently target_data
-          expect(email_domain.status).to eq "ban_pending"
+          expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
+          expect(email_domain.status).to eq "provisional_ban"
           expect(described_class).to_not have_enqueued_sidekiq_job
+          expect(email_domain.spam_score).to be < 2
         end
       end
 
@@ -146,7 +172,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             instance.perform(email_domain.id)
             expect(email_domain.reload.has_ban_blockers?).to be_falsey
             expect(email_domain.auto_bannable?).to be_truthy
-            expect(email_domain.reload.status).to eq "ban_pending"
+            expect(email_domain.reload.status).to eq "provisional_ban"
 
             expect(EmailDomain.count).to eq 5
             email_domain_tld = EmailDomain.order(:id).last
@@ -157,8 +183,8 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             expect(email_domain_tld.reload.status).to eq "permitted"
             expect(email_domain_tld.calculated_users.count).to eq 2
             expect(EmailDomain.count).to eq 5
-            # Update all the other subs to be ban_pending
-            EmailDomain.all.each { |d| d.update(status: "ban_pending") }
+            # Update all the other subs to be provisional_ban
+            EmailDomain.all.each { |d| d.update(status: "provisional_ban") }
             # if the TLD is banned, delete all the subs and the users
             email_domain_tld.update(status: "banned")
             instance.perform(email_domain_tld.id)
@@ -177,7 +203,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
               expect(EmailDomain.count).to eq 5
               instance.perform(email_domain.id)
 
-              expect(email_domain.reload.status).to eq "ban_pending"
+              expect(email_domain.reload.status).to eq "provisional_ban"
 
               expect(EmailDomain.count).to eq 6
             end

@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Email::ConfirmationJob, type: :job do
-  before { stub_const("Email::ConfirmationJob::PROCESS_NEW_EMAIL_DOMAINS", true) }
+  before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
 
   it "sends a welcome email" do
     VCR.use_cassette("Email::ConfirmationJob-default") do
@@ -29,7 +29,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
     end
 
     context "pending" do
-      let(:status) { "ban_pending" }
+      let(:status) { "provisional_ban" }
       it "does not send an email" do
         expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
         ActionMailer::Base.deliveries = []
