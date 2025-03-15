@@ -2461,9 +2461,10 @@ en:
         visibility
       logo_with_background_cutout_html: Logo with background cutout (%{svg_link},
         %{png_link})
-      logo_with_blue_shield_html: Logo with blue shield and white text (%{svg_link},
-        %{png_link})
+      logo_with_links_html: "%{text} (%{svg_link}, %{png_link})"
+      logo_with_blue_shield: Logo with blue shield and white text
       logo_with_cutout: Logo with background cutout
+      logo_with_cutout_black: Logo with black background cutout
       logo_with_stripes: Logo with stripes
       single_color_logo: Single color logo
       single_color_logo_in_white: Single color logo in white
