@@ -84,5 +84,21 @@ class BikeDisplayer
       ext = "/small_" + small.pop
       small.join("/") + ext
     end
+
+    def header_image_urls(bike)
+      if bike.thumb_path.blank?
+        return single_image_hash(bike.stock_photo_url) if bike.stock_photo_url.present?
+        return false # Because there are no images
+      end
+
+      bike_image_url = bike.public_images.limit(1)&.first&.image_url(:large)
+      single_image_hash(bike_image_url)
+    end
+
+    private
+
+    def single_image_hash(image_url)
+      {page: image_url, twitter: image_url, facebook: image_url}
+    end
   end
 end

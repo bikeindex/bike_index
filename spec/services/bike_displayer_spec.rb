@@ -422,4 +422,30 @@ RSpec.describe BikeDisplayer do
       end
     end
   end
+
+  describe "header_image_urls" do
+    let(:bike) { Bike.new }
+    let(:result) { described_class.header_image_urls(bike) }
+
+    it "is false" do
+      expect(result).to be_falsey
+    end
+    context "with stock_photo_url" do
+      let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg" }
+      let(:bike) { Bike.new(stock_photo_url:) }
+      let(:target) { {page: stock_photo_url, twitter: stock_photo_url, facebook: stock_photo_url} }
+      it "is stock_photo_url" do
+        expect(result).to eq target
+      end
+
+      context "with public image" do
+        let(:bike) { FactoryBot.create(:bike, :with_image, stock_photo_url:) }
+        let!(:image_url) { bike.reload.public_images.limit(1)&.first&.image_url(:large) }
+        let(:target) { {page: image_url, twitter: image_url, facebook: image_url} }
+        it "is public image" do
+          expect(result).to eq target
+        end
+      end
+    end
+  end
 end
