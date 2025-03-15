@@ -371,7 +371,7 @@ class Bike < ApplicationRecord
     end
 
     def matching_domain(str)
-      where("owner_email ILIKE ?", "%#{str.to_s.strip}")
+      where("bikes.owner_email ILIKE ?", "%#{str.to_s.strip}")
     end
   end
 

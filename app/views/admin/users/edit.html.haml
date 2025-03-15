@@ -1,5 +1,5 @@
 - last_email_errored = @user.user_emails&.last_email_errored || UserEmail.none
-- if @user.banned? || @user.deleted? || last_email_errored.any?
+- if @user.banned? || @user.deleted? || last_email_errored.any? || @user.likely_spam?
   .row.mb-4
     - if @user.deleted?
       .col-sm-10.offset-sm-1.col-md-6.offset-md-3.mt-4
