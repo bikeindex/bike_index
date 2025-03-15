@@ -91,8 +91,13 @@ class BikeDisplayer
         return false # Because there are no images
       end
 
-      bike_image_url = bike.public_images.limit(1)&.first&.image_url(:large)
-      single_image_hash(bike_image_url)
+      if bike.current_stolen_record.present?
+        facebook_image = bike.current_stolen_record.current_alert_image&.image_url(:facebook)
+        if facebook_image.present?
+          return {page: facebook_image, facebook: facebook_image, twitter: bike.current_stolen_record.current_alert_image.image_url(:twitter)}
+        end
+      end
+      single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
     end
 
     private

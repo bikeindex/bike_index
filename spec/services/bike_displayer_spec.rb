@@ -450,14 +450,22 @@ RSpec.describe BikeDisplayer do
     end
     context "with current_stolen_record" do
       let(:bike) { FactoryBot.create(:stolen_bike, :with_image) }
+      let(:stolen_record) { bike.reload.current_stolen_record }
       it "renders public_image" do
         expect(public_image_url).to be_present
-        expect(bike.current_stolen_record).to be_present
+        expect(stolen_record).to be_present
         expect(result).to eq public_image_target
       end
 
       context "with alert image" do
-        it "renders the "
+        let(:alert_image) { FactoryBot.create(:alert_image, :with_image, stolen_record:) }
+        let(:alert_image_url) { alert_image.reload.image_url(:square) }
+        let(:target) { {page: alert_image.image_url(:facebook), twitter: alert_image.image_url(:twitter), facebook: alert_image.image_url(:facebook)} }
+
+        it "renders the alert image" do
+          expect(alert_image.reload.image_url(:square)).to be_present
+          expect(result).to eq target
+        end
       end
     end
   end
