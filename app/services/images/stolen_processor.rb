@@ -31,12 +31,16 @@ class Images::StolenProcessor
       public_image = stolen_record.bike_main_image
       image = public_image&.open_file
 
+      stolen_record.skip_update = true
       if image.present?
         return unless attach_new_image?(stolen_record, public_image)
 
-        attach_images(stolen_record, image, stolen_record_location(stolen_record))
-        stolen_record.image_four_by_five.blob.metadata["public_image_id"] = public_image.id
-        stolen_record.image_four_by_five.blob.save
+        # Prevent touching the stolen record, which kicks off a job
+        ActiveRecord::Base.no_touching do
+          attach_images(stolen_record, image, stolen_record_location(stolen_record))
+          stolen_record.image_four_by_five.blob.metadata["public_image_id"] = public_image.id
+          stolen_record.image_four_by_five.blob.save
+        end
       elsif (existing_blob = stolen_record.image_four_by_five&.blob)
         existing_blob.metadata["removed"] = true
         # We don't want to update the bike.updated_at unless this is a change

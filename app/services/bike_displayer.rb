@@ -91,10 +91,14 @@ class BikeDisplayer
         return false # Because there are no images
       end
 
-      if bike.current_stolen_record.present?
-        facebook_image = bike.current_stolen_record.current_alert_image&.image_url(:facebook)
+      if (stolen_record = bike.current_stolen_record).present?
+        if stolen_record.images_attached?
+          return {page: stolen_record.image_four_by_five, facebook: stolen_record.image_four_by_five, twitter: stolen_record.image_square}
+        end
+
+        facebook_image = stolen_record.current_alert_image&.image_url(:facebook)
         if facebook_image.present?
-          return {page: facebook_image, facebook: facebook_image, twitter: bike.current_stolen_record.current_alert_image.image_url(:twitter)}
+          return {page: facebook_image, facebook: facebook_image, twitter: stolen_record.current_alert_image.image_url(:twitter)}
         end
       end
       single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))

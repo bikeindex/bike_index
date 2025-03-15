@@ -35,8 +35,10 @@ RSpec.describe Images::StolenProcessor do
 
     it "assigns the public_image" do
       stolen_record.bike.update_column :updated_at, Time.current - 1.hour
+      Sidekiq::Job.clear_all
       expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
       expect do
+        pp "-------"
         described_class.update_alert_images(stolen_record)
       end.to change(ActiveStorage::Blob, :count).by 3
       expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
@@ -44,6 +46,8 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.image_landscape.attached?).to be_truthy
       expect(stolen_record.reload.image_four_by_five.blob.metadata["public_image_id"]).to eq public_image.id
       expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
+      # No new jobs are enqueued
+      expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
 
       stolen_record.bike.update_column :updated_at, Time.current - 1.hour
       # It doesn't create again
@@ -53,6 +57,8 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.reload.images_attached?).to be_truthy
       # It doesn't update the updated_at
       expect(stolen_record.reload.bike.updated_at).to be_within(1).of(Time.current - 1.hour)
+      # No new jobs are enqueued
+      expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
     end
 
     context "public_image deleted" do

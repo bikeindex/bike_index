@@ -268,7 +268,7 @@ class StolenRecord < ApplicationRecord
       self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
     end
     update_tsved_at
-    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
+    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to {after_comm}it
     self.current = false if recovered_at.present? # Make sure we set current to false if recovered
     self.recovery_display_status = calculated_recovery_display_status
     self.no_notify = !receive_notifications # TODO: replace receive_notifications with no_notify
