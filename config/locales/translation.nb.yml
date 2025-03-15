@@ -2941,22 +2941,17 @@ nb:
       trifold_flyer: Trifold Flyer
       trifold_flyer_pdf_url: https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf
     image_resources:
-      basic_logo_alt: Grunnleggende logo
-      basic_logo_html: Grunnleggende logo (%{svg_link}, %{png_link})
-      basic_logo_in_white_html: Grunnleggende logo i hvitt (%{svg_link}, %{png_link})
       bike_index_image_assets: Bike Index bildeelementer
       black_background_shown_here: Svart bakgrunn vist her for synlighet
       check_out_resources_html: Sjekk ut %{resources_link} for ytterligere designressurser
       image_has_no_background: bildet har ingen bakgrunn, vist her med svart for synlighet
-      logo_with_background_cutout_html: Logo med bakgrunnsutskjæring (%{svg_link},
-        %{png_link})
-      logo_with_blue_shield_html: Logo med blått skjold og hvit tekst (%{svg_link},
-        %{png_link})
       logo_with_cutout: Logo med bakgrunnsutskjæring
       logo_with_stripes: Logo med striper
       single_color_logo: Ensfarget logo
       single_color_logo_in_white: Ensfarget logo i hvitt
-      striped_logo_html: Stripete logo (%{svg_link}, %{png_link})
+      logo_with_blue_shield: Logo med blått skjold og hvit tekst
+      logo_with_cutout_black: Logo med svart bakgrunnsutskjæring
+      logo_with_links_html: "%{text} (%{svg_link}, %{png_link})"
     lightspeed:
       a_few_things_to_note: 'Et par ting å merke seg:'
       a_listing_on_bike_index_will_be_created: Når Lightspeed Retail-kontoen din er

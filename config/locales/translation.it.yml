@@ -2682,20 +2682,17 @@ it:
       trifold_flyer:
       trifold_flyer_pdf_url:
     image_resources:
-      basic_logo_alt:
-      basic_logo_html:
-      basic_logo_in_white_html:
       bike_index_image_assets:
       black_background_shown_here:
       check_out_resources_html:
       image_has_no_background:
-      logo_with_background_cutout_html:
-      logo_with_blue_shield_html:
       logo_with_cutout:
       logo_with_stripes:
       single_color_logo:
       single_color_logo_in_white:
-      striped_logo_html:
+      logo_with_blue_shield:
+      logo_with_cutout_black:
+      logo_with_links_html:
     lightspeed:
       a_few_things_to_note:
       a_listing_on_bike_index_will_be_created:
