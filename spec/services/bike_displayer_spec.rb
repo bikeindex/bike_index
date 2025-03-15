@@ -426,6 +426,8 @@ RSpec.describe BikeDisplayer do
   describe "header_image_urls" do
     let(:bike) { Bike.new }
     let(:result) { described_class.header_image_urls(bike) }
+    let(:public_image_url) { bike.reload.public_images.limit(1)&.first&.image_url(:large) }
+    let(:public_image_target) { {page: public_image_url, twitter: public_image_url, facebook: public_image_url} }
 
     it "is false" do
       expect(result).to be_falsey
@@ -440,11 +442,22 @@ RSpec.describe BikeDisplayer do
 
       context "with public image" do
         let(:bike) { FactoryBot.create(:bike, :with_image, stock_photo_url:) }
-        let!(:image_url) { bike.reload.public_images.limit(1)&.first&.image_url(:large) }
-        let(:target) { {page: image_url, twitter: image_url, facebook: image_url} }
         it "is public image" do
-          expect(result).to eq target
+          expect(public_image_url).to be_present
+          expect(result).to eq public_image_target
         end
+      end
+    end
+    context "with current_stolen_record" do
+      let(:bike) { FactoryBot.create(:stolen_bike, :with_image) }
+      it "renders public_image" do
+        expect(public_image_url).to be_present
+        expect(bike.current_stolen_record).to be_present
+        expect(result).to eq public_image_target
+      end
+
+      context "with alert image" do
+        it "renders the "
       end
     end
   end
