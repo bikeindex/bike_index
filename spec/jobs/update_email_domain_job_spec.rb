@@ -25,7 +25,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         b_param_count: 0,
         notification_count: 0,
         bike_count_pos: 0,
-        user_count_donated: 0,
+        user_count_donated: 0
       }
     end
     let(:domain) { "bikeindex.org" }

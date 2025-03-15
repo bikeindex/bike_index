@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Email::PartialRegistrationJob, type: :job do
-  let!(:b_param) { b_param = FactoryBot.create(:b_param, owner_email:) }
+  let!(:b_param) { FactoryBot.create(:b_param, owner_email:) }
   let(:owner_email) { "bikeowner@stuff.org" }
 
   it "sends a partial registration email" do

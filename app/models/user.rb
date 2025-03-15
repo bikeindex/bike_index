@@ -124,7 +124,6 @@ class User < ApplicationRecord
   scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
   scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
-  # NOTE: Not the same as donor? which checks for donations above $10
   scope :donated, -> { joins(:payments).merge(Payment.paid) }
   scope :member, -> { includes(:memberships).merge(Membership.active) }
 

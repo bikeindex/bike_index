@@ -175,7 +175,7 @@ class EmailDomain < ApplicationRecord
 
   def spam_score_domain_resolution
     # 2 points for valid domain (and 2 more for valid subdomain, or being the TLD)
-    base_score = data.slice("domain_resolves", "tld_resolves").count { |_k, v| v } * 1.5
+    data.slice("domain_resolves", "tld_resolves").count { |_k, v| v } * 1.5
   end
 
   def spam_score_our_records
