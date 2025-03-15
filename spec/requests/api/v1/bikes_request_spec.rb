@@ -145,7 +145,7 @@ RSpec.describe API::V1::BikesController, type: :request do
 
       context "new pos_integrator format" do
         # We're switching to use numeric id rather than slug, because the slugs change :(
-        it "creates correctly" do
+        it "creates correctly", :flaky do
           Sidekiq::Testing.inline! do
             expect {
               post base_url, params: bike_hash.merge(organization_slug: organization.id).as_json

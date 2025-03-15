@@ -29,24 +29,61 @@ RSpec.describe Images::StolenProcessor do
 
   describe "update_alert_images" do
     let(:stolen_record) { FactoryBot.create(:stolen_record) }
-    let(:image) { Rails.root.join("spec", "fixtures", "bike_photo-landscape.jpeg") }
+    let(:bike) { stolen_record.bike }
+    let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image)) }
+    let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
 
-    it "attaches the image" do
-      expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
-      described_class.update_alert_images(stolen_record, image:)
-
+    it "assigns the public_image" do
+      stolen_record.bike.update_column :updated_at, Time.current - 1.hour
+      expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+      expect do
+        described_class.update_alert_images(stolen_record)
+      end.to change(ActiveStorage::Blob, :count).by 3
       expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
       expect(stolen_record.image_square.attached?).to be_truthy
       expect(stolen_record.image_landscape.attached?).to be_truthy
+      expect(stolen_record.reload.image_four_by_five.blob.metadata["public_image_id"]).to eq public_image.id
+      expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
 
       stolen_record.bike.update_column :updated_at, Time.current - 1.hour
-      # and calling it again removes the images (since the stolen record has no actual images)
-      described_class.update_alert_images(stolen_record)
+      # It doesn't create again
+      expect do
+        described_class.update_alert_images(stolen_record)
+      end.to change(ActiveStorage::Blob, :count).by 0
+      expect(stolen_record.reload.images_attached?).to be_truthy
+      # It doesn't update the updated_at
+      expect(stolen_record.reload.bike.updated_at).to be_within(1).of(Time.current - 1.hour)
+    end
 
-      expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
-      expect(stolen_record.image_square.attached?).to be_falsey
-      expect(stolen_record.image_landscape.attached?).to be_falsey
-      expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
+    context "public_image deleted" do
+      it "removes" do
+        expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+
+        expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
+        expect(stolen_record.image_square.attached?).to be_truthy
+        expect(stolen_record.image_landscape.attached?).to be_truthy
+
+        public_image.destroy
+        stolen_record.bike.update_column :updated_at, Time.current - 1.hour
+        # and calling it again removes the images (since the stolen record has no actual images)
+        described_class.update_alert_images(stolen_record)
+        expect(stolen_record.reload.images_attached?).to be_falsey
+        expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
+      end
+    end
+
+    context "passing a public_image" do
+      let!(:public_image_2) { FactoryBot.create(:public_image, imageable: bike) }
+
+      it "creates, deletes if the image is deleted" do
+
+      end
+
+      it "doesn't recreate if the image changes" do
+      end
     end
   end
 

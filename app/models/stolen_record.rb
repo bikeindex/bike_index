@@ -192,11 +192,9 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  def purge_images!
-    alert_image&.destroy
-    image_four_by_five.purge
-    image_square.purge
-    image_landscape.purge
+  # In Images::StolenProcessor we set metadata["removed"] when we remove an image
+  def images_attached?
+    image_four_by_five&.attached? && image_four_by_five.blob&.metadata&.dig("removed") != true
   end
 
   # override to enable reverse geocoding if applicable

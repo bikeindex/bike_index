@@ -21,14 +21,34 @@ class Images::StolenProcessor
   TOPBAR_VERTICAL_WIDTH = 106
 
   class << self
-    def update_alert_images(stolen_record, image: nil)
-      # This relies on existing carrierewave methods, will need to be updated
-      image ||= stolen_record.bike_main_image&.open_file
+    # NOTE: This doesn't delete images - that's handled by StolenBike::RemoveOrphanedImagesJob
 
-      stolen_record.purge_images!
-      attach_images(stolen_record, image, stolen_record_location(stolen_record)) if image.present?
+    # Previously, we would set the image via passing it. That's a pain to track!
+    # Instead, when overriding the image in admin, let's update the image we're overriding with
+    # and make it the first image
+    def update_alert_images(stolen_record)
+      # This relies on existing carrierewave methods, will need to be updated
+      public_image = stolen_record.bike_main_image
+      image = public_image&.open_file
+
+      if image.present?
+        return unless attach_new_image?(stolen_record, public_image)
+
+        attach_images(stolen_record, image, stolen_record_location(stolen_record))
+        stolen_record.image_four_by_five.blob.metadata["public_image_id"] = public_image.id
+        stolen_record.image_four_by_five.blob.save
+      elsif (existing_blob = stolen_record.image_four_by_five&.blob)
+        existing_blob.metadata["removed"] = true
+        # We don't want to update the bike.updated_at unless this is a change
+        return unless existing_blob.changed?
+        existing_blob.save
+      end
       stolen_record.bike&.update(updated_at: Time.current)
       stolen_record
+    end
+
+    def attach_new_image?(stolen_record, public_image)
+      stolen_record.image_four_by_five&.blob&.metadata&.dig("public_image_id") != public_image.id
     end
 
     private

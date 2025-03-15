@@ -26,6 +26,7 @@ RSpec.describe HeaderTags::Component, type: :component do
     expect(component.css('meta[name="description"]').first["content"]).to eq description
     expect(component.css('[property="og:description"]').first["content"]).to eq description
     expect(component.css('[name="twitter:description"]').first["content"]).to eq description
+    expect(component.css('[name="twitter:card"]').first["content"]).to eq "summary_large_image"
 
     if published_at.present?
       expect(component.css('[property="article:published_time"]').first["content"]).to eq published_at.iso8601(0)
@@ -207,7 +208,6 @@ RSpec.describe HeaderTags::Component, type: :component do
 
           expect(component.css('link[rel="author"]').first["href"]).to eq Rails.application.routes.url_helpers.user_path(user)
 
-
           expect(component.css('[property="og:type"]').first["content"]).to eq "article"
           expect(component.css('[name="twitter:creator"]').first["content"]).to eq "@stolenbikereg"
 
@@ -246,7 +246,7 @@ RSpec.describe HeaderTags::Component, type: :component do
       end
       context "stolen" do
         let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
-        let(:title) { "Stolen #{mnfg_name}"}
+        let(:title) { "Stolen #{mnfg_name}" }
         let(:description) do
           "#{bike.primary_frame_color.name} #{mnfg_name}, serial: #{bike.serial_number.upcase}. " \
           "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, US"
@@ -255,8 +255,6 @@ RSpec.describe HeaderTags::Component, type: :component do
           expect(bike.reload.current_stolen_record.address).to eq "Chicago, IL 60608, US"
 
           expect_matching_tags(title:, description:, updated_at: bike.updated_at)
-
-          # expect(header_tags.find { |t| t && t.include?("twitter:card") }).to match "summary"
         end
       end
       context "found" do
@@ -265,7 +263,6 @@ RSpec.describe HeaderTags::Component, type: :component do
           "#{bike.primary_frame_color.name} #{title}, serial: Hidden. Cool description. " \
           "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY 10007, US"
         end
-        # let(:title_string) { "1969 #{mnfg_name} Something special" }
         let(:title_extended) { "Found #{title}" }
         it "returns expected things" do
           expect(bike.reload.current_impound_record.address).to eq "New York, NY 10007"

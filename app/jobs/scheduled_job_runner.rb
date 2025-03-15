@@ -60,6 +60,7 @@ class ScheduledJobRunner < ScheduledJob
       UpdateInvoiceJob,
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
+      StolenBike::RemoveOrphanedImagesJob,
       self
     ].freeze
   end
