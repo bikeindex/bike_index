@@ -30,7 +30,7 @@ RSpec.describe Images::StolenProcessor do
   describe "update_alert_images" do
     let(:stolen_record) { FactoryBot.create(:stolen_record) }
     let(:bike) { stolen_record.bike }
-    let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image)) }
+    let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image), listing_order: 5) }
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
 
     it "assigns the public_image" do
@@ -43,6 +43,7 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
       expect(stolen_record.image_square.attached?).to be_truthy
       expect(stolen_record.image_landscape.attached?).to be_truthy
+      expect(stolen_record.images_attached_id).to eq public_image.id
       expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
       expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
       # No new jobs are enqueued
@@ -86,12 +87,29 @@ RSpec.describe Images::StolenProcessor do
     end
 
     context "with a new public_image" do
-      let!(:public_image_2) { FactoryBot.create(:public_image, imageable: bike) }
+      let(:public_image2) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image), listing_order: 1) }
 
-      it "creates, deletes if the image is deleted" do
+      it "switches to the new images" do
+        Sidekiq::Job.clear_all
+        expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(stolen_record.images_attached_id).to eq public_image.id
+
+        expect(public_image2).to be_valid
+        expect(stolen_record.reload.bike_main_image.id).to eq public_image2.id
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(stolen_record.images_attached_id).to eq public_image2.id
       end
+    end
 
-      it "doesn't recreate if the image changes" do
+    context "with stock photo" do
+      it "creates" do
       end
     end
   end

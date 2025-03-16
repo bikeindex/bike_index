@@ -32,7 +32,7 @@ class Images::StolenProcessor
 
       stolen_record.skip_update = true
       if image.present?
-        return unless attach_new_image?(stolen_record, image_id)
+        return if stolen_record.images_attached_id == image_id
 
         # Prevent touching the stolen record, which kicks off a job
         ActiveRecord::Base.no_touching do
@@ -58,10 +58,6 @@ class Images::StolenProcessor
       return [nil, nil] if public_image.blank?
 
       [public_image&.open_file, public_image.id]
-    end
-
-    def attach_new_image?(stolen_record, image_id)
-      stolen_record.image_four_by_five&.blob&.metadata&.dig("image_id") != image_id
     end
 
     def attach_images(stolen_record, image, location_text)

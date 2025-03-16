@@ -197,6 +197,10 @@ class StolenRecord < ApplicationRecord
     image_four_by_five&.attached? && image_four_by_five.blob&.metadata&.dig("removed") != true
   end
 
+  def images_attached_id
+    image_four_by_five&.blob&.metadata&.dig("image_id")
+  end
+
   # override to enable reverse geocoding if applicable
   def should_be_geocoded?
     !skip_geocoding?
