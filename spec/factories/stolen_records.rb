@@ -20,8 +20,8 @@ FactoryBot.define do
         stolen_record.image_four_by_five.attach(
           io: File.open(evaluator.filename),
           filename: "alert-photo.jpg",
-          content_type: 'image/jpeg'
-         )
+          content_type: "image/jpeg"
+        )
       end
     end
 

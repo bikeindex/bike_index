@@ -10,7 +10,7 @@ RSpec.describe StolenRecord, type: :model do
       expect(stolen_record.reload.images_attached?).to be_falsey
     end
     context "with images attached" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images)}
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images) }
       it "is valid" do
         expect(stolen_record).to be_valid
         expect(stolen_record.reload.images_attached?).to be_truthy
