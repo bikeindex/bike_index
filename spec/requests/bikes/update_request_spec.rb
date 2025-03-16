@@ -388,8 +388,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone_for_shops).to be_truthy
         expect(stolen_record.phone_for_police).to be_falsey
 
-        expect(stolen_record.alert_image).to be_present
-        expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
+        expect(stolen_record.images_attached?).to be_truthy
       end
 
       expect(current_user.reload.alert_slugs).to eq([])

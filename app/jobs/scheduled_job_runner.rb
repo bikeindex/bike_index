@@ -51,6 +51,7 @@ class ScheduledJobRunner < ScheduledJob
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
       StolenBike::DeactivateExpiredTheftAlertJob,
+      StolenBike::RemoveOrphanedImagesJob,
       StolenBike::UpdateTheftAlertFacebookJob,
       TsvCreatorJob,
       # UnusedOwnershipRemovalJob,
@@ -60,7 +61,6 @@ class ScheduledJobRunner < ScheduledJob
       UpdateInvoiceJob,
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
-      StolenBike::RemoveOrphanedImagesJob,
       self
     ].freeze
   end
