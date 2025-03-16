@@ -15,9 +15,7 @@ RSpec.describe StolenBike::RemoveOrphanedImagesJob, type: :lib do
     it "enqueues for images that have been created in the past day"
 
     context "passed an ID" do
-      
       it "deletes the orphaned records and also the alert_image" do
-
       end
     end
   end

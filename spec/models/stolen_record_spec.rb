@@ -3,6 +3,21 @@ require "rails_helper"
 RSpec.describe StolenRecord, type: :model do
   it_behaves_like "geocodeable"
 
+  describe "factories" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    it "is valid" do
+      expect(stolen_record).to be_valid
+      expect(stolen_record.reload.images_attached?).to be_falsey
+    end
+    context "with images attached" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images)}
+      it "is valid" do
+        expect(stolen_record).to be_valid
+        expect(stolen_record.reload.images_attached?).to be_truthy
+      end
+    end
+  end
+
   describe "after_save hooks" do
     let(:bike) { FactoryBot.create(:bike) }
     context "if bike no longer exists" do
@@ -16,7 +31,7 @@ RSpec.describe StolenRecord, type: :model do
 
         stolen_record.reload
         expect(stolen_record.bike).to be_blank
-        expect(stolen_record.alert_image).to be_blank
+        expect(stolen_record.images_attached?).to be_falsey
       end
     end
 
@@ -42,7 +57,6 @@ RSpec.describe StolenRecord, type: :model do
 
         expect(stolen_record.recovered?).to be_truthy
         expect(stolen_record.bike.status_stolen?).to be_falsey
-        expect(stolen_record.alert_image).to be_blank
       end
     end
 

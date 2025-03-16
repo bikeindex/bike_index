@@ -38,7 +38,6 @@ RSpec.describe Images::StolenProcessor do
       Sidekiq::Job.clear_all
       expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
       expect do
-        pp "-------"
         described_class.update_alert_images(stolen_record)
       end.to change(ActiveStorage::Blob, :count).by 3
       expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
@@ -74,8 +73,11 @@ RSpec.describe Images::StolenProcessor do
 
         public_image.destroy
         stolen_record.bike.update_column :updated_at, Time.current - 1.hour
-        # and calling it again removes the images (since the stolen record has no actual images)
-        described_class.update_alert_images(stolen_record)
+        # Calling it after public_image is deleted, soft deletes the attachments
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 0
+
         expect(stolen_record.reload.images_attached?).to be_falsey
         expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
       end
@@ -85,7 +87,6 @@ RSpec.describe Images::StolenProcessor do
       let!(:public_image_2) { FactoryBot.create(:public_image, imageable: bike) }
 
       it "creates, deletes if the image is deleted" do
-
       end
 
       it "doesn't recreate if the image changes" do

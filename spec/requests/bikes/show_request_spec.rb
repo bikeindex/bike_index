@@ -163,7 +163,8 @@ RSpec.describe "BikesController#show", type: :request do
       expect {
         StolenBike::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
       }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
-      expect(stolen_record.reload.alert_image).to be_present
+      expect(stolen_record.reload.alert_image).to_not be_present
+      expect(stolen_record.reload.images_attached?).to be_truthy
       expect(stolen_record.recovery_link_token).to be_present
     end
   end

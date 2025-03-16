@@ -5,8 +5,11 @@
 class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
   prepend ScheduledJobRecorder
 
-  def perform(stolen_record_id = nil)
+  def self.frequency
+    30.hours
+  end
 
+  def perform(stolen_record_id = nil)
     # stolen_record.alert_image&.destroy
     # stolen_record.image_four_by_five.purge
     # stolen_record.image_square.purge

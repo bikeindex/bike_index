@@ -14,11 +14,9 @@ RSpec.describe HeaderTags::Component, type: :component do
   let(:default_description) { "The best bike registry: Simple, secure and free." }
 
   # Add tests for:
-  # - page title & description for welcome choose_registration
   # - page title for bikes edit
   # - page title for bike_versions edit
   # - page title for bikes edit
-  # - at least one translation
 
   def expect_matching_tags(title:, description:, image: :default, published_at: nil, modified_at: nil, updated_at: nil)
     expect(component.css("title")).to have_text title
@@ -48,15 +46,17 @@ RSpec.describe HeaderTags::Component, type: :component do
   end
 
   def expect_matching_image_tags(image = :default)
-    return if image == false
+    # return if image == false
     if image == :default
       page_image = "/opengraph.png"
       twitter_image = "/opengraph.png"
-    elsif image.is_a?(String)
+    elsif image.is_a?(Hash)
+      page_image = image[:page_image]
+      twitter_image = image[:twitter_image]
+    else
       page_image = image
       twitter_image = image
     end
-
     expect(component.css('[property="og:image"]').first["content"]).to eq page_image
     expect(component.css('[name="twitter:image"]').first["content"]).to eq twitter_image
   end
@@ -244,6 +244,16 @@ RSpec.describe HeaderTags::Component, type: :component do
         expect(component.css('[property="og:url"]').first["content"]).to eq request_url
         expect(component.css('link[rel="canonical"]').first["href"]).to eq request_url
       end
+      context "public_image" do
+        let!(:public_image) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
+        before do
+          bike.reload.save
+          # bike.reload
+        end
+        it "returns expected thing" do
+          expect_matching_tags(title:, description:, image: public_image.image_url(:large), updated_at: bike.updated_at)
+        end
+      end
       context "stolen" do
         let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
         let(:title) { "Stolen #{mnfg_name}" }
@@ -255,6 +265,23 @@ RSpec.describe HeaderTags::Component, type: :component do
           expect(bike.reload.current_stolen_record.address).to eq "Chicago, IL 60608, US"
 
           expect_matching_tags(title:, description:, updated_at: bike.updated_at)
+        end
+        context "with attached image" do
+          let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image_path)) }
+          let(:stolen_record) { bike.current_stolen_record }
+          let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+          before { Images::StolenProcessor.update_alert_images(stolen_record) }
+          let(:target_images) do
+            {
+              page_image: Rails.application.routes.url_helpers.rails_public_blob_url(stolen_record.image_four_by_five),
+              twitter_image: Rails.application.routes.url_helpers.rails_public_blob_url(stolen_record.image_landscape)
+            }
+          end
+          it "returns expected" do
+            expect(stolen_record.reload.images_attached?).to be_truthy
+
+            expect_matching_tags(title:, image: target_images, description:, updated_at: bike.updated_at)
+          end
         end
       end
       context "found" do
