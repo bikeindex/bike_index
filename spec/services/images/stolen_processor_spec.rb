@@ -28,8 +28,8 @@ RSpec.describe Images::StolenProcessor do
   end
 
   describe "update_alert_images" do
-    let(:stolen_record) { FactoryBot.create(:stolen_record) }
-    let(:bike) { stolen_record.bike }
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
     let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image), listing_order: 5) }
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
 
@@ -109,7 +109,20 @@ RSpec.describe Images::StolenProcessor do
     end
 
     context "with stock photo" do
+      let(:bike) { FactoryBot.create(:bike, stock_photo_url:) }
+      let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/13095/csm_INFINITO_CV_SUPER_RECORD_EPS_Compact_2a2c680c1b.jpg" }
+      let(:public_image) { nil }
       it "creates" do
+        VCR.use_cassette("Images-StolenProcessor-stock_photo") do
+          expect(bike.reload.public_images.count).to eq 0
+          expect(bike.stock_photo_url).to be_present
+          Sidekiq::Job.clear_all
+          expect do
+            described_class.update_alert_images(stolen_record)
+          end.to change(ActiveStorage::Blob, :count).by 3
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          expect(stolen_record.images_attached_id).to eq "b#{bike.id}"
+        end
       end
     end
   end

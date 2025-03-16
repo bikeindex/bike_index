@@ -55,9 +55,13 @@ class Images::StolenProcessor
     def image_and_id(stolen_record)
       public_image = stolen_record.bike_main_image
       # TODO: Add bike.stock_photo_url (along with bike_id) here
-      return [nil, nil] if public_image.blank?
+      return [public_image&.open_file, public_image.id] if public_image.present?
 
-      [public_image&.open_file, public_image.id]
+      if (stock_photo_url = stolen_record.bike.stock_photo_url).present?
+        [URI.parse(stock_photo_url).open, "b#{stolen_record.bike_id}"]
+      else
+        [nil, nil]
+      end
     end
 
     def attach_images(stolen_record, image, location_text)
