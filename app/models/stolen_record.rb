@@ -100,9 +100,9 @@ class StolenRecord < ApplicationRecord
   has_one :recovery_display
   has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
 
-  has_one_attached :image_four_by_five
-  has_one_attached :image_square
-  has_one_attached :image_landscape
+  has_one_attached :image_four_by_five, dependent: false
+  has_one_attached :image_square, dependent: false
+  has_one_attached :image_landscape, dependent: false
 
   validates_presence_of :date_stolen
 

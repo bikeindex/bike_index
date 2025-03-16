@@ -28,17 +28,16 @@ class Images::StolenProcessor
     # and make it the first image
     def update_alert_images(stolen_record)
       # This relies on existing carrierewave methods, will need to be updated
-      public_image = stolen_record.bike_main_image
-      image = public_image&.open_file
+      image, image_id = image_and_id(stolen_record)
 
       stolen_record.skip_update = true
       if image.present?
-        return unless attach_new_image?(stolen_record, public_image)
+        return unless attach_new_image?(stolen_record, image_id)
 
         # Prevent touching the stolen record, which kicks off a job
         ActiveRecord::Base.no_touching do
           attach_images(stolen_record, image, stolen_record_location(stolen_record))
-          stolen_record.image_four_by_five.blob.metadata["public_image_id"] = public_image.id
+          stolen_record.image_four_by_five.blob.metadata["image_id"] = image_id
           stolen_record.image_four_by_five.blob.save
         end
       elsif (existing_blob = stolen_record.image_four_by_five&.blob)
@@ -51,11 +50,19 @@ class Images::StolenProcessor
       stolen_record
     end
 
-    def attach_new_image?(stolen_record, public_image)
-      stolen_record.image_four_by_five&.blob&.metadata&.dig("public_image_id") != public_image.id
+    private
+
+    def image_and_id(stolen_record)
+      public_image = stolen_record.bike_main_image
+      # TODO: Add bike.stock_photo_url (along with bike_id) here
+      return [nil, nil] if public_image.blank?
+
+      [public_image&.open_file, public_image.id]
     end
 
-    private
+    def attach_new_image?(stolen_record, image_id)
+      stolen_record.image_four_by_five&.blob&.metadata&.dig("image_id") != image_id
+    end
 
     def attach_images(stolen_record, image, location_text)
       stolen_record.image_four_by_five

@@ -4,6 +4,8 @@ touch log/development.log
 > log/test.log # Clear out test log too
 touch log/bullet.log
 > log/test.log # Clear out bullet log
+# Clear out temp - mainly used by tests
+rm -rf tmp/*
 
 # Start Redis in the background, if it isn't started already
 touch log/redis.log

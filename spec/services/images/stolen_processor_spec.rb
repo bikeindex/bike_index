@@ -43,7 +43,7 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
       expect(stolen_record.image_square.attached?).to be_truthy
       expect(stolen_record.image_landscape.attached?).to be_truthy
-      expect(stolen_record.reload.image_four_by_five.blob.metadata["public_image_id"]).to eq public_image.id
+      expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
       expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
       # No new jobs are enqueued
       expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
@@ -53,6 +53,7 @@ RSpec.describe Images::StolenProcessor do
       expect do
         described_class.update_alert_images(stolen_record)
       end.to change(ActiveStorage::Blob, :count).by 0
+      expect(ActiveStorage::Attachment.count).to eq 3
       expect(stolen_record.reload.images_attached?).to be_truthy
       # It doesn't update the updated_at
       expect(stolen_record.reload.bike.updated_at).to be_within(1).of(Time.current - 1.hour)
@@ -77,13 +78,14 @@ RSpec.describe Images::StolenProcessor do
         expect do
           described_class.update_alert_images(stolen_record)
         end.to change(ActiveStorage::Blob, :count).by 0
+        expect(ActiveStorage::Attachment.count).to eq 3
 
         expect(stolen_record.reload.images_attached?).to be_falsey
         expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
       end
     end
 
-    context "passing a public_image" do
+    context "with a new public_image" do
       let!(:public_image_2) { FactoryBot.create(:public_image, imageable: bike) }
 
       it "creates, deletes if the image is deleted" do

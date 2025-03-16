@@ -15,13 +15,12 @@ FactoryBot.define do
       transient do
         filename { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
       end
-      # NOTE: Only attaches a single photo, because that's the only one that's verified
+      # NOTE: Only attaches 2 photos, because those are the only ones used currently
       after(:build) do |stolen_record, evaluator|
-        stolen_record.image_four_by_five.attach(
-          io: File.open(evaluator.filename),
-          filename: "alert-photo.jpg",
-          content_type: "image/jpeg"
-        )
+        stolen_record.image_four_by_five.attach(io: File.open(evaluator.filename),
+          filename: "image.jpg")
+        stolen_record.image_landscape.attach(io: File.open(evaluator.filename),
+          filename: "image.jpg")
       end
     end
 
