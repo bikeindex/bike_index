@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   # Direct route for active storage, lipanski.com/posts/activestorage-cdn-rails-direct-route
   direct :rails_public_blob do |blob|
     # Preserve the behavior of `rails_blob_url` when using file storage
-    if Bikeindex::Application.config.active_storage.service == :local
+    if %i[local test].include?(Bikeindex::Application.config.active_storage.service)
       route =
         if blob.is_a?(ActiveStorage::Variant) || blob.is_a?(ActiveStorage::VariantWithRecord)
           :rails_representation

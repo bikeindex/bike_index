@@ -8,8 +8,6 @@ class UpdateEmailDomainJob < ScheduledJob
   VALIDATE_WITH_SENDGRID = EmailDomain::VERIFICATION_ENABLED && SENDGRID_VALIDATION_KEY.present?
   SENDGRID_VALIDATION_URL = "https://api.sendgrid.com/v3/validations/email"
 
-  sidekiq_options retry: 1
-
   class << self
     def frequency
       24.hours

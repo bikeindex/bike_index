@@ -145,7 +145,10 @@ RSpec.describe "BikesController#show", type: :request do
     let(:theft_alert) { FactoryBot.create(:theft_alert_ended) }
     let(:stolen_record) { theft_alert.stolen_record }
     let(:bike) { stolen_record.bike }
-    let!(:image1) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
+    let!(:image1) do
+      FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike,
+        image: File.open(Rails.root.join("spec/fixtures/bike.jpg")))
+    end
     it "renders" do
       stolen_record.update_attribute :recovery_link_token, nil
       expect(stolen_record.reload.alert_image).to be_blank
@@ -160,7 +163,8 @@ RSpec.describe "BikesController#show", type: :request do
       expect {
         StolenBike::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
       }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
-      expect(stolen_record.reload.alert_image).to be_present
+      expect(stolen_record.reload.alert_image).to_not be_present
+      expect(stolen_record.reload.images_attached?).to be_truthy
       expect(stolen_record.recovery_link_token).to be_present
     end
   end

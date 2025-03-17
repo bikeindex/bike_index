@@ -14,11 +14,52 @@ RSpec.describe HeaderTags::Component, type: :component do
   let(:default_description) { "The best bike registry: Simple, secure and free." }
 
   # Add tests for:
-  # - page title & description for welcome choose_registration
   # - page title for bikes edit
   # - page title for bike_versions edit
   # - page title for bikes edit
-  # - at least one translation
+
+  def expect_matching_tags(title:, description:, image: :default, published_at: nil, modified_at: nil, updated_at: nil)
+    expect(component.css("title")).to have_text title
+
+    expect(component.css('meta[name="description"]').first["content"]).to eq description
+    expect(component.css('[property="og:description"]').first["content"]).to eq description
+    expect(component.css('[name="twitter:description"]').first["content"]).to eq description
+    expect(component.css('[name="twitter:card"]').first["content"]).to eq "summary_large_image"
+
+    if published_at.present?
+      expect(component.css('[property="article:published_time"]').first["content"]).to eq published_at.iso8601(0)
+    else
+      expect(component.css('[property="article:published_time"]')).to be_blank
+    end
+    if modified_at.present?
+      expect(component.css('[property="article:modified_time"]').first["content"]).to eq modified_at.iso8601(0)
+    else
+      expect(component.css('[property="article:modified_time"]')).to be_blank
+    end
+    if updated_at.present?
+      expect(component.css('[property="og:updated_time"]').first["content"]).to eq updated_at.utc.iso8601(0)
+    else
+      expect(component.css('[property="og:updated_time"]')).to be_blank
+    end
+
+    expect_matching_image_tags(image)
+  end
+
+  def expect_matching_image_tags(image = :default)
+    # return if image == false
+    if image == :default
+      page_image = "/opengraph.png"
+      twitter_image = "/opengraph.png"
+    elsif image.is_a?(Hash)
+      page_image = image[:page_image]
+      twitter_image = image[:twitter_image]
+    else
+      page_image = image
+      twitter_image = image
+    end
+    expect(component.css('[property="og:image"]').first["content"]).to eq page_image
+    expect(component.css('[name="twitter:image"]').first["content"]).to eq twitter_image
+  end
 
   context "welcome controller" do
     let(:controller_name) { "welcome" }
@@ -119,20 +160,14 @@ RSpec.describe HeaderTags::Component, type: :component do
           page_obj.secondary_title = "Another title for cool stuff"
 
           expect(component.css('link[type="application/atom+xml"]').first["href"]).to eq "http://test.host/news.atom"
-          expect(component.css("title")).to have_text "Cool blog"
-          expect(component.css('link[rel="author"]').first["href"]).to eq Rails.application.routes.url_helpers.user_path(user)
-          expect(component.css('meta[name="description"]').first["content"]).to eq "Bike Index did something cool"
-          expect(component.css('[property="og:description"]').first["content"]).to eq "Bike Index did something cool"
-          expect(component.css('[name="twitter:description"]').first["content"]).to eq "Bike Index did something cool"
 
-          expect(component.css('[property="og:image"]').first["content"]).to eq target_url
-          expect(component.css('[name="twitter:image"]').first["content"]).to eq target_url
+          expect_matching_tags(title: "Cool blog", description: "Bike Index did something cool",
+            image: target_url, published_at: target_time, modified_at: target_time)
+
+          expect(component.css('link[rel="author"]').first["href"]).to eq Rails.application.routes.url_helpers.user_path(user)
 
           expect(component.css('[property="og:type"]').first["content"]).to eq "article"
           expect(component.css('[name="twitter:creator"]').first["content"]).to eq "@stolenbikereg"
-
-          expect(component.css('[property="article:published_time"]').first["content"]).to eq target_time.iso8601(0)
-          expect(component.css('[property="article:modified_time"]').first["content"]).to eq target_time.iso8601(0)
 
           expect(component.css('[property="og:url"]').first["content"]).to eq request_url
           expect(component.css('link[rel="canonical"]').first["href"]).to eq request_url
@@ -155,9 +190,8 @@ RSpec.describe HeaderTags::Component, type: :component do
           allow(page_obj).to receive(:index_image_lg) { target_url }
         end
         it "adds the public image we want" do
-          expect(component.css("title")).to have_text title
-          expect(component.css('[property="og:image"]').first["content"]).to eq target_url
-          expect(component.css('[name="twitter:image"]').first["content"]).to eq target_url
+          expect_matching_tags(title: title, description: "Bike Index did something cool",
+            image: target_url, published_at: target_time, modified_at: target_time)
         end
       end
       describe "info post" do
@@ -168,20 +202,14 @@ RSpec.describe HeaderTags::Component, type: :component do
         end
         it "returns the info tags" do
           expect(component.css('link[type="application/atom+xml"]').any?).to be_falsey
-          expect(component.css("title")).to have_text "Cool blog"
-          expect(component.css('link[rel="author"]').first["href"]).to eq Rails.application.routes.url_helpers.user_path(user)
-          expect(component.css('meta[name="description"]').first["content"]).to eq "Bike Index did something cool"
-          expect(component.css('[property="og:description"]').first["content"]).to eq "Bike Index did something cool"
-          expect(component.css('[name="twitter:description"]').first["content"]).to eq "Bike Index did something cool"
 
-          expect(component.css('[property="og:image"]').first["content"]).to eq "/opengraph.png"
-          expect(component.css('[name="twitter:image"]').first["content"]).to eq "/opengraph.png"
+          expect_matching_tags(title: "Cool blog", description: "Bike Index did something cool",
+            published_at: target_time, modified_at: target_time)
+
+          expect(component.css('link[rel="author"]').first["href"]).to eq Rails.application.routes.url_helpers.user_path(user)
 
           expect(component.css('[property="og:type"]').first["content"]).to eq "article"
           expect(component.css('[name="twitter:creator"]').first["content"]).to eq "@stolenbikereg"
-
-          expect(component.css('[property="article:published_time"]').first["content"]).to eq target_time.iso8601(0)
-          expect(component.css('[property="article:modified_time"]').first["content"]).to eq target_time.iso8601(0)
 
           expect(component.css('[property="og:url"]').first["content"]).to eq request_url
           expect(component.css('link[rel="canonical"]').first["href"]).to eq request_url
@@ -195,89 +223,99 @@ RSpec.describe HeaderTags::Component, type: :component do
     let(:bike) { Bike.new(status: "status_stolen") }
     let(:target_time) { Time.current - 2.days }
     let(:page_obj) { bike }
+    let(:mnfg_name) { bike.manufacturer.simple_name.to_s }
+
     describe "show" do
       let(:action_name) { "show" }
-      let(:bike) { FactoryBot.create(:bike, frame_model: "Something special", year: 1969, description: "Cool description") }
-      let(:title_string) { "1969 #{bike.manufacturer.simple_name} Something special" }
-      let(:target_description) { "#{bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number.upcase}. Cool description." }
-      let(:image_url) { "http://something.com" }
+      let(:bike) { FactoryBot.create(:bike, frame_model: "Something special", year: 1969, description: "Cool description", stock_photo_url:) }
+      let(:title) { "1969 #{mnfg_name} Something special" }
+      let(:description) { "#{bike.primary_frame_color.name} #{title}, serial: #{bike.serial_number.upcase}. Cool description." }
+      let(:stock_photo_url) { "http://something.com" }
       it "returns the bike name on Show" do
-        expect(bike.title_string).to eq title_string
-        allow(bike).to receive(:stock_photo_url) { image_url }
+        expect(bike.title_string).to eq title
         bike.update_column :updated_at, target_time
 
-        expect(component.css("title")).to have_text title_string
+        expect_matching_tags(title:, description:, image: stock_photo_url, updated_at: target_time)
         expect(component.css('link[rel="author"]')).to be_blank
-        expect(component.css('meta[name="description"]').first["content"]).to eq target_description
-        expect(component.css('[property="og:description"]').first["content"]).to eq target_description
-        expect(component.css('[name="twitter:description"]').first["content"]).to eq target_description
-
-        expect(component.css('[property="og:image"]').first["content"]).to eq image_url
-        expect(component.css('[name="twitter:image"]').first["content"]).to eq image_url
 
         expect(component.css('[property="og:type"]')).to be_blank
         expect(component.css('[name="twitter:creator"]').first["content"]).to eq "@bikeindex"
 
-        expect(component.css('[property="og:updated_time"]').first["content"]).to eq target_time.utc.iso8601(0)
-
         expect(component.css('[property="og:url"]').first["content"]).to eq request_url
         expect(component.css('link[rel="canonical"]').first["href"]).to eq request_url
       end
-      #     context "stolen" do
-      #       let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
-      #       let(:title_string) { bike.manufacturer.simple_name.to_s }
-      #       let(:target_page_description) do
-      #         "#{@bike.primary_frame_color.name} #{title_string}, serial: #{bike.serial_number.upcase}. " \
-      #         "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, US"
-      #       end
-      #       it "returns expected things" do
-      #         expect(bike.reload.current_stolen_record.address).to eq "Chicago, IL 60608, US"
-      #         expect(bike.title_string).to eq title_string
-      #         header_tags = helper.bikes_header_tags
-      #         expect(helper.page_title).to eq "Stolen #{title_string}"
-      #         expect(helper.page_description).to eq target_page_description
-      #         og_image = header_tags.find { |t| t && t[/og.image/] }
-      #         twitter_image = header_tags.find { |t| t&.include?("twitter:image") }
-      #         expect(og_image.include?("/bike_index.png")).to be_truthy
-      #         expect(twitter_image.include?("/bike_index.png")).to be_truthy
-      #         expect(header_tags.find { |t| t && t.include?("twitter:card") }).to match "summary"
-      #       end
-      #     end
-      #     context "found" do
-      #       let!(:impound_record) { FactoryBot.create(:impound_record, :in_nyc, bike: bike) }
-      #       let(:target_page_description) do
-      #         "#{@bike.primary_frame_color.name} #{title_string}, serial: Hidden. Cool description. " \
-      #         "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY 10007, US"
-      #       end
-      #       it "returns expected things" do
-      #         expect(bike.reload.current_impound_record.address).to eq "New York, NY 10007"
-      #         expect(bike.status_humanized).to eq "found"
-      #         expect(bike.title_string).to eq title_string
-      #         helper.bikes_header_tags
-      #         expect(helper.page_title).to eq "Found #{title_string}"
-      #         expect(helper.page_description).to eq target_page_description
-      #       end
-      #     end
-      #     context "impounded" do
-      #       let(:parking_notification) { FactoryBot.create(:parking_notification_organized, :in_edmonton, bike: bike, use_entered_address: true) }
-      #       let(:organization) { parking_notification.organization }
-      #       let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike, parking_notification: parking_notification, organization: organization) }
-      #       let(:target_page_description) do
-      #         "#{@bike.primary_frame_color.name} #{title_string}, serial: Hidden. Cool description. " \
-      #         "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB T6G 2B3, CA"
-      #       end
-      #       it "returns expected things" do
-      #         expect(parking_notification.reload.address).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, CA"
-      #         impound_record.reload
-      #         expect(bike.reload.current_impound_record.address).to eq "Edmonton, AB T6G 2B3, CA"
-      #         expect(bike.status_humanized).to eq "impounded"
-      #         expect(bike.title_string).to eq title_string
-      #         helper.bikes_header_tags
-      #         expect(helper.page_title).to eq "Impounded #{title_string}"
-      #         expect(helper.page_description).to eq target_page_description
-      #       end
-      #     end
-      #   end
+      context "public_image" do
+        let!(:public_image) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
+        before do
+          bike.reload.save
+          # bike.reload
+        end
+        it "returns expected thing" do
+          expect_matching_tags(title:, description:, image: public_image.image_url(:large), updated_at: bike.updated_at)
+        end
+      end
+      context "stolen" do
+        let(:bike) { FactoryBot.create(:stolen_bike_in_chicago) }
+        let(:title) { "Stolen #{mnfg_name}" }
+        let(:description) do
+          "#{bike.primary_frame_color.name} #{mnfg_name}, serial: #{bike.serial_number.upcase}. " \
+          "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, US"
+        end
+        it "returns expected things" do
+          expect(bike.reload.current_stolen_record.address).to eq "Chicago, IL 60608, US"
+
+          expect_matching_tags(title:, description:, updated_at: bike.updated_at)
+        end
+        context "with attached image" do
+          let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image_path)) }
+          let(:stolen_record) { bike.current_stolen_record }
+          let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+          before { Images::StolenProcessor.update_alert_images(stolen_record) }
+          let(:target_images) do
+            {
+              page_image: Rails.application.routes.url_helpers.rails_public_blob_url(stolen_record.image_four_by_five),
+              twitter_image: Rails.application.routes.url_helpers.rails_public_blob_url(stolen_record.image_landscape)
+            }
+          end
+          it "returns expected" do
+            expect(stolen_record.reload.images_attached?).to be_truthy
+
+            expect_matching_tags(title:, image: target_images, description:, updated_at: bike.updated_at)
+          end
+        end
+      end
+      context "found" do
+        let!(:impound_record) { FactoryBot.create(:impound_record, :in_nyc, bike: bike) }
+        let(:description) do
+          "#{bike.primary_frame_color.name} #{title}, serial: Hidden. Cool description. " \
+          "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY 10007, US"
+        end
+        let(:title_extended) { "Found #{title}" }
+        it "returns expected things" do
+          expect(bike.reload.current_impound_record.address).to eq "New York, NY 10007"
+          expect(bike.status_humanized).to eq "found"
+          expect(bike.title_string).to eq title
+          expect_matching_tags(title: title_extended, description:, image: stock_photo_url, updated_at: bike.updated_at)
+        end
+      end
+      context "impounded" do
+        let(:parking_notification) { FactoryBot.create(:parking_notification_organized, :in_edmonton, bike: bike, use_entered_address: true) }
+        let(:organization) { parking_notification.organization }
+        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike, parking_notification: parking_notification, organization: organization) }
+        let(:title_extended) { "Impounded #{title}" }
+        let(:description) do
+          "#{bike.primary_frame_color.name} #{title}, serial: Hidden. Cool description. " \
+          "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB T6G 2B3, CA"
+        end
+        it "returns expected things" do
+          expect(parking_notification.reload.address).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, CA"
+          impound_record.reload
+          expect(bike.reload.current_impound_record.address).to eq "Edmonton, AB T6G 2B3, CA"
+          expect(bike.status_humanized).to eq "impounded"
+
+          expect_matching_tags(title: title_extended, description:, image: stock_photo_url, updated_at: bike.updated_at)
+        end
+      end
       #   context "twitter present and shown" do
       #     it "has twitter creator if present and shown" do
       #       user = User.new(twitter: "coolio", show_twitter: true)

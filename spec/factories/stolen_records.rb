@@ -11,6 +11,19 @@ FactoryBot.define do
       current { false }
     end
 
+    trait :with_images do
+      transient do
+        filename { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+      end
+      # NOTE: Only attaches 2 photos, because those are the only ones used currently
+      after(:build) do |stolen_record, evaluator|
+        stolen_record.image_four_by_five.attach(io: File.open(evaluator.filename),
+          filename: "image.jpg")
+        stolen_record.image_landscape.attach(io: File.open(evaluator.filename),
+          filename: "image.jpg")
+      end
+    end
+
     trait :with_alert_image do
       transient do
         filename { nil }

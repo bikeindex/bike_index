@@ -51,6 +51,7 @@ class ScheduledJobRunner < ScheduledJob
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
       StolenBike::DeactivateExpiredTheftAlertJob,
+      StolenBike::RemoveOrphanedImagesJob,
       StolenBike::UpdateTheftAlertFacebookJob,
       TsvCreatorJob,
       # UnusedOwnershipRemovalJob,

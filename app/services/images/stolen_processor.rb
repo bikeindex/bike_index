@@ -21,17 +21,51 @@ class Images::StolenProcessor
   TOPBAR_VERTICAL_WIDTH = 106
 
   class << self
-    def update_alert_images(stolen_record, image: nil)
+    # NOTE: This doesn't delete images - that's handled by StolenBike::RemoveOrphanedImagesJob
+
+    # Previously, we would set the image via passing it. That's a pain to track!
+    # Instead, when overriding the image in admin, let's update the image we're overriding with
+    # and make it the first image
+    def update_alert_images(stolen_record)
       # This relies on existing carrierewave methods, will need to be updated
-      image ||= stolen_record.bike_main_image&.open_file
+      image, image_id = image_and_id(stolen_record)
 
-      stolen_record.image_four_by_five.purge
-      stolen_record.image_square.purge
-      stolen_record.image_landscape.purge
-      return if image.blank?
+      stolen_record.skip_update = true
+      if image.present?
+        return if stolen_record.images_attached_id == image_id
 
-      location_text = stolen_record_location(stolen_record)
+        # Prevent touching the stolen record, which kicks off a job
+        ActiveRecord::Base.no_touching do
+          attach_images(stolen_record, image, stolen_record_location(stolen_record))
+          stolen_record.image_four_by_five.blob.metadata["image_id"] = image_id
+          stolen_record.image_four_by_five.blob.save
+        end
+      elsif (existing_blob = stolen_record.image_four_by_five&.blob)
+        existing_blob.metadata["removed"] = true
+        # We don't want to update the bike.updated_at unless this is a change
+        return unless existing_blob.changed?
+        existing_blob.save
+      end
+      stolen_record.bike&.update(updated_at: Time.current)
+      stolen_record
+    end
 
+    private
+
+    def image_and_id(stolen_record)
+      public_image = stolen_record.bike_main_image
+      # TODO: Add bike.stock_photo_url (along with bike_id) here
+      return [public_image&.open_file, public_image.id] if public_image.present?
+
+      stock_photo_url = Bike.unscoped.find_by(id: stolen_record.bike_id)&.stock_photo_url
+      if stock_photo_url.present?
+        [URI.parse(stock_photo_url).open, "b#{stolen_record.bike_id}"]
+      else
+        [nil, nil]
+      end
+    end
+
+    def attach_images(stolen_record, image, location_text)
       stolen_record.image_four_by_five
         .attach(io: generate_alert(template: :four_by_five, image:, location_text:),
           filename: "stolen-#{stolen_record.id}-four_by_five.jpeg")
@@ -46,10 +80,7 @@ class Images::StolenProcessor
         .attach(io: generate_alert(template: :landscape, image:, location_text:),
           filename: "stolen-#{stolen_record.id}-landscape.jpeg")
       stolen_record.image_landscape.analyze
-      stolen_record
     end
-
-    private
 
     def generate_alert(template:, image:, location_text:, convert: "jpeg")
       config = TEMPLATE_CONFIG[template]

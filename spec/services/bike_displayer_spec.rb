@@ -422,4 +422,51 @@ RSpec.describe BikeDisplayer do
       end
     end
   end
+
+  describe "header_image_urls" do
+    let(:bike) { Bike.new }
+    let(:result) { described_class.header_image_urls(bike) }
+    let(:public_image_url) { bike.reload.public_images.limit(1)&.first&.image_url(:large) }
+    let(:public_image_target) { {page: public_image_url, twitter: public_image_url, facebook: public_image_url} }
+
+    it "is false" do
+      expect(result).to be_falsey
+    end
+    context "with stock_photo_url" do
+      let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg" }
+      let(:bike) { Bike.new(stock_photo_url:) }
+      let(:target) { {page: stock_photo_url, twitter: stock_photo_url, facebook: stock_photo_url} }
+      it "is stock_photo_url" do
+        expect(result).to eq target
+      end
+
+      context "with public image" do
+        let(:bike) { FactoryBot.create(:bike, :with_image, stock_photo_url:) }
+        it "is public image" do
+          expect(public_image_url).to be_present
+          expect(result).to eq public_image_target
+        end
+      end
+    end
+    context "with current_stolen_record" do
+      let(:bike) { FactoryBot.create(:stolen_bike, :with_image) }
+      let(:stolen_record) { bike.reload.current_stolen_record }
+      it "renders public_image" do
+        expect(public_image_url).to be_present
+        expect(stolen_record).to be_present
+        expect(result).to eq public_image_target
+      end
+
+      context "with alert image" do
+        let(:alert_image) { FactoryBot.create(:alert_image, :with_image, stolen_record:) }
+        let(:alert_image_url) { alert_image.reload.image_url(:square) }
+        let(:target) { {page: alert_image.image_url(:facebook), twitter: alert_image.image_url(:twitter), facebook: alert_image.image_url(:facebook)} }
+
+        it "renders the alert image" do
+          expect(alert_image.reload.image_url(:square)).to be_present
+          expect(result).to eq target
+        end
+      end
+    end
+  end
 end

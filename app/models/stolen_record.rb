@@ -100,9 +100,9 @@ class StolenRecord < ApplicationRecord
   has_one :recovery_display
   has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
 
-  has_one_attached :image_four_by_five
-  has_one_attached :image_square
-  has_one_attached :image_landscape
+  has_one_attached :image_four_by_five, dependent: false
+  has_one_attached :image_square, dependent: false
+  has_one_attached :image_landscape, dependent: false
 
   validates_presence_of :date_stolen
 
@@ -192,6 +192,15 @@ class StolenRecord < ApplicationRecord
     end
   end
 
+  # In Images::StolenProcessor we set metadata["removed"] when we remove an image
+  def images_attached?
+    image_four_by_five&.attached? && image_four_by_five.blob&.metadata&.dig("removed") != true
+  end
+
+  def images_attached_id
+    image_four_by_five&.blob&.metadata&.dig("image_id")
+  end
+
   # override to enable reverse geocoding if applicable
   def should_be_geocoded?
     !skip_geocoding?
@@ -263,7 +272,7 @@ class StolenRecord < ApplicationRecord
       self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
     end
     update_tsved_at
-    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
+    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to {after_comm}it
     self.current = false if recovered_at.present? # Make sure we set current to false if recovered
     self.recovery_display_status = calculated_recovery_display_status
     self.no_notify = !receive_notifications # TODO: replace receive_notifications with no_notify

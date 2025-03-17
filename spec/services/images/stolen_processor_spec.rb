@@ -28,23 +28,102 @@ RSpec.describe Images::StolenProcessor do
   end
 
   describe "update_alert_images" do
-    let(:stolen_record) { FactoryBot.create(:stolen_record) }
-    let(:image) { Rails.root.join("spec", "fixtures", "bike_photo-landscape.jpeg") }
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+    let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image), listing_order: 5) }
+    let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
 
-    it "attaches the image" do
-      expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
-      described_class.update_alert_images(stolen_record, image:)
-
+    it "assigns the public_image" do
+      stolen_record.bike.update_column :updated_at, Time.current - 1.hour
+      Sidekiq::Job.clear_all
+      expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+      expect do
+        described_class.update_alert_images(stolen_record)
+      end.to change(ActiveStorage::Blob, :count).by 3
       expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
       expect(stolen_record.image_square.attached?).to be_truthy
       expect(stolen_record.image_landscape.attached?).to be_truthy
+      expect(stolen_record.images_attached_id).to eq public_image.id
+      expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
+      expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
+      # No new jobs are enqueued
+      expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
 
-      # and calling it again removes the images (since the stolen record has no actual images)
-      described_class.update_alert_images(stolen_record)
+      stolen_record.bike.update_column :updated_at, Time.current - 1.hour
+      # It doesn't create again
+      expect do
+        described_class.update_alert_images(stolen_record)
+      end.to change(ActiveStorage::Blob, :count).by 0
+      expect(ActiveStorage::Attachment.count).to eq 3
+      expect(stolen_record.reload.images_attached?).to be_truthy
+      # It doesn't update the updated_at
+      expect(stolen_record.reload.bike.updated_at).to be_within(1).of(Time.current - 1.hour)
+      # No new jobs are enqueued
+      expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
+    end
 
-      expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
-      expect(stolen_record.image_square.attached?).to be_falsey
-      expect(stolen_record.image_landscape.attached?).to be_falsey
+    context "public_image deleted" do
+      it "removes" do
+        expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+
+        expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
+        expect(stolen_record.image_square.attached?).to be_truthy
+        expect(stolen_record.image_landscape.attached?).to be_truthy
+
+        public_image.destroy
+        stolen_record.bike.update_column :updated_at, Time.current - 1.hour
+        # Calling it after public_image is deleted, soft deletes the attachments
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 0
+        expect(ActiveStorage::Attachment.count).to eq 3
+
+        expect(stolen_record.reload.images_attached?).to be_falsey
+        expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
+      end
+    end
+
+    context "with a new public_image" do
+      let(:public_image2) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image), listing_order: 1) }
+
+      it "switches to the new images" do
+        Sidekiq::Job.clear_all
+        expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(stolen_record.images_attached_id).to eq public_image.id
+
+        expect(public_image2).to be_valid
+        expect(stolen_record.reload.bike_main_image.id).to eq public_image2.id
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(stolen_record.images_attached_id).to eq public_image2.id
+      end
+    end
+
+    context "with stock photo" do
+      let(:bike) { FactoryBot.create(:bike, stock_photo_url:) }
+      let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/13095/csm_INFINITO_CV_SUPER_RECORD_EPS_Compact_2a2c680c1b.jpg" }
+      let(:public_image) { nil }
+      it "creates" do
+        VCR.use_cassette("Images-StolenProcessor-stock_photo") do
+          expect(bike.reload.public_images.count).to eq 0
+          expect(bike.stock_photo_url).to be_present
+          Sidekiq::Job.clear_all
+          expect do
+            described_class.update_alert_images(stolen_record)
+          end.to change(ActiveStorage::Blob, :count).by 3
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          expect(stolen_record.images_attached_id).to eq "b#{bike.id}"
+        end
+      end
     end
   end
 
@@ -85,15 +164,14 @@ RSpec.describe Images::StolenProcessor do
     # If the image generation updates, use this to save the updated image:
     # before { `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}` }
 
-    # Commented out because I want to merge #2716 - even though it isn't passing CI
-    # context "with template: landscape" do
-    #   let(:template) { :landscape }
-    #   let(:generated_fixture_name) { "alert-landscape-landscape.png" }
+    context "with template: landscape" do
+      let(:template) { :landscape }
+      let(:generated_fixture_name) { "alert-landscape-landscape.png" }
 
-    #   it "creates an image matching target" do
-    #     expect_images_to_match(generated_image, target_image)
-    #   end
-    # end
+      it "creates an image matching target" do
+        expect_images_to_match(generated_image, target_image)
+      end
+    end
 
     # These tests take a substantial amount of resources and are largely the same
     # - they were useful for building the functionality, and will be useful if it's ever changed -

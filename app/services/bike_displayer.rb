@@ -84,5 +84,42 @@ class BikeDisplayer
       ext = "/small_" + small.pop
       small.join("/") + ext
     end
+
+    def header_image_urls(bike)
+      if bike.thumb_path.blank?
+        return single_image_hash(bike.stock_photo_url) if bike.stock_photo_url.present?
+        return false # Because there are no images
+      end
+
+      if (stolen_record = bike.current_stolen_record).present?
+        if stolen_record.images_attached?
+          return {
+            page: storage_url(stolen_record.image_four_by_five),
+            facebook: storage_url(stolen_record.image_four_by_five),
+            twitter: storage_url(stolen_record.image_landscape)
+          }
+        end
+
+        facebook_image = stolen_record.current_alert_image&.image_url(:facebook)
+        if facebook_image.present?
+          return {
+            page: facebook_image,
+            facebook: facebook_image,
+            twitter: stolen_record.current_alert_image.image_url(:twitter)
+          }
+        end
+      end
+      single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
+    end
+
+    private
+
+    def storage_url(attachment)
+      Rails.application.routes.url_helpers.rails_public_blob_url(attachment)
+    end
+
+    def single_image_hash(image_url)
+      {page: image_url, twitter: image_url, facebook: image_url}
+    end
   end
 end

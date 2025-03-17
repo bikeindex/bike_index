@@ -171,13 +171,12 @@ module HeaderTags
 
       @page_description = bike_page_description(bike, status_prefix)
 
-      if bike.current_stolen_record.present?
-        @page_image = bike.alert_image_url(:square)
-        @twitter_image = bike.alert_image_url(:twitter)
-        @facebook_image = bike.alert_image_url(:facebook)
-      elsif bike.image_url.present?
-        @page_image = bike.image_url(:large)
+      if (header_image_urls = BikeDisplayer.header_image_urls(bike))
+        @page_image = header_image_urls[:page]
+        @twitter_image = header_image_urls[:twitter]
+        @facebook_image = header_image_urls[:facebook]
       end
+
       if bike.owner&.show_twitter && bike.owner.twitter.present?
         @twitter_creator = "@#{bike.owner.twitter}"
       end

@@ -55,6 +55,7 @@ Rails.application.configure do
   config.i18n.exception_handler = proc { |exception| raise exception.to_exception }
 
   config.action_mailer.default_url_options = {host: ENV["BASE_URL"]}
+  routes.default_url_options = config.action_mailer.default_url_options
 
   config.cache_store = :file_store, Rails.root.join("tmp", "cache", "test#{ENV["TEST_ENV_NUMBER"]}")
 end
