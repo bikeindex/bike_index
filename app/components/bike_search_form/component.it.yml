@@ -1,0 +1,20 @@
+---
+it:
+  components:
+    bike_search_form:
+      distance: Distance
+      include_hidden_search_fields: Include_hidden_search_fields
+      include_location_search: Include_location_search
+      include_organized_search_fields: Include_organized_search_fields
+      location: Location
+      query: Query
+      raw_serial: Raw_serial
+      search_address: Search_address
+      search_email: Search_email
+      search_model_audit_id: Search_model_audit_id
+      search_path: Search_path
+      search_secondary: Search_secondary
+      search_stickers: Search_stickers
+      serial: Serial
+      skip_serial_field: Skip_serial_field
+      stolenness: Stolenness
