@@ -57,7 +57,8 @@ class Images::StolenProcessor
       # TODO: Add bike.stock_photo_url (along with bike_id) here
       return [public_image&.open_file, public_image.id] if public_image.present?
 
-      if (stock_photo_url = stolen_record.bike.stock_photo_url).present?
+      stock_photo_url = Bike.unscoped.find_by(id: stolen_record.bike_id)&.stock_photo_url
+      if stock_photo_url.present?
         [URI.parse(stock_photo_url).open, "b#{stolen_record.bike_id}"]
       else
         [nil, nil]
