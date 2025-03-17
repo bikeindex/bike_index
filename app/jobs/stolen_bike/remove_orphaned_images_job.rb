@@ -2,8 +2,6 @@
 
 # Images are linked by external sources - so don't purge them in Images::StolenProcessor
 # Do it after a delay (and after we've verified the new images are correct)
-
-# NOTE: This job also purges any orphaned blobs
 class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
   prepend ScheduledJobRecorder
 
@@ -16,14 +14,9 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
       1.week.ago..1.day.ago
     end
 
-    def purge_orphaned_blobs
-      orphaned_blobs.each { |blob| blob.purge }
-    end
-
-    def orphaned_blobs
-      ActiveStorage::Blob.left_joins(:attachments)
-        .where(active_storage_attachments: {id: nil})
-        .where("active_storage_blobs.created_at < ?", check_period.first)
+    def blobs_for(stolen_record_id)
+      ActiveStorage::Blob.where("filename ILIKE ?", "stolen-#{stolen_record_id}-%")
+        .where("created_at < ?", check_period.last)
     end
   end
 
@@ -35,6 +28,7 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
     if stolen_record.present?
       if stolen_record.images_attached?
         delete_alert_images!(stolen_record_id)
+        delete_outdated_blobs!(stolen_record_id)
       elsif stolen_record.bike_main_image.blank?
         delete_all_images!(stolen_record_id)
       end
@@ -49,14 +43,18 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
 
   def delete_all_images!(stolen_record_id)
     delete_alert_images!(stolen_record_id)
-    attachments(stolen_record_id).each do |attachment|
-      attachment.blob.purge
-      attachment.destroy_all
-    end
+    self.class.blobs_for(stolen_record_id).each { |blob| blob.purge }
+    attachments(stolen_record_id).destroy_all
   end
 
   def delete_alert_images!(stolen_record_id)
     AlertImage.where(stolen_record_id:).destroy_all
+  end
+
+  def delete_outdated_blobs!(stolen_record_id)
+    self.class.blobs_for(stolen_record_id).where.not(id: attachments(stolen_record_id)
+      .pluck(:blob_id))
+      .each { |blob| blob.purge }
   end
 
   def attachments(record_id)
@@ -76,7 +74,5 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
     # Enqueue these *after* active storage attachment, there might be some overlap with deleted
     StolenRecord.unscoped.where(recovered_at: self.class.check_period).pluck(:id)
       .each { |id| self.class.perform_async(id) }
-
-    self.class.purge_orphaned_blobs
   end
 end

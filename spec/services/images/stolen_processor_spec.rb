@@ -106,6 +106,57 @@ RSpec.describe Images::StolenProcessor do
         expect(stolen_record.reload.images_attached?).to be_truthy
         expect(stolen_record.images_attached_id).to eq public_image2.id
       end
+      context "with public_image_id" do
+        it "uses the new image" do
+          expect(public_image2).to be_valid
+          expect(stolen_record.reload.bike_main_image.id).to eq public_image2.id
+          expect do
+            described_class.update_alert_images(stolen_record)
+          end.to change(ActiveStorage::Blob, :count).by 3
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          expect(stolen_record.images_attached_id).to eq public_image2.id
+
+          expect do
+            described_class.update_alert_images(stolen_record, public_image_id: public_image.id)
+          end.to change(ActiveStorage::Blob, :count).by 3
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          expect(stolen_record.images_attached_id).to eq public_image.id
+
+          # Calling it again, without assigned image, doesn't update the image
+          expect do
+            described_class.update_alert_images(stolen_record)
+          end.to change(ActiveStorage::Blob, :count).by 0
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          expect(stolen_record.images_attached_id).to eq public_image.id
+
+          # updating the public_image order makes it update
+          public_image2.update(listing_order: 15)
+          expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+          expect do
+            described_class.update_alert_images(stolen_record)
+          end.to change(ActiveStorage::Blob, :count).by 0
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          expect(stolen_record.images_attached_id).to eq public_image.id
+        end
+      end
+    end
+
+    context "with force_regenerate" do
+      it "regenerates the image" do
+        Sidekiq::Job.clear_all
+        expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(stolen_record.images_attached_id).to eq public_image.id
+
+        expect do
+          described_class.update_alert_images(stolen_record, force_regenerate: true)
+        end.to change(ActiveStorage::Blob, :count).by 3
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(stolen_record.images_attached_id).to eq public_image.id
+      end
     end
 
     context "with stock photo" do

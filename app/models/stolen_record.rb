@@ -272,7 +272,7 @@ class StolenRecord < ApplicationRecord
       self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
     end
     update_tsved_at
-    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to {after_comm}it
+    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
     self.current = false if recovered_at.present? # Make sure we set current to false if recovered
     self.recovery_display_status = calculated_recovery_display_status
     self.no_notify = !receive_notifications # TODO: replace receive_notifications with no_notify
@@ -366,7 +366,7 @@ class StolenRecord < ApplicationRecord
 
   # The associated bike's first public image, if available. Else nil.
   def bike_main_image
-    bike&.public_images&.first
+    Bike.unscoped.find_by_id(bike_id)&.public_images&.first
   end
 
   def current_alert_image

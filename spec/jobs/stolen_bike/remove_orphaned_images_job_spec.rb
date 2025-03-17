@@ -58,29 +58,29 @@ RSpec.describe StolenBike::RemoveOrphanedImagesJob, type: :lib do
     end
 
     context "passed an ID" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record) }
       let!(:alert_image) { FactoryBot.create(:alert_image, stolen_record:) }
-      let(:filename) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+      let!(:public_image) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
       before do
-        image_attachment.update(created_at: time)
-        stolen_record.reload.image_four_by_five.blob.update(created_at: time - 1.week)
-        stolen_record.reload.image_landscape.blob.update(created_at: time - 1.week)
-
-        ActiveRecord::Base.no_touching do
-          stolen_record.reload.image_four_by_five.attach(io: File.open(filename), filename: "alert-photo.jpg")
-          stolen_record.reload.image_landscape.attach(io: File.open(filename), filename: "alert-photo.jpg")
-        end
+        Images::StolenProcessor.update_alert_images(stolen_record)
+        stolen_record.reload.image_four_by_five.blob.update(created_at: time)
+        stolen_record.image_landscape.blob.update(created_at: time)
+        # Don't update square - just to test that things that are created more recently aren't destroyed
       end
 
       it "does not delete current image, deletes orphaned attachments and alert_image" do
-        expect(ActiveStorage::Blob.count).to eq 4
+        expect(ActiveStorage::Blob.count).to eq 3
+        Images::StolenProcessor.update_alert_images(stolen_record, force_regenerate: true)
+        expect(ActiveStorage::Blob.count).to eq 6
         # I'd really prefer if this didn't actually delete the records, but...
-        expect(ActiveStorage::Attachment.count).to eq 2
+        expect(ActiveStorage::Attachment.count).to eq 3
         expect(AlertImage.count).to eq 1
         instance.perform
         instance.perform(stolen_record.id)
 
-        expect(ActiveStorage::Blob.count).to eq 2
-        expect(ActiveStorage::Attachment.count).to eq 2
+        # Because square wasn't created before the check period
+        expect(ActiveStorage::Blob.count).to eq 4
+        expect(ActiveStorage::Attachment.count).to eq 3
         expect(AlertImage.count).to eq 0
         expect(stolen_record.reload.images_attached?).to be_truthy
       end

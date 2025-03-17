@@ -45,11 +45,11 @@
     }
 
     .selection-preview-image-template {
-      background-image: url("promoted_alerts/facebook-template.png");
+      background-image: url("promoted_alerts/preview-template.png");
       background-size: cover;
       margin: auto;
       max-width: 420px;
-      padding: 13px 0 13px 28px;
+      padding: 0 0 0 28px;
       position: relative;
       vertical-align: middle;
       width: auto;
@@ -68,11 +68,11 @@
 
     .selection-preview-caption {
       background: $black;
-      bottom: 4px;
+      bottom: 8px;
       color: $white;
       font-size: 1rem;
       font-style: italic;
-      height: 10%;
+      height: 12%;
       line-height: 1.5;
       position: absolute;
       right: 0;

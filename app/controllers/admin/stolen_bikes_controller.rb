@@ -82,21 +82,26 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def update_image
     selected_image = @bike.public_images.find_by_id(params[:public_image_id])
+
     if params[:public_image_id].present? && selected_image.blank?
       flash[:error] = "Unable to find that image!"
+      return
     elsif params[:update_action] == "delete"
+      selected_image.skip_update = true # Prevent autorunning of job
       selected_image.destroy
       flash[:success] = "Image deleted"
-      @bike.current_stolen_record.generate_alert_image
-    elsif params[:update_action] == "regenerate_alert_image"
-      if @bike.current_stolen_record.generate_alert_image(bike_image: selected_image)
-        flash[:success] = "Promoted alert bike image updated."
-      else
-        flash[:error] = "Could not update promoted alert image."
-      end
-    else
+      selected_image = nil
+    elsif params[:update_action] != "regenerate_alert_image"
       flash[:error] = "Unknown action!"
+      return
     end
+
+    # Running this inline causes the server to break. So background it
+    StolenBike::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, true,
+      selected_image&.id)
+    # Lazy hack to wait for it to process
+    sleep 1
+    flash[:success] ||= "Promoted alert bike image updated."
   end
 
   def available_stolen_records

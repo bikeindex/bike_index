@@ -18,9 +18,9 @@ FactoryBot.define do
       # NOTE: Only attaches 2 photos, because those are the only ones used currently
       after(:build) do |stolen_record, evaluator|
         stolen_record.image_four_by_five.attach(io: File.open(evaluator.filename),
-          filename: "image.jpg")
+          filename: "stolen-#{stolen_record.id}-four_by_five.jpeg")
         stolen_record.image_landscape.attach(io: File.open(evaluator.filename),
-          filename: "image.jpg")
+          filename: "stolen-#{stolen_record.id}-landscape.jpeg")
       end
     end
 

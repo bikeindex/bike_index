@@ -20,6 +20,8 @@ RSpec.describe StolenRecord, type: :model do
 
   describe "after_save hooks" do
     let(:bike) { FactoryBot.create(:bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+
     context "if bike no longer exists" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
@@ -32,6 +34,27 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record.reload
         expect(stolen_record.bike).to be_blank
         expect(stolen_record.images_attached?).to be_falsey
+      end
+    end
+
+    context "if phone changes" do
+      it "enqueues update without location_changed" do
+        # ensure not memoizing anything
+        stolen_record_instance = StolenRecord.find(stolen_record.id)
+        Sidekiq::Job.clear_all
+        stolen_record_instance.update(phone: "1112223333")
+        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+          .to eq([stolen_record_instance.id, false])
+      end
+    end
+
+    context "location changes" do
+      it "enqueues update with location_changed" do
+        stolen_record_instance = StolenRecord.find(stolen_record.id)
+        Sidekiq::Job.clear_all
+        stolen_record_instance.update(city: "New city")
+        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+          .to eq([stolen_record_instance.id, true])
       end
     end
 
