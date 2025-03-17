@@ -32,6 +32,8 @@ class AfterBikeSaveJob < ApplicationJob
       FindOrCreateModelAuditJob.perform_async(bike.id)
     end
     return true unless bike.status_stolen? # For now, only hooking on stolen bikes
+
+    StolenBike::AfterStolenRecordSaveJob.perform_async(bike.current_stolen_record_id)
     post_bike_to_webhook(serialized(bike))
   end
 

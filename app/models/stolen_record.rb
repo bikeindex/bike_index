@@ -370,45 +370,7 @@ class StolenRecord < ApplicationRecord
   end
 
   def current_alert_image
-    return @current_alert_image if defined?(@current_alert_image)
-
-    @current_alert_image = if alert_image
-      alert_image
-    elsif ApplicationRecord.current_role != :reading
-      # Generate alert image, unless in read replica
-      generate_alert_image
-    else
-      enqueue_worker
-      nil
-    end
-  end
-
-  # Generate the "promoted alert image"
-  # (One of the stolen bike's public images, placed on a branded template)
-  #
-  # The URL is available immediately - processing is performed in the background.
-  # bike_image: [PublicImage]
-  def generate_alert_image(bike_image: bike_main_image)
-    alert_image&.destroy # Destroy before returning if the bike has no images - in case image was removed
-    return if bike_image&.image.blank? && bike&.stock_photo_url.blank?
-
-    new_image = AlertImage.new(stolen_record: self)
-
-    # Try to fallback to main image
-    bike_image = bike_main_image if bike_image&.image.blank?
-    if bike_image&.image.blank?
-      new_image.remote_image_url = bike.stock_photo_url
-    else
-      new_image.image = bike_image.image
-    end
-    new_image.save
-
-    if new_image.valid?
-      new_image
-    else
-      update(alert_image: nil) if alert_image.id.present?
-      nil
-    end
+    alert_image
   end
 
   def update_associations

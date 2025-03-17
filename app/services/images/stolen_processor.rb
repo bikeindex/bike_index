@@ -26,9 +26,8 @@ class Images::StolenProcessor
     # Previously, we would set the image via passing it. That's a pain to track!
     # Instead, when overriding the image in admin, let's update the image we're overriding with
     # and make it the first image
-    def update_alert_images(stolen_record, force_regenerate: false)
-      # This relies on existing carrierewave methods, will need to be updated
-      image, image_id = image_and_id(stolen_record, force_regenerate)
+    def update_alert_images(stolen_record, force_regenerate_images: false)
+      image, image_id = image_and_id(stolen_record, force_regenerate_images)
 
       stolen_record.skip_update = true
       if image.present?
@@ -52,8 +51,8 @@ class Images::StolenProcessor
 
     private
 
-    def image_and_id(stolen_record, force_regenerate)
-      return [nil, nil] if force_regenerate
+    def image_and_id(stolen_record, force_regenerate_images)
+      return [nil, nil] if force_regenerate_images
 
       public_image = stolen_record.bike_main_image
       return [public_image&.open_file, public_image.id] if public_image.present?
