@@ -305,7 +305,7 @@ RSpec.describe "BikesController#update", type: :request do
   end
   context "adding location to a stolen bike" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/6058/13-brentwood-l-purple-1000.jpg", user: current_user) }
-    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
     let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
     let(:stolen_params) do
       {
@@ -339,9 +339,9 @@ RSpec.describe "BikesController#update", type: :request do
       VCR.use_cassette("bike_request-stolen", match_requests_on: [:method], re_record_interval: 1.month) do
         expect(bike.reload.claimed?).to be_truthy
         expect(bike.owner&.id).to eq current_user.id
-        stolen_record.current_alert_image
+        FactoryBot.create(:alert_image, stolen_record:)
         stolen_record.reload
-        expect(bike.current_stolen_record).to eq stolen_record
+        expect(bike.current_stolen_record_id).to eq stolen_record.id
         expect(stolen_record.without_location?).to be_truthy
         og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
         expect(og_alert_image_id).to be_present

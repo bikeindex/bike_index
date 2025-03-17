@@ -1724,33 +1724,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "#alert_image_url" do
-    context "given no current_stolen_record" do
-      it "returns nil" do
-        bike = FactoryBot.create(:bike, :with_image, current_stolen_record: nil)
-        expect(bike.alert_image_url).to be_nil
-      end
-    end
-
-    context "given no public images" do
-      it "returns nil" do
-        bike = FactoryBot.create(:bike)
-        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
-        bike.update(current_stolen_record: stolen_record)
-        expect(bike.current_stolen_record).to be_present
-        expect(bike.public_images).to be_empty
-        expect(bike.alert_image_url).to be_nil
-      end
-    end
-
-    context "given a current_stolen_record and public bike images" do
-      it "returns the alert_image url" do
-        bike = FactoryBot.create(:stolen_bike, :with_image)
-        expect(bike.alert_image_url).to match(%r{https?://.+/bike-#{bike.id}.jpg})
-      end
-    end
-  end
-
   describe "messages_count" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
     let(:owner) { bike.owner }

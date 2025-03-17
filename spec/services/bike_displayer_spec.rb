@@ -427,7 +427,7 @@ RSpec.describe BikeDisplayer do
     let(:bike) { Bike.new }
     let(:result) { described_class.header_image_urls(bike) }
     let(:public_image_url) { bike.reload.public_images.limit(1)&.first&.image_url(:large) }
-    let(:public_image_target) { {page: public_image_url, twitter: public_image_url, facebook: public_image_url} }
+    let(:public_image_target) { {square: public_image_url, twitter: public_image_url, facebook: public_image_url} }
 
     it "is false" do
       expect(result).to be_falsey
@@ -435,7 +435,7 @@ RSpec.describe BikeDisplayer do
     context "with stock_photo_url" do
       let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg" }
       let(:bike) { Bike.new(stock_photo_url:) }
-      let(:target) { {page: stock_photo_url, twitter: stock_photo_url, facebook: stock_photo_url} }
+      let(:target) { {square: stock_photo_url, twitter: stock_photo_url, facebook: stock_photo_url} }
       it "is stock_photo_url" do
         expect(result).to eq target
       end
@@ -459,8 +459,7 @@ RSpec.describe BikeDisplayer do
 
       context "with alert image" do
         let(:alert_image) { FactoryBot.create(:alert_image, :with_image, stolen_record:) }
-        let(:alert_image_url) { alert_image.reload.image_url(:square) }
-        let(:target) { {page: alert_image.image_url(:facebook), twitter: alert_image.image_url(:twitter), facebook: alert_image.image_url(:facebook)} }
+        let(:target) { {square: alert_image.image_url(:facebook), twitter: alert_image.image_url(:twitter), facebook: alert_image.image_url(:facebook)} }
 
         it "renders the alert image" do
           expect(alert_image.reload.image_url(:square)).to be_present

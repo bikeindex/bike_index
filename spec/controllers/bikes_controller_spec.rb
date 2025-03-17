@@ -1049,9 +1049,6 @@ RSpec.describe BikesController, type: :controller do
               end
             end
           end
-          context "recovered bike" do
-            it "marks the bike recovered"
-          end
         end
       end
     end

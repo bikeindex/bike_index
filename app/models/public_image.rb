@@ -28,16 +28,19 @@ class PublicImage < ApplicationRecord
   }.freeze
 
   mount_uploader :image, ImageUploader # Not processed in background, because they are uploaded directly
-  attr_writer :image_cache
-  belongs_to :imageable, polymorphic: true
 
-  default_scope { where(is_private: false).order(:listing_order) }
-  scope :bike, -> { where(imageable_type: "Bike") }
+  enum :kind, KIND_ENUM
+
+  belongs_to :imageable, polymorphic: true
 
   before_save :set_calculated_attributes
   after_commit :enqueue_after_commit_jobs
 
-  enum :kind, KIND_ENUM
+  default_scope { where(is_private: false).order(:listing_order) }
+  scope :bike, -> { where(imageable_type: "Bike") }
+
+  attr_writer :image_cache
+  attr_accessor :skip_update
 
   def default_name
     if bike?
@@ -65,11 +68,14 @@ class PublicImage < ApplicationRecord
   end
 
   def enqueue_after_commit_jobs
+    return if skip_update
+
     if external_image_url.present? && image.blank?
       return ExternalImageUrlStoreJob.perform_async(id)
     end
     imageable&.update(updated_at: Time.current)
     return true unless bike?
+
     AfterBikeSaveJob.perform_async(imageable_id, false, true)
   end
 

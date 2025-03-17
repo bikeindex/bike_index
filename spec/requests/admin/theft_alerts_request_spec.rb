@@ -5,7 +5,7 @@ base_url = "/admin/theft_alerts"
 RSpec.describe Admin::TheftAlertsController, type: :request do
   context "given a logged-in superuser" do
     include_context :request_spec_logged_in_as_superuser
-    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, approved: true) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :in_vancouver, approved: true) }
     let(:bike) { stolen_record.bike }
 
     describe "GET /admin/theft_alerts" do
@@ -124,6 +124,8 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
 
     describe "create" do
       let!(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :in_vancouver, :with_images, approved: true) }
+
       it "creates and activates" do
         Sidekiq::Job.clear_all
         expect do
@@ -151,7 +153,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 1
       end
       context "not activateable" do
-        let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver) }
+        let(:stolen_record) { FactoryBot.create(:stolen_record, :in_vancouver) }
         it "does not activate" do
           Sidekiq::Job.clear_all
           expect(stolen_record.reload.approved?).to be_falsey

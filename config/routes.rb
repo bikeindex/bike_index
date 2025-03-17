@@ -15,7 +15,7 @@ Rails.application.routes.draw do
         end
       route_for(route, blob)
     else
-      File.join(ENV.fetch("ACTIVE_STORAGE_HOST"), blob.key) # Use the CDN
+      File.join(ENV.fetch("ACTIVE_STORAGE_HOST"), blob.key || "") # Use the CDN
     end
   end
 
