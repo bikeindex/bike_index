@@ -16,7 +16,7 @@ RSpec.describe StolenBike::RemoveOrphanedImagesJob, type: :lib do
     let(:bike) { stolen_record.bike }
     let!(:image_attachment) { stolen_record.reload.image_four_by_five.attachment }
 
-    it "does not enqueue anything" do
+    it "does not enqueue anything, but removes orphans" do
       Sidekiq::Job.clear_all
       instance.perform
       expect(described_class.jobs.map { |j| j["args"] }.last&.flatten).to be_blank

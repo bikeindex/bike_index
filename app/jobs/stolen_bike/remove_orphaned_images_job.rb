@@ -7,12 +7,24 @@
 class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
   prepend ScheduledJobRecorder
 
-  def self.frequency
-    30.hours
-  end
+  class << self
+    def frequency
+      30.hours
+    end
 
-  def self.check_period
-    1.week.ago..1.day.ago
+    def check_period
+      1.week.ago..1.day.ago
+    end
+
+    def purge_orphaned_blobs
+      orphaned_blobs.each { |blob| blob.purge }
+    end
+
+    def orphaned_blobs
+      ActiveStorage::Blob.left_joins(:attachments)
+        .where(active_storage_attachments: {id: nil})
+        .where("active_storage_blobs.created_at < ?", check_period.first)
+    end
   end
 
   def perform(stolen_record_id = nil)
@@ -37,16 +49,14 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
 
   def delete_all_images!(stolen_record_id)
     delete_alert_images!(stolen_record_id)
-    blobs(stolen_record_id).each { |blob| blob.purge }
-    attachments(stolen_record_id).destroy_all
+    attachments(stolen_record_id).each do |attachment|
+      attachment.blob.purge
+      attachment.destroy_all
+    end
   end
 
   def delete_alert_images!(stolen_record_id)
     AlertImage.where(stolen_record_id:).destroy_all
-  end
-
-  def blobs(record_id)
-    ActiveStorage::Blob.where(record_type: "StolenRecord", record_id:)
   end
 
   def attachments(record_id)
@@ -63,13 +73,10 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
       .where(created_at: self.class.check_period).distinct.pluck(:record_id)
       .each { |id| self.class.perform_async(id) }
 
-    # Enqueue these after active storage attachment, since there might be some overlap with deleted
+    # Enqueue these *after* active storage attachment, there might be some overlap with deleted
     StolenRecord.unscoped.where(recovered_at: self.class.check_period).pluck(:id)
       .each { |id| self.class.perform_async(id) }
 
-    ActiveStorage::Blob.left_joins(:attachments)
-      .where(active_storage_attachments: {id: nil})
-      .where("active_storage_blobs.created_at < ?", self.class.check_period.first)
-      .each { |blob| blob.purge }
+    self.class.purge_orphaned_blobs
   end
 end
