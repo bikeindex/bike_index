@@ -827,10 +827,6 @@ class Bike < ApplicationRecord
     end
   end
 
-  def alert_image_url(version = nil)
-    current_stolen_record&.current_alert_image&.image_url(version)
-  end
-
   def external_image_urls
     b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
   end

@@ -361,12 +361,16 @@ class StolenRecord < ApplicationRecord
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
   def theft_alert_missing_photo?
-    current_alert_image.blank? && theft_alerts.any?
+    missing_photo? && theft_alerts.any?
   end
 
   # The associated bike's first public image, if available. Else nil.
   def bike_main_image
     Bike.unscoped.find_by_id(bike_id)&.public_images&.first
+  end
+
+  def missing_photo?
+    !images_attached? && alert_image.blank?
   end
 
   def current_alert_image

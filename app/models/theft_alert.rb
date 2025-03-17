@@ -216,8 +216,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def missing_photo?
-    return false if stolen_record&.images_attached?
-    stolen_record&.alert_image.blank?
+    stolen_record.present? && stolen_record.theft_alert_missing_photo?
   end
 
   def facebook_name(kind = "campaign")

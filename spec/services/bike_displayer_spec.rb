@@ -459,7 +459,6 @@ RSpec.describe BikeDisplayer do
 
       context "with alert image" do
         let(:alert_image) { FactoryBot.create(:alert_image, :with_image, stolen_record:) }
-        let(:alert_image_url) { alert_image.reload.image_url(:square) }
         let(:target) { {square: alert_image.image_url(:facebook), twitter: alert_image.image_url(:twitter), facebook: alert_image.image_url(:facebook)} }
 
         it "renders the alert image" do
