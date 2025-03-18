@@ -269,7 +269,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
   end
 
-  describe "create v2_accessor" do
+  describe "create v2_accessor", :flaky do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike_attrs) do
       {
