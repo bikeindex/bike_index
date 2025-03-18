@@ -347,8 +347,9 @@ GEM
     hashdiff (1.1.2)
     highline (3.1.2)
       reline
-    honeybadger (5.16.0)
+    honeybadger (5.27.0)
       logger
+      ostruct
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http (4.4.1)
@@ -501,6 +502,7 @@ GEM
     observer (0.1.2)
     oj (3.16.3)
       bigdecimal (>= 3.0)
+    ostruct (0.6.1)
     pagy (9.3.3)
     parallel (1.26.3)
     parallel_tests (4.10.1)

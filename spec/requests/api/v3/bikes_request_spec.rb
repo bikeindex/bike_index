@@ -1019,10 +1019,10 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(json_result[:error]).to match(/no user/i)
       expect(Bike.count).to eq 0
     end
-    context "application creator is admin of organization" do
+    context "application creator is admin of organization", :flaky do
       let(:application_owner) { FactoryBot.create(:organization_admin, organization: organization) }
 
-      it "creates", :flaky do
+      it "creates" do
         expect(application_owner.reload.admin_of?(organization)).to be_truthy
         expect(client_credentials_token.application.owner.id).to_not eq auto_user.id
         post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
@@ -1054,7 +1054,7 @@ RSpec.describe "Bikes API V3", type: :request do
       context "application creator is auto_user of organization" do
         let(:application_owner) { auto_user }
         before { application_owner.organization_roles.first.update(role: "admin") }
-        it "creates", :flaky do
+        it "creates" do
           expect(application_owner.reload.admin_of?(organization)).to be_truthy
           expect(client_credentials_token.application.owner.id).to eq auto_user.id
           post url, params: bike_attrs.merge(no_duplicate: true).to_json, headers: json_headers
