@@ -2,4 +2,4 @@
 breadcrumbs:
   enabled: true
 insights:
-  enabled: true
+  enabled: ENV["HONEYBADGER_INSIGHTS"]
