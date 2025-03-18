@@ -1,6 +1,6 @@
 # [![BIKE INDEX][bike-index-logo]][bike-index] [![View performance data on Skylight][skylight-badge]][skylight]
 
-[bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/bike_index.png?raw=true
+[bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/public/icon-dark.svg?raw=true
 [skylight]: https://oss.skylight.io/app/applications/j93iQ4K2pxCP
 [skylight-badge]: https://badges.skylight.io/status/j93iQ4K2pxCP.svg
 [bike-index]: https://www.bikeindex.org
@@ -13,13 +13,13 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ### Dependencies
 
-_We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of the following dependencies that Bike Index uses._
+_We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of required versions of:_
 
 - [Ruby](http://www.ruby-lang.org/en/)
 
-- [Rails](http://rubyonrails.org/)
-
 - [Node](https://nodejs.org/en/)
+
+_Bike Index also requires some additional libraries. We recommend installing them via your system package manager / homebrew_
 
 - PostgreSQL
 
@@ -27,8 +27,6 @@ _We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby an
 
 - `libvips` and `imagemagick` for image manipulation
   - Eventually, `imagemagick` will only be required for testing (via [chunky_png](https://github.com/wvanbergen/chunky_png)), but we're not there yet
-
-- [Sidekiq](https://github.com/mperham/sidekiq)
 
 
 ## Running Bike Index locally
