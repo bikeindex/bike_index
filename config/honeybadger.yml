@@ -1,3 +1,5 @@
 ---
 breadcrumbs:
   enabled: true
+insights:
+  enabled: true
