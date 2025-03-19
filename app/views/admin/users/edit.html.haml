@@ -275,7 +275,7 @@
   = render partial: "admin/user_alerts/table", locals: {user_alerts: user_alerts.active, skip_user: true}
 
 
-- payments = @user.payments.reorder(created_at: :desc)
+- payments = @user.payments.reorder(created_at: :desc).paid
 %h4.mt-4
   Donations/payments
   %small

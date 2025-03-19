@@ -285,7 +285,7 @@ class User < ApplicationRecord
   end
 
   def donations
-    payments.donation.sum(:amount_cents)
+    payments.donation.paid.sum(:amount_cents)
   end
 
   def donor?
