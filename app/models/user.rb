@@ -104,7 +104,7 @@ class User < ApplicationRecord
   has_many :user_emails, dependent: :destroy
   has_many :user_phones
   has_many :user_alerts
-  has_many :email_bans
+  has_many :email_bans, dependent: :destroy
   has_many :email_bans_active, -> { period_active }, class_name: "EmailBan"
   has_many :superuser_abilities
 

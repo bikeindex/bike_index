@@ -4,7 +4,7 @@ module ActivePeriodable
   extend ActiveSupport::Concern
 
   included do
-    scope :period_started, -> { where("start_at < ?", Time.current) }
+    scope :period_started, -> { where("start_at <= ?", Time.current) }
     scope :period_active, -> {
       period_started.where(end_at: nil).or(period_started.where("end_at > ?", Time.current))
     }

@@ -63,7 +63,7 @@ class Admin::EmailDomainsController < Admin::BaseController
 
   def sortable_columns
     %w[created_at updated_at domain creator_id status user_count bike_count status_changed_at
-       spam_score domain_length]
+      spam_score domain_length]
   end
 
   def searchable_statuses
