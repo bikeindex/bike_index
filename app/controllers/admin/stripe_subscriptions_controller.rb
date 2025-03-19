@@ -18,6 +18,11 @@ class Admin::StripeSubscriptionsController < Admin::BaseController
   end
 
   def matching_stripe_subscriptions
-    StripeSubscription
+    stripe_subscriptions = StripeSubscription
+
+    @time_range_column = sort_column if %w[start_at end_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+
+    stripe_subscriptions.where(@time_range_column => @time_range)
   end
 end
