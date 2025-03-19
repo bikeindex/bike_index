@@ -118,16 +118,6 @@ class User < ApplicationRecord
   has_one :user_ban
   accepts_nested_attributes_for :user_ban
 
-  scope :banned, -> { where(banned: true) }
-  scope :confirmed, -> { where(confirmed: true) }
-  scope :unconfirmed, -> { where(confirmed: false) }
-  scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
-  scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
-  scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
-  scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
-  scope :donated, -> { joins(:payments).merge(Payment.paid) }
-  scope :member, -> { includes(:memberships).merge(Membership.active) }
-
   validates_uniqueness_of :username, case_sensitive: false
 
   validates :password,
@@ -153,6 +143,19 @@ class User < ApplicationRecord
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
+
+  scope :email_banned, -> { left_joins(:email_bans_active).where.not(email_bans: {id: nil}) }
+  scope :no_email_bans, -> { left_joins(:email_bans_active).where(email_bans: {id: nil}) }
+  scope :banned, -> { where(banned: true) }
+  scope :valid_only, -> { no_email_bans.where(banned: false) }
+  scope :confirmed, -> { where(confirmed: true) }
+  scope :unconfirmed, -> { where(confirmed: false) }
+  scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
+  scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
+  scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
+  scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
+  scope :donated, -> { joins(:payments).merge(Payment.paid) }
+  scope :member, -> { includes(:memberships).merge(Membership.active) }
 
   attr_accessor :skip_update
 

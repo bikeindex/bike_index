@@ -2,6 +2,7 @@ class Admin::UsersController < Admin::BaseController
   include SortableTable
 
   before_action :find_user, only: %i[show edit update destroy]
+  helper_method :invalid_user_options
 
   def index
     @per_page = params[:per_page] || 25
@@ -56,7 +57,7 @@ class Admin::UsersController < Admin::BaseController
 
   helper_method :matching_users
 
-  protected
+  private
 
   def sortable_columns
     %w[created_at email updated_at deleted_at]
@@ -64,6 +65,10 @@ class Admin::UsersController < Admin::BaseController
 
   def earliest_period_date
     Time.at(1357912007)
+  end
+
+  def invalid_user_options
+    %w[valid_users banned_only email_banned_only deleted_only all_except_deleted all].freeze
   end
 
   def find_user
@@ -104,9 +109,7 @@ class Admin::UsersController < Admin::BaseController
 
   def matching_users
     @search_ambassadors = InputNormalizer.boolean(params[:search_ambassadors])
-    @search_banned = InputNormalizer.boolean(params[:search_banned])
     @search_superusers = InputNormalizer.boolean(params[:search_superusers])
-    @search_deleted = InputNormalizer.boolean(params[:search_deleted])
     @updated_at = InputNormalizer.boolean(params[:search_updated_at])
     @search_unconfirmed = InputNormalizer.boolean(params[:search_unconfirmed])
     @search_confirmed = @search_unconfirmed ? false : InputNormalizer.boolean(params[:search_confirmed])
@@ -115,10 +118,14 @@ class Admin::UsersController < Admin::BaseController
     else
       User
     end
-    users = users.only_deleted if @search_deleted
+    @invalid = if invalid_user_options.include?(params[:search_invalid])
+      params[:search_invalid]
+    else
+      invalid_user_options.first
+    end
+    users = users.send(invalidness_scope(@invalid))
     users = users.ambassadors if @search_ambassadors
     users = users.superuser_abilities if @search_superusers
-    users = users.banned if @search_banned
     users = users.unconfirmed if @search_unconfirmed
     users = users.confirmed if @search_confirmed
 
@@ -134,6 +141,20 @@ class Admin::UsersController < Admin::BaseController
     @time_range_column = nil if @time_range_column == "deleted_at" && !@search_deleted
     @time_range_column ||= "created_at"
     users.where(@time_range_column => @time_range)
+  end
+
+  def invalidness_scope(invalidness)
+    @deleted = %w[deleted_only all].include?(invalidness) # Gross side effect :/
+
+    case invalidness
+    when "all_except_deleted" then :all
+    when "all" then :unscoped
+    when "deleted_only" then :only_deleted
+    when "banned_only" then :banned
+    when "email_banned_only" then :email_banned
+    else
+      :valid_only
+    end
   end
 
   def calculate_user_bikes
