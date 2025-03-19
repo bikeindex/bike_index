@@ -31,6 +31,16 @@ class EmailBan < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
+  def self.reason_humanized(str)
+    return nil unless str.present?
+
+    str.humanize.gsub(/email/i, "").strip.downcase
+  end
+
+  def reason_humanized
+    self.class.reason_humanized(reason)
+  end
+
   def set_calculated_attributes
     self.start_at ||= Time.current
   end

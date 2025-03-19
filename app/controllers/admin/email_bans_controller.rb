@@ -22,7 +22,6 @@ class Admin::EmailBansController < Admin::BaseController
 
     @time_range_column = sort_column if %w[updated_at status_changed_at].include?(sort_column)
     @time_range_column ||= "created_at"
-
     email_bans.where(@time_range_column => @time_range)
   end
 end

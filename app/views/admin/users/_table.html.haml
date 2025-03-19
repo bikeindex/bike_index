@@ -54,6 +54,11 @@
                 %small.less-strong-right
                   &nbsp;#{user.id}
             %td
+              - if user.email_bans_active.any?
+                %small
+                  email banned:
+                  %span.text-danger
+                    = user.email_bans_active.pluck(:reason).map { EmailBan.reason_humanized(_1) }.join(", ")
               %small.less-strong
                 = user.secondary_emails.join(', ')
             %td
@@ -83,6 +88,3 @@
                   %span.text-info limited
             %td.table-cell-check
               = check_mark if user.confirmed
-              - if user.email_bans_active.any?
-                Not receiving email:
-                %small.text-danger= user.email_bans_active.join(",")

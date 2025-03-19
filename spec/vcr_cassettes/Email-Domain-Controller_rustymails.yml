@@ -150,4 +150,34 @@ http_interactions:
       encoding: UTF-8
       string: ''
   recorded_at: Wed, 19 Mar 2025 02:36:58 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Wed, 19 Mar 2025 03:30:29 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 03:30:29 GMT
 recorded_with: VCR 6.3.1

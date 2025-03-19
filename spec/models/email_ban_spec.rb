@@ -9,6 +9,7 @@ RSpec.describe EmailBan, type: :model do
     it "is valid" do
       expect(email_ban).to be_valid
       expect(user.reload.email_banned?).to be_truthy
+      expect(email_ban.reason_humanized).to eq "domain"
       # It doesn't let the same thing be created for the same user
       expect(FactoryBot.build(:email_ban, user:, reason: :email_domain, start_at: Time.current - 1.hour))
         .to_not be_valid
