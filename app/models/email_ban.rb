@@ -19,7 +19,7 @@
 class EmailBan < ApplicationRecord
   include ActivePeriodable
 
-  REASON_ENUM = {email_domain: 0, email_duplicate: 1}
+  REASON_ENUM = {email_domain: 0, email_duplicate: 1, delivery_failure: 2}
 
   belongs_to :user
   belongs_to :email_ban
@@ -36,7 +36,10 @@ class EmailBan < ApplicationRecord
   end
 
   def is_not_duplicate_ban
-    return if self.class.where(user_id:, reason:).period_active_at(start_at).where.not(id:).none?
+    matching_previous_ban = self.class.where(user_id:, reason:).period_active_at(start_at)
+      .where.not(id:)
+    matching_previous_ban = matching_previous_ban.where("id < ?", id) if id.present?
+    return if matching_previous_ban.none?
 
     errors.add(:user_id, "there is already an active email_ban for the same reason for that user")
   end
