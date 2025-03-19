@@ -37,7 +37,9 @@
                 = l(email_domain.updated_at, format: :convert_time)
           %td= email_domain.domain
           %td
-            %span{class: (email_domain.status.match?("ban") ? "text-danger" : "")}
+            - status_class = "text-danger" if email_domain.status.match?("ban")
+            - status_class = "text-warning font-weight-bold" if email_domain.ignored?
+            %span{class: status_class}
               = email_domain.status_humanized
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: email_domain.creator, user_id: email_domain.creator_id, cache: false}

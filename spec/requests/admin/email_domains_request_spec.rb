@@ -40,7 +40,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
     let(:valid_attributes) { {domain: "@rustymails.com", status: "provisional_ban"} }
 
     it "creates" do
-      VCR.use_cassette("EmailDomainController-rustymails") do
+      VCR.use_cassette("Email-Domain-Controller_rustymails") do
         expect do
           post base_url, params: {email_domain: valid_attributes}
         end.to change(EmailDomain, :count).by 1
@@ -58,13 +58,13 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
     let(:status) { "banned" }
 
     it "updates" do
-      VCR.use_cassette("EmailDomainController-mails") do
+      VCR.use_cassette("Email-Domain-Controller_mails") do
         email_domain.update(status_changed_at: 1.week.ago)
         expect(email_domain.reload.status_changed_at).to be < Time.current - 1.day
         expect(email_domain.status_changed_after_create?).to be_falsey
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{email_domain.id}", params: {
-          email_domain: {domain: "newdomain.com", status: "provisional_ban"}
+          email_domain: {domain: "newdomain.com", status: "provisional_ban", ignored: true}
         }
         expect(flash[:success]).to be_present
         expect(email_domain.reload.status).to eq "provisional_ban"
@@ -80,7 +80,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       let(:status) { "permitted" }
 
       it "responds with not likely spam" do
-        VCR.use_cassette("EmailDomainController-mails") do
+        VCR.use_cassette("Email-Domain-Controller_mails") do
           patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
           expect(flash[:error]).to be_present
           expect(flash[:error]).to_not match("bikes")
@@ -93,7 +93,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
         before { stub_const("EmailDomain::EMAIL_MIN_COUNT", 0) }
 
         it "updates" do
-          VCR.use_cassette("EmailDomainController-ffrustymails") do
+          VCR.use_cassette("Email-Domain-Controller_ffrustymails") do
             patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
 
             expect(flash[:success]).to be_present
@@ -108,7 +108,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
           before { email_domain.update(data: email_domain.data.merge(bike_count: 10)) }
 
           it "responds with not likely spam" do
-            VCR.use_cassette("EmailDomainController-fffrustymails") do
+            VCR.use_cassette("Email-Domain-Controller_fffrustymails") do
               patch "#{base_url}/#{email_domain.id}", params: {email_domain: {status: "banned"}}
               expect(flash[:error]).to match("bikes")
               expect(email_domain.reload.status).to eq "permitted"

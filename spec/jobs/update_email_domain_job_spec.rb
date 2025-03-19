@@ -38,7 +38,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
       let!(:email_domain_bare) { FactoryBot.create(:email_domain, domain:) }
 
       it "updates counts in the cache" do
-        VCR.use_cassette("UpdateEmailDomainJob-bikeindex") do
+        VCR.use_cassette("Update-Email-Domain-Job_bikeindex") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 4 # Because users created for email domains
           expect(email_domain.status).to eq "permitted"
@@ -67,7 +67,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
       let!(:bike2) { FactoryBot.create(:bike_lightspeed_pos, owner_email: "example@#{domain}") }
       let(:target_data) { valid_data.merge(bike_count: 1, bike_count_pos: 1) }
       it "resolves" do
-        VCR.use_cassette("UpdateEmailDomainJob-gmail") do
+        VCR.use_cassette("Update-Email-Domain-Job_gmail") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 1
           expect(email_domain.has_ban_blockers?).to be_truthy
@@ -82,7 +82,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         it "marks it permitted" do
           expect(email_domain.reload.status).to eq "provisional_ban"
 
-          VCR.use_cassette("UpdateEmailDomainJob-gmail") do
+          VCR.use_cassette("Update-Email-Domain-Job_gmail") do
             instance.perform(email_domain.id)
             expect(email_domain.reload.user_count).to eq 1
             expect(email_domain.has_ban_blockers?).to be_truthy
@@ -101,7 +101,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
       before { stub_const("UpdateEmailDomainJob::VALIDATE_WITH_SENDGRID", true) }
 
       it "doesn't resolve, but bike makes it permitted" do
-        VCR.use_cassette("UpdateEmailDomainJob-co.za") do
+        VCR.use_cassette("Update-Email-Domain-Job_co.za") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 2
           expect(email_domain.bike_count).to eq 0
@@ -125,7 +125,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
 
       it "doesn't resolve, but bike makes it permitted" do
         expect(User.donated.pluck(:id)).to eq([user.id])
-        VCR.use_cassette("UpdateEmailDomainJob-msn") do
+        VCR.use_cassette("Update-Email-Domain-Job_msn") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 1
           expect(email_domain.bike_count).to eq 1
@@ -150,7 +150,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
       it "makes provisional_ban" do
         expect(email_domain.reload.calculated_users.count).to eq 2
 
-        VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
+        VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 2
           expect(email_domain.has_ban_blockers?).to be_falsey
@@ -166,7 +166,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         let!(:email_domain_3) { FactoryBot.create(:email_domain, domain: "zsss.#{domain}") }
         let!(:email_domain_4) { FactoryBot.create(:email_domain, domain: "dd.zs.#{domain}") }
         it "makes tld domain" do
-          VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
+          VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
             expect(EmailDomain.count).to eq 4
             Sidekiq::Job.clear_all
             instance.perform(email_domain.id)
@@ -199,13 +199,41 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
             expect(email_domain_at.tld?).to be_truthy
 
-            VCR.use_cassette("UpdateEmailDomainJob-unresolved") do
+            VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
               expect(EmailDomain.count).to eq 5
               instance.perform(email_domain.id)
 
               expect(email_domain.reload.status).to eq "provisional_ban"
 
               expect(EmailDomain.count).to eq 6
+            end
+            new_email_domain = EmailDomain.order(:id).last
+            expect(new_email_domain.domain).to eq domain
+            expect(new_email_domain.status).to eq "permitted"
+
+            # If we ignore the new domain, it doesn't get created again
+            new_email_domain.update(status: "ignored")
+
+            VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
+              expect { instance.perform(email_domain.id) }.to_not change(EmailDomain, :count)
+            end
+          end
+
+          context "with broader" do
+            let!(:email_domain_ignored) { FactoryBot.create(:email_domain, domain: "lix.com", status: :ignored) }
+            it "makes tld domain" do
+              expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
+              expect(email_domain_at.tld?).to be_truthy
+
+              VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
+                expect(EmailDomain.count).to eq 6
+                instance.perform(email_domain.id)
+
+                expect(email_domain.reload.status).to eq "provisional_ban"
+
+                expect(EmailDomain.count).to eq 7
+              end
+              expect(EmailDomain.order(:id).last.domain).to eq domain
             end
           end
         end
