@@ -1049,6 +1049,41 @@ ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bik
 
 
 --
+-- Name: email_bans; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_bans (
+    id bigint NOT NULL,
+    user_id bigint,
+    user_email_id bigint,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    reason integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: email_bans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.email_bans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: email_bans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.email_bans_id_seq OWNED BY public.email_bans.id;
+
+
+--
 -- Name: email_domains; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3607,38 +3642,6 @@ ALTER SEQUENCE public.user_emails_id_seq OWNED BY public.user_emails.id;
 
 
 --
--- Name: user_likely_spam_reasons; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_likely_spam_reasons (
-    id bigint NOT NULL,
-    user_id bigint,
-    reason integer,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: user_likely_spam_reasons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.user_likely_spam_reasons_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: user_likely_spam_reasons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.user_likely_spam_reasons_id_seq OWNED BY public.user_likely_spam_reasons.id;
-
-
---
 -- Name: user_phones; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3997,6 +4000,13 @@ ALTER TABLE ONLY public.customer_contacts ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('public.duplicate_bike_groups_id_seq'::regclass);
+
+
+--
+-- Name: email_bans id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_bans ALTER COLUMN id SET DEFAULT nextval('public.email_bans_id_seq'::regclass);
 
 
 --
@@ -4448,13 +4458,6 @@ ALTER TABLE ONLY public.user_emails ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- Name: user_likely_spam_reasons id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_likely_spam_reasons ALTER COLUMN id SET DEFAULT nextval('public.user_likely_spam_reasons_id_seq'::regclass);
-
-
---
 -- Name: user_phones id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4688,6 +4691,14 @@ ALTER TABLE ONLY public.customer_contacts
 
 ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: email_bans email_bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_bans
+    ADD CONSTRAINT email_bans_pkey PRIMARY KEY (id);
 
 
 --
@@ -5203,14 +5214,6 @@ ALTER TABLE ONLY public.user_emails
 
 
 --
--- Name: user_likely_spam_reasons user_likely_spam_reasons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_likely_spam_reasons
-    ADD CONSTRAINT user_likely_spam_reasons_pkey PRIMARY KEY (id);
-
-
---
 -- Name: user_phones user_phones_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5625,6 +5628,20 @@ CREATE INDEX index_components_on_bike_version_id ON public.components USING btre
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON public.components USING btree (manufacturer_id);
+
+
+--
+-- Name: index_email_bans_on_user_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_email_id ON public.email_bans USING btree (user_email_id);
+
+
+--
+-- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_id ON public.email_bans USING btree (user_id);
 
 
 --
@@ -6573,13 +6590,6 @@ CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (use
 
 
 --
--- Name: index_user_likely_spam_reasons_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_likely_spam_reasons_on_user_id ON public.user_likely_spam_reasons USING btree (user_id);
-
-
---
 -- Name: index_user_phones_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6685,14 +6695,6 @@ ALTER TABLE ONLY public.active_storage_variant_records
 
 
 --
--- Name: user_likely_spam_reasons fk_rails_a9be85d50e; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_likely_spam_reasons
-    ADD CONSTRAINT fk_rails_a9be85d50e FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
 -- Name: active_storage_attachments fk_rails_c3b3935057; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6715,6 +6717,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250319024056'),
+('20250319010935'),
 ('20250313035336'),
 ('20250312225116'),
 ('20250312171401'),

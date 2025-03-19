@@ -696,10 +696,12 @@ RSpec.describe User, type: :model do
   describe "donations" do
     let(:user) { FactoryBot.create(:user) }
     it "returns the payment amount" do
-      Payment.create(user: user, amount_cents: 200)
+      Payment.create(user: user, amount_cents: 200, paid_at: Time.current)
       expect(user.donations).to eq 200
       expect(user.donor?).to be_falsey
       Payment.create(user: user, amount_cents: 800)
+      expect(user.donor?).to be_falsey
+      Payment.create(user: user, amount_cents: 800, paid_at: Time.current)
       expect(user.donor?).to be_truthy
     end
   end

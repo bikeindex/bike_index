@@ -50,8 +50,12 @@
           %td
             Status
           %td
-            %span{class: (@email_domain.status.match?("ban") ? "text-danger" : "")}
+            - status_class = "text-danger" if @email_domain.status.match?("ban")
+            - status_class = "text-warning font-weight-bold" if @email_domain.ignored?
+            %span{class: status_class}
               = @email_domain.status_humanized
+            - if @email_domain.ignored?
+              %small.less-strong will not match any new users
 
   .col-md-6
     %table.table-list
