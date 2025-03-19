@@ -83,3 +83,6 @@
                   %span.text-info limited
             %td.table-cell-check
               = check_mark if user.confirmed
+              - if user.email_bans_active.any?
+                Not receiving email:
+                %small.text-danger= user.email_bans_active.join(",")
