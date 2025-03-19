@@ -46,6 +46,7 @@ class EmailDomain < ApplicationRecord
   after_commit :enqueue_processing_worker, on: :create
 
   scope :active, -> { where(ignored: false) }
+  scope :ignored, -> { where(ignored: true) }
   scope :ban_or_provisional, -> { where(status: %i[provisional_ban banned]) }
   scope :tld, -> { where("(data -> 'is_tld')::text = ?", "true") }
   scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }

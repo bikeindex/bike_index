@@ -64,7 +64,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
         expect(email_domain.status_changed_after_create?).to be_falsey
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{email_domain.id}", params: {
-          email_domain: {domain: "newdomain.com", status: "provisional_ban"}
+          email_domain: {domain: "newdomain.com", status: "provisional_ban", ignored: true}
         }
         expect(flash[:success]).to be_present
         expect(email_domain.reload.status).to eq "provisional_ban"

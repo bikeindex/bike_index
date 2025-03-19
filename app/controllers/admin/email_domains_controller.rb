@@ -3,7 +3,7 @@
 class Admin::EmailDomainsController < Admin::BaseController
   include SortableTable
   before_action :find_email_domain, only: %i[show update]
-  helper_method :searchable_statuses, :matching_email_domains
+  helper_method :searchable_statuses, :matching_email_domains, :ignorable_options
 
   def index
     @per_page = params[:per_page] || 25
@@ -82,6 +82,10 @@ class Admin::EmailDomainsController < Admin::BaseController
     matching_email_domains.includes(:creator).reorder(order_sql)
   end
 
+  def ignorable_options
+    %w[active ignored all].freeze
+  end
+
   def find_email_domain
     @email_domain = EmailDomain.find(params[:id])
   end
@@ -98,6 +102,13 @@ class Admin::EmailDomainsController < Admin::BaseController
       email_domains = (@tld == "only_tld") ? email_domains.tld : email_domains.subdomain
     end
 
+    @ignored = if ignorable_options.include?(params[:search_ignored])
+      params[:search_ignored]
+    else
+      ignorable_options.first
+    end
+    email_domains = email_domains.send(@ignored)
+
     @show_matching_users = InputNormalizer.boolean(params[:search_matching_users])
     @time_range_column = sort_column if %w[updated_at status_changed_at].include?(sort_column)
     @time_range_column ||= "created_at"
@@ -110,7 +121,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def permitted_update_parameters
-    params.require(:email_domain).permit(:status)
+    params.require(:email_domain).permit(:status, :ignored)
   end
 
   def email_domain_params

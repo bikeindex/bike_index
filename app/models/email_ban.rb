@@ -31,7 +31,6 @@ class EmailBan < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-
   def set_calculated_attributes
     self.start_at ||= Time.current
   end

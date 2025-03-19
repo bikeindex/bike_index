@@ -1,9 +1,9 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe EmailBan, type: :model do
   describe "factory" do
     let(:email_ban) { FactoryBot.create(:email_ban, reason: :email_domain, end_at:) }
-    let(:email_ban_duplicate) {  }
+    let(:email_ban_duplicate) {}
     let(:user) { email_ban.user }
     let(:end_at) { nil }
     it "is valid" do

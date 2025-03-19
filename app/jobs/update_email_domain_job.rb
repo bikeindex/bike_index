@@ -59,7 +59,7 @@ class UpdateEmailDomainJob < ScheduledJob
 
   def calculated_data(email_domain)
     {
-      broader_domain_exists: EmailDomain.find_matching_domain(email_domain.domain).id != email_domain.id,
+      broader_domain_exists: EmailDomain.find_matching_domain(email_domain.domain)&.id != email_domain.id,
       domain_resolves: domain_resolves?(email_domain.domain),
       tld_resolves: domain_resolves?(email_domain.tld),
       bike_count: email_domain.calculated_bikes.count,

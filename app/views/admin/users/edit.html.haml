@@ -1,5 +1,5 @@
 - last_email_errored = @user.user_emails&.last_email_errored || UserEmail.none
-- if @user.banned? || @user.deleted? || last_email_errored.any? || @user.likely_spam?
+- if @user.banned? || @user.deleted? || last_email_errored.any? || @user.email_banned?
   .row.mb-4
     - if @user.deleted?
       .col-sm-10.offset-sm-1.col-md-6.offset-md-3.mt-4
@@ -38,12 +38,12 @@
         .alert.alert-danger.mb-4
           %h4.text-danger Last email to user errored!
           Check the notifications "Delivery Errors" (below)
-    - if @user.likely_spam?
+    - if @user.email_banned?
       .col-sm-10.offset-sm-1.col-md-6.offset-md-3.mt-4
         .alert.alert-danger.mb-4
-          %h4.text-danger User Likely spam
+          %h4.text-danger User email banned
           Reasons:
-          = @user.user_likely_spam_reasons.pluck(:reason).to_sentence
+          = @user.email_bans_active.pluck(:reason).to_sentence
 .row
   .col-md-6
     %h1
