@@ -1097,8 +1097,7 @@ CREATE TABLE public.email_domains (
     status integer DEFAULT 0,
     user_count integer,
     status_changed_at timestamp(6) without time zone,
-    data jsonb,
-    ignored boolean DEFAULT false
+    data jsonb
 );
 
 
@@ -6781,7 +6780,6 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20250319010935'),
-('20250319010138'),
 ('20250313035336'),
 ('20250312225116'),
 ('20250312171401'),

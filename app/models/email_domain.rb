@@ -8,7 +8,6 @@
 #  data              :jsonb
 #  deleted_at        :datetime
 #  domain            :string
-#  ignored           :boolean          default(FALSE)
 #  status            :integer          default("permitted")
 #  status_changed_at :datetime
 #  user_count        :integer
@@ -24,7 +23,7 @@ class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
-  STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2}
+  STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}
   TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za]
   SPAM_SCORE_AUTO_BAN = 5
   # We don't verify with EmailDomains in most tests because it slows things down.
@@ -45,8 +44,6 @@ class EmailDomain < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker, on: :create
 
-  scope :active, -> { where(ignored: false) }
-  scope :ignored, -> { where(ignored: true) }
   scope :ban_or_provisional, -> { where(status: %i[provisional_ban banned]) }
   scope :tld, -> { where("(data -> 'is_tld')::text = ?", "true") }
   scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }
@@ -66,11 +63,11 @@ class EmailDomain < ApplicationRecord
 
     def find_matching_domain(domain)
       tld = tld_for(domain)
-      tld_match = active.where(domain: tld).first
+      tld_match = not_ignored.where(domain: tld).first
       if tld_match.present?
         # For TLDs with subdomains, if a non-subdomain record is stored, return than
         if tld.count(".") > 1
-          even_more_tld_match = active.where(domain: tld.gsub(/\A[^\.]*\./, "")).first
+          even_more_tld_match = not_ignored.where(domain: tld.gsub(/\A[^\.]*\./, "")).first
 
           return even_more_tld_match if even_more_tld_match.present?
         end
@@ -103,7 +100,7 @@ class EmailDomain < ApplicationRecord
     end
 
     def matching_domain(domain)
-      active.where("domain ILIKE ?", "%#{domain.tr("@", "")}").order(Arel.sql("length(domain) ASC"))
+      not_ignored.where("domain ILIKE ?", "%#{domain.tr("@", "")}").order(Arel.sql("length(domain) ASC"))
     end
   end
 
@@ -133,10 +130,6 @@ class EmailDomain < ApplicationRecord
 
   def b_param_count
     data&.dig("b_param_count")&.to_i || 0
-  end
-
-  def active?
-    !ignored?
   end
 
   def broader_domain_exists?

@@ -1,21 +1,14 @@
 - nav_header_list_items = capture_haml do
-  %li.nav-item.dropdown
-    %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@ignored == "active" ? "" : "active")}
-      - if @ignored == "all"
-        Ignored and not
-      - else
-        = @ignored.humanize
-    .dropdown-menu
-      - ignorable_options.each do |kind|
-        = link_to kind.titleize, url_for(sortable_search_params.merge(search_ignored: kind)), class: "dropdown-item #{@ignored == kind ? 'active' : ''}"
+  %li.nav-item
+    = link_to "length", url_for(sortable_search_params.merge(sort: "domain_length")), class: "nav-link #{sort_column == 'domain_length' ? 'active' : ''}"
   %li.nav-item.dropdown
     %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@status.present? ? "active" : "")}
       - if @status.blank?
-        All statuses
+        All statuses except ignored
       - else
         #{@status.titleize} only
     .dropdown-menu
-      = link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status.present? ? '' : 'active'}"
+      = link_to "All statuses except ignored", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status.present? ? '' : 'active'}"
       .dropdown-divider
       - searchable_statuses.each do |kind|
         = link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_status: kind)), class: "dropdown-item #{@status == kind ? 'active' : ''}"

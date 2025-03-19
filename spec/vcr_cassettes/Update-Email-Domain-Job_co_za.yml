@@ -19,7 +19,7 @@ http_interactions:
       message: Moved Permanently
     headers:
       Date:
-      - Thu, 13 Mar 2025 22:16:45 GMT
+      - Wed, 19 Mar 2025 02:21:19 GMT
       Content-Type:
       - text/html; charset=iso-8859-1
       Connection:
@@ -35,21 +35,21 @@ http_interactions:
       Cf-Cache-Status:
       - DYNAMIC
       Report-To:
-      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=9vKneA6%2Fy3IvTtMYz%2FQSJEmkZut98F%2BJXLT%2FvFcsOAGJa%2FRH4k9lUyIYYvBcrrorqbPDukTJqoiDMEZsg%2BA4tvu40vXsWW2NitabE3prenhfX9lv0%2B46NibNs2M%3D"}],"group":"cf-nel","max_age":604800}'
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=riE1bkkGryH7Rw184fAbrMrFoqpFKQ7M00FeFPWORP4hh85y5IpY8skZkuL1%2BBWUmOqXDmwlb27n9K2prwDteValau0Cty18VXzodmxjHxAx1zPLr4NTlsl9HMI%3D"}],"group":"cf-nel","max_age":604800}'
       Nel:
       - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
       Server:
       - cloudflare
       Cf-Ray:
-      - 91fee5c039b5cef9-SJC
+      - 92297ee1deefce74-SJC
       Alt-Svc:
       - h3=":443"; ma=86400
       Server-Timing:
-      - cfL4;desc="?proto=TCP&rtt=6261&min_rtt=6261&rtt_var=3130&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=136&delivery_rate=0&cwnd=249&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
+      - cfL4;desc="?proto=TCP&rtt=6789&min_rtt=6789&rtt_var=3394&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=136&delivery_rate=0&cwnd=243&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 22:16:45 GMT
+  recorded_at: Wed, 19 Mar 2025 02:21:19 GMT
 - request:
     method: head
     uri: https://dan.com/buy-domain/nkk.co.za?redirected=true
@@ -85,33 +85,33 @@ http_interactions:
       Location:
       - https://www.godaddy.com/forsale/nkk.co.za?utm_source=TDFS_BINNS2&utm_medium=parkedpages&utm_campaign=x_corp_tdfs-binns2_base&traffic_type=TDFS_BINNS2&traffic_id=binns2&
       X-Request-Id:
-      - 7efa8194-a848-41b5-87c4-22ec21671632
+      - 5e930c32-a9f9-4b94-a41a-7f729fef2596
       X-Runtime:
-      - '0.012383'
+      - '0.040636'
       Content-Security-Policy:
       - frame-ancestors 'self';
       X-Envoy-Upstream-Service-Time:
-      - '16'
+      - '72'
       Content-Length:
       - '1'
       Expires:
-      - Thu, 13 Mar 2025 22:16:45 GMT
+      - Wed, 19 Mar 2025 02:21:19 GMT
       Cache-Control:
       - max-age=0, no-cache, no-store
       Pragma:
       - no-cache
       Date:
-      - Thu, 13 Mar 2025 22:16:45 GMT
+      - Wed, 19 Mar 2025 02:21:19 GMT
       Connection:
       - keep-alive
       Strict-Transport-Security:
       - max-age=86400 ; includeSubDomains ; preload
       Server-Timing:
-      - ak_p; desc="1741904205428_400069787_123105572_17659_7944_17_34_-";dur=1
+      - ak_p; desc="1742350879411_399222541_57919456_21590_5415_7_10_-";dur=1
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 22:16:45 GMT
+  recorded_at: Wed, 19 Mar 2025 02:21:19 GMT
 - request:
     method: head
     uri: https://www.godaddy.com/forsale/nkk.co.za?traffic_id=binns2&traffic_type=TDFS_BINNS2&utm_campaign=x_corp_tdfs-binns2_base&utm_medium=parkedpages&utm_source=TDFS_BINNS2
@@ -137,15 +137,15 @@ http_interactions:
       Content-Type:
       - text/html
       Content-Length:
-      - '401'
+      - '403'
       Expires:
-      - Thu, 13 Mar 2025 22:16:45 GMT
+      - Wed, 19 Mar 2025 02:21:19 GMT
       Cache-Control:
       - max-age=0, no-cache, no-store
       Pragma:
       - no-cache
       Date:
-      - Thu, 13 Mar 2025 22:16:45 GMT
+      - Wed, 19 Mar 2025 02:21:19 GMT
       Connection:
       - close
       X-Frame-Options:
@@ -154,11 +154,11 @@ http_interactions:
       - '2'
       - '6'
       Server-Timing:
-      - ak_p; desc="1741904205738_389950736_25648042_15_15163_8_101_-";dur=1
+      - ak_p; desc="1742350879778_399532110_365373339_20_29487_8_16_-";dur=1
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 22:16:45 GMT
+  recorded_at: Wed, 19 Mar 2025 02:21:19 GMT
 - request:
     method: head
     uri: http://nkk.co.za/
@@ -178,7 +178,7 @@ http_interactions:
       message: Moved Permanently
     headers:
       Date:
-      - Thu, 13 Mar 2025 22:16:46 GMT
+      - Wed, 19 Mar 2025 02:21:20 GMT
       Content-Type:
       - text/html; charset=iso-8859-1
       Connection:
@@ -194,21 +194,21 @@ http_interactions:
       Cf-Cache-Status:
       - DYNAMIC
       Report-To:
-      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=jHBKxgwq%2Fm4VANONw7%2FFBK22kznmPHeopw9IFdNrwrcFtum5hYp%2Bi3QpK%2F1I4FyZfisglx2Ko6HMAwtqWDiJwZugS%2BR7aJFdtY199nRDmI64BBr%2BSHQuddJGRBU%3D"}],"group":"cf-nel","max_age":604800}'
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=hnCq4z6XGKyK5yfPidLeJ81eOLuOuxDIIj6QGB2aXGKKnQGn%2F%2FO21tWefPyZzDo0bG3e%2B8HnKs%2B5efXRHkFxxsuDACNgOT8VsbYWHHp%2F2uQNpPBX0OUDEwF7q%2Fk%3D"}],"group":"cf-nel","max_age":604800}'
       Nel:
       - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
       Server:
       - cloudflare
       Cf-Ray:
-      - 91fee5c6ea2e7b4d-SEA
+      - 92297ee81c3d15e1-SJC
       Alt-Svc:
       - h3=":443"; ma=86400
       Server-Timing:
-      - cfL4;desc="?proto=TCP&rtt=28383&min_rtt=28383&rtt_var=14191&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=136&delivery_rate=0&cwnd=30&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
+      - cfL4;desc="?proto=TCP&rtt=151976&min_rtt=151976&rtt_var=75988&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=136&delivery_rate=0&cwnd=249&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 22:16:46 GMT
+  recorded_at: Wed, 19 Mar 2025 02:21:20 GMT
 - request:
     method: head
     uri: https://dan.com/buy-domain/nkk.co.za?redirected=true
@@ -244,33 +244,33 @@ http_interactions:
       Location:
       - https://www.godaddy.com/forsale/nkk.co.za?utm_source=TDFS_BINNS2&utm_medium=parkedpages&utm_campaign=x_corp_tdfs-binns2_base&traffic_type=TDFS_BINNS2&traffic_id=binns2&
       X-Request-Id:
-      - '0529b883-f7cd-4602-956d-57abd3a06362'
+      - 02b8b3be-10b1-4dbc-bbcd-8353273ff13b
       X-Runtime:
-      - '0.011903'
+      - '0.019109'
       Content-Security-Policy:
       - frame-ancestors 'self';
       X-Envoy-Upstream-Service-Time:
-      - '15'
+      - '67'
       Content-Length:
       - '1'
       Expires:
-      - Thu, 13 Mar 2025 22:16:46 GMT
+      - Wed, 19 Mar 2025 02:21:20 GMT
       Cache-Control:
       - max-age=0, no-cache, no-store
       Pragma:
       - no-cache
       Date:
-      - Thu, 13 Mar 2025 22:16:46 GMT
+      - Wed, 19 Mar 2025 02:21:20 GMT
       Connection:
       - keep-alive
       Strict-Transport-Security:
       - max-age=86400 ; includeSubDomains ; preload
       Server-Timing:
-      - ak_p; desc="1741904206260_400069768_45290942_23420_6514_7_8_-";dur=1
+      - ak_p; desc="1742350880443_399222540_109060982_20607_5486_12_16_-";dur=1
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 22:16:46 GMT
+  recorded_at: Wed, 19 Mar 2025 02:21:20 GMT
 - request:
     method: head
     uri: https://www.godaddy.com/forsale/nkk.co.za?traffic_id=binns2&traffic_type=TDFS_BINNS2&utm_campaign=x_corp_tdfs-binns2_base&utm_medium=parkedpages&utm_source=TDFS_BINNS2
@@ -296,15 +296,15 @@ http_interactions:
       Content-Type:
       - text/html
       Content-Length:
-      - '401'
+      - '403'
       Expires:
-      - Thu, 13 Mar 2025 22:16:46 GMT
+      - Wed, 19 Mar 2025 02:21:20 GMT
       Cache-Control:
       - max-age=0, no-cache, no-store
       Pragma:
       - no-cache
       Date:
-      - Thu, 13 Mar 2025 22:16:46 GMT
+      - Wed, 19 Mar 2025 02:21:20 GMT
       Connection:
       - close
       X-Frame-Options:
@@ -313,11 +313,11 @@ http_interactions:
       - '2'
       - '6'
       Server-Timing:
-      - ak_p; desc="1741904206538_389950736_25648895_14_12926_9_12_-";dur=1
+      - ak_p; desc="1742350880706_399532110_365382061_19_34475_9_23_-";dur=1
     body:
       encoding: UTF-8
       string: ''
-  recorded_at: Thu, 13 Mar 2025 22:16:46 GMT
+  recorded_at: Wed, 19 Mar 2025 02:21:20 GMT
 - request:
     method: post
     uri: https://api.sendgrid.com/v3/validations/email
@@ -341,19 +341,19 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 13 Mar 2025 22:16:47 GMT
+      - Wed, 19 Mar 2025 02:21:21 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '421'
+      - '420'
       Connection:
       - keep-alive
       X-Amzn-Requestid:
-      - 36a3f28d-06c4-4f5f-a8cf-e5bdd7b049f9
+      - 71d02c2d-6742-4686-aeb8-f5cccbd35ca9
       X-Amz-Apigw-Id:
-      - HYrkYH2ziYcESfg=
+      - HpuFOHkkiYcEpOg=
       X-Amzn-Trace-Id:
-      - Root=1-67d3594e-11efd5c7446b9b412bb48207;Parent=18e5f131ea699793;Sampled=0;Lineage=1:3bae0364:0
+      - Root=1-67da2a21-563f46865c154c9b27cf764a;Parent=2a09e320770ad118;Sampled=0;Lineage=1:3bae0364:0
       Access-Control-Allow-Methods:
       - HEAD, GET, PUT, POST, DELETE, OPTIONS, PATCH
       Access-Control-Max-Age:
@@ -380,11 +380,11 @@ http_interactions:
       X-Ratelimit-Limit:
       - '7'
       X-Ratelimit-Reset:
-      - '1741904207'
+      - '1742350882'
       Twilio-Request-Id:
-      - RQ2uHSrhyBkf7H4GW6PKFzX1xvArN
+      - RQ2uW4DxA9IBjQuYi0ciOodwA9CR2
       X-Envoy-Upstream-Service-Time:
-      - '555'
+      - '277'
       Powered-By:
       - Mako
       Cache-Control:
@@ -393,6 +393,6 @@ http_interactions:
       - strict-origin-when-cross-origin
     body:
       encoding: UTF-8
-      string: '{"result":{"email":"malaysia_lloyd57@nkk.co.za","verdict":"Risky","score":0.36246,"local":"malaysia_lloyd57","host":"nkk.co.za","checks":{"domain":{"has_valid_address_syntax":true,"has_mx_or_a_record":true,"is_suspected_disposable_address":false},"local_part":{"is_suspected_role_address":false},"additional":{"has_known_bounces":false,"has_suspected_bounces":true}},"source":"EMAILDOMAIN","ip_address":"157.131.171.36"}}'
-  recorded_at: Thu, 13 Mar 2025 22:16:47 GMT
+      string: '{"result":{"email":"malaysia_lloyd57@nkk.co.za","verdict":"Risky","score":0.36246,"local":"malaysia_lloyd57","host":"nkk.co.za","checks":{"domain":{"has_valid_address_syntax":true,"has_mx_or_a_record":true,"is_suspected_disposable_address":false},"local_part":{"is_suspected_role_address":false},"additional":{"has_known_bounces":false,"has_suspected_bounces":true}},"source":"EMAILDOMAIN","ip_address":"157.131.200.8"}}'
+  recorded_at: Wed, 19 Mar 2025 02:21:21 GMT
 recorded_with: VCR 6.3.1

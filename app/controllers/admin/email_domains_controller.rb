@@ -62,7 +62,8 @@ class Admin::EmailDomainsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at domain creator_id status user_count bike_count status_changed_at spam_score]
+    %w[created_at updated_at domain creator_id status user_count bike_count status_changed_at
+       spam_score domain_length]
   end
 
   def searchable_statuses
@@ -76,14 +77,12 @@ class Admin::EmailDomainsController < Admin::BaseController
       Arel.sql("COALESCE((data -> 'spam_score')::integer, 0) #{sort_direction}")
     elsif sort_column == "domain"
       Arel.sql("REVERSE(domain) #{sort_direction}")
+    elsif sort_column == "domain_length"
+      Arel.sql("LENGTH(domain) ASC")
     else
       "email_domains.#{sort_column} #{sort_direction}"
     end
     matching_email_domains.includes(:creator).reorder(order_sql)
-  end
-
-  def ignorable_options
-    %w[active ignored all].freeze
   end
 
   def find_email_domain
@@ -93,7 +92,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   def matching_email_domains
     email_domains = EmailDomain
     @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
-    email_domains = email_domains.send(@status) if @status.present?
+    email_domains = @status.present? ? email_domains.send(@status) : email_domains.not_ignored
     if params[:query].present?
       email_domains = email_domains.where("domain ILIKE ?", "%#{params[:query]}%")
     end
@@ -101,13 +100,6 @@ class Admin::EmailDomainsController < Admin::BaseController
       @tld = params[:search_tld]
       email_domains = (@tld == "only_tld") ? email_domains.tld : email_domains.subdomain
     end
-
-    @ignored = if ignorable_options.include?(params[:search_ignored])
-      params[:search_ignored]
-    else
-      ignorable_options.first
-    end
-    email_domains = email_domains.send(@ignored)
 
     @show_matching_users = InputNormalizer.boolean(params[:search_matching_users])
     @time_range_column = sort_column if %w[updated_at status_changed_at].include?(sort_column)
@@ -121,7 +113,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def permitted_update_parameters
-    params.require(:email_domain).permit(:status, :ignored)
+    params.require(:email_domain).permit(:status)
   end
 
   def email_domain_params

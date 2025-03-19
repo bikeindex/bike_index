@@ -58,16 +58,16 @@ RSpec.describe EmailDomain, type: :model do
     end
 
     context "busted gmail" do
-      let!(:email_domain_tld) { FactoryBot.create(:email_domain, domain: "ail.com", ignored:) }
-      let(:ignored) { false }
+      let!(:email_domain_tld) { FactoryBot.create(:email_domain, domain: "ail.com", status:) }
+      let(:status) { :permitted }
       it "creates and finds for busted gmail" do
         email_domain = EmailDomain.find_or_create_for("t.b.000.07@g.m.ail.com")
         expect(email_domain&.id).to eq email_domain_tld.id
       end
       context "with ail.com ignored" do
-        let(:ignored) { true }
+        let(:status) { :ignored }
         it "creates for busted gmail" do
-          expect(email_domain_tld.reload.active?).to be_falsey
+          expect(email_domain_tld.reload.ignored?).to be_truthy
           email_domain = EmailDomain.find_or_create_for("t.b.000.07@g.m.ail.com")
           expect(email_domain&.id).to_not eq email_domain_tld.id
           expect(email_domain.tld?).to be_falsey
