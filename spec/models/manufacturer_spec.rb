@@ -146,6 +146,8 @@ RSpec.describe Manufacturer, type: :model do
     it "returns the value of manufacturer_other if manufacturer is other" do
       expect(Manufacturer.calculated_mnfg_name(manufacturer, "Other manufacturer name")).to eq "Mnfg name"
       expect(Manufacturer.calculated_mnfg_name(manufacturer_other, "Other manufacturer name")).to eq("Other manufacturer name")
+      expect(manufacturer.simple_name).to eq "Mnfg name"
+      expect(manufacturer.alternate_name).to be_nil
     end
 
     it "returns the name of the manufacturer if it isn't other" do
@@ -171,6 +173,9 @@ RSpec.describe Manufacturer, type: :model do
       let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Racing (S E Bikes)") }
       it "returns Just SE Bikes (and does it on save)" do
         expect(Manufacturer.calculated_mnfg_name(manufacturer, nil)).to eq "SE Racing"
+        expect(manufacturer.reload.name).to eq "SE Racing (S E Bikes)"
+        expect(manufacturer.simple_name).to eq "SE Racing"
+        expect(manufacturer.alternate_name).to eq "S E Bikes"
       end
     end
   end
