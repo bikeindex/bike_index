@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe TsvCreator do
+RSpec.describe Spreadsheets::TsvCreator do
   let(:instance) { described_class.new }
 
   describe "create_manufacturer" do

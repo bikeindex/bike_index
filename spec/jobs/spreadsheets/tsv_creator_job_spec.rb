@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe TsvCreatorJob, type: :job do
+RSpec.describe Spreadsheets::TsvCreatorJob, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
 
@@ -10,8 +10,8 @@ RSpec.describe TsvCreatorJob, type: :job do
   end
 
   it "sends tsv creator the method it's passed" do
-    expect_any_instance_of(TsvCreator).to receive(:create_stolen).with(true).and_return(true)
-    expect_any_instance_of(TsvCreator).to receive(:create_stolen).with(false).and_return(true)
+    expect_any_instance_of(Spreadsheets::TsvCreator).to receive(:create_stolen).with(true).and_return(true)
+    expect_any_instance_of(Spreadsheets::TsvCreator).to receive(:create_stolen).with(false).and_return(true)
     described_class.new.perform("create_stolen", true)
   end
 
