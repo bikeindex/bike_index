@@ -1049,6 +1049,41 @@ ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bik
 
 
 --
+-- Name: email_bans; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_bans (
+    id bigint NOT NULL,
+    user_id bigint,
+    user_email_id bigint,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    reason integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: email_bans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.email_bans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: email_bans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.email_bans_id_seq OWNED BY public.email_bans.id;
+
+
+--
 -- Name: email_domains; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1062,7 +1097,8 @@ CREATE TABLE public.email_domains (
     status integer DEFAULT 0,
     user_count integer,
     status_changed_at timestamp(6) without time zone,
-    data jsonb
+    data jsonb,
+    ignored boolean DEFAULT false
 );
 
 
@@ -4000,6 +4036,13 @@ ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: email_bans id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_bans ALTER COLUMN id SET DEFAULT nextval('public.email_bans_id_seq'::regclass);
+
+
+--
 -- Name: email_domains id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4688,6 +4731,14 @@ ALTER TABLE ONLY public.customer_contacts
 
 ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: email_bans email_bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_bans
+    ADD CONSTRAINT email_bans_pkey PRIMARY KEY (id);
 
 
 --
@@ -5625,6 +5676,20 @@ CREATE INDEX index_components_on_bike_version_id ON public.components USING btre
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON public.components USING btree (manufacturer_id);
+
+
+--
+-- Name: index_email_bans_on_user_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_email_id ON public.email_bans USING btree (user_email_id);
+
+
+--
+-- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_id ON public.email_bans USING btree (user_id);
 
 
 --
@@ -6715,6 +6780,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250319010935'),
+('20250319010138'),
 ('20250313035336'),
 ('20250312225116'),
 ('20250312171401'),

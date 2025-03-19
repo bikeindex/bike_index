@@ -13,6 +13,14 @@ module ActivePeriodable
     scope :time_ordered, -> { reorder(:start_at) }
   end
 
+  module ClassMethods
+    def period_active_at(datetime)
+      active_before = where("start_at <= ?", datetime)
+
+      active_before.where(end_at: nil).or(active_before.where("end_at > ?", datetime))
+    end
+  end
+
   def period_active?
     return false unless start_at.present? && start_at <= Time.current
 

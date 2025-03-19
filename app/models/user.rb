@@ -104,7 +104,8 @@ class User < ApplicationRecord
   has_many :user_emails, dependent: :destroy
   has_many :user_phones
   has_many :user_alerts
-  has_many :user_likely_spam_reasons, dependent: :destroy
+  has_many :email_bans
+  has_many :email_bans_active, -> { period_active }, class_name: "EmailBan"
   has_many :superuser_abilities
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
@@ -472,8 +473,8 @@ class User < ApplicationRecord
     user_phones.confirmed.limit(1).any?
   end
 
-  def likely_spam?
-    user_likely_spam_reasons.any?
+  def email_banned?
+    email_bans_active.any?
   end
 
   def set_calculated_attributes

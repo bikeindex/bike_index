@@ -5,11 +5,12 @@
 # Table name: email_domains
 #
 #  id                :bigint           not null, primary key
-#  status_changed_at :datetime
 #  data              :jsonb
 #  deleted_at        :datetime
 #  domain            :string
+#  ignored           :boolean          default(FALSE)
 #  status            :integer          default("permitted")
+#  status_changed_at :datetime
 #  user_count        :integer
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
@@ -41,9 +42,10 @@ class EmailDomain < ApplicationRecord
   validate :domain_is_expected_format
   validate :domain_is_not_contained_in_existing, on: :create
 
-  before_save :set_calculated_attributes
+  before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker, on: :create
 
+  scope :active, -> { where(ignored: false) }
   scope :ban_or_provisional, -> { where(status: %i[provisional_ban banned]) }
   scope :tld, -> { where("(data -> 'is_tld')::text = ?", "true") }
   scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }
@@ -63,11 +65,11 @@ class EmailDomain < ApplicationRecord
 
     def find_matching_domain(domain)
       tld = tld_for(domain)
-      tld_match = where(domain: tld).first
+      tld_match = active.where(domain: tld).first
       if tld_match.present?
         # For TLDs with subdomains, if a non-subdomain record is stored, return than
         if tld.count(".") > 1
-          even_more_tld_match = where(domain: tld.gsub(/\A[^\.]*\./, "")).first
+          even_more_tld_match = active.where(domain: tld.gsub(/\A[^\.]*\./, "")).first
 
           return even_more_tld_match if even_more_tld_match.present?
         end
@@ -100,7 +102,7 @@ class EmailDomain < ApplicationRecord
     end
 
     def matching_domain(domain)
-      where("domain ILIKE ?", "%#{domain.tr("@", "")}").order(Arel.sql("length(domain) ASC"))
+      active.where("domain ILIKE ?", "%#{domain.tr("@", "")}").order(Arel.sql("length(domain) ASC"))
     end
   end
 
@@ -130,6 +132,10 @@ class EmailDomain < ApplicationRecord
 
   def b_param_count
     data&.dig("b_param_count")&.to_i || 0
+  end
+
+  def active?
+    !ignored?
   end
 
   def broader_domain_exists?
