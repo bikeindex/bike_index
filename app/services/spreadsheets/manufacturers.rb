@@ -37,6 +37,7 @@ class Spreadsheets::Manufacturers
       manufacturer.motorized_only = InputNormalizer.boolean(row[:ebike_only])
       manufacturer.open_year = row[:open_year]
       manufacturer.close_year = row[:close_year]
+      manufacturer.website = row[:website]
       # Ignoring logo for now
       manufacturer.save! if manufacturer.changed?
     end
