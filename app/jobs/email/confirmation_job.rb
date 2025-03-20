@@ -5,6 +5,7 @@ class Email::ConfirmationJob < ApplicationJob
 
   BLOCK_DUPLICATE_PERIOD = 1.day
   PRE_PERIOD_DUPLICATE_LIMIT = 2
+  PERMITTED_DUPLICATE_DOMAINS = %w[bikeindex.org]
 
   def perform(user_id)
     user = User.find_by(id: user_id)
@@ -24,7 +25,7 @@ class Email::ConfirmationJob < ApplicationJob
 
     # Create a email ban if we should
     EmailBan.create(reason: :email_domain, user:) if email_domain&.provisional_ban?
-    EmailBan.create(reason: :email_duplicate, user:) if email_duplicate?(user)
+    EmailBan.create(reason: :email_duplicate, user:) if email_duplicate?(user.email)
     # Don't send an email if the email is blocked
     return if EmailBan.period_started.where(user:).any?
 
@@ -44,12 +45,24 @@ class Email::ConfirmationJob < ApplicationJob
     User.where(email: user.email).where("id < ?", user.id).present?
   end
 
-  def email_duplicate?(user)
-    matches = User.where("REPLACE(email, '.', '') = ?", user.email.tr(".", ""))
-      .where.not(email: user.email)
+  def email_duplicate?(email)
+    return false if PERMITTED_DUPLICATE_DOMAINS.include?(email.split("@").last)
+
+    return true if email_period_duplicate?(email)
+
+    email_plus_duplicate?(email)
+  end
+
+  def email_period_duplicate?(email)
+    matches = User.where("REPLACE(email, '.', '') = ?", email.tr(".", ""))
+      .where.not(email: email)
 
     return true if matches.where("created_at > ?", Time.current - BLOCK_DUPLICATE_PERIOD).any?
 
     matches.count > PRE_PERIOD_DUPLICATE_LIMIT
+  end
+
+  def email_plus_duplicate?(email)
+    false
   end
 end
