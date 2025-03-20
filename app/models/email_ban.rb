@@ -30,11 +30,16 @@ class EmailBan < ApplicationRecord
   validate :is_not_duplicate_ban
 
   before_validation :set_calculated_attributes
+  class << self
+    def ban(user)
+      # Logic to ban
+    end
 
-  def self.reason_humanized(str)
-    return nil unless str.present?
+    def reason_humanized(str)
+      return nil unless str.present?
 
-    str.humanize.gsub(/email/i, "").strip.downcase
+      str.humanize.gsub(/email/i, "").strip.downcase
+    end
   end
 
   def reason_humanized
