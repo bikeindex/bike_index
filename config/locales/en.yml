@@ -810,6 +810,7 @@ en:
         impound_record:
           user_not_authorized: does not have permission to impound this bike
         manufacturer:
+          cannot_include_quote: cannot include double quote
           cannot_match_a_color_name: cannot be the same as a color name
         organization_message:
           latlon_required: latitude and longitude required
@@ -3921,11 +3922,13 @@ en:
         locks
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below: Give us a heads up in a comment below.
+      also_available_html: This list is also available as a %{csv_on_github}.
+      csv_on_github: CSV on Github
       manufacturers_we_know_about: Manufacturers we know about
       name: Name
       oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
       only_makes_components: Only makes components
+      submit_a_pr_html: Suggest an update by submitting a Pull Request to the %{csv_on_github}.
       thats_not_actually_surprising: That's not actually surprising, there are a bunch.
   memberships:
     success:

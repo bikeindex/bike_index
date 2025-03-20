@@ -1,4 +1,4 @@
-class TsvCreator
+class Spreadsheets::TsvCreator
   attr_reader :file_prefix
 
   def initialize
