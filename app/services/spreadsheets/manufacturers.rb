@@ -25,10 +25,10 @@ class Spreadsheets::Manufacturers
     private
 
     def update_or_create_for!(row)
-      manufacturer = friendly_find(row[:name])
-      manufacturer ||= friendly_find(row[:alternate_name]) if row[:alternate_name].present?
+      manufacturer = Manufacturer.friendly_find(row[:name])
+      manufacturer ||= Manufacturer.friendly_find(row[:alternate_name]) if row[:alternate_name].present?
       manufacturer ||= Manufacturer.new
-      mnfg.name = if row[:alternate_name].present?
+      manufacturer.name = if row[:alternate_name].present?
         "#{row[:name]} (#{row[:alternate_name]})"
       else
         row[:name]
@@ -45,7 +45,12 @@ class Spreadsheets::Manufacturers
       export_column_methods.map do |meth|
         next if meth.blank?
 
-        manufacturer.send(meth)
+        result = manufacturer.send(meth)
+        if meth == :logo_url && result == ManufacturerLogoUploader::FALLBACK_IMAGE
+          nil
+        else
+          result
+        end
       end
     end
 
