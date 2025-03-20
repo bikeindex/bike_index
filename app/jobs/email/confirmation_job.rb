@@ -63,6 +63,16 @@ class Email::ConfirmationJob < ApplicationJob
   end
 
   def email_plus_duplicate?(email)
-    false
+    return false unless email.match?(/\+.*@/)
+
+    email_start, email_end = email.split("@")
+    email_start.gsub!(/\+.*/, "")
+    pp email_start, email_end
+
+    matches = User.where("email ~ ?", "^#{email_start}(\\+.*)?@#{email_end}")
+
+    return true if matches.where("created_at > ?", Time.current - BLOCK_DUPLICATE_PERIOD).any?
+
+    matches.count > PRE_PERIOD_DUPLICATE_LIMIT
   end
 end
