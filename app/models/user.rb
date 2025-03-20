@@ -66,7 +66,7 @@ class User < ApplicationRecord
   include FeatureFlaggable
   include Geocodeable
 
-  EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/.freeze
+  EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
 
   cattr_accessor :current_user
 
@@ -142,7 +142,7 @@ class User < ApplicationRecord
 
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
-  validates :email, format: { with: EMAIL_REGEX, message: "Email invalid"  }
+  validates :email, format: {with: EMAIL_REGEX, message: "Email invalid"}
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
