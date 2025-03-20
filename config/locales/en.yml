@@ -3921,7 +3921,7 @@ en:
         locks
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below: Give us a heads up in a comment below.
+      submit_pr: Submit a Pull Request to the CSV on GitHub
       manufacturers_we_know_about: Manufacturers we know about
       name: Name
       oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?

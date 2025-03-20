@@ -6,6 +6,11 @@ AllCops:
     - "db/migrate/**/*"
     - "node_modules/**/*"
 
+
+
+Layout:
+  Enabled: false
+
 Lint/DeprecatedOpenSSLConstant:
   Enabled: false
 
@@ -18,20 +23,17 @@ Lint/RaiseException:
 Lint/StructNewOverride:
   Enabled: false
 
-Layout:
+Metrics/BlockLength:
+  Exclude:
+    - "**/*_spec.rb"
+
+Metrics/ClassLength:
   Enabled: false
 
 Metrics/MethodLength:
   Enabled: false
 
-Metrics/ClassLength:
-  Enabled: false
-
 Metrics/ModuleLength:
-  Exclude:
-    - "**/*_spec.rb"
-
-Metrics/BlockLength:
   Exclude:
     - "**/*_spec.rb"
 

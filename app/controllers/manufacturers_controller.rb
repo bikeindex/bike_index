@@ -3,11 +3,7 @@ class ManufacturersController < ApplicationController
     @manufacturers = Manufacturer.all
     respond_to do |format|
       format.html
-      format.csv { render plain: @manufacturers.to_csv }
+      format.csv { render plain: Spreadsheets::Manufacturer.to_csv(@manufacturers) }
     end
-  end
-
-  def tsv
-    redirect_to "https://files.bikeindex.org/uploads/tsvs/manufacturers.tsv", allow_other_host: true
   end
 end
