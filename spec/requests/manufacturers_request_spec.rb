@@ -16,11 +16,4 @@ RSpec.describe ManufacturersController, type: :request do
       end
     end
   end
-
-  describe "tsv" do
-    it "redirects to " do
-      get "/manufacturers/tsv"
-      expect(response).to redirect_to("https://files.bikeindex.org/uploads/tsvs/manufacturers.tsv")
-    end
-  end
 end

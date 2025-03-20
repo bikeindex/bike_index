@@ -25,6 +25,19 @@ RSpec.describe Manufacturer, type: :model do
         expect(manufacturer.errors.count).to eq 0
       end
     end
+    context "name with single quote" do
+      let(:manufacturer) { FactoryBot.build(:manufacturer, name: "stuff'") }
+      it "is valid" do
+        expect(manufacturer.valid?).to be_truthy
+      end
+    end
+    context "name with double quote" do
+      let(:manufacturer) { FactoryBot.build(:manufacturer, name: 'stuff"') }
+      it "adds an error" do
+        expect(manufacturer.valid?).to be_falsey
+        expect(manufacturer.errors.full_messages.to_s).to match "quote"
+      end
+    end
   end
 
   describe "friendly_find" do

@@ -123,13 +123,20 @@ class Manufacturer < ApplicationRecord
   # Because of issues with autocomplete if the names are the same
   # Also, probably just a good idea in general
   def ensure_non_blocking_name
-    return true unless name
+    return unless name.present?
+
+    errors.add(:name, :cannot_include_quote) if name.match?('"')
     errors.add(:name, :cannot_match_a_color_name) if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
   end
 
+  def simple_name
+    name.gsub(/\s?\([^)]*\)/i, "")
+  end
+
   def secondary_name
-    s_name = name&.gsub(/\A[^(]*/, "")&.gsub(/\(|\)/, "")
-    s_name.present? ? s_name : nil
+    return unless name&.match?(/\(/)
+
+    name.split("(").last.tr(")", "")
   end
 
   def set_calculated_attributes
@@ -168,16 +175,6 @@ class Manufacturer < ApplicationRecord
 
   def other?
     name == "Other"
-  end
-
-  def simple_name
-    name.gsub(/\s?\([^)]*\)/i, "")
-  end
-
-  def alternate_name
-    return nil unless name.match?(/\(/)
-
-    name.split("(").last.tr(")", "")
   end
 
   # Can't be private because it's called by UpdateManufacturerLogoAndPriorityJob

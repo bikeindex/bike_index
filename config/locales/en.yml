@@ -810,6 +810,7 @@ en:
         impound_record:
           user_not_authorized: does not have permission to impound this bike
         manufacturer:
+          cannot_include_quote: cannot include double quote
           cannot_match_a_color_name: cannot be the same as a color name
         organization_message:
           latlon_required: latitude and longitude required
