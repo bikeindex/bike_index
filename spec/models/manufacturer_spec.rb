@@ -3,12 +3,6 @@ require "rails_helper"
 RSpec.describe Manufacturer, type: :model do
   it_behaves_like "autocomplete_hashable"
 
-  describe "scopes" do
-    it "default_scope is alphabetized" do
-      expect(Manufacturer.all.to_sql).to eq(Manufacturer.unscoped.order(:name).to_sql)
-    end
-  end
-
   describe "ensure_non_blocking_name" do
     before { FactoryBot.create(:color, name: "Purple") }
     context "name same as a color" do

@@ -40,8 +40,9 @@ class Manufacturer < ApplicationRecord
   validates_uniqueness_of :secondary_slug, allow_nil: true
   validate :ensure_non_blocking_name
 
-  default_scope { order(:name) }
+  default_scope { alphabetized }
 
+  scope :alphabetized, -> { order(Arel.sql("LOWER(name)")) }
   scope :frame_makers, -> { where(frame_maker: true) }
   scope :with_websites, -> { where("website is NOT NULL and website != ''") }
   scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
