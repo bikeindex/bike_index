@@ -3922,11 +3922,13 @@ en:
         locks
   manufacturers:
     index:
-      submit_pr: Submit a Pull Request to the CSV on GitHub
+      also_available_html: This list is also available as a %{csv_on_github}.
+      csv_on_github: CSV on Github
       manufacturers_we_know_about: Manufacturers we know about
       name: Name
       oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
       only_makes_components: Only makes components
+      submit_a_pr_html: Suggest an update by submitting a Pull Request to the %{csv_on_github}.
       thats_not_actually_surprising: That's not actually surprising, there are a bunch.
   memberships:
     success:

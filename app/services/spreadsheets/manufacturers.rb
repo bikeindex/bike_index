@@ -38,7 +38,7 @@ class Spreadsheets::Manufacturers
       manufacturer.open_year = row[:open_year]
       manufacturer.close_year = row[:close_year]
       # Ignoring logo for now
-      manufacturer.save!
+      manufacturer.save! if manufacturer.changed?
     end
 
     def row_for(manufacturer)

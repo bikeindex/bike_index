@@ -1,8 +1,10 @@
 - cache(['manufacturers_index', @manufacturers.maximum(:updated_at)]) do
+  - github_url = "https://github.com/bikeindex/resources/blob/main/manufacturers.csv"
+  - csv_on_github = link_to t('.csv_on_github'), github_url
   %h1
     = t(".manufacturers_we_know_about")
   %p
-    This is also available as a #{link_to "CSV on Github", "https://github.com/bikeindex/resources/blob/main/manufacturers.csv"}.
+    = t(".also_available_html", csv_on_github:)
 
 
   .mt-4
@@ -27,5 +29,5 @@
   %h2.padded
     = t(".oh_no_were_missing_a_manufacturer")
   %p= t(".thats_not_actually_surprising")
-  %p
-    = link_to t(".submit_pr"), "https://github.com/bikeindex/resources"
+  %p= t(".submit_a_pr_html", csv_on_github:)
+

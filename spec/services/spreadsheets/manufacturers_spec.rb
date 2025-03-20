@@ -7,8 +7,8 @@ RSpec.describe Spreadsheets::Manufacturers do
   end
   describe "to_csv" do
     let(:target) do
-      ['name,alternate_name,website,makes_frames,ebike_only,open_year,close_year,logo_url',
-       'Riese & Müller,Riese and Muller,https://www.r-m.de/,true,true,1993,,']
+      ["name,alternate_name,website,makes_frames,ebike_only,open_year,close_year,logo_url",
+        "Riese & Müller,Riese and Muller,https://www.r-m.de/,true,true,1993,,"]
     end
     it "generates" do
       result = described_class.to_csv.split("\n")
@@ -43,7 +43,7 @@ RSpec.describe Spreadsheets::Manufacturers do
     describe "import" do
       it "imports" do
         expect do
-          described_class.import(File.open(csv_path))
+          described_class.import(csv_path)
         end.to change(Manufacturer, :count).by 1
         expect_target_manufacturer(manufacturer.reload)
       end
@@ -62,7 +62,6 @@ RSpec.describe Spreadsheets::Manufacturers do
           logo_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Decathlon_Logo24.svg/1600px-Decathlon_Logo24.svg.png"
         }
       end
-
 
       it "updates" do
         expect { described_class.send(:update_or_create_for!, row) }.to change(Manufacturer, :count).by 0

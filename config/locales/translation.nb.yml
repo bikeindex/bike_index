@@ -234,6 +234,7 @@ nb:
           user_not_authorized: har ikke tillatelse til å beslaglegge denne sykkelen
         manufacturer:
           cannot_match_a_color_name: kan ikke være det samme som et fargenavn
+          cannot_include_quote: kan ikke inkludere dobbelt anførselstegn
         organization_message:
           latlon_required: breddegrad og lengdegrad kreves
           required: nødvendig
@@ -4289,12 +4290,15 @@ nb:
         dine
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below: Gi oss beskjed i en kommentar nedenfor.
       manufacturers_we_know_about: Produsenter vi kjenner til
       name: Navn
       oh_no_were_missing_a_manufacturer: Å NEI! Mangler vi en produsent?
       only_makes_components: lager kun komponenter
       thats_not_actually_surprising: Det er faktisk ikke overraskende, det er en haug.
+      also_available_html: Denne listen er også tilgjengelig som en %{csv_on_github}.
+      csv_on_github: CSV på Github
+      submit_a_pr_html: Foreslå en oppdatering ved å sende inn en Pull-forespørsel
+        til %{csv_on_github}.
   meta_descriptions:
     bikes_index: Søk etter sykler som er registrert på Bike Index
     bikes_new: Registrer en sykkel på Bike Index raskt, enkelt og gratis. Lag en permanent

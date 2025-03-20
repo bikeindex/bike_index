@@ -231,6 +231,7 @@ nl:
           required: verplicht
         manufacturer:
           cannot_match_a_color_name: Kan niet hetzelfde zijn als een kleurnaam
+          cannot_include_quote: kan geen dubbele aanhalingstekens bevatten
         organization_message:
           latlon_required: breedte- en lengtegraad vereist
           required: verplicht
@@ -5429,14 +5430,16 @@ nl:
         stuur uw bericht hier naartoe.
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below: Geef ons een waarschuwing in een reactie
-        hieronder.
       manufacturers_we_know_about: Fabrikanten die we kennen
       name: Naam
       oh_no_were_missing_a_manufacturer: OH NEE! We missen een fabrikant?
       only_makes_components: Maakt alleen componenten
       thats_not_actually_surprising: Dat is eigenlijk niet zo verwonderlijk, er zijn
         er een heleboel.
+      also_available_html: Deze lijst is ook beschikbaar als %{csv_on_github}.
+      csv_on_github: CSV op Github
+      submit_a_pr_html: Stel een update voor door een Pull Request in te dienen bij
+        %{csv_on_github}.
   news:
     index:
       bike_index_blog: Bike Index Blog

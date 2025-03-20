@@ -47,11 +47,6 @@ class Manufacturer < ApplicationRecord
   scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
 
   class << self
-    def export_columns
-      %w[name slug website frame_maker open_year close_year logo remote_logo_url
-        logo_cache logo_source description].map(&:to_sym).freeze
-    end
-
     # Secondary_slug is the slug of the stuff in the paretheses
     def find_by_secondary_slug(str)
       return nil if str.blank?
@@ -81,25 +76,6 @@ class Manufacturer < ApplicationRecord
     def fill_stripped(n)
       n.gsub!(/accell/i, "") if n.match(/accell/i).present?
       Slugifyer.manufacturer(n)
-    end
-
-    def import(file)
-      CSV.foreach(file.path, headers: true, header_converters: :symbol) do |row|
-        mnfg = find_by_name(row[:name]) || new
-        mnfg.attributes = row.to_h.slice(*export_columns)
-        next if mnfg.save
-        puts "\n#{row} \n"
-        fail mnfg.errors.full_messages.to_sentence
-      end
-    end
-
-    def to_csv
-      CSV.generate do |csv|
-        csv << column_names
-        all.each do |mnfg|
-          csv << mnfg.attributes.values_at(*column_names)
-        end
-      end
     end
 
     def calculated_mnfg_name(manufacturer, manufacturer_other)
