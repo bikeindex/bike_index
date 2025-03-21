@@ -62,7 +62,8 @@ class Admin::EmailDomainsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at updated_at domain creator_id status user_count bike_count status_changed_at spam_score]
+    %w[created_at updated_at domain creator_id status user_count bike_count status_changed_at
+      spam_score domain_length]
   end
 
   def searchable_statuses
@@ -76,6 +77,8 @@ class Admin::EmailDomainsController < Admin::BaseController
       Arel.sql("COALESCE((data -> 'spam_score')::integer, 0) #{sort_direction}")
     elsif sort_column == "domain"
       Arel.sql("REVERSE(domain) #{sort_direction}")
+    elsif sort_column == "domain_length"
+      Arel.sql("LENGTH(domain) ASC")
     else
       "email_domains.#{sort_column} #{sort_direction}"
     end
@@ -89,7 +92,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   def matching_email_domains
     email_domains = EmailDomain
     @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
-    email_domains = email_domains.send(@status) if @status.present?
+    email_domains = @status.present? ? email_domains.send(@status) : email_domains.not_ignored
     if params[:query].present?
       email_domains = email_domains.where("domain ILIKE ?", "%#{params[:query]}%")
     end

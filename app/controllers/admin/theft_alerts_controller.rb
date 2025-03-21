@@ -49,9 +49,6 @@ class Admin::TheftAlertsController < Admin::BaseController
     @stolen_record = @bike.current_stolen_record
     @theft_alerts = @stolen_record&.theft_alerts || []
 
-    bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-    @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
-
     @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
 
     @theft_alert = TheftAlert.new(stolen_record: @stolen_record,

@@ -18,5 +18,12 @@ FactoryBot.define do
     trait :for_stolen_bike do
       imageable { FactoryBot.create(:stolen_bike) }
     end
+
+    trait :with_image_file do
+      transient do
+        image_path { "spec/fixtures/bike_photo-landscape.jpeg" }
+      end
+      image { File.open(Rails.root.join(image_path)) }
+    end
   end
 end

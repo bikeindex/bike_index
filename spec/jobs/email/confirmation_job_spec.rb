@@ -19,7 +19,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
     let(:status) { "permitted" }
     let!(:user) { FactoryBot.create(:user, email: "something@rustymails.com") }
 
-    it "creates the user" do
+    it "creates the user and sends the email" do
       expect(email_domain.reload.unprocessed?).to be_falsey
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
       expect do
@@ -38,15 +38,15 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         end.to change(Notification, :count).by 0
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         expect(User.unscoped.count).to eq 2
-        expect(UserLikelySpamReason.count).to eq 1
-        expect(user.reload.likely_spam?).to be_truthy
-        expect(user.user_likely_spam_reasons.first).to have_attributes(reason: "email_domain")
+        expect(EmailBan.count).to eq 1
+        expect(user.reload.email_banned?).to be_truthy
+        expect(user.email_bans.first).to have_attributes(reason: "email_domain")
       end
     end
 
     context "banned" do
       let(:status) { "banned" }
-      let!(:user_likely_spam_reason) { FactoryBot.create(:user_likely_spam_reason, user:) }
+      let!(:email_ban) { FactoryBot.create(:email_ban, user:) }
 
       it "does not send an email" do
         expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
@@ -56,10 +56,58 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         end.to change(Notification, :count).by 0
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         expect(User.unscoped.count).to eq 1
-        expect(UserLikelySpamReason.count).to eq 0 # It deletes the user
+        expect(EmailBan.count).to eq 0 # It deletes the user
       end
     end
   end
+
+  context "with an email with periods in different places" do
+    let!(:user_prior) { FactoryBot.create(:user, email: "someth.i.ng@g.mail.com", created_at:) }
+    let(:created_at) { Time.current - 12.hours }
+    let!(:user) { FactoryBot.create(:user, email: "something@g.mail.com") }
+
+    it "creates a ban and doesn't notify" do
+      expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
+      ActionMailer::Base.deliveries = []
+      expect do
+        Email::ConfirmationJob.new.perform(user.id)
+      end.to change(Notification, :count).by 0
+      expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+      expect(User.unscoped.count).to eq 2
+      expect(EmailBan.count).to eq 1
+      expect(user.reload.email_banned?).to be_truthy
+      expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")
+    end
+
+    context "before period" do
+      let(:created_at) { Time.current - 14.days }
+      it "creates the user and sends the email" do
+        expect(User.unscoped.count).to eq 2
+        expect do
+          Email::ConfirmationJob.new.perform(user.id)
+        end.to change(Notification, :count).by 1
+        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+      end
+
+      context "with > PRE_PERIOD_DUPLICATE_LIMIT" do
+        let!(:user3) { FactoryBot.create(:user, email: "someth.i.n.g@g.mail.com", created_at:) }
+        let!(:user4) { FactoryBot.create(:user, email: "someth.i.ng@gmail.com", created_at:) }
+        it "creates a ban and doesn't notify" do
+          expect(User.unscoped.count).to eq 4 # Because the admin from email_domain
+          ActionMailer::Base.deliveries = []
+          expect do
+            Email::ConfirmationJob.new.perform(user.id)
+          end.to change(Notification, :count).by 0
+          expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+          expect(User.unscoped.count).to eq 4
+          expect(EmailBan.count).to eq 1
+          expect(user.reload.email_banned?).to be_truthy
+          expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")
+        end
+      end
+    end
+  end
+
   context "user with email already exists" do
     let!(:email_domain) { FactoryBot.create(:email_domain, domain: "bikeindex.org", status: "permitted", user_count: 1) }
     let(:email) { "test@bikeindex.org" }

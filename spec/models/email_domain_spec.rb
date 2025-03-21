@@ -57,6 +57,26 @@ RSpec.describe EmailDomain, type: :model do
       expect(EmailDomain.find_or_create_for("something@stuff.bikeindex.org")&.id).to eq email_domain.id
     end
 
+    context "busted gmail" do
+      let!(:email_domain_tld) { FactoryBot.create(:email_domain, domain: "ail.com", status:) }
+      let(:status) { :permitted }
+      it "creates and finds for busted gmail" do
+        email_domain = EmailDomain.find_or_create_for("t.b.000.07@g.m.ail.com")
+        expect(email_domain&.id).to eq email_domain_tld.id
+      end
+      context "with ail.com ignored" do
+        let(:status) { :ignored }
+        it "creates for busted gmail" do
+          expect(email_domain_tld.reload.ignored?).to be_truthy
+          email_domain = EmailDomain.find_or_create_for("t.b.000.07@g.m.ail.com")
+          expect(email_domain&.id).to_not eq email_domain_tld.id
+          expect(email_domain.tld?).to be_falsey
+          expect(email_domain).to have_attributes(domain: "@g.m.ail.com", status: "permitted")
+          expect(EmailDomain.find_or_create_for("b00007@g.m.ail.com")&.id).to eq email_domain.id
+        end
+      end
+    end
+
     context "with subdomain" do
       let!(:email_domain_sub) { FactoryBot.create(:email_domain, domain: "xxxx.stuff.com") }
       it "creates and finds" do

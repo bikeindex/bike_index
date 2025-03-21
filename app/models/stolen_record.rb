@@ -272,7 +272,7 @@ class StolenRecord < ApplicationRecord
       self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
     end
     update_tsved_at
-    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to {after_comm}it
+    @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
     self.current = false if recovered_at.present? # Make sure we set current to false if recovered
     self.recovery_display_status = calculated_recovery_display_status
     self.no_notify = !receive_notifications # TODO: replace receive_notifications with no_notify
@@ -361,54 +361,20 @@ class StolenRecord < ApplicationRecord
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
   def theft_alert_missing_photo?
-    current_alert_image.blank? && theft_alerts.any?
+    missing_photo? && theft_alerts.any?
   end
 
   # The associated bike's first public image, if available. Else nil.
   def bike_main_image
-    bike&.public_images&.first
+    Bike.unscoped.find_by_id(bike_id)&.public_images&.first
+  end
+
+  def missing_photo?
+    !images_attached? && alert_image.blank?
   end
 
   def current_alert_image
-    return @current_alert_image if defined?(@current_alert_image)
-
-    @current_alert_image = if alert_image
-      alert_image
-    elsif ApplicationRecord.current_role != :reading
-      # Generate alert image, unless in read replica
-      generate_alert_image
-    else
-      enqueue_worker
-      nil
-    end
-  end
-
-  # Generate the "promoted alert image"
-  # (One of the stolen bike's public images, placed on a branded template)
-  #
-  # The URL is available immediately - processing is performed in the background.
-  # bike_image: [PublicImage]
-  def generate_alert_image(bike_image: bike_main_image)
-    alert_image&.destroy # Destroy before returning if the bike has no images - in case image was removed
-    return if bike_image&.image.blank? && bike&.stock_photo_url.blank?
-
-    new_image = AlertImage.new(stolen_record: self)
-
-    # Try to fallback to main image
-    bike_image = bike_main_image if bike_image&.image.blank?
-    if bike_image&.image.blank?
-      new_image.remote_image_url = bike.stock_photo_url
-    else
-      new_image.image = bike_image.image
-    end
-    new_image.save
-
-    if new_image.valid?
-      new_image
-    else
-      update(alert_image: nil) if alert_image.id.present?
-      nil
-    end
+    alert_image
   end
 
   def update_associations

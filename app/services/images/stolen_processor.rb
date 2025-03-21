@@ -13,12 +13,11 @@ class Images::StolenProcessor
     landscape: {topbar: :vertical, dimensions: [1600, 990]}
   }.freeze
 
-  TOPBAR_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
-  TOPBAR_LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "topbar.png")
   # topbar is 170px tall, right side is 120px tall - so the minimum height is 120
   TOPBAR_HORIZONTAL_HEIGHT = 120
   # topbar vertical is 170px wide, right side is 106px wide
-  TOPBAR_VERTICAL_WIDTH = 106
+  # ... It looks better when the image doesn't overlap with the bar
+  TOPBAR_VERTICAL_WIDTH = 190
 
   class << self
     # NOTE: This doesn't delete images - that's handled by StolenBike::RemoveOrphanedImagesJob
@@ -26,13 +25,12 @@ class Images::StolenProcessor
     # Previously, we would set the image via passing it. That's a pain to track!
     # Instead, when overriding the image in admin, let's update the image we're overriding with
     # and make it the first image
-    def update_alert_images(stolen_record)
-      # This relies on existing carrierewave methods, will need to be updated
-      image, image_id = image_and_id(stolen_record)
+    def update_alert_images(stolen_record, force_regenerate: false, public_image_id: nil)
+      image, image_id = image_and_id(stolen_record, public_image_id)
 
       stolen_record.skip_update = true
       if image.present?
-        return if stolen_record.images_attached_id == image_id
+        return if !force_regenerate && stolen_record.images_attached_id == image_id
 
         # Prevent touching the stolen record, which kicks off a job
         ActiveRecord::Base.no_touching do
@@ -52,9 +50,14 @@ class Images::StolenProcessor
 
     private
 
-    def image_and_id(stolen_record)
-      public_image = stolen_record.bike_main_image
-      # TODO: Add bike.stock_photo_url (along with bike_id) here
+    def image_and_id(stolen_record, public_image_id)
+      if public_image_id.present?
+        public_image = PublicImage.unscoped.find_by_id(public_image_id)
+      elsif use_stolen_images_override_id?(stolen_record)
+        # Image ID is overridden, use the assigned ID
+        return image_and_id(stolen_record, stolen_record.images_attached_id)
+      end
+      public_image ||= stolen_record.bike_main_image
       return [public_image&.open_file, public_image.id] if public_image.present?
 
       stock_photo_url = Bike.unscoped.find_by(id: stolen_record.bike_id)&.stock_photo_url
@@ -65,21 +68,38 @@ class Images::StolenProcessor
       end
     end
 
+    # If the existing attached image was created after the bike's public images were updated
+    # use the existing public image (it was assigned manually)
+    def use_stolen_images_override_id?(stolen_record)
+      images_updated = PublicImage.unscoped.where(imageable_type: "Bike", imageable_id: stolen_record.bike_id).maximum(:updated_at)
+      return false if images_updated.blank? || stolen_record.image_four_by_five&.blob&.created_at.blank?
+
+      stolen_record.image_four_by_five.blob.created_at > images_updated
+    end
+
     def attach_images(stolen_record, image, location_text)
-      stolen_record.image_four_by_five
-        .attach(io: generate_alert(template: :four_by_five, image:, location_text:),
-          filename: "stolen-#{stolen_record.id}-four_by_five.jpeg")
-      stolen_record.image_four_by_five.analyze
+      four_by_five = ActiveStorage::Blob.create_and_upload!(
+        io: generate_alert(template: :four_by_five, image:, location_text:),
+        filename: "stolen-#{stolen_record.id}-four_by_five.jpeg"
+      )
+      four_by_five.analyze
 
-      stolen_record.image_square
-        .attach(io: generate_alert(template: :square, image:, location_text:),
-          filename: "stolen-#{stolen_record.id}-square.jpeg")
-      stolen_record.image_square.analyze
+      square = ActiveStorage::Blob.create_and_upload!(
+        io: generate_alert(template: :square, image:, location_text:),
+        filename: "stolen-#{stolen_record.id}-square.jpeg"
+      )
+      square.analyze
 
-      stolen_record.image_landscape
-        .attach(io: generate_alert(template: :landscape, image:, location_text:),
-          filename: "stolen-#{stolen_record.id}-landscape.jpeg")
-      stolen_record.image_landscape.analyze
+      landscape = ActiveStorage::Blob.create_and_upload!(
+        io: generate_alert(template: :landscape, image:, location_text:),
+        filename: "stolen-#{stolen_record.id}-landscape.jpeg"
+      )
+      landscape.analyze
+
+      stolen_record.image_square.attach(square)
+      stolen_record.image_landscape.attach(landscape)
+      # Attach 4 by five last, it's what sets images_attached?
+      stolen_record.image_four_by_five.attach(four_by_five)
     end
 
     def generate_alert(template:, image:, location_text:, convert: "jpeg")

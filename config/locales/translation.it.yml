@@ -227,6 +227,7 @@ it:
           user_not_authorized: non ha il permesso di confiscare questa bicicletta
         manufacturer:
           cannot_match_a_color_name: non può essere uguale al nome del colore
+          cannot_include_quote:
         organization_message:
           latlon_required: latitudine e longitudine richieste
           required: richiesto
@@ -3323,12 +3324,14 @@ it:
       save_information_about_one_of_your_locks:
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below:
       manufacturers_we_know_about:
       name: Nome
       oh_no_were_missing_a_manufacturer:
       only_makes_components:
       thats_not_actually_surprising:
+      also_available_html:
+      csv_on_github:
+      submit_a_pr_html:
   meta_descriptions:
     bikes_index:
     bikes_new:

@@ -45,6 +45,12 @@ RSpec.describe User, type: :model do
         expect(subject.valid?).to be_truthy
       end
 
+      it "is invalid if email is invalid" do
+        subject.email = "+response.write(9515797*9796573)+"
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages.to_s).to match(/email/i)
+      end
+
       it "requires password on create" do
         subject.password = nil
         subject.password_confirmation = nil
@@ -696,10 +702,12 @@ RSpec.describe User, type: :model do
   describe "donations" do
     let(:user) { FactoryBot.create(:user) }
     it "returns the payment amount" do
-      Payment.create(user: user, amount_cents: 200)
+      Payment.create(user: user, amount_cents: 200, paid_at: Time.current)
       expect(user.donations).to eq 200
       expect(user.donor?).to be_falsey
       Payment.create(user: user, amount_cents: 800)
+      expect(user.donor?).to be_falsey
+      Payment.create(user: user, amount_cents: 800, paid_at: Time.current)
       expect(user.donor?).to be_truthy
     end
   end

@@ -20,6 +20,8 @@ RSpec.describe StolenRecord, type: :model do
 
   describe "after_save hooks" do
     let(:bike) { FactoryBot.create(:bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+
     context "if bike no longer exists" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
@@ -32,6 +34,27 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record.reload
         expect(stolen_record.bike).to be_blank
         expect(stolen_record.images_attached?).to be_falsey
+      end
+    end
+
+    context "if phone changes" do
+      it "enqueues update without location_changed" do
+        # ensure not memoizing anything
+        stolen_record_instance = StolenRecord.find(stolen_record.id)
+        Sidekiq::Job.clear_all
+        stolen_record_instance.update(phone: "1112223333")
+        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+          .to eq([stolen_record_instance.id, false])
+      end
+    end
+
+    context "location changes" do
+      it "enqueues update with location_changed" do
+        stolen_record_instance = StolenRecord.find(stolen_record.id)
+        Sidekiq::Job.clear_all
+        stolen_record_instance.update(city: "New city")
+        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+          .to eq([stolen_record_instance.id, true])
       end
     end
 
@@ -84,88 +107,6 @@ RSpec.describe StolenRecord, type: :model do
           expect(stolen_record2.reload.current).to be_truthy
           expect(bike.reload.current_stolen_record_id).to eq stolen_record2.id
         end
-      end
-    end
-  end
-
-  describe "#generate_alert_image" do
-    context "given no bike image" do
-      it "returns falsey with no changes" do
-        stolen_record = FactoryBot.create(:stolen_record)
-
-        result = stolen_record.generate_alert_image
-
-        expect(result).to be_nil
-        expect(stolen_record.alert_image).to be_blank
-        expect(AlertImage.count).to be_zero
-      end
-    end
-
-    context "given a bike image" do
-      it "returns truthy, persists the alert image, but destroys it if it is destroyed" do
-        stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
-        image = stolen_record.bike.public_images.first
-
-        result = stolen_record.generate_alert_image
-
-        expect(result).to be_an_instance_of(AlertImage)
-        expect(stolen_record.alert_image).to eq(result)
-        stolen_record.skip_update = false # Make sure we aren't blocking
-        expect(AlertImage.count).to eq(1)
-        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
-        FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
-        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
-
-        image.destroy
-        expect(stolen_record.bike.public_images.count).to eq 0
-        result = stolen_record.generate_alert_image
-        expect(result).to be_nil
-        stolen_record.reload
-        expect(stolen_record.alert_image).to be_blank
-      end
-    end
-
-    context "given alert image creation fails" do
-      it "returns falsey with no changes" do
-        stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
-
-        # image: can no longer be an integer due to changes in carrierwave
-        # We updated the test to stub the value of `image` to be a file of a type
-        # that was no longer in the whitelist, i.e. a csv file.
-        bad_image = double(:image, image: File.open(Rails.root.join("spec", "fixtures", "manufacturer-test-import.csv")))
-        result = stolen_record.generate_alert_image(bike_image: bad_image)
-
-        expect(result).to be_nil
-        expect(stolen_record.reload.alert_image).to be_nil
-        expect(AlertImage.count).to eq(0)
-      end
-      it "doesn't update again" do
-        # ensure no looping of updates in the case of a failed image
-        bike = FactoryBot.create(:bike, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg")
-        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
-        expect(stolen_record.alert_image).to be_blank
-        expect(bike).to_not receive(:save)
-        expect(stolen_record.generate_alert_image).to be_blank
-      end
-    end
-
-    context "given multiple bike images" do
-      it "uses the first bike image for the alert image" do
-        bike = FactoryBot.create(:bike)
-        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
-
-        image1 = FactoryBot.create(:public_image, imageable: bike)
-        FactoryBot.create(:public_image, imageable: bike)
-        stolen_record.reload
-        expect(stolen_record.alert_image).to be_blank
-
-        stolen_record.generate_alert_image
-        expect(stolen_record.alert_image).to be_present
-
-        alert_image = stolen_record.alert_image
-        alert_image_name = File.basename(alert_image.image.path, ".*")
-        image1_name = File.basename(image1.image.path, ".*")
-        expect(alert_image_name).to eq(image1_name)
       end
     end
   end

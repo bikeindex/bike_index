@@ -114,6 +114,9 @@ RSpec.describe Admin::StolenBikesController, type: :request do
     end
 
     describe "update" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, bike:) }
+
       it "updates the bike and calls update_ownership and serial_normalizer" do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
@@ -124,37 +127,42 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       context "without public image" do
         # Sometimes bikes have alert images even though they have no photo, this enables deleting it
         it "calls regenerates_alert_image" do
-          # Stub this call, it proves that the image will be deleted
-          expect_any_instance_of(StolenRecord).to receive(:generate_alert_image) { true }
-          put "#{base_url}/#{bike.id}", params: {public_image_id: nil, update_action: "regenerate_alert_image"}
+          expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          Sidekiq::Testing.inline! do
+            put "#{base_url}/#{bike.id}", params: {public_image_id: nil, update_action: "regenerate_alert_image"}
+          end
           expect(response).to redirect_to(:edit_admin_stolen_bike)
           expect(flash[:success]).to be_present
+          expect(stolen_record.reload.images_attached?).to be_falsey
         end
       end
       context "with public image" do
-        let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+        let!(:public_image) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
         describe "regenerate_alert_image" do
           it "regenerates_alert_image" do
-            expect(stolen_record.alert_image).to be_blank
-            put "#{base_url}/#{bike.id}", params: {public_image_id: public_image.id, update_action: "regenerate_alert_image"}
+            expect(stolen_record.reload.images_attached?).to be_truthy
+            expect(stolen_record.images_attached_id).to be_blank
+            Sidekiq::Testing.inline! do
+              put "#{base_url}/#{bike.id}", params: {public_image_id: public_image.id, update_action: "regenerate_alert_image"}
+            end
             expect(response).to redirect_to(:edit_admin_stolen_bike)
             expect(flash[:success]).to be_present
-            stolen_record.reload
-            expect(stolen_record.alert_image).to be_present
+            expect(stolen_record.reload.images_attached?).to be_truthy
+            expect(stolen_record.images_attached_id).to eq public_image.id
           end
         end
         describe "delete image" do
           it "deletes image" do
-            bike.current_stolen_record.generate_alert_image(bike_image: public_image)
-            bike.reload
-            expect(bike.current_stolen_record.alert_image).to be_present
+            expect(bike.reload.current_stolen_record.images_attached?).to be_truthy
             expect(bike.public_images.count).to eq 1
-            put "#{base_url}/#{bike.id}", params: {public_image_id: public_image.id, update_action: "delete"}
+            Sidekiq::Testing.inline! do
+              put "#{base_url}/#{bike.id}", params: {public_image_id: public_image.id, update_action: "delete"}
+            end
             expect(response).to redirect_to(:edit_admin_stolen_bike)
             expect(flash[:success]).to be_present
-            bike.reload
-            expect(bike.public_images.count).to eq 0
-            expect(bike.current_stolen_record.alert_image).to be_blank
+            expect(bike.reload.public_images.count).to eq 0
+            expect(bike.current_stolen_record.images_attached?).to be_falsey
           end
         end
       end

@@ -191,7 +191,7 @@ RSpec.describe Export, type: :model do
   end
 
   describe "bikes_scoped" do
-    # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
+    # Pending - we're getting the organization scopes up and running before migrating existing Spreadsheets::TsvCreator tasks
     # But we eventually want to add stolen tsv's into here
     # context "stolen" do
     #   it "matches existing tsv scopes"

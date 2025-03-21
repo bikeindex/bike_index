@@ -94,18 +94,18 @@ class BikeDisplayer
       if (stolen_record = bike.current_stolen_record).present?
         if stolen_record.images_attached?
           return {
-            page: storage_url(stolen_record.image_four_by_five),
+            square: storage_url(stolen_record.image_square),
             facebook: storage_url(stolen_record.image_four_by_five),
             twitter: storage_url(stolen_record.image_landscape)
           }
         end
 
-        facebook_image = stolen_record.current_alert_image&.image_url(:facebook)
+        facebook_image = stolen_record.alert_image&.image_url(:facebook)
         if facebook_image.present?
           return {
-            page: facebook_image,
+            square: facebook_image,
             facebook: facebook_image,
-            twitter: stolen_record.current_alert_image.image_url(:twitter)
+            twitter: stolen_record.alert_image.image_url(:twitter)
           }
         end
       end
@@ -119,7 +119,7 @@ class BikeDisplayer
     end
 
     def single_image_hash(image_url)
-      {page: image_url, twitter: image_url, facebook: image_url}
+      {square: image_url, twitter: image_url, facebook: image_url}
     end
   end
 end

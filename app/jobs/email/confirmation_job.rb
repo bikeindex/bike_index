@@ -3,6 +3,9 @@
 class Email::ConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
+  BLOCK_DUPLICATE_PERIOD = 1.day
+  PRE_PERIOD_DUPLICATE_LIMIT = 2
+
   def perform(user_id)
     user = User.find_by(id: user_id)
     return if user.blank?
@@ -19,8 +22,11 @@ class Email::ConfirmationJob < ApplicationJob
     # Clean up situations where there are two users created
     return user.really_destroy! if duplicate_user?(user)
 
-    # Create a likely_spam_reason and don't send a notification if provisional_ban
-    return UserLikelySpamReason.create(reason: "email_domain", user:) if email_domain&.provisional_ban?
+    # Create a email ban if we should
+    EmailBan.create(reason: :email_domain, user:) if email_domain&.provisional_ban?
+    EmailBan.create(reason: :email_duplicate, user:) if email_duplicate?(user)
+    # Don't send an email if the email is blocked
+    return if EmailBan.period_started.where(user:).any?
 
     notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
     # If we just sent it, don't send again
@@ -32,7 +38,18 @@ class Email::ConfirmationJob < ApplicationJob
     end
   end
 
+  private
+
   def duplicate_user?(user)
     User.where(email: user.email).where("id < ?", user.id).present?
+  end
+
+  def email_duplicate?(user)
+    matches = User.where("REPLACE(email, '.', '') = ?", user.email.tr(".", ""))
+      .where.not(email: user.email)
+
+    return true if matches.where("created_at > ?", Time.current - BLOCK_DUPLICATE_PERIOD).any?
+
+    matches.count > PRE_PERIOD_DUPLICATE_LIMIT
   end
 end

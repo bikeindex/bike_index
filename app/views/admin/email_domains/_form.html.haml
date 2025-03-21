@@ -17,6 +17,7 @@
   .form-group
     = f.label :domain, class: "form-label"
     = f.text_field :domain, placeholder: "@something.com", class: "form-control", disabled: email_domain.id.present?
+  .form-check.mt-2.mb-2
   -# The status is ignored on create, processing has to happen first
   - if email_domain.id.present?
     - EmailDomain.statuses.keys.each do |status|
@@ -24,5 +25,8 @@
         %label
           = f.radio_button :status, status, class: "form-check-input"
           = EmailDomain.status_humanized(status)
+          - if status == "ignored"
+            %small.less-strong
+              Used to make sure super short top-level domains don't match everything
   .mt-4
     = submit_tag submit_label, class: "btn btn-success btn-lg"

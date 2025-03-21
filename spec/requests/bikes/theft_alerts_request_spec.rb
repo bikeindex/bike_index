@@ -126,12 +126,12 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(ActionMailer::Base.deliveries.count).to eq 0
     end
     context "passing alert_image" do
-      let!(:image1) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
-      let!(:image2) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
+      let!(:image1) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
+      let!(:image2) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
       it "updates the alert image" do
-        stolen_record.reload.current_alert_image
-        expect(stolen_record.reload.alert_image).to be_present
-        og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
+        Images::StolenProcessor.update_alert_images(stolen_record)
+        expect(stolen_record.reload.images_attached_id).to eq image1.id
+
         expect(Payment.count).to eq 0
         expect(TheftAlert.count).to eq 0
         Sidekiq::Job.clear_all
@@ -149,8 +149,8 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
         end
         expect_theft_alert_to_be_created
 
-        expect(stolen_record.reload.alert_image).to be_present
-        expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(stolen_record.images_attached_id).to eq image2.id
 
         # No deliveries, because the payment hasn't been completed
         expect(Notification.count).to eq 0

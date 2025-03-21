@@ -8,7 +8,7 @@ class CircularImageUploader < ApplicationUploader
 
   process :fix_exif_rotation
   process :strip # Remove EXIF data, because we don't need it
-  process convert: "jpg"
+  process convert: "png"
 
   version :large do
     process :round_image

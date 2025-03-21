@@ -5,9 +5,6 @@ class Bikes::TheftAlertsController < Bikes::BaseController
   def new
     return unless setup_edit_template("alert")
 
-    bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-    @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
-
     @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
     @selected_theft_alert_plan =
       @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
@@ -37,11 +34,11 @@ class Bikes::TheftAlertsController < Bikes::BaseController
 
     theft_alert.update(payment: @payment)
 
+    # Enqueue creation of the image with the specified image
+    StolenBike::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, false,
+      params[:selected_bike_image_id])
+
     redirect_to @payment.stripe_checkout_session.url, allow_other_host: true
-    image_id = params[:selected_bike_image_id]
-    if image_id.present? && image_id != @bike.public_images&.first&.id
-      @bike.current_stolen_record&.generate_alert_image(bike_image: PublicImage.find_by_id(image_id))
-    end
   end
 
   private

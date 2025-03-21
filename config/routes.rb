@@ -15,7 +15,7 @@ Rails.application.routes.draw do
         end
       route_for(route, blob)
     else
-      File.join(ENV.fetch("ACTIVE_STORAGE_HOST"), blob.key) # Use the CDN
+      File.join(ENV.fetch("ACTIVE_STORAGE_HOST"), blob.key || "") # Use the CDN
     end
   end
 
@@ -228,9 +228,9 @@ Rails.application.routes.draw do
       :theft_alerts
 
     %i[
-      bike_sticker_updates exports graduated_notifications invoices logged_searches mailchimp_data
-      model_attestations model_audits notifications organization_statuses parking_notifications
-      stripe_prices stripe_subscriptions user_alerts user_registration_organizations
+      bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
+      mailchimp_data model_attestations model_audits notifications organization_statuses
+      parking_notifications stripe_prices stripe_subscriptions user_alerts user_registration_organizations
     ].each { resources _1, only: %i[index] }
 
     resources :bike_stickers do
@@ -328,9 +328,9 @@ Rails.application.routes.draw do
   end
 
   resources :manufacturers, only: %i[index] do
-    collection { get "tsv" }
+    collection { get "tsv" } # TODO: can we delete this?
   end
-  get "manufacturers_tsv", to: "manufacturers#tsv"
+  get "manufacturers_tsv", to: "manufacturers#tsv" # TODO: can we delete this?
 
   get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
   get "theft-ring", to: redirect("theft-rings")

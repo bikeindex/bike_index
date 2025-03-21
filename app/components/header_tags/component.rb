@@ -172,9 +172,9 @@ module HeaderTags
       @page_description = bike_page_description(bike, status_prefix)
 
       if (header_image_urls = BikeDisplayer.header_image_urls(bike))
-        @page_image = header_image_urls[:page]
-        @twitter_image = header_image_urls[:twitter]
+        @page_image = header_image_urls[:facebook]
         @facebook_image = header_image_urls[:facebook]
+        @twitter_image = header_image_urls[:twitter]
       end
 
       if bike.owner&.show_twitter && bike.owner.twitter.present?

@@ -1,0 +1,36 @@
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      %th
+        = sortable "reason", render_sortable: render_sortable
+      %th
+        = sortable "start_at", render_sortable: render_sortable
+      %th
+        = sortable "end_at", render_sortable: render_sortable
+      %th
+        = sortable "user_id", render_sortable: render_sortable
+    %tbody
+      - collection.each do |email_ban|
+        %tr
+          %td
+            .less-strong-hold
+
+              %span.convertTime
+                = l email_ban.created_at, format: :convert_time
+              %span.less-strong-right.d-none.d-md-block
+                = email_ban.id
+          %td
+            = email_ban.reason.humanize
+          %td
+            - if email_ban.start_at.present?
+              %span.convertTime
+                = l email_ban.start_at, format: :convert_time
+          %td
+            - if email_ban.end_at.present?
+              %span.convertTime
+                = l email_ban.end_at, format: :convert_time
+          %td
+            - if email_ban.user_id.present?
+              = render partial: "/shared/admin/user_cell", locals: {user: email_ban.user, render_search: true, cache: true}
