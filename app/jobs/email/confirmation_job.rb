@@ -3,31 +3,14 @@
 class Email::ConfirmationJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 3
 
-  BLOCK_DUPLICATE_PERIOD = 1.day
-  PRE_PERIOD_DUPLICATE_LIMIT = 2
-  PERMITTED_DUPLICATE_DOMAINS = %w[bikeindex.org]
-
   def perform(user_id)
     user = User.find_by(id: user_id)
     return if user.blank?
 
-    # Don't suffer a witch to live
-    if EmailDomain::VERIFICATION_ENABLED
-      email_domain = EmailDomain.find_or_create_for(user.email, skip_processing: true)
-      # Async processing for existing domains, inline for new ones
-      email_domain.unprocessed? ? email_domain.process! : email_domain.enqueue_processing_worker
-
-      return user.really_destroy! if email_domain.banned?
-    end
-
+    # Don't send an email if the email is blocked
+    return if EmailBan.ban?(user)
     # Clean up situations where there are two users created
     return user.really_destroy! if duplicate_user?(user)
-
-    # Create a email ban if we should
-    EmailBan.create(reason: :email_domain, user:) if email_domain&.provisional_ban?
-    EmailBan.create(reason: :email_duplicate, user:) if email_duplicate?(user.email)
-    # Don't send an email if the email is blocked
-    return if EmailBan.period_started.where(user:).any?
 
     notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
     # If we just sent it, don't send again
@@ -43,36 +26,5 @@ class Email::ConfirmationJob < ApplicationJob
 
   def duplicate_user?(user)
     User.where(email: user.email).where("id < ?", user.id).present?
-  end
-
-  def email_duplicate?(email)
-    return false if PERMITTED_DUPLICATE_DOMAINS.include?(email.split("@").last)
-
-    return true if email_period_duplicate?(email)
-
-    email_plus_duplicate?(email)
-  end
-
-  def email_period_duplicate?(email)
-    matches = User.where("REPLACE(email, '.', '') = ?", email.tr(".", ""))
-      .where.not(email: email)
-
-    return true if matches.where("created_at > ?", Time.current - BLOCK_DUPLICATE_PERIOD).any?
-
-    matches.count > PRE_PERIOD_DUPLICATE_LIMIT
-  end
-
-  def email_plus_duplicate?(email)
-    return false unless email.match?(/\+.*@/)
-
-    email_start, email_end = email.split("@")
-    email_start.gsub!(/\+.*/, "")
-    pp email_start, email_end
-
-    matches = User.where("email ~ ?", "^#{email_start}(\\+.*)?@#{email_end}")
-
-    return true if matches.where("created_at > ?", Time.current - BLOCK_DUPLICATE_PERIOD).any?
-
-    matches.count > PRE_PERIOD_DUPLICATE_LIMIT
   end
 end
