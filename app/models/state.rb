@@ -35,4 +35,8 @@ class State < ApplicationRecord
   def self.valid_names
     StatesAndCountries.states.map { |s| s[:name] }
   end
+
+  def to_combobox_display
+    name
+  end
 end
