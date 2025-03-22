@@ -350,6 +350,11 @@ GEM
     honeybadger (5.27.0)
       logger
       ostruct
+    hotwire_combobox (0.4.0)
+      platform_agent (>= 1.0.1)
+      rails (>= 7.0.7.2)
+      stimulus-rails (>= 1.2)
+      turbo-rails (>= 1.2)
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http (4.4.1)
@@ -518,6 +523,9 @@ GEM
       activesupport (>= 6.1)
     pghero (3.6.1)
       activerecord (>= 6.1)
+    platform_agent (1.0.1)
+      activesupport (>= 5.2.0)
+      useragent (~> 0.16.3)
     postmark (1.22.0)
       json
     postmark-rails (0.21.0)
@@ -868,6 +876,7 @@ DEPENDENCIES
   guard-rspec
   haml
   honeybadger
+  hotwire_combobox
   httparty
   i18n-country-translations
   i18n-js
