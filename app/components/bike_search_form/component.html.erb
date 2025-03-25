@@ -1,19 +1,7 @@
-<style>
-  .search-fields .hw-combobox {
-    display: block;
-    width: 100%;
-  }
-  .search-fields .hw-combobox__main__wrapper {
-    width: 100%;
-  }
-  .search-fields input[role="combobox"] {
-    outline: none;
-  }
-</style>
 <%= form_with url: bikes_path, builder: BikeIndexFormBuilder, method: :get do |f| %>
-  <div class="tw:flex tw:flex-nowrap tw:gap-4 tw:p-1" data-controller="bike-search-form--component">
+  <div class="tw:flex tw:flex-nowrap tw:gap-4" data-controller="bike-search-form--component">
     <div class="tw:flex-grow search-fields">
-      <%= combobox_tag "state", State.all, class: "tw:w-full" %>
+      <%= select_tag :query_items, nil, multiple: true, class: "tw:w-full" %>
       <%= text_field_tag :serial, @serial, placeholder: ".search_for_serial_number", title: ".search_for_serial_number", class: "tw:w-full" %>
       <%# placeholder: t(".search_for_serial_number"), title: t(".search_for_serial_number") %>
     </div>
