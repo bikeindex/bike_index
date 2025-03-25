@@ -1,4 +1,7 @@
-// Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
+// Import jquery at the top so that we can use select2
+import "jquery"
+window.jQuery = jQuery
+// window.$ = jQuery
 
 // Import stimulus controllers
 import { Application } from '@hotwired/stimulus'
@@ -11,7 +14,3 @@ application.debug = false
 window.Stimulus = application
 
 lazyLoadControllersFrom('components', application)
-
-// Add the following two lines:
-import HwComboboxController from "controllers/hw_combobox_controller"
-application.register("hw-combobox", HwComboboxController)

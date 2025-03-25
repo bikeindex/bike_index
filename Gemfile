@@ -99,7 +99,6 @@ gem "groupdate" # Required for charts
 gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
 gem "sprockets-rails"
 gem "dartsass-rails"
-gem "hotwire_combobox" # multiselect
 
 # new frontend
 gem "importmap-rails" # New JS setup

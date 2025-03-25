@@ -3,6 +3,7 @@
 module BikeSearchForm
   class ComponentPreview < ApplicationComponentPreview
     def default
+      @padded = true
       render(BikeSearchForm::Component.new())
     end
 

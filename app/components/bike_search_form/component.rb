@@ -20,5 +20,12 @@ module BikeSearchForm
       # @skip_serial_field = skip_serial_field
       # @stolenness = stolenness
     end
+
+    private
+
+    def opt_vals
+      # @selected_query_items_options
+      [].map { |i| i.is_a?(String) ? [i, i] : [i["text"], i["search_id"]]  }
+    end
   end
 end

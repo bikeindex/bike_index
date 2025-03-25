@@ -1,7 +1,12 @@
 <%= form_with url: bikes_path, builder: BikeIndexFormBuilder, method: :get do |f| %>
-  <div class="tw:flex tw:flex-nowrap tw:gap-4" data-controller="bike-search-form--component">
+  <div class="tw:flex tw:flex-nowrap tw:gap-4 bikes-search-form" data-controller="bike-search-form--component">
     <div class="tw:flex-grow search-fields">
-      <%= select_tag :query_items, nil, multiple: true, class: "tw:w-full" %>
+      <%= select_tag :query_items,
+        options_for_select(opt_vals, selected: opt_vals.map(&:last)),
+        placeholder: ".search_bike_descriptions",
+        class: "tw:w-full tw:d-none",
+        multiple: true %>
+
       <%= text_field_tag :serial, @serial, placeholder: ".search_for_serial_number", title: ".search_for_serial_number", class: "tw:w-full" %>
       <%# placeholder: t(".search_for_serial_number"), title: t(".search_for_serial_number") %>
     </div>

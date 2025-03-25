@@ -50,3 +50,68 @@ body {
 body.dark {
   @apply tw:bg-gray-900 tw:text-gray-400;
 }
+
+
+/*
+  Select2 styles - only used on search, these styles
+  make the field on bikes search appear the same as other fields
+*/
+
+.select2-container .select2-selection--multiple {
+  /*  @extend .form-control;*/
+
+  padding-bottom: 0;
+}
+
+.select2-dropdown,
+.select2-container--default.select2-container--focus
+  .select2-selection--multiple {
+  border-color: #66afe9;
+}
+
+.select2-container--default
+  .select2-selection--multiple
+  .select2-selection__choice,
+  .select2-container .select2-search--inline .select2-search__field {
+  margin-top: 0;
+}
+
+.select2-container--default
+  .select2-selection--multiple
+  .select2-selection__rendered {
+  padding: 0;
+}
+
+/*
+  Bike search form styles
+*/
+.select2-results__options .sch_s {
+  display: inline-block;
+}
+
+.select2-results__options .sch_m,
+.select2-results__options .sch_ {
+  color: #ccc;
+}
+
+.select2-results__options .sch_special {
+  border-bottom: 1px solid #ddd;
+}
+
+.select2-results__options .sch_c {
+  color: #bbb;
+  display: inline-block;
+}
+
+.select2-results__options .sclr {
+  border-radius: 3px;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 1px solid white;
+  line-height: 0.8em;
+  margin: 0 6px -6px;
+  font-size: 0.5em;
+  text-align: center;
+  padding-top: 1em;
+}
