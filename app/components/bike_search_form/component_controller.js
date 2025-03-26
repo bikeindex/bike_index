@@ -16,7 +16,6 @@ export default class extends Controller {
     //   remove class which hides fields that require JS
     //   Remove query field (which works when there is no js)
     //
-    //   Can the import be moved to just the controller?
     //   Can
 
     const initial_opts = $query_field.data('initial') ? $query_field.data('initial') : [];
