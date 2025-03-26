@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import "jquery"
 import "select2"
 
 // Connects to data-controller='bike-search-form--component'
@@ -6,8 +7,6 @@ export default class extends Controller {
   connect() {
     console.log(`app/components/bike_search_form/component_controller.js - connected to: ${this.element}`)
 
-    console.log($.fn.jquery)
-    console.log(window.jQuery)
     this.initializeHeaderSearch($('#query_items'));
   }
 

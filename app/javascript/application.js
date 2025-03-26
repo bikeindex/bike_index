@@ -1,8 +1,3 @@
-// Import jquery at the top so that we can use select2
-import "jquery"
-window.jQuery = jQuery
-// window.$ = jQuery
-
 // Import stimulus controllers
 import { Application } from '@hotwired/stimulus'
 // Lazy load all controllers
