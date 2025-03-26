@@ -1,0 +1,10 @@
+---
+nb:
+  components:
+    search:
+      form:
+        distance: Distance
+        include_location_search: Include_location_search
+        search_path: Search_path
+        interpreted_params: Interpreted_params
+        skip_serial_field: Skip_serial_field
