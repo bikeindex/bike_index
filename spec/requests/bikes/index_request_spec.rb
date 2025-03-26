@@ -20,7 +20,7 @@ RSpec.describe "BikesController#index", type: :request do
   context "geocoder_stubbed_bounding_box" do
     let(:ip_address) { "23.115.69.69" }
     let(:target_location) { default_location[:formatted_address] }
-    let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
+    let(:target_interpreted_params) { BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address) }
     let(:headers) { {"HTTP_CF_CONNECTING_IP" => ip_address} }
     include_context :geocoder_stubbed_bounding_box
     include_context :geocoder_default_location
@@ -58,7 +58,7 @@ RSpec.describe "BikesController#index", type: :request do
         let(:manufacturer) { non_stolen_bike.manufacturer }
         let(:color) { non_stolen_bike.primary_frame_color }
         let(:query_params) { {serial: "#{serial}0d", query_items: [color.search_id, manufacturer.search_id], stolenness: "non"} }
-        let(:target_selected_query_items_options) { Bike.selected_query_items_options(target_interpreted_params) }
+        let(:target_selected_query_items_options) { BikeSearchable.selected_query_items_options(target_interpreted_params) }
         it "assigns passed parameters, assigns close_serials" do
           get base_url, params: query_params
           expect(response.status).to eq 200
@@ -150,7 +150,7 @@ RSpec.describe "BikesController#index", type: :request do
         end
         let(:ip_address) { "special" }
         it "sends all the params we want to searchable_interpreted_params" do
-          expect(Bike).to receive(:searchable_interpreted_params).with(query_params, ip: "special") { {} }
+          expect(BikeSearchable).to receive(:searchable_interpreted_params).with(query_params, ip: "special") { {} }
           get base_url, params: query_params.to_h, headers: headers
           expect(response.status).to eq 200
         end
