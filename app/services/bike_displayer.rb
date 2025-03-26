@@ -94,9 +94,9 @@ class BikeDisplayer
       if (stolen_record = bike.current_stolen_record).present?
         if stolen_record.images_attached?
           return {
-            square: storage_url(stolen_record.image_square),
-            facebook: storage_url(stolen_record.image_four_by_five),
-            twitter: storage_url(stolen_record.image_landscape)
+            square: BlobUrl.for(stolen_record.image_square),
+            facebook: BlobUrl.for(stolen_record.image_four_by_five),
+            twitter: BlobUrl.for(stolen_record.image_landscape)
           }
         end
 
@@ -113,10 +113,6 @@ class BikeDisplayer
     end
 
     private
-
-    def storage_url(attachment)
-      Rails.application.routes.url_helpers.rails_public_blob_url(attachment)
-    end
 
     def single_image_hash(image_url)
       {square: image_url, twitter: image_url, facebook: image_url}

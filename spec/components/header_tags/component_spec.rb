@@ -273,8 +273,8 @@ RSpec.describe HeaderTags::Component, type: :component do
           before { Images::StolenProcessor.update_alert_images(stolen_record) }
           let(:target_images) do
             {
-              page_image: Rails.application.routes.url_helpers.rails_public_blob_url(stolen_record.image_four_by_five),
-              twitter_image: Rails.application.routes.url_helpers.rails_public_blob_url(stolen_record.image_landscape)
+              page_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_four_by_five),
+              twitter_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_landscape)
             }
           end
           it "returns expected" do
