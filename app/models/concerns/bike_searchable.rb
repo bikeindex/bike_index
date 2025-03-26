@@ -1,7 +1,7 @@
 module BikeSearchable
   extend ActiveSupport::Concern
 
-  module ClassMethods
+  class << self
     # searchable_interpreted_params returns the args for by all other public methods in this class
     # query_params:
     #   query_items: array of select2 query items. Parsed into query, manufacturer and color
@@ -32,28 +32,6 @@ module BikeSearchable
         .to_h
     end
 
-    def search(interpreted_params)
-      matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
-        .non_serial_matches(interpreted_params)
-    end
-
-    def search_close_serials(interpreted_params)
-      return none if interpreted_params[:serial].blank? # normalized_serial blank
-
-      # serials_not_containing excludes exact matches too
-      serials_not_containing(interpreted_params[:serial], interpreted_params[:serial_no_space])
-        .non_serial_matches(interpreted_params)
-        .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", interpreted_params[:serial_no_space])
-    end
-
-    def search_serials_containing(interpreted_params)
-      return none if interpreted_params[:serial].blank? # normalized_serial blank
-
-      not_matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
-        .non_serial_matches(interpreted_params)
-        .serials_containing(interpreted_params[:serial], interpreted_params[:serial_no_space])
-    end
-
     # Initial autocomplete options hashes for the main select search input
     # ignores manufacturer_id and color_ids we don't have
     def selected_query_items_options(interpreted_params)
@@ -75,33 +53,7 @@ module BikeSearchable
       items.flatten.compact
     end
 
-    def permitted_search_params
-      [:cycle_type, :distance, :location, :manufacturer, :query, :propulsion_type,
-        :serial, :stolenness, colors: [], query_items: []].freeze
-    end
-
-    # NOTE: This where query should exactly match not_matching_serial
-    # This method is called from outside this class
-    def matching_serial(serial, serial_no_space = nil)
-      return all unless serial.present?
-      serial_no_space ||= SerialNormalizer.no_space(serial)
-      # Note: @@ is postgres fulltext search
-      where("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
-    end
-
-    # TODO: actually make private?
-    # Private (internal only) methods below here, as defined at the start
-
-    def non_serial_matches(interpreted_params)
-      # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
-      (interpreted_params[:colors] || [nil])
-        .reduce(self) { |matches, c_id| matches.search_matching_color_ids(c_id) }
-        .search_matching_stolenness(interpreted_params)
-        .search_matching_query(interpreted_params[:query])
-        .search_matching_cycle_type(interpreted_params[:cycle_type])
-        .search_matching_propulsion_type(interpreted_params[:propulsion_type])
-        .where(interpreted_params[:manufacturer] ? {manufacturer_id: interpreted_params[:manufacturer]} : {})
-    end
+    private
 
     def searchable_query_items_query(query_params)
       return {query: query_params[:query]} if query_params[:query].present?
@@ -215,6 +167,58 @@ module BikeSearchable
         location: location,
         distance: (distance && distance > 0) ? distance : 100
       }
+    end
+  end
+
+  module ClassMethods
+    def search(interpreted_params)
+      matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
+        .non_serial_matches(interpreted_params)
+    end
+
+    def search_close_serials(interpreted_params)
+      return none if interpreted_params[:serial].blank? # normalized_serial blank
+
+      # serials_not_containing excludes exact matches too
+      serials_not_containing(interpreted_params[:serial], interpreted_params[:serial_no_space])
+        .non_serial_matches(interpreted_params)
+        .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", interpreted_params[:serial_no_space])
+    end
+
+    def search_serials_containing(interpreted_params)
+      return none if interpreted_params[:serial].blank? # normalized_serial blank
+
+      not_matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
+        .non_serial_matches(interpreted_params)
+        .serials_containing(interpreted_params[:serial], interpreted_params[:serial_no_space])
+    end
+
+    def permitted_search_params
+      [:cycle_type, :distance, :location, :manufacturer, :query, :propulsion_type,
+        :serial, :stolenness, colors: [], query_items: []].freeze
+    end
+
+    # NOTE: This where query should exactly match not_matching_serial
+    # This method is called from outside this class
+    def matching_serial(serial, serial_no_space = nil)
+      return all unless serial.present?
+      serial_no_space ||= SerialNormalizer.no_space(serial)
+      # Note: @@ is postgres fulltext search
+      where("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
+    end
+
+    # TODO: actually make private?
+    # Private (internal only) methods below here, as defined at the start
+
+    def non_serial_matches(interpreted_params)
+      # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
+      (interpreted_params[:colors] || [nil])
+        .reduce(self) { |matches, c_id| matches.search_matching_color_ids(c_id) }
+        .search_matching_stolenness(interpreted_params)
+        .search_matching_query(interpreted_params[:query])
+        .search_matching_cycle_type(interpreted_params[:cycle_type])
+        .search_matching_propulsion_type(interpreted_params[:propulsion_type])
+        .where(interpreted_params[:manufacturer] ? {manufacturer_id: interpreted_params[:manufacturer]} : {})
     end
 
     # Actual searcher methods
