@@ -10,11 +10,13 @@
       <% if render_serial_field? %>
         <%= label_tag :serial, translation(".search_for_serial_number"), class: "twlabel tw:sr-only" %>
         <%= text_field_tag :serial, nil, placeholder: translation(".search_for_serial_number"), class: "twinput tw:mt-2" %>
-     <% end %>
+      <% end %>
     </div>
     <div class="tw:w-20">
       <%= button_tag(type: translation(".submit"), class: "twbtn-blue tw:w-full tw:h-full") do %>
-        <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
+        <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>
+              .cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}
+            </style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
       <% end %>
     </div>
   </div>

@@ -1,8 +1,9 @@
 class SearchController < Bikes::BaseController
   MAX_INDEX_PAGE = 100
   before_action :render_ad, only: %i[index]
-  skip_before_action :find_bike
-  skip_before_action :ensure_user_allowed_to_edit
+  before_action :enable_importmaps
+  skip_before_action :find_bike # from Bikes::baseController
+  skip_before_action :ensure_user_allowed_to_edit # from Bikes::baseController
   around_action :set_reading_role
 
   def index

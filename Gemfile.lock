@@ -868,6 +868,7 @@ DEPENDENCIES
   guard-rspec
   haml
   honeybadger
+  htmlbeautifier
   httparty
   i18n-country-translations
   i18n-js

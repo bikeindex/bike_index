@@ -3,21 +3,24 @@ import 'jquery'
 import 'select2'
 
 /* global $ */
+
 // Connects to data-controller='search--everything-combobox--component'
 export default class extends Controller {
-  connect () {
-    // remove the query field that is for users that don't have JS and show the combobox
-    document.querySelectorAll('.remove_when_js_available').forEach(el => { if (el) el.remove() })
-    this.element.classList.remove('tw:hidden')
+  static targets = ['input']
+  static values = { apiUrl: String }
 
-    // TODO:
-    //   Can switch to using jquery without preload, by checking if it's loaded first?
-    this.initializeHeaderSearch($(this.element))
+  connect () {
+    // remove the query field that is for users that don't have JS
+    this.element.querySelectorAll('.remove_when_js_available').forEach(el => { if (el) el.remove() })
+    this.inputTarget.classList.remove('tw:hidden') // show the combobox
+
+    // TODO: should we update to remove preload from jquery?
+    // Does this need to check that jquery is initialized?
+    this.initializeHeaderSearch($(this.inputTarget), this.apiUrlValue)
   }
 
-  initializeHeaderSearch ($queryField) {
+  initializeHeaderSearch ($queryField, url) {
     const perPage = 15
-
     // TODO: Find this dynamically? Set it at a higher level?
     const searchFormSelector = '#Search_Form'
 
@@ -36,7 +39,7 @@ export default class extends Controller {
       // selectOnClose: true // Turned off in PR#2325
       escapeMarkup: function (markup) { return markup }, // Allow our fancy display of options
       ajax: {
-        url: '/api/autocomplete',
+        url,
         dataType: 'json',
         delay: 150,
         data: function (params) {
