@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Search::Form::Component, :js, type: :system do
-  let(:preview_path) { "/rails/view_componentssearch/form/component/default" }
+  let(:preview_path) { "/rails/view_components/search/form/component/default" }
 
   it "default preview" do
     visit(preview_path)

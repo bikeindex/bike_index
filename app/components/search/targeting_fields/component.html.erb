@@ -1,0 +1,22 @@
+<div data-controller="search--targeting-fields--component">
+  <% if include_stolenness? %>
+    <%= hidden_field_tag :stolenness, @stolenness %>
+  <% end %>
+  <div class="tw:mt-2 tw:flex tw:flex-nowrap tw:w-min tw:ml-auto <%= location_fields_hidden? ? 'tw:hidden' : '' %>">
+    <span class="tw:block tw:py-1.5 tw:mr-2"><%= translation(".within") %></span>
+    <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
+    <%= number_field_tag :distance, @distance, placeholder: "100", min: 1, class: "twinput tw:mr-2 tw:min-w-20" %>
+
+    <span class="tw:block tw:text-nowrap tw:py-1.5 tw:mr-2"><%= translation(".miles_of") %></span>
+    <%= label_tag :location, translation(".search_location"), class: "twlabel tw:sr-only" %>
+    <%= text_field_tag :location, @location, placeholder: translation(".anywhere"), class: "twinput tw:min-w-50" %>
+  </div>
+
+  <ul class="tw:items-center tw:w-full tw:text-sm tw:font-medium tw:text-gray-900 tw:bg-white tw:border tw:border-gray-200 tw:rounded-lg tw:sm:flex tw:dark:bg-gray-800 tw:dark:border-gray-600 tw:dark:text-white tw:mt-6">
+    <%= stolenness_radio_item("proximity") %>
+    <%= stolenness_radio_item("stolen") %>
+    <%# TODO: add Found in search area %>
+    <%= stolenness_radio_item("non") %>
+    <%= stolenness_radio_item("all", skip_li_border: true, skip_count: true) %>
+  </ul>
+</div>
