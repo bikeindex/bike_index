@@ -1,8 +1,9 @@
 class SearchController < Bikes::BaseController
   MAX_INDEX_PAGE = 100
   before_action :render_ad, only: %i[index]
-  skip_before_action :assign_current_organization, except: %i[index]
-  around_action :set_reading_role, only: %i[index]
+  skip_before_action :find_bike
+  skip_before_action :ensure_user_allowed_to_edit
+  around_action :set_reading_role
 
   def index
     @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
