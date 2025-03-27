@@ -5,22 +5,25 @@ import "select2"
 // Connects to data-controller='search--everything-combobox--component'
 export default class extends Controller {
   connect() {
-    console.log('app/components/search/everything_combobox/component_controller.js - connected to:')
-    console.log(this.element)
-    // TODO:
-    //   show/hide for js (maybe inline script if there is a flicker?)
-    //   use this.element to initialize
-    //   Can switch to using jquery without preload, by checking if it's loaded first?
+    // remove the query field that is for users that don't have JS and show the combobox
+    document.querySelectorAll(".remove_when_js_available").forEach(el => {if(!!el) el.remove()})
+    this.element.classList.remove("tw:hidden")
 
-    this.initializeHeaderSearch($('#query_items'));
+    // TODO:
+    //   Can switch to using jquery without preload, by checking if it's loaded first?
+    this.initializeHeaderSearch($(this.element));
   }
 
   initializeHeaderSearch($query_field) {
     const per_page = 15;
 
+    // TODO: Find this dynamically? Set it at a higher level?
+    const searchFormSelector = '#Search_Form'
+
     const initial_opts = $query_field.data('initial') ? $query_field.data('initial') : [];
     const processedResults = this.processedResults; // Custom data processor
     const formatSearchText = this.formatSearchText; // Custom formatter
+
 
     const $desc_search = $query_field.select2({
       allowClear: true,
@@ -29,7 +32,7 @@ export default class extends Controller {
       openOnEnter: false,
       tokenSeparators: [','],
       placeholder: $query_field.attr('placeholder'), // Pull placeholder from HTML
-      dropdownParent: $('.bikes-search-form'), // Append to search for for easier css access
+      // dropdownParent: $(searchFormSelector), // Append to search for for easier css access
       templateResult: formatSearchText, // let custom formatter work
       // selectOnClose: true // Turned off in PR#2325
       escapeMarkup: function(markup) { return markup; }, // Allow our fancy display of options
@@ -60,7 +63,7 @@ export default class extends Controller {
 
     // Submit on enter. Requires select2 be appended to bike-search form (as it is)
     // window.bike_search_submit = true
-    $('.bikes-search-form .select2-selection').on('keyup', function(e) {
+    $(`${searchFormSelector} .select2-selection`).on('keyup', function(e) {
       // Only trigger submit on enter if:
       //  - Enter key pressed last (13)
       //  - Escape key pressed last (27)
@@ -70,7 +73,7 @@ export default class extends Controller {
 
       if (window.bike_search_submit) {
         $desc_search.select2('close'); // Because form is submitted, hide select box
-        $('#bikes_search_form').submit();
+        $(searchFormSelector).submit();
       } else {
         window.bike_search_submit = true;
       }
@@ -78,7 +81,7 @@ export default class extends Controller {
 
     // Every time the select changes, check the categories
     $query_field.on('change', (e) => {
-      this.setCategories();
+      this.setCategories($query_field);
     });
   }
 
@@ -124,8 +127,8 @@ export default class extends Controller {
   }
 
   // Don't include manufacturers if a manufacturer is selected
-  setCategories() {
-    let query = $("#bikes_search_form #query_items").val();
+  setCategories($query_field) {
+    let query = $query_field.val();
     if (!query) query = []; // Assign query to an array if it's blank
 
     let queried_categories = query.filter(function(x) {

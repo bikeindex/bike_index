@@ -1,3 +1,51 @@
-<div data-controller="search--everything-combobox--component">
-  Search::EverythingCombobox::Component component
-</div>
+<style>
+  <%#
+    Styles specific to the EverythingCombobox items
+  %>
+  .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background: rgba(228,228,228,0.2);
+  }
+  .select2-results__options .sch_s {
+    display: inline-block;
+  }
+
+  .select2-results__options .sch_m,
+  .select2-results__options .sch_ {
+    color: #ccc;
+  }
+
+  .select2-results__options .sch_special {
+    border-bottom: 1px solid #ddd;
+  }
+
+  .select2-results__options .sch_c {
+    color: #bbb;
+    display: inline-block;
+  }
+
+  .select2-results__options .sclr {
+    border-radius: 3px;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 1px solid rgba(255,255,255,0.5);
+    line-height: 0.8em;
+    margin: 0 6px -6px;
+    font-size: 0.5em;
+    text-align: center;
+    padding-top: 1em;
+  }
+</style>
+
+<%= label_tag :query_items, translation(".query_items_description"), class: "twlabel tw:sr-only" %>
+<%= select_tag :query_items,
+  options_for_select(@opt_vals, selected: @opt_vals.map(&:last)),
+  placeholder: translation(".search_descriptions"),
+  class: "tw:w-full tw:hidden",
+  multiple: true,
+  "data-controller" => "search--everything-combobox--component" %>
+
+<%= label_tag :query, translation(".search_descriptions"), class: "twlabel tw:sr-only remove_when_js_available" %>
+<%= text_field_tag :query, @query,
+  placeholder: translation(".search_descriptions"),
+  class: "twinput remove_when_js_available" %>

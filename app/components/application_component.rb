@@ -20,7 +20,7 @@ class ApplicationComponent < ViewComponent::Base
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.
   #
-  # NOTE: There is an equivalent method in ComponentHelpers#translation
+  # NOTE: There is an equivalent method in ControllerHelpers#translation
   #
   # :components
   # > [component_namespace] (possibly none)
@@ -30,7 +30,7 @@ class ApplicationComponent < ViewComponent::Base
   # corresponding keyword args, the latter taking precedence if both are
   # provided.
   #
-  # See specs for component_translation_scope in Search::BikeBox::Component
+  # See specs for component_translation_scope in Search::Form::Component
   def translation(key, scope: nil, **kwargs)
     scope ||= component_translation_scope
 

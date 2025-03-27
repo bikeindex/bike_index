@@ -3,8 +3,15 @@ en:
   components:
     search:
       form:
-        distance: Distance
-        include_location_search: Include_location_search
-        search_path: Search_path
-        interpreted_params: Interpreted_params
-        skip_serial_field: Skip_serial_field
+        search_for_serial_number: Search for serial number
+        submit: submit
+        search_location: Search location
+        anywhere: Anywhere
+        miles_of: miles of
+        search_distance: Search distance
+        within: within
+        doesnt_look_like_serial: The serial you entered doesn't look like a serial number, so it isn't being used to search.
+        stolenness_proximity: Stolen in search area
+        stolenness_stolen: Stolen anywhere
+        stolenness_non: Not marked stolen
+        stolenness_all: All

@@ -10,7 +10,8 @@
   </head>
   <%# NOTE: This sets the theme %>
   <body class="<%= params.dig(:lookbook, :display, :theme) %>">
-    <div class="tw:w-full tw:h-full">
+    <%# NOTE: at some point, make the padding optional %>
+    <div class="tw:w-full tw:h-full tw:p-4">
       <%= yield %>
     </div>
   </body>

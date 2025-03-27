@@ -1,20 +1,45 @@
-<%= form_with url: target_search_path, builder: BikeIndexFormBuilder, method: :get do |f| %>
-  <div class="tw:flex tw:flex-nowrap tw:gap-4 bikes-search-form" data-controller="search--form--component">
-    <div class="tw:flex-grow search-fields">
-      <%= select_tag :query_items,
-        options_for_select(opt_vals, selected: opt_vals.map(&:last)),
-        placeholder: ".search_bike_descriptions",
-        class: "tw:w-full tw:d-none",
-        multiple: true %>
+<%= form_with url: @target_search_path, builder: BikeIndexFormBuilder, method: :get, id: "Search_Form", "data-controller" => "search--form--component" do |f| %>
+  <% if include_stolenness? %>
+    <%= hidden_field_tag :stolenness, @interpreted_params[:stolenness] %>
+  <% end %>
 
-      <%= text_field_tag :serial, nil, placeholder: ".search_for_serial_number", title: ".search_for_serial_number", class: "tw:w-full" %>
-      <%# placeholder: t(".search_for_serial_number"), title: t(".search_for_serial_number") %>
+  <div class="tw:flex tw:flex-nowrap tw:gap-4">
+    <div class="tw:flex-grow search-fields">
+      <%= render(Search::EverythingCombobox::Component.new(selected_query_items_options: @selected_query_items_options, query:)) %>
+
+      <% if render_serial_field? %>
+        <%= label_tag :serial, translation(".search_for_serial_number"), class: "twlabel tw:sr-only" %>
+        <%= text_field_tag :serial, nil, placeholder: translation(".search_for_serial_number"), class: "twinput tw:mt-2" %>
+     <% end %>
     </div>
     <div class="tw:w-20">
-      <%= button_tag(type: ".submit", class: "twbtn-blue tw:w-full") do %>
+      <%= button_tag(type: translation(".submit"), class: "twbtn-blue tw:w-full tw:h-full") do %>
         <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
       <% end %>
     </div>
   </div>
-<% end %>
 
+  <% if render_serial_field? && serial_looks_like_not_a_serial? %>
+    <%= render(Alert::Component.new(text: translation(".doesnt_look_like_serial"), kind: :warning, margin_classes: "tw:my-2")) %>
+  <% end %>
+
+  <% if include_location_search? %>
+    <div class="tw:mt-2 tw:flex tw:flex-nowrap tw:w-min tw:ml-auto <%= location_fields_hidden? ? 'tw:hidden' : '' %>">
+      <span class="tw:block tw:py-1.5 tw:mr-2"><%= translation(".within") %></span>
+      <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
+      <%= number_field_tag :distance, distance_value, placeholder: "100", min: 1, class: "twinput tw:mr-2 tw:min-w-20" %>
+
+      <span class="tw:block tw:text-nowrap tw:py-1.5 tw:mr-2"><%= translation(".miles_of") %></span>
+      <%= label_tag :location, translation(".search_location"), class: "twlabel tw:sr-only" %>
+      <%= text_field_tag :location, @interpreted_params[:location], placeholder: translation(".anywhere"), class: "twinput tw:min-w-50" %>
+    </div>
+  <% end %>
+
+  <ul class="tw:items-center tw:w-full tw:text-sm tw:font-medium tw:text-gray-900 tw:bg-white tw:border tw:border-gray-200 tw:rounded-lg tw:sm:flex tw:dark:bg-gray-800 tw:dark:border-gray-600 tw:dark:text-white tw:mt-6">
+    <%= stolenness_radio_item("proximity") %>
+    <%= stolenness_radio_item("stolen") %>
+    <%# TODO: add Found in search area %>
+    <%= stolenness_radio_item("non") %>
+    <%= stolenness_radio_item("all", skip_li_border: true, skip_count: true) %>
+  </ul>
+<% end %>
