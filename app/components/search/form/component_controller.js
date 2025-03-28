@@ -3,7 +3,14 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='search--form--component'
 export default class extends Controller {
   connect () {
-    console.log('app/components/search/form/component_controller.js - connected to:')
-    console.log(this.element)
+    // Remove search_no_js hidden field
+    const noJsElement = this.element.querySelector("#search_no_js")
+    if (noJsElement) noJsElement.remove()
+
+    // TODO: show counts
+    // Hide count when search description or serial changes
+    //
+
   }
+
 }

@@ -52,8 +52,11 @@
     multiple: true,
     "data-search--everything-combobox--component-target" => "input" %>
 
-  <%= label_tag :query, translation(".search_descriptions"), class: "twlabel tw:sr-only remove_when_js_available" %>
+  <%= label_tag :query, translation(".search_descriptions"),
+    class: "twlabel tw:sr-only",
+    "data-search--everything-combobox--component-target" => "nonjsfields" %>
   <%= text_field_tag :query, @query,
     placeholder: translation(".search_descriptions"),
-    class: "twinput remove_when_js_available" %>
+    class: "twinput",
+    "data-search--everything-combobox--component-target" => "nonjsfields" %>
 </div>

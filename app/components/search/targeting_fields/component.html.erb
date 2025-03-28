@@ -1,4 +1,7 @@
-<div data-controller="search--targeting-fields--component">
+<div
+  data-controller="search--targeting-fields--component"
+  data-search--targeting-fields--component-api-count-url-value="<%= API_COUNT_URL %>">
+
   <% if include_stolenness? %>
     <%= hidden_field_tag :stolenness, @stolenness %>
   <% end %>
@@ -13,10 +16,24 @@
   </div>
 
   <ul class="tw:items-center tw:w-full tw:text-sm tw:font-medium tw:text-gray-900 tw:bg-white tw:border tw:border-gray-200 tw:rounded-lg tw:sm:flex tw:dark:bg-gray-800 tw:dark:border-gray-600 tw:dark:text-white tw:mt-6">
-    <%= stolenness_radio_item("proximity") %>
-    <%= stolenness_radio_item("stolen") %>
-    <%# TODO: add Found in search area %>
-    <%= stolenness_radio_item("non") %>
-    <%= stolenness_radio_item("all", skip_li_border: true, skip_count: true) %>
+    <% stolenness_options.each do |opt| %>
+      <% skip_li_border = opt == stolenness_options.last %>
+      <li class="<%= stolenness_li_classes(skip_li_border) %>">
+        <div class="tw:flex tw:items-center tw:ps-3">
+          <%= radio_button_tag(:stolenness, opt, @stolenness == opt,
+            class: "tw:w-4 tw:h-4 tw:text-blue-600 tw:bg-gray-100 tw:border-gray-300 tw:focus:ring-blue-500 " \
+              ":tw:dark:focus:ring-blue-600 tw:dark:ring-offset-gray-700 tw:dark:focus:ring-offset-gray-700 " \
+              "tw:focus:ring-2 tw:dark:bg-gray-600 tw:dark:border-gray-500")
+          %>
+
+          <%= label_tag("stolenness_#{opt}", class: "tw:w-full tw:py-3 tw:ms-2 tw:cursor-pointer") do %>
+            <%= translation(".stolenness_#{opt}") %>
+            <% unless stolenness_no_count.include?(opt) %>
+              <%= content_tag(:span, "", class: "count") %>
+            <% end %>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
   </ul>
 </div>

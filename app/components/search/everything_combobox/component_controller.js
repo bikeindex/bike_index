@@ -6,13 +6,14 @@ import 'select2'
 
 // Connects to data-controller='search--everything-combobox--component'
 export default class extends Controller {
-  static targets = ['input']
+  static targets = ['input', 'nonjsfields']
   static values = { apiUrl: String }
 
   connect () {
     // remove the query field that is for users that don't have JS
-    this.element.querySelectorAll('.remove_when_js_available').forEach(el => { if (el) el.remove() })
-    this.inputTarget.classList.remove('tw:hidden') // show the combobox
+    this.nonjsfieldsTargets.forEach(el => { if (el) el.remove() })
+    // show the combobox
+    this.inputTarget.classList.remove('tw:hidden')
 
     // TODO: should we update to remove preload from jquery?
     // Does this need to check that jquery is initialized?
