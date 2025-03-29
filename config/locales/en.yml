@@ -700,6 +700,7 @@ en:
         cargo_trike_rear: Cargo Tricycle (rear storage)
         e_motorcycle: e-Motorcycle/e-Dirtbike (no pedals)
         e_scooter: e-Scooter
+        elliptical: Elliptical bike
         non_e_scooter: Scooter (not electric)
         non_e_skateboard: Skateboard (not electric)
         pedi_cab: Pedi Cab (rickshaw)
@@ -707,7 +708,7 @@ en:
         personal_mobility: e-Skateboard (e-Unicycle, Personal mobility device, etc)
         recumbent: Recumbent
         stroller: Stroller
-        tall_bike: Tall Bike
+        tall_bike: Tall Bike (multiple frames fused together)
         tandem: Tandem
         traditional_bike: Traditional Bike (2 wheels, 1 seat, pedals)
         trail_behind: Trail behind (half bike)

@@ -15,8 +15,9 @@ def system!(*args)
 end
 
 def html_files
-  (Dir.glob("app/**/*.{html}{+*,}.erb") + Dir.glob(".static_dev/*.html"))
-    .map { |f| "'#{f}'" }.join(" ")
+  # Dir.glob("app/**/*.{html}{+*,}.erb").map { |f| "'#{f}'" }.join(" ")
+  # Currently just doing components
+  Dir.glob("app/components/**/*.{html}{+*,}.erb").map { |f| "'#{f}'" }.join(" ")
 end
 
 chdir APP_ROOT do
@@ -28,7 +29,8 @@ chdir APP_ROOT do
     # system!("bundle exec htmlbeautifier --keep-blank-lines 1 --lint-only #{html_files}")
   else
     system!("bundle exec standardrb --fix")
-    # system!("bundle exec htmlbeautifier --keep-blank-lines 1 #{html_files}")
+    # pp html_files
+    system!("bundle exec htmlbeautifier --keep-blank-lines 1 #{html_files}")
     system!("npm run lint")
   end
 end

@@ -162,6 +162,8 @@ enableEscapeForModals = ->
     $(window).off 'keyup'
     $(".modal .close").off
 
+# Once the updated search is shipped, this will no longer be necessary -
+# since it will find the localStorage location when renders (before searching)
 window.updateSearchBikesHeaderLink = ->
   location = localStorage.getItem('location')
   if location?

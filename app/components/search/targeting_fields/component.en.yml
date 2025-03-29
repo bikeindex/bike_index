@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    search:
+      targeting_fields:
+        search_location: Search location
+        anywhere: Anywhere
+        miles_of: miles of
+        search_distance: Search distance
+        within: within
+        stolenness_proximity: Stolen in search area
+        stolenness_stolen: Stolen anywhere
+        stolenness_non: Not marked stolen
+        stolenness_all: All

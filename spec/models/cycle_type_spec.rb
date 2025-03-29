@@ -45,7 +45,7 @@ RSpec.describe CycleType, type: :model do
     it "has the values" do
       expect(CycleType.select_options).to include(["Bike", "bike"])
       expect(CycleType.select_options(traditional_bike: true)).to include(trad_bike)
-      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 21
+      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 22
     end
   end
 
