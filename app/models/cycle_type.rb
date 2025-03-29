@@ -24,7 +24,7 @@ class CycleType
     "non-e-scooter": 19,
     "non-e-skateboard": 20,
     "e-motorcycle": 21,
-   elliptical: 22
+    elliptical: 22
   }.freeze
 
   NAMES = {
@@ -49,7 +49,7 @@ class CycleType
     "non-e-scooter": "Scooter (not electric)",
     "non-e-skateboard": "Skateboard (not electric)",
     "e-motorcycle": "e-Motorcycle/e-Dirtbike (no pedals)",
-    "elliptical": "Elliptical bike"
+    elliptical: "Elliptical bike"
   }.freeze
 
   MODEST_PRIORITY = %i[personal-mobility recumbent tandem tricycle].freeze
