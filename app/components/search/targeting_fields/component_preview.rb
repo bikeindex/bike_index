@@ -3,13 +3,15 @@
 module Search::TargetingFields
   class ComponentPreview < ApplicationComponentPreview
     def default
+      interpreted_params = BikeSearchable.searchable_interpreted_params({})
       render(Search::TargetingFields::Component.new(interpreted_params))
     end
 
-    private
+    def chicago_tall_bike
+      interpreted_params = BikeSearchable.searchable_interpreted_params({stolenness: "proximity",
+        location: "Chicago, IL", query_items: ["v_9"]})
 
-    def interpreted_params
-      BikeSearchable.searchable_interpreted_params({})
+      render(Search::TargetingFields::Component.new(interpreted_params))
     end
   end
 end

@@ -4,11 +4,11 @@ module Alert
   class ComponentPreview < ApplicationComponentPreview
     # @group Kind Variants
     # @param kind "The kind of alert"
-    def info(kind: :info)
+    def notice(kind: :notice)
       render(Alert::Component.new(text: default_text, kind:))
     end
 
-    def danger(kind: :danger)
+    def error(kind: :error)
       render(Alert::Component.new(text: default_text, kind:))
     end
 
@@ -22,11 +22,11 @@ module Alert
 
     # @group Dismissable Variants
     # @param kind "The kind of alert"
-    def dismissable_info(kind: :info)
+    def dismissable_notice(kind: :notice)
       render(Alert::Component.new(text: default_text, kind:, dismissable: true))
     end
 
-    def dismissable_danger(kind: :danger)
+    def dismissable_error(kind: :error)
       render(Alert::Component.new(text: default_text, kind:, dismissable: true))
     end
 

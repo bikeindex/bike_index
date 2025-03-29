@@ -47,7 +47,7 @@ RSpec.describe GeocodeHelper do
          state_id: state.id, country_id: country.id, neighborhood: nil, street: nil}
       end
 
-      it "returns an address_hash" do
+      it "returns an assignable_address_hash" do
         VCR.use_cassette("geohelper-zipcode", vcr_config) do
           expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
         end
@@ -93,6 +93,18 @@ RSpec.describe GeocodeHelper do
       it "finds the address" do
         VCR.use_cassette("geohelper-ip_address", vcr_config) do
           expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
+        end
+      end
+      context "another IP address" do
+        let(:address) { "50.211.197.209" }
+        let(:target_address_hash) do
+          target_assignable_hash.merge(latitude: 37.7308, longitude: -122.3838,
+            formatted_address: "San Francisco, CA, US")
+        end
+        it "finds the address" do
+          VCR.use_cassette("geohelper-ip_address2", vcr_config) do
+            expect(described_class.address_hash_for(address)).to eq target_address_hash
+          end
         end
       end
     end

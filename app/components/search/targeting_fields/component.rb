@@ -6,12 +6,18 @@ module Search::TargetingFields
     MAX_DISTANCE = 2_000 # IDK, seems reasonable
     API_COUNT_URL = "/api/v3/search/count"
 
-    def initialize(stolenness:, distance: nil, location: nil)
-      @distance = distance.present? ? distance.to_i : DEFAULT_DISTANCE
+    def initialize(interpreted_params)
+      @distance = if interpreted_params[:distance].present?
+        interpreted_params[:distance].to_i
+      else
+        DEFAULT_DISTANCE
+      end
       @distance.clamp(1, MAX_DISTANCE)
 
-      @location = location
-      @stolenness = stolenness
+      @location = interpreted_params[:location]
+      @stolenness = interpreted_params[:stolenness]
+      @interpreted_params = interpreted_params # TODO Remove if possible
+      @interpreted_params_json = interpreted_params.to_json
     end
 
     private
@@ -21,16 +27,12 @@ module Search::TargetingFields
     end
 
     def location_fields_hidden?
-      @stolenness == "proximity" # also true for marketplace
+      @stolenness != "proximity" # also true for marketplace
     end
 
     def stolenness_options
       # TODO: add Found in search area
       %w[proximity stolen non all]
-    end
-
-    def stolenness_no_count
-      %w[all]
     end
 
     def stolenness_li_classes(skip_li_border)

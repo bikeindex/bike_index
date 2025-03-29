@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
+# should replace _revised_messages.html.haml
 module Alert
   class Component < ApplicationComponent
-    KINDS = %i[info danger warning success]
-    # TODO: handle converting error>danger, notice>warning
+    KINDS = %i[notice error warning success]
+    # TODO: Should this convert danger>error, notice>warning? Do we need those anymore, from some bootstrap thing?
 
     # NOTE: you can pass arbitrary classes in via margin_classes, but that's not ideal (they might conflict, etc)
     def initialize(text: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4")
@@ -21,10 +22,10 @@ module Alert
 
     def color_classes
       case @kind
-      when :info
+      when :notice
         "tw:text-blue-800 tw:bg-blue-50 tw:dark:bg-gray-800 tw:dark:text-blue-400 " \
         "tw:border-blue-300 tw:dark:border-blue-800"
-      when :danger
+      when :error
         "tw:text-red-800 tw:bg-red-50 tw:dark:bg-gray-800 tw:dark:text-red-400 " \
         "tw:border-red-300 tw:dark:border-red-800"
       when :warning
@@ -38,9 +39,9 @@ module Alert
 
     def dismissable_color_classes
       case @kind
-      when :info
+      when :notice
         "tw:bg-blue-50 tw:focus:ring-blue-400 tw:hover:bg-blue-200 tw:dark:bg-gray-800 tw:dark:hover:bg-gray-700"
-      when :danger
+      when :error
         "tw:bg-red-50 tw:focus:ring-red-400 tw:hover:bg-red-200 tw:dark:bg-gray-800 tw:dark:hover:bg-gray-700"
       when :warning
         "tw:bg-yellow-50 tw:focus:ring-yellow-400 tw:hover:bg-yellow-200 tw:dark:bg-gray-800 tw:dark:hover:bg-gray-700"

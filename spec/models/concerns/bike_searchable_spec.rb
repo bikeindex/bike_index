@@ -149,8 +149,8 @@ RSpec.describe BikeSearchable do
       context "proximity" do
         context "ignored locations" do
           context "proximity of anywhere" do
-            let(:query_params) { {stolenness: "proximity", location: "anywhere", distance: 100} }
-            let(:target) { {stolenness: "stolen"} }
+            let(:query_params) { {stolenness: "proximity", location: "anywhere", distance: 69} }
+            let(:target) { {stolenness: "stolen", location: "anywhere", distance: 69} }
             it "returns a non-proximity search" do
               expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
             end
@@ -174,7 +174,7 @@ RSpec.describe BikeSearchable do
             let(:nan) { 0.0 / 0 }
             # Override bounding box stub in geocoder_default_location shared_context
             let(:bounding_box) { [nan, nan, nan, nan] }
-            let(:target) { {stolenness: "stolen"} }
+            let(:target) { {stolenness: "stolen", location: "these parts", distance: "-1"} }
             it "returns a non-proximity search" do
               expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
             end

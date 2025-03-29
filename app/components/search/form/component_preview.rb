@@ -6,6 +6,13 @@ module Search::Form
       render(Search::Form::Component.new(**default_options))
     end
 
+    def chicago_tall_bike
+      interpreted_params = BikeSearchable.searchable_interpreted_params({
+        stolenness: "proximity", location: "Chicago, IL", query_items: ["v_9"]})
+
+      render(Search::Form::Component.new(**default_options(interpreted_params)))
+    end
+
     private
 
     # this is the path of the raw preview - so when search is submitted, it just re-renders

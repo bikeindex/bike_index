@@ -4,13 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   connect () {
     // Remove search_no_js hidden field
-    const noJsElement = this.element.querySelector("#search_no_js")
+    const noJsElement = this.element.querySelector('#search_no_js')
     if (noJsElement) noJsElement.remove()
-
-    // TODO: show counts
-    // Hide count when search description or serial changes
-    //
-
   }
-
 }
