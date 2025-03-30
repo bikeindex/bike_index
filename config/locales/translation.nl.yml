@@ -859,6 +859,7 @@ nl:
         non_e_skateboard: Skateboard (niet elektrisch)
         e_motorcycle: e-motorfiets (of e-dirtbike)
         traditional_bike: Traditionele fiets (2 wielen, 1 zadel, pedaal)
+        elliptical: Elliptische fiets
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
