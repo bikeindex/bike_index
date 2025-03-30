@@ -26,7 +26,7 @@ module Search::TargetingFields
       true # will be false for versions and marketplace
     end
 
-    def location_fields_hidden?
+    def location_wrap_hidden?
       @stolenness != "proximity" # also true for marketplace
     end
 

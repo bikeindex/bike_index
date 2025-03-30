@@ -3,11 +3,10 @@
   data-search--targeting-fields--component-api-count-url-value="<%= API_COUNT_URL %>"
   data-search--targeting-fields--component-interpreted-params-value='<%= raw(@interpreted_params.to_json) %>'>
 
-  <% if include_stolenness? %>
-    <%= hidden_field_tag :stolenness, @stolenness %>
-  <% end %>
+  <div
+    class="tw:mt-2 tw:flex tw:flex-nowrap tw:w-min tw:ml-auto tw:transition-[height] tw:duration-300 <%= location_wrap_hidden? ? 'tw:collapse tw:h-0' : '' %>"
+    data-search--targeting-fields--component-target="locationWrap">
 
-  <div class="tw:mt-2 tw:flex tw:flex-nowrap tw:w-min tw:ml-auto <%= location_fields_hidden? ? 'tw:hidden' : '' %>">
     <span class="tw:block tw:py-1.5 tw:mr-2"><%= translation(".within") %></span>
     <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
     <%=
@@ -21,7 +20,7 @@
     <%=
       text_field_tag :location, @location,
       placeholder: translation(".anywhere"), class: "twinput tw:min-w-50",
-      "data-search--targeting-fields--component-target" => "location"
+      "data-search--targeting-fields--component-target" => "location fieldResetsCounts"
     %>
   </div>
 
@@ -33,7 +32,8 @@
           <%= radio_button_tag(:stolenness, opt, @stolenness == opt,
             class: "tw:w-4 tw:h-4 tw:text-blue-600 tw:bg-gray-100 tw:border-gray-300 tw:focus:ring-blue-500 " \
               ":tw:dark:focus:ring-blue-600 tw:dark:ring-offset-gray-700 tw:dark:focus:ring-offset-gray-700 " \
-              "tw:focus:ring-2 tw:dark:bg-gray-600 tw:dark:border-gray-500")
+              "tw:focus:ring-2 tw:dark:bg-gray-600 tw:dark:border-gray-500",
+            "data-action" => "change->search--targeting-fields--component#updateLocationVisibility")
           %>
 
           <%= label_tag("stolenness_#{opt}", class: "tw:w-full tw:py-3 tw:ms-2 tw:cursor-pointer") do %>

@@ -32,11 +32,12 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     before do
       # Stub the API_URL to use the production autocomplete url, for more accurate testing
       stub_const("Search::EverythingCombobox::Component::API_URL", "https://bikeindex.org/api/autocomplete")
+      visit(preview_path)
+      # Clear localStorage
+      page.execute_script("window.localStorage.clear()")
     end
 
     it "adds an item when selected" do
-      visit(preview_path)
-
       expect(find("#query_items", visible: false).value).to be_blank
       find(".select2-container").click
 
@@ -50,10 +51,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     end
 
     it "submits when enter is pressed twice" do
-      visit(preview_path)
-
-
       expect(find("#query_items", visible: false).value).to be_blank
+
       find(".select2-container").click
       # Wait for select2 to load
       expect(page).to have_content("Bikes that are Black", wait: 5)
@@ -67,12 +66,16 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       # NOTE: Since this uses production data, values are consistent
       expect(find("#query_items", visible: false).value).to eq(["c_5"])
 
+      # Enter location info
+      find('#distance').set('251')
+      find('#location').set('Portland, OR')
+
       page.send_keys(:return)
       expect(page).to have_current_path(/\?/, wait: 5)
 
       target_params = {
         distance: ["251"],
-        location: ["Chicago, IL"],
+        location: ["Portland, OR"],
         "query_items[]": ["c_5"],
         query: [""],
         stolenness: "stolen",
@@ -91,6 +94,16 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       # Scroll down
       # verify it loads more
       # Do it twice
+      page.execute_script(<<-JS)
+        const container = document.querySelector('.select2-results__options');
+        const interval = setInterval(() => {
+          container.scrollTop += 100;
+          const element = Array.from(container.querySelectorAll('li')).find(el => el.textContent.includes('Bikes made by All City'));
+          if (element && element.getBoundingClientRect().top >= 0 && element.getBoundingClientRect().bottom <= window.innerHeight) {
+            clearInterval(interval);
+          }
+        }, 100);
+      JS
       fail
 
     end

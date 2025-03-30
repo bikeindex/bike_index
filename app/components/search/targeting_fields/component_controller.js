@@ -4,13 +4,59 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='search--targeting-fields--component'
 export default class extends Controller {
-  static targets = ['distance', 'location', 'fieldResetsCount', 'nonCount', 'stolenCount', 'proximityCount']
+  static targets = ['distance', 'location', 'locationWrap', 'fieldResetsCounts', 'nonCount', 'stolenCount', 'proximityCount']
   static values = { apiCountUrl: String, interpretedParams: Object }
 
   connect () {
     const interpretedParams = this.interpretedParamsValue
 
+    this.updateLocationVisibility()
     this.setSearchProximity(interpretedParams)
+  }
+
+  updateLocationVisibility() {
+    const selectedValue = this.element.querySelector('input[name="stolenness"]:checked')?.value
+    if (selectedValue === 'proximity') {
+      this.uncollapseElement(this.locationWrapTarget)
+    } else {
+      this.collapseElement(this.locationWrapTarget)
+    }
+  }
+
+  // TODO: generalizable collapse component,
+  // add will-change: height;
+  // form fields padding is weird
+  uncollapseElement(element) {
+    // Remove height constraints
+    element.classList.remove('tw:h-0', 'tw:overflow-hidden', 'tw:collapse')
+
+    // Get the natural height of the element
+    const height = element.scrollHeight
+
+    // Set the element's height to its natural height to trigger transition
+    element.style.height = height + 'px'
+
+    // After transition is complete, remove explicit height to allow for responsive changes
+    setTimeout(() => {
+      element.style.height = ''
+    }, 300) // Match the duration with the CSS transition duration
+  }
+
+  collapseElement(element) {
+    // First set an explicit height to enable the transition
+    element.style.height = element.scrollHeight + 'px'
+    // Force a reflow to ensure the browser registers the set height
+    element.offsetHeight
+    // Add classes that will collapse it
+    element.classList.add('tw:overflow-hidden')
+
+    // Transition to height 0
+    element.style.height = '0px'
+
+    // After transition completes, add 'invisible' class for accessibility
+    setTimeout(() => {
+      element.classList.add('tw:h-0', 'tw:collapse')
+    }, 300) // Match the duration with the CSS transition duration
   }
 
   setSearchProximity (interpretedParams) {
@@ -29,7 +75,6 @@ export default class extends Controller {
       location = localStorage.getItem('location')
       // Make location 'you' if location is anywhere or blank, so user isn't stuck and unable to use location
       if (this.ignoredLocation(location)) {
-        console.log("ignored location")
         location = 'you'
       }
       // Then set the location from whatever we got
@@ -62,6 +107,7 @@ export default class extends Controller {
       .then(data => { this.insertTabCounts(data) })
 
     // TODO: connect to targets via fieldResetsCount to reset counts if they change value
+    // console.log(this.fieldResetsCountsTargets)
   }
 
   insertTabCounts (counts) {
@@ -86,7 +132,7 @@ export default class extends Controller {
 
 
   doNotFetchCounts (interpretedParams) {
-
+    // if (this.ignoredLocation(interpretedParams.location)
     console.log(interpretedParams)
     // if (interpretedParams.query)
     return false
