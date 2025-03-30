@@ -128,9 +128,10 @@ export default class extends Controller {
     return `(${number})`
   }
 
+  // TODO: Make this no fetch counts for times where there are no query items
   doNotFetchCounts (interpretedParams) {
     // if (this.ignoredLocation(interpretedParams.location)
-    console.log(interpretedParams)
+    // console.log(interpretedParams)
     // if (interpretedParams.query)
     return false
   }

@@ -48,6 +48,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     it "submits when enter is pressed twice" do
       expect(find("#query_items", visible: false).value).to be_blank
 
+      find("label", text: "Stolen in search area").click
+
       find(".select2-container").click
       # Wait for select2 to load
       expect(page).to have_content("Bikes that are Black", wait: 5)
@@ -74,7 +76,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         "query_items[]": ["c_5"],
         query: [""],
         button: [""],
-        stolenness: ["stolen"],
+        stolenness: ["proximity"],
         serial: [""]
       }
       expect(page_query_params(current_url)).to match_hash_indifferently(target_params)
