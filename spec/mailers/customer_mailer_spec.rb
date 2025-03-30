@@ -128,7 +128,7 @@ RSpec.describe CustomerMailer, type: :mailer do
     it "renders email" do
       mail = CustomerMailer.recovered_from_link(stolen_record)
       expect(mail.to).to eq([bike.owner_email])
-      expect(mail.subject).to eq "Your tall bike has been marked recovered!"
+      expect(mail.subject).to eq "Your tall bike (multiple frames fused together) has been marked recovered!"
       expect(mail.from).to eq(["bryan@bikeindex.org"])
       expect(mail.body.encoded).to match recovered_description
     end
