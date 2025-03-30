@@ -91,7 +91,7 @@ class GeocodeHelper
         result.formatted_address
       else
         result.address
-      end.gsub(" ,", ",") # something is broken and causes bad spacing from maxmind - fix it here
+      end&.gsub(" ,", ",") # something is broken and causes bad spacing from maxmind - fix it here
       {
         city: result.city,
         latitude: result.latitude,

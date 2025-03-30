@@ -16,7 +16,7 @@ module BikeSearchable
     def searchable_interpreted_params(query_params, ip: nil)
       # Include the passed location and distance (if they are set)
       # they will be overridden in stolenness if searching by proximity
-      params = query_params.slice(:location, :distance).select { |_, value| value }
+      params = {location: query_params[:location], distance: query_params[:distance]}.select { |_, value| value }
 
       if query_params[:serial].present?
         params[:serial] = SerialNormalizer.normalized_and_corrected(query_params[:serial])
