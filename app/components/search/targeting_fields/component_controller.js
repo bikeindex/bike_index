@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='search--targeting-fields--component'
 export default class extends Controller {
-  static targets = ['distance', 'location', 'nonCount', 'stolenCount', 'proximityCount']
+  static targets = ['distance', 'location', 'fieldResetsCount', 'nonCount', 'stolenCount', 'proximityCount']
   static values = { apiCountUrl: String, interpretedParams: Object }
 
   connect () {
@@ -28,7 +28,8 @@ export default class extends Controller {
     } else {
       location = localStorage.getItem('location')
       // Make location 'you' if location is anywhere or blank, so user isn't stuck and unable to use location
-      if (!location || location.match(/anywhere/i)) {
+      if (this.ignoredLocation(location)) {
+        console.log("ignored location")
         location = 'you'
       }
       // Then set the location from whatever we got
@@ -37,6 +38,12 @@ export default class extends Controller {
 
     // Then set up the counts
     this.setStolennessCounts(Object.assign({}, interpretedParams, { location }))
+  }
+
+  ignoredLocation (location) {
+    if (!location) { return true };
+
+    return (location.match(/anywhere/i) || location.match(/you/i))
   }
 
   // TODO: Should this just be getting the values from the form?
@@ -53,10 +60,12 @@ export default class extends Controller {
     })
       .then(response => response.json())
       .then(data => { this.insertTabCounts(data) })
+
+    // TODO: connect to targets via fieldResetsCount to reset counts if they change value
   }
 
   insertTabCounts (counts) {
-    console.log(counts)
+    // console.log(counts)
     for (const stolenness of Object.keys(counts)) {
       this[`${stolenness}CountTarget`].textContent = this.displayedCountNumber(counts[stolenness])
     }
@@ -75,8 +84,11 @@ export default class extends Controller {
     return `(${number})`
   }
 
+
   doNotFetchCounts (interpretedParams) {
+
     console.log(interpretedParams)
+    // if (interpretedParams.query)
     return false
   }
 }

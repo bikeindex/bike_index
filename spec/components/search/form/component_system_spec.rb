@@ -9,8 +9,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       distance: ["100"],
       location: [""],
       "query_items[]": [],
-      stolenness: ["stolen", "stolen"],
-      # stolenness: "stolen", # TODO: above should be this
+      stolenness: "stolen", # TODO: above should be this
       serial: [""]
     }
   end
@@ -46,15 +45,13 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       expect(page).to have_css(".select2-selection__rendered", text: "Black")
 
-      # TODO: Once using production, actually test the values are correct
+      # NOTE: Since this uses production data, values are consistent
       expect(find("#query_items", visible: false).value).to eq(["c_1"])
-      # new_values = find("#query_items", visible: false).value
-      # expect(new_values.count).to eq 1
-      # expect(new_values.first).to match("c_")
     end
 
     it "submits when enter is pressed twice" do
       visit(preview_path)
+
 
       expect(find("#query_items", visible: false).value).to be_blank
       find(".select2-container").click
@@ -67,17 +64,35 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       page.send_keys :return
 
-      # TODO: Once using production, actually test the values are correct
+      # NOTE: Since this uses production data, values are consistent
       expect(find("#query_items", visible: false).value).to eq(["c_5"])
 
       page.send_keys(:return)
       expect(page).to have_current_path(/\?/, wait: 5)
 
-      target_params = default_params.merge("query_items[]": ["c_5"], query: [""])
+      target_params = {
+        distance: ["251"],
+        location: ["Chicago, IL"],
+        "query_items[]": ["c_5"],
+        query: [""],
+        stolenness: "stolen",
+        serial: [""]
+      }
       expect(page_query_params(current_url)).to match_hash_indifferently(target_params)
     end
 
     it "scrolls through paginated options" do
+      visit(preview_path)
+
+      expect(find("#query_items", visible: false).value).to be_blank
+      find(".select2-container").click
+
+      expect(page).to have_content("Bikes that are Black", wait: 5)
+      # Scroll down
+      # verify it loads more
+      # Do it twice
+      fail
+
     end
   end
 end
