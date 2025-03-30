@@ -8,7 +8,8 @@ module Search::Form
 
     def chicago_tall_bike
       interpreted_params = BikeSearchable.searchable_interpreted_params({
-        stolenness: "proximity", location: "Chicago, IL", query_items: ["v_9"]})
+        stolenness: "proximity", location: "Chicago, IL", query_items: ["v_9"]
+      })
 
       render(Search::Form::Component.new(**default_options(interpreted_params)))
     end

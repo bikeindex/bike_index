@@ -41,7 +41,7 @@ export default class extends Controller {
 
   // TODO: Should this just be getting the values from the form?
   setStolennessCounts (interpretedParams) {
-    if (this.doNotFetchCounts(interpretedParams)) return;
+    if (this.doNotFetchCounts(interpretedParams)) return
 
     const searchParams = new URLSearchParams(interpretedParams)
 

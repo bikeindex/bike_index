@@ -3,5 +3,5 @@ en:
   components:
     search:
       everything_combobox:
-        search_descriptions: Search descriptions
         query_items_description: Search descriptions combobox
+        search_descriptions: Search descriptions
