@@ -91,12 +91,13 @@ class GeocodeHelper
         result.formatted_address
       else
         result.address
-      end&.gsub(" ,", ",") # something is broken and causes bad spacing from maxmind - fix it here
+      end
+
       {
         city: result.city,
         latitude: result.latitude,
         longitude: result.longitude,
-        formatted_address: formatted_address,
+        formatted_address: formatted_address&.gsub(" ,", ","), # something is broken and causes bad spacing from maxmind - fix it here
         state_id: State.friendly_find(result.state_code)&.id, # TODO: Use region_code instead
         country_id: Country.friendly_find(result.country_code)&.id,
         neighborhood: result.respond_to?(:neighborhood) ? result.neighborhood : nil,
