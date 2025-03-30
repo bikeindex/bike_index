@@ -29,7 +29,6 @@ chdir APP_ROOT do
     # system!("bundle exec htmlbeautifier --keep-blank-lines 1 --lint-only #{html_files}")
   else
     system!("bundle exec standardrb --fix")
-    # pp html_files
     system!("bundle exec htmlbeautifier --keep-blank-lines 1 #{html_files}")
     system!("npm run lint")
   end
