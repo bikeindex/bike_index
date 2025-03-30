@@ -23,7 +23,8 @@ class CycleType
     "personal-mobility": 18,
     "non-e-scooter": 19,
     "non-e-skateboard": 20,
-    "e-motorcycle": 21
+    "e-motorcycle": 21,
+    elliptical: 22
   }.freeze
 
   NAMES = {
@@ -36,7 +37,7 @@ class CycleType
     trailer: "Bike Trailer",
     wheelchair: "Wheelchair",
     cargo: "Cargo Bike (front storage)",
-    "tall-bike": "Tall Bike",
+    "tall-bike": "Tall Bike (multiple frames fused together)",
     "penny-farthing": "Penny Farthing",
     "cargo-rear": "Cargo Bike Rear (e.g. longtail)",
     "cargo-trike": "Cargo Tricycle (front storage)",
@@ -47,7 +48,8 @@ class CycleType
     "personal-mobility": "e-Skateboard (e-Unicycle, Personal mobility device, etc)",
     "non-e-scooter": "Scooter (not electric)",
     "non-e-skateboard": "Skateboard (not electric)",
-    "e-motorcycle": "e-Motorcycle/e-Dirtbike (no pedals)"
+    "e-motorcycle": "e-Motorcycle/e-Dirtbike (no pedals)",
+    elliptical: "Elliptical bike"
   }.freeze
 
   MODEST_PRIORITY = %i[personal-mobility recumbent tandem tricycle].freeze
