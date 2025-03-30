@@ -860,6 +860,7 @@ nb:
         wheelchair: Rullestol
         e_motorcycle: e-motorsykkel (eller e-Dirtbike)
         traditional_bike: Tradisjonell sykkel (2 hjul, 1 sete, pedal)
+        elliptical: Elliptisk sykkel
       frame_material:
         aluminum: Aluminium
         composite: Karbon eller kompositt

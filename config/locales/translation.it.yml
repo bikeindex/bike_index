@@ -854,6 +854,7 @@ it:
         tricycle: Triciclo
         unicycle: Monociclo
         wheelchair: Sedia a rotelle
+        elliptical:
       frame_material:
         aluminum: Alluminio
         composite: Carbonio o composito
