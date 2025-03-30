@@ -19,11 +19,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     CGI.parse(uri.query || "")
   end
 
-  # TODO:
-  # - system specs for submitting
-  #   - updates the URL without
-  #   - submits query without JS
-
   describe "EverythingCombobox" do
     # NOTE: these tests are specific to Select2, unfortuanately
     # It requires hacks to target specific selectors because Select2 doesn't use accessible elements
@@ -67,8 +62,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       expect(find("#query_items", visible: false).value).to eq(["c_5"])
 
       # Enter location info
-      find('#distance').set('251')
-      find('#location').set('Portland, OR')
+      find("#distance").set("251")
+      find("#location").set("Portland, OR")
 
       page.send_keys(:return)
       expect(page).to have_current_path(/\?/, wait: 5)
@@ -78,7 +73,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         location: ["Portland, OR"],
         "query_items[]": ["c_5"],
         query: [""],
-        stolenness: "stolen",
+        button: [""],
+        stolenness: ["stolen"],
         serial: [""]
       }
       expect(page_query_params(current_url)).to match_hash_indifferently(target_params)
@@ -91,9 +87,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       find(".select2-container").click
 
       expect(page).to have_content("Bikes that are Black", wait: 5)
-      # Scroll down
-      # verify it loads more
-      # Do it twice
+      # Scroll down, verify it loads more
       page.execute_script(<<-JS)
         const container = document.querySelector('.select2-results__options');
         const interval = setInterval(() => {
@@ -104,8 +98,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
           }
         }, 100);
       JS
-      fail
-
     end
   end
 end

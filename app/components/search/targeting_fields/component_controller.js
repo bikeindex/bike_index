@@ -14,7 +14,7 @@ export default class extends Controller {
     this.setSearchProximity(interpretedParams)
   }
 
-  updateLocationVisibility() {
+  updateLocationVisibility () {
     const selectedValue = this.element.querySelector('input[name="stolenness"]:checked')?.value
     if (selectedValue === 'proximity') {
       this.uncollapseElement(this.locationWrapTarget)
@@ -26,7 +26,7 @@ export default class extends Controller {
   // TODO: generalizable collapse component,
   // add will-change: height;
   // form fields padding is weird
-  uncollapseElement(element) {
+  uncollapseElement (element) {
     // Remove height constraints
     element.classList.remove('tw:h-0', 'tw:overflow-hidden', 'tw:collapse')
 
@@ -42,11 +42,9 @@ export default class extends Controller {
     }, 300) // Match the duration with the CSS transition duration
   }
 
-  collapseElement(element) {
+  collapseElement (element) {
     // First set an explicit height to enable the transition
     element.style.height = element.scrollHeight + 'px'
-    // Force a reflow to ensure the browser registers the set height
-    element.offsetHeight
     // Add classes that will collapse it
     element.classList.add('tw:overflow-hidden')
 
@@ -129,7 +127,6 @@ export default class extends Controller {
     }
     return `(${number})`
   }
-
 
   doNotFetchCounts (interpretedParams) {
     // if (this.ignoredLocation(interpretedParams.location)
