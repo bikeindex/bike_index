@@ -24,6 +24,6 @@
       <%= render(Alert::Component.new(text: translation(".doesnt_look_like_serial"), kind: :warning, margin_classes: "tw:my-2")) %>
     <% end %>
 
-    <%= render(Search::TargetingFields::Component.new(@interpreted_params)) %>
+    <%= render(Search::RegistrationFields::Component.new(@interpreted_params)) %>
   <% end %>
 </div>

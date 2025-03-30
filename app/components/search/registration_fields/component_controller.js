@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global localStorage  */
 
-// Connects to data-controller='search--targeting-fields--component'
+// Connects to data-controller='search--registration-fields--component'
 export default class extends Controller {
   static targets = ['distance', 'location', 'locationWrap', 'fieldResetsCounts', 'nonCount', 'stolenCount', 'proximityCount']
   static values = { apiCountUrl: String, interpretedParams: Object }

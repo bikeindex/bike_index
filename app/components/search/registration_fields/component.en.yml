@@ -2,7 +2,7 @@
 en:
   components:
     search:
-      targeting_fields:
+      registration_fields:
         anywhere: Anywhere
         miles_of: miles of
         search_distance: Search distance

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Search::TargetingFields
+module Search::RegistrationFields
   class Component < ApplicationComponent
     DEFAULT_DISTANCE = 100
     MAX_DISTANCE = 2_000 # IDK, seems reasonable
