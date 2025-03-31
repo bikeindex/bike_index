@@ -17,6 +17,16 @@ RSpec.describe "SearchController", type: :request do
     expect(assigns(:bikes)).to be_blank
   end
 
+  describe "registrations" do
+    it "renders" do
+      get base_url
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:index)
+      expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
+      expect(assigns(:bikes).pluck(:id)).to match_array([stolen_bike_2.id, impounded_bike.id, stolen_bike.id])
+    end
+  end
+
   # context "geocoder_stubbed_bounding_box" do
   #   let(:ip_address) { "23.115.69.69" }
   #   let(:target_location) { default_location[:formatted_address] }

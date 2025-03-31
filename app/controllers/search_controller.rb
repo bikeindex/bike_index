@@ -13,6 +13,11 @@ class SearchController < Bikes::BaseController
   def registrations
     @page = permitted_page(params[:page])
     @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
+
+    respond_to do |format|
+      format.html # Renders the full page for non-Turbo requests
+      format.turbo_stream # Renders search/index.turbo_stream.erb by convention
+    end
   end
 
   private
