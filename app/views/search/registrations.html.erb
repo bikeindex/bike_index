@@ -5,8 +5,7 @@
 
 <div class="container tw:mt-6">
   <%= turbo_frame_tag "search_results_frame" do %>
-    <div class="results-placeholder">
-      <p>Enter a search term above to see results here.</p>
-    </div>
-  <% end %>
-</div>
+
+    <%= render partial: "/search/results" %>
+  </div>
+<% end %>

@@ -1,5 +1,5 @@
 <div data-controller="search--form--component">
-  <%= form_with url: @target_search_path, builder: BikeIndexFormBuilder, method: :get, id: "Search_Form" do |f| %>
+  <%= form_with url: @target_search_path, builder: BikeIndexFormBuilder, method: :get, id: "Search_Form", data: { turbo_frame: "search_results_frame"},  turbo: true do |f| %>
     <%= hidden_field_tag :search_no_js, true %>
 
     <div class="tw:flex tw:flex-nowrap tw:gap-4">

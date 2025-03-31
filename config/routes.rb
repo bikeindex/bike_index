@@ -155,7 +155,9 @@ Rails.application.routes.draw do
     collection { get :embed }
   end
 
-  resources :search, only: [:index]
+  resources :search, only: [:index] do
+    collection { get :registrations }
+  end
   resources :bikes, except: [:edit] do
     collection { get :scanned }
     member do
