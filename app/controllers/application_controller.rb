@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include ControllerHelpers
+  include Turbo::Redirection
   include Pagy::Backend
   protect_from_forgery
 
