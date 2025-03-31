@@ -53,7 +53,7 @@ module TurboMatchersHelper
 
   def turbo_visit_location_and_action
     if response.body =~ TURBO_VISIT
-      [ $1, $2 ]
+      [$1, $2]
     end
   end
 
