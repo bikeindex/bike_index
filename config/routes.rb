@@ -151,16 +151,14 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
-  resources :registrations, only: [:new, :create] do
+  resources :registrations, only: %i[new create] do
     collection { get :embed }
   end
 
-  resources :search, only: [:index] do
-    collection do
-      get :registrations
-      get :registrations_results
-    end
+  namespace :search do
+    resources :registrations, only: %i[index]
   end
+
   resources :bikes, except: [:edit] do
     collection { get :scanned }
     member do

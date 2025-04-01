@@ -1,6 +1,8 @@
 <div data-controller="search--form--component">
-  <%= form_with url: @target_search_path, builder: BikeIndexFormBuilder, method: :get, id: "Search_Form", data: { turbo_frame: "search_results_frame", turbo: true} do |f| %>
-  <%# turbo_action: "advance" %>
+  <%= form_with url: @target_search_path, builder: BikeIndexFormBuilder, method: :get, id: "Search_Form", data: { turbo_frame: :search_registrations_results_frame, turbo_action: "advance", turbo: true} do |f| %>
+
+    <%# search_no_js is removed in the search--form--component stimulus controller.
+        If it's present, the results render synchronously (rather than as a turbo frame) %>
     <%= hidden_field_tag :search_no_js, true %>
 
     <div class="tw:flex tw:flex-nowrap tw:gap-4">
@@ -9,7 +11,7 @@
 
         <% if render_serial_field? %>
           <%= label_tag :serial, translation(".search_for_serial_number"), class: "twlabel tw:sr-only" %>
-          <%= text_field_tag :serial, nil, placeholder: translation(".search_for_serial_number"), class: "twinput tw:mt-2" %>
+          <%= text_field_tag :serial, serial_value, placeholder: translation(".search_for_serial_number"), class: "twinput tw:mt-2" %>
         <% end %>
       </div>
       <div class="tw:w-20">

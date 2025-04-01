@@ -14,6 +14,10 @@ module Search::Form
       @interpreted_params[:query] # might be more complicated someday
     end
 
+    def serial_value
+      @interpreted_params[:raw_serial]
+    end
+
     def render_serial_field?
       true # false if bike versions, or marketplace
     end

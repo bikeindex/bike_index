@@ -1,4 +1,4 @@
-class SearchController < Bikes::BaseController
+class Search::RegistrationsController < Bikes::BaseController
   MAX_INDEX_PAGE = 100
   before_action :render_ad
   before_action :enable_importmaps
@@ -8,28 +8,19 @@ class SearchController < Bikes::BaseController
   around_action :set_reading_role
 
   def index
-    # redirect_to registrations_search_index_path
     @page = permitted_page(params[:page])
-    @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
+
+    @render_results = InputNormalizer.boolean(params[:search_no_js]) || request.format.turbo_stream?
+
+    if @render_results
+      @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
+    end
 
     respond_to do |format|
       format.html
       format.turbo_stream
     end
   end
-
-  def registrations
-    @page = permitted_page(params[:page])
-    @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
-
-    @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_frame_request?
-
-    respond_to do |format|
-      format.html
-      format.turbo_stream
-    end
-  end
-
 
   private
 
