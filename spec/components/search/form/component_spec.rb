@@ -8,7 +8,8 @@ RSpec.describe Search::Form::Component, type: :component do
   let(:interpreted_params) { BikeSearchable.searchable_interpreted_params({}) }
   let(:options) do
     {
-      target_search_path: Rails.application.routes.url_helpers.search_index_path,
+      target_search_path: Rails.application.routes.url_helpers.search_registrations_path,
+      target_frame: :search_registrations_results_frame,
       interpreted_params:,
       selected_query_items_options: BikeSearchable.selected_query_items_options(interpreted_params)
     }

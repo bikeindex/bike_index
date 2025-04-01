@@ -25,6 +25,7 @@ module Search::Form
       interpreted_params ||= BikeSearchable.searchable_interpreted_params({})
       {
         target_search_path:,
+        target_frame: :search_registrations_results_frame,
         interpreted_params:,
         selected_query_items_options: BikeSearchable.selected_query_items_options(interpreted_params)
       }

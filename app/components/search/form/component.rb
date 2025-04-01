@@ -2,8 +2,9 @@
 
 module Search::Form
   class Component < ApplicationComponent
-    def initialize(target_search_path:, interpreted_params:, selected_query_items_options:)
+    def initialize(target_search_path:, target_frame:, interpreted_params:, selected_query_items_options:)
       @target_search_path = target_search_path
+      @target_frame = target_frame
       @interpreted_params = interpreted_params
       @selected_query_items_options = selected_query_items_options
     end

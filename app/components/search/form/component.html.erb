@@ -1,5 +1,5 @@
 <div data-controller="search--form--component">
-  <%= form_with url: @target_search_path, builder: BikeIndexFormBuilder, method: :get, id: "Search_Form", data: { turbo_frame: :search_registrations_results_frame, turbo_action: "advance", turbo: true} do |f| %>
+  <%= form_with url: @target_search_path, builder: BikeIndexFormBuilder, method: :get, id: "Search_Form", data: { turbo_frame: @target_frame, turbo_action: "advance", turbo: true} do |f| %>
 
     <%# search_no_js is removed in the search--form--component stimulus controller.
         If it's present, the results render synchronously (rather than as a turbo frame) %>
