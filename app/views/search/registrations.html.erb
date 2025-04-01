@@ -4,11 +4,11 @@
 </div>
 
 <div class="container tw:mt-6">
-  <%= turbo_frame_tag "search_results_frame" do %>
-    <% if @render_results %>
-      <%= render partial: "/search/results" %>
-    <% else %>
-      <%= render LoadingSpinner::Component.new(text: t(".loading_results")) %>
-    <% end %>
+  <%= turbo_frame_tag :search_results_frame, src: registrations_search_index_path, loading: :lazy do %>
+    <%= render LoadingSpinner::Component.new(text: t(".loading_results")) %>
+    <%# if @render_results %>
+      <%#= render partial: "/search/results" %>
+    <%# else %>
+    <%#= render LoadingSpinner::Component.new(text: t(".loading_results")) %>
   <% end %>
 </div>

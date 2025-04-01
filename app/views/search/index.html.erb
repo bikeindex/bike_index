@@ -3,7 +3,7 @@
   <%= render Search::Form::Component.new(target_search_path: registrations_search_index_path, interpreted_params: @interpreted_params, selected_query_items_options: @selected_query_items_options) %>
 </div>
 
-<div class="container tw:mt-6">
+<div class="container tw:mt-6" id="Search_Results">
   <%= turbo_frame_tag "search_results_frame" do %>
     <div class="results-placeholder">
       <p>Enter a search term above to see results here.</p>
