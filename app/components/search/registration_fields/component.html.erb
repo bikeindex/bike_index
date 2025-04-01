@@ -4,7 +4,7 @@
   data-search--registration-fields--component-interpreted-params-value='<%= raw(@interpreted_params.to_json) %>'>
 
   <div
-    class="tw:mt-2 tw:flex tw:flex-nowrap tw:w-min tw:ml-auto tw:transition-[height] tw:duration-300 <%= location_wrap_hidden? ? 'tw:collapse tw:h-0' : '' %>"
+    class="tw:mt-2 tw:flex tw:flex-nowrap tw:w-min tw:ml-auto <%= location_wrap_hidden? ? 'tw:hidden' : '' %>"
     data-search--registration-fields--component-target="locationWrap">
 
     <span class="tw:block tw:py-1.5 tw:mr-2"><%= translation(".within") %></span>

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "SearchController", type: :request do
   include_context :request_spec_logged_in_as_user_if_present
-  let(:base_url) { "/bikes" }
+  let(:search_url) { "/search" }
   let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
   let!(:stolen_bike) { FactoryBot.create(:stolen_bike_in_nyc) }
   let!(:impounded_bike) { FactoryBot.create(:impounded_bike, :in_nyc) }
@@ -10,7 +10,7 @@ RSpec.describe "SearchController", type: :request do
   let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles, cycle_type: "e-scooter") }
 
   it "renders" do
-    get base_url
+    get search_url
     expect(response.code).to eq("200")
     expect(response).to render_template(:index)
     expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
@@ -18,12 +18,27 @@ RSpec.describe "SearchController", type: :request do
   end
 
   describe "registrations" do
+    let(:search_url) { "/search/registrations" }
     it "renders" do
-      get base_url
+      get search_url
       expect(response.code).to eq("200")
-      expect(response).to render_template(:index)
+      expect(response).to render_template(:registrations)
       expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
       expect(assigns(:bikes).pluck(:id)).to match_array([stolen_bike_2.id, impounded_bike.id, stolen_bike.id])
+    end
+
+    context 'turbo_stream' do
+      it "renders" do
+        get search_url, as: :turbo_stream
+        expect(response.media_type).to eq Mime[:turbo_stream].to_s
+        expect(response.content_type).to include('text/vnd.turbo-stream.html')
+        expect(response).to have_http_status(:success)
+
+        expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_results_frame\">")
+        expect(response).to render_template(:registrations)
+        expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
+        expect(assigns(:bikes).pluck(:id)).to match_array([stolen_bike_2.id, impounded_bike.id, stolen_bike.id])
+      end
     end
   end
 

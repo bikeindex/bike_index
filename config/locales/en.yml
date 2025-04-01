@@ -4368,6 +4368,11 @@ en:
       your_current_account_will_be_a_member_html: >-
         Your current account (<strong>%{user_email}</strong>) will be a member of
         the organization you create.
+  search:
+    results:
+      no_bikes_matched:  No bikes exactly matched your search
+    registrations:
+      loading_results: Loading results...
   organized:
     ambassador_dashboards:
       getting_started:

@@ -156,7 +156,10 @@ Rails.application.routes.draw do
   end
 
   resources :search, only: [:index] do
-    collection { get :registrations }
+    collection do
+      get :registrations
+      get :registrations_results
+    end
   end
   resources :bikes, except: [:edit] do
     collection { get :scanned }

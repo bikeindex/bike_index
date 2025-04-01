@@ -10,7 +10,7 @@ export default class extends Controller {
   connect () {
     const interpretedParams = this.interpretedParamsValue
 
-    this.updateLocationVisibility()
+    // this.updateLocationVisibility()
     this.setSearchProximity(interpretedParams)
   }
 
@@ -24,37 +24,43 @@ export default class extends Controller {
   }
 
   // TODO: generalizable collapse component,
-  // add will-change: height;
-  // form fields padding is weird
-  uncollapseElement (element) {
-    // Remove height constraints
-    element.classList.remove('tw:h-0', 'tw:overflow-hidden', 'tw:collapse')
+  uncollapseElement (element, duration = 200) {
+    // Remove the hidden
+    element.classList.remove('tw:hidden')
 
-    // Get the natural height of the element
-    const height = element.scrollHeight
+    // First, ensure the hidden attributes are set
+    element.classList.add('tw:scale-y-0')
+    element.style.height = 0
 
-    // Set the element's height to its natural height to trigger transition
-    element.style.height = height + 'px'
+    // Always add transition classes (moving toward a more generalizable collapse method)
+    element.classList.add('tw:transition-all', `tw:duration-${duration}`)
 
-    // After transition is complete, remove explicit height to allow for responsive changes
+    // Remove things that transition to hide the element
+    element.classList.remove('tw:scale-y-0')
+
+    // Set the element's height to its natural height to shrink it
+    element.style.height = `${element.scrollHeight}px`
+
+    // After transition is complete, remove explicit height (clean up afterward)
     setTimeout(() => {
       element.style.height = ''
-    }, 300) // Match the duration with the CSS transition duration
+    }, duration)
   }
 
-  collapseElement (element) {
-    // First set an explicit height to enable the transition
+  collapseElement (element, duration = 200) {
+    // Always add transition classes (moving toward a more generalizable collapse method)
+    element.classList.add('tw:transition-all', `tw:duration-${duration}`)
+    // Add the tailwind class to shrink
+    element.classList.add('tw:scale-y-0')
+    // Set an explicit height to enable the transition
     element.style.height = element.scrollHeight + 'px'
-    // Add classes that will collapse it
-    element.classList.add('tw:overflow-hidden')
-
     // Transition to height 0
     element.style.height = '0px'
 
-    // After transition completes, add 'invisible' class for accessibility
+    // After transition completes, add display: none to remove element from the flow
     setTimeout(() => {
-      element.classList.add('tw:h-0', 'tw:collapse')
-    }, 300) // Match the duration with the CSS transition duration
+      element.classList.add('tw:hidden')
+    }, duration)
   }
 
   setSearchProximity (interpretedParams) {
