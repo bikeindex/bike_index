@@ -18,18 +18,20 @@
   .twbtn, .twbtn-blue, .twbtn-green {
     @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3
     tw:cursor-pointer tw:active:outline tw:focus-visible:outline-offset-2
+    tw:disabled:cursor-not-allowed tw:disabled:opacity-85
     tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2
     tw:active:outline-none tw:active:opacity-95;
   }
 
   .twbtn-green {
     @apply tw:text-white tw:bg-green-600
-      tw:hover:bg-green-500 tw:focus-visible:outline-green-600;
+      tw:hover:bg-green-500 tw:focus-visible:outline-green-600 tw:disabled:hover:bg-green-600;
   }
 
   .twbtn-blue {
     @apply tw:text-white tw:bg-blue-600
-      tw:hover:bg-blue-500 tw:focus-visible:outline-blue-600;
+      tw:hover:bg-blue-500 tw:focus-visible:outline-blue-600
+      tw:disabled:hover:bg-blue-600;
   }
 
   .twinput {

@@ -1,7 +1,6 @@
 <div
   data-controller="search--registration-fields--component"
-  data-search--registration-fields--component-api-count-url-value="<%= API_COUNT_URL %>"
-  data-search--registration-fields--component-interpreted-params-value='<%= raw(@interpreted_params.to_json) %>'>
+  data-search--registration-fields--component-api-count-url-value="<%= API_COUNT_URL %>">
 
   <div
     class="tw:mt-2 tw:flex tw:flex-nowrap tw:w-min tw:ml-auto <%= location_wrap_hidden? ? 'tw:hidden' : '' %>"
@@ -11,7 +10,7 @@
     <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
     <%=
       number_field_tag :distance, @distance,
-      placeholder: "100", min: 1, class: "twinput tw:mr-2 tw:min-w-20",
+      placeholder: "100", min: 1, class: "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
       "data-search--registration-fields--component-target" => "distance"
     %>
 
@@ -19,8 +18,8 @@
     <%= label_tag :location, translation(".search_location"), class: "twlabel tw:sr-only" %>
     <%=
       text_field_tag :location, @location,
-      placeholder: translation(".anywhere"), class: "twinput tw:min-w-50",
-      "data-search--registration-fields--component-target" => "location fieldResetsCounts"
+      placeholder: translation(".anywhere"), class: "twinput tw:min-w-50 fieldResetsCounts",
+      "data-search--registration-fields--component-target" => "location"
     %>
   </div>
 

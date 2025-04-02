@@ -1,69 +1,50 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage  */
 
 // Connects to data-controller='search--registration-fields--component'
 export default class extends Controller {
-  static targets = ['distance', 'location', 'locationWrap', 'fieldResetsCounts', 'nonCount', 'stolenCount', 'proximityCount']
-  static values = { apiCountUrl: String, interpretedParams: Object }
+  static targets = ['distance', 'location', 'locationWrap', 'nonCount', 'stolenCount', 'proximityCount']
+  static values = { apiCountUrl: String }
 
   connect () {
-    const interpretedParams = this.interpretedParamsValue
+    this.setSearchProximity()
+    this.updateCountsToSubmit()
+  }
 
-    // this.updateLocationVisibility()
-    this.setSearchProximity(interpretedParams)
+  disconnect () {
+    this.resetStolennessCounts() // also removes the bindings
+  }
+
+  get form () {
+    return (this.element.closest('form'))
+  }
+
+  // Can we use get here?
+  get searchQuery () {
+    const formData = new FormData(this.form)
+    return new URLSearchParams(formData).toString()
+  }
+
+  updateCountsToSubmit () {
+    if (!this.form) return
+
+    this.form.addEventListener('turbo:submit-end', this.setStolennessCounts.bind(this))
   }
 
   updateLocationVisibility () {
     const selectedValue = this.element.querySelector('input[name="stolenness"]:checked')?.value
+
     if (selectedValue === 'proximity') {
-      this.uncollapseElement(this.locationWrapTarget)
+      collapse('show', this.locationWrapTarget)
     } else {
-      this.collapseElement(this.locationWrapTarget)
+      collapse('hide', this.locationWrapTarget)
     }
   }
 
-  // TODO: generalizable collapse component,
-  uncollapseElement (element, duration = 200) {
-    // Remove the hidden
-    element.classList.remove('tw:hidden')
-
-    // First, ensure the hidden attributes are set
-    element.classList.add('tw:scale-y-0')
-    element.style.height = 0
-
-    // Always add transition classes (moving toward a more generalizable collapse method)
-    element.classList.add('tw:transition-all', `tw:duration-${duration}`)
-
-    // Remove things that transition to hide the element
-    element.classList.remove('tw:scale-y-0')
-
-    // Set the element's height to its natural height to shrink it
-    element.style.height = `${element.scrollHeight}px`
-
-    // After transition is complete, remove explicit height (clean up afterward)
-    setTimeout(() => {
-      element.style.height = ''
-    }, duration)
-  }
-
-  collapseElement (element, duration = 200) {
-    // Always add transition classes (moving toward a more generalizable collapse method)
-    element.classList.add('tw:transition-all', `tw:duration-${duration}`)
-    // Add the tailwind class to shrink
-    element.classList.add('tw:scale-y-0')
-    // Set an explicit height to enable the transition
-    element.style.height = element.scrollHeight + 'px'
-    // Transition to height 0
-    element.style.height = '0px'
-
-    // After transition completes, add display: none to remove element from the flow
-    setTimeout(() => {
-      element.classList.add('tw:hidden')
-    }, duration)
-  }
-
-  setSearchProximity (interpretedParams) {
+  // TODO: make this location be controller specific
+  setSearchProximity () {
     let location = this.locationTarget.value
     // strip the location text
     location = location ? location.replace(/^\s*|\s*$/g, '') : ''
@@ -84,9 +65,6 @@ export default class extends Controller {
       // Then set the location from whatever we got
       this.locationTarget.value = location
     }
-
-    // Then set up the counts
-    this.setStolennessCounts(Object.assign({}, interpretedParams, { location }))
   }
 
   ignoredLocation (location) {
@@ -96,26 +74,49 @@ export default class extends Controller {
   }
 
   // TODO: Should this just be getting the values from the form?
-  setStolennessCounts (interpretedParams) {
-    if (this.doNotFetchCounts(interpretedParams)) return
+  setStolennessCounts () {
+    const queryString = this.searchQuery
+    if (this.doNotFetchCounts(queryString)) {
+      return this.resetStolennessCounts()
+    }
 
-    const searchParams = new URLSearchParams(interpretedParams)
-
-    fetch(`${this.apiCountUrlValue}?${searchParams.toString()}`, {
+    fetch(`${this.apiCountUrlValue}?${queryString}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers: { 'Content-Type': 'application/json' }
     })
       .then(response => response.json())
       .then(data => { this.insertTabCounts(data) })
 
-    // TODO: connect to targets via fieldResetsCount to reset counts if they change value
-    // console.log(this.fieldResetsCountsTargets)
+    this.setResetFieldListeners()
+  }
+
+  setResetFieldListeners () {
+    this.resetFields = this.form.querySelectorAll('.fieldResetsCounts')
+
+    this.resetFields.forEach(field => {
+      // Save the bound function reference so we can remove it later
+      field._boundResetFunction = this.resetStolennessCounts.bind(this)
+      field.addEventListener('change', field._boundResetFunction)
+    })
+  }
+
+  resetStolennessCounts () {
+    console.log('resetting counts')
+    // NOTE: countKeys will need to be updated if response changes
+    const countKeys = ['non', 'stolen', 'proximity']
+    for (const stolenness of countKeys) { this[`${stolenness}CountTarget`].textContent = '' }
+
+    if (this.resetFields) {
+      this.resetFields.forEach(field => {
+        if (field._boundResetFunction) {
+          field.removeEventListener('change', field._boundResetFunction)
+          delete field._boundResetFunction
+        }
+      })
+    }
   }
 
   insertTabCounts (counts) {
-    // console.log(counts)
     for (const stolenness of Object.keys(counts)) {
       this[`${stolenness}CountTarget`].textContent = this.displayedCountNumber(counts[stolenness])
     }
@@ -135,7 +136,7 @@ export default class extends Controller {
   }
 
   // TODO: Make this no fetch counts for times where there are no query items
-  doNotFetchCounts (interpretedParams) {
+  doNotFetchCounts (searchQuery) {
     // if (this.ignoredLocation(interpretedParams.location)
     // console.log(interpretedParams)
     // if (interpretedParams.query)

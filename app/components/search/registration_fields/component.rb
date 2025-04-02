@@ -6,18 +6,17 @@ module Search::RegistrationFields
     MAX_DISTANCE = 2_000 # IDK, seems reasonable
     API_COUNT_URL = "/api/v3/search/count"
 
-    def initialize(interpreted_params)
-      @distance = if interpreted_params[:distance].present?
-        interpreted_params[:distance].to_i
+    # TODO: This only needs location and stolenness now! Drop interpreted params
+    def initialize(stolenness:, location:, distance: nil)
+      @distance = if distance.present?
+        distance.to_i
       else
         DEFAULT_DISTANCE
       end
       @distance.clamp(1, MAX_DISTANCE)
 
-      @location = interpreted_params[:location]
-      @stolenness = interpreted_params[:stolenness]
-      @interpreted_params = interpreted_params # TODO Remove if possible
-      @interpreted_params_json = interpreted_params.to_json
+      @location = location
+      @stolenness = stolenness
     end
 
     private
