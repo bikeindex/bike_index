@@ -132,8 +132,7 @@ group :development do
   gem "guard-rspec", require: false
   gem "letter_opener"
   gem "rerun" # restart sidekiq processes in development on app change
-  # Locked to 1.4.1, see kirillplatonov/hotwire-livereload/issues/73 - mainly because it double re-renders lookbook
-  gem "hotwire-livereload", "~> 1.4.1" # livereload pages in development
+  gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
   gem "annotate_rb", github: "sethherr/annotate_rb", branch: "rename-annotate_rb"
 end
