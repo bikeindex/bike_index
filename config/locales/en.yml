@@ -4369,12 +4369,6 @@ en:
       your_current_account_will_be_a_member_html: >-
         Your current account (<strong>%{user_email}</strong>) will be a member of
         the organization you create.
-  search:
-    registrations:
-      index:
-        loading_results: Loading results...
-      results:
-        no_bikes_matched:  No bikes exactly matched your search
   organized:
     ambassador_dashboards:
       getting_started:
@@ -5031,6 +5025,12 @@ en:
         stolen
       vehicle_manufacturer: Vehicle manufacturer
       your: your
+  search:
+    registrations:
+      index:
+        loading_results: Loading results...
+      results:
+        no_bikes_matched: No bikes exactly matched your search
   sessions:
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with

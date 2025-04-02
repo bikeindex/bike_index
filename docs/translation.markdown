@@ -54,7 +54,7 @@ To aid translation, it's desirable to externalize strings in a form as close to
 semantically complete as possible.
 
 In particular, use coarse conditional branching in templates. Duplication of
-user-facing copy is desirable whenever its alernative is to break up a string
+user-facing copy is desirable whenever its alternative is to break up a string
 into units that, in isolation, might lose their context or encode an assumption
 about word order that doesn't hold in another language.
 
