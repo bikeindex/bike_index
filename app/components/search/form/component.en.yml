@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    search:
+      form:
+        doesnt_look_like_serial: >-
+          The serial you entered doesn't look like a serial number, so it isn't being
+          used to search.
+        search_for_serial_number: Search for serial number
+        submit: submit

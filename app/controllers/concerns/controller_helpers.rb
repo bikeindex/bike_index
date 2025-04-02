@@ -288,6 +288,10 @@ module ControllerHelpers
     redirect_to(new_session_path) && return
   end
 
+  def turbo_request?
+    request.format.turbo_stream? || turbo_frame_request?
+  end
+
   protected
 
   # passive_organization is the organization set for the user - which is persisted in session

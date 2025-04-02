@@ -4153,6 +4153,7 @@ nl:
     welcome_goodbye: Uitgelogd
     welcome_index: Bike Index - Fietsregistratie die werkt
     my_accounts_show: Jij op Bike Index
+    search_registrations_index: Zoekresultaten
   organized:
     ambassador_dashboards:
       getting_started:
@@ -5995,3 +5996,30 @@ nl:
       thank_you_for_supporting_bike_index: Bedankt voor het ondersteunen van Bike
         Index!
       xoxo: XOXO,
+  components:
+    search:
+      registration_fields:
+        within: binnen
+        anywhere: Overal
+        miles_of: mijl van
+        search_distance: Zoek afstand
+        search_location: Zoek locatie
+        stolenness_all: Alle
+        stolenness_non: Niet gemarkeerd als gestolen
+        stolenness_proximity: Gestolen in zoekgebied
+        stolenness_stolen: Overal gestolen
+      everything_combobox:
+        query_items_description: Zoekbeschrijvingen combobox
+        search_descriptions: Zoek beschrijvingen
+      form:
+        doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet
+          op een serienummer en wordt dus niet gebruikt om te zoeken.
+        search_for_serial_number: Zoek naar framenummer
+        submit: Voorleggen
+  search:
+    registrations:
+      index:
+        loading_results: Resultaten laden...
+      results:
+        no_bikes_matched: Er zijn geen serienummers die exact overeenkomen met uw
+          zoekopdracht

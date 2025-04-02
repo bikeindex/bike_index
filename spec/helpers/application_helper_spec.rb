@@ -176,6 +176,14 @@ RSpec.describe ApplicationHelper, type: :helper do
         end
       end
     end
+    describe "search registrations controller" do
+      let(:controller_namespace) { "search" }
+      before { allow(view).to receive(:controller_name) { "registrations" } }
+      it "returns nil" do
+        allow(view).to receive(:action_name) { "index" }
+        expect(helper.current_page_skeleton).to be_nil
+      end
+    end
     describe "info controller" do
       before { allow(view).to receive(:controller_name) { "info" } }
       %w[about protect_your_bike where serials image_resources resources dev_and_design].each do |action|
