@@ -7,7 +7,7 @@ module Search::RegistrationFields
     API_COUNT_URL = "/api/v3/search/count"
 
     # TODO: This only needs location and stolenness now! Drop interpreted params
-    def initialize(stolenness:, location:, distance: nil)
+    def initialize(stolenness:, location: nil, distance: nil)
       @distance = if distance.present?
         distance.to_i
       else
