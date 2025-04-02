@@ -5842,18 +5842,14 @@ nb:
         beskjed når vi har oppdateringer om medlemsfordelene og alt annet kult å dele.
       thank_you_for_supporting_bike_index: Takk for at du støtter Bike Index!
       xoxo: XOXO,
+  search:
+    registrations:
+      index:
+        loading_results: Laster inn resultater...
+      results:
+        no_bikes_matched: Ingen sykler samsvarte nøyaktig med søket ditt
   components:
     search:
-      registration_fields:
-        within: innenfor
-        anywhere: Hvor som helst
-        miles_of: miles av
-        search_distance: Søkeavstand
-        search_location: Søk plassering
-        stolenness_all: Alle
-        stolenness_non: Ikke merket som stjålet
-        stolenness_proximity: Stjålet i søkeområdet
-        stolenness_stolen: Stjålet hvor som helst
       everything_combobox:
         query_items_description: Søkebeskrivelser kombinasjonsboksen
         search_descriptions: Søk i beskrivelser
@@ -5862,9 +5858,13 @@ nb:
           så det brukes ikke til å søke.
         search_for_serial_number: Søk etter serienummer
         submit: sende inn
-  search:
-    registrations:
-      index:
-        loading_results: Laster inn resultater...
-      results:
-        no_bikes_matched: Ingen sykler samsvarte nøyaktig med søket ditt
+      registration_fields:
+        anywhere: Hvor som helst
+        miles_of: miles av
+        search_distance: Søkeavstand
+        search_location: Søk plassering
+        stolenness_all: Alle
+        stolenness_non: Ikke merket som stjålet
+        stolenness_proximity: Stjålet i søkeområdet
+        stolenness_stolen: Stjålet hvor som helst
+        within: innenfor
