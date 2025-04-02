@@ -4381,6 +4381,7 @@ nb:
     welcome_goodbye: Logget ut
     welcome_index: Bike Index - Sykkelregistrering som fungerer
     my_accounts_show: Du på Bike Index
+    search_registrations_index: Søkeresultater
   money:
     currencies:
       en: USD
@@ -5841,3 +5842,29 @@ nb:
         beskjed når vi har oppdateringer om medlemsfordelene og alt annet kult å dele.
       thank_you_for_supporting_bike_index: Takk for at du støtter Bike Index!
       xoxo: XOXO,
+  components:
+    search:
+      registration_fields:
+        within: innenfor
+        anywhere: Hvor som helst
+        miles_of: miles av
+        search_distance: Søkeavstand
+        search_location: Søk plassering
+        stolenness_all: Alle
+        stolenness_non: Ikke merket som stjålet
+        stolenness_proximity: Stjålet i søkeområdet
+        stolenness_stolen: Stjålet hvor som helst
+      everything_combobox:
+        query_items_description: Søkebeskrivelser kombinasjonsboksen
+        search_descriptions: Søk i beskrivelser
+      form:
+        doesnt_look_like_serial: Serienummeret du skrev inn ser ikke ut som et serienummer,
+          så det brukes ikke til å søke.
+        search_for_serial_number: Søk etter serienummer
+        submit: sende inn
+  search:
+    registrations:
+      index:
+        loading_results: Laster inn resultater...
+      results:
+        no_bikes_matched: Ingen sykler samsvarte nøyaktig med søket ditt
