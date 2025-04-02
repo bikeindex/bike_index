@@ -15486,6 +15486,22 @@ body.welcome-page .content:before {
     padding-right: 15px
 }
 
+.lock-type span {
+    display: block;
+    width: 100%;
+    clear: both;
+    text-align: left;
+    padding-left: 20px
+}
+
+.lock-type div {
+    width: 100%;
+    padding-right: 15px;
+    position: absolute;
+    top: 0;
+    left: 0
+}
+
 @media (min-width: 840px) {
     .lock-type-title {
         float: left;
