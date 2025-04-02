@@ -3896,7 +3896,6 @@ en:
       has_combination: Has combination
       has_key: Has key
       large_kryptonite_key: Large Kryptonite key
-      lock_type: Lock type
       other_lock_manufacturer: Other lock manufacturer
       pinhead_key: Pinhead key
       pinhead_locking_skewer_key: Pinhead locking skewer key
@@ -4155,7 +4154,7 @@ en:
       bike_sticker: Bike Sticker
       bikes: bikes
       combination: Combination
-      edit: Edit
+      edit: edit
       edit_bike: Edit Bike
       generally_connect_to_org: >-
         Some of your bikes are associated with %{org_name}, but this one is not. Generally,
