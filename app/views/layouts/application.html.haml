@@ -12,6 +12,7 @@
     - if @include_importmaps
       = stylesheet_link_tag 'tailwind', "data-turbo-track": "reload"
       = javascript_importmap_tags
+      = hotwire_livereload_tags if Rails.env.development?
     :javascript
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);

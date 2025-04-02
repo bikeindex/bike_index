@@ -352,10 +352,10 @@ GEM
     honeybadger (5.27.0)
       logger
       ostruct
-    hotwire-livereload (2.0.0)
-      actioncable (>= 7.0.0)
+    hotwire-livereload (1.4.1)
+      actioncable (>= 6.0.0)
       listen (>= 3.0.0)
-      railties (>= 7.0.0)
+      railties (>= 6.0.0)
     htmlbeautifier (1.4.3)
     htmlentities (4.3.4)
     http (4.4.1)
@@ -874,7 +874,7 @@ DEPENDENCIES
   guard-rspec
   haml
   honeybadger
-  hotwire-livereload
+  hotwire-livereload (~> 1.4.1)
   htmlbeautifier
   httparty
   i18n-country-translations

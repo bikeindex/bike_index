@@ -9,9 +9,7 @@ class Search::RegistrationsController < Bikes::BaseController
 
   def index
     @page = permitted_page(params[:page])
-
-    @render_results = InputNormalizer.boolean(params[:search_no_js]) || request.format.turbo_stream?
-
+    @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
     if @render_results
       @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
     end

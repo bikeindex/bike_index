@@ -7,6 +7,8 @@
   <%= turbo_frame_tag :search_registrations_results_frame do %>
     <% if @render_results %>
       <%= render partial: "results" %>
+    <% else %>
+      <span id="loadedWithoutResults" class="tw:hidden"></span>
     <% end %>
   <% end %>
 </div>
