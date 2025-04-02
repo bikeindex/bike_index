@@ -5996,18 +5996,15 @@ nl:
       thank_you_for_supporting_bike_index: Bedankt voor het ondersteunen van Bike
         Index!
       xoxo: XOXO,
+  search:
+    registrations:
+      index:
+        loading_results: Resultaten laden...
+      results:
+        no_bikes_matched: Er zijn geen serienummers die exact overeenkomen met uw
+          zoekopdracht
   components:
     search:
-      registration_fields:
-        within: binnen
-        anywhere: Overal
-        miles_of: mijl van
-        search_distance: Zoek afstand
-        search_location: Zoek locatie
-        stolenness_all: Alle
-        stolenness_non: Niet gemarkeerd als gestolen
-        stolenness_proximity: Gestolen in zoekgebied
-        stolenness_stolen: Overal gestolen
       everything_combobox:
         query_items_description: Zoekbeschrijvingen combobox
         search_descriptions: Zoek beschrijvingen
@@ -6016,10 +6013,13 @@ nl:
           op een serienummer en wordt dus niet gebruikt om te zoeken.
         search_for_serial_number: Zoek naar framenummer
         submit: Voorleggen
-  search:
-    registrations:
-      index:
-        loading_results: Resultaten laden...
-      results:
-        no_bikes_matched: Er zijn geen serienummers die exact overeenkomen met uw
-          zoekopdracht
+      registration_fields:
+        anywhere: Overal
+        miles_of: mijl van
+        search_distance: Zoek afstand
+        search_location: Zoek locatie
+        stolenness_all: Alle
+        stolenness_non: Niet gemarkeerd als gestolen
+        stolenness_proximity: Gestolen in zoekgebied
+        stolenness_stolen: Overal gestolen
+        within: binnen

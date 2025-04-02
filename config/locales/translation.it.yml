@@ -4595,10 +4595,22 @@ it:
       glad_to_have_you_on_board:
       thank_you_for_supporting_bike_index:
       xoxo:
+  search:
+    registrations:
+      index:
+        loading_results:
+      results:
+        no_bikes_matched:
   components:
     search:
+      everything_combobox:
+        query_items_description:
+        search_descriptions:
+      form:
+        doesnt_look_like_serial:
+        search_for_serial_number:
+        submit:
       registration_fields:
-        within:
         anywhere:
         miles_of:
         search_distance:
@@ -4607,16 +4619,4 @@ it:
         stolenness_non:
         stolenness_proximity:
         stolenness_stolen:
-      everything_combobox:
-        query_items_description:
-        search_descriptions:
-      form:
-        doesnt_look_like_serial:
-        search_for_serial_number:
-        submit:
-  search:
-    registrations:
-      index:
-        loading_results:
-      results:
-        no_bikes_matched:
+        within:
