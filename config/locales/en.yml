@@ -4165,8 +4165,6 @@ en:
       list_a_bike_on_bikefair: List a bike on BikeFair
       location: Location
       lock_type: Lock Type
-      registered: Registered
-      updated: Updated
       locks: locks
       manufacturer: Manufacturer
       mark_bike_stolen: Mark bike stolen

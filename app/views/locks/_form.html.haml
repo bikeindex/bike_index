@@ -5,25 +5,19 @@
     - cable_type = LockType.friendly_find('cable')
     - skewer_type = LockType.friendly_find('locking-skewer')
     - other_type = LockType.friendly_find('other-style')
-    - ebike_type = LockType.friendly_find('e-bike-key')
+    - ebike_type = LockType.friendly_find('battery-or-e-bike-key')
     - lock_types = [ulock_type, chain_type, cable_type, skewer_type, other_type, ebike_type]
 
-    .lock-types-select
-      .lock-type-title
-        %label= t(".lock_type")
-
-      - lock_types.each do |lock|
-        .lock-type
-          %div
-            %input{ id: "locky_#{lock.id}", type: "radio", name: "lock_types_select", data: { value: lock.id } }
-          %label{ for: "locky_#{lock.id}" }
-            %span= lock.name
-            - unless lock.slug == "e-bike-key"
-              = image_tag "locks/#{lock.slug}.jpg"
-
-      = f.hidden_field :lock_type_id
-
     .row
+      - lock_types.each do |lock_type|
+        .col-xs-4.col-md-2
+          = f.label "lock_type_id_#{lock_type.id}", class: "cursor-pointer" do
+            = f.radio_button :lock_type_id, lock_type.id
+            %span.d-block= lock_type.name
+            - unless lock_type.slug == "battery-or-e-bike-key"
+              = image_tag "locks/#{lock_type.slug}.jpg"
+
+    .row.mt-4
       .col-md-6
         .related-fields
           .form-group.unfancy.fancy-select.manufacturer-select{ data: { otherid: Manufacturer.other.id } }

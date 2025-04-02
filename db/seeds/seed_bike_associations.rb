@@ -1,6 +1,6 @@
 # Seed the lock types
 
-lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewer", "Other style", "e-bike key"]
+lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewer", "Other style", "battery-or-e-bike-key"]
 lock_types.each do |type_name|
   lock_type = LockType.create(name: type_name)
   lock_type.save
