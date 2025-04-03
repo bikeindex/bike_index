@@ -8,17 +8,27 @@ class Search::RegistrationsController < Bikes::BaseController
   around_action :set_reading_role
 
   def index
-    @page = permitted_page(params[:page])
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
     if @render_results
-      @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
+      @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page,
+        max_pages: MAX_INDEX_PAGE)
     end
 
     respond_to do |format|
       format.html
       format.turbo_stream
     end
+  end
+
+  def similar_serials
+    @pagy, @bikes = pagy(Bike.search_close_serials(@interpreted_params), limit: 10, page: @page,
+      max_pages: MAX_INDEX_PAGE)
+  end
+
+  def serials_containing
+    @pagy, @bikes = pagy(Bike.search_serials_containing(@interpreted_params), limit: 10, page: @page,
+      max_pages: MAX_INDEX_PAGE)
   end
 
   private
@@ -29,6 +39,8 @@ class Search::RegistrationsController < Bikes::BaseController
     if params[:stolenness] == "proximity" && @interpreted_params[:stolenness] != "proximity"
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
+
+    @page = permitted_page(params[:page])
     @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
   end
 

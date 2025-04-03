@@ -13,8 +13,17 @@ RSpec.describe Pagination::Component, type: :component do
 
     it "renders" do
       with_request_url "/search/registrations" do
+        expect(described_class.new(**options).render?).to be_truthy
         expect(component).to be_present
       end
+    end
+  end
+
+  context "one page" do
+    let(:pagy) { Pagy.new(count: 25, limit: 25, page: 1) }
+
+    it "doesn't render" do
+      expect(described_class.new(**options).render?).to be_falsey
     end
   end
 end

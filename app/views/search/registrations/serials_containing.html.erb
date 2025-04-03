@@ -1,0 +1,22 @@
+<%= turbo_frame_tag :search_registrations_serials_containing_frame do %>
+  <div class="container mt-4 mb-5">
+    <hr class="mb-4">
+    <div class="row">
+      <div class="col-md-12">
+        <% if @bikes.present? %>
+          <h3 class="text-center uncap">
+            <%= t(".with_serials_containing", serial: @interpreted_params[:serial]) %>
+            (<%= number_with_delimiter(@pagy.count) %>)
+          </h3>
+          <ul class="bike-boxes">
+            <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
+          </ul>
+        <% else %>
+          <h3 class="text-center uncap">
+            <%= t(".no_matched", serial: @interpreted_params[:serial]) %>
+          </h3>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

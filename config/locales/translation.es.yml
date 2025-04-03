@@ -4592,7 +4592,15 @@ es:
       index:
         loading_results:
       results:
-        no_bikes_matched:
+        no_matched:
+        search_for_containing:
+        search_for_similar:
+      serials_containing:
+        no_matched:
+        with_serials_containing:
+      similar_serials:
+        no_matched:
+        with_similar_serials:
   components:
     search:
       everything_combobox:

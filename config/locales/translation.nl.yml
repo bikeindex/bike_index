@@ -6000,8 +6000,15 @@ nl:
       index:
         loading_results: Resultaten laden...
       results:
-        no_bikes_matched: Er zijn geen serienummers die exact overeenkomen met uw
-          zoekopdracht
+        no_matched: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
+        search_for_containing: Zoeken naar series die uw zoekopdracht bevatten...
+        search_for_similar: Zoeken naar soortgelijke series...
+      serials_containing:
+        no_matched: Geen registraties met serienummers die %{serial} bevatten
+        with_serials_containing: Registraties met series die %{serial} bevatten
+      similar_serials:
+        no_matched: Geen registraties met serienummers vergelijkbaar met %{serial}
+        with_similar_serials: Registraties met series vergelijkbaar met %{serial}
   components:
     search:
       everything_combobox:
