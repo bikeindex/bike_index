@@ -158,7 +158,10 @@ Rails.application.routes.draw do
   namespace :search do
     get "/", to: redirect("/search/registrations")
     resources :registrations, only: %i[index] do
-      collection { get :similar_serials }
+      collection do
+        get :similar_serials
+        get :serials_containing
+      end
     end
   end
 

@@ -50,7 +50,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
     end
   end
 
-  describe "similar serials" do
+  describe "similar_serials" do
     let(:serial) { "1234667890" }
     let(:target_params) do
       {raw_serial: "1234667890", serial: "1234667890", serial_no_space: "1234667890",
@@ -63,6 +63,21 @@ RSpec.describe Search::RegistrationsController, type: :request do
       expect(response).to render_template(:similar_serials)
       expect(assigns(:interpreted_params)).to eq target_params
       expect(assigns(:bikes).pluck(:id)).to eq([impounded_bike.id])
+    end
+  end
+
+  describe "serials_containing" do
+    let(:serial) { "3456789" }
+    let(:target_params) do
+      {raw_serial: "3456789", serial: "3456789", serial_no_space: "3456789", stolenness: "stolen"}
+    end
+
+    it "renders" do
+      get "#{base_url}/serials_containing?serial=#{serial}"
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:serials_containing)
+      expect(assigns(:interpreted_params)).to eq target_params
+      expect(assigns(:bikes).pluck(:id).sort).to eq([stolen_bike.id, impounded_bike.id])
     end
   end
 end

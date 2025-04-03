@@ -11,7 +11,6 @@ class Search::RegistrationsController < Bikes::BaseController
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
     if @render_results
-      @page = permitted_page(params[:page])
       @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page,
         max_pages: MAX_INDEX_PAGE)
     end
@@ -23,8 +22,12 @@ class Search::RegistrationsController < Bikes::BaseController
   end
 
   def similar_serials
-    @page = permitted_page(params[:page])
     @pagy, @bikes = pagy(Bike.search_close_serials(@interpreted_params), limit: 10, page: @page,
+      max_pages: MAX_INDEX_PAGE)
+  end
+
+  def serials_containing
+    @pagy, @bikes = pagy(Bike.search_serials_containing(@interpreted_params), limit: 10, page: @page,
       max_pages: MAX_INDEX_PAGE)
   end
 
@@ -37,6 +40,7 @@ class Search::RegistrationsController < Bikes::BaseController
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
 
+    @page = permitted_page(params[:page])
     @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
   end
 
