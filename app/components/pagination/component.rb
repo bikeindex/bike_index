@@ -2,11 +2,15 @@
 
 module Pagination
   class Component < ApplicationComponent
-    def initialize(pagy:, page_params:, size: :md, data: {})
+    def initialize(pagy:, page_params:, size: :md, data: {}, display_single: false)
       @pagy = pagy
       @params = page_params.is_a?(Hash) ? page_params : page_params.permit!
       @size = size
       @data = data
+    end
+
+    def render?
+      @pagy.count > @pagy.limit
     end
 
     private

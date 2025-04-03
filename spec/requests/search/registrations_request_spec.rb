@@ -6,7 +6,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
   let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
   let!(:stolen_bike) { FactoryBot.create(:stolen_bike_in_nyc, serial_number: "345678901") }
   let!(:impounded_bike) { FactoryBot.create(:impounded_bike, :in_nyc, serial_number: "12345678901") }
-  let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles, cycle_type: "e-scooter", "9876543210") }
+  let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles, cycle_type: "e-scooter", serial_number: "9876543210") }
 
   describe "index" do
     let(:target_bike_ids) { [stolen_bike.id, impounded_bike.id, stolen_bike_2.id] }
@@ -52,12 +52,16 @@ RSpec.describe Search::RegistrationsController, type: :request do
 
   describe "similar serials" do
     let(:serial) { "1234667890" }
+    let(:target_params) do
+      {raw_serial: "1234667890", serial: "1234667890", serial_no_space: "1234667890",
+       stolenness: "stolen"}
+    end
 
     it "renders" do
       get "#{base_url}/similar_serials?serial=#{serial}"
       expect(response).to have_http_status(:success)
-      expect(response).to render_template(:index)
-      expect(assigns(:interpreted_params)).to eq(stolenness: "stolen", serial:)
+      expect(response).to render_template(:similar_serials)
+      expect(assigns(:interpreted_params)).to eq target_params
       expect(assigns(:bikes).pluck(:id)).to eq([impounded_bike.id])
     end
   end

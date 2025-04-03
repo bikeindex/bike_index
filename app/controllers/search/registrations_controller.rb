@@ -12,7 +12,8 @@ class Search::RegistrationsController < Bikes::BaseController
 
     if @render_results
       @page = permitted_page(params[:page])
-      # @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
+      @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page,
+        max_pages: MAX_INDEX_PAGE)
     end
 
     respond_to do |format|
@@ -22,10 +23,9 @@ class Search::RegistrationsController < Bikes::BaseController
   end
 
   def similar_serials
-    sleep 3
-
     @page = permitted_page(params[:page])
-    @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
+    @pagy, @bikes = pagy(Bike.search_close_serials(@interpreted_params), limit: 10, page: @page,
+      max_pages: MAX_INDEX_PAGE)
   end
 
   private

@@ -1,15 +1,19 @@
-<div class="container mb-5">
-  <div class="row">
-    <div class="col-md-12">
-      <% if @bikes.present? %>
-        <ul class="bike-boxes">
-          <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
-        </ul>
-      <% else %>
-        <h3 class="text-center uncap">
-          <%#= t(".no_bikes_matched") %>
-        </h3>
-      <% end %>
+WTFTWFSDF
+<%= turbo_frame_tag :search_registrations_similar_serials_frame do %>
+  <div class="container mt-5 mb-5">
+    <div class="row">
+      <div class="col-md-12">
+        <% if @bikes.present? %>
+          <ul class="bike-boxes">
+            <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
+          </ul>
+        <% else %>
+          <h3 class="text-center uncap">
+            <%= t(".no_bikes_matched", serial: @interpreted_params[:serial]) %>
+          </h3>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>
+  <h2><%= @interpreted_params[:serial] %></h2>
+<% end %>
