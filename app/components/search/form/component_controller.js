@@ -23,7 +23,7 @@ export default class extends Controller {
     const noJsElement = this.element.querySelector('#search_no_js')
     if (noJsElement) noJsElement.remove()
 
-    // if the frame was loaded without results, submit the form (so we )
+    // if the frame was loaded without results, submit the form
     if (this.frameElement?.querySelector('#loadedWithoutResults')) {
       this.formTarget.requestSubmit()
     }
