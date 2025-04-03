@@ -1,0 +1,54 @@
+<%# This will become a view component, but for now just rendering old styled results %>
+
+<div class="container mb-5">
+  <div class="row bikes-searched-default">
+    <div class="col-md-12">
+      <% if @bikes.present? %>
+        <ul class="bike-boxes">
+          <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
+        </ul>
+        <%# hidden, no ads  %>
+        <div class="row d-none">
+          <div class="col-md-4 mt-4 offset-md-2">
+            <div class="ad-block ad-binx ad468x60">
+            </div>
+          </div>
+        </div>
+        <div class="row d-none">
+          <div class="col-md-8 mt-4 offset-md-2">
+            <%= render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"} %>
+          </div>
+        </div>
+      <% else %>
+        <h3 class="text-center uncap">
+          <%= t(".no_matched") %>
+        </h3>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%# This is now a view component, so it needs to be outside the bootstrap container for styling %>
+<% if @bikes.present? && @pagy.present? %>
+  <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
+    size: :lg, data: {turbo_action: "advance"})) %>
+<% end %>
+
+<%# render near serials %>
+<% if @interpreted_params[:serial].present? %>
+  <%=
+    turbo_frame_tag :search_registrations_similar_serials_frame,
+    src: similar_serials_search_registrations_path(@interpreted_params),
+    loading: :lazy do
+  %>
+    <%= render LoadingSpinner::Component.new(text: t(".search_for_similar")) %>
+  <% end %>
+
+  <%=
+    turbo_frame_tag :search_registrations_serials_containing_frame,
+    src: serials_containing_search_registrations_path(@interpreted_params),
+    loading: :lazy do
+  %>
+    <%= render LoadingSpinner::Component.new(text: t(".search_for_containing")) %>
+  <% end %>
+<% end %>

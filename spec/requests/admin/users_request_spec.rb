@@ -48,10 +48,10 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.banned?).to be_falsey
         current_user.reload
         Sidekiq::Job.clear_all
-        put "#{base_url}/#{user_subject.id}", params: {
+        patch "#{base_url}/#{user_subject.id}", params: {
           user: {
             name: "New Name",
-            email: "newemailexample.com",
+            email: "newemail@example.com",
             confirmed: true,
             superuser: true,
             developer: "1",
@@ -64,7 +64,7 @@ RSpec.describe Admin::UsersController, type: :request do
           }
         }
         expect(user_subject.reload.name).to eq("New Name")
-        expect(user_subject.email).to eq("newemailexample.com")
+        expect(user_subject.email).to eq("newemail@example.com")
         expect(user_subject.confirmed).to be_truthy
         expect(user_subject.superuser).to be_truthy
         expect(user_subject.developer).to be_falsey

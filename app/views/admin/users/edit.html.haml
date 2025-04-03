@@ -394,7 +394,7 @@
 
 %hr.mt-4
 %h4 Edit
-= form_for [:admin, @user] do |f|
+= form_for @user, url: admin_user_path, method: :patch  do |f|
   - if @user.errors.any?
     = render partial: "/shared/errors", locals: { name: "User", obj: @user }
   .row.mt-4
@@ -467,30 +467,30 @@
                 = user_ban.label :description, "Description/notes"
                 = user_ban.text_area :description, class: "form-control"
 
-
-%hr{style: "margin-top: 60px;"}
-.mt-4.mb-4.row
-  .col-sm-6.mb-4
-    = link_to "Delete #{@user.email}!", admin_user_url(@user.to_param), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger less-strong"
-  .col-sm-6.mb-4
-    .text-right
-      %a.gray-link{ href: "#forceMergeEmail", data: { toggle: "collapse", target: "#forceMergeEmail" } }
-        Force merge with another email
-    #forceMergeEmail.collapse.mt-2
-      .card
-        .card-body
-          %p
-            Add another email to this user.
-          %p
-            %span.text-danger WARNING
-            this does not send a confirmation email or check that they have access to the email you merge with.
-          %p
-            %span.text-warning We can <strong>not</strong> undo this.
-          = form_for [:admin, @user] do |f|
-            .row.mt-2
-              .col-md-8
-                .form-group
-                  = email_field_tag :force_merge_email, "", placeholder: "Email to merge", class: "form-control"
-                  %small.less-strong Email must be another user account on Bike Index
-              .col-md-4
-                = f.submit "Merge", class: 'btn btn-outline-danger'
+- if @user.present?
+  %hr{style: "margin-top: 60px;"}
+  .mt-4.mb-4.row
+    .col-sm-6.mb-4
+      = link_to "Delete #{@user.email}!", admin_user_url(@user.id, method: :delete), data: { confirm: "Are you sure?" }, class: "btn btn-danger less-strong"
+    .col-sm-6.mb-4
+      .text-right
+        %a.gray-link{ href: "#forceMergeEmail", data: { toggle: "collapse", target: "#forceMergeEmail" } }
+          Force merge with another email
+      #forceMergeEmail.collapse.mt-2
+        .card
+          .card-body
+            %p
+              Add another email to this user.
+            %p
+              %span.text-danger WARNING
+              this does not send a confirmation email or check that they have access to the email you merge with.
+            %p
+              %span.text-warning We can <strong>not</strong> undo this.
+            = form_for @user, url: admin_user_path, method: :patch  do |f|
+              .row.mt-2
+                .col-md-8
+                  .form-group
+                    = email_field_tag :force_merge_email, "", placeholder: "Email to merge", class: "form-control"
+                    %small.less-strong Email must be another user account on Bike Index
+                .col-md-4
+                  = f.submit "Merge", class: 'btn btn-outline-danger'

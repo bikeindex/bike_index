@@ -66,6 +66,8 @@ class User < ApplicationRecord
   include FeatureFlaggable
   include Geocodeable
 
+  EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
+
   cattr_accessor :current_user
 
   acts_as_paranoid
@@ -140,6 +142,7 @@ class User < ApplicationRecord
 
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
+  validates :email, format: {with: EMAIL_REGEX, message: "Email invalid"}
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
@@ -227,6 +230,7 @@ class User < ApplicationRecord
   def ensure_unique_email
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
     return true if id.present? # Because existing users shouldn't see this error
+
     errors.add(:email, :email_already_exists)
   end
 

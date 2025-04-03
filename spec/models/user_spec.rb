@@ -45,6 +45,12 @@ RSpec.describe User, type: :model do
         expect(subject.valid?).to be_truthy
       end
 
+      it "is invalid if email is invalid" do
+        subject.email = "+response.write(9515797*9796573)+"
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages.to_s).to match(/email/i)
+      end
+
       it "requires password on create" do
         subject.password = nil
         subject.password_confirmation = nil

@@ -67,7 +67,7 @@ RSpec.describe "Search API V3", type: :request do
   describe "/close_serials" do
     let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "something") }
     let(:query_params) { {serial: "somethind", stolenness: "non"} }
-    let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: nil) }
+    let(:target_interpreted_params) { BikeSearchable.searchable_interpreted_params(query_params, ip: nil) }
     context "with per_page" do
       it "returns matching bikes, defaults to stolen" do
         get "/api/v3/search/close_serials", params: query_params.merge(format: :json)
@@ -163,7 +163,7 @@ RSpec.describe "Search API V3", type: :request do
         }
       end
       let(:proximity_query_params) { request_query_params.merge(stolenness: "proximity") }
-      let(:proximity_interpreted_params) { Bike.searchable_interpreted_params(proximity_query_params, ip: "") }
+      let(:proximity_interpreted_params) { BikeSearchable.searchable_interpreted_params(proximity_query_params, ip: "") }
       # Use the interpreted params, because they come with proximity data - it"s what we do in the API
       let(:stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "stolen") }
       let(:non_stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "non") }

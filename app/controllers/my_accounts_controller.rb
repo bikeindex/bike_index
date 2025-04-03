@@ -8,7 +8,7 @@ class MyAccountsController < ApplicationController
     @locks_active_tab = params[:active_tab] == "locks"
     @per_page = params[:per_page] || 20
     @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page)
-    @locks = current_user.locks
+    @locks = current_user.locks.reorder(created_at: :desc)
   end
 
   def edit

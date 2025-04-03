@@ -231,6 +231,7 @@ nl:
           required: verplicht
         manufacturer:
           cannot_match_a_color_name: Kan niet hetzelfde zijn als een kleurnaam
+          cannot_include_quote: kan geen dubbele aanhalingstekens bevatten
         organization_message:
           latlon_required: breedte- en lengtegraad vereist
           required: verplicht
@@ -858,6 +859,7 @@ nl:
         non_e_skateboard: Skateboard (niet elektrisch)
         e_motorcycle: e-motorfiets (of e-dirtbike)
         traditional_bike: Traditionele fiets (2 wielen, 1 zadel, pedaal)
+        elliptical: Elliptische fiets
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
@@ -4151,6 +4153,7 @@ nl:
     welcome_goodbye: Uitgelogd
     welcome_index: Bike Index - Fietsregistratie die werkt
     my_accounts_show: Jij op Bike Index
+    search_registrations_index: Zoekresultaten
   organized:
     ambassador_dashboards:
       getting_started:
@@ -5235,7 +5238,6 @@ nl:
       has_combination: Heeft combinatie
       has_key: Heeft sleutel
       large_kryptonite_key: Grote Kryptonite-sleutel
-      lock_type: Slottype
       other_lock_manufacturer: Andere slotfabrikant
       pinhead_key: Pinhead-toets
       pinhead_locking_skewer_key: Pinhead spies sleutel
@@ -5429,14 +5431,16 @@ nl:
         stuur uw bericht hier naartoe.
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below: Geef ons een waarschuwing in een reactie
-        hieronder.
       manufacturers_we_know_about: Fabrikanten die we kennen
       name: Naam
       oh_no_were_missing_a_manufacturer: OH NEE! We missen een fabrikant?
       only_makes_components: Maakt alleen componenten
       thats_not_actually_surprising: Dat is eigenlijk niet zo verwonderlijk, er zijn
         er een heleboel.
+      also_available_html: Deze lijst is ook beschikbaar als %{csv_on_github}.
+      csv_on_github: CSV op Github
+      submit_a_pr_html: Stel een update voor door een Pull Request in te dienen bij
+        %{csv_on_github}.
   news:
     index:
       bike_index_blog: Bike Index Blog
@@ -5991,3 +5995,37 @@ nl:
       thank_you_for_supporting_bike_index: Bedankt voor het ondersteunen van Bike
         Index!
       xoxo: XOXO,
+  search:
+    registrations:
+      index:
+        loading_results: Resultaten laden...
+      results:
+        no_matched: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
+        search_for_containing: Zoeken naar series die uw zoekopdracht bevatten...
+        search_for_similar: Zoeken naar soortgelijke series...
+      serials_containing:
+        no_matched: Geen registraties met serienummers die %{serial} bevatten
+        with_serials_containing: Registraties met series die %{serial} bevatten
+      similar_serials:
+        no_matched: Geen registraties met serienummers vergelijkbaar met %{serial}
+        with_similar_serials: Registraties met series vergelijkbaar met %{serial}
+  components:
+    search:
+      everything_combobox:
+        query_items_description: Zoekbeschrijvingen combobox
+        search_descriptions: Zoek beschrijvingen
+      form:
+        doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet
+          op een serienummer en wordt dus niet gebruikt om te zoeken.
+        search_for_serial_number: Zoek naar framenummer
+        submit: Voorleggen
+      registration_fields:
+        anywhere: Overal
+        miles_of: mijl van
+        search_distance: Zoek afstand
+        search_location: Zoek locatie
+        stolenness_all: Alle
+        stolenness_non: Niet gemarkeerd als gestolen
+        stolenness_proximity: Gestolen in zoekgebied
+        stolenness_stolen: Overal gestolen
+        within: binnen

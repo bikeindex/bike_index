@@ -12,6 +12,14 @@ task reset_autocomplete: :environment do
   AutocompleteLoaderJob.new.perform(nil, true)
 end
 
+desc "import manufacturers from GitHub"
+task import_manufacturers_csv: :environment do
+  url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/manufacturers.csv"
+  file_path = Rails.root.join("tmp/manufacturers.csv")
+  system("wget -q #{url} -O #{file_path}", exception: true)
+  Spreadsheets::Manufacturers.import(file_path)
+end
+
 # TODO: Remove :processed attribute when processing finishes
 desc "Enqueue Logged Search Processing"
 task process_logged_searches: :environment do

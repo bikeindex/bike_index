@@ -263,9 +263,6 @@ html {
   background: $black-off;
 }
 
-.currently-hidden {
-  display: none;
-}
 
 img {
   max-width: 100%;
@@ -394,4 +391,18 @@ $dev-color: #9400d3;
 
 .cursor-not-allowed {
   cursor: not-allowed;
+}
+
+// Fix collapse post tailwind
+.container {
+  .currently-hidden {
+    display: none;
+  }
+
+  .collapse {
+    display: none;
+    &.in {
+      display: block;
+    }
+  }
 }

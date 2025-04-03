@@ -1,4 +1,5 @@
 require "rails_helper"
+
 RSpec.describe WebhooksController, type: :request do
   let(:re_record_interval) { 30.days }
 
@@ -20,9 +21,8 @@ RSpec.describe WebhooksController, type: :request do
       let(:target_stripe_subscription) do
         {
           user_id: nil,
-          stripe_status: "active",
-          email: "seth@bikeindex.org",
-          end_at: nil
+          stripe_status: "canceled",
+          email: "seth@bikeindex.org"
         }
       end
       it "processes the webhook successfully" do
@@ -40,6 +40,7 @@ RSpec.describe WebhooksController, type: :request do
           expect(stripe_event.stripe_id).to be_present
           stripe_subscription = StripeSubscription.last
           expect(stripe_subscription.start_at).to be_within(1).of Time.at(1740173835) # has to be updated when cassette is updated
+          expect(stripe_subscription.end_at).to be_within(1).of Time.at(1742593035)
           expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription
           expect(stripe_subscription.stripe_id).to be_present
           expect(stripe_subscription.membership_id).to be_blank
@@ -111,7 +112,7 @@ RSpec.describe WebhooksController, type: :request do
         expect(membership.user_id).to eq user.id
         expect(membership.start_at).to be_within(1).of stripe_subscription.start_at
         expect(membership.end_at).to be_within(1).of stripe_subscription.end_at
-        expect(membership.status).to eq "active"
+        expect(membership.status).to eq "ended"
       end
     end
 

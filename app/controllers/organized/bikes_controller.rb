@@ -194,7 +194,7 @@ module Organized
     def search_organization_bikes
       @permitted_org_bike_search_params = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?)
       @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
@@ -236,7 +236,7 @@ module Organized
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
     end
 
     def search_status

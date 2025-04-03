@@ -234,6 +234,7 @@ nb:
           user_not_authorized: har ikke tillatelse til å beslaglegge denne sykkelen
         manufacturer:
           cannot_match_a_color_name: kan ikke være det samme som et fargenavn
+          cannot_include_quote: kan ikke inkludere dobbelt anførselstegn
         organization_message:
           latlon_required: breddegrad og lengdegrad kreves
           required: nødvendig
@@ -859,6 +860,7 @@ nb:
         wheelchair: Rullestol
         e_motorcycle: e-motorsykkel (eller e-Dirtbike)
         traditional_bike: Tradisjonell sykkel (2 hjul, 1 sete, pedal)
+        elliptical: Elliptisk sykkel
       frame_material:
         aluminum: Aluminium
         composite: Karbon eller kompositt
@@ -4262,7 +4264,6 @@ nb:
       has_combination: Har kombinasjon
       has_key: Har nøkkel
       large_kryptonite_key: Stor Kryptonite-nøkkel
-      lock_type: Lås type
       other_lock_manufacturer: Annen låsprodusent
       pinhead_key: Pinhead nøkkel
       pinhead_locking_skewer_key: Pinhead låsende spyd nøkkel
@@ -4289,12 +4290,15 @@ nb:
         dine
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below: Gi oss beskjed i en kommentar nedenfor.
       manufacturers_we_know_about: Produsenter vi kjenner til
       name: Navn
       oh_no_were_missing_a_manufacturer: Å NEI! Mangler vi en produsent?
       only_makes_components: lager kun komponenter
       thats_not_actually_surprising: Det er faktisk ikke overraskende, det er en haug.
+      also_available_html: Denne listen er også tilgjengelig som en %{csv_on_github}.
+      csv_on_github: CSV på Github
+      submit_a_pr_html: Foreslå en oppdatering ved å sende inn en Pull-forespørsel
+        til %{csv_on_github}.
   meta_descriptions:
     bikes_index: Søk etter sykler som er registrert på Bike Index
     bikes_new: Registrer en sykkel på Bike Index raskt, enkelt og gratis. Lag en permanent
@@ -4376,6 +4380,7 @@ nb:
     welcome_goodbye: Logget ut
     welcome_index: Bike Index - Sykkelregistrering som fungerer
     my_accounts_show: Du på Bike Index
+    search_registrations_index: Søkeresultater
   money:
     currencies:
       en: USD
@@ -5836,3 +5841,37 @@ nb:
         beskjed når vi har oppdateringer om medlemsfordelene og alt annet kult å dele.
       thank_you_for_supporting_bike_index: Takk for at du støtter Bike Index!
       xoxo: XOXO,
+  search:
+    registrations:
+      index:
+        loading_results: Laster inn resultater...
+      results:
+        no_matched: Ingen registreringer samsvarte nøyaktig med søket ditt
+        search_for_containing: Søker etter serier som inneholder søket ditt...
+        search_for_similar: Søker etter lignende serier...
+      serials_containing:
+        no_matched: Ingen registreringer med serienumre som inneholder %{serial}
+        with_serials_containing: Registreringer med serier som inneholder %{serial}
+      similar_serials:
+        no_matched: Ingen registreringer med serienummer som ligner på %{serial}
+        with_similar_serials: Registreringer med serier som ligner på %{serial}
+  components:
+    search:
+      everything_combobox:
+        query_items_description: Søkebeskrivelser kombinasjonsboksen
+        search_descriptions: Søk i beskrivelser
+      form:
+        doesnt_look_like_serial: Serienummeret du skrev inn ser ikke ut som et serienummer,
+          så det brukes ikke til å søke.
+        search_for_serial_number: Søk etter serienummer
+        submit: sende inn
+      registration_fields:
+        anywhere: Hvor som helst
+        miles_of: miles av
+        search_distance: Søkeavstand
+        search_location: Søk plassering
+        stolenness_all: Alle
+        stolenness_non: Ikke merket som stjålet
+        stolenness_proximity: Stjålet i søkeområdet
+        stolenness_stolen: Stjålet hvor som helst
+        within: innenfor

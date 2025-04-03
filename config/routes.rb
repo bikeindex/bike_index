@@ -135,8 +135,18 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
-  resources :registrations, only: [:new, :create] do
+  resources :registrations, only: %i[new create] do
     collection { get :embed }
+  end
+
+  namespace :search do
+    get "/", to: redirect("/search/registrations")
+    resources :registrations, only: %i[index] do
+      collection do
+        get :similar_serials
+        get :serials_containing
+      end
+    end
   end
 
   resources :bikes, except: [:edit] do
@@ -312,9 +322,9 @@ Rails.application.routes.draw do
   end
 
   resources :manufacturers, only: %i[index] do
-    collection { get "tsv" }
+    collection { get "tsv" } # TODO: can we delete this?
   end
-  get "manufacturers_tsv", to: "manufacturers#tsv"
+  get "manufacturers_tsv", to: "manufacturers#tsv" # TODO: can we delete this?
 
   get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
   get "theft-ring", to: redirect("theft-rings")

@@ -9,7 +9,7 @@ class BikesController < Bikes::BaseController
   around_action :set_reading_role, only: %i[index show]
 
   def index
-    @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
+    @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
     @stolenness = @interpreted_params[:stolenness]
 
     if params[:stolenness] == "proximity" && @stolenness != "proximity"
@@ -17,7 +17,7 @@ class BikesController < Bikes::BaseController
     end
     @page = permitted_page(params[:page])
     @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
-    @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+    @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
   end
 
   def show

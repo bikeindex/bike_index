@@ -40,74 +40,53 @@ class Manufacturer < ApplicationRecord
   validates_uniqueness_of :secondary_slug, allow_nil: true
   validate :ensure_non_blocking_name
 
-  default_scope { order(:name) }
+  default_scope { alphabetized }
 
+  scope :alphabetized, -> { order(Arel.sql("LOWER(name)")) }
   scope :frame_makers, -> { where(frame_maker: true) }
   scope :with_websites, -> { where("website is NOT NULL and website != ''") }
   scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
 
-  def self.export_columns
-    %w[name slug website frame_maker open_year close_year logo remote_logo_url
-      logo_cache logo_source description].map(&:to_sym).freeze
-  end
-
-  # Secondary_slug is the slug of the stuff in the paretheses
-  def self.find_by_secondary_slug(str)
-    return nil if str.blank?
-    super
-  end
-
-  def self.friendly_find(n)
-    return nil if n.blank?
-    if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
-      where(id: n).first
-    else
-      ns = Slugifyer.manufacturer(n)
-      find_by_slug(ns) || find_by_slug(fill_stripped(ns)) ||
-        find_by_secondary_slug(ns)
+  class << self
+    # Secondary_slug is the slug of the stuff in the paretheses
+    def find_by_secondary_slug(str)
+      return nil if str.blank?
+      super
     end
-  end
 
-  def self.friendly_find_id(n)
-    friendly_find(n)&.id
-  end
-
-  def self.other
-    return @other if MEMOIZE_OTHER && defined?(@other)
-    @other = where(name: "Other", frame_maker: true).first_or_create
-  end
-
-  def self.fill_stripped(n)
-    n.gsub!(/accell/i, "") if n.match(/accell/i).present?
-    Slugifyer.manufacturer(n)
-  end
-
-  def self.import(file)
-    CSV.foreach(file.path, headers: true, header_converters: :symbol) do |row|
-      mnfg = find_by_name(row[:name]) || new
-      mnfg.attributes = row.to_h.slice(*export_columns)
-      next if mnfg.save
-      puts "\n#{row} \n"
-      fail mnfg.errors.full_messages.to_sentence
-    end
-  end
-
-  def self.to_csv
-    CSV.generate do |csv|
-      csv << column_names
-      all.each do |mnfg|
-        csv << mnfg.attributes.values_at(*column_names)
+    def friendly_find(n)
+      return nil if n.blank?
+      if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
+        where(id: n).first
+      else
+        ns = Slugifyer.manufacturer(n)
+        find_by_slug(ns) || find_by_slug(fill_stripped(ns)) ||
+          find_by_secondary_slug(ns)
       end
     end
-  end
 
-  def self.calculated_mnfg_name(manufacturer, manufacturer_other)
-    return nil if manufacturer.blank?
-    if manufacturer.other? && manufacturer_other.present?
-      InputNormalizer.sanitize(manufacturer_other)
-    else
-      manufacturer.simple_name
-    end.strip.truncate(60)
+    def friendly_find_id(n)
+      friendly_find(n)&.id
+    end
+
+    def other
+      return @other if MEMOIZE_OTHER && defined?(@other)
+      @other = where(name: "Other", frame_maker: true).first_or_create
+    end
+
+    def fill_stripped(n)
+      n.gsub!(/accell/i, "") if n.match(/accell/i).present?
+      Slugifyer.manufacturer(n)
+    end
+
+    def calculated_mnfg_name(manufacturer, manufacturer_other)
+      return nil if manufacturer.blank?
+      if manufacturer.other? && manufacturer_other.present?
+        InputNormalizer.sanitize(manufacturer_other)
+      else
+        manufacturer.simple_name
+      end.strip.truncate(60)
+    end
   end
 
   def to_param
@@ -121,13 +100,20 @@ class Manufacturer < ApplicationRecord
   # Because of issues with autocomplete if the names are the same
   # Also, probably just a good idea in general
   def ensure_non_blocking_name
-    return true unless name
+    return unless name.present?
+
+    errors.add(:name, :cannot_include_quote) if name.match?('"')
     errors.add(:name, :cannot_match_a_color_name) if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
   end
 
+  def simple_name
+    name.gsub(/\s?\([^)]*\)/i, "")
+  end
+
   def secondary_name
-    s_name = name&.gsub(/\A[^(]*/, "")&.gsub(/\(|\)/, "")
-    s_name.present? ? s_name : nil
+    return unless name&.match?(/\(/)
+
+    name.split("(").last.tr(")", "")
   end
 
   def set_calculated_attributes
@@ -166,10 +152,6 @@ class Manufacturer < ApplicationRecord
 
   def other?
     name == "Other"
-  end
-
-  def simple_name
-    name.gsub(/\s?\([^)]*\)/i, "")
   end
 
   # Can't be private because it's called by UpdateManufacturerLogoAndPriorityJob

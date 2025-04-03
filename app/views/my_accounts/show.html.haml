@@ -102,19 +102,25 @@
           - if @locks.present?
             %table.table.table-striped.table-bordered
               %thead
+                %th= t(".registered")
                 %th= t(".lock_type")
                 %th= t(".manufacturer")
                 %th= t(".key_serial")
                 %th= t(".combination")
+                %th.small= t(".updated")
               %tbody
                 - @locks.each do |lock|
                   %tr
                     %td
+                      %span.convertTime.mr-2= l lock.created_at, format: :convert_time
+                      %small= link_to(t(".edit"), edit_lock_path(lock))
+                    %td
                       = lock.lock_type&.name
-                      = link_to(t(".edit"), edit_lock_path(lock))
                     %td= lock.mnfg_name
                     %td= lock.key_serial
                     %td= lock.combination
+                    %td
+                      %small.convertTime= l lock.updated_at, format: :convert_time
           - else
             %h2= t(".you_have_no_registered_locks")
     .col-md-4
