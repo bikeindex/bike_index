@@ -162,22 +162,6 @@ enableEscapeForModals = ->
     $(window).off 'keyup'
     $(".modal .close").off
 
-# Once the updated search is shipped, this will no longer be necessary -
-# since it will find the localStorage location when renders (before searching)
-window.updateSearchBikesHeaderLink = ->
-  location = localStorage.getItem('location')
-  if location?
-    location = location.replace(/^\s*|\s*$/g, '')
-    location = 'you' if location.length < 1 or location == 'null'
-    localStorage.setItem('location', location)
-  distance = localStorage.getItem('distance')
-  if distance?
-    distance = parseInt(distance, 10)
-    if isNaN(distance)
-      distance = null
-    else
-      localStorage.setItem('distance', distance)
-
 renderDonationModal = ->
   hideModal = localStorage.getItem("hideDonationModal")
   unless hideModal == "true"
@@ -192,7 +176,6 @@ renderDonationModal = ->
       localStorage.setItem("hideDonationModal", "true")
 
 $(document).ready ->
-  window.updateSearchBikesHeaderLink()
   enableEscapeForModals()
   window.BikeIndex.Init = new BikeIndex.Init
   if document.getElementById('binx_registration_widget')

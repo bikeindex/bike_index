@@ -133,7 +133,7 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
-    bikes_path(stolenness: "all")
+    search_registrations_path(stolenness: "all")
   end
 
   def ensure_current_organization!
