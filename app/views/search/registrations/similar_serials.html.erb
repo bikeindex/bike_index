@@ -1,9 +1,13 @@
-WTFTWFSDF
 <%= turbo_frame_tag :search_registrations_similar_serials_frame do %>
-  <div class="container mt-5 mb-5">
+  <div class="container mt-4 mb-5">
+    <hr class="mb-4">
     <div class="row">
       <div class="col-md-12">
         <% if @bikes.present? %>
+          <h3 class="text-center uncap">
+            <%= t(".bikes_with_similar_serials", serial: @interpreted_params[:serial]) %>
+            (<%= number_with_delimiter(@pagy.count) %>)
+          </h3>
           <ul class="bike-boxes">
             <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
           </ul>
@@ -15,5 +19,4 @@ WTFTWFSDF
       </div>
     </div>
   </div>
-  <h2><%= @interpreted_params[:serial] %></h2>
 <% end %>

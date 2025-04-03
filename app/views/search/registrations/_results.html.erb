@@ -38,7 +38,8 @@
 <% if @interpreted_params[:serial].present? %>
   <%=
     turbo_frame_tag :search_registrations_similar_serials_frame,
-    src: similar_serials_search_registrations_path do
+    src: similar_serials_search_registrations_path(@interpreted_params),
+    loading: :lazy do
   %>
     <%= render LoadingSpinner::Component.new(text: t(".search_for_similar")) %>
   <% end %>

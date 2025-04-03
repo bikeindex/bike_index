@@ -5029,10 +5029,11 @@ en:
       index:
         loading_results: Loading results...
       results:
-        no_bikes_matched: No bikes exactly matched your search
+        no_bikes_matched: No registrations exactly matched your search
         search_for_similar: Searching for similar serials...
       similar_serials:
-        no_bikes_matched: No bikes with serial numbers similar to %{serial}
+        no_bikes_matched: No registrations with serial numbers similar to %{serial}
+        bikes_with_similar_serials: Registrations with serials similar to %{serial}
 
   sessions:
     magic_link:
