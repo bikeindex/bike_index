@@ -33,7 +33,6 @@ class BikeIndex.BikeSearchBar extends BikeIndex
         $('#location').val(location)
     # Store location in localStorage if it's there, otherwise -
     # Set from localStorage - so we don't override if it's already set
-    # updateSearchBikesHeaderLink is called first, this is guaranteed to be something
     if location? and location.length > 0
       # Don't save location if user entered 'Anywhere'
       unless location.match(/anywhere/i)
@@ -47,7 +46,6 @@ class BikeIndex.BikeSearchBar extends BikeIndex
       $location.val(location)
     # Then set up search view and the top menu link
     @setSearchTabInfo(location)
-    window.updateSearchBikesHeaderLink()
 
   setSearchTabInfo: (location) ->
     $('#search_distance').text($('#distance').val())
