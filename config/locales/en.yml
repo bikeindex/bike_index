@@ -5030,15 +5030,14 @@ en:
         loading_results: Loading results...
       results:
         no_matched: No registrations exactly matched your search
-        search_for_similar: Searching for similar serials...
         search_for_containing: Searching for serials containing your search...
-      similar_serials:
-        no_matched: No registrations with serial numbers similar to %{serial}
-        with_similar_serials: Registrations with serials similar to %{serial}
+        search_for_similar: Searching for similar serials...
       serials_containing:
         no_matched: No registrations with serial numbers containing %{serial}
         with_serials_containing: Registrations with serials containing %{serial}
-
+      similar_serials:
+        no_matched: No registrations with serial numbers similar to %{serial}
+        with_similar_serials: Registrations with serials similar to %{serial}
   sessions:
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with

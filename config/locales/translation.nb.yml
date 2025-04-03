@@ -5846,7 +5846,15 @@ nb:
       index:
         loading_results: Laster inn resultater...
       results:
-        no_bikes_matched: Ingen sykler samsvarte nøyaktig med søket ditt
+        no_matched: Ingen registreringer samsvarte nøyaktig med søket ditt
+        search_for_containing: Søker etter serier som inneholder søket ditt...
+        search_for_similar: Søker etter lignende serier...
+      serials_containing:
+        no_matched: Ingen registreringer med serienumre som inneholder %{serial}
+        with_serials_containing: Registreringer med serier som inneholder %{serial}
+      similar_serials:
+        no_matched: Ingen registreringer med serienummer som ligner på %{serial}
+        with_similar_serials: Registreringer med serier som ligner på %{serial}
   components:
     search:
       everything_combobox:
