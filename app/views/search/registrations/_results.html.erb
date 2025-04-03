@@ -1,19 +1,20 @@
 <%# This will become a view component, but for now just rendering old styled results %>
 
-<div class="container" %>
+<div class="container mb-5">
   <div class="row bikes-searched-default">
     <div class="col-md-12">
       <% if @bikes.present? %>
         <ul class="bike-boxes">
           <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
         </ul>
-        <div class="row">
+        <%# hidden, no ads  %>
+        <div class="row d-none">
           <div class="col-md-4 mt-4 offset-md-2">
             <div class="ad-block ad-binx ad468x60">
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row d-none">
           <div class="col-md-8 mt-4 offset-md-2">
             <%= render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"} %>
           </div>
