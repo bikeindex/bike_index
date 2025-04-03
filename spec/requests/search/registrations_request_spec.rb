@@ -10,6 +10,11 @@ RSpec.describe Search::RegistrationsController, type: :request do
   let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles, cycle_type: "e-scooter") }
   let(:target_bike_ids) { [stolen_bike.id, impounded_bike.id, stolen_bike_2.id] }
 
+  it "redirects from search" do
+    get "/search"
+    expect(response).to redirect_to base_url
+  end
+
   it "renders" do
     get base_url
     expect(response.code).to eq("200")

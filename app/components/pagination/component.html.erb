@@ -1,0 +1,11 @@
+<nav
+  class="tw:flex tw:space-x-1 tw:font-semibold tw:text-sm tw:text-gray-500"
+  aria-label="<%= pagy_t('pagy.aria_label.nav', count: @pagy.pages) %>"
+  data-controller="pagination--component"
+>
+  <%= prev_html.html_safe %>
+  <% @pagy.series.each do |item| %>
+    <%= pagy_series_link(item) %>
+  <% end %>
+  <%= next_html %>
+</nav>
