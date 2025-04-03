@@ -11,16 +11,13 @@ class BikeIndex.OptionalFormUpdate extends BikeIndex
     unless $target.is('a') # Ensure we aren't clicking on an interior element
       $target = $target.parents('.optional-form-block')
     $click_target = $($target.attr('data-target'))
-    $($target.attr('data-toggle')).slideDown 'fast', ->
-        $($target.attr('data-toggle')).removeClass('currently-hidden')
-    $target.slideUp 'fast', ->
-        $target.addClass('currently-hidden')
+    $($target.attr('data-toggle')).show().removeClass('currently-hidden')
+    $target.addClass('currently-hidden').hide()
     action = $target.attr('data-action')
 
     if action == 'rm-block'
       $click_target.slideUp 'fast', ->
         $click_target.removeClass('unhidden').addClass('currently-hidden')
-        $click_target.removeAttr('style')
         # FIX FIX FIX
         # THIS IS A TERRIBLE HACK
         setTimeout ->
@@ -29,10 +26,8 @@ class BikeIndex.OptionalFormUpdate extends BikeIndex
 
     else if action == 'swap'
       $swap = $($target.attr('data-swap'))
-      console.log('swap')
       $swap.slideUp 'fast', ->
-        console.log('here')
-        # $click_target.fadeIn()
+        $click_target.fadeIn()
         $click_target.slideDown().addClass('unhidden').removeClass('currently-hidden')
         $swap.addClass('currently-hidden').removeClass('unhidden')
 
