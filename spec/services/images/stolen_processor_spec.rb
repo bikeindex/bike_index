@@ -42,7 +42,7 @@ RSpec.describe Images::StolenProcessor do
       end.to change(ActiveStorage::Blob, :count).by 3
       expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
       expect(stolen_record.image_square.attached?).to be_truthy
-      expect(stolen_record.image_landscape.attached?).to be_truthy
+      expect(stolen_record.image_opengraph.attached?).to be_truthy
       expect(stolen_record.images_attached_id).to eq public_image.id
       expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
       expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
@@ -71,7 +71,7 @@ RSpec.describe Images::StolenProcessor do
 
         expect(stolen_record.reload.image_four_by_five.attached?).to be_truthy
         expect(stolen_record.image_square.attached?).to be_truthy
-        expect(stolen_record.image_landscape.attached?).to be_truthy
+        expect(stolen_record.image_opengraph.attached?).to be_truthy
 
         public_image.destroy
         stolen_record.bike.update_column :updated_at, Time.current - 1.hour
@@ -215,9 +215,9 @@ RSpec.describe Images::StolenProcessor do
     # If the image generation updates, use this to save the updated image:
     # before { `mv #{generated_image.path} spec/fixtures/#{generated_fixture_name}` }
 
-    context "with template: landscape" do
-      let(:template) { :landscape }
-      let(:generated_fixture_name) { "alert-landscape-landscape.png" }
+    context "with template: opengraph" do
+      let(:template) { :opengraph }
+      let(:generated_fixture_name) { "alert-landscape-opengraph.png" }
 
       it "creates an image matching target" do
         expect_images_to_match(generated_image, target_image)
