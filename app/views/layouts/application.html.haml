@@ -28,7 +28,7 @@
   %body{id: page_id, class:  body_class}
 
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache(["main_navbar", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar1", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
           %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
@@ -47,7 +47,7 @@
           - elsif current_user.blank?
             .center-navbar-signup-link-container
               = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
-          - bike_search_active = controller_namespace.blank? && controller_name == "bikes" && action_name == "index"
+          - bike_search_active = controller_namespace == "search" && controller_name == "registrations" && action_name == "index"
           %a#menu-opened-backdrop{ "aria-hidden" => "true" }
           .hamburgler{ "aria-hidden" => "true" }
             %a#primary_nav_hamburgler
