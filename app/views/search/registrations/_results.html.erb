@@ -20,7 +20,7 @@
           </div>
         </div>
       <% else %>
-        <h3 class="no-exact-results">
+        <h3 class="text-center uncap">
           <%= t(".no_bikes_matched") %>
         </h3>
       <% end %>
@@ -28,7 +28,7 @@
   </div>
 </div>
 
-<%# This is now a view component, so it needs to be outside the bootstrap container %>
+<%# This is now a view component, so it needs to be outside the bootstrap container for styling %>
 <% if @pagy.present? %>
   <%= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg, data: {turbo_action: "advance"})) %>
 <% end %>
