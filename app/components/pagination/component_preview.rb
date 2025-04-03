@@ -5,7 +5,11 @@ module Pagination
     include Pagy::Backend
 
     def default
-      render(Pagination::Component.new(pagy: pagy_opt, params: {}, data: {turbo_action: "advance"}))
+      render(Pagination::Component.new(pagy: pagy_opt, page_params: {}, data: {turbo_action: "advance"}))
+    end
+
+    def large
+      render(Pagination::Component.new(pagy: pagy_opt, page_params: {}, size: :lg, data: {turbo_action: "advance"}))
     end
 
     private

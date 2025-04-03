@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe Pagination::Component, type: :component do
-  let(:options) { {pagy:, data:, params:} }
-  let(:params) { {} }
+  let(:options) { {pagy:, data:, page_params:} }
+  let(:page_params) { {} }
   let(:data) { {} }
   let(:component) { render_inline(described_class.new(**options)) }
 
