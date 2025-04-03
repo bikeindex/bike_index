@@ -11,9 +11,10 @@ RSpec.describe Pagination::Component, type: :component do
   context "bike pagy" do
     let(:pagy) { Pagy.new(count: 1_384_155, limit: 10, page: 1, max_pages: 100) }
 
-    # This fails because the view component doesn't have a page to link from. I'm not sure how to fix
-    xit "renders" do
-      expect(component).to be_present
+    it "renders" do
+      with_request_url "/search/registrations" do
+        expect(component).to be_present
+      end
     end
   end
 end

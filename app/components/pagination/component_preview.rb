@@ -2,8 +2,6 @@
 
 module Pagination
   class ComponentPreview < ApplicationComponentPreview
-    include Pagy::Backend
-
     def default
       render(Pagination::Component.new(pagy: pagy_opt, page_params: {}, data: {turbo_action: "advance"}))
     end
