@@ -29,6 +29,18 @@
 </div>
 
 <%# This is now a view component, so it needs to be outside the bootstrap container for styling %>
-<% if @pagy.present? %>
-  <%= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg, data: {turbo_action: "advance"})) %>
+<% if @bikes.present? && @pagy.present? %>
+  <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
+    size: :lg, data: {turbo_action: "advance"})) %>
+<% end %>
+
+<%# render near serial frame %>
+<% if @interpreted_params[:serial].present? %>
+  <%=
+    turbo_frame_tag :search_registrations_similar_serials_frame,
+    src: similar_serials_search_registrations_path,
+    loading: :lazy do
+  %>
+    <%= render LoadingSpinner::Component.new(text: t(".search_for_similar")) %>
+  <% end %>
 <% end %>
