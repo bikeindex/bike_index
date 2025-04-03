@@ -10,6 +10,7 @@ class Images::StolenProcessor
   TEMPLATE_CONFIG = {
     four_by_five: {topbar: :horizontal, dimensions: [1440, 1800]},
     square: {topbar: :horizontal, dimensions: [1440, 1440]},
+    opengraph: {topbar: :vertical, dimensions: [1600, 990]},
     landscape: {topbar: :vertical, dimensions: [1600, 990]}
   }.freeze
 
