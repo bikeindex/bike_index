@@ -11,7 +11,6 @@ RSpec.describe Search::RegistrationsController, type: :request do
   describe "index" do
     let(:target_bike_ids) { [stolen_bike.id, impounded_bike.id, stolen_bike_2.id] }
 
-
     it "redirects from search" do
       get "/search"
       expect(response).to redirect_to base_url
