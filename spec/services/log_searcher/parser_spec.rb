@@ -28,8 +28,8 @@ RSpec.describe LogSearcher::Parser do
         let(:time) { Time.parse("2025-04-03T05:18:55.534592 UTC") }
         let(:target) do
           {request_at: time, request_id: "d22faa57-0d50-4d24-bf72-3db7c500b8ef", duration_ms: 871, page: nil,
-            user_id: 85, endpoint: :web_bikes, ip_address: "157.131.200.8",
-            query_items: {serial: "adsfadsfadfadsfasdfasdfasdf", distance: "100", location: "San Francisco", stolenness: "stolen"},
+           user_id: 85, endpoint: :web_bikes, ip_address: "157.131.200.8",
+           query_items: {serial: "adsfadsfadfadsfasdfasdfasdf", distance: "100", location: "San Francisco", stolenness: "stolen"},
            stolenness: :stolen, serial_normalized: "AD5FAD5FADFAD5FA5DFA5DFA5DF", includes_query: true, organization_id: nil}
         end
         it "parses" do
