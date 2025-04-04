@@ -145,15 +145,15 @@ export default class TimeLocalizer {
     const currentThreeDays = (time < this.tomorrowEnd && time > this.yesterdayStart)
 
     // If it's preciseTime (or preciseTimeSeconds), always show the hours and mins
-    let hourEl = (preciseTime || includeSeconds || currentThreeDays) ? ` ${this.hourFormat(time, 'h:mm', includeSeconds, withPreposition)}` : '';
+    let hourEl = (preciseTime || includeSeconds || currentThreeDays) ? ` ${this.hourFormat(time, 'h:mm', includeSeconds, withPreposition)}` : ''
 
     if (singleFormat) {
-      return time.toFormat('yyyy-MM-dd') + hourEl;
+      return time.toFormat('yyyy-MM-dd') + hourEl
     }
 
     // If not withPreposition, include a comma
     if (!withPreposition && hourEl.length > 0) {
-      hourEl = ', ' + hourEl;
+      hourEl = ', ' + hourEl
     }
 
     let prefix = ''

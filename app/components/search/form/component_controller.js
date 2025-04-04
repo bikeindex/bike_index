@@ -35,19 +35,12 @@ export default class extends Controller {
 
     // Add timeLocalizer and watch for turbo-frame renders
     if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
-    this.frameRenderHandler = () => {
-      // Run the time localization command on frame render
-      if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
-        window.timeLocalizer.localize()
-      }
-    }
-    // Add the event listener
-    document.addEventListener("turbo:frame-render", this.frameRenderHandler)
+    document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
-  disconnect() {
+  disconnect () {
     // Clean up event listener when controller disconnects
-    document.removeEventListener("turbo:frame-render", this.frameRenderHandler)
+    document.removeEventListener('turbo:frame-render', this.frameRenderHandler)
   }
 
   setupFormFieldListeners () {
@@ -76,7 +69,10 @@ export default class extends Controller {
     if (this.hasButtonTarget) { this.buttonTarget.disabled = false }
   }
 
-  frameRenderHandler (_event) {
-    window.timeLocalizer.localize()
+  handleFrameRender = () => {
+    // Run the time localization command on frame render
+    if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
+      window.timeLocalizer.localize()
+    }
   }
 }
