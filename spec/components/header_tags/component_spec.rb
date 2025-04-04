@@ -274,7 +274,7 @@ RSpec.describe HeaderTags::Component, type: :component do
           let(:target_images) do
             {
               page_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_four_by_five),
-              twitter_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_landscape)
+              twitter_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_four_by_five)
             }
           end
           it "returns expected" do
