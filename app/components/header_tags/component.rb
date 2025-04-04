@@ -52,8 +52,8 @@ module HeaderTags
     end
 
     def known_image_dimensions?
-      return false # TODO: update after switch to new opegraph images
-      @facebook_image == DEFAULT_IMAGE || @image_dimensions.present?
+      # TODO: update after switch to new opengraph images
+      facebook_image == DEFAULT_IMAGE # || @image_dimensions.present?
     end
 
     def image_width
@@ -185,8 +185,8 @@ module HeaderTags
       @page_description = bike_page_description(bike, status_prefix)
 
       if (header_image_urls = BikeDisplayer.header_image_urls(bike))
-        @image_dimensions = [1200,630]
-        # TODO switch to
+        @image_dimensions = [1200, 630]
+        # TODO: update after switch to new opengraph images
         @page_image = header_image_urls[:facebook]
         @facebook_image = header_image_urls[:facebook]
         @twitter_image = header_image_urls[:twitter]

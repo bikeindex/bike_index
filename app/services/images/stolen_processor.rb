@@ -10,7 +10,7 @@ class Images::StolenProcessor
   TEMPLATE_CONFIG = {
     four_by_five: {topbar: :horizontal, dimensions: [1440, 1800]},
     square: {topbar: :horizontal, dimensions: [1440, 1440]},
-    opengraph: {topbar: :vertical, dimensions: [1200, 630]},
+    opengraph: {topbar: :vertical, dimensions: [1200, 630]}
   }.freeze
 
   # topbar is 170px tall, right side is 120px tall - so the minimum height is 120
