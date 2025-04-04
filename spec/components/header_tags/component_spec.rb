@@ -68,6 +68,8 @@ RSpec.describe HeaderTags::Component, type: :component do
       expect(component).to be_present
       expect(component.css("title")).to have_text "Bike Index - Bike registration that works"
       expect(component.css('meta[name="description"]').first["content"]).to eq default_description
+      expect(component.css('[property="og:image:height"]').first["content"]).to eq "630"
+      expect(component.css('[property="og:image:width"]').first["content"]).to eq "1200"
     end
     context "choose registration" do
       let(:action_name) { "choose_registration" }
@@ -192,6 +194,8 @@ RSpec.describe HeaderTags::Component, type: :component do
         it "adds the public image we want" do
           expect_matching_tags(title: title, description: "Bike Index did something cool",
             image: target_url, published_at: target_time, modified_at: target_time)
+
+          expect(component.css('[property="og:image:height"]')).to be_blank
         end
       end
       describe "info post" do
@@ -274,13 +278,16 @@ RSpec.describe HeaderTags::Component, type: :component do
           let(:target_images) do
             {
               page_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_four_by_five),
-              twitter_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_landscape)
+              twitter_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_four_by_five)
             }
           end
           it "returns expected" do
             expect(stolen_record.reload.images_attached?).to be_truthy
 
             expect_matching_tags(title:, image: target_images, description:, updated_at: bike.updated_at)
+            # TODO: update after switch to new opengraph images
+            # expect(component.css('[property="og:image:height"]').first["content"]).to eq "630"
+            # expect(component.css('[property="og:image:width"]').first["content"]).to eq "1200"
           end
         end
       end

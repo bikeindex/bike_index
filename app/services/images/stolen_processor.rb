@@ -10,12 +10,12 @@ class Images::StolenProcessor
   TEMPLATE_CONFIG = {
     four_by_five: {topbar: :horizontal, dimensions: [1440, 1800]},
     square: {topbar: :horizontal, dimensions: [1440, 1440]},
-    landscape: {topbar: :vertical, dimensions: [1600, 990]}
+    opengraph: {topbar: :vertical, dimensions: [1200, 630]}
   }.freeze
 
   # topbar is 170px tall, right side is 120px tall - so the minimum height is 120
   TOPBAR_HORIZONTAL_HEIGHT = 120
-  # topbar vertical is 170px wide, right side is 106px wide
+  # topbar vertical is 82px wide, right side is 106px wide
   # ... It looks better when the image doesn't overlap with the bar
   TOPBAR_VERTICAL_WIDTH = 190
 
@@ -90,14 +90,14 @@ class Images::StolenProcessor
       )
       square.analyze
 
-      landscape = ActiveStorage::Blob.create_and_upload!(
-        io: generate_alert(template: :landscape, image:, location_text:),
-        filename: "stolen-#{stolen_record.id}-landscape.jpeg"
+      opengraph = ActiveStorage::Blob.create_and_upload!(
+        io: generate_alert(template: :opengraph, image:, location_text:),
+        filename: "stolen-#{stolen_record.id}-opengraph.jpeg"
       )
-      landscape.analyze
+      opengraph.analyze
 
       stolen_record.image_square.attach(square)
-      stolen_record.image_landscape.attach(landscape)
+      stolen_record.image_opengraph.attach(opengraph)
       # Attach 4 by five last, it's what sets images_attached?
       stolen_record.image_four_by_five.attach(four_by_five)
     end
@@ -157,7 +157,7 @@ class Images::StolenProcessor
       left_offset = (config[:dimensions].first - bike_image_width) / 2
       top_offset = (config[:dimensions].last - bike_image_height) / 2
       if config[:topbar] === :horizontal
-        # landscape images look better vertically centered in the template. If offset is < top-bar height,
+        # opengraph images look better vertically centered in the template. If offset is < top-bar height,
         # the image takes up the whole visible area - so use the top-bar min height. Otherwise, use the
         # offset (which vertically centers the image).
         top_offset = TOPBAR_HORIZONTAL_HEIGHT if top_offset < TOPBAR_HORIZONTAL_HEIGHT

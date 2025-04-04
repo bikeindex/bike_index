@@ -102,7 +102,7 @@ class StolenRecord < ApplicationRecord
 
   has_one_attached :image_four_by_five, dependent: false
   has_one_attached :image_square, dependent: false
-  has_one_attached :image_landscape, dependent: false
+  has_one_attached :image_opengraph, dependent: false
 
   validates_presence_of :date_stolen
 
