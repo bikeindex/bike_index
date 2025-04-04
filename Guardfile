@@ -5,7 +5,7 @@ group :red_green_refactor, halt_on_fail: true do
     cmd: "SKIP_CSS_BUILD=true bin/rspec -f progress",
     cmd_additional_args: "--require rails_helper --no-profile --order defined",
     run_all: {
-      cmd: "bin/parallel_rspec --quiet --test-options='-f documentation -o /dev/null -f progress",
+      cmd: "turbo_tests --quiet --test-options='-f documentation -o /dev/null -f progress",
       cmd_additional_args: "'"
     },
     failed_mode: :focus,
