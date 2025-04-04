@@ -72,7 +72,8 @@ class Images::StolenProcessor
     # use the existing public image (it was assigned manually)
     def use_stolen_images_override_id?(stolen_record)
       images_updated = PublicImage.unscoped.where(imageable_type: "Bike", imageable_id: stolen_record.bike_id).maximum(:updated_at)
-      return false if images_updated.blank? || stolen_record.image_four_by_five&.blob&.created_at.blank?
+      return false if images_updated.blank? || stolen_record.image_four_by_five&.blob&.created_at.blank? ||
+        stolen_record.images_attached_id.blank? # handle if metadata is overwritten
 
       stolen_record.image_four_by_five.blob.created_at > images_updated
     end

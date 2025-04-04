@@ -95,8 +95,8 @@ class BikeDisplayer
         if stolen_record.images_attached?
           return {
             square: BlobUrl.for(stolen_record.image_square),
-            facebook: BlobUrl.for(stolen_record.image_four_by_five), # TODO: update after switch to new opegraph images
-            twitter: BlobUrl.for(stolen_record.image_four_by_five) # TODO: update after switch to new opegraph images
+            facebook: BlobUrl.for(stolen_record.image_opengraph),
+            twitter: BlobUrl.for(stolen_record.image_opengraph)
           }
         end
 
