@@ -9,5 +9,10 @@ RSpec.describe BlobUrl do
       expect(described_class.for(stolen_record.image_four_by_five))
         .to eq Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_four_by_five.blob)
     end
+    context "blank" do
+      it "returns nil" do
+        expect(described_class.for(nil)).to be_nil
+      end
+    end
   end
 end
