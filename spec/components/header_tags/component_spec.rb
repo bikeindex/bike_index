@@ -277,17 +277,16 @@ RSpec.describe HeaderTags::Component, type: :component do
           before { Images::StolenProcessor.update_alert_images(stolen_record) }
           let(:target_images) do
             {
-              page_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_four_by_five),
-              twitter_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_four_by_five)
+              page_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_opengraph),
+              twitter_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_opengraph)
             }
           end
           it "returns expected" do
             expect(stolen_record.reload.images_attached?).to be_truthy
 
             expect_matching_tags(title:, image: target_images, description:, updated_at: bike.updated_at)
-            # TODO: update after switch to new opengraph images
-            # expect(component.css('[property="og:image:height"]').first["content"]).to eq "630"
-            # expect(component.css('[property="og:image:width"]').first["content"]).to eq "1200"
+            expect(component.css('[property="og:image:height"]').first["content"]).to eq "630"
+            expect(component.css('[property="og:image:width"]').first["content"]).to eq "1200"
           end
         end
       end
