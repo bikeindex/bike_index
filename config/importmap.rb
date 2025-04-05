@@ -15,4 +15,4 @@ pin "select2", to: "https://cdn.jsdelivr.net/npm/select2@4.0.8/dist/js/select2.f
 # Our javascript!
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin_all_from "app/components", under: "components"
-pin "utils/collapse_utils", to: "utils/collapse_utils.js"
+pin_all_from "app/javascript/utils", under: "utils", to: "utils"

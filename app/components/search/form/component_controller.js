@@ -1,4 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
+import TimeLocalizer from 'utils/time_localizer'
+
+/* global window  */
 
 // Connects to data-controller='search--form--component'
 export default class extends Controller {
@@ -29,6 +32,15 @@ export default class extends Controller {
     }
 
     this.setupFormFieldListeners()
+
+    // Add timeLocalizer and watch for turbo-frame renders
+    if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
+    document.addEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  disconnect () {
+    // Clean up event listener when controller disconnects
+    document.removeEventListener('turbo:frame-render', this.frameRenderHandler)
   }
 
   setupFormFieldListeners () {
@@ -55,5 +67,12 @@ export default class extends Controller {
 
   resetButton () {
     if (this.hasButtonTarget) { this.buttonTarget.disabled = false }
+  }
+
+  handleFrameRender = () => {
+    // Run the time localization command on frame render
+    if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
+      window.timeLocalizer.localize()
+    }
   }
 }
