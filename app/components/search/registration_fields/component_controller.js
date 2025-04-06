@@ -34,6 +34,8 @@ export default class extends Controller {
   }
 
   updateLocationVisibility () {
+    return
+    // Updated to always show location
     const selectedValue = this.element.querySelector('input[name="stolenness"]:checked')?.value
 
     if (selectedValue === 'proximity') {
