@@ -1,6 +1,9 @@
 // collapse-utils.js
 // Utility class for handling element collapse animations
 
+// The only place this was used was removed in #2773
+// check that PR to see how to use it
+
 /**
  * CollapseUtils class providing element collapse/expand functionality
  */
