@@ -1,5 +1,4 @@
 import { Controller } from '@hotwired/stimulus'
-// import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage  */
 
@@ -31,18 +30,6 @@ export default class extends Controller {
     if (!this.form) return
 
     this.form.addEventListener('turbo:submit-end', this.setStolennessCounts.bind(this))
-  }
-
-  updateLocationVisibility () {
-
-    // Updated to always show location
-    // const selectedValue = this.element.querySelector('input[name="stolenness"]:checked')?.value
-
-    // if (selectedValue === 'proximity') {
-    //   collapse('show', this.locationWrapTarget)
-    // } else {
-    //   collapse('hide', this.locationWrapTarget)
-    // }
   }
 
   // TODO: make this location be controller specific
