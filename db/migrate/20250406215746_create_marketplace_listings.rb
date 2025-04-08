@@ -4,11 +4,11 @@ class CreateMarketplaceListings < ActiveRecord::Migration[8.0]
       t.references :seller
       t.references :buyer
       t.references :item, polymorphic: true
-      t.datetime :published_at
+      t.datetime :for_sale_at
       t.datetime :sold_at
       t.integer :price_cents
       t.boolean :willing_to_ship, default: false
-
+      t.integer :status, default: 0
 
       t.timestamps
     end

@@ -1,5 +1,32 @@
+# == Schema Information
+#
+# Table name: marketplace_listings
+#
+#  id              :bigint           not null, primary key
+#  for_sale_at     :datetime
+#  item_type       :string
+#  price_cents     :integer
+#  sold_at         :datetime
+#  status          :integer          default("draft")
+#  willing_to_ship :boolean          default(FALSE)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  buyer_id        :bigint
+#  item_id         :bigint
+#  seller_id       :bigint
+#
+# Indexes
+#
+#  index_marketplace_listings_on_buyer_id   (buyer_id)
+#  index_marketplace_listings_on_item       (item_type,item_id)
+#  index_marketplace_listings_on_seller_id  (seller_id)
+#
 class MarketplaceListing < ApplicationRecord
-  belongs_to :seller
-  belongs_to :buyer
+  STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
+
+  enum :status, STATUS_ENUM
+
+  belongs_to :seller, class_name: "User"
+  belongs_to :buyer, class_name: "User"
   belongs_to :item, polymorphic: true
 end
