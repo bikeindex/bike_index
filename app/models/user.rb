@@ -276,6 +276,10 @@ class User < ApplicationRecord
     organization_roles.ambassador_organizations.limit(1).any?
   end
 
+  def can_list_items?
+    superuser?
+  end
+
   def to_param
     username
   end
