@@ -466,7 +466,7 @@ RSpec.describe "Bikes API V3", type: :request do
           }
         end
         it "updates" do
-          bike_sticker.claim(bike: bike, user: FactoryBot.create(:admin))
+          bike_sticker.claim(bike: bike, user: FactoryBot.create(:superuser))
           expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
           expect(bike.year).to_not eq 2012
           expect {

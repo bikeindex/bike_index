@@ -83,7 +83,7 @@ RSpec.describe StripeSubscription, type: :model do
     context "with existing admin_managed membership" do
       let!(:membership_existing) do
         FactoryBot.create(:membership, user:, start_at: start_at_existing, end_at: end_at_existing,
-          creator: FactoryBot.create(:admin))
+          creator: FactoryBot.create(:superuser))
       end
       let(:start_at_existing) { Time.current - 1.year }
       let(:end_at_existing) { nil }

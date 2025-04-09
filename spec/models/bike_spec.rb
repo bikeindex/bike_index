@@ -773,7 +773,7 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "claimed" do
-        let(:superuser) { FactoryBot.create(:admin) }
+        let(:superuser) { FactoryBot.create(:superuser) }
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: superuser, creator: FactoryBot.create(:user_confirmed)) }
         it "returns true for user, not creator" do
           expect(bike.reload.current_ownership.creator_id).to_not eq superuser.id

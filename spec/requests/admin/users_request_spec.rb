@@ -85,7 +85,7 @@ RSpec.describe Admin::UsersController, type: :request do
       end
     end
     context "developer" do
-      let(:current_user) { FactoryBot.create(:admin_developer) }
+      let(:current_user) { FactoryBot.create(:superuser_developer) }
       it "updates developer" do
         user_subject.reload
         og_auth_token = user_subject.auth_token

@@ -5,7 +5,7 @@ RSpec.describe PublicImagesController, type: :request do
   let(:base_url) { "/public_images" }
 
   describe "create" do
-    let(:current_user) { FactoryBot.create(:admin) }
+    let(:current_user) { FactoryBot.create(:superuser) }
     context "bike" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
       let!(:current_user) { bike.current_ownership.creator }

@@ -93,7 +93,7 @@ RSpec.describe AfterUserChangeJob, type: :job do
       expect(user.reload.superuser_abilities.count).to eq 0
     end
     context "user is superuser" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "does adds superuser_abilities" do
         expect(user.superuser).to be_truthy
         expect(user.superuser_abilities.count).to eq 0
@@ -152,7 +152,7 @@ RSpec.describe AfterUserChangeJob, type: :job do
   end
 
   describe "phone_waiting_confirmation" do
-    let(:user) { FactoryBot.create(:admin) } # Confirm that superadmins still get this alert, because we want them to
+    let(:user) { FactoryBot.create(:superuser) } # Confirm that superadmins still get this alert, because we want them to
     let!(:user_phone) { FactoryBot.create(:user_phone, user: user) }
     it "adds alert_slugs" do
       expect {
