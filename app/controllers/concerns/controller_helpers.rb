@@ -133,7 +133,7 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
-    bikes_path(stolenness: "all")
+    search_registrations_path(stolenness: "all")
   end
 
   def ensure_current_organization!
@@ -286,6 +286,10 @@ module ControllerHelpers
     flash[:notice] = translation(:please_sign_in,
       scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(new_session_path) && return
+  end
+
+  def turbo_request?
+    request.format.turbo_stream? || turbo_frame_request?
   end
 
   protected

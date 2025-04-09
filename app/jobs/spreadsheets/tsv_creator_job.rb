@@ -1,4 +1,4 @@
-class TsvCreatorJob < ScheduledJob
+class Spreadsheets::TsvCreatorJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   def self.frequency
@@ -14,7 +14,7 @@ class TsvCreatorJob < ScheduledJob
   end
 
   def create_tsv(tsv_method, true_and_false)
-    creator = TsvCreator.new
+    creator = Spreadsheets::TsvCreator.new
 
     if true_and_false
       creator.send(tsv_method, true)
@@ -25,9 +25,9 @@ class TsvCreatorJob < ScheduledJob
   end
 
   def enqueue_scheduled_jobs
-    TsvCreatorJob.perform_async("create_manufacturer")
-    TsvCreatorJob.perform_async("create_daily_tsvs")
-    TsvCreatorJob.perform_in(20.minutes, "create_stolen_with_reports", true)
-    TsvCreatorJob.perform_in(1.hour, "create_stolen", true)
+    Spreadsheets::TsvCreatorJob.perform_async("create_manufacturer")
+    Spreadsheets::TsvCreatorJob.perform_async("create_daily_tsvs")
+    Spreadsheets::TsvCreatorJob.perform_in(20.minutes, "create_stolen_with_reports", true)
+    Spreadsheets::TsvCreatorJob.perform_in(1.hour, "create_stolen", true)
   end
 end

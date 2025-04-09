@@ -64,7 +64,7 @@ RSpec.describe StolenBike::RemoveOrphanedImagesJob, type: :lib do
       before do
         Images::StolenProcessor.update_alert_images(stolen_record)
         stolen_record.reload.image_four_by_five.blob.update(created_at: time)
-        stolen_record.image_landscape.blob.update(created_at: time)
+        stolen_record.image_opengraph.blob.update(created_at: time)
         # Don't update square - just to test that things that are created more recently aren't destroyed
       end
 

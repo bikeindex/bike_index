@@ -8,7 +8,7 @@
 
 @layer components {
   .twlink {
-    @apply tw:text-blue-500 tw:underline ;
+    @apply tw:text-blue-500 tw:underline;
   }
 
   .twless-strong {
@@ -18,18 +18,30 @@
   .twbtn, .twbtn-blue, .twbtn-green {
     @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3
     tw:cursor-pointer tw:active:outline tw:focus-visible:outline-offset-2
+    tw:disabled:cursor-not-allowed tw:disabled:opacity-85
     tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2
     tw:active:outline-none tw:active:opacity-95;
   }
 
   .twbtn-green {
     @apply tw:text-white tw:bg-green-600
-      tw:hover:bg-green-500 tw:focus-visible:outline-green-600;
+      tw:hover:bg-green-500 tw:focus-visible:outline-green-600 tw:disabled:hover:bg-green-600;
   }
 
   .twbtn-blue {
     @apply tw:text-white tw:bg-blue-600
-      tw:hover:bg-blue-500 tw:focus-visible:outline-blue-600;
+      tw:hover:bg-blue-500 tw:focus-visible:outline-blue-600
+      tw:disabled:hover:bg-blue-600;
+  }
+
+  .twinput {
+    @apply tw:bg-white tw:border tw:border-gray-300 tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:rounded-lg
+      tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
+      tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-blue-400 tw:focus-visible:border-blue-400 tw:dark:focus-visible:ring-blue-500 tw:dark:focus:border-blue-500
+      tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
+  }
+  .twlabel {
+    @apply tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
   }
 }
 
@@ -49,4 +61,42 @@ body {
 */
 body.dark {
   @apply tw:bg-gray-900 tw:text-gray-400;
+}
+
+
+
+/* select2 is used by everythingcombox. Here are styles to make it look like the other inputs */
+.select2 .select2-selection--multiple {
+  /* There is some funky padding stuff that goes on in select2. This makes it mostly match */
+  @apply tw:pt-1.5 tw:px-2.5 tw:pb-0;
+}
+
+.select2-container.select2-container--default .select2-selection--multiple {
+  @apply tw:border tw:border-gray-300 tw:dark:border-gray-600;
+}
+
+.select2-container .select2-dropdown, .select2-container.select2-container--default .select2-selection--multiple {
+  @apply tw:bg-white tw:dark:bg-gray-700 tw:rounded-lg
+    tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200;
+}
+
+.select2-search__field {
+  @apply tw:placeholder-gray-500 tw:dark:placeholder-gray-400;
+}
+
+.select2-container .select2-dropdown, .select2.select2-container--default.select2-container--focus .select2-selection--multiple {
+  @apply tw:outline-0 tw:ring tw:ring-blue-400 tw:border-blue-400 tw:dark:ring-blue-500 tw:dark:focus:border-blue-500;
+}
+
+.select2-container--default
+  .select2-selection--multiple
+  .select2-selection__choice,
+  .select2-container .select2-search--inline .select2-search__field {
+  margin-top: 0 !important;
+}
+
+.select2-container--default
+  .select2-selection--multiple
+  .select2-selection__rendered {
+  padding: 0 !important;
 }

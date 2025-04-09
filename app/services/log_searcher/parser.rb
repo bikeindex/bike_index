@@ -9,7 +9,10 @@ class LogSearcher::Parser
     "Admin::BikesController#index" => :admin_bikes,
     "OrgPublic::ImpoundedBikesController#index" => :org_public_impounded,
     "Organized::ImpoundRecordsController#index" => :org_impounded,
-    "Organized::ParkingNotificationsController#index" => :org_parking_notifications
+    "Organized::ParkingNotificationsController#index" => :org_parking_notifications,
+    "Search::RegistrationsController#index" => :web_bikes,
+    "Search::RegistrationsController#serials_containing" => :web_serials_containing,
+    "Search::RegistrationsController#similar_serials" => :web_close_serials
   }.freeze
 
   ROUTE_ENDPOINTS = {

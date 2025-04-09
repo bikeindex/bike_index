@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Thu, 02 Jan 2025 19:33:48 GMT
+      - Thu, 03 Apr 2025 01:39:17 GMT
       Pragma:
       - no-cache
       Expires:
@@ -33,21 +33,21 @@ http_interactions:
       X-Goog-Maps-Metro-Area:
       - San Francisco, CA
       Content-Security-Policy-Report-Only:
-      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:229:0
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:228:0
       Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to=coop_reporting
+      - same-origin; report-to=msaifdggmnwc:228:0
       Report-To:
-      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:229:0"}],}'
+      - '{"group":"msaifdggmnwc:228:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:228:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '2187'
+      - '2186'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=46
+      - gfet4t7; dur=49
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -68,9 +68,9 @@ http_interactions:
         \                 \"political\"\n               ]\n            }\n         ],\n
         \        \"formatted_address\" : \"San Francisco, CA, USA\",\n         \"geometry\"
         : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
-        : \n               {\n                  \"lat\" : 37.9298239,\n                  \"lng\"
+        : \n               {\n                  \"lat\" : 37.929824,\n                  \"lng\"
         : -122.28178\n               },\n               \"southwest\" : \n               {\n
-        \                 \"lat\" : 37.6398299,\n                  \"lng\" : -123.1328309\n
+        \                 \"lat\" : 37.6398299,\n                  \"lng\" : -123.1328145\n
         \              }\n            },\n            \"location\" : \n            {\n
         \              \"lat\" : 37.7749295,\n               \"lng\" : -122.4194155\n
         \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
@@ -80,6 +80,5 @@ http_interactions:
         : -122.527\n               }\n            }\n         },\n         \"place_id\"
         : \"ChIJIQBpAG2ahYAR_6128GcTUEo\",\n         \"types\" : \n         [\n            \"locality\",\n
         \           \"political\"\n         ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-    http_version:
-  recorded_at: Thu, 02 Jan 2025 19:33:48 GMT
-recorded_with: VCR 5.0.0
+  recorded_at: Thu, 03 Apr 2025 01:39:17 GMT
+recorded_with: VCR 6.3.1

@@ -19,9 +19,9 @@ RSpec.describe StripeEvent, type: :model do
       let(:target_subscription) do
         {
           email: "seth@bikeindex.org",
-          stripe_status: "active",
+          stripe_status: "canceled",
           stripe_price_stripe_id: stripe_price.stripe_id,
-          end_at: nil,
+          end_at: Time.parse("2025-03-21 16:37:15 -0500"),
           membership_level: "plus",
           interval: "monthly",
           test?: true
@@ -85,7 +85,7 @@ RSpec.describe StripeEvent, type: :model do
       context "with user matching email" do
         let!(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
         let(:target_membership) do
-          {level: "plus", status: "active", user_id: user.id, end_at: nil}
+          {level: "plus", status: "ended", user_id: user.id, end_at: Time.parse("2025-03-21 16:37:15 -0500")}
         end
 
         it "assigns things to the user and creates a membership" do
@@ -196,7 +196,7 @@ RSpec.describe StripeEvent, type: :model do
           expect(membership.user_id).to eq user.id
           expect(membership.start_at).to be_within(1).of stripe_subscription.start_at
           expect(membership.end_at).to be_within(1).of stripe_subscription.end_at
-          expect(membership.status).to eq "active"
+          expect(membership.status).to eq "ended"
         end
       end
     end

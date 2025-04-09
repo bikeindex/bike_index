@@ -226,6 +226,7 @@ es:
           user_not_authorized:
         manufacturer:
           cannot_match_a_color_name:
+          cannot_include_quote:
         organization_message:
           latlon_required:
           required:
@@ -848,6 +849,7 @@ es:
         wheelchair:
         e_motorcycle:
         traditional_bike:
+        elliptical:
       frame_material:
         aluminum:
         composite:
@@ -3286,7 +3288,6 @@ es:
       has_combination:
       has_key:
       large_kryptonite_key:
-      lock_type:
       other_lock_manufacturer:
       pinhead_key:
       pinhead_locking_skewer_key:
@@ -3307,12 +3308,14 @@ es:
       save_information_about_one_of_your_locks:
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below:
       manufacturers_we_know_about:
       name: Nombre
       oh_no_were_missing_a_manufacturer:
       only_makes_components:
       thats_not_actually_surprising:
+      also_available_html:
+      csv_on_github:
+      submit_a_pr_html:
   meta_descriptions:
     bikes_index: Bicicletas registradas esta semana
     bikes_new:
@@ -3381,6 +3384,7 @@ es:
     welcome_goodbye:
     welcome_index:
     my_accounts_show:
+    search_registrations_index:
   money:
     currencies:
       en:
@@ -4583,3 +4587,36 @@ es:
       glad_to_have_you_on_board:
       thank_you_for_supporting_bike_index:
       xoxo:
+  search:
+    registrations:
+      index:
+        loading_results:
+      results:
+        no_matched:
+        search_for_containing:
+        search_for_similar:
+      serials_containing:
+        no_matched:
+        with_serials_containing:
+      similar_serials:
+        no_matched:
+        with_similar_serials:
+  components:
+    search:
+      everything_combobox:
+        query_items_description:
+        search_descriptions:
+      form:
+        doesnt_look_like_serial:
+        search_for_serial_number:
+        submit:
+      registration_fields:
+        anywhere:
+        miles_of:
+        search_distance:
+        search_location:
+        stolenness_all:
+        stolenness_non:
+        stolenness_proximity:
+        stolenness_stolen:
+        within:

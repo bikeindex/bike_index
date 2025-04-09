@@ -58,7 +58,9 @@ class LoggedSearch < AnalyticsRecord
     org_bikes: 12,
     org_parking_notifications: 13,
     org_impounded: 14,
-    org_public_impounded: 15
+    org_public_impounded: 15,
+    web_serials_containing: 19,
+    web_close_serials: 20
   }.freeze
 
   STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3}.freeze

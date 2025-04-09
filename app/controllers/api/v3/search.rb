@@ -21,7 +21,7 @@ module API
         end
 
         def interpreted_params
-          Bike.searchable_interpreted_params(params, ip: forwarded_ip_address)
+          BikeSearchable.searchable_interpreted_params(params, ip: forwarded_ip_address)
         end
 
         def serialized_bikes_results(paginated_bikes)
@@ -82,7 +82,7 @@ module API
           max_limit = 11_000
           ActiveRecord::Base.connected_to(role: :reading) do
             # Doing extra stuff to make this query more efficient, since this is called all the time
-            interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: "proximity"), ip: forwarded_ip_address)
+            interpreted_params = BikeSearchable.searchable_interpreted_params(params.merge(stolenness: "proximity"), ip: forwarded_ip_address)
             # Un-scope to remove the unnecessary eager loading
             bikes = Bike.unscoped.current.search(interpreted_params.merge(stolenness: "all"))
             # And then execute the specific BikeSearchable#search_matching_stolenness query for each

@@ -3,22 +3,6 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-  # Direct route for active storage, lipanski.com/posts/activestorage-cdn-rails-direct-route
-  direct :rails_public_blob do |blob|
-    # Preserve the behavior of `rails_blob_url` when using file storage
-    if %i[local test].include?(Bikeindex::Application.config.active_storage.service)
-      route =
-        if blob.is_a?(ActiveStorage::Variant) || blob.is_a?(ActiveStorage::VariantWithRecord)
-          :rails_representation
-        else
-          :rails_blob
-        end
-      route_for(route, blob)
-    else
-      File.join(ENV.fetch("ACTIVE_STORAGE_HOST"), blob.key || "") # Use the CDN
-    end
-  end
-
   mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
   mount PgHero::Engine, at: "/pghero", constraints: AdminRestriction
 
@@ -151,8 +135,18 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
-  resources :registrations, only: [:new, :create] do
+  resources :registrations, only: %i[new create] do
     collection { get :embed }
+  end
+
+  namespace :search do
+    get "/", to: redirect("/search/registrations")
+    resources :registrations, only: %i[index] do
+      collection do
+        get :similar_serials
+        get :serials_containing
+      end
+    end
   end
 
   resources :bikes, except: [:edit] do
@@ -328,9 +322,9 @@ Rails.application.routes.draw do
   end
 
   resources :manufacturers, only: %i[index] do
-    collection { get "tsv" }
+    collection { get "tsv" } # TODO: can we delete this?
   end
-  get "manufacturers_tsv", to: "manufacturers#tsv"
+  get "manufacturers_tsv", to: "manufacturers#tsv" # TODO: can we delete this?
 
   get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
   get "theft-ring", to: redirect("theft-rings")

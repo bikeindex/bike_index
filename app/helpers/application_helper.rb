@@ -68,6 +68,7 @@ module ApplicationHelper
   #  - nil - which just calls yield directly
   def current_page_skeleton
     return "organized_skeleton" if controller_namespace == "organized" && action_name != "landing"
+    return nil if controller_namespace == "search"
     return nil if @force_landing_page_render
     case controller_name
     when "bikes"

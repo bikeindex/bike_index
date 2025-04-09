@@ -6,7 +6,7 @@ class GeocodeHelper
   class << self
     # Always returns latitude and longitude
     def coordinates_for(lookup_string)
-      coords = address_hash_for(lookup_string).slice(:latitude, :longitude)
+      coords = assignable_address_hash_for(lookup_string).slice(:latitude, :longitude)
       coords.present? ? coords : {latitude: nil, longitude: nil}
     end
 
@@ -24,6 +24,13 @@ class GeocodeHelper
       box_coords.detect(&:nan?) ? [] : box_coords
     end
 
+    def address_hash_for(lookup_string)
+      address_hash_from_geocoder_result(
+        Geocoder.search(geocoder_lookup_string(lookup_string))
+      )
+    end
+
+    # assignable_address_hash is just the address hash without the "formatted_address" string
     def assignable_address_hash_for(lookup_string = nil, latitude: nil, longitude: nil)
       address_hash = if latitude.present? && longitude.present?
         address_hash_from_reverse_geocode(latitude, longitude)
@@ -32,20 +39,10 @@ class GeocodeHelper
         address_hash_for(lookup_string)
       end
 
-      assignable_address_hash(address_hash)
-    end
-
-    def address_hash_for(lookup_string)
-      address_hash_from_geocoder_result(
-        Geocoder.search(geocoder_lookup_string(lookup_string))
-      )
+      address_hash.except(:formatted_address)
     end
 
     private
-
-    def assignable_address_hash(address_hash)
-      address_hash.except(:formatted_address)
-    end
 
     # Google isn't a fan of bare zipcodes anymore. But we search using bare US zipcodes a lot - so make it work
     def geocoder_lookup_string(addy)
@@ -58,6 +55,7 @@ class GeocodeHelper
       [
         [71.53880, -66.88542], # Google general can't find
         [37.09024, -95.71289], # USA can't find
+        [37.751, -97.822], # USA can't find
         [38.79460, -106.53484] # USA can't find also
       ].any? { |coord| coord[0] == latitude.round(5) && coord[1] == longitude.round(5) }
     end
@@ -94,11 +92,12 @@ class GeocodeHelper
       else
         result.address
       end
+
       {
         city: result.city,
         latitude: result.latitude,
         longitude: result.longitude,
-        formatted_address: formatted_address,
+        formatted_address: formatted_address&.gsub(" ,", ","), # something is broken and causes bad spacing from maxmind - fix it here
         state_id: State.friendly_find(result.state_code)&.id, # TODO: Use region_code instead
         country_id: Country.friendly_find(result.country_code)&.id,
         neighborhood: result.respond_to?(:neighborhood) ? result.neighborhood : nil,

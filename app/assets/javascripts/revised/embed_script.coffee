@@ -118,7 +118,7 @@ updateYear = ->
       $('#bike_unknown_year').prop('checked', false)
 
   slug = $('#bike_manufacturer_id').val()
-  if slug.length > 0
+  if slug and slug.length > 0
     getModelList(slug)
 
   else

@@ -6986,7 +6986,7 @@ function program9(depth0,data) {
 function program11(depth0,data) {
 
 
-  return "\n          <div class='sandbox_header'>\n            <input class='submit' name='commit' type='button' value='Try it out!' />\n            <a href='#' class='response_hider' style='display:none'>Hide Response</a>\n            <img alt='Throbber' class='response_throbber' src='/assets/throbber-2ee611796301606f3e649aa2bb934510c10454a01c8eea93102a33a610b677d4.gif' style='display:none' />\n          </div>\n          ";
+  return "\n          <div class='sandbox_header'>\n            <input class='submit' name='commit' type='button' value='Try it out!' />\n            <a href='#' class='response_hider' style='display:none'>Hide Response</a>\n            \n          </div>\n          ";
   }
 
   buffer += "\n  <ul class='operations' >\n    <li class='";

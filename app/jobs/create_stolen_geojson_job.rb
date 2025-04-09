@@ -25,7 +25,7 @@ class CreateStolenGeojsonJob < ScheduledJob
     output = File.open(out_file, "w")
     output.puts Oj.dump({type: "FeatureCollection", features: geojson_bike_features})
     # Note: this file url uses Cloudflare's transform function to add CORS headers
-    TsvCreator.new.send_to_uploader(output)
+    Spreadsheets::TsvCreator.new.send_to_uploader(output)
     # Expire cache so we get the newest one!
     Integrations::Cloudflare.new.expire_cache(self.class.file_url)
   end

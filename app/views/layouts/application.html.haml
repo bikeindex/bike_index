@@ -4,11 +4,15 @@
     = render(HeaderTags::Component.new(**header_tags_component_options))
     -# TODO: Cache this ^
     = csrf_meta_tags
-    = stylesheet_link_tag 'revised'
+    = stylesheet_link_tag 'revised', "data-turbo-track": "reload"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <script src="https://kit.fontawesome.com/82eb17360c.js"></script>
     = javascript_include_tag 'application_revised'
+    - if @include_importmaps
+      = stylesheet_link_tag 'tailwind', "data-turbo-track": "reload"
+      = javascript_importmap_tags
+      = hotwire_livereload_tags if Rails.env.development?
     :javascript
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
@@ -24,7 +28,7 @@
   %body{id: page_id, class:  body_class}
 
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache(["main_navbar", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar1", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
           %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
@@ -43,7 +47,7 @@
           - elsif current_user.blank?
             .center-navbar-signup-link-container
               = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
-          - bike_search_active = controller_namespace.blank? && controller_name == "bikes" && action_name == "index"
+          - bike_search_active = controller_namespace == "search" && controller_name == "registrations" && action_name == "index"
           %a#menu-opened-backdrop{ "aria-hidden" => "true" }
           .hamburgler{ "aria-hidden" => "true" }
             %a#primary_nav_hamburgler

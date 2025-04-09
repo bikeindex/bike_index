@@ -700,6 +700,7 @@ en:
         cargo_trike_rear: Cargo Tricycle (rear storage)
         e_motorcycle: e-Motorcycle/e-Dirtbike (no pedals)
         e_scooter: e-Scooter
+        elliptical: Elliptical bike
         non_e_scooter: Scooter (not electric)
         non_e_skateboard: Skateboard (not electric)
         pedi_cab: Pedi Cab (rickshaw)
@@ -707,7 +708,7 @@ en:
         personal_mobility: e-Skateboard (e-Unicycle, Personal mobility device, etc)
         recumbent: Recumbent
         stroller: Stroller
-        tall_bike: Tall Bike
+        tall_bike: Tall Bike (multiple frames fused together)
         tandem: Tandem
         traditional_bike: Traditional Bike (2 wheels, 1 seat, pedals)
         trail_behind: Trail behind (half bike)
@@ -810,6 +811,7 @@ en:
         impound_record:
           user_not_authorized: does not have permission to impound this bike
         manufacturer:
+          cannot_include_quote: cannot include double quote
           cannot_match_a_color_name: cannot be the same as a color name
         organization_message:
           latlon_required: latitude and longitude required
@@ -3894,7 +3896,6 @@ en:
       has_combination: Has combination
       has_key: Has key
       large_kryptonite_key: Large Kryptonite key
-      lock_type: Lock type
       other_lock_manufacturer: Other lock manufacturer
       pinhead_key: Pinhead key
       pinhead_locking_skewer_key: Pinhead locking skewer key
@@ -3921,11 +3922,13 @@ en:
         locks
   manufacturers:
     index:
-      give_us_a_heads_up_in_a_comment_below: Give us a heads up in a comment below.
+      also_available_html: This list is also available as a %{csv_on_github}.
+      csv_on_github: CSV on Github
       manufacturers_we_know_about: Manufacturers we know about
       name: Name
       oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
       only_makes_components: Only makes components
+      submit_a_pr_html: Suggest an update by submitting a Pull Request to the %{csv_on_github}.
       thats_not_actually_surprising: That's not actually surprising, there are a bunch.
   memberships:
     success:
@@ -4014,6 +4017,7 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
+    search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
     stolen_index: Bike registry
@@ -4150,7 +4154,7 @@ en:
       bike_sticker: Bike Sticker
       bikes: bikes
       combination: Combination
-      edit: Edit
+      edit: edit
       edit_bike: Edit Bike
       generally_connect_to_org: >-
         Some of your bikes are associated with %{org_name}, but this one is not. Generally,
@@ -5020,6 +5024,20 @@ en:
         stolen
       vehicle_manufacturer: Vehicle manufacturer
       your: your
+  search:
+    registrations:
+      index:
+        loading_results: Loading results...
+      results:
+        no_matched: No registrations exactly matched your search
+        search_for_containing: Searching for serials containing your search...
+        search_for_similar: Searching for similar serials...
+      serials_containing:
+        no_matched: No registrations with serial numbers containing %{serial}
+        with_serials_containing: Registrations with serials containing %{serial}
+      similar_serials:
+        no_matched: No registrations with serial numbers similar to %{serial}
+        with_similar_serials: Registrations with serials similar to %{serial}
   sessions:
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with

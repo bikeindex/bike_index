@@ -10,7 +10,7 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       Idempotency-Key:
-      - 7969495c-5e3a-446c-b828-8b6ec822157d
+      - bb234414-8118-4537-bffc-837ad31ec24d
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -27,11 +27,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 22 Feb 2025 19:32:07 GMT
+      - Thu, 03 Apr 2025 22:48:25 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2417'
+      - '2466'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -50,19 +50,19 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=upoR4e7Yv2pll3K2Xa4XsvBuEvNNIQFb0W6w8emd4Tlt47P2dFe3jfatbF9Rstvm1BMmu0kIEjCwtVnz
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=esapG2QsA4sEAJ4OcImr5kHuWzeF1AMb4iPRNSnMcsuGVMcZ1-WYZzZMVfW-w670rRo9oWMLL6cfOto4
       Cross-Origin-Opener-Policy-Report-Only:
       - same-origin; report-to="coop"
       Idempotency-Key:
-      - 7969495c-5e3a-446c-b828-8b6ec822157d
+      - bb234414-8118-4537-bffc-837ad31ec24d
       Original-Request:
-      - req_qxmnzoTf4LrrAn
+      - req_zsBEacufZqLUr4
       Report-To:
       - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
       Reporting-Endpoints:
       - coop="https://q.stripe.com/coop-report"
       Request-Id:
-      - req_qxmnzoTf4LrrAn
+      - req_zsBEacufZqLUr4
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -74,14 +74,14 @@ http_interactions:
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       X-Wc:
-      - AB
+      - ABGHI
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
     body:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1I8HQYrVLDVPG8zbJ8VwUkctFx5pV4AX8SxELEH4WfDpKjo0o3WzuOBF1",
+          "id": "cs_test_a1ZtrkfPrzcVVoBQvI1FbtJvCusbe0X4NraRA8fxnTq3nxbsSkzEdMv2Al",
           "object": "checkout.session",
           "adaptive_pricing": null,
           "after_expiration": null,
@@ -100,7 +100,7 @@ http_interactions:
           "collected_information": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1740252727,
+          "created": 1743720505,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -115,7 +115,7 @@ http_interactions:
           "customer_details": null,
           "customer_email": null,
           "discounts": [],
-          "expires_at": 1740339127,
+          "expires_at": 1743806904,
           "invoice": null,
           "invoice_creation": null,
           "livemode": false,
@@ -139,6 +139,7 @@ http_interactions:
             "cashapp"
           ],
           "payment_status": "unpaid",
+          "permissions": null,
           "phone_number_collection": {
             "enabled": false
           },
@@ -165,7 +166,8 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1I8HQYrVLDVPG8zbJ8VwUkctFx5pV4AX8SxELEH4WfDpKjo0o3WzuOBF1#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1ZtrkfPrzcVVoBQvI1FbtJvCusbe0X4NraRA8fxnTq3nxbsSkzEdMv2Al#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+          "wallet_options": null
         }
-  recorded_at: Sat, 22 Feb 2025 19:32:07 GMT
+  recorded_at: Thu, 03 Apr 2025 22:48:25 GMT
 recorded_with: VCR 6.3.1

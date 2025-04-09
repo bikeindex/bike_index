@@ -132,6 +132,7 @@ group :development do
   gem "guard-rspec", require: false
   gem "letter_opener"
   gem "rerun" # restart sidekiq processes in development on app change
+  gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
   gem "annotate_rb", github: "sethherr/annotate_rb", branch: "rename-annotate_rb"
 end
@@ -149,6 +150,7 @@ group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem "standard" # Ruby linter
+  gem "htmlbeautifier" # html linter
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"

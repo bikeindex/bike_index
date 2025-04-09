@@ -2,14 +2,15 @@
 <html>
   <head>
     <title>Bike Index Component Preview</title>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    <%= stylesheet_link_tag 'tailwind' %>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <%= stylesheet_link_tag "tailwind" %>
     <%= javascript_importmap_tags %>
   </head>
   <%# NOTE: This sets the theme %>
   <body class="<%= params.dig(:lookbook, :display, :theme) %>">
-    <div class="tw:w-full tw:h-full">
+    <%# NOTE: at some point, make the padding optional %>
+    <div class="tw:w-full tw:h-full tw:p-4">
       <%= yield %>
     </div>
   </body>
