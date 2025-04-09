@@ -20,8 +20,6 @@ FactoryBot.define do
         factory :superuser_developer do
           developer { true }
         end
-        # TODO: replace all use of admin with superuser
-        factory :admin
       end
       factory :developer do
         developer { true }
