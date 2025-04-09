@@ -21,8 +21,8 @@ class EmailBan < ApplicationRecord
 
   BLOCK_DUPLICATE_PERIOD = 1.day
   PRE_PERIOD_DUPLICATE_LIMIT = 2
-  PERMITTED_DUPLICATE_DOMAINS = %w[bikeindex.org]
-  REASON_ENUM = {email_domain: 0, email_duplicate: 1, delivery_failure: 2}
+  PERMITTED_DUPLICATE_DOMAINS = %w[bikeindex.org].freeze
+  REASON_ENUM = {email_domain: 0, email_duplicate: 1, delivery_failure: 2}.freeze
 
   belongs_to :user
   belongs_to :email_ban
@@ -51,7 +51,7 @@ class EmailBan < ApplicationRecord
       create(reason: :email_domain, user:) if email_domain&.provisional_ban?
       create(reason: :email_duplicate, user:) if email_duplicate?(user.email)
       # Don't send an email if the email is blocked
-      return if period_started.where(user:).any?
+      nil if period_started.where(user:).any?
     end
 
     def reason_humanized(str)
