@@ -44,7 +44,7 @@ RSpec.describe Membership, type: :model do
   end
 
   describe "validations" do
-    let(:creator) { FactoryBot.create(:admin) }
+    let(:creator) { FactoryBot.create(:superuser) }
     let!(:membership_existing) { FactoryBot.create(:membership, start_at: Time.current - 2.months, end_at: end_at_existing, creator:) }
     let(:user) { membership_existing.user.reload }
     let(:membership_new) { FactoryBot.build(:membership, start_at: Time.current - 1.week, user:, creator:) }

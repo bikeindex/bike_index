@@ -20,7 +20,7 @@ RSpec.describe ProcessLoggedSearchJob, type: :job do
       end
 
       context "user is superuser" do
-        let(:user) { FactoryBot.create(:admin, :with_organization) }
+        let(:user) { FactoryBot.create(:superuser, :with_organization) }
         it "doesn't associate" do
           expect(logged_search.user_id).to eq user.id
           expect(logged_search.organization_id).to be_nil

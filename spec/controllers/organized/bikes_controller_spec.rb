@@ -39,7 +39,7 @@ RSpec.describe Organized::BikesController, type: :controller do
       expect(session[:passive_organization_id]).to eq "0" # sets it to zero so we don't look it up again
     end
     context "admin user" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "renders, doesn't reassign passive_organization_id" do
         session[:passive_organization_id] = organization.to_param # Admin, so user has access
         get :index, params: {organization_id: organization.to_param}

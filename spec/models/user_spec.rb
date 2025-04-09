@@ -212,7 +212,7 @@ RSpec.describe User, type: :model do
     end
 
     context "with superuser" do
-      let(:user) { FactoryBot.build(:admin) }
+      let(:user) { FactoryBot.build(:superuser) }
 
       it "is true for superuser attribute" do
         expect(user.superuser?).to be_truthy
@@ -807,7 +807,7 @@ RSpec.describe User, type: :model do
       end
     end
     context "superadmin" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "returns true" do
         expect(user.member_of?(organization)).to be_truthy
         expect(user.member_of?(organization, no_superuser_override: true)).to be_falsey
@@ -862,7 +862,7 @@ RSpec.describe User, type: :model do
       end
     end
     context "superadmin" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "returns true" do
         expect(user.admin_of?(organization)).to be_truthy
       end

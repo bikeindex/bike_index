@@ -134,7 +134,7 @@ RSpec.describe Email::StolenNotificationJob, type: :job do
       expect_notification_blocked(stolen_notification.sender.email)
     end
     context "admin" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "sends to customer" do
         instance.perform(stolen_notification.id)
         expect_notification_sent(stolen_notification.sender.email)

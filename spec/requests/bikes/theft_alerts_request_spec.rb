@@ -52,7 +52,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
           expect(assigns(:theft_alerts).pluck(:id)).to eq([])
         end
         context "superadmin" do
-          let(:current_user) { FactoryBot.create(:admin) }
+          let(:current_user) { FactoryBot.create(:superuser) }
           it "renders" do
             get "#{base_url}/new"
             expect(response.code).to eq("200")

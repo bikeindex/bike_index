@@ -80,7 +80,7 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
       end
 
       context "admin" do
-        let(:current_user) { FactoryBot.create(:admin) }
+        let(:current_user) { FactoryBot.create(:superuser) }
         it "renders if superuser" do
           expect(doorkeeper_app.owner_id).to_not eq current_user.id
           get "#{base_url}/#{doorkeeper_app.id}/edit"

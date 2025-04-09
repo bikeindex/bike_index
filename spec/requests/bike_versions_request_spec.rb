@@ -36,7 +36,7 @@ RSpec.describe BikeVersionsController, type: :request do
       expect(response).to render_template(:show)
     end
     context "superadmin" do
-      let(:current_user) { FactoryBot.create(:admin) }
+      let(:current_user) { FactoryBot.create(:superuser) }
       it "renders" do
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"

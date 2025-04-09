@@ -137,7 +137,7 @@ RSpec.describe CustomerMailer, type: :mailer do
   describe "admin_contact_stolen_email" do
     let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
     let(:bike) { FactoryBot.create(:stolen_bike) }
-    let(:user) { FactoryBot.create(:admin, email: "something@stuff.com") }
+    let(:user) { FactoryBot.create(:superuser, email: "something@stuff.com") }
     let(:customer_contact) do
       CustomerContact.create(user_email: bike.owner_email,
         creator_email: user.email,

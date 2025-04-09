@@ -6,7 +6,7 @@ RSpec.describe User::CreateOrUpdateMembershipFromPaymentJob, type: :job do
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:amount_cents) { 999 }
   let(:payment) { FactoryBot.create(:payment, amount_cents:, user:, paid_at: Time.current - 1.day) }
-  let(:creator_id) { FactoryBot.create(:admin).id }
+  let(:creator_id) { FactoryBot.create(:superuser).id }
 
   let(:new_attrs) do
     {user_id: user.id, start_at: Time.current, end_at: Time.current + 3.month,
