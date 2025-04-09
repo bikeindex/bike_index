@@ -14,10 +14,10 @@ FactoryBot.define do
       factory :user_bikehub_signup do
         partner_data { {sign_up: "bikehub"} }
       end
-      factory :admin do
+      factory :superuser do
         accepted_vendor_terms_of_service { true }
         superuser { true }
-        factory :admin_developer do
+        factory :superuser_developer do
           developer { true }
         end
       end

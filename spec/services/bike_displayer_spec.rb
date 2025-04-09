@@ -247,7 +247,7 @@ RSpec.describe BikeDisplayer do
   describe "user_edit_bike_address?, display_edit_address_fields? and edit_street_address?" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:user) { FactoryBot.create(:user, :confirmed) }
-    let(:admin) { FactoryBot.create(:admin) }
+    let(:admin) { FactoryBot.create(:superuser) }
 
     it "is falsey" do
       expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey

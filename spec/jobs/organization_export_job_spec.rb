@@ -58,7 +58,7 @@ RSpec.describe OrganizationExportJob, type: :job do
         end
       end
       context "avery export" do
-        let(:user) { FactoryBot.create(:admin) }
+        let(:user) { FactoryBot.create(:superuser) }
         let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ", user: user) }
         let(:bike_for_avery_og) do
           FactoryBot.create(:bike_organized,

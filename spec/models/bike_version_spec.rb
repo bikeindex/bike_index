@@ -16,7 +16,7 @@ RSpec.describe BikeVersion, type: :model do
     let(:bike_version) { FactoryBot.create(:bike_version) }
     let(:owner) { bike_version.owner }
     let(:user) { FactoryBot.create(:user) }
-    let(:superuser) { FactoryBot.create(:admin) }
+    let(:superuser) { FactoryBot.create(:superuser) }
     it "is false for non-owner" do
       expect(bike_version.authorized?(nil)).to be_falsey
       expect(bike_version.authorized?(user)).to be_falsey

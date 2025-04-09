@@ -17,7 +17,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
   context "super admin and developer" do
     include_context :request_spec_logged_in_as_superuser
-    let(:current_user) { FactoryBot.create(:admin_developer) }
+    let(:current_user) { FactoryBot.create(:superuser_developer) }
 
     describe "index" do
       it "renders" do

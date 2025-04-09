@@ -313,7 +313,7 @@ RSpec.describe SessionsController, type: :controller do
         end
 
         context "admin" do
-          let(:user) { FactoryBot.create(:admin) }
+          let(:user) { FactoryBot.create(:superuser) }
           it "authenticates and redirects to admin" do
             expect(user).to receive(:authenticate).and_return(true)
             request.env["HTTP_REFERER"] = my_account_url

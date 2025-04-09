@@ -27,7 +27,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
   end
   context "superadmin" do
     let!(:bike_version) { FactoryBot.create(:bike_version) }
-    let(:current_user) { FactoryBot.create(:admin) }
+    let(:current_user) { FactoryBot.create(:superuser) }
     it "renders" do
       expect(bike_version.authorized?(current_user)).to be_truthy
       expect(bike_version.owner_id).to_not eq current_user.id
