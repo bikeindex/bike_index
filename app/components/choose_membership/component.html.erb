@@ -9,11 +9,11 @@
     <div class="tw:text-center" id="intervalSelector">
       <label class="tw:cursor-pointer tw:mx-1">
         <%= f.radio_button :set_interval, :monthly, required: true, class: "tw:cursor-pointer", data: {action: "change->choose-membership--component#updateIntervalVisibility"} %>
-        Monthly
+        Monthly donation
       </label>
       <label class="tw:cursor-pointer tw:mx-1">
         <%= f.radio_button :set_interval, :yearly, required: true, class: "tw:cursor-pointer", data: {action: "change->choose-membership--component#updateIntervalVisibility"} %>
-        Yearly
+        Yearly donation
       </label>
     </div>
     <ul class="tw:grid tw:w-full tw:gap-6 tw:md:grid-cols-3 tw:mt-6 tw:mb-8 tw:justify-items-stretch tw:items-stretch">
