@@ -33,6 +33,8 @@ class AddressRecord < ApplicationRecord
   belongs_to :country
   belongs_to :region_record, class_name: "State"
 
+  has_many :address_records
+
   before_validation :set_calculated_attributes
   after_validation :address_record_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
 
