@@ -10,6 +10,10 @@ class CreateMarketplaceListings < ActiveRecord::Migration[8.0]
       t.boolean :willing_to_ship, default: false
       t.integer :status, default: 0
 
+      t.references :address
+      t.float :latitude
+      t.float :longitude
+
       t.timestamps
     end
   end

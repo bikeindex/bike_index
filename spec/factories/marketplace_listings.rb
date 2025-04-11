@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :marketplace_listing do
     seller { FactoryBot.create(:user_confirmed) }
+    buyer { nil }
     item { FactoryBot.create(:bike) }
     price_cents { 5_000 }
     willing_to_ship { false }
