@@ -9,7 +9,7 @@ RSpec.describe Country, type: :model do
     end
 
     context "united_states" do
-      let(:country) { FactoryBot.create(:country_us) }
+      let(:country) { FactoryBot.create(:country_united_states) }
 
       it "matches class methods" do
         expect(country.id).to eq Country.united_states.id

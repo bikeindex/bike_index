@@ -75,14 +75,9 @@ module Geocodeable
     ].reject(&:blank?).join(", ")
   end
 
-  # For testing, look it up, otherwise use static
-  def self.canada_id
-    Rails.env.test? ? Country.canada.id : 38
-  end
-
   def self.format_postal_code(str, country_id = nil)
     str = str.strip.upcase.gsub(/\s*,\z/, "")
-    return str unless country_id == canada_id && str.gsub(/\s+/, "").length == 6
+    return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
     str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
   end
 

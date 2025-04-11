@@ -9,7 +9,7 @@ FactoryBot.define do
       end
     end
 
-    factory :country_us, traits: [:find_or_create] do
+    factory :country_united_states, traits: [:find_or_create] do
       name { "United States" }
       iso { "US" }
     end
