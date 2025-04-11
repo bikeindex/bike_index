@@ -1,3 +1,4 @@
+
 class CreateAddressRecords < ActiveRecord::Migration[8.0]
   def change
     create_table :address_records do |t|
