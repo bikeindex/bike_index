@@ -75,14 +75,9 @@ module Geocodeable
     ].reject(&:blank?).join(", ")
   end
 
-  # For testing, look it up, otherwise use static
-  def self.canada_id
-    Rails.env.test? ? Country.canada.id : 38
-  end
-
   def self.format_postal_code(str, country_id = nil)
     str = str.strip.upcase.gsub(/\s*,\z/, "")
-    return str unless country_id == canada_id && str.gsub(/\s+/, "").length == 6
+    return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
     str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
   end
 
@@ -197,7 +192,7 @@ module Geocodeable
   # Assign state if not assigned.
   # Only works for USA because states only work in US :(
   def clean_city(str)
-    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id == Country.united_states.id
+    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id == Country.united_states_id
       str_state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
       str_no_state = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
       if state_id.present?
