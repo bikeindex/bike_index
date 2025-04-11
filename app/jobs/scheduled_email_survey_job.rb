@@ -78,6 +78,6 @@ class ScheduledEmailSurveyJob < ScheduledJob
   # Split out to make it easier to individually send messages
   def potential_stolen_records
     StolenRecord.unscoped.where(no_notify: false, date_stolen: stolen_survey_period)
-      .where(country_id: [nil, Country.united_states.id, Country.canada.id])
+      .where(country_id: [nil, Country.united_states_id, Country.canada_id])
   end
 end

@@ -1,6 +1,22 @@
 require "rails_helper"
 
 RSpec.describe Country, type: :model do
+  describe "factory" do
+    let(:country) { FactoryBot.create(:country_australia) }
+    it "is valid and only creates once" do
+      expect(country).to be_valid
+      expect(FactoryBot.create(:country_australia).id).to eq country.id
+    end
+
+    context "united_states" do
+      let(:country) { FactoryBot.create(:country_united_states) }
+
+      it "matches class methods" do
+        expect(country.id).to eq Country.united_states.id
+      end
+    end
+  end
+
   describe "friendly_find" do
     it "finds the country by name or iso" do
       country = Country.create(name: "Svenborgia", iso: "SVE")

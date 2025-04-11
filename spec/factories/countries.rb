@@ -3,27 +3,33 @@ FactoryBot.define do
     sequence(:name) { |n| "Country #{n}" }
     sequence(:iso) { |n| "country-#{n}" }
 
-    factory :country_us do
+    trait :find_or_create do
+      initialize_with do
+        Country.find_by(iso:) || Country.new(attributes)
+      end
+    end
+
+    factory :country_united_states, traits: [:find_or_create] do
       name { "United States" }
       iso { "US" }
     end
 
-    factory :country_canada do
+    factory :country_canada, traits: [:find_or_create] do
       name { "Canada" }
       iso { "CA" }
     end
 
-    factory :country_australia do
+    factory :country_australia, traits: [:find_or_create] do
       name { "Australia" }
       iso { "AU" }
     end
 
-    factory :country_uk do
+    factory :country_uk, traits: [:find_or_create] do
       name { "United Kingdom" }
       iso { "UK" }
     end
 
-    factory :country_nl do
+    factory :country_nl, traits: [:find_or_create] do
       name { "Netherlands" }
       iso { "NL" }
     end

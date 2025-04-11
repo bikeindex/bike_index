@@ -1,10 +1,10 @@
-- state_class = (srecord.object.country_id == Country.united_states.id) ? "unhidden" : ""
+- state_class = (srecord.object.country_id == Country.united_states_id) ? "unhidden" : ""
 
 .related-fields
   .form-group.row.fancy-select.unfancy
     %label.form-well-label
       = t(".where_was_it_stolen_type", stolen_type: @bike.status_humanized_translated)
-    .form-well-input#us_id_data{ data: { usid: Country.united_states.id } }
+    .form-well-input#us_id_data{ data: { usid: Country.united_states_id } }
       = srecord.select(:country_id, Country.select_options,
         { required: true, prompt: t(".choose_country") },
         { class: "country-select-input form-control" } )
@@ -27,4 +27,4 @@
   .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
     %label.form-well-label
     .form-well-input
-      = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
+      = srecord.collection_select(:state_id, State.united_states, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
