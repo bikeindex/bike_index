@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2174,12 +2173,12 @@ CREATE TABLE public.marketplace_listings (
     buyer_id bigint,
     item_type character varying,
     item_id bigint,
+    address_record_id bigint,
     for_sale_at timestamp(6) without time zone,
     sold_at timestamp(6) without time zone,
     price_cents integer,
     willing_to_ship boolean DEFAULT false,
     status integer DEFAULT 0,
-    address_id bigint,
     latitude double precision,
     longitude double precision,
     created_at timestamp(6) without time zone NOT NULL,
@@ -6116,10 +6115,10 @@ CREATE INDEX index_mailchimp_data_on_user_id ON public.mailchimp_data USING btre
 
 
 --
--- Name: index_marketplace_listings_on_address_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_marketplace_listings_on_address_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_marketplace_listings_on_address_id ON public.marketplace_listings USING btree (address_id);
+CREATE INDEX index_marketplace_listings_on_address_record_id ON public.marketplace_listings USING btree (address_record_id);
 
 
 --
