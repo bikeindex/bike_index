@@ -42,7 +42,7 @@ class AddressRecord < ApplicationRecord
 
   class << self
     def default_visibility_for(kind)
-      kind == "organization" ? :street : :postal_code
+      (kind == "organization") ? :street : :postal_code
     end
   end
 

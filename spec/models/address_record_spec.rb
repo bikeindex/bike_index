@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe AddressRecord, type: :model do
   describe "factory" do
@@ -7,13 +7,13 @@ RSpec.describe AddressRecord, type: :model do
       expect(address_record).to be_valid
       expect(address_record.region).to eq "CA"
       expect(address_record.formatted_address_string).to eq "Davis, CA, 95616"
-      expect(address_record.formatted_address_string(render_country: 'always')).to eq "Davis, CA, 95616, United States"
+      expect(address_record.formatted_address_string(render_country: "always")).to eq "Davis, CA, 95616, United States"
 
       expect(address_record.formatted_address_string(render_country: :if_different)).to eq "Davis, CA, 95616"
       expect(address_record.formatted_address_string(render_country: :if_different, current_country_iso: "CA"))
         .to eq "Davis, CA, 95616, United States"
       # include_country defaults to :if_different if not matching
-      expect(address_record.formatted_address_string(render_country: 'something')).to eq "Davis, CA, 95616"
+      expect(address_record.formatted_address_string(render_country: "something")).to eq "Davis, CA, 95616"
     end
     context "in_amsterdam" do
       let(:address_record) { FactoryBot.create(:address_record, :amsterdam) }
@@ -79,7 +79,6 @@ RSpec.describe AddressRecord, type: :model do
 
       context "with an update" do
         xit "overwrites the latitude and longitude" do
-
         end
       end
     end

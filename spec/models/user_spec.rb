@@ -883,4 +883,13 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe "address" do
+    let(:address_record) { FactoryBot.create(:address_record) }
+    let(:user) { FactoryBot.create(:user, address_record:) }
+    it "deletes on delete" do
+      expect(user.reload.address_record).to be_present
+      expect { user.destroy }.to change(AddressRecord, :count).by(-1)
+    end
+  end
 end

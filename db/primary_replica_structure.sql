@@ -3811,7 +3811,8 @@ CREATE TABLE public.users (
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
-    neighborhood character varying
+    neighborhood character varying,
+    address_record_id bigint
 );
 
 
@@ -6681,6 +6682,13 @@ CREATE INDEX index_user_registration_organizations_on_user_id ON public.user_reg
 
 
 --
+-- Name: index_users_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_address_record_id ON public.users USING btree (address_record_id);
+
+
+--
 -- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6787,6 +6795,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250411232603'),
 ('20250406215740'),
 ('20250319024056'),
 ('20250319010935'),
