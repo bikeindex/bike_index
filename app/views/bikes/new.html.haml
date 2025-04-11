@@ -166,7 +166,7 @@
               .form-group.row.fancy-select-placeholder.unfancy
                 %label.form-well-label
                 .form-well-input
-                  = f.collection_select(:state, State.all, :abbreviation, :name,
+                  = f.collection_select(:state, State.united_states, :abbreviation, :name,
                     {include_blank: true, required: true, prompt: t(".state")},
                     {class: "form-control"})
 

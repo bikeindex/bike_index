@@ -104,7 +104,7 @@
                   = Country.united_states.id
             .form-group.fancy-select.unfancy.col-6
               = s.label :state, "State"
-              = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State")
+              = s.collection_select(:state_id, State.united_states, :id, :name, include_blank: true, prompt: "State")
           .form-group
             = label :street, "Intersection or address"
             = s.text_field :street, placeholder: "Intersection or address", class: "form-control"

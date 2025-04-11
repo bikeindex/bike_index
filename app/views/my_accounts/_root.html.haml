@@ -95,7 +95,7 @@
     .form-group.row.fancy-select-placeholder.unfancy.hidden-other{class: state_class}
       %label.form-well-label
       .form-well-input
-        = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
+        = f.collection_select(:state_id, State.united_states, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
     .form-group.row.mb-4
       %label.form-well-label
       .form-well-input

@@ -193,7 +193,7 @@
                 .form-group.row.fancy-select-placeholder.unfancy.hidden-other.unhidden
                   = f.label :state_id, class: "form-well-label"
                   .form-well-input
-                    = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
+                    = f.collection_select(:state_id, State.united_states, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
 
           -# need to check if any stickers, because maybe it has some that aren't user editable
           - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)
