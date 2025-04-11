@@ -78,7 +78,7 @@ RSpec.describe AddressRecord, type: :model do
       end
 
       context "with an update" do
-        it "overwrites the latitude and longitude" do
+        xit "overwrites the latitude and longitude" do
 
         end
       end
