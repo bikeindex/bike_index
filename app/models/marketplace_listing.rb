@@ -3,11 +3,12 @@
 # Table name: marketplace_listings
 #
 #  id                :bigint           not null, primary key
+#  amount_cents      :integer
+#  currency_enum     :integer
 #  for_sale_at       :datetime
 #  item_type         :string
 #  latitude          :float
 #  longitude         :float
-#  price_cents       :integer
 #  sold_at           :datetime
 #  status            :integer          default("draft")
 #  willing_to_ship   :boolean          default(FALSE)

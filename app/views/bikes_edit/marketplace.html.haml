@@ -1,0 +1,23 @@
+
+= form_with(model: @bike, multipart: true, html: { class: 'primary-edit-bike-form' }) do |f|
+  - if params[:return_to].present?
+    = hidden_field_tag :return_to, params[:return_to]
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: '/bikes_edit/primary_menu'
+
+      .col-md-8.form-well#form_well_wrap
+        .form-wrap
+          .form-well-form-header
+            %h3= @edit_templates[@edit_template]
+
+          .related-fields
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :handlebar_type_id, class: 'form-well-label'
+              .form-well-input.fancy-select-placeholder.unfancy
+                = select(:bike, :handlebar_type, HandlebarType.select_options , { prompt: " " }, { class: "form-control" })
+
+
+
+
+          = render "/shared/form_well_footer_save"

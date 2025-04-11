@@ -6,14 +6,17 @@ class CreateMarketplaceListings < ActiveRecord::Migration[8.0]
       t.references :item, polymorphic: true
       t.references :address_record
 
-      t.datetime :for_sale_at
-      t.datetime :sold_at
-      t.integer :price_cents
-      t.boolean :willing_to_ship, default: false
-      t.integer :status, default: 0
-
       t.float :latitude
       t.float :longitude
+
+      t.datetime :for_sale_at
+      t.datetime :sold_at
+
+      t.integer :currency_enum
+      t.integer :amount_cents
+
+      t.integer :status, default: 0
+      t.integer :condition
 
       t.timestamps
     end

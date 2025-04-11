@@ -57,6 +57,13 @@ module BikeEditable
       unless @bike.version?
         h[:ownership] = translation(:ownership, scope: t_scope)
         h[:groups] = translation(:groups, scope: t_scope)
+        if @current_user&.can_list_items? && @bike&.status_with_owner?
+          h[:marketplace] = if @bike.is_for_sale
+            translation(:marketplace_on_sale, scope: t_scope)
+          else
+            translation(:marketplace_list, scope: t_scope)
+          end
+        end
       end
       h[:remove] = translation(:remove, scope: t_scope)
       if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
