@@ -403,6 +403,6 @@ class StolenRecord < ApplicationRecord
 
   def all_location_attributes_present?
     return false if country_id.blank? || city.blank? || zipcode.blank?
-    (country_id == Country.united_states.id) ? state_id.present? : true
+    (country_id == Country.united_states_id) ? state_id.present? : true
   end
 end

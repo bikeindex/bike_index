@@ -192,7 +192,7 @@ module Geocodeable
   # Assign state if not assigned.
   # Only works for USA because states only work in US :(
   def clean_city(str)
-    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id == Country.united_states.id
+    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id == Country.united_states_id
       str_state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
       str_no_state = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
       if state_id.present?

@@ -1,14 +1,14 @@
-<script>window.unitedStatesID = #{Country.united_states.id};</script>
+<script>window.unitedStatesID = #{Country.united_states_id};</script>
 -# Note - this has to have a separate div with collapse, because the fieldset breaks styles
 -# The collapse class is what the slideup is called on
 - organization ||= @organization || current_organization
-- default_country ||= organization.locations.first&.country_id || current_user&.country_id || Country.united_states.id
+- default_country ||= organization.locations.first&.country_id || current_user&.country_id || Country.united_states_id
 - default_name ||= organization.name
 
 - f.object.country_id ||= default_country
 - f.object.name ||= default_name
 - f.object.state_id ||= organization.locations.first&.state_id || current_user&.state_id
-- state_class = (f.object.country_id == Country.united_states.id) ? "unhidden" : ""
+- state_class = (f.object.country_id == Country.united_states_id) ? "unhidden" : ""
 
 -# This is primarily used for the new form
 -# BUT! We didn't use to require location, so it's included in the main manage page for orgs without locations
@@ -22,7 +22,7 @@
       = f.text_field :city, required: true, placeholder: t(".city"), class: "form-control"
       = f.text_field :zipcode, placeholder: t(".zipcode"), required: true, class: "form-control"
       .row.countrystatezip
-        .col-sm-6.fancy-select.unfancy.no-restore-on-backspace#us_id_data{data: {usid: Country.united_states.id}}
+        .col-sm-6.fancy-select.unfancy.no-restore-on-backspace#us_id_data{data: {usid: Country.united_states_id}}
           = f.select :country_id, Country.select_options, {prompt: t(".choose_country")}, {class: "form-control country-select-input"}
         .col-sm-6.fancy-select.unfancy.no-restore-on-backspace.hidden-other{class: state_class}
           = f.collection_select(:state_id, State.united_states, :id, :name, {prompt: t(".state")}, {include_blank: true, class: "form-control"} )
@@ -46,7 +46,7 @@
           = f.text_field :street, placeholder: t(".street"), class: "form-control"
           = f.text_field :city, required: true, placeholder: t(".city"), class: "form-control"
           .row.countrystatezip
-            .col-sm-4.fancy-select.unfancy.no-restore-on-backspace#us_id_data{data: {usid: Country.united_states.id}}
+            .col-sm-4.fancy-select.unfancy.no-restore-on-backspace#us_id_data{data: {usid: Country.united_states_id}}
               = f.select :country_id, Country.select_options, {prompt: t(".choose_country")}, {class: "form-control country-select-input"}
             .col-sm-4
               = f.text_field :zipcode, placeholder: t(".zipcode"), required: true, class: "form-control"

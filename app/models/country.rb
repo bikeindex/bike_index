@@ -9,6 +9,9 @@
 #  updated_at :datetime         not null
 #
 class Country < ApplicationRecord
+  UNITED_STATES_ID = Rails.env.test? ? nil : 230
+  CANADA_ID = Rails.env.test? ? nil : 38
+
   validates_presence_of :name
   validates_uniqueness_of :name, :iso
 
@@ -40,12 +43,12 @@ class Country < ApplicationRecord
 
     # For testing, look it up, otherwise use static
     def united_states_id
-      Rails.env.test? ? Country.united_states.id : 230
+      UNITED_STATES_ID || Country.united_states.id
     end
 
     # For testing, look it up, otherwise use static
     def canada_id
-      Rails.env.test? ? Country.canada.id : 38
+      CANADA_ID || Country.canada.id
     end
 
     def netherlands
