@@ -883,4 +883,17 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe "can_list_items?" do
+    let(:user) { User.new }
+    it "is false" do
+      expect(user.can_list_items?).to be_falsey
+    end
+    context "superuser" do
+      let(:user) { FactoryBot.build(:superuser) }
+      it "is truthy" do
+        expect(user.can_list_items?).to be_truthy
+      end
+    end
+  end
 end

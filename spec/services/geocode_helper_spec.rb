@@ -22,11 +22,26 @@ RSpec.describe GeocodeHelper do
       end
       it "returns address_hash, with original coordinates" do
         VCR.use_cassette("geohelper-reverse_geocode", vcr_config) do
-          expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude)).to eq result_hash
+          expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude, new_attrs: false)).to eq result_hash
           result = described_class.assignable_address_hash_for(latitude: latitude, longitude: longitude)
           # Ensure assignable_address_hash_for returns original lat & long
           expect(result).to eq target_assignable_hash
           expect(result.keys.map(&:to_s).sort).to eq Geocodeable.location_attrs.sort
+        end
+      end
+      context "new_attrs" do
+        let(:new_result) do
+          result_hash.delete(:state_id)
+          postal_code = result_hash.delete(:zipcode)
+          result_hash.merge(postal_code:, region_string: state.abbreviation)
+        end
+        it "returns address_hash, with original coordinates" do
+          VCR.use_cassette("geohelper-reverse_geocode", vcr_config) do
+            expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude, new_attrs: true)).to eq new_result
+            result = described_class.assignable_address_hash_for(latitude: latitude, longitude: longitude, new_attrs: true)
+            # Ensure assignable_address_hash_for returns original lat & long
+            expect(result).to eq new_result.except(:formatted_address).merge(latitude: latitude, longitude: longitude)
+          end
         end
       end
     end

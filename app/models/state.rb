@@ -23,9 +23,10 @@ class State < ApplicationRecord
 
   default_scope { order(:name) }
 
-  def self.friendly_find(str)
+  def self.friendly_find(str, country_id: nil)
     return nil unless str.present?
-    fuzzy_abbr_find(str) || where("lower(name) = ?", str.downcase.strip).first
+    matches = country_id.present? ? where(country_id:) : all
+    matches.fuzzy_abbr_find(str) || matches.where("lower(name) = ?", str.downcase.strip).first
   end
 
   def self.fuzzy_abbr_find(str)
