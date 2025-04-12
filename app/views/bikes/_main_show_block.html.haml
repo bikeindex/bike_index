@@ -80,7 +80,7 @@
       %h3
         = t(".distinguishing_features")
       %p
-        = @bike.description
+        = render(UserTextBlockDisplay::Component.new(text: @bike.description))
 
     - if @bike.status_stolen? && @stolen_record.present?
       %h3
