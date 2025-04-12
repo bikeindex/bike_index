@@ -17,8 +17,8 @@ class ComponentGenerator < Rails::Generators::NamedBase
     template("component.html.erb", File.join(app_component_dir, "component.html.erb"))
     template("component_controller.js", stimulus_controller_path)
     template("preview.rb", File.join(app_component_dir, "component_preview.rb"))
-    # generate the locales
-    I18n.available_locales.each { |locale| create_locale_file(locale) }
+    # Only generate english locale, the others are handled by translation.io
+    create_locale_file(:en)
 
     # Create tests in spec/components/
     template("component_spec.rb", File.join(spec_component_dir, "component_spec.rb"))
