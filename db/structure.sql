@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3848,8 +3847,7 @@ CREATE TABLE public.users (
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
-    neighborhood character varying,
-    address_record_id bigint
+    neighborhood character varying
 );
 
 
@@ -6755,13 +6753,6 @@ CREATE INDEX index_user_registration_organizations_on_user_id ON public.user_reg
 
 
 --
--- Name: index_users_on_address_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_users_on_address_record_id ON public.users USING btree (address_record_id);
-
-
---
 -- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6869,7 +6860,6 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20250413160556'),
-('20250411232603'),
 ('20250406215740'),
 ('20250319024056'),
 ('20250319010935'),
