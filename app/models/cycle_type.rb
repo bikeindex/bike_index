@@ -1,6 +1,7 @@
 class CycleType
   include Enumable
   include AutocompleteHashable
+  include ShortNameable
 
   SLUGS = {
     bike: 0,
