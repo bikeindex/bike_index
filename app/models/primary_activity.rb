@@ -16,6 +16,7 @@
 #
 class PrimaryActivity < ApplicationRecord
   include FriendlySlugFindable
+  include SimpleNameable
 
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"
 

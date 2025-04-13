@@ -23,6 +23,8 @@
 #
 class Manufacturer < ApplicationRecord
   include AutocompleteHashable
+  include SimpleNameable
+
   MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"].blank? # enable skipping for testing
 
   has_many :bikes
@@ -104,16 +106,6 @@ class Manufacturer < ApplicationRecord
 
     errors.add(:name, :cannot_include_quote) if name.match?('"')
     errors.add(:name, :cannot_match_a_color_name) if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
-  end
-
-  def simple_name
-    name.gsub(/\s?\([^)]*\)/i, "")
-  end
-
-  def secondary_name
-    return unless name&.match?(/\(/)
-
-    name.split("(").last.tr(")", "")
   end
 
   def set_calculated_attributes

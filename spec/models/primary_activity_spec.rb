@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe PrimaryActivity, type: :model do
   it_behaves_like "friendly_slug_findable"
+  it_behaves_like "simple_nameable"
 
   describe "factory" do
     let(:primary_activity) { FactoryBot.create(:primary_activity) }

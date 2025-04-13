@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Manufacturer, type: :model do
   it_behaves_like "autocomplete_hashable"
+  it_behaves_like "simple_nameable"
 
   describe "ensure_non_blocking_name" do
     before { FactoryBot.create(:color, name: "Purple") }
