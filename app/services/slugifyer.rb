@@ -33,7 +33,7 @@ class Slugifyer
     private
 
     def remove_parens(string)
-      string&.gsub(/\([^)]*\)/i, "")
+      string&.to_s&.gsub(/\([^)]*\)/i, "")
     end
 
     def transliterate(string)
