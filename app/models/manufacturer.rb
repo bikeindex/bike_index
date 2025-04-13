@@ -86,7 +86,7 @@ class Manufacturer < ApplicationRecord
       if manufacturer.other? && manufacturer_other.present?
         InputNormalizer.sanitize(manufacturer_other)
       else
-        manufacturer.simple_name
+        manufacturer.short_name
       end.strip.truncate(60)
     end
   end

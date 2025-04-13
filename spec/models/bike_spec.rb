@@ -1474,7 +1474,7 @@ RSpec.describe Bike, type: :model do
   describe "mnfg_name" do
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Racing (S E Bikes)") }
     let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-    it "is the simple_name" do
+    it "is the short_name" do
       expect(bike.reload.mnfg_name).to eq "SE Racing"
     end
     context "manufacturer_other blank" do

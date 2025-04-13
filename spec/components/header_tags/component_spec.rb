@@ -227,7 +227,7 @@ RSpec.describe HeaderTags::Component, type: :component do
     let(:bike) { Bike.new(status: "status_stolen") }
     let(:target_time) { Time.current - 2.days }
     let(:page_obj) { bike }
-    let(:mnfg_name) { bike.manufacturer.simple_name.to_s }
+    let(:mnfg_name) { bike.manufacturer.short_name.to_s }
 
     describe "show" do
       let(:action_name) { "show" }
