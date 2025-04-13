@@ -88,7 +88,7 @@ module BikeAttributable
 
   def type_titleize
     return "" unless type.present?
-    CycleType.slug_translation(cycle_type)
+    CycleType.slug_translation_short(cycle_type)
   end
 
   def propulsion_titleize
@@ -131,7 +131,11 @@ module BikeAttributable
   end
 
   def cycle_type_name
-    CycleType.new(cycle_type)&.name
+    cycle_type_obj&.name
+  end
+
+  def cycle_type_obj
+    CycleType.new(cycle_type)
   end
 
   def not_cycle?

@@ -409,7 +409,7 @@ class Bike < ApplicationRecord
   end
 
   def display_name
-    name.presence || cycle_type.titleize
+    name.presence || cycle_type_obj&.short_name
   end
 
   def user?

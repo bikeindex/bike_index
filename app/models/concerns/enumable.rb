@@ -9,6 +9,10 @@ module Enumable
       )
     end
 
+    def slug_translation_short(slug)
+      slug_translation(slug)&.gsub(/\s?\([^)]*\)/i, "")
+    end
+
     def select_options
       slugs.map { |slug| [slug_translation(slug), slug] }
     end
