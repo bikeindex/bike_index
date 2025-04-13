@@ -4,7 +4,7 @@ class CreatePrimaryActivities < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :slug
       t.references :primary_activity_family
-      t.boolean :is_family
+      t.boolean :family
 
       t.timestamps
     end

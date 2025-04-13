@@ -3,7 +3,7 @@
 # Table name: primary_activities
 #
 #  id                         :bigint           not null, primary key
-#  is_family                  :boolean
+#  family                     :boolean
 #  name                       :string
 #  slug                       :string
 #  created_at                 :datetime         not null
@@ -15,6 +15,11 @@
 #  index_primary_activities_on_primary_activity_family_id  (primary_activity_family_id)
 #
 class PrimaryActivity < ApplicationRecord
-  belongs_to :primary_activity_family
+  include FriendlySlugFindable
 
+  belongs_to :primary_activity_family, class_name: "PrimaryActivity"
+
+  def flavor?
+    !family?
+  end
 end

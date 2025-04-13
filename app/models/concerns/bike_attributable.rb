@@ -10,6 +10,7 @@ module BikeAttributable
     belongs_to :front_wheel_size, class_name: "WheelSize"
     belongs_to :rear_gear_type
     belongs_to :front_gear_type
+    belongs_to :primary_activity
 
     has_many :public_images, as: :imageable, dependent: :destroy
     has_many :components
