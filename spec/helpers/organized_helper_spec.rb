@@ -14,7 +14,7 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
     context "unregistered" do
       let(:target_text) do
-        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike (front storage)</small><em class=\"small text-warning\"> unregistered</em></span>"
+        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike</small><em class=\"small text-warning\"> unregistered</em></span>"
       end
       it "renders with unregistered" do
         bike.cycle_type = "cargo"

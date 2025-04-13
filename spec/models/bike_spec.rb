@@ -1625,7 +1625,6 @@ RSpec.describe Bike, type: :model do
     it "escapes correctly" do
       bike = Bike.new(frame_model: "</title><svg/onload=alert(document.cookie)>", cycle_type: :cargo)
       allow(bike).to receive(:mnfg_name).and_return("baller")
-      allow(bike).to receive(:type).and_return("bike")
       expect(bike.title_string).not_to match("</title><svg/onload=alert(document.cookie)>")
       expect(bike.title_string.length).to be > 5
       expect(bike.display_name).to eq "Cargo Bike"
