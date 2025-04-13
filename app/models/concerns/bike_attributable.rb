@@ -81,7 +81,7 @@ module BikeAttributable
     components.map(&:cgroup_id).uniq
   end
 
-  # Small helper because we call this a lot
+  # When displaying the cycle_type, generally this is what you want
   def type
     type_titleize&.downcase
   end

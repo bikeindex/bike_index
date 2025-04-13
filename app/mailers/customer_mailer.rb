@@ -79,7 +79,7 @@ class CustomerMailer < ApplicationMailer
     @customer_contact = customer_contact
     @info = customer_contact.info_hash
     @bike = customer_contact.bike
-    @bike_type = @bike.cycle_type_obj&.short_name_translation_downcase
+    @bike_type = @bike.type
     @user = @customer_contact.user
 
     @location = @info["location"]
