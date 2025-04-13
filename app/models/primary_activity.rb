@@ -16,4 +16,5 @@
 #
 class PrimaryActivity < ApplicationRecord
   belongs_to :primary_activity_family
+
 end
