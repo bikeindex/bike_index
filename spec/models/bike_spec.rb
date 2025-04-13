@@ -1629,7 +1629,6 @@ RSpec.describe Bike, type: :model do
       expect(bike.title_string).not_to match("</title><svg/onload=alert(document.cookie)>")
       expect(bike.title_string.length).to be > 5
       expect(bike.display_name).to eq "Cargo Bike"
-
     end
   end
 
