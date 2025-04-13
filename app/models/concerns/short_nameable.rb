@@ -1,4 +1,4 @@
-module SimpleNameable
+module ShortNameable
   extend ActiveSupport::Concern
 
   def simple_name

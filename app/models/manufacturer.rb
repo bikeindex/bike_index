@@ -23,7 +23,7 @@
 #
 class Manufacturer < ApplicationRecord
   include AutocompleteHashable
-  include SimpleNameable
+  include ShortNameable
 
   MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"].blank? # enable skipping for testing
 

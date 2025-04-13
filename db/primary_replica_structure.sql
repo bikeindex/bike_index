@@ -2910,6 +2910,7 @@ CREATE TABLE public.primary_activities (
     slug character varying,
     primary_activity_family_id bigint,
     family boolean,
+    priority integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

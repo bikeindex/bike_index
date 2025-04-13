@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.shared_examples "simple_nameable" do
+RSpec.shared_examples "short_nameable" do
   let(:model_sym) { subject.class.name.underscore.to_sym }
 
   describe "simple_name" do
