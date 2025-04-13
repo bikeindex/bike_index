@@ -83,12 +83,11 @@ module BikeAttributable
 
   # Small helper because we call this a lot
   def type
-    cycle_type && cycle_type_name&.downcase
+    type_titleize&.downcase
   end
 
   def type_titleize
-    return "" unless type.present?
-    CycleType.slug_translation_short(cycle_type)
+    cycle_type_obj&.short_name_translation
   end
 
   def propulsion_titleize
