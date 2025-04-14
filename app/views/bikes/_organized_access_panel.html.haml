@@ -331,7 +331,7 @@
       - impound_record = @bike.current_impound_record&.organization_id == passive_organization.id ? @bike.current_impound_record : nil
       %h3.uncap.mt-2
         %span.text-danger
-          #{@bike.type&.titleize} is
+          #{@bike.type_titleize} is
           - if @bike.current_impound_record&.organization&.id == passive_organization.id
             impounded!
           - else

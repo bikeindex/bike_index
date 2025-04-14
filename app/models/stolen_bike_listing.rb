@@ -169,7 +169,7 @@ class StolenBikeListing < ActiveRecord::Base
   def set_calculated_attributes
     self.data ||= {}
     self.mnfg_name = if manufacturer.present?
-      manufacturer.other? ? manufacturer_other : manufacturer.simple_name
+      manufacturer.other? ? manufacturer_other : manufacturer.short_name
     end
     self.listed_at ||= Time.current
     self.listing_order = listed_at.to_i

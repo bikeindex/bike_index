@@ -1,7 +1,7 @@
 module ShortNameable
   extend ActiveSupport::Concern
 
-  def simple_name
+  def short_name
     name&.gsub(/\s?\([^)]*\)/i, "")
   end
 
