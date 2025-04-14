@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Manufacturer, type: :model do
   it_behaves_like "autocomplete_hashable"
+  it_behaves_like "short_nameable"
 
   describe "ensure_non_blocking_name" do
     before { FactoryBot.create(:color, name: "Purple") }
@@ -124,7 +125,7 @@ RSpec.describe Manufacturer, type: :model do
     it "returns the value of manufacturer_other if manufacturer is other" do
       expect(Manufacturer.calculated_mnfg_name(manufacturer, "Other manufacturer name")).to eq "Mnfg name"
       expect(Manufacturer.calculated_mnfg_name(manufacturer_other, "Other manufacturer name")).to eq("Other manufacturer name")
-      expect(manufacturer.simple_name).to eq "Mnfg name"
+      expect(manufacturer.short_name).to eq "Mnfg name"
       expect(manufacturer.secondary_name).to be_nil
     end
 
@@ -152,7 +153,7 @@ RSpec.describe Manufacturer, type: :model do
       it "returns Just SE Bikes (and does it on save)" do
         expect(Manufacturer.calculated_mnfg_name(manufacturer, nil)).to eq "SE Racing"
         expect(manufacturer.reload.name).to eq "SE Racing (S E Bikes)"
-        expect(manufacturer.simple_name).to eq "SE Racing"
+        expect(manufacturer.short_name).to eq "SE Racing"
         expect(manufacturer.secondary_name).to eq "S E Bikes"
       end
     end

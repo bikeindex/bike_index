@@ -81,14 +81,13 @@ module BikeAttributable
     components.map(&:cgroup_id).uniq
   end
 
-  # Small helper because we call this a lot
+  # When displaying the cycle_type, generally this is what you want
   def type
-    cycle_type && cycle_type_name&.downcase
+    type_titleize&.downcase
   end
 
   def type_titleize
-    return "" unless type.present?
-    CycleType.slug_translation(cycle_type)
+    cycle_type_obj&.short_name_translation
   end
 
   def propulsion_titleize
@@ -131,7 +130,11 @@ module BikeAttributable
   end
 
   def cycle_type_name
-    CycleType.new(cycle_type)&.name
+    cycle_type_obj&.name
+  end
+
+  def cycle_type_obj
+    CycleType.new(cycle_type)
   end
 
   def not_cycle?

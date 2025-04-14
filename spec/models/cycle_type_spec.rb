@@ -29,6 +29,8 @@ RSpec.describe CycleType, type: :model do
         expect(CycleType.find_sym("CARGO BIKE")).to eq :cargo
         finder = CycleType.friendly_find(name)
         expect(finder.slug).to eq :cargo
+        expect(finder.name).to eq "Cargo Bike (front storage)"
+        expect(finder.short_name).to eq "Cargo Bike"
       end
     end
   end

@@ -203,7 +203,7 @@ RSpec.describe ParkingNotification, type: :model do
     let(:organization) { parking_notification.organization }
     it "is default with snippet" do
       expect(parking_notification.mail_snippet).to be_blank
-      expect(parking_notification.subject).to eq "Your pedi cab (rickshaw) is parked incorrectly"
+      expect(parking_notification.subject).to eq "Your pedi cab is parked incorrectly"
     end
     context "with mail_snippet" do
       let!(:mail_snippet) do

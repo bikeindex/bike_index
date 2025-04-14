@@ -79,7 +79,7 @@ RSpec.describe BikeVersionCreatorJob, type: :job do
         bike.tertiary_frame_color.name,
         "#{bike.rear_wheel_size.name} wheel",
         "#{bike.front_wheel_size.name} wheel",
-        component_manufacturer.simple_name,
+        component_manufacturer.short_name,
         "Some other Manufacturer",
         "party",
         2020

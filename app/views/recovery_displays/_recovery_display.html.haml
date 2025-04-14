@@ -19,7 +19,7 @@
           = recovery_display.quote_by
 
       %span.h4recovery
-        - bike_type = recovery_display&.bike&.type&.titleize.presence || t(".bike")
+        - bike_type = recovery_display&.bike&.type_titleize.presence || t(".bike")
         - date = l(recovery_display.recovered_at, format: :dotted)
         - recovery_date = content_tag(:span, t(".recovered_date", date: date), class: "recover-date")
         - recovery_text = safe_join([bike_type, recovery_date], " ")

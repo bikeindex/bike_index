@@ -98,7 +98,7 @@ class ModelAudit < ApplicationRecord
 
     def matching_bikes_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
       manufacturer_id ||= bike&.manufacturer_id
-      mnfg_name ||= bike&.mnfg_name || Manufacturer.find_by_id(manufacturer_id)&.simple_name
+      mnfg_name ||= bike&.mnfg_name || Manufacturer.find_by_id(manufacturer_id)&.short_name
       # Always match by mnfg_name, to fix things if it previously was manufacturer_other
       bikes = Bike.unscoped.where("mnfg_name ILIKE ?", mnfg_name)
       if manufacturer_id != Manufacturer.other.id
