@@ -50,7 +50,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
     let!(:primary_activity) { FactoryBot.create(:primary_activity_family, name: "Road Bike") }
     let(:csv_path) { Rails.root.join("spec/fixtures/primary_activities-test-import.csv") }
     let(:target_display_names) do
-      ["Road Bike", "ATB (All Terrain Bike)", "All Road (ATB)", "All Road (Road Bike)", "Bike Polo"]
+      ["Road Bike", "ATB (All Terrain Bike)", "ATB (All Terrain Bike): All Road", "Road Bike: All Road", "Bike Polo"]
     end
 
     describe "import" do

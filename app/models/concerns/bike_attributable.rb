@@ -131,7 +131,9 @@ module BikeAttributable
   end
 
   def cycle_type_name
-    cycle_type_obj&.name
+    return nil if cycle_type.blank?
+
+    CycleType.slug_translation(cycle_type)
   end
 
   def cycle_type_obj
