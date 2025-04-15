@@ -332,8 +332,8 @@ Rails.application.routes.draw do
 
   get "/auth/failure", to: "integrations#integrations_controller_creation_error"
 
-  %w[donate support_bike_index support_the_index support_the_bike_index protect_your_bike
-    serials about where vendor_terms resources image_resources privacy terms security
+  %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
+    protect_your_bike serials about where vendor_terms resources image_resources privacy terms security
     how_not_to_buy_stolen dev_and_design lightspeed].freeze.each do |page|
     get page, controller: "info", action: page
   end

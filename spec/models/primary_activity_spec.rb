@@ -1,8 +1,7 @@
 require "rails_helper"
 
 RSpec.describe PrimaryActivity, type: :model do
-  it_behaves_like "friendly_slug_findable"
-  it_behaves_like "simple_nameable"
+  it_behaves_like "short_nameable"
 
   describe "factory" do
     let(:primary_activity) { FactoryBot.create(:primary_activity) }
@@ -19,6 +18,48 @@ RSpec.describe PrimaryActivity, type: :model do
         expect(primary_activity.primary_activity_family_id).to be_present
         expect(primary_activity.primary_activity_family.family?).to be_truthy
       end
+    end
+  end
+
+  describe "display_name" do
+    let(:primary_activity) { FactoryBot.create(:primary_activity, name: "Bike Polo") }
+    it "is the name" do
+      expect(primary_activity.name).to eq "Bike Polo"
+    end
+    context "with family" do
+      let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Bike)") }
+      let(:primary_activity) { FactoryBot.create(:primary_activity, name:, primary_activity_family:) }
+      let(:name) { "All Road" }
+      it "is the name with the family" do
+        expect(primary_activity.primary_activity_family.short_name).to eq "ATB"
+        expect(primary_activity.display_name).to eq "All Road (ATB)"
+      end
+      context "with other primary_activity with same name" do
+        let(:primary_activity_family_2) { FactoryBot.create(:primary_activity_family, name: "Road Bike") }
+        let(:primary_activity_2) { FactoryBot.create(:primary_activity, name:, primary_activity_family: primary_activity_family_2) }
+        it "is valid for both" do
+          expect(primary_activity).to be_valid
+          expect(primary_activity.display_name).to eq "All Road (ATB)"
+
+          expect(primary_activity_2).to be_valid
+          expect(primary_activity_2.display_name).to eq "All Road (Road Bike)"
+        end
+      end
+      context "gravel" do
+        let(:name) { "Gravel" }
+        it "does not include family in name" do
+          expect(primary_activity.display_name).to eq "Gravel"
+        end
+      end
+    end
+  end
+
+  describe "priority" do
+    let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Bike)") }
+    let(:primary_activity) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:) }
+    it "is expected" do
+      expect(primary_activity_family.reload.priority).to eq 495
+      expect(primary_activity.reload.priority).to eq 445
     end
   end
 end

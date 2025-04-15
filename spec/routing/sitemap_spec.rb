@@ -18,7 +18,7 @@ RSpec.describe "Sitemaps pages" do
     let(:info_routes) { all_app_routes.select { |r| r.controller == "info" }.map { |r| to_formatted_path(r) } }
     let(:landing_pages_routes) { all_app_routes.select { |r| r.controller == "landing_pages" }.map { |r| to_formatted_path(r) } }
     let(:excluded_routes) do
-      ["support_bike_index", "support_the_index", "support_the_bike_index", "info/:id",
+      ["support_bike_index", "support_the_index", "support_the_bike_index", "info/:id", "primary_activities",
         "info/how-to-get-your-stolen-bike-back", "ikes", "university"]
     end
 
