@@ -27,6 +27,7 @@ module FriendlySlugFindable
   end
 
   def set_slug
+    self.name = name&.strip
     self.slug ||= Slugifyer.slugify(name)
   end
 end
