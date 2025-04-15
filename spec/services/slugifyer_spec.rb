@@ -1,6 +1,21 @@
 require "rails_helper"
 
 RSpec.describe Slugifyer do
+  describe "slugify" do
+    it "handles &" do
+      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
+      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
+    end
+    it "handles é" do
+      expect(Slugifyer.slugify("paké rum runner")).to eq("pake-rum-runner")
+      expect(Slugifyer.slugify("pañe rum runner")).to eq("pane-rum-runner")
+    end
+
+    it "removes parens" do
+      expect(Slugifyer.slugify(" Some Cool NAMe (additional info)")).to eq("some-cool-name")
+    end
+  end
+
   describe "book_slug" do
     it "removes special characters and downcase" do
       slug = Slugifyer.book_slug("Surly's Cross-check bike (small wheel)")
@@ -20,17 +35,6 @@ RSpec.describe Slugifyer do
     it "changes + to plus for URL safety, and Trek uses + to differentiate" do
       slug = Slugifyer.book_slug("L100+ Lowstep BLX")
       expect(slug).to eq("l100plus_lowstep_blx")
-    end
-  end
-
-  describe "slugify" do
-    it "handles &" do
-      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
-      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
-    end
-    it "handles é" do
-      expect(Slugifyer.slugify("paké rum runner")).to eq("pake-rum-runner")
-      expect(Slugifyer.slugify("pañe rum runner")).to eq("pane-rum-runner")
     end
   end
 
@@ -62,6 +66,10 @@ RSpec.describe Slugifyer do
     it "removes parens from EAI" do
       slug = Slugifyer.manufacturer("EAI (Euro Asia Imports)")
       expect(slug).to eq("eai")
+    end
+    it "handles Riese & Müller (Riese and Muller)" do
+      slug = Slugifyer.manufacturer("Riese & Müller (Riese and Muller)")
+      expect(slug).to eq "riese_amp_muller"
     end
   end
 end
