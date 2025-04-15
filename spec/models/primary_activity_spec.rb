@@ -32,17 +32,17 @@ RSpec.describe PrimaryActivity, type: :model do
       let(:name) { "All Road" }
       it "is the name with the family" do
         expect(primary_activity.primary_activity_family.short_name).to eq "ATB"
-        expect(primary_activity.display_name).to eq "All Road (ATB)"
+        expect(primary_activity.display_name).to eq "ATB (All Terrain Bike): All Road"
       end
       context "with other primary_activity with same name" do
         let(:primary_activity_family_2) { FactoryBot.create(:primary_activity_family, name: "Road Bike") }
         let(:primary_activity_2) { FactoryBot.create(:primary_activity, name:, primary_activity_family: primary_activity_family_2) }
         it "is valid for both" do
           expect(primary_activity).to be_valid
-          expect(primary_activity.display_name).to eq "All Road (ATB)"
+          expect(primary_activity.display_name).to eq "ATB (All Terrain Bike): All Road"
 
           expect(primary_activity_2).to be_valid
-          expect(primary_activity_2.display_name).to eq "All Road (Road Bike)"
+          expect(primary_activity_2.display_name).to eq "Road Bike: All Road"
         end
       end
       context "gravel" do
@@ -58,8 +58,8 @@ RSpec.describe PrimaryActivity, type: :model do
     let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Bike)") }
     let(:primary_activity) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:) }
     it "is expected" do
-      expect(primary_activity_family.reload.priority).to eq 495
-      expect(primary_activity.reload.priority).to eq 445
+      expect(primary_activity_family.reload.priority).to eq 490
+      expect(primary_activity.reload.priority).to eq 489
     end
   end
 end

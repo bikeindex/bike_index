@@ -13,7 +13,7 @@ class BikeCreator
       coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
       timezone date_stolen receive_notifications phone creator creator_id image
       components_attributes b_param_id embeded embeded_extended example organization_affiliation student_id
-      stock_photo_url pdf send_email skip_email listing_order approved_stolen
+      stock_photo_url pdf send_email skip_email listing_order approved_stolen primary_activity_id
       marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
       [
         stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,

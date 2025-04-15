@@ -37,6 +37,7 @@ class PrimaryActivity < ApplicationRecord
   scope :family, -> { where(family: true) }
   scope :flavor, -> { where(family: false) }
   scope :by_priority, -> { order(priority: :desc) }
+  scope :alphabetized, -> { order(Arel.sql("LOWER(name)")) }
 
   class << self
     def friendly_find(n)
@@ -61,7 +62,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def display_name
-    [name, family_display_name].compact.join(" ")
+    [family_display_name, name].compact.join(": ")
   end
 
   def family_name
@@ -81,7 +82,7 @@ class PrimaryActivity < ApplicationRecord
   def family_display_name
     return nil if skip_family_display_name? || primary_activity_family.blank?
 
-    "(#{family_short_name})"
+    family_name
   end
 
   def set_calculated_attributes
@@ -92,7 +93,7 @@ class PrimaryActivity < ApplicationRecord
 
   def calculated_priority
     return calculated_family_priority if family?
-    return primary_activity_family.priority - 50 if primary_activity_family.present?
+    return primary_activity_family.priority - 1 if primary_activity_family.present?
 
     401
   end
@@ -101,6 +102,6 @@ class PrimaryActivity < ApplicationRecord
     prior_families = self.class.family
     prior_families = prior_families.where("id < ?", id) if id.present?
 
-    495 - (prior_families.count * 5)
+    490 - (prior_families.count * 10)
   end
 end
