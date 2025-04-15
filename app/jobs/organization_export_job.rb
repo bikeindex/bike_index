@@ -107,7 +107,7 @@ class OrganizationExportJob < ApplicationJob
           color_id.present? ? Color.find(color_id).name : nil
         }.compact.join(", ")
       when "owner_email" then b_param.owner_email
-      when "vehicle_type" then CycleType.slug_translation(b_param.cycle_type)
+      when "vehicle_type" then CycleType.slug_translation_short(b_param.cycle_type)
       when "motorized" then b_param.motorized?
       when "partial_registration" then true
       end

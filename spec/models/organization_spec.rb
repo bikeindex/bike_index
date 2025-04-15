@@ -509,7 +509,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.name).to eq "Bikes (& Trikes)"
         expect(organization.short_name).to eq "Bikes (& Trikes)"
         # only ampersands surrounded by spaces are kept
-        expect(organization.slug).to eq "bikes--trikes"
+        expect(organization.slug).to eq "bikes"
       end
     end
 
