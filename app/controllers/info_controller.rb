@@ -81,6 +81,12 @@ class InfoController < ApplicationController
     redirect_to(DONT_BUY_STOLEN_URL, allow_other_host: true)
   end
 
+  def primary_activities
+    respond_to do |format|
+      format.csv { render plain: Spreadsheets::PrimaryActivities.to_csv }
+    end
+  end
+
   private
 
   def redirect_to_donation_or_payment

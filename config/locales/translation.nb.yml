@@ -1827,6 +1827,7 @@ nb:
       wheel_diameter: Hjuldiameter
       year: år
       vehicle_type: Bil type
+      primary_activity: Primæraktivitet
     new:
       additional_serial_sticker_number: Ekstra serie-/klistremerkenummer
       affiliation: "%{org_name} tilknytning"
@@ -2142,6 +2143,7 @@ nb:
       updated_serial: Oppdatert serie
       version_name: Versjonsnavn
       zipcode: Postnummer
+      primary_activity: Primæraktivitet
     bike_fields:
       revised_colors:
         add_a_color: Legg til en farge

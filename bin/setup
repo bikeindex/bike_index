@@ -27,6 +27,8 @@ chdir APP_ROOT do
 
   # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
   system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed"
+  system "bin/rake import_manufacturers_csv"
+  system "bin/rake import_primary_activities_csv"
   system "bin/rake seed_test_users_and_bikes"
 
   puts "\n== Preparing test database (including parallelism) =="

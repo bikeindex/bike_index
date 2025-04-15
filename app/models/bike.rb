@@ -65,6 +65,7 @@
 #  manufacturer_id             :integer
 #  model_audit_id              :bigint
 #  paint_id                    :integer
+#  primary_activity_id         :bigint
 #  primary_frame_color_id      :integer
 #  rear_gear_type_id           :integer
 #  rear_wheel_size_id          :integer
@@ -86,6 +87,7 @@
 #  index_bikes_on_model_audit_id             (model_audit_id)
 #  index_bikes_on_organization_id            (creation_organization_id)
 #  index_bikes_on_paint_id                   (paint_id)
+#  index_bikes_on_primary_activity_id        (primary_activity_id)
 #  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)
 #  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id)
 #  index_bikes_on_state_id                   (state_id)
