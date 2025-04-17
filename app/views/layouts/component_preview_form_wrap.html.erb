@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html style="background: none;">
+  <head>
+    <title>Bike Index Component Preview</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <%= stylesheet_link_tag "tailwind", "revised" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <%# NOTE: inline styles to override revised styles and make the form-well show up in the top right %>
+  <body class="<%= params.dig(:lookbook, :display, :theme) %>" style="min-height: auto; padding: 1rem 0;">
+    <div class="form-well-container container" style="margin-left: 0; margin-right: 0;">
+      <div class="row">
+        <div class="col-md-8 form-well" style="float: none;">
+          <div class="form-wrap">
+            <div class="form-well-form-header-always-visible">
+              <h3>Preview Form wrap</h3>
+            </div>
+            <%= yield %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

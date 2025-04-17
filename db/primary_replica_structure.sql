@@ -141,6 +141,47 @@ ALTER SEQUENCE public.active_storage_variant_records_id_seq OWNED BY public.acti
 
 
 --
+-- Name: address_records; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.address_records (
+    id bigint NOT NULL,
+    country_id bigint,
+    region_record_id bigint,
+    region_string character varying,
+    street character varying,
+    city character varying,
+    neighborhood character varying,
+    postal_code character varying,
+    latitude double precision,
+    longitude double precision,
+    kind integer,
+    publicly_visible_attribute integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: address_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.address_records_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: address_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.address_records_id_seq OWNED BY public.address_records.id;
+
+
+--
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3807,7 +3848,8 @@ CREATE TABLE public.users (
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
-    neighborhood character varying
+    neighborhood character varying,
+    address_record_id bigint
 );
 
 
@@ -3883,6 +3925,13 @@ ALTER TABLE ONLY public.active_storage_blobs ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.active_storage_variant_records ALTER COLUMN id SET DEFAULT nextval('public.active_storage_variant_records_id_seq'::regclass);
+
+
+--
+-- Name: address_records id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.address_records ALTER COLUMN id SET DEFAULT nextval('public.address_records_id_seq'::regclass);
 
 
 --
@@ -4551,6 +4600,14 @@ ALTER TABLE ONLY public.active_storage_blobs
 
 ALTER TABLE ONLY public.active_storage_variant_records
     ADD CONSTRAINT active_storage_variant_records_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: address_records address_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.address_records
+    ADD CONSTRAINT address_records_pkey PRIMARY KEY (id);
 
 
 --
@@ -5323,6 +5380,20 @@ CREATE UNIQUE INDEX index_active_storage_blobs_on_key ON public.active_storage_b
 --
 
 CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.active_storage_variant_records USING btree (blob_id, variation_digest);
+
+
+--
+-- Name: index_address_records_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_country_id ON public.address_records USING btree (country_id);
+
+
+--
+-- Name: index_address_records_on_region_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_region_record_id ON public.address_records USING btree (region_record_id);
 
 
 --
@@ -6684,6 +6755,13 @@ CREATE INDEX index_user_registration_organizations_on_user_id ON public.user_reg
 
 
 --
+-- Name: index_users_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_address_record_id ON public.users USING btree (address_record_id);
+
+
+--
 -- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6791,6 +6869,8 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20250413160556'),
+('20250411232603'),
+('20250406215740'),
 ('20250319024056'),
 ('20250319010935'),
 ('20250313035336'),

@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    legacy_form_well:
+      address_record:
+        your_full_address_is_required: Your full address is required by %{org_name}
+        address: Street address
+        address_school: Campus mailing address
+        city: City
+        choose_country: Choose country
+        state: State
+        postal_code: Postal Code
+        region: Region / Province

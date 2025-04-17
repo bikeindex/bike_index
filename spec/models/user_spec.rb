@@ -884,16 +884,12 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "can_list_items?" do
-    let(:user) { User.new }
-    it "is false" do
-      expect(user.can_list_items?).to be_falsey
-    end
-    context "superuser" do
-      let(:user) { FactoryBot.build(:superuser) }
-      it "is truthy" do
-        expect(user.can_list_items?).to be_truthy
-      end
+  describe "address" do
+    let(:address_record) { FactoryBot.create(:address_record) }
+    let(:user) { FactoryBot.create(:user, address_record:) }
+    it "deletes on delete" do
+      expect(user.reload.address_record).to be_present
+      expect { user.destroy }.to change(AddressRecord, :count).by(-1)
     end
   end
 end
