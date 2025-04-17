@@ -10,6 +10,6 @@ class ManufacturerSerializer < ApplicationSerializer
   end
 
   def short_name
-    object.simple_name
+    object.short_name
   end
 end

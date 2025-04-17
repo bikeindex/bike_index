@@ -2114,6 +2114,7 @@ nl:
       year: jaar
       propulsion_type: Voortstuwing
       vehicle_type: 'Voertuigtype:'
+      primary_activity: Primaire activiteit
     organization_stolen_message:
       report_link_text: op deze link
       report_the_theft_to_the_organization_html: <span class="text-warning">Meld de
@@ -5788,6 +5789,7 @@ nl:
         versies en moeten worden bijgewerkt op de originele %{bike_type}-registratie.
         %{bike_registration_link}.
       version_name: Versienaam
+      primary_activity: Primaire activiteit
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe

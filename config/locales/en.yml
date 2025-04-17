@@ -1078,6 +1078,7 @@ en:
       other_serial: Other serial/registration/sticker
       paint_description: Color description
       police_report: 'Police report #'
+      primary_activity: Primary activity
       primary_colors: Primary colors
       propulsion_type: Propulsion
       rear: Rear
@@ -1401,6 +1402,7 @@ en:
       nevermind: Nevermind
       other_serial_or_registration_number: Other serial or registration number
       please_fill_in_both_fields: Please fill in both fields
+      primary_activity: Primary activity
       reason_for_update: Reason for update
       remove_end: Remove end
       remove_start: Remove start

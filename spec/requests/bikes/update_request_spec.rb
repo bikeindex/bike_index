@@ -36,7 +36,11 @@ RSpec.describe "BikesController#update", type: :request do
   context "setting address for bike" do
     let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address.merge(address_set_manually: true)) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
-    let(:update) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
+    let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
+    let(:update) do
+      {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: "",
+       primary_activity_id:}
+    end
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
@@ -61,6 +65,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.street).to eq default_location[:street_address]
       expect(bike.address_set_manually).to be_falsey
       expect(bike.updated_by_user_at).to be > (Time.current - 1)
+      expect(bike.primary_activity_id).to eq primary_activity_id
       expect(bike.not_updated_by_user?).to be_falsey
     end
     context "with user without address" do

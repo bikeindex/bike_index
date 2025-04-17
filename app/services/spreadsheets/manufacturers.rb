@@ -58,7 +58,7 @@ class Spreadsheets::Manufacturers
     def export_column_methods
       EXPORT_COLUMNS.map do |key|
         case key
-        when :name then :simple_name
+        when :name then :short_name
         when :alternate_name then :secondary_name
         when :ebike_only then :motorized_only
         when :makes_frames then :frame_maker

@@ -1776,6 +1776,7 @@ es:
       wheel_diameter:
       year: Año
       vehicle_type:
+      primary_activity:
     new:
       additional_serial_sticker_number:
       affiliation:
@@ -2054,6 +2055,7 @@ es:
       updated_serial:
       version_name:
       zipcode:
+      primary_activity:
     bike_fields:
       revised_colors:
         add_a_color:

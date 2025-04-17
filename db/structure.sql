@@ -525,7 +525,8 @@ CREATE TABLE public.bike_versions (
     start_at timestamp without time zone,
     end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    primary_activity_id bigint
 );
 
 
@@ -622,7 +623,8 @@ CREATE TABLE public.bikes (
     likely_spam boolean DEFAULT false,
     serial_segments_migrated_at timestamp without time zone,
     model_audit_id bigint,
-    neighborhood character varying
+    neighborhood character varying,
+    primary_activity_id bigint
 );
 
 
@@ -2899,6 +2901,41 @@ ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_sta
 
 
 --
+-- Name: primary_activities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.primary_activities (
+    id bigint NOT NULL,
+    name character varying,
+    slug character varying,
+    primary_activity_family_id bigint,
+    family boolean,
+    priority integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: primary_activities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.primary_activities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: primary_activities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.primary_activities_id_seq OWNED BY public.primary_activities.id;
+
+
+--
 -- Name: public_images; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4332,6 +4369,13 @@ ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: primary_activities id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primary_activities ALTER COLUMN id SET DEFAULT nextval('public.primary_activities_id_seq'::regclass);
+
+
+--
 -- Name: public_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5070,6 +5114,14 @@ ALTER TABLE ONLY public.pghero_query_stats
 
 
 --
+-- Name: primary_activities primary_activities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primary_activities
+    ADD CONSTRAINT primary_activities_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: public_images public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5442,6 +5494,13 @@ CREATE INDEX index_bike_versions_on_paint_id ON public.bike_versions USING btree
 
 
 --
+-- Name: index_bike_versions_on_primary_activity_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions USING btree (primary_activity_id);
+
+
+--
 -- Name: index_bike_versions_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5551,6 +5610,13 @@ CREATE INDEX index_bikes_on_organization_id ON public.bikes USING btree (creatio
 --
 
 CREATE INDEX index_bikes_on_paint_id ON public.bikes USING btree (paint_id);
+
+
+--
+-- Name: index_bikes_on_primary_activity_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_primary_activity_id ON public.bikes USING btree (primary_activity_id);
 
 
 --
@@ -6324,6 +6390,13 @@ CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghe
 
 
 --
+-- Name: index_primary_activities_on_primary_activity_family_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_primary_activities_on_primary_activity_family_id ON public.primary_activities USING btree (primary_activity_family_id);
+
+
+--
 -- Name: index_public_images_on_imageable_id_and_imageable_type; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6717,6 +6790,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250413160556'),
 ('20250319024056'),
 ('20250319010935'),
 ('20250313035336'),

@@ -39,7 +39,8 @@
         - unless @bike.serial_hidden?
           = attr_list_item(@bike.extra_registration_number, t(".other_serial"))
       - unless @bike.type == "bike"
-        = attr_list_item(@bike.type_titleize, t(".vehicle_type"))
+        = attr_list_item(@bike.cycle_type_name, t(".vehicle_type"))
+      = attr_list_item(@bike.primary_activity&.display_name, t(".primary_activity"))
       - unless @bike.propulsion_type == "foot-pedal"
         = attr_list_item(@bike.propulsion_type, t(".propulsion_type"))
 
@@ -80,7 +81,7 @@
       %h3
         = t(".distinguishing_features")
       %p
-        = @bike.description
+        = render(UserTextBlockDisplay::Component.new(text: @bike.description))
 
     - if @bike.status_stolen? && @stolen_record.present?
       %h3
