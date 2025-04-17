@@ -1,9 +1,0 @@
----
-en:
-  components:
-    legacy_form_wrap:
-      address_record:
-        form_object: Form_object
-        address_record: Address_record
-        street_placeholder: Street_placeholder
-        street_required_text: Street_required_text

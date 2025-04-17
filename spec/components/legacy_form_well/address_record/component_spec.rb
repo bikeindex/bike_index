@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe LegacyFormWrap::AddressRecord::Component, type: :component do
-  let(:options) { {} }
+RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
+  let(:options) { {form_builder: BikeIndexFormBuilder} }
   let(:component) { render_inline(described_class.new(**options)) }
 
   it "renders" do

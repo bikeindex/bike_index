@@ -121,9 +121,10 @@ class User < ApplicationRecord
   has_one :mailchimp_datum
   has_one :user_ban
 
-  accepts_nested_attributes_for :user_ban
-
   belongs_to :address_record, dependent: :destroy
+
+  accepts_nested_attributes_for :user_ban
+  accepts_nested_attributes_for :address_record
 
   accepts_nested_attributes_for :address_record
 
