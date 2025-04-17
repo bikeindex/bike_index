@@ -116,5 +116,13 @@ RSpec.describe Admin::DashboardController, type: :request do
         expect(FileCacheMaintainer.blocklist).to eq([1, 2, 69, 200, 22222].map(&:to_s))
       end
     end
+
+    describe "ip_location" do
+      it "renders" do
+        get "/admin/ip_location"
+        expect(response.code).to eq "200"
+        expect(response).to render_template(:ip_location)
+      end
+    end
   end
 end
