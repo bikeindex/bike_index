@@ -34,7 +34,7 @@ module ControllerHelpers
   end
 
   def forwarded_ip_address
-    @forwarded_ip_address ||= ForwardedIpAddress.parse(request)
+    @forwarded_ip_address ||= IpAddressParser.forwarded_address(request)
   end
 
   def enable_rack_profiler
