@@ -7,11 +7,12 @@ class IpAddressParser
     end
 
     def location_hash(request)
-      # Additional CF headers that we're ignoring: timezone, continent, region-code, and metro-code
+      # CF headers that we're ignoring (but might be nice someday):
+      #   timezone, continent, region-code
       {
         city: request.env["HTTP_CF_IPCITY"],
-        latitude: request.env["HTTP_CF_IPLATITUDE"],
-        longitude: request.env["HTTP_CF_IPLONGITUDE"],
+        latitude: request.env["HTTP_CF_IPLATITUDE"]&.to_f,
+        longitude: request.env["HTTP_CF_IPLONGITUDE"]&.to_f,
         formatted_address: nil, # could build this, ignoring for now
         country_id: Country.friendly_find_id(request.env["HTTP_CF_IPCOUNTRY"]),
         neighborhood: request.env["HTTP_CF_METRO"],
