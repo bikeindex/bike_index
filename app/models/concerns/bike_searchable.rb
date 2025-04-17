@@ -157,7 +157,7 @@ module BikeSearchable
 
       distance = query_params[:distance]&.to_i
       bounding_box = if ["", "ip", "you"].include?(location.strip.downcase)
-        address_hash = GeocodeHelper.address_hash_for(ip_address)
+        address_hash = IpAddressParser.location_hash_geocoder(ip_address)
         location = address_hash[:formatted_address]
         GeocodeHelper.bounding_box([address_hash[:latitude], address_hash[:longitude]], distance)
       else
