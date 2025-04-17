@@ -26,7 +26,7 @@ class Country < ApplicationRecord
     end
 
     def friendly_find(name_or_iso)
-      name_or_iso = name_or_iso.to_s.strip.downcase
+      name_or_iso = name_or_iso&.to_s&.strip&.downcase
       return if name_or_iso.blank?
       return united_states if %w[us usa].include?(name_or_iso)
 
@@ -34,8 +34,9 @@ class Country < ApplicationRecord
     end
 
     def friendly_find_id(name_or_iso)
-      name_or_iso = name_or_iso.to_s.strip.downcase
+      name_or_iso = name_or_iso&.to_s&.strip&.downcase
       return united_states_id if %w[us usa].include?(name_or_iso)
+      return canada_id if name_or_iso == "ca"
 
       friendly_find(name_or_iso)
     end
