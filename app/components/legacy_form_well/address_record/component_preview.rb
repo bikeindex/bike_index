@@ -5,7 +5,7 @@ module LegacyFormWell::AddressRecord
     layout "component_preview_form_wrap"
 
     def default
-      { template: 'legacy_form_well/address_record/component_preview/default' }
+      {template: "legacy_form_well/address_record/component_preview/default"}
     end
 
     # TODO: Figure out how to use slots to actually pass user to these different options

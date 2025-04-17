@@ -4,7 +4,7 @@ module LegacyFormWell::AddressRecord
   class Component < ApplicationComponent
     US_ID = Country.united_states_id
 
-    def initialize(form_builder:,  organization: nil, no_street: false)
+    def initialize(form_builder:, organization: nil, no_street: false)
       @builder = form_builder
       @no_street = no_street
       @organization = organization
@@ -18,7 +18,7 @@ module LegacyFormWell::AddressRecord
     end
 
     def initial_state_class
-      @initial_country_id == US_ID ? "" : "tw:hidden!" # Should check if address_object.country_id == Country.united_states_id
+      (@initial_country_id == US_ID) ? "" : "tw:hidden!" # Should check if address_object.country_id == Country.united_states_id
     end
 
     def initial_region_class
@@ -39,8 +39,6 @@ module LegacyFormWell::AddressRecord
       @organization&.additional_registration_fields&.include?("reg_address") || false
     end
 
-    def builder
-      @builder
-    end
+    attr_reader :builder
   end
 end

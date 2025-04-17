@@ -10,7 +10,7 @@ export default class extends Controller {
     this.updateRegionFieldOnCountryChange()
   }
 
-  updateRegionFieldOnCountryChange() {
+  updateRegionFieldOnCountryChange () {
     this.countryTarget.addEventListener('change', (event) => {
       if (event.target.value === this.usIdValue) {
         // Show the state select
