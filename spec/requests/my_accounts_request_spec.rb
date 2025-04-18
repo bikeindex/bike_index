@@ -151,6 +151,22 @@ RSpec.describe MyAccountsController, type: :request do
         end
       end
     end
+    context "Backfills::AddressRecordsForUsersJob" do
+      let(:current_user) { FactoryBot.create(:user_confirmed, :in_edmonton) }
+      it "creates an address_record on render" do
+        expect(current_user.reload.address_record).to be_blank
+
+        # non-root view doesn't create the address record
+        get "#{base_url}/edit/password"
+        expect(response).to be_ok
+        expect(current_user.reload.address_record).to be_blank
+
+        # Root view creates!
+        get "#{base_url}/edit"
+        expect(response).to be_ok
+        expect(current_user.reload.address_record).to be_present
+      end
+    end
     context "with user_registration_organization" do
       let(:target_templates) { default_edit_templates.merge(registration_organizations: "Registration Organizations") }
       let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: current_user) }
@@ -237,28 +253,39 @@ RSpec.describe MyAccountsController, type: :request do
           id: current_user.username,
           user: {
             name: "Mr. Slick",
-            country_id: country.id,
-            state_id: state.id,
-            city: "New York",
-            street: "278 Broadway",
-            zipcode: "10007",
+            address_record_attributes: {
+              country_id: country.id,
+              region_record_id: state.id,
+              region_string: "something",
+              city: "New York",
+              street: "278 Broadway",
+              postal_code: "10007"
+            },
             notification_newsletters: "1",
             phone: "3223232"
           }
         }
         expect(response).to redirect_to "/my_account/edit/root"
         expect(flash[:error]).to_not be_present
+        Callbacks::AddressRecordUpdateAssociationsJob.drain
         current_user.reload
         expect(current_user.name).to eq("Mr. Slick")
-        expect(current_user.country).to eq country
-        expect(current_user.state).to eq state
-        expect(current_user.street).to eq "278 Broadway"
-        expect(current_user.zipcode).to eq "10007"
         expect(current_user.notification_newsletters).to be_truthy
-        expect(current_user.latitude).to eq default_location[:latitude]
-        expect(current_user.longitude).to eq default_location[:longitude]
         expect(current_user.phone).to eq "3223232"
         expect(current_user.address_set_manually).to be_truthy
+
+        expect(AddressRecord.count).to eq 1
+        address_record = AddressRecord.last
+        expect(address_record.user_id).to eq current_user.id
+        expect(address_record.country_id).to eq country.id
+        expect(address_record.region_record_id).to eq state.id
+        expect(address_record.street).to eq "278 Broadway"
+        expect(address_record.postal_code).to eq "10007"
+        expect(address_record.latitude).to eq default_location[:latitude]
+        expect(address_record.longitude).to eq default_location[:longitude]
+
+        expect(current_user.reload.latitude).to eq default_location[:latitude]
+        expect(current_user.longitude).to eq default_location[:longitude]
       end
     end
 
@@ -579,7 +606,7 @@ RSpec.describe MyAccountsController, type: :request do
             target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
             expect(bike3.registration_info).to eq target_bike3_info
 
-            expect(current_user.reload.address_hash).to eq default_location_registration_address.as_json
+            expect(current_user.reload.address_record.address_hash).to eq default_location_registration_address.as_json
           end
         end
       end

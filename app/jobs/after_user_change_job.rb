@@ -21,11 +21,12 @@ class AfterUserChangeJob < ApplicationJob
     elsif !user.address_set_manually # If user.address_set_manually bikes pick it up on save
       address_bike = user.bikes.with_street.first || user.bikes.with_location.first
       if address_bike.present?
-        user.attributes = address_bike.address_hash
-        user.address_set_manually = address_bike.address_set_manually
+        user.address_record = AddressRecord.new(user_id: user.id, kind: :user)
+        user.address_record.attributes = AddressRecord.attributes_from_legacy(address_bike)
+        # user.address_set_manually = address_bike.address_set_manually
       end
     end
-    user.update(skip_update: true, skip_geocoding: true) if user.changed?
+    user.update(skip_update: true) if user.changed?
 
     update_user_alerts(user)
     current_alerts = user_alert_slugs(user)

@@ -8,8 +8,6 @@ FactoryBot.define do
 
     skip_geocoding { true }
 
-    trait :davis
-
     trait :amsterdam do
       latitude { 52.37403 }
       longitude { 4.88969 }

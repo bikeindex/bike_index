@@ -25,8 +25,8 @@ FactoryBot.define do
     latitude { 52.37403 }
     longitude { 4.88969 }
     city { "Amsterdam" }
-    state { nil }
-    country { Country.netherlands }
+    state_id { nil }
+    country_id { Country.netherlands.id }
     street { "Spuistraat 134afd.Gesch." }
     zipcode { "1012" }
   end
@@ -35,8 +35,8 @@ FactoryBot.define do
     latitude { 41.8624488 }
     longitude { -87.6591502 }
     city { "Chicago" }
-    state { FactoryBot.create(:state_illinois) }
-    country { Country.united_states }
+    state_id { FactoryBot.create(:state_illinois).id }
+    country_id { Country.united_states.id }
     street { "1300 W 14th Pl" }
     zipcode { "60608" }
   end
@@ -46,17 +46,17 @@ FactoryBot.define do
     longitude { -118.24368 }
     street { "100 W 1st St" }
     city { "Los Angeles" }
-    state { FactoryBot.create(:state_california) }
+    state_id { FactoryBot.create(:state_california).id.id }
     zipcode { "90021" }
-    country { Country.united_states }
+    country_id { Country.united_states.id }
   end
 
   trait :in_nyc do
     latitude { 40.7143528 }
     longitude { -74.0059731 }
     city { "New York" }
-    state { FactoryBot.create(:state_new_york) }
-    country { Country.united_states }
+    state_id { FactoryBot.create(:state_new_york).id }
+    country_id { Country.united_states.id }
     street { "278 Broadway" }
     zipcode { "10007" }
   end
@@ -67,8 +67,8 @@ FactoryBot.define do
     street { "278 Broadway" }
     zipcode { "10007" }
     city { "Vancouver" }
-    state
-    country { Country.canada }
+    state_id { nil }
+    country_id { Country.canada.id }
   end
 
   trait :in_edmonton do
@@ -77,7 +77,7 @@ FactoryBot.define do
     street { "9330 Groat Rd NW" }
     zipcode { "AB T6G 2B3" }
     city { "Edmonton" }
-    state
-    country { Country.canada }
+    state_id { nil }
+    country_id { Country.canada.id }
   end
 end

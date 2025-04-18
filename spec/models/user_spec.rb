@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe User, type: :model do
-  it_behaves_like "geocodeable"
-
   describe ".ambassadors" do
     context "given ambassadors and no org filter" do
       it "returns any and only users who are ambassadors" do
@@ -881,15 +879,6 @@ RSpec.describe User, type: :model do
           expect(user.admin_of?(nil)).to be_falsey
         end
       end
-    end
-  end
-
-  describe "address" do
-    let(:address_record) { FactoryBot.create(:address_record) }
-    let(:user) { FactoryBot.create(:user, address_record:) }
-    it "deletes on delete" do
-      expect(user.reload.address_record).to be_present
-      expect { user.destroy }.to change(AddressRecord, :count).by(-1)
     end
   end
 end

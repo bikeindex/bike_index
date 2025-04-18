@@ -146,6 +146,7 @@ ALTER SEQUENCE public.active_storage_variant_records_id_seq OWNED BY public.acti
 
 CREATE TABLE public.address_records (
     id bigint NOT NULL,
+    user_id bigint,
     country_id bigint,
     region_record_id bigint,
     region_string character varying,
@@ -5397,6 +5398,13 @@ CREATE INDEX index_address_records_on_region_record_id ON public.address_records
 
 
 --
+-- Name: index_address_records_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id);
+
+
+--
 -- Name: index_alert_images_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6868,9 +6876,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250413160560'),
 ('20250413160556'),
-('20250411232603'),
-('20250406215740'),
 ('20250319024056'),
 ('20250319010935'),
 ('20250313035336'),
