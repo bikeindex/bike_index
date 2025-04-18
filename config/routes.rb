@@ -203,6 +203,7 @@ Rails.application.routes.draw do
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
+    get "ip_location", to: "dashboard#ip_location"
     resources :ads,
       :bulk_imports,
       :content_tags,
