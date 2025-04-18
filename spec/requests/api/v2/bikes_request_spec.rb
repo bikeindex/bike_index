@@ -365,7 +365,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "updates bike even if stolen record doesn't have important things" do
-      FactoryBot.create(:country, iso: "US")
+      Country.united_states
       expect(bike.year).to be_nil
       params[:stolen_record] = {
         phone: "",
@@ -378,7 +378,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do
-      FactoryBot.create(:country, iso: "US")
+      Country.united_states
       expect(bike.year).to be_nil
       serial = bike.serial_number
       params[:stolen_record] = {
