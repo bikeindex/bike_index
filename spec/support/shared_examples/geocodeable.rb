@@ -148,7 +148,7 @@ RSpec.shared_examples "geocodeable" do
         end
       end
       context "larkspur" do
-        let!(:state) { FactoryBot.create(:state, name: "Colorado", abbreviation: "CO") }
+        let!(:state) { FactoryBot.create(:state, :find_or_create, name: "Colorado", abbreviation: "CO") }
         let(:object) { subject.class.new(country: Country.united_states, state: state, city: " larkspur . co\n") }
         it "removes co" do
           expect(object.city).to eq "larkspur"

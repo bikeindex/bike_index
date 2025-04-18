@@ -244,7 +244,7 @@ RSpec.describe MyAccountsController, type: :request do
 
     context "setting address" do
       let(:country) { Country.united_states }
-      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      let(:state) { FactoryBot.create(:state_new_york) }
       it "sets address, geocodes" do
         current_user.reload
         expect(current_user.address_set_manually).to be_falsey

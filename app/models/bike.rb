@@ -769,8 +769,8 @@ class Bike < ApplicationRecord
 
   # THIS IS FUCKING OBNOXIOUS.
   # Somehow we need to get rid of needing to have this method. country should default to optional
-  def address
-    Geocodeable.address(self, country: [:optional])
+  def address(country: [:optional])
+    Geocodeable.address(self, country:)
   end
 
   def valid_mailing_address?

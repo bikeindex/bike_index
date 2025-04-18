@@ -190,8 +190,8 @@ RSpec.describe "Bikes API V2", type: :request do
       organization = FactoryBot.create(:organization)
       user.update_attribute :phone, "0987654321"
       FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
-      FactoryBot.create(:country, iso: "US")
-      FactoryBot.create(:state, abbreviation: "NY")
+      Country.united_states
+      FactoryBot.create(:state_new_york)
       organization.save
       bike_attrs[:organization_slug] = organization.slug
       date_stolen = 1357192800

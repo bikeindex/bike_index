@@ -176,7 +176,7 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:testable_bike_params) { bike_params.except(:serial_unknown, :b_param_id_token, :cycle_type_slug, :accuracy, :origin) }
     context "with parking_notification" do
       let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
-      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      let(:state) { FactoryBot.create(:state_new_york) }
 
       let(:parking_notification) do
         {

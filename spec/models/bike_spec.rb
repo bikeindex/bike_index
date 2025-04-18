@@ -1388,7 +1388,7 @@ RSpec.describe Bike, type: :model do
     end
     context "with user with address" do
       let(:country) { Country.united_states }
-      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      let(:state) { FactoryBot.create(:state_new_york) }
       let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007", address_set_manually: true) }
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
@@ -1857,7 +1857,7 @@ RSpec.describe Bike, type: :model do
     context "given no creation org location" do
       let(:city) { "New York" }
       let(:zipcode) { "10011" }
-      let(:address_record) { FactoryBot.create(:address_record, :geocoder_default) }
+      let(:address_record) { FactoryBot.create(:address_record, :new_york) }
       let(:user) { FactoryBot.create(:user_confirmed, address_record:) }
       let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"}) }
       let(:bike) { ownership.bike }

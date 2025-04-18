@@ -4622,3 +4622,13 @@ es:
         stolenness_proximity:
         stolenness_stolen:
         within:
+    legacy_form_well:
+      address_record:
+        address:
+        address_school:
+        choose_country:
+        city:
+        postal_code:
+        region:
+        state:
+        your_full_address_is_required:

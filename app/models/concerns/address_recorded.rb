@@ -7,7 +7,8 @@ module AddressRecorded
     belongs_to :address_record
     accepts_nested_attributes_for :address_record
 
-    delegate :address_hash, :address_present?, to: :address_record, allow_nil: true
+    delegate :address_present?, :address_hash, :formatted_address_string,
+      to: :address_record, allow_nil: true
   end
 
   def to_coordinates

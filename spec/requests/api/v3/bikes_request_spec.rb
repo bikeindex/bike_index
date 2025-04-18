@@ -754,8 +754,7 @@ RSpec.describe "Bikes API V3", type: :request do
       it "creates a stolen bike through an organization and uses the passed phone", :flaky do
         user.update_attribute :phone, "0987654321"
         FactoryBot.create(:organization_role, user: user, organization: organization)
-        FactoryBot.create(:country, iso: "US")
-        FactoryBot.create(:state, abbreviation: "NY")
+        FactoryBot.create(:state_new_york)
         date_stolen = 1357192800
         bike_attrs[:serial] = "unknown"
         bike_attrs[:stolen_record] = {

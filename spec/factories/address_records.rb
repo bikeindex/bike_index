@@ -39,7 +39,8 @@ FactoryBot.define do
       country { Country.united_states }
     end
 
-    trait :geocoder_default do
+    # geocoder default
+    trait :new_york do
       latitude { 40.7143528 }
       longitude { -74.0059731 }
       city { "New York" }

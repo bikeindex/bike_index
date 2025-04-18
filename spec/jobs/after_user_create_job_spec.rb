@@ -99,7 +99,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
     # Block traditional run, so we can do it separately }
     before { allow_any_instance_of(User).to receive(:perform_create_jobs) { true } }
     let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org") }
-    let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
+    let!(:state) { FactoryBot.create(:state_california) }
     let!(:country) { Country.united_states }
     let(:target_address_hash) { {street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "US", latitude: 37.8016649, longitude: -122.397348} }
     let(:bike) do
