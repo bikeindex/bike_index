@@ -213,7 +213,7 @@
       %tr
         %td Address
         %td
-          %small= @user.address
+          %small= @user.formatted_address_string(current_country_id:)
       %tr
         %td Vendor terms?
         %td

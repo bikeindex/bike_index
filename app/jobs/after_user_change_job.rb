@@ -1,6 +1,27 @@
 class AfterUserChangeJob < ApplicationJob
   sidekiq_options retry: false
 
+  def self.assign_user_address_from_bikes(user, bikes: nil, save_user: false)
+    # if the user has address info that hasn't been backfilled, don't overwrite that
+    return user unless [user.street, user.city, user.zipcode].reject(&:blank?).none?
+
+    bikes ||= user.bikes
+    address_bike = bikes.with_street.first || bikes.with_location.first
+    if address_bike.present?
+      address_record = user.address_record ||
+        AddressRecord.new(user_id: user.id, kind: :user, skip_geocoding: true, skip_callback_job: true)
+      address_record.update(AddressRecord.attrs_from_legacy(address_bike))
+      user.attributes = {
+        address_record_id: address_record.id,
+        latitude: address_record.latitude,
+        longitude: address_record.longitude,
+        address_set_manually: address_bike.address_set_manually
+      }
+      user.save if save_user
+    end
+    user
+  end
+
   def perform(user_id, user = nil, skip_bike_update = false)
     user ||= User.find_by_id(user_id)
     return false unless user.present?
@@ -15,17 +36,9 @@ class AfterUserChangeJob < ApplicationJob
     # Create a new mailchimp datum if it's deserved
     MailchimpDatum.find_and_update_or_create_for(user)
 
-    no_address = user.bike_organizations.with_enabled_feature_slugs("no_address").any?
-    if no_address
-      user.no_address = no_address unless user.no_address
-    elsif !user.address_set_manually # If user.address_set_manually bikes pick it up on save
-      address_bike = user.bikes.with_street.first || user.bikes.with_location.first
-      if address_bike.present?
-        user.address_record = AddressRecord.new(user_id: user.id, kind: :user)
-        user.address_record.attributes = AddressRecord.attrs_from_legacy(address_bike)
-        # TODO: Seems like this can be removed??
-        # user.address_set_manually = address_bike.address_set_manually
-      end
+    user.no_address = user.bike_organizations.with_enabled_feature_slugs("no_address").any?
+    if !user.no_address && !user.address_set_manually # If user.address_set_manually bikes pick it up on save
+      self.class.assign_user_address_from_bikes(user)
     end
     user.update(skip_update: true) if user.changed?
 

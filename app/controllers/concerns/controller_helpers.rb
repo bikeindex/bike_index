@@ -8,7 +8,7 @@ module ControllerHelpers
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
       :controller_namespace, :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
-      :display_dev_info?
+      :display_dev_info?, :current_country_id
     before_action :enable_rack_profiler
 
     before_action do
@@ -35,6 +35,14 @@ module ControllerHelpers
 
   def forwarded_ip_address
     @forwarded_ip_address ||= IpAddressParser.forwarded_address(request)
+  end
+
+  def request_location_hash
+    @request_location_hash ||= IpAddressParser.location_hash(request)
+  end
+
+  def current_country_id
+    request_location_hash[:country_id]
   end
 
   def enable_rack_profiler

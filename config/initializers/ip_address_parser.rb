@@ -22,10 +22,6 @@ class IpAddressParser
       }
     end
 
-    def country_id(request)
-      location_hash(request)[:country_id]
-    end
-
     def location_hash_geocoder(ip_address, new_attrs: false)
       GeocodeHelper.address_hash_for(ip_address, new_attrs:)
     end

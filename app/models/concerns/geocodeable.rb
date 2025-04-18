@@ -85,11 +85,8 @@ module Geocodeable
     def new_address_hash(address_hash)
       new_hash = address_hash.dup.symbolize_keys
       new_hash[:postal_code] = new_hash.delete(:zipcode)
-      new_hash[:region_string] = new_hash.delete(:state)
-      new_hash[:region_record_id] = new_hash.delete(:state_id)
-      if new_hash[:country].present?
-        new_hash[:country_id] = Country.friendly_find_id(new_hash.delete(:country))
-      end
+      new_hash[:region] = new_hash.delete(:state)
+      new_hash[:country] = Country.friendly_find(new_hash.delete(:country))&.name
       new_hash
     end
   end
@@ -171,7 +168,7 @@ module Geocodeable
   end
 
   def address_hash_new_attrs
-    Geocodeable.new_address_hash(attributes.slice(*Geocodeable.location_attrs))
+    Geocodeable.new_address_hash(address_hash)
   end
 
   # Override assignment to enable friendly finding state and country

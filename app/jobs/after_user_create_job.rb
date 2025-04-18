@@ -89,19 +89,18 @@ class AfterUserCreateJob < ApplicationJob
       user.phone = user_bikes_for_attrs(user.id).map { |b| b.phone }.reject(&:blank?).last
     end
     # Only do address import if the user doesn't have an address present
-    unless [user.street, user.city, user.zipcode, user.state, user.country].reject(&:blank?).any?
-      address = user_bikes_for_attrs(user.id).map { |b| b.address_hash }.reject(&:blank?).last
-      user.attributes = address.merge(skip_geocoding: true) if address.present?
+    unless user.address_present?
+      AfterUserChangeJob.assign_user_address_from_bikes(user, bikes: user_bikes_for_attrs(user.id),
+        save_user: true)
     end
-    user.save if user.changed?
   end
 
   private
 
   def user_bikes_for_attrs(user_id)
     # Deal with example bikes
-    Ownership.where(user_id: user_id).where.not(user_id: nil).order(:created_at).pluck(:bike_id)
-      .map { |id| Bike.unscoped.where(id: id).first }.compact
+    bike_ids = Ownership.where(user_id: user_id).where.not(user_id: nil).order(:created_at).limit(100).pluck(:bike_id)
+    Bike.unscoped.where(id: bike_ids)
   end
 
   def create_passwordless_domain_organization_roles(user)

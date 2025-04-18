@@ -18,6 +18,7 @@ class Backfills::AddressRecordsForUsersJob < ApplicationJob
       return user.address_record if user.latitude.blank? || user.longitude.blank?
 
       user.address_record.attributes = AddressRecord.attrs_from_legacy(user)
+      user.skip_update = true
       user.save
       user.address_record.skip_geocoding = false
       user.address_record

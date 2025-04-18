@@ -122,12 +122,12 @@ RSpec.describe AfterUserCreateJob, type: :job do
         user.reload
 
         expect(user.phone).to eq "1112223333"
-        expect(user.address_hash).to eq target_address_hash.as_json
+        expect(user.address_hash_legacy).to eq target_address_hash.merge(country: "United States").as_json
         expect(user.to_coordinates).to eq([37.8016649, -122.397348])
       end
     end
     context "existing attributes" do
-      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999", skip_geocoding: true) }
+      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999") }
       it "doesn't import" do
         instance.perform(user.id, "new")
         user.reload
@@ -135,8 +135,8 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(user.street).to be_nil
         expect(user.city).to be_nil
         expect(user.zipcode).to eq "89999"
-        expect(user.state).to be_nil
-        expect(user.country).to be_nil
+        expect(user.state_id).to be_nil
+        expect(user.country_id).to be_nil
       end
     end
   end

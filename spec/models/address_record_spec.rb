@@ -6,23 +6,26 @@ RSpec.describe AddressRecord, type: :model do
     it "is valid" do
       expect(address_record).to be_valid
       expect(address_record.region).to eq "CA"
-      expect(address_record.formatted_address_string).to eq "Davis, CA, 95616"
-      expect(address_record.formatted_address_string(render_country: "always")).to eq "Davis, CA, 95616, United States"
+      expect(address_record.include_country?).to be_falsey
+      expect(address_record.formatted_address_string).to eq "Davis, CA 95616"
+      expect(address_record.formatted_address_string(render_country: true)).to eq "Davis, CA 95616, United States"
 
-      expect(address_record.formatted_address_string(render_country: :if_different)).to eq "Davis, CA, 95616"
+      expect(address_record.formatted_address_string(render_country: :if_different)).to eq "Davis, CA 95616"
       expect(address_record.formatted_address_string(render_country: :if_different, current_country_iso: "CA"))
-        .to eq "Davis, CA, 95616, United States"
+        .to eq "Davis, CA 95616, United States"
       # include_country defaults to :if_different if not matching
-      expect(address_record.formatted_address_string(render_country: "something")).to eq "Davis, CA, 95616"
+      expect(address_record.formatted_address_string(render_country: "something")).to eq "Davis, CA 95616"
     end
     context "in_amsterdam" do
       let(:address_record) { FactoryBot.create(:address_record, :amsterdam) }
       it "is valid" do
         expect(address_record).to be_valid
         expect(address_record.region).to eq "North Holland"
-        expect(address_record.formatted_address_string(render_country: :always)).to eq "Amsterdam, North Holland, 1012, Netherlands"
-        expect(address_record.formatted_address_string).to eq "Amsterdam, North Holland, 1012, Netherlands"
-        expect(address_record.formatted_address_string(current_country_iso: "NL")).to eq "Amsterdam, North Holland, 1012"
+        expect(address_record.formatted_address_string(render_country: true)).to eq "Amsterdam, North Holland 1012, Netherlands"
+        expect(address_record.formatted_address_string).to eq "Amsterdam, North Holland 1012, Netherlands"
+        expect(address_record.formatted_address_string(current_country_iso: "NL")).to eq "Amsterdam, North Holland 1012"
+        # NOTE: actual correct formatted address: Spuistraat 134afd.Gesch., 1012 VB Amsterdam, Netherlands
+        expect(address_record.formatted_address_string(visible_attribute: "street")).to eq "Spuistraat 134afd.Gesch., Amsterdam, North Holland 1012, Netherlands"
       end
     end
   end
@@ -78,8 +81,58 @@ RSpec.describe AddressRecord, type: :model do
       end
 
       context "with an update" do
-        xit "overwrites the latitude and longitude" do
+        it "overwrites the latitude and longitude" do
+          VCR.use_cassette("address-record-assignment_geocode") do
+            expect(address_record).to be_valid
+
+            expect(address_record.reload).to match_hash_indifferently target_attrs
+          end
+
+          address_record.reload
+          # not wrapped in VCR, so will error if it attempts to geocode
+
+          address_record.update(kind: :marketplace, publicly_visible_attribute: :city, user_id: 121212)
+
+          VCR.use_cassette("address-record-assignment_geocode-again") do
+            address_record.update(street: "100 Shields Ave")
+
+            expect(address_record.reload.latitude).to_not eq target_attrs[:latitude]
+          end
         end
+      end
+    end
+  end
+
+  describe "formatted_address_string" do
+    let(:address_record) { FactoryBot.build(:address_record, :vancouver, publicly_visible_attribute:) }
+    let(:publicly_visible_attribute) { :street }
+    let(:country_id) { address_record.country_id }
+    let(:target) { "278 W Broadway, Vancouver, BC V5Y 1P5, Canada" }
+    let(:target_no_street) { target.gsub("278 W Broadway, ", "") }
+
+    it "returns formatted_address_string" do
+      expect(address_record.formatted_address_string).to eq target
+      expect(address_record.formatted_address_string(render_country: true)).to eq target
+      expect(address_record.formatted_address_string(current_country_iso: "mx")).to eq target
+      target_no_country = target.gsub(", Canada", "")
+      expect(address_record.formatted_address_string(current_country_iso: "ca")).to eq target_no_country
+      expect(address_record.formatted_address_string(current_country_id: country_id)).to eq target_no_country
+    end
+
+    context "publicly_visible_attribute: :postal_code" do
+      let(:publicly_visible_attribute) { :postal_code }
+      it "returns without street, unless overridden" do
+        expect(address_record.formatted_address_string).to eq target.gsub("278 W Broadway, ", "")
+        expect(address_record.formatted_address_string(visible_attribute: :street)).to eq target
+      end
+    end
+
+    context "publicly_visible_attribute: :city" do
+      let(:publicly_visible_attribute) { :city }
+      it "returns without street or postal_code, unless overridden" do
+        expect(address_record.formatted_address_string).to eq target_no_street.gsub(" V5Y 1P5", "")
+        expect(address_record.formatted_address_string(visible_attribute: :street)).to eq target
+        expect(address_record.formatted_address_string(visible_attribute: :postal_code)).to eq target_no_street
       end
     end
   end

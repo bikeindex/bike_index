@@ -46,7 +46,7 @@ FactoryBot.define do
     longitude { -118.24368 }
     street { "100 W 1st St" }
     city { "Los Angeles" }
-    state_id { FactoryBot.create(:state_california).id.id }
+    state_id { FactoryBot.create(:state_california).id }
     zipcode { "90021" }
     country_id { Country.united_states.id }
   end
