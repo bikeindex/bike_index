@@ -1091,7 +1091,7 @@ RSpec.describe "Bikes API V3", type: :request do
   describe "update" do
     before do
       FactoryBot.create(:color, name: "Orange")
-      FactoryBot.create(:country, iso: "US")
+      Country.united_states
     end
 
     let(:params) do
