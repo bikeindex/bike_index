@@ -15,11 +15,15 @@ class IpAddressParser
         longitude: request.env["HTTP_CF_IPLONGITUDE"]&.to_f,
         formatted_address: nil, # could build this, ignoring for now
         country_id: Country.friendly_find_id(request.env["HTTP_CF_IPCOUNTRY"]),
-        neighborhood: request.env["HTTP_CF_METRO"],
+        neighborhood: nil,
         street: nil,
         postal_code: request.env["HTTP_CF_POSTAL_CODE"],
         region_string: request.env["HTTP_CF_REGION"]
       }
+    end
+
+    def country_id(request)
+      location_hash(request)[:country_id]
     end
 
     def location_hash_geocoder(ip_address, new_attrs: false)

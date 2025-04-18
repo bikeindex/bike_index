@@ -26,59 +26,72 @@ module Geocodeable
     end
   end
 
-  def self.location_attrs
-    %w[country_id state_id street city zipcode latitude longitude neighborhood].freeze
-  end
+  class << self
+    def location_attrs
+      %w[country_id state_id street city zipcode latitude longitude neighborhood].freeze
+    end
 
-  # Build an address string from the given object's location data.
-  #
-  # The following keyword args accept booleans for inclusion / omission in the
-  # string: `street` `city` `state` `zipcode`, `country`.
-  #
-  # By default, the country is included as an ISO abbreviation and is required
-  # (an empty string is returned if no country is available.)
-  #
-  # The `country` keyword arg also accepts a list of options to customize
-  # output:
-  #
-  # - :iso or :name for the format
-  # - :optional to make the country optional
-  # - :skip_default to omit the country name if it's the default country (US)
-  #
-  # Returns a String.
-  def self.address(obj, street: true, city: true, state: true, zipcode: true, country: [:iso])
-    return "" if obj.blank?
+    # Build an address string from the given object's location data.
+    #
+    # The following keyword args accept booleans for inclusion / omission in the
+    # string: `street` `city` `state` `zipcode`, `country`.
+    #
+    # By default, the country is included as an ISO abbreviation and is required
+    # (an empty string is returned if no country is available.)
+    #
+    # The `country` keyword arg also accepts a list of options to customize
+    # output:
+    #
+    # - :iso or :name for the format
+    # - :optional to make the country optional
+    # - :skip_default to omit the country name if it's the default country (US)
+    #
+    # Returns a String.
+    def address(obj, street: true, city: true, state: true, zipcode: true, country: [:iso])
+      return "" if obj.blank?
 
-    include_country =
-      country && !(obj.country&.default? && country.include?(:skip_default))
+      include_country =
+        country && !(obj.country&.default? && country.include?(:skip_default))
 
-    country_name =
-      if include_country
-        country_format = country.find { |e| e.in? %i[iso name] } || :iso
-        country_name = obj.country&.public_send(country_format)
+      country_name =
+        if include_country
+          country_format = country.find { |e| e.in? %i[iso name] } || :iso
+          country_name = obj.country&.public_send(country_format)
 
-        country_is_required = !country.include?(:optional)
-        not_enough_info = country_is_required && country_name.blank?
-        return "" if not_enough_info
+          country_is_required = !country.include?(:optional)
+          not_enough_info = country_is_required && country_name.blank?
+          return "" if not_enough_info
 
-        country_name
-      end
+          country_name
+        end
 
-    [
-      street && obj.street,
-      city && obj.city,
       [
-        state && obj.state&.abbreviation,
-        zipcode && obj.zipcode
-      ].reject(&:blank?).join(" "),
-      country_name
-    ].reject(&:blank?).join(", ")
-  end
+        street && obj.street,
+        city && obj.city,
+        [
+          state && obj.state&.abbreviation,
+          zipcode && obj.zipcode
+        ].reject(&:blank?).join(" "),
+        country_name
+      ].reject(&:blank?).join(", ")
+    end
 
-  def self.format_postal_code(str, country_id = nil)
-    str = str.strip.upcase.gsub(/\s*,\z/, "")
-    return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
-    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
+    def format_postal_code(str, country_id = nil)
+      str = str.strip.upcase.gsub(/\s*,\z/, "")
+      return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
+      str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
+    end
+
+    def new_address_hash(address_hash)
+      new_hash = address_hash.dup.symbolize_keys
+      new_hash[:postal_code] = new_hash.delete(:zipcode)
+      new_hash[:region_string] = new_hash.delete(:state)
+      new_hash[:region_record_id] = new_hash.delete(:state_id)
+      if new_hash[:country].present?
+        new_hash[:country_id] = Country.friendly_find_id(new_hash.delete(:country))
+      end
+      new_hash
+    end
   end
 
   def address(**kwargs)
@@ -155,6 +168,10 @@ module Geocodeable
       .merge(state: state_abbr, country: country_abbr)
       .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
       .with_indifferent_access
+  end
+
+  def address_hash_new_attrs
+    Geocodeable.new_address_hash(attributes.slice(*Geocodeable.location_attrs))
   end
 
   # Override assignment to enable friendly finding state and country

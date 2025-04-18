@@ -17,8 +17,9 @@ class MyAccountsController < ApplicationController
     @page_title = @edit_templates[@edit_template]
 
     if @edit_template&.to_sym == :root
-      Backfills::AddressRecordsForUsersJob.build_or_create_for(@user)
-      # country_id: IpAddressParser.location_hash(request)[:country_id]
+      Backfills::AddressRecordsForUsersJob.build_or_create_for(
+        @user, country_id: IpAddressParser.country_id(request)
+      )
     end
   end
 

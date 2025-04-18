@@ -22,7 +22,8 @@ class AfterUserChangeJob < ApplicationJob
       address_bike = user.bikes.with_street.first || user.bikes.with_location.first
       if address_bike.present?
         user.address_record = AddressRecord.new(user_id: user.id, kind: :user)
-        user.address_record.attributes = AddressRecord.attributes_from_legacy(address_bike)
+        user.address_record.attributes = AddressRecord.attrs_from_legacy(address_bike)
+        # TODO: Seems like this can be removed??
         # user.address_set_manually = address_bike.address_set_manually
       end
     end

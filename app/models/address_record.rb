@@ -54,7 +54,7 @@ class AddressRecord < ApplicationRecord
       %i[city postal_code region_string street country_id region_record_id].freeze
     end
 
-    def attributes_from_legacy(obj)
+    def attrs_from_legacy(obj)
       {
         skip_geocoding: true, # Skip geocoding, this is a direct copy
         skip_callback_job: true, # they're already in sync
@@ -74,7 +74,7 @@ class AddressRecord < ApplicationRecord
   end
 
   def address_hash
-    attributes.slice(*self.class.location_attrs)
+    attributes.slice(*self.class.location_attrs).symbolize_keys
   end
 
   def should_be_geocoded?
