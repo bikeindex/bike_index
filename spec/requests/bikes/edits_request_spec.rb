@@ -3,8 +3,9 @@ require "rails_helper"
 RSpec.describe Bikes::EditsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bikes/#{bike.to_param}/edit" }
-  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-  let(:current_user) { bike.creator }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: bike_creator) }
+  let(:bike_creator) { FactoryBot.create(:user_confirmed) }
+  let(:current_user) { bike_creator }
 
   let(:edit_templates) do
     {
@@ -90,6 +91,23 @@ RSpec.describe Bikes::EditsController, type: :request do
     get base_url, params: {id: bike.id, edit_template: "root_party"}
     expect(response).to redirect_to(edit_bike_url(bike, edit_template: :bike_details))
   end
+  context "with can_list_item" do
+    let(:bike_creator) { FactoryBot.create(:superuser) }
+
+    it "includes marketplace in edit_templates" do
+      expect(bike_creator.reload.can_list_items?).to be_truthy
+      get base_url
+      expect(flash).to be_blank
+      expect(response).to render_template(:bike_details)
+      expect(assigns(:bike).id).to eq bike.id
+      expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates.merge(marketplace: "List for sale")
+      # Because user is bike#user
+      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+      # If passed an unknown template, it renders default template
+      get base_url, params: {id: bike.id, edit_template: "marketplace"}
+      expect(response).to render_template(:marketplace)
+    end
+  end
   context "with bike_versions" do
     it "renders" do
       Flipper.enable :bike_versions # Simpler to just enable it all
@@ -125,7 +143,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     end
   end
   context "stolen bike" do
-    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: bike_creator) }
     it "renders" do
       get base_url
       expect(flash).to be_blank
