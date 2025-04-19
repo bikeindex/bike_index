@@ -2167,6 +2167,49 @@ ALTER SEQUENCE public.manufacturers_id_seq OWNED BY public.manufacturers.id;
 
 
 --
+-- Name: marketplace_listings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_listings (
+    id bigint NOT NULL,
+    seller_id bigint,
+    buyer_id bigint,
+    item_type character varying,
+    item_id bigint,
+    address_record_id bigint,
+    latitude double precision,
+    longitude double precision,
+    for_sale_at timestamp(6) without time zone,
+    sold_at timestamp(6) without time zone,
+    currency_enum integer,
+    amount_cents integer,
+    status integer DEFAULT 0,
+    condition integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_listings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_listings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_listings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_listings_id_seq OWNED BY public.marketplace_listings.id;
+
+
+--
 -- Name: memberships; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3808,7 +3851,6 @@ CREATE TABLE public.users (
     password_digest character varying(255),
     banned boolean DEFAULT false NOT NULL,
     phone character varying(255),
-    zipcode character varying(255),
     twitter character varying(255),
     show_twitter boolean DEFAULT false NOT NULL,
     show_website boolean DEFAULT false NOT NULL,
@@ -3831,10 +3873,6 @@ CREATE TABLE public.users (
     partner_data jsonb,
     latitude double precision,
     longitude double precision,
-    street character varying,
-    city character varying,
-    country_id integer,
-    state_id integer,
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
     preferred_language character varying,
@@ -3849,7 +3887,6 @@ CREATE TABLE public.users (
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
-    neighborhood character varying,
     address_record_id bigint
 );
 
@@ -4283,6 +4320,13 @@ ALTER TABLE ONLY public.mailchimp_values ALTER COLUMN id SET DEFAULT nextval('pu
 --
 
 ALTER TABLE ONLY public.manufacturers ALTER COLUMN id SET DEFAULT nextval('public.manufacturers_id_seq'::regclass);
+
+
+--
+-- Name: marketplace_listings id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_listings ALTER COLUMN id SET DEFAULT nextval('public.marketplace_listings_id_seq'::regclass);
 
 
 --
@@ -5017,6 +5061,14 @@ ALTER TABLE ONLY public.mailchimp_values
 
 ALTER TABLE ONLY public.manufacturers
     ADD CONSTRAINT manufacturers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: marketplace_listings marketplace_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_listings
+    ADD CONSTRAINT marketplace_listings_pkey PRIMARY KEY (id);
 
 
 --
@@ -6133,6 +6185,34 @@ CREATE INDEX index_mailchimp_data_on_user_id ON public.mailchimp_data USING btre
 
 
 --
+-- Name: index_marketplace_listings_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_address_record_id ON public.marketplace_listings USING btree (address_record_id);
+
+
+--
+-- Name: index_marketplace_listings_on_buyer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_buyer_id ON public.marketplace_listings USING btree (buyer_id);
+
+
+--
+-- Name: index_marketplace_listings_on_item; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_item ON public.marketplace_listings USING btree (item_type, item_id);
+
+
+--
+-- Name: index_marketplace_listings_on_seller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_seller_id ON public.marketplace_listings USING btree (seller_id);
+
+
+--
 -- Name: index_memberships_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6876,8 +6956,10 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250419023411'),
 ('20250413160560'),
 ('20250413160556'),
+('20250406215746'),
 ('20250319024056'),
 ('20250319010935'),
 ('20250313035336'),
