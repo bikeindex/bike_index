@@ -39,7 +39,7 @@ export class CollapseUtils {
   static toggle (element, duration) {
     if (!element) return
 
-    const isHidden = element.classList.contains('tw:hidden')
+    const isHidden = element.classList.contains('tw:hidden!')
     this.collapse(isHidden ? 'show' : 'hide', element, duration)
   }
 
@@ -50,7 +50,7 @@ export class CollapseUtils {
    */
   static show (element, duration) {
     // Remove the hidden
-    element.classList.remove('tw:hidden')
+    element.classList.remove('tw:hidden!')
     // First, ensure the hidden attributes are set
     element.classList.add('tw:scale-y-0')
     element.style.height = 0
@@ -84,7 +84,7 @@ export class CollapseUtils {
 
     // After transition completes, add display: none to remove element from the flow
     setTimeout(() => {
-      element.classList.add('tw:hidden')
+      element.classList.add('tw:hidden!')
     }, duration)
   }
 }

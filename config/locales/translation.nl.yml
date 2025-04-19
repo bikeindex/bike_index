@@ -6031,3 +6031,13 @@ nl:
         stolenness_proximity: Gestolen in zoekgebied
         stolenness_stolen: Overal gestolen
         within: binnen
+    legacy_form_well:
+      address_record:
+        address: Adres
+        address_school: Postadres van de campus
+        choose_country: Kies land
+        city: City
+        postal_code: Postcode
+        region: Regio / Provincie
+        state: Staat
+        your_full_address_is_required: Uw volledige adres is vereist door %{org_name}

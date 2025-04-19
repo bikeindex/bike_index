@@ -4629,3 +4629,13 @@ it:
         stolenness_proximity:
         stolenness_stolen:
         within:
+    legacy_form_well:
+      address_record:
+        address:
+        address_school:
+        choose_country:
+        city: Città
+        postal_code: Codice postale
+        region:
+        state: Stato
+        your_full_address_is_required:
