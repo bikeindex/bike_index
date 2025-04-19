@@ -498,7 +498,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record.street = ""
         expect(stolen_record.without_location?).to be_truthy
 
-        ca = FactoryBot.create(:state, name: "California", abbreviation: "CA")
+        ca = FactoryBot.create(:state_california)
         stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ca, country: Country.united_states)
         expect(stolen_record.address).to eq("CA, US")
         expect(stolen_record.address(country: [:skip_default])).to eq("CA")

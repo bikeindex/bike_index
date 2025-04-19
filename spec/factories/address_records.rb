@@ -8,8 +8,6 @@ FactoryBot.define do
 
     skip_geocoding { true }
 
-    trait :davis
-
     trait :amsterdam do
       latitude { 52.37403 }
       longitude { 4.88969 }
@@ -41,7 +39,8 @@ FactoryBot.define do
       country { Country.united_states }
     end
 
-    trait :nyc do
+    # geocoder default
+    trait :new_york do
       latitude { 40.7143528 }
       longitude { -74.0059731 }
       city { "New York" }
@@ -54,8 +53,8 @@ FactoryBot.define do
     trait :vancouver do
       latitude { 49.253992 }
       longitude { -123.241084 }
-      street { "278 Broadway" }
-      postal_code { "10007" }
+      street { "278 W Broadway" }
+      postal_code { "V5Y 1P5" }
       city { "Vancouver" }
       region_record { FactoryBot.create(:state_british_columbia) }
       country { Country.canada }

@@ -4083,13 +4083,10 @@ en:
       add_additional_email: Add additional email
       add_new_phone_number: Add a new phone number
       additional_email: Additional email
-      address: Street address
       any_use_of_your_personal_information_html: >-
         Any use of your personal information is governed by the terms of our %{privacy_policy}.
         We do not sell, trade, or rent your personal information.
-      choose_country: Choose country
       choose_language: Choose language
-      city: City
       confirmed_emails: Confirmed emails
       daily_hot_sheet_notifications_html: Receive daily <em>%{org_name}</em> %{hot_sheets_link}
       give_us_permission_html: >-
@@ -4109,7 +4106,6 @@ en:
       remove_email: Remove email
       remove_number: remove number
       resend_confirmation: Resend confirmation
-      state: State
       stolen_hot_sheets: Stolen Bike Hot Sheets
       time_single_format: Only show dates
       time_single_format_small: "(not today, yesterday, etc)"
@@ -4117,7 +4113,6 @@ en:
       unconfirmed_emails: Unconfirmed emails
       verified: verified
       why_you_should_text: Read why you should
-      zipcode: Postal code
     sharing:
       choose_file: Choose file...
       create_page: Create page

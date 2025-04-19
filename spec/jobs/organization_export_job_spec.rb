@@ -96,7 +96,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           ]
         end
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "a1111") }
-        let!(:state) { FactoryBot.create(:state, name: "Pennsylvania", abbreviation: "PA", country: Country.united_states) }
+        let!(:state) { FactoryBot.create(:state, :find_or_create, name: "Pennsylvania", abbreviation: "PA", country: Country.united_states) }
         include_context :geocoder_real
         it "exports only bike with name, email and address" do
           bike.reload
@@ -244,7 +244,7 @@ RSpec.describe OrganizationExportJob, type: :job do
       end
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, extra_registration_number: "cool extra serial", creation_registration_info: registration_info, cycle_type: "cargo", propulsion_type: "pedal-assist") }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
-      let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
+      let!(:state) { FactoryBot.create(:state_california) }
       let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).as_json }
       include_context :geocoder_real
 

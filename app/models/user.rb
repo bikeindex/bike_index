@@ -66,7 +66,7 @@
 #
 class User < ApplicationRecord
   include FeatureFlaggable
-  include Geocodeable
+  include AddressRecorded
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
 
@@ -121,12 +121,7 @@ class User < ApplicationRecord
   has_one :mailchimp_datum
   has_one :user_ban
 
-  belongs_to :address_record, dependent: :destroy
-
   accepts_nested_attributes_for :user_ban
-  accepts_nested_attributes_for :address_record
-
-  accepts_nested_attributes_for :address_record
 
   validates_uniqueness_of :username, case_sensitive: false
 
@@ -282,10 +277,6 @@ class User < ApplicationRecord
 
   def ambassador?
     organization_roles.ambassador_organizations.limit(1).any?
-  end
-
-  def can_list_items?
-    superuser?
   end
 
   def to_param

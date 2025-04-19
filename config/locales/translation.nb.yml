@@ -5877,3 +5877,13 @@ nb:
         stolenness_proximity: Stjålet i søkeområdet
         stolenness_stolen: Stjålet hvor som helst
         within: innenfor
+    legacy_form_well:
+      address_record:
+        address: gateadresse
+        address_school: Campus postadresse
+        choose_country: Velg land
+        city: By
+        postal_code: postnummer
+        region: Region/provins
+        state: Stat
+        your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}

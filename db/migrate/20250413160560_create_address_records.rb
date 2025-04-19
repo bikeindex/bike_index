@@ -1,6 +1,7 @@
 class CreateAddressRecords < ActiveRecord::Migration[8.0]
   def change
     create_table :address_records do |t|
+      t.references :user
       t.references :country
       t.references :region_record
 
@@ -18,5 +19,7 @@ class CreateAddressRecords < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_reference :users, :address_record
   end
 end

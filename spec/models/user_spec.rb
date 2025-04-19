@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe User, type: :model do
-  it_behaves_like "geocodeable"
-
   describe ".ambassadors" do
     context "given ambassadors and no org filter" do
       it "returns any and only users who are ambassadors" do

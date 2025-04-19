@@ -992,7 +992,7 @@ RSpec.describe BikesController, type: :controller do
             end
           end
           context "canadian stolen record" do
-            let!(:canada) { FactoryBot.create(:country, name: "Canada", iso: "CA") }
+            let!(:canada) { Country.canada }
             let(:stolen_attrs) do
               {
                 date_stolen: "2016-02-08 04:00:00",

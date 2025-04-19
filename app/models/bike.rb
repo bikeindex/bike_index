@@ -769,8 +769,8 @@ class Bike < ApplicationRecord
 
   # THIS IS FUCKING OBNOXIOUS.
   # Somehow we need to get rid of needing to have this method. country should default to optional
-  def address
-    Geocodeable.address(self, country: [:optional])
+  def address(country: [:optional])
+    Geocodeable.address(self, country:)
   end
 
   def valid_mailing_address?
@@ -796,7 +796,7 @@ class Bike < ApplicationRecord
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
     @registration_address = case registration_address_source
-    when "user" then user&.address_hash
+    when "user" then user&.address_hash_legacy
     when "bike_update" then address_hash
     when "initial_creation" then current_ownership.address_hash
     else
