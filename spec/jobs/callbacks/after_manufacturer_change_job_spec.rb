@@ -14,6 +14,7 @@ RSpec.describe Callbacks::AfterManufacturerChangeJob, type: :job do
     expect(bike2.reload.manufacturer_other).to eq "PEDEGO ELECTRIC bikes"
 
     manufacturer.update(name: "Pedego (Pedego Electric Bikes)")
+    expect(manufacturer.priority).to eq 0
     instance.perform(manufacturer.id)
 
     expect(bike.reload.manufacturer_id).to eq manufacturer.id
@@ -25,5 +26,6 @@ RSpec.describe Callbacks::AfterManufacturerChangeJob, type: :job do
     expect(bike2.manufacturer_other).to be_nil
 
     expect(bike3.reload.manufacturer_id).to eq Manufacturer.other.id
+    expect(manufacturer.reload.priority).to eq 10
   end
 end

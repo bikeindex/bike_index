@@ -13,6 +13,9 @@ class Callbacks::AfterManufacturerChangeJob < ApplicationJob
 
     Bike.unscoped.where("manufacturer_other ILIKE ?", manufacturer.secondary_name)
       .find_each { |bike| update_bike(bike, manufacturer_id) }
+
+    # Bump manufacturer in case the priority changed
+    manufacturer.update(updated_at: Time.current)
   end
 
   def update_bike(bike, manufacturer_id)
