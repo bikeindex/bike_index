@@ -97,14 +97,14 @@ RSpec.describe UserAlertsController, type: :request do
         expect(bike.organizations.pluck(:id)).to eq([])
         expect(bike.editable_organizations.pluck(:id)).to eq([])
         expect(current_user.alert_slugs).to eq([])
-        AfterUserChangeJob.new.perform(current_user.id)
+        ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
         user_alert.reload
         current_user.reload
         expect(current_user.alert_slugs).to eq(["unassigned_bike_org"])
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{user_alert.to_param}", params: {add_bike_organization: "true"},
           headers: {"HTTP_REFERER" => "http://bikeindex.org/my_account"}
-        expect(AfterUserChangeJob.jobs.count).to eq 1
+        expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
         expect(response).to redirect_to "/my_account"
         expect(flash).to be_blank
         bike.reload

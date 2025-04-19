@@ -19,6 +19,6 @@ class UserPhoneConfirmationJob < ApplicationJob
     return true if skip_user_update
     # Manually run after user change to add a user alert
     # (rather than spinning up a new worker)
-    AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)
+    ::Callbacks::AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)
   end
 end

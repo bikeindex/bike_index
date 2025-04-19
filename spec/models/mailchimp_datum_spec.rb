@@ -98,7 +98,7 @@ RSpec.describe MailchimpDatum, type: :model do
             expect(mailchimp_datum.on_mailchimp?).to be_falsey
             Sidekiq::Job.clear_all
             organization_role.destroy
-            expect(AfterUserChangeJob.jobs.count).to eq 1
+            expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
             id = mailchimp_datum.id
             mailchimp_datum = MailchimpDatum.find(id) # Unmemoize
             expect(mailchimp_datum.mailchimp_organization&.id).to be_blank

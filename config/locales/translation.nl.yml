@@ -5652,13 +5652,10 @@ nl:
       add_additional_email: Voeg extra e-mail toe
       add_new_phone_number: Voeg een nieuw telefoonnummer toe
       additional_email: Extra E-mail
-      address: Adres
       any_use_of_your_personal_information_html: Elk gebruik van uw persoonlijke informatie
         valt onder de voorwaarden van onze %{privacy_policy}. We verkopen, verhandelen
         of verhuren uw persoonlijke gegevens niet aan derden.
-      choose_country: Kies land
       choose_language: Kies een taal
-      city: City
       confirmed_emails: Bevestigde e-mails
       daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
       give_us_permission_html: Geef ons toestemming om contact met u op te nemen als
@@ -5674,13 +5671,11 @@ nl:
       remove_email: E-mail verwijderen
       remove_number: nummer verwijderen
       resend_confirmation: Opnieuw verzenden Bevestiging
-      state: Staat
       stolen_hot_sheets: Gestolen Bike Hot Sheets
       unconfirmed: niet bevestigd!
       unconfirmed_emails: Niet-bevestigde e-mails
       verified: Geverifieerd
       why_you_should_text: Lees waarom u zou moeten
-      zipcode: Postcode
       absolutely_no_notifications: Absoluut geen e-mail
       no_notifications_explanation: blokkeert alle e-mail behalve wachtwoordresets
         en diefstalmeldingen (u ontvangt bijvoorbeeld geen nieuwe registratie-e-mails

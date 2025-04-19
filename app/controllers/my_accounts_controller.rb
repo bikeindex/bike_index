@@ -113,7 +113,7 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeJob
+    @user.update(updated_at: Time.current) # Bump user to enqueue ::Callbacks::AfterUserChangeJob
     @user
   end
 

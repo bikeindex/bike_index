@@ -65,7 +65,7 @@ class Admin::BikesController < Admin::BaseController
       if bike_ids.any?
         bike_ids.each do |id|
           Bike.unscoped.find(id).destroy!
-          AfterBikeSaveJob.perform_async(id)
+          ::Callbacks::AfterBikeSaveJob.perform_async(id)
         end
         # Lazy pluralize hack
         flash[:success] = "#{bike_ids.count} #{(bike_ids.count == 1) ? "bike" : "bikes"} deleted!"
@@ -140,7 +140,7 @@ class Admin::BikesController < Admin::BaseController
   def destroy_bike
     find_bike
     @bike.destroy
-    AfterBikeSaveJob.perform_async(@bike.id)
+    ::Callbacks::AfterBikeSaveJob.perform_async(@bike.id)
     flash[:success] = "Bike deleted!"
     redirect_to admin_bikes_url
   end
