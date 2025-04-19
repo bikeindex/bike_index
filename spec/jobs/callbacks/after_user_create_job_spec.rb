@@ -1,8 +1,7 @@
 require "rails_helper"
 
-RSpec.describe AfterUserCreateJob, type: :job do
-  let(:subject) { AfterUserCreateJob }
-  let(:instance) { subject.new }
+RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
+  let(:instance) { described_class.new }
 
   let!(:user) { FactoryBot.create(:user, email: "owner1@A.COM") }
   let(:email) { user.email }
@@ -16,9 +15,9 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(instance).to receive(:associate_organization_role_invites).and_return(true)
         expect {
           instance.perform(user.id, "new", user: user)
-        }.to change(AfterUserCreateJob.jobs, :count).by 1
+        }.to change(::Callbacks::AfterUserCreateJob.jobs, :count).by 1
         expect(Email::ConfirmationJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
-        expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+        expect(::Callbacks::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
 
       context "confirmed user" do
@@ -26,9 +25,9 @@ RSpec.describe AfterUserCreateJob, type: :job do
           allow(user).to receive(:confirmed?) { true }
           expect {
             instance.perform(user.id, "new", user: user)
-          }.to change(AfterUserCreateJob.jobs, :count).by 1
+          }.to change(::Callbacks::AfterUserCreateJob.jobs, :count).by 1
           expect(Email::WelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
-          expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+          expect(::Callbacks::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
         end
       end
     end
@@ -38,8 +37,8 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(UserEmail).to receive(:create_confirmed_primary_email).with(user)
         expect {
           instance.perform(user.id, "confirmed", user: user)
-        }.to change(AfterUserCreateJob.jobs, :count).by 1
-        expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+        }.to change(::Callbacks::AfterUserCreateJob.jobs, :count).by 1
+        expect(::Callbacks::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
     end
 
@@ -49,7 +48,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(instance).to receive(:associate_organization_role_invites)
         expect {
           instance.perform(user.id, "merged", user: user)
-        }.to_not change(AfterUserCreateJob.jobs, :count)
+        }.to_not change(::Callbacks::AfterUserCreateJob.jobs, :count)
       end
     end
 
@@ -59,7 +58,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(instance).to receive(:import_user_attributes)
         expect {
           instance.perform(user.id, "async")
-        }.to_not change(AfterUserCreateJob.jobs, :count)
+        }.to_not change(::Callbacks::AfterUserCreateJob.jobs, :count)
       end
       context "confirmed user" do
         let(:user) { FactoryBot.create(:user_confirmed) }
@@ -68,7 +67,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
           expect(instance).to receive(:import_user_attributes)
           expect {
             instance.perform(user.id, "async")
-          }.to_not change(AfterUserCreateJob.jobs, :count)
+          }.to_not change(::Callbacks::AfterUserCreateJob.jobs, :count)
         end
       end
     end

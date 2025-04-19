@@ -251,11 +251,11 @@ class User < ApplicationRecord
 
   # Performed inline
   def perform_create_jobs
-    AfterUserCreateJob.new.perform(id, "new", user: self)
+    ::Callbacks::AfterUserCreateJob.new.perform(id, "new", user: self)
   end
 
   def perform_user_update_jobs
-    AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
+    ::Callbacks::AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
   end
 
   def superuser?(controller_name: nil, action_name: nil)
@@ -384,7 +384,7 @@ class User < ApplicationRecord
     self.confirmed = true
     save
     reload
-    AfterUserCreateJob.new.perform(id, "confirmed", user: self)
+    ::Callbacks::AfterUserCreateJob.new.perform(id, "confirmed", user: self)
     true
   end
 
