@@ -1,7 +1,7 @@
 # This will replace WebhookRunner - which is brittle and not flexible enough for what I'm looking for now
 # I need to refactor that, but I don't want to right now because I don't want to break existing stuff yet
 
-class ::Callbacks::AfterBikeSaveJob < ApplicationJob
+class Callbacks::AfterBikeSaveJob < ApplicationJob
   sidekiq_options retry: false
 
   POST_URL = ENV["BIKE_WEBHOOK_URL"]

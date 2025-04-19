@@ -1,4 +1,4 @@
-class ::Callbacks::AfterPhoneConfirmedJob < ApplicationJob
+class Callbacks::AfterPhoneConfirmedJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform(user_phone_id)

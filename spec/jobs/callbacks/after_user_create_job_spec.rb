@@ -1,8 +1,7 @@
 require "rails_helper"
 
-RSpec.describe ::Callbacks::AfterUserCreateJob, type: :job do
-  let(:subject) { ::Callbacks::AfterUserCreateJob }
-  let(:instance) { subject.new }
+RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
+  let(:instance) { described_class.new }
 
   let!(:user) { FactoryBot.create(:user, email: "owner1@A.COM") }
   let(:email) { user.email }

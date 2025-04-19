@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ::Callbacks::AfterPhoneConfirmedJob, type: :job do
+RSpec.describe Callbacks::AfterPhoneConfirmedJob, type: :job do
   let(:subject) { described_class }
   let(:instance) { subject.new }
 

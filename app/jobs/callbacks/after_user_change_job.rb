@@ -1,4 +1,4 @@
-class ::Callbacks::AfterUserChangeJob < ApplicationJob
+class Callbacks::AfterUserChangeJob < ApplicationJob
   sidekiq_options retry: false
 
   def self.assign_user_address_from_bikes(user, bikes: nil, save_user: false)

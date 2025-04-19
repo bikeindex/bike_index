@@ -1,5 +1,5 @@
 # TODO: eventually this should merge with after_user_change_worker.rb, or something
-class ::Callbacks::AfterUserCreateJob < ApplicationJob
+class Callbacks::AfterUserCreateJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   # Generally, this is called inline - so it makes sense to pass in the user rather than just the user_id

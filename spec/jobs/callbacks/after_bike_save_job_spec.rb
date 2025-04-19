@@ -1,12 +1,11 @@
 require "rails_helper"
 
-RSpec.describe ::Callbacks::AfterBikeSaveJob, type: :job do
-  let(:subject) { ::Callbacks::AfterBikeSaveJob }
-  let(:instance) { subject.new }
+RSpec.describe Callbacks::AfterBikeSaveJob, type: :job do
+  let(:instance) { described_class.new }
   before { Sidekiq::Job.clear_all }
 
   it "is the correct queue" do
-    expect(subject.sidekiq_options["queue"]).to eq "low_priority"
+    expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
   end
 
   describe "enqueuing jobs" do
