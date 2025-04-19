@@ -19,6 +19,6 @@ class Callbacks::AfterManufacturerChangeJob < ApplicationJob
     bike.update(manufacturer_id: manufacturer_id, manufacturer_other: nil)
 
     # Needs to happen after the manufacturer has been assigned to everything
-    UpdateModelAuditJob.perform_in(5.minutes, bike.id)
+    UpdateModelAuditJob.perform_in(5.minutes, bike.model_audit_id) if bike.model_audit_id.present?
   end
 end
