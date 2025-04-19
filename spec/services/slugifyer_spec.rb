@@ -47,6 +47,16 @@ RSpec.describe Slugifyer do
       slug = Slugifyer.manufacturer("Legacy Frameworks")
       expect(slug).to eq("legacy")
     end
+    it "removes e-bike" do
+      slug = Slugifyer.manufacturer("AIMA E-Bike")
+      expect(slug).to eq("aima")
+      expect(Slugifyer.manufacturer("AIMA EBike")).to eq "aima"
+      expect(Slugifyer.manufacturer("AIMA E Bike")).to eq "aima"
+    end
+    it "removes electric bike" do
+      slug = Slugifyer.manufacturer("Pedego Electric Bikes")
+      expect(slug).to eq("pedego")
+    end
     it "removes bicycle company for Kona" do
       slug = Slugifyer.manufacturer("Kona Bicycle Company")
       expect(slug).to eq("kona")
