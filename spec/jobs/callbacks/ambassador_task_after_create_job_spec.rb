@@ -4,12 +4,12 @@ RSpec.describe Callbacks::AmbassadorTaskAfterCreateJob, type: :job do
   describe "#perform" do
     it "assigns the given task to all ambassadors" do
       task = FactoryBot.create(:ambassador_task)
-      allow(AmbassadorTaskAssignmentCreator)
+      allow(described_class)
         .to(receive(:assign_task_to_all_ambassadors).with(task))
 
       described_class.new.perform(task.id)
 
-      expect(AmbassadorTaskAssignmentCreator)
+      expect(described_class)
         .to(have_received(:assign_task_to_all_ambassadors).once)
     end
   end
@@ -21,7 +21,7 @@ RSpec.describe Callbacks::AmbassadorTaskAfterCreateJob, type: :job do
         a1, a2, a3 = FactoryBot.create_list(:ambassador, 3)
         task = FactoryBot.create(:ambassador_task)
 
-        AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(task)
+        described_class.assign_task_to_all_ambassadors(task)
 
         expect(AmbassadorTaskAssignment.count).to eq(3)
         expect(user.ambassador_task_assignments.count).to eq(0)
@@ -29,7 +29,7 @@ RSpec.describe Callbacks::AmbassadorTaskAfterCreateJob, type: :job do
         expect(a2.ambassador_task_assignments.count).to eq(1)
         expect(a3.ambassador_task_assignments.count).to eq(1)
 
-        AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(task)
+        described_class.assign_task_to_all_ambassadors(task)
 
         expect(AmbassadorTaskAssignment.count).to eq(3)
         expect(user.ambassador_task_assignments.count).to eq(0)

@@ -186,4 +186,31 @@ RSpec.describe Manufacturer, type: :model do
       expect(manufacturer.description).to be_nil
     end
   end
+
+  describe "run_callback_job" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
+    it "happens on create" do
+      expect { manufacturer }.to change(::Callbacks::AfterManufacturerChangeJob.jobs, :count).by 1
+    end
+
+    it "happens when name is changed" do
+      expect(manufacturer).to be_valid
+
+      expect do
+        manufacturer.update(frame_maker: true, description: "something", close_year: Time.current.year)
+      end.to change(::Callbacks::AfterManufacturerChangeJob.jobs, :count).by 0
+
+      expect do
+        manufacturer.update(name: "new special special name")
+      end.to change(::Callbacks::AfterManufacturerChangeJob.jobs, :count).by 1
+    end
+
+    it "does not happen when deleted" do
+      expect(manufacturer).to be_valid
+
+      expect do
+        manufacturer.destroy
+      end.to change(::Callbacks::AfterManufacturerChangeJob.jobs, :count).by 0
+    end
+  end
 end
