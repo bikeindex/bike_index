@@ -94,7 +94,7 @@ RSpec.describe MyAccountsController, type: :request do
               expect(response).to be_ok
               expect(assigns(:show_general_alert)).to be_falsey
               expect(response).to render_template("show")
-            }.to change(AfterUserChangeJob.jobs, :count).by 0
+            }.to change(::Callbacks::AfterUserChangeJob.jobs, :count).by 0
           end
           context "with phone_verification enabled" do
             before { Flipper.enable(:phone_verification) }
@@ -105,8 +105,8 @@ RSpec.describe MyAccountsController, type: :request do
                 expect(response).to be_ok
                 expect(assigns(:show_general_alert)).to be_truthy
                 expect(response).to render_template("show")
-              }.to change(AfterUserChangeJob.jobs, :count).by 1
-              AfterUserChangeJob.drain
+              }.to change(::Callbacks::AfterUserChangeJob.jobs, :count).by 1
+              ::Callbacks::AfterUserChangeJob.drain
               expect(current_user.reload.alert_slugs).to eq([])
             end
           end
@@ -199,7 +199,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(current_user.username).to eq "something"
         expect {
           patch base_url, params: {id: current_user.username, user: {username: " ", name: "tim"}, edit_template: "sharing"}
-        }.to change(AfterUserChangeJob.jobs, :size).by(1)
+        }.to change(::Callbacks::AfterUserChangeJob.jobs, :size).by(1)
         expect(assigns(:edit_template)).to eq("sharing")
         current_user.reload
         expect(current_user.username).to eq("something")
@@ -210,7 +210,7 @@ RSpec.describe MyAccountsController, type: :request do
       expect(current_user.notification_unstolen).to be_truthy # Because it's set to true by default
       expect {
         patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
-      }.to change(AfterUserChangeJob.jobs, :size).by(1)
+      }.to change(::Callbacks::AfterUserChangeJob.jobs, :size).by(1)
       expect(response).to redirect_to edit_my_account_url(edit_template: "root")
       current_user.reload
       expect(current_user.notification_newsletters).to be_truthy
@@ -483,7 +483,7 @@ RSpec.describe MyAccountsController, type: :request do
 
         Sidekiq::Job.clear_all
         put base_url, params: update_params
-        expect(AfterUserChangeJob.jobs.count).to eq 1
+        expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
         expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
         expect(flash[:success]).to be_present
         expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -492,7 +492,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_registration_organization1.registration_info).to eq target_info
 
         Sidekiq::Testing.inline! {
-          AfterUserChangeJob.drain
+          ::Callbacks::AfterUserChangeJob.drain
         }
         expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
         expect(bike1.registration_info).to eq target_info
@@ -516,7 +516,7 @@ RSpec.describe MyAccountsController, type: :request do
             "reg_field-organization_affiliation_#{organization1.id}" => "student",
             "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
           }
-          expect(AfterUserChangeJob.jobs.count).to eq 1
+          expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
           expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
           expect(flash[:success]).to be_present
           expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -525,7 +525,7 @@ RSpec.describe MyAccountsController, type: :request do
           expect(user_registration_organization1.registration_info).to eq target_info
 
           Sidekiq::Testing.inline! {
-            AfterUserChangeJob.drain
+            ::Callbacks::AfterUserChangeJob.drain
           }
           expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
           expect(bike1.registration_info).to eq target_info
@@ -574,7 +574,7 @@ RSpec.describe MyAccountsController, type: :request do
               "reg_field-student_id_#{organization1.id}" => "XXX777YYY",
               "reg_field-organization_affiliation_#{organization2.id}" => "employee"
             }
-            expect(AfterUserChangeJob.jobs.count).to eq 1
+            expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
             expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
             expect(flash[:success]).to be_present
             expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -587,7 +587,7 @@ RSpec.describe MyAccountsController, type: :request do
             expect(user_registration_organization2.registration_info).to eq target_extra_info
 
             Sidekiq::Testing.inline! {
-              AfterUserChangeJob.drain
+              ::Callbacks::AfterUserChangeJob.drain
             }
             deleted_bike_organization = BikeOrganization.unscoped.where(id: bike1_organization2.id).first
             expect(deleted_bike_organization.deleted?).to be_truthy

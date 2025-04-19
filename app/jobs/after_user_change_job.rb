@@ -1,4 +1,4 @@
-class AfterUserChangeJob < ApplicationJob
+class ::Callbacks::AfterUserChangeJob < ApplicationJob
   sidekiq_options retry: false
 
   def self.assign_user_address_from_bikes(user, bikes: nil, save_user: false)
@@ -128,7 +128,7 @@ class AfterUserChangeJob < ApplicationJob
   end
 
   def process_bikes(user)
-    user.bike_ids.each { |id| AfterBikeSaveJob.perform_async(id, true, true) }
+    user.bike_ids.each { |id| ::Callbacks::AfterBikeSaveJob.perform_async(id, true, true) }
   end
 
   def update_superuser_abilities(user)

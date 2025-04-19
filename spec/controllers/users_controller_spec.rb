@@ -168,8 +168,8 @@ RSpec.describe UsersController, type: :controller do
             expect(user.user_emails.first.email).to eq email
             expect(User.fuzzy_email_find(email)).to eq user
             # bike association is processed async, so we have to drain the queue
-            expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
-            AfterUserCreateJob.drain
+            expect(::Callbacks::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+            ::Callbacks::AfterUserCreateJob.drain
             bike.reload
             expect(bike.user).to eq user
           }.to change(Email::WelcomeJob.jobs, :count)

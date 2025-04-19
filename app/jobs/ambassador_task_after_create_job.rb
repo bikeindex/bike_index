@@ -1,4 +1,4 @@
-class AmbassadorTaskAfterCreateJob < ApplicationJob
+class ::Callbacks::AmbassadorTaskAfterCreateJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform(ambassador_task_id)

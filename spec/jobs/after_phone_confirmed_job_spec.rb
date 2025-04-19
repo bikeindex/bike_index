@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe AfterPhoneConfirmedJob, type: :job do
+RSpec.describe ::Callbacks::AfterPhoneConfirmedJob, type: :job do
   let(:subject) { described_class }
   let(:instance) { subject.new }
 
@@ -17,7 +17,7 @@ RSpec.describe AfterPhoneConfirmedJob, type: :job do
 
     context "it adds the bike to the user" do
       it "adds the bike" do
-        AfterUserChangeJob.new.perform(user.id, user)
+        ::Callbacks::AfterUserChangeJob.new.perform(user.id, user)
         expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
 
         bike.reload

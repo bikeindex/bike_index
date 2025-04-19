@@ -93,7 +93,7 @@ class UserPhone < ApplicationRecord
   def confirm!
     return true if confirmed?
     result = update(confirmed_at: Time.current)
-    AfterPhoneConfirmedJob.perform_async(id)
+    ::Callbacks::AfterPhoneConfirmedJob.perform_async(id)
     result
   end
 
