@@ -9,6 +9,12 @@ class Callbacks::AfterManufacturerChangeJob < ApplicationJob
 
     Bike.unscoped.where("manufacturer_other ILIKE ?", manufacturer.short_name)
       .find_each { |bike| update_bike(bike, manufacturer_id) }
+
+    # Important for names with prefixes like "bike"
+    if manufacturer.slug != manufacturer.short_name.downcase
+      Bike.unscoped.where("manufacturer_other ILIKE ?", manufacturer.slug)
+        .find_each { |bike| update_bike(bike, manufacturer_id) }
+    end
     return if manufacturer.secondary_name.blank?
 
     Bike.unscoped.where("manufacturer_other ILIKE ?", manufacturer.secondary_name)
