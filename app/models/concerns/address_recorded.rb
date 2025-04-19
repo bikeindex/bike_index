@@ -15,7 +15,6 @@ module AddressRecorded
     [latitude, longitude]
   end
 
-  # TODO: This should just be delegated
   def address_hash_legacy
     return address_record.address_hash_legacy if address_record.present?
     # To ease migration, use the existing attrs. Handle if they've been dropped

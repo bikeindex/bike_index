@@ -141,7 +141,7 @@ class MyAccountsController < ApplicationController
       pparams.delete("username") unless pparams["username"].present?
     end
     if pparams[:address_record_attributes].present?
-      pparams[:address_record_attributes].merge!(kind: "user", user_id: current_user.id)
+      pparams[:address_record_attributes].merge!(kind: :user, user_id: current_user.id)
     end
     pparams
   end
