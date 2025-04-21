@@ -34,13 +34,14 @@ class Manufacturer < ApplicationRecord
 
   mount_uploader :logo, ManufacturerLogoUploader
 
-  before_validation :set_calculated_attributes
-
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :slug
   validates_uniqueness_of :secondary_slug, allow_nil: true
   validate :ensure_non_blocking_name
+
+  before_validation :set_calculated_attributes
+  after_commit :run_callback_job, on: %i[create update]
 
   default_scope { alphabetized }
 
@@ -117,6 +118,7 @@ class Manufacturer < ApplicationRecord
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
     self.description = nil if description.blank?
     self.priority = calculated_priority # scheduled updates via UpdateManufacturerLogoAndPriorityJob
+    @run_callback_job = name_changed?
     true
   end
 
@@ -155,6 +157,12 @@ class Manufacturer < ApplicationRecord
   end
 
   private
+
+  def run_callback_job
+    return unless @run_callback_job
+
+    ::Callbacks::AfterManufacturerChangeJob.perform_async(id)
+  end
 
   def b_count
     @b_count ||= bikes.limit(1000).count

@@ -1,7 +1,7 @@
 # This will replace WebhookRunner - which is brittle and not flexible enough for what I'm looking for now
 # I need to refactor that, but I don't want to right now because I don't want to break existing stuff yet
 
-class AfterBikeSaveJob < ApplicationJob
+class Callbacks::AfterBikeSaveJob < ApplicationJob
   sidekiq_options retry: false
 
   POST_URL = ENV["BIKE_WEBHOOK_URL"]
@@ -21,7 +21,7 @@ class AfterBikeSaveJob < ApplicationJob
     update_ownership(bike)
     unless skip_user_update
       # Update the user to update any user alerts relevant to bikes
-      AfterUserChangeJob.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
+      ::Callbacks::AfterUserChangeJob.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
     end
     bike.bike_versions.each do |bike_version|
       bike_version.set_calculated_attributes

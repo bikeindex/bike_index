@@ -76,7 +76,7 @@ class PublicImage < ApplicationRecord
     imageable&.update(updated_at: Time.current)
     return true unless bike?
 
-    AfterBikeSaveJob.perform_async(imageable_id, false, true)
+    ::Callbacks::AfterBikeSaveJob.perform_async(imageable_id, false, true)
   end
 
   # Because the way we load the file is different if it's remote or local
