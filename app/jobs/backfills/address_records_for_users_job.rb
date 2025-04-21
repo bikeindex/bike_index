@@ -26,6 +26,8 @@ class Backfills::AddressRecordsForUsersJob < ApplicationJob
   end
 
   def build_enumerator(cursor:)
+    return if skip_job?
+
     active_record_records_enumerator(self.class.iterable_scope, cursor:)
   end
 
