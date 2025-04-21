@@ -372,7 +372,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         VCR.use_cassette("v1_bikes_create-stolen", match_requests_on: [:path]) do
           manufacturer = FactoryBot.create(:manufacturer)
           @organization.users.first.update_attribute :phone, "123-456-6969"
-          FactoryBot.create(:state, abbreviation: "IL", name: "Illinois")
+          FactoryBot.create(:state_illinois)
           bike_attrs = {
             serial_number: "69 stolen bike",
             manufacturer_id: manufacturer.id,

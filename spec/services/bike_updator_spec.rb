@@ -105,7 +105,7 @@ RSpec.describe BikeUpdator do
 
   describe "update_available_attributes" do
     it "does not let protected attributes be updated" do
-      FactoryBot.create(:country, iso: "US")
+      Country.united_states
       organization = FactoryBot.create(:organization)
       bike = FactoryBot.create(:bike,
         creation_organization_id: organization.id,
@@ -140,7 +140,7 @@ RSpec.describe BikeUpdator do
     end
 
     it "marks a bike stolen with the date_stolen" do
-      FactoryBot.create(:country, iso: "US")
+      Country.united_states
       bike = FactoryBot.create(:bike, :with_ownership)
       updator = BikeUpdator.new(user: bike.creator, b_params: {id: bike.id, bike: {date_stolen: 963205199}}.as_json)
       updator.update_available_attributes
@@ -199,6 +199,6 @@ RSpec.describe BikeUpdator do
     expect(update_bike).to receive(:update_ownership).and_return(true)
     expect {
       update_bike.update_available_attributes
-    }.to change(AfterBikeSaveJob.jobs, :size).by(1)
+    }.to change(::Callbacks::AfterBikeSaveJob.jobs, :size).by(1)
   end
 end

@@ -1,4 +1,6 @@
-module AmbassadorTaskAssignmentCreator
+class Callbacks::AmbassadorTaskAfterCreateJob < ApplicationJob
+  sidekiq_options queue: "high_priority"
+
   def self.assign_task_to_all_ambassadors(ambassador_task)
     already_assigned_ambassador_ids =
       Ambassador
@@ -16,5 +18,11 @@ module AmbassadorTaskAssignmentCreator
     unassigned_ambassadors.find_each do |ambassador|
       ambassador_task.assign_to(ambassador)
     end
+  end
+
+  def perform(ambassador_task_id)
+    ambassador_task = AmbassadorTask.find(ambassador_task_id)
+
+    self.class.assign_task_to_all_ambassadors(ambassador_task)
   end
 end

@@ -21,7 +21,7 @@ RSpec.describe ExternalImageUrlStoreJob, type: :job do
         expect(public_image.image).to be_present
       end
       expect(Sidekiq::Job.jobs.count).to eq 1
-      expect(AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+      expect(::Callbacks::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
     end
   end
   context "already has an image" do

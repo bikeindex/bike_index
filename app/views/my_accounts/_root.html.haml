@@ -66,40 +66,9 @@
                     = link_to t(".resend_confirmation"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "patch", action: "update", class: "small"
                   - else
                     = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
+  = f.fields_for :address_record do |address_form|
+    = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @user.uro_organization_reg_address, no_street: @user.no_address?))
 
-  .related-fields
-    - address_org = @user.uro_organization_reg_address
-    - address_label = registration_field_label(address_org, "reg_address") || t(".address")
-
-    - unless @user.no_address?
-      .form-group.row
-        = f.label :street, address_label, class: "form-well-label"
-        .form-well-input
-          = f.text_field :street, placeholder: registration_field_address_placeholder(address_org), class: "form-control"
-          = registration_address_required_below_helper(address_org)
-
-    .form-group.row
-      - if @user.no_address?
-        = f.label :city, address_label, class: "form-well-label"
-      - else
-        %label.form-well-label
-      .form-well-input
-        = f.text_field :city, placeholder: t(".city"), class: "form-control"
-
-    .form-group.row.fancy-select.no-restore-on-backspace.unfancy
-      %label.form-well-label
-      .form-well-input#us_id_data{data: {usid: Country.united_states_id}}
-        = f.select(:country_id, Country.select_options, {prompt: t(".choose_country")}, {class: "country-select-input form-control"})
-
-    - state_class = (@user.country_id == Country.united_states_id) ? "unhidden" : ""
-    .form-group.row.fancy-select-placeholder.unfancy.hidden-other{class: state_class}
-      %label.form-well-label
-      .form-well-input
-        = f.collection_select(:state_id, State.united_states, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
-    .form-group.row.mb-4
-      %label.form-well-label
-      .form-well-input
-        = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
 
   .related-fields.my-account-checks
     .form-group.row.fancy-select.unfancy

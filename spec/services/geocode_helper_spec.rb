@@ -56,7 +56,7 @@ RSpec.describe GeocodeHelper do
 
     context "passed a bare zipcode" do
       let(:address) { "60647" }
-      let!(:state) { FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: country) }
+      let!(:state) { FactoryBot.create(:state_illinois) }
       let(:target_assignable_hash) do
         {city: "Chicago", latitude: 41.9215421, longitude: -87.70248169999999, zipcode: "60647",
          state_id: state.id, country_id: country.id, neighborhood: nil, street: nil}

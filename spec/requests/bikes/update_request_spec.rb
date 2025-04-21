@@ -34,7 +34,8 @@ RSpec.describe "BikesController#update", type: :request do
     end
   end
   context "setting address for bike" do
-    let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address.merge(address_set_manually: true)) }
+    let(:address_record) { FactoryBot.create(:address_record, :new_york) }
+    let(:current_user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
     let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
     let(:update) do
@@ -104,7 +105,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.status_stolen?).to be_falsey
       expect(bike.claimed?).to be_falsey
       expect(bike.authorized?(current_user)).to be_truthy
-      AfterUserChangeJob.new.perform(current_user.id)
+      ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
       expect(current_user.reload.alert_slugs).to eq([])
       Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
@@ -170,9 +171,9 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.status_stolen?).to be_falsey
         expect(bike.claimed?).to be_falsey
         expect(bike.user&.id).to eq current_user.id
-        AfterUserChangeJob.new.perform(current_user.id)
+        ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq([])
-        expect(current_user.address).to eq "278 Broadway, New York, 10007, US"
+        expect(current_user.formatted_address_string(visible_attribute: :street)).to eq "278 Broadway, New York, 10007"
         expect(current_user.address_set_manually).to be_truthy
         # saving the bike one more time changes address_set_manually to be false
         # Someone surprising, but I think I'm happy with the outcome - it should be set by user
@@ -311,7 +312,7 @@ RSpec.describe "BikesController#update", type: :request do
   context "adding location to a stolen bike" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/6058/13-brentwood-l-purple-1000.jpg", user: current_user) }
     let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
-    let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+    let(:state) { FactoryBot.create(:state_new_york) }
     let(:stolen_params) do
       {
         timezone: "America/Los_Angeles",
@@ -355,7 +356,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone_for_users).to be_truthy
         expect(stolen_record.phone_for_shops).to be_truthy
         expect(stolen_record.phone_for_police).to be_truthy
-        AfterUserChangeJob.new.perform(current_user.id)
+        ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
         current_user.update_column :updated_at, Time.current - 5.minutes
         Sidekiq::Job.clear_all
@@ -403,7 +404,7 @@ RSpec.describe "BikesController#update", type: :request do
   end
   context "updating impound_record" do
     let!(:impound_record) { FactoryBot.create(:impound_record, user: current_user, bike: bike) }
-    let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+    let(:state) { FactoryBot.create(:state_new_york) }
     let(:impound_params) do
       {
         timezone: "America/Los_Angeles",

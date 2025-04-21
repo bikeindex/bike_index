@@ -1,8 +1,7 @@
 require "rails_helper"
 
-RSpec.describe AfterUserCreateJob, type: :job do
-  let(:subject) { AfterUserCreateJob }
-  let(:instance) { subject.new }
+RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
+  let(:instance) { described_class.new }
 
   let!(:user) { FactoryBot.create(:user, email: "owner1@A.COM") }
   let(:email) { user.email }
@@ -16,9 +15,9 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(instance).to receive(:associate_organization_role_invites).and_return(true)
         expect {
           instance.perform(user.id, "new", user: user)
-        }.to change(AfterUserCreateJob.jobs, :count).by 1
+        }.to change(::Callbacks::AfterUserCreateJob.jobs, :count).by 1
         expect(Email::ConfirmationJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
-        expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+        expect(::Callbacks::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
 
       context "confirmed user" do
@@ -26,9 +25,9 @@ RSpec.describe AfterUserCreateJob, type: :job do
           allow(user).to receive(:confirmed?) { true }
           expect {
             instance.perform(user.id, "new", user: user)
-          }.to change(AfterUserCreateJob.jobs, :count).by 1
+          }.to change(::Callbacks::AfterUserCreateJob.jobs, :count).by 1
           expect(Email::WelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
-          expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+          expect(::Callbacks::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
         end
       end
     end
@@ -38,8 +37,8 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(UserEmail).to receive(:create_confirmed_primary_email).with(user)
         expect {
           instance.perform(user.id, "confirmed", user: user)
-        }.to change(AfterUserCreateJob.jobs, :count).by 1
-        expect(AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+        }.to change(::Callbacks::AfterUserCreateJob.jobs, :count).by 1
+        expect(::Callbacks::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
     end
 
@@ -49,7 +48,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(instance).to receive(:associate_organization_role_invites)
         expect {
           instance.perform(user.id, "merged", user: user)
-        }.to_not change(AfterUserCreateJob.jobs, :count)
+        }.to_not change(::Callbacks::AfterUserCreateJob.jobs, :count)
       end
     end
 
@@ -59,7 +58,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(instance).to receive(:import_user_attributes)
         expect {
           instance.perform(user.id, "async")
-        }.to_not change(AfterUserCreateJob.jobs, :count)
+        }.to_not change(::Callbacks::AfterUserCreateJob.jobs, :count)
       end
       context "confirmed user" do
         let(:user) { FactoryBot.create(:user_confirmed) }
@@ -68,7 +67,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
           expect(instance).to receive(:import_user_attributes)
           expect {
             instance.perform(user.id, "async")
-          }.to_not change(AfterUserCreateJob.jobs, :count)
+          }.to_not change(::Callbacks::AfterUserCreateJob.jobs, :count)
         end
       end
     end
@@ -99,7 +98,7 @@ RSpec.describe AfterUserCreateJob, type: :job do
     # Block traditional run, so we can do it separately }
     before { allow_any_instance_of(User).to receive(:perform_create_jobs) { true } }
     let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org") }
-    let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA", country: Country.united_states) }
+    let!(:state) { FactoryBot.create(:state_california) }
     let!(:country) { Country.united_states }
     let(:target_address_hash) { {street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "US", latitude: 37.8016649, longitude: -122.397348} }
     let(:bike) do
@@ -122,12 +121,12 @@ RSpec.describe AfterUserCreateJob, type: :job do
         user.reload
 
         expect(user.phone).to eq "1112223333"
-        expect(user.address_hash).to eq target_address_hash.as_json
+        expect(user.address_hash_legacy).to eq target_address_hash.merge(country: "United States").as_json
         expect(user.to_coordinates).to eq([37.8016649, -122.397348])
       end
     end
     context "existing attributes" do
-      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999", skip_geocoding: true) }
+      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999") }
       it "doesn't import" do
         instance.perform(user.id, "new")
         user.reload
@@ -135,8 +134,8 @@ RSpec.describe AfterUserCreateJob, type: :job do
         expect(user.street).to be_nil
         expect(user.city).to be_nil
         expect(user.zipcode).to eq "89999"
-        expect(user.state).to be_nil
-        expect(user.country).to be_nil
+        expect(user.state_id).to be_nil
+        expect(user.country_id).to be_nil
       end
     end
   end

@@ -1,5 +1,5 @@
 # TODO: eventually this should merge with after_user_change_worker.rb, or something
-class AfterUserCreateJob < ApplicationJob
+class Callbacks::AfterUserCreateJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   # Generally, this is called inline - so it makes sense to pass in the user rather than just the user_id
@@ -23,7 +23,7 @@ class AfterUserCreateJob < ApplicationJob
     # Auto confirming the user actually ends up running perform_confirmed_jobs.
     associate_organization_role_invites(user, email)
     send_welcoming_email(user)
-    AfterUserCreateJob.perform_async(user.id, "async")
+    ::Callbacks::AfterUserCreateJob.perform_async(user.id, "async")
   end
 
   def perform_merged_jobs(user, email)
@@ -36,7 +36,7 @@ class AfterUserCreateJob < ApplicationJob
   def perform_confirmed_jobs(user, email)
     UserEmail.create_confirmed_primary_email(user)
     create_passwordless_domain_organization_roles(user)
-    AfterUserCreateJob.perform_async(user.id, "async")
+    ::Callbacks::AfterUserCreateJob.perform_async(user.id, "async")
   end
 
   def perform_async_jobs(user, email)
@@ -89,19 +89,18 @@ class AfterUserCreateJob < ApplicationJob
       user.phone = user_bikes_for_attrs(user.id).map { |b| b.phone }.reject(&:blank?).last
     end
     # Only do address import if the user doesn't have an address present
-    unless [user.street, user.city, user.zipcode, user.state, user.country].reject(&:blank?).any?
-      address = user_bikes_for_attrs(user.id).map { |b| b.address_hash }.reject(&:blank?).last
-      user.attributes = address.merge(skip_geocoding: true) if address.present?
+    unless user.address_present?
+      ::Callbacks::AfterUserChangeJob.assign_user_address_from_bikes(user, bikes: user_bikes_for_attrs(user.id),
+        save_user: true)
     end
-    user.save if user.changed?
   end
 
   private
 
   def user_bikes_for_attrs(user_id)
     # Deal with example bikes
-    Ownership.where(user_id: user_id).where.not(user_id: nil).order(:created_at).pluck(:bike_id)
-      .map { |id| Bike.unscoped.where(id: id).first }.compact
+    bike_ids = Ownership.where(user_id: user_id).where.not(user_id: nil).order(:created_at).limit(100).pluck(:bike_id)
+    Bike.unscoped.where(id: bike_ids)
   end
 
   def create_passwordless_domain_organization_roles(user)

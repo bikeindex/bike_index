@@ -4426,13 +4426,10 @@ nb:
       add_additional_email: Legg til ekstra e-post
       add_new_phone_number: Legg til et nytt telefonnummer
       additional_email: Ytterligere e-post
-      address: gateadresse
       any_use_of_your_personal_information_html: All bruk av din personlige informasjon
         er underlagt vilkårene i vår %{privacy_policy}. Vi selger, bytter eller leier
         ikke ut personopplysningene dine.
-      choose_country: Velg land
       choose_language: Velg språk
-      city: By
       confirmed_emails: Bekreftede e-poster
       daily_hot_sheet_notifications_html: Motta daglig <em>%{org_name}</em> %{hot_sheets_link}
       give_us_permission_html: Gi oss tillatelse til å kontakte deg hvis vi tror sykkelen
@@ -4449,13 +4446,11 @@ nb:
       remove_email: Fjern e-post
       remove_number: fjerne nummeret
       resend_confirmation: Send bekreftelse på nytt
-      state: Stat
       stolen_hot_sheets: Stjålet Bike Hot Sheets
       unconfirmed: ubekreftet!
       unconfirmed_emails: Ubekreftede e-poster
       verified: verifisert
       why_you_should_text: Les hvorfor du bør
-      zipcode: Postnummer
       time_single_format: Vis kun datoer
       time_single_format_small: "(ikke i dag, i går osv.)"
     sharing:
@@ -5877,3 +5872,13 @@ nb:
         stolenness_proximity: Stjålet i søkeområdet
         stolenness_stolen: Stjålet hvor som helst
         within: innenfor
+    legacy_form_well:
+      address_record:
+        address: gateadresse
+        address_school: Campus postadresse
+        choose_country: Velg land
+        city: By
+        postal_code: postnummer
+        region: Region/provins
+        state: Stat
+        your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}

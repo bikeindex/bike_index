@@ -3427,11 +3427,8 @@ es:
       add_additional_email:
       add_new_phone_number:
       additional_email:
-      address:
       any_use_of_your_personal_information_html:
-      choose_country:
       choose_language:
-      city:
       confirmed_emails:
       daily_hot_sheet_notifications_html:
       give_us_permission_html:
@@ -3446,7 +3443,6 @@ es:
       remove_email:
       remove_number:
       resend_confirmation:
-      state:
       stolen_hot_sheets:
       time_single_format:
       time_single_format_small:
@@ -3454,7 +3450,6 @@ es:
       unconfirmed_emails:
       verified:
       why_you_should_text:
-      zipcode:
     sharing:
       choose_file:
       create_page:
@@ -4622,3 +4617,13 @@ es:
         stolenness_proximity:
         stolenness_stolen:
         within:
+    legacy_form_well:
+      address_record:
+        address:
+        address_school:
+        choose_country:
+        city:
+        postal_code:
+        region:
+        state:
+        your_full_address_is_required:

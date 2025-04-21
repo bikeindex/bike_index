@@ -53,18 +53,20 @@
 #  zipcode                            :string(255)
 #  created_at                         :datetime         not null
 #  updated_at                         :datetime         not null
+#  address_record_id                  :bigint
 #  country_id                         :integer
 #  state_id                           :integer
 #  stripe_id                          :string(255)
 #
 # Indexes
 #
+#  index_users_on_address_record_id         (address_record_id)
 #  index_users_on_auth_token                (auth_token)
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
 #
 class User < ApplicationRecord
   include FeatureFlaggable
-  include Geocodeable
+  include AddressRecorded
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
 
@@ -118,6 +120,7 @@ class User < ApplicationRecord
   has_one :membership_active, -> { active }, class_name: "Membership"
   has_one :mailchimp_datum
   has_one :user_ban
+
   accepts_nested_attributes_for :user_ban
 
   validates_uniqueness_of :username, case_sensitive: false
@@ -248,11 +251,11 @@ class User < ApplicationRecord
 
   # Performed inline
   def perform_create_jobs
-    AfterUserCreateJob.new.perform(id, "new", user: self)
+    ::Callbacks::AfterUserCreateJob.new.perform(id, "new", user: self)
   end
 
   def perform_user_update_jobs
-    AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
+    ::Callbacks::AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
   end
 
   def superuser?(controller_name: nil, action_name: nil)
@@ -381,7 +384,7 @@ class User < ApplicationRecord
     self.confirmed = true
     save
     reload
-    AfterUserCreateJob.new.perform(id, "confirmed", user: self)
+    ::Callbacks::AfterUserCreateJob.new.perform(id, "confirmed", user: self)
     true
   end
 
