@@ -17,7 +17,7 @@ class CreateMarketplaceListings < ActiveRecord::Migration[8.0]
       t.integer :currency_enum
       t.integer :amount_cents
 
-      t.integer :status, default: 0
+      t.integer :status
       t.integer :condition
 
       t.timestamps
