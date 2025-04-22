@@ -2177,13 +2177,14 @@ CREATE TABLE public.marketplace_listings (
     item_type character varying,
     item_id bigint,
     address_record_id bigint,
+    primary_activity_id bigint,
     latitude double precision,
     longitude double precision,
     for_sale_at timestamp(6) without time zone,
     sold_at timestamp(6) without time zone,
     currency_enum integer,
     amount_cents integer,
-    status integer DEFAULT 0,
+    status integer,
     condition integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -6212,6 +6213,13 @@ CREATE INDEX index_marketplace_listings_on_item ON public.marketplace_listings U
 
 
 --
+-- Name: index_marketplace_listings_on_primary_activity_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_primary_activity_id ON public.marketplace_listings USING btree (primary_activity_id);
+
+
+--
 -- Name: index_marketplace_listings_on_seller_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6962,9 +6970,9 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250421153929'),
 ('20250413160560'),
 ('20250413160556'),
-('20250406215746'),
 ('20250319024056'),
 ('20250319010935'),
 ('20250313035336'),
