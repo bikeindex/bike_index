@@ -22,6 +22,8 @@
 class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
+  INVALID_REGEX = /[\/\\\(\)\[\]=\s!"']/.freeze
+  INVALID_DOMAIN = "(invalid).domain".freeze
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
   STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}
   TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za]
@@ -62,6 +64,8 @@ class EmailDomain < ApplicationRecord
     end
 
     def find_matching_domain(domain)
+      return invalid_domain if invalid_domain?(domain)
+
       tld = tld_for(domain)
       tld_match = not_ignored.where(domain: tld).first
       if tld_match.present?
@@ -79,6 +83,14 @@ class EmailDomain < ApplicationRecord
       end
     end
 
+    def invalid_domain
+      @invalid_domain ||= where(domain: INVALID_DOMAIN, status: "banned").first_or_create
+    end
+
+    def invalid_domain?(domain)
+      domain =~ INVALID_REGEX
+    end
+
     def no_valid_organization_roles?(domain)
       org_ids = OrganizationRole.unscoped.where("invited_email ILIKE ?", "%#{domain}").pluck(:organization_id)
       Organization.approved.where(id: org_ids).none?
@@ -90,6 +102,7 @@ class EmailDomain < ApplicationRecord
 
     def tld_for(email_or_domain)
       domain = email_or_domain&.split("@")&.last&.strip
+      return invalid_domain if invalid_domain?(domain)
       return domain if domain.split(".").count == 1
 
       multi_subdomain = TLD_HAS_SUBDOMAIN.any? { domain.end_with?(_1) }
@@ -208,6 +221,8 @@ class EmailDomain < ApplicationRecord
   end
 
   def domain_is_not_contained_in_existing
+    return if domain == INVALID_DOMAIN
+
     broader_domain = self.class.find_matching_domain(domain)
     return if broader_domain.blank?
     # Allow creating without @, if an @domain exists
@@ -273,6 +288,8 @@ class EmailDomain < ApplicationRecord
   end
 
   def set_calculated_attributes
+    return if domain == INVALID_DOMAIN
+
     self.data ||= {}
     self.data["tld"] = self.class.tld_for(domain)
     self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length

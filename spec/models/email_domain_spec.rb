@@ -77,6 +77,18 @@ RSpec.describe EmailDomain, type: :model do
       end
     end
 
+    context "with invalid characters" do
+      let(:invalid_domain) { EmailDomain.invalid_domain }
+      let(:invalid_characters) { ['/', '\\', '(', ')', '[', ']', '=', ' ', '!'] }
+      it "returns invalid_domain" do
+        expect(invalid_domain.banned?).to be_truthy
+
+        invalid_characters.each do |char|
+          expect(EmailDomain.find_or_create_for("@example#{char}.com")&.id).to eq invalid_domain.id
+        end
+      end
+    end
+
     context "with subdomain" do
       let!(:email_domain_sub) { FactoryBot.create(:email_domain, domain: "xxxx.stuff.com") }
       it "creates and finds" do
