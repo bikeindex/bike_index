@@ -79,7 +79,7 @@ RSpec.describe EmailDomain, type: :model do
 
     context "with invalid characters" do
       let(:invalid_domain) { EmailDomain.invalid_domain }
-      let(:invalid_characters) { ['/', '\\', '(', ')', '[', ']', '=', ' ', '!'] }
+      let(:invalid_characters) { ["/", "\\", "(", ")", "[", "]", "=", " ", "!"] }
       it "returns invalid_domain" do
         expect(invalid_domain.banned?).to be_truthy
 

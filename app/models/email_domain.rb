@@ -22,8 +22,8 @@
 class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
-  INVALID_REGEX = /[\/\\\(\)\[\]=\s!"']/.freeze
-  INVALID_DOMAIN = "(invalid).domain".freeze
+  INVALID_REGEX = /[\/\\\(\)\[\]=\s!"']/
+  INVALID_DOMAIN = "(invalid).domain"
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
   STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}
   TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za]
