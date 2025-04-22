@@ -56,7 +56,7 @@
             %td
               = impound_record.address
 
-  .paginate-container.paginate-container-bottom.mb-4
+  .pt-4.pb-4
     = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
 
 -# include javascript because of period select

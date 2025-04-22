@@ -75,5 +75,5 @@
                 bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id),
                 method: "PUT"
 
-.paginate-container.paginate-container-bottom
+.pt-4.pb-4
   = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
