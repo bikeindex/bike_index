@@ -31,7 +31,7 @@
             .ad-block.ad-binx.ad468x60
           .col-md-8.col-lg-4.mt-4
             .paginate-container.paginate-container-bottom
-              = pagy_bootstrap_nav(@pagy).html_safe
+              = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
         .row
           .col-md-8.mt-4.offset-md-2
             = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}

@@ -67,5 +67,5 @@
         %td
           = bulk_import.ownerships.count # Don't need to do bikes through ownerships
 
-.paginate-container.paginate-container-bottom
-  = pagy_bootstrap_nav(@pagy).html_safe
+.pb-4.pt-4
+  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
