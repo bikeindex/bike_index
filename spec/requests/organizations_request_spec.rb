@@ -134,12 +134,24 @@ RSpec.describe OrganizationsController, type: :request do
     end
     context "stolen" do
       it "renders embed without xframe block" do
-        get "#{base_url}/#{current_organization.slug}/embed?stolen=1"
+        get "#{base_url}/#{current_organization.slug}/embed?stolen=1&non_stolen=true"
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).to be_blank
         expect(assigns(:stolen)).to be_truthy
+        expect(assigns(:non_stolen)).to be_falsey
         expect(assigns(:bike).status).to eq "status_stolen"
+      end
+    end
+    context "non_stolen" do
+      it "renders embed without xframe block" do
+        get "#{base_url}/#{current_organization.slug}/embed?non_stolen=1"
+        expect(response.code).to eq("200")
+        expect(response).to render_template(:embed)
+        expect(response.headers["X-Frame-Options"]).to be_blank
+        expect(assigns(:stolen)).to be_falsey
+        expect(assigns(:non_stolen)).to be_truthy
+        expect(assigns(:bike).status).to eq "status_with_owner"
       end
     end
     context "embed_extended" do

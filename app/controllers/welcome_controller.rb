@@ -22,6 +22,9 @@ class WelcomeController < ApplicationController
   end
 
   def choose_registration
+
+    qrcode = RQRCode::QRCode.new("https://bikeindex.org/organizations/hush-money-bikes/embed_extended")
+    render plain: qrcode.as_png(size: 2400, border_modules: 0), template: nil, format: :png
   end
 
   def recovery_stories
