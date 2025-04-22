@@ -10,7 +10,7 @@ module Pagination
     end
 
     def render?
-      @pagy.count > @pagy.limit
+      @pagy.present? && @pagy.count > @pagy.limit
     end
 
     private

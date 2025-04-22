@@ -94,7 +94,7 @@
                       .small.less-strong.dismiss-wrapper
                         = link_to t(".ignore"), user_alert_path(id: alert.id, alert_action: "dismiss"), method: :patch, action: "update"
 
-            .paginate-container.paginate-container-bottom.pb-4
+            .pt-4.pb-4
               = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
           - else
             %h2= t(".you_have_no_registered_bikes")

@@ -26,4 +26,11 @@ RSpec.describe Pagination::Component, type: :component do
       expect(described_class.new(**options).render?).to be_falsey
     end
   end
+
+  context "no pagy" do
+    let(:pagy) { nil }
+    it "doesn't render" do
+      expect(described_class.new(**options).render?).to be_falsey
+    end
+  end
 end

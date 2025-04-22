@@ -1,6 +1,4 @@
 module ApplicationHelper
-  include Pagy::Frontend
-
   # Override ActionView `cache` helper, adding the current locale to the cache
   # key.
   def cache(key = {}, options = {}, &block)
