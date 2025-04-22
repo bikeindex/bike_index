@@ -40,5 +40,5 @@
   - render_status = !ImpoundClaim.statuses.include?(@search_status) # Don't render status if we're looking at a single status
   = render partial: "/organized/impound_claims/table", locals: { impound_claims: @impound_claims, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, skip_impound_record: @impound_record.present? }
 
-.paginate-container.paginate-container-bottom
-  = pagy_bootstrap_nav(@pagy).html_safe
+.pt-4.pb-4
+  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
