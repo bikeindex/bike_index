@@ -4231,7 +4231,6 @@ nb:
     embed_layout:
       error: feil
       please_fix_the_following: Rett opp følgende
-      register_through_org: Registrer en sykkel gjennom %{org_name}
     payments_layout:
       be_a_bike_saver: Vær en sykkelsparer.
       support_bike_index_today: Støtt Bike Index i dag.
@@ -4341,6 +4340,8 @@ nb:
       ble verdens største åpne sykkelregistreringstjeneste
     users_new: Registrer deg for Bike Index
     welcome_index: 'Det beste sykkelregisteret: Enkelt, sikkert og gratis.'
+    registrations_embed: Innebygd %{organization} Bike Index registreringsskjema.
+      Registrer sykkelen din gratis, akkurat nå
   meta_titles:
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
@@ -4383,6 +4384,7 @@ nb:
     welcome_index: Bike Index - Sykkelregistrering som fungerer
     my_accounts_show: Du på Bike Index
     search_registrations_index: Søkeresultater
+    registrations_embed: Registrer en sykkel med %{organization}
   money:
     currencies:
       en: USD

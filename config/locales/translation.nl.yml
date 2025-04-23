@@ -4027,7 +4027,6 @@ nl:
     embed_layout:
       error: Fout
       please_fix_the_following: Los het volgende op
-      register_through_org: Registreer een fiets via %{org_name}
     payments_layout:
       be_a_bike_saver: Red het leven van een fiets.
       support_bike_index_today: Ondersteun Bike Index vandaag.
@@ -4113,6 +4112,8 @@ nl:
     users_new: Meld u aan voor Bike Index
     welcome_index: 'Het beste fietsregister: eenvoudig, veilig en gratis.'
     my_accounts_show: Uw fietsen op Bike Index
+    registrations_embed: Insluitbaar %{organization} Fietsindex registratieformulier.
+      Registreer je fiets nu gratis.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -4155,6 +4156,7 @@ nl:
     welcome_index: Bike Index - Fietsregistratie die werkt
     my_accounts_show: Jij op Bike Index
     search_registrations_index: Zoekresultaten
+    registrations_embed: Registreer een fiets met %{organization}
   organized:
     ambassador_dashboards:
       getting_started:
