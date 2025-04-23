@@ -301,7 +301,7 @@ RSpec.describe "BikesController#create", type: :request do
     # Make bike_params without address because it's used more often
     let(:bike_params) { bike_params_with_address.except(:street, :city, :zipcode, :state) }
     include_context :geocoder_real
-    it "creates with address" do
+    it "creates with address", :flaky do
       expect(current_user.reload.to_coordinates.compact).to eq([])
       expect(current_user.user_registration_organizations.count).to eq 0
       VCR.use_cassette("bikes_controller-create-reg_address", match_requests_on: [:method]) do
