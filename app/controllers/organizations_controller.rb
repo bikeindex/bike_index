@@ -37,8 +37,8 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  # previously accepted stolen_first=true as a parameter.
-  # Stopped accepting in PR#1875, because consistency, use stolen=true instead
+  # Additional parameter included in shop printouts: shop_display=true
+  # currently not used, but may use it someday!
   def embed
     @bike = BikeCreator.new.build_bike(@b_param)
     @bike.owner_email = params[:email] if params[:email].present?

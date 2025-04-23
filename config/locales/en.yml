@@ -1389,6 +1389,7 @@ en:
       add_start: Add version start date
       bike_name: Bike Name
       bike_registration: Edit the %{bike_type} registration here
+      choose_activity: Choose activity
       choose_country: Choose country
       choose_material: Choose material
       city: City
@@ -1494,22 +1495,6 @@ en:
       groups_and_organizations: Groups and Organizations
       other_organizations: Other organizations
       remove: Remove
-    ownership:
-      enter_new_owner_email_to_transfer: Enter the new owner's email to transfer the
-        registration.
-      impound_record_page: Impound record page
-      new_email_assigned_save_to_update: A new email is entered, click "save changes"
-        to transfer.
-      sell_trade_or_give_away_this_bike: Are you selling, trading or giving away this
-        %{bike_type}?
-      this_bike_is_currently_impounded_html: >-
-        This %{bike_type} is currently impounded with impound record <strong>#%{impound_record_id}</strong>.
-        If you update the email address here, <em class="text-warning">the %{bike_type}
-        will still be impounded</em>.
-      to_transfer_use_impound_record_page_html: >-
-        If you want to transfer the bike to a new owner, update it with "Transferred
-        To New Owner" from the %{link_to_impound_record_page}.
-      transfer_ownership: Transfer Ownership
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button
@@ -1531,18 +1516,36 @@ en:
         knows to watch out for your %{bike_type}!
     remove:
       delete_bike: Delete bike
+      delete_registration: Delete this registration
       delete_this_bike: Delete this %{bike_type} from Bike Index
       delete_this_version_html: Delete <em>%{version_name}</em>
+      enter_new_owner_email_to_transfer: Enter the new owner's email to transfer the
+        registration.
       faqs: FAQs
+      hide_registration: Hide this registration
       hide_this_bike: Hide this %{bike_type} from other users
+      impound_record_page: Impound record page
       keeping_your_bike_public: >-
         Keeping your bike public is the best way to help recover stolen bikes and
         deter theft.
       modal_title: Are you sure you want to delete this %{bike_type}?
       nevermind: Nevermind
+      new_email_assigned_save_to_update: A new email is entered, click "save changes"
+        to transfer.
       reason_for_deletion: Reason for deletion
       reason_modal_body: Please fill in the reason for the %{bike_type} deletion
       reason_modal_title: We want to know why!
+      save_changes: Update ownership
+      sell_trade_or_give_away_this_bike: Are you selling, trading or giving away this
+        %{bike_type}?
+      this_bike_is_currently_impounded_html: >-
+        This %{bike_type} is currently impounded with impound record <strong>#%{impound_record_id}</strong>.
+        If you update the email address here, <em class="text-warning">the %{bike_type}
+        will still be impounded</em>.
+      to_transfer_use_impound_record_page_html: >-
+        If you want to transfer the bike to a new owner, update it with "Transferred
+        To New Owner" from the %{link_to_impound_record_page}.
+      transfer_ownership: Transfer Ownership
       unhide_this_bike: Un-hide this %{bike_type}
       visibility: Visibility
       we_strongly_recommend: >-
@@ -1649,10 +1652,10 @@ en:
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
         groups: Groups and Organizations
-        ownership: Transfer Ownership
         photos: Photos
         publicize: Share on Social Media
         remove: Hide or Delete
+        remove_or_transfer: Transfer, Hide or Delete
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
         theft_details: Theft details
@@ -3865,7 +3868,6 @@ en:
     embed_layout:
       error: error
       please_fix_the_following: Please fix the following
-      register_through_org: Register a bike through %{org_name}
     payments_layout:
       be_a_bike_saver: Be a bike saver.
       support_bike_index_today: Support Bike Index today.
@@ -3984,6 +3986,9 @@ en:
       and then some.
     my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
+    registrations_embed: >-
+      Embedable %{organization} Bike Index registration form. Register your bike for
+      free, right now
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
     stolen_index: Bike Index helps recover your stolen bike
@@ -4021,6 +4026,7 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
+    registrations_embed: Register a bike with %{organization}
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
@@ -4158,14 +4164,15 @@ en:
       generally_connect_to_org: >-
         Some of your bikes are associated with %{org_name}, but this one is not. Generally,
         you should connect all your bikes to %{org_name} -
+      header_title: "%{current_user_name} on Bike Index"
       ignore: ignore
       key_serial: Key Serial
-      list_a_bike_on_bikefair: List a bike on BikeFair
       location: Location
       lock_type: Lock Type
       locks: locks
       manufacturer: Manufacturer
       mark_bike_stolen: Mark bike stolen
+      membership_subtitle: Thank you for being a Bike Index %{level} member!
       next: Next steps
       primary_colors: Primary colors
       register_new_items: Register new items
@@ -4180,9 +4187,7 @@ en:
       to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
       update_your_profile: Update your profile
       updated: Updated
-      user_bikes: "%{current_user_name} bikes"
       user_hidden: Hidden from other users
-      want_to_sell_your_bikes: Want to sell one of your registered bikes?
       welcome: Welcome
       you_have_no_registered_bikes: You have no registered bikes
       you_have_no_registered_locks: You have no registered locks

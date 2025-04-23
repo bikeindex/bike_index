@@ -2144,6 +2144,7 @@ nb:
       version_name: Versjonsnavn
       zipcode: Postnummer
       primary_activity: Primæraktivitet
+      choose_activity: Velg aktivitet
     bike_fields:
       revised_colors:
         add_a_color: Legg til en farge
@@ -2213,20 +2214,6 @@ nb:
       groups_and_organizations: Grupper og organisasjoner
       other_organizations: Andre organisasjoner
       remove: Fjerne
-    ownership:
-      enter_new_owner_email_to_transfer: Skriv inn den nye eierens e-postadresse for
-        å overføre registreringen.
-      impound_record_page: Beslagleggingsside
-      new_email_assigned_save_to_update: En ny e-post legges inn, klikk "lagre endringer"
-        for å overføre.
-      sell_trade_or_give_away_this_bike: Selger, bytter eller gir du bort denne %{bike_type}?
-      this_bike_is_currently_impounded_html: Denne %{bike_type} er for øyeblikket
-        beslaglagt med beslaglagt post <strong>#%{impound_record_id}</strong> . Hvis
-        du oppdaterer e-postadressen her, <em class="text-warning">vil %{bike_type}
-        fortsatt bli beslaglagt</em> .
-      to_transfer_use_impound_record_page_html: Hvis du ønsker å overføre sykkelen
-        til en ny eier, oppdater den med "Overført til ny eier" fra %{link_to_impound_record_page}.
-      transfer_ownership: Overføre eierskap
     photos:
       drag_and_drop_files_here_html: Dra og slipp filer her eller bruk <strong>Last
         opp bilder-</strong> knappen
@@ -2267,6 +2254,22 @@ nb:
         for å vise og skjule en sykkel.
       you_can_read_more_html: Du kan lese mer om hvorfor dette er viktig for oss i
         vår %{faq_link}.
+      delete_registration: Slett denne registreringen
+      enter_new_owner_email_to_transfer: Skriv inn den nye eierens e-postadresse for
+        å overføre registreringen.
+      hide_registration: Skjul denne registreringen
+      impound_record_page: Beslagleggingsside
+      new_email_assigned_save_to_update: En ny e-post legges inn, klikk "lagre endringer"
+        for å overføre.
+      save_changes: Oppdater eierskap
+      sell_trade_or_give_away_this_bike: Selger, bytter eller gir du bort denne %{bike_type}?
+      this_bike_is_currently_impounded_html: Denne %{bike_type} er for øyeblikket
+        beslaglagt med beslaglagt post <strong>#%{impound_record_id}</strong> . Hvis
+        du oppdaterer e-postadressen her, <em class="text-warning">vil %{bike_type}
+        fortsatt bli beslaglagt</em> .
+      to_transfer_use_impound_record_page_html: Hvis du ønsker å overføre sykkelen
+        til en ny eier, oppdater den med "Overført til ny eier" fra %{link_to_impound_record_page}.
+      transfer_ownership: Overføre eierskap
     report_recovered:
       can_we_share_your_story: Kan vi dele historien din?
       did_we_help: Har vi hjulpet til?
@@ -2359,7 +2362,6 @@ nb:
         drivetrain: Hjul og drivverk
         found_details: Informasjon om å finne
         groups: Grupper og organisasjoner
-        ownership: Overføre eierskap
         photos: Bilder
         publicize: Del på sosiale medier
         remove: Skjul eller Slett
@@ -2367,6 +2369,7 @@ nb:
         report_stolen: Meld stjålet eller savnet
         theft_details: Tyveridetaljer
         versions: Versjoner
+        remove_or_transfer: Overfør, skjul eller slett
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: Det %{bike_type} er ikke gjort krav på ennå.
           Hvis det er din %{bike_type}, registrer deg og du vil kunne redigere den!
@@ -4231,7 +4234,6 @@ nb:
     embed_layout:
       error: feil
       please_fix_the_following: Rett opp følgende
-      register_through_org: Registrer en sykkel gjennom %{org_name}
     payments_layout:
       be_a_bike_saver: Vær en sykkelsparer.
       support_bike_index_today: Støtt Bike Index i dag.
@@ -4341,6 +4343,8 @@ nb:
       ble verdens største åpne sykkelregistreringstjeneste
     users_new: Registrer deg for Bike Index
     welcome_index: 'Det beste sykkelregisteret: Enkelt, sikkert og gratis.'
+    registrations_embed: Innebygd %{organization} Bike Index registreringsskjema.
+      Registrer sykkelen din gratis, akkurat nå
   meta_titles:
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
@@ -4383,6 +4387,7 @@ nb:
     welcome_index: Bike Index - Sykkelregistrering som fungerer
     my_accounts_show: Du på Bike Index
     search_registrations_index: Søkeresultater
+    registrations_embed: Registrer en sykkel med %{organization}
   money:
     currencies:
       en: USD
@@ -4500,7 +4505,6 @@ nb:
         -
       ignore: overse
       key_serial: Nøkkelserie
-      list_a_bike_on_bikefair: List en sykkel på BikeFair
       location: plassering
       lock_type: Lås type
       locks: låser
@@ -4520,12 +4524,12 @@ nb:
         deg!
       update_your_profile: Oppdater profilen din
       updated: Oppdatert
-      user_bikes: "%{current_user_name} sykler"
       user_hidden: Skjult for andre brukere
-      want_to_sell_your_bikes: Vil du selge en av dine registrerte sykler?
       welcome: Velkommen
       you_have_no_registered_bikes: Du har ingen registrerte sykler
       you_have_no_registered_locks: Du har ingen registrerte låser
+      header_title: "%{current_user_name} på Bike Index"
+      membership_subtitle: Takk for at du er medlem av Bike Index %{level}!
     delete_account:
       delete_account: Slett konto
       delete_my_account: Slett kontoen min og alle mine registrerte sykler

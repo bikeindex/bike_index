@@ -2056,6 +2056,7 @@ es:
       version_name:
       zipcode:
       primary_activity:
+      choose_activity:
     bike_fields:
       revised_colors:
         add_a_color:
@@ -2119,14 +2120,6 @@ es:
       groups_and_organizations:
       other_organizations:
       remove:
-    ownership:
-      enter_new_owner_email_to_transfer:
-      impound_record_page:
-      new_email_assigned_save_to_update:
-      sell_trade_or_give_away_this_bike:
-      this_bike_is_currently_impounded_html:
-      to_transfer_use_impound_record_page_html:
-      transfer_ownership:
     photos:
       drag_and_drop_files_here_html:
       drag_the_uploaded_photos:
@@ -2158,6 +2151,16 @@ es:
       visibility:
       we_strongly_recommend:
       you_can_read_more_html:
+      delete_registration:
+      enter_new_owner_email_to_transfer:
+      hide_registration:
+      impound_record_page:
+      new_email_assigned_save_to_update:
+      save_changes:
+      sell_trade_or_give_away_this_bike:
+      this_bike_is_currently_impounded_html:
+      to_transfer_use_impound_record_page_html:
+      transfer_ownership:
     report_recovered:
       can_we_share_your_story:
       did_we_help:
@@ -2235,7 +2238,6 @@ es:
         drivetrain:
         found_details:
         groups:
-        ownership:
         photos:
         publicize:
         remove:
@@ -2243,6 +2245,7 @@ es:
         report_stolen:
         theft_details:
         versions:
+        remove_or_transfer:
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet:
         bike_impounded:
@@ -3256,7 +3259,6 @@ es:
     embed_layout:
       error:
       please_fix_the_following:
-      register_through_org:
     payments_layout:
       be_a_bike_saver:
       support_bike_index_today:
@@ -3346,6 +3348,7 @@ es:
     stolen_merging:
     users_new:
     welcome_index: 'El mejor registro de bicicletas: Sencillo, seguro y gratuito.'
+    registrations_embed:
   meta_titles:
     bikes_index:
     bikes_new:
@@ -3387,6 +3390,7 @@ es:
     welcome_index:
     my_accounts_show:
     search_registrations_index:
+    registrations_embed:
   money:
     currencies:
       en:
@@ -3490,7 +3494,6 @@ es:
       generally_connect_to_org:
       ignore:
       key_serial:
-      list_a_bike_on_bikefair:
       location:
       lock_type:
       locks:
@@ -3507,12 +3510,12 @@ es:
       to_bike_index_thanks_for_signing_up:
       update_your_profile:
       updated:
-      user_bikes:
       user_hidden:
-      want_to_sell_your_bikes:
       welcome:
       you_have_no_registered_bikes:
       you_have_no_registered_locks:
+      header_title:
+      membership_subtitle:
     delete_account:
       delete_account:
       delete_my_account:

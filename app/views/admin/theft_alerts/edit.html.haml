@@ -6,7 +6,7 @@
     alert status:
     %span{class: theft_alert_status_class(@theft_alert)}
       = @theft_alert.status
-- if @theft_alert.failed_to_activate_inactive?
+- if @theft_alert.manual_override_inactive?
   %p.pt-2.pb-2
     %span.text-danger
       Facebook Activation failed
@@ -73,6 +73,8 @@
                 %li Alert is missing photo
               - if @theft_alert.missing_location?
                 %li Alert is missing location
+              - if @theft_alert.bike_not_current?
+                %li Bike is hidden, deleted, or spam
 
 .row.mt-4
   .col-sm-6

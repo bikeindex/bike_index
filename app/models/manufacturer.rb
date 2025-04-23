@@ -49,6 +49,7 @@ class Manufacturer < ApplicationRecord
   scope :frame_makers, -> { where(frame_maker: true) }
   scope :with_websites, -> { where("website is NOT NULL and website != ''") }
   scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
+  scope :except_other, -> { where.not(id: Manufacturer.other.id) }
 
   class << self
     # Secondary_slug is the slug of the stuff in the paretheses

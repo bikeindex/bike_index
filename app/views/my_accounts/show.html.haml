@@ -1,11 +1,18 @@
 .container
-  .row.first-row
-    .col-md-8
-      %h1
-        = t(".user_bikes", current_user_name: current_user.display_name)
+  .row{class: " tw:flex tw:flex-wrap tw:items-end tw:py-4"}
+    - membership = current_user.membership_active
+    %div{class: " tw:flex-1 tw:px-[15px] tw:pb-4"}
+      %h1.uncap.mb-2= t(".header_title", current_user_name: current_user.display_name)
+      - if membership.present?
+        %h3.uncap
+          = t(".membership_subtitle", level: membership.basic? ? '' : membership.level_humanized)
 
-    .col-md-4.ad-col
-      .ad-block.ad-binx.ad468x60.d-none.d-sm-block
+    - if membership.present?
+      %div{class: "tw:w-full tw:sm:w-1/3 tw:flex tw:px-[15px]"}
+        = render(MemberBadge::Component.new(level: membership.level, shadow: true, classes: "tw:max-w-1/2! tw:sm:max-w-full! tw:mx-auto"))
+
+
+.container
   .row
     .col-md-8
       %ul.user-items-nav.nav.nav-tabs{ role: 'tablist' }
@@ -152,20 +159,12 @@
                     = t(".to_bike_index_thanks_for_signing_up")
           .lock-group
             .image-column
-              = image_tag 'revised/lock_icon.svg'
+              = image_tag 'revised/update_account_icon.svg'
             .col-xs-10
               %p
                 %strong
                   = t(".tell_us_more_about_yourself")
                 = link_to t(".update_your_profile"), edit_my_account_url
-          - if @bikes.present?
-            .lock-group
-              .image-column
-                = image_tag "logos/bikefair.svg"
-              .col-xs-10
-                %p
-                  = t(".want_to_sell_your_bikes")
-                  = link_to t(".list_a_bike_on_bikefair"), "https://bikefair.org/auth/bikeindex"
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do

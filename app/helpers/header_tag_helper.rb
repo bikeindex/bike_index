@@ -1,6 +1,6 @@
 module HeaderTagHelper
   def header_tags_component_options
-    organization_name = current_organization&.short_name
+    organization_name = current_organization&.short_name || @organization&.short_name
     page_title = @page_title || page_title_for_edit_bikes(controller_name, action_name)
 
     {
