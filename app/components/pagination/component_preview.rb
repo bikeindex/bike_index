@@ -13,7 +13,7 @@ module Pagination
     private
 
     def pagy_opt
-      Pagy.new(count: 1_384_155, limit: 10, page: 1, max_pages: 100)
+      Pagy.new(count: 1_384_155, limit: 10, page: 100, max_pages: 100)
     end
   end
 end

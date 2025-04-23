@@ -9,12 +9,38 @@ RSpec.describe Pagination::Component, type: :component do
   let(:component) { render_inline(described_class.new(**options)) }
 
   context "bike pagy" do
-    let(:pagy) { Pagy.new(count: 1_384_155, limit: 10, page: 1, max_pages: 100) }
+    let(:page) { 1 }
+    let(:pagy) { Pagy.new(count: 1_384_155, limit: 10, page:, max_pages: 100) }
 
-    it "renders" do
+    it "renders without previous" do
       with_request_url "/search/registrations" do
         expect(described_class.new(**options).render?).to be_truthy
         expect(component).to be_present
+        expect(component).to_not have_css('a[aria-label="Previous"]')
+        expect(component).to have_css('a[aria-label="Next"]')
+      end
+    end
+
+    context "midrange" do
+      let(:page) { 3 }
+      it "renders with previous and next" do
+        with_request_url "/search/registrations" do
+          expect(described_class.new(**options).render?).to be_truthy
+          expect(component).to be_present
+          expect(component).to have_css('[aria-label="Previous"]')
+          expect(component).to have_css('[aria-label="Next"]')
+        end
+      end
+    end
+    context "final page" do
+      let(:page) { 99 }
+      it "renders without next" do
+        with_request_url "/search/registrations" do
+          expect(described_class.new(**options).render?).to be_truthy
+          expect(component).to be_present
+          expect(component).to have_css('a[aria-label="Previous"]')
+          expect(component).to_not have_css('a[aria-label="Next"]')
+        end
       end
     end
   end
