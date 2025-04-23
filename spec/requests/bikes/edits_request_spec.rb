@@ -109,9 +109,9 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(assigns(:new_email_assigned)).to be_blank
       expect(assigns(:bike).owner_email).to eq bike.owner_email
       # Preserve previous ownership functionality
-      # get "#{base_url}/ownership?owner_email=new_email@stuff.com"
-      # expect(response).to redirect_to "#{base_url}/remove?owner_email=new_email@stuff.com"
-
+      get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      expect(response).to redirect_to(edit_bike_path(bike.to_param, edit_template: "remove", owner_email: "new_email@stuff.com"))
+      # And then, test the previous assign email functionality
       get "#{base_url}/remove?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
       expect(response).to render_template(:remove)

@@ -81,14 +81,14 @@ module BikeEditable
     @edit_template = requested_page || @bike.default_edit_template
     valid_requested_page = (edit_templates.keys.map(&:to_s) + ["alert_purchase_confirmation"]).include?(@edit_template)
     unless valid_requested_page && controller_name == edits_controller_name_for(@edit_template)
-      redirect_template = if valid_requested_page
-        @edit_template
-      # elsif @edit_template == "ownership" # Preserve
-
+      edit_redirect_url = if @edit_template == "ownership" && params[:owner_email].present?# Preserve older functionality
+        edit_bike_url(@bike.id, edit_template: "remove", owner_email: params[:owner_email])
       else
-        @bike.default_edit_template
+        redirect_template = valid_requested_page ? @edit_template : @bike.default_edit_template
+        edit_bike_template_path_for(@bike, redirect_template)
       end
-      redirect_to(edit_bike_template_path_for(@bike, redirect_template))
+
+      redirect_to(edit_redirect_url)
       return false
     end
 
