@@ -3240,7 +3240,7 @@ es:
       user_settings: "%{user_email} ajustes"
       view_org: Ver %{org_name}
       your_bikes: Sus bicicletas
-      search:
+      search: Buscar
     application_bikehub:
       accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
         Bike Index, el principal registro de bicicletas.
