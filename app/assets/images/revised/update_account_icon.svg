@@ -6,4 +6,16 @@
         stroke-width="20"
         stroke-linecap="round"
         stroke-linejoin="round"/>
+
+  <!-- Settings icon (gear) in the middle -->
+  <g transform="translate(100, 75) scale(0.5)">
+    <!-- Outer circle -->
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#3498db" stroke-width="10" />
+
+    <!-- Inner details (gear teeth) -->
+    <path d="M0,-60 L0,-45 M0,45 L0,60 M-42,-42 L-32,-32 M42,42 L32,32 M-60,0 L-45,0 M45,0 L60,0 M-42,42 L-32,32 M42,-42 L32,-32"
+          stroke="#3498db"
+          stroke-width="16"
+          stroke-linecap="round" />
+  </g>
 </svg>

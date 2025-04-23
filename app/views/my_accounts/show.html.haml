@@ -158,14 +158,6 @@
                 %strong
                   = t(".tell_us_more_about_yourself")
                 = link_to t(".update_your_profile"), edit_my_account_url
-          - if @bikes.present?
-            .lock-group
-              .image-column
-                = image_tag "logos/bikefair.svg"
-              .col-xs-10
-                %p
-                  = t(".want_to_sell_your_bikes")
-                  = link_to t(".list_a_bike_on_bikefair"), "https://bikefair.org/auth/bikeindex"
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do
