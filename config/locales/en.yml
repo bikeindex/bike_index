@@ -1389,7 +1389,6 @@ en:
       add_start: Add version start date
       bike_name: Bike Name
       bike_registration: Edit the %{bike_type} registration here
-      choose_activity: Choose activity
       choose_country: Choose country
       choose_material: Choose material
       city: City
@@ -1403,7 +1402,6 @@ en:
       nevermind: Nevermind
       other_serial_or_registration_number: Other serial or registration number
       please_fill_in_both_fields: Please fill in both fields
-      primary_activity: Primary activity
       reason_for_update: Reason for update
       remove_end: Remove end
       remove_start: Remove start
@@ -1456,6 +1454,9 @@ en:
         state: State
         where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
+      primary_activity:
+        choose_activity: Choose activity
+        primary_activity: Primary activity
     drivetrain:
       belt_drive: Belt Drive
       coaster_brake: Coaster Brake
