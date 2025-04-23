@@ -5608,7 +5608,6 @@ nl:
       edit: Bewerken
       edit_bike: Fiets bewerken
       key_serial: Sleutel serienummer
-      list_a_bike_on_bikefair: Zet een fiets op BikeFair
       location: Plaats
       lock_type: Slottype
       locks: sloten
@@ -5625,8 +5624,6 @@ nl:
         heeft toegevoegd aan de index.
       to_bike_index_thanks_for_signing_up: naar Bike Index. Bedankt voor het aanmelden!
       update_your_profile: update uw profiel
-      user_bikes: "%{current_user_name} Fietsen"
-      want_to_sell_your_bikes: Wilt u een van uw geregistreerde fietsen verkopen?
       welcome: Welkom
       you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
@@ -5639,6 +5636,7 @@ nl:
       user_hidden: Verborgen voor andere gebruikers
       registered: Geregistreerd
       updated: Bijgewerkt
+      header_title: "%{current_user_name} op Fietsindex"
     edit:
       save_changes: Wijzigingen opslaan
       edit_pages: 'Accountpagina''s bewerken:'

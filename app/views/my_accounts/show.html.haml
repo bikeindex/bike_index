@@ -1,11 +1,12 @@
 .container
-  .row.first-row
+  .row
     .col-md-8
-      %h1
-        = t(".user_bikes", current_user_name: current_user.display_name)
+      %h1.uncap
+        = t(".header_title", current_user_name: current_user.display_name)
+    .col-md-4
+      = render(MemberBadge::Component.new(level: current_user.membership_active&.level, size: :lg))
 
-    .col-md-4.ad-col
-      .ad-block.ad-binx.ad468x60.d-none.d-sm-block
+.container
   .row
     .col-md-8
       %ul.user-items-nav.nav.nav-tabs{ role: 'tablist' }
