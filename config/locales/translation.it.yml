@@ -3251,13 +3251,13 @@ it:
       log_in:
       logout:
       register_a_new_bike:
-      search_bikes:
       sign_up:
       stolen_bike:
       the_nonprofit_bike_registry:
       user_settings:
       view_org:
       your_bikes:
+      search:
     application_bikehub:
       accounts_powered_by_bike_index:
       contact:
