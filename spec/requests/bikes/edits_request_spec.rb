@@ -92,7 +92,6 @@ RSpec.describe Bikes::EditsController, type: :request do
   end
   context "with bike_versions" do
     it "renders" do
-      Flipper.enable :bike_versions # Simpler to just enable it all
       get base_url
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
