@@ -130,6 +130,34 @@ RSpec.describe HeaderTags::Component, type: :component do
     end
   end
 
+  context "embed" do
+    let(:controller_name) { "organizations" }
+    let(:action_name) { "embed" }
+    let(:organization_name) { "Hush Money Bikes" }
+    let(:title) { "Register a bike with #{organization_name}" }
+    let(:description) do
+      "Embedable #{organization_name} Bike Index registration form. Register your bike for free, right now"
+    end
+    it "renders" do
+      expect(component).to be_present
+      expect_matching_tags(title:, description:)
+    end
+
+    context "embed_extended" do
+      let(:action_name) { "embed_extended" }
+      it "renders" do
+        expect_matching_tags(title:, description:)
+      end
+    end
+
+    context "reg_embed" do
+      let(:controller_name) { "registrations" }
+      it "renders" do
+        expect_matching_tags(title:, description:)
+      end
+    end
+  end
+
   context "news controller" do
     let(:controller_name) { "news" }
     it "renders with atom feed" do
