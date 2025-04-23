@@ -129,7 +129,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def bike
-    stolen_record&.bike
+    stolen_record&.bike || Bike.unscoped.find_by(id: bike_id)
   end
 
   # never geocode, use calculated lat/long
@@ -172,7 +172,7 @@ class TheftAlert < ApplicationRecord
 
   # literally CAN NOT activate
   def activateable_except_approval?
-    return false if missing_photo? || missing_location?
+    return false if missing_photo? || missing_location? || bike_not_current?
     admin ? true : paid?
   end
 
@@ -191,12 +191,18 @@ class TheftAlert < ApplicationRecord
   end
 
   # Some alerts have been manually overridden to be inactive - make it possible to show this state
-  def failed_to_activate_inactive?
-    inactive? && failed_to_activate_data? && start_at.blank?
+  def manual_override_inactive?
+    return false unless inactive? && end_at.blank?
+
+    facebook_data.blank? || (failed_to_activate_data? && start_at.blank?)
   end
 
   def recovered?
     stolen_record&.recovered?
+  end
+
+  def bike_not_current?
+    bike.blank? || !bike.current?
   end
 
   def missing_location?
@@ -300,6 +306,8 @@ class TheftAlert < ApplicationRecord
   private
 
   def failed_to_activate_data?
+    return false if activating_at.blank?
+
     activating_at < Time.current - FAILED_DELAY
   end
 

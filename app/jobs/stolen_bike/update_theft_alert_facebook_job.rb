@@ -10,6 +10,8 @@ class StolenBike::UpdateTheftAlertFacebookJob < ScheduledJob
     return enqueue_workers if theft_alert_id.blank?
 
     theft_alert = TheftAlert.find(theft_alert_id)
+    return if theft_alert.manual_override_inactive?
+
     # If the ad_id is blank, we need to activate the ad
     if theft_alert.facebook_data&.dig("ad_id").blank? || theft_alert.failed_to_activate?
       return StolenBike::ActivateTheftAlertJob.perform_async(theft_alert_id)

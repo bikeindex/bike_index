@@ -430,6 +430,11 @@ class Bike < ApplicationRecord
     !impounded? && owner_name.present? && valid_mailing_address?
   end
 
+  # matches current scope
+  def current?
+    !example? && !user_hidden && deleted_at.blank? && !likely_spam
+  end
+
   def current_parking_notification
     parking_notifications.current.first
   end
