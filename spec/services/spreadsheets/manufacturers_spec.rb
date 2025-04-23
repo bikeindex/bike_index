@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Spreadsheets::Manufacturers do
   let!(:manufacturer) do
+    Manufacturer.destroy_all
     FactoryBot.create(:manufacturer, name: "Riese & Müller (Riese and Muller)", frame_maker: true,
       motorized_only: true, open_year: 1993, website: "https://www.r-m.de/")
   end
@@ -34,12 +35,12 @@ RSpec.describe Spreadsheets::Manufacturers do
     let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Btwin") }
     let(:csv_path) { Rails.root.join("spec/fixtures/manufacturer-test-import.csv") }
 
-    def expect_target_manufacturer(manufacturer)
-      expect(manufacturer.name).to eq("b'Twin (Btwin)")
-      expect(manufacturer.frame_maker).to be_truthy
-      expect(manufacturer.motorized_only).to be_falsey
-      expect(manufacturer.open_year).to eq 1976
-      expect(manufacturer.close_year).to be_blank
+    def expect_target_manufacturer(mnfg)
+      expect(mnfg.name).to eq("b'Twin (Btwin)")
+      expect(mnfg.frame_maker).to be_truthy
+      expect(mnfg.motorized_only).to be_falsey
+      expect(mnfg.open_year).to eq 1976
+      expect(mnfg.close_year).to be_blank
     end
 
     describe "import" do

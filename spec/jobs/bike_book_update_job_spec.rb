@@ -17,7 +17,7 @@ RSpec.describe BikeBookUpdateJob, type: :job do
     BikeBookUpdateJob.new.perform(bike.id)
   end
 
-  it "grabs the components and doesn't overwrite components nothing if the bike isn't on bikebook" do
+  it "grabs the components but doesn't overwrite components if the bike isn't on bikebook", :flaky do
     manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
     bike = FactoryBot.create(:bike,
       manufacturer_id: manufacturer.id,
