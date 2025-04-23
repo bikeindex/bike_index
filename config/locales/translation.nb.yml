@@ -4502,7 +4502,6 @@ nb:
         -
       ignore: overse
       key_serial: Nøkkelserie
-      list_a_bike_on_bikefair: List en sykkel på BikeFair
       location: plassering
       lock_type: Lås type
       locks: låser
@@ -4522,12 +4521,12 @@ nb:
         deg!
       update_your_profile: Oppdater profilen din
       updated: Oppdatert
-      user_bikes: "%{current_user_name} sykler"
       user_hidden: Skjult for andre brukere
-      want_to_sell_your_bikes: Vil du selge en av dine registrerte sykler?
       welcome: Velkommen
       you_have_no_registered_bikes: Du har ingen registrerte sykler
       you_have_no_registered_locks: Du har ingen registrerte låser
+      header_title: "%{current_user_name} på Bike Index"
+      membership_subtitle: Takk for at du er medlem av Bike Index %{level}!
     delete_account:
       delete_account: Slett konto
       delete_my_account: Slett kontoen min og alle mine registrerte sykler
