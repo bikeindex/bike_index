@@ -155,7 +155,7 @@
               .form-well-input
                 = f.text_field :name, class: "form-control"
 
-          .form-group.row.fancy-select-placeholder.unfancy.hidden-other.unhidden
+          .form-group.row.fancy-select-placeholder.unfancy
             = f.label :primary_activity_id, t(".primary_activity"), class: "form-well-label"
             .form-well-input
               = f.collection_select(:primary_activity_id, PrimaryActivity.by_priority, :id, :display_name, {include_blank: true, prompt: " "}, {class: "form-control"})
