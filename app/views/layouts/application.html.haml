@@ -27,7 +27,7 @@
   %body{id: page_id, class:  body_class}
 
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache(["main_navbar1", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar2", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
           %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
@@ -52,7 +52,7 @@
             %a#primary_nav_hamburgler
           %ul.primary-main-menu
             %li.primary-nav-item.d-lg-none
-              = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", id: "search_bikes_header_link"
+              = link_to t(".search"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", id: "search_bikes_header_link"
             %li.divider-nav-item.d-lg-none{ "aria-hidden" => "true" }
             - if current_user_or_unconfirmed_user.present?
               %li.primary-nav-item
@@ -94,7 +94,7 @@
             %li.primary-nav-item
               = active_link t(".blog"), news_index_path, class: 'nav-link', match_controller: true
             %li.primary-nav-item.d-none.d-lg-block
-              = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", match_controller: true
+              = link_to t(".search"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", match_controller: true
     = render partial: "/layouts/revised_messages"
 
     - if current_page_skeleton.present?
