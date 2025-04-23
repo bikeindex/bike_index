@@ -3256,7 +3256,6 @@ es:
     embed_layout:
       error:
       please_fix_the_following:
-      register_through_org:
     payments_layout:
       be_a_bike_saver:
       support_bike_index_today:
@@ -3346,6 +3345,7 @@ es:
     stolen_merging:
     users_new:
     welcome_index: 'El mejor registro de bicicletas: Sencillo, seguro y gratuito.'
+    registrations_embed:
   meta_titles:
     bikes_index:
     bikes_new:
@@ -3387,6 +3387,7 @@ es:
     welcome_index:
     my_accounts_show:
     search_registrations_index:
+    registrations_embed:
   money:
     currencies:
       en:

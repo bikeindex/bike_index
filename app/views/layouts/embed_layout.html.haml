@@ -1,11 +1,7 @@
 !!!
 %html{ lang: I18n.locale }
   %head
-    %meta{charset: 'utf-8'}
-    %meta{'http-equiv' => 'X-UA-Compatible', content: 'IE=edge,chrome=1'}
-    %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1'}
-    %meta{name: 'description', content: "Embedable form, add a bike through #{@organization.name}." }
-    %title= t(".register_through_org", org_name: @organization.name)
+    = render(HeaderTags::Component.new(**header_tags_component_options))
     = stylesheet_link_tag "embed_styles", media: "all"
     = javascript_include_tag "embed"
     = csrf_meta_tags

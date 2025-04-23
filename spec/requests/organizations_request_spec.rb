@@ -124,6 +124,8 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).to be_blank
+        expect(response.body).to match("<title>Register a bike with #{current_organization.short_name}</title>")
+        expect(response.body).to match("Click here to register a STOLEN")
         expect(assigns(:current_user)&.id).to be_blank
         expect(assigns(:stolen)).to be_falsey
         expect(assigns(:bike).status).to eq "status_with_owner"
@@ -138,6 +140,7 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).to be_blank
+        expect(response.body).to_not match("Click here to register")
         expect(assigns(:stolen)).to be_truthy
         expect(assigns(:non_stolen)).to be_falsey
         expect(assigns(:bike).status).to eq "status_stolen"
@@ -149,6 +152,7 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).to be_blank
+        expect(response.body).to_not match("Click here to register")
         expect(assigns(:stolen)).to be_falsey
         expect(assigns(:non_stolen)).to be_truthy
         expect(assigns(:bike).status).to eq "status_with_owner"
@@ -160,6 +164,7 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed_extended)
         expect(response.headers["X-Frame-Options"]).to be_blank
+        expect(response.body).to_not match("Click here to register")
         expect(assigns(:persist_email)).to be_truthy
         bike = assigns(:bike)
         expect(bike.status).to eq "status_with_owner"
@@ -174,6 +179,7 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response).to render_template(:embed)
         expect(response.code).to eq("200")
         expect(response.headers["X-Frame-Options"]).to be_blank
+        expect(response.body).to match("Click here to register a STOLEN")
         expect(assigns(:stolen)).to be_falsey
         expect(assigns(:bike).status).to eq "status_with_owner"
         # And test rendering other things, to prove that it doesn't explode
@@ -208,6 +214,7 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).to be_blank
+        expect(response.body).to_not match("Click here to register")
         expect(b_param.status).to eq "status_stolen"
         expect(assigns(:stolen)).to be_truthy
         bike = assigns(:bike)

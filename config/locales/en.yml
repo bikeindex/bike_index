@@ -3863,7 +3863,6 @@ en:
     embed_layout:
       error: error
       please_fix_the_following: Please fix the following
-      register_through_org: Register a bike through %{org_name}
     payments_layout:
       be_a_bike_saver: Be a bike saver.
       support_bike_index_today: Support Bike Index today.
@@ -3982,6 +3981,9 @@ en:
       and then some.
     my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
+    registrations_embed: >-
+      Embedable %{organization} Bike Index registration form. Register your bike for
+      free, right now
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
     stolen_index: Bike Index helps recover your stolen bike
@@ -4019,6 +4021,7 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
+    registrations_embed: Register a bike with %{organization}
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
