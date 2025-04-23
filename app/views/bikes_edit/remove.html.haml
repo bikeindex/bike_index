@@ -8,9 +8,35 @@
       .col-md-8.form-well
         .form-wrap
           .form-well-form-header
-            %h3
-              = @edit_templates[@edit_template]
-              %em= @bike.display_name
+            %h3= t(".transfer_ownership")
+          .col-xs-12
+            %p
+              - if @bike.current_impound_record.present? && @bike.authorized_by_organization?(u: current_user)
+                - impound_record = @bike.current_impound_record
+                - if impound_record.organization.present? # I don't think there is a scenario where the org would be nil, but just in case...
+                  = t(".this_bike_is_currently_impounded_html", impound_record_id: impound_record.display_id, bike_type: @bike.type)
+                  %br
+                  .mt-2
+                  - link_to_impound_record_page = link_to t(".impound_record_page"), organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization.to_param)
+                  = t(".to_transfer_use_impound_record_page_html", link_to_impound_record_page: link_to_impound_record_page)
+              - else
+                %p
+                  = t(".sell_trade_or_give_away_this_bike", bike_type: @bike.type)
+                %p.pb-2
+                  - if @new_email_assigned
+                    %em= t(".new_email_assigned_save_to_update")
+                  - else
+                    = t(".enter_new_owner_email_to_transfer")
+          .form-group.row.unnested-field.no-divider-row
+            = f.label :owner_email, class: 'form-well-label'
+            .form-well-input
+              = f.email_field :owner_email, required: true, class: 'form-control'
+          .form-group.row.unnested-field.pt-5
+            = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary saveBikeChanges ml-auto mr-auto'
+
+        .form-wrap.secondary-form-wrap
+          .form-well-form-header
+            %h3= t(".hide_registration")
 
           - if @bike.version?
             .related-fields.no-divider-row.form-group.row.unnested-field
@@ -39,7 +65,7 @@
                 = render "/shared/trash_icon"
                 = t(".delete_this_version_html", version_name: @bike.display_name)
           - else
-            .related-fields.hide-this-bike.no-divider-row
+            .related-fields.hide-this-bike
               .form-group.row
                 - unless @bike.user_hidden?
                   .hide-this-bike-link
@@ -66,12 +92,13 @@
                           = t(".unhide_this_bike", bike_type: @bike.type)
                         - else
                           = t(".hide_this_bike", bike_type: @bike.type)
-            %hr
-
-            .delete-from-index.no-divider-row
-              %a{data: { toggle: "modal", target: "#request-delete" } }
-                = render "/shared/trash_icon"
-                = t(".delete_this_bike", bike_type: @bike.type)
+        .form-wrap.secondary-form-wrap
+          .form-well-form-header
+            %h3= t(".delete_registration")
+          .delete-from-index
+            %a{data: { toggle: "modal", target: "#request-delete" } }
+              = render "/shared/trash_icon"
+              = t(".delete_this_bike", bike_type: @bike.type)
 
 -# Explicitly redirect to my_account - other locations (e.g. admin) don't include js for rendering BikeIndexAlerts
 -# Referenced by the edit_remove.coffee file, so we can redirect there afterward

@@ -12,9 +12,8 @@ RSpec.describe Bikes::EditsController, type: :request do
       photos: "Photos",
       drivetrain: "Wheels and Drivetrain",
       accessories: "Accessories and Components",
-      ownership: "Transfer Ownership",
       groups: "Groups and Organizations",
-      remove: "Hide or Delete",
+      remove: "Transfer, Hide or Delete",
       report_stolen: "Report Stolen or Missing"
     }
   end
@@ -103,23 +102,27 @@ RSpec.describe Bikes::EditsController, type: :request do
     end
   end
   context "with owner_email" do
-    it "renders with owner_email in ownership" do
+    it "renders with owner_email in remove" do
       get "#{base_url}?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
       expect(assigns(:new_email_assigned)).to be_blank
       expect(assigns(:bike).owner_email).to eq bike.owner_email
-      get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      # Preserve previous ownership functionality
+      # get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      # expect(response).to redirect_to "#{base_url}/remove?owner_email=new_email@stuff.com"
+
+      get "#{base_url}/remove?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
-      expect(response).to render_template(:ownership)
+      expect(response).to render_template(:remove)
       expect(assigns(:bike).owner_email).to eq "new_email@stuff.com"
       expect(assigns(:new_email_assigned)).to be_truthy
       expect {
         put "/bikes/#{bike.to_param}", params: {bike: {owner_email: "new_email@stuff.com"}}
       }.to change(Ownership, :count).by 1
-      get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      get "#{base_url}/remove?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
-      expect(response).to render_template(:ownership)
+      expect(response).to render_template(:remove)
       expect(assigns(:new_email_assigned)).to be_falsey
       expect(assigns(:bike).owner_email).to eq "new_email@stuff.com"
     end
