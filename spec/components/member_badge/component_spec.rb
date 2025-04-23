@@ -8,7 +8,7 @@ RSpec.describe MemberBadge::Component, type: :component do
   let(:component) { render_inline(described_class.new(**options)) }
 
   it "doesn't renders" do
-    expect(component).to_not be_present
+    expect(described_class.new(**options).render?).to be_falsey
   end
 
   context "basic" do

@@ -5637,6 +5637,7 @@ nl:
       registered: Geregistreerd
       updated: Bijgewerkt
       header_title: "%{current_user_name} op Fietsindex"
+      membership_subtitle: Bedankt dat u lid bent van Bike Index %{level}!
     edit:
       save_changes: Wijzigingen opslaan
       edit_pages: 'Accountpagina''s bewerken:'
