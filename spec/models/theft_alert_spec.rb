@@ -52,7 +52,7 @@ RSpec.describe TheftAlert, type: :model do
     context "is activateable" do
       # let(:bike) { FactoryBot.create(:bike) }
       let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver, approved: true) }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {campaign_id: "xxxx"}) }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {}) }
       it "is truthy" do
         expect(theft_alert.reload.missing_location?).to be_falsey
         expect(stolen_record.reload.images_attached?).to be_truthy
@@ -65,10 +65,32 @@ RSpec.describe TheftAlert, type: :model do
         expect(TheftAlert.activating.pluck(:id)).to eq([])
         expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
         # Also, test notify? in here too
+        expect(theft_alert.notify?).to be_falsey
+        theft_alert.update(facebook_data: {campaign_id: "xxxx"})
+        expect(theft_alert.reload.activateable?).to be_truthy
+        expect(theft_alert.posted?).to be_falsey
+        expect(theft_alert.failed_to_activate?).to be_falsey
         expect(theft_alert.notify?).to be_truthy
         stolen_record.update(receive_notifications: false)
-        theft_alert.reload
-        expect(theft_alert.notify?).to be_falsey
+        expect(theft_alert.reload.notify?).to be_falsey
+      end
+      context "bike user hidden" do
+        let!(:bike) { stolen_record.reload.bike }
+        it "is falsey" do
+          bike.update(user_hidden: true)
+          expect(bike.reload.current?).to be_falsey
+          expect(Bike.where(id: bike.id).count).to eq 0 # Because default scope
+          expect(theft_alert.reload.missing_location?).to be_falsey
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          expect(theft_alert.missing_photo?).to be_falsey
+          expect(theft_alert.stolen_record_approved?).to be_truthy
+          expect(theft_alert.paid?).to be_truthy
+          expect(theft_alert.activateable?).to be_falsey
+          expect(theft_alert.bike).to be_present
+          theft_alert.update(status: :inactive)
+          expect(theft_alert.reload.failed_to_activate?).to be_falsey
+          expect(theft_alert.manual_override_inactive?).to be_truthy
+        end
       end
     end
     context "with alert_image" do

@@ -138,6 +138,7 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
         it "enqueues activate theft worker and exits" do
           theft_alert.reload
           expect(theft_alert.failed_to_activate?).to be_truthy
+          expect(theft_alert.manual_override_inactive?).to be_falsey
           expect(theft_alert.should_update_facebook?).to be_falsey
           expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([theft_alert.id])
           # It's enqueued
@@ -148,6 +149,26 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
           expect {
             instance.perform(theft_alert.id)
           }.to change(StolenBike::ActivateTheftAlertJob.jobs, :count).by 1
+        end
+        context "manual_override_inactive?" do
+          let(:facebook_data) { {activating_at: (Time.current - 1.month).to_i} }
+          it "does not enqueue" do
+            theft_alert.update(status: :inactive)
+            theft_alert.reload
+            expect(theft_alert.failed_to_activate?).to be_falsey
+            expect(theft_alert.send(:failed_to_activate_data?)).to be_truthy
+            expect(theft_alert.manual_override_inactive?).to be_truthy
+            expect(theft_alert.should_update_facebook?).to be_falsey
+            expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
+            # It's enqueued
+            expect {
+              instance.perform
+            }.to change(StolenBike::UpdateTheftAlertFacebookJob.jobs, :count).by 0
+            # when processed, it does not run activate
+            expect {
+              instance.perform(theft_alert.id)
+            }.to change(StolenBike::ActivateTheftAlertJob.jobs, :count).by 0
+          end
         end
       end
     end
