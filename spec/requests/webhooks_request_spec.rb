@@ -128,8 +128,9 @@ RSpec.describe WebhooksController, type: :request do
       end
     end
 
-    context "unknown event type" do
-      it "returns 400"
-    end
+    # TODO: Someday, handle this - not a high priority though
+    # context "unknown event type" do
+    #   it "returns 400"
+    # end
   end
 end
