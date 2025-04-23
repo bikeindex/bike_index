@@ -43,4 +43,8 @@ class MarketplaceListing < ApplicationRecord
   belongs_to :item, polymorphic: true
   belongs_to :address_record
   belongs_to :primary_activity
+
+  scope :current, -> { where(status: :for_sale) }
+
+  # validate that there isn't another current listing for an item
 end

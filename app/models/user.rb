@@ -279,6 +279,10 @@ class User < ApplicationRecord
     organization_roles.ambassador_organizations.limit(1).any?
   end
 
+  def can_create_listing?
+    superuser? || Flipper.enabled?(:create_listing, self)
+  end
+
   def to_param
     username
   end

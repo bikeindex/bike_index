@@ -15,7 +15,8 @@ RSpec.describe Bikes::EditsController, type: :request do
       accessories: "Accessories and Components",
       groups: "Groups and Organizations",
       remove: "Transfer, Hide or Delete",
-      report_stolen: "Report Stolen or Missing"
+      report_stolen: "Report Stolen or Missing",
+      versions: "Versions"
     }
   end
   let(:theft_templates) do
@@ -90,11 +91,11 @@ RSpec.describe Bikes::EditsController, type: :request do
     get base_url, params: {id: bike.id, edit_template: "root_party"}
     expect(response).to redirect_to(edit_bike_url(bike, edit_template: :bike_details))
   end
-  context "with can_list_item" do
+  context "with can_create_listing?" do
     let(:bike_creator) { FactoryBot.create(:superuser) }
 
     it "includes marketplace in edit_templates" do
-      expect(bike_creator.reload.can_list_items?).to be_truthy
+      expect(bike_creator.reload.can_create_listing?).to be_truthy
       get base_url
       expect(flash).to be_blank
       expect(response).to render_template(:bike_details)
@@ -109,7 +110,6 @@ RSpec.describe Bikes::EditsController, type: :request do
   end
   context "with bike_versions" do
     it "renders" do
-      Flipper.enable :bike_versions # Simpler to just enable it all
       get base_url
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)

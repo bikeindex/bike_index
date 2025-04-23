@@ -58,7 +58,7 @@ module BikeEditable
       unless @bike.version?
         h[:groups] = translation(:groups, scope: t_scope)
 
-        if @current_user&.can_list_items? && @bike&.status_with_owner?
+        if show_listing_link?(@bike, @current_user)
           h[:marketplace] = if @bike.is_for_sale
             translation(:marketplace_on_sale, scope: t_scope)
           else
@@ -73,9 +73,7 @@ module BikeEditable
         translation(:remove_or_transfer, scope: t_scope)
       end
 
-      if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
-        h[:versions] = translation(:versions, scope: t_scope)
-      end
+      h[:versions] = translation(:versions, scope: t_scope)
       unless @bike.status_stolen_or_impounded? || @bike.version?
         h[:report_stolen] = translation(:report_stolen, scope: t_scope)
       end
@@ -106,11 +104,20 @@ module BikeEditable
     true
   end
 
+  def show_listing_link?(bike, user)
+    # initial hacky way of checking if a bike is currently for sale
+    return true if bike.marketplace_listings.current.first.present?
+
+    return false unless bike.status_with_owner?
+
+    user&.can_create_listing?
+  end
+
   def assign_versions
-    return true unless Flipper.enabled?(:bike_versions, @current_user) && @bike.present?
+    return true unless @bike.present?
+
     @bike_og ||= @bike # Already assigned by bike_versions controller
-    @bike_versions = @bike_og.bike_versions
-      .where(owner_id: @current_user&.id)
+    @bike_versions = @bike_og.bike_versions.where(owner_id: @current_user&.id)
   end
 
   def edits_controller_name_for(requested_page)
