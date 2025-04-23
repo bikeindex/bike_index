@@ -15,7 +15,7 @@ module MemberBadge
     private
 
     def image_path
-      "membership/badge_#{@level}#{@shadow ? '-shadow' : ''}.png"
+      "membership/badge_#{@level}#{@shadow ? "-shadow" : ""}.png"
     end
 
     def badge_alt_text

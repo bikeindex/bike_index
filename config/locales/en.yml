@@ -4167,6 +4167,7 @@ en:
       locks: locks
       manufacturer: Manufacturer
       mark_bike_stolen: Mark bike stolen
+      membership_subtitle: Thank you for being a Bike Index %{level} member!
       next: Next steps
       primary_colors: Primary colors
       register_new_items: Register new items
