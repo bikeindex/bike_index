@@ -14,7 +14,8 @@ RSpec.describe Bikes::EditsController, type: :request do
       accessories: "Accessories and Components",
       groups: "Groups and Organizations",
       remove: "Transfer, Hide or Delete",
-      report_stolen: "Report Stolen or Missing"
+      report_stolen: "Report Stolen or Missing",
+      versions: "Versions"
     }
   end
   let(:theft_templates) do
@@ -91,7 +92,6 @@ RSpec.describe Bikes::EditsController, type: :request do
   end
   context "with bike_versions" do
     it "renders" do
-      Flipper.enable :bike_versions # Simpler to just enable it all
       get base_url
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
