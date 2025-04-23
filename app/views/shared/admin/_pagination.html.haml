@@ -12,7 +12,7 @@
 
 .row.mt-4.mb-4
   - unless skip_total
-    .col-md-5.mb-2
+    .col-md-5.mb-4
       %p.pagination-number.mb-0
         %strong= number_with_delimiter(count)
         Matching #{viewing.pluralize(count)}
@@ -30,9 +30,9 @@
           %em.less-strong
             (#{number_with_delimiter(collection.where("#{collection.table_name}.#{@time_range_column || "created_at"} >= ?", Time.current.beginning_of_day).total_count)} today)
   - unless skip_pagination || !defined?(@pagy)
-    .pagination-flex.justify-content-md-end{class: (skip_total ? "col-12" : "col-md-7")}
-      = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+    %div{class: "tw:md:text-right tw:flex tw:flex-wrap tw:md:flex-nowrap tw:gap-4 #{(skip_total ? "col-12" : "col-md-7")}"}
+      = render(Pagination::Component.new(pagy: @pagy, page_params: params))
 
       - per_pages = [10, 25, 50, 100, @per_page.to_i].uniq.sort
       -# Add -skiptotal onto id so that the JS can select it correctly for updating on change (otherwise there are two elements with the same ID)
-      = select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @per_page), {id: "per_page_select#{skip_total ? '-skiptotal' : ''}", class: "form-control per-page-select ml-2"}
+      = select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @per_page), {id: "per_page_select#{skip_total ? '-skiptotal' : ''}", class: "form-control d-inline-block", style: "margin-top: -6px; max-width: 8rem;"}
