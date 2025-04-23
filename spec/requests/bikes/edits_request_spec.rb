@@ -14,7 +14,8 @@ RSpec.describe Bikes::EditsController, type: :request do
       accessories: "Accessories and Components",
       groups: "Groups and Organizations",
       remove: "Transfer, Hide or Delete",
-      report_stolen: "Report Stolen or Missing"
+      report_stolen: "Report Stolen or Missing",
+      versions: "Versions"
     }
   end
   let(:theft_templates) do
