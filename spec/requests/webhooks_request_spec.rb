@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe WebhooksController, type: :request do
-  let(:re_record_interval) { 30.days }
+  let(:re_record_interval) { 90.days }
 
   describe "POST stripe" do
     let(:webhook_url) { "/webhooks/stripe" }
