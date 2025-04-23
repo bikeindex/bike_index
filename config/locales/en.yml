@@ -3863,7 +3863,6 @@ en:
     embed_layout:
       error: error
       please_fix_the_following: Please fix the following
-      register_through_org: Register a bike through %{org_name}
     payments_layout:
       be_a_bike_saver: Be a bike saver.
       support_bike_index_today: Support Bike Index today.
