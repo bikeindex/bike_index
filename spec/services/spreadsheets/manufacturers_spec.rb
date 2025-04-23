@@ -11,11 +11,13 @@ RSpec.describe Spreadsheets::Manufacturers do
         "Riese & Müller,Riese and Muller,https://www.r-m.de/,true,true,1993,,"]
     end
     it "generates" do
+      expect(Manufacturer.other).to be_present
+      expect(Manufacturer.count).to eq 2
       result = described_class.to_csv.split("\n")
 
       expect(result.first).to eq target.first
       expect(result.second).to eq target.second
-      expect(result.length).to eq target.length
+      expect(result.length).to eq target.length # it doesn't include other
     end
   end
 
@@ -78,7 +80,7 @@ RSpec.describe Spreadsheets::Manufacturers do
         let!(:manufacturer) { nil }
         it "creates" do
           expect { described_class.send(:update_or_create_for!, row) }.to change(Manufacturer, :count).by 1
-          expect_target_manufacturer(Manufacturer.last)
+          expect_target_manufacturer(Manufacturer.order(:id).last)
         end
       end
     end
