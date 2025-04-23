@@ -80,7 +80,6 @@ RSpec.describe Spreadsheets::Manufacturers do
       context "with no matching manufacturer" do
         let!(:manufacturer) { nil }
         it "creates" do
-
           expect { described_class.send(:update_or_create_for!, row) }.to change(Manufacturer, :count).by 1
           expect_target_manufacturer(Manufacturer.order(:id).last)
         end
