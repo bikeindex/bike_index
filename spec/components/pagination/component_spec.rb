@@ -33,7 +33,7 @@ RSpec.describe Pagination::Component, type: :component do
       end
     end
     context "final page" do
-      let(:page) { 99 }
+      let(:page) { 100 }
       it "renders without next" do
         with_request_url "/search/registrations" do
           expect(described_class.new(**options).render?).to be_truthy
