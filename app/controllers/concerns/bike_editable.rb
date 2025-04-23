@@ -29,7 +29,7 @@ module BikeEditable
   protected
 
   def t_scope
-    [:controllers, :bikes, :edit]
+    %i[controllers bikes edit]
   end
 
   # NB: Hash insertion order here determines how nav links are displayed in the
@@ -54,11 +54,15 @@ module BikeEditable
       h[:photos] = translation(:photos, scope: t_scope)
       h[:drivetrain] = translation(:drivetrain, scope: t_scope)
       h[:accessories] = translation(:accessories, scope: t_scope)
-      unless @bike.version?
-        h[:ownership] = translation(:ownership, scope: t_scope)
-        h[:groups] = translation(:groups, scope: t_scope)
+
+      h[:groups] = translation(:groups, scope: t_scope) unless @bike.version?
+
+      h[:remove] = if @bike.version?
+        translation(:remove, scope: t_scope)
+      else
+        translation(:remove_or_transfer, scope: t_scope)
       end
-      h[:remove] = translation(:remove, scope: t_scope)
+
       if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
         h[:versions] = translation(:versions, scope: t_scope)
       end
@@ -77,8 +81,14 @@ module BikeEditable
     @edit_template = requested_page || @bike.default_edit_template
     valid_requested_page = (edit_templates.keys.map(&:to_s) + ["alert_purchase_confirmation"]).include?(@edit_template)
     unless valid_requested_page && controller_name == edits_controller_name_for(@edit_template)
-      redirect_template = valid_requested_page ? @edit_template : @bike.default_edit_template
-      redirect_to(edit_bike_template_path_for(@bike, redirect_template))
+      edit_redirect_url = if @edit_template == "ownership" && params[:owner_email].present? # Preserve older functionality
+        edit_bike_url(@bike.id, edit_template: "remove", owner_email: params[:owner_email])
+      else
+        redirect_template = valid_requested_page ? @edit_template : @bike.default_edit_template
+        edit_bike_template_path_for(@bike, redirect_template)
+      end
+
+      redirect_to(edit_redirect_url)
       return false
     end
 
