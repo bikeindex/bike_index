@@ -2128,7 +2128,6 @@ nl:
         bike_details: Fietsdetails
         drivetrain: Wielen en aandrijflijn
         groups: Groepen en organisaties
-        ownership: Eigendom overdragen
         photos: foto's
         publicize: Delen op sociale media
         remove: Verbergen of verwijderen
@@ -2138,6 +2137,7 @@ nl:
         found_details: Informatie over het vinden
         bike_or_version_version: Versie
         versions: versies
+        remove_or_transfer: Overdragen, verbergen of verwijderen
       create:
         bike_was_added: Bike met succes toegevoegd aan de index!
         bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
@@ -5786,6 +5786,7 @@ nl:
         %{bike_registration_link}.
       version_name: Versienaam
       primary_activity: Primaire activiteit
+      choose_activity: Kies activiteit
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
@@ -5850,23 +5851,6 @@ nl:
       groups_and_organizations: Groepen en organisaties
       other_organizations: Andere organisaties
       remove: Verwijderen
-    ownership:
-      impound_record_page: In beslag genomen record pagina
-      sell_trade_or_give_away_this_bike: Deze %{bike_type} verkopen, verhandelen of
-        weggeven? Voer het e-mailadres van de nieuwe eigenaar in om de registratie
-        over te dragen.
-      this_bike_is_currently_impounded_html: Deze %{bike_type} is momenteel in beslag
-        genomen met inbeslagname record <strong># %{impound_record_id}</strong> .
-        Als u het e-mailadres hier bijwerkt, wordt <em class="text-warning">de %{bike_type}
-        nog steeds in beslag genomen</em> .
-      to_transfer_use_impound_record_page_html: Als u de fiets aan een nieuwe eigenaar
-        wilt overdragen, werkt u deze bij met "Overgedragen aan nieuwe eigenaar" uit
-        de %{link_to_impound_record_page}.
-      transfer_ownership: Eigendom overdragen
-      enter_new_owner_email_to_transfer: Voer het e-mailadres van de nieuwe eigenaar
-        in om de registratie over te dragen.
-      new_email_assigned_save_to_update: Er is een nieuw e-mailadres ingevoerd, klik
-        op "wijzigingen opslaan" om over te zetten.
     photos:
       drag_and_drop_files_here_html: Sleep bestanden hier naartoe of gebruik de knop
         <strong>Foto's uploaden</strong>
@@ -5907,6 +5891,25 @@ nl:
         is in onze %{faq_link}.
       delete_this_version_html: Verwijder <em>%{version_name}</em>
       visibility: Zichtbaarheid
+      delete_registration: Verwijder deze registratie
+      enter_new_owner_email_to_transfer: Voer het e-mailadres van de nieuwe eigenaar
+        in om de registratie over te dragen.
+      hide_registration: Verberg deze registratie
+      impound_record_page: In beslag genomen record pagina
+      new_email_assigned_save_to_update: Er is een nieuw e-mailadres ingevoerd, klik
+        op "wijzigingen opslaan" om over te zetten.
+      save_changes: Eigendom bijwerken
+      sell_trade_or_give_away_this_bike: Deze %{bike_type} verkopen, verhandelen of
+        weggeven? Voer het e-mailadres van de nieuwe eigenaar in om de registratie
+        over te dragen.
+      this_bike_is_currently_impounded_html: Deze %{bike_type} is momenteel in beslag
+        genomen met inbeslagname record <strong># %{impound_record_id}</strong> .
+        Als u het e-mailadres hier bijwerkt, wordt <em class="text-warning">de %{bike_type}
+        nog steeds in beslag genomen</em> .
+      to_transfer_use_impound_record_page_html: Als u de fiets aan een nieuwe eigenaar
+        wilt overdragen, werkt u deze bij met "Overgedragen aan nieuwe eigenaar" uit
+        de %{link_to_impound_record_page}.
+      transfer_ownership: Eigendom overdragen
     report_recovered:
       can_we_share_your_story: Kunnen we jouw verhaal delen?
       did_we_help: Hebben we geholpen?
