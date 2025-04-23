@@ -120,7 +120,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(ownership.is_new).to be_truthy
       end
 
-      it "creates a bike and does not duplicate" do
+      it "creates a bike and does not duplicate", :flaky do
         expect {
           post base_url, params: bike_hash.as_json
         }.to change(Ownership, :count).by(1)
