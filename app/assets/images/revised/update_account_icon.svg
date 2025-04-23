@@ -1,0 +1,9 @@
+<svg viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main speech bubble shape -->
+  <path d="M20 20 L180 20 Q190 20 190 30 L190 120 Q190 130 180 130 L70 130 L40 160 L40 130 L20 130 Q10 130 10 120 L10 30 Q10 20 20 20 Z"
+        fill="none"
+        stroke="#3498db"
+        stroke-width="20"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+</svg>
