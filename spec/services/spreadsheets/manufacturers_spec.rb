@@ -80,6 +80,8 @@ RSpec.describe Spreadsheets::Manufacturers do
       context "with no matching manufacturer" do
         let!(:manufacturer) { FactoryBot.create(:manufacturer) }
         it "creates", :flaky do
+          Manufacturer.destroy_all
+          expect(Manufacturer.count).to eq 0
           expect { described_class.send(:update_or_create_for!, row) }.to change(Manufacturer, :count).by 1
           expect_target_manufacturer(Manufacturer.order(:id).last)
         end
