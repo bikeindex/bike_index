@@ -31,6 +31,7 @@
 class MarketplaceListing < ApplicationRecord
   STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
   CONDITION_ENUM = {new_in_box: 0, like_new: 1, excellent: 2, good: 3, fair: 4, salvage: 5}.freeze
+  CURRENT_STATUSES = %i[draft for_sale]
 
   include Amountable
   include Currencyable
@@ -44,7 +45,14 @@ class MarketplaceListing < ApplicationRecord
   belongs_to :address_record
   belongs_to :primary_activity
 
-  scope :current, -> { where(status: :for_sale) }
+  scope :current, -> { where(status: CURRENT_STATUSES) }
 
   # validate that there isn't another current listing for an item
+  # validate when marked for_sale that it has all the required attributes
+
+  class << self
+    def find_or_build_current_for_bike(bike)
+      new(status: :draft, item: bike, seller: bike.user)
+    end
+  end
 end

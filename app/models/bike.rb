@@ -158,6 +158,7 @@ class Bike < ApplicationRecord
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records
   accepts_nested_attributes_for :components, allow_destroy: true
+  accepts_nested_attributes_for :current_marketplace_listing
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type

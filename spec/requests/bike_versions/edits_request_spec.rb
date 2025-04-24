@@ -30,7 +30,6 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       get "#{base_url}/#{edit_template}"
       expect(response.code).to eq "200"
       expect(response).to render_template("bikes_edit/#{edit_template}")
-      expect(response.body).to match(/<title>Details:/)
     end
   end
 

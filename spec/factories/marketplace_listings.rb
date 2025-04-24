@@ -3,8 +3,10 @@ FactoryBot.define do
     seller { FactoryBot.create(:user_confirmed) }
     buyer { nil }
     item { FactoryBot.create(:bike) }
-    price_cents { 5_000 }
-    willing_to_ship { false }
+    amount_cents { 5_000 }
+
+    condition { MarketplaceListing.conditions.first }
+    status { MarketplaceListing.statuses.first }
 
     trait :for_sale do
       for_sale_at { Time.current - 1.minute }
