@@ -28,6 +28,10 @@ module BikeEditable
 
   protected
 
+  def page_title_for(edit_template, bike)
+    "#{edit_templates[edit_template]}: #{bike.title_string}"
+  end
+
   def t_scope
     %i[controllers bikes edit]
   end

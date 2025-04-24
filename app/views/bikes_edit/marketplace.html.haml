@@ -11,11 +11,8 @@
           .form-well-form-header
             %h3= @edit_templates[@edit_template]
 
-          .related-fields
-            .form-group.row.unnested-field.no-divider-row
-              = f.label :handlebar_type_id, class: 'form-well-label'
-              .form-well-input.fancy-select-placeholder.unfancy
-                = select(:bike, :handlebar_type, HandlebarType.select_options , { prompt: " " }, { class: "form-control" })
+          - unless @bike.primary_activity.present?
+            = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
 
 
 

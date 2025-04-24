@@ -61,6 +61,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(bike.user_id).to eq current_user.id
         expect(response).to be_ok
         expect(assigns(:edit_template)).to eq "bike_details"
+        expect(response.body).to match(/<title>Details:/)
         expect(session[:return_to]).to be_blank
       end
     end
@@ -91,23 +92,6 @@ RSpec.describe Bikes::EditsController, type: :request do
     get base_url, params: {id: bike.id, edit_template: "root_party"}
     expect(response).to redirect_to(edit_bike_url(bike, edit_template: :bike_details))
   end
-  context "with can_create_listing?" do
-    let(:bike_creator) { FactoryBot.create(:superuser) }
-
-    it "includes marketplace in edit_templates" do
-      expect(bike_creator.reload.can_create_listing?).to be_truthy
-      get base_url
-      expect(flash).to be_blank
-      expect(response).to render_template(:bike_details)
-      expect(assigns(:bike).id).to eq bike.id
-      expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates.merge(marketplace: "List for sale")
-      # Because user is bike#user
-      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
-      # If passed an unknown template, it renders default template
-      get base_url, params: {id: bike.id, edit_template: "marketplace"}
-      expect(response).to render_template(:marketplace)
-    end
-  end
   context "with bike_versions" do
     it "renders" do
       get base_url
@@ -117,6 +101,27 @@ RSpec.describe Bikes::EditsController, type: :request do
       get "#{base_url}/versions"
       expect(response.status).to eq 200
       expect(response).to render_template(:versions)
+      expect(response.body).to match(/<title>Versions: #{bike.title_string}/)
+    end
+  end
+  describe "marketplace" do
+    it "redirects"
+    context "with can_create_listing?" do
+      let(:bike_creator) { FactoryBot.create(:superuser) }
+
+      it "includes marketplace in edit_templates" do
+        expect(bike_creator.reload.can_create_listing?).to be_truthy
+        get base_url
+        expect(flash).to be_blank
+        expect(response).to render_template(:bike_details)
+        expect(assigns(:bike).id).to eq bike.id
+        expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates.merge(marketplace: "List for sale")
+        # Because user is bike#user
+        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+        # If passed an unknown template, it renders default template
+        get base_url, params: {id: bike.id, edit_template: "marketplace"}
+        expect(response).to render_template(:marketplace)
+      end
     end
   end
   context "with owner_email" do
