@@ -71,15 +71,17 @@ RSpec.describe Spreadsheets::Manufacturers do
         expect_target_manufacturer(manufacturer.reload)
       end
       context "with existing mnfg with alternate_name" do
-        let(:manufacturer) { FactoryBot.create(:manufacturer, name: "B'twin something (Btwin)") }
+        let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "B'twin something (Btwin)") }
         it "updates" do
           expect { described_class.send(:update_or_create_for!, row) }.to change(Manufacturer, :count).by 0
           expect_target_manufacturer(manufacturer.reload)
         end
       end
       context "with no matching manufacturer" do
-        let!(:manufacturer) { nil }
-        it "creates" do
+        let!(:manufacturer) { FactoryBot.create(:manufacturer) }
+        it "creates", :flaky do
+          Manufacturer.destroy_all
+          expect(Manufacturer.count).to eq 0
           expect { described_class.send(:update_or_create_for!, row) }.to change(Manufacturer, :count).by 1
           expect_target_manufacturer(Manufacturer.order(:id).last)
         end

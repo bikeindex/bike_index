@@ -3234,13 +3234,13 @@ es:
       log_in: conectarse
       logout: Cierre de sesión
       register_a_new_bike: Registre su bicicleta
-      search_bikes: Buscar bicicletas
       sign_up: Inscríbete
       stolen_bike: "¿Bicicleta robada?"
       the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
       user_settings: "%{user_email} ajustes"
       view_org: Ver %{org_name}
       your_bikes: Sus bicicletas
+      search: Buscar
     application_bikehub:
       accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
         Bike Index, el principal registro de bicicletas.

@@ -267,7 +267,7 @@ $mainmenu-open-zindex: 10;
       top: 4 * $vertical-height;
       transform: translate(100%, 0);
       width: $mainmenu-width;
-      height: 100%;
+      height: 100vh;
       transition: transform $mainmenu-transform-speed linear;
       z-index: $mainmenu-open-zindex;
       overflow-y: auto;
