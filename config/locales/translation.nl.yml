@@ -4047,13 +4047,13 @@ nl:
       log_in: Log in
       logout: Afmelden
       register_a_new_bike: Registreer een nieuwe fiets
-      search_bikes: Zoek fietsen
       sign_up: Registreren
       the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
       user_settings: "%{user_email} instellingen"
       view_org: Bekijk %{org_name}
       your_bikes: Je fietsen
       stolen_bike: Fiets gestolen?
+      search: Zoeken
     application_bikehub:
       contact: contact
       home: Thuis

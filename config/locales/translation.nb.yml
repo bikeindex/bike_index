@@ -4205,13 +4205,13 @@ nb:
       log_in: Logg Inn
       logout: Logg ut
       register_a_new_bike: Registrer en ny sykkel
-      search_bikes: Søk etter sykler
       sign_up: Melde deg på
       stolen_bike: Stjålet sykkel?
       the_nonprofit_bike_registry: det ideelle sykkelregisteret
       user_settings: "%{user_email}-innstillinger"
       view_org: Se %{org_name}
       your_bikes: Syklene dine
+      search: Søk
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub-kontoer er drevet av Bike Index – det
         fremste sykkelregisteret.
