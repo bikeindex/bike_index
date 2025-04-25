@@ -6,11 +6,6 @@
          ],
          "components": [
             {
-               "/": "*",
-               "exclude": true,
-               "comment": "Defer all to the web (instead of app) for all links except those explicitly listed later"
-            },
-            {
                "/": "/bikes/scanned/*",
                "comment": "Example: bikeindex.org/bikes/scanned/A40340, open directly in-app for QR code scanning"
             }
