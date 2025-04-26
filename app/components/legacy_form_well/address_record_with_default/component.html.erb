@@ -5,11 +5,11 @@
       form_builder: @builder,
       not_related_fields: true
     )) %>
-  <% if render_use_default_record? %>
+  <% if render_user_account_address? %>
     <div class="form-group row unnested-field no-divider-row">
       <label class="form-well-label"></label>
       <div class="form-well-input form-well-input-checks">
-        <%= @builder.check_box :use_default_record %>
+        <%= @builder.check_box :user_account_address %>
         Use account address (<%= link_to "edit on my account", edit_my_account_path %>)
       </div>
     </div>

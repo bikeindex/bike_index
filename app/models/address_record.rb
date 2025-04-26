@@ -134,12 +134,13 @@ class AddressRecord < ApplicationRecord
     end
   end
 
-  def use_default_record=(val)
-    @use_default_record = InputNormalizer.boolean(val)
+  # This is used when rendering something with an address that is not the user
+  def user_account_address=(val)
+    @user_account_address = InputNormalizer.boolean(val)
   end
 
-  def use_default_record
-    return @use_default_record if defined?(@use_default_record)
+  def user_account_address
+    return @user_account_address if defined?(@user_account_address)
 
     user&.address_record_id == id
   end

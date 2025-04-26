@@ -35,7 +35,7 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :compo
 
   let(:component) { rendered_component(bike, user) }
 
-  it "does not show use_default_record" do
+  it "does not show user_account_address" do
     expect(user.reload.address_record).to be_blank
 
     expect(component).to_not have_text("Use account address")
@@ -46,33 +46,33 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :compo
 
     it "use account address is checked" do
       expect(user.reload.address_record).to be_present
-      expect(marketplace_listing.address_record.use_default_record).to be_truthy
+      expect(marketplace_listing.address_record.user_account_address).to be_truthy
 
       expect(component).to have_text("Use account address")
-      expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][use_default_record]")
+      expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
     end
 
     context "marketplace_listing address" do
       let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, address_record: listing_address_record) }
       let(:listing_address_record) { address_record }
 
-      it "use_default_record is checked when address record is user record" do
+      it "user_account_address is checked when address record is user record" do
         expect(user.reload.address_record).to be_present
-        expect(marketplace_listing.address_record.use_default_record).to be_truthy
+        expect(marketplace_listing.address_record.user_account_address).to be_truthy
 
         expect(component).to have_text("Use account address")
-        expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][use_default_record]")
+        expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
       end
 
       context "non-user address record" do
         let(:listing_address_record) { FactoryBot.create(:address_record, kind: :marketplace_listing, user:) }
 
-        it "use_default_record is unchecked when address record different" do
+        it "user_account_address is unchecked when address record different" do
           expect(user.reload.address_record).to be_present
-          expect(marketplace_listing.address_record.use_default_record).to be_falsey
+          expect(marketplace_listing.address_record.user_account_address).to be_falsey
 
           expect(component).to have_text("Use account address")
-          expect(page).to_not have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][use_default_record]")
+          expect(page).to_not have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
         end
       end
     end
