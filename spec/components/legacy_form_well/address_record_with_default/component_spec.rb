@@ -35,21 +35,46 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :compo
 
   let(:component) { rendered_component(bike, user) }
 
-  it "default preview" do
+  it "does not show use_default_record" do
     expect(user.reload.address_record).to be_blank
 
     expect(component).to_not have_text("Use account address")
   end
 
-  context "with account address" do
+  context "with user address" do
     let!(:address_record) { FactoryBot.create(:address_record, user:, kind: :user) }
 
-    it "default preview" do
+    it "use account address is checked" do
       expect(user.reload.address_record).to be_present
       expect(marketplace_listing.address_record.use_default_record).to be_truthy
 
       expect(component).to have_text("Use account address")
       expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][use_default_record]")
+    end
+
+    context "marketplace_listing address" do
+      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, address_record: listing_address_record) }
+      let(:listing_address_record) { address_record }
+
+      it "use_default_record is checked when address record is user record" do
+        expect(user.reload.address_record).to be_present
+        expect(marketplace_listing.address_record.use_default_record).to be_truthy
+
+        expect(component).to have_text("Use account address")
+        expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][use_default_record]")
+      end
+
+      context "non-user address record" do
+        let(:listing_address_record) { FactoryBot.create(:address_record, kind: :marketplace_listing, user:) }
+
+        it "use_default_record is unchecked when address record different" do
+          expect(user.reload.address_record).to be_present
+          expect(marketplace_listing.address_record.use_default_record).to be_falsey
+
+          expect(component).to have_text("Use account address")
+          expect(page).to_not have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][use_default_record]")
+        end
+      end
     end
   end
 end

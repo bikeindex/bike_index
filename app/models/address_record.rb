@@ -25,7 +25,7 @@
 #  index_address_records_on_user_id           (user_id)
 #
 class AddressRecord < ApplicationRecord
-  KIND_ENUM = {user: 0, stolen_record: 1, marketplace: 2}.freeze
+  KIND_ENUM = {user: 0, stolen_record: 1, marketplace_listing: 2}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
 
@@ -141,7 +141,7 @@ class AddressRecord < ApplicationRecord
   def use_default_record
     return @use_default_record if defined?(@use_default_record)
 
-    user.address_record_id == id
+    user&.address_record_id == id
   end
 
   private
