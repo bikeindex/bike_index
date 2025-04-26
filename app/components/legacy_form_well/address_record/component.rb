@@ -25,8 +25,9 @@ module LegacyFormWell::AddressRecord
 
     def address_label
       txt = @organization&.registration_field_labels&.dig("reg_address")
+      return txt.html_safe if txt.present?
 
-      txt.present? ? txt.html_safe : translation(:address)
+      no_street? ? translation(:address_no_street) : translation(:address)
     end
 
     def street_placeholder
@@ -36,7 +37,5 @@ module LegacyFormWell::AddressRecord
     def street_requires_below_helper?
       @organization&.additional_registration_fields&.include?("reg_address") || false
     end
-
-    attr_reader :builder
   end
 end

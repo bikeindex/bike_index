@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    legacy_form_well:
+      address_record_with_default:
+        form_builder: Form_builder
+        organization: Organization
+        no_street: No_street

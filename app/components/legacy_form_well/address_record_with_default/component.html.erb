@@ -1,0 +1,14 @@
+<div data-controller="legacy-form-well--address-record-with-default--component">
+  <%= render(LegacyFormWell::AddressRecord::Component.new(
+      form_builder: @builder
+    )) %>
+  <% if render_use_default_record? %>
+    <div class="form-group row unnested-field no-divider-row">
+      <label class="form-well-label"></label>
+      <div class="form-well-input form-well-input-checks">
+        <%= @builder.check_box :use_default_record %>
+        Use default address (<%= link_to "edit on my account page", my_account_path %>)
+      </div>
+    </div>
+  <% end %>
+</div>

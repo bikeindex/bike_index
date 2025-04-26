@@ -42,7 +42,7 @@ class AddressRecord < ApplicationRecord
   after_validation :address_record_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
   after_commit :update_associations
 
-  attr_accessor :skip_geocoding, :skip_callback_job
+  attr_accessor :skip_geocoding, :skip_callback_job, :use_default_record
 
   class << self
     def location_attrs

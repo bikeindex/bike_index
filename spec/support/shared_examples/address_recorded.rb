@@ -8,9 +8,10 @@ RSpec.shared_examples "address_recorded" do
   describe "Callbacks::AddressRecordUpdateAssociationsJob updates" do
     let(:job) { Callbacks::AddressRecordUpdateAssociationsJob }
 
-    # users have specific handling - which is tested in the job spec
-    unless subject.class.name == "User"
-      it "is updated from the job" do
+    it "is updated from the job" do
+      # users have specific handling - which is tested in the job spec
+      unless subject.class.name == "User"
+
         expect(instance.address_record.id).to eq address_record.id
         expect(instance.to_coordinates.any?).to be_falsey
         expect(address_record.reload.to_coordinates.any?).to be_truthy
