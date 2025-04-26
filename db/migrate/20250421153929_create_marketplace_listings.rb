@@ -6,7 +6,6 @@ class CreateMarketplaceListings < ActiveRecord::Migration[8.0]
       t.references :buyer
       t.references :item, polymorphic: true
       t.references :address_record
-      t.references :primary_activity
 
       t.float :latitude
       t.float :longitude

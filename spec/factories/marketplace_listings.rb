@@ -5,8 +5,8 @@ FactoryBot.define do
     item { FactoryBot.create(:bike) }
     amount_cents { 5_000 }
 
-    condition { MarketplaceListing.conditions.first }
-    status { MarketplaceListing.statuses.first }
+    # condition { MarketplaceListing.conditions.keys.first }
+    status { "draft" }
 
     trait :for_sale do
       for_sale_at { Time.current - 1.minute }

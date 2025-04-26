@@ -15,6 +15,13 @@
             = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
 
 
+          = f.fields_for :current_marketplace_listing, MarketplaceListing.find_or_build_current_for(@bike) do |ml|
+            .form-group.row.unnested-field.no-divider-row
+              = ml.label :condition, t(".condition"), class: "form-well-label"
+              .form-well-input
+                = ml.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
+            -# = builder.fields_for :address_record do |address_form|
+              -# = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form))
 
 
           = render "/shared/form_well_footer_save"

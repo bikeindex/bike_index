@@ -14,6 +14,14 @@ FactoryBot.define do
       after(:create) { |u| u.confirm(u.confirmation_token) }
     end
 
+    trait :with_address_record do
+      address_record { FactoryBot.build(:address_record, kind: :user) }
+
+      after(:create) do |user, _evaluator|
+        user.address_record.update(user_id: user.id)
+      end
+    end
+
     factory :user_confirmed, traits: [:confirmed] do
       factory :user_bikehub_signup do
         partner_data { {sign_up: "bikehub"} }

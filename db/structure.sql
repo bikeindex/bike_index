@@ -2177,7 +2177,6 @@ CREATE TABLE public.marketplace_listings (
     item_type character varying,
     item_id bigint,
     address_record_id bigint,
-    primary_activity_id bigint,
     latitude double precision,
     longitude double precision,
     for_sale_at timestamp(6) without time zone,
@@ -6210,13 +6209,6 @@ CREATE INDEX index_marketplace_listings_on_buyer_id ON public.marketplace_listin
 --
 
 CREATE INDEX index_marketplace_listings_on_item ON public.marketplace_listings USING btree (item_type, item_id);
-
-
---
--- Name: index_marketplace_listings_on_primary_activity_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_marketplace_listings_on_primary_activity_id ON public.marketplace_listings USING btree (primary_activity_id);
 
 
 --

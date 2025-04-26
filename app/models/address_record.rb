@@ -36,7 +36,7 @@ class AddressRecord < ApplicationRecord
   belongs_to :country
   belongs_to :region_record, class_name: "State"
 
-  has_many :address_records
+  has_many :marketplace_listings
 
   before_validation :set_calculated_attributes
   after_validation :address_record_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
@@ -71,6 +71,10 @@ class AddressRecord < ApplicationRecord
     def default_visibility_for(kind)
       (kind == "organization") ? :street : :postal_code
     end
+  end
+
+  def to_coordinates
+    [latitude, longitude]
   end
 
   def address_hash(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)

@@ -105,7 +105,10 @@ RSpec.describe Bikes::EditsController, type: :request do
     end
   end
   describe "marketplace" do
-    it "redirects"
+    it "redirects" do
+      get "#{base_url}/marketplace"
+      expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
+    end
     context "with can_create_listing?" do
       let(:bike_creator) { FactoryBot.create(:superuser) }
 
@@ -119,7 +122,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         # Because user is bike#user
         expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
         # If passed an unknown template, it renders default template
-        get base_url, params: {id: bike.id, edit_template: "marketplace"}
+        get "#{base_url}/marketplace"
         expect(response).to render_template(:marketplace)
       end
     end

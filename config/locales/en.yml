@@ -737,6 +737,14 @@ en:
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
         throttle: Electric Throttle
+      marketplace_listing:
+        condition:
+          new_in_box: new in box
+          like_new: like new
+          excellent: excellent
+          good: good
+          fair: fair
+          salvage: salvage
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.
@@ -1496,6 +1504,9 @@ en:
       groups_and_organizations: Groups and Organizations
       other_organizations: Other organizations
       remove: Remove
+    marketplace:
+      condition: Condition
+      choose_condition: Choose condition
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button
