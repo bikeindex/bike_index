@@ -1,10 +1,15 @@
-<% @user = User.new %>
-<% @user.address_record = AddressRecord.new(country: Country.united_states) %>
-<%= form_for @user, url: my_account_path, method: :patch, multipart: true do |f| %>
-  <%= f.fields_for :address_record do |address_form| %>
-    <%= render(LegacyFormWell::AddressRecordWithDefault::Component.new(
+<% user_id = ENV.fetch("LOOKBOOK_USER_ID", nil) %>
+<% @user = user_id.present? ? User.find(user_id) : User.new %>
+<% @bike = @user.bikes.first || Bike.new %>
+
+<%= form_with(model: @bike, multipart: true, html: { class: 'primary-edit-bike-form' }) do |f| %>
+  <%= f.fields_for :current_marketplace_listing, MarketplaceListing.find_or_build_current_for(@bike) do |ml| %>
+    <%= ml.fields_for :address_record do |address_form| %>
+      <%# Here we provide the form_builder to the component %>
+      <%= render(LegacyFormWell::AddressRecordWithDefault::Component.new(
         form_builder: address_form,
         user: @user
-    )) %>
+      )) %>
+    <% end %>
   <% end %>
 <% end %>

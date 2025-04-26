@@ -11,6 +11,8 @@ module LegacyFormWell::AddressRecordWithDefault
     private
 
     def render_use_default_record?
+      return false if @user.address_record.blank?
+
       true
     end
   end

@@ -2,11 +2,12 @@
 
 module LegacyFormWell::AddressRecord
   class Component < ApplicationComponent
-    def initialize(form_builder:, organization: nil, no_street: false)
+    def initialize(form_builder:, organization: nil, no_street: false, not_related_fields: false)
       @builder = form_builder
       @no_street = no_street
       @organization = organization
       @initial_country_id = form_builder.object.country_id
+      @wrapper_class = not_related_fields ? "" : "related-fields"
     end
 
     private

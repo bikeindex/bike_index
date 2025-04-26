@@ -10,7 +10,7 @@ RSpec.shared_examples "address_recorded" do
 
     it "is updated from the job" do
       # users have specific handling - which is tested in the job spec
-      unless subject.class.name == "User"
+      unless subject.instance_of?(User)
 
         expect(instance.address_record.id).to eq address_record.id
         expect(instance.to_coordinates.any?).to be_falsey

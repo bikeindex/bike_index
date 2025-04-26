@@ -42,7 +42,7 @@ class AddressRecord < ApplicationRecord
   after_validation :address_record_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
   after_commit :update_associations
 
-  attr_accessor :skip_geocoding, :skip_callback_job, :use_default_record
+  attr_accessor :skip_geocoding, :skip_callback_job
 
   class << self
     def location_attrs
@@ -132,6 +132,16 @@ class AddressRecord < ApplicationRecord
     else
       region_record.present? ? region_record.abbreviation : region_string
     end
+  end
+
+  def use_default_record=(val)
+    @use_default_record = InputNormalizer.boolean(val)
+  end
+
+  def use_default_record
+    return @use_default_record if defined?(@use_default_record)
+
+    user.address_record_id == id
   end
 
   private

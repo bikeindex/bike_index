@@ -153,7 +153,7 @@ class Bike < ApplicationRecord
   has_many :theft_alerts
   has_many :marketplace_listings, as: :item
 
-  has_one :current_marketplace_listing, -> { current }, class_name: 'MarketplaceListing', as: :item
+  has_one :current_marketplace_listing, -> { current }, class_name: "MarketplaceListing", as: :item
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records

@@ -50,7 +50,7 @@ export class CollapseUtils {
    */
   static show (element, duration) {
     // Return early if already visible
-    if (this.isVisible(element)) return;
+    if (this.isVisible(element)) return
     // Remove the hidden
     element.classList.remove('tw:hidden!')
     // First, ensure the hidden attributes are set
@@ -76,7 +76,7 @@ export class CollapseUtils {
    */
   static hide (element, duration) {
     // Return early if already hidden
-    if (!this.isVisible(element)) return;
+    if (!this.isVisible(element)) return
 
     // Always add transition classes (moving toward a more generalizable collapse method)
     element.classList.add('tw:transition-all', `tw:duration-${duration}`)
@@ -100,9 +100,9 @@ export class CollapseUtils {
    */
   static isVisible (element) {
     // check display, visibility and opacity
-    if (window.getComputedStyle(element).display === 'none') return false;
-    if (window.getComputedStyle(element).visibility === 'hidden') return false;
-    if (window.getComputedStyle(element).opacity === '0') return false;
+    if (window.getComputedStyle(element).display === 'none') return false
+    if (window.getComputedStyle(element).visibility === 'hidden') return false
+    if (window.getComputedStyle(element).opacity === '0') return false
 
     return true
   }
