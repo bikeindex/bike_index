@@ -56,13 +56,20 @@ class MarketplaceListing < ApplicationRecord
     # Only works for bikes currently...
     def find_or_build_current_for(item, condition: :good)
       item.marketplace_listings.current.first ||
-        new(status: :draft, item:, seller: item.user, address_record: item.user&.address_record, condition:)
+        new(status: :draft, item:, seller: item.user, address_record: item_address_record(item), condition:)
     end
 
     def condition_humanized(str)
       return nil unless CONDITION_ENUM.key?(str&.to_sym)
 
       I18n.t(str, scope: %i[activerecord enums marketplace_listing condition])
+    end
+
+    private
+
+    def item_address_record(item)
+      item.user&.address_record ||
+        AddressRecord.new(user: item.user, kind: :marketplace_listing)
     end
   end
 end

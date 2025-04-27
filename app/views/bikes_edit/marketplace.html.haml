@@ -1,3 +1,4 @@
+= javascript_importmap_tags
 
 = form_with(model: @bike, multipart: true, html: { class: 'primary-edit-bike-form' }) do |f|
   - if params[:return_to].present?
@@ -20,8 +21,10 @@
               = ml.label :condition, t(".condition"), class: "form-well-label"
               .form-well-input
                 = ml.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
-            -# = builder.fields_for :address_record do |address_form|
-              -# = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form))
+
+            = ml.fields_for :address_record do |address_form|
+              = render(LegacyFormWell::AddressRecordWithDefault::Component.new(form_builder: address_form, user: @bike.user))
+
 
 
           = render "/shared/form_well_footer_save"

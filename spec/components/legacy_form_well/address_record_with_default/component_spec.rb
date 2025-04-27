@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :component do
   let(:user) { FactoryBot.create(:user) }
-  let(:address_record) { }
+  let(:address_record) {}
   let(:organization) { nil }
   let(:options) { {form_builder:, organization:, no_street: user.no_address?} }
   let(:bike) { FactoryBot.create(:bike, :with_ownership, user:) }
@@ -12,7 +12,7 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :compo
 
   def rendered_component(passed_bike, passed_user)
     render_in_view_context do
-      form_with(model: passed_bike, multipart: true, html: { class: 'primary-edit-bike-form' }) do |f|
+      form_with(model: passed_bike, multipart: true, html: {class: "primary-edit-bike-form"}) do |f|
         f.fields_for :current_marketplace_listing do |ml|
           ml.fields_for :address_record do |address_form|
             # Here we provide the form_builder to the component
@@ -39,6 +39,8 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :compo
     expect(user.reload.address_record).to be_blank
 
     expect(component).to_not have_text("Use account address")
+
+    expect(component).to have_field("bike[current_marketplace_listing_attributes][address_record_attributes][postal_code]", visible: true)
   end
 
   context "with user address" do
@@ -49,7 +51,9 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :compo
       expect(marketplace_listing.address_record.user_account_address).to be_truthy
 
       expect(component).to have_text("Use account address")
-      expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
+      expect(component).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
+
+      expect(component).to_not have_field("bike[current_marketplace_listing_attributes][address_record_attributes][postal_code]", visible: true)
     end
 
     context "marketplace_listing address" do
@@ -61,7 +65,9 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :compo
         expect(marketplace_listing.address_record.user_account_address).to be_truthy
 
         expect(component).to have_text("Use account address")
-        expect(page).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
+        expect(component).to have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
+
+        expect(component).to_not have_field("bike[current_marketplace_listing_attributes][address_record_attributes][postal_code]", visible: true)
       end
 
       context "non-user address record" do
@@ -72,7 +78,7 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, type: :compo
           expect(marketplace_listing.address_record.user_account_address).to be_falsey
 
           expect(component).to have_text("Use account address")
-          expect(page).to_not have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
+          expect(component).to_not have_checked_field("bike[current_marketplace_listing_attributes][address_record_attributes][user_account_address]")
         end
       end
     end

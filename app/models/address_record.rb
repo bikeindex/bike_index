@@ -119,6 +119,10 @@ class AddressRecord < ApplicationRecord
     country&.iso
   end
 
+  def country_name
+    country&.name
+  end
+
   def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     f_hash = address_hash(visible_attribute:, render_country:, current_country_id:, current_country_iso:)
     arr = f_hash.values_at(:street, :city)

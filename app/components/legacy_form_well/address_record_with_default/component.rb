@@ -6,6 +6,12 @@ module LegacyFormWell::AddressRecordWithDefault
       @builder = form_builder
       @user = user
       @no_street = no_street
+
+      @address_static_fields = if render_user_account_address?
+        @builder.object.user_account_address ? :shown : :hidden
+      else
+        false
+      end
     end
 
     private
