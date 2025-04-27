@@ -9,7 +9,7 @@ export default class extends Controller {
     this.toggleUseAccount()
   }
 
-  toggleUseAccount() {
+  toggleUseAccount () {
     if (this.useAccountCheckboxTarget.checked) {
       this.staticFieldsTargets.forEach(targ => {
         collapse('show', targ)
