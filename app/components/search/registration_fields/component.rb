@@ -21,6 +21,10 @@ module Search::RegistrationFields
 
     private
 
+    def location_wrap_hidden?
+      @stolenness != "proximity" # also true for marketplace
+    end
+
     def include_stolenness?
       true # will be false for versions and marketplace
     end
