@@ -156,10 +156,7 @@ class BikesController < Bikes::BaseController
   def update
     if params[:bike].present?
       begin
-        # TODO: Remove this, should be in updator. Probably using BParam.safe_bike_attrs
-        # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
-        b_params = {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}.as_json
-        @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params:, current_ownership: @current_ownership).update_available_attributes
+        @bike = BikeUpdator.new(user: current_user, bike: @bike, params:, current_ownership: @current_ownership).update_available_attributes
       rescue => e
         flash[:error] = e.message
         # Sometimes, weird things error. In production, Don't show a 500 page to the user

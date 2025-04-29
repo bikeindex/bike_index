@@ -92,7 +92,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def update
-    updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}.as_json)
+    updator = BikeUpdator.new(user: current_user, bike: @bike, params:)
     updator.update_ownership
     updator.update_stolen_record
     if params[:mark_recovered_reason].present?

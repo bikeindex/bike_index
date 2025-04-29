@@ -2,18 +2,18 @@ class BikeUpdatorError < StandardError
 end
 
 class BikeUpdator
-  def initialize(creation_params = {})
-    @user = creation_params[:user]
-    @bike_params = creation_params[:b_params]
-    @bike = creation_params[:bike] || find_bike
-    @current_ownership = creation_params[:current_ownership]
-    @currently_stolen = @bike.status_stolen?
+  def self.permitted_params(params, _user)
+    # TODO: Remove this, should be in updator. Probably using BParam.safe_bike_attrs
+    # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
+    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}.as_json
   end
 
-  def find_bike
-    Bike.unscoped.find(@bike_params["id"])
-  rescue
-    raise BikeUpdatorError, "Oh no! We couldn't find that bike"
+  def initialize(user:, bike:, current_ownership: nil, params: nil, permitted_params: nil)
+    @user = user
+    @bike_params = permitted_params || self.class.permitted_params(params, @user)
+    @bike = bike
+    @current_ownership = current_ownership
+    @currently_stolen = @bike.status_stolen?
   end
 
   def update_ownership
