@@ -3,7 +3,7 @@ end
 
 class BikeUpdator
   def self.permitted_params(params, _user)
-    # TODO: Remove this, should be in updator. Probably using BParam.safe_bike_attrs
+    # TODO: improve this. Maybe using BParam.safe_bike_attrs
     # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
     {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}.as_json
   end
