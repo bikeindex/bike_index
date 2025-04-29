@@ -65,6 +65,13 @@ class MarketplaceListing < ApplicationRecord
       I18n.t(str, scope: %i[activerecord enums marketplace_listing condition])
     end
 
+    def seller_permitted_parameters
+      [
+        :condition, :amount,
+        address_record_attributes: (AddressRecord.permitted_params + %i[user_account_address id])
+      ].freeze
+    end
+
     private
 
     def item_address_record(item)

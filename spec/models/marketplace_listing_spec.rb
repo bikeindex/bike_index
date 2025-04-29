@@ -78,4 +78,70 @@ RSpec.describe MarketplaceListing, type: :model do
       end
     end
   end
+
+  describe "permitted_update" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let!(:user) { bike.reload.user }
+    let(:params) { ActionController::Parameters.new(nested_params) }
+    let!(:current_ownership) { bike.current_ownership }
+    let(:address_record) { nil }
+    let(:default_address_record_attrs) do
+      {
+        country_id: Country.canada_id.to_s,
+        city: "Edmonton",
+        region_record_id: "",
+        region_string: "AB",
+        postal_code: "AB T6G 2B3",
+        user_account_address: "0",
+        id: address_record&.id
+
+      }
+    end
+    let(:address_record_attributes) { default_address_record_attrs }
+
+    let(:nested_params) do
+      {
+        bike: {
+          current_marketplace_listing_attributes: {
+            condition:"fair",
+            amount: "300.69",
+            address_record_attributes:
+          }
+        }
+      }
+    end
+    let(:b_params) { {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}.as_json }
+    let(:target_address_attrs) { default_address_record_attrs.merge(user_id: user.id, kind: :marketplace_listing, publicly_visible_attribute: :postal_code) }
+
+    shared_examples_for 'user_account_address: false' do
+      it "permits the expected active controller params" do
+        expect do
+          updated_bike = BikeUpdator.new(user:, bike:, b_params:, current_ownership:).update_available_attributes
+          pp updated_bike.errors.full_messages
+        end.to change(MarketplaceListing, :count).by(1)
+          .and change(AddressRecord, :count).by 1
+
+        bike.reload
+        expect(bike.current_marketplace_listing).to be_present
+        marketplace_listing = bike.current_marketplace_listing
+        expect(marketplace_listing.amount_cents).to eq 30069
+        expect(marketplace_listing.condition).to eq "fair"
+        expect(marketplace_listing.address_record_id).to be_present
+        expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
+      end
+    end
+
+    it_behaves_like 'user_account_address: false'
+
+    # context "existing user_account_address" do
+    #   let!(:address_record) { FactoryBot.create(:address_record, user:, kind: :user) }
+
+    #   it_behaves_like 'user_account_address: false'
+
+    #   context 'with user_account_address: true'
+    #     it "uses the address_record" do
+
+    #   end
+    # end
+  end
 end

@@ -189,7 +189,7 @@ RSpec.describe BikeUpdator do
     end
   end
 
-  it "enque listing order working" do
+  it "enqueue listing order working" do
     Sidekiq::Testing.fake!
     bike = FactoryBot.create(:bike)
     ownership = FactoryBot.create(:ownership, bike: bike)
