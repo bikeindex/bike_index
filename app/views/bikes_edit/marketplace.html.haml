@@ -17,10 +17,15 @@
 
 
           = f.fields_for :current_marketplace_listing, MarketplaceListing.find_or_build_current_for(@bike) do |ml|
-            .form-group.row.unnested-field.no-divider-row
-              = ml.label :condition, t(".condition"), class: "form-well-label"
-              .form-well-input
-                = ml.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
+            = render LegacyFormWell::FormGroupRow::Component.new(form_builder: ml, label: :condition, label_translation: t(".condition"), row_classes: "unnested-field no-divider-row") do
+              = ml.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
+
+            .form-group.row.unnested-field
+              = ml.label :amount, t(".price"), class: 'form-well-label'
+              .form-well-input.input-group{ style: 'max-height: 2.5rem;'}
+                .input-group-addon
+                  = current_currency.symbol
+                = ml.number_field :amount, min: '0', class: 'form-control'
 
             = ml.fields_for :address_record do |address_form|
               = render(LegacyFormWell::AddressRecordWithDefault::Component.new(form_builder: address_form, user: @bike.user))

@@ -107,7 +107,7 @@
               - unless labeled
                 = t(".confirmed_emails")
                 - labeled = true
-            %p.form-well-input-static
+            %p.form-well-input-static{style: "overflow-x: scroll"}
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post, class: "d-block"

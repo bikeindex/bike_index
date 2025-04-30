@@ -1507,6 +1507,7 @@ en:
     marketplace:
       choose_condition: Choose condition
       condition: Condition
+      price: Price
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button

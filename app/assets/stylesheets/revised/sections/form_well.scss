@@ -186,7 +186,8 @@
 // XS screens
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .form-well {
-    .form-well-input {
+    .form-well-input,
+    .form-well-input-static {
       @include make-col(8);
     }
 
