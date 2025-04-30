@@ -3,5 +3,5 @@ en:
   components:
     legacy_form_well:
       address_record_with_default:
+        edit_my_account_path: edit on my account
         use_account_address: Use account address
-        edit_my_account_path: "edit on my account"

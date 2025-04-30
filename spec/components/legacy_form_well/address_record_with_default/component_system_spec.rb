@@ -11,15 +11,6 @@ RSpec.describe LegacyFormWell::AddressRecordWithDefault::Component, :js, type: :
   let(:bike) { FactoryBot.create(:bike, :with_ownership, user:) }
   let(:marketplace_listing) { MarketplaceListing.find_or_build_current_for(bike) }
 
-  # it "default preview" do
-  #   FactoryBot.create(:state_california)
-  #   FactoryBot.create(:state_new_york)
-  #   Country.canada
-  #   address_record_with_default
-  #   visit(preview_path)
-
-  #   expect(page).to have_content "Use default address"
-  # end
   before do
     FactoryBot.create(:state_california)
     Country.united_states

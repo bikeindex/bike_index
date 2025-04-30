@@ -280,7 +280,7 @@ class User < ApplicationRecord
   end
 
   def can_create_listing?
-    superuser? || Flipper.enabled?(:create_listing, self)
+    superuser? || member?
   end
 
   def to_param

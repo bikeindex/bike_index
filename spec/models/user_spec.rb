@@ -858,8 +858,8 @@ RSpec.describe User, type: :model do
         expect(user.can_create_listing?).to be_truthy
       end
     end
-    context "feature enabled" do
-      before { Flipper.enable_actor(:create_listing, user) }
+    context "member" do
+      let!(:membership) { FactoryBot.create(:membership, user:) }
       it "returns true" do
         expect(user.can_create_listing?).to be_truthy
       end

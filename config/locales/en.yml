@@ -730,6 +730,14 @@ en:
         forward: Forward facing
         other: Not handlebars
         rearward: Rear facing
+      marketplace_listing:
+        condition:
+          excellent: excellent
+          fair: fair
+          good: good
+          like_new: like new
+          new_in_box: new in box
+          salvage: salvage
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Cycle (hand pedal)
@@ -737,14 +745,6 @@ en:
         pedal_assist: Pedal Assist
         pedal_assist_and_throttle: Pedal Assist and Throttle
         throttle: Electric Throttle
-      marketplace_listing:
-        condition:
-          new_in_box: new in box
-          like_new: like new
-          excellent: excellent
-          good: good
-          fair: fair
-          salvage: salvage
     errors:
       messages:
         access_denied: The resource owner or authorization server denied the request.
@@ -1431,6 +1431,9 @@ en:
       version_name: Version Name
       zipcode: Postal code
     bike_fields:
+      primary_activity:
+        choose_activity: Choose activity
+        primary_activity: Primary activity
       revised_colors:
         add_a_color: Add a color
         choose_color: Choose color
@@ -1462,9 +1465,6 @@ en:
         state: State
         where_was_it_stolen_type: Where was it %{stolen_type}?
         zipcode: Postal code
-      primary_activity:
-        choose_activity: Choose activity
-        primary_activity: Primary activity
     drivetrain:
       belt_drive: Belt Drive
       coaster_brake: Coaster Brake
@@ -1505,8 +1505,8 @@ en:
       other_organizations: Other organizations
       remove: Remove
     marketplace:
-      condition: Condition
       choose_condition: Choose condition
+      condition: Condition
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button
@@ -1664,6 +1664,8 @@ en:
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
         groups: Groups and Organizations
+        marketplace_list: List for sale
+        marketplace_on_sale: Update marketplace listing
         photos: Photos
         publicize: Share on Social Media
         remove: Hide or Delete
@@ -1672,8 +1674,6 @@ en:
         report_stolen: Report Stolen or Missing
         theft_details: Theft details
         versions: Versions
-        marketplace_on_sale: Update marketplace listing
-        marketplace_list: List for sale
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
