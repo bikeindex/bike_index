@@ -13,6 +13,13 @@ class Callbacks::AddressRecordUpdateAssociationsJob < ApplicationJob
       if address_record.user.address_record_id == address_record.id
         update_association(address_record, address_record.user)
       end
+    elsif address_record.kind.blank?
+      # Currently just handles marketplace_listings, but can be easily updated!
+      if address_record.marketplace_listings.any?
+        address_record.kind = :marketplace_listing
+        address_record.user_id ||= address_record.marketplace_listings.first.seller_id
+        address_record.update(skip_callback_job: true)
+      end
     end
 
     address_record.marketplace_listings.each { update_association(address_record, _1) }

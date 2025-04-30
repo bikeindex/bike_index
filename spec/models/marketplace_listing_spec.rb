@@ -80,10 +80,10 @@ RSpec.describe MarketplaceListing, type: :model do
   end
 
   describe "permitted_update" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-    let!(:user) { bike.reload.user }
+    let(:user) { FactoryBot.create(:superuser) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
     let(:params) { ActionController::Parameters.new(nested_params) }
-    let!(:current_ownership) { bike.current_ownership }
+    let!(:current_ownership) { bike.reload.current_ownership }
     let(:address_record) { nil }
     let(:default_address_record_attrs) do
       {
@@ -103,45 +103,118 @@ RSpec.describe MarketplaceListing, type: :model do
       {
         bike: {
           current_marketplace_listing_attributes: {
-            condition:"fair",
+            condition: "fair",
             amount: "300.69",
             address_record_attributes:
           }
         }
       }
     end
-    let(:b_params) { {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}.as_json }
-    let(:target_address_attrs) { default_address_record_attrs.merge(user_id: user.id, kind: :marketplace_listing, publicly_visible_attribute: :postal_code) }
+    let(:target_address_attrs) do
+      default_address_record_attrs.except(:id)
+        .merge(user_id: user.id, kind: :marketplace_listing, publicly_visible_attribute: :postal_code)
+    end
 
-    shared_examples_for 'user_account_address: false' do
+    def update_with_bike_updator(user:, bike:, current_ownership:, params:, marketplace_listing_change: 1, address_record_change: 1)
+      Sidekiq::Job.clear_all
+
+      expect do
+        BikeUpdator.new(user:, bike:, params:, current_ownership:).update_available_attributes
+      end.to change(MarketplaceListing, :count).by(marketplace_listing_change)
+        .and change(AddressRecord, :count).by address_record_change
+
+      # Required to set the correct attributes on created address record
+      Callbacks::AddressRecordUpdateAssociationsJob.drain
+
+      bike.reload
+    end
+
+    it "permits the expected active controller params" do
+      update_with_bike_updator(user:, bike:, params:, current_ownership:)
+
+      expect(bike.current_marketplace_listing).to be_present
+      marketplace_listing = bike.current_marketplace_listing
+      expect(marketplace_listing.amount_cents).to eq 30069
+      expect(marketplace_listing.condition).to eq "fair"
+
+      expect(marketplace_listing.address_record_id).to be_present
+      expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
+    end
+
+    context "user can not create listings" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+
+      it "updates the marketplace_listing (not creating)" do
+        expect(user.reload.can_create_listing?).to be_falsey
+        update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0, address_record_change: 0)
+        expect(bike.current_marketplace_listing&.id).to be_blank
+      end
+    end
+
+    context "existing user_account_address" do
+      let!(:address_record) { FactoryBot.create(:address_record, user:, kind: :user) }
+      before do
+        Callbacks::AddressRecordUpdateAssociationsJob.new.perform(address_record.id)
+        expect(user.reload.address_record_id).to be_present
+      end
+
       it "permits the expected active controller params" do
-        expect do
-          updated_bike = BikeUpdator.new(user:, bike:, b_params:, current_ownership:).update_available_attributes
-          pp updated_bike.errors.full_messages
-        end.to change(MarketplaceListing, :count).by(1)
-          .and change(AddressRecord, :count).by 1
+        update_with_bike_updator(user:, bike:, params:, current_ownership:)
 
-        bike.reload
         expect(bike.current_marketplace_listing).to be_present
         marketplace_listing = bike.current_marketplace_listing
         expect(marketplace_listing.amount_cents).to eq 30069
         expect(marketplace_listing.condition).to eq "fair"
+
         expect(marketplace_listing.address_record_id).to be_present
         expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
       end
+
+      context "with user_account_address: true" do
+        let(:address_record_attributes) { default_address_record_attrs.merge(user_account_address: "1") }
+
+        it "uses the address_record" do
+          bike.reload
+          update_with_bike_updator(user:, bike:, params:, current_ownership:, address_record_change: 0)
+          expect(bike.current_marketplace_listing).to be_present
+          marketplace_listing = bike.current_marketplace_listing
+          expect(marketplace_listing.amount_cents).to eq 30069
+          expect(marketplace_listing.condition).to eq "fair"
+
+          expect(marketplace_listing.address_record_id).to eq address_record.id
+          expect(address_record.reload.kind).to eq "user"
+        end
+      end
     end
 
-    it_behaves_like 'user_account_address: false'
+    context "with existing marketplace_listing" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, seller: bike.user, condition: :new_in_box, amount_cents: nil) }
 
-    # context "existing user_account_address" do
-    #   let!(:address_record) { FactoryBot.create(:address_record, user:, kind: :user) }
+      it "doesn't create a new marketplace_listing" do
+        expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
 
-    #   it_behaves_like 'user_account_address: false'
+        update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0)
+        expect(bike.current_marketplace_listing.id).to eq marketplace_listing.id
+        expect(marketplace_listing.reload.amount_cents).to eq 30069
+        expect(marketplace_listing.condition).to eq "fair"
 
-    #   context 'with user_account_address: true'
-    #     it "uses the address_record" do
+        # Updating without passing current_marketplace_listing_attributes doesn't remove the listing
+        BikeUpdator.new(user:, bike:, current_ownership:, permitted_params: {bike: {name: "New name"}}.as_json).update_available_attributes
+        expect(bike.reload.name).to eq "New name"
+        expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
+      end
 
-    #   end
-    # end
+      context "user can not create listings" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
+
+        it "updates the marketplace_listing (not creating)" do
+          expect(user.reload.can_create_listing?).to be_falsey
+          update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0)
+          expect(bike.current_marketplace_listing.id).to eq marketplace_listing.id
+          expect(marketplace_listing.reload.amount_cents).to eq 30069
+          expect(marketplace_listing.condition).to eq "fair"
+        end
+      end
+    end
   end
 end

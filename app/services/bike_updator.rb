@@ -2,16 +2,47 @@ class BikeUpdatorError < StandardError
 end
 
 class BikeUpdator
-  def self.permitted_params(params, _user)
-    # TODO: improve this. Maybe using BParam.safe_bike_attrs
-    # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
-    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}.as_json
+  class << self
+    def permitted_params(params, bike, user)
+      # TODO: improve this entire thing. Maybe using BParam.safe_bike_attrs
+      # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
+      pparams = {
+        bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)
+      }
+      # Have to remove the parameters in case we aren't creating/updating
+      current_marketplace_listing = permitted_marketplace_listing_params(
+        pparams[:bike].delete(:current_marketplace_listing_attributes), bike, user
+      )
+      if current_marketplace_listing.present?
+        pparams[:bike][:current_marketplace_listing_attributes] = current_marketplace_listing
+      end
+
+      pparams.as_json
+    end
+
+    private
+
+    def permitted_marketplace_listing_params(marketplace_listing_attributes, bike, user)
+      return false if marketplace_listing_attributes.blank?
+      return false unless user.can_create_listing? || bike.current_marketplace_listing&.id.present?
+
+      if bike.current_marketplace_listing.present?
+        marketplace_listing_attributes[:id] = bike.current_marketplace_listing.id
+      end
+
+      if InputNormalizer.boolean(marketplace_listing_attributes[:address_record_attributes][:user_account_address])
+        marketplace_listing_attributes.delete(:address_record_attributes)
+        marketplace_listing_attributes[:address_record_id] = user.address_record_id
+      end
+
+      marketplace_listing_attributes
+    end
   end
 
   def initialize(user:, bike:, current_ownership: nil, params: nil, permitted_params: nil)
     @user = user
-    @bike_params = permitted_params || self.class.permitted_params(params, @user)
     @bike = bike
+    @bike_params = permitted_params || self.class.permitted_params(params, bike, user)
     @current_ownership = current_ownership
     @currently_stolen = @bike.status_stolen?
   end

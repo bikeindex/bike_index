@@ -47,6 +47,8 @@ class MarketplaceListing < ApplicationRecord
   validates_presence_of :seller_id
   validates_presence_of :status
 
+  before_validation :set_calculated_attributes
+
   scope :current, -> { where(status: CURRENT_STATUSES) }
 
   # validate that there isn't another current listing for an item
@@ -68,7 +70,7 @@ class MarketplaceListing < ApplicationRecord
     def seller_permitted_parameters
       [
         :condition, :amount,
-        address_record_attributes: (AddressRecord.permitted_params + %i[user_account_address id])
+        address_record_attributes: (AddressRecord.permitted_params + %i[user_account_address])
       ].freeze
     end
 
@@ -78,5 +80,12 @@ class MarketplaceListing < ApplicationRecord
       item.user&.address_record ||
         AddressRecord.new(user: item.user, kind: :marketplace_listing)
     end
+  end
+
+  private
+
+  def set_calculated_attributes
+    self.seller_id ||= item.user&.id
+    self.status ||= :draft
   end
 end
