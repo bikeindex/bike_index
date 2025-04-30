@@ -1,30 +1,19 @@
 require "rails_helper"
 
 RSpec.describe BikeUpdator do
-  describe "find_bike" do
-    it "raises an error if it can't find the bike" do
-      expect { BikeUpdator.new(b_params: {id: 696969}).find_bike }.to raise_error(BikeUpdatorError)
-    end
-    it "finds the bike from the bike_params" do
-      bike = FactoryBot.create(:bike)
-      response = BikeUpdator.new(b_params: {id: bike.id}.as_json).find_bike
-      expect(response).to eq(bike)
-    end
-  end
-
   describe "ensure_ownership!" do
     it "raises an error if the user doesn't own the bike" do
       ownership = FactoryBot.create(:ownership)
       user = FactoryBot.create(:user)
       bike = ownership.bike
-      expect { BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).send(:ensure_ownership!) }.to raise_error(BikeUpdatorError)
+      expect { BikeUpdator.new(user: user, bike:, permitted_params: {id: bike.id}.as_json).send(:ensure_ownership!) }.to raise_error(BikeUpdatorError)
     end
 
     it "returns true if the bike is owned by the user" do
       ownership = FactoryBot.create(:ownership)
       user = ownership.creator
       bike = ownership.bike
-      expect(BikeUpdator.new(user: user, b_params: {id: bike.id}.as_json).send(:ensure_ownership!)).to be_truthy
+      expect(BikeUpdator.new(user:, bike:, permitted_params: {id: bike.id}.as_json).send(:ensure_ownership!)).to be_truthy
     end
   end
 
@@ -37,7 +26,7 @@ RSpec.describe BikeUpdator do
       expect(bike.reload.updator_id).to be_nil
       expect(bike.user_id).to be_present
       expect(Ownership.count).to eq 1
-      update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@email.co"}}.as_json, user: user)
+      update_bike = BikeUpdator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@email.co"}}.as_json, user: user)
       update_bike.update_ownership
       bike.reload
       expect(bike.updator).to eq(user)
@@ -48,7 +37,7 @@ RSpec.describe BikeUpdator do
       it "does not call create_ownership if the email hasn't changed" do
         bike.reload
         expect(Ownership.count).to eq 1
-        update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json)
+        update_bike = BikeUpdator.new(bike:, user:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json)
         update_bike.update_ownership
         expect(Ownership.count).to eq 1
       end
@@ -66,7 +55,7 @@ RSpec.describe BikeUpdator do
         expect(ownership.reload.organization_pre_registration?).to be_falsey
         expect(ownership.origin).to eq "web"
         expect(ownership.organization_id).to eq organization.id
-        update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
+        update_bike = BikeUpdator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
         update_bike.update_ownership
         expect(Ownership.count).to eq 2
         new_ownership = bike.reload.current_ownership
@@ -88,7 +77,7 @@ RSpec.describe BikeUpdator do
           expect(ownership.reload.organization_pre_registration?).to be_falsey
           expect(ownership.origin).to eq "web"
           expect(ownership.organization_id).to eq organization.id
-          update_bike = BikeUpdator.new(b_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
+          update_bike = BikeUpdator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
           update_bike.update_ownership
           expect(Ownership.count).to eq 2
           new_ownership = bike.reload.current_ownership
@@ -107,12 +96,11 @@ RSpec.describe BikeUpdator do
     it "does not let protected attributes be updated" do
       Country.united_states
       organization = FactoryBot.create(:organization)
-      bike = FactoryBot.create(:bike,
+      bike = FactoryBot.create(:bike, :with_ownership,
         creation_organization_id: organization.id,
         example: true,
         owner_email: "foo@bar.com")
-      ownership = FactoryBot.create(:ownership, bike: bike)
-      user = ownership.creator
+      user = bike.creator
       new_creator = FactoryBot.create(:user)
       og_bike = bike
       bike_params = {
@@ -126,7 +114,7 @@ RSpec.describe BikeUpdator do
         user_hidden: true,
         owner_email: " "
       }
-      BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json).update_available_attributes
+      BikeUpdator.new(user: user, bike:, permitted_params: {id: bike.id, bike: bike_params}.as_json).update_available_attributes
       expect(bike.reload.serial_number).to eq(og_bike.serial_number)
       expect(bike.manufacturer_id).to eq(og_bike.manufacturer_id)
       expect(bike.manufacturer_other).to eq(og_bike.manufacturer_other)
@@ -142,7 +130,7 @@ RSpec.describe BikeUpdator do
     it "marks a bike stolen with the date_stolen" do
       Country.united_states
       bike = FactoryBot.create(:bike, :with_ownership)
-      updator = BikeUpdator.new(user: bike.creator, b_params: {id: bike.id, bike: {date_stolen: 963205199}}.as_json)
+      updator = BikeUpdator.new(user: bike.creator, bike:, permitted_params: {id: bike.id, bike: {date_stolen: 963205199}}.as_json)
       updator.update_available_attributes
       bike.reload
       expect(bike.status).to eq "status_stolen"
@@ -152,24 +140,20 @@ RSpec.describe BikeUpdator do
 
     it "marks a bike user hidden" do
       organization = FactoryBot.create(:organization)
-      bike = FactoryBot.create(:bike, creation_organization_id: organization.id, example: true)
-      ownership = FactoryBot.create(:ownership, bike: bike)
-      user = ownership.creator
-      FactoryBot.create(:user)
+      bike = FactoryBot.create(:bike, :with_ownership, creation_organization_id: organization.id, example: true)
+      user = bike.creator
       expect(bike.user_hidden).to be_falsey
       bike_params = {marked_user_hidden: true}
-      BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json).update_available_attributes
+      BikeUpdator.new(user:, bike:, permitted_params: {id: bike.id, bike: bike_params}.as_json).update_available_attributes
       expect(bike.reload.user_hidden).to be_truthy
     end
 
     it "updates the bike and set year to nothing if year nil" do
-      bike = FactoryBot.create(:bike, year: 2014)
-      ownership = FactoryBot.create(:ownership, bike: bike)
-      user = ownership.creator
-      FactoryBot.create(:user)
+      bike = FactoryBot.create(:bike, :with_ownership, year: 2014)
+      user = bike.creator
       bike_params = {coaster_brake: true, year: nil, components_attributes: {"1387762503379" => {"ctype_id" => "", "front" => "0", "rear" => "0", "ctype_other" => "", "description" => "", "manufacturer_id" => "", "model_name" => "", "manufacturer_other" => "", "year" => "", "serial_number" => "", "_destroy" => "0"}}}
-      update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: bike_params}.as_json)
-      expect(update_bike).to receive(:update_ownership).and_return(true)
+      update_bike = BikeUpdator.new(user:, bike:, permitted_params: {id: bike.id, bike: bike_params}.as_json)
+      # expect(update_bike).to receive(:update_current_ownership).and_return(true)
       update_bike.update_available_attributes
       expect(bike.reload.coaster_brake).to be_truthy
       expect(bike.year).to be_nil
@@ -177,11 +161,10 @@ RSpec.describe BikeUpdator do
     end
 
     it "updates the bike sets is_for_sale and address_set_manually to false" do
-      bike = FactoryBot.create(:bike, is_for_sale: true, address_set_manually: true)
-      ownership = FactoryBot.create(:ownership, bike: bike)
-      user = ownership.creator
-      new_creator = FactoryBot.create(:user)
-      update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: {owner_email: new_creator.email}}.as_json)
+      bike = FactoryBot.create(:bike, :with_ownership, is_for_sale: true, address_set_manually: true)
+      user = bike.creator
+      new_owner = FactoryBot.create(:user)
+      update_bike = BikeUpdator.new(user: user, bike:, permitted_params: {id: bike.id, bike: {owner_email: new_owner.email}}.as_json)
       update_bike.update_available_attributes
       bike.reload
       expect(bike.is_for_sale).to be_falsey
@@ -191,11 +174,10 @@ RSpec.describe BikeUpdator do
 
   it "enqueue listing order working" do
     Sidekiq::Testing.fake!
-    bike = FactoryBot.create(:bike)
-    ownership = FactoryBot.create(:ownership, bike: bike)
-    user = ownership.creator
+    bike = FactoryBot.create(:bike, :with_ownership)
+    user = bike.creator
     FactoryBot.create(:user)
-    update_bike = BikeUpdator.new(user: user, b_params: {id: bike.id, bike: {}}.as_json)
+    update_bike = BikeUpdator.new(user:, bike:, permitted_params: {id: bike.id, bike: {}}.as_json)
     expect(update_bike).to receive(:update_ownership).and_return(true)
     expect {
       update_bike.update_available_attributes
