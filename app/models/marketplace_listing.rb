@@ -86,6 +86,34 @@ class MarketplaceListing < ApplicationRecord
     CURRENT_STATUSES.include?(status&.to_sym)
   end
 
+  def item_type
+    item&.type_titleize || "bike"
+  end
+
+  def publish!
+    return false unless valid_publishable?
+
+    update(published_at: Time.current, status: "for_sale")
+    item&.update(is_for_sale: true) # Only relevant to bikes
+    true
+  end
+
+  def valid_publishable?
+    if item.blank? || !item.current?
+      # Ensure the item is still around and visible
+      errors.add(:base, :item_not_visible, item_type:)
+    elsif item.primary_activity.blank?
+      errors.add(:base, :primary_activity_required, item_type:)
+    end
+
+    errors.add(:base, :price_required) if amount_cents.blank?
+    errors.add(:base, :condition_required) if condition.blank?
+
+    errors.add(:base, :address_required) unless address_record&.address_present?
+
+    errors.none?
+  end
+
   def bike_ownership
     return nil unless item_type == "Bike"
 

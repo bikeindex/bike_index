@@ -172,6 +172,8 @@ Rails.application.routes.draw do
   resources :impound_claims, only: [:create, :update]
   resources :review_impound_claims, only: [:show, :update]
 
+  resources :marketplace_listings, only: %i[update]
+
   namespace :admin do
     root to: "dashboard#index", as: :root
     resources :ambassador_tasks, except: :show

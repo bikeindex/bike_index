@@ -52,6 +52,8 @@ RSpec.describe BikeUpdator do
       let(:status) { :draft }
       let(:published_at) { nil }
       let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, status:, published_at:) }
+      before { bike.update(is_for_sale: true) }
+
       it "updates the marketplace_listing to be removed" do
         Sidekiq::Job.clear_all
 
@@ -65,10 +67,11 @@ RSpec.describe BikeUpdator do
         expect(marketplace_listing.end_at).to be_within(5).of Time.current
         expect(marketplace_listing.status).to eq "removed"
         expect(marketplace_listing.current?).to be_falsey
+        expect(bike.reload.is_for_sale).to be_falsey
       end
 
       context "with published_at" do
-        let(:published_at) { Time.current - 1}
+        let(:published_at) { Time.current - 1 }
         it "updates the marketplace_listing to be removed" do
           Sidekiq::Job.clear_all
 
@@ -82,6 +85,7 @@ RSpec.describe BikeUpdator do
           expect(marketplace_listing.end_at).to be_within(5).of Time.current
           expect(marketplace_listing.status).to eq "sold" # guessed
           expect(marketplace_listing.current?).to be_falsey
+          expect(bike.reload.is_for_sale).to be_falsey
         end
       end
     end

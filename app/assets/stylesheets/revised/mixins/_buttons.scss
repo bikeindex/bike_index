@@ -228,7 +228,8 @@ $btn-border-radius-sm: 1px;
 //
 // Base styles
 //
-.container, .container-fluid, .bootstrapstyle {
+
+.container, .container-fluid, .bootstrapstyle, #dirty-dialog {
   .btn {
     font-family: $header-font-family;
     font-weight: 400;
