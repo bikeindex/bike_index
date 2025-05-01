@@ -6,11 +6,11 @@
 #  amount_cents      :integer
 #  condition         :integer
 #  currency_enum     :integer
-#  for_sale_at       :datetime
+#  end_at            :datetime
 #  item_type         :string
 #  latitude          :float
 #  longitude         :float
-#  sold_at           :datetime
+#  published_at      :datetime
 #  status            :integer
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
@@ -80,6 +80,16 @@ class MarketplaceListing < ApplicationRecord
       item.user&.address_record ||
         AddressRecord.new(user: item.user, kind: :marketplace_listing)
     end
+  end
+
+  def current?
+    CURRENT_STATUSES.include?(status&.to_sym)
+  end
+
+  def bike_ownership
+    return nil unless item_type == "Bike"
+
+    item.ownerships.order(:created_at).claimed.where("claimed_at < ?", created_at).last
   end
 
   private
