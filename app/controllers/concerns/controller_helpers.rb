@@ -41,7 +41,7 @@ module ControllerHelpers
     @request_location_hash ||= IpAddressParser.location_hash(request)
   end
 
-  # TODO: make this actually function
+  # TODO: make this actually use the request location
   def current_currency
     Currency.default
   end

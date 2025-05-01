@@ -250,6 +250,13 @@ nl:
           unauthorized_to_claim: hebben geen toestemming om dit te claimen
         parking_notification:
           address_required: "(of locatie) van deze verlaten fiets vereist"
+        marketplace_listing:
+          address_required: Locatie is vereist - geef minimaal een stad op
+          condition_required: Voorwaarde is vereist
+          item_not_visible: "%{item_type} is niet zichtbaar. Heb je het misschien
+            als verborgen gemarkeerd?"
+          price_required: Prijs is vereist
+          primary_activity_required: Primaire activiteit is vereist
       organization:
         duplicate_short_name: al in gebruik bij een andere organisatie. Als je denkt
           dat dat niet het geval zou moeten zijn, neem dan contact op met support@bikeindex.org
@@ -886,6 +893,14 @@ nl:
         eur: EUR
         mxn: MXN
         usd: USD
+      marketplace_listing:
+        condition:
+          excellent: uitstekend
+          fair: eerlijk
+          good: Goed
+          like_new: als nieuw
+          new_in_box: nieuw in doos
+          salvage: redden
     models:
       ad: Advertentie
       ambassador: Ambassadeur
@@ -2138,6 +2153,8 @@ nl:
         bike_or_version_version: Versie
         versions: versies
         remove_or_transfer: Overdragen, verbergen of verwijderen
+        marketplace_list: Lijst te koop
+        marketplace_on_sale: Marktplaatsvermelding bijwerken
       create:
         bike_was_added: Bike met succes toegevoegd aan de index!
         bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
@@ -2465,6 +2482,12 @@ nl:
           een e-mail naar support@bikeindex.org als u vragen hebt.
         no_active_membership: Als u nog geen actief lidmaatschap heeft, moet u zich
           aanmelden voor een nieuw lidmaatschap.
+    marketplace_listings:
+      ensure_user_allowed_to_edit!:
+        you_dont_own_that: Oh nee! Het lijkt erop dat je die %{item_type} niet hebt.
+      update:
+        item_published_for_sale: Uw %{item_type} is gepubliceerd. Het staat nu te
+          koop!
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5785,8 +5808,6 @@ nl:
         versies en moeten worden bijgewerkt op de originele %{bike_type}-registratie.
         %{bike_registration_link}.
       version_name: Versienaam
-      primary_activity: Primaire activiteit
-      choose_activity: Kies activiteit
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
@@ -5819,6 +5840,9 @@ nl:
         state: Staat
         where_was_it_stolen_type: Waar was het %{stolen_type}?
         zipcode: Postcode
+      primary_activity:
+        choose_activity: Kies activiteit
+        primary_activity: Primaire activiteit
     drivetrain:
       belt_drive: Riemaandrijving
       coaster_brake: Terugtraprem
@@ -5979,6 +6003,10 @@ nl:
       wide: Breed
       wide_help: "> 38 mm (1,5 inch)"
       wide_title: Banden die minimaal 39 mm (1,5 inch) breed zijn
+    marketplace:
+      choose_condition: Kies conditie
+      condition: Voorwaarde
+      price: Prijs
   bike_versions:
     index:
       primary_colors: Primaire kleuren
@@ -6040,3 +6068,7 @@ nl:
         region: Regio / Provincie
         state: Staat
         your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
+        address_no_street: Adres
+      address_record_with_default:
+        edit_my_account_path: bewerken op mijn account
+        use_account_address: Gebruik accountadres

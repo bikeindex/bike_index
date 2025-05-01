@@ -109,8 +109,7 @@ module BikeEditable
   end
 
   def show_listing_link?(bike, user)
-    # initial hacky way of checking if a bike is currently for sale
-    return true if bike.marketplace_listings.current.first.present?
+    return true if bike.current_marketplace_listing&.current?
 
     return false unless bike.status_with_owner?
 
