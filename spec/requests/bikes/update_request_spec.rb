@@ -98,6 +98,68 @@ RSpec.describe "BikesController#update", type: :request do
       end
     end
   end
+  context "updating marketplace_listing" do
+    let(:address_record) { FactoryBot.create(:address_record, :new_york) }
+    let(:current_user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
+    let!(:membership) { FactoryBot.create(:membership, user: current_user) }
+    let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
+    let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
+    let(:state) { FactoryBot.create(:state_california) }
+    let(:address_record_attributes) do
+      {
+        country_id: Country.united_states_id.to_s,
+        city: "Los Angeles",
+        region_record_id: state.id,
+        region_string: "AB",
+        postal_code: "90021",
+        user_account_address: "false",
+        id: address_record&.id
+      }
+    end
+    let(:update_params) do
+      {
+        bike: {
+          primary_activity_id:,
+          current_marketplace_listing_attributes: {
+            condition: "new_in_box",
+            amount: "1442.42",
+            address_record_attributes:
+          }
+        }
+      }
+    end
+    it "creates the listing" do
+      expect(current_user.reload.can_create_listing?).to be_truthy
+      bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
+
+      expect(bike.reload.primary_activity_id).to be_nil
+      expect(bike.updated_by_user_at).to eq bike.created_at
+      expect(bike.not_updated_by_user?).to be_truthy
+      expect(bike.current_ownership.claimed?).to be_truthy
+      expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+
+      VCR.use_cassette("bike_request-update-marketplace_listing") do
+        Sidekiq::Job.clear_all
+        Sidekiq::Testing.inline! do
+          patch base_url, params: update_params
+        end
+      end
+
+      expect(bike.reload.primary_activity_id).to eq primary_activity_id
+      marketplace_listing = bike.current_marketplace_listing
+      expect(marketplace_listing).to be_present
+      expect(marketplace_listing.amount_cents).to eq 144242
+      expect(marketplace_listing.condition).to eq "new_in_box"
+      expect(marketplace_listing.status).to eq "draft"
+      address_record = marketplace_listing.address_record
+      expect(address_record).to be_present
+      expect(address_record.kind).to eq "marketplace_listing"
+      expect(address_record.user_id).to eq current_user.id
+      expect(address_record.region_record_id).to eq state.id
+      expect(address_record.city).to eq "Los Angeles"
+      expect(address_record.region_string).to be_blank
+    end
+  end
   context "mark bike stolen, the way it's done on the web" do
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "marks bike stolen and doesn't set a location in Kansas!" do

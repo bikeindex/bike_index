@@ -151,10 +151,14 @@ class Bike < ApplicationRecord
   has_many :notifications
   has_many :theft_surveys, -> { theft_survey }, class_name: "Notification"
   has_many :theft_alerts
+  has_many :marketplace_listings, as: :item
+
+  has_one :current_marketplace_listing, -> { current }, class_name: "MarketplaceListing", as: :item
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records
   accepts_nested_attributes_for :components, allow_destroy: true
+  accepts_nested_attributes_for :current_marketplace_listing
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type

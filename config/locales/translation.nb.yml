@@ -251,6 +251,13 @@ nb:
         user:
           email_already_exists: Den e-posten er allerede registrert på Bike Index.
           not_an_available_language: ikke et tilgjengelig språk
+        marketplace_listing:
+          address_required: Plassering er obligatorisk – vennligst angi minst én by
+          condition_required: Betingelse er påkrevd
+          item_not_visible: "%{item_type} er ikke synlig – kanskje du markerte den
+            som skjult?"
+          price_required: Pris er påkrevd
+          primary_activity_required: Primæraktivitet er påkrevd
       organization:
         duplicate_short_name: allerede i bruk av en annen organisasjon. Hvis du ikke
           synes det burde være tilfelle, kontakt support@bikeindex.org
@@ -887,6 +894,14 @@ nb:
         eur: EUR
         mxn: MXN
         usd: USD
+      marketplace_listing:
+        condition:
+          excellent: glimrende
+          fair: rettferdig
+          good: god
+          like_new: som ny
+          new_in_box: ny i esken
+          salvage: berging
     models:
       ad: Annonse
       ambassador: Ambassadør
@@ -2143,8 +2158,6 @@ nb:
       updated_serial: Oppdatert serie
       version_name: Versjonsnavn
       zipcode: Postnummer
-      primary_activity: Primæraktivitet
-      choose_activity: Velg aktivitet
     bike_fields:
       revised_colors:
         add_a_color: Legg til en farge
@@ -2176,6 +2189,9 @@ nb:
         state: Stat
         where_was_it_stolen_type: Hvor var det %{stolen_type}?
         zipcode: Postnummer
+      primary_activity:
+        choose_activity: Velg aktivitet
+        primary_activity: Primæraktivitet
     drivetrain:
       belt_drive: Remdrift
       coaster_brake: Coaster Brems
@@ -2334,6 +2350,10 @@ nb:
       wide: Bred
       wide_help: "> 38 mm (1,5 tommer)"
       wide_title: Dekk som er minst 39 mm (1,5 tommer) brede
+    marketplace:
+      choose_condition: Velg tilstand
+      condition: Betingelse
+      price: Pris
   controllers:
     application:
       handle_unverified_request:
@@ -2370,6 +2390,8 @@ nb:
         theft_details: Tyveridetaljer
         versions: Versjoner
         remove_or_transfer: Overfør, skjul eller slett
+        marketplace_list: Liste til salgs
+        marketplace_on_sale: Oppdater markedsplassoppføring
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: Det %{bike_type} er ikke gjort krav på ennå.
           Hvis det er din %{bike_type}, registrer deg og du vil kunne redigere den!
@@ -2672,6 +2694,12 @@ nb:
           til support@bikeindex.org hvis du har spørsmål.
         no_active_membership: Du har ikke et aktivt medlemskap, du må registrere deg
           for et nytt.
+    marketplace_listings:
+      ensure_user_allowed_to_edit!:
+        you_dont_own_that: Å nei! Det ser ut som du ikke eier den %{item_type}.
+      update:
+        item_published_for_sale: Din %{item_type} er publisert. Den er nå lagt ut
+          for salg!
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5886,3 +5914,7 @@ nb:
         region: Region/provins
         state: Stat
         your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
+        address_no_street: Adresse
+      address_record_with_default:
+        edit_my_account_path: redigering på kontoen min
+        use_account_address: Bruk kontoadresse

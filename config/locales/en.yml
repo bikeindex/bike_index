@@ -730,6 +730,14 @@ en:
         forward: Forward facing
         other: Not handlebars
         rearward: Rear facing
+      marketplace_listing:
+        condition:
+          excellent: excellent
+          fair: fair
+          good: good
+          like_new: like new
+          new_in_box: new in box
+          salvage: salvage
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Cycle (hand pedal)
@@ -813,6 +821,12 @@ en:
         manufacturer:
           cannot_include_quote: cannot include double quote
           cannot_match_a_color_name: cannot be the same as a color name
+        marketplace_listing:
+          address_required: Location is required - please set at least a city
+          condition_required: Condition is required
+          item_not_visible: "%{item_type} is not visible - maybe you marked it hidden?"
+          price_required: Price is required
+          primary_activity_required: Primary activity is required
         organization_message:
           latlon_required: latitude and longitude required
           required: required
@@ -1389,7 +1403,6 @@ en:
       add_start: Add version start date
       bike_name: Bike Name
       bike_registration: Edit the %{bike_type} registration here
-      choose_activity: Choose activity
       choose_country: Choose country
       choose_material: Choose material
       city: City
@@ -1403,7 +1416,6 @@ en:
       nevermind: Nevermind
       other_serial_or_registration_number: Other serial or registration number
       please_fill_in_both_fields: Please fill in both fields
-      primary_activity: Primary activity
       reason_for_update: Reason for update
       remove_end: Remove end
       remove_start: Remove start
@@ -1425,6 +1437,9 @@ en:
       version_name: Version Name
       zipcode: Postal code
     bike_fields:
+      primary_activity:
+        choose_activity: Choose activity
+        primary_activity: Primary activity
       revised_colors:
         add_a_color: Add a color
         choose_color: Choose color
@@ -1495,6 +1510,10 @@ en:
       groups_and_organizations: Groups and Organizations
       other_organizations: Other organizations
       remove: Remove
+    marketplace:
+      choose_condition: Choose condition
+      condition: Condition
+      price: Price
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button
@@ -1652,6 +1671,8 @@ en:
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
         groups: Groups and Organizations
+        marketplace_list: List for sale
+        marketplace_on_sale: Update marketplace listing
         photos: Photos
         publicize: Share on Social Media
         remove: Hide or Delete
@@ -1748,6 +1769,12 @@ en:
         lock_created: Lock created successfully!
       find_lock:
         not_your_lock: Whoops, that's not your lock!
+    marketplace_listings:
+      ensure_user_allowed_to_edit!:
+        you_dont_own_that: Oh no! It looks like you don't own that %{item_type}.
+      update:
+        item_published_for_sale: Your %{item_type} has been published. It is now listed
+          for sale!
     memberships:
       edit:
         free_membership: >-

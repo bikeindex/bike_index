@@ -91,7 +91,7 @@ RSpec.describe AddressRecord, type: :model do
           address_record.reload
           # not wrapped in VCR, so will error if it attempts to geocode
 
-          address_record.update(kind: :marketplace, publicly_visible_attribute: :city, user_id: 121212)
+          address_record.update(kind: :marketplace_listing, publicly_visible_attribute: :city, user_id: 121212)
 
           VCR.use_cassette("address-record-assignment_geocode-again") do
             address_record.update(street: "100 Shields Ave")

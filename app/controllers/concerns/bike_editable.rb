@@ -28,6 +28,10 @@ module BikeEditable
 
   protected
 
+  def page_title_for(edit_template, bike)
+    "#{edit_templates[edit_template]}: #{bike.title_string}"
+  end
+
   def t_scope
     %i[controllers bikes edit]
   end
@@ -55,7 +59,17 @@ module BikeEditable
       h[:drivetrain] = translation(:drivetrain, scope: t_scope)
       h[:accessories] = translation(:accessories, scope: t_scope)
 
-      h[:groups] = translation(:groups, scope: t_scope) unless @bike.version?
+      unless @bike.version?
+        h[:groups] = translation(:groups, scope: t_scope)
+
+        if show_listing_link?(@bike, @current_user)
+          h[:marketplace] = if @bike.is_for_sale
+            translation(:marketplace_on_sale, scope: t_scope)
+          else
+            translation(:marketplace_list, scope: t_scope)
+          end
+        end
+      end
 
       h[:remove] = if @bike.version?
         translation(:remove, scope: t_scope)
@@ -94,11 +108,19 @@ module BikeEditable
     true
   end
 
+  def show_listing_link?(bike, user)
+    return true if bike.current_marketplace_listing&.current?
+
+    return false unless bike.status_with_owner?
+
+    user&.can_create_listing?
+  end
+
   def assign_versions
     return true unless @bike.present?
+
     @bike_og ||= @bike # Already assigned by bike_versions controller
-    @bike_versions = @bike_og.bike_versions
-      .where(owner_id: @current_user&.id)
+    @bike_versions = @bike_og.bike_versions.where(owner_id: @current_user&.id)
   end
 
   def edits_controller_name_for(requested_page)

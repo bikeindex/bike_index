@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe BikeUpdator do
+  let(:params) { ActionController::Parameters.new(passed_params) }
+
   describe "ensure_ownership!" do
     it "raises an error if the user doesn't own the bike" do
       ownership = FactoryBot.create(:ownership)
@@ -22,11 +24,12 @@ RSpec.describe BikeUpdator do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: email) }
     let(:user) { bike.user }
     let(:ownership) { bike.ownerships.first }
+    let(:passed_params) { {id: bike.id, bike: {owner_email: "another@email.co"}} }
     it "calls create_ownership if the email has changed" do
       expect(bike.reload.updator_id).to be_nil
       expect(bike.user_id).to be_present
       expect(Ownership.count).to eq 1
-      update_bike = BikeUpdator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@email.co"}}.as_json, user: user)
+      update_bike = BikeUpdator.new(bike:, params:, user:)
       update_bike.update_ownership
       bike.reload
       expect(bike.updator).to eq(user)
@@ -37,9 +40,53 @@ RSpec.describe BikeUpdator do
       it "does not call create_ownership if the email hasn't changed" do
         bike.reload
         expect(Ownership.count).to eq 1
-        update_bike = BikeUpdator.new(bike:, user:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json)
+        update_bike = BikeUpdator.new(bike:, user:, params:)
         update_bike.update_ownership
         expect(Ownership.count).to eq 1
+      end
+    end
+
+    # NOTE: This is intended as a fallback catch
+    # There should be specific functionality added for handling sales
+    context "when there is a marketplace listing" do
+      let(:status) { :draft }
+      let(:published_at) { nil }
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, status:, published_at:) }
+      before { bike.update(is_for_sale: true) }
+
+      it "updates the marketplace_listing to be removed" do
+        Sidekiq::Job.clear_all
+
+        expect(marketplace_listing.reload.bike_ownership&.id).to eq ownership.id
+        expect(marketplace_listing.current?).to be_truthy
+        expect do
+          BikeUpdator.new(bike:, params:, user: user).update_available_attributes
+        end.to change(Ownership, :count).by 1
+        Sidekiq::Job.drain_all
+        expect(marketplace_listing.reload.bike_ownership&.id).to eq ownership.id
+        expect(marketplace_listing.end_at).to be_within(5).of Time.current
+        expect(marketplace_listing.status).to eq "removed"
+        expect(marketplace_listing.current?).to be_falsey
+        expect(bike.reload.is_for_sale).to be_falsey
+      end
+
+      context "with published_at" do
+        let(:published_at) { Time.current - 1 }
+        it "updates the marketplace_listing to be removed" do
+          Sidekiq::Job.clear_all
+
+          expect(marketplace_listing.reload.status).to eq "draft"
+          expect(marketplace_listing.current?).to be_truthy
+          expect do
+            BikeUpdator.new(bike:, params:, user: user).update_available_attributes
+          end.to change(Ownership, :count).by 1
+          Sidekiq::Job.drain_all
+          expect(marketplace_listing.reload.bike_ownership&.id).to eq ownership.id
+          expect(marketplace_listing.end_at).to be_within(5).of Time.current
+          expect(marketplace_listing.status).to eq "sold" # guessed
+          expect(marketplace_listing.current?).to be_falsey
+          expect(bike.reload.is_for_sale).to be_falsey
+        end
       end
     end
 
@@ -172,7 +219,7 @@ RSpec.describe BikeUpdator do
     end
   end
 
-  it "enque listing order working" do
+  it "enqueue listing order working" do
     Sidekiq::Testing.fake!
     bike = FactoryBot.create(:bike, :with_ownership)
     user = bike.creator

@@ -4,6 +4,7 @@ en:
     legacy_form_well:
       address_record:
         address: Street address
+        address_no_street: Address
         address_school: Campus mailing address
         choose_country: Choose country
         city: City

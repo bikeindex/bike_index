@@ -25,7 +25,7 @@
 #  index_address_records_on_user_id           (user_id)
 #
 class AddressRecord < ApplicationRecord
-  KIND_ENUM = {user: 0, stolen_record: 1, marketplace: 2}.freeze
+  KIND_ENUM = {user: 0, stolen_record: 1, marketplace_listing: 2}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
 
@@ -36,7 +36,7 @@ class AddressRecord < ApplicationRecord
   belongs_to :country
   belongs_to :region_record, class_name: "State"
 
-  has_many :address_records
+  has_many :marketplace_listings
 
   before_validation :set_calculated_attributes
   after_validation :address_record_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
@@ -71,6 +71,10 @@ class AddressRecord < ApplicationRecord
     def default_visibility_for(kind)
       (kind == "organization") ? :street : :postal_code
     end
+  end
+
+  def to_coordinates
+    [latitude, longitude]
   end
 
   def address_hash(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
@@ -115,6 +119,10 @@ class AddressRecord < ApplicationRecord
     country&.iso
   end
 
+  def country_name
+    country&.name
+  end
+
   def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     f_hash = address_hash(visible_attribute:, render_country:, current_country_id:, current_country_iso:)
     arr = f_hash.values_at(:street, :city)
@@ -128,6 +136,17 @@ class AddressRecord < ApplicationRecord
     else
       region_record.present? ? region_record.abbreviation : region_string
     end
+  end
+
+  # This is used when rendering something with an address that is not the user
+  def user_account_address=(val)
+    @user_account_address = InputNormalizer.boolean(val)
+  end
+
+  def user_account_address
+    return @user_account_address if defined?(@user_account_address)
+
+    user&.address_record_id == id
   end
 
   private

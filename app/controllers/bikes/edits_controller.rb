@@ -7,6 +7,8 @@ class Bikes::EditsController < Bikes::BaseController
     @page_errors = @bike.errors
     return unless setup_edit_template(params[:edit_template]) # Returns nil if redirecting
 
+    @page_title = page_title_for(@edit_template, @bike)
+
     if @edit_template == "photos"
       @private_images = PublicImage
         .unscoped

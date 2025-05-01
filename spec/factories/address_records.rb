@@ -5,6 +5,8 @@ FactoryBot.define do
     country { Country.united_states }
     street { "1 Shields Ave" }
     postal_code { "95616" }
+    latitude { 38.5449065 }
+    longitude { -121.7405167 }
 
     skip_geocoding { true }
 
