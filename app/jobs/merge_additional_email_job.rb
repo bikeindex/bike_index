@@ -27,6 +27,7 @@ class MergeAdditionalEmailJob < ApplicationJob
     old_user.theft_alerts.update_all(user_id: user_email.user_id)
     old_user.bike_sticker_updates.update_all(user_id: user_email.user_id)
 
+    BikeVersion.where(owner_id: old_user.id).update_all(owner_id: user_email.user_id)
     BikeSticker.where(user_id: old_user.id).update_all(user_id: user_email.user_id)
     GraduatedNotification.where(user_id: old_user.id).update_all(user_id: user_email.user_id)
     ParkingNotification.where(user_id: old_user.id).update_all(user_id: user_email.user_id)
