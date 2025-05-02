@@ -1,23 +1,23 @@
 require "rails_helper"
 
 RSpec.describe MergeAdditionalEmailJob, type: :job do
-  let(:subject) { MergeAdditionalEmailJob }
+  let(:instance) { described_class.new }
 
   it "is the correct queue" do
-    expect(subject.sidekiq_options["queue"]).to eq "high_priority"
+    expect(described_class.sidekiq_options["queue"]).to eq "high_priority"
   end
 
   context "confirmed" do
     let(:email) { "FOO@barexample.com" }
     let(:ownership) { FactoryBot.create(:ownership, owner_email: email) }
     let(:user) { FactoryBot.create(:user_confirmed, stripe_id:) }
+    let(:old_user) { FactoryBot.create(:user_confirmed, email: email, stripe_id: "xxxyyy") }
     let(:user_email) { FactoryBot.create(:user_email, email:, user:) }
     let(:organization_role) { FactoryBot.create(:organization_role, invited_email: "#{email.upcase} ") }
     let(:stripe_id) { nil }
 
     context "existing user account", flaky: true do
       let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
-      let(:old_user) { FactoryBot.create(:user_confirmed, email: email, stripe_id: "xxxyyy") }
       let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
       let(:old_user_ownership) { FactoryBot.create(:ownership, owner_email: email) }
       let(:theft_alert) { FactoryBot.create(:theft_alert, user: old_user) }
@@ -66,7 +66,7 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
         user.reload
         expect(user.organization_roles.count).to eq 1
         expect(user.ownerships.count).to eq 0
-        MergeAdditionalEmailJob.new.perform(user_email.id)
+        instance.perform(user_email.id)
         user.reload
         user_email.reload
         ownership.reload
@@ -119,10 +119,11 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
           expect(user.banned?).to be_truthy
         end
       end
-      context "graduated_notifications, parking_notifications, stickers, payment" do
+      context "graduated_notifications, parking_notifications, stickers, payment, address_record" do
         let(:graduated_notification) { FactoryBot.create(:graduated_notification, :with_user, user: old_user) }
         let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, user: old_user) }
         let(:bike_sticker) { FactoryBot.create(:bike_sticker) }
+        let!(:address_record) { FactoryBot.create(:address_record, user: old_user, kind: :user) }
         it "merges" do
           expect(graduated_notification.reload.user_id).to eq old_user.id
           expect(ParkingNotification.where(user_id: old_user.id).pluck(:id)).to eq([parking_notification.id])
@@ -134,31 +135,88 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
           expect(GraduatedNotification.where(user_id: user.id).pluck(:id)).to eq([graduated_notification.id])
           expect(bike_sticker.reload.user_id).to eq user.id
           expect(bike_sticker.bike_sticker_updates.pluck(:user_id)).to eq([user.id]) # One update, from claiming
+          expect(address_record.reload.user_id).to eq user.id
         end
       end
     end
 
-    context "membership" do
+    context "membership and duplicate address_records" do
       let!(:stripe_subscription) { FactoryBot.create(:stripe_subscription_active, user: old_user) }
       let(:membership) { stripe_subscription.membership }
       let(:stripe_id) { "new_stripe_id" }
-      let(:old_user) { FactoryBot.create(:user_confirmed, email: email, stripe_id: "xxxyyy") }
 
       it "merges" do
         stripe_subscription.reload
         old_user.reload
         user.reload
 
-        MergeAdditionalEmailJob.new.perform(user_email.id)
+        instance.perform(user_email.id)
 
         expect(stripe_subscription.reload.user_id).to eq user.id
         expect(stripe_subscription.membership.user_id).to eq user.id
       end
     end
 
-    context "existing multi-user-account" do
-      it "merges all the accounts. It does not create multiple organization_roles for one org"
-      # It would be nice to test this... future todo
+    context "address_records" do
+      let!(:address_record_current) { FactoryBot.create(:address_record, user:, kind: :user) }
+      let!(:address_record_old) { FactoryBot.create(:address_record, user: old_user, kind: :user) }
+      let!(:address_record_stolen_record) { FactoryBot.create(:address_record, user:, kind: :stolen_record) }
+      let!(:address_record_stolen_record_old) { FactoryBot.create(:address_record, user: old_user, kind: :stolen_record) }
+      let(:merged_address_record_ids) { [address_record_current.id, address_record_stolen_record.id, address_record_stolen_record_old.id] }
+      it "updates non-user records and deletes the user one" do
+        expect(AddressRecord.count).to eq 4
+        expect { instance.perform(user_email.id) }.to change(AddressRecord, :count).by(0)
+        expect(AddressRecord.where(user_id: user.id).pluck(:id)).to match_array(merged_address_record_ids)
+      end
+    end
+
+    context "bike_versions" do
+      let(:bike_version) { FactoryBot.create(:bike_version, owner: old_user, visibility: :user_hidden) }
+
+      it "updates the bike_verions" do
+        expect(bike_version.reload.owner_id).to eq old_user.id
+        instance.perform(user_email.id)
+        expect(bike_version.reload.owner_id).to eq user.id
+      end
+    end
+
+    context "marketplace_listings" do
+      let!(:address_record_current) { FactoryBot.create(:address_record, user:, kind: :user) }
+      let!(:address_record_old) { FactoryBot.create(:address_record, user: old_user, kind: :user) }
+      let!(:marketplace_listing_seller) { FactoryBot.create(:marketplace_listing, seller: old_user, address_record: address_record_old) }
+      let!(:marketplace_listing_buyer) { FactoryBot.create(:marketplace_listing, :sold, buyer: old_user) }
+      it "updates the marketplace_listings" do
+        expect(marketplace_listing_buyer.reload.buyer_id).to eq old_user.id
+        instance.perform(user_email.id)
+        expect(marketplace_listing_seller.reload.seller_id).to eq user.id
+        expect(marketplace_listing_buyer.reload.buyer_id).to eq user.id
+        expect(address_record_current.reload.user_id).to eq user.id
+        # IDK know what to do with this situation, so just leaving it
+        expect(address_record_old.reload.user_id).to eq old_user.id
+        expect(marketplace_listing_seller.address_record_id).to eq address_record_old.id
+      end
+    end
+
+    context "multi merging" do
+      let(:older_user) { FactoryBot.create(:user_confirmed) }
+      let!(:older_user_email) { FactoryBot.create(:user_email, email: older_user.email, user: old_user) }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: older_user) }
+      let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, creator_id: old_user.id) }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: old_user) }
+      let(:organization) { organization_role.organization }
+      let!(:organization_role2) { FactoryBot.create(:organization_role_claimed, user: older_user, organization:) }
+
+      it "merges all the accounts. It does not create multiple organization_roles for one org" do
+        instance.perform(older_user_email.id)
+        expect(bike.reload.user&.id).to eq old_user.id
+        expect(bike2.reload.creator_id).to eq old_user.id
+        # Second merge
+        instance.perform(user_email.id)
+        expect(bike.reload.user&.id).to eq user.id
+        expect(bike2.reload.creator_id).to eq user.id
+        expect(OrganizationRole.count).to eq 1
+        expect(user.organizations.pluck(:id)).to match_array([organization.id])
+      end
     end
 
     context "no existing user account" do
@@ -172,7 +230,7 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
         user.reload
         expect(user.organization_roles.count).to eq 0
         expect(user.ownerships.count).to eq 0
-        MergeAdditionalEmailJob.new.perform(user_email.id)
+        instance.perform(user_email.id)
         user.reload
         user_email.reload
         ownership.reload
@@ -189,7 +247,7 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
       ownership = FactoryBot.create(:ownership)
       user_email = FactoryBot.create(:user_email, email: ownership.owner_email, confirmation_token: "token-stuff")
       expect(user_email.confirmed?).to be_falsey
-      MergeAdditionalEmailJob.new.perform(user_email.id)
+      instance.perform(user_email.id)
       user_email.reload
       ownership.reload
       expect(user_email.confirmed?).to be_falsey
