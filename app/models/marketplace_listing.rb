@@ -43,6 +43,8 @@ class MarketplaceListing < ApplicationRecord
   belongs_to :item, polymorphic: true
   belongs_to :address_record
 
+  has_many :marketplace_messages
+
   validates_presence_of :item_id
   validates_presence_of :seller_id
   validates_presence_of :status
