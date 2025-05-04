@@ -18,11 +18,15 @@
 #  index_marketplace_messages_on_sender_id               (sender_id)
 #
 class MarketplaceMessage < ApplicationRecord
-  KIND_ENUM = {sender_buyer: 0, sender_seller: 1}.freeze
+  KIND_ENUM = {buyer_to_seller: 0, seller_response: 1}.freeze
+
+  enum :kind, KIND_ENUM
 
   belongs_to :marketplace_listing
   belongs_to :sender, class_name: "User"
   belongs_to :receiver, class_name: "User"
 
-  enum :kind, KIND_ENUM
+  has_many :notifications, as: :notifiable
+
+
 end

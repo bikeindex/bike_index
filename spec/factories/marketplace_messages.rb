@@ -4,6 +4,6 @@ FactoryBot.define do
     body { "Some " }
     sender { FactoryBot.create(:user_confirmed) }
     receiver { FactoryBot.create(:user_confirmed) }
-    kind { :sender_buyer }
+    kind { :buyer_to_seller }
   end
 end

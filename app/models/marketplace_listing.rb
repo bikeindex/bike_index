@@ -88,7 +88,7 @@ class MarketplaceListing < ApplicationRecord
     CURRENT_STATUSES.include?(status&.to_sym)
   end
 
-  def item_type
+  def item_type_display
     item&.type_titleize || "bike"
   end
 
@@ -103,9 +103,9 @@ class MarketplaceListing < ApplicationRecord
   def valid_publishable?
     if item.blank? || !item.current?
       # Ensure the item is still around and visible
-      errors.add(:base, :item_not_visible, item_type:)
+      errors.add(:base, :item_not_visible, item_type: item_type_display)
     elsif item.primary_activity.blank?
-      errors.add(:base, :primary_activity_required, item_type:)
+      errors.add(:base, :primary_activity_required, item_type: item_type_display)
     end
 
     errors.add(:base, :price_required) if amount_cents.blank?
