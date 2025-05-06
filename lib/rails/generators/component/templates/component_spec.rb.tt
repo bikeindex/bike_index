@@ -3,7 +3,10 @@
 require "rails_helper"
 
 RSpec.describe <%= component_class %>, type: :component do
-  let(:options) { {} }
+  let(:options) { {<%= initialize_signature %>} }
+  <% attributes.each do |attr| %>
+    let(:<%= attr.name %>) { nil }
+  <% end %>
   let(:component) { render_inline(described_class.new(**options)) }
 
   it "renders" do
