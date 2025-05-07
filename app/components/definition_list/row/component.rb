@@ -8,8 +8,6 @@ module DefinitionList::Row
       @render_with_no_value = render_with_no_value
     end
 
-    private
-
     def render?
       return true if @render_with_no_value
 

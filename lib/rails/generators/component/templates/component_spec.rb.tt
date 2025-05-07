@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe <%= component_class %>, type: :component do
   let(:options) { {<%= initialize_signature %>} }
   <% attributes.each do |attr| %>
-    let(:<%= attr.name %>) { nil }
+  let(:<%= attr.name %>) { nil }
   <% end %>
   let(:component) { render_inline(described_class.new(**options)) }
 
