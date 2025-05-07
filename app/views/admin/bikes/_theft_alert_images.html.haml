@@ -1,3 +1,4 @@
+-# requires being passed locals: bike:, stolen_record:
 %h3
   Bike Images
   - if bike.public_images.any?
@@ -19,7 +20,7 @@
 
 %h3.mt-4 Promoted Alert Images
 
-- if alert_image_versions.blank? || !(@stolen_record.images_attached? || @stolen_record.alert_image.present?)
+- if alert_image_versions.blank? || !(stolen_record.images_attached? || stolen_record.alert_image.present?)
   .mb-4 None
 - else
   .stolen-bike-image-editing-list-group-wrapper
