@@ -1,7 +1,7 @@
 <div data-controller="marketplace-listing-panel--component">
   <h2><%= @marketplace_listing.item_type_display %></h2>
   <h3><%= @marketplace_listing.currency_symbol %> <%= @marketplace_listing.amount %></h3>
-  <%= render(DefinitionList::Container::Component.new) do %>
+  <%= render(DefinitionList::Container::Component.new(multi_columns: true)) do %>
     <%= render(DefinitionList::Row::Component.new(label: translation(".condition"), value: @marketplace_listing.condition_humanized) %>
   <% end %>
 </div>

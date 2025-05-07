@@ -1,3 +1,13 @@
-<dl class="tw:break-words <%= dl_split_classes %>">
-  <%= content %>
-</dl>
+<% if @multi_columns %>
+  <%# NOTE: this container doesn't seem to exactly track its own size,
+      it definitely works if the width is set with tailwind classes on @container  %>
+  <div class="tw:@container">
+    <dl class="tw:break-words tw:@md:grid tw:grid-cols-2 tw:gap-x-4">
+      <%= content %>
+    </dl>
+  </div>
+<% else %>
+  <dl class="tw:break-words">
+    <%= content %>
+  </dl>
+<% end %>
