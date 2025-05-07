@@ -1,4 +1,4 @@
-<div class="tw:block tw:max-w-4xl tw:p-4 tw:mx-auto tw:bg-white tw:border tw:border-gray-200 tw:rounded-lg tw:shadow-sm tw:dark:bg-gray-800 tw:dark:border-gray-700" data-controller="choose-membership--component">
+<div class="tw:block tw:max-w-4xl tw:p-4 tw:mx-auto tw:bg-white tw:border tw:border-gray-200 tw:rounded-lg tw:shadow-sm tw:dark:bg-gray-800 tw:dark:border-gray-700" data-controller="page-section--choose-membership--component">
   <h1 class="tw:mb-5 tw:text-xl tw:font-medium tw:text-gray-900 tw:dark:text-gray-100 tw:text-center tw:font-header">
     Become a Bike Index member!
   </h1>
@@ -8,11 +8,11 @@
 
     <div class="tw:text-center" id="intervalSelector">
       <label class="tw:cursor-pointer tw:mx-1">
-        <%= f.radio_button :set_interval, :monthly, required: true, class: "tw:cursor-pointer", data: {action: "change->choose-membership--component#updateIntervalVisibility"} %>
+        <%= f.radio_button :set_interval, :monthly, required: true, class: "tw:cursor-pointer", data: {action: "change->page-section--choose-membership--component#updateIntervalVisibility"} %>
         Monthly donation
       </label>
       <label class="tw:cursor-pointer tw:mx-1">
-        <%= f.radio_button :set_interval, :yearly, required: true, class: "tw:cursor-pointer", data: {action: "change->choose-membership--component#updateIntervalVisibility"} %>
+        <%= f.radio_button :set_interval, :yearly, required: true, class: "tw:cursor-pointer", data: {action: "change->page-section--choose-membership--component#updateIntervalVisibility"} %>
         Yearly donation
       </label>
     </div>
