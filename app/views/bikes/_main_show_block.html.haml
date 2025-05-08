@@ -67,8 +67,7 @@
           = render(DefinitionList::Row::Component.new(label: t(".front_tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
           = render(DefinitionList::Row::Component.new(label: t(".rear_wheel_diameter"), value: @bike.rear_wheel_size&.name))
           = render(DefinitionList::Row::Component.new(label: t(".rear_tire_width"), value: t(".tire_width_narrow_#{@bike.rear_tire_narrow}")))
-      = render(DefinitionList::Row::Component.new(label: t(".rear_tire_width"), value: t(".tire_width_narrow_#{@bike.rear_tire_narrow}")))
-
+      -# TODO: Drivetrain
       = render(DefinitionList::Row::Component.new(label: t(".distinguishing_features"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: @bike.description))))
 
     - if @bike.status_stolen? && @stolen_record.present?
@@ -78,19 +77,15 @@
         - if @bike.current_stolen_record.latitude.present?
           = render partial: "stolen_map", locals: { mapping_record: @stolen_record }
         .col-md-4
-          %ul.attr-list.separate-lines
-            = attr_list_item(@stolen_record.address(country: [:skip_default]), t(".location"))
-            = attr_list_item(@stolen_record.locking_description, t(".locking_description"))
-            = attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
-            %li
-              %strong.attr-title
-                #{t(".stolen_at")}:&nbsp;
-              %span.convertTime= l @stolen_record.date_stolen, format: :convert_time
-            = attr_list_item(@stolen_record.police_report_number, t(".police_report"))
-            = attr_list_item(@stolen_record.police_report_department, t(".department_city"))
-      - if @stolen_record.theft_description.present?
-        %h3= t(".description_of_incident")
-        %p= @stolen_record.theft_description
+          = render(DefinitionList::Container::Component.new) do
+            = render(DefinitionList::Row::Component.new(label: t(".location"), value: @stolen_record.address(country: [:skip_default])))
+            = render(DefinitionList::Row::Component.new(label: t(".locking_description"), value: @stolen_record.locking_description))
+            = render(DefinitionList::Row::Component.new(label: t(".locking_circumvented"), value: @stolen_record.lock_defeat_description))
+            = render(DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen))
+            = render(DefinitionList::Row::Component.new(label: t(".police_report"), value: @stolen_record.police_report_number))
+            = render(DefinitionList::Row::Component.new(label: t(".department_city"), value: @stolen_record.police_report_department))
+            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), value: @stolen_record.theft_description, kind: :full_width))
+
     - elsif !@bike.version? && @bike.current_impound_record.present?
       - impound_record = @bike.current_impound_record
       %h3

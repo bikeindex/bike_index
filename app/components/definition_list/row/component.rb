@@ -19,6 +19,10 @@ module DefinitionList::Row
 
     private
 
+    def render_convertime?
+      @value.present? && (@value.is_a?(Time) || @value.is_a?(Date))
+    end
+
     def wrapper_classes
       if @kind == :full_width
         "tw:col-span-full tw:pt-4"

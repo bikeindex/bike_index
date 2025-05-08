@@ -5,7 +5,11 @@
   </dt>
   <%# bootstrap sets margin_bottom on dd %>
   <dd class="tw:mb-0!">
-    <% if @value.present? %>
+    <% if render_convertime? %>
+      <span class="convertTime">
+        <%= l @value, format: :convert_time %>
+      </span>
+    <% elsif @value.present? %>
       <%= @value %>
     <% else %>
       <span class="tw:opacity-50 tw:text-xs">none</span>
