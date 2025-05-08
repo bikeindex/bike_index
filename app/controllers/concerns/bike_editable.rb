@@ -63,7 +63,7 @@ module BikeEditable
         h[:groups] = translation(:groups, scope: t_scope)
 
         if show_listing_link?(@bike, @current_user)
-          h[:marketplace] = if @bike.is_for_sale
+          h[:marketplace] = if @bike.is_for_sale?
             translation(:marketplace_on_sale, scope: t_scope)
           else
             translation(:marketplace_list, scope: t_scope)

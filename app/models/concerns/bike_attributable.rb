@@ -40,6 +40,8 @@ module BikeAttributable
 
   def status_humanized
     return "found" if status_found?
+    return "for sale" if status == "status_with_owner" && is_for_sale?
+
     Bike.status_humanized(status)
   end
 
@@ -49,6 +51,7 @@ module BikeAttributable
 
   def status_humanized_no_with_owner
     return "" if status == "status_with_owner"
+
     status_humanized
   end
 
