@@ -220,4 +220,28 @@ RSpec.describe TheftAlert, type: :model do
       end
     end
   end
+
+  describe "stolen_record scoping" do
+    let(:payment_unpaid) { FactoryBot.create(:payment, paid_at: nil) }
+    let(:theft_alert_unpaid) { FactoryBot.create(:theft_alert, payment: payment_unpaid, user: payment_unpaid.user) }
+    let!(:stolen_record_unpaid_id) { theft_alert_unpaid.stolen_record_id }
+    let(:theft_alert_paid) { FactoryBot.create(:theft_alert, :paid) }
+    let!(:stolen_record_paid_id) { theft_alert_paid.stolen_record_id }
+    let(:theft_alert_admin) { FactoryBot.create(:theft_alert, admin: true) }
+    let!(:stolen_record_admin_id) { theft_alert_admin.stolen_record_id }
+    let(:theft_alert_admin_and_unpaid) { FactoryBot.create(:theft_alert, admin: true) }
+    let!(:stolen_record_admin_and_unpaid_id) { theft_alert_admin_and_unpaid.stolen_record_id }
+    let!(:theft_alert_admin_unpaid) { FactoryBot.create(:theft_alert, stolen_record_id: stolen_record_admin_and_unpaid_id) }
+    let(:stolen_record_ids) { [stolen_record_unpaid_id, stolen_record_paid_id, stolen_record_admin_id, stolen_record_admin_and_unpaid_id] }
+
+    it "finds the pertinent stolen_records" do
+      expect(Payment.paid.pluck(:id)).to eq([theft_alert_paid.payment_id])
+      expect(StolenRecord.pluck(:id)).to match_array stolen_record_ids
+      expect(StolenRecord.with_theft_alerts.pluck(:id)).to match_array stolen_record_ids
+      expect(TheftAlert.paid.pluck(:id)).to match_array([theft_alert_paid.id])
+      expect(TheftAlert.admin.pluck(:id)).to match_array([theft_alert_admin.id, theft_alert_admin_and_unpaid.id])
+      expect(TheftAlert.paid_or_admin.pluck(:id)).to match_array([theft_alert_paid.id, theft_alert_admin.id, theft_alert_admin_and_unpaid.id])
+      expect(StolenRecord.with_theft_alerts_paid_or_admin.pluck(:id)).to match_array(stolen_record_ids - [stolen_record_unpaid_id])
+    end
+  end
 end
