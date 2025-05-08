@@ -15,6 +15,12 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(response).to render_template("index")
         expect(flash).to_not be_present
         expect(assigns(:stolen_records)).to match_array([stolen_record])
+        # test the search_with_promoted_alert because scoping is weird
+        get "#{base_url}?search_with_promoted_alert=true"
+        expect(response.code).to eq("200")
+        expect(response).to render_template("index")
+        expect(flash).to_not be_present
+        expect(assigns(:stolen_records)).to match_array([])
       end
     end
 
