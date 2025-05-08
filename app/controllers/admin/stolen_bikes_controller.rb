@@ -122,6 +122,9 @@ class Admin::StolenBikesController < Admin::BaseController
       available_stolen_records = available_stolen_records.not_spam
     end
 
+    @with_promoted_alert = InputNormalizer.boolean(params[:search_with_promoted_alert])
+    available_stolen_records = available_stolen_records.with_theft_alerts if @with_promoted_alert
+
     # We always render distance
     distance = params[:search_distance].to_i
     @distance = (distance.present? && distance > 0) ? distance : 50
