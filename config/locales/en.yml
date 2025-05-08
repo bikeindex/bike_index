@@ -1104,6 +1104,11 @@ en:
       stolen_details: Theft Details
       vehicle_type: Vehicle type
       wheel_diameter: Wheel diameter
+      tire_width_narrow_true: (Narrow tire)
+      tire_width_narrow_false: (Wide tire)
+      front_tire_width: Front tire width
+      rear_tire_width: Front tire width
+      tire_width: Tire width
       year: Year
     new:
       additional_serial_sticker_number: Additional serial/sticker number

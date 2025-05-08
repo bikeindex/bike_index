@@ -1,8 +1,14 @@
-<div class="tw:flex tw:py-2 tw:gap-x-2 tw:items-center tw:leading-tight">
-  <dt class="tw:text-sm tw:text-right tw:opacity-65 tw:w-1/5 tw:min-w-[100px]">
+<div class="<%= wrapper_classes %>">
+  <%# bootstrap sets font-weight on dt %>
+  <dt class="<%= dt_classes %>">
     <%= @label %>
   </dt>
-  <dd class="">
-    <%= @value %>
+  <%# bootstrap sets margin_bottom on dd %>
+  <dd class="tw:mb-0!">
+    <% if @value.present? %>
+      <%= @value %>
+    <% else %>
+      <span class="tw:opacity-50 tw:text-xs">none</span>
+    <% end %>
   </dd>
 </div>

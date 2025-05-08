@@ -1,13 +1,11 @@
 <% if @multi_columns %>
-  <%# NOTE: this container doesn't seem to exactly track its own size,
-      it definitely works if the width is set with tailwind classes on @container  %>
-  <div class="tw:@container">
-    <dl class="tw:break-words tw:@md:grid tw:grid-cols-2 tw:gap-x-4">
+  <div class="tw:@container tw:w-full">
+    <dl class="tw:break-words tw:@md:grid tw:@md:grid-cols-2 tw:gap-x-4 tw:@container">
       <%= content %>
     </dl>
   </div>
 <% else %>
-  <dl class="tw:break-words">
+  <dl class="tw:break-words tw:@container">
     <%= content %>
   </dl>
 <% end %>

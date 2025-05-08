@@ -92,6 +92,10 @@ class MarketplaceListing < ApplicationRecord
     item&.type_titleize || "bike"
   end
 
+  def condition_humanized
+    self.class.condition_humanized(condition)
+  end
+
   def publish!
     return false unless valid_publishable?
 
