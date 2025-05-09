@@ -57,6 +57,7 @@
       = render(DefinitionList::Row::Component.new(label: t(".frame_size"), value: @bike.frame_size&.upcase))
       = render(DefinitionList::Row::Component.new(label: t(".frame_material"), value: @bike.frame_material_name))
       = render(DefinitionList::Row::Component.new(label: t(".handlebar_type"), value: @bike.handlebar_type))
+      -# wheels
       - if @bike.front_wheel_size_id.present?
         - same_width = @bike.front_tire_narrow.nil? || @bike.front_tire_narrow == @bike.rear_tire_narrow
         - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id && same_width
@@ -67,7 +68,14 @@
           = render(DefinitionList::Row::Component.new(label: t(".front_tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
           = render(DefinitionList::Row::Component.new(label: t(".rear_wheel_diameter"), value: @bike.rear_wheel_size&.name))
           = render(DefinitionList::Row::Component.new(label: t(".rear_tire_width"), value: t(".tire_width_narrow_#{@bike.rear_tire_narrow}")))
-      -# TODO: Drivetrain
+      -# Drivetrain
+      - if @bike.fixed_gear?
+        = render(DefinitionList::Row::Component.new(label: t(".drivetrain"), value: t(".drivetrain_fixed")))
+      - else
+        = render(DefinitionList::Row::Component.new(label: t(".drivetrain"), value: @bike.drivetrain_attributes))
+        = render(DefinitionList::Row::Component.new(label: t(".drivetrain_front"), value: @bike.front_gear_type&.name))
+        = render(DefinitionList::Row::Component.new(label: t(".drivetrain_rear"), value: @bike.rear_gear_type&.name))
+      -# description
       = render(DefinitionList::Row::Component.new(label: t(".distinguishing_features"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: @bike.description))))
 
     - if @bike.status_stolen? && @stolen_record.present?
@@ -84,62 +92,57 @@
             = render(DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen))
             = render(DefinitionList::Row::Component.new(label: t(".police_report"), value: @stolen_record.police_report_number))
             = render(DefinitionList::Row::Component.new(label: t(".department_city"), value: @stolen_record.police_report_department))
-            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), value: @stolen_record.theft_description, kind: :full_width))
+            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: @stolen_record.theft_description))))
 
     - elsif !@bike.version? && @bike.current_impound_record.present?
       - impound_record = @bike.current_impound_record
-      %h3
-        This is an abandoned #{@bike.type} that was #{impound_record.kind}
+      %h3= t(".abandoned_title", bike_type: @bike.type_titleize, impound_kind: impound_record.kind)
+
       .row
         - if impound_record.latitude.present?
           = render partial: "stolen_map", locals: { mapping_record: impound_record }
         .col-md-4
-          %ul.attr-list.separate-lines
-            = attr_list_item(impound_record.address, t(".location"))
-            %li
-              %strong.attr-title
-                - if @bike.status_found?
-                  = t(".found_at")
-                - else
-                  = t(".impounded_at")
-                \:&nbsp;
+          = render(DefinitionList::Container::Component.new) do
+            = render(DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.address))
+            - status_label = @bike.status_found? ? t(".found_at") : t(".impounded_at")
+            - status_value = capture_haml do
               %span.convertTime.preciseTime= l impound_record.impounded_at, format: :convert_time
               %span.convertTimezone
-      - if impound_record.impounded_description.present?
-        %h3= t(".description_of_incident")
-        %p= impound_record.impounded_description
+            = render(DefinitionList::Row::Component.new(label: status_label, value: status_value))
+            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: impound_record.impounded_description))))
 
-  - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
-  - if cgroups.any?
-    %ul.nav.nav-tabs.component-types{ role: 'tablist' }
-      - cgroups.each_with_index do |cgroup, index|
-        %li.nav-item
-          - link_class = index == 0 ? 'active' : ''
-          %a.nav-link{ class: link_class, href: "#cgroup_#{cgroup[:id]}", data: { toggle: 'tab', role: 'tab' } }
-            = cgroup[:name]
-    .tab-content.component-group-wrap
-      - cgroups.each_with_index do |cgroup, index|
-        - tab_class = index == 0 ? 'active' : ''
-        .tab-pane.component-group{ id: "cgroup_#{cgroup[:id]}", class: tab_class }
-          %h3.cgroup-name
-            = cgroup[:name]
-          %ul.attr-list
-            - @bike.components.each do |component|
-              - next unless component.cgroup_id == cgroup[:id]
-              %li
-                %strong.attr-title
-                  - if component.front && component.rear
-                    = t(".front_rear")
-                  - elsif component.front
-                    = t(".front")
-                  - elsif component.rear
-                    = t(".rear")
-                  - if component.component_type == "unknown"
-                    = t(".other")
-                  - else
-                    = component.component_type.titleize if component.component_type.present?
-                = component.description
-                - if component.year.present? || component.component_model.present? || component.manufacturer.present?
-                  = component.component_model
-                  = t(".componentyear", componentyear: component.year) if component.year.present?
-                  = "(#{component.mnfg_name})"
+
+  -# I think it's more performant to make the query once for all the components and then run through them all for each cgroup
+  - components = @bike.components
+  - if components.any?
+    - Cgroup.commonness.each do |cgroup|
+      - cgroup_components = components.select { |c| c.cgroup_id == cgroup.id }
+      - next unless cgroup_components.any?
+
+      %h3.mt-4.mb-3= cgroup.name
+      = render(DefinitionList::Container::Component.new(multi_columns: true)) do
+        - cgroup_components.each do |component|
+          - next if component.cgroup_id != cgroup.id
+
+          - label = if component.front && component.rear
+            - t(".front_rear")
+          - elsif component.front
+            - t(".front")
+          - elsif component.rear
+            - t(".rear")
+          - else
+            - ""
+
+          - if component.component_type == "unknown"
+            - label += t(".other")
+          - elsif component.component_type.present?
+            - label += " " unless label.empty?
+            - label += component.component_type.titleize
+
+          - value = [component.description, component.component_model].reject(&:blank?)
+          - value << t(".componentyear", componentyear: component.year) if component.year.present?
+          - value << "(#{component.mnfg_name})" if component.mnfg_name.present?
+          - value = value.any? ? value.join(" ") : t(".component_no_info")
+
+          = render(DefinitionList::Row::Component.new(label:, value: ))
+

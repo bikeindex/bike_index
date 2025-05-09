@@ -23,12 +23,16 @@ module DefinitionList::Row
       @value.present? && (@value.is_a?(Time) || @value.is_a?(Date))
     end
 
+    def no_value_content
+      translation(".no_value")
+    end
+
     def wrapper_classes
       if @kind == :full_width
-        "tw:col-span-full tw:pt-4"
+        "tw:col-span-full"
       else
-        "tw:pt-3 tw:items-center tw:@sm:flex tw:@sm:gap-x-2 tw:@sm:pt-1"
-      end + " tw:leading-tight"
+        "tw:items-center tw:@sm:flex tw:@sm:gap-x-2 tw:@sm:pt-2"
+      end + " tw:pt-3 tw:leading-tight"
     end
 
     def dt_classes

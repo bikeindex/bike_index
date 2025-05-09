@@ -28,6 +28,7 @@ RSpec.describe DefinitionList::Row::Component, type: :component do
         expect(described_class.new(**options).render?).to be_truthy
         expect(component).to be_present
         expect(component).to have_text label
+        expect(component).to have_text "none" # no_value_content
       end
     end
   end

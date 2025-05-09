@@ -12,7 +12,9 @@
     <% elsif @value.present? %>
       <%= @value %>
     <% else %>
-      <span class="tw:opacity-50 tw:text-xs">none</span>
+      <span class="tw:opacity-50 tw:text-xs">
+        <%= no_value_content %>
+      </span>
     <% end %>
   </dd>
 </div>
