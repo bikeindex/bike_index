@@ -158,7 +158,7 @@ module BikeAttributable
     d_slugs << "belt_drive" if belt_drive
 
     d_slugs.map do |d_slug|
-      I18n.t(slug, scope: [:activerecord, :bike_attributable, d_slug])
+      I18n.t(d_slug, scope: [:activerecord, :bike_attributable, :drivetrain_attributes])
     end.join(", ")
   end
 
