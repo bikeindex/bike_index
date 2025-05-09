@@ -5,7 +5,9 @@
   <%= render(DefinitionList::Row::Component.new(label: "Key serial", value: "xxxyyyzzzz")) %>
   <%= render(DefinitionList::Row::Component.new(label: "Combination", value: "", render_with_no_value: true)) %>
   <%= render(DefinitionList::Row::Component.new(label: "Some really long thing as example", value: "A value of whatever")) %>
+  <%= render(DefinitionList::Row::Component.new(label: "Some time", value: Time.current - 1.hour)) %>
   <%= render(DefinitionList::Row::Component.new(label: "User's description", value: description, kind: :full_width)) %>
+
 <% end %>
 
 <h6 class="tw:opacity-75 tw:font-sm tw:mt-8 tw:mb-3">multi_columns</h6>
@@ -16,5 +18,6 @@
   <%= render(DefinitionList::Row::Component.new(label: "Key serial", value: "xxxyyyzzzz")) %>
   <%= render(DefinitionList::Row::Component.new(label: "Combination", value: "", render_with_no_value: true)) %>
   <%= render(DefinitionList::Row::Component.new(label: "Some really long thing as example", value: "A value of whatever")) %>
+  <%= render(DefinitionList::Row::Component.new(label: "Some time", value: Time.current - 1.hour)) %>
   <%= render(DefinitionList::Row::Component.new(label: "User's description", value: description, kind: :full_width)) %>
 <% end %>

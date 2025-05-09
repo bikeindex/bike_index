@@ -104,11 +104,7 @@
         .col-md-4
           = render(DefinitionList::Container::Component.new) do
             = render(DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.address))
-            - status_label = @bike.status_found? ? t(".found_at") : t(".impounded_at")
-            - status_value = capture_haml do
-              %span.convertTime.preciseTime= l impound_record.impounded_at, format: :convert_time
-              %span.convertTimezone
-            = render(DefinitionList::Row::Component.new(label: status_label, value: status_value))
+            = render(DefinitionList::Row::Component.new(label: @bike.status_found? ? t(".found_at") : t(".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone]))
             = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: impound_record.impounded_description))))
 
 
