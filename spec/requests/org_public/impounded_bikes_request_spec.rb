@@ -49,7 +49,7 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
     let(:current_organization) { impound_configuration.organization }
     let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered, organization: current_organization) }
     let!(:bike) { parking_notification.bike }
-    # This is required by show, if it isn't preset we get ReadOnlyError by
+    # This is required by show, if it isn't present it raises ReadOnlyError
     before { RearGearType.fixed }
 
     it "renders, shows impounded bike" do

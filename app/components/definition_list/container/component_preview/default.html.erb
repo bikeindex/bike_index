@@ -1,23 +1,13 @@
-<% description = "I'm baby microdosing church-key try-hard, yuccie small batch lumbersexual craft beer skateboard slow-carb neutral milk hotel big mood enamel pin gatekeep chartreuse schlitz. Deep v try-hard green juice retro shaman occupy artisan shabby chic vinyl.\n\nStreet art kickstarter JOMO chillwave heirloom drinking vinegar single-origin coffee banh mi try-hard air plant." %>
-<%= render(DefinitionList::Container::Component.new) do %>
+<% multi_columns ||= false %>
+
+<%= render(DefinitionList::Container::Component.new(multi_columns:)) do %>
+  <% description = "I'm baby microdosing church-key try-hard, yuccie small batch lumbersexual craft beer skateboard slow-carb neutral milk hotel big mood enamel pin gatekeep chartreuse schlitz. Deep v try-hard green juice retro shaman occupy artisan shabby chic vinyl.\n\nStreet art kickstarter JOMO chillwave heirloom drinking vinegar single-origin coffee banh mi try-hard air plant." %>
+
   <%= render(DefinitionList::Row::Component.new(label: "Manufacturer", value: "Kryptonite")) %>
   <%= render(DefinitionList::Row::Component.new(label: "Lock type", value: "Chain with lock")) %>
   <%= render(DefinitionList::Row::Component.new(label: "Key serial", value: "xxxyyyzzzz")) %>
   <%= render(DefinitionList::Row::Component.new(label: "Combination", value: "", render_with_no_value: true)) %>
   <%= render(DefinitionList::Row::Component.new(label: "Some really long thing as example", value: "A value of whatever")) %>
   <%= render(DefinitionList::Row::Component.new(label: "Some time", value: Time.current - 1.hour)) %>
-  <%= render(DefinitionList::Row::Component.new(label: "User's description", value: description, full_width: true)) %>
-
-<% end %>
-
-<h6 class="tw:opacity-75 tw:font-sm tw:mt-8 tw:mb-3">multi_columns</h6>
-
-<%= render(DefinitionList::Container::Component.new(multi_columns: true)) do %>
-  <%= render(DefinitionList::Row::Component.new(label: "Manufacturer", value: "Kryptonite")) %>
-  <%= render(DefinitionList::Row::Component.new(label: "Lock type", value: "Chain with lock")) %>
-  <%= render(DefinitionList::Row::Component.new(label: "Key serial", value: "xxxyyyzzzz")) %>
-  <%= render(DefinitionList::Row::Component.new(label: "Combination", value: "", render_with_no_value: true)) %>
-  <%= render(DefinitionList::Row::Component.new(label: "Some really long thing as example", value: "A value of whatever")) %>
-  <%= render(DefinitionList::Row::Component.new(label: "Some time", value: Time.current - 1.hour, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
   <%= render(DefinitionList::Row::Component.new(label: "User's description", value: description, full_width: true)) %>
 <% end %>

@@ -1046,14 +1046,19 @@ it:
         two_u_locks: Due lucchetti a U
         u_lock: Lucchetto a U
         u_lock_and_cable: Lucchetto a U e cavo
-    status_humanized:
-      bike:
-        abandoned: abbandonato
-        found: trovato
-        impounded: sequestrato
-        stolen: rubato
-        unregistered: non registrato
-        with_owner: con il proprietario
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive: Trasmissione a cinghia
+        coaster_brake: Freno a contropedale
+      status_humanized:
+        bike:
+          abandoned: abbandonato
+          for_sale:
+          found: trovato
+          impounded: sequestrato
+          stolen: rubato
+          unregistered: non registrato
+          with_owner: con il proprietario
   datetime:
     distance_in_words:
       half_a_minute: mezzo minuto
@@ -1808,6 +1813,17 @@ it:
       wheel_diameter:
       year: Anno
       primary_activity:
+      abandoned_title:
+      component_no_info:
+      drivetrain:
+      drivetrain_fixed:
+      drivetrain_front:
+      drivetrain_rear:
+      front_tire_width:
+      rear_tire_width:
+      tire_width:
+      tire_width_narrow_false:
+      tire_width_narrow_true:
     new:
       additional_serial_sticker_number:
       affiliation:
@@ -3339,17 +3355,6 @@ it:
       pinhead_locking_skewer_key:
       small_kryptonite_key:
       update_the_lock:
-    lock_home:
-      add_a_new_lock:
-      any_lock_information_you_enter_on_bike_in:
-      if_you_want_you_can_save_serial_html:
-      lock_keys_often_have_serial_numbers_so_yo:
-      lock_type:
-      manufacturer:
-      save_information_about_a_lock:
-      save_information_about_your_bike_lock:
-      you_can_also_record_your_lock_html:
-      your_locks:
     new:
       save_information_about_one_of_your_locks:
   manufacturers:
@@ -4667,3 +4672,15 @@ it:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:
+    definition_list:
+      row:
+        no_value:
+    page_section:
+      marketplace_listing_panel:
+        condition:
+        description: Descrizione
+        first_posted_at:
+        location: Luogo
+        price_is_firm_false:
+        price_is_firm_true:
+        still_for_sale_at:

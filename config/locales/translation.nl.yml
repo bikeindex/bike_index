@@ -1052,14 +1052,19 @@ nl:
           employee: Werknemer
           student: Student
           graduate_student: Afgestudeerde student
-    status_humanized:
-      bike:
-        abandoned: Verlaten
-        found: gevonden
-        impounded: in beslag genomen
-        stolen: Gestolen
-        with_owner: met eigenaar
-        unregistered: niet ingeschreven
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive: Riemaandrijving
+        coaster_brake: Terugtraprem
+      status_humanized:
+        bike:
+          abandoned: Verlaten
+          for_sale: Te koop
+          found: gevonden
+          impounded: in beslag genomen
+          stolen: Gestolen
+          unregistered: Geregistreerd
+          with_owner: met eigenaar
   datetime:
     distance_in_words:
       half_a_minute: een halve minuut
@@ -2130,6 +2135,17 @@ nl:
       propulsion_type: Voortstuwing
       vehicle_type: 'Voertuigtype:'
       primary_activity: Primaire activiteit
+      abandoned_title: Dit is een verlaten %{bike_type} die %{impound_kind} was
+      component_no_info: "-"
+      drivetrain: drivetrain
+      drivetrain_fixed: Vaste versnelling
+      drivetrain_front: Aandrijflijn voor
+      drivetrain_rear: Aandrijflijn achter
+      front_tire_width: Breedte van de voorband
+      rear_tire_width: Breedte van de voorband
+      tire_width: Bandbreedte
+      tire_width_narrow_false: Brede band
+      tire_width_narrow_true: Smalle band
     organization_stolen_message:
       report_link_text: op deze link
       report_the_theft_to_the_organization_html: <span class="text-warning">Meld de
@@ -5269,22 +5285,6 @@ nl:
       pinhead_locking_skewer_key: Pinhead spies sleutel
       small_kryptonite_key: Kleine Kryptonite-sleutel
       update_the_lock: Update het slot!
-    lock_home:
-      add_a_new_lock: Voeg een nieuw slot toe
-      any_lock_information_you_enter_on_bike_in: Alle slotinformatie die u op Bike
-        Index invoert, is privé en alleen zichtbaar voor u.
-      if_you_want_you_can_save_serial_html: Als je wilt, kun je <strong>de framenummers
-        van je sleutels opslaan</strong> op Bike Index, zodat je geen pech hebt als
-        je ze verliest.
-      lock_keys_often_have_serial_numbers_so_yo: Vergrendelingssleutels hebben vaak
-        framenummers, zodat u vervangingen kunt bestellen als u de sleutels verliest.
-      lock_type: Slottype
-      manufacturer: Fabrikant
-      save_information_about_a_lock: Informatie opslaan over een slot
-      save_information_about_your_bike_lock: Informatie opslaan over uw fietsslot!
-      you_can_also_record_your_lock_html: U kunt ook <strong>uw slotcombinaties opnemen</strong>
-        .
-      your_locks: Je sloten
     new:
       save_information_about_one_of_your_locks: Informatie opslaan over een van uw
         sloten
@@ -6072,3 +6072,15 @@ nl:
       address_record_with_default:
         edit_my_account_path: bewerken op mijn account
         use_account_address: Gebruik accountadres
+    definition_list:
+      row:
+        no_value: geen
+    page_section:
+      marketplace_listing_panel:
+        condition: Voorwaarde
+        description: Beschrijving
+        first_posted_at: Geplaatst
+        location: Plaats
+        price_is_firm_false: prijs is onderhandelbaar
+        price_is_firm_true: prijs is vast
+        still_for_sale_at: Nog steeds te koop bij

@@ -65,11 +65,11 @@ body.dark {
 
 /* TODO: use this in the body instead of separately */
 .twtext-color {
-  @apply tw:text-gray-900 tw:text-gray-400;
+  @apply tw:text-gray-900 tw:dark:text-gray-400;
 }
 
 .twtext-color\! {
-  @apply tw:text-gray-900! tw:text-gray-400!;
+  @apply tw:text-gray-900! tw:dark:text-gray-400!;
 }
 
 

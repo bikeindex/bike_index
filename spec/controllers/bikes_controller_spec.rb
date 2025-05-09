@@ -15,7 +15,7 @@ RSpec.describe BikesController, type: :controller do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:user) { bike.creator }
     let(:organization) { FactoryBot.create(:organization) }
-    # This is required by show, if it isn't preset we get ReadOnlyError by
+    # This is required by show, if it isn't present it raises ReadOnlyError
     before { RearGearType.fixed }
 
     it "shows the bike" do
