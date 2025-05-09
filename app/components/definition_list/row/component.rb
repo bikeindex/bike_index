@@ -2,13 +2,11 @@
 
 module DefinitionList::Row
   class Component < ApplicationComponent
-    PERMITTED_KINDS = %i[full_width].freeze
-
-    def initialize(label:, value: nil, render_with_no_value: false, kind: nil, time_localizer_settings: nil)
+    def initialize(label:, value: nil, render_with_no_value: false, full_width: false, time_localizer_settings: nil)
       @label = label
       @value = value
       @render_with_no_value = render_with_no_value
-      @kind = kind.to_sym if PERMITTED_KINDS.include?(kind&.to_sym)
+      @full_width = full_width
 
       # TODO: actually support originalTimeZone. We add the timezone, but it's currently the user's timezone
       @include_time_zone = time_localizer_settings&.include?(:originalTimeZone) || false
@@ -33,7 +31,7 @@ module DefinitionList::Row
     end
 
     def wrapper_classes
-      if @kind == :full_width
+      if @full_width
         "tw:col-span-full"
       else
         "tw:items-center tw:@sm:flex tw:@sm:gap-x-2 tw:@sm:pt-2"
@@ -41,7 +39,7 @@ module DefinitionList::Row
     end
 
     def dt_classes
-      if @kind == :full_width
+      if @full_width
         ""
       else
         "tw:@sm:text-right tw:@sm:w-1/4 tw:min-w-[100px]"

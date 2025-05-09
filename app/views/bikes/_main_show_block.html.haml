@@ -76,7 +76,7 @@
         = render(DefinitionList::Row::Component.new(label: t(".drivetrain_front"), value: @bike.front_gear_type&.name))
         = render(DefinitionList::Row::Component.new(label: t(".drivetrain_rear"), value: @bike.rear_gear_type&.name))
       -# description
-      = render(DefinitionList::Row::Component.new(label: t(".distinguishing_features"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: @bike.description))))
+      = render(DefinitionList::Row::Component.new(label: t(".distinguishing_features"), full_width: true, value: render(UserTextBlockDisplay::Component.new(text: @bike.description))))
 
     - if @bike.status_stolen? && @stolen_record.present?
       %h3
@@ -92,7 +92,7 @@
             = render(DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone]))
             = render(DefinitionList::Row::Component.new(label: t(".police_report"), value: @stolen_record.police_report_number))
             = render(DefinitionList::Row::Component.new(label: t(".department_city"), value: @stolen_record.police_report_department))
-            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: @stolen_record.theft_description))))
+            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: render(UserTextBlockDisplay::Component.new(text: @stolen_record.theft_description))))
 
     - elsif !@bike.version? && @bike.current_impound_record.present?
       - impound_record = @bike.current_impound_record
@@ -105,7 +105,7 @@
           = render(DefinitionList::Container::Component.new) do
             = render(DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.address))
             = render(DefinitionList::Row::Component.new(label: @bike.status_found? ? t(".found_at") : t(".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone]))
-            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: impound_record.impounded_description))))
+            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: render(UserTextBlockDisplay::Component.new(text: impound_record.impounded_description))))
 
 
   -# I think it's more performant to make the query once for all the components and then run through them all for each cgroup

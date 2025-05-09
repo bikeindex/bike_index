@@ -6,7 +6,7 @@
   <%= render(DefinitionList::Row::Component.new(label: "Combination", value: "", render_with_no_value: true)) %>
   <%= render(DefinitionList::Row::Component.new(label: "Some really long thing as example", value: "A value of whatever")) %>
   <%= render(DefinitionList::Row::Component.new(label: "Some time", value: Time.current - 1.hour)) %>
-  <%= render(DefinitionList::Row::Component.new(label: "User's description", value: description, kind: :full_width)) %>
+  <%= render(DefinitionList::Row::Component.new(label: "User's description", value: description, full_width: true)) %>
 
 <% end %>
 
@@ -19,5 +19,5 @@
   <%= render(DefinitionList::Row::Component.new(label: "Combination", value: "", render_with_no_value: true)) %>
   <%= render(DefinitionList::Row::Component.new(label: "Some really long thing as example", value: "A value of whatever")) %>
   <%= render(DefinitionList::Row::Component.new(label: "Some time", value: Time.current - 1.hour, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
-  <%= render(DefinitionList::Row::Component.new(label: "User's description", value: description, kind: :full_width)) %>
+  <%= render(DefinitionList::Row::Component.new(label: "User's description", value: description, full_width: true)) %>
 <% end %>
