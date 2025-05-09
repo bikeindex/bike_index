@@ -1530,6 +1530,9 @@ en:
       choose_condition: Choose condition
       condition: Condition
       price: Price
+      publish_listing: publish listing
+      optional_information: Optional information
+      price_is_negitiable: Price is negotiable
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button

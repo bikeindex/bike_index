@@ -3,37 +3,51 @@
 = form_with(model: @bike, multipart: true, html: { class: 'primary-edit-bike-form' }) do |f|
   - if params[:return_to].present?
     = hidden_field_tag :return_to, params[:return_to]
-  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
-    .row
-      = render partial: '/bikes_edit/primary_menu'
+  = f.fields_for :current_marketplace_listing, marketplace_listing do |ml|
+    .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+      .row
+        = render partial: '/bikes_edit/primary_menu'
 
-      .col-md-8.form-well#form_well_wrap
-        .form-wrap
-          .form-well-form-header
-            %h3= @edit_templates[@edit_template]
+        .col-md-8.form-well#form_well_wrap
+          .form-wrap
+            .form-well-form-header
+              %h3= @edit_templates[@edit_template]
 
-          - unless @bike.primary_activity.present?
-            = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
+            - unless @bike.primary_activity.present?
+              = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
 
 
-          = f.fields_for :current_marketplace_listing, marketplace_listing do |ml|
-            = render LegacyFormWell::FormGroupRow::Component.new(form_builder: ml, label: :condition, label_translation: t(".condition"), row_classes: "unnested-field no-divider-row") do
-              = ml.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
 
+              = render LegacyFormWell::FormGroupRow::Component.new(form_builder: ml, label: :condition, label_translation: t(".condition"), row_classes: "unnested-field no-divider-row") do
+                = ml.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
+
+              .form-group.row.unnested-field
+                = ml.label :amount, t(".price"), class: 'form-well-label'
+                .form-well-input.input-group{ style: 'max-height: 2.5rem;'}
+                  .input-group-addon
+                    = current_currency.symbol
+                  = ml.number_field :amount, min: '0', class: 'form-control'
+
+              = ml.fields_for :address_record do |address_form|
+                = render(LegacyFormWell::AddressRecordWithDefault::Component.new(form_builder: address_form, user: @bike.user))
+
+            - if marketplace_listing.id.present? && !marketplace_listing.for_sale?
+              .form-group.row.unnested-field.pt-4.pb-3
+                .form-well-label
+                .form-well-input
+                  = link_to t(".publish_listing"), marketplace_listing_path(marketplace_listing, marketplace_listing: {status: :for_sale}), method: :patch, class: "btn btn-success tw:w-full"
+
+          .form-wrap.secondary-form-wrap
+            .form-well-form-header-always-visible
+              %h3
+                = t(".optional_information")
             .form-group.row.unnested-field
-              = ml.label :amount, t(".price"), class: 'form-well-label'
-              .form-well-input.input-group{ style: 'max-height: 2.5rem;'}
-                .input-group-addon
-                  = current_currency.symbol
-                = ml.number_field :amount, min: '0', class: 'form-control'
+              %label.form-well-label
+              .form-well-input.form-well-input-checks
+                %label
+                  = ml.check_box :price_negotiable
+                  = t(".price_is_negitiable")
 
-            = ml.fields_for :address_record do |address_form|
-              = render(LegacyFormWell::AddressRecordWithDefault::Component.new(form_builder: address_form, user: @bike.user))
-
-          - if marketplace_listing.id.present? && !marketplace_listing.for_sale?
-            .form-group.row.unnested-field.pt-4.pb-5
-              .form-well-label
-              .form-well-input
-                = link_to "publish listing", marketplace_listing_path(marketplace_listing, marketplace_listing: {status: :for_sale}), method: :patch, class: "btn btn-success tw:w-full"
 
           = render "/shared/form_well_footer_save"
+
