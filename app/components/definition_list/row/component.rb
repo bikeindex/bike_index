@@ -11,7 +11,7 @@ module DefinitionList::Row
       @kind = kind.to_sym if PERMITTED_KINDS.include?(kind&.to_sym)
 
       # TODO: actually support originalTimeZone. We add the timezone, but it's currently the user's timezone
-      @include_time_zone = time_localizer_settings&.include?("originalTimeZone") || false
+      @include_time_zone = time_localizer_settings&.include?(:originalTimeZone) || false
 
       @time_localizer_classes = time_localizer_classes(time_localizer_settings)
     end
@@ -49,9 +49,9 @@ module DefinitionList::Row
     end
 
     def time_localizer_classes(time_localizer_settings)
-      time_localizer_settings ||= ""
-      time_localizer_settings += "convertTime"
-      time_localizer_settings
+      time_localizer_settings ||= []
+      time_localizer_settings << "convertTime"
+      time_localizer_settings.join(" ")
     end
   end
 end

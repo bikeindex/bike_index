@@ -686,6 +686,19 @@ en:
         iso_bsd: Iso bsd
         name: Name
         priority: Priority
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive: Belt drive
+        coaster_brake: Coaster brake
+      status_humanized:
+        bike:
+          abandoned: abandoned
+          for_sale: for sale
+          found: found
+          impounded: impounded
+          stolen: stolen
+          unregistered: unregistered
+          with_owner: with owner
     enums:
       currency:
         cad: CAD
@@ -995,19 +1008,6 @@ en:
         two_u_locks: Two U-locks
         u_lock: U-lock
         u_lock_and_cable: U-lock and cable
-    bike_attributable:
-      status_humanized:
-        bike:
-          abandoned: abandoned
-          found: found
-          impounded: impounded
-          stolen: stolen
-          unregistered: unregistered
-          with_owner: with owner
-          for_sale: for sale
-      drivetrain_attributes:
-        coaster_brake: Coaster brake
-        belt_drive: Belt drive
   attributes:
     bikes:
       location: Location
@@ -1073,15 +1073,16 @@ en:
       stolen_within: Stolen within
       you: you
     main_show_block:
-      abandoned_title: "This is an abandoned %{bike_type} that was %{impound_kind}"
+      abandoned_title: This is an abandoned %{bike_type} that was %{impound_kind}
       bike_photo: "%{bike_type} photo"
       color_may_not_match: Color may not match!
-      componentyear: "%{componentyear}"
       component_no_info: "-"
+      componentyear: "%{componentyear}"
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
       drivetrain: Drivetrain
+      drivetrain_fixed: Fixed gear
       drivetrain_front: Drivetrain front
       drivetrain_rear: Drivetrain rear
       found_at: Found at
@@ -1089,6 +1090,7 @@ en:
       frame_size: Frame size
       front: Front
       front_rear: Front & rear
+      front_tire_width: Front tire width
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
       impounded_at: Impounded
@@ -1106,20 +1108,18 @@ en:
       primary_colors: Primary colors
       propulsion_type: Propulsion
       rear: Rear
+      rear_tire_width: Front tire width
       rear_wheel_diameter: Rear wheel diameter
       serial: Serial
       stock_photo: Stock photo of a %{year} %{model}
       stolen_at: Stolen at
       stolen_details: Theft Details
+      tire_width: Tire width
+      tire_width_narrow_false: Wide tire
+      tire_width_narrow_true: Narrow tire
       vehicle_type: Vehicle type
       wheel_diameter: Wheel diameter
-      tire_width_narrow_true: Narrow tire
-      tire_width_narrow_false: Wide tire
-      front_tire_width: Front tire width
-      rear_tire_width: Front tire width
-      tire_width: Tire width
       year: Year
-      drivetrain_fixed: Fixed gear
     new:
       additional_serial_sticker_number: Additional serial/sticker number
       affiliation: "%{org_name} affiliation"

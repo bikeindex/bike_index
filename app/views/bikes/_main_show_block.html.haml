@@ -89,7 +89,7 @@
             = render(DefinitionList::Row::Component.new(label: t(".location"), value: @stolen_record.address(country: [:skip_default])))
             = render(DefinitionList::Row::Component.new(label: t(".locking_description"), value: @stolen_record.locking_description))
             = render(DefinitionList::Row::Component.new(label: t(".locking_circumvented"), value: @stolen_record.lock_defeat_description))
-            = render(DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen))
+            = render(DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone]))
             = render(DefinitionList::Row::Component.new(label: t(".police_report"), value: @stolen_record.police_report_number))
             = render(DefinitionList::Row::Component.new(label: t(".department_city"), value: @stolen_record.police_report_department))
             = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), kind: :full_width, value: render(UserTextBlockDisplay::Component.new(text: @stolen_record.theft_description))))

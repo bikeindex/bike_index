@@ -8,10 +8,10 @@
     <% if render_convertime? %>
       <span class="<%= @time_localizer_classes %>">
         <%= l @value, format: :convert_time %>
-        <% if @include_time_zone %>
-          <span class="convertTimezone"></span>
-        <% end %>
       </span>
+      <% if @include_time_zone %>
+        <span class="convertTimezone"></span>
+      <% end %>
     <% elsif @value.present? %>
       <%= @value %>
     <% else %>
