@@ -15,6 +15,9 @@ RSpec.describe BikesController, type: :controller do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:user) { bike.creator }
     let(:organization) { FactoryBot.create(:organization) }
+    # This is required by show, if it isn't preset we get ReadOnlyError by
+    before { RearGearType.fixed }
+
     it "shows the bike" do
       get :show, params: {id: bike.id}
       expect(response.status).to eq(200)
@@ -191,6 +194,17 @@ RSpec.describe BikesController, type: :controller do
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
         end
+      end
+    end
+    context "with recovery token present" do
+      let(:bike) { FactoryBot.create(:stolen_bike) }
+      let(:stolen_record) { bike.current_stolen_record }
+      let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
+      it "renders a mark recovered modal, and deletes the session recovery_link_token" do
+        session[:recovery_link_token] = recovery_link_token
+        get :show, params: {id: bike.id}
+        expect(response.body).to match(recovery_link_token)
+        expect(session[:recovery_link_token]).to be_nil
       end
     end
   end
@@ -1192,18 +1206,6 @@ RSpec.describe BikesController, type: :controller do
           end
         end
       end
-    end
-  end
-
-  describe "show with recovery token present" do
-    let(:bike) { FactoryBot.create(:stolen_bike) }
-    let(:stolen_record) { bike.current_stolen_record }
-    let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
-    it "renders a mark recovered modal, and deletes the session recovery_link_token" do
-      session[:recovery_link_token] = recovery_link_token
-      get :show, params: {id: bike.id}
-      expect(response.body).to match(recovery_link_token)
-      expect(session[:recovery_link_token]).to be_nil
     end
   end
 end
