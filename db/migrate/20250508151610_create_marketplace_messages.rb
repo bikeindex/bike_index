@@ -1,3 +1,4 @@
+
 class CreateMarketplaceMessages < ActiveRecord::Migration[8.0]
   def change
     create_table :marketplace_messages do |t|
