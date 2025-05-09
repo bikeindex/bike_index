@@ -31,6 +31,10 @@
           = image_tag(@bike.stock_photo_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
   .show-bike-details
+    - if @bike.is_for_sale?
+      = render(PageSection::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing))
+
+    -# Basic bike details
     = render(DefinitionList::Container::Component.new(multi_columns: true)) do
       - unless @bike.version?
         = render(DefinitionList::Row::Component.new(label: t(".serial"), value: render_serial_display(@bike, current_user)))
@@ -40,7 +44,6 @@
         = render(DefinitionList::Row::Component.new(label: t(".vehicle_type"), value: @bike.cycle_type_name))
       - unless @bike.propulsion_type == "foot-pedal"
         = render(DefinitionList::Row::Component.new(label: t(".propulsion_type"), value: @bike.propulsion_type))
-
       = render(DefinitionList::Row::Component.new(label: t(".primary_activity"), value: @bike.primary_activity&.display_name))
 
       -# We want to display the whole manufacturer name here, not just the

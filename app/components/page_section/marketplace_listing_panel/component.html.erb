@@ -1,7 +1,14 @@
-<div data-controller="marketplace-listing-panel--component">
-  <h2><%= @marketplace_listing.item_type_display %></h2>
-  <h3><%= @marketplace_listing.currency_symbol %> <%= @marketplace_listing.amount %></h3>
+<%= render(Card::Component.new(additional_classes: "tw:mt-10 tw:mb-5")) do %>
+  <h2 class="tw:text-4xl! tw:font-normal tw:my-2! twtext-color!">
+    <%= @marketplace_listing.currency_symbol %><%= @marketplace_listing.amount %>
+    <small class="tw:text-2xl!"><%= @marketplace_listing.currency_name %></small>,
+    <span class="tw:text-xl! uncap"><%= translation(".price_is_firm_#{@marketplace_listing.price_firm?}") %></span>
+  </h2>
   <%= render(DefinitionList::Container::Component.new(multi_columns: true)) do %>
     <%= render(DefinitionList::Row::Component.new(label: translation(".condition"), value: @marketplace_listing.condition_humanized)) %>
+    <%= render(DefinitionList::Row::Component.new(label: translation(".location"), value: @marketplace_listing.formatted_address_string)) %>
+    <%= render(DefinitionList::Row::Component.new(label: translation(".first_posted_at"), value: @marketplace_listing.published_at)) %>
+    <%= render(DefinitionList::Row::Component.new(label: translation(".still_for_sale_at"), value: @marketplace_listing.still_for_sale_at)) %>
+    <%= render(DefinitionList::Row::Component.new(label: translation(".description"), value: @marketplace_listing.description, full_width: true)) %>
   <% end %>
-</div>
+<% end %>

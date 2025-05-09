@@ -3,9 +3,8 @@
 require "rails_helper"
 
 RSpec.describe PageSection::MarketplaceListingPanel::Component, type: :component do
-  let(:options) { {marketplace_listing:, current_user:} }
+  let(:options) { {marketplace_listing:} }
   let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
-  let(:current_user) { nil }
   let(:component) { render_inline(described_class.new(**options)) }
 
   it "renders" do

@@ -4,3 +4,9 @@ en:
     page_section:
       marketplace_listing_panel:
         condition: Condition
+        description: Description
+        first_posted_at: Posted
+        location: Location
+        price_is_firm_false: price is negotiable
+        price_is_firm_true: price is firm
+        still_for_sale_at: Still selling at

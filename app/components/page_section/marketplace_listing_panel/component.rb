@@ -2,9 +2,12 @@
 
 module PageSection::MarketplaceListingPanel
   class Component < ApplicationComponent
-    def initialize(marketplace_listing:, current_user: nil)
+    def initialize(marketplace_listing: nil)
       @marketplace_listing = marketplace_listing
-      @current_user = current_user
+    end
+
+    def render?
+      @marketplace_listing.present?
     end
   end
 end

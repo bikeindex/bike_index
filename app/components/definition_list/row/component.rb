@@ -8,7 +8,8 @@ module DefinitionList::Row
       @render_with_no_value = render_with_no_value
       @full_width = full_width
 
-      # TODO: actually support originalTimeZone. We add the timezone, but it's currently the user's timezone
+      # TODO: actually support originalTimeZone. When this is set currently, we show the timezone,
+      # but it's still the user's timezone
       @include_time_zone = time_localizer_settings&.include?(:originalTimeZone) || false
 
       @time_localizer_classes = time_localizer_classes(time_localizer_settings)

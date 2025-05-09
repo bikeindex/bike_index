@@ -6,10 +6,12 @@
 #  amount_cents      :integer
 #  condition         :integer
 #  currency_enum     :integer
+#  description       :text
 #  end_at            :datetime
 #  item_type         :string
 #  latitude          :float
 #  longitude         :float
+#  price_negotiable  :boolean          default(FALSE)
 #  published_at      :datetime
 #  status            :integer
 #  created_at        :datetime         not null
@@ -96,6 +98,11 @@ class MarketplaceListing < ApplicationRecord
     self.class.condition_humanized(condition)
   end
 
+  # make this more sophisticated!
+  def still_for_sale_at
+    item&.updated_by_user_at
+  end
+
   def publish!
     return false unless valid_publishable?
 
@@ -124,6 +131,10 @@ class MarketplaceListing < ApplicationRecord
     return nil unless item_type == "Bike"
 
     item.ownerships.order(:created_at).claimed.where("claimed_at < ?", created_at).last
+  end
+
+  def price_firm?
+    !price_negotiable?
   end
 
   private

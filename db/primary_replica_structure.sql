@@ -2187,7 +2187,9 @@ CREATE TABLE public.marketplace_listings (
     status integer,
     condition integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    price_negotiable boolean DEFAULT false,
+    description text
 );
 
 
