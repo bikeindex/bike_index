@@ -85,6 +85,14 @@ RSpec.describe BikeHelper, type: :helper do
     it "responds with nil" do
       expect(bike_status_span(bike)).to be_blank
     end
+    context "is_for_sale" do
+      before { bike.is_for_sale = true }
+      let(:target) { "<strong class=\"for-sale-color uppercase bike-status-html\">for sale</strong>" }
+      it "responds with strong" do
+        expect(bike.status_humanized).to eq "for sale"
+        expect(bike_status_span(bike)).to eq target
+      end
+    end
     context "unregistered parking notification" do
       let(:status) { "unregistered_parking_notification" }
       let(:target) { "<strong class=\"unregistered-color uppercase bike-status-html\">unregistered</strong>" }
@@ -102,6 +110,20 @@ RSpec.describe BikeHelper, type: :helper do
     context "impounded" do
       let(:status) { "status_impounded" }
       let(:target) { "<strong class=\"impounded-color uppercase bike-status-html\">impounded</strong>" }
+      it "responds with strong" do
+        expect(bike_status_span(bike)).to eq target
+      end
+      context "found" do
+        let(:target) { "<strong class=\"found-color uppercase bike-status-html\">found</strong>" }
+        it "responds with found" do
+          allow(bike).to receive(:status_found?).and_return(true)
+          expect(bike_status_span(bike)).to eq target
+        end
+      end
+    end
+    context "found" do
+      let(:status) { "status_abandoned" }
+      let(:target) { "<strong class=\"abandoned-color uppercase bike-status-html\">abandoned</strong>" }
       it "responds with strong" do
         expect(bike_status_span(bike)).to eq target
       end

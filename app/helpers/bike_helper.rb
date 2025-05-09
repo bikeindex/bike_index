@@ -24,7 +24,8 @@ module BikeHelper
   end
 
   def bike_status_span(bike)
-    return "" if bike.status_with_owner?
+    return "" if bike.status_humanized == "with owner" # for sale is status_with_owner
+
     content_tag(:strong,
       bike.status_humanized_translated,
       class: "#{bike.status_humanized.tr(" ", "-")}-color uppercase bike-status-html")

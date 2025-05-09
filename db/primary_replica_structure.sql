@@ -819,7 +819,8 @@ CREATE TABLE public.cgroups (
     slug character varying(255),
     description character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    priority integer DEFAULT 1
 );
 
 
@@ -2186,7 +2187,9 @@ CREATE TABLE public.marketplace_listings (
     status integer,
     condition integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    price_negotiable boolean DEFAULT false,
+    description text
 );
 
 
@@ -6962,6 +6965,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250508151602'),
 ('20250421153929'),
 ('20250413160560'),
 ('20250413160556'),

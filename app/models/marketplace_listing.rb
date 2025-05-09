@@ -6,10 +6,12 @@
 #  amount_cents      :integer
 #  condition         :integer
 #  currency_enum     :integer
+#  description       :text
 #  end_at            :datetime
 #  item_type         :string
 #  latitude          :float
 #  longitude         :float
+#  price_negotiable  :boolean          default(FALSE)
 #  published_at      :datetime
 #  status            :integer
 #  created_at        :datetime         not null
@@ -42,6 +44,8 @@ class MarketplaceListing < ApplicationRecord
   belongs_to :buyer, class_name: "User"
   belongs_to :item, polymorphic: true
   belongs_to :address_record
+
+  has_many :marketplace_messages
 
   validates_presence_of :item_id
   validates_presence_of :seller_id
@@ -86,8 +90,17 @@ class MarketplaceListing < ApplicationRecord
     CURRENT_STATUSES.include?(status&.to_sym)
   end
 
-  def item_type
+  def item_type_display
     item&.type_titleize || "bike"
+  end
+
+  def condition_humanized
+    self.class.condition_humanized(condition)
+  end
+
+  # make this more sophisticated!
+  def still_for_sale_at
+    item&.updated_by_user_at
   end
 
   def publish!
@@ -101,9 +114,9 @@ class MarketplaceListing < ApplicationRecord
   def valid_publishable?
     if item.blank? || !item.current?
       # Ensure the item is still around and visible
-      errors.add(:base, :item_not_visible, item_type:)
+      errors.add(:base, :item_not_visible, item_type: item_type_display)
     elsif item.primary_activity.blank?
-      errors.add(:base, :primary_activity_required, item_type:)
+      errors.add(:base, :primary_activity_required, item_type: item_type_display)
     end
 
     errors.add(:base, :price_required) if amount_cents.blank?
@@ -118,6 +131,10 @@ class MarketplaceListing < ApplicationRecord
     return nil unless item_type == "Bike"
 
     item.ownerships.order(:created_at).claimed.where("claimed_at < ?", created_at).last
+  end
+
+  def price_firm?
+    !price_negotiable?
   end
 
   private

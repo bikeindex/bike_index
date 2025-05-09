@@ -54,7 +54,7 @@
 }
 
 body {
-  @apply tw:antialiased tw:text-gray-900 tw:font-sans;
+  @apply tw:antialiased tw:font-sans tw:text-gray-900;
 }
 /*
   'dark:' syntax isn't working for the body element, unclear why - hacking with this for now
@@ -63,6 +63,14 @@ body.dark {
   @apply tw:bg-gray-900 tw:text-gray-400;
 }
 
+/* TODO: use this in the body instead of separately */
+.twtext-color {
+  @apply tw:text-gray-900 tw:dark:text-gray-400;
+}
+
+.twtext-color\! {
+  @apply tw:text-gray-900! tw:dark:text-gray-400!;
+}
 
 
 /* select2 is used by everythingcombox. Here are styles to make it look like the other inputs */

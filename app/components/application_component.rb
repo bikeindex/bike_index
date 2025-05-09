@@ -17,6 +17,10 @@ class ApplicationComponent < ViewComponent::Base
 
   private
 
+  def number_display(number)
+    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "tw:opacity-40" : ""))
+  end
+
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.
   #

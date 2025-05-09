@@ -16,19 +16,20 @@ class WheelSize < ApplicationRecord
   has_many :bikes
 
   default_scope { order(:iso_bsd) }
-  scope :commonness, -> { order("priority ASC, iso_bsd DESC") }
+
+  scope :commonness, -> { reorder("wheel_sizes.priority ASC, wheel_sizes.iso_bsd DESC") }
 
   def self.id_for_bsd(bsd)
     ws = where(iso_bsd: bsd.to_i).first
     ws&.id
   end
 
-  def select_value
-    "[#{iso_bsd}] #{description}"
+  def self.popularities
+    %w[Standard Common Uncommon Rare]
   end
 
-  def self.popularities
-    ["Standard", "Common", "Uncommon", "Rare"]
+  def select_value
+    "[#{iso_bsd}] #{description}"
   end
 
   def popularity

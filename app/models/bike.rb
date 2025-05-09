@@ -240,7 +240,7 @@ class Bike < ApplicationRecord
 
     def status_humanized_translated(str)
       return "" unless str.present?
-      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
+      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :bike_attributable, :status_humanized, :bike])
     end
 
     def text_search(query)

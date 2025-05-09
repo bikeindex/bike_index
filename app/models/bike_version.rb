@@ -123,6 +123,11 @@ class BikeVersion < ApplicationRecord
   end
 
   # Necessary to duplicate bike
+  def is_for_sale?
+    false
+  end
+
+  # Necessary to duplicate bike
   def pos?
     false
   end
