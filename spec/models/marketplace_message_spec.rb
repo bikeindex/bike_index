@@ -58,15 +58,7 @@ RSpec.describe MarketplaceMessage, type: :model do
     it "returns the threads for user in the order by id" do
       expect(MarketplaceMessage.for_user(user).order(:id).pluck(:id)).to match_array([marketplace_message.id, marketplace_message_2.id, marketplace_message_reply.id])
       expect(MarketplaceMessage.distinct.pluck(:initial_record_id)).to match_array([marketplace_message.id, marketplace_message_2.initial_record_id])
-      # pp MarketplaceMessage.distinct_threads.map(&:id)
-      pp MarketplaceMessage.pluck(:id, :initial_record_id)
-      pp MarketplaceMessage.distinct_threads.map(&:id)
-      # pp MarketplaceMessage.threads_for_user(user).map(&:id)
-      # expect(MarketplaceMessage.distinct_threads.order(:id).pluck(:id)).to eq([marketplace_message_reply.id, marketplace_message_2.id])
-      # pp MarketplaceMessage.threads_for_user(user).each { |mm| pp mm }
       expect(MarketplaceMessage.threads_for_user(user).map(&:id)).to match_array([marketplace_message_reply.id, marketplace_message_2.id])
     end
   end
 end
-
-
