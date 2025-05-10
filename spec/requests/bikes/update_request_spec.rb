@@ -100,9 +100,10 @@ RSpec.describe "BikesController#update", type: :request do
   end
   context "updating marketplace_listing" do
     let(:address_record) { FactoryBot.create(:address_record, :new_york) }
-    let(:current_user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
-    let!(:membership) { FactoryBot.create(:membership, user: current_user) }
-    let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
+    let(:user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
+    let(:current_user) { user }
+    let!(:membership) { FactoryBot.create(:membership, user: user) }
+    let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, owner_email: user.email) }
     let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
     let(:state) { FactoryBot.create(:state_california) }
     let(:address_record_attributes) do
@@ -136,7 +137,7 @@ RSpec.describe "BikesController#update", type: :request do
         .merge(amount_cents: 144242, status: "draft", price_negotiable: true)
     end
     it "creates the listing" do
-      expect(current_user.reload.can_create_listing?).to be_truthy
+      expect(user.reload.can_create_listing?).to be_truthy
       bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
 
       expect(bike.reload.primary_activity_id).to be_nil
@@ -148,7 +149,7 @@ RSpec.describe "BikesController#update", type: :request do
       VCR.use_cassette("bike_request-update-marketplace_listing") do
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
-          patch base_url, params: update_params
+          expect { patch base_url, params: update_params }.to change(MarketplaceListing, :count).by 1
         end
       end
 
@@ -160,10 +161,35 @@ RSpec.describe "BikesController#update", type: :request do
       address_record = marketplace_listing.address_record
       expect(address_record).to be_present
       expect(address_record.kind).to eq "marketplace_listing"
-      expect(address_record.user_id).to eq current_user.id
+      expect(address_record.user_id).to eq user.id
       expect(address_record.region_record_id).to eq state.id
       expect(address_record.city).to eq "Los Angeles"
       expect(address_record.region_string).to be_blank
+    end
+    context "existing marketplace_listing" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
+      let(:current_user) { FactoryBot.create(:superuser, :with_address_record, address_set_manually: true) }
+      let(:address_record_attributes) { {user_account_address: "1"} }
+
+      it "updates the listing" do
+        expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
+        expect(marketplace_listing.reload.address_record_id).to be_blank
+
+        VCR.use_cassette("bike_request-update-marketplace_listing") do
+          Sidekiq::Job.clear_all
+          Sidekiq::Testing.inline! do
+            expect {
+              patch base_url, params: update_params
+              expect(flash[:success]).to be_present
+            }.to change(MarketplaceListing, :count).by 0
+          end
+        end
+
+        expect(bike.reload.primary_activity_id).to eq primary_activity_id
+        expect(bike.current_marketplace_listing&.id).to eq marketplace_listing.id
+        expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs
+        expect(marketplace_listing.address_record_id).to eq address_record.id
+      end
     end
   end
   context "mark bike stolen, the way it's done on the web" do
