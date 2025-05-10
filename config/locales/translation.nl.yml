@@ -896,11 +896,10 @@ nl:
       marketplace_listing:
         condition:
           excellent: uitstekend
-          fair: eerlijk
           good: Goed
-          like_new: als nieuw
           new_in_box: nieuw in doos
           salvage: redden
+          poor: arm - heeft service nodig
     models:
       ad: Advertentie
       ambassador: Ambassadeur
@@ -6007,6 +6006,22 @@ nl:
       choose_condition: Kies conditie
       condition: Voorwaarde
       price: Prijs
+      add_required_information: Voeg de vereiste informatie toe (conditie, prijs,
+        adres)
+      description: Beschrijving
+      listing_draft: Conceptnotering
+      listing_is_published: De lijst is gepubliceerd
+      optional: optioneel
+      preview_it: Bekijk een voorbeeld van de aanbieding
+      price_is_negitiable: Prijs is onderhandelbaar
+      publish_listing: lijst publiceren
+      publish_listing_when_ready: Publiceer de advertentie wanneer u klaar bent om
+        te verkopen!
+      sale_description_html: Aanvullende informatie specifiek voor de verkoop. Plaats
+        <a href="%{edit_item_path}">hier</a> informatie over %{item_type_display}.
+      save_to_preview: Sla de aanbieding op om er een voorbeeld van te kunnen bekijken
+      view_listing: Bekijk uw vermelding
+      why_are_you_selling: Waarom verkoop je dit? Wat moet een potentiële koper weten?
   bike_versions:
     index:
       primary_colors: Primaire kleuren
