@@ -747,7 +747,7 @@ en:
         condition:
           excellent: excellent - lightly ridden
           poor: poor - needs service
-          good: good - used, mechanically sound
+          good: good - used but mechanically sound
           new_in_box: new - unridden/with tags
           salvage: for parts - not working/unrideable
       propulsion_type:
@@ -1526,6 +1526,14 @@ en:
       other_organizations: Other organizations
       remove: Remove
     marketplace:
+      preview_it: Preview the listing
+      save_to_preview: "Save the listing to be able to preview it"
+      listing_draft: Listing draft
+      view_listing: "View your listing"
+      add_required_information: Add required information (condition, price, address)
+      listing_is_published: Listing is published
+      save_the_listing: Save the listing
+      publish_listing_when_ready: Publish listing when you're ready to sell!
       choose_condition: Choose condition
       condition: Condition
       description: Description

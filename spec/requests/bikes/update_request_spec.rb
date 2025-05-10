@@ -122,7 +122,7 @@ RSpec.describe "BikesController#update", type: :request do
           primary_activity_id:,
           current_marketplace_listing_attributes: {
             condition: "new_in_box",
-            amount: "1442.42",
+            amount_with_nil: "1442.42",
             description: "some description",
             price_negotiable: "1",
             address_record_attributes:

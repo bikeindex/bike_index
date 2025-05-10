@@ -82,15 +82,20 @@ RSpec.describe BikeHelper, type: :helper do
   describe "bike_status_span" do
     let(:bike) { Bike.new(status: status) }
     let(:status) { "status_with_owner" }
+    let(:target_for_sale) { "<strong class=\"for-sale-color uppercase bike-status-html\">for sale</strong>" }
     it "responds with nil" do
       expect(bike_status_span(bike)).to be_blank
     end
+    context "override_to_for_sale" do
+      it "responds with for_sale" do
+        expect(bike_status_span(bike, override_to_for_sale: true)).to eq target_for_sale
+      end
+    end
     context "is_for_sale" do
       before { bike.is_for_sale = true }
-      let(:target) { "<strong class=\"for-sale-color uppercase bike-status-html\">for sale</strong>" }
       it "responds with strong" do
         expect(bike.status_humanized).to eq "for sale"
-        expect(bike_status_span(bike)).to eq target
+        expect(bike_status_span(bike)).to eq target_for_sale
       end
     end
     context "unregistered parking notification" do

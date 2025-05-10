@@ -32,6 +32,7 @@ RSpec.describe MarketplaceListing, type: :model do
       expect(marketplace_listing.status).to eq "draft"
       expect(marketplace_listing.seller_id).to eq user.id
       expect(marketplace_listing.condition).to eq "good"
+      expect(marketplace_listing.amount_cents).to be_blank
       expect(marketplace_listing.id).to be_blank
       marketplace_listing
     end
@@ -111,7 +112,7 @@ RSpec.describe MarketplaceListing, type: :model do
         bike: {
           current_marketplace_listing_attributes: {
             condition: "good",
-            amount: "300.69",
+            amount_with_nil: "300.69",
             address_record_attributes:
           }
         }
@@ -225,7 +226,7 @@ RSpec.describe MarketplaceListing, type: :model do
     end
   end
 
-  describe "valid_publishable" do
+  describe "validate_publishable?" do
     let(:user_hidden) { false }
     let(:primary_activity) { FactoryBot.create(:primary_activity) }
     let(:item) { FactoryBot.create(:bike, :with_ownership_claimed, user_hidden:, cycle_type: :stroller, primary_activity:) }
@@ -234,14 +235,14 @@ RSpec.describe MarketplaceListing, type: :model do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item:, address_record:, condition: "poor") }
 
     it "is truthy" do
-      expect(marketplace_listing.valid_publishable?).to be_truthy
+      expect(marketplace_listing.validate_publishable?).to be_truthy
       expect(marketplace_listing.errors.full_messages).to eq([])
     end
 
     context "no price" do
       it "is false" do
         marketplace_listing.amount_cents = nil
-        expect(marketplace_listing.valid_publishable?).to be_falsey
+        expect(marketplace_listing.validate_publishable?).to be_falsey
         expect(marketplace_listing.errors.full_messages).to eq(["Price is required"])
       end
     end
@@ -249,7 +250,7 @@ RSpec.describe MarketplaceListing, type: :model do
       let(:user_hidden) { true }
       it "is false when item is missing" do
         expect(item.reload.current?).to be_falsey
-        expect(marketplace_listing.valid_publishable?).to be_falsey
+        expect(marketplace_listing.validate_publishable?).to be_falsey
         expect(marketplace_listing.errors.full_messages).to eq(["Stroller is not visible - maybe you marked it hidden?"])
       end
     end

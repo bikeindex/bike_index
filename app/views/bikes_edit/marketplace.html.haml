@@ -8,7 +8,41 @@
       = render partial: '/bikes_edit/primary_menu'
 
       .col-md-8.form-well#form_well_wrap
-        .form-wrap
+        .form-wrap.stolen-checklist-wrap
+          .form-well-form-header-always-visible
+            %h3.header-font-alt
+              - if marketplace_listing.for_sale?
+                = t(".listing_is_published")
+              - else
+                = t(".listing_draft", item_type_display: marketplace_listing.item_type_display)
+
+            - if marketplace_listing.for_sale?
+              = link_to t(".view_listing"), bike_path(@bike)
+            - else
+              - publishable = marketplace_listing.valid_publishable?
+              %ul.stolen-checklist
+                %li{class: (publishable ? "completed-item" : "")}
+                  %span.checklist-checkbox
+                    = "&#10003;".html_safe if publishable
+                  %span.checklist-text
+                    = t(".add_required_information")
+                %li
+                  %span.checklist-checkbox
+                  %span.checklist-text
+                    - if marketplace_listing.id.present?
+                      = link_to t(".preview_it"), bike_path(@bike, show_marketplace_preview: true)
+                    - else
+                      %span{class: "tw:underline tw:cursor-not-allowed"}
+                        = t(".preview_it")
+                      %em.ml-1.less-strong= t(".save_to_preview")
+                %li
+                  %span.checklist-checkbox
+                  %span.checklist-text
+                    = t(".publish_listing_when_ready")
+
+
+
+        .form-wrap.secondary-form-wrap
           .form-well-form-header
             %h3= @edit_templates[@edit_template]
 
@@ -22,11 +56,11 @@
 
             .related-fields
               .form-group.row
-                = ml.label :amount, t(".price"), class: 'form-well-label'
+                = ml.label :amount_with_nil, t(".price"), class: 'form-well-label'
                 .form-well-input.input-group{ style: 'max-height: 2.5rem;'}
                   .input-group-addon
                     = current_currency.symbol
-                  = ml.number_field :amount, min: '0', class: 'form-control'
+                  = ml.number_field :amount_with_nil, min: 0, class: 'form-control'
               .form-group.row.mt-2
                 %label.form-well-label
                 .form-well-input.form-well-input-checks
