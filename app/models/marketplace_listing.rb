@@ -73,7 +73,7 @@ class MarketplaceListing < ApplicationRecord
 
     def seller_permitted_parameters
       [
-        :condition, :amount,
+        :condition, :amount, :price_negotiable, :description,
         address_record_attributes: (AddressRecord.permitted_params + %i[user_account_address])
       ].freeze
     end

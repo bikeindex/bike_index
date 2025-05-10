@@ -1529,10 +1529,16 @@ en:
     marketplace:
       choose_condition: Choose condition
       condition: Condition
+      description: Description
+      optional: optional
       price: Price
-      publish_listing: publish listing
-      optional_information: Optional information
       price_is_negitiable: Price is negotiable
+      publish_listing: publish listing
+      sale_description_html: >-
+        Additional information specific to the sale. Put information about the %{item_type_display}
+        <a href="%{edit_item_path}">here</a>.
+      why_are_you_selling: Why are you selling this? What should a potential buyer
+        know?
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button
