@@ -2213,6 +2213,41 @@ ALTER SEQUENCE public.marketplace_listings_id_seq OWNED BY public.marketplace_li
 
 
 --
+-- Name: marketplace_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_messages (
+    id bigint NOT NULL,
+    marketplace_listing_id bigint,
+    sender_id bigint,
+    receiver_id bigint,
+    body text,
+    kind integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_messages_id_seq OWNED BY public.marketplace_messages.id;
+
+
+--
 -- Name: memberships; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4339,6 +4374,13 @@ ALTER TABLE ONLY public.marketplace_listings ALTER COLUMN id SET DEFAULT nextval
 
 
 --
+-- Name: marketplace_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_messages ALTER COLUMN id SET DEFAULT nextval('public.marketplace_messages_id_seq'::regclass);
+
+
+--
 -- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5078,6 +5120,14 @@ ALTER TABLE ONLY public.manufacturers
 
 ALTER TABLE ONLY public.marketplace_listings
     ADD CONSTRAINT marketplace_listings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: marketplace_messages marketplace_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_messages
+    ADD CONSTRAINT marketplace_messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -6222,6 +6272,27 @@ CREATE INDEX index_marketplace_listings_on_seller_id ON public.marketplace_listi
 
 
 --
+-- Name: index_marketplace_messages_on_marketplace_listing_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_marketplace_listing_id ON public.marketplace_messages USING btree (marketplace_listing_id);
+
+
+--
+-- Name: index_marketplace_messages_on_receiver_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_receiver_id ON public.marketplace_messages USING btree (receiver_id);
+
+
+--
+-- Name: index_marketplace_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_sender_id ON public.marketplace_messages USING btree (sender_id);
+
+
+--
 -- Name: index_memberships_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6965,6 +7036,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250508151610'),
 ('20250508151602'),
 ('20250421153929'),
 ('20250413160560'),
