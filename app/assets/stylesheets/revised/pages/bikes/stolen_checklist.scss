@@ -52,4 +52,11 @@ $checklist-border: #919197;
       }
     }
   }
+
+  @include media-breakpoint-up(lg) {
+    .stolen-checklist, .also-give-me-padding-x {
+      padding-right: $vertical-height;
+      padding-left: $vertical-height;
+    }
+  }
 }

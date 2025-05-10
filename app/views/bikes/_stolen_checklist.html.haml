@@ -2,7 +2,7 @@
   - police_report_present = stolen_record.police_report_number.present?
 
   - if stolen_record.organization_stolen_message&.shown_to?(stolen_record)
-    .pl-1.pr-1= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: stolen_record}
+    .also-give-me-padding-x= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: stolen_record}
 
   %ul.stolen-checklist
     %li.completed-item

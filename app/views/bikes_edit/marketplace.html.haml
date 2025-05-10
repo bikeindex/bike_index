@@ -17,7 +17,8 @@
                 = t(".listing_draft", item_type_display: marketplace_listing.item_type_display)
 
             - if marketplace_listing.for_sale?
-              = link_to t(".view_listing"), bike_path(@bike)
+              %strong.d-block.also-give-me-padding-x
+                = link_to t(".view_listing"), bike_path(@bike)
             - else
               - publishable = marketplace_listing.valid_publishable?
               %ul.stolen-checklist
@@ -30,7 +31,7 @@
                   %span.checklist-checkbox
                   %span.checklist-text
                     - if marketplace_listing.id.present?
-                      = link_to t(".preview_it"), bike_path(@bike, show_marketplace_preview: true)
+                      = link_to t(".preview_it"), bike_path(@bike, show_marketplace_preview: true), target: "_blank"
                     - else
                       %span{class: "tw:underline tw:cursor-not-allowed"}
                         = t(".preview_it")
