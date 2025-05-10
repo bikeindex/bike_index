@@ -40,6 +40,7 @@ class BikesController < Bikes::BaseController
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
+    @show_for_sale = show_for_sale?(@bike)
     find_token
     respond_to do |format|
       format.html { render :show }
@@ -217,7 +218,17 @@ class BikesController < Bikes::BaseController
     redirect_to bike_path(@bike.id)
   end
 
-  protected
+  private
+
+  def show_for_sale?(bike)
+    return true if bike.is_for_sale?
+
+    marketplace_listing = bike.current_marketplace_listing
+    return false if marketplace_listing.blank? ||
+      !InputNormalizer.boolean(params[:show_marketplace_preview])
+
+    marketplace_listing.visible_by?(current_user)
+  end
 
   def permitted_page(page_param)
     page = (page_param.presence || 1).to_i

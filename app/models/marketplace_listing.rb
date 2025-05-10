@@ -30,7 +30,7 @@
 #
 class MarketplaceListing < ApplicationRecord
   STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
-  CONDITION_ENUM = {new_in_box: 0, like_new: 1, excellent: 2, good: 3, fair: 4, salvage: 5}.freeze
+  CONDITION_ENUM = {new_in_box: 0, excellent: 1, good: 2, poor: 3, salvage: 4}.freeze
   CURRENT_STATUSES = %i[draft for_sale]
 
   include AddressRecorded
@@ -73,7 +73,7 @@ class MarketplaceListing < ApplicationRecord
 
     def seller_permitted_parameters
       [
-        :condition, :amount,
+        :condition, :amount_with_nil, :price_negotiable, :description,
         address_record_attributes: (AddressRecord.permitted_params + %i[user_account_address])
       ].freeze
     end
@@ -100,11 +100,13 @@ class MarketplaceListing < ApplicationRecord
 
   # make this more sophisticated!
   def still_for_sale_at
+    return nil unless for_sale?
+
     item&.updated_by_user_at
   end
 
   def publish!
-    return false unless valid_publishable?
+    return false unless validate_publishable?
 
     update(published_at: Time.current, status: "for_sale")
     item&.update(is_for_sale: true) # Only relevant to bikes
@@ -112,6 +114,12 @@ class MarketplaceListing < ApplicationRecord
   end
 
   def valid_publishable?
+    return false if id.blank? || item.blank? || !item.current? || item.primary_activity.blank?
+
+    amount_cents.present? && condition.present? && address_record&.address_present?
+  end
+
+  def validate_publishable?
     if item.blank? || !item.current?
       # Ensure the item is still around and visible
       errors.add(:base, :item_not_visible, item_type: item_type_display)
@@ -135,6 +143,20 @@ class MarketplaceListing < ApplicationRecord
 
   def price_firm?
     !price_negotiable?
+  end
+
+  def visible_by?(passed_user = nil)
+    return true if for_sale?
+
+    authorized?(passed_user)
+  end
+
+  def authorized?(passed_user = nil)
+    return false if passed_user.blank?
+    return true if passed_user.superuser?
+
+    return true if passed_user.id == seller_id
+    sold? && passed_user.id == buyer_id
   end
 
   private

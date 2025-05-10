@@ -31,7 +31,7 @@
           = image_tag(@bike.stock_photo_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
   .show-bike-details
-    - if @bike.is_for_sale?
+    - if @show_for_sale
       = render(PageSection::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing))
 
     -# Basic bike details
