@@ -745,12 +745,11 @@ en:
         rearward: Rear facing
       marketplace_listing:
         condition:
-          excellent: excellent
-          fair: fair
-          good: good
-          like_new: like new
-          new_in_box: new in box
-          salvage: salvage
+          excellent: excellent - lightly ridden
+          poor: poor - needs service
+          good: good - used, mechanically sound
+          new_in_box: new - unridden/with tags
+          salvage: for parts - not working/unrideable
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Cycle (hand pedal)
