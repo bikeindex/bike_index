@@ -2,8 +2,12 @@
 
 module UserTextBlockDisplay
   class Component < ApplicationComponent
-    def initialize(text:)
-      @text = text.strip
+    def initialize(text: nil)
+      @text = text&.strip
+    end
+
+    def render?
+      @text.present?
     end
   end
 end

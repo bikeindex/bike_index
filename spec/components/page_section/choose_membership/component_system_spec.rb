@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe ChooseMembership::Component, :js, type: :system do
-  let(:preview_path) { "/rails/view_components/choose_membership/component/default" }
+RSpec.describe PageSection::ChooseMembership::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/page_section/choose_membership/component/default" }
 
   it "default preview" do
     visit(preview_path)

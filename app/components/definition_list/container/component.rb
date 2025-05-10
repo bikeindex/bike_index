@@ -2,7 +2,8 @@
 
 module DefinitionList::Container
   class Component < ApplicationComponent
-    def initialize
+    def initialize(multi_columns: false)
+      @multi_columns = multi_columns
     end
   end
 end

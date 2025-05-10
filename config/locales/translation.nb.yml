@@ -1051,14 +1051,19 @@ nb:
         two_u_locks: To U-låser
         u_lock: U-lås
         u_lock_and_cable: U-lås og kabel
-    status_humanized:
-      bike:
-        abandoned: forlatt
-        found: funnet
-        impounded: beslaglagt
-        stolen: stjålet
-        unregistered: uregistrert
-        with_owner: med eier
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive: Remdrift
+        coaster_brake: Coaster brems
+      status_humanized:
+        bike:
+          abandoned: forlatt
+          for_sale: til salgs
+          found: funnet
+          impounded: beslaglagt
+          stolen: stjålet
+          unregistered: uregistrert
+          with_owner: med eier
   datetime:
     distance_in_words:
       half_a_minute: et halvt minutt
@@ -1843,6 +1848,17 @@ nb:
       year: år
       vehicle_type: Bil type
       primary_activity: Primæraktivitet
+      abandoned_title: Dette er en forlatt %{bike_type} som var %{impound_kind}
+      component_no_info: "-"
+      drivetrain: Drivverk
+      drivetrain_fixed: Fast utstyr
+      drivetrain_front: Drivverk foran
+      drivetrain_rear: Drivverk bak
+      front_tire_width: Bredde på forhjulet
+      rear_tire_width: Bredde på forhjulet
+      tire_width: Dekkbredde
+      tire_width_narrow_false: Bredt dekk
+      tire_width_narrow_true: Smalt dekk
     new:
       additional_serial_sticker_number: Ekstra serie-/klistremerkenummer
       affiliation: "%{org_name} tilknytning"
@@ -4301,22 +4317,6 @@ nb:
       pinhead_locking_skewer_key: Pinhead låsende spyd nøkkel
       small_kryptonite_key: Liten Kryptonite-nøkkel
       update_the_lock: Oppdater låsen!
-    lock_home:
-      add_a_new_lock: Legg til en ny lås
-      any_lock_information_you_enter_on_bike_in: All låsinformasjon du legger inn
-        på Bike Index er privat og kun synlig for deg.
-      if_you_want_you_can_save_serial_html: Hvis du vil, kan du <strong>lagre serienumrene
-        til nøklene dine</strong> på Bike Index – slik at du ikke er uheldig hvis
-        du mister dem.
-      lock_keys_often_have_serial_numbers_so_yo: Låsnøkler har ofte serienummer, så
-        du kan bestille erstatninger hvis du mister nøklene.
-      lock_type: Lås type
-      manufacturer: Produsent
-      save_information_about_a_lock: Lagre informasjon om en lås
-      save_information_about_your_bike_lock: Lagre informasjon om sykkellåsen din!
-      you_can_also_record_your_lock_html: Du kan også <strong>registrere låsekombinasjonene
-        dine</strong> .
-      your_locks: Låsene dine
     new:
       save_information_about_one_of_your_locks: Lagre informasjon om en av låsene
         dine
@@ -5918,3 +5918,15 @@ nb:
       address_record_with_default:
         edit_my_account_path: redigering på kontoen min
         use_account_address: Bruk kontoadresse
+    definition_list:
+      row:
+        no_value: ingen
+    page_section:
+      marketplace_listing_panel:
+        condition: Betingelse
+        description: Beskrivelse
+        first_posted_at: Postet
+        location: plassering
+        price_is_firm_false: Prisen er omsettelig
+        price_is_firm_true: prisen er fast
+        still_for_sale_at: Selger fortsatt på

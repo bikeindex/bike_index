@@ -2,10 +2,10 @@
 
 require "rails_helper"
 
-RSpec.describe <%= component_class %>, type: :component do
+RSpec.describe Card::Component, type: :component do
+  let(:options) { {} }
+
   let(:component) { render_inline(described_class.new(**options)) }
-  let(:options) { {<%= initialize_signature %>} }<% attributes.each do |attr| %>
-  let(:<%= attr.name %>) { nil }<% end %>
 
   it "renders" do
     expect(component).to be_present
