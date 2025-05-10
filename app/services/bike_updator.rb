@@ -32,7 +32,8 @@ class BikeUpdator
 
       if InputNormalizer.boolean(marketplace_listing_attributes[:address_record_attributes][:user_account_address])
         marketplace_listing_attributes.delete(:address_record_attributes)
-        marketplace_listing_attributes[:address_record_id] = user.address_record_id
+        # NOTE: Not user, or else admin edits overwrite the user's address
+        marketplace_listing_attributes[:address_record_id] = bike.user&.address_record_id
       end
 
       marketplace_listing_attributes
