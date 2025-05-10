@@ -3899,7 +3899,7 @@ en:
       the_nonprofit_bike_registry: the non-profit bike registry
       user_settings: "%{user_email} settings"
       view_org: View %{org_name}
-      your_bikes: Your bikes
+      your_registrations: Your registrations
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index –
         the premier bike registry.

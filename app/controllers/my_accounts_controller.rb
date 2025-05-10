@@ -67,10 +67,6 @@ class MyAccountsController < ApplicationController
 
   private
 
-  def authenticate_user_for_my_accounts_controller
-    authenticate_user(translation_key: :create_account, flash_type: :info)
-  end
-
   def edit_templates
     @edit_templates ||= {
       root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),

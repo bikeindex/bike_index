@@ -45,7 +45,11 @@ module Sessionable
     cookies.signed[:auth] = cookie_options(user)
   end
 
-  protected
+  def authenticate_user_for_my_accounts_controller
+    authenticate_user(translation_key: :create_account, flash_type: :info)
+  end
+
+  private
 
   def cookie_options(user)
     c = {
