@@ -9,6 +9,7 @@ RSpec.describe MarketplaceMessage, type: :model do
       expect(marketplace_message.receiver_id).to eq seller_id
       expect(marketplace_message.initial_message?).to be_truthy
       expect(marketplace_message.kind).to eq "sender_buyer"
+      expect(marketplace_message.initial_record_id).to eq marketplace_message.id
       expect(MarketplaceMessage.any_for_user?).to be_falsey
       expect(MarketplaceMessage.any_for_user?(marketplace_message.sender)).to be_truthy
       expect(MarketplaceMessage.any_for_user?(marketplace_message.receiver)).to be_truthy
@@ -25,6 +26,8 @@ RSpec.describe MarketplaceMessage, type: :model do
         expect(marketplace_message_reply.marketplace_listing_id).to eq marketplace_message.marketplace_listing_id
         expect(marketplace_message_reply.initial_message?).to be_falsey
         expect(marketplace_message_reply.kind).to eq "sender_seller"
+        expect(MarketplaceMessage.initial_message.pluck(:id)).to eq([marketplace_message.id])
+        expect(MarketplaceMessage.reply_message.pluck(:id)).to eq([marketplace_message_reply.id])
       end
     end
     context "reply passed sender" do
@@ -45,4 +48,25 @@ RSpec.describe MarketplaceMessage, type: :model do
       end
     end
   end
+
+  describe "threads_for_user" do
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
+    let(:user) { marketplace_message.receiver }
+    let!(:marketplace_message_2) { FactoryBot.create(:marketplace_message_reply, receiver: user) }
+    let!(:marketplace_message_reply) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message) }
+
+    it "returns the threads for user in the order by id" do
+      expect(MarketplaceMessage.for_user(user).order(:id).pluck(:id)).to match_array([marketplace_message.id, marketplace_message_2.id, marketplace_message_reply.id])
+      expect(MarketplaceMessage.distinct.pluck(:initial_record_id)).to match_array([marketplace_message.id, marketplace_message_2.initial_record_id])
+      # pp MarketplaceMessage.distinct_threads.map(&:id)
+      pp MarketplaceMessage.pluck(:id, :initial_record_id)
+      pp MarketplaceMessage.distinct_threads.map(&:id)
+      # pp MarketplaceMessage.threads_for_user(user).map(&:id)
+      # expect(MarketplaceMessage.distinct_threads.order(:id).pluck(:id)).to eq([marketplace_message_reply.id, marketplace_message_2.id])
+      # pp MarketplaceMessage.threads_for_user(user).each { |mm| pp mm }
+      expect(MarketplaceMessage.threads_for_user(user).map(&:id)).to match_array([marketplace_message_reply.id, marketplace_message_2.id])
+    end
+  end
 end
+
+

@@ -40,14 +40,26 @@ class MarketplaceMessage < ApplicationRecord
 
   attr_accessor :skip_processing
 
-  scope :initial_message, -> { where(initial_record_id: nil) }
-  scope :reply_message, -> { where.not(initial_record_id: nil) }
+  scope :initial_message, -> { where('id = initial_record_id') }
+  scope :reply_message, -> { where.not('id = initial_record_id') }
+  scope :distinct_threads, -> {
+    # select('DISTINCT ON (initial_record_id) marketplace_messages.*')
+    # .order('initial_record_id, created_at ASC')
+    select('DISTINCT ON (initial_record_id) *')
+      .order(:initial_record_id, id: :desc)
+  }
 
   delegate :seller_id, to: :marketplace_listing, allow_nil: true
 
   class << self
     def for_user(user)
       where(sender_id: user.id).or(where(receiver_id: user.id))
+    end
+
+    def threads_for_user(user)
+      for_user(user).distinct_threads
+      # for_user(user).distinct(:initial_record_id)
+      # .select('DISTINCT ON (initial_record_id) *')
     end
 
     # Cached because this is called on every page load - to determine whether to render the messages menu item
@@ -59,11 +71,11 @@ class MarketplaceMessage < ApplicationRecord
   end
 
   def initial_message
-    initial_message? ? self : initial_record
+    initial_record
   end
 
   def initial_message?
-    initial_record_id.blank?
+    id.blank? ? initial_record_id.blank? : initial_record_id == id
   end
 
   def reply_message?
@@ -75,6 +87,7 @@ class MarketplaceMessage < ApplicationRecord
   def set_calculated_attributes
     self.kind ||= sender_id == seller_id ? "sender_seller" : "sender_buyer"
     self.subject = "Re: #{initial_record.subject}" if reply_message?
+    self.initial_record ||= self
   end
 
   def process_notification
