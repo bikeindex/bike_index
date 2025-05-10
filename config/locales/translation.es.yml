@@ -885,11 +885,10 @@ es:
       marketplace_listing:
         condition:
           excellent:
-          fair:
           good:
-          like_new:
           new_in_box:
           salvage:
+          poor:
     models:
       ad:
       ambassador:
@@ -2248,6 +2247,19 @@ es:
       choose_condition:
       condition:
       price:
+      add_required_information:
+      description:
+      listing_draft:
+      listing_is_published:
+      optional:
+      preview_it:
+      price_is_negitiable:
+      publish_listing:
+      publish_listing_when_ready:
+      sale_description_html:
+      save_to_preview:
+      view_listing:
+      why_are_you_selling:
   controllers:
     application:
       handle_unverified_request:

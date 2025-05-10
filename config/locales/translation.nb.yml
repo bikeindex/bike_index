@@ -897,11 +897,10 @@ nb:
       marketplace_listing:
         condition:
           excellent: glimrende
-          fair: rettferdig
           good: god
-          like_new: som ny
           new_in_box: ny i esken
           salvage: berging
+          poor: dårlig - trenger service
     models:
       ad: Annonse
       ambassador: Ambassadør
@@ -2370,6 +2369,20 @@ nb:
       choose_condition: Velg tilstand
       condition: Betingelse
       price: Pris
+      add_required_information: Legg til nødvendig informasjon (tilstand, pris, adresse)
+      description: Beskrivelse
+      listing_draft: Utkast til oppføring
+      listing_is_published: Oppføringen er publisert
+      optional: valgfri
+      preview_it: Forhåndsvis oppføringen
+      price_is_negitiable: Prisen er omsettelig
+      publish_listing: publiser oppføring
+      publish_listing_when_ready: Publiser annonsen når du er klar til å selge!
+      sale_description_html: Tilleggsinformasjon spesifikk for salget. Skriv inn informasjon
+        om %{item_type_display} <a href="%{edit_item_path}">her</a> .
+      save_to_preview: Lagre oppføringen for å kunne forhåndsvise den
+      view_listing: Se oppføringen din
+      why_are_you_selling: Hvorfor selger du dette? Hva bør en potensiell kjøper vite?
   controllers:
     application:
       handle_unverified_request:

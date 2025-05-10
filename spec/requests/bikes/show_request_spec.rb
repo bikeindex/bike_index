@@ -569,6 +569,79 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+
+  context "with marketplace_listing" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.reload.user }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, status:) }
+    let(:status) { :draft }
+
+    it "renders with preview" do
+      expect(marketplace_listing.reload.seller_id).to eq current_user.id
+      expect(marketplace_listing.visible_by?(current_user)).to be_truthy
+      get "#{base_url}/#{bike.id}"
+      expect(flash).to be_blank
+      expect(assigns(:bike)).to eq bike
+      expect(assigns(:show_for_sale)).to be_falsey
+      # passed preview
+      get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+      expect(flash).to be_blank
+      expect(assigns(:bike)).to eq bike
+      expect(assigns(:show_for_sale)).to be_truthy
+    end
+
+    context "current_user not owner" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "doesn't render" do
+        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        expect(flash).to be_blank
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:show_for_sale)).to be_truthy
+      end
+    end
+
+    context "current_user not owner" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+      it "doesn't render" do
+        expect(marketplace_listing.visible_by?(current_user)).to be_falsey
+        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        expect(flash).to be_blank
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:show_for_sale)).to be_falsey
+        # when status: for_sale it does render
+        marketplace_listing.update(status: :for_sale, address_record: FactoryBot.create(:address_record, user: bike.user))
+        bike.update(is_for_sale: true)
+        expect(marketplace_listing.reload.status).to eq "for_sale"
+        expect(marketplace_listing.visible_by?(current_user)).to be_truthy
+        get "#{base_url}/#{bike.id}"
+        expect(flash).to be_blank
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:show_for_sale)).to be_truthy
+      end
+    end
+
+    context "sold" do
+      let(:status) { :sold }
+      it "doesn't render" do
+        expect(marketplace_listing.reload.visible_by?(current_user)).to be_truthy
+        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        expect(flash).to be_blank
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:show_for_sale)).to be_falsey
+      end
+    end
+
+    context "no marketplace_listing present" do
+      let!(:marketplace_listing) { nil }
+      it "doesn't render" do
+        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        expect(flash).to be_blank
+        expect(assigns(:bike)).to eq bike
+        expect(assigns(:show_for_sale)).to be_falsey
+      end
+    end
+  end
   context "qr code png" do
     it "renders" do
       get "#{base_url}/#{bike.id}.png"

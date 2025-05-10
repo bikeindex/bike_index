@@ -16,7 +16,10 @@
             "data-action" => "change->legacy-form-well--address-record-with-default--component#toggleUseAccount",
             "data-legacy-form-well--address-record-with-default--component-target" => "useAccountCheckbox"
           } %>
-          <%= translation(".use_account_address") %> (<%= link_to translation(".edit_my_account_path"), edit_my_account_path %>)
+          <span class="tw:cursor-pointer">
+            <%= translation(".use_account_address") %>
+          </span>
+          (<%= link_to translation(".edit_my_account_path"), edit_my_account_path %>)
         </label>
       </div>
     </div>

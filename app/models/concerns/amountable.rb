@@ -12,6 +12,16 @@ module Amountable
     self.amount_cents = MoneyFormatter.convert_to_cents(val)
   end
 
+  def amount_with_nil
+    return nil if amount_cents.blank?
+
+    amount
+  end
+
+  def amount_with_nil=(val)
+    self.amount_cents = val.present? ? MoneyFormatter.convert_to_cents(val) : nil
+  end
+
   def amount_formatted
     MoneyFormatter.money_format(amount_cents, currency_name)
   end

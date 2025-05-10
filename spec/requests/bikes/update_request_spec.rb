@@ -122,11 +122,18 @@ RSpec.describe "BikesController#update", type: :request do
           primary_activity_id:,
           current_marketplace_listing_attributes: {
             condition: "new_in_box",
-            amount: "1442.42",
+            amount_with_nil: "1442.42",
+            description: "some description",
+            price_negotiable: "1",
             address_record_attributes:
           }
         }
       }
+    end
+    let(:target_marketplace_attrs) do
+      update_params.dig(:bike, :current_marketplace_listing_attributes)
+        .except(:amount, :address_record_attributes)
+        .merge(amount_cents: 144242, status: "draft", price_negotiable: true)
     end
     it "creates the listing" do
       expect(current_user.reload.can_create_listing?).to be_truthy
@@ -148,9 +155,8 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.reload.primary_activity_id).to eq primary_activity_id
       marketplace_listing = bike.current_marketplace_listing
       expect(marketplace_listing).to be_present
-      expect(marketplace_listing.amount_cents).to eq 144242
-      expect(marketplace_listing.condition).to eq "new_in_box"
-      expect(marketplace_listing.status).to eq "draft"
+      expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs
+
       address_record = marketplace_listing.address_record
       expect(address_record).to be_present
       expect(address_record.kind).to eq "marketplace_listing"

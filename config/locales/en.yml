@@ -745,12 +745,11 @@ en:
         rearward: Rear facing
       marketplace_listing:
         condition:
-          excellent: excellent
-          fair: fair
-          good: good
-          like_new: like new
-          new_in_box: new in box
-          salvage: salvage
+          excellent: excellent - lightly ridden
+          good: good - used but mechanically sound
+          new_in_box: new - unridden/with tags
+          poor: poor - needs service
+          salvage: for parts - not working/unrideable
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Cycle (hand pedal)
@@ -1527,9 +1526,25 @@ en:
       other_organizations: Other organizations
       remove: Remove
     marketplace:
+      add_required_information: Add required information (condition, price, address)
       choose_condition: Choose condition
       condition: Condition
+      description: Description
+      listing_draft: Listing draft
+      listing_is_published: Listing is published
+      optional: optional
+      preview_it: Preview the listing
       price: Price
+      price_is_negitiable: Price is negotiable
+      publish_listing: publish listing
+      publish_listing_when_ready: Publish listing when you're ready to sell!
+      sale_description_html: >-
+        Additional information specific to the sale. Put information about the %{item_type_display}
+        <a href="%{edit_item_path}">here</a>.
+      save_to_preview: Save the listing to be able to preview it
+      view_listing: View your listing
+      why_are_you_selling: Why are you selling this? What should a potential buyer
+        know?
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button

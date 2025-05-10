@@ -80,7 +80,7 @@
   .row
     .col-md-8
       %h1.bike-title
-        = bike_status_span(@bike)
+        = bike_status_span(@bike, override_to_for_sale: @show_for_sale)
         %span.uncap= bike_title_html(@bike)
         - if @bike.example?
           %small.text-warning.uncap= t(".test_registration")
