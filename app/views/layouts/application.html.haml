@@ -73,8 +73,8 @@
                     = active_link t(".your_registrations"), my_account_path, class: 'nav-link'
                   -# .any_for_user? caches
                   - if MarketplaceMessage.any_for_user?(current_user)
-                      %li
-                        = active_link t(".marketplace_messages"), my_account_messages_path, class: 'nav-link'
+                    %li
+                      = active_link t(".marketplace_messages"), my_account_messages_path, class: 'nav-link'
                   %li
                     = active_link t(".register_a_new_bike"), choose_registration_path, class: 'nav-link'
                   %li

@@ -81,7 +81,6 @@ class User < ApplicationRecord
   mount_uploader :avatar, AvatarUploader
 
   has_many :ambassador_task_assignments
-  has_many :ambassador_tasks, through: :ambassador_task_assignments
   has_many :bike_sticker_updates
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
@@ -101,9 +100,7 @@ class User < ApplicationRecord
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organization_roles
-  has_many :organizations, through: :organization_roles
   has_many :ownerships
-  has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :payments
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
   has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
@@ -111,12 +108,16 @@ class User < ApplicationRecord
   has_many :stripe_subscriptions
   has_many :superuser_abilities
   has_many :theft_alerts
-  has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
-  has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
   has_many :user_alerts
   has_many :user_emails, dependent: :destroy
   has_many :user_phones
   has_many :user_registration_organizations
+
+  has_many :ambassador_tasks, through: :ambassador_task_assignments
+  has_many :organizations, through: :organization_roles
+  has_many :owned_bikes, through: :ownerships, source: :bike
+  has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
+  has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
 
   has_one :membership_active, -> { active }, class_name: "Membership"
   has_one :mailchimp_datum
