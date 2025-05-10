@@ -2219,8 +2219,10 @@ ALTER SEQUENCE public.marketplace_listings_id_seq OWNED BY public.marketplace_li
 CREATE TABLE public.marketplace_messages (
     id bigint NOT NULL,
     marketplace_listing_id bigint,
+    initial_record_id bigint,
     sender_id bigint,
     receiver_id bigint,
+    subject text,
     body text,
     kind integer,
     created_at timestamp(6) without time zone NOT NULL,
@@ -6269,6 +6271,13 @@ CREATE INDEX index_marketplace_listings_on_item ON public.marketplace_listings U
 --
 
 CREATE INDEX index_marketplace_listings_on_seller_id ON public.marketplace_listings USING btree (seller_id);
+
+
+--
+-- Name: index_marketplace_messages_on_initial_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_initial_record_id ON public.marketplace_messages USING btree (initial_record_id);
 
 
 --
