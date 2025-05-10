@@ -255,4 +255,12 @@ RSpec.describe MarketplaceListing, type: :model do
       end
     end
   end
+
+  describe "visible_by?" do
+    let(:marketplace_listing) { FactoryBot.create(:marketplace_listing) }
+    it "is visible by the user" do
+      expect(marketplace_listing.visible_by?).to be_falsey
+      expect(marketplace_listing.visible_by?(marketplace_listing.seller)).to be_truthy
+    end
+  end
 end

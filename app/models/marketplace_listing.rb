@@ -100,6 +100,8 @@ class MarketplaceListing < ApplicationRecord
 
   # make this more sophisticated!
   def still_for_sale_at
+    return nil unless for_sale?
+
     item&.updated_by_user_at
   end
 
