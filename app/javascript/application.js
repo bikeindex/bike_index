@@ -5,6 +5,8 @@ import { Application } from '@hotwired/stimulus'
 // Lazy load all controllers
 import { lazyLoadControllersFrom } from '@hotwired/stimulus-loading'
 
+import TimeLocalizer from 'utils/time_localizer'
+
 /* global Turbo */
 // Disable Turbo by default, only enable on case-by-case
 // You must include data-turbo="true" on the elements you want to enable turbo on
@@ -16,3 +18,14 @@ application.debug = false
 window.Stimulus = application
 
 lazyLoadControllersFrom('components', application)
+
+function localizeTime() {
+  if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
+  window.timeLocalizer.localize()
+}
+
+// Set window.importmapLocalizeTime on pages without application_revised.js
+// so time localization still happens (e.g. lookbook)
+if (window.importmapLocalizeTime) {
+  document.addEventListener('DOMContentLoaded', localizeTime)
+}

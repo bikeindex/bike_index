@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    messages:
+      thread:
+        me: me
+        current_user: Current_user

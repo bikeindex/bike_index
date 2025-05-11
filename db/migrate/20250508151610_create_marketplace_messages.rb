@@ -9,6 +9,7 @@ class CreateMarketplaceMessages < ActiveRecord::Migration[8.0]
       t.text :subject
       t.text :body
       t.integer :kind
+      t.integer :messages_prior_count
 
       t.timestamps
     end

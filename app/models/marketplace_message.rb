@@ -5,6 +5,7 @@
 #  id                     :bigint           not null, primary key
 #  body                   :text
 #  kind                   :integer
+#  messages_prior_count   :integer
 #  subject                :text
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
@@ -47,7 +48,8 @@ class MarketplaceMessage < ApplicationRecord
       .order(:initial_record_id, id: :desc)
   }
 
-  delegate :seller_id, to: :marketplace_listing, allow_nil: true
+  delegate :seller_id, :seller, :item, :item_id, :item_type,
+    to: :marketplace_listing, allow_nil: true
 
   class << self
     def for_user(user)
@@ -58,12 +60,18 @@ class MarketplaceMessage < ApplicationRecord
       for_user(user).distinct_threads
     end
 
-    # Cached because this is called on every page load - to determine whether to render the messages menu item
+    # Cached because this is called on every page load, to determine whether to show the messages menu item
     def any_for_user?(user = nil)
       return false unless user.present?
 
       Rails.cache.fetch(["any_marketplace_messages", user]) { for_user(user).any? }
     end
+  end
+
+  def other_user(user_or_id)
+    user_id = user_or_id&.is_a?(User) ? user_or_id.id : user_or_id
+    return [receiver, :receiver] if user_id == sender_id
+    return [sender, :sender] if user_id == receiver_id
   end
 
   def initial_message
@@ -78,12 +86,22 @@ class MarketplaceMessage < ApplicationRecord
     !initial_message?
   end
 
+  def messages_in_thread
+    self.class.where(initial_record_id:)
+  end
+
   private
 
   def set_calculated_attributes
     self.kind ||= (sender_id == seller_id) ? "sender_seller" : "sender_buyer"
     self.subject = "Re: #{initial_record.subject}" if reply_message?
     self.initial_record ||= self
+    self.messages_prior_count ||= calculated_messages_prior_count
+    self.receiver_id = if initial_message?
+      seller_id
+    else
+      sender_id == seller_id ? initial_record.sender_id : seller_id
+    end
   end
 
   def process_notification
@@ -93,5 +111,12 @@ class MarketplaceMessage < ApplicationRecord
     # Bust caches on the associations
     sender&.update(updated_at: Time.current)
     receiver&.update(updated_at: Time.current)
+  end
+
+
+  def calculated_messages_prior_count
+    return 0 if initial_message?
+
+    (id.present? ? messages_in_thread.where("id < ?", id) : messages_in_thread).count
   end
 end

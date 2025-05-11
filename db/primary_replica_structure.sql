@@ -2225,6 +2225,7 @@ CREATE TABLE public.marketplace_messages (
     subject text,
     body text,
     kind integer,
+    messages_prior_count integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

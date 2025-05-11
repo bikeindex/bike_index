@@ -289,6 +289,10 @@ class User < ApplicationRecord
     username
   end
 
+  def marketplace_message_name
+    name.present? ? name : short_username
+  end
+
   def display_name
     name.present? ? name : email
   end
@@ -558,6 +562,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def short_username
+    username&.truncate(11)
+  end
 
   def password_reset_just_sent?
     auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i

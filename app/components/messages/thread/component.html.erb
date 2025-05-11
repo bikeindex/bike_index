@@ -1,0 +1,15 @@
+<div class="tw:@container tw:w-full tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:gap-4 tw:items-center">
+  <div class="tw:col-span-2 tw:md:col-span-3 tw:md:grid tw:md:grid-cols-3 tw:md:gap-4">
+    <h2 class="tw:text-lg tw:font-semibold">
+      <%= sender_display_html %>
+    </h2>
+  </div>
+  <div><%= item_title %></div>
+  <span><%= message_display %></span>
+  <div>
+    <span class="convertTime">
+      <%= l @marketplace_message.created_at, format: :convert_time %>
+    </span>
+  </div>
+</div>
+3
