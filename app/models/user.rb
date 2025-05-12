@@ -290,7 +290,7 @@ class User < ApplicationRecord
   end
 
   def marketplace_message_name
-    name.present? ? name : short_username
+    InputNormalizer.sanitize(name.present? ? name : short_username)
   end
 
   def display_name

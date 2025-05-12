@@ -68,10 +68,31 @@ class MarketplaceMessage < ApplicationRecord
     end
   end
 
+  # TODO: do we need all these other_user methods?
   def other_user(user_or_id)
     user_id = user_or_id&.is_a?(User) ? user_or_id.id : user_or_id
+
     return [receiver, :receiver] if user_id == sender_id
-    return [sender, :sender] if user_id == receiver_id
+    [sender, :sender] if user_id == receiver_id
+  end
+
+  # TODO: do we need all these other_user methods?
+  def other_user_and_id(user_or_id)
+    user_id = user_or_id&.is_a?(User) ? user_or_id.id : user_or_id
+
+    return [receiver, receiver_id] if user_id == sender_id
+    [sender, sender_id] if user_id == receiver_id
+  end
+
+  # TODO: do we need all these other_user methods?
+  def other_user_display_and_id(user_or_id)
+    o_user, o_id = other_user_and_id(user_or_id)
+
+    raise "not passed a sender or receiver: #{user_or_id}" unless o_id.present?
+
+    o_name = o_user&.marketplace_message_name ||
+      I18n.t("user_removed", scope: %i[activerecord errors messages])
+    [o_name, o_id]
   end
 
   def initial_message
@@ -86,8 +107,10 @@ class MarketplaceMessage < ApplicationRecord
     !initial_message?
   end
 
-  def messages_in_thread
-    self.class.where(initial_record_id:)
+  def messages_prior
+    return self.class.none if initial_message?
+
+    (id.present? ? messages_in_thread.where("id < ?", id) : messages_in_thread).order(:id)
   end
 
   private
@@ -96,11 +119,11 @@ class MarketplaceMessage < ApplicationRecord
     self.kind ||= (sender_id == seller_id) ? "sender_seller" : "sender_buyer"
     self.subject = "Re: #{initial_record.subject}" if reply_message?
     self.initial_record ||= self
-    self.messages_prior_count ||= calculated_messages_prior_count
+    self.messages_prior_count ||= messages_prior.count
     self.receiver_id = if initial_message?
       seller_id
     else
-      sender_id == seller_id ? initial_record.sender_id : seller_id
+      (sender_id == seller_id) ? initial_record.sender_id : seller_id
     end
   end
 
@@ -113,10 +136,7 @@ class MarketplaceMessage < ApplicationRecord
     receiver&.update(updated_at: Time.current)
   end
 
-
-  def calculated_messages_prior_count
-    return 0 if initial_message?
-
-    (id.present? ? messages_in_thread.where("id < ?", id) : messages_in_thread).count
+  def messages_in_thread
+    self.class.where(initial_record_id:)
   end
 end

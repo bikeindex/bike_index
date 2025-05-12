@@ -32,6 +32,16 @@ RSpec.describe MarketplaceMessage, type: :model do
         expect(MarketplaceMessage.initial_message.pluck(:id)).to eq([marketplace_message.id])
         expect(MarketplaceMessage.reply_message.pluck(:id)).to eq([marketplace_message_reply.id])
       end
+      context "passed a receiver" do
+        let(:receiver) { FactoryBot.create(:user) }
+        let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply, receiver:) }
+        it "is valid" do
+          expect(marketplace_message).to be_valid
+          expect(marketplace_message.receiver_id).to eq receiver.id
+          expect(marketplace_message.initial_record.sender_id).to eq receiver.id
+          expect(marketplace_message.initial_record.receiver_id).to eq marketplace_message.sender_id
+        end
+      end
     end
     context "reply passed sender" do
       let(:marketplace_message_reply) do
@@ -71,6 +81,31 @@ RSpec.describe MarketplaceMessage, type: :model do
       expect(MarketplaceMessage.for_user(user).order(:id).pluck(:id)).to match_array([marketplace_message.id, marketplace_message_1.id, marketplace_message_2.id, marketplace_message_reply.id])
       expect(MarketplaceMessage.distinct.pluck(:initial_record_id)).to match_array([marketplace_message.id, marketplace_message_2.initial_record_id])
       expect(MarketplaceMessage.threads_for_user(user).map(&:id)).to match_array([marketplace_message_reply.id, marketplace_message_2.id])
+    end
+  end
+
+  describe "other_user_display_name" do
+    let(:receiver) { User.new(id: 12, name: "Seth H", username: "xxxyyy") }
+    let(:sender) { User.new(id: 32, name: nil, username: "123456789101112") }
+    let(:marketplace_message) { MarketplaceMessage.new(sender:, receiver:) }
+    it "returns the other user marketplace_message_name" do
+      expect(marketplace_message.other_user(sender)).to eq([receiver, :receiver])
+      expect(marketplace_message.other_user(32)).to eq([receiver, :receiver])
+      expect(marketplace_message.other_user_display_and_id(sender)).to eq(["Seth H", 12])
+      expect(marketplace_message.other_user(receiver)).to eq([sender, :sender])
+      expect(marketplace_message.other_user(12)).to eq([sender, :sender])
+      expect(marketplace_message.other_user_display_and_id(receiver)).to eq(["12345678...", 32])
+    end
+
+    context "user deleted" do
+      let(:marketplace_message) { MarketplaceMessage.new(sender_id: 11, receiver:) }
+      it "returns the other user marketplace_message_name" do
+        expect(marketplace_message.other_user(11)).to eq([receiver, :receiver])
+        expect(marketplace_message.other_user_display_and_id(11)).to eq(["Seth H", 12])
+        expect(marketplace_message.other_user(receiver)).to eq([nil, :sender])
+        expect(marketplace_message.other_user(12)).to eq([nil, :sender])
+        expect(marketplace_message.other_user_display_and_id(receiver)).to eq(["(user removed)", 11])
+      end
     end
   end
 end

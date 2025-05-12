@@ -7,7 +7,5 @@ module Messages::Threads
     end
 
     private
-
-
   end
 end

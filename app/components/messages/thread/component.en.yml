@@ -4,4 +4,4 @@ en:
     messages:
       thread:
         me: me
-        current_user: Current_user
+        to: To

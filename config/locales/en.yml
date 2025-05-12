@@ -813,6 +813,7 @@ en:
           response mode.
         unsupported_response_type: The authorization server does not support this
           response type.
+        user_removed: (user removed)
       models:
         bike:
           not_found: not found

@@ -22,8 +22,6 @@ class MyAccount::MessagesController < ApplicationController
   private
 
   def matching_marketplace_messages
-    marketplace_messages = MarketplaceMessage.threads_for_user(current_user)
-
-    marketplace_messages
+    MarketplaceMessage.threads_for_user(current_user)
   end
 end
