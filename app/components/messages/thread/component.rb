@@ -36,22 +36,25 @@ module Messages::Thread
     end
 
     def sender_display_html_with_count
-      initial_record_sender_text + ((@messages_prior_arr.count > 1) ? "... " : ", ") +
+      messages_prior_sender_text +
         content_tag(:strong, user_display(@marketplace_message.sender_id)) +
-        content_tag(:span, " #{@marketplace_message.messages_prior_count}", class: "tw:opacity-65")
-      # #{" +
-      # else
-      #   "#{user_display(@messages_prior_arr.first.last)}"
-      # end + content_tag(:span, " #{@marketplace_message.messages_prior_count}", class: "tw:opacity-65")
+        content_tag(:span, " #{@marketplace_message.messages_prior_count + 1}", class: "tw:opacity-65")
     end
 
-    def initial_record_sender_text
+    def messages_prior_sender_text
       # special handling for unrequited sender
       if @marketplace_message.sender_buyer? && @messages_prior_arr.all? { |kind, _| kind == "sender_buyer" }
-        to_sender_text
-      else
-        user_display(@messages_prior_arr.first.last)
+        return to_sender_text + ((@messages_prior_arr.count > 1) ? "... " : ", ")
       end
+
+      initial_sender_id = @messages_prior_arr.first.last
+      text = user_display(initial_sender_id)
+      if @messages_prior_arr.count < 2 || initial_sender_id != @marketplace_message.sender_id
+        return text + ((@messages_prior_arr.count > 1) ? "... " : ", ")
+      end
+
+      # If the initial sender is the same as the final sender, always "me" - to indicate that user has replied
+      "#{text}, #{me_text}" + ((@messages_prior_arr.count > 2) ? "... " : ", ")
     end
 
     def to_sender_text
@@ -63,7 +66,7 @@ module Messages::Thread
     end
 
     def user_display(user_id)
-      if user_id == @current_user
+      if user_id == @current_user.id
         translation(".me")
       else
         @other_user_name

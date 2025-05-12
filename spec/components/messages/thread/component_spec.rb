@@ -41,7 +41,7 @@ RSpec.describe Messages::Thread::Component, type: :component do
     context "when a reply" do
       let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply, receiver: current_user) }
       let(:target) do
-        "<span>me, <strong>#{other_name}</strong><span class=\"tw:opacity-65\"> 2</span></span>"
+        "<span>me, <strong>#{marketplace_message.sender.name}</strong><span class=\"tw:opacity-65\"> 2</span></span>"
       end
       it "returns html" do
         expect(marketplace_message.initial_record.sender_id).to eq current_user.id
@@ -63,27 +63,32 @@ RSpec.describe Messages::Thread::Component, type: :component do
       end
     end
 
-    # context "when multiple replies" do
-    #   let(:initial_record) { FactoryBot.create(:marketplace_message, sender: current_user) }
-    #   let!(:marketplace_message_pre) { FactoryBot.create(:marketplace_message_reply, receiver: current_user, initial_record:) }
-    #   let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply, sender: current_user, initial_record:) }
-    #   let(:target) do
-    #     "<span>#{other_name}, me, <strong>#{other_name}</strong><span class=\"tw:opacity-65\"> 3</span></span>"
-    #   end
-    #   it "returns html" do
-    #     expect(marketplace_message.messages_prior.pluck(:id)).to eq([initial_record.id, marketplace_message_pre.id])
-    #     expect(sender_display_html).to eq target
-    #   end
+    context "when multiple replies" do
+      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, seller: current_user) }
+      let(:initial_record) { FactoryBot.create(:marketplace_message, marketplace_listing:) }
+      let!(:marketplace_message_pre) { FactoryBot.create(:marketplace_message_reply, receiver: current_user, initial_record:) }
+      let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply, sender: current_user, initial_record:) }
+      let(:target) do
+        "<span>#{other_name}, me, <strong>#{other_name}</strong><span class=\"tw:opacity-65\"> 3</span></span>"
+      end
+      it "returns html" do
+        expect(marketplace_message_pre.receiver_id).to eq current_user.id
+        expect(marketplace_message.sender_id).to eq current_user.id
+        expect(marketplace_message_pre.receiver_id).to eq marketplace_message.receiver_id
+        expect(marketplace_message.messages_prior.pluck(:id)).to eq([initial_record.id, marketplace_message_pre.id])
+        expect(sender_display_html).to eq target
+      end
 
-    #   context "even more replies" do
-    #     let!(:marketplace_message_pre_2) { FactoryBot.create(:marketplace_message_reply, sender: current_user, initial_record:) }
-    #     let(:target) do
-    #       "<span>#{other_name}, me, <strong>#{other_name}</strong><span class=\"tw:opacity-65\"> 3</span></span>"
-    #     end
-    #     it "returns html" do
-    #       expect(sender_display_html).to eq target
-    #     end
-    #   end
-    # end
+      context "even more replies" do
+        let!(:marketplace_message_pre_2) { FactoryBot.create(:marketplace_message_reply, sender: current_user, initial_record:) }
+        let(:target) do
+          "<span>#{other_name}... <strong>#{other_name}</strong><span class=\"tw:opacity-65\"> 4</span></span>"
+        end
+        it "returns html" do
+          expect(marketplace_message.reload.messages_prior.pluck(:id)).to eq([initial_record.id, marketplace_message_pre.id, marketplace_message_pre_2.id])
+          expect(sender_display_html).to eq target
+        end
+      end
+    end
   end
 end
