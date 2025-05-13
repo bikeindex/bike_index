@@ -49,9 +49,9 @@ module Pagination
     def current_link_class
       # Round the outer edge, if there isn't a prev/next
       extra_classes = if !show_previous
-        "tw:rounded-s-lg "
+        "tw:rounded-s-md "
       elsif !show_next
-        "tw:rounded-e-lg "
+        "tw:rounded-e-md "
       else
         ""
       end
@@ -69,20 +69,20 @@ module Pagination
 
     def prev_html
       if (p_prev = @pagy.prev)
-        link_to(pagy_t("pagy.prev").html_safe, @params.merge(page: p_prev), class: active_classes + " tw:rounded-s-lg",
+        link_to(pagy_t("pagy.prev").html_safe, @params.merge(page: p_prev), class: active_classes + " tw:rounded-s-md",
           "aria-label": pagy_t("pagy.aria_label.prev"), data: @data)
       else
-        content_tag(:a, pagy_t("pagy.prev").html_safe, role: "link", class: disabled_classes + " tw:rounded-s-lg",
+        content_tag(:a, pagy_t("pagy.prev").html_safe, role: "link", class: disabled_classes + " tw:rounded-s-md",
           disabled: true, "aria-disabled": "true", "aria-label": pagy_t("pagy.aria_label.prev"))
       end
     end
 
     def next_html
       if (p_next = @pagy.next)
-        link_to(pagy_t("pagy.next").html_safe, @params.merge(page: p_next), class: active_classes + " tw:rounded-e-lg",
+        link_to(pagy_t("pagy.next").html_safe, @params.merge(page: p_next), class: active_classes + " tw:rounded-e-md",
           "aria-label": pagy_t("pagy.aria_label.next"), data: @data)
       else
-        content_tag(:a, pagy_t("pagy.next").html_safe, role: "link", class: disabled_classes + " tw:rounded-e-lg",
+        content_tag(:a, pagy_t("pagy.next").html_safe, role: "link", class: disabled_classes + " tw:rounded-e-md",
           disabled: true, "aria-disabled": "true", "aria-label": pagy_t("pagy.aria_label.next"))
       end
     end

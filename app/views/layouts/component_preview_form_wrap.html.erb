@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <%= stylesheet_link_tag "tailwind", "revised" %>
     <%= javascript_importmap_tags %>
+    <script>window.importmapLocalizeTime = true</script>
   </head>
   <%# NOTE: inline styles to override revised styles and make the form-well show up in the top right %>
   <body class="<%= params.dig(:lookbook, :display, :theme) %>" style="min-height: auto; padding: 1rem 0;">

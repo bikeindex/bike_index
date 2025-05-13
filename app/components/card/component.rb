@@ -10,7 +10,7 @@ module Card
     private
 
     def card_classes
-      "tw:p-4 tw:bg-white tw:border tw:border-gray-200 tw:rounded-lg " \
+      "tw:p-4 tw:bg-white tw:border tw:border-gray-200 tw:rounded-sm " \
       "tw:dark:bg-gray-800 tw:dark:border-gray-700 " + @additional_classes
     end
   end
