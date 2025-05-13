@@ -46,7 +46,7 @@ module Sessionable
   end
 
   def authenticate_user_for_my_accounts_controller
-    authenticate_user(translation_key: :create_account, flash_type: :info)
+    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :info)
   end
 
   private

@@ -1816,10 +1816,6 @@ en:
           if you have questions.
         no_active_membership: You don't have an active membership, you'll have to
           sign up for a new one.
-    my_account:
-      messages:
-        index:
-          marketplace_messages: Marketplace messages
     my_accounts:
       edit:
         delete_account: Delete account
@@ -4095,6 +4091,10 @@ en:
       it: EUR
       nb: EUR
       nl: EUR
+  my_account:
+    messages:
+      index:
+        marketplace_messages: Marketplace messages
   my_accounts:
     delete_account:
       delete_account: Delete account

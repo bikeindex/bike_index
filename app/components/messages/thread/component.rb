@@ -42,8 +42,7 @@ module Messages::Thread
       else
         content_tag(:span, (messages_prior_sender_text +
           content_tag(:strong, user_display(@marketplace_message.sender_id), class: "tw:font-bold") +
-          content_tag(:span, " #{@marketplace_message.messages_prior_count + 1}", class: "tw:opacity-65")).html_safe
-        )
+          content_tag(:span, " #{@marketplace_message.messages_prior_count + 1}", class: "tw:opacity-65")).html_safe)
       end
     end
 

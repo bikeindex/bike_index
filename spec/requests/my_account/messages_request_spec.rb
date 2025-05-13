@@ -7,7 +7,8 @@ RSpec.describe MyAccount::MessagesController, type: :request do
     context "user not logged in" do
       it "redirects" do
         get base_url
-        expect(response).to redirect_to(/users\/new/) # weird subdomain issue matching url directly otherwise
+        expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
+        expect(session[:return_to]).to eq "/my_account/messages"
       end
     end
 
@@ -35,6 +36,44 @@ RSpec.describe MyAccount::MessagesController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template("index")
         end
+      end
+    end
+  end
+
+  describe "new" do
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, status: :for_sale) }
+    let(:new_url) { "#{base_url}/new?marketplace_listing_id=#{marketplace_listing.id}" }
+
+    it "redirects" do
+      get new_url
+      expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
+      expect(session[:return_to]).to eq new_url
+    end
+
+    context "logged in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "renders" do
+        expect(marketplace_listing.visible_by?(current_user)).to be_truthy
+        get new_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template("new")
+      end
+
+      context "draft item" do
+        it "redirects"
+      end
+
+      context "sold item" do
+        it "renders but doesn't include new marketplace_message"
+
+        context "marketplace_message is a reply" do
+          it "renders"
+        end
+      end
+
+      context "removed" do
+        it "renders but doesn't include new marketplace_message"
       end
     end
   end

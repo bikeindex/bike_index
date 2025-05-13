@@ -75,7 +75,7 @@ module ControllerHelpers
     @include_importmaps = true
   end
 
-  def store_return_and_authenticate_user(flash_type: :error)
+  def store_return_and_authenticate_user(translation_key: nil, flash_type: :error)
     return if current_user&.confirmed?
 
     store_return_to
@@ -157,7 +157,9 @@ module ControllerHelpers
   # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(target = nil)
     # fallback to the return to parameters, or the current path
-    target ||= params[:return_to] || request.env["PATH_INFO"]
+    target ||= params[:return_to] ||
+      [request.env["PATH_INFO"], request.env["QUERY_STRING"]].reject(&:blank?).join("?")
+
     session[:return_to] = target unless invalid_return_to?(target)
   end
 
