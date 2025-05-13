@@ -1,5 +1,5 @@
 <div
-  class="tw:flex tw:items-center tw:rounded-sm tw:border tw:p-4 <%= @margin_classes %> <%= color_classes %> tw:transition-all tw:duration-300"
+  class="tw:flex tw:items-center tw:flex-wrap tw:rounded-sm tw:border tw:p-4 <%= @margin_classes %> <%= color_classes %> tw:transition-all tw:duration-300"
   role="alert"
   data-controller="alert--component">
 
@@ -9,8 +9,12 @@
   </svg>
   <span class="tw:sr-only"><%= @kind.to_s.titleize %></span>
   <div class="tw:ms-3 ">
-    <%= @text %>
-    <%= content %>
+    <% if @header.present? %>
+      <h4 class="tw:text-lg"><%= @header %></h4>
+    <% else %>
+      <%= @text %>
+      <%= content %>
+    <% end %>
   </div>
 
   <% if @dismissable %>
@@ -25,5 +29,12 @@
         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
       </svg>
     </button>
+  <% end %>
+
+  <% if @header.present? %>
+    <div class="tw:w-full">
+      <%= @text %>
+      <%= content %>
+    </div>
   <% end %>
 </div>

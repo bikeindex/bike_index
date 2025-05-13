@@ -7,8 +7,9 @@ module Alert
     # TODO: Should this convert danger>error, notice>warning? Do we need those anymore, from some bootstrap thing?
 
     # NOTE: you can pass arbitrary classes in via margin_classes, but that's not ideal (they might conflict, etc)
-    def initialize(text: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4")
+    def initialize(text: nil, header: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4")
       @text = text
+      @header = header
       @kind = if KINDS.include?(kind&.to_sym)
         kind&.to_sym
       else
