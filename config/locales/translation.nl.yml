@@ -6099,3 +6099,6 @@ nl:
         price_is_firm_false: prijs is onderhandelbaar
         price_is_firm_true: prijs is vast
         still_for_sale_at: Nog steeds te koop bij
+    alert_for_errors:
+      errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+        dit %{object_name} wordt opgeslagen:"

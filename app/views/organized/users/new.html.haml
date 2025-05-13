@@ -20,8 +20,7 @@
 
 = form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 
-  - if @organization_role.errors.any?
-    = render partial: "shared/errors", locals: { name: t(".organization_role"), obj: @organization_role }
+  = render(AlertForErrors::Component.new(object: @organization_role, name: t(".organization_role")))
 
   - display_multi_invite = params[:multiple_emails_invited].present?
   .form-group.row#singleEmailInvite{ class: display_multi_invite ? "currently-hidden" : "" }

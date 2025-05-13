@@ -4689,3 +4689,5 @@ es:
         price_is_firm_false:
         price_is_firm_true:
         still_for_sale_at:
+    alert_for_errors:
+      errors_prevented_this_from_being_saved:

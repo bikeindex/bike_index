@@ -8,6 +8,7 @@
     <link href="/vendored_assets/admin.css" rel='stylesheet' type='text/css'>
     <script src="/vendored_assets/application_standalone.js"></script>
     = stylesheet_link_tag 'tailwind', "data-turbo-track": "reload"
+    = javascript_importmap_tags
   -# manually override body_class in a few situations :/
   - admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - admin_body_class = "vendor-signup-page" if current_page?(:vendor_signup)
