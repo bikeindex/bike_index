@@ -13,7 +13,9 @@
 
   <div class="tw:grow">
     <% if @header.present? %>
-      <h4 class="tw:text-lg"><%= @header %></h4>
+      <h4 class="tw:text-lg! tw:mb-0! uncap <%= text_color_classes_important %>">
+        <%= @header %>
+      </h4>
     <% end %>
     <%= @text %>
     <%= content %>

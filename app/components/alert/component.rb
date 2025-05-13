@@ -24,18 +24,36 @@ module Alert
     def color_classes
       case @kind
       when :notice
-        "tw:text-blue-800 tw:bg-blue-50 tw:dark:bg-gray-800 tw:dark:text-blue-400 " \
+        "#{text_color_classes} tw:bg-blue-50 tw:dark:bg-gray-800 " \
         "tw:border-blue-300 tw:dark:border-blue-800"
       when :error
-        "tw:text-red-800 tw:bg-red-50 tw:dark:bg-gray-800 tw:dark:text-red-400 " \
+        "#{text_color_classes} tw:bg-red-50 tw:dark:bg-gray-800 " \
         "tw:border-red-300 tw:dark:border-red-800"
       when :warning
-        "tw:text-yellow-800 tw:bg-yellow-50 tw:dark:bg-gray-800 tw:dark:text-yellow-400 " \
+        "#{text_color_classes} tw:bg-yellow-50 tw:dark:bg-gray-800 " \
         "tw:border-yellow-300 tw:dark:border-yellow-800"
       when :success
-        "tw:text-green-800 tw:bg-green-50 tw:dark:bg-gray-800 tw:dark:text-green-400 " \
+        "#{text_color_classes} tw:bg-green-50 tw:dark:bg-gray-800 " \
         "tw:border-green-300 tw:dark:border-green-800"
       end
+    end
+
+    def text_color_classes
+      case @kind
+      when :notice
+        "tw:text-blue-800 tw:dark:text-blue-400"
+      when :error
+        "tw:text-red-800 tw:dark:text-red-400"
+      when :warning
+        "tw:text-yellow-800 tw:dark:text-yellow-400"
+      when :success
+        "tw:text-green-800 tw:dark:text-green-400"
+      end
+    end
+
+    # Required because bootstrap alert color overrides
+    def text_color_classes_important
+      text_color_classes.gsub("00", "00!")
     end
 
     def dismissable_color_classes
