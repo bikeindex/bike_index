@@ -52,15 +52,15 @@ RSpec.describe "my_account", type: :routing do
     describe "index" do
       it "directs to my_account" do
         expect(get: "my_account/messages").to route_to(
-          controller: "my_account/messages", action: "index"
+          controller: "my_accounts/messages", action: "index"
         )
       end
     end
 
-    describe "new" do
+    describe "show" do
       it "directs to my_account" do
-        expect(get: "my_account/messages/new").to route_to(
-          controller: "my_account/messages", action: "new"
+        expect(get: "my_account/messages/marketplace_listing_id-2222").to route_to(
+          controller: "my_accounts/messages", action: "show", id: "marketplace_listing_id-2222"
         )
       end
     end

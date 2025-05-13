@@ -4091,10 +4091,6 @@ en:
       it: EUR
       nb: EUR
       nl: EUR
-  my_account:
-    messages:
-      index:
-        marketplace_messages: Marketplace messages
   my_accounts:
     delete_account:
       delete_account: Delete account
@@ -4105,6 +4101,11 @@ en:
     edit:
       edit_pages: 'Edit account pages:'
       save_changes: Save changes
+    messages:
+      index:
+        marketplace_messages: Marketplace messages
+      new:
+        message: something
     password:
       better_password: better
       for_password_update: For password update

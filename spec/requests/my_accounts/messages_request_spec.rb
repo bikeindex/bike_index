@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe MyAccount::MessagesController, type: :request do
+RSpec.describe MyAccounts::MessagesController, type: :request do
   base_url = "/my_account/messages"
 
   describe "index" do
@@ -40,14 +40,14 @@ RSpec.describe MyAccount::MessagesController, type: :request do
     end
   end
 
-  describe "new" do
+  describe "show" do
     let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, status: :for_sale) }
-    let(:new_url) { "#{base_url}/new?marketplace_listing_id=#{marketplace_listing.id}" }
+    let(:show_url) { "#{base_url}/show?marketplace_listing_id=#{marketplace_listing.id}" }
 
     it "redirects" do
-      get new_url
+      get show_url
       expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
-      expect(session[:return_to]).to eq new_url
+      expect(session[:return_to]).to eq show_url
     end
 
     context "logged in" do
@@ -55,9 +55,9 @@ RSpec.describe MyAccount::MessagesController, type: :request do
 
       it "renders" do
         expect(marketplace_listing.visible_by?(current_user)).to be_truthy
-        get new_url
+        get show_url
         expect(response.status).to eq(200)
-        expect(response).to render_template("new")
+        expect(response).to render_template("show")
       end
 
       context "draft item" do

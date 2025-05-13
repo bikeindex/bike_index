@@ -1,4 +1,4 @@
-class MyAccount::MessagesController < ApplicationController
+class MyAccounts::MessagesController < ApplicationController
   include Sessionable
   before_action :authenticate_user_for_my_accounts_controller
 
@@ -10,7 +10,7 @@ class MyAccount::MessagesController < ApplicationController
       .includes(:marketplace_listing, :sender, :receiver, :item, :intial_record), limit: @per_page)
   end
 
-  def new
+  def show
     @marketplace_messages = matching_marketplace_thread
     # Create so that we don't have to rely on form parameters to handle initial creation
     @marketplace_message = MarketplaceMessage.new(marketplace_listing_id: @marketplace_listing.id)
