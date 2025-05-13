@@ -29,7 +29,6 @@ import { DateTime } from 'luxon'
 // componentDidUpdate() { window.timeLocalizer.localize() }
 
 export default class TimeLocalizer {
-
   constructor () {
     if (!window.localTimezone) {
       window.localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
