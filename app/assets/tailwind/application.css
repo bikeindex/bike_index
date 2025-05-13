@@ -7,6 +7,7 @@
 }
 
 @layer components {
+
   .twlink {
     @apply tw:text-blue-500 tw:underline;
   }
@@ -35,7 +36,7 @@
   }
 
   .twinput {
-    @apply tw:bg-white tw:border tw:border-gray-300 tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:rounded-lg
+    @apply tw:bg-white tw:border tw:border-gray-300 tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:rounded-sm
       tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
       tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-blue-400 tw:focus-visible:border-blue-400 tw:dark:focus-visible:ring-blue-500 tw:dark:focus:border-blue-500
       tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
@@ -84,7 +85,7 @@ body.dark {
 }
 
 .select2-container .select2-dropdown, .select2-container.select2-container--default .select2-selection--multiple {
-  @apply tw:bg-white tw:dark:bg-gray-700 tw:rounded-lg
+  @apply tw:bg-white tw:dark:bg-gray-700 tw:rounded-sm
     tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200;
 }
 

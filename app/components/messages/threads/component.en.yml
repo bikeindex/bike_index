@@ -1,7 +1,0 @@
----
-en:
-  components:
-    messages:
-      threads:
-        marketplace_messages: Marketplace_messages
-        current_user: Current_user
