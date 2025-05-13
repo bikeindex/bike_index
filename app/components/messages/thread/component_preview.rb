@@ -27,7 +27,7 @@ module Messages::Thread
         marketplace_listing: marketplace_listing,
         receiver: current_user,
         sender: other_user,
-        created_at: Time.current - 7.minutes
+        created_at: Time.current - 2.hours - 6.months
       }
     end
 

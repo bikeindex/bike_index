@@ -1,15 +1,17 @@
-<div class="tw:@container tw:w-full tw:grid tw:grid-cols-2 tw:md:grid-cols-4 tw:gap-4 tw:items-center">
-  <div class="tw:col-span-2 tw:md:col-span-3 tw:md:grid tw:md:grid-cols-3 tw:md:gap-4">
-    <h2 class="tw:text-lg tw:font-semibold">
-      <%= sender_display_html %>
-    </h2>
-  </div>
-  <div><%= item_title %></div>
-  <span><%= message_display %></span>
-  <div>
+<a
+  href="<%= message_path %>"
+  class="tw:@container tw:w-full tw:py-2 tw:px-3 tw:border-y tw:border-gray-200 tw:dark:border-gray-700 tw:gap-x-6 tw:grid tw:grid-cols-max tw:max-md:grid-cols-4 tw:lg:grid-flow-col">
+  <span class="tw:min-w-40 tw:col-span-3 tw:lg:col-auto tw:truncate" title="<%= translation(".from") %>: <%= sender_full_text %>">
+    <%= sender_display_html %>
+  </span>
+  <div class="tw:w-28 tw:min-w-28 tw:text-right tw:lg:order-last">
     <span class="convertTime">
       <%= l @marketplace_message.created_at, format: :convert_time %>
     </span>
   </div>
-</div>
-3
+  <div class="tw:lg:truncate tw:col-span-4 tw:lg:col-auto tw:lg:w-full">
+    <strong class="tw:opacity-65 tw:mr-2"><%= item_title %></strong>
+
+    <span title="<%= @marketplace_message.body %>"><%= message_display %></span>
+  </div>
+</a>

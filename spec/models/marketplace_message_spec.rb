@@ -84,6 +84,40 @@ RSpec.describe MarketplaceMessage, type: :model do
     end
   end
 
+  describe "for" do
+    let(:marketplace_listing) { FactoryBot.create(:marketplace_listing) }
+    let(:seller) { marketplace_listing.seller }
+    let(:sender) { FactoryBot.create(:user_confirmed) }
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender:) }
+    let(:marketplace_message_reply) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message) }
+    let(:other_user) { FactoryBot.create(:user_confirmed) }
+
+    it "returns the marketplace_messages if present" do
+      expect(MarketplaceMessage.for(user: sender, marketplace_listing:).pluck(:id)).to eq([])
+      expect(marketplace_message).to be_present
+      expect(MarketplaceMessage.for(user: sender, marketplace_listing:).pluck(:id)).to eq([marketplace_message.id])
+      expect(MarketplaceMessage.for(user: sender, marketplace_listing:, initial_record_id: marketplace_message.id).pluck(:id)).to eq([marketplace_message.id])
+      expect(MarketplaceMessage.for(user: seller, marketplace_listing:, initial_record_id: marketplace_message.id).pluck(:id)).to eq([marketplace_message.id])
+      expect do
+        MarketplaceMessage.for(user: seller, marketplace_listing:).pluck(:id)
+      end.to raise_error(ActiveRecord::RecordNotFound)
+
+      # It finds both the messages when passed correct parameters
+      both_ids = [marketplace_message.id, marketplace_message_reply.id]
+      expect(MarketplaceMessage.for(user: sender, marketplace_listing:).pluck(:id)).to match_array both_ids
+      expect(MarketplaceMessage.for(user: sender, marketplace_listing:, initial_record_id: marketplace_message.id).pluck(:id)).to match_array both_ids
+      expect(MarketplaceMessage.for(user: seller, marketplace_listing:, initial_record_id: marketplace_message.id).pluck(:id)).to match_array both_ids
+      expect do
+        MarketplaceMessage.for(user: seller, marketplace_listing:).pluck(:id)
+      end.to raise_error(ActiveRecord::RecordNotFound)
+
+      # it raises if passed a different user not in the thread
+      expect do
+        MarketplaceMessage.for(user: other_user, marketplace_listing:, initial_record_id: marketplace_message.id).pluck(:id)
+      end.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
   describe "other_user_display_name" do
     let(:receiver) { User.new(id: 12, name: "Seth H", username: "xxxyyy") }
     let(:sender) { User.new(id: 32, name: nil, username: "123456789101112") }

@@ -1317,6 +1317,8 @@ en:
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
+      viewing_listing_preview: This is a preview of your "for sale" listing. It is not publicly visible.
+      view_public_non_listing: View public registration 
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
       no_one_but_the_user_and_bike_index_admins: No one but the user (and Bike Index
         admins) can see it
@@ -1814,6 +1816,10 @@ en:
           if you have questions.
         no_active_membership: You don't have an active membership, you'll have to
           sign up for a new one.
+    my_account:
+      messages:
+        index:
+          marketplace_messages: Marketplace messages
     my_accounts:
       edit:
         delete_account: Delete account

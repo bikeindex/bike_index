@@ -13,13 +13,15 @@ RSpec.describe Messages::Thread::Component, type: :component do
     expect(component).to be_present
   end
 
-  # context "with deleted item and user" do
-  #   before do
-  #     marketplace_message.item.destroy
-  #     marketplace_message.receiver.destroy
-  #   end
-  #   it "renders"
-  # end
+  context "with deleted item and user" do
+    before do
+      marketplace_message.item.destroy
+      marketplace_message.receiver.destroy
+    end
+    it "renders" do
+      expect(component).to be_present
+    end
+  end
 
   describe "#sender_display_html" do
     let(:sender_display_html) { instance.send(:sender_display_html) }
@@ -32,7 +34,7 @@ RSpec.describe Messages::Thread::Component, type: :component do
     context "when the receiver" do
       let(:marketplace_message) { FactoryBot.build(:marketplace_message, receiver: current_user) }
       let(:other_name) { marketplace_message.sender.name }
-      let(:target) { "<strong>#{other_name}</strong>" }
+      let(:target) { "<strong class=\"tw:font-bold\">#{other_name}</strong>" }
       it "returns html" do
         expect(sender_display_html).to eq target
       end
@@ -41,7 +43,7 @@ RSpec.describe Messages::Thread::Component, type: :component do
     context "when a reply" do
       let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply, receiver: current_user) }
       let(:target) do
-        "<span>me, <strong>#{marketplace_message.sender.name}</strong><span class=\"tw:opacity-65\"> 2</span></span>"
+        "<span>me, <strong class=\"tw:font-bold\">#{marketplace_message.sender.name}</strong><span class=\"tw:opacity-65\"> 2</span></span>"
       end
       it "returns html" do
         expect(marketplace_message.initial_record.sender_id).to eq current_user.id
@@ -52,7 +54,7 @@ RSpec.describe Messages::Thread::Component, type: :component do
         let(:marketplace_message_pre) { FactoryBot.create(:marketplace_message, sender: current_user) }
         let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message_pre, sender: current_user) }
         let(:target) do
-          "<span>To: #{other_name}, <strong>me</strong><span class=\"tw:opacity-65\"> 2</span></span>"
+          "<span>To: #{other_name}, <strong class=\"tw:font-bold\">me</strong><span class=\"tw:opacity-65\"> 2</span></span>"
         end
         it "is the target" do
           expect(marketplace_message_pre.sender_id).to eq current_user.id
@@ -69,20 +71,23 @@ RSpec.describe Messages::Thread::Component, type: :component do
       let!(:marketplace_message_pre) { FactoryBot.create(:marketplace_message_reply, receiver: current_user, initial_record:) }
       let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply, sender: current_user, initial_record:) }
       let(:target) do
-        "<span>#{other_name}, me, <strong>#{other_name}</strong><span class=\"tw:opacity-65\"> 3</span></span>"
+        "<span>#{other_name}... <strong class=\"tw:font-bold\">me</strong><span class=\"tw:opacity-65\"> 3</span></span>"
       end
       it "returns html" do
         expect(marketplace_message_pre.receiver_id).to eq current_user.id
         expect(marketplace_message.sender_id).to eq current_user.id
-        expect(marketplace_message_pre.receiver_id).to eq marketplace_message.receiver_id
+        expect(marketplace_message.receiver_id).to eq marketplace_message_pre.sender_id
         expect(marketplace_message.messages_prior.pluck(:id)).to eq([initial_record.id, marketplace_message_pre.id])
         expect(sender_display_html).to eq target
       end
 
       context "even more replies" do
+        let(:seller) { FactoryBot.create(:user) }
+        let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, seller:) }
+        let(:initial_record) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: current_user) }
         let!(:marketplace_message_pre_2) { FactoryBot.create(:marketplace_message_reply, sender: current_user, initial_record:) }
         let(:target) do
-          "<span>#{other_name}... <strong>#{other_name}</strong><span class=\"tw:opacity-65\"> 4</span></span>"
+          "<span>me, #{other_name}... <strong class=\"tw:font-bold\">me</strong><span class=\"tw:opacity-65\"> 4</span></span>"
         end
         it "returns html" do
           expect(marketplace_message.reload.messages_prior.pluck(:id)).to eq([initial_record.id, marketplace_message_pre.id, marketplace_message_pre_2.id])

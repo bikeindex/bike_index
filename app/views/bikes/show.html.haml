@@ -77,6 +77,11 @@
     - @contact_owner_open = true if @impound_claim.id.present? && !@contact_owner_open
     = render partial: "impound_claim", locals: { impound_record: @bike.current_impound_record, impound_claim: @impound_claim, start_open: @contact_owner_open }
 
+  -# alert
+  - if @marketplace_preview
+    = render(Alert::Component.new(kind: :notice)) do
+      = t(".viewing_listing_preview")
+      #{link_to(t(".view_public_non_listing"), bike_path(@bike))}.
   .row
     .col-md-8
       %h1.bike-title

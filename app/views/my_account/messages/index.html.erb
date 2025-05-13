@@ -1,0 +1,5 @@
+<% @marketplace_messages.each do |marketplace_message| %>
+  <% cache(marketplace_message) do %>
+    <%= Messages::Thread::Component.new(marketplace_message:, current_user:) %>
+  <% end %>
+<% end %>

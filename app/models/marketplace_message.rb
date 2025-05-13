@@ -56,6 +56,19 @@ class MarketplaceMessage < ApplicationRecord
       where(sender_id: user.id).or(where(receiver_id: user.id))
     end
 
+    def for(user:, marketplace_listing:, initial_record_id: nil)
+      if initial_record_id.present?
+        matches = for_user(user).where(initial_record_id:)
+        return matches if matches.any?
+      elsif marketplace_listing.seller_id != user.id
+        return for_user(user).where(marketplace_listing_id: marketplace_listing.id)
+      end
+
+      # If the user is the seller, an initial_record_id is required.
+      # This also catches instances where passed not the users' messages
+      raise ActiveRecord::RecordNotFound
+    end
+
     def threads_for_user(user)
       for_user(user).distinct_threads
     end
@@ -107,6 +120,10 @@ class MarketplaceMessage < ApplicationRecord
     !initial_message?
   end
 
+  def messages_in_thread
+    self.class.where(initial_record_id:)
+  end
+
   def messages_prior
     return self.class.none if initial_message?
 
@@ -134,9 +151,5 @@ class MarketplaceMessage < ApplicationRecord
     # Bust caches on the associations
     sender&.update(updated_at: Time.current)
     receiver&.update(updated_at: Time.current)
-  end
-
-  def messages_in_thread
-    self.class.where(initial_record_id:)
   end
 end

@@ -109,7 +109,7 @@ Rails.application.routes.draw do
     end
   end
   resource :my_account, only: %i[show update destroy] do
-    resources :messages, only: %i[index show new create], controller: "my_account/messages"
+    resources :messages, only: %i[index new create], controller: "my_account/messages"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
   # Legacy - there are places where user_home existed in emails, etc, so keep this

@@ -14,13 +14,22 @@ module Messages::Thread
 
     private
 
+    def message_path
+      new_my_account_message_path(marketplace_listing_id: @initial_record.marketplace_listing_id,
+        initial_record_id: @initial_record.id)
+    end
+
     def item_title
       @marketplace_message.item&.title_string ||
         "#{@marketplace_message.item_type}: #{@marketplace_message.item_id}"
     end
 
     def message_display
-      "#{@initial_record.subject} - #{@marketplace_message.body}"
+      if @marketplace_message.initial_message?
+        "#{@initial_record.subject} - #{@marketplace_message.body}".truncate(100)
+      else
+        @marketplace_message.body.truncate(100)
+      end
     end
 
     def sender_display_html
@@ -28,17 +37,20 @@ module Messages::Thread
         if @marketplace_message.sender_id == @current_user.id
           content_tag(:span, to_sender_text)
         else
-          content_tag(:strong, @other_user_name)
+          content_tag(:strong, @other_user_name, class: "tw:font-bold")
         end
       else
-        content_tag(:span, sender_display_html_with_count.html_safe)
+        content_tag(:span, (messages_prior_sender_text +
+          content_tag(:strong, user_display(@marketplace_message.sender_id), class: "tw:font-bold") +
+          content_tag(:span, " #{@marketplace_message.messages_prior_count + 1}", class: "tw:opacity-65")).html_safe
+        )
       end
     end
 
-    def sender_display_html_with_count
-      messages_prior_sender_text +
-        content_tag(:strong, user_display(@marketplace_message.sender_id)) +
-        content_tag(:span, " #{@marketplace_message.messages_prior_count + 1}", class: "tw:opacity-65")
+    def sender_full_text
+      (@messages_prior_arr.map { |_, id| user_display(user_id) } +
+        [user_display(@marketplace_message.sender_id)])
+        .join(", ")
     end
 
     def messages_prior_sender_text
@@ -49,20 +61,19 @@ module Messages::Thread
 
       initial_sender_id = @messages_prior_arr.first.last
       text = user_display(initial_sender_id)
-      if @messages_prior_arr.count < 2 || initial_sender_id != @marketplace_message.sender_id
-        return text + ((@messages_prior_arr.count > 1) ? "... " : ", ")
-      end
 
-      # If the initial sender is the same as the final sender, always "me" - to indicate that user has replied
-      "#{text}, #{me_text}" + ((@messages_prior_arr.count > 2) ? "... " : ", ")
+      # If the initial sender is the same as the final sender, always include the other user display
+      # - to indicate that user has replied
+      if @messages_prior_arr.count > 1 && initial_sender_id == @marketplace_message.sender_id
+        "#{text}, #{user_display(@marketplace_message.receiver_id)}" +
+          ((@messages_prior_arr.count > 2) ? "... " : ", ")
+      else
+        text + ((@messages_prior_arr.count > 1) ? "... " : ", ")
+      end
     end
 
     def to_sender_text
       "#{translation(".to")}: #{@other_user_name}"
-    end
-
-    def me_text
-      translation(".me")
     end
 
     def user_display(user_id)

@@ -26,8 +26,11 @@ RSpec.describe MyAccount::MessagesController, type: :request do
 
       context "confirmed" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
-        it "renders, includes special header tags" do
+
+        it "renders" do
           expect(current_user.confirmed?).to be_truthy
+          # Even though any_for_user is false
+          expect(MarketplaceMessage.any_for_user?(current_user)).to be_falsey
           get base_url
           expect(response.status).to eq(200)
           expect(response).to render_template("index")
