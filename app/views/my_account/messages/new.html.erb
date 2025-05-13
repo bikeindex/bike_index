@@ -1,6 +1,6 @@
-<div class="tw:container mx-auto">
+<div class="container">
   <div class="tw:w-full">
-    <h2 class="tw:text-2xl tw:font-bold tw:mb-6">New Message</h2>
+    <h2 class="uncap">New Message</h2>
 
     <%= form_with(model: @marketplace_message, url: my_account_messages_path, method: :post, local: true, class: "tw:space-y-4") do |form| %>
       <%= render partial: "/shared/errors", locals: {obj: @marketplace_message, name: t(".message")} if @marketplace_message.errors.any? %>
@@ -11,10 +11,12 @@
       <% end %>
 
 
-      <%= form.label :body, class: "twlabel" %>
-      <%= form.text_area :body, rows: 5, class: "twinput" %>
+      <div class="tw:mt-3">
+        <%= form.label :body, class: "twlabel" %>
+        <%= form.text_area :body, rows: 5, class: "twinput" %>
+      </div>
 
-      <div class="tw:flex tw:items-center tw:justify-end">
+      <div class="tw:mt-3 tw:flex tw:items-center tw:justify-end">
         <%= form.submit "Send Message", class: "twbtn-green" %>
       </div>
     <% end %>
