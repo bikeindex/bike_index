@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <%= stylesheet_link_tag "tailwind" %>
     <%= javascript_importmap_tags %>
+    <script>window.importmapLocalizeTime = true</script>
   </head>
   <%# NOTE: This sets the theme %>
   <body class="<%= params.dig(:lookbook, :display, :theme) %>">
