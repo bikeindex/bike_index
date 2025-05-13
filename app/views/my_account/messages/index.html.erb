@@ -1,5 +1,10 @@
+<h1>
+  <%= t(".marketplace_messages") %>
+</h1>
 <% @marketplace_messages.each do |marketplace_message| %>
   <% cache(marketplace_message) do %>
     <%= Messages::Thread::Component.new(marketplace_message:, current_user:) %>
   <% end %>
 <% end %>
+
+<%= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>

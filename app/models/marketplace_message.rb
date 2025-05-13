@@ -34,7 +34,7 @@ class MarketplaceMessage < ApplicationRecord
 
   has_many :notifications, as: :notifiable
 
-  validates_presence_of :marketplace_listing_id, :sender_id, :receiver_id, :subject
+  validates_presence_of :marketplace_listing_id, :sender_id, :receiver_id, :subject, :body
 
   before_validation :set_calculated_attributes
   after_commit :process_notification
