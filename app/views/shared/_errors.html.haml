@@ -1,11 +1,12 @@
--# Rendering errors requires an `obj`
-- name ||=  obj.class.name.titleize
+- if obj.errors.any?
+  -# Rendering errors requires an `obj`
+  - name ||=  obj.class.name.titleize
 
-.alert.alert-danger
-  %h4
-    - errors_count = pluralize(obj.errors.count, t(".error"))
-    = t(".errors_prevented_this_from_being_saved", errors_count: errors_count, object_name: name)
-  %ul
-    - obj.errors.full_messages.each do |message|
-      %li
-        = message
+  .alert.alert-danger
+    %h4
+      - errors_count = pluralize(obj.errors.count, t(".error"))
+      = t(".errors_prevented_this_from_being_saved", errors_count: errors_count, object_name: name)
+    %ul
+      - obj.errors.full_messages.each do |message|
+        %li
+          = message
