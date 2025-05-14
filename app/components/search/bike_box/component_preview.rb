@@ -4,7 +4,7 @@ module Search::BikeBox
   class ComponentPreview < ApplicationComponentPreview
     def default
       bike = Bike.new(
-        id: 42,
+        id: 35,
         serial_number: "XXX999 999xxxx",
         mnfg_name: "Humble Frameworks",
         year: "2015",

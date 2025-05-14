@@ -2,17 +2,21 @@
   <%= render(Search::BikeBox::Component::new(bike: @marketplace_listing.item, current_user: @current_user)) %>
 
   <% if @marketplace_messages.any? %>
-    <h2><%= @initial_message.subject %></h2>
-
     <% @marketplace_messages.each do |marketplace_message| %>
-      <div class="tw:p-4 tw:bg-white tw:border tw:border-gray-200 tw:rounded-sm tw:dark:bg-gray-800 tw:dark:border-gray-700 ">
-        <div class="tw:w-full tw:pb-4 tw:gap-x-6 tw:grid tw:flex">
-          <span class="tw:block"><%= user_display(marketplace_message.sender_id) %></span>
+      <div class="tw:p-4 tw:bg-white tw:border tw:border-gray-200 tw:rounded-sm tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:mt-4">
+        <div class="tw:w-full tw:mb-2 tw:gap-x-6 tw:flex tw:flex-nowrap">
+          <span class="tw:block tw:grow"><%= user_display(marketplace_message.sender_id) %></span>
           <span class="tw:block convertTime">
             <%= l marketplace_message.created_at, format: :convert_time %>
           </span>
         </div>
-        <%= render(UserTextBlockDisplay::Component.new(text: marketplace_message.body)) %>
+        <% if marketplace_message.id == @initial_message.id %>
+          <h2 class="tw:text-lg tw:w-full">
+            <strong><%= translation(".subject") %>:</strong>
+            <%= @initial_message.subject %>
+          </h2>
+        <% end %>
+        <%= render(UserTextBlockDisplay::Component.new(text: marketplace_message.body, max_height_class: "", additional_classes: "tw:mt-4")) %>
       </div>
     <% end %>
   <% end %>

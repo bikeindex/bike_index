@@ -56,19 +56,26 @@ class MarketplaceMessage < ApplicationRecord
       where(sender_id: user.id).or(where(receiver_id: user.id))
     end
 
+    def decoded_marketplace_listing_id(user:, id:)
+      # marketplace_list_id is encoded as "ml_#{id}"
+      return unless id.is_a?(String) && id.start_with?(/ml_/i)
+
+      id.gsub(/\Aml_/i, "")
+    end
+
     def thread_for(user:, id:)
       # marketplace_list_id is encoded as "ml_#{id}"
-      if id.is_a?(String) && id.start_with?(/ml_/i)
-        marketplace_listing_id = id.gsub(/\Aml_/i, '')
+      if (marketplace_listing_id = decoded_marketplace_listing_id(user:, id:))
         # verify that the marketplace_listing_id exists and the user isn't the seller
         if MarketplaceListing.where.not(seller_id: user.id).where(id: marketplace_listing_id).any?
-          return for_user(user).where(marketplace_listing_id:)
+          return for_user(user).where(marketplace_listing_id:).order(:id)
         end
       else
         matches = for_user(user).where(initial_record_id: id)
         if matches.none?
           # If the id wasn't an initial_record_id, find the record and look up by its initial_record_id
           matches = for_user(user).where(initial_record_id: for_user(user).where(id:).pluck(:initial_record_id))
+            .order(:id)
         end
         return matches if matches.any?
       end
@@ -78,6 +85,14 @@ class MarketplaceMessage < ApplicationRecord
 
     def threads_for_user(user)
       for_user(user).distinct_threads
+    end
+
+    # TODO: permit specific things
+    def can_send_message?(user:, marketplace_listing:, marketplace_message: nil)
+      return true if marketplace_message.id.present? && marketplace_message.user_ids.include?(user.id)
+      return true if marketplace_listing.for_sale?
+
+      false
     end
 
     # Cached because this is called on every page load, to determine whether to show the messages menu item
@@ -135,6 +150,10 @@ class MarketplaceMessage < ApplicationRecord
     return self.class.none if initial_message?
 
     (id.present? ? messages_in_thread.where("id < ?", id) : messages_in_thread).order(:id)
+  end
+
+  def user_ids
+    [sender_id, receiver_id]
   end
 
   private

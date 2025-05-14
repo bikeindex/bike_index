@@ -2,9 +2,9 @@
 
 module Messages::ThreadShow
   class Component < ApplicationComponent
-    def initialize(current_user:, marketplace_messages:, marketplace_listing: nil)
+    def initialize(current_user:, marketplace_messages:, initial_message: nil, marketplace_listing: nil)
       @marketplace_messages = marketplace_messages
-      @initial_message = @marketplace_messages.first
+      @initial_message = initial_message || @marketplace_messages.first
       @marketplace_listing = marketplace_listing || @initial_message.marketplace_listing
       @current_user = current_user
 

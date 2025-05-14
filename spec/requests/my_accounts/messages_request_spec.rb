@@ -41,7 +41,8 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
   end
 
   describe "show" do
-    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, status: :for_sale) }
+    let(:status) { :for_sale }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, status:) }
     let(:show_url) { "#{base_url}/show?marketplace_listing_id=#{marketplace_listing.id}" }
 
     it "redirects" do
@@ -58,10 +59,19 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
         get show_url
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
+        expect(assigns(:can_send_message)).to be_truthy
       end
 
       context "draft item" do
-        it "redirects"
+        let(:status) { :for_sale }
+
+        it "redirects" do
+          expect(marketplace_listing.visible_by?(current_user)).to be_truthy
+          get show_url
+          expect(response.status).to eq(404)
+          expect(response).to render_template("show")
+          expect(assigns(:can_send_message)).to be_falsey
+        end
       end
 
       context "sold item" do

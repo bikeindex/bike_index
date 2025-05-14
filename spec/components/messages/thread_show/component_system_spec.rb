@@ -11,6 +11,6 @@ RSpec.describe Messages::ThreadShow::Component, :js, type: :system do
   it "default preview" do
     visit(preview_path)
 
-    expect(page).to have_content "Messages::ThreadShow::Component"
+    expect(page).to have_content "When are you available"
   end
 end

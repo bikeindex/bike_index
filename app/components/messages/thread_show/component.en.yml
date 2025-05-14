@@ -3,5 +3,4 @@ en:
   components:
     messages:
       thread_show:
-        marketplace_messages: Marketplace_messages
-        marketplace_listing: Marketplace_listing
+        subject: Subject

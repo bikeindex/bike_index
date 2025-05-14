@@ -13,12 +13,25 @@ class MyAccounts::MessagesController < ApplicationController
 
   def show
     @marketplace_messages = matching_marketplace_thread
-    # Create so that we don't have to rely on form parameters to handle initial creation
-    @marketplace_message = MarketplaceMessage.new(marketplace_listing_id: @marketplace_listing.id)
+    @initial_record = @marketplace_messages.first
+
+    @marketplace_listing = if @marketplace_messages.none?
+      MarketplaceListing.find(decoded_marketplace_listing_id)
+    else
+      @initial_record.marketplace_listing
+    end
+
+    @can_send_message = MarketplaceMessage.can_send_message?(user: current_user,
+      marketplace_listing: @marketplace_listing, marketplace_message: @initial_record)
+
+    if @can_send_message
+      @marketplace_message = MarketplaceMessage.new(marketplace_listing_id: @marketplace_listing.id)
+    end
   end
 
   def create
     @marketplace_message = MarketplaceMessage.new(permitted_params)
+
     if @marketplace_message.save
       flash[:success] = "Message sent"
       redirect_to my_account_messages_path
@@ -28,6 +41,14 @@ class MyAccounts::MessagesController < ApplicationController
   end
 
   private
+
+  def permitted_params
+    params.require(:marketplace_message).permit(:status)
+  end
+
+  def decoded_marketplace_listing_id
+    MarketplaceMessage.decoded_marketplace_listing_id(user: current_user, id: params[:id])
+  end
 
   def matching_marketplace_thread
     MarketplaceMessage.thread_for(user: current_user, id: params[:id])

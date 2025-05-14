@@ -4104,8 +4104,8 @@ en:
     messages:
       index:
         marketplace_messages: Marketplace messages
-      new:
-        message: something
+      show:
+        can_not_send_new_message: Sorry, you can't send a new message.
     password:
       better_password: better
       for_password_update: For password update
