@@ -15,8 +15,7 @@ module Messages::Thread
     private
 
     def message_path
-      new_my_account_message_path(marketplace_listing_id: @initial_record.marketplace_listing_id,
-        initial_record_id: @initial_record.id)
+      my_account_message_path(id: @initial_record.id)
     end
 
     def item_title

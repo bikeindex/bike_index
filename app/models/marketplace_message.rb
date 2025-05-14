@@ -56,16 +56,23 @@ class MarketplaceMessage < ApplicationRecord
       where(sender_id: user.id).or(where(receiver_id: user.id))
     end
 
-    def for(user:, marketplace_listing:, initial_record_id: nil)
-      if initial_record_id.present?
-        matches = for_user(user).where(initial_record_id:)
+    def thread_for(user:, id:)
+      # marketplace_list_id is encoded as "ml_#{id}"
+      if id.is_a?(String) && id.start_with?(/ml_/i)
+        marketplace_listing_id = id.gsub(/\Aml_/i, '')
+        # verify that the marketplace_listing_id exists and the user isn't the seller
+        if MarketplaceListing.where.not(seller_id: user.id).where(id: marketplace_listing_id).any?
+          return for_user(user).where(marketplace_listing_id:)
+        end
+      else
+        matches = for_user(user).where(initial_record_id: id)
+        if matches.none?
+          # If the id wasn't an initial_record_id, find the record and look up by its initial_record_id
+          matches = for_user(user).where(initial_record_id: for_user(user).where(id:).pluck(:initial_record_id))
+        end
         return matches if matches.any?
-      elsif marketplace_listing.seller_id != user.id
-        return for_user(user).where(marketplace_listing_id: marketplace_listing.id)
       end
 
-      # If the user is the seller, an initial_record_id is required.
-      # This also catches instances where passed not the users' messages
       raise ActiveRecord::RecordNotFound
     end
 

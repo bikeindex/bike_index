@@ -1,6 +1,7 @@
 class MyAccounts::MessagesController < ApplicationController
   include Sessionable
   before_action :authenticate_user_for_my_accounts_controller
+  before_action :enable_importmaps
 
   def index
     params[:page] || 1
@@ -29,10 +30,7 @@ class MyAccounts::MessagesController < ApplicationController
   private
 
   def matching_marketplace_thread
-    @marketplace_listing = MarketplaceListing.find(params[:marketplace_listing_id])
-
-    MarketplaceMessage.for(user: current_user, marketplace_listing: @marketplace_listing,
-      initial_record_id: params[:initial_record_id])
+    MarketplaceMessage.thread_for(user: current_user, id: params[:id])
   end
 
   def matching_marketplace_messages
