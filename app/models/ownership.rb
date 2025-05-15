@@ -318,11 +318,10 @@ class Ownership < ApplicationRecord
   end
 
   def calculated_impound_record_id
-    ir_id = bike.impound_records.current.last&.id
     # if the previous ownership is :status_with_owner, the new ownership should be too (not registered impounded)
-    return if ir_id.blank? || bike.ownerships.where.not(id: nil).last&.status == "status_with_owner"
+    return if bike.ownerships.where.not(id: nil).last&.status == "status_with_owner"
 
-    ir_id
+    bike.impound_records.current.last&.id
   end
 
   # Some organizations pre-register bikes and then transfer them.

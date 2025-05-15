@@ -65,10 +65,12 @@ class BikeUpdator
     end
     # If updator is a member of the creation organization, add org to the new ownership!
     ownership_org = @bike.current_ownership&.organization
+    # If previous ownership was with_owner, this should be too
+    status = "status_with_owner" if @bike.current_ownership&.status_with_owner?
     @bike.ownerships.create(owner_email: new_owner_email,
       creator: @user,
       origin: "transferred_ownership",
-      status: @bike.current_ownership&.status,
+      status:,
       organization: @user&.member_of?(ownership_org) ? ownership_org : nil,
       skip_email: @bike_params.dig("bike", "skip_email"))
 

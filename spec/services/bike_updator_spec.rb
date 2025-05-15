@@ -94,7 +94,7 @@ RSpec.describe BikeUpdator do
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, owner_email: email) }
       let(:organization) { bike.organizations.first }
       let(:new_ownership_attrs) do
-        { organization_id: nil, origin: "transferred_ownership", status: "status_with_owner", impound_record_id: nil }
+        {organization_id: nil, origin: "transferred_ownership", status: "status_with_owner", impound_record_id: nil}
       end
       it "does not pass organization" do
         expect(bike.reload.current_ownership.organization).to be_present
