@@ -1,10 +1,8 @@
-<div class="container">
-  <div class="tw:w-full">
-    <%= render(Messages::ThreadShow::Component.new(current_user:, marketplace_messages: [marketplace_message])) %>
-    <% if @can_send_message %>
-      <%= render partial: "form" %>
-    <% else %>
-      <%= t(".can_not_send_new_message") %>
-    <% end %>
-  </div>
+<div class="twbootcontainer">
+  <%= render(Messages::ThreadShow::Component.new(current_user:, marketplace_messages: @marketplace_messages, marketplace_listing: @marketplace_listing)) %>
+  <% if @can_send_message %>
+    <%= render partial: "form", locals: {marketplace_message: @marketplace_message} %>
+  <% else %>
+    <%= t(".can_not_send_new_message") %>
+  <% end %>
 </div>

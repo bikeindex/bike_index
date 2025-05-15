@@ -38,25 +38,28 @@ module Messages::Thread
         else
           content_tag(:strong, @other_user_name, class: "tw:font-bold")
         end
+      elsif unrequited_sender?(@marketplace_message)
+        content_tag(:span, (to_sender_text + count_html).html_safe)
       else
-        content_tag(:span, (messages_prior_sender_text +
+        content_tag(:span, (
+          messages_prior_sender_text +
           content_tag(:strong, user_display(@marketplace_message.sender_id), class: "tw:font-bold") +
-          content_tag(:span, " #{@marketplace_message.messages_prior_count + 1}", class: "tw:opacity-65")).html_safe)
+          count_html
+        ).html_safe)
       end
     end
 
+    def unrequited_sender?(marketplace_message)
+      marketplace_message.sender_buyer? && @messages_prior_arr.all? { |kind, _| kind == "sender_buyer" }
+    end
+
     def sender_full_text
-      (@messages_prior_arr.map { |_, id| user_display(user_id) } +
+      (@messages_prior_arr.map { |_, id| user_display(id) } +
         [user_display(@marketplace_message.sender_id)])
         .join(", ")
     end
 
     def messages_prior_sender_text
-      # special handling for unrequited sender
-      if @marketplace_message.sender_buyer? && @messages_prior_arr.all? { |kind, _| kind == "sender_buyer" }
-        return to_sender_text + ((@messages_prior_arr.count > 1) ? "... " : ", ")
-      end
-
       initial_sender_id = @messages_prior_arr.first.last
       text = user_display(initial_sender_id)
 
@@ -80,6 +83,10 @@ module Messages::Thread
       else
         @other_user_name
       end
+    end
+
+    def count_html
+      content_tag(:span, " #{@marketplace_message.messages_prior_count + 1}", class: "tw:opacity-65")
     end
   end
 end

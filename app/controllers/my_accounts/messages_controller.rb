@@ -8,7 +8,7 @@ class MyAccounts::MessagesController < ApplicationController
     @per_page = params[:per_page] || 50
     @marketplace_messages = matching_marketplace_messages
     @pagy, @marketplace_messages = pagy(matching_marketplace_messages
-      .includes(:marketplace_listing, :sender, :receiver, :item, :intial_record), limit: @per_page)
+      .includes(:marketplace_listing, :sender, :receiver, :initial_record), limit: @per_page)
   end
 
   def show
@@ -16,38 +16,52 @@ class MyAccounts::MessagesController < ApplicationController
     @initial_record = @marketplace_messages.first
 
     @marketplace_listing = if @marketplace_messages.none?
-      MarketplaceListing.find(decoded_marketplace_listing_id)
+      decoded_marketplace_listing
     else
       @initial_record.marketplace_listing
     end
 
-    @can_send_message = MarketplaceMessage.can_send_message?(user: current_user,
-      marketplace_listing: @marketplace_listing, marketplace_message: @initial_record)
+    @can_send_message = verify_can_see_message!(@marketplace_listing, @initial_record)
 
     if @can_send_message
-      @marketplace_message = MarketplaceMessage.new(marketplace_listing_id: @marketplace_listing.id)
+      @marketplace_message = MarketplaceMessage.new(marketplace_listing_id: @marketplace_listing.id, initial_record_id: @initial_record&.id)
     end
   end
 
   def create
     @marketplace_message = MarketplaceMessage.new(permitted_params)
 
-    if @marketplace_message.save
-      flash[:success] = "Message sent"
+    if !@marketplace_message.can_send?
+      flash[:error] = translation(:can_not_send_message)
+      render :show
+    elsif @marketplace_message.save
+      flash[:success] = translation(:message_sent)
       redirect_to my_account_messages_path
     else
-      render :new
+      render :show
     end
   end
 
   private
 
   def permitted_params
-    params.require(:marketplace_message).permit(:status)
+    params.require(:marketplace_message)
+      .permit(:initial_record_id, :marketplace_listing_id, :subject, :body)
+      .merge(sender_id: current_user.id)
   end
 
-  def decoded_marketplace_listing_id
-    MarketplaceMessage.decoded_marketplace_listing_id(user: current_user, id: params[:id])
+  def verify_can_see_message!(marketplace_listing, marketplace_message)
+    raise ActiveRecord::RecordNotFound unless MarketplaceMessage.can_see_messages?(
+      user: current_user, marketplace_listing:, marketplace_message:
+    )
+
+    MarketplaceMessage.can_send_message?(user: current_user, marketplace_listing:, marketplace_message:)
+  end
+
+  def decoded_marketplace_listing
+    MarketplaceListing.find(
+      MarketplaceMessage.decoded_marketplace_listing_id(user: current_user, id: params[:id])
+    )
   end
 
   def matching_marketplace_thread

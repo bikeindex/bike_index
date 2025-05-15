@@ -54,7 +54,7 @@ RSpec.describe Messages::Thread::Component, type: :component do
         let(:marketplace_message_pre) { FactoryBot.create(:marketplace_message, sender: current_user) }
         let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message_pre, sender: current_user) }
         let(:target) do
-          "<span>To: #{other_name}, <strong class=\"tw:font-bold\">me</strong><span class=\"tw:opacity-65\"> 2</span></span>"
+          "<span>To: #{other_name}<span class=\"tw:opacity-65\"> 2</span></span>"
         end
         it "is the target" do
           expect(marketplace_message_pre.sender_id).to eq current_user.id

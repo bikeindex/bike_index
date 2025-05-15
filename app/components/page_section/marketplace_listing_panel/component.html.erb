@@ -1,4 +1,4 @@
-<%= render(Card::Component.new(additional_classes: "tw:mt-10 tw:mb-5")) do %>
+<%= render(Card::Component.new) do %>
   <h2 class="tw:text-4xl! tw:font-normal tw:my-2! twtext-color!">
     <%= @marketplace_listing.currency_symbol %><%= number_display(@marketplace_listing.amount) %>
     <small class="tw:text-2xl!"><%= @marketplace_listing.currency_name %></small>

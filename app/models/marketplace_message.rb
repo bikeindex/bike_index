@@ -87,12 +87,27 @@ class MarketplaceMessage < ApplicationRecord
       for_user(user).distinct_threads
     end
 
-    # TODO: permit specific things
-    def can_send_message?(user:, marketplace_listing:, marketplace_message: nil)
-      return true if marketplace_message.id.present? && marketplace_message.user_ids.include?(user.id)
-      return true if marketplace_listing.for_sale?
+    # TODO: permit sending message only in certain period, only to new owner post sale, etc.
+    def can_send_message?(user: nil, marketplace_listing:, marketplace_message: nil)
+      return false unless can_see_messages?(user:, marketplace_listing:, marketplace_message:)
 
-      false
+      marketplace_listing.for_sale? ||
+        marketplace_message&.id.present? && marketplace_message.user_ids.include?(user.id)
+    end
+
+    def can_see_messages?(user: nil, marketplace_listing:, marketplace_message: nil)
+      return false if user.blank?
+
+      if marketplace_message.present?
+        return false unless marketplace_message.user_ids.include?(user.id)
+      else
+        # seller can't send a message unless they have an existing message
+        return false if marketplace_listing.seller_id == user.id
+      end
+
+      # Block seeing messages for draft posts.
+      # TODO: maybe don't allow seeing X days after listing ended?
+      %w[for_sale sold removed].include?(marketplace_listing.status)
     end
 
     # Cached because this is called on every page load, to determine whether to show the messages menu item
@@ -101,6 +116,11 @@ class MarketplaceMessage < ApplicationRecord
 
       Rails.cache.fetch(["any_marketplace_messages", user]) { for_user(user).any? }
     end
+  end
+
+  # Should be called before creation
+  def can_send?
+    self.class.can_send_message?(user: sender, marketplace_listing:, marketplace_message: self)
   end
 
   # TODO: do we need all these other_user methods?

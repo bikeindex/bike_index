@@ -84,7 +84,7 @@ RSpec.describe MarketplaceMessage, type: :model do
     end
   end
 
-  describe "for" do
+  describe "thread_for" do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing) }
     let(:marketplace_listing_id) { "ml_#{marketplace_listing.id}" }
     let(:seller) { marketplace_listing.seller }
@@ -118,6 +118,80 @@ RSpec.describe MarketplaceMessage, type: :model do
       expect do
         MarketplaceMessage.thread_for(user: other_user, id: marketplace_message.id).pluck(:id)
       end.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe "can_send_message?" do
+    let(:user) { FactoryBot.create(:user) }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, status:) }
+    let(:seller) { marketplace_listing.seller }
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: user) }
+    let(:status) { :for_sale }
+
+    it "is truthy" do
+      expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
+      expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+
+      expect(marketplace_message).to be_valid
+      expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+      expect(MarketplaceMessage.can_see_messages?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+      expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+      expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+
+      # Even with an existing marketplace_message, seller still needs a message to be able to message
+      expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:)).to be_falsey
+      expect(MarketplaceMessage.can_see_messages?(user: seller, marketplace_listing:)).to be_falsey
+
+      # It is falsey for another user
+      user2 = FactoryBot.create(:user_confirmed)
+      expect(MarketplaceMessage.can_send_message?(user: user2, marketplace_listing:, marketplace_message:)).to be_falsey
+      expect(MarketplaceMessage.can_see_messages?(user: user2, marketplace_listing:, marketplace_message:)).to be_falsey
+    end
+
+    context "with draft" do
+      let(:status) { :draft }
+      it "is falsey" do
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_falsey
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_falsey
+
+        expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:)).to be_falsey
+
+        # Even though this message wouldn't be permitted to be created in reality
+        expect(marketplace_message).to be_valid
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_falsey
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_falsey
+      end
+    end
+
+    context "with sold" do
+      let(:status) { :sold }
+      it "is falsey, unless message exists" do
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_falsey
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+
+        expect(marketplace_message).to be_valid
+        expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+      end
+    end
+
+    context "with removed" do
+      let(:status) { :removed }
+      it "is falsey" do
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_falsey
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+
+        expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:)).to be_falsey
+
+        # Functionally, I think removed should work the same way as sold
+        expect(marketplace_message).to be_valid
+        expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+      end
     end
   end
 

@@ -1828,6 +1828,10 @@ en:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
         successfully_updated: Your information was successfully updated.
+      messages:
+        create: 
+          can_not_send_message: Sorry, you can't send a message to that listing
+          message_sent: Message sent
     oauth:
       applications:
         ensure_app_owner!:
@@ -4106,6 +4110,11 @@ en:
         marketplace_messages: Marketplace messages
       show:
         can_not_send_new_message: Sorry, you can't send a new message.
+      form:
+        message: message
+        new_message: New message
+        send_message: Send message
+        reply_to_message: Reply to message
     password:
       better_password: better
       for_password_update: For password update
