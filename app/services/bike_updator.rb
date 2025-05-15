@@ -68,6 +68,7 @@ class BikeUpdator
     @bike.ownerships.create(owner_email: new_owner_email,
       creator: @user,
       origin: "transferred_ownership",
+      status: @bike.current_ownership&.status,
       organization: @user&.member_of?(ownership_org) ? ownership_org : nil,
       skip_email: @bike_params.dig("bike", "skip_email"))
 

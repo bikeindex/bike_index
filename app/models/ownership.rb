@@ -222,7 +222,7 @@ class Ownership < ApplicationRecord
         self.creator_id ||= bike.creator_id
         self.example = bike.example
         # Calculate current_impound_record, if it isn't assigned
-        self.impound_record_id ||= bike.impound_records.current.last&.id
+        self.impound_record_id ||= calculated_impound_record_id
       end
       # Previous attrs to #2110
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
@@ -315,6 +315,14 @@ class Ownership < ApplicationRecord
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
     return true if pos?
     embed? && organization&.spam_registrations?
+  end
+
+  def calculated_impound_record_id
+    ir_id = bike.impound_records.current.last&.id
+    # if the previous ownership is :status_with_owner, the new ownership should be too (not registered impounded)
+    return if ir_id.blank? || bike.ownerships.where.not(id: nil).last&.status == "status_with_owner"
+
+    ir_id
   end
 
   # Some organizations pre-register bikes and then transfer them.

@@ -93,6 +93,9 @@ RSpec.describe BikeUpdator do
     context "organized" do
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, owner_email: email) }
       let(:organization) { bike.organizations.first }
+      let(:new_ownership_attrs) do
+        { organization_id: nil, origin: "transferred_ownership", status: "status_with_owner", impound_record_id: nil }
+      end
       it "does not pass organization" do
         expect(bike.reload.current_ownership.organization).to be_present
         expect(bike.created_at).to be < Time.current - 1.hour
@@ -105,16 +108,42 @@ RSpec.describe BikeUpdator do
         update_bike = BikeUpdator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
         update_bike.update_ownership
         expect(Ownership.count).to eq 2
-        new_ownership = bike.reload.current_ownership
-        expect(new_ownership.id).to_not eq ownership.id
-        expect(new_ownership.organization_id).to be_blank
-        expect(new_ownership.origin).to eq "transferred_ownership"
+        expect(bike.reload.current_ownership.id).to_not eq ownership.id
+        expect(bike.current_ownership).to have_attributes(new_ownership_attrs)
         expect(bike.bike_organizations.count).to eq 1
         expect(bike.bike_organizations.first.organization).to eq organization
         expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
         expect(bike.reload.updated_by_user_at).to be > Time.current - 1
         expect(bike.not_updated_by_user?).to be_falsey
         expect(bike.updator_id).to eq user.id
+      end
+      context "bike is impounded" do
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:, organization:) }
+        it "creates a new ownership with status_with_owner" do
+          ProcessImpoundUpdatesJob.new.perform(impound_record.id)
+          expect(bike.reload.current_ownership.organization).to be_present
+          expect(bike.created_at).to be < Time.current - 1.hour
+          expect(bike.not_updated_by_user?).to be_truthy
+          expect(bike.updator_id).to be_blank
+          expect(bike.status).to eq "status_impounded"
+          expect(bike.current_ownership.status).to eq "status_with_owner"
+          expect(user.member_of?(organization)).to be_falsey
+          expect(ownership.reload.organization_pre_registration?).to be_falsey
+          expect(ownership.origin).to eq "web"
+          expect(ownership.organization_id).to eq organization.id
+          update_bike = BikeUpdator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
+          update_bike.update_ownership
+          expect(Ownership.count).to eq 2
+          expect(bike.reload.current_ownership.id).to_not eq ownership.id
+          expect(bike.current_ownership.new_registration?).to be_falsey
+          expect(bike.current_ownership).to have_attributes(new_ownership_attrs)
+          expect(bike.bike_organizations.count).to eq 1
+          expect(bike.bike_organizations.first.organization).to eq organization
+          expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
+          expect(bike.reload.updated_by_user_at).to be > Time.current - 1
+          expect(bike.not_updated_by_user?).to be_falsey
+          expect(bike.updator_id).to eq user.id
+        end
       end
       context "user is an organization member" do
         it "passes users organization" do
@@ -127,10 +156,8 @@ RSpec.describe BikeUpdator do
           update_bike = BikeUpdator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
           update_bike.update_ownership
           expect(Ownership.count).to eq 2
-          new_ownership = bike.reload.current_ownership
-          expect(new_ownership.id).to_not eq ownership.id
-          expect(new_ownership.organization_id).to eq organization.id
-          expect(new_ownership.origin).to eq "transferred_ownership"
+          expect(bike.reload.current_ownership.id).to_not eq ownership.id
+          expect(bike.current_ownership).to have_attributes(new_ownership_attrs.merge(organization_id: organization.id))
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.organization).to eq organization
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
