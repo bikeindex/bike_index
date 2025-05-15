@@ -52,7 +52,7 @@ RSpec.describe BikesController, type: :controller do
     context "sign_in_if_not" do
       it "redirects to sign in" do
         get :show, params: {id: bike.id, sign_in_if_not: 1}
-        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}"
+        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}?sign_in_if_not=1"
         expect(flash[:notice]).to be_present
         expect(response).to redirect_to(new_session_path)
       end
@@ -60,7 +60,7 @@ RSpec.describe BikesController, type: :controller do
         let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
         it "redirects to magic link, because organization sign in" do
           get :show, params: {id: bike.id, sign_in_if_not: 1, organization_id: organization.to_param}
-          expect(session[:return_to]).to eq bike_path(bike.to_param)
+          expect(session[:return_to]).to eq bike_path(bike.to_param, sign_in_if_not: 1, organization_id: organization.to_param)
           expect(flash[:notice]).to be_present
           expect(response).to redirect_to(magic_link_session_path)
         end

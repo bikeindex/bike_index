@@ -211,6 +211,7 @@ nl:
           niet.
         unsupported_response_type: De authorisatie server ondersteund dit response
           type niet
+        user_removed: "(gebruiker verwijderd)"
       models:
         doorkeeper/application:
           attributes:
@@ -2031,6 +2032,9 @@ nl:
       in: in
       looking_for_correct_owner: Op zoek naar de juiste eigenaar van deze %{bike_type}!
       test_registration: proefregistratie
+      view_public_non_listing: Bekijk openbare registratie
+      viewing_listing_preview: Dit is een voorbeeld van uw 'te koop'-advertentie.
+        Deze is niet openbaar zichtbaar.
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
@@ -2491,6 +2495,10 @@ nl:
         current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
           is vereist voor het bijwerken van uw wachtwoord.
         successfully_updated: Uw gegevens zijn succesvol bijgewerkt.
+      messages:
+        create:
+          can_not_send_message: Helaas kunt u geen bericht naar deze advertentie sturen
+          message_sent: Bericht verzonden
     memberships:
       edit:
         free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
@@ -4089,9 +4097,10 @@ nl:
       the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
       user_settings: "%{user_email} instellingen"
       view_org: Bekijk %{org_name}
-      your_bikes: Je fietsen
       stolen_bike: Fiets gestolen?
       search: Zoeken
+      marketplace_messages: Marktplaatsberichten
+      your_registrations: Uw registraties
     application_bikehub:
       contact: contact
       home: Thuis
@@ -5764,6 +5773,17 @@ nl:
         gemaakt worden!"
       modal_title: Weet u zeker dat u uw account wilt verwijderen?
       nevermind: Laat maar
+    messages:
+      form:
+        body_placeholder: Voeg wat berichttekst toe
+        message: bericht
+        new_message: Nieuw bericht
+        reply_to_message: Reageer op bericht
+        send_message: Verstuur bericht
+      index:
+        marketplace_messages: Marktplaatsberichten
+      show:
+        can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -6102,3 +6122,10 @@ nl:
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
         dit %{object_name} wordt opgeslagen:"
+    messages:
+      thread:
+        from: uit
+        me: mij
+        to: Naar
+      thread_show:
+        subject: Onderwerp

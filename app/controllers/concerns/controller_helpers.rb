@@ -76,7 +76,7 @@ module ControllerHelpers
   end
 
   def store_return_and_authenticate_user(translation_key: nil, flash_type: :error)
-    return if current_user&.confirmed?
+    return if current_user&.confirmed? && current_user.terms_of_service
 
     store_return_to
     authenticate_user(flash_type:) && return
