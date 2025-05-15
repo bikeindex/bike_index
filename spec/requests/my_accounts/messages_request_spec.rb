@@ -173,6 +173,34 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       expect(marketplace_message).to match_hash_indifferently(new_params.except(:initial_record_id))
       expect(marketplace_message.sender_id).to eq current_user.id
       expect(marketplace_message.receiver_id).to eq marketplace_listing.seller_id
+      expect(Email::MarketplaceMessageJob.jobs.count).to eq 1
+    end
+
+    context "invalid post" do
+      it "renders with errors" do
+        expect do
+          post base_url, params: {marketplace_message: new_params.except(:body)}
+        end.to change(MarketplaceMessage, :count).by 0
+
+        expect(response).to render_template("show")
+        expect(assigns(:marketplace_listing)&.id).to eq marketplace_listing.id
+      end
+    end
+
+    context "not user's marketplace_message" do
+      let!(:marketplace_message) { FactoryBot.create(:marketplace_message) }
+
+      it "404s" do
+        can_see_message = MarketplaceMessage.can_see_messages?(user: current_user, marketplace_listing:, marketplace_message:)
+        expect(can_see_message).to be_falsey
+
+        expect do
+          post base_url, params: {
+            marketplace_message: new_params.merge(initial_record_id: marketplace_message.id)
+          }
+        end.to change(MarketplaceMessage, :count).by 0
+        expect(response.status).to eq(404)
+      end
     end
 
     context "seller reply" do
@@ -181,16 +209,22 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       let(:reply_params) { new_params.merge(initial_record_id: marketplace_message.id.to_s) }
 
       it "sends a message" do
-        expect do
-          post base_url, params: {marketplace_message: reply_params}
-          expect(flash[:success]).to be_present
-        end.to change(MarketplaceMessage, :count).by 1
+        ActionMailer::Base.deliveries = []
+
+        Sidekiq::Testing.inline! do
+          expect do
+            post base_url, params: {marketplace_message: reply_params}
+            expect(flash[:success]).to be_present
+          end.to change(MarketplaceMessage, :count).by 1
+        end
 
         new_marketplace_message = MarketplaceMessage.last
         expect(new_marketplace_message).to match_hash_indifferently(reply_params.except(:subject))
         expect(new_marketplace_message.subject).to eq "Re: #{marketplace_message.subject}"
         expect(new_marketplace_message.sender_id).to eq current_user.id
         expect(new_marketplace_message.receiver_id).to eq marketplace_message.sender_id
+
+        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       end
     end
   end

@@ -98,6 +98,10 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.bike_possibly_found_email(contact)
   end
 
+  def marketplace_message_notification
+    CustomerMailer.marketplace_message_notification(MarketplaceMessage.last)
+  end
+
   private
 
   def preview_user

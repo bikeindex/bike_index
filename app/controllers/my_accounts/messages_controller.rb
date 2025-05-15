@@ -30,6 +30,10 @@ class MyAccounts::MessagesController < ApplicationController
 
   def create
     @marketplace_message = MarketplaceMessage.new(permitted_params)
+    @marketplace_listing ||= @marketplace_message.marketplace_listing # enables rendering!
+
+    # raise if can't see
+    verify_can_see_message!(@marketplace_listing, @marketplace_message)
 
     if !@marketplace_message.can_send?
       flash[:error] = translation(:can_not_send_message)

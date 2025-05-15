@@ -14,14 +14,14 @@
     <% if marketplace_message.initial_message? %>
       <div class="tw:mb-3">
         <%= f.label :subject, class: "twlabel" %>
-        <%= f.text_field :subject, class: "twinput" %>
+        <%= f.text_field :subject, maxlength: 180, class: "twinput" %>
       </div>
     <% end %>
 
 
     <div class="tw:mt-3">
       <%= f.label :body, class: "twlabel tw:sr-only" %>
-      <%= f.text_area :body, rows: 5, class: "twinput" %>
+      <%= f.text_area :body, rows: 5, placeholder: t(".body_placeholder"), class: "twinput" %>
     </div>
 
     <div class="tw:mt-3 tw:flex tw:items-center tw:justify-end">

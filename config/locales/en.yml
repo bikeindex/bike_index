@@ -813,7 +813,7 @@ en:
           response mode.
         unsupported_response_type: The authorization server does not support this
           response type.
-        user_removed: (user removed)
+        user_removed: "(user removed)"
       models:
         bike:
           not_found: not found
@@ -1317,8 +1317,6 @@ en:
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
-      viewing_listing_preview: This is a preview of your "for sale" listing. It is not publicly visible.
-      view_public_non_listing: View public registration 
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
       no_one_but_the_user_and_bike_index_admins: No one but the user (and Bike Index
         admins) can see it
@@ -1331,7 +1329,10 @@ en:
       switch_to_new_bike_id: Switch to a new bike ID
       test_registration: test registration
       update: Update
+      view_public_non_listing: View public registration
       view_users_other_registrations: View user's other registrations
+      viewing_listing_preview: This is a preview of your "for sale" listing. It is
+        not publicly visible.
       where_did_you_see_this_bike: >-
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below
@@ -1824,14 +1825,14 @@ en:
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
         user_settings: User Settings
+      messages:
+        create:
+          can_not_send_message: Sorry, you can't send a message to that listing
+          message_sent: Message sent
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
         successfully_updated: Your information was successfully updated.
-      messages:
-        create: 
-          can_not_send_message: Sorry, you can't send a message to that listing
-          message_sent: Message sent
     oauth:
       applications:
         ensure_app_owner!:
@@ -3899,6 +3900,7 @@ en:
       help: Help
       log_in: log in
       logout: Logout
+      marketplace_messages: Marketplace messages
       register_a_new_bike: Register a new bike
       search: Search
       sign_up: Sign up
@@ -3907,7 +3909,6 @@ en:
       user_settings: "%{user_email} settings"
       view_org: View %{org_name}
       your_registrations: Your registrations
-      marketplace_messages: Marketplace messages
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index –
         the premier bike registry.
@@ -4106,15 +4107,16 @@ en:
       edit_pages: 'Edit account pages:'
       save_changes: Save changes
     messages:
+      form:
+        body_placeholder: Add some message text
+        message: message
+        new_message: New message
+        reply_to_message: Reply to message
+        send_message: Send message
       index:
         marketplace_messages: Marketplace messages
       show:
         can_not_send_new_message: Sorry, you can't send a new message.
-      form:
-        message: message
-        new_message: New message
-        send_message: Send message
-        reply_to_message: Reply to message
     password:
       better_password: better
       for_password_update: For password update

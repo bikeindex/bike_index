@@ -88,22 +88,25 @@ class MarketplaceMessage < ApplicationRecord
     end
 
     # TODO: permit sending message only in certain period, only to new owner post sale, etc.
-    def can_send_message?(user: nil, marketplace_listing:, marketplace_message: nil)
+    def can_send_message?(marketplace_listing:, user: nil, marketplace_message: nil)
       return false unless can_see_messages?(user:, marketplace_listing:, marketplace_message:)
 
       marketplace_listing.for_sale? ||
         marketplace_message&.id.present? && marketplace_message.user_ids.include?(user.id)
     end
 
-    def can_see_messages?(user: nil, marketplace_listing:, marketplace_message: nil)
+    def can_see_messages?(marketplace_listing:, user: nil, marketplace_message: nil)
       return false if user.blank?
 
       if marketplace_message.present?
         return false unless marketplace_message.user_ids.include?(user.id)
-      else
-        # seller can't send a message unless they have an existing message
-        return false if marketplace_listing.seller_id == user.id
+        if marketplace_message.initial_record.present?
+          return false unless marketplace_message.initial_record.user_ids.include?(user.id)
+        end
+      elsif marketplace_listing.seller_id == user.id
+        return false
       end
+      # seller can't send a message unless they have an existing message
 
       # Block seeing messages for draft posts.
       # TODO: maybe don't allow seeing X days after listing ended?
@@ -193,9 +196,6 @@ class MarketplaceMessage < ApplicationRecord
   def process_notification
     return if skip_processing
 
-    # ProcessMarketplaceMessageJob
-    # Bust caches on the associations
-    sender&.update(updated_at: Time.current)
-    receiver&.update(updated_at: Time.current)
+    Email::MarketplaceMessageJob.perform_async(id)
   end
 end
