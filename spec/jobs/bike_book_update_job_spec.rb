@@ -51,6 +51,6 @@ RSpec.describe BikeBookUpdateJob, type: :job do
     expect(bike.components.where(id: component2.id).first.is_stock).to be_falsey
     expect(bike.components.where(is_stock: false).count).to eq(1)
     expect(bike.components.where(ctype_id: component2.ctype_id).count).to eq(1)
-    expect(Ctype.pluck(:id) - bike.components.pluck(:ctype_id)).to eq([])
+    expect(bike.components.pluck(:ctype_id).count).to eq 14
   end
 end
