@@ -204,6 +204,8 @@ es:
         unsupported_response_type: El servidor de autorización no soporta este tipo
           de respuesta.
         user_removed:
+        re:
+        user_not_in_initial_record:
       models:
         doorkeeper/application:
           attributes:

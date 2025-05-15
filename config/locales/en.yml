@@ -790,6 +790,7 @@ en:
           expired: The access token expired
           revoked: The access token was revoked
           unknown: The access token is invalid
+        re: 'Re: %{original_subject}'
         record_invalid: 'Validation failed: %{errors}'
         resource_owner_authenticator_not_configured: >-
           Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator
@@ -813,6 +814,7 @@ en:
           response mode.
         unsupported_response_type: The authorization server does not support this
           response type.
+        user_not_in_initial_record: user isn't one of the original message users
         user_removed: "(user removed)"
       models:
         bike:

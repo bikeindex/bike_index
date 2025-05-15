@@ -212,6 +212,8 @@ nb:
         unsupported_response_type: Autoriseringsserveren har ikke støtte for denne
           responstypen.
         user_removed: "(bruker fjernet)"
+        re: 'Sv: %{original_subject}'
+        user_not_in_initial_record: brukeren er ikke en av de opprinnelige meldingsbrukerne
       models:
         doorkeeper/application:
           attributes:

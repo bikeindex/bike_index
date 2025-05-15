@@ -24,6 +24,7 @@
 class MarketplaceMessage < ApplicationRecord
   # enum because eventually may have notifications about sale or alerts about suspicious behavior
   KIND_ENUM = {sender_buyer: 0, sender_seller: 1}.freeze
+  BUYER_SELLER_MESSAGE_KINDS = %w[sender_buyer sender_seller]
 
   enum :kind, KIND_ENUM
 
@@ -35,6 +36,7 @@ class MarketplaceMessage < ApplicationRecord
   has_many :notifications, as: :notifiable
 
   validates_presence_of :marketplace_listing_id, :sender_id, :receiver_id, :subject, :body
+  validate :users_match_initial_record, if: -> { buyer_seller_message? }
 
   before_validation :set_calculated_attributes
   after_commit :process_notification
@@ -43,6 +45,7 @@ class MarketplaceMessage < ApplicationRecord
 
   scope :initial_message, -> { where("id = initial_record_id") }
   scope :reply_message, -> { where.not("id = initial_record_id") }
+  scope :buyer_seller_message, -> { where(kind: BUYER_SELLER_MESSAGE_KINDS) }
   scope :distinct_threads, -> {
     select("DISTINCT ON (initial_record_id) *")
       .order(:initial_record_id, id: :desc)
@@ -126,6 +129,10 @@ class MarketplaceMessage < ApplicationRecord
     self.class.can_send_message?(user: sender, marketplace_listing:, marketplace_message: self)
   end
 
+  def buyer_seller_message?
+    BUYER_SELLER_MESSAGE_KINDS.include?(kind)
+  end
+
   # TODO: do we need all these other_user methods?
   def other_user(user_or_id)
     user_id = user_or_id&.is_a?(User) ? user_or_id.id : user_or_id
@@ -181,9 +188,20 @@ class MarketplaceMessage < ApplicationRecord
 
   private
 
+  def users_match_initial_record
+    # only pertinent for replies, blankness already validated
+    return if initial_message? || sender_id.blank? || receiver_id.blank?
+    return if initial_record.user_ids.sort == user_ids.sort
+
+    errors.add(:base, I18n.t("user_not_in_initial_record", scope: %i[activerecord errors messages]))
+  end
+
   def set_calculated_attributes
     self.kind ||= (sender_id == seller_id) ? "sender_seller" : "sender_buyer"
-    self.subject = "Re: #{initial_record.subject}" if reply_message?
+    if reply_message?
+      self.subject = I18n.t("re", original_subject: initial_record.subject,
+        scope: %i[activerecord errors messages])
+    end
     self.initial_record ||= self
     self.messages_prior_count ||= messages_prior.count
     self.receiver_id = if initial_message?

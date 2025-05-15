@@ -62,6 +62,30 @@ RSpec.describe MarketplaceMessage, type: :model do
     end
   end
 
+  describe "sender_is_user_from_initial_record validation" do
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
+    let(:sender_id) { marketplace_message.sender_id }
+    let(:receiver_id) { marketplace_message.receiver_id }
+    let(:other_user_id) { FactoryBot.create(:user_confirmed).id }
+    let(:marketplace_message_reply) { FactoryBot.build(:marketplace_message_reply, initial_record: marketplace_message, sender_id:, receiver_id:) }
+
+    it "is invalid" do
+      expect(marketplace_message_reply).to be_valid
+      # When sender isn't original
+      marketplace_message.attributes = {sender_id: other_user_id}
+      expect(marketplace_message_reply).to_not be_valid
+      expect(marketplace_message_reply.errors.full_messages).to eq(["user isn't one of the original message users"])
+      # when receiver isn't original
+      marketplace_message.attributes = {sender_id:, receiver_id: other_user_id}
+      expect(marketplace_message_reply).to_not be_valid
+      expect(marketplace_message_reply.errors.full_messages).to eq(["user isn't one of the original message users"])
+      # when blank, different error
+      marketplace_message_reply.attributes = {sender_id: nil, receiver_id: nil}
+      expect(marketplace_message_reply).to_not be_valid
+      expect(marketplace_message_reply.errors.full_messages).to eq(["Sender can't be blank"])
+    end
+  end
+
   describe "threads_for_user" do
     let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
     let(:user) { marketplace_message.receiver }

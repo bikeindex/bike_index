@@ -205,6 +205,8 @@ it:
         unsupported_response_type: Il server di autorizzazione non supporta questo
           response type.
         user_removed:
+        re:
+        user_not_in_initial_record:
       models:
         doorkeeper/application:
           attributes:

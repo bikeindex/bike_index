@@ -37,6 +37,7 @@ class MergeAdditionalEmailJob < ApplicationJob
     # Marketplace things
     MarketplaceListing.unscoped.where(seller_id: old_user.id).each { |i| i.update(seller_id: user_id) }
     MarketplaceListing.unscoped.where(buyer_id: old_user.id).each { |i| i.update(buyer_id: user_id) }
+    update_marketplace_messages(user_id, old_user.id)
 
     # No index, so update all
     BikeSticker.where(user_id: old_user.id).update_all(user_id:)
@@ -60,6 +61,14 @@ class MergeAdditionalEmailJob < ApplicationJob
       AddressRecord.user.where(user_id: old_user_id).each { |i| i.update(user_id:) }
     end
     AddressRecord.not_user.where(user_id: old_user_id).each { |i| i.update(user_id:) }
+  end
+
+  def update_marketplace_messages(user_id, old_user_id)
+    # Have to update initial_message first or validations fail on reply updates
+    MarketplaceMessage.unscoped.initial_message.where(sender_id: old_user_id).each { |i| i.update(sender_id: user_id) }
+    MarketplaceMessage.unscoped.where(sender_id: old_user_id).each { |i| i.update(sender_id: user_id) }
+    MarketplaceMessage.unscoped.initial_message.where(receiver_id: old_user_id).each { |i| i.update(receiver_id: user_id) }
+    MarketplaceMessage.unscoped.where(receiver_id: old_user_id).each { |i| i.update(receiver_id: user_id) }
   end
 
   def merge_user_organization_roles(user_email, old_user)

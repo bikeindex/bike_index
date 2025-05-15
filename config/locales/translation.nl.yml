@@ -212,6 +212,8 @@ nl:
         unsupported_response_type: De authorisatie server ondersteund dit response
           type niet
         user_removed: "(gebruiker verwijderd)"
+        re: 'Re: %{original_subject}'
+        user_not_in_initial_record: gebruiker is niet een van de originele berichtgebruikers
       models:
         doorkeeper/application:
           attributes:
