@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe ProcessImpoundUpdatesJob, type: :job do
   let(:instance) { described_class.new }
 
-  let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours) }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: Time.current - 2.hours) }
   let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
   let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, processed: false, kind: kind) }
   let(:kind) { "note" }
@@ -13,6 +13,7 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
     # The factory force updates bike, so force un-update
     bike.update_columns(status: "status_with_owner", current_impound_record_id: nil)
     expect(bike.reload.status).to eq "status_with_owner"
+    expect(bike.current_ownership.status).to eq "status_with_owner"
 
     impound_record_update.save
     Sidekiq::Job.clear_all
@@ -24,6 +25,7 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
 
     expect(bike.reload.status).to eq "status_impounded"
     expect(bike.updated_at).to be_within(1).of Time.current
+    expect(bike.current_ownership.reload.status).to eq "status_with_owner"
   end
 
   context "unregistered_parking_notification" do
@@ -146,7 +148,7 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
 
   context "transferred_to_new_owner" do
     let(:kind) { "transferred_to_new_owner" }
-    let!(:ownership) { FactoryBot.create(:ownership, bike: bike, claimed: false) }
+    let!(:ownership) { bike.reload.current_ownership }
     let!(:impound_record_update) do
       impound_record.impound_record_updates.create(processed: false,
         kind: kind,
