@@ -1,5 +1,5 @@
 <div data-controller="search--bike-box--component">
-  <a href="<%= @bike.html_url %>" class="bike-list-image <%= 'hover-expand' if @bike.thumb_path %>">
+  <a href="<%= @bike.html_url %>">
     <%= bike_thumb_image(@bike) %>
   </a>
   <div class="bike-information <%= 'multi-attr-lists' if @bike.current_stolen_record.present? %>">

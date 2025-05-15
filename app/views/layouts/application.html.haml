@@ -12,6 +12,7 @@
     - if @include_importmaps
       = javascript_importmap_tags
       = hotwire_livereload_tags if Rails.env.development?
+      <script>window.importmapLocalizeTime = true</script>
     :javascript
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
@@ -70,9 +71,13 @@
                           = t(".view_org", org_name: organization.name)
                     %li.divider-nav-item
                   %li
-                    = active_link t(".register_a_new_bike"), choose_registration_path, class: 'nav-link'
+                    = active_link t(".your_registrations"), my_account_path, class: 'nav-link'
+                  -# .any_for_user? caches
+                  - if MarketplaceMessage.any_for_user?(current_user)
+                    %li
+                      = active_link t(".marketplace_messages"), my_account_messages_path, class: 'nav-link'
                   %li
-                    = active_link t(".your_bikes"), my_account_path, class: 'nav-link'
+                    = active_link t(".register_a_new_bike"), choose_registration_path, class: 'nav-link'
                   %li
                     = active_link t(".user_settings", user_email: current_user_or_unconfirmed_user.email), edit_my_account_path, class: 'nav-link', id: "navUserSettingLink", "data-email" => current_user_or_unconfirmed_user.email
                   %li.divider-nav-item

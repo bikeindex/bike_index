@@ -203,6 +203,9 @@ es:
         unsupported_response_mode:
         unsupported_response_type: El servidor de autorización no soporta este tipo
           de respuesta.
+        user_removed:
+        re:
+        user_not_in_initial_record:
       models:
         doorkeeper/application:
           attributes:
@@ -1987,6 +1990,8 @@ es:
       where_did_you_see_this_bike:
       write_them_a_message:
       you_scanned_this_sticker_html:
+      view_public_non_listing:
+      viewing_listing_preview:
     stolen_checklist:
       a_photo_of_your_bike_type:
       add:
@@ -2376,6 +2381,10 @@ es:
       update:
         current_password_doesnt_match:
         successfully_updated:
+      messages:
+        create:
+          can_not_send_message:
+          message_sent:
     oauth:
       applications:
         ensure_app_owner!:
@@ -3293,8 +3302,9 @@ es:
       the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
       user_settings: "%{user_email} ajustes"
       view_org: Ver %{org_name}
-      your_bikes: Sus bicicletas
       search: Buscar
+      marketplace_messages:
+      your_registrations: Sus registros
     application_bikehub:
       accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
         Bike Index, el principal registro de bicicletas.
@@ -3565,6 +3575,17 @@ es:
       delete_warning_html:
       modal_title:
       nevermind:
+    messages:
+      form:
+        body_placeholder:
+        message:
+        new_message:
+        reply_to_message:
+        send_message:
+      index:
+        marketplace_messages:
+      show:
+        can_not_send_new_message:
   news:
     index:
       bike_index_blog:
@@ -4691,3 +4712,10 @@ es:
         still_for_sale_at:
     alert_for_errors:
       errors_prevented_this_from_being_saved:
+    messages:
+      thread:
+        from:
+        me:
+        to:
+      thread_show:
+        subject:

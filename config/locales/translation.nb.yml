@@ -211,6 +211,9 @@ nb:
         unsupported_response_mode: Autorisasjonsserveren støtter ikke denne responsmodusen.
         unsupported_response_type: Autoriseringsserveren har ikke støtte for denne
           responstypen.
+        user_removed: "(bruker fjernet)"
+        re: 'Sv: %{original_subject}'
+        user_not_in_initial_record: brukeren er ikke en av de opprinnelige meldingsbrukerne
       models:
         doorkeeper/application:
           attributes:
@@ -2065,6 +2068,9 @@ nb:
       write_them_a_message: Skriv en melding til dem
       you_scanned_this_sticker_html: Du skannet klistremerket <strong>%{pretty_code}</strong>
         , som er tilordnet denne %{bike_type}.
+      view_public_non_listing: Se offentlig registrering
+      viewing_listing_preview: Dette er en forhåndsvisning av annonsen din som er
+        «til salgs». Den er ikke offentlig synlig.
     stolen_checklist:
       a_photo_of_your_bike_type: et bilde av din %{bike_type}
       add: Legg til
@@ -2515,6 +2521,10 @@ nb:
         current_password_doesnt_match: Gjeldende passord stemmer ikke, det er nødvendig
           for å oppdatere passordet ditt.
         successfully_updated: Informasjonen din ble oppdatert.
+      messages:
+        create:
+          can_not_send_message: Beklager, du kan ikke sende en melding til den oppføringen
+          message_sent: Melding sendt
     oauth:
       applications:
         ensure_app_owner!:
@@ -4267,8 +4277,9 @@ nb:
       the_nonprofit_bike_registry: det ideelle sykkelregisteret
       user_settings: "%{user_email}-innstillinger"
       view_org: Se %{org_name}
-      your_bikes: Syklene dine
       search: Søk
+      marketplace_messages: Markedsplassmeldinger
+      your_registrations: Dine registreringer
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub-kontoer er drevet av Bike Index – det
         fremste sykkelregisteret.
@@ -4577,6 +4588,17 @@ nb:
       delete_warning_html: "<strong>Advarsel!</strong> Denne handlingen kan ikke angres!"
       modal_title: Er du sikker på at du vil slette kontoen din?
       nevermind: Glem det
+    messages:
+      form:
+        body_placeholder: Legg til litt meldingstekst
+        message: beskjed
+        new_message: Ny melding
+        reply_to_message: Svar på melding
+        send_message: Sende melding
+      index:
+        marketplace_messages: Markedsplassmeldinger
+      show:
+        can_not_send_new_message: Beklager, du kan ikke sende en ny melding.
   news:
     index:
       bike_index_blog: Sykkelindeksblogg
@@ -5946,3 +5968,10 @@ nb:
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
         %{object_name} ble lagret:"
+    messages:
+      thread:
+        from: Fra
+        me: meg
+        to: Til
+      thread_show:
+        subject: Emne

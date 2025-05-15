@@ -185,12 +185,21 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
       let!(:address_record_old) { FactoryBot.create(:address_record, user: old_user, kind: :user) }
       let!(:marketplace_listing_seller) { FactoryBot.create(:marketplace_listing, seller: old_user, address_record: address_record_old) }
       let!(:marketplace_listing_buyer) { FactoryBot.create(:marketplace_listing, :sold, buyer: old_user) }
+      let!(:marketplace_message_receiver) { FactoryBot.create(:marketplace_message, marketplace_listing: marketplace_listing_seller) }
+      let!(:marketplace_message_sender) { FactoryBot.create(:marketplace_message, sender_id: old_user.id) }
+      let!(:marketplace_message_reply) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message_receiver) }
       it "updates the marketplace_listings" do
         expect(marketplace_listing_buyer.reload.buyer_id).to eq old_user.id
+        expect(marketplace_message_receiver.reload.receiver_id).to eq old_user.id
+        expect(marketplace_message_sender.reload.sender_id).to eq old_user.id
+        expect(marketplace_message_reply.reload.sender_id).to eq old_user.id
         instance.perform(user_email.id)
         expect(marketplace_listing_seller.reload.seller_id).to eq user.id
         expect(marketplace_listing_buyer.reload.buyer_id).to eq user.id
         expect(address_record_current.reload.user_id).to eq user.id
+        expect(marketplace_message_receiver.reload.receiver_id).to eq user.id
+        expect(marketplace_message_sender.reload.sender_id).to eq user.id
+        expect(marketplace_message_reply.reload.sender_id).to eq old_user.id
         # IDK know what to do with this situation, so just leaving it
         expect(address_record_old.reload.user_id).to eq old_user.id
         expect(marketplace_listing_seller.address_record_id).to eq address_record_old.id

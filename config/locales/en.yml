@@ -790,6 +790,7 @@ en:
           expired: The access token expired
           revoked: The access token was revoked
           unknown: The access token is invalid
+        re: 'Re: %{original_subject}'
         record_invalid: 'Validation failed: %{errors}'
         resource_owner_authenticator_not_configured: >-
           Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator
@@ -813,6 +814,8 @@ en:
           response mode.
         unsupported_response_type: The authorization server does not support this
           response type.
+        user_not_in_initial_record: user isn't one of the original message users
+        user_removed: "(user removed)"
       models:
         bike:
           not_found: not found
@@ -1328,7 +1331,10 @@ en:
       switch_to_new_bike_id: Switch to a new bike ID
       test_registration: test registration
       update: Update
+      view_public_non_listing: View public registration
       view_users_other_registrations: View user's other registrations
+      viewing_listing_preview: This is a preview of your "for sale" listing. It is
+        not publicly visible.
       where_did_you_see_this_bike: >-
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below
@@ -1821,6 +1827,10 @@ en:
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
         user_settings: User Settings
+      messages:
+        create:
+          can_not_send_message: Sorry, you can't send a message to that listing
+          message_sent: Message sent
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
@@ -3892,6 +3902,7 @@ en:
       help: Help
       log_in: log in
       logout: Logout
+      marketplace_messages: Marketplace messages
       register_a_new_bike: Register a new bike
       search: Search
       sign_up: Sign up
@@ -3899,7 +3910,7 @@ en:
       the_nonprofit_bike_registry: the non-profit bike registry
       user_settings: "%{user_email} settings"
       view_org: View %{org_name}
-      your_bikes: Your bikes
+      your_registrations: Your registrations
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index –
         the premier bike registry.
@@ -4097,6 +4108,17 @@ en:
     edit:
       edit_pages: 'Edit account pages:'
       save_changes: Save changes
+    messages:
+      form:
+        body_placeholder: Add some message text
+        message: message
+        new_message: New message
+        reply_to_message: Reply to message
+        send_message: Send message
+      index:
+        marketplace_messages: Marketplace messages
+      show:
+        can_not_send_new_message: Sorry, you can't send a new message.
     password:
       better_password: better
       for_password_update: For password update

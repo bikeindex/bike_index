@@ -145,10 +145,10 @@ class MarketplaceListing < ApplicationRecord
     !price_negotiable?
   end
 
+  # TODO: consolidate the handling of this and MarketplaceMessage.can_see_messages?
+  # ... someday, users should get to choose to hide their sold items
   def visible_by?(passed_user = nil)
-    return true if for_sale?
-
-    authorized?(passed_user)
+    for_sale? || authorized?(passed_user)
   end
 
   def authorized?(passed_user = nil)

@@ -28,4 +28,5 @@ function localizeTime () {
 // so time localization still happens (e.g. lookbook)
 if (window.importmapLocalizeTime) {
   document.addEventListener('DOMContentLoaded', localizeTime)
+  document.addEventListener('turbo:frame-render', localizeTime)
 }

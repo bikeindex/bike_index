@@ -227,7 +227,8 @@ class BikesController < Bikes::BaseController
     return false if marketplace_listing.blank? ||
       !InputNormalizer.boolean(params[:show_marketplace_preview])
 
-    marketplace_listing.visible_by?(current_user)
+    return false unless marketplace_listing.visible_by?(current_user)
+    @marketplace_preview = true
   end
 
   def permitted_page(page_param)

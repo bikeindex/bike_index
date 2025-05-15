@@ -204,6 +204,9 @@ it:
           modalità di risposta.
         unsupported_response_type: Il server di autorizzazione non supporta questo
           response type.
+        user_removed:
+        re:
+        user_not_in_initial_record:
       models:
         doorkeeper/application:
           attributes:
@@ -2004,6 +2007,8 @@ it:
       where_did_you_see_this_bike:
       write_them_a_message:
       you_scanned_this_sticker_html:
+      view_public_non_listing:
+      viewing_listing_preview:
     stolen_checklist:
       a_photo_of_your_bike_type:
       add:
@@ -2393,6 +2398,10 @@ it:
       update:
         current_password_doesnt_match:
         successfully_updated:
+      messages:
+        create:
+          can_not_send_message:
+          message_sent:
     oauth:
       applications:
         ensure_app_owner!:
@@ -3310,8 +3319,9 @@ it:
       the_nonprofit_bike_registry:
       user_settings:
       view_org:
-      your_bikes:
       search: Cerca
+      marketplace_messages:
+      your_registrations: Le vostre registrazioni
     application_bikehub:
       accounts_powered_by_bike_index:
       contact:
@@ -3581,6 +3591,17 @@ it:
       you_have_no_registered_locks:
       header_title:
       membership_subtitle:
+    messages:
+      form:
+        body_placeholder:
+        message:
+        new_message:
+        reply_to_message:
+        send_message:
+      index:
+        marketplace_messages:
+      show:
+        can_not_send_new_message:
   news:
     index:
       bike_index_blog:
@@ -4698,3 +4719,10 @@ it:
         still_for_sale_at:
     alert_for_errors:
       errors_prevented_this_from_being_saved:
+    messages:
+      thread:
+        from:
+        me:
+        to:
+      thread_show:
+        subject: Oggetto

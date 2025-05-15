@@ -129,6 +129,13 @@ RSpec.describe BikeDisplayer do
     end
   end
 
+  describe "display_marketplace_message?" do
+    let(:bike) { Bike.new }
+    it "is falsey" do
+      expect(BikeDisplayer.display_marketplace_message?(bike)).to be_falsey
+    end
+  end
+
   describe "display_sticker_edit?" do
     let(:bike) { Bike.new }
     let(:owner) { User.new }

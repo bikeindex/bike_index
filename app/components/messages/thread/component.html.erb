@@ -1,0 +1,16 @@
+<div class="tw:w-full tw:py-2 tw:px-3 tw:border-y tw:border-gray-200 tw:dark:border-gray-700 tw:gap-x-6 tw:grid tw:grid-cols-max tw:max-md:grid-cols-4 tw:lg:grid-flow-col tw:relative tw:hover:shadow-md">
+  <span class="tw:lg:min-w-40 tw:col-span-3 tw:lg:col-auto tw:truncate" title="<%= translation(".from") %>: <%= sender_full_text %>">
+    <%= sender_display_html %>
+  </span>
+  <div class="tw:w-28 tw:text-right tw:lg:order-last">
+    <span class="convertTime">
+      <%= l @marketplace_message.created_at, format: :convert_time %>
+    </span>
+  </div>
+  <a href="<%= message_path %>" class="tw:col-span-4 tw:lg:truncate tw:lg:col-auto tw:lg:w-full">
+    <span class="tw:absolute tw:inset-0 tw:z-10"></span>
+    <strong class="tw:opacity-65 tw:mr-2"><%= item_title %></strong>
+
+    <span title="<%= @marketplace_message.body %>"><%= message_display %></span>
+  </a>
+</div>

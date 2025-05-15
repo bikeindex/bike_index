@@ -200,4 +200,16 @@ class CustomerMailer < ApplicationMailer
         tag: __callee__)
     end
   end
+
+  def marketplace_message_notification(marketplace_message)
+    @marketplace_message = marketplace_message
+    @user = @marketplace_message.receiver
+    @marketplace_listing = @marketplace_message.marketplace_listing
+    # TODO: Specific layout for these, rather than just skipping header
+    @skip_header = true
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @user.email, subject: @marketplace_message.subject, tag: __callee__)
+    end
+  end
 end
