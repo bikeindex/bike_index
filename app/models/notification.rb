@@ -15,6 +15,7 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  bike_id                :bigint
+#  message_id             :string
 #  notifiable_id          :bigint
 #  user_id                :bigint
 #
@@ -222,8 +223,9 @@ class Notification < ApplicationRecord
   def track_email_delivery
     return if delivery_success?
 
-    yield
+    delivery = yield
 
+    self.message_id ||= message_id_from_delivery(delivery)
     update(delivery_status: "delivery_success")
     user_email&.update_last_email_errored!(email_errored: false)
   rescue => e
@@ -242,6 +244,10 @@ class Notification < ApplicationRecord
   end
 
   private
+
+  def message_id_from_delivery(delivery)
+    defined?(delivery.message_id) ? delivery.message_id : nil
+  end
 
   def calculated_phone
     notifiable&.phone

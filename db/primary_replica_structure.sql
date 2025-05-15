@@ -2413,7 +2413,8 @@ CREATE TABLE public.notifications (
     bike_id bigint,
     message_channel_target character varying,
     delivery_status integer,
-    delivery_error character varying
+    delivery_error character varying,
+    message_id character varying
 );
 
 
@@ -7046,6 +7047,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250515190821'),
 ('20250508151610'),
 ('20250508151602'),
 ('20250421153929'),

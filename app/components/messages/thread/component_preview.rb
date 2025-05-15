@@ -3,8 +3,13 @@
 module Messages::Thread
   class ComponentPreview < ApplicationComponentPreview
     def default
-      marketplace_message = built_marketplace_message(default_marketplace_message_attrs)
-      render(Messages::Thread::Component.new(marketplace_message:, current_user:))
+      # marketplace_message_1 = built_marketplace_message(default_marketplace_message_attrs)
+      # marketplace_message_2 = built_marketplace_message(default_marketplace_message_attrs.merge(body: "yes"))
+      # # marketplace_message_3 = built_marketplace_message(default_marketplace_message_attrs.merge(messages_prior_count: 3))
+      # render do
+      #   Messages::Thread::Component.new(marketplace_message: marketplace_message_1, current_user:))
+      #   Messages::Thread::Component.new(marketplace_message: marketplace_message_2, current_user:))
+      # end
     end
 
     private
