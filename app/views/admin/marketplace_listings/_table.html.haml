@@ -46,9 +46,9 @@
               %span.convertTime
                 = l marketplace_listing.published_at, format: :convert_time
           %td
-            - if marketplace_listing.published_at.present?
+            - if marketplace_listing.end_at.present?
               %span.convertTime
-                = l marketplace_listing.published_at, format: :convert_time
+                = l marketplace_listing.end_at, format: :convert_time
           %td
             = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true) }
           %td

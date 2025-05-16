@@ -122,6 +122,10 @@ class MarketplaceMessage < ApplicationRecord
 
       Rails.cache.fetch(["any_marketplace_messages", user]) { for_user(user).any? }
     end
+
+    def kind_humanized(str)
+      str&.to_s&.gsub("sender_", "")
+    end
   end
 
   # Should be called before creation
@@ -192,6 +196,10 @@ class MarketplaceMessage < ApplicationRecord
     er_id = Notification.where(notifiable_type: "MarketplaceMessage", notifiable_id: messages_prior.pluck(:id))
       .with_message_id.order(:id).limit(1).pluck(:message_id).first
     er_id.present? ? "<#{er_id}>" : nil
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   private
