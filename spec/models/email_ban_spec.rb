@@ -26,4 +26,17 @@ RSpec.describe EmailBan, type: :model do
       end
     end
   end
+
+  describe "ban?" do
+    let!(:user) { FactoryBot.create(:user) }
+
+    before { Sidekiq::Job.clear_all }
+
+    it "processes email domain inline" do
+    end
+
+    context "already existing email domain" do
+      it "enqueues processing of job"
+    end
+  end
 end

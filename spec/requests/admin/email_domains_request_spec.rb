@@ -34,6 +34,16 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
       expect(response).to render_template(:show)
       expect(assigns(:email_domain)&.id).to eq email_domain.id
     end
+
+    context "invalid_domain" do
+      let(:email_domain) { EmailDomain.invalid_domain }
+      it "responds with ok" do
+        get "#{base_url}/#{email_domain.to_param}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:email_domain)&.id).to eq email_domain.id
+      end
+    end
   end
 
   describe "#create" do

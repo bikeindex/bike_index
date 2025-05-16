@@ -30,7 +30,7 @@ class EmailDomain < ApplicationRecord
   SPAM_SCORE_AUTO_BAN = 5
   # We don't verify with EmailDomains in most tests because it slows things down.
   # This also includes an env to turn if off in case things block up
-  VERIFICATION_ENABLED = (!Rails.env.test? && ENV["SKIP_EMAIL_DOMAIN_VERIFICATION"] != true).freeze
+  VERIFICATION_ENABLED = (!Rails.env.test? && ENV["SKIP_EMAIL_DOMAIN_VERIFICATION"] != "true").freeze
 
   acts_as_paranoid
 
@@ -102,7 +102,7 @@ class EmailDomain < ApplicationRecord
 
     def tld_for(email_or_domain)
       domain = email_or_domain&.split("@")&.last&.strip
-      return invalid_domain if invalid_domain?(domain)
+      return INVALID_DOMAIN if invalid_domain?(domain) || email_or_domain == INVALID_DOMAIN
       return domain if domain.split(".").count == 1
 
       multi_subdomain = TLD_HAS_SUBDOMAIN.any? { domain.end_with?(_1) }
@@ -288,8 +288,6 @@ class EmailDomain < ApplicationRecord
   end
 
   def set_calculated_attributes
-    return if domain == INVALID_DOMAIN
-
     self.data ||= {}
     self.data["tld"] = self.class.tld_for(domain)
     self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length

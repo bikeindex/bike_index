@@ -38,6 +38,17 @@ RSpec.describe EmailDomain, type: :model do
     end
   end
 
+  describe "invalid_domain" do
+    let(:email_domain) { EmailDomain.invalid_domain }
+    it "returns expected things" do
+      expect(email_domain.reload.banned?).to be_truthy
+      expect(EmailDomain.invalid_domain?(email_domain.domain)).to be_truthy
+      expect(EmailDomain.tld_for(email_domain.domain)).to eq EmailDomain::INVALID_DOMAIN
+      expect(email_domain.tld?).to be_truthy
+      expect(email_domain.tld_matches_subdomains?).to be_truthy
+    end
+  end
+
   describe "find_or_create_for" do
     it "creates and finds" do
       email_domain = EmailDomain.find_or_create_for("example@bikeindex.org")
@@ -81,8 +92,6 @@ RSpec.describe EmailDomain, type: :model do
       let(:invalid_domain) { EmailDomain.invalid_domain }
       let(:invalid_characters) { ["/", "\\", "(", ")", "[", "]", "=", " ", "!"] }
       it "returns invalid_domain" do
-        expect(invalid_domain.banned?).to be_truthy
-
         invalid_characters.each do |char|
           expect(EmailDomain.find_or_create_for("@example#{char}.com")&.id).to eq invalid_domain.id
         end
