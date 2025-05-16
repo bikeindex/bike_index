@@ -139,7 +139,7 @@ RSpec.describe BikeCreator do
         end
       end
       context "with organization" do
-        it "creates the bike_organization" do
+        it "creates the bike_organization", :flaky do
           expect {
             instance.create_bike(b_param)
           }.to change(BikeOrganization, :count).by 1

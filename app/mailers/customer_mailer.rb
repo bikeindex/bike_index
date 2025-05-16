@@ -208,6 +208,8 @@ class CustomerMailer < ApplicationMailer
     # TODO: Specific layout for these, rather than just skipping header
     @skip_header = true
 
+    @message_url = my_account_message_url(id: @marketplace_message.id, anchor: "message-#{@marketplace_message.id}")
+
     I18n.with_locale(@user&.preferred_language) do
       mail(
         to: @user.email,
