@@ -12,8 +12,7 @@ module Messages::Thread
       [
         built_marketplace_message(default_marketplace_message_attrs),
         built_marketplace_message(default_marketplace_message_attrs.merge(body: "yes")),
-        built_marketplace_message(default_marketplace_message_attrs.merge(body: long_body)),
-        built_marketplace_message(default_marketplace_message_attrs.merge(created_at: Time.current - 6.months))
+        built_marketplace_message(default_marketplace_message_attrs.merge(body: long_body, created_at: Time.current - 6.months))
       ]
     end
 
