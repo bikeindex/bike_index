@@ -5,7 +5,9 @@
     <% if @can_send_message %>
       <%= render partial: "form", locals: {marketplace_message: @marketplace_message} %>
     <% else %>
-      <%= t(".can_not_send_new_message") %>
+      <div class="tw:mt-10">
+        <%= render(Alert::Component.new(text: t(".can_not_send_new_message"), kind: :error)) %>
+      </div>
     <% end %>
   </div>
 </div>

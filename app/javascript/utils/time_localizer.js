@@ -1,4 +1,5 @@
 // TODO: add ability to show in og time zone
+// 2025-5-15 - switch to using .localizeTime class (instead of .convertTime)
 // 2025-5-12 - add onlyTodayWithoutDate option
 // 2024-11-24 - refactor code to better take advantage of luxon
 // 2024-11-13 - switch moment to luxon!

@@ -47,8 +47,8 @@ class MarketplaceMessage < ApplicationRecord
   scope :reply_message, -> { where.not("id = initial_record_id") }
   scope :buyer_seller_message, -> { where(kind: BUYER_SELLER_MESSAGE_KINDS) }
   scope :distinct_threads, -> {
-    select("DISTINCT ON (initial_record_id) *")
-      .order(:initial_record_id, id: :desc)
+    select("DISTINCT ON (marketplace_messages.initial_record_id) *")
+      .order("marketplace_messages.initial_record_id, marketplace_messages.id desc")
   }
 
   delegate :seller_id, :seller, :item, :item_id, :item_type,

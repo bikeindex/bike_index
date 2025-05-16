@@ -79,7 +79,7 @@ class MarketplaceListing < ApplicationRecord
     end
 
     def status_humanized(str)
-      str&.to_s&.gsub("_", " ")
+      str&.to_s&.tr("_", " ")
     end
 
     private
