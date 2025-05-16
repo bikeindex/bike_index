@@ -56,6 +56,7 @@ class Notification < ApplicationRecord
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
+  scope :with_message_id, -> { where.not(message_id: nil) }
 
   class << self
     def kinds

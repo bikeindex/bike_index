@@ -186,6 +186,14 @@ class MarketplaceMessage < ApplicationRecord
     [sender_id, receiver_id]
   end
 
+  def email_references_id
+    return nil if initial_message?
+
+    er_id = Notification.where(notifiable_type: "MarketplaceMessage", notifiable_id: messages_prior.pluck(:id))
+      .with_message_id.order(:id).limit(1).pluck(:message_id).first
+    er_id.present? ? "<#{er_id}>" : nil
+  end
+
   private
 
   def users_match_initial_record

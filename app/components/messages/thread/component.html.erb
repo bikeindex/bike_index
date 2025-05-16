@@ -2,7 +2,7 @@
   <span class="tw:lg:min-w-40 tw:col-span-3 tw:lg:col-auto tw:truncate" title="<%= translation(".from") %>: <%= sender_full_text %>">
     <%= sender_display_html %>
   </span>
-  <div class="tw:w-28 tw:text-right tw:lg:order-last">
+  <div class=" tw:text-right tw:lg:order-last tw:grow">
     <span class="convertTime">
       <%= l @marketplace_message.created_at, format: :convert_time %>
     </span>
@@ -11,6 +11,10 @@
     <span class="tw:absolute tw:inset-0 tw:z-10"></span>
     <strong class="tw:opacity-65 tw:mr-2"><%= item_title %></strong>
 
-    <span title="<%= @marketplace_message.body %>"><%= message_display %></span>
+    <span title="<%= @marketplace_message.body %>">
+      <%= message_display %>
+      <%# This is a gross hack to make this the full width, TODO: fix! %>
+      <span class="tw:opacity-0 tw:hidden tw:lg:inline"><%= message_display_filler %></span>
+    </span>
   </a>
 </div>

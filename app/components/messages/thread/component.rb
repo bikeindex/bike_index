@@ -3,6 +3,8 @@
 # NOTE: This component makes a number of DB calls - so rendering of this should be cached!
 module Messages::Thread
   class Component < ApplicationComponent
+    TRUNCATED_MESSAGE_LENGTH = 120
+
     def initialize(marketplace_message:, current_user:)
       @marketplace_message = marketplace_message
       @messages_prior_arr = @marketplace_message.messages_prior.pluck(:kind, :sender_id)
@@ -25,10 +27,16 @@ module Messages::Thread
 
     def message_display
       if @marketplace_message.initial_message?
-        "#{@initial_record.subject} - #{@marketplace_message.body}".truncate(100)
+        "#{@initial_record.subject} - #{@marketplace_message.body}".truncate(TRUNCATED_MESSAGE_LENGTH)
       else
-        @marketplace_message.body.truncate(100)
+        @marketplace_message.body.truncate(TRUNCATED_MESSAGE_LENGTH)
       end
+    end
+
+    def message_display_filler
+      return "" unless message_display.length < TRUNCATED_MESSAGE_LENGTH
+
+      TRUNCATED_MESSAGE_LENGTH.times.map { |_i| "&nbsp;" }.join.html_safe
     end
 
     def sender_display_html

@@ -3,16 +3,19 @@
 module Messages::Thread
   class ComponentPreview < ApplicationComponentPreview
     def default
-      # marketplace_message_1 = built_marketplace_message(default_marketplace_message_attrs)
-      # marketplace_message_2 = built_marketplace_message(default_marketplace_message_attrs.merge(body: "yes"))
-      # # marketplace_message_3 = built_marketplace_message(default_marketplace_message_attrs.merge(messages_prior_count: 3))
-      # render do
-      #   Messages::Thread::Component.new(marketplace_message: marketplace_message_1, current_user:))
-      #   Messages::Thread::Component.new(marketplace_message: marketplace_message_2, current_user:))
-      # end
+      {template: "messages/thread/component_preview/default", locals: {current_user:, marketplace_messages:}}
     end
 
     private
+
+    def marketplace_messages
+      [
+        built_marketplace_message(default_marketplace_message_attrs),
+        built_marketplace_message(default_marketplace_message_attrs.merge(body: "yes")),
+        built_marketplace_message(default_marketplace_message_attrs.merge(body: long_body)),
+        built_marketplace_message(default_marketplace_message_attrs.merge(created_at: Time.current - 6.months))
+      ]
+    end
 
     def current_user
       @current_user ||= User.find(ENV.fetch("LOOKBOOK_USER_ID", 1))
@@ -32,7 +35,7 @@ module Messages::Thread
         marketplace_listing: marketplace_listing,
         receiver: current_user,
         sender: other_user,
-        created_at: Time.current - 2.hours - 6.months
+        created_at: Time.current - 2.hours
       }
     end
 
@@ -45,6 +48,11 @@ module Messages::Thread
       message = MarketplaceMessage.new(attrs)
       message.send(:set_calculated_attributes)
       message
+    end
+
+    def long_body
+      "Cred poutine 8-bit, put a bird on it iceland tofu knausgaard craft beer fingerstache distillery pitchfork authentic master cleanse jawn banjo.\n\n" \
+      "Mixtape distillery raw denim four loko dreamcatcher. Celiac schlitz mlkshk whatever, gochujang chia disrupt actually lomo distillery."
     end
   end
 end
