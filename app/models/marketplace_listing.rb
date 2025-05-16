@@ -78,12 +78,20 @@ class MarketplaceListing < ApplicationRecord
       ].freeze
     end
 
+    def status_humanized(str)
+      str&.to_s&.gsub("_", " ")
+    end
+
     private
 
     def item_address_record(item)
       item.user&.address_record ||
         AddressRecord.new(user: item.user, kind: :marketplace_listing)
     end
+  end
+
+  def status_humanized
+    self.class.status_humanized(status)
   end
 
   def current?

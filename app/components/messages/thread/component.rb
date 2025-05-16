@@ -36,7 +36,7 @@ module Messages::Thread
     def message_display_filler
       return "" unless message_display.length < TRUNCATED_MESSAGE_LENGTH
 
-      TRUNCATED_MESSAGE_LENGTH.times.map { |_i| "&nbsp;" }.join.html_safe
+      (TRUNCATED_MESSAGE_LENGTH * 2).times.map { |_i| "&nbsp;" }.join.html_safe
     end
 
     def sender_display_html

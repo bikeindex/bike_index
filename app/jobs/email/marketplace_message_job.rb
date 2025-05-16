@@ -22,6 +22,6 @@ class Email::MarketplaceMessageJob < ApplicationJob
     marketplace_message.sender&.update(updated_at: Time.current)
     marketplace_message.receiver&.update(updated_at: Time.current)
 
-    delivery # so that we can check the actual email response
+    delivery # so that we can check the actual email response in tests
   end
 end
