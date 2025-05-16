@@ -33,12 +33,6 @@ module Messages::Thread
       end
     end
 
-    def message_display_filler
-      return "" unless message_display.length < TRUNCATED_MESSAGE_LENGTH
-
-      (TRUNCATED_MESSAGE_LENGTH * 2).times.map { |_i| "&nbsp;" }.join.html_safe
-    end
-
     def sender_display_html
       if @marketplace_message.initial_message?
         if @marketplace_message.sender_id == @current_user.id
