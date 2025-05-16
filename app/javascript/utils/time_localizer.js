@@ -7,7 +7,7 @@
 
 import { DateTime } from 'luxon'
 
-// TimeLocalizer updates all HTML elements with class '.convertTime', making them:
+// TimeLocalizer updates all HTML elements with class '.localizeTime', making them:
 // - Human readable
 // - Displayed with time in provided timezone
 // - With context relevant data (e.g. today shows hour, last month just date)
@@ -74,13 +74,13 @@ export default class TimeLocalizer {
   // Removes the classes that trigger localization, so it doesn't reupdate the times
   localize () {
     // Write times
-    Array.from(document.getElementsByClassName('convertTime')).forEach((el) =>
+    Array.from(document.getElementsByClassName('localizeTime')).forEach((el) =>
       this.writeTime(el)
     )
 
     // Write timezones
     Array.from(
-      document.getElementsByClassName('convertTimezone')
+      document.getElementsByClassName('localizeTimezone')
     ).forEach((el) => this.writeTimezone(el))
 
     // Write hidden timezone fields - so if we're submitting a form, it includes the current timezone
@@ -104,9 +104,9 @@ export default class TimeLocalizer {
     const text = el.textContent.trim()
     const time = this.parse(text)
     // So running this again doesn't reapply to this element
-    el.classList.remove('convertTime')
+    el.classList.remove('localizeTime')
     // So we know which were updated (for styling, future updates, etc)
-    el.classList.add('convertedTime')
+    el.classList.add('localizedTime')
 
     // If we couldn't parse the time, exit
     if (!(text.length > 0) || time === null) {
@@ -226,6 +226,6 @@ export default class TimeLocalizer {
 
   writeTimezone (el) {
     el.textContent = this.now.toFormat('z')
-    el.classList.remove('convertTimezone')
+    el.classList.remove('localizeTimezone')
   }
 }

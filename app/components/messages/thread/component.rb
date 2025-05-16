@@ -17,7 +17,7 @@ module Messages::Thread
     private
 
     def message_path
-      my_account_message_path(id: @initial_record.id)
+      my_account_message_path(id: @initial_record.id, anchor: "message-#{@marketplace_message.id}")
     end
 
     def item_title

@@ -1,9 +1,9 @@
-<div class="tw:w-full tw:py-2 tw:px-3 tw:border-b tw:first:border-t tw:border-gray-200 tw:dark:border-gray-700 tw:flex tw:max-lg:flex-wrap tw:relative tw:hover:shadow-md tw:dark:hover:shadow-slate-300/10">
+<div class="tw:w-full tw:py-2 tw:px-3 tw:border-t tw:last:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:flex tw:max-lg:flex-wrap tw:relative tw:hover:shadow-md tw:dark:hover:shadow-slate-300/10">
   <span class="tw:max-lg:grow tw:lg:w-40 tw:lg:min-w-40 tw:truncate" title="<%= translation(".from") %>: <%= sender_full_text %>">
     <%= sender_display_html %>
   </span>
   <div class="tw:w-30 tw:text-right tw:lg:order-last">
-    <span class="convertTime">
+    <span class="localizeTime">
       <%= l @marketplace_message.created_at, format: :convert_time %>
     </span>
   </div>

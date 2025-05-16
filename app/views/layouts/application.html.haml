@@ -12,7 +12,6 @@
     - if @include_importmaps
       = javascript_importmap_tags
       = hotwire_livereload_tags if Rails.env.development?
-      <script>window.importmapLocalizeTime = true</script>
     :javascript
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);

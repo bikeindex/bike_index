@@ -49,7 +49,7 @@ module DefinitionList::Row
 
     def time_localizer_classes(time_localizer_settings)
       time_localizer_settings ||= []
-      time_localizer_settings << "convertTime"
+      time_localizer_settings << "localizeTime"
       time_localizer_settings.join(" ")
     end
   end
