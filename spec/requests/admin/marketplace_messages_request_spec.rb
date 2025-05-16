@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Admin::MarketplaceMessagesController, type: :request do
   include_context :request_spec_logged_in_as_superuser
-  let!(:marketplace_messages) { FactoryBot.create(:marketplace_message) }
+  let!(:marketplace_message) { FactoryBot.create(:marketplace_message) }
 
   base_url = "/admin/marketplace_messages"
 
@@ -14,7 +14,7 @@ RSpec.describe Admin::MarketplaceMessagesController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
-      expect(assigns(:collection).pluck(:id)).to eq([marketplace_listing.id])
+      expect(assigns(:collection).pluck(:id)).to eq([marketplace_message.id])
     end
   end
 

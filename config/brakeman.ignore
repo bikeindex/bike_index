@@ -165,7 +165,7 @@
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/bikes_controller.rb",
-      "line": 61,
+      "line": 62,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\", \"wb\")",
       "render_path": null,
@@ -256,7 +256,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/my_accounts/edit.html.haml",
-      "line": 27,
+      "line": 30,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(partial => (params[:edit_template] or edit_templates.keys.first), { :locals => ({ :f => FormBuilder.new }) })",
       "render_path": [
@@ -264,7 +264,7 @@
           "type": "controller",
           "class": "MyAccountsController",
           "method": "edit",
-          "line": 18,
+          "line": 20,
           "file": "app/controllers/my_accounts_controller.rb",
           "rendered": {
             "name": "my_accounts/edit",
@@ -323,7 +323,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/theft_alerts_controller.rb",
-      "line": 133,
+      "line": 130,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "(if InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  TheftAlert.where(:stolen_record_id => StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  TheftAlert\nend).public_send((params[:search_paid_admin] or available_paid_admin.first))",
       "render_path": null,
@@ -346,7 +346,7 @@
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/bikes/theft_alerts_controller.rb",
-      "line": 40,
+      "line": 41,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
       "code": "redirect_to(Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
       "render_path": null,
@@ -369,7 +369,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/admin/email_domains_controller.rb",
-      "line": 78,
+      "line": 79,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql(\"REVERSE(domain) #{sort_direction}\")",
       "render_path": null,
@@ -518,7 +518,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/theft_alerts_controller.rb",
-      "line": 142,
+      "line": 139,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "(if InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  TheftAlert.where(:stolen_record_id => StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  TheftAlert\nend).public_send((params[:search_paid_admin] or available_paid_admin.first)).facebook_updateable.send(params[:search_status])",
       "render_path": null,
@@ -790,7 +790,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/admin/email_domains_controller.rb",
-      "line": 74,
+      "line": 75,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql(\"COALESCE((data -> 'bike_count')::integer, 0) #{sort_direction}\")",
       "render_path": null,
@@ -803,6 +803,29 @@
       "confidence": "Medium",
       "cwe_id": [
         89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "7e76033efdc3fd033fc62a7360eb95ff695c36087e35565d2854ec4374d7b29a",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "app/controllers/admin/marketplace_listings_controller.rb",
+      "line": 27,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "MarketplaceListing.send((params[:search_status] or nil))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::MarketplaceListingsController",
+        "method": "matching_marketplace_listings"
+      },
+      "user_input": "params[:search_status]",
+      "confidence": "High",
+      "cwe_id": [
+        77
       ],
       "note": ""
     },
@@ -1173,7 +1196,7 @@
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/theft_alerts/edit.html.haml",
-      "line": 86,
+      "line": 88,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
       "code": "link_to(\"Facebook post\", TheftAlert.find(params[:id]).facebook_post_url, :target => \"_blank\")",
       "render_path": [
@@ -1524,7 +1547,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/admin/email_domains_controller.rb",
-      "line": 76,
+      "line": 77,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql(\"COALESCE((data -> 'spam_score')::integer, 0) #{sort_direction}\")",
       "render_path": null,
@@ -1547,7 +1570,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/email_domains_controller.rb",
-      "line": 92,
+      "line": 95,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "EmailDomain.send((params[:search_status] or nil))",
       "render_path": null,
@@ -1682,7 +1705,7 @@
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/controllers/bikes_controller.rb",
-      "line": 65,
+      "line": 66,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "File.open(\"#{Rails.root}/tmp/#{(\"Registration_\" + Bike.unscoped.find((params[:bike_id] or params[:id])).updated_at.strftime(\"%m%d_%H%M\")[(0..)])}.pdf\")",
       "render_path": null,
@@ -1699,5 +1722,5 @@
       "note": ""
     }
   ],
-  "brakeman_version": "7.0.0"
+  "brakeman_version": "7.0.2"
 }
