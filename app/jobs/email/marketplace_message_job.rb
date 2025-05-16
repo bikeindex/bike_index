@@ -13,13 +13,15 @@ class Email::MarketplaceMessageJob < ApplicationJob
 
     # track_email_delivery returns if delivery_success, but return early here to prevent updating the cache
     return if notification.delivery_success?
-
+    delivery = nil
     notification.track_email_delivery do
-      CustomerMailer.marketplace_message_notification(marketplace_message).deliver_now
+      delivery = CustomerMailer.marketplace_message_notification(marketplace_message).deliver_now
     end
 
     # Bust caches on the associations
     marketplace_message.sender&.update(updated_at: Time.current)
     marketplace_message.receiver&.update(updated_at: Time.current)
+
+    delivery # so that we can check the actual email response in tests
   end
 end

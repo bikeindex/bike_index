@@ -47,8 +47,8 @@ class MarketplaceMessage < ApplicationRecord
   scope :reply_message, -> { where.not("id = initial_record_id") }
   scope :buyer_seller_message, -> { where(kind: BUYER_SELLER_MESSAGE_KINDS) }
   scope :distinct_threads, -> {
-    select("DISTINCT ON (initial_record_id) *")
-      .order(:initial_record_id, id: :desc)
+    select("DISTINCT ON (marketplace_messages.initial_record_id) *")
+      .order("marketplace_messages.initial_record_id, marketplace_messages.id desc")
   }
 
   delegate :seller_id, :seller, :item, :item_id, :item_type,
@@ -122,6 +122,10 @@ class MarketplaceMessage < ApplicationRecord
 
       Rails.cache.fetch(["any_marketplace_messages", user]) { for_user(user).any? }
     end
+
+    def kind_humanized(str)
+      str&.to_s&.gsub("sender_", "")
+    end
   end
 
   # Should be called before creation
@@ -184,6 +188,18 @@ class MarketplaceMessage < ApplicationRecord
 
   def user_ids
     [sender_id, receiver_id]
+  end
+
+  def email_references_id
+    return nil if initial_message?
+
+    er_id = Notification.where(notifiable_type: "MarketplaceMessage", notifiable_id: messages_prior.pluck(:id))
+      .with_message_id.order(:id).limit(1).pluck(:message_id).first
+    er_id.present? ? "<#{er_id}>" : nil
+  end
+
+  def kind_humanized
+    self.class.kind_humanized(kind)
   end
 
   private

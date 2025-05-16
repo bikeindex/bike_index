@@ -10,7 +10,7 @@
         <%= l @value, format: :convert_time %>
       </span>
       <% if @include_time_zone %>
-        <span class="convertTimezone"></span>
+        <span class="localizeTimezone"></span>
       <% end %>
     <% elsif @value.present? %>
       <%= @value %>

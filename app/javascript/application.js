@@ -24,9 +24,5 @@ function localizeTime () {
   window.timeLocalizer.localize()
 }
 
-// Set window.importmapLocalizeTime on pages without application_revised.js
-// so time localization still happens (e.g. lookbook)
-if (window.importmapLocalizeTime) {
-  document.addEventListener('DOMContentLoaded', localizeTime)
-  document.addEventListener('turbo:frame-render', localizeTime)
-}
+document.addEventListener('DOMContentLoaded', localizeTime)
+document.addEventListener('turbo:render', localizeTime)

@@ -1,0 +1,3 @@
+<% marketplace_messages.each do |marketplace_message| %>
+  <%= render(Messages::Thread::Component.new(marketplace_message:, current_user: current_user)) %>
+<% end %>

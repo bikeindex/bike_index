@@ -235,4 +235,15 @@ RSpec.describe CustomerMailer, type: :mailer do
       end
     end
   end
+
+  describe "marketplace_message_notification" do
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
+    it "delivers" do
+      mail = CustomerMailer.marketplace_message_notification(marketplace_message)
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.to).to eq([marketplace_message.receiver.email])
+      expect(mail.body.encoded.strip).to match marketplace_message.body
+      expect(mail.message_stream).to eq "outbound"
+    end
+  end
 end

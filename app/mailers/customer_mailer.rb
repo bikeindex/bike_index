@@ -209,7 +209,12 @@ class CustomerMailer < ApplicationMailer
     @skip_header = true
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email, subject: @marketplace_message.subject, tag: __callee__)
+      mail(
+        to: @user.email,
+        subject: @marketplace_message.subject,
+        references: @marketplace_message.email_references_id,
+        tag: __callee__
+      )
     end
   end
 end
