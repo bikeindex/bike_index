@@ -15,6 +15,12 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(response).to render_template("index")
         expect(flash).to_not be_present
         expect(assigns(:stolen_records)).to match_array([stolen_record])
+        # test the search_with_promoted_alert because scoping is weird
+        get "#{base_url}?search_with_promoted_alert=true"
+        expect(response.code).to eq("200")
+        expect(response).to render_template("index")
+        expect(flash).to_not be_present
+        expect(assigns(:stolen_records)).to match_array([])
       end
     end
 
@@ -81,8 +87,8 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(StolenBike::ApproveStolenListingJob.jobs.count).to eq 1
           expect(StolenBike::ApproveStolenListingJob.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
 
-          expect(AfterUserChangeJob.jobs.count).to eq 1
-          AfterUserChangeJob.drain
+          expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
+          ::Callbacks::AfterUserChangeJob.drain
 
           expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 1
           expect(StolenBike::ActivateTheftAlertJob.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])

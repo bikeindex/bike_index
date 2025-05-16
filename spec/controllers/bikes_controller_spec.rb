@@ -15,6 +15,9 @@ RSpec.describe BikesController, type: :controller do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:user) { bike.creator }
     let(:organization) { FactoryBot.create(:organization) }
+    # This is required by show, if it isn't present it raises ReadOnlyError
+    before { RearGearType.fixed }
+
     it "shows the bike" do
       get :show, params: {id: bike.id}
       expect(response.status).to eq(200)
@@ -49,7 +52,7 @@ RSpec.describe BikesController, type: :controller do
     context "sign_in_if_not" do
       it "redirects to sign in" do
         get :show, params: {id: bike.id, sign_in_if_not: 1}
-        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}"
+        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}?sign_in_if_not=1"
         expect(flash[:notice]).to be_present
         expect(response).to redirect_to(new_session_path)
       end
@@ -57,7 +60,7 @@ RSpec.describe BikesController, type: :controller do
         let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
         it "redirects to magic link, because organization sign in" do
           get :show, params: {id: bike.id, sign_in_if_not: 1, organization_id: organization.to_param}
-          expect(session[:return_to]).to eq bike_path(bike.to_param)
+          expect(session[:return_to]).to eq bike_path(bike.to_param, sign_in_if_not: 1, organization_id: organization.to_param)
           expect(flash[:notice]).to be_present
           expect(response).to redirect_to(magic_link_session_path)
         end
@@ -191,6 +194,17 @@ RSpec.describe BikesController, type: :controller do
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
         end
+      end
+    end
+    context "with recovery token present" do
+      let(:bike) { FactoryBot.create(:stolen_bike) }
+      let(:stolen_record) { bike.current_stolen_record }
+      let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
+      it "renders a mark recovered modal, and deletes the session recovery_link_token" do
+        session[:recovery_link_token] = recovery_link_token
+        get :show, params: {id: bike.id}
+        expect(response.body).to match(recovery_link_token)
+        expect(session[:recovery_link_token]).to be_nil
       end
     end
   end
@@ -992,7 +1006,7 @@ RSpec.describe BikesController, type: :controller do
             end
           end
           context "canadian stolen record" do
-            let!(:canada) { FactoryBot.create(:country, name: "Canada", iso: "CA") }
+            let!(:canada) { Country.canada }
             let(:stolen_attrs) do
               {
                 date_stolen: "2016-02-08 04:00:00",
@@ -1192,18 +1206,6 @@ RSpec.describe BikesController, type: :controller do
           end
         end
       end
-    end
-  end
-
-  describe "show with recovery token present" do
-    let(:bike) { FactoryBot.create(:stolen_bike) }
-    let(:stolen_record) { bike.current_stolen_record }
-    let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
-    it "renders a mark recovered modal, and deletes the session recovery_link_token" do
-      session[:recovery_link_token] = recovery_link_token
-      get :show, params: {id: bike.id}
-      expect(response.body).to match(recovery_link_token)
-      expect(session[:recovery_link_token]).to be_nil
     end
   end
 end

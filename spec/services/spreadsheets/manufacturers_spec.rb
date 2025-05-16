@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Spreadsheets::Manufacturers do
   let!(:manufacturer) do
+    Manufacturer.destroy_all
     FactoryBot.create(:manufacturer, name: "Riese & Müller (Riese and Muller)", frame_maker: true,
       motorized_only: true, open_year: 1993, website: "https://www.r-m.de/")
   end
@@ -11,11 +12,13 @@ RSpec.describe Spreadsheets::Manufacturers do
         "Riese & Müller,Riese and Muller,https://www.r-m.de/,true,true,1993,,"]
     end
     it "generates" do
+      expect(Manufacturer.other).to be_present
+      expect(Manufacturer.count).to eq 2
       result = described_class.to_csv.split("\n")
 
       expect(result.first).to eq target.first
       expect(result.second).to eq target.second
-      expect(result.length).to eq target.length
+      expect(result.length).to eq target.length # it doesn't include other
     end
   end
 
@@ -32,12 +35,12 @@ RSpec.describe Spreadsheets::Manufacturers do
     let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Btwin") }
     let(:csv_path) { Rails.root.join("spec/fixtures/manufacturer-test-import.csv") }
 
-    def expect_target_manufacturer(manufacturer)
-      expect(manufacturer.name).to eq("b'Twin (Btwin)")
-      expect(manufacturer.frame_maker).to be_truthy
-      expect(manufacturer.motorized_only).to be_falsey
-      expect(manufacturer.open_year).to eq 1976
-      expect(manufacturer.close_year).to be_blank
+    def expect_target_manufacturer(mnfg)
+      expect(mnfg.name).to eq("b'Twin (Btwin)")
+      expect(mnfg.frame_maker).to be_truthy
+      expect(mnfg.motorized_only).to be_falsey
+      expect(mnfg.open_year).to eq 1976
+      expect(mnfg.close_year).to be_blank
     end
 
     describe "import" do
@@ -68,17 +71,19 @@ RSpec.describe Spreadsheets::Manufacturers do
         expect_target_manufacturer(manufacturer.reload)
       end
       context "with existing mnfg with alternate_name" do
-        let(:manufacturer) { FactoryBot.create(:manufacturer, name: "B'twin something (Btwin)") }
+        let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "B'twin something (Btwin)") }
         it "updates" do
           expect { described_class.send(:update_or_create_for!, row) }.to change(Manufacturer, :count).by 0
           expect_target_manufacturer(manufacturer.reload)
         end
       end
       context "with no matching manufacturer" do
-        let!(:manufacturer) { nil }
-        it "creates" do
+        let!(:manufacturer) { FactoryBot.create(:manufacturer) }
+        it "creates", :flaky do
+          Manufacturer.destroy_all
+          expect(Manufacturer.count).to eq 0
           expect { described_class.send(:update_or_create_for!, row) }.to change(Manufacturer, :count).by 1
-          expect_target_manufacturer(Manufacturer.last)
+          expect_target_manufacturer(Manufacturer.order(:id).last)
         end
       end
     end

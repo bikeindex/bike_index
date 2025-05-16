@@ -8,7 +8,7 @@ module ControllerHelpers
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
       :controller_namespace, :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
-      :display_dev_info?
+      :display_dev_info?, :current_country_id, :current_currency
     before_action :enable_rack_profiler
 
     before_action do
@@ -34,7 +34,20 @@ module ControllerHelpers
   end
 
   def forwarded_ip_address
-    @forwarded_ip_address ||= ForwardedIpAddress.parse(request)
+    @forwarded_ip_address ||= IpAddressParser.forwarded_address(request)
+  end
+
+  def request_location_hash
+    @request_location_hash ||= IpAddressParser.location_hash(request)
+  end
+
+  # TODO: make this actually use the request location
+  def current_currency
+    Currency.default
+  end
+
+  def current_country_id
+    request_location_hash[:country_id]
   end
 
   def enable_rack_profiler
@@ -62,8 +75,8 @@ module ControllerHelpers
     @include_importmaps = true
   end
 
-  def store_return_and_authenticate_user(flash_type: :error)
-    return if current_user&.confirmed?
+  def store_return_and_authenticate_user(translation_key: nil, flash_type: :error)
+    return if current_user&.confirmed? && current_user.terms_of_service
 
     store_return_to
     authenticate_user(flash_type:) && return
@@ -144,7 +157,9 @@ module ControllerHelpers
   # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(target = nil)
     # fallback to the return to parameters, or the current path
-    target ||= params[:return_to] || request.env["PATH_INFO"]
+    target ||= params[:return_to] ||
+      [request.env["PATH_INFO"], request.env["QUERY_STRING"]].reject(&:blank?).join("?")
+
     session[:return_to] = target unless invalid_return_to?(target)
   end
 

@@ -203,6 +203,9 @@ es:
         unsupported_response_mode:
         unsupported_response_type: El servidor de autorización no soporta este tipo
           de respuesta.
+        user_removed:
+        re:
+        user_not_in_initial_record:
       models:
         doorkeeper/application:
           attributes:
@@ -242,6 +245,12 @@ es:
         user:
           email_already_exists:
           not_an_available_language:
+        marketplace_listing:
+          address_required:
+          condition_required:
+          item_not_visible:
+          price_required:
+          primary_activity_required:
       organization:
         duplicate_short_name:
     attributes:
@@ -876,6 +885,13 @@ es:
         eur:
         mxn:
         usd:
+      marketplace_listing:
+        condition:
+          excellent:
+          good:
+          new_in_box:
+          salvage:
+          poor:
     models:
       ad:
       ambassador:
@@ -1022,14 +1038,19 @@ es:
         two_u_locks:
         u_lock:
         u_lock_and_cable:
-    status_humanized:
-      bike:
-        abandoned:
-        found:
-        impounded:
-        stolen:
-        unregistered:
-        with_owner:
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive:
+        coaster_brake:
+      status_humanized:
+        bike:
+          abandoned: abandonado
+          for_sale: en venta
+          found: encontrado
+          impounded: incautado
+          stolen: robado
+          unregistered: no registrado
+          with_owner: con el propietario
   datetime:
     distance_in_words:
       half_a_minute: medio minuto
@@ -1776,6 +1797,18 @@ es:
       wheel_diameter:
       year: Año
       vehicle_type:
+      primary_activity:
+      abandoned_title:
+      component_no_info:
+      drivetrain:
+      drivetrain_fixed:
+      drivetrain_front:
+      drivetrain_rear:
+      front_tire_width:
+      rear_tire_width:
+      tire_width:
+      tire_width_narrow_false:
+      tire_width_narrow_true:
     new:
       additional_serial_sticker_number:
       affiliation:
@@ -1957,6 +1990,8 @@ es:
       where_did_you_see_this_bike:
       write_them_a_message:
       you_scanned_this_sticker_html:
+      view_public_non_listing:
+      viewing_listing_preview:
     stolen_checklist:
       a_photo_of_your_bike_type:
       add:
@@ -2082,6 +2117,9 @@ es:
         state:
         where_was_it_stolen_type:
         zipcode:
+      primary_activity:
+        choose_activity:
+        primary_activity:
     drivetrain:
       belt_drive:
       coaster_brake:
@@ -2117,14 +2155,6 @@ es:
       groups_and_organizations:
       other_organizations:
       remove:
-    ownership:
-      enter_new_owner_email_to_transfer:
-      impound_record_page:
-      new_email_assigned_save_to_update:
-      sell_trade_or_give_away_this_bike:
-      this_bike_is_currently_impounded_html:
-      to_transfer_use_impound_record_page_html:
-      transfer_ownership:
     photos:
       drag_and_drop_files_here_html:
       drag_the_uploaded_photos:
@@ -2156,6 +2186,16 @@ es:
       visibility:
       we_strongly_recommend:
       you_can_read_more_html:
+      delete_registration:
+      enter_new_owner_email_to_transfer:
+      hide_registration:
+      impound_record_page:
+      new_email_assigned_save_to_update:
+      save_changes:
+      sell_trade_or_give_away_this_bike:
+      this_bike_is_currently_impounded_html:
+      to_transfer_use_impound_record_page_html:
+      transfer_ownership:
     report_recovered:
       can_we_share_your_story:
       did_we_help:
@@ -2208,6 +2248,23 @@ es:
       wide:
       wide_help:
       wide_title:
+    marketplace:
+      choose_condition:
+      condition:
+      price:
+      add_required_information:
+      description:
+      listing_draft:
+      listing_is_published:
+      optional:
+      preview_it:
+      price_is_negitiable:
+      publish_listing:
+      publish_listing_when_ready:
+      sale_description_html:
+      save_to_preview:
+      view_listing:
+      why_are_you_selling:
   controllers:
     application:
       handle_unverified_request:
@@ -2233,7 +2290,6 @@ es:
         drivetrain:
         found_details:
         groups:
-        ownership:
         photos:
         publicize:
         remove:
@@ -2241,6 +2297,9 @@ es:
         report_stolen:
         theft_details:
         versions:
+        remove_or_transfer:
+        marketplace_list:
+        marketplace_on_sale:
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet:
         bike_impounded:
@@ -2322,6 +2381,10 @@ es:
       update:
         current_password_doesnt_match:
         successfully_updated:
+      messages:
+        create:
+          can_not_send_message:
+          message_sent:
     oauth:
       applications:
         ensure_app_owner!:
@@ -2487,6 +2550,11 @@ es:
       edit:
         free_membership:
         no_active_membership:
+    marketplace_listings:
+      ensure_user_allowed_to_edit!:
+        you_dont_own_that:
+      update:
+        item_published_for_sale:
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -3229,13 +3297,14 @@ es:
       log_in: conectarse
       logout: Cierre de sesión
       register_a_new_bike: Registre su bicicleta
-      search_bikes: Buscar bicicletas
       sign_up: Inscríbete
       stolen_bike: "¿Bicicleta robada?"
       the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
       user_settings: "%{user_email} ajustes"
       view_org: Ver %{org_name}
-      your_bikes: Sus bicicletas
+      search: Buscar
+      marketplace_messages:
+      your_registrations: Sus registros
     application_bikehub:
       accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
         Bike Index, el principal registro de bicicletas.
@@ -3254,7 +3323,6 @@ es:
     embed_layout:
       error:
       please_fix_the_following:
-      register_through_org:
     payments_layout:
       be_a_bike_saver:
       support_bike_index_today:
@@ -3293,17 +3361,6 @@ es:
       pinhead_locking_skewer_key:
       small_kryptonite_key:
       update_the_lock:
-    lock_home:
-      add_a_new_lock:
-      any_lock_information_you_enter_on_bike_in:
-      if_you_want_you_can_save_serial_html:
-      lock_keys_often_have_serial_numbers_so_yo:
-      lock_type:
-      manufacturer:
-      save_information_about_a_lock:
-      save_information_about_your_bike_lock:
-      you_can_also_record_your_lock_html:
-      your_locks:
     new:
       save_information_about_one_of_your_locks:
   manufacturers:
@@ -3344,6 +3401,7 @@ es:
     stolen_merging:
     users_new:
     welcome_index: 'El mejor registro de bicicletas: Sencillo, seguro y gratuito.'
+    registrations_embed:
   meta_titles:
     bikes_index:
     bikes_new:
@@ -3385,6 +3443,7 @@ es:
     welcome_index:
     my_accounts_show:
     search_registrations_index:
+    registrations_embed:
   money:
     currencies:
       en:
@@ -3425,11 +3484,8 @@ es:
       add_additional_email:
       add_new_phone_number:
       additional_email:
-      address:
       any_use_of_your_personal_information_html:
-      choose_country:
       choose_language:
-      city:
       confirmed_emails:
       daily_hot_sheet_notifications_html:
       give_us_permission_html:
@@ -3444,7 +3500,6 @@ es:
       remove_email:
       remove_number:
       resend_confirmation:
-      state:
       stolen_hot_sheets:
       time_single_format:
       time_single_format_small:
@@ -3452,7 +3507,6 @@ es:
       unconfirmed_emails:
       verified:
       why_you_should_text:
-      zipcode:
     sharing:
       choose_file:
       create_page:
@@ -3493,7 +3547,6 @@ es:
       generally_connect_to_org:
       ignore:
       key_serial:
-      list_a_bike_on_bikefair:
       location:
       lock_type:
       locks:
@@ -3510,18 +3563,29 @@ es:
       to_bike_index_thanks_for_signing_up:
       update_your_profile:
       updated:
-      user_bikes:
       user_hidden:
-      want_to_sell_your_bikes:
       welcome:
       you_have_no_registered_bikes:
       you_have_no_registered_locks:
+      header_title:
+      membership_subtitle:
     delete_account:
       delete_account:
       delete_my_account:
       delete_warning_html:
       modal_title:
       nevermind:
+    messages:
+      form:
+        body_placeholder:
+        message:
+        new_message:
+        reply_to_message:
+        send_message:
+      index:
+        marketplace_messages:
+      show:
+        can_not_send_new_message:
   news:
     index:
       bike_index_blog:
@@ -4620,3 +4684,38 @@ es:
         stolenness_proximity:
         stolenness_stolen:
         within:
+    legacy_form_well:
+      address_record:
+        address:
+        address_school:
+        choose_country:
+        city:
+        postal_code:
+        region:
+        state:
+        your_full_address_is_required:
+        address_no_street:
+      address_record_with_default:
+        edit_my_account_path:
+        use_account_address:
+    definition_list:
+      row:
+        no_value:
+    page_section:
+      marketplace_listing_panel:
+        condition:
+        description:
+        first_posted_at:
+        location:
+        price_is_firm_false:
+        price_is_firm_true:
+        still_for_sale_at:
+    alert_for_errors:
+      errors_prevented_this_from_being_saved:
+    messages:
+      thread:
+        from:
+        me:
+        to:
+      thread_show:
+        subject:

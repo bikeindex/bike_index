@@ -1,6 +1,6 @@
 class ManufacturersController < ApplicationController
   def index
-    @manufacturers = Manufacturer.all
+    @manufacturers = Manufacturer.except_other
 
     respond_to do |format|
       format.html

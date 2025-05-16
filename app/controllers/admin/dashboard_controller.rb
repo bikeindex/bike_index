@@ -59,4 +59,10 @@ class Admin::DashboardController < Admin::BaseController
     FileCacheMaintainer.reset_blocklist_ids(new_blocklist)
     redirect_to admin_tsvs_path
   end
+
+  def ip_location
+    @cloudflare_hash = IpAddressParser.location_hash(request)
+    @geocoder_hash = IpAddressParser.location_hash_geocoder(forwarded_ip_address, new_attrs: true)
+    @headers = request.headers.to_h.select { |k, _v| k.start_with?("HTTP_") }.to_h
+  end
 end

@@ -78,14 +78,14 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_ban.description).to eq "something here"
         # Bump the auth token, because we want to sign out the user
         expect(user_subject.auth_token).to_not eq og_auth_token
-        expect(AfterUserChangeJob.jobs.count).to be > 0
-        AfterUserChangeJob.new.perform(user_subject.id)
+        expect(::Callbacks::AfterUserChangeJob.jobs.count).to be > 0
+        ::Callbacks::AfterUserChangeJob.new.perform(user_subject.id)
         expect(user_subject.superuser_abilities.count).to eq 1
         expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
       end
     end
     context "developer" do
-      let(:current_user) { FactoryBot.create(:admin_developer) }
+      let(:current_user) { FactoryBot.create(:superuser_developer) }
       it "updates developer" do
         user_subject.reload
         og_auth_token = user_subject.auth_token

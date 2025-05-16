@@ -15,6 +15,10 @@ class MyAccountsController < ApplicationController
     @user = current_user
     @page_errors = @user.errors
     @page_title = @edit_templates[@edit_template]
+
+    if @edit_template&.to_sym == :root
+      Backfills::AddressRecordsForUsersJob.build_or_create_for(@user, country_id: current_country_id)
+    end
   end
 
   def update
@@ -26,7 +30,8 @@ class MyAccountsController < ApplicationController
     end
     unless @user.errors.any?
       successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations
-      @user.address_set_manually = true if params&.dig(:user, :street).present?
+      @user.address_set_manually = true if params&.dig(:user, :address_record_attributes, :postal_code).present?
+
       if params[:user].present? && @user.update(permitted_parameters)
         successfully_updated = true
         if params.dig(:user, :password).present?
@@ -61,10 +66,6 @@ class MyAccountsController < ApplicationController
   end
 
   private
-
-  def authenticate_user_for_my_accounts_controller
-    authenticate_user(translation_key: :create_account, flash_type: :info)
-  end
 
   def edit_templates
     @edit_templates ||= {
@@ -108,7 +109,7 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeJob
+    @user.update(updated_at: Time.current) # Bump user to enqueue ::Callbacks::AfterUserChangeJob
     @user
   end
 
@@ -130,9 +131,13 @@ class MyAccountsController < ApplicationController
         :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :instagram, :show_instagram,
         :show_website, :show_bikes, :show_phone, :my_bikes_link_target, :time_single_format,
         :my_bikes_link_title, :password, :password_confirmation, :preferred_language,
-        user_registration_organization_attributes: [:all_bikes, :can_edit_claimed])
+        user_registration_organization_attributes: [:all_bikes, :can_edit_claimed],
+        address_record_attributes: AddressRecord.permitted_params)
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
+    end
+    if pparams[:address_record_attributes].present?
+      pparams[:address_record_attributes].merge!(kind: :user, user_id: current_user.id)
     end
     pparams
   end

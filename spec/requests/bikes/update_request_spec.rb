@@ -34,9 +34,14 @@ RSpec.describe "BikesController#update", type: :request do
     end
   end
   context "setting address for bike" do
-    let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address.merge(address_set_manually: true)) }
+    let(:address_record) { FactoryBot.create(:address_record, :new_york) }
+    let(:current_user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
-    let(:update) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
+    let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
+    let(:update) do
+      {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: "",
+       primary_activity_id:}
+    end
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
@@ -61,6 +66,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.street).to eq default_location[:street_address]
       expect(bike.address_set_manually).to be_falsey
       expect(bike.updated_by_user_at).to be > (Time.current - 1)
+      expect(bike.primary_activity_id).to eq primary_activity_id
       expect(bike.not_updated_by_user?).to be_falsey
     end
     context "with user without address" do
@@ -92,6 +98,100 @@ RSpec.describe "BikesController#update", type: :request do
       end
     end
   end
+  context "updating marketplace_listing" do
+    let(:address_record) { FactoryBot.create(:address_record, :new_york) }
+    let(:user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
+    let(:current_user) { user }
+    let!(:membership) { FactoryBot.create(:membership, user: user) }
+    let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, owner_email: user.email) }
+    let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
+    let(:state) { FactoryBot.create(:state_california) }
+    let(:address_record_attributes) do
+      {
+        country_id: Country.united_states_id.to_s,
+        city: "Los Angeles",
+        region_record_id: state.id,
+        region_string: "AB",
+        postal_code: "90021",
+        user_account_address: "false",
+        id: address_record&.id
+      }
+    end
+    let(:update_params) do
+      {
+        bike: {
+          primary_activity_id:,
+          current_marketplace_listing_attributes: {
+            condition: "new_in_box",
+            amount_with_nil: "1442.42",
+            description: "some description",
+            price_negotiable: "1",
+            address_record_attributes:
+          }
+        }
+      }
+    end
+    let(:target_marketplace_attrs) do
+      update_params.dig(:bike, :current_marketplace_listing_attributes)
+        .except(:amount, :address_record_attributes)
+        .merge(amount_cents: 144242, status: "draft", price_negotiable: true)
+    end
+    it "creates the listing" do
+      expect(user.reload.can_create_listing?).to be_truthy
+      bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
+
+      expect(bike.reload.primary_activity_id).to be_nil
+      expect(bike.updated_by_user_at).to eq bike.created_at
+      expect(bike.not_updated_by_user?).to be_truthy
+      expect(bike.current_ownership.claimed?).to be_truthy
+      expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+
+      VCR.use_cassette("bike_request-update-marketplace_listing") do
+        Sidekiq::Job.clear_all
+        Sidekiq::Testing.inline! do
+          expect { patch base_url, params: update_params }.to change(MarketplaceListing, :count).by 1
+        end
+      end
+
+      expect(bike.reload.primary_activity_id).to eq primary_activity_id
+      marketplace_listing = bike.current_marketplace_listing
+      expect(marketplace_listing).to be_present
+      expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs
+
+      address_record = marketplace_listing.address_record
+      expect(address_record).to be_present
+      expect(address_record.kind).to eq "marketplace_listing"
+      expect(address_record.user_id).to eq user.id
+      expect(address_record.region_record_id).to eq state.id
+      expect(address_record.city).to eq "Los Angeles"
+      expect(address_record.region_string).to be_blank
+    end
+    context "existing marketplace_listing" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
+      let(:current_user) { FactoryBot.create(:superuser, :with_address_record, address_set_manually: true) }
+      let(:address_record_attributes) { {user_account_address: "1"} }
+
+      it "updates the listing" do
+        expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
+        expect(marketplace_listing.reload.address_record_id).to be_blank
+
+        VCR.use_cassette("bike_request-update-marketplace_listing") do
+          Sidekiq::Job.clear_all
+          Sidekiq::Testing.inline! do
+            expect {
+              patch base_url, params: update_params
+              expect(flash[:success]).to be_present
+            }.to change(MarketplaceListing, :count).by 0
+          end
+        end
+
+        expect(bike.reload.primary_activity_id).to eq primary_activity_id
+        expect(bike.current_marketplace_listing&.id).to eq marketplace_listing.id
+        expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs
+        expect(marketplace_listing.address_record_id).to eq address_record.id
+      end
+    end
+  end
   context "mark bike stolen, the way it's done on the web" do
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "marks bike stolen and doesn't set a location in Kansas!" do
@@ -99,7 +199,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.status_stolen?).to be_falsey
       expect(bike.claimed?).to be_falsey
       expect(bike.authorized?(current_user)).to be_truthy
-      AfterUserChangeJob.new.perform(current_user.id)
+      ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
       expect(current_user.reload.alert_slugs).to eq([])
       Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
@@ -165,9 +265,9 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.status_stolen?).to be_falsey
         expect(bike.claimed?).to be_falsey
         expect(bike.user&.id).to eq current_user.id
-        AfterUserChangeJob.new.perform(current_user.id)
+        ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq([])
-        expect(current_user.address).to eq "278 Broadway, New York, 10007, US"
+        expect(current_user.formatted_address_string(visible_attribute: :street)).to eq "278 Broadway, New York, 10007"
         expect(current_user.address_set_manually).to be_truthy
         # saving the bike one more time changes address_set_manually to be false
         # Someone surprising, but I think I'm happy with the outcome - it should be set by user
@@ -306,7 +406,7 @@ RSpec.describe "BikesController#update", type: :request do
   context "adding location to a stolen bike" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/6058/13-brentwood-l-purple-1000.jpg", user: current_user) }
     let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
-    let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+    let(:state) { FactoryBot.create(:state_new_york) }
     let(:stolen_params) do
       {
         timezone: "America/Los_Angeles",
@@ -350,7 +450,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone_for_users).to be_truthy
         expect(stolen_record.phone_for_shops).to be_truthy
         expect(stolen_record.phone_for_police).to be_truthy
-        AfterUserChangeJob.new.perform(current_user.id)
+        ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
         current_user.update_column :updated_at, Time.current - 5.minutes
         Sidekiq::Job.clear_all
@@ -398,7 +498,7 @@ RSpec.describe "BikesController#update", type: :request do
   end
   context "updating impound_record" do
     let!(:impound_record) { FactoryBot.create(:impound_record, user: current_user, bike: bike) }
-    let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+    let(:state) { FactoryBot.create(:state_new_york) }
     let(:impound_params) do
       {
         timezone: "America/Los_Angeles",

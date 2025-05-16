@@ -1,0 +1,23 @@
+<div class="<%= wrapper_classes %>">
+  <%# bootstrap sets font-weight on dt %>
+  <dt class="<%= dt_classes %>">
+    <%= @label %>
+  </dt>
+  <%# bootstrap sets margin_bottom on dd %>
+  <dd class="tw:mb-0!">
+    <% if render_convertime? %>
+      <span class="<%= @time_localizer_classes %>">
+        <%= l @value, format: :convert_time %>
+      </span>
+      <% if @include_time_zone %>
+        <span class="localizeTimezone"></span>
+      <% end %>
+    <% elsif @value.present? %>
+      <%= @value %>
+    <% else %>
+      <span class="tw:opacity-50 tw:text-xs">
+        <%= no_value_content %>
+      </span>
+    <% end %>
+  </dd>
+</div>

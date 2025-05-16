@@ -30,6 +30,10 @@ class BikeDisplayer
         bike.impound_claims_claimed.active.where(user_id: user.id).any?
     end
 
+    def display_marketplace_message?(bike, _user = nil)
+      bike.status_with_owner? && bike.is_for_sale? && bike.current_marketplace_listing.present?
+    end
+
     def display_sticker_edit?(bike, user = nil)
       return false unless user.present? && !bike.version?
       return true if user.superuser? || user.enabled?("bike_stickers")

@@ -16,7 +16,8 @@ module AdminHelper
       {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match_controller: false},
       {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
       {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true},
-      {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true}
+      {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true},
+      {title: "Dev: IP Location", path: admin_ip_location_path, match_controller: false}
     ]
   end
 
@@ -62,6 +63,8 @@ module AdminHelper
       {title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true},
       {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false},
       {title: "Model Audits", path: admin_model_audits_path, match_controller: true},
+      {title: "Marketplace Listings", path: admin_marketplace_listings_path, match_controller: true},
+      {title: "Marketplace Messages", path: admin_marketplace_messages_path, match_controller: true},
       {title: "Logged bike searches", path: admin_logged_searches_path, match_controller: true},
       {title: "Organization statuses", path: admin_organization_statuses_path, match_controller: true},
       {title: "Config: Email Domains", path: admin_email_domains_path, match_controller: true},

@@ -211,6 +211,9 @@ nl:
           niet.
         unsupported_response_type: De authorisatie server ondersteund dit response
           type niet
+        user_removed: "(gebruiker verwijderd)"
+        re: 'Re: %{original_subject}'
+        user_not_in_initial_record: gebruiker is niet een van de originele berichtgebruikers
       models:
         doorkeeper/application:
           attributes:
@@ -250,6 +253,13 @@ nl:
           unauthorized_to_claim: hebben geen toestemming om dit te claimen
         parking_notification:
           address_required: "(of locatie) van deze verlaten fiets vereist"
+        marketplace_listing:
+          address_required: Locatie is vereist - geef minimaal een stad op
+          condition_required: Voorwaarde is vereist
+          item_not_visible: "%{item_type} is niet zichtbaar. Heb je het misschien
+            als verborgen gemarkeerd?"
+          price_required: Prijs is vereist
+          primary_activity_required: Primaire activiteit is vereist
       organization:
         duplicate_short_name: al in gebruik bij een andere organisatie. Als je denkt
           dat dat niet het geval zou moeten zijn, neem dan contact op met support@bikeindex.org
@@ -886,6 +896,13 @@ nl:
         eur: EUR
         mxn: MXN
         usd: USD
+      marketplace_listing:
+        condition:
+          excellent: uitstekend
+          good: Goed
+          new_in_box: nieuw in doos
+          salvage: redden
+          poor: arm - heeft service nodig
     models:
       ad: Advertentie
       ambassador: Ambassadeur
@@ -1037,14 +1054,19 @@ nl:
           employee: Werknemer
           student: Student
           graduate_student: Afgestudeerde student
-    status_humanized:
-      bike:
-        abandoned: Verlaten
-        found: gevonden
-        impounded: in beslag genomen
-        stolen: Gestolen
-        with_owner: met eigenaar
-        unregistered: niet ingeschreven
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive: Riemaandrijving
+        coaster_brake: Terugtraprem
+      status_humanized:
+        bike:
+          abandoned: Verlaten
+          for_sale: Te koop
+          found: gevonden
+          impounded: in beslag genomen
+          stolen: Gestolen
+          unregistered: Geregistreerd
+          with_owner: met eigenaar
   datetime:
     distance_in_words:
       half_a_minute: een halve minuut
@@ -2012,6 +2034,9 @@ nl:
       in: in
       looking_for_correct_owner: Op zoek naar de juiste eigenaar van deze %{bike_type}!
       test_registration: proefregistratie
+      view_public_non_listing: Bekijk openbare registratie
+      viewing_listing_preview: Dit is een voorbeeld van uw 'te koop'-advertentie.
+        Deze is niet openbaar zichtbaar.
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       add: Toevoegen
@@ -2114,6 +2139,18 @@ nl:
       year: jaar
       propulsion_type: Voortstuwing
       vehicle_type: 'Voertuigtype:'
+      primary_activity: Primaire activiteit
+      abandoned_title: Dit is een verlaten %{bike_type} die %{impound_kind} was
+      component_no_info: "-"
+      drivetrain: drivetrain
+      drivetrain_fixed: Vaste versnelling
+      drivetrain_front: Aandrijflijn voor
+      drivetrain_rear: Aandrijflijn achter
+      front_tire_width: Breedte van de voorband
+      rear_tire_width: Breedte van de voorband
+      tire_width: Bandbreedte
+      tire_width_narrow_false: Brede band
+      tire_width_narrow_true: Smalle band
     organization_stolen_message:
       report_link_text: op deze link
       report_the_theft_to_the_organization_html: <span class="text-warning">Meld de
@@ -2127,7 +2164,6 @@ nl:
         bike_details: Fietsdetails
         drivetrain: Wielen en aandrijflijn
         groups: Groepen en organisaties
-        ownership: Eigendom overdragen
         photos: foto's
         publicize: Delen op sociale media
         remove: Verbergen of verwijderen
@@ -2137,6 +2173,9 @@ nl:
         found_details: Informatie over het vinden
         bike_or_version_version: Versie
         versions: versies
+        remove_or_transfer: Overdragen, verbergen of verwijderen
+        marketplace_list: Lijst te koop
+        marketplace_on_sale: Marktplaatsvermelding bijwerken
       create:
         bike_was_added: Bike met succes toegevoegd aan de index!
         bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
@@ -2458,12 +2497,22 @@ nl:
         current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
           is vereist voor het bijwerken van uw wachtwoord.
         successfully_updated: Uw gegevens zijn succesvol bijgewerkt.
+      messages:
+        create:
+          can_not_send_message: Helaas kunt u geen bericht naar deze advertentie sturen
+          message_sent: Bericht verzonden
     memberships:
       edit:
         free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
           een e-mail naar support@bikeindex.org als u vragen hebt.
         no_active_membership: Als u nog geen actief lidmaatschap heeft, moet u zich
           aanmelden voor een nieuw lidmaatschap.
+    marketplace_listings:
+      ensure_user_allowed_to_edit!:
+        you_dont_own_that: Oh nee! Het lijkt erop dat je die %{item_type} niet hebt.
+      update:
+        item_published_for_sale: Uw %{item_type} is gepubliceerd. Het staat nu te
+          koop!
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4026,7 +4075,6 @@ nl:
     embed_layout:
       error: Fout
       please_fix_the_following: Los het volgende op
-      register_through_org: Registreer een fiets via %{org_name}
     payments_layout:
       be_a_bike_saver: Red het leven van een fiets.
       support_bike_index_today: Ondersteun Bike Index vandaag.
@@ -4047,13 +4095,14 @@ nl:
       log_in: Log in
       logout: Afmelden
       register_a_new_bike: Registreer een nieuwe fiets
-      search_bikes: Zoek fietsen
       sign_up: Registreren
       the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
       user_settings: "%{user_email} instellingen"
       view_org: Bekijk %{org_name}
-      your_bikes: Je fietsen
       stolen_bike: Fiets gestolen?
+      search: Zoeken
+      marketplace_messages: Marktplaatsberichten
+      your_registrations: Uw registraties
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4112,6 +4161,8 @@ nl:
     users_new: Meld u aan voor Bike Index
     welcome_index: 'Het beste fietsregister: eenvoudig, veilig en gratis.'
     my_accounts_show: Uw fietsen op Bike Index
+    registrations_embed: Insluitbaar %{organization} Fietsindex registratieformulier.
+      Registreer je fiets nu gratis.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -4154,6 +4205,7 @@ nl:
     welcome_index: Bike Index - Fietsregistratie die werkt
     my_accounts_show: Jij op Bike Index
     search_registrations_index: Zoekresultaten
+    registrations_embed: Registreer een fiets met %{organization}
   organized:
     ambassador_dashboards:
       getting_started:
@@ -5243,22 +5295,6 @@ nl:
       pinhead_locking_skewer_key: Pinhead spies sleutel
       small_kryptonite_key: Kleine Kryptonite-sleutel
       update_the_lock: Update het slot!
-    lock_home:
-      add_a_new_lock: Voeg een nieuw slot toe
-      any_lock_information_you_enter_on_bike_in: Alle slotinformatie die u op Bike
-        Index invoert, is privé en alleen zichtbaar voor u.
-      if_you_want_you_can_save_serial_html: Als je wilt, kun je <strong>de framenummers
-        van je sleutels opslaan</strong> op Bike Index, zodat je geen pech hebt als
-        je ze verliest.
-      lock_keys_often_have_serial_numbers_so_yo: Vergrendelingssleutels hebben vaak
-        framenummers, zodat u vervangingen kunt bestellen als u de sleutels verliest.
-      lock_type: Slottype
-      manufacturer: Fabrikant
-      save_information_about_a_lock: Informatie opslaan over een slot
-      save_information_about_your_bike_lock: Informatie opslaan over uw fietsslot!
-      you_can_also_record_your_lock_html: U kunt ook <strong>uw slotcombinaties opnemen</strong>
-        .
-      your_locks: Je sloten
     new:
       save_information_about_one_of_your_locks: Informatie opslaan over een van uw
         sloten
@@ -5605,7 +5641,6 @@ nl:
       edit: Bewerken
       edit_bike: Fiets bewerken
       key_serial: Sleutel serienummer
-      list_a_bike_on_bikefair: Zet een fiets op BikeFair
       location: Plaats
       lock_type: Slottype
       locks: sloten
@@ -5622,8 +5657,6 @@ nl:
         heeft toegevoegd aan de index.
       to_bike_index_thanks_for_signing_up: naar Bike Index. Bedankt voor het aanmelden!
       update_your_profile: update uw profiel
-      user_bikes: "%{current_user_name} Fietsen"
-      want_to_sell_your_bikes: Wilt u een van uw geregistreerde fietsen verkopen?
       welcome: Welkom
       you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
@@ -5636,6 +5669,8 @@ nl:
       user_hidden: Verborgen voor andere gebruikers
       registered: Geregistreerd
       updated: Bijgewerkt
+      header_title: "%{current_user_name} op Fietsindex"
+      membership_subtitle: Bedankt dat u lid bent van Bike Index %{level}!
     edit:
       save_changes: Wijzigingen opslaan
       edit_pages: 'Accountpagina''s bewerken:'
@@ -5651,13 +5686,10 @@ nl:
       add_additional_email: Voeg extra e-mail toe
       add_new_phone_number: Voeg een nieuw telefoonnummer toe
       additional_email: Extra E-mail
-      address: Adres
       any_use_of_your_personal_information_html: Elk gebruik van uw persoonlijke informatie
         valt onder de voorwaarden van onze %{privacy_policy}. We verkopen, verhandelen
         of verhuren uw persoonlijke gegevens niet aan derden.
-      choose_country: Kies land
       choose_language: Kies een taal
-      city: City
       confirmed_emails: Bevestigde e-mails
       daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
       give_us_permission_html: Geef ons toestemming om contact met u op te nemen als
@@ -5673,13 +5705,11 @@ nl:
       remove_email: E-mail verwijderen
       remove_number: nummer verwijderen
       resend_confirmation: Opnieuw verzenden Bevestiging
-      state: Staat
       stolen_hot_sheets: Gestolen Bike Hot Sheets
       unconfirmed: niet bevestigd!
       unconfirmed_emails: Niet-bevestigde e-mails
       verified: Geverifieerd
       why_you_should_text: Lees waarom u zou moeten
-      zipcode: Postcode
       absolutely_no_notifications: Absoluut geen e-mail
       no_notifications_explanation: blokkeert alle e-mail behalve wachtwoordresets
         en diefstalmeldingen (u ontvangt bijvoorbeeld geen nieuwe registratie-e-mails
@@ -5745,6 +5775,17 @@ nl:
         gemaakt worden!"
       modal_title: Weet u zeker dat u uw account wilt verwijderen?
       nevermind: Laat maar
+    messages:
+      form:
+        body_placeholder: Voeg wat berichttekst toe
+        message: bericht
+        new_message: Nieuw bericht
+        reply_to_message: Reageer op bericht
+        send_message: Verstuur bericht
+      index:
+        marketplace_messages: Marktplaatsberichten
+      show:
+        can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -5820,6 +5861,9 @@ nl:
         state: Staat
         where_was_it_stolen_type: Waar was het %{stolen_type}?
         zipcode: Postcode
+      primary_activity:
+        choose_activity: Kies activiteit
+        primary_activity: Primaire activiteit
     drivetrain:
       belt_drive: Riemaandrijving
       coaster_brake: Terugtraprem
@@ -5852,23 +5896,6 @@ nl:
       groups_and_organizations: Groepen en organisaties
       other_organizations: Andere organisaties
       remove: Verwijderen
-    ownership:
-      impound_record_page: In beslag genomen record pagina
-      sell_trade_or_give_away_this_bike: Deze %{bike_type} verkopen, verhandelen of
-        weggeven? Voer het e-mailadres van de nieuwe eigenaar in om de registratie
-        over te dragen.
-      this_bike_is_currently_impounded_html: Deze %{bike_type} is momenteel in beslag
-        genomen met inbeslagname record <strong># %{impound_record_id}</strong> .
-        Als u het e-mailadres hier bijwerkt, wordt <em class="text-warning">de %{bike_type}
-        nog steeds in beslag genomen</em> .
-      to_transfer_use_impound_record_page_html: Als u de fiets aan een nieuwe eigenaar
-        wilt overdragen, werkt u deze bij met "Overgedragen aan nieuwe eigenaar" uit
-        de %{link_to_impound_record_page}.
-      transfer_ownership: Eigendom overdragen
-      enter_new_owner_email_to_transfer: Voer het e-mailadres van de nieuwe eigenaar
-        in om de registratie over te dragen.
-      new_email_assigned_save_to_update: Er is een nieuw e-mailadres ingevoerd, klik
-        op "wijzigingen opslaan" om over te zetten.
     photos:
       drag_and_drop_files_here_html: Sleep bestanden hier naartoe of gebruik de knop
         <strong>Foto's uploaden</strong>
@@ -5909,6 +5936,25 @@ nl:
         is in onze %{faq_link}.
       delete_this_version_html: Verwijder <em>%{version_name}</em>
       visibility: Zichtbaarheid
+      delete_registration: Verwijder deze registratie
+      enter_new_owner_email_to_transfer: Voer het e-mailadres van de nieuwe eigenaar
+        in om de registratie over te dragen.
+      hide_registration: Verberg deze registratie
+      impound_record_page: In beslag genomen record pagina
+      new_email_assigned_save_to_update: Er is een nieuw e-mailadres ingevoerd, klik
+        op "wijzigingen opslaan" om over te zetten.
+      save_changes: Eigendom bijwerken
+      sell_trade_or_give_away_this_bike: Deze %{bike_type} verkopen, verhandelen of
+        weggeven? Voer het e-mailadres van de nieuwe eigenaar in om de registratie
+        over te dragen.
+      this_bike_is_currently_impounded_html: Deze %{bike_type} is momenteel in beslag
+        genomen met inbeslagname record <strong># %{impound_record_id}</strong> .
+        Als u het e-mailadres hier bijwerkt, wordt <em class="text-warning">de %{bike_type}
+        nog steeds in beslag genomen</em> .
+      to_transfer_use_impound_record_page_html: Als u de fiets aan een nieuwe eigenaar
+        wilt overdragen, werkt u deze bij met "Overgedragen aan nieuwe eigenaar" uit
+        de %{link_to_impound_record_page}.
+      transfer_ownership: Eigendom overdragen
     report_recovered:
       can_we_share_your_story: Kunnen we jouw verhaal delen?
       did_we_help: Hebben we geholpen?
@@ -5978,6 +6024,26 @@ nl:
       wide: Breed
       wide_help: "> 38 mm (1,5 inch)"
       wide_title: Banden die minimaal 39 mm (1,5 inch) breed zijn
+    marketplace:
+      choose_condition: Kies conditie
+      condition: Voorwaarde
+      price: Prijs
+      add_required_information: Voeg de vereiste informatie toe (conditie, prijs,
+        adres)
+      description: Beschrijving
+      listing_draft: Conceptnotering
+      listing_is_published: De lijst is gepubliceerd
+      optional: optioneel
+      preview_it: Bekijk een voorbeeld van de aanbieding
+      price_is_negitiable: Prijs is onderhandelbaar
+      publish_listing: lijst publiceren
+      publish_listing_when_ready: Publiceer de advertentie wanneer u klaar bent om
+        te verkopen!
+      sale_description_html: Aanvullende informatie specifiek voor de verkoop. Plaats
+        <a href="%{edit_item_path}">hier</a> informatie over %{item_type_display}.
+      save_to_preview: Sla de aanbieding op om er een voorbeeld van te kunnen bekijken
+      view_listing: Bekijk uw vermelding
+      why_are_you_selling: Waarom verkoop je dit? Wat moet een potentiële koper weten?
   bike_versions:
     index:
       primary_colors: Primaire kleuren
@@ -6029,3 +6095,39 @@ nl:
         stolenness_proximity: Gestolen in zoekgebied
         stolenness_stolen: Overal gestolen
         within: binnen
+    legacy_form_well:
+      address_record:
+        address: Adres
+        address_school: Postadres van de campus
+        choose_country: Kies land
+        city: City
+        postal_code: Postcode
+        region: Regio / Provincie
+        state: Staat
+        your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
+        address_no_street: Adres
+      address_record_with_default:
+        edit_my_account_path: bewerken op mijn account
+        use_account_address: Gebruik accountadres
+    definition_list:
+      row:
+        no_value: geen
+    page_section:
+      marketplace_listing_panel:
+        condition: Voorwaarde
+        description: Beschrijving
+        first_posted_at: Geplaatst
+        location: Plaats
+        price_is_firm_false: prijs is onderhandelbaar
+        price_is_firm_true: prijs is vast
+        still_for_sale_at: Nog steeds te koop bij
+    alert_for_errors:
+      errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+        dit %{object_name} wordt opgeslagen:"
+    messages:
+      thread:
+        from: uit
+        me: mij
+        to: Naar
+      thread_show:
+        subject: Onderwerp

@@ -39,6 +39,7 @@
 #  manufacturer_id           :bigint
 #  owner_id                  :bigint
 #  paint_id                  :bigint
+#  primary_activity_id       :bigint
 #  primary_frame_color_id    :bigint
 #  rear_gear_type_id         :bigint
 #  rear_wheel_size_id        :bigint
@@ -53,6 +54,7 @@
 #  index_bike_versions_on_manufacturer_id           (manufacturer_id)
 #  index_bike_versions_on_owner_id                  (owner_id)
 #  index_bike_versions_on_paint_id                  (paint_id)
+#  index_bike_versions_on_primary_activity_id       (primary_activity_id)
 #  index_bike_versions_on_primary_frame_color_id    (primary_frame_color_id)
 #  index_bike_versions_on_rear_gear_type_id         (rear_gear_type_id)
 #  index_bike_versions_on_rear_wheel_size_id        (rear_wheel_size_id)
@@ -117,6 +119,11 @@ class BikeVersion < ApplicationRecord
 
   # Necessary to duplicate bike
   def status_found?
+    false
+  end
+
+  # Necessary to duplicate bike
+  def is_for_sale?
     false
   end
 

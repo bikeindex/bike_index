@@ -65,6 +65,7 @@
 #  manufacturer_id             :integer
 #  model_audit_id              :bigint
 #  paint_id                    :integer
+#  primary_activity_id         :bigint
 #  primary_frame_color_id      :integer
 #  rear_gear_type_id           :integer
 #  rear_wheel_size_id          :integer
@@ -86,6 +87,7 @@
 #  index_bikes_on_model_audit_id             (model_audit_id)
 #  index_bikes_on_organization_id            (creation_organization_id)
 #  index_bikes_on_paint_id                   (paint_id)
+#  index_bikes_on_primary_activity_id        (primary_activity_id)
 #  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)
 #  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id)
 #  index_bikes_on_state_id                   (state_id)
@@ -149,10 +151,14 @@ class Bike < ApplicationRecord
   has_many :notifications
   has_many :theft_surveys, -> { theft_survey }, class_name: "Notification"
   has_many :theft_alerts
+  has_many :marketplace_listings, as: :item
+
+  has_one :current_marketplace_listing, -> { current }, class_name: "MarketplaceListing", as: :item
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records
   accepts_nested_attributes_for :components, allow_destroy: true
+  accepts_nested_attributes_for :current_marketplace_listing
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type
@@ -234,7 +240,7 @@ class Bike < ApplicationRecord
 
     def status_humanized_translated(str)
       return "" unless str.present?
-      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
+      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :bike_attributable, :status_humanized, :bike])
     end
 
     def text_search(query)
@@ -409,7 +415,7 @@ class Bike < ApplicationRecord
   end
 
   def display_name
-    name.presence || cycle_type.titleize
+    name.presence || type_titleize
   end
 
   def user?
@@ -426,6 +432,11 @@ class Bike < ApplicationRecord
 
   def avery_exportable?
     !impounded? && owner_name.present? && valid_mailing_address?
+  end
+
+  # matches current scope
+  def current?
+    !example? && !user_hidden && deleted_at.blank? && !likely_spam
   end
 
   def current_parking_notification
@@ -767,8 +778,8 @@ class Bike < ApplicationRecord
 
   # THIS IS FUCKING OBNOXIOUS.
   # Somehow we need to get rid of needing to have this method. country should default to optional
-  def address
-    Geocodeable.address(self, country: [:optional])
+  def address(country: [:optional])
+    Geocodeable.address(self, country:)
   end
 
   def valid_mailing_address?
@@ -794,7 +805,7 @@ class Bike < ApplicationRecord
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
     @registration_address = case registration_address_source
-    when "user" then user&.address_hash
+    when "user" then user&.address_hash_legacy
     when "bike_update" then address_hash
     when "initial_creation" then current_ownership.address_hash
     else

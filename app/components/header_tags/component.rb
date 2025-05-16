@@ -107,6 +107,10 @@ module HeaderTags
 
       if %w[bikes bike_versions].include?(controller_name)
         return "bikes_new_stolen" if (action_name == "new" || action_name == "create") && page_obj&.status_stolen?
+      elsif %w[embed embed_extended embed_create_success].include?(action_name)
+        # All the registration embed forms have the same title and description
+        controller_name = "registrations"
+        action_name = "embed"
       end
 
       [controller_namespace, controller_name, action_name].compact.join("_")

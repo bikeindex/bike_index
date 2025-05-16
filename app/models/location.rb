@@ -40,7 +40,7 @@ class Location < ApplicationRecord
   scope :publicly_visible, -> { shown.where(not_publicly_visible: false) }
   scope :impound_locations, -> { where(impound_location: true) }
   scope :default_impound_locations, -> { impound_locations.where(default_impound_location: true) }
-  # scope :international, where("country_id IS NOT #{Country.united_states.id}")
+  # scope :international, where("country_id IS NOT #{Country.united_states_id}")
 
   before_validation :set_calculated_attributes
   after_commit :update_associations

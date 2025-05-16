@@ -140,4 +140,12 @@ RSpec.describe InfoController, type: :request do
       expect(response).to redirect_to InfoController::DONT_BUY_STOLEN_URL
     end
   end
+
+  context "primary_activities" do
+    it "gets a csv" do
+      get "/primary_activities.csv"
+      expect(response.status).to eq(200)
+      expect(response.content_type).to match("text/csv")
+    end
+  end
 end

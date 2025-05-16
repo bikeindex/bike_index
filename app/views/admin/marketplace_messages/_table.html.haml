@@ -1,0 +1,38 @@
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      %th
+        = sortable "kind", render_sortable: render_sortable
+      %th
+        = sortable "marketplace_listing", render_sortable: render_sortable
+      %th
+        Body
+      %th
+        = sortable "sender_id", render_sortable: render_sortable
+      -# I don't think this is necessary...
+      -# %th
+      -#   = sortable "receiver_id", render_sortable: render_sortable
+    %tbody
+      - collection.each do |marketplace_message|
+        %tr
+          %td
+            .less-strong-hold
+              %a.convertTime{href: admin_marketplace_message_path(marketplace_message)}
+                = l marketplace_message.created_at, format: :convert_time
+              - if display_dev_info?
+                %span.less-strong-right.d-none.d-md-block.only-dev-visible
+                  = marketplace_message.id
+          %td
+            = marketplace_message.kind_humanized
+          %td
+            %small.less-strong= "#{marketplace_message.marketplace_listing.currency_symbol}#{admin_number_display(marketplace_message.marketplace_listing.amount)}"
+
+            = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_link_path: bike_path(marketplace_message.item_id, show_marketplace_preview: true) }
+          %td
+            = marketplace_message.body.truncate(100)
+          %td
+            = render partial: "/shared/admin/user_cell", locals: {user: marketplace_message.sender, render_search: true, cache: true}
+          -# %td
+          -#   = render partial: "/shared/admin/user_cell", locals: {user: marketplace_message.receiver, render_search: true, cache: true}

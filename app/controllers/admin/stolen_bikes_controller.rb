@@ -45,7 +45,8 @@ class Admin::StolenBikesController < Admin::BaseController
     if %w[regenerate_alert_image delete].include?(params[:update_action])
       update_image
     else
-      BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}).update_ownership
+      BikeUpdator.new(user: current_user, bike: @bike, params:).update_ownership
+
       if @bike.update(permitted_parameters)
         SerialNormalizer.new(serial: @bike.serial_number).save_segments(@bike.id)
         flash[:success] = "Bike was successfully updated."
@@ -119,6 +120,11 @@ class Admin::StolenBikesController < Admin::BaseController
     end
     unless InputNormalizer.boolean(params[:search_include_spam])
       available_stolen_records = available_stolen_records.not_spam
+    end
+
+    @with_promoted_alert = InputNormalizer.boolean(params[:search_with_promoted_alert])
+    if @with_promoted_alert
+      available_stolen_records = available_stolen_records.with_theft_alerts_paid_or_admin
     end
 
     # We always render distance

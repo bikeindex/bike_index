@@ -20,7 +20,7 @@ RSpec.describe ProcessLoggedSearchJob, type: :job do
       end
 
       context "user is superuser" do
-        let(:user) { FactoryBot.create(:admin, :with_organization) }
+        let(:user) { FactoryBot.create(:superuser, :with_organization) }
         it "doesn't associate" do
           expect(logged_search.user_id).to eq user.id
           expect(logged_search.organization_id).to be_nil
@@ -48,7 +48,7 @@ RSpec.describe ProcessLoggedSearchJob, type: :job do
     context "ip_address" do
       let(:logged_search) { FactoryBot.create(:logged_search, ip_address: "181.41.206.24") }
       let!(:country) { Country.united_states }
-      let!(:state) { FactoryBot.create(:state, abbreviation: "NY", name: "New York") }
+      let!(:state) { FactoryBot.create(:state_new_york) }
       let(:target_location_attrs) do
         {
           latitude: 40.7143528,
@@ -73,7 +73,7 @@ RSpec.describe ProcessLoggedSearchJob, type: :job do
       context "maxmind response" do
         # Override default_location for geocoder_default_location, this is a Maxmind response
         let(:default_location) { {country_code: "US", region_code: "CO", state_code: "CO", city: "Denver", latitude: 39.738800, longitude: -104.986800, error: nil} }
-        let!(:state) { FactoryBot.create(:state, abbreviation: "CO", name: "Colorado") }
+        let!(:state) { FactoryBot.create(:state, :find_or_create, abbreviation: "CO", name: "Colorado") }
         let(:target_location_attrs) do
           {
             latitude: 39.738800,

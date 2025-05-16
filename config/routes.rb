@@ -108,7 +108,9 @@ Rails.application.routes.draw do
       post "unsubscribe_update"
     end
   end
-  resource :my_account, only: %i[show update destroy]
+  resource :my_account, only: %i[show update destroy] do
+    resources :messages, only: %i[index show create], controller: "my_accounts/messages"
+  end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
   # Legacy - there are places where user_home existed in emails, etc, so keep this
   get "user_home", to: redirect("/my_account")
@@ -172,6 +174,8 @@ Rails.application.routes.draw do
   resources :impound_claims, only: [:create, :update]
   resources :review_impound_claims, only: [:show, :update]
 
+  resources :marketplace_listings, only: %i[update]
+
   namespace :admin do
     root to: "dashboard#index", as: :root
     resources :ambassador_tasks, except: :show
@@ -203,6 +207,7 @@ Rails.application.routes.draw do
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
+    get "ip_location", to: "dashboard#ip_location"
     resources :ads,
       :bulk_imports,
       :content_tags,
@@ -223,9 +228,12 @@ Rails.application.routes.draw do
 
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
-      mailchimp_data model_attestations model_audits notifications organization_statuses
-      parking_notifications stripe_prices stripe_subscriptions user_alerts user_registration_organizations
+      mailchimp_data marketplace_listings model_attestations model_audits
+      notifications organization_statuses parking_notifications stripe_prices stripe_subscriptions
+      user_alerts user_registration_organizations
     ].each { resources _1, only: %i[index] }
+
+    resources :marketplace_messages, only: %i[index show]
 
     resources :bike_stickers do
       collection { get :reassign }
@@ -332,8 +340,8 @@ Rails.application.routes.draw do
 
   get "/auth/failure", to: "integrations#integrations_controller_creation_error"
 
-  %w[donate support_bike_index support_the_index support_the_bike_index protect_your_bike
-    serials about where vendor_terms resources image_resources privacy terms security
+  %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
+    protect_your_bike serials about where vendor_terms resources image_resources privacy terms security
     how_not_to_buy_stolen dev_and_design lightspeed].freeze.each do |page|
     get page, controller: "info", action: page
   end

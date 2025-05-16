@@ -7,7 +7,7 @@ RSpec.describe MyAccountsController, type: :request do
     context "user not logged in" do
       it "redirects" do
         get base_url
-        expect(response).to redirect_to(/users\/new/) # weird subdomain issue matching url directly otherwise
+        expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
       end
     end
 
@@ -94,7 +94,7 @@ RSpec.describe MyAccountsController, type: :request do
               expect(response).to be_ok
               expect(assigns(:show_general_alert)).to be_falsey
               expect(response).to render_template("show")
-            }.to change(AfterUserChangeJob.jobs, :count).by 0
+            }.to change(::Callbacks::AfterUserChangeJob.jobs, :count).by 0
           end
           context "with phone_verification enabled" do
             before { Flipper.enable(:phone_verification) }
@@ -105,8 +105,8 @@ RSpec.describe MyAccountsController, type: :request do
                 expect(response).to be_ok
                 expect(assigns(:show_general_alert)).to be_truthy
                 expect(response).to render_template("show")
-              }.to change(AfterUserChangeJob.jobs, :count).by 1
-              AfterUserChangeJob.drain
+              }.to change(::Callbacks::AfterUserChangeJob.jobs, :count).by 1
+              ::Callbacks::AfterUserChangeJob.drain
               expect(current_user.reload.alert_slugs).to eq([])
             end
           end
@@ -151,6 +151,22 @@ RSpec.describe MyAccountsController, type: :request do
         end
       end
     end
+    context "Backfills::AddressRecordsForUsersJob" do
+      let(:current_user) { FactoryBot.create(:user_confirmed, :in_edmonton) }
+      it "creates an address_record on render" do
+        expect(current_user.reload.address_record).to be_blank
+
+        # non-root view doesn't create the address record
+        get "#{base_url}/edit/password"
+        expect(response).to be_ok
+        expect(current_user.reload.address_record).to be_blank
+
+        # Root view creates!
+        get "#{base_url}/edit"
+        expect(response).to be_ok
+        expect(current_user.reload.address_record).to be_present
+      end
+    end
     context "with user_registration_organization" do
       let(:target_templates) { default_edit_templates.merge(registration_organizations: "Registration Organizations") }
       let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: current_user) }
@@ -183,7 +199,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(current_user.username).to eq "something"
         expect {
           patch base_url, params: {id: current_user.username, user: {username: " ", name: "tim"}, edit_template: "sharing"}
-        }.to change(AfterUserChangeJob.jobs, :size).by(1)
+        }.to change(::Callbacks::AfterUserChangeJob.jobs, :size).by(1)
         expect(assigns(:edit_template)).to eq("sharing")
         current_user.reload
         expect(current_user.username).to eq("something")
@@ -194,7 +210,7 @@ RSpec.describe MyAccountsController, type: :request do
       expect(current_user.notification_unstolen).to be_truthy # Because it's set to true by default
       expect {
         patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
-      }.to change(AfterUserChangeJob.jobs, :size).by(1)
+      }.to change(::Callbacks::AfterUserChangeJob.jobs, :size).by(1)
       expect(response).to redirect_to edit_my_account_url(edit_template: "root")
       current_user.reload
       expect(current_user.notification_newsletters).to be_truthy
@@ -228,7 +244,7 @@ RSpec.describe MyAccountsController, type: :request do
 
     context "setting address" do
       let(:country) { Country.united_states }
-      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      let(:state) { FactoryBot.create(:state_new_york) }
       it "sets address, geocodes" do
         current_user.reload
         expect(current_user.address_set_manually).to be_falsey
@@ -237,28 +253,39 @@ RSpec.describe MyAccountsController, type: :request do
           id: current_user.username,
           user: {
             name: "Mr. Slick",
-            country_id: country.id,
-            state_id: state.id,
-            city: "New York",
-            street: "278 Broadway",
-            zipcode: "10007",
+            address_record_attributes: {
+              country_id: country.id,
+              region_record_id: state.id,
+              region_string: "something",
+              city: "New York",
+              street: "278 Broadway",
+              postal_code: "10007"
+            },
             notification_newsletters: "1",
             phone: "3223232"
           }
         }
         expect(response).to redirect_to "/my_account/edit/root"
         expect(flash[:error]).to_not be_present
+        Callbacks::AddressRecordUpdateAssociationsJob.drain
         current_user.reload
         expect(current_user.name).to eq("Mr. Slick")
-        expect(current_user.country).to eq country
-        expect(current_user.state).to eq state
-        expect(current_user.street).to eq "278 Broadway"
-        expect(current_user.zipcode).to eq "10007"
         expect(current_user.notification_newsletters).to be_truthy
-        expect(current_user.latitude).to eq default_location[:latitude]
-        expect(current_user.longitude).to eq default_location[:longitude]
         expect(current_user.phone).to eq "3223232"
         expect(current_user.address_set_manually).to be_truthy
+
+        expect(AddressRecord.count).to eq 1
+        address_record = AddressRecord.last
+        expect(address_record.user_id).to eq current_user.id
+        expect(address_record.country_id).to eq country.id
+        expect(address_record.region_record_id).to eq state.id
+        expect(address_record.street).to eq "278 Broadway"
+        expect(address_record.postal_code).to eq "10007"
+        expect(address_record.latitude).to eq default_location[:latitude]
+        expect(address_record.longitude).to eq default_location[:longitude]
+
+        expect(current_user.reload.latitude).to eq default_location[:latitude]
+        expect(current_user.longitude).to eq default_location[:longitude]
       end
     end
 
@@ -456,7 +483,7 @@ RSpec.describe MyAccountsController, type: :request do
 
         Sidekiq::Job.clear_all
         put base_url, params: update_params
-        expect(AfterUserChangeJob.jobs.count).to eq 1
+        expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
         expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
         expect(flash[:success]).to be_present
         expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -465,7 +492,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_registration_organization1.registration_info).to eq target_info
 
         Sidekiq::Testing.inline! {
-          AfterUserChangeJob.drain
+          ::Callbacks::AfterUserChangeJob.drain
         }
         expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
         expect(bike1.registration_info).to eq target_info
@@ -489,7 +516,7 @@ RSpec.describe MyAccountsController, type: :request do
             "reg_field-organization_affiliation_#{organization1.id}" => "student",
             "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
           }
-          expect(AfterUserChangeJob.jobs.count).to eq 1
+          expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
           expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
           expect(flash[:success]).to be_present
           expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -498,7 +525,7 @@ RSpec.describe MyAccountsController, type: :request do
           expect(user_registration_organization1.registration_info).to eq target_info
 
           Sidekiq::Testing.inline! {
-            AfterUserChangeJob.drain
+            ::Callbacks::AfterUserChangeJob.drain
           }
           expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
           expect(bike1.registration_info).to eq target_info
@@ -547,7 +574,7 @@ RSpec.describe MyAccountsController, type: :request do
               "reg_field-student_id_#{organization1.id}" => "XXX777YYY",
               "reg_field-organization_affiliation_#{organization2.id}" => "employee"
             }
-            expect(AfterUserChangeJob.jobs.count).to eq 1
+            expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
             expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
             expect(flash[:success]).to be_present
             expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
@@ -560,7 +587,7 @@ RSpec.describe MyAccountsController, type: :request do
             expect(user_registration_organization2.registration_info).to eq target_extra_info
 
             Sidekiq::Testing.inline! {
-              AfterUserChangeJob.drain
+              ::Callbacks::AfterUserChangeJob.drain
             }
             deleted_bike_organization = BikeOrganization.unscoped.where(id: bike1_organization2.id).first
             expect(deleted_bike_organization.deleted?).to be_truthy
@@ -579,7 +606,12 @@ RSpec.describe MyAccountsController, type: :request do
             target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
             expect(bike3.registration_info).to eq target_bike3_info
 
-            expect(current_user.reload.address_hash).to eq default_location_registration_address.as_json
+            expect(current_user.reload.address_record).to be_present
+            expect(current_user.address_hash(visible_attribute: :street, render_country: true))
+              .to eq default_location_registration_address_new
+
+            expect(current_user.address_hash_legacy)
+              .to eq default_location_registration_address.merge("country" => "United States")
           end
         end
       end

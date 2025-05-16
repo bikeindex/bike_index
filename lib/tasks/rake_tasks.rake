@@ -20,6 +20,16 @@ task import_manufacturers_csv: :environment do
   Spreadsheets::Manufacturers.import(file_path)
 end
 
+desc "import primary activities from GitHub"
+# NOTE: This doesn't actually do a good job updating existing primary activities.
+# If that is required, probably do it manually via console
+task import_primary_activities_csv: :environment do
+  url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/primary_activities.csv"
+  file_path = Rails.root.join("tmp/primary_activities.csv")
+  system("wget -q #{url} -O #{file_path}", exception: true)
+  Spreadsheets::PrimaryActivities.import(file_path)
+end
+
 # TODO: Remove :processed attribute when processing finishes
 desc "Enqueue Logged Search Processing"
 task process_logged_searches: :environment do

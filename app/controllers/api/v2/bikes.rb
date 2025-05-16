@@ -273,9 +273,9 @@ module API
             end
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
-              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :no_duplicate))
+              permitted_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :no_duplicate))
               BikeUpdator
-                .new(user: current_user, bike: @bike, b_params: bike_update_params)
+                .new(user: current_user, bike: @bike, permitted_params:)
                 .update_available_attributes
             rescue => e
               error!("Unable to update bike: #{e}", 401)
@@ -322,10 +322,9 @@ module API
           authorize_bike_for_user
           b_param = BParam.new(params: declared_p.as_json, origin: origin_api_version)
           b_param.clean_params
-          hash = b_param.params
-          @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
+          @bike.load_external_images(b_param.params["bike"]["external_image_urls"]) if b_param.params.dig("bike", "external_image_urls").present?
           begin
-            BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
+            BikeUpdator.new(user: current_user, bike: @bike, permitted_params: b_param.params).update_available_attributes
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end

@@ -7,7 +7,7 @@ module GrapeLogging
   module Loggers
     class BinxLogger < GrapeLogging::Loggers::Base
       def parameters(request, _)
-        {remote_ip: ForwardedIpAddress.parse(request), format: "json"}
+        {remote_ip: IpAddressParser.forwarded_address(request), format: "json"}
       end
     end
   end

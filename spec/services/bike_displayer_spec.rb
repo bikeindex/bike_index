@@ -129,6 +129,13 @@ RSpec.describe BikeDisplayer do
     end
   end
 
+  describe "display_marketplace_message?" do
+    let(:bike) { Bike.new }
+    it "is falsey" do
+      expect(BikeDisplayer.display_marketplace_message?(bike)).to be_falsey
+    end
+  end
+
   describe "display_sticker_edit?" do
     let(:bike) { Bike.new }
     let(:owner) { User.new }
@@ -247,7 +254,7 @@ RSpec.describe BikeDisplayer do
   describe "user_edit_bike_address?, display_edit_address_fields? and edit_street_address?" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:user) { FactoryBot.create(:user, :confirmed) }
-    let(:admin) { FactoryBot.create(:admin) }
+    let(:admin) { FactoryBot.create(:superuser) }
 
     it "is falsey" do
       expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey

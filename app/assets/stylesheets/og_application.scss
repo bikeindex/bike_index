@@ -14501,19 +14501,6 @@ body.welcome-page .content:before {
     clear: both
 }
 
-.handlebar-tip p span {
-    display: block;
-    width: 75px;
-    height: 75px;
-    margin: 0 5px 10px 0;
-    float: left;
-    position: relative;
-    border: 1px solid #bebebe;
-    background: purple;
-    background: url("icons/bar_sprites.jpg") no-repeat;
-    background-size: 450px 75px
-}
-
 .handlebar-tip .flat-bars {
     background-position: 0 0
 }
@@ -14536,12 +14523,6 @@ body.welcome-page .content:before {
 
 .handlebar-tip .other-bars {
     background-position: -375px 0
-}
-
-@media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3 / 2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
-    .handlebar-tip p span {
-        background: url("icons/bar_sprites_retina.jpg") no-repeat
-    }
 }
 
 .new-bike-container {

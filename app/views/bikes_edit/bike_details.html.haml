@@ -155,6 +155,8 @@
               .form-well-input
                 = f.text_field :name, class: "form-control"
 
+          = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
+
           .form-group.row.unnested-field
             = f.label :description, t(".general_description"), class: "form-well-label form-well-label-large-input"
             .form-well-input-large
@@ -182,7 +184,7 @@
                 .form-well-input
                   = f.text_field :zipcode, class: "form-control", required: true, placeholder: t(".zipcode")
 
-              .form-group.row.fancy-select-placeholder.unfancy#us_id_data{data: {usid: Country.united_states.id}}
+              .form-group.row.fancy-select-placeholder.unfancy#us_id_data{data: {usid: Country.united_states_id}}
                 = f.label :country_id, class: "form-well-label"
                 .form-well-input
                   = f.select :country_id, Country.select_options,
@@ -193,7 +195,7 @@
                 .form-group.row.fancy-select-placeholder.unfancy.hidden-other.unhidden
                   = f.label :state_id, class: "form-well-label"
                   .form-well-input
-                    = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
+                    = f.collection_select(:state_id, State.united_states, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
 
           -# need to check if any stickers, because maybe it has some that aren't user editable
           - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)

@@ -3,8 +3,9 @@ require "rails_helper"
 RSpec.describe Bikes::EditsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bikes/#{bike.to_param}/edit" }
-  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-  let(:current_user) { bike.creator }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: bike_creator) }
+  let(:bike_creator) { FactoryBot.create(:user_confirmed) }
+  let(:current_user) { bike_creator }
 
   let(:edit_templates) do
     {
@@ -12,10 +13,10 @@ RSpec.describe Bikes::EditsController, type: :request do
       photos: "Photos",
       drivetrain: "Wheels and Drivetrain",
       accessories: "Accessories and Components",
-      ownership: "Transfer Ownership",
       groups: "Groups and Organizations",
-      remove: "Hide or Delete",
-      report_stolen: "Report Stolen or Missing"
+      remove: "Transfer, Hide or Delete",
+      report_stolen: "Report Stolen or Missing",
+      versions: "Versions"
     }
   end
   let(:theft_templates) do
@@ -60,6 +61,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(bike.user_id).to eq current_user.id
         expect(response).to be_ok
         expect(assigns(:edit_template)).to eq "bike_details"
+        expect(response.body).to match(/<title>Details:/)
         expect(session[:return_to]).to be_blank
       end
     end
@@ -92,7 +94,6 @@ RSpec.describe Bikes::EditsController, type: :request do
   end
   context "with bike_versions" do
     it "renders" do
-      Flipper.enable :bike_versions # Simpler to just enable it all
       get base_url
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
@@ -100,32 +101,60 @@ RSpec.describe Bikes::EditsController, type: :request do
       get "#{base_url}/versions"
       expect(response.status).to eq 200
       expect(response).to render_template(:versions)
+      expect(response.body).to match(/<title>Versions: #{bike.title_string}/)
+    end
+  end
+  describe "marketplace" do
+    it "redirects" do
+      get "#{base_url}/marketplace"
+      expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
+    end
+    context "with can_create_listing?" do
+      let(:bike_creator) { FactoryBot.create(:superuser) }
+
+      it "includes marketplace in edit_templates" do
+        expect(bike_creator.reload.can_create_listing?).to be_truthy
+        get base_url
+        expect(flash).to be_blank
+        expect(response).to render_template(:bike_details)
+        expect(assigns(:bike).id).to eq bike.id
+        expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates.merge(marketplace: "List for sale")
+        # Because user is bike#user
+        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+        # If passed an unknown template, it renders default template
+        get "#{base_url}/marketplace"
+        expect(response).to render_template(:marketplace)
+      end
     end
   end
   context "with owner_email" do
-    it "renders with owner_email in ownership" do
+    it "renders with owner_email in remove" do
       get "#{base_url}?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
       expect(assigns(:new_email_assigned)).to be_blank
       expect(assigns(:bike).owner_email).to eq bike.owner_email
+      # Preserve previous ownership functionality
       get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      expect(response).to redirect_to(edit_bike_path(bike.to_param, edit_template: "remove", owner_email: "new_email@stuff.com"))
+      # And then, test the previous assign email functionality
+      get "#{base_url}/remove?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
-      expect(response).to render_template(:ownership)
+      expect(response).to render_template(:remove)
       expect(assigns(:bike).owner_email).to eq "new_email@stuff.com"
       expect(assigns(:new_email_assigned)).to be_truthy
       expect {
         put "/bikes/#{bike.to_param}", params: {bike: {owner_email: "new_email@stuff.com"}}
       }.to change(Ownership, :count).by 1
-      get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      get "#{base_url}/remove?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
-      expect(response).to render_template(:ownership)
+      expect(response).to render_template(:remove)
       expect(assigns(:new_email_assigned)).to be_falsey
       expect(assigns(:bike).owner_email).to eq "new_email@stuff.com"
     end
   end
   context "stolen bike" do
-    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: bike_creator) }
     it "renders" do
       get base_url
       expect(flash).to be_blank

@@ -23,11 +23,13 @@ module BikeHelper
     end
   end
 
-  def bike_status_span(bike)
-    return "" if bike.status_with_owner?
+  def bike_status_span(bike, override_to_for_sale: false)
+    status_humanized = override_to_for_sale ? "for sale" : bike.status_humanized
+    return "" if status_humanized == "with owner" # for sale is status_with_owner
+
     content_tag(:strong,
-      bike.status_humanized_translated,
-      class: "#{bike.status_humanized.tr(" ", "-")}-color uppercase bike-status-html")
+      Bike.status_humanized_translated(status_humanized),
+      class: "#{status_humanized.tr(" ", "-")}-color uppercase bike-status-html")
   end
 
   def bike_thumb_image(bike)
@@ -49,7 +51,7 @@ module BikeHelper
       concat(content_tag(:strong, year_and_mnfg))
       concat(" #{bike.frame_model_truncated}") if bike.frame_model.present?
       if bike.type != "bike"
-        concat(content_tag(:em, " #{bike.type&.titleize}"))
+        concat(content_tag(:em, " #{bike.type_titleize}"))
       end
     end
   end

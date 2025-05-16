@@ -7,6 +7,7 @@
 }
 
 @layer components {
+
   .twlink {
     @apply tw:text-blue-500 tw:underline;
   }
@@ -35,7 +36,7 @@
   }
 
   .twinput {
-    @apply tw:bg-white tw:border tw:border-gray-300 tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:rounded-lg
+    @apply tw:bg-white tw:border tw:border-gray-300 tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:rounded-sm
       tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
       tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-blue-400 tw:focus-visible:border-blue-400 tw:dark:focus-visible:ring-blue-500 tw:dark:focus:border-blue-500
       tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
@@ -54,7 +55,7 @@
 }
 
 body {
-  @apply tw:antialiased tw:text-gray-900 tw:font-sans;
+  @apply tw:antialiased tw:font-sans tw:text-gray-900;
 }
 /*
   'dark:' syntax isn't working for the body element, unclear why - hacking with this for now
@@ -63,6 +64,14 @@ body.dark {
   @apply tw:bg-gray-900 tw:text-gray-400;
 }
 
+/* TODO: use this in the body instead of separately */
+.twtext-color {
+  @apply tw:text-gray-900 tw:dark:text-gray-400;
+}
+
+.twtext-color\! {
+  @apply tw:text-gray-900! tw:dark:text-gray-400!;
+}
 
 
 /* select2 is used by everythingcombox. Here are styles to make it look like the other inputs */
@@ -76,7 +85,7 @@ body.dark {
 }
 
 .select2-container .select2-dropdown, .select2-container.select2-container--default .select2-selection--multiple {
-  @apply tw:bg-white tw:dark:bg-gray-700 tw:rounded-lg
+  @apply tw:bg-white tw:dark:bg-gray-700 tw:rounded-sm
     tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200;
 }
 
@@ -99,4 +108,24 @@ body.dark {
   .select2-selection--multiple
   .select2-selection__rendered {
   padding: 0 !important;
+}
+
+/* This is a container that matches the width of the bootstrap container */
+.twbootcontainer {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+@media (min-width: 544px) {
+  .twbootcontainer { max-width: 576px; }
+}
+@media (min-width: 768px) {
+  .twbootcontainer { max-width: 720px; }
+}
+@media (min-width: 992px) {
+  .twbootcontainer { max-width: 940px; }
+}
+@media (min-width: 1200px) {
+  .twbootcontainer { max-width: 1140px; }
 }

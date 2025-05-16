@@ -773,7 +773,7 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "claimed" do
-        let(:superuser) { FactoryBot.create(:admin) }
+        let(:superuser) { FactoryBot.create(:superuser) }
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: superuser, creator: FactoryBot.create(:user_confirmed)) }
         it "returns true for user, not creator" do
           expect(bike.reload.current_ownership.creator_id).to_not eq superuser.id
@@ -1330,7 +1330,7 @@ RSpec.describe Bike, type: :model do
           bike.reload
           expect(bike.registration_address_source).to eq "user"
           expect(bike.address_hash["city"]).to eq "Lancaster" # Because it's set on the bike
-          expect(bike.registration_address(true)).to eq user.address_hash
+          expect(bike.registration_address(true)).to eq user.address_hash_legacy
           expect(bike.registration_address["city"]).to eq "Vancouver"
         end
       end
@@ -1388,20 +1388,20 @@ RSpec.describe Bike, type: :model do
     end
     context "with user with address" do
       let(:country) { Country.united_states }
-      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      let(:state) { FactoryBot.create(:state_new_york) }
       let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007", address_set_manually: true) }
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do
-        expect(user.address_hash).to eq default_location_registration_address
+        expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil)
         bike.reload
         expect(bike.registration_address_source).to eq "user"
-        expect(bike.registration_address(true)).to eq default_location_registration_address
+        expect(bike.registration_address(true)).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil)
       end
       context "ownership creator" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: FactoryBot.create(:user_confirmed)) }
         it "returns nothing" do
-          expect(user.address_hash).to eq default_location_registration_address
+          expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil)
           expect(bike.user).to_not eq user
           expect(bike.registration_address_source).to be_blank
           expect(bike.registration_address.values.compact).to eq([])
@@ -1474,7 +1474,7 @@ RSpec.describe Bike, type: :model do
   describe "mnfg_name" do
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Racing (S E Bikes)") }
     let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-    it "is the simple_name" do
+    it "is the short_name" do
       expect(bike.reload.mnfg_name).to eq "SE Racing"
     end
     context "manufacturer_other blank" do
@@ -1623,11 +1623,11 @@ RSpec.describe Bike, type: :model do
 
   describe "title_string" do
     it "escapes correctly" do
-      bike = Bike.new(frame_model: "</title><svg/onload=alert(document.cookie)>")
+      bike = Bike.new(frame_model: "</title><svg/onload=alert(document.cookie)>", cycle_type: :cargo)
       allow(bike).to receive(:mnfg_name).and_return("baller")
-      allow(bike).to receive(:type).and_return("bike")
       expect(bike.title_string).not_to match("</title><svg/onload=alert(document.cookie)>")
       expect(bike.title_string.length).to be > 5
+      expect(bike.display_name).to eq "Cargo Bike"
     end
   end
 
@@ -1857,7 +1857,8 @@ RSpec.describe Bike, type: :model do
     context "given no creation org location" do
       let(:city) { "New York" }
       let(:zipcode) { "10011" }
-      let(:user) { FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa, city: city) }
+      let(:address_record) { FactoryBot.create(:address_record, :new_york) }
+      let(:user) { FactoryBot.create(:user_confirmed, address_record:) }
       let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"}) }
       let(:bike) { ownership.bike }
       it "takes location from the creation state" do
@@ -1899,7 +1900,7 @@ RSpec.describe Bike, type: :model do
           bike.set_location_info
           expect(bike.skip_geocoding).to be_truthy
 
-          expect(bike.address_hash).to eq user.address_hash
+          expect(bike.address_hash).to eq user.address_hash_legacy
           expect(bike.street).to eq user.street
           expect(bike.address_set_manually).to be_falsey # Because it's set by the user
         end

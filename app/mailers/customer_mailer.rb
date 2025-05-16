@@ -79,7 +79,7 @@ class CustomerMailer < ApplicationMailer
     @customer_contact = customer_contact
     @info = customer_contact.info_hash
     @bike = customer_contact.bike
-    @bike_type = @bike.cycle_type_name&.downcase
+    @bike_type = @bike.type
     @user = @customer_contact.user
 
     @location = @info["location"]
@@ -198,6 +198,23 @@ class CustomerMailer < ApplicationMailer
       mail(to: @user.email,
         from: '"Gavin Hoover" <gavin@bikeindex.org>',
         tag: __callee__)
+    end
+  end
+
+  def marketplace_message_notification(marketplace_message)
+    @marketplace_message = marketplace_message
+    @user = @marketplace_message.receiver
+    @marketplace_listing = @marketplace_message.marketplace_listing
+    # TODO: Specific layout for these, rather than just skipping header
+    @skip_header = true
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @user.email,
+        subject: @marketplace_message.subject,
+        references: @marketplace_message.email_references_id,
+        tag: __callee__
+      )
     end
   end
 end

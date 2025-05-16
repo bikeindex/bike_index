@@ -265,7 +265,7 @@ RSpec.describe CredibilityScorer do
     end
     describe "long_time_user" do
       let(:user) { FactoryBot.create(:user, created_at: Time.current - 3.years) }
-      it "returns veteran" do
+      it "returns veteran", :flaky do
         expect(subject.bike_user_badges(bike)).to eq([:long_time_user])
         # Also, just test for the full thing, because curiosity
         expect(instance.badges).to eq([:long_time_registration, :current_ownership_claimed, :long_time_user])

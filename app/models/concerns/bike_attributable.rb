@@ -10,9 +10,12 @@ module BikeAttributable
     belongs_to :front_wheel_size, class_name: "WheelSize"
     belongs_to :rear_gear_type
     belongs_to :front_gear_type
+    belongs_to :primary_activity
 
     has_many :public_images, as: :imageable, dependent: :destroy
     has_many :components
+    has_many :ctypes, -> { distinct }, through: :components
+    has_many :cgroups, -> { distinct }, through: :ctypes
 
     accepts_nested_attributes_for :components, allow_destroy: true
 
@@ -39,6 +42,8 @@ module BikeAttributable
 
   def status_humanized
     return "found" if status_found?
+    return "for sale" if status == "status_with_owner" && is_for_sale?
+
     Bike.status_humanized(status)
   end
 
@@ -48,6 +53,7 @@ module BikeAttributable
 
   def status_humanized_no_with_owner
     return "" if status == "status_with_owner"
+
     status_humanized
   end
 
@@ -76,19 +82,13 @@ module BikeAttributable
     ].compact
   end
 
-  # list of cgroups so that we can arrange them
-  def cgroup_array
-    components.map(&:cgroup_id).uniq
-  end
-
-  # Small helper because we call this a lot
+  # When displaying the cycle_type, generally this is what you want
   def type
-    cycle_type && cycle_type_name&.downcase
+    type_titleize&.downcase
   end
 
   def type_titleize
-    return "" unless type.present?
-    CycleType.slug_translation(cycle_type)
+    cycle_type_obj&.short_name_translation
   end
 
   def propulsion_titleize
@@ -131,15 +131,35 @@ module BikeAttributable
   end
 
   def cycle_type_name
-    CycleType.new(cycle_type)&.name
+    return nil if cycle_type.blank?
+
+    CycleType.slug_translation(cycle_type)
+  end
+
+  def cycle_type_obj
+    CycleType.new(cycle_type)
   end
 
   def not_cycle?
     CycleType.not_cycle?(cycle_type)
   end
 
+  def fixed_gear?
+    rear_gear_type_id == RearGearType.fixed.id
+  end
+
   def propulsion_type_name
     PropulsionType.new(propulsion_type).name
+  end
+
+  def drivetrain_attributes
+    d_slugs = []
+    d_slugs << "coaster_brake" if coaster_brake
+    d_slugs << "belt_drive" if belt_drive
+
+    d_slugs.map do |d_slug|
+      I18n.t(d_slug, scope: %i[activerecord bike_attributable drivetrain_attributes])
+    end.join(", ")
   end
 
   # NB: val can be a propulsion_type OR [nil, :motorized] (see spec)

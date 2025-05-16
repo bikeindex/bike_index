@@ -148,7 +148,7 @@ ignore_unused:
   - "activerecord.attributes.*"
   - "activerecord.enums.*"
   - "activerecord.select_options.*"
-  - "activerecord.status_humanized.*"
+  - "activerecord.bike_attributable.*"
   - "attributes.*"
   - "{devise,doorkeeper,gflash}.*"
   - "simple_form.{yes,no}"

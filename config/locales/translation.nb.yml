@@ -211,6 +211,9 @@ nb:
         unsupported_response_mode: Autorisasjonsserveren støtter ikke denne responsmodusen.
         unsupported_response_type: Autoriseringsserveren har ikke støtte for denne
           responstypen.
+        user_removed: "(bruker fjernet)"
+        re: 'Sv: %{original_subject}'
+        user_not_in_initial_record: brukeren er ikke en av de opprinnelige meldingsbrukerne
       models:
         doorkeeper/application:
           attributes:
@@ -251,6 +254,13 @@ nb:
         user:
           email_already_exists: Den e-posten er allerede registrert på Bike Index.
           not_an_available_language: ikke et tilgjengelig språk
+        marketplace_listing:
+          address_required: Plassering er obligatorisk – vennligst angi minst én by
+          condition_required: Betingelse er påkrevd
+          item_not_visible: "%{item_type} er ikke synlig – kanskje du markerte den
+            som skjult?"
+          price_required: Pris er påkrevd
+          primary_activity_required: Primæraktivitet er påkrevd
       organization:
         duplicate_short_name: allerede i bruk av en annen organisasjon. Hvis du ikke
           synes det burde være tilfelle, kontakt support@bikeindex.org
@@ -887,6 +897,13 @@ nb:
         eur: EUR
         mxn: MXN
         usd: USD
+      marketplace_listing:
+        condition:
+          excellent: glimrende
+          good: god
+          new_in_box: ny i esken
+          salvage: berging
+          poor: dårlig - trenger service
     models:
       ad: Annonse
       ambassador: Ambassadør
@@ -1036,14 +1053,19 @@ nb:
         two_u_locks: To U-låser
         u_lock: U-lås
         u_lock_and_cable: U-lås og kabel
-    status_humanized:
-      bike:
-        abandoned: forlatt
-        found: funnet
-        impounded: beslaglagt
-        stolen: stjålet
-        unregistered: uregistrert
-        with_owner: med eier
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive: Remdrift
+        coaster_brake: Coaster brems
+      status_humanized:
+        bike:
+          abandoned: forlatt
+          for_sale: til salgs
+          found: funnet
+          impounded: beslaglagt
+          stolen: stjålet
+          unregistered: uregistrert
+          with_owner: med eier
   datetime:
     distance_in_words:
       half_a_minute: et halvt minutt
@@ -1827,6 +1849,18 @@ nb:
       wheel_diameter: Hjuldiameter
       year: år
       vehicle_type: Bil type
+      primary_activity: Primæraktivitet
+      abandoned_title: Dette er en forlatt %{bike_type} som var %{impound_kind}
+      component_no_info: "-"
+      drivetrain: Drivverk
+      drivetrain_fixed: Fast utstyr
+      drivetrain_front: Drivverk foran
+      drivetrain_rear: Drivverk bak
+      front_tire_width: Bredde på forhjulet
+      rear_tire_width: Bredde på forhjulet
+      tire_width: Dekkbredde
+      tire_width_narrow_false: Bredt dekk
+      tire_width_narrow_true: Smalt dekk
     new:
       additional_serial_sticker_number: Ekstra serie-/klistremerkenummer
       affiliation: "%{org_name} tilknytning"
@@ -2034,6 +2068,9 @@ nb:
       write_them_a_message: Skriv en melding til dem
       you_scanned_this_sticker_html: Du skannet klistremerket <strong>%{pretty_code}</strong>
         , som er tilordnet denne %{bike_type}.
+      view_public_non_listing: Se offentlig registrering
+      viewing_listing_preview: Dette er en forhåndsvisning av annonsen din som er
+        «til salgs». Den er ikke offentlig synlig.
     stolen_checklist:
       a_photo_of_your_bike_type: et bilde av din %{bike_type}
       add: Legg til
@@ -2173,6 +2210,9 @@ nb:
         state: Stat
         where_was_it_stolen_type: Hvor var det %{stolen_type}?
         zipcode: Postnummer
+      primary_activity:
+        choose_activity: Velg aktivitet
+        primary_activity: Primæraktivitet
     drivetrain:
       belt_drive: Remdrift
       coaster_brake: Coaster Brems
@@ -2211,20 +2251,6 @@ nb:
       groups_and_organizations: Grupper og organisasjoner
       other_organizations: Andre organisasjoner
       remove: Fjerne
-    ownership:
-      enter_new_owner_email_to_transfer: Skriv inn den nye eierens e-postadresse for
-        å overføre registreringen.
-      impound_record_page: Beslagleggingsside
-      new_email_assigned_save_to_update: En ny e-post legges inn, klikk "lagre endringer"
-        for å overføre.
-      sell_trade_or_give_away_this_bike: Selger, bytter eller gir du bort denne %{bike_type}?
-      this_bike_is_currently_impounded_html: Denne %{bike_type} er for øyeblikket
-        beslaglagt med beslaglagt post <strong>#%{impound_record_id}</strong> . Hvis
-        du oppdaterer e-postadressen her, <em class="text-warning">vil %{bike_type}
-        fortsatt bli beslaglagt</em> .
-      to_transfer_use_impound_record_page_html: Hvis du ønsker å overføre sykkelen
-        til en ny eier, oppdater den med "Overført til ny eier" fra %{link_to_impound_record_page}.
-      transfer_ownership: Overføre eierskap
     photos:
       drag_and_drop_files_here_html: Dra og slipp filer her eller bruk <strong>Last
         opp bilder-</strong> knappen
@@ -2265,6 +2291,22 @@ nb:
         for å vise og skjule en sykkel.
       you_can_read_more_html: Du kan lese mer om hvorfor dette er viktig for oss i
         vår %{faq_link}.
+      delete_registration: Slett denne registreringen
+      enter_new_owner_email_to_transfer: Skriv inn den nye eierens e-postadresse for
+        å overføre registreringen.
+      hide_registration: Skjul denne registreringen
+      impound_record_page: Beslagleggingsside
+      new_email_assigned_save_to_update: En ny e-post legges inn, klikk "lagre endringer"
+        for å overføre.
+      save_changes: Oppdater eierskap
+      sell_trade_or_give_away_this_bike: Selger, bytter eller gir du bort denne %{bike_type}?
+      this_bike_is_currently_impounded_html: Denne %{bike_type} er for øyeblikket
+        beslaglagt med beslaglagt post <strong>#%{impound_record_id}</strong> . Hvis
+        du oppdaterer e-postadressen her, <em class="text-warning">vil %{bike_type}
+        fortsatt bli beslaglagt</em> .
+      to_transfer_use_impound_record_page_html: Hvis du ønsker å overføre sykkelen
+        til en ny eier, oppdater den med "Overført til ny eier" fra %{link_to_impound_record_page}.
+      transfer_ownership: Overføre eierskap
     report_recovered:
       can_we_share_your_story: Kan vi dele historien din?
       did_we_help: Har vi hjulpet til?
@@ -2329,6 +2371,24 @@ nb:
       wide: Bred
       wide_help: "> 38 mm (1,5 tommer)"
       wide_title: Dekk som er minst 39 mm (1,5 tommer) brede
+    marketplace:
+      choose_condition: Velg tilstand
+      condition: Betingelse
+      price: Pris
+      add_required_information: Legg til nødvendig informasjon (tilstand, pris, adresse)
+      description: Beskrivelse
+      listing_draft: Utkast til oppføring
+      listing_is_published: Oppføringen er publisert
+      optional: valgfri
+      preview_it: Forhåndsvis oppføringen
+      price_is_negitiable: Prisen er omsettelig
+      publish_listing: publiser oppføring
+      publish_listing_when_ready: Publiser annonsen når du er klar til å selge!
+      sale_description_html: Tilleggsinformasjon spesifikk for salget. Skriv inn informasjon
+        om %{item_type_display} <a href="%{edit_item_path}">her</a> .
+      save_to_preview: Lagre oppføringen for å kunne forhåndsvise den
+      view_listing: Se oppføringen din
+      why_are_you_selling: Hvorfor selger du dette? Hva bør en potensiell kjøper vite?
   controllers:
     application:
       handle_unverified_request:
@@ -2357,7 +2417,6 @@ nb:
         drivetrain: Hjul og drivverk
         found_details: Informasjon om å finne
         groups: Grupper og organisasjoner
-        ownership: Overføre eierskap
         photos: Bilder
         publicize: Del på sosiale medier
         remove: Skjul eller Slett
@@ -2365,6 +2424,9 @@ nb:
         report_stolen: Meld stjålet eller savnet
         theft_details: Tyveridetaljer
         versions: Versjoner
+        remove_or_transfer: Overfør, skjul eller slett
+        marketplace_list: Liste til salgs
+        marketplace_on_sale: Oppdater markedsplassoppføring
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: Det %{bike_type} er ikke gjort krav på ennå.
           Hvis det er din %{bike_type}, registrer deg og du vil kunne redigere den!
@@ -2459,6 +2521,10 @@ nb:
         current_password_doesnt_match: Gjeldende passord stemmer ikke, det er nødvendig
           for å oppdatere passordet ditt.
         successfully_updated: Informasjonen din ble oppdatert.
+      messages:
+        create:
+          can_not_send_message: Beklager, du kan ikke sende en melding til den oppføringen
+          message_sent: Melding sendt
     oauth:
       applications:
         ensure_app_owner!:
@@ -2667,6 +2733,12 @@ nb:
           til support@bikeindex.org hvis du har spørsmål.
         no_active_membership: Du har ikke et aktivt medlemskap, du må registrere deg
           for et nytt.
+    marketplace_listings:
+      ensure_user_allowed_to_edit!:
+        you_dont_own_that: Å nei! Det ser ut som du ikke eier den %{item_type}.
+      update:
+        item_published_for_sale: Din %{item_type} er publisert. Den er nå lagt ut
+          for salg!
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4200,13 +4272,14 @@ nb:
       log_in: Logg Inn
       logout: Logg ut
       register_a_new_bike: Registrer en ny sykkel
-      search_bikes: Søk etter sykler
       sign_up: Melde deg på
       stolen_bike: Stjålet sykkel?
       the_nonprofit_bike_registry: det ideelle sykkelregisteret
       user_settings: "%{user_email}-innstillinger"
       view_org: Se %{org_name}
-      your_bikes: Syklene dine
+      search: Søk
+      marketplace_messages: Markedsplassmeldinger
+      your_registrations: Dine registreringer
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub-kontoer er drevet av Bike Index – det
         fremste sykkelregisteret.
@@ -4229,7 +4302,6 @@ nb:
     embed_layout:
       error: feil
       please_fix_the_following: Rett opp følgende
-      register_through_org: Registrer en sykkel gjennom %{org_name}
     payments_layout:
       be_a_bike_saver: Vær en sykkelsparer.
       support_bike_index_today: Støtt Bike Index i dag.
@@ -4269,22 +4341,6 @@ nb:
       pinhead_locking_skewer_key: Pinhead låsende spyd nøkkel
       small_kryptonite_key: Liten Kryptonite-nøkkel
       update_the_lock: Oppdater låsen!
-    lock_home:
-      add_a_new_lock: Legg til en ny lås
-      any_lock_information_you_enter_on_bike_in: All låsinformasjon du legger inn
-        på Bike Index er privat og kun synlig for deg.
-      if_you_want_you_can_save_serial_html: Hvis du vil, kan du <strong>lagre serienumrene
-        til nøklene dine</strong> på Bike Index – slik at du ikke er uheldig hvis
-        du mister dem.
-      lock_keys_often_have_serial_numbers_so_yo: Låsnøkler har ofte serienummer, så
-        du kan bestille erstatninger hvis du mister nøklene.
-      lock_type: Lås type
-      manufacturer: Produsent
-      save_information_about_a_lock: Lagre informasjon om en lås
-      save_information_about_your_bike_lock: Lagre informasjon om sykkellåsen din!
-      you_can_also_record_your_lock_html: Du kan også <strong>registrere låsekombinasjonene
-        dine</strong> .
-      your_locks: Låsene dine
     new:
       save_information_about_one_of_your_locks: Lagre informasjon om en av låsene
         dine
@@ -4339,6 +4395,8 @@ nb:
       ble verdens største åpne sykkelregistreringstjeneste
     users_new: Registrer deg for Bike Index
     welcome_index: 'Det beste sykkelregisteret: Enkelt, sikkert og gratis.'
+    registrations_embed: Innebygd %{organization} Bike Index registreringsskjema.
+      Registrer sykkelen din gratis, akkurat nå
   meta_titles:
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
@@ -4381,6 +4439,7 @@ nb:
     welcome_index: Bike Index - Sykkelregistrering som fungerer
     my_accounts_show: Du på Bike Index
     search_registrations_index: Søkeresultater
+    registrations_embed: Registrer en sykkel med %{organization}
   money:
     currencies:
       en: USD
@@ -4424,13 +4483,10 @@ nb:
       add_additional_email: Legg til ekstra e-post
       add_new_phone_number: Legg til et nytt telefonnummer
       additional_email: Ytterligere e-post
-      address: gateadresse
       any_use_of_your_personal_information_html: All bruk av din personlige informasjon
         er underlagt vilkårene i vår %{privacy_policy}. Vi selger, bytter eller leier
         ikke ut personopplysningene dine.
-      choose_country: Velg land
       choose_language: Velg språk
-      city: By
       confirmed_emails: Bekreftede e-poster
       daily_hot_sheet_notifications_html: Motta daglig <em>%{org_name}</em> %{hot_sheets_link}
       give_us_permission_html: Gi oss tillatelse til å kontakte deg hvis vi tror sykkelen
@@ -4447,13 +4503,11 @@ nb:
       remove_email: Fjern e-post
       remove_number: fjerne nummeret
       resend_confirmation: Send bekreftelse på nytt
-      state: Stat
       stolen_hot_sheets: Stjålet Bike Hot Sheets
       unconfirmed: ubekreftet!
       unconfirmed_emails: Ubekreftede e-poster
       verified: verifisert
       why_you_should_text: Les hvorfor du bør
-      zipcode: Postnummer
       time_single_format: Vis kun datoer
       time_single_format_small: "(ikke i dag, i går osv.)"
     sharing:
@@ -4503,7 +4557,6 @@ nb:
         -
       ignore: overse
       key_serial: Nøkkelserie
-      list_a_bike_on_bikefair: List en sykkel på BikeFair
       location: plassering
       lock_type: Lås type
       locks: låser
@@ -4523,18 +4576,29 @@ nb:
         deg!
       update_your_profile: Oppdater profilen din
       updated: Oppdatert
-      user_bikes: "%{current_user_name} sykler"
       user_hidden: Skjult for andre brukere
-      want_to_sell_your_bikes: Vil du selge en av dine registrerte sykler?
       welcome: Velkommen
       you_have_no_registered_bikes: Du har ingen registrerte sykler
       you_have_no_registered_locks: Du har ingen registrerte låser
+      header_title: "%{current_user_name} på Bike Index"
+      membership_subtitle: Takk for at du er medlem av Bike Index %{level}!
     delete_account:
       delete_account: Slett konto
       delete_my_account: Slett kontoen min og alle mine registrerte sykler
       delete_warning_html: "<strong>Advarsel!</strong> Denne handlingen kan ikke angres!"
       modal_title: Er du sikker på at du vil slette kontoen din?
       nevermind: Glem det
+    messages:
+      form:
+        body_placeholder: Legg til litt meldingstekst
+        message: beskjed
+        new_message: Ny melding
+        reply_to_message: Svar på melding
+        send_message: Sende melding
+      index:
+        marketplace_messages: Markedsplassmeldinger
+      show:
+        can_not_send_new_message: Beklager, du kan ikke sende en ny melding.
   news:
     index:
       bike_index_blog: Sykkelindeksblogg
@@ -5875,3 +5939,39 @@ nb:
         stolenness_proximity: Stjålet i søkeområdet
         stolenness_stolen: Stjålet hvor som helst
         within: innenfor
+    legacy_form_well:
+      address_record:
+        address: gateadresse
+        address_school: Campus postadresse
+        choose_country: Velg land
+        city: By
+        postal_code: postnummer
+        region: Region/provins
+        state: Stat
+        your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
+        address_no_street: Adresse
+      address_record_with_default:
+        edit_my_account_path: redigering på kontoen min
+        use_account_address: Bruk kontoadresse
+    definition_list:
+      row:
+        no_value: ingen
+    page_section:
+      marketplace_listing_panel:
+        condition: Betingelse
+        description: Beskrivelse
+        first_posted_at: Postet
+        location: plassering
+        price_is_firm_false: Prisen er omsettelig
+        price_is_firm_true: prisen er fast
+        still_for_sale_at: Selger fortsatt på
+    alert_for_errors:
+      errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
+        %{object_name} ble lagret:"
+    messages:
+      thread:
+        from: Fra
+        me: meg
+        to: Til
+      thread_show:
+        subject: Emne

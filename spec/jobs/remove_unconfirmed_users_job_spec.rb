@@ -29,7 +29,7 @@ RSpec.describe RemoveUnconfirmedUsersJob, type: :job do
       let!(:user) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "something@zzz.example.com") }
       let!(:user_not_domain) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "other@example.org") }
       let!(:user_pending_domain) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "other@stuff.stuff.com") }
-      let(:creator) { FactoryBot.create(:admin) }
+      let(:creator) { FactoryBot.create(:superuser) }
       let!(:email_domain_banned) { FactoryBot.create(:email_domain, status: "banned", domain: "example.com", creator:) }
       let!(:email_domain_pending) { FactoryBot.create(:email_domain, status: "provisional_ban", domain: "stuff.com", creator:) }
 

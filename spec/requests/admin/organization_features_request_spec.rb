@@ -57,7 +57,7 @@ RSpec.describe Admin::OrganizationFeaturesController, type: :request do
         expect(subject.feature_slugs).to eq([])
       end
       context "developer" do
-        let(:current_user) { FactoryBot.create(:admin_developer) }
+        let(:current_user) { FactoryBot.create(:superuser_developer) }
         it "does not update feature_slugs" do
           put "#{base_url}/#{subject.to_param}", params: {organization_feature: passed_params.merge(feature_slugs_string: "csv_exports, ,pARKinG_notifications, blarg")}
           subject.reload
@@ -75,7 +75,7 @@ RSpec.describe Admin::OrganizationFeaturesController, type: :request do
         passed_params.each { |k, v| expect(subject.send(k)).to_not eq(v) }
       end
       context "developer" do
-        let(:current_user) { FactoryBot.create(:admin_developer) }
+        let(:current_user) { FactoryBot.create(:superuser_developer) }
         it "does not update feature_slugs" do
           patch "#{base_url}/#{subject.to_param}", params: {organization_feature: passed_params.merge(feature_slugs_string: "csv_exports, parkiNG_NOTifications, blarg")}
           subject.reload
@@ -96,7 +96,7 @@ RSpec.describe Admin::OrganizationFeaturesController, type: :request do
       expect(organization_feature.feature_slugs).to eq([])
     end
     context "developer" do
-      let(:current_user) { FactoryBot.create(:admin_developer) }
+      let(:current_user) { FactoryBot.create(:superuser_developer) }
       it "succeeds" do
         expect {
           post base_url, params: {organization_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import")}

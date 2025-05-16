@@ -2,18 +2,50 @@ class BikeUpdatorError < StandardError
 end
 
 class BikeUpdator
-  def initialize(creation_params = {})
-    @user = creation_params[:user]
-    @bike_params = creation_params[:b_params]
-    @bike = creation_params[:bike] || find_bike
-    @current_ownership = creation_params[:current_ownership]
-    @currently_stolen = @bike.status_stolen?
+  class << self
+    def permitted_params(params, bike, user)
+      # TODO: improve this entire thing. Maybe using BParam.safe_bike_attrs
+      # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
+      pparams = {
+        bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)
+      }
+      # Have to remove the parameters in case we aren't creating/updating
+      current_marketplace_listing = permitted_marketplace_listing_params(
+        pparams[:bike].delete(:current_marketplace_listing_attributes), bike, user
+      )
+      if current_marketplace_listing.present?
+        pparams[:bike][:current_marketplace_listing_attributes] = current_marketplace_listing
+      end
+
+      pparams.as_json
+    end
+
+    private
+
+    def permitted_marketplace_listing_params(marketplace_listing_attributes, bike, user)
+      return false if marketplace_listing_attributes.blank?
+      return false unless user.can_create_listing? || bike.current_marketplace_listing&.id.present?
+
+      if bike.current_marketplace_listing.present?
+        marketplace_listing_attributes[:id] = bike.current_marketplace_listing.id
+      end
+
+      if InputNormalizer.boolean(marketplace_listing_attributes[:address_record_attributes][:user_account_address])
+        marketplace_listing_attributes.delete(:address_record_attributes)
+        # NOTE: Not user, or else admin edits overwrite the user's address
+        marketplace_listing_attributes[:address_record_id] = bike.user&.address_record_id
+      end
+
+      marketplace_listing_attributes
+    end
   end
 
-  def find_bike
-    Bike.unscoped.find(@bike_params["id"])
-  rescue
-    raise BikeUpdatorError, "Oh no! We couldn't find that bike"
+  def initialize(user:, bike:, current_ownership: nil, params: nil, permitted_params: nil)
+    @user = user
+    @bike = bike
+    @bike_params = permitted_params || self.class.permitted_params(params, bike, user)
+    @current_ownership = current_ownership
+    @currently_stolen = @bike.status_stolen?
   end
 
   def update_ownership
@@ -33,9 +65,12 @@ class BikeUpdator
     end
     # If updator is a member of the creation organization, add org to the new ownership!
     ownership_org = @bike.current_ownership&.organization
+    # If previous ownership was with_owner, this should be too
+    status = "status_with_owner" if @bike.current_ownership&.status_with_owner?
     @bike.ownerships.create(owner_email: new_owner_email,
       creator: @user,
       origin: "transferred_ownership",
+      status:,
       organization: @user&.member_of?(ownership_org) ? ownership_org : nil,
       skip_email: @bike_params.dig("bike", "skip_email"))
 
@@ -86,7 +121,7 @@ class BikeUpdator
       update_stolen_record
       update_impound_record
     end
-    AfterBikeSaveJob.perform_async(@bike.id) if @bike.present? # run immediately
+    ::Callbacks::AfterBikeSaveJob.perform_async(@bike.id) if @bike.present? # run immediately
     remove_blank_components
     @bike
   end
