@@ -17,6 +17,7 @@ module Messages::Thread
     private
 
     def message_path
+      # NOTE: This path, with anchor, is also used in the marketplace_message_notification mailer
       my_account_message_path(id: @initial_record.id, anchor: "message-#{@marketplace_message.id}")
     end
 
