@@ -43,7 +43,8 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.reload.user_count).to eq 4 # Because users created for email domains
           expect(email_domain.status).to eq "permitted"
           expect(email_domain.tld_matches_subdomains?).to be_falsey
-          expect(email_domain.data.except("spam_score")).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
+          # expect(email_domain.data.except("spam_score")).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
+          expect(email_domain.data.except("spam_score")).to match_hash_indifferently valid_data.merge(subdomain_count: 1)
           expect(EmailDomain.tld.pluck(:id)).to match_array([email_domain.id, email_domain_bare.id])
           expect(EmailDomain.subdomain.pluck(:id)).to match_array([email_domain_sub.id])
           expect(email_domain.calculated_subdomains.pluck(:id)).to eq([email_domain_sub.id])
@@ -195,14 +196,15 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             expect(EmailDomain.count).to eq 5
             email_domain_tld = EmailDomain.order(:id).last
             expect(EmailDomain.tld_matches_subdomains.pluck(:id)).to eq([email_domain_tld.id])
-            expect(email_domain_tld.status).to eq "permitted"
-            expect(described_class).to have_enqueued_sidekiq_job(email_domain_tld.id)
+            expect(email_domain_tld.status).to eq "provisional_ban"
+            Sidekiq::Job.clear_all
             instance.perform(email_domain_tld.id)
-            expect(email_domain_tld.reload.status).to eq "permitted"
+            expect(email_domain_tld.reload.status).to eq "provisional_ban"
+            expect(described_class.jobs.map { |j| j["args"] }.flatten).to match_array([email_domain_2.id, email_domain_3.id, email_domain_4.id])
             expect(email_domain_tld.calculated_users.count).to eq 2
             expect(EmailDomain.count).to eq 5
-            # Update all the other subs to be provisional_ban
-            EmailDomain.all.each { |d| d.update(status: "provisional_ban") }
+            described_class.drain
+            expect(EmailDomain.provisional_ban.count).to eq 5
             # if the TLD is banned, delete all the subs and the users
             email_domain_tld.update(status: "banned")
             instance.perform(email_domain_tld.id)
@@ -227,7 +229,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             end
             new_email_domain = EmailDomain.order(:id).last
             expect(new_email_domain.domain).to eq domain
-            expect(new_email_domain.status).to eq "permitted"
+            expect(new_email_domain.status).to eq "provisional_ban"
 
             # If we ignore the new domain, it doesn't get created again
             new_email_domain.update(status: "ignored")

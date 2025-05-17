@@ -118,24 +118,24 @@ RSpec.describe EmailBan, type: :model do
         end
       end
 
-      # context "with TLD with provisional_ban" do
-      #   let(:tld_status) { "provisional_ban" }
-      #   it "matches the tld domain, creates a ban" do
-      #     VCR.use_cassette("email_ban_process_email_domain-tld") do
-      #       UpdateEmailDomainJob.new.perform(email_domain_tld.id)
-      #       UpdateEmailDomainJob.new.perform(email_domain.id)
-      #       expect(email_domain_tld.reload.tld_matches_subdomains?).to be_truthy
-      #       expect(email_domain.reload.tld).to eq email_domain_tld.domain
+      context "with TLD with provisional_ban" do
+        let(:tld_status) { "provisional_ban" }
+        it "matches the tld domain, creates a ban" do
+          VCR.use_cassette("email_ban_process_email_domain-tld") do
+            UpdateEmailDomainJob.new.perform(email_domain_tld.id)
+            UpdateEmailDomainJob.new.perform(email_domain.id)
+            expect(email_domain_tld.reload.tld_matches_subdomains?).to be_truthy
+            expect(email_domain.reload.tld).to eq email_domain_tld.domain
 
-      #       expect do
-      #         expect(EmailBan.ban?(user)).to be_truthy
-      #       end.to change(EmailDomain, :count).by(0)
-      #         .and change(EmailBan, :count).by(1)
-      #       expect(email_domain.calculated_users.count).to_not eq email_domain.user_count # Verify it still hasn't been processed
-      #       expect(UpdateEmailDomainJob.jobs.count).to eq 1
-      #     end
-      #   end
-      # end
+            expect do
+              expect(EmailBan.ban?(user)).to be_truthy
+            end.to change(EmailDomain, :count).by(0)
+              .and change(EmailBan, :count).by(1)
+            expect(email_domain.calculated_users.count).to_not eq email_domain.user_count # Verify it still hasn't been processed
+            expect(UpdateEmailDomainJob.jobs.count).to eq 1
+          end
+        end
+      end
     end
   end
 end

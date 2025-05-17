@@ -47,11 +47,11 @@ class UpdateEmailDomainJob < ScheduledJob
     elsif email_domain.banned? && email_domain.user_count > 0
       email_domain.calculated_subdomains.each(&:destroy)
       email_domain.calculated_users.find_each { |user| user.really_destroy! }
+    elsif email_domain.provisional_ban? && email_domain.tld_matches_subdomains?
+      email_domain.calculated_subdomains.where.not(status: email_domain.status).pluck(:id)
+        .each { UpdateEmailDomainJob.perform_async(_1) }
     end
-
-    if email_domain.tld_matches_subdomains? && %w[provisional_ban banned].include?(email_domain.status)
-      fail # Update all the subdomains to match status
-    end
+    email_domain
   end
 
   private
