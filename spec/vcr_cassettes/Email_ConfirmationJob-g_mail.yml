@@ -187,4 +187,130 @@ http_interactions:
       encoding: UTF-8
       string: '{"errors":[{"field":null,"message":"access forbidden"}]}'
   recorded_at: Sat, 17 May 2025 19:34:25 GMT
+- request:
+    method: head
+    uri: http://bikeindex.org/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 17 May 2025 20:57:16 GMT
+      Content-Type:
+      - text/html; charset=utf-8
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Strict-Transport-Security:
+      - max-age=631139040
+      X-Content-Type-Options:
+      - nosniff
+      Link:
+      - "</assets/tailwind-ffb9b2c7e15e317fa4f911d183ff0d5dccc91890bafdda27c42fb402834a7fc4.css>;
+        rel=preload; as=style; nopush,</assets/revised-d77254966537e3a2ca5ed870b0500ab650203aff16fb4f3f3206942e21f51b6c.css>;
+        rel=preload; as=style; nopush,</assets/application_revised-b8b9f5c13508c3e0e5b7109fd5e63a94728191f8372daba9dd18d93d23052181.js>;
+        rel=preload; as=script; nopush"
+      Etag:
+      - W/"630fe330fd86c5cb464e49852773700b"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - e884b1c1-a89b-434b-b548-6617317ed060
+      X-Runtime:
+      - '0.014516'
+      X-Powered-By:
+      - cloud66
+      Cf-Cache-Status:
+      - DYNAMIC
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=%2Fk4cN54q56Ak2eYlquVMZ1kndE4n%2BkE4qYKxvbWi8rGUnyGC06LQbrRc4l2BXCnAtBRWxQTuTtY02MH5LNIaqVB4MH4lyk8ZPDGkx7X6G26gj9p8BdUcV6K5lDKlCV4%3D"}],"group":"cf-nel","max_age":604800}'
+      Nel:
+      - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 941606b3af778e9b-SJC
+      Server-Timing:
+      - cfL4;desc="?proto=TCP&rtt=5962&min_rtt=5962&rtt_var=2981&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=140&delivery_rate=0&cwnd=249&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 20:57:16 GMT
+- request:
+    method: head
+    uri: http://bikeindex.org/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 17 May 2025 20:57:16 GMT
+      Content-Type:
+      - text/html; charset=utf-8
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Strict-Transport-Security:
+      - max-age=631139040
+      X-Content-Type-Options:
+      - nosniff
+      Link:
+      - "</assets/tailwind-ffb9b2c7e15e317fa4f911d183ff0d5dccc91890bafdda27c42fb402834a7fc4.css>;
+        rel=preload; as=style; nopush,</assets/revised-d77254966537e3a2ca5ed870b0500ab650203aff16fb4f3f3206942e21f51b6c.css>;
+        rel=preload; as=style; nopush,</assets/application_revised-b8b9f5c13508c3e0e5b7109fd5e63a94728191f8372daba9dd18d93d23052181.js>;
+        rel=preload; as=script; nopush"
+      Etag:
+      - W/"6fe6d33dfacc5190473acb6a884d7443"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 65c188f5-ef46-487d-acef-2114d65b2a1e
+      X-Runtime:
+      - '0.015218'
+      X-Powered-By:
+      - cloud66
+      Cf-Cache-Status:
+      - DYNAMIC
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=oUhsEwNA7fMIzBq6iu5PtN0aR%2FuqAZsnuBpt%2F4U1bk4TP4SaFuLuM6%2BLJxXkL2CQr5Rq3VpsxbOrJkHQ02ynub73fNXNThNcXpC8%2B0DWuZH7Hl3NRsqsJzIMaoRdyoo%3D"}],"group":"cf-nel","max_age":604800}'
+      Nel:
+      - '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 941606b42fecfada-SJC
+      Server-Timing:
+      - cfL4;desc="?proto=TCP&rtt=7750&min_rtt=7750&rtt_var=3875&sent=1&recv=3&lost=0&retrans=0&sent_bytes=0&recv_bytes=140&delivery_rate=0&cwnd=235&unsent_bytes=0&cid=0000000000000000&ts=0&x=0"
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 20:57:16 GMT
 recorded_with: VCR 6.3.1

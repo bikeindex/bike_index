@@ -65,9 +65,7 @@ class EmailBan < ApplicationRecord
     def email_duplicate?(email)
       return false if PERMITTED_DUPLICATE_DOMAINS.include?(email.split("@").last)
 
-      return true if email_period_duplicate?(email)
-
-      email_plus_duplicate?(email)
+      email_period_duplicate?(email) || email_plus_duplicate?(email)
     end
 
     def email_period_duplicate?(email)
@@ -82,14 +80,15 @@ class EmailBan < ApplicationRecord
     def email_plus_duplicate?(email)
       return false unless email.match?(/\+.*@/)
 
-      email_start, email_end = email.split("@")
-      email_start.gsub!(/\+.*/, "")
-
-      matches = User.where("email ~ ?", "^#{email_start}(\\+.*)?@#{email_end}")
+      matches = email_plus_duplicate_matches(email)
 
       return true if matches.where("created_at > ?", Time.current - BLOCK_DUPLICATE_PERIOD).any?
 
       matches.count > PRE_PERIOD_DUPLICATE_LIMIT
+    end
+
+    def email_plus_duplicate_matches(email)
+      User.where("email ~ ?", "^#{email_start}(\\+.*)?@#{email_end}").where.not(email:)
     end
   end
 
