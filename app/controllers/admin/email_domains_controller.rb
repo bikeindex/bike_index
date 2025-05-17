@@ -42,7 +42,7 @@ class Admin::EmailDomainsController < Admin::BaseController
 
   def update
     # Only check if allowed to make banned if updating to make banned
-    if permitted_update_parameters[:status] == "banned" && !@email_domain.banned? && @email_domain.has_ban_blockers?
+    if permitted_update_parameters[:status] == "banned" && !@email_domain.banned? && @email_domain.ban_blockers.any?
       flash.now[:error] = domain_ban_message(@email_domain)
     else
       @email_domain.creator_id ||= current_user.id
@@ -121,10 +121,11 @@ class Admin::EmailDomainsController < Admin::BaseController
   end
 
   def domain_ban_message(email_domain)
-    "Doesn't seem like a new spam email domain" + if email_domain.calculated_bikes.count > 0
-      " - Maybe there are bikes"
+    bikes_count = email_domain.calculated_bikes.count
+    if bikes_count > 0
+      "Doesn't seem like a new spam email domain - there are *#{bikes_count}* bikes"
     else
-      ""
+      "Blocked by: #{email_domain.ban_blockers.map(&:humanize).join(", ")}"
     end
   end
 end

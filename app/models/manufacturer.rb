@@ -25,7 +25,7 @@ class Manufacturer < ApplicationRecord
   include AutocompleteHashable
   include ShortNameable
 
-  MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"].blank? # enable skipping for testing
+  MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"].blank? # enable skipping for testing
 
   has_many :bikes
   has_many :locks
@@ -75,6 +75,7 @@ class Manufacturer < ApplicationRecord
 
     def other
       return @other if MEMOIZE_OTHER && defined?(@other)
+
       @other = where(name: "Other", frame_maker: true).first_or_create
     end
 
