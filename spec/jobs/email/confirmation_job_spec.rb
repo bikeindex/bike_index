@@ -70,7 +70,9 @@ RSpec.describe Email::ConfirmationJob, type: :job do
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
       ActionMailer::Base.deliveries = []
       expect do
-        Email::ConfirmationJob.new.perform(user.id)
+        VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+          Email::ConfirmationJob.new.perform(user.id)
+        end
       end.to change(Notification, :count).by 0
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       expect(User.unscoped.count).to eq 2
@@ -84,22 +86,105 @@ RSpec.describe Email::ConfirmationJob, type: :job do
       it "creates the user and sends the email" do
         expect(User.unscoped.count).to eq 2
         expect do
-          Email::ConfirmationJob.new.perform(user.id)
+          VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+            Email::ConfirmationJob.new.perform(user.id)
+          end
         end.to change(Notification, :count).by 1
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       end
 
       context "with > PRE_PERIOD_DUPLICATE_LIMIT" do
-        let!(:user3) { FactoryBot.create(:user, email: "someth.i.n.g@g.mail.com", created_at:) }
-        let!(:user4) { FactoryBot.create(:user, email: "someth.i.ng@gmail.com", created_at:) }
+        let!(:user2) { FactoryBot.create(:user, email: "someth.i.n.g@g.mail.com", created_at:) }
+        let!(:user3) { FactoryBot.create(:user, email: "someth.i.ng@gmail.com", created_at:) }
         it "creates a ban and doesn't notify" do
           expect(User.unscoped.count).to eq 4 # Because the admin from email_domain
           ActionMailer::Base.deliveries = []
+          expect(EmailDomain.ban_or_provisional.count).to eq 0
           expect do
-            Email::ConfirmationJob.new.perform(user.id)
+            VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+              Email::ConfirmationJob.new.perform(user.id)
+            end
           end.to change(Notification, :count).by 0
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
           expect(User.unscoped.count).to eq 4
+          expect(EmailDomain.count).to eq 1
+          email_domain = EmailDomain.last
+          expect(email_domain.ban_blockers).to eq(["below_email_count"])
+          expect(email_domain.status).to eq "permitted"
+          expect(EmailDomain.ban_or_provisional.count).to eq 0
+          expect(EmailBan.count).to eq 1
+          expect(user.reload.email_banned?).to be_truthy
+          expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")
+        end
+      end
+    end
+  end
+
+  context "with an email with +" do
+    let(:created_at) { Time.current - 12.hours }
+    let!(:user_prior) { FactoryBot.create(:user, email: "some@g.mail.com", created_at:) }
+    let!(:user) { FactoryBot.create(:user, email: "some+thing@g.mail.com") }
+
+    it "creates a ban and doesn't notify" do
+      expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
+      ActionMailer::Base.deliveries = []
+      expect do
+        VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+          Email::ConfirmationJob.new.perform(user.id)
+        end
+      end.to change(Notification, :count).by 0
+      expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+      expect(User.unscoped.count).to eq 2
+      expect(EmailBan.count).to eq 1
+      expect(user.reload.email_banned?).to be_truthy
+      expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")
+    end
+    context "with bikeindex.org domain" do
+      let!(:user_prior) { FactoryBot.create(:user, email: "some+thing@bikeindex.org", created_at:) }
+      let(:created_at) { Time.current - 12.hours }
+      let!(:user) { FactoryBot.create(:user, email: "some@bikeindex.org") }
+      it "creates" do
+        expect(User.unscoped.count).to eq 2
+        expect(EmailBan.send(:email_plus_duplicate_matches, user.email).pluck(:id)).to match_array([user_prior.id])
+        expect do
+          VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+            Email::ConfirmationJob.new.perform(user.id)
+          end
+        end.to change(Notification, :count).by 1
+        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+      end
+    end
+
+    context "before period" do
+      let(:created_at) { Time.current - 14.days }
+      it "creates the user and sends the email" do
+        expect(User.unscoped.count).to eq 2
+        expect do
+          expect(EmailBan.send(:email_plus_duplicate?, user.email)).to be_falsey
+          VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+            Email::ConfirmationJob.new.perform(user.id)
+          end
+        end.to change(Notification, :count).by 1
+        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+      end
+
+      context "with > PRE_PERIOD_DUPLICATE_LIMIT" do
+        let!(:user2) { FactoryBot.create(:user, email: "some+ggg@g.mail.com", created_at:) }
+        let!(:user3) { FactoryBot.create(:user, email: "some+gf@g.mail.com", created_at:) }
+        # NOTE: Using period and + is not captured!
+        let!(:user4) { FactoryBot.create(:user, email: "som.e+i@gmail.com", created_at:) }
+        it "creates a ban and doesn't notify" do
+          expect(User.unscoped.count).to eq 5
+          ActionMailer::Base.deliveries = []
+          expect(EmailBan.send(:email_plus_duplicate_matches, user.email).pluck(:id)).to match_array([user_prior.id, user2.id, user3.id])
+          expect(EmailBan.send(:email_plus_duplicate_matches, user_prior.email).pluck(:id)).to match_array([user.id, user2.id, user3.id])
+          expect do
+            VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+              Email::ConfirmationJob.new.perform(user.id)
+            end
+          end.to change(Notification, :count).by 0
+          expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+          expect(User.unscoped.count).to eq 5
           expect(EmailBan.count).to eq 1
           expect(user.reload.email_banned?).to be_truthy
           expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")

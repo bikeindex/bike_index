@@ -25,12 +25,13 @@ class EmailDomain < ApplicationRecord
   INVALID_REGEX = /[\/\\\(\)\[\]=\s!"']/
   INVALID_DOMAIN = "(invalid).domain"
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
-  STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}
-  TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za]
+  STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}.freeze
+  TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za].freeze
   SPAM_SCORE_AUTO_BAN = 5
   # We don't verify with EmailDomains in most tests because it slows things down.
   # This also includes an env to turn if off in case things block up
-  VERIFICATION_ENABLED = (!Rails.env.test? && ENV["SKIP_EMAIL_DOMAIN_VERIFICATION"] != true).freeze
+  VERIFICATION_ENABLED = (!Rails.env.test? && ENV["SKIP_EMAIL_DOMAIN_VERIFICATION"] != "true").freeze
+  MEMOIZE_INVALID = ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"].blank? # enable skipping for testing
 
   acts_as_paranoid
 
@@ -41,7 +42,7 @@ class EmailDomain < ApplicationRecord
   validates_presence_of :domain
   validates_uniqueness_of :domain
   validate :domain_is_expected_format
-  validate :domain_is_not_contained_in_existing, on: :create
+  validate :domain_does_not_match_existing, on: :create
 
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker, on: :create
@@ -64,27 +65,15 @@ class EmailDomain < ApplicationRecord
     end
 
     def find_matching_domain(domain)
-      return invalid_domain if invalid_domain?(domain)
+      return invalid_domain_record if invalid_domain?(domain)
 
-      tld = tld_for(domain)
-      tld_match = not_ignored.where(domain: tld).first
-      if tld_match.present?
-        # For TLDs with subdomains, if a non-subdomain record is stored, return than
-        if tld.count(".") > 1
-          even_more_tld_match = not_ignored.where(domain: tld.gsub(/\A[^\.]*\./, "")).first
-
-          return even_more_tld_match if even_more_tld_match.present?
-        end
-        return tld_match
-      end
-
-      matching_domain(tld).detect do |email_domain|
-        domain.match?(email_domain.domain)
-      end
+      find_by(domain:) || find_by(domain: domain.tr("@", ""))
     end
 
-    def invalid_domain
-      @invalid_domain ||= where(domain: INVALID_DOMAIN, status: "banned").first_or_create
+    def invalid_domain_record
+      return @invalid_domain_record if MEMOIZE_INVALID && defined?(@invalid_domain_record)
+
+      @invalid_domain_record = where(domain: INVALID_DOMAIN, status: "banned").first_or_create
     end
 
     def invalid_domain?(domain)
@@ -102,7 +91,7 @@ class EmailDomain < ApplicationRecord
 
     def tld_for(email_or_domain)
       domain = email_or_domain&.split("@")&.last&.strip
-      return invalid_domain if invalid_domain?(domain)
+      return INVALID_DOMAIN if invalid_domain?(domain)
       return domain if domain.split(".").count == 1
 
       multi_subdomain = TLD_HAS_SUBDOMAIN.any? { domain.end_with?(_1) }
@@ -112,8 +101,9 @@ class EmailDomain < ApplicationRecord
       domain.split(".")[start_subdomain..].join(".")
     end
 
-    def matching_domain(domain)
-      not_ignored.where("domain ILIKE ?", "%#{domain.tr("@", "")}").order(Arel.sql("length(domain) ASC"))
+    def broadest_matching_domains(domain)
+      search_domain = tld_for(domain)
+      not_ignored.where("domain ILIKE ?", "%#{search_domain}").order(Arel.sql("length(domain) ASC"))
     end
   end
 
@@ -151,22 +141,23 @@ class EmailDomain < ApplicationRecord
 
   # Only check for ban_blockers if the domain is not banned
   def auto_bannable?
-    return false if has_ban_blockers?
+    return false if ban_blockers.any?
 
     spam_score < SPAM_SCORE_AUTO_BAN
   end
 
-  def has_ban_blockers?
-    return true if below_email_count_blocker? || bike_count_blocker? ||
-      organization_role_blocker?
-
-    # Ensure there aren't permitted subdomains
-    calculated_subdomains.permitted.count > 0
+  def ban_blockers
+    b_blockers = []
+    b_blockers << "below_email_count" if below_email_count_blocker?
+    b_blockers << "bike_count" if bike_count_blocker?
+    b_blockers << "organization_role" if organization_role_blocker?
+    b_blockers << "permitted_subdomains" if calculated_subdomains.permitted.count > 0
+    b_blockers
   end
 
-  # If users don't confirm, they get deleted. Check notifications count to verify that
+  # If users don't confirm, they get deleted - so check notifications count instead of users
   def below_email_count_blocker?
-    calculated_user_count < EMAIL_MIN_COUNT && (notification_count / 10) < EMAIL_MIN_COUNT
+    (notification_count / 2) < EMAIL_MIN_COUNT
   end
 
   # Ensure that domains that registered bikes before the creation of EmailDomains aren't blocked
@@ -214,23 +205,6 @@ class EmailDomain < ApplicationRecord
     self.class.status_humanized(status)
   end
 
-  def domain_is_expected_format
-    self.domain = domain.strip
-
-    errors.add(:domain, "Must include a .") unless domain.match?(/\./)
-  end
-
-  def domain_is_not_contained_in_existing
-    return if domain == INVALID_DOMAIN
-
-    broader_domain = self.class.find_matching_domain(domain)
-    return if broader_domain.blank?
-    # Allow creating without @, if an @domain exists
-    return if broader_domain.domain == "@#{domain}"
-
-    errors.add(:domain, "already exists: '#{broader_domain.domain}'")
-  end
-
   def calculated_users
     User.matching_domain(domain)
   end
@@ -250,7 +224,11 @@ class EmailDomain < ApplicationRecord
   def calculated_subdomains
     return self.class.none unless tld?
 
-    self.class.subdomain.matching_domain(domain)
+    self.class.subdomain.where.not(id:).broadest_matching_domains(domain)
+  end
+
+  def invalid_domain?
+    domain == INVALID_DOMAIN
   end
 
   def no_auto_assign_status?
@@ -261,21 +239,43 @@ class EmailDomain < ApplicationRecord
     (status_changed_at - created_at).abs >= 60.seconds
   end
 
-  def process!
-    return if skip_processing
-    UpdateEmailDomainJob.new.perform(id, self)
-    reload
-  end
-
   def unprocessed?
     user_count.nil?
   end
 
+  def processed?
+    !unprocessed?
+  end
+
+  def process!
+    UpdateEmailDomainJob.new.perform(id, self)
+    reload
+  end
+
   def enqueue_processing_worker
+    return if skip_processing
+
     UpdateEmailDomainJob.perform_async(id)
   end
 
   private
+
+  def domain_is_expected_format
+    self.domain = domain.strip
+
+    errors.add(:domain, "Must include a .") unless domain.match?(/\./)
+  end
+
+  def domain_does_not_match_existing
+    return if invalid_domain?
+
+    existing_domain = self.class.find_matching_domain(domain)
+    return if existing_domain.blank?
+    # Allow creating without @, if an @domain exists
+    return if existing_domain.domain == "@#{domain}"
+
+    errors.add(:domain, "already exists: '#{existing_domain.domain}'")
+  end
 
   # Used for calculations in blockers
   def calculated_bike_count
@@ -288,16 +288,32 @@ class EmailDomain < ApplicationRecord
   end
 
   def set_calculated_attributes
-    return if domain == INVALID_DOMAIN
-
     self.data ||= {}
     self.data["tld"] = self.class.tld_for(domain)
     self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length
+
+    if !no_auto_assign_status? && !ban_or_provisional?
+      broader_status = broader_domain_bannable_status
+
+      self.status = broader_status if broader_status.present?
+    end
 
     if status_changed?
       self.status_changed_at = Time.current
     else
       self.status_changed_at ||= created_at || Time.current
     end
+  end
+
+  def broader_domain_bannable_status
+    statuses = broader_domains.ban_or_provisional.pluck(:status).uniq
+    return nil if statuses.none?
+
+    statuses.include?("banned") ? "banned" : statuses.first
+  end
+
+  def broader_domains
+    self.class.broadest_matching_domains(domain).where.not(id:)
+      .where(Arel.sql("length(domain) < ?", domain.length))
   end
 end
