@@ -88,6 +88,9 @@ class EmailBan < ApplicationRecord
     end
 
     def email_plus_duplicate_matches(email)
+      email_start, email_end = email.split("@")
+      email_start.gsub!(/\+.*/, "")
+
       User.where("email ~ ?", "^#{email_start}(\\+.*)?@#{email_end}").where.not(email:)
     end
   end
