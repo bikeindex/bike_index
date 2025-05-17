@@ -48,7 +48,10 @@ class UpdateEmailDomainJob < ScheduledJob
       email_domain.calculated_subdomains.each(&:destroy)
       email_domain.calculated_users.find_each { |user| user.really_destroy! }
     end
-    email_domain
+
+    if email_domain.tld_matches_subdomains? && %w[provisional_ban banned].include?(email_domain.status)
+      fail # Update all the subdomains to match status
+    end
   end
 
   private
@@ -101,14 +104,9 @@ class UpdateEmailDomainJob < ScheduledJob
   end
 
   def create_tld_for_subdomains?(email_domain)
-    return false if email_domain.tld? || email_domain.permitted?
+    return false if email_domain.tld?
 
-    tld = email_domain.tld
-    return false if EmailDomain.tld_matches_subdomains.matching_domain(tld).any?
-
-    return false if EmailDomain.matching_domain(tld).count < CREATE_TLD_SUBDOMAIN_COUNT
-
-    true
+    EmailDomain.broadest_matching_domains(email_domain.domain).count > CREATE_TLD_SUBDOMAIN_COUNT
   end
 
   def validate_with_sendgrid?(email_domain)

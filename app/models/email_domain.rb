@@ -42,7 +42,7 @@ class EmailDomain < ApplicationRecord
   validates_presence_of :domain
   validates_uniqueness_of :domain
   validate :domain_is_expected_format
-  validate :domain_is_not_contained_in_existing, on: :create
+  validate :domain_does_not_match_existing, on: :create
 
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker, on: :create
@@ -67,22 +67,28 @@ class EmailDomain < ApplicationRecord
     def find_matching_domain(domain)
       return invalid_domain_record if invalid_domain?(domain)
 
-      tld = tld_for(domain)
-      tld_match = not_ignored.where(domain: tld).first
-      if tld_match.present?
-        # For TLDs with subdomains, if a non-subdomain record is stored, return than
-        if tld.count(".") > 1
-          even_more_tld_match = not_ignored.where(domain: tld.gsub(/\A[^\.]*\./, "")).first
-
-          return even_more_tld_match if even_more_tld_match.present?
-        end
-        return tld_match
-      end
-
-      matching_domain(tld).detect do |email_domain|
-        domain.match?(email_domain.domain)
-      end
+      find_by(domain:) || find_by(domain: domain.tr("@", ""))
     end
+
+    # def find_broadest_matching_domain(domain)
+    #   return invalid_domain_record if invalid_domain?(domain)
+
+    #   tld = tld_for(domain)
+    #   tld_match = not_ignored.where(domain: tld).first
+    #   if tld_match.present?
+    #     # For TLDs with subdomains, if a non-subdomain record is stored, return than
+    #     if tld.count(".") > 1
+    #       even_more_tld_match = not_ignored.where(domain: tld.gsub(/\A[^\.]*\./, "")).first
+
+    #       return even_more_tld_match if even_more_tld_match.present?
+    #     end
+    #     return tld_match
+    #   end
+
+    #   broadest_matching_domain(tld).detect do |email_domain|
+    #     domain.match?(email_domain.domain)
+    #   end
+    # end
 
     def invalid_domain_record
       return @invalid_domain_record if MEMOIZE_INVALID && defined?(@invalid_domain_record)
@@ -115,8 +121,15 @@ class EmailDomain < ApplicationRecord
       domain.split(".")[start_subdomain..].join(".")
     end
 
+    def broadest_matching_domains(domain)
+      search_domain = tld_for(domain)
+      not_ignored.where("domain ILIKE ?", "%#{search_domain}").order(Arel.sql("length(domain) ASC"))
+    end
+
+    private
+
     def matching_domain(domain)
-      not_ignored.where("domain ILIKE ?", "%#{domain.tr("@", "")}").order(Arel.sql("length(domain) ASC"))
+      not_ignored.where("domain ILIKE ?", "%#{domain.tr("@", "")}").order(Arel.sql("length(domain) DESC"))
     end
   end
 
@@ -217,23 +230,6 @@ class EmailDomain < ApplicationRecord
     self.class.status_humanized(status)
   end
 
-  def domain_is_expected_format
-    self.domain = domain.strip
-
-    errors.add(:domain, "Must include a .") unless domain.match?(/\./)
-  end
-
-  def domain_is_not_contained_in_existing
-    return if invalid_domain?
-
-    broader_domain = self.class.find_matching_domain(domain)
-    return if broader_domain.blank?
-    # Allow creating without @, if an @domain exists
-    return if broader_domain.domain == "@#{domain}"
-
-    errors.add(:domain, "already exists: '#{broader_domain.domain}'")
-  end
-
   def calculated_users
     User.matching_domain(domain)
   end
@@ -253,7 +249,7 @@ class EmailDomain < ApplicationRecord
   def calculated_subdomains
     return self.class.none unless tld?
 
-    self.class.subdomain.matching_domain(domain)
+    self.class.subdomain.broadest_matching_domains(domain)
   end
 
   def invalid_domain?
@@ -289,6 +285,23 @@ class EmailDomain < ApplicationRecord
 
   private
 
+  def domain_is_expected_format
+    self.domain = domain.strip
+
+    errors.add(:domain, "Must include a .") unless domain.match?(/\./)
+  end
+
+  def domain_does_not_match_existing
+    return if invalid_domain?
+
+    broader_domain = self.class.find_matching_domain(domain)
+    return if broader_domain.blank?
+    # Allow creating without @, if an @domain exists
+    return if broader_domain.domain == "@#{domain}"
+
+    errors.add(:domain, "already exists: '#{broader_domain.domain}'")
+  end
+
   # Used for calculations in blockers
   def calculated_bike_count
     @calculated_bike_count ||= calculated_bikes.count
@@ -304,10 +317,23 @@ class EmailDomain < ApplicationRecord
     self.data["tld"] = self.class.tld_for(domain)
     self.data["is_tld"] = data["tld"].length >= domain&.tr("@", "")&.length
 
+    if !no_auto_assign_status? && !ban_or_provisional?
+      broader_status = broader_domain_bannable_status
+      # pp "in here #{domain} - #{broader_status}"
+      self.status = broader_status if broader_status.present?
+    end
+
     if status_changed?
       self.status_changed_at = Time.current
     else
       self.status_changed_at ||= created_at || Time.current
     end
+  end
+
+  def broader_domain_bannable_status
+    statuses = self.class.broadest_matching_domains(domain).ban_or_provisional.pluck(:status).uniq
+    return nil if statuses.none?
+
+    statuses.include?("banned") ? "banned" : statuses.first
   end
 end

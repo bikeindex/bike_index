@@ -63,7 +63,10 @@ RSpec.describe EmailBan, type: :model do
     end
 
     context "already existing email domain" do
-      let!(:email_domain) { FactoryBot.create(:email_domain, domain:, user_count: 222, skip_processing: true, status:) }
+      let!(:email_domain) do
+        FactoryBot.create(:email_domain, domain:, user_count: 222, skip_processing: true, status:,
+          data: {no_auto_assign_status: "true"})
+      end
       let(:email_domain_tld) { FactoryBot.create(:email_domain, domain: "honeybadger.io", skip_processing: true, status: tld_status) }
       let(:status) { "permitted" }
 
@@ -100,7 +103,8 @@ RSpec.describe EmailBan, type: :model do
               UpdateEmailDomainJob.new.perform(email_domain.id)
               expect(email_domain_tld.reload.tld_matches_subdomains?).to be_truthy
               expect(email_domain.reload.tld).to eq email_domain_tld.domain
-
+              expect(email_domain.status).to eq status
+              pp email_domain
               expect(EmailDomain.find_or_create_for(user.email)&.id).to eq email_domain.id
 
               expect do
