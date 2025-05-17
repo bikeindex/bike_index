@@ -65,12 +65,13 @@
           %td
             Ban Blockers
           %td
-            = @email_domain.has_ban_blockers? ? check_mark : cross_mark
+            = @email_domain.ban_blockers.any? ? check_mark : cross_mark
             %small.ml-2
               - if @email_domain.auto_bannable?
                 %span.text-warning auto bannable
               - else
                 not auto banable
+                -# duplicates the logic from ban_blockers to make it more readable
                 - if @email_domain.below_email_count_blocker?
                   %em.ml-2{title: "NOTE: this also checks against notifications / 10"}
                     Below email min count (#{EmailDomain::EMAIL_MIN_COUNT})

@@ -1,0 +1,190 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://mail.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Date:
+      - Sat, 17 May 2025 19:34:24 GMT
+      Server:
+      - Apache
+      Location:
+      - https://mail.com/
+      Connection:
+      - close
+      Content-Type:
+      - text/html; charset=iso-8859-1
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 19:34:24 GMT
+- request:
+    method: head
+    uri: https://mail.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Date:
+      - Sat, 17 May 2025 19:34:25 GMT
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      Location:
+      - https://www.mail.com/
+      Connection:
+      - close
+      Content-Type:
+      - text/html; charset=iso-8859-1
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 19:34:25 GMT
+- request:
+    method: head
+    uri: https://www.mail.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: '200'
+    headers:
+      Date:
+      - Sat, 17 May 2025 19:34:25 GMT
+      Server:
+      - Apache
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubdomains; preload
+      Vary:
+      - X-Forwarded-Proto,Accept-Encoding
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Security-Policy:
+      - block-all-mixed-content;frame-ancestors *.mail.com
+      X-Frame-Options:
+      - DENY
+      Content-Language:
+      - en-US
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - text/html;charset=UTF-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 19:34:25 GMT
+- request:
+    method: post
+    uri: https://api.sendgrid.com/v3/validations/email
+    body:
+      encoding: UTF-8
+      string: '{"email":"something@g.mail.com","source":"EmailDomain"}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 403
+      message: Forbidden
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Sat, 17 May 2025 19:34:25 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '56'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Methods:
+      - HEAD, GET, PUT, POST, DELETE, OPTIONS, PATCH
+      Access-Control-Max-Age:
+      - '21600'
+      Access-Control-Expose-Headers:
+      - Link, Location
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Headers:
+      - AUTHORIZATION, Content-Type, On-behalf-of, x-sg-elas-acl, X-Recaptcha, X-Request-Source,
+        Browser-Fingerprint
+      Content-Security-Policy:
+      - default-src https://api.sendgrid.com; frame-src 'none'; object-src 'none'
+      X-Content-Type-Options:
+      - nosniff
+      Strict-Transport-Security:
+      - max-age=31536000
+      X-Robots-Tag:
+      - noindex, nofollow
+      X-Client-Ff:
+      - '3010'
+      X-Ratelimit-Remaining:
+      - '6'
+      X-Ratelimit-Limit:
+      - '7'
+      X-Ratelimit-Reset:
+      - '1747510466'
+      Twilio-Request-Id:
+      - RQ2xEk98dgQ561pHEfIvcMbgtPvSK
+      X-Envoy-Upstream-Service-Time:
+      - '163'
+      Cache-Control:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+    body:
+      encoding: UTF-8
+      string: '{"errors":[{"field":null,"message":"access forbidden"}]}'
+  recorded_at: Sat, 17 May 2025 19:34:25 GMT
+recorded_with: VCR 6.3.1

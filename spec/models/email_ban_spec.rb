@@ -64,8 +64,7 @@ RSpec.describe EmailBan, type: :model do
 
     context "already existing email domain" do
       let!(:email_domain) do
-        FactoryBot.create(:email_domain, domain:, user_count: 222, skip_processing: true, status:,
-          data: {no_auto_assign_status: "true"})
+        FactoryBot.create(:email_domain, domain:, user_count: 222, skip_processing: true, status:)
       end
       let(:email_domain_tld) { FactoryBot.create(:email_domain, domain: "honeybadger.io", skip_processing: true, status: tld_status) }
       let(:status) { "permitted" }
@@ -98,22 +97,18 @@ RSpec.describe EmailBan, type: :model do
         context "with TLD" do
           let(:tld_status) { "permitted" }
           it "matches the actual domain, creates a ban" do
-            VCR.use_cassette("email_ban_process_email_domain-tld") do
-              UpdateEmailDomainJob.new.perform(email_domain_tld.id)
-              UpdateEmailDomainJob.new.perform(email_domain.id)
-              expect(email_domain_tld.reload.tld_matches_subdomains?).to be_truthy
-              expect(email_domain.reload.tld).to eq email_domain_tld.domain
-              expect(email_domain.status).to eq status
-              pp email_domain
-              expect(EmailDomain.find_or_create_for(user.email)&.id).to eq email_domain.id
+            expect(email_domain_tld.reload.tld_matches_subdomains?).to be_truthy
+            expect(email_domain_tld.status).to eq tld_status
+            email_domain.update(updated_at: Time.current)
+            expect(email_domain.reload.tld).to eq email_domain_tld.domain
+            expect(email_domain.status).to eq status
+            expect(EmailDomain.find_or_create_for(user.email)&.id).to eq email_domain.id
 
-              expect do
-                expect(EmailBan.ban?(user)).to be_truthy
-              end.to change(EmailDomain, :count).by(0)
-                .and change(EmailBan, :count).by(1)
-              expect(email_domain.calculated_users.count).to_not eq email_domain.user_count # Verify it still hasn't been processed
-              expect(UpdateEmailDomainJob.jobs.count).to eq 1
-            end
+            expect do
+              expect(EmailBan.ban?(user)).to be_truthy
+            end.to change(EmailDomain, :count).by(0)
+              .and change(EmailBan, :count).by(1)
+            expect(UpdateEmailDomainJob.jobs.count).to eq 1
           end
         end
       end
@@ -121,19 +116,18 @@ RSpec.describe EmailBan, type: :model do
       context "with TLD with provisional_ban" do
         let(:tld_status) { "provisional_ban" }
         it "matches the tld domain, creates a ban" do
-          VCR.use_cassette("email_ban_process_email_domain-tld") do
-            UpdateEmailDomainJob.new.perform(email_domain_tld.id)
-            UpdateEmailDomainJob.new.perform(email_domain.id)
-            expect(email_domain_tld.reload.tld_matches_subdomains?).to be_truthy
-            expect(email_domain.reload.tld).to eq email_domain_tld.domain
+          expect(email_domain_tld.reload.tld_matches_subdomains?).to be_truthy
+          expect(email_domain_tld.status).to eq tld_status
+          email_domain.update(updated_at: Time.current)
+          expect(email_domain.reload.tld).to eq email_domain_tld.domain
+          expect(email_domain.status).to eq tld_status
 
-            expect do
-              expect(EmailBan.ban?(user)).to be_truthy
-            end.to change(EmailDomain, :count).by(0)
-              .and change(EmailBan, :count).by(1)
-            expect(email_domain.calculated_users.count).to_not eq email_domain.user_count # Verify it still hasn't been processed
-            expect(UpdateEmailDomainJob.jobs.count).to eq 1
-          end
+          expect do
+            expect(EmailBan.ban?(user)).to be_truthy
+          end.to change(EmailDomain, :count).by(0)
+            .and change(EmailBan, :count).by(1)
+          expect(email_domain.calculated_users.count).to_not eq email_domain.user_count # Verify it still hasn't been processed
+          expect(UpdateEmailDomainJob.jobs.count).to eq 1
         end
       end
     end

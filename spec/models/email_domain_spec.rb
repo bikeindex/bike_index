@@ -186,7 +186,12 @@ RSpec.describe EmailDomain, type: :model do
           email_domain_sub_sub = EmailDomain.find_or_create_for(domain_sub_sub, skip_processing: true)
           expect(email_domain_sub_sub).to be_valid
           expect(email_domain_sub_sub.tld).to eq "stuff.com"
-          expect(email_domain_sub_sub.status).to eq status
+          expect(email_domain_sub_sub.status).to eq "provisional_ban" # status
+
+          # Verify that email_domain doesn't get assigned subdomain's status
+          email_domain.update(updated_at: Time.current)
+          expect(email_domain.reload.status).to eq "permitted" # status
+          expect(email_domain.ban_blockers).to eq(["below_email_count"])
         end
       end
     end

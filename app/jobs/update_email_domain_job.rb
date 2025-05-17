@@ -110,7 +110,7 @@ class UpdateEmailDomainJob < ScheduledJob
   end
 
   def validate_with_sendgrid?(email_domain)
-    return false if !VALIDATE_WITH_SENDGRID || email_domain.has_ban_blockers?
+    return false if !VALIDATE_WITH_SENDGRID || email_domain.ban_blockers.any?
 
     email_domain.data["sendgrid_validations"].blank?
   end

@@ -70,7 +70,9 @@ RSpec.describe Email::ConfirmationJob, type: :job do
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
       ActionMailer::Base.deliveries = []
       expect do
-        Email::ConfirmationJob.new.perform(user.id)
+        VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+          Email::ConfirmationJob.new.perform(user.id)
+        end
       end.to change(Notification, :count).by 0
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       expect(User.unscoped.count).to eq 2
@@ -84,7 +86,9 @@ RSpec.describe Email::ConfirmationJob, type: :job do
       it "creates the user and sends the email" do
         expect(User.unscoped.count).to eq 2
         expect do
-          Email::ConfirmationJob.new.perform(user.id)
+          VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+            Email::ConfirmationJob.new.perform(user.id)
+          end
         end.to change(Notification, :count).by 1
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       end
@@ -95,11 +99,16 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         it "creates a ban and doesn't notify" do
           expect(User.unscoped.count).to eq 4 # Because the admin from email_domain
           ActionMailer::Base.deliveries = []
+          expect(EmailDomain.ban_or_provisional.count).to eq 0
           expect do
-            Email::ConfirmationJob.new.perform(user.id)
+            VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+              Email::ConfirmationJob.new.perform(user.id)
+            end
           end.to change(Notification, :count).by 0
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
           expect(User.unscoped.count).to eq 4
+          expect(EmailDomain.ban_or_provisional.count).to eq 0
+          EmailBan.all.map { pp _1, _1.user.email }
           expect(EmailBan.count).to eq 1
           expect(user.reload.email_banned?).to be_truthy
           expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")

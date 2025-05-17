@@ -141,17 +141,18 @@ class EmailDomain < ApplicationRecord
 
   # Only check for ban_blockers if the domain is not banned
   def auto_bannable?
-    return false if has_ban_blockers?
+    return false if ban_blockers.any?
 
     spam_score < SPAM_SCORE_AUTO_BAN
   end
 
-  def has_ban_blockers?
-    return true if below_email_count_blocker? || bike_count_blocker? ||
-      organization_role_blocker?
-
-    # Ensure there aren't permitted subdomains
-    calculated_subdomains.permitted.count > 0
+  def ban_blockers
+    b_blockers = []
+    b_blockers << "below_email_count" if below_email_count_blocker?
+    b_blockers << "bike_count" if bike_count_blocker?
+    b_blockers << "organization_role" if organization_role_blocker?
+    b_blockers << "permitted_subdomains" if calculated_subdomains.permitted.count > 0
+    b_blockers
   end
 
   # If users don't confirm, they get deleted. Check notifications count to verify that
@@ -268,12 +269,12 @@ class EmailDomain < ApplicationRecord
   def domain_does_not_match_existing
     return if invalid_domain?
 
-    broader_domain = self.class.find_matching_domain(domain)
-    return if broader_domain.blank?
+    existing_domain = self.class.find_matching_domain(domain)
+    return if existing_domain.blank?
     # Allow creating without @, if an @domain exists
-    return if broader_domain.domain == "@#{domain}"
+    return if existing_domain.domain == "@#{domain}"
 
-    errors.add(:domain, "already exists: '#{broader_domain.domain}'")
+    errors.add(:domain, "already exists: '#{existing_domain.domain}'")
   end
 
   # Used for calculations in blockers
@@ -305,10 +306,14 @@ class EmailDomain < ApplicationRecord
   end
 
   def broader_domain_bannable_status
-    statuses = self.class.broadest_matching_domains(domain).where.not(id:).ban_or_provisional
-      .pluck(:status).uniq
+    statuses = broader_domains.ban_or_provisional.pluck(:status).uniq
     return nil if statuses.none?
 
     statuses.include?("banned") ? "banned" : statuses.first
+  end
+
+  def broader_domains
+    self.class.broadest_matching_domains(domain).where.not(id:)
+      .where(Arel.sql("length(domain) < ?", domain.length))
   end
 end
