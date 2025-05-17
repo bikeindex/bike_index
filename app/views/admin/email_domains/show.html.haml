@@ -88,7 +88,7 @@
           %td
             %strong
               #{@email_domain.spam_score} / 10
-            %small.less-strong below #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
+            %small.less-strong above #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
             %small.d-block
               %span
                 %strong= admin_number_display(@email_domain.spam_score_our_records)
