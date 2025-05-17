@@ -157,7 +157,7 @@ class EmailDomain < ApplicationRecord
 
   # If users don't confirm, they get deleted. Check notifications count to verify that
   def below_email_count_blocker?
-    calculated_user_count < EMAIL_MIN_COUNT && (notification_count / 10) < EMAIL_MIN_COUNT
+    calculated_user_count < EMAIL_MIN_COUNT || (notification_count / 2) < EMAIL_MIN_COUNT
   end
 
   # Ensure that domains that registered bikes before the creation of EmailDomains aren't blocked

@@ -107,8 +107,11 @@ RSpec.describe Email::ConfirmationJob, type: :job do
           end.to change(Notification, :count).by 0
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
           expect(User.unscoped.count).to eq 4
+          expect(EmailDomain.count).to eq 1
+          email_domain = EmailDomain.last
+          expect(email_domain.ban_blockers).to eq(["below_email_count"])
+          expect(email_domain.status).to eq "permitted"
           expect(EmailDomain.ban_or_provisional.count).to eq 0
-          EmailBan.all.map { pp _1, _1.user.email }
           expect(EmailBan.count).to eq 1
           expect(user.reload.email_banned?).to be_truthy
           expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")
