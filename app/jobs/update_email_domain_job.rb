@@ -78,6 +78,8 @@ class UpdateEmailDomainJob < ScheduledJob
   end
 
   def domain_resolves?(domain)
+    return false if EmailDomain.invalid_domain?(domain)
+
     conn = Faraday.new do |faraday|
       faraday.use FaradayMiddleware::FollowRedirects, limit: 15
       faraday.adapter Faraday.default_adapter

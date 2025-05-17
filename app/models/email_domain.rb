@@ -31,6 +31,7 @@ class EmailDomain < ApplicationRecord
   # We don't verify with EmailDomains in most tests because it slows things down.
   # This also includes an env to turn if off in case things block up
   VERIFICATION_ENABLED = (!Rails.env.test? && ENV["SKIP_EMAIL_DOMAIN_VERIFICATION"] != "true").freeze
+  MEMOIZE_INVALID = ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"].blank? # enable skipping for testing
 
   acts_as_paranoid
 
@@ -64,7 +65,7 @@ class EmailDomain < ApplicationRecord
     end
 
     def find_matching_domain(domain)
-      return invalid_domain if invalid_domain?(domain)
+      return invalid_domain_record if invalid_domain?(domain)
 
       tld = tld_for(domain)
       tld_match = not_ignored.where(domain: tld).first
@@ -83,8 +84,10 @@ class EmailDomain < ApplicationRecord
       end
     end
 
-    def invalid_domain
-      @invalid_domain ||= where(domain: INVALID_DOMAIN, status: "banned").first_or_create
+    def invalid_domain_record
+      return @invalid_domain_record if MEMOIZE_INVALID && defined?(@invalid_domain_record)
+
+      @invalid_domain_record = where(domain: INVALID_DOMAIN, status: "banned").first_or_create
     end
 
     def invalid_domain?(domain)
@@ -102,7 +105,7 @@ class EmailDomain < ApplicationRecord
 
     def tld_for(email_or_domain)
       domain = email_or_domain&.split("@")&.last&.strip
-      return INVALID_DOMAIN if invalid_domain?(domain) || email_or_domain == INVALID_DOMAIN
+      return INVALID_DOMAIN if invalid_domain?(domain)
       return domain if domain.split(".").count == 1
 
       multi_subdomain = TLD_HAS_SUBDOMAIN.any? { domain.end_with?(_1) }
@@ -221,7 +224,7 @@ class EmailDomain < ApplicationRecord
   end
 
   def domain_is_not_contained_in_existing
-    return if domain == INVALID_DOMAIN
+    return if invalid_domain?
 
     broader_domain = self.class.find_matching_domain(domain)
     return if broader_domain.blank?
@@ -253,6 +256,10 @@ class EmailDomain < ApplicationRecord
     self.class.subdomain.matching_domain(domain)
   end
 
+  def invalid_domain?
+    domain == INVALID_DOMAIN
+  end
+
   def no_auto_assign_status?
     data["no_auto_assign_status"]&.to_s == "true"
   end
@@ -261,17 +268,22 @@ class EmailDomain < ApplicationRecord
     (status_changed_at - created_at).abs >= 60.seconds
   end
 
-  def process!
-    return if skip_processing
-    UpdateEmailDomainJob.new.perform(id, self)
-    reload
-  end
-
   def unprocessed?
     user_count.nil?
   end
 
+  def processed?
+    !unprocessed?
+  end
+
+  def process!
+    UpdateEmailDomainJob.new.perform(id, self)
+    reload
+  end
+
   def enqueue_processing_worker
+    return if skip_processing
+
     UpdateEmailDomainJob.perform_async(id)
   end
 

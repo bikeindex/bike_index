@@ -25,7 +25,6 @@ class EmailBan < ApplicationRecord
   REASON_ENUM = {email_domain: 0, email_duplicate: 1, delivery_failure: 2}.freeze
 
   belongs_to :user
-  belongs_to :email_ban
 
   enum :reason, REASON_ENUM
 
@@ -38,6 +37,7 @@ class EmailBan < ApplicationRecord
       # Don't suffer a witch to live
       if EmailDomain::VERIFICATION_ENABLED
         email_domain = EmailDomain.find_or_create_for(user.email, skip_processing: true)
+
         # Async processing for existing domains, inline for new ones
         email_domain.unprocessed? ? email_domain.process! : email_domain.enqueue_processing_worker
 
@@ -50,8 +50,8 @@ class EmailBan < ApplicationRecord
       # Create a email ban if we should
       create(reason: :email_domain, user:) if email_domain&.provisional_ban?
       create(reason: :email_duplicate, user:) if email_duplicate?(user.email)
-      # Don't send an email if the email is blocked
-      nil if period_started.where(user:).any?
+      # match existing bans
+      period_started.where(user:).any?
     end
 
     def reason_humanized(str)

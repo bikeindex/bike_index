@@ -36,7 +36,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
     end
 
     context "invalid_domain" do
-      let(:email_domain) { EmailDomain.invalid_domain }
+      let(:email_domain) { EmailDomain.invalid_domain_record }
       it "responds with ok" do
         get "#{base_url}/#{email_domain.to_param}"
         expect(response.status).to eq(200)

@@ -62,6 +62,24 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
       end
     end
 
+    context "invalid_domain" do
+      let!(:email_domain) { EmailDomain.invalid_domain_record }
+      let(:domain) { 'fffff\.com' }
+      let(:invalid_data) do
+        valid_data.merge(domain_resolves: false, tld_resolves: false, tld: email_domain.domain)
+      end
+      it "updates counts in the cache" do
+        expect(EmailDomain.find_matching_domain(user_domain)&.id).to eq email_domain.id
+        instance.perform(email_domain.id)
+        expect(email_domain.reload.user_count).to eq 0 # invalid_domain doesn't match
+        expect(email_domain.status).to eq "banned"
+        expect(email_domain.tld_matches_subdomains?).to be_truthy
+        expect(EmailDomain.subdomain.pluck(:id)).to match_array([])
+        expect(email_domain.calculated_subdomains.pluck(:id)).to eq([])
+        expect(email_domain.data.except("spam_score")).to match_hash_indifferently invalid_data
+      end
+    end
+
     context "@gmail.com" do
       let(:domain) { "gmail.com" }
       let!(:bike2) { FactoryBot.create(:bike_lightspeed_pos, owner_email: "example@#{domain}") }

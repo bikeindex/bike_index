@@ -1,0 +1,360 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://honeybadger.io/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 16 May 2025 20:28:29 GMT
+      Location:
+      - https://www.honeybadger.io/
+      Server:
+      - AmazonS3
+      X-Cache:
+      - Hit from cloudfront
+      Via:
+      - 1.1 80b537f2cda1e26d67673c227b9e06a6.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO20-C1
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      X-Amz-Cf-Id:
+      - oAyJQAWUy7doC50dChzbfi8Kcfw8AaLvYP3XX2Znul-_lraUkMsGhQ==
+      Age:
+      - '71068'
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 16:12:56 GMT
+- request:
+    method: head
+    uri: https://www.honeybadger.io/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Accept-Ranges:
+      - bytes
+      Age:
+      - '51820'
+      Cache-Control:
+      - public,max-age=0,must-revalidate
+      Cache-Status:
+      - '"Netlify Edge"; hit'
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '37938'
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Security-Policy-Report-Only:
+      - 'default-src ''none''; connect-src ''self'' data: https://*.savvycal.com/
+        https://*.frontapp.com/ https://*.fontawesome.com/ https://*.typekit.net/
+        https://*.honeybadger.io https://*.convertkit.com/ https://*.convertexperiments.com/
+        https://*.profitwell.com https://*.usefathom.com/ https://*.wistia.com/ https://fg8vvsvnieiv3ej16jby.litix.io
+        https://pipedream.wistia.com/mput https://embedwistia-a.akamaihd.net/ https://cdnjs.cloudflare.com;
+        font-src ''self'' data: https://use.typekit.net https://cdnjs.cloudflare.com
+        https://*.fontawesome.com; frame-src https://savvycal.com/ https://player.vimeo.com
+        https://platform.twitter.com https://syndication.twitter.com https://fast.wistia.com;
+        img-src ''self'' data: https:; script-src ''self'' ''unsafe-eval'' ''unsafe-inline''
+        https://*.savvycal.com/ https://*.frontapp.com/ https://*.fontawesome.com/
+        https://*.typekit.net/ https://*.profitwell.com https://*.usefathom.com/ https://*.honeybadger.io/
+        https://*.convertkit.com/ https://*.convertexperiments.com/ https://gist.github.com
+        https://*.wistia.com https://cdn.syndication.twimg.com https://platform.twitter.com
+        https://fast.wistia.com/ https://identity.netlify.com/v1/netlify-identity-widget.js
+        https://cdnjs.cloudflare.com; style-src ''self'' ''unsafe-inline'' blob: https://*.fontawesome.com
+        https://*.typekit.net https://github.githubassets.com/ https://platform.twitter.com
+        https://ton.twimg.com https://cdnjs.cloudflare.com; media-src ''self'' data:
+        https://embedwistia-a.akamaihd.net https://*.wistia.com; report-uri https://api.honeybadger.io/v1/browser/csp?api_key=c2f13350&report_only=true&env=production'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Sat, 17 May 2025 16:12:56 GMT
+      Etag:
+      - '"733ed94d26f5d84385ad77dbc00aaaf1-ssl-df"'
+      Server:
+      - Netlify
+      Strict-Transport-Security:
+      - max-age=31536000
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Nf-Request-Id:
+      - 01JVFGA7003MRRXY8SG4KXZBZ1
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 16:12:56 GMT
+- request:
+    method: head
+    uri: http://honeybadger.io/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 16 May 2025 20:28:29 GMT
+      Location:
+      - https://www.honeybadger.io/
+      Server:
+      - AmazonS3
+      X-Cache:
+      - Hit from cloudfront
+      Via:
+      - 1.1 f94de31c777bc3bf7b8976bac21b4482.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO20-C1
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      X-Amz-Cf-Id:
+      - SXIRWTNKufZzYi8COzeUTy1MeYiAo6bw5Uj_jU4OlhKlON7lDpSODw==
+      Age:
+      - '71068'
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 16:12:56 GMT
+- request:
+    method: head
+    uri: https://www.honeybadger.io/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Accept-Ranges:
+      - bytes
+      Age:
+      - '51820'
+      Cache-Control:
+      - public,max-age=0,must-revalidate
+      Cache-Status:
+      - '"Netlify Edge"; hit'
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '37938'
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Security-Policy-Report-Only:
+      - 'default-src ''none''; connect-src ''self'' data: https://*.savvycal.com/
+        https://*.frontapp.com/ https://*.fontawesome.com/ https://*.typekit.net/
+        https://*.honeybadger.io https://*.convertkit.com/ https://*.convertexperiments.com/
+        https://*.profitwell.com https://*.usefathom.com/ https://*.wistia.com/ https://fg8vvsvnieiv3ej16jby.litix.io
+        https://pipedream.wistia.com/mput https://embedwistia-a.akamaihd.net/ https://cdnjs.cloudflare.com;
+        font-src ''self'' data: https://use.typekit.net https://cdnjs.cloudflare.com
+        https://*.fontawesome.com; frame-src https://savvycal.com/ https://player.vimeo.com
+        https://platform.twitter.com https://syndication.twitter.com https://fast.wistia.com;
+        img-src ''self'' data: https:; script-src ''self'' ''unsafe-eval'' ''unsafe-inline''
+        https://*.savvycal.com/ https://*.frontapp.com/ https://*.fontawesome.com/
+        https://*.typekit.net/ https://*.profitwell.com https://*.usefathom.com/ https://*.honeybadger.io/
+        https://*.convertkit.com/ https://*.convertexperiments.com/ https://gist.github.com
+        https://*.wistia.com https://cdn.syndication.twimg.com https://platform.twitter.com
+        https://fast.wistia.com/ https://identity.netlify.com/v1/netlify-identity-widget.js
+        https://cdnjs.cloudflare.com; style-src ''self'' ''unsafe-inline'' blob: https://*.fontawesome.com
+        https://*.typekit.net https://github.githubassets.com/ https://platform.twitter.com
+        https://ton.twimg.com https://cdnjs.cloudflare.com; media-src ''self'' data:
+        https://embedwistia-a.akamaihd.net https://*.wistia.com; report-uri https://api.honeybadger.io/v1/browser/csp?api_key=c2f13350&report_only=true&env=production'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Sat, 17 May 2025 16:12:56 GMT
+      Etag:
+      - '"733ed94d26f5d84385ad77dbc00aaaf1-ssl-df"'
+      Server:
+      - Netlify
+      Strict-Transport-Security:
+      - max-age=31536000
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Nf-Request-Id:
+      - 01JVFGA7259WJGNKGVG9V436RV
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 16:12:56 GMT
+- request:
+    method: head
+    uri: http://honeybadger.io/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 16 May 2025 20:28:29 GMT
+      Location:
+      - https://www.honeybadger.io/
+      Server:
+      - AmazonS3
+      X-Cache:
+      - Hit from cloudfront
+      Via:
+      - 1.1 7a21e9c0eca084f9537ebb23906ea9fe.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO20-C1
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      X-Amz-Cf-Id:
+      - i0U3bVTilMXMfLDwGyQEMwW6dYtSC55yf-lvVWEg0ydx--v5rEOttg==
+      Age:
+      - '71068'
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 16:12:56 GMT
+- request:
+    method: head
+    uri: https://www.honeybadger.io/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Accept-Ranges:
+      - bytes
+      Age:
+      - '51820'
+      Cache-Control:
+      - public,max-age=0,must-revalidate
+      Cache-Status:
+      - '"Netlify Edge"; hit'
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '37938'
+      Content-Security-Policy:
+      - frame-ancestors 'none'
+      Content-Security-Policy-Report-Only:
+      - 'default-src ''none''; connect-src ''self'' data: https://*.savvycal.com/
+        https://*.frontapp.com/ https://*.fontawesome.com/ https://*.typekit.net/
+        https://*.honeybadger.io https://*.convertkit.com/ https://*.convertexperiments.com/
+        https://*.profitwell.com https://*.usefathom.com/ https://*.wistia.com/ https://fg8vvsvnieiv3ej16jby.litix.io
+        https://pipedream.wistia.com/mput https://embedwistia-a.akamaihd.net/ https://cdnjs.cloudflare.com;
+        font-src ''self'' data: https://use.typekit.net https://cdnjs.cloudflare.com
+        https://*.fontawesome.com; frame-src https://savvycal.com/ https://player.vimeo.com
+        https://platform.twitter.com https://syndication.twitter.com https://fast.wistia.com;
+        img-src ''self'' data: https:; script-src ''self'' ''unsafe-eval'' ''unsafe-inline''
+        https://*.savvycal.com/ https://*.frontapp.com/ https://*.fontawesome.com/
+        https://*.typekit.net/ https://*.profitwell.com https://*.usefathom.com/ https://*.honeybadger.io/
+        https://*.convertkit.com/ https://*.convertexperiments.com/ https://gist.github.com
+        https://*.wistia.com https://cdn.syndication.twimg.com https://platform.twitter.com
+        https://fast.wistia.com/ https://identity.netlify.com/v1/netlify-identity-widget.js
+        https://cdnjs.cloudflare.com; style-src ''self'' ''unsafe-inline'' blob: https://*.fontawesome.com
+        https://*.typekit.net https://github.githubassets.com/ https://platform.twitter.com
+        https://ton.twimg.com https://cdnjs.cloudflare.com; media-src ''self'' data:
+        https://embedwistia-a.akamaihd.net https://*.wistia.com; report-uri https://api.honeybadger.io/v1/browser/csp?api_key=c2f13350&report_only=true&env=production'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Sat, 17 May 2025 16:12:56 GMT
+      Etag:
+      - '"733ed94d26f5d84385ad77dbc00aaaf1-ssl-df"'
+      Server:
+      - Netlify
+      Strict-Transport-Security:
+      - max-age=31536000
+      Vary:
+      - Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Nf-Request-Id:
+      - 01JVFGA77H75M5PY7XA9B35W2V
+      X-Xss-Protection:
+      - 1; mode=block
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sat, 17 May 2025 16:12:56 GMT
+recorded_with: VCR 6.3.1
