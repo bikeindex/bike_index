@@ -63,7 +63,7 @@ class UpdateEmailDomainJob < ScheduledJob
     broader_domain_exists = if email_domain.ignored?
       false
     else
-      EmailDomain.find_matching_domain(email_domain.domain)&.id != email_domain.id
+      EmailDomain.broadest_matching_domains(email_domain.domain).first&.id != email_domain.id
     end
     {
       broader_domain_exists:,

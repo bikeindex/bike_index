@@ -43,8 +43,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.reload.user_count).to eq 4 # Because users created for email domains
           expect(email_domain.status).to eq "permitted"
           expect(email_domain.tld_matches_subdomains?).to be_falsey
-          # expect(email_domain.data.except("spam_score")).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
-          expect(email_domain.data.except("spam_score")).to match_hash_indifferently valid_data.merge(subdomain_count: 1)
+          expect(email_domain.data.except("spam_score")).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
           expect(EmailDomain.tld.pluck(:id)).to match_array([email_domain.id, email_domain_bare.id])
           expect(EmailDomain.subdomain.pluck(:id)).to match_array([email_domain_sub.id])
           expect(email_domain.calculated_subdomains.pluck(:id)).to eq([email_domain_sub.id])
@@ -222,52 +221,52 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             expect(email_domain_tld.reload.calculated_users.count).to eq 0
           end
         end
-        # context "with @tld" do
-        #   let!(:email_domain_at) { FactoryBot.create(:email_domain, domain: "@#{domain}") }
+        context "with @tld" do
+          let!(:email_domain_at) { FactoryBot.create(:email_domain, domain: "@#{domain}") }
 
-        #   it "makes tld domain" do
-        #     expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
-        #     expect(email_domain_at.tld?).to be_truthy
-        #     expect(email_domain_at.send(:broader_domains).pluck(:id)).to eq([])
+          it "makes tld domain" do
+            expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
+            expect(email_domain_at.tld?).to be_truthy
+            expect(email_domain_at.send(:broader_domains).pluck(:id)).to eq([])
 
-        #     VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
-        #       expect(EmailDomain.count).to eq 5
-        #       instance.perform(email_domain.id)
+            VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
+              expect(EmailDomain.count).to eq 5
+              instance.perform(email_domain.id)
 
-        #       expect(email_domain.reload.status).to eq "provisional_ban"
+              expect(email_domain.reload.status).to eq "provisional_ban"
 
-        #       expect(EmailDomain.count).to eq 6
-        #     end
-        #     new_email_domain = EmailDomain.order(:id).last
-        #     expect(new_email_domain.domain).to eq domain
-        #     expect(new_email_domain.status).to eq "permitted"
+              expect(EmailDomain.count).to eq 6
+            end
+            new_email_domain = EmailDomain.order(:id).last
+            expect(new_email_domain.domain).to eq domain
+            expect(new_email_domain.status).to eq "permitted"
 
-        #     # If we ignore the new domain, it doesn't get created again
-        #     new_email_domain.update(status: "ignored")
+            # If we ignore the new domain, it doesn't get created again
+            new_email_domain.update(status: "ignored")
 
-        #     VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
-        #       expect { instance.perform(email_domain.id) }.to_not change(EmailDomain, :count)
-        #     end
-        #   end
+            VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
+              expect { instance.perform(email_domain.id) }.to_not change(EmailDomain, :count)
+            end
+          end
 
-        #   context "with broader" do
-        #     let!(:email_domain_ignored) { FactoryBot.create(:email_domain, domain: "lix.com", status: :ignored) }
-        #     it "makes tld domain" do
-        #       expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
-        #       expect(email_domain_at.tld?).to be_truthy
+          context "with broader" do
+            let!(:email_domain_ignored) { FactoryBot.create(:email_domain, domain: "lix.com", status: :ignored) }
+            it "makes tld domain" do
+              expect(email_domain_at.reload.tld_matches_subdomains?).to be_falsey
+              expect(email_domain_at.tld?).to be_truthy
 
-        #       VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
-        #         expect(EmailDomain.count).to eq 6
-        #         instance.perform(email_domain.id)
+              VCR.use_cassette("Update-Email-Domain-Job_unresolved") do
+                expect(EmailDomain.count).to eq 6
+                instance.perform(email_domain.id)
 
-        #         expect(email_domain.reload.status).to eq "provisional_ban"
+                expect(email_domain.reload.status).to eq "provisional_ban"
 
-        #         expect(EmailDomain.count).to eq 7
-        #       end
-        #       expect(EmailDomain.order(:id).last.domain).to eq domain
-        #     end
-        #   end
-        # end
+                expect(EmailDomain.count).to eq 7
+              end
+              expect(EmailDomain.order(:id).last.domain).to eq domain
+            end
+          end
+        end
       end
     end
   end
