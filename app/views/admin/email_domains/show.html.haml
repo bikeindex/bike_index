@@ -91,13 +91,13 @@
             %small.less-strong above #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
             %small.d-block
               %span
-                %strong= admin_number_display(@email_domain.spam_score_our_records)
+                %strong= admin_number_display(- @email_domain.spam_score_our_records)
                 our records,
               %span.ml-2
-                %strong= admin_number_display(@email_domain.spam_score_domain_resolution)
+                %strong= admin_number_display(- @email_domain.spam_score_domain_resolution)
                 domain resolution,
               %span.ml-2
-                %strong= admin_number_display(@email_domain.spam_score_sendgrid_validations)
+                %strong= admin_number_display(- @email_domain.spam_score_sendgrid_validations)
                 sendgrid
 
         %tr

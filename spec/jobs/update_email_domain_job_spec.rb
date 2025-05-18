@@ -91,7 +91,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.ban_blockers.any?).to be_truthy
           expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
           expect(email_domain.status).to eq "permitted"
-          expect(email_domain.spam_score).to be > 5
+          expect(email_domain.spam_score).to be < 3
         end
       end
       context "with domain starting out provisional_ban" do
@@ -106,7 +106,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             expect(email_domain.ban_blockers.any?).to be_truthy
             expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
             expect(email_domain.status).to eq "permitted"
-            expect(email_domain.spam_score).to be > 5
+            expect(email_domain.spam_score).to be < 3
           end
         end
       end
@@ -127,7 +127,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.data.except("sendgrid_validations", "spam_score"))
             .to match_hash_indifferently valid_data.merge(domain_resolves: false, tld_resolves: false)
           expect(email_domain.data.dig("sendgrid_validations", user2.email).keys.sort).to eq target_sendgrid_keys
-          expect(email_domain.spam_score).to be < 2
+          expect(email_domain.spam_score).to be > 9
           expect(email_domain.status).to eq "provisional_ban"
         end
       end
@@ -178,7 +178,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
           expect(email_domain.status).to eq "provisional_ban"
           expect(described_class).to_not have_enqueued_sidekiq_job
-          expect(email_domain.spam_score).to be < 2
+          expect(email_domain.spam_score).to be >9
         end
       end
 

@@ -175,8 +175,7 @@ class EmailDomain < ApplicationRecord
 
     s_score = (10 - spam_score_domain_resolution - spam_score_our_records - spam_score_sendgrid_validations)
       .clamp(1, 10)
-    s_score == 1 ? score_zero_if_allowed : s_score
-
+    (s_score == 1) ? score_zero_if_allowed : s_score
   end
 
   def spam_score_domain_resolution
@@ -263,7 +262,7 @@ class EmailDomain < ApplicationRecord
   private
 
   def score_zero_if_allowed
-    data["bike_count_pos"]&.to_i > 1 && user_count > 5 ? 0 : 1
+    ((data["bike_count_pos"]&.to_i&.> 1) && user_count > 5) ? 0 : 1
   end
 
   def domain_is_expected_format
