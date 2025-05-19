@@ -56,6 +56,8 @@
               = @email_domain.status_humanized
             - if @email_domain.ignored?
               %small.less-strong will not match any new users
+            - if @email_domain&.no_auto_assign_status?
+              %small{class: "tw:ml-1 tw:text-sky-400"} no auto status
 
   .col-md-6
     %table.table-list

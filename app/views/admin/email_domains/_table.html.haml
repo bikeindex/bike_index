@@ -41,6 +41,8 @@
             - status_class = "text-warning font-weight-bold" if email_domain.ignored?
             %span{class: status_class}
               = email_domain.status_humanized
+            - if email_domain&.no_auto_assign_status?
+              %small{class: "tw:ml-1 tw:text-sky-400"} no auto status
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: email_domain.creator, user_id: email_domain.creator_id, cache: false}
           %td

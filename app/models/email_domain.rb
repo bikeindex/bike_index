@@ -52,6 +52,7 @@ class EmailDomain < ApplicationRecord
   scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }
   scope :subdomain, -> { where("(data -> 'is_tld')::text = ?", "false") }
   scope :with_bikes, -> { where("COALESCE((data -> 'bike_count')::integer, 0) > 0") }
+  scope :no_auto_assign_status, -> { where("(data -> 'no_auto_assign_status')::text =?", "true") }
 
   attr_accessor :skip_processing
 
