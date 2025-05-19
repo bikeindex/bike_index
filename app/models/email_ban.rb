@@ -2,19 +2,17 @@
 #
 # Table name: email_bans
 #
-#  id            :bigint           not null, primary key
-#  end_at        :datetime
-#  reason        :integer
-#  start_at      :datetime
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  user_email_id :bigint
-#  user_id       :bigint
+#  id         :bigint           not null, primary key
+#  end_at     :datetime
+#  reason     :integer
+#  start_at   :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  user_id    :bigint
 #
 # Indexes
 #
-#  index_email_bans_on_user_email_id  (user_email_id)
-#  index_email_bans_on_user_id        (user_id)
+#  index_email_bans_on_user_id  (user_id)
 #
 class EmailBan < ApplicationRecord
   include ActivePeriodable
@@ -93,6 +91,16 @@ class EmailBan < ApplicationRecord
 
       User.where("email ~ ?", "^#{email_start}(\\+.*)?@#{email_end}").where.not(email:)
     end
+  end
+
+  def email
+    user&.email
+  end
+
+  def email_domain
+    return nil if email.blank?
+
+    EmailDomain.find_or_create_for(email, skip_processing: true)
   end
 
   def reason_humanized

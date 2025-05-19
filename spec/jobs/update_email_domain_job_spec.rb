@@ -178,7 +178,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
           expect(email_domain.status).to eq "provisional_ban"
           expect(described_class).to_not have_enqueued_sidekiq_job
-          expect(email_domain.spam_score).to be >9
+          expect(email_domain.spam_score).to be > 9
         end
       end
 

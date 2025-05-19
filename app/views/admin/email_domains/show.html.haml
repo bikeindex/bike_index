@@ -65,28 +65,35 @@
           %td
             Ban Blockers
           %td
-            = @email_domain.ban_blockers.any? ? check_mark : cross_mark
+            - ban_blockers = @email_domain.ban_blockers.any?
+            = ban_blockers ? check_mark : cross_mark
             %small.ml-2
               - if @email_domain.auto_bannable?
                 %span.text-warning auto bannable
               - else
                 not auto banable
-                -# duplicates the logic from ban_blockers to make it more readable
-                - if @email_domain.below_email_count_blocker?
-                  %em.ml-2{title: "NOTE: this also checks against notifications / 10"}
-                    Below email min count (#{EmailDomain::EMAIL_MIN_COUNT})
-                - if @email_domain.bike_count_blocker?
-                  %em.ml-2 Bike count
-                - if @email_domain.organization_role_blocker?
-                  %em.ml-2 Org Roles
-                - if @email_domain.calculated_subdomains.permitted.count > 0
-                  %em.ml-2 Permitted subdomains
+                - if ban_blockers
+                  %ul.mb-0
+                    -# duplicates the logic from ban_blockers to make it more readable
+                    - if @email_domain.below_email_count_blocker?
+                      %li
+                        %em.ml-2{title: "NOTE: this also checks against notifications / 10"}
+                          Below email min count (#{EmailDomain::EMAIL_MIN_COUNT})
+                    - if @email_domain.bike_count_blocker?
+                      %li
+                        %em.ml-2 Bike count
+                    - if @email_domain.organization_role_blocker?
+                      %li
+                        %em.ml-2 Org Roles
+                    - if @email_domain.calculated_subdomains.permitted.count > 0
+                      %li
+                        %em.ml-2 Permitted subdomains
 
 
         %tr
           %td Spam score
           %td
-            %strong
+            %strong{class: admin_email_domain_spam_color(@email_domain.spam_score)}
               #{@email_domain.spam_score} / 10
             %small.less-strong above #{EmailDomain::SPAM_SCORE_AUTO_BAN} is auto-bannable (with no blockers)
             %small.d-block

@@ -54,7 +54,7 @@
             = admin_number_display(email_domain.notification_count)
           %td
             - spam_score = email_domain.spam_score.round(0)
-            %span{class: (spam_score < EmailDomain::SPAM_SCORE_AUTO_BAN ? "text-info" : "")}
+            %span{class: admin_email_domain_spam_color(spam_score)}
               = email_domain.spam_score.round(0)
           %td
             = render partial: "data_details", locals: {email_domain:}
