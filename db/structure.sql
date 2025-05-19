@@ -1100,7 +1100,6 @@ ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bik
 CREATE TABLE public.email_bans (
     id bigint NOT NULL,
     user_id bigint,
-    user_email_id bigint,
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
     reason integer,
@@ -5891,13 +5890,6 @@ CREATE INDEX index_components_on_manufacturer_id ON public.components USING btre
 
 
 --
--- Name: index_email_bans_on_user_email_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_email_bans_on_user_email_id ON public.email_bans USING btree (user_email_id);
-
-
---
 -- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7047,6 +7039,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250519154506'),
 ('20250515190821'),
 ('20250508151610'),
 ('20250508151602'),

@@ -52,6 +52,7 @@ class EmailDomain < ApplicationRecord
   scope :tld_matches_subdomains, -> { tld.where.not("domain ILIKE ?", "@%") }
   scope :subdomain, -> { where("(data -> 'is_tld')::text = ?", "false") }
   scope :with_bikes, -> { where("COALESCE((data -> 'bike_count')::integer, 0) > 0") }
+  scope :no_auto_assign_status, -> { where("(data -> 'no_auto_assign_status')::text =?", "true") }
 
   attr_accessor :skip_processing
 
@@ -143,7 +144,7 @@ class EmailDomain < ApplicationRecord
   def auto_bannable?
     return false if ban_blockers.any?
 
-    spam_score < SPAM_SCORE_AUTO_BAN
+    spam_score > SPAM_SCORE_AUTO_BAN
   end
 
   def ban_blockers
@@ -171,10 +172,11 @@ class EmailDomain < ApplicationRecord
   end
 
   def spam_score
-    return 10 if data.blank? # Don't judge unless data is present
+    return 1 if data.blank? # Don't judge unless data is present
 
-    (spam_score_domain_resolution + spam_score_our_records + spam_score_sendgrid_validations)
-      .clamp(0, 10)
+    s_score = (10 - spam_score_domain_resolution - spam_score_our_records - spam_score_sendgrid_validations)
+      .clamp(1, 10)
+    (s_score == 1) ? score_zero_if_allowed : s_score
   end
 
   def spam_score_domain_resolution
@@ -191,7 +193,7 @@ class EmailDomain < ApplicationRecord
     score += 3 if (data["bike_count_pos"]&.to_i || 0) > 0
     # if domain has a high notification count, it often means they have a lot of unconfirmed users
     score -= 1 if (bike_count + uc) < notification_count
-    score.clamp(0, 10)
+    score.clamp(0, 9)
   end
 
   # SendGrid validation appears to be pretty much useless. Using just decimal for now, which has no effect
@@ -206,7 +208,7 @@ class EmailDomain < ApplicationRecord
   end
 
   def calculated_users
-    User.matching_domain(domain)
+    User.confirmed.matching_domain(domain)
   end
 
   def calculated_bikes
@@ -259,6 +261,10 @@ class EmailDomain < ApplicationRecord
   end
 
   private
+
+  def score_zero_if_allowed
+    ((data["bike_count_pos"]&.to_i&.> 1) && user_count > 5) ? 0 : 1
+  end
 
   def domain_is_expected_format
     self.domain = domain.strip

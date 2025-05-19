@@ -54,7 +54,7 @@
           %td
             = "#{marketplace_listing.currency_symbol}#{admin_number_display(marketplace_listing.amount)}"
           %td
-            = marketplace_listing.status_humanized
+            = marketplace_listing.condition
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.seller, render_search: true, cache: true}
           %td

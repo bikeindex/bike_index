@@ -124,6 +124,16 @@ module AdminHelper
     content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
   end
 
+  def admin_email_domain_spam_color(spam_score)
+    if spam_score > 9
+      "text-danger"
+    elsif spam_score < EmailDomain::SPAM_SCORE_AUTO_BAN
+      "text-info"
+    else
+      ""
+    end
+  end
+
   def user_icon_hash(user = nil)
     icon_hash = {tags: []}
     return icon_hash if user&.id.blank?
@@ -143,6 +153,7 @@ module AdminHelper
     icon_hash
   end
 
+  # Add icon for unconfirmed, email banned
   def user_icon(user = nil, full_text: false)
     icon_hash = user_icon_hash(user)
     return "" if icon_hash[:tags].empty?

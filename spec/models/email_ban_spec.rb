@@ -132,4 +132,12 @@ RSpec.describe EmailBan, type: :model do
       end
     end
   end
+
+  describe "email and email_domain" do
+    let(:email_ban) { FactoryBot.create(:email_ban) }
+    it "returns the user's email" do
+      expect(email_ban.email).to eq email_ban.user.email
+      expect(email_ban.email_domain&.id).to be_present
+    end
+  end
 end

@@ -43,15 +43,15 @@
         .alert.alert-danger.mb-4
           %h4.text-danger User's email banned (not delivered)
           Reasons:
-          - @user.email_bans_active.pluck(:reason).each do |reason|
-            = EmailBan.reason_humanized(reason)
+          - @user.email_bans_active.each do |email_ban|
+            = email_ban.reason_humanized
             %small.less-strong
-              - if reason == "email_domain"
-                The email domain was banned
-              - elsif reason == "email_duplicate"
-                The email looks like a duplicate of another email. In 2025, we were getting a lot of user sign up spam with emails that just had extra periods added in (which still deliver to gmail)
-              - elsif reason == "delivery_failure"
-                A recent email to them failed to be delivered. Have them check their spam folder!
+              - if email_ban.reason == "email_domain"
+                \- the #{link_to "email domain", admin_email_domain_path(email_ban.email_domain)} was banned.
+              - elsif email_ban.reason == "email_duplicate"
+                \- the email looks like a duplicate of another email. In 2025, we were getting a lot of user sign up spam with emails that just had extra periods added in (which still deliver to gmail)
+              - elsif email_ban.reason == "delivery_failure"
+                \- a recent email to them failed to be delivered. Have them check their spam folder!
 .row
   .col-md-6
     %h1

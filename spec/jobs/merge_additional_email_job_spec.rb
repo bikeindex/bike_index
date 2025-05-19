@@ -206,6 +206,14 @@ RSpec.describe MergeAdditionalEmailJob, type: :job do
       end
     end
 
+    context "email_ban" do
+      let!(:email_ban) { FactoryBot.create(:email_ban, user: old_user) }
+      it "updates the email_ban" do
+        instance.perform(user_email.id)
+        expect(email_ban.reload.user_id).to eq user.id
+      end
+    end
+
     context "multi merging" do
       let(:older_user) { FactoryBot.create(:user_confirmed) }
       let!(:older_user_email) { FactoryBot.create(:user_email, email: older_user.email, user: old_user) }
