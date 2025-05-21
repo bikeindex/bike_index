@@ -34,6 +34,8 @@ class Membership < ApplicationRecord
   enum :status, STATUS_ENUM
 
   validate :no_current_stripe_subscription_admin_managed
+  validates :user, presence: true, on: :create
+
   before_validation :set_calculated_attributes
 
   scope :admin_managed, -> { where.not(creator_id: nil) }
