@@ -61,7 +61,8 @@
             %td
               = f.id
             %td
-              = link_to f.bike_id, edit_admin_bike_url(f.bike_id)
+              - if f.bike_id.present?
+                = link_to f.bike_id, edit_admin_bike_url(f.bike_id)
 
   %h2
     Handlebar Types
