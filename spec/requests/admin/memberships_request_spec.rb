@@ -43,6 +43,15 @@ RSpec.describe Admin::MembershipsController, type: :request do
       end.to change(Membership, :count).by 1
       expect(Membership.last).to match_hash_indifferently(target_attrs)
     end
+    context "no matching user" do
+      it "doesn't create" do
+        expect do
+          post base_url, params: {
+            membership: {level: "plus", user_email: "unknownemail@example.com"}
+          }
+        end.to change(Membership, :count).by 0
+      end
+    end
     context "with a start_at" do
       it "creates" do
         expect do
