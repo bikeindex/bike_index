@@ -87,24 +87,25 @@ RSpec.describe MarketplaceMessage, type: :model do
   end
 
   describe "threads_for_user" do
-    let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
-    let(:user) { marketplace_message.receiver }
-    let(:marketplace_message_1) { FactoryBot.create(:marketplace_message, sender: user) }
-    let(:marketplace_message_2) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message_1, receiver: user) }
-    let(:marketplace_message_reply) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message) }
+    let(:marketplace_message_1) { FactoryBot.create(:marketplace_message) }
+    let(:user) { marketplace_message_1.receiver }
+    let!(:marketplace_message_2_reply) { FactoryBot.create(:marketplace_message_reply, receiver: user) }
+    let(:marketplace_message_2) { marketplace_message_2_reply.initial_record }
+    let!(:marketplace_message_1_reply) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message_1, receiver: user) }
+    let!(:marketplace_message_3) { FactoryBot.create(:marketplace_message, sender: user) }
+    let!(:marketplace_message_other) { FactoryBot.create(:marketplace_message) }
 
     it "returns the threads for user in the order by id" do
-      expect(marketplace_message).to be_valid
-      expect(marketplace_message_1).to be_valid
-      expect(marketplace_message_1.receiver_id).to_not eq user.id
-      expect(marketplace_message_1.sender_id).to eq user.id
-      expect(marketplace_message_2).to be_valid
-      expect(marketplace_message_2.receiver_id).to eq user.id
-      expect(marketplace_message_2.sender_id).to_not eq user.id
-      expect(marketplace_message_reply).to be_valid
-      expect(MarketplaceMessage.for_user(user).order(:id).pluck(:id)).to match_array([marketplace_message.id, marketplace_message_1.id, marketplace_message_2.id, marketplace_message_reply.id])
-      expect(MarketplaceMessage.distinct.pluck(:initial_record_id)).to match_array([marketplace_message.id, marketplace_message_2.initial_record_id])
-      expect(MarketplaceMessage.threads_for_user(user).map(&:id)).to match_array([marketplace_message_reply.id, marketplace_message_2.id])
+      expect(marketplace_message_1.receiver_id).to eq user.id
+      expect(marketplace_message_2.sender_id).to eq user.id
+      expect(marketplace_message_1_reply.receiver_id).to eq user.id
+      expect(marketplace_message_3.sender_id).to eq user.id
+
+      expect(MarketplaceMessage.order(id: :desc).pluck(:id)).to eq([marketplace_message_other.id, marketplace_message_3.id, marketplace_message_1_reply.id, marketplace_message_2_reply.id, marketplace_message_2.id, marketplace_message_1.id])
+      expect(MarketplaceMessage.for_user(user).order(id: :desc).pluck(:id)).to eq([marketplace_message_3.id, marketplace_message_1_reply.id, marketplace_message_2_reply.id, marketplace_message_2.id, marketplace_message_1.id])
+
+      expect(MarketplaceMessage.threads_for_user(user).map(&:id)).to match_array([marketplace_message_3.id, marketplace_message_1_reply.id, marketplace_message_2_reply.id])
+      expect(MarketplaceMessage.distinct_threads.map(&:id)).to eq([marketplace_message_other.id, marketplace_message_3.id, marketplace_message_1_reply.id, marketplace_message_2_reply.id])
     end
   end
 
