@@ -1,7 +1,6 @@
 
 = form_for [:admin, @manufacturer] do |f|
-  - if @manufacturer.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Payment", obj: @manufacturer }
+  = render(AlertForErrors::Component.new(object: @manufacturer))
 
   .form-group
     = f.label :name

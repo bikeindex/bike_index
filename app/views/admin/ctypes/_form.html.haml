@@ -1,7 +1,6 @@
-
 = form_for [:admin, @ctype], html: {class: "form-group"} do |f|
-  - if @ctype.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Component Type", obj: @ctype }
+  = render(AlertForErrors::Component.new(name: "Component Type", object: @ctype))
+
   .form-group
     = f.label :name, "Name"
     = f.text_field :name, class: "form-control"

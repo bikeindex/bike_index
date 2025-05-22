@@ -395,8 +395,8 @@
 %hr.mt-4
 %h4 Edit
 = form_for @user, url: admin_user_path, method: :patch  do |f|
-  - if @user.errors.any?
-    = render partial: "/shared/errors", locals: { name: "User", obj: @user }
+  = render(AlertForErrors::Component.new(object: @user))
+
   .row.mt-4
     .col-md-6
       .form-group

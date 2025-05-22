@@ -7,8 +7,8 @@
           %br
           It would be better to delete and re-add
     = form_for [:admin, @organization_role] do |f|
-      - if @organization_role.errors.any?
-        = render partial: "/shared/errors", locals: { name: "OrganizationRole", obj: @organization_role }
+      = render(AlertForErrors::Component.new(object: @organization_role))
+
       .form-group.fancy-select.unfancy
         = f.label :organization
         = collection_select :organization_role, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"

@@ -5461,10 +5461,6 @@ nb:
       serial: 'Serie:'
       stolen_at: 'Stjålet på:'
       stolen_from: 'Stjålet fra:'
-    errors:
-      error: feil
-      errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
-        %{object_name} ble lagret:"
     faq:
       absolutely: Absolutt!
       add_a_stolen_bike_link: legg til din stjålne sykkel til Bike Index!

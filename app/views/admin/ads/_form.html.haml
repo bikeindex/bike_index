@@ -1,5 +1,4 @@
-- if @ad.errors.any?
-  = render partial: "/shared/errors", locals: { name: "Ad", obj: @ad }
+= render(AlertForErrors::Component.new(object: @ad))
 
 .form-group
   = f.label :organization

@@ -11,8 +11,8 @@
 .row
   .col-md-6
     = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
-      - if @ownership.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Ownership", obj: @ownership }
+      = render(AlertForErrors::Component.new(object: @ownership))
+
       .form-group
         = f.label :creator_id
         = f.email_field :creator_email, value: @ownership.creator&.email, required: true, prompt: "Creator's email", class: "form-control"
