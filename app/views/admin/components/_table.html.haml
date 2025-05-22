@@ -1,0 +1,60 @@
+-# requires collection local
+- render_sortable ||= false
+- ctype_other_id = Ctype.other.id
+- manufacturer_other_id = Manufacturer.other.id
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      %th
+        Model, description, serial
+      %th
+        Year
+      %th
+        Type
+      %th
+        Front/Rear
+      %th
+        = sortable "manufacturer_id", render_sortable: render_sortable
+      %th
+        = sortable "bike_id", render_sortable: render_sortable
+    %tbody
+      - collection.each do |component|
+        %tr
+          %td
+            .less-strong-hold
+              %span.convertTime
+                = l component.created_at, format: :convert_time
+              - if display_dev_info?
+                %span.less-strong-right.d-none.d-md-block.only-dev-visible
+                  = component.id
+          %td
+            = component.model_name
+            - if component.description.present?
+              %small{title: component.description}
+                = component.description.truncate(100)
+            - if component.serial_number.present?
+              %small.d-block
+                serial: #{component.serial_number}
+          %td
+            = component.year
+          %td
+            - if component.ctype_id = ctype_other_id
+              %span.stolen-color= component.ctype_other.presence || "-"
+            - else
+              = component.ctype.name
+          %td
+            %span{class: (component.manufacturer_id = manufacturer_other_id ? "stolen-color" : "")}
+              = component.mnfg_name
+          %td
+            - if component.front
+              front
+            - if component.rear
+              rear
+
+          %td
+            - if component.bike_id.present?
+              = render partial: "/shared/admin/bike_cell", locals: {bike: component.bike, bike_link_path: admin_bike_path(component.bike_id) }
+

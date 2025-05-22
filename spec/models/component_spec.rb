@@ -2,21 +2,30 @@ require "rails_helper"
 
 RSpec.describe Component, type: :model do
   describe "component_type" do
+    let(:component) { FactoryBot.create(:component, ctype:, ctype_other:) }
+    let(:ctype) { FactoryBot.create(:ctype) }
+    let(:ctype_other) { "" }
+
     it "returns the name of the ctype other if it should" do
-      ctype = Ctype.new
-      component = Component.new
-      allow(component).to receive(:ctype).and_return(ctype)
-      allow(ctype).to receive(:name).and_return("Other")
-      allow(component).to receive(:ctype_other).and_return("OOOP")
-      expect(component.component_type).to eq("OOOP")
+      expect(component.reload.component_type).to eq ctype.name
+      expect(component.ctype_other).to be_nil
     end
 
-    it "returns the name of the ctype" do
-      ctype = Ctype.new
-      component = Component.new
-      allow(component).to receive(:ctype).and_return(ctype)
-      allow(ctype).to receive(:name).and_return("stuff")
-      expect(component.component_type).to eq("stuff")
+    context "with ctype other" do
+      let(:ctype) { Ctype.other }
+      let(:ctype_other) { " OthER\n"}
+      it "returns other" do
+        expect(component.reload.component_type).to eq "unknown"
+        expect(component.ctype_other).to be_nil
+      end
+
+      context "with ctype_other set" do
+        let(:ctype_other) { "cool thing we don't have " }
+        it "returns the name" do
+          expect(component.reload.component_type).to eq ctype_other.strip
+          expect(component.ctype_other).to eq ctype_other.strip
+        end
+      end
     end
   end
 
