@@ -19,7 +19,7 @@ class Admin::DashboardController < Admin::BaseController
     @component_mnfgs = Component.where(manufacturer_id: mnfg_other_id).reorder(id: :desc).limit(100)
     @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other_id)
     @component_types = Component.where(ctype_id: Ctype.other.id)
-    @handlebar_types = Bike.where(handlebar_type: Bike.handlebar_types[:other]).reorder(id: :desc).limit(50)
+    @bikes_other_handlebar_type = Bike.where(handlebar_type: Bike.handlebar_types[:other]).reorder(id: :desc).limit(50)
     @paint = Paint.where("color_id IS NULL")
   end
 

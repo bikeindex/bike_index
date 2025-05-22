@@ -65,22 +65,20 @@
                 = link_to f.bike_id, edit_admin_bike_url(f.bike_id)
 
   %h2
-    Handlebar Types
+    Handlebar Types other
   .full-screen-table
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th
           Date
         %th
-          Handlebar type
-        %th
           Bike
       %tbody
-        - @handlebar_types.each do |f|
+        - @bikes_other_handlebar_type.each do |bike|
           %tr
             %td
               %span.convertTime
-                = l f.created_at, format: :convert_time
+                = l bike.created_at, format: :convert_time
 
             %td
-              = link_to f.id, edit_admin_bike_url(f)
+              = link_to bike.title_string, edit_admin_bike_url(bike)
