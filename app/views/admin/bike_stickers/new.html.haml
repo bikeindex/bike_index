@@ -51,8 +51,8 @@
 
 
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
-  - if @bike_sticker_batch.errors.any?
-    = render partial: "shared/errors", locals: { name: "Sticker Batch", obj: @bike_sticker_batch }
+  = render(AlertForErrors::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))
+
   .row.mt-4
     .col-md-6.col-lg-3
       .form-group.fancy-select.unfancy

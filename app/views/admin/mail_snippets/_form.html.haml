@@ -14,8 +14,7 @@
   Organization emails are editable through the organization's page and should probably be edited there (rather than here). Those kinds:
   %small.d-block.mt-2= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ")
 
-- if @mail_snippet.errors.any?
-  = render partial: "/shared/errors", locals: {name: "Mail Snippet", obj: @mail_snippet}
+= render(AlertForErrors::Component.new(object:@mail_snippet))
 
 - def select_display(k); "#{MailSnippet.kind_humanized(k)} - in #{MailSnippet.organization_email_for(k)} emails" end
 .form-group.fancy-select.unfancy

@@ -1,6 +1,5 @@
 = form_for [:admin, @content_tag] do |f|
-  - if @content_tag.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Content tag", obj: @content_tag }
+  = render(AlertForErrors::Component.new(object: @content_tag))
 
   .row
     .col-md-6

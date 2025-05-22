@@ -2,8 +2,7 @@
   New Payment
 
 = form_for [:admin, @payment] do |f|
-  - if @payment.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Payment", obj: @payment }
+  = render(AlertForErrors::Component.new(object: @payment))
 
   .row
     .col-md-6

@@ -19,7 +19,6 @@ class Ctype < ApplicationRecord
 
   MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"].blank? # enable skipping for testing
 
-
   belongs_to :cgroup
 
   has_many :components

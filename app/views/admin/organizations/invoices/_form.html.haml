@@ -1,8 +1,7 @@
 #invoiceForm.mt-4
   = form_for [:admin, @organization, @invoice] do |f|
     = f.hidden_field :organization_feature_ids
-    - if @invoice.errors.any?
-      = render partial: "/shared/errors", locals: { name: "Invoice", obj: @invoice }
+    = render(AlertForErrors::Component.new(object: @invoice))
 
     .full-screen-table
       %table.table.table-striped.table-bordered.table-sm

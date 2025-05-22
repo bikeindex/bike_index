@@ -20,8 +20,7 @@
   .row
     .col-md-8.offset-md-2
       = form_for [:admin, @payment] do |f|
-        - if @payment.errors.any?
-          = render partial: "/shared/errors", locals: {name: "Payment", obj: @payment}
+        = render(AlertForErrors::Component.new(object: @payment))
 
         .row
           .col-lg-6

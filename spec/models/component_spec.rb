@@ -13,7 +13,7 @@ RSpec.describe Component, type: :model do
 
     context "with ctype other" do
       let(:ctype) { Ctype.other }
-      let(:ctype_other) { " OthER\n"}
+      let(:ctype_other) { " OthER\n" }
       it "returns other" do
         expect(component.reload.component_type).to eq "unknown"
         expect(component.ctype_other).to be_nil

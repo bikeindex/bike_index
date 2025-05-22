@@ -32,8 +32,8 @@
 
 
 = form_for [:admin, @paint] do |f|
-  - if @paint.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Paint", obj: @paint }
+  = render(AlertForErrors::Component.new(object: @paint))
+
   .row
     .col-lg-3.col-md-6.col-sm-12
       .form-group

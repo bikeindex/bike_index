@@ -44,8 +44,7 @@
     .card.bg-light
       .card-body
         = form_for [:admin, @superuser_ability] do |f|
-          - if @superuser_ability.errors.any?
-            = render partial: "/shared/errors", locals: {obj: @superuser_ability}
+          = render(AlertForErrors::Component.new(object: @superuser_ability))
 
           - SuperuserAbility::SU_OPTIONS.each do |ability|
             .form-group

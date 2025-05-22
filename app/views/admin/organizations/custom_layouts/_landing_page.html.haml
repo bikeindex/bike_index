@@ -1,6 +1,5 @@
+= render(AlertForErrors::Component.new(object: @organization))
 
-- if @organization.errors.any?
-  = render partial: "/shared/errors", locals: { name: "Organization", obj: @organization  }
 = form_for @organization, {as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update'} do |f|
   = hidden_field_tag :kind, "landing_page"
   .form-group
