@@ -5014,10 +5014,6 @@ nl:
         voor Bike Shop, die wij aanbevelen te gebruiken
       subscription_expired_html: Uw abonnement op Bike Index is verlopen. Neem contact
         op met %{email_link} om het opnieuw in te schakelen.
-    errors:
-      error: Fout
-      errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-        dit %{object_name} wordt opgeslagen:"
     content_skeleton:
       about: Over
       bicycle_serials: Fietsseries

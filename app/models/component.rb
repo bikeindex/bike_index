@@ -106,6 +106,7 @@ class Component < ApplicationRecord
   def set_calculated_attributes
     set_front_or_rear
     set_is_stock
+    self.manufacturer_other = InputNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.ctype_other = InputNormalizer.string(ctype_other)
     self.ctype_other = nil if ctype_other&.downcase == "other"

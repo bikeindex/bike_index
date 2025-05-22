@@ -4313,9 +4313,6 @@ it:
       serial:
       stolen_at:
       stolen_from:
-    errors:
-      error:
-      errors_prevented_this_from_being_saved:
     faq:
       absolutely:
       add_a_stolen_bike_link:
