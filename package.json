@@ -1,10 +1,12 @@
 {
   "name": "bike_index-webapp",
   "devDependencies": {
-    "standard": "*"
+    "standard": "*",
+    "test": "jest"
   },
   "scripts": {
-    "lint": "standard --fix"
+    "lint": "standard --fix",
+    "test": "jest"
   },
   "standard": {
     "ignore": [
