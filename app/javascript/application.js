@@ -20,7 +20,6 @@ window.Stimulus = application
 lazyLoadControllersFrom('components', application)
 
 function localizeTime () {
-  console.log('localizeTime!')
   if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
   window.timeLocalizer.localize()
 }
