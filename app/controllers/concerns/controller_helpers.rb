@@ -227,7 +227,7 @@ module ControllerHelpers
         caller_locations
           .slice(0, 2)
           .map(&:label)
-          .reject { |label| label.include?('rescue in') }
+          .reject { |label| label.include?("rescue in") }
           .first
     end
 
