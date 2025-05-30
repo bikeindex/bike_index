@@ -2,18 +2,16 @@
 
 require "rails_helper"
 
-RSpec.describe TimeLocalizer::Component, :js, type: :system do
-  let(:time_zone) { "America%2FChicago" }
-  let(:page_url) { "time_localizer/component_preview/default?time_zone=#{time_zone}" }
+RSpec.describe "time_localizer.js", :js, type: :system do
+  let(:time_zone) { "America/Chicago" }
+  let(:preview_path) { "/rails/view_components/time_localizer/component/default?time_zone=#{CGI.escape(time_zone)}" }
+  let(:current_in_zone) { TimeParser.parse(Time.current, time_zone, in_time_zone: true) }
 
   it "has the expected times" do
     visit(preview_path)
 
-    expect(page).to have_content "A simple alert with some info"
-
-    find('button[aria-label="Close"]').click
-
-    expect(page).to_not have_content "a simple alert with some info"
+    sleep 1 # WTF, TimeLocalizer isn't executing before running the spec
+    expect(page).to have_content("Current time: #{current_in_zone.strftime("%l:%M %p")}", wait: 10)
   end
 
   # describe 'localizedTimeHtml method' do

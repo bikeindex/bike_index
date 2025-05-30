@@ -1,16 +1,19 @@
 <%# NOTE: this component is here for testing. It uses the same time_localizer.js setup as everything else %>
 
 <% time_zone ||= nil %>
+<% if time_zone.present? %>
+  <script>
+    window.localTimezone = '<%= time_zone %>';
+  </script>
+<% end %>
+
 <h2 class="tw:text-sm tw:mb-4">
   <span class="tw:opacity-65">In time zone:</span> <span class="localizeTimezone"></span>
 </h2>
-<% if time_zone.present? %>
-  <script>window.localTimezone = '<%= time_zone %>';</script>
-<% end %>
 
 <div class="tw:mb-4">
   <p>
-    <span class="tw:text-sm tw:opacity-65">Current time</span>
+    <span class="tw:text-sm tw:opacity-65">Current time:</span>
     <span class="localizeTime">
       <%= l Time.current, format: :convert_time %>
     </span>
@@ -19,10 +22,63 @@
 
 <div class="tw:mb-4">
   <p>
-    <span class="tw:text-sm tw:opacity-65">Yesterday</span>
+    <span class="tw:text-sm tw:opacity-65">Yesterday:</span>
     <span class="localizeTime">
       <%= l (Time.current - 1.day), format: :convert_time %>
     </span>
   </p>
 </div>
 
+<div class="tw:mb-4">
+  <p>
+    <span class="tw:text-sm tw:opacity-65">Tonight 1am:</span>
+    <span class="localizeTime">
+      <%= l (Time.current.end_of_day + 1.hour), format: :convert_time %>
+    </span>
+  </p>
+</div>
+
+<div class="tw:mb-4">
+  <p>
+    <span class="tw:text-sm tw:opacity-65">Tomorrow:</span>
+    <span class="localizeTime">
+      <%= l (Time.current + 1.day), format: :convert_time %>
+    </span>
+  </p>
+</div>
+
+<div class="tw:mb-4">
+  <p>
+    <span class="tw:text-sm tw:opacity-65">One week ago:</span>
+    <span class="localizeTime">
+      <%= l (Time.current - 7.days), format: :convert_time %>
+    </span>
+  </p>
+</div>
+
+<div class="tw:mb-4">
+  <p>
+    <span class="tw:text-sm tw:opacity-65">One year ago:</span>
+    <span class="localizeTime">
+      <%= l (Time.current - 1.year), format: :convert_time %>
+    </span>
+  </p>
+</div>
+
+<div class="tw:mb-4">
+  <p>
+    <span class="tw:text-sm tw:opacity-65">Yesterday (precise time):</span>
+    <span class="localizeTime preciseTime">
+      <%= l (Time.current - 1.day), format: :convert_time %>
+    </span>
+  </p>
+</div>
+
+<div class="tw:mb-4">
+  <p>
+    <span class="tw:text-sm tw:opacity-65">Yesterday (precise time seconds):</span>
+    <span class="localizeTime preciseTimeSeconds">
+      <%= l (Time.current - 1.day), format: :convert_time %>
+    </span>
+  </p>
+</div>

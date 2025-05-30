@@ -155,7 +155,6 @@ export default class TimeLocalizer {
   ) {
     const timeInZone = time.setZone(this.localTimezone) // TODO: this is where we could pass in
     const withoutDate = this.renderWithoutDate(timeInZone)
-    console.log(withoutDate)
 
     // If it's preciseTime (or preciseTimeSeconds), always show the hours and mins
     let hourEl = (preciseTime || includeSeconds || withoutDate) ? ` ${this.hourFormat(timeInZone, 'h:mm', includeSeconds, withPreposition)}` : ''
