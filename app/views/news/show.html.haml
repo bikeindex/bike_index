@@ -39,7 +39,7 @@
       = link_to @blog.pretty_canonical, @blog.canonical_url
 
 
-- if Rails.env.production? && @blog.published
+- if @blog.published && @show_discuss
   -# Clear the ad overhang with a padded block
   .padded
   %article#discourse-comments
