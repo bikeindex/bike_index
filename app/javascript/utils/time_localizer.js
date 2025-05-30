@@ -26,8 +26,6 @@ import { DateTime } from 'luxon'
 // To get span with the localized time:
 // localizedTimeHtml("1604337131", {})
 //
-// You can add this to a react component:
-// componentDidUpdate() { window.timeLocalizer.localize() }
 
 export default class TimeLocalizer {
   constructor () {
@@ -36,8 +34,8 @@ export default class TimeLocalizer {
     }
     this.singleFormat = !!window.timeLocalizerSingleFormat
     this.localTimezone = window.localTimezone
+    this.now = DateTime.now().setZone(this.localTimezone)
     // Create all DateTime instances with the local timezone
-    this.now = DateTime.local().setZone(this.localTimezone)
     this.yesterdayStart = this.now.minus({ days: 1 }).startOf('day') - 1
     this.todayStart = this.now.startOf('day')
     this.todayEnd = this.now.endOf('day')
@@ -142,7 +140,7 @@ export default class TimeLocalizer {
   renderWithoutDate (time) {
     if (this.onlyTodayWithoutDate) {
       // If it's in the past 4 hours (in milliseconds), return true (so e.g. it returns 11:30pm at 12:30pm)
-      return time > (this.now.minus(14400000)) || (time < this.todayEnd && time > this.todayStart)
+      return (time < this.now && time > (this.now.minus(14400000))) || (time < this.todayEnd && time > this.todayStart)
     } else {
       return (time < this.tomorrowEnd && time > this.yesterdayStart)
     }
@@ -155,13 +153,14 @@ export default class TimeLocalizer {
     includeSeconds,
     withPreposition
   ) {
-    const withoutDate = this.renderWithoutDate(time)
+    const timeInZone = time.setZone(this.localTimezone) // TODO: this is where we could pass in
+    const withoutDate = this.renderWithoutDate(timeInZone)
 
     // If it's preciseTime (or preciseTimeSeconds), always show the hours and mins
-    let hourEl = (preciseTime || includeSeconds || withoutDate) ? ` ${this.hourFormat(time, 'h:mm', includeSeconds, withPreposition)}` : ''
+    let hourEl = (preciseTime || includeSeconds || withoutDate) ? ` ${this.hourFormat(timeInZone, 'h:mm', includeSeconds, withPreposition)}` : ''
 
     if (singleFormat) {
-      return time.toFormat('yyyy-MM-dd') + hourEl
+      return timeInZone.toFormat('yyyy-MM-dd') + hourEl
     }
 
     let prefix = ''
@@ -170,9 +169,9 @@ export default class TimeLocalizer {
       // ... unless we're only showing today without day (in which case, don't prefix)
       if (this.onlyTodayWithoutDate) {
         // no-op
-      } else if (time < this.todayStart) {
+      } else if (timeInZone < this.todayStart) {
         prefix = 'Yesterday'
-      } else if (time > this.todayEnd) {
+      } else if (timeInZone > this.todayEnd) {
         prefix = 'Tomorrow'
       } else {
         prefix = 'Today'
@@ -188,10 +187,10 @@ export default class TimeLocalizer {
     }
 
     // Only show the year if it isn't this year
-    if (time.year - this.todayYear !== 0) {
-      return prefix + time.toLocaleString({ month: 'short', day: 'numeric', year: 'numeric' }) + hourEl
+    if (timeInZone.year - this.todayYear !== 0) {
+      return prefix + timeInZone.toLocaleString({ month: 'short', day: 'numeric', year: 'numeric' }) + hourEl
     } else {
-      return prefix + time.toLocaleString({ month: 'short', day: 'numeric' }) + hourEl
+      return prefix + timeInZone.toLocaleString({ month: 'short', day: 'numeric' }) + hourEl
     }
   }
 

@@ -1,8 +1,5 @@
 - def template_url(template); template == "membership" ? edit_membership_path : edit_my_account_path(edit_template: template) end
 
--# Add importmaps, because of ViewComponents
-= javascript_importmap_tags
-
 = form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
   .form-well-container.container
     .row

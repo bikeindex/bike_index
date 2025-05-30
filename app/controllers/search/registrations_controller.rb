@@ -1,7 +1,6 @@
 class Search::RegistrationsController < Bikes::BaseController
   MAX_INDEX_PAGE = 100
   before_action :render_ad
-  before_action :enable_importmaps
   before_action :set_interpreted_params
   skip_before_action :find_bike # from Bikes::baseController
   skip_before_action :ensure_user_allowed_to_edit # from Bikes::baseController

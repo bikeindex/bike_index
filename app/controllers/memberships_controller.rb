@@ -1,5 +1,4 @@
 class MembershipsController < ApplicationController
-  before_action :enable_importmaps
   before_action :store_return_and_authenticate_user, only: %i[edit]
 
   layout "payments_layout"
