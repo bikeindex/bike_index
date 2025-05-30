@@ -10,50 +10,14 @@ RSpec.describe "time_localizer.js", :js, type: :system do
   it "has the expected times" do
     visit(preview_path)
 
-    sleep 1 # WTF, TimeLocalizer isn't executing before running the spec
-    expect(page).to have_content("Current time: #{current_in_zone.strftime("%l:%M %p")}", wait: 10)
+    expect(page).to have_content("Current time: #{current_in_zone.strftime("%l:%M %p")}", wait: 5)
+
+    expect(page).to have_content("Yesterday: #{(current_in_zone - 1.day).strftime("%B %e")}")
+    expect(page).to have_content("Tomorrow: #{(current_in_zone + 1.day).strftime("%B %e")}")
+    expect(page).to have_content("One week ago: #{(current_in_zone - 7.days).strftime("%B %e")}")
+    expect(page).to have_content("One year ago: #{(current_in_zone - 1.year).strftime("%B %e, %Y")}")
+
+    expect(page).to have_content("Yesterday (precise time): #{(current_in_zone - 1.day).strftime("%B %e, %l:%M %p")}")
+    expect(page).to have_content("One year ago (precise time seconds): #{(current_in_zone - 1.year).strftime("%B %-e, %Y, %-l:%M:%S %p")}")
   end
-
-  # describe 'localizedTimeHtml method' do
-  #   it 'returns HTML string with localized time' do
-  #     result = page.evaluate_script(<<~JS)
-  #       window.timeLocalizer.localizedTimeHtml('#{unix_timestamp}', {})
-  #     JS
-
-  #     expect(result).to include('<span')
-  #     expect(result).to include('title=')
-  #     expect(result).to include('Nov')
-  #   end
-
-  #   it 'handles options for precise time' do
-  #     result = page.evaluate_script(<<~JS)
-  #       window.timeLocalizer.localizedTimeHtml('#{unix_timestamp}', {
-  #         preciseTime: true,
-  #         includeSeconds: true
-  #       })
-  #     JS
-
-  #     expect(result).to include('<small>')
-  #     expect(result).to match(/\d{1,2}:\d{2}/)
-  #   end
-
-  #   it 'handles withPreposition option' do
-  #     result = page.evaluate_script(<<~JS)
-  #       window.timeLocalizer.localizedTimeHtml('#{unix_timestamp}', {
-  #         preciseTime: true,
-  #         withPreposition: true
-  #       })
-  #     JS
-
-  #     expect(result).to include(' at ')
-  #   end
-
-  #   it 'returns empty span for invalid time' do
-  #     result = page.evaluate_script(<<~JS)
-  #       window.timeLocalizer.localizedTimeHtml('invalid-time', {})
-  #     JS
-
-  #     expect(result).to eq('<span></span>')
-  #   end
-  # end
 end

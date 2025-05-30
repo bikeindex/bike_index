@@ -140,7 +140,7 @@ export default class TimeLocalizer {
   renderWithoutDate (time) {
     if (this.onlyTodayWithoutDate) {
       // If it's in the past 4 hours (in milliseconds), return true (so e.g. it returns 11:30pm at 12:30pm)
-      return time > (this.now.minus(14400000)) || (time < this.todayEnd && time > this.todayStart)
+      return (time < this.now && time > (this.now.minus(14400000))) || (time < this.todayEnd && time > this.todayStart)
     } else {
       return (time < this.tomorrowEnd && time > this.yesterdayStart)
     }

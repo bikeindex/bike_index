@@ -31,15 +31,6 @@
 
 <div class="tw:mb-4">
   <p>
-    <span class="tw:text-sm tw:opacity-65">Tonight 1am:</span>
-    <span class="localizeTime">
-      <%= l (Time.current.end_of_day + 1.hour), format: :convert_time %>
-    </span>
-  </p>
-</div>
-
-<div class="tw:mb-4">
-  <p>
     <span class="tw:text-sm tw:opacity-65">Tomorrow:</span>
     <span class="localizeTime">
       <%= l (Time.current + 1.day), format: :convert_time %>
@@ -76,9 +67,9 @@
 
 <div class="tw:mb-4">
   <p>
-    <span class="tw:text-sm tw:opacity-65">Yesterday (precise time seconds):</span>
+    <span class="tw:text-sm tw:opacity-65">One year ago (precise time seconds):</span>
     <span class="localizeTime preciseTimeSeconds">
-      <%= l (Time.current - 1.day), format: :convert_time %>
+      <%= l (Time.current - 1.year), format: :convert_time %>
     </span>
   </p>
 </div>
