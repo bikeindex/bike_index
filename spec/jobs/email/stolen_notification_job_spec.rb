@@ -121,6 +121,21 @@ RSpec.describe Email::StolenNotificationJob, type: :job do
         expect(notification.kind).to eq "stolen_notification_sent"
       end
     end
+    context "with doorkeeper app" do
+      let(:stolen_notification2) { FactoryBot.create(:stolen_notification, sender: user, bike: bike2, doorkeeper_app_id: 42) }
+
+      it "sends customer an email" do
+        expect(stolen_notification.reload.kind).to eq "stolen_permitted"
+        expect {
+          instance.perform(stolen_notification.id)
+        }.to change(Notification, :count).by 1
+
+        expect(stolen_notification2.reload.kind).to eq "stolen_permitted"
+        expect {
+          instance.perform(stolen_notification2.id)
+        }.to change(Notification, :count).by 1
+      end
+    end
   end
 
   context "unstolen bike" do

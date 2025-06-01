@@ -1600,18 +1600,20 @@ RSpec.describe "Bikes API V3", type: :request do
             .and change(StolenNotification, :count).by(1)
           expect(response.code).to eq("201")
           expect(StolenNotification.last.doorkeeper_application_id).to eq doorkeeper_app.id
+          expect(stolen_notification.mail_snippet&.id).to be_blank
 
           Email::StolenNotificationJob.drain
           expect(ActionMailer::Base.deliveries).to_not be_empty
         end
 
         context "mail snippet" do
-          let(:snippet_body) { "Special Stolen Notification Snippet!" }
+          let(:body) { "Special Stolen Notification Snippet!" }
           let!(:mail_snippet) do
             FactoryBot.create(:mail_snippet, kind: "stolen_notification_oauth",
-              doorkeeper_application: doorkeeper_app, body: snippet_body)
+              doorkeeper_application: doorkeeper_app, body: body)
           end
           it "includes the mail snippet" do
+            expect(mail_snippet.reload.is_enabled).to be_truthy
             ActionMailer::Base.deliveries = []
             Sidekiq::Job.clear_all
 
@@ -1620,7 +1622,9 @@ RSpec.describe "Bikes API V3", type: :request do
             end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
               .and change(StolenNotification, :count).by(1)
             expect(response.code).to eq("201")
-            expect(StolenNotification.last.doorkeeper_application_id).to eq doorkeeper_app.id
+            stolen_notification = StolenNotification.last
+            expect(stolen_notification.doorkeeper_application_id).to eq doorkeeper_app.id
+            expect(stolen_notification.mail_snippet&.id).to eq mail_snippet.id
 
             Email::StolenNotificationJob.drain
             expect(ActionMailer::Base.deliveries).to_not be_empty
@@ -1628,7 +1632,7 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(mail.to).to eq([bike.owner_email])
             expect(mail.subject).to eq "Stolen bike contact"
             expect(mail.body.encoded).to match params[:message]
-            expect(mail.body.encoded).to match snippet_body
+            expect(mail.body.encoded).to match body
           end
         end
       end

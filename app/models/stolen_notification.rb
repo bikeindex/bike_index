@@ -54,7 +54,7 @@ class StolenNotification < ApplicationRecord
 
   def permitted_send?
     return false unless bike&.contact_owner?(sender)
-    return true if sender.enabled?("unstolen_notifications")
+    return true if sender.enabled?("unstolen_notifications") || doorkeeper_application_id.present?
     (sender.sent_stolen_notifications.count < 2) || sender.can_send_many_stolen_notifications
   end
 
@@ -76,6 +76,12 @@ class StolenNotification < ApplicationRecord
       Hi, this is #{sender&.name} with Bike Index.
       Is this your missing #{bike.type}?
     STR
+  end
+
+  def mail_snippet
+    return nil if doorkeeper_application_id.blank?
+
+    MailSnippet.enabled.stolen_notification_oauth.find_by(doorkeeper_application_id:)
   end
 
   private
