@@ -534,7 +534,7 @@ RSpec.describe "Bikes API V2", type: :request do
         expect(bike.reload.status).to eq "status_with_owner"
         post url, params: params.to_json, headers: json_headers
         expect(response.code).to eq("400")
-        expect(response.body.match("is not stolen")).to be_present
+        expect(response.body.match("Unable to find matching stolen bike")).to be_present
       end
     end
 
