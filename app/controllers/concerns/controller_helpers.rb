@@ -69,12 +69,6 @@ module ControllerHelpers
     end
   end
 
-  # This alone doesn't enable importmaps (and tailwind)
-  # Make sure the layout has 'if @include_importmaps'
-  def enable_importmaps
-    @include_importmaps = true
-  end
-
   def store_return_and_authenticate_user(translation_key: nil, flash_type: :error)
     return if current_user&.confirmed? && current_user.terms_of_service
 
@@ -233,7 +227,7 @@ module ControllerHelpers
         caller_locations
           .slice(0, 2)
           .map(&:label)
-          .reject { |label| label =~ /rescue in/ }
+          .reject { |label| label.include?("rescue in") }
           .first
     end
 

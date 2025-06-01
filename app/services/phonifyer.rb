@@ -24,7 +24,7 @@ class Phonifyer
     country_code = number[/\A\+\d*/]
     if country_code.length > 10 # Looks like the whole number is in country code
       # This assumes the number is 10 digits long - so we grab any number before the last 10
-      country_code = country_code.slice(0, (country_code.length - 10))
+      country_code = country_code.slice(0, country_code.length - 10)
     end
     number = number.gsub(country_code, "")
     [number.strip, country_code.strip]

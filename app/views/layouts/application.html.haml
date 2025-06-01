@@ -9,9 +9,8 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <script src="https://kit.fontawesome.com/82eb17360c.js"></script>
     = javascript_include_tag 'application_revised'
-    - if @include_importmaps
-      = javascript_importmap_tags
-      = hotwire_livereload_tags if Rails.env.development?
+    = javascript_importmap_tags
+    = hotwire_livereload_tags if Rails.env.development?
     :javascript
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);

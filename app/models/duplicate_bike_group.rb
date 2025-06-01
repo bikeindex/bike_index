@@ -26,7 +26,6 @@ class DuplicateBikeGroup < ApplicationRecord
   end
 
   def segment
-    normalized_serial_segments&.first &&
-      normalized_serial_segments.first.segment || ""
+    normalized_serial_segments&.first&.segment || ""
   end
 end

@@ -1,7 +1,6 @@
 class MyAccounts::MessagesController < ApplicationController
   include Sessionable
   before_action :authenticate_user_for_my_accounts_controller
-  before_action :enable_importmaps
 
   def index
     params[:page] || 1

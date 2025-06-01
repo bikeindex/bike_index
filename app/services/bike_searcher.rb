@@ -162,7 +162,7 @@ class BikeSearcher
     end
     radius ||= 100
     location = GeocodeHelper.address_string_for(@params[:proximity]) if @params[:reverse_geocode]
-    box = GeocodeHelper.bounding_box((location || @params[:proximity]), radius)
+    box = GeocodeHelper.bounding_box(location || @params[:proximity], radius)
     unless box[0].nan?
       bike_ids = StolenRecord.where(id: stolen_ids).within_bounding_box(box).pluck(:bike_id)
       @bikes = @bikes.where(id: bike_ids)

@@ -9,6 +9,7 @@
     <script src="/vendored_assets/application_standalone.js"></script>
     = stylesheet_link_tag 'tailwind', "data-turbo-track": "reload"
     = javascript_importmap_tags
+    = hotwire_livereload_tags if Rails.env.development?
   -# manually override body_class in a few situations :/
   - admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - admin_body_class = "vendor-signup-page" if current_page?(:vendor_signup)
@@ -54,5 +55,3 @@
     %section#admin-content.pb-4.mb-4
       .container-fluid.mt-4.pb-4
         = yield
-
-
