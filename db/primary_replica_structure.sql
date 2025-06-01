@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2026,7 +2027,8 @@ CREATE TABLE public.mail_snippets (
     state_id bigint,
     country_id bigint,
     subject text,
-    neighborhood character varying
+    neighborhood character varying,
+    doorkeeper_application_id bigint
 );
 
 
@@ -6217,6 +6219,13 @@ CREATE INDEX index_locks_on_user_id ON public.locks USING btree (user_id);
 --
 
 CREATE INDEX index_mail_snippets_on_country_id ON public.mail_snippets USING btree (country_id);
+
+
+--
+-- Name: index_mail_snippets_on_doorkeeper_application_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mail_snippets_on_doorkeeper_application_id ON public.mail_snippets USING btree (doorkeeper_application_id);
 
 
 --

@@ -1552,22 +1552,86 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.reload.status).to eq "status_with_owner"
       post url, params: params.to_json, headers: json_headers
       expect(response.code).to eq("400")
-      expect(response.body.match("is not stolen")).to be_present
-    end
-
-    it "fails if the bike isn't owned by the access token user" do
-      bike.current_ownership.update(user_id: FactoryBot.create(:user).id, claimed: true)
-      post url, params: params.to_json, headers: json_headers
-      expect(response.code).to eq("403")
-      expect(response.body.match("application is not approved")).to be_present
+      expect(response.body.match("Unable to find matching stolen bike")).to be_present
     end
 
     it "sends a notification" do
       expect(bike.reload.status).to eq "status_stolen"
-      expect {
+      ActionMailer::Base.deliveries = []
+      Sidekiq::Job.clear_all
+
+      expect do
         post url, params: params.to_json, headers: json_headers
-      }.to change(Email::StolenNotificationJob.jobs, :size).by(1)
+      end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
+        .and change(StolenNotification, :count).by 1
       expect(response.code).to eq("201")
+      expect(StolenNotification.last.doorkeeper_application_id).to eq doorkeeper_app.id
+
+      Email::StolenNotificationJob.drain
+      expect(ActionMailer::Base.deliveries).to_not be_empty
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq([bike.owner_email])
+      expect(mail.subject).to eq "Stolen bike contact"
+      expect(mail.body.encoded).to match params[:message]
+    end
+
+    context "bike isn't owned by current user" do
+      let!(:bike) { FactoryBot.create(:stolen_bike, :with_ownership) }
+      it "fails" do
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Job.clear_all
+        expect do
+          post url, params: params.to_json, headers: json_headers
+          expect(response.code).to eq("403")
+          expect(response.body.match("application is not approved")).to be_present
+        end.to change(Email::StolenNotificationJob.jobs, :size).by(0)
+          .and change(StolenNotification, :count).by(0)
+      end
+
+      context "Application is approved" do
+        before { doorkeeper_app.update(can_send_stolen_notifications: true) }
+
+        it "sends" do
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Job.clear_all
+          expect do
+            post url, params: params.to_json, headers: json_headers
+          end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
+            .and change(StolenNotification, :count).by(1)
+          expect(response.code).to eq("201")
+          expect(StolenNotification.last.doorkeeper_application_id).to eq doorkeeper_app.id
+
+          Email::StolenNotificationJob.drain
+          expect(ActionMailer::Base.deliveries).to_not be_empty
+        end
+
+        context "mail snippet" do
+          let(:snippet_body) { "Special Stolen Notification Snippet!" }
+          let!(:mail_snippet) do
+            FactoryBot.create(:mail_snippet, kind: "stolen_notification_oauth",
+              doorkeeper_application: doorkeeper_app, body: snippet_body)
+          end
+          it "includes the mail snippet" do
+            ActionMailer::Base.deliveries = []
+            Sidekiq::Job.clear_all
+
+            expect do
+              post url, params: params.to_json, headers: json_headers
+            end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
+              .and change(StolenNotification, :count).by(1)
+            expect(response.code).to eq("201")
+            expect(StolenNotification.last.doorkeeper_application_id).to eq doorkeeper_app.id
+
+            Email::StolenNotificationJob.drain
+            expect(ActionMailer::Base.deliveries).to_not be_empty
+            mail = ActionMailer::Base.deliveries.last
+            expect(mail.to).to eq([bike.owner_email])
+            expect(mail.subject).to eq "Stolen bike contact"
+            expect(mail.body.encoded).to match params[:message]
+            expect(mail.body.encoded).to match snippet_body
+          end
+        end
+      end
     end
   end
 end

@@ -196,7 +196,7 @@ RSpec.describe "Bikes API V2", type: :request do
       bike_attrs[:organization_slug] = organization.slug
       date_stolen = 1357192800
       bike_attrs[:stolen_record] = {
-        phone: "1234567890",
+        phone: "1", # phone number isn't validated in any way
         date_stolen: date_stolen,
         theft_description: "This bike was stolen and that's no fair.",
         country: "US",
@@ -226,7 +226,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.current_ownership.creator).to eq bike.creator
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
-      expect(bike.current_stolen_record.phone).to eq("1234567890")
+      expect(bike.current_stolen_record.phone).to eq("1")
     end
   end
 
