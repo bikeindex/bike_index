@@ -2,25 +2,25 @@
 #
 # Table name: stolen_notifications
 #
-#  id                        :integer          not null, primary key
-#  kind                      :integer
-#  message                   :text
-#  receiver_email            :string(255)
-#  reference_url             :text
-#  send_dates                :json
-#  subject                   :string(255)
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  bike_id                   :integer
-#  doorkeeper_application_id :bigint
-#  oauth_application_id      :integer
-#  receiver_id               :integer
-#  sender_id                 :integer
+#  id                   :integer          not null, primary key
+#  kind                 :integer
+#  message              :text
+#  receiver_email       :string(255)
+#  reference_url        :text
+#  send_dates           :json
+#  subject              :string(255)
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  bike_id              :integer
+#  doorkeeper_app_id    :bigint
+#  oauth_application_id :integer
+#  receiver_id          :integer
+#  sender_id            :integer
 #
 # Indexes
 #
-#  index_stolen_notifications_on_doorkeeper_application_id  (doorkeeper_application_id)
-#  index_stolen_notifications_on_oauth_application_id       (oauth_application_id)
+#  index_stolen_notifications_on_doorkeeper_app_id     (doorkeeper_app_id)
+#  index_stolen_notifications_on_oauth_application_id  (oauth_application_id)
 #
 class StolenNotification < ApplicationRecord
   KIND_ENUM = {
@@ -35,7 +35,7 @@ class StolenNotification < ApplicationRecord
   belongs_to :bike
   belongs_to :sender, class_name: "User", foreign_key: :sender_id
   belongs_to :receiver, class_name: "User", foreign_key: :receiver_id
-  belongs_to :doorkeeper_application, class_name: "Doorkeeper::Application"
+  belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application"
 
   has_many :notifications, as: :notifiable
 
@@ -54,7 +54,8 @@ class StolenNotification < ApplicationRecord
 
   def permitted_send?
     return false unless bike&.contact_owner?(sender)
-    return true if sender.enabled?("unstolen_notifications") || doorkeeper_application_id.present?
+    return true if sender.enabled?("unstolen_notifications") || doorkeeper_app_id.present?
+
     (sender.sent_stolen_notifications.count < 2) || sender.can_send_many_stolen_notifications
   end
 
@@ -79,9 +80,9 @@ class StolenNotification < ApplicationRecord
   end
 
   def mail_snippet
-    return nil if doorkeeper_application_id.blank?
+    return nil if doorkeeper_app_id.blank?
 
-    MailSnippet.enabled.stolen_notification_oauth.find_by(doorkeeper_application_id:)
+    MailSnippet.enabled.stolen_notification_oauth.find_by(doorkeeper_app_id:)
   end
 
   private

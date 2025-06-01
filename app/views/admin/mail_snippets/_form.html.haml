@@ -23,8 +23,8 @@
 
 - if @mail_snippet.kind == "stolen_notification_oauth"
   .form-group.fancy-select.unfancy
-    = f.label :doorkeeper_application_id
-    = f.collection_select(:doorkeeper_application_id, Doorkeeper::Application.where(can_send_stolen_notifications: true), :id, :name, {prompt: "Choose Doorkeeper App"}, {class: "form-control"})
+    = f.label :doorkeeper_app_id
+    = f.collection_select(:doorkeeper_app_id, Doorkeeper::Application.where(can_send_stolen_notifications: true), :id, :name, {prompt: "Choose Doorkeeper App"}, {class: "form-control"})
 - else
   .form-group.fancy-select.unfancy
     = f.label :organization_id

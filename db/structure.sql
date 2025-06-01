@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2028,7 +2027,7 @@ CREATE TABLE public.mail_snippets (
     country_id bigint,
     subject text,
     neighborhood character varying,
-    doorkeeper_application_id bigint
+    doorkeeper_app_id bigint
 );
 
 
@@ -3282,7 +3281,7 @@ CREATE TABLE public.stolen_notifications (
     reference_url text,
     send_dates json,
     kind integer,
-    doorkeeper_application_id bigint
+    doorkeeper_app_id bigint
 );
 
 
@@ -6222,10 +6221,10 @@ CREATE INDEX index_mail_snippets_on_country_id ON public.mail_snippets USING btr
 
 
 --
--- Name: index_mail_snippets_on_doorkeeper_application_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_mail_snippets_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_mail_snippets_on_doorkeeper_application_id ON public.mail_snippets USING btree (doorkeeper_application_id);
+CREATE INDEX index_mail_snippets_on_doorkeeper_app_id ON public.mail_snippets USING btree (doorkeeper_app_id);
 
 
 --
@@ -6712,10 +6711,10 @@ CREATE INDEX index_stolen_bike_listings_on_tertiary_frame_color_id ON public.sto
 
 
 --
--- Name: index_stolen_notifications_on_doorkeeper_application_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_stolen_notifications_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_stolen_notifications_on_doorkeeper_application_id ON public.stolen_notifications USING btree (doorkeeper_application_id);
+CREATE INDEX index_stolen_notifications_on_doorkeeper_app_id ON public.stolen_notifications USING btree (doorkeeper_app_id);
 
 
 --

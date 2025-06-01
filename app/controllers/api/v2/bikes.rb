@@ -438,7 +438,7 @@ module API
           stolen_notification = StolenNotification.create(bike_id: params[:id],
             message: params[:message],
             sender: current_user,
-            doorkeeper_application_id: doorkeeper_application.id)
+            doorkeeper_app_id: doorkeeper_application.id)
           StolenNotificationSerializer.new(stolen_notification).as_json
         end
       end

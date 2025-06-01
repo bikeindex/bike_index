@@ -1565,7 +1565,7 @@ RSpec.describe "Bikes API V3", type: :request do
       end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
         .and change(StolenNotification, :count).by 1
       expect(response.code).to eq("201")
-      expect(StolenNotification.last.doorkeeper_application_id).to eq doorkeeper_app.id
+      expect(StolenNotification.last.doorkeeper_app_id).to eq doorkeeper_app.id
 
       Email::StolenNotificationJob.drain
       expect(ActionMailer::Base.deliveries).to_not be_empty
@@ -1599,7 +1599,8 @@ RSpec.describe "Bikes API V3", type: :request do
           end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
             .and change(StolenNotification, :count).by(1)
           expect(response.code).to eq("201")
-          expect(StolenNotification.last.doorkeeper_application_id).to eq doorkeeper_app.id
+          stolen_notification = StolenNotification.last
+          expect(stolen_notification.doorkeeper_app_id).to eq doorkeeper_app.id
           expect(stolen_notification.mail_snippet&.id).to be_blank
 
           Email::StolenNotificationJob.drain
@@ -1610,7 +1611,7 @@ RSpec.describe "Bikes API V3", type: :request do
           let(:body) { "Special Stolen Notification Snippet!" }
           let!(:mail_snippet) do
             FactoryBot.create(:mail_snippet, kind: "stolen_notification_oauth",
-              doorkeeper_application: doorkeeper_app, body: body)
+              doorkeeper_app: doorkeeper_app, body: body)
           end
           it "includes the mail snippet" do
             expect(mail_snippet.reload.is_enabled).to be_truthy
@@ -1623,7 +1624,7 @@ RSpec.describe "Bikes API V3", type: :request do
               .and change(StolenNotification, :count).by(1)
             expect(response.code).to eq("201")
             stolen_notification = StolenNotification.last
-            expect(stolen_notification.doorkeeper_application_id).to eq doorkeeper_app.id
+            expect(stolen_notification.doorkeeper_app_id).to eq doorkeeper_app.id
             expect(stolen_notification.mail_snippet&.id).to eq mail_snippet.id
 
             Email::StolenNotificationJob.drain
