@@ -73,6 +73,7 @@ class Admin::MailSnippetsController < Admin::BaseController
       :latitude,
       :longitude,
       :proximity_radius,
+      :doorkeeper_app_id,
       :is_location_triggered)
   end
 

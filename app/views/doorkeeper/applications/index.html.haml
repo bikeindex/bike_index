@@ -21,6 +21,8 @@
               = l application.created_at, format: :convert_time
           %td
             = application.name
+            - if application.can_send_stolen_notifications?
+              %span.text-warning Has permission to send stolen notifications
           %td
             %pre.small
               = application.redirect_uri.gsub(/\s+/, "\n")
@@ -30,9 +32,9 @@
             = link_to 'Edit', edit_oauth_application_url(application), class: 'btn btn-primary'
           %td
             = render 'delete_form', application: application
-.container
-  %h3.mt-4.mb-4.header-font-alt.text-center
-    Documentation on the API is available at #{link_to "/documentation", documentation_index_url}
+%h3.mt-4.mb-5.header-font-alt.text-center
+  Documentation on the API is available at #{link_to "/documentation", documentation_index_url}
+%hr
 
 - if current_user.superuser?
   = render 'admin_applications'

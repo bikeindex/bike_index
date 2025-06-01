@@ -132,6 +132,7 @@ class CustomerMailer < ApplicationMailer
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
     @user = stolen_notification.receiver
+    @mail_snippet = stolen_notification.mail_snippet
 
     I18n.with_locale(@user&.preferred_language) do
       mail(

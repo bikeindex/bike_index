@@ -16,12 +16,12 @@ RSpec.describe "time_localizer.js", :js, type: :system do
 
     expect(page).to have_content("Current time: #{strip(current_in_zone.strftime("%l:%M %p"))}", wait: 5)
 
-    expect(page).to have_content("Yesterday: #{strip((current_in_zone - 1.day).strftime("%B %e"))}")
-    expect(page).to have_content("Tomorrow: #{strip((current_in_zone + 1.day).strftime("%B %e"))}")
-    expect(page).to have_content("One week ago: #{strip((current_in_zone - 7.days).strftime("%B %e"))}")
-    expect(page).to have_content("One year ago: #{strip((current_in_zone - 1.year).strftime("%B %e, %Y"))}")
+    expect(page).to have_content("Yesterday: #{strip((current_in_zone - 1.day).strftime("%b %e"))}")
+    expect(page).to have_content("Tomorrow: #{strip((current_in_zone + 1.day).strftime("%b %e"))}")
+    expect(page).to have_content("One week ago: #{strip((current_in_zone - 7.days).strftime("%b %e"))}")
+    expect(page).to have_content("One year ago: #{strip((current_in_zone - 1.year).strftime("%b %e, %Y"))}")
 
-    expect(page).to have_content("Yesterday (precise time): #{strip((current_in_zone - 1.day).strftime("%B %e, %l:%M %p")).gsub("  ", " ")}")
-    expect(page).to have_content("One year ago (precise time seconds): #{strip((current_in_zone - 1.year).strftime("%B %-e, %Y, %-l:%M:%S %p"))}")
+    expect(page).to have_content("Yesterday (precise time): #{strip((current_in_zone - 1.day).strftime("%b %e, %l:%M %p")).gsub("  ", " ")}")
+    expect(page).to have_content("One year ago (precise time seconds): #{strip((current_in_zone - 1.year).strftime("%b %-e, %Y, %-l:%M:%S %p"))}")
   end
 end

@@ -10,102 +10,6 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_DnIf17TEjZqmkn","request_duration_ms":766}}'
-      Idempotency-Key:
-      - af0dbade-4f97-4260-bdf9-7ff62d3b1441
-      Stripe-Version:
-      - 2025-01-27.acacia
-      Content-Type:
-      - application/x-www-form-urlencoded
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Server:
-      - nginx
-      Date:
-      - Sat, 22 Feb 2025 23:46:31 GMT
-      Content-Type:
-      - application/json
-      Content-Length:
-      - '463'
-      Connection:
-      - keep-alive
-      Access-Control-Allow-Credentials:
-      - 'true'
-      Access-Control-Allow-Methods:
-      - GET, HEAD, PUT, PATCH, POST, DELETE
-      Access-Control-Allow-Origin:
-      - "*"
-      Access-Control-Expose-Headers:
-      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
-        X-Stripe-Privileged-Session-Required
-      Access-Control-Max-Age:
-      - '300'
-      Cache-Control:
-      - no-cache, no-store
-      Content-Security-Policy:
-      - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
-        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=xP7tIiKQEDHeojVO3xADkjdNX8IPmsEW9dE-zrf4DZT1pmmDKu-Dqs90SB0k9g3GGhWJbg_JzNw8GknU
-      Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to="coop"
-      Idempotency-Key:
-      - af0dbade-4f97-4260-bdf9-7ff62d3b1441
-      Original-Request:
-      - req_JhzygWlyRUEszM
-      Report-To:
-      - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
-      Reporting-Endpoints:
-      - coop="https://q.stripe.com/coop-report"
-      Request-Id:
-      - req_JhzygWlyRUEszM
-      Stripe-Should-Retry:
-      - 'false'
-      Stripe-Version:
-      - 2025-01-27.acacia
-      Vary:
-      - Origin
-      X-Stripe-Priority-Routing-Enabled:
-      - 'true'
-      X-Stripe-Routing-Context-Priority-Tier:
-      - api-testmode
-      X-Wc:
-      - AB
-      Strict-Transport-Security:
-      - max-age=63072000; includeSubDomains; preload
-    body:
-      encoding: UTF-8
-      string: |-
-        {
-          "id": "bps_0QvSOxm0T0GBfX0v6jNg1OzH",
-          "object": "billing_portal.session",
-          "configuration": "bpc_0QvSOWm0T0GBfX0vQCpYBJv1",
-          "created": 1740267991,
-          "customer": "cus_RohIc4uZhMPzxN",
-          "flow": null,
-          "livemode": false,
-          "locale": null,
-          "on_behalf_of": null,
-          "return_url": "http://test.host/my_account",
-          "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfUnA2Y3BmRXBPcDZMQmhjZjlZMHJKUHprSm1rSmV6eQ010066OHp1TG"
-        }
-  recorded_at: Sat, 22 Feb 2025 23:46:31 GMT
-- request:
-    method: post
-    uri: https://api.stripe.com/v1/billing_portal/sessions
-    body:
-      encoding: UTF-8
-      string: customer=cus_RohIc4uZhMPzxN&return_url=http%3A%2F%2Ftest.host%2Fmy_account
-    headers:
-      User-Agent:
-      - Stripe/v1 RubyBindings/13.4.1
-      X-Stripe-Client-Telemetry:
       - '{"last_request_metrics":{"request_id":"req_GxWvZGeu5eCYpF","request_duration_ms":0}}'
       Idempotency-Key:
       - ffaf5ef0-39be-42da-a1ed-52900f55bd8b
@@ -192,4 +96,94 @@ http_interactions:
           "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfUzQ0aWh6V2hKaEs4SHE4WU9IUkZtOHkxQjk2YVh0VA0100ptZHhjGW"
         }
   recorded_at: Thu, 03 Apr 2025 22:48:26 GMT
+- request:
+    method: post
+    uri: https://api.stripe.com/v1/billing_portal/sessions
+    body:
+      encoding: UTF-8
+      string: customer=cus_RohIc4uZhMPzxN&return_url=http%3A%2F%2Ftest.host%2Fmy_account
+    headers:
+      User-Agent:
+      - Stripe/v1 RubyBindings/13.4.1
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_ly1UpQOr7UzE35","request_duration_ms":0}}'
+      Idempotency-Key:
+      - b07312cf-08bc-4101-836e-c5e21225a9c8
+      Stripe-Version:
+      - 2025-01-27.acacia
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Sun, 01 Jun 2025 15:14:13 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '463'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Methods:
+      - GET, HEAD, PUT, PATCH, POST, DELETE
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
+        X-Stripe-Privileged-Session-Required
+      Access-Control-Max-Age:
+      - '300'
+      Cache-Control:
+      - no-cache, no-store
+      Content-Security-Policy:
+      - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
+        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=5vc1HPy1WipLCFSVxPRTCM14FfLWyOhze0vrKVoKtVH48hZwp3sp8Jj65DTguNNXIE75okQiLViuSZN6
+      Idempotency-Key:
+      - b07312cf-08bc-4101-836e-c5e21225a9c8
+      Original-Request:
+      - req_qVKE44UQ78937I
+      Request-Id:
+      - req_qVKE44UQ78937I
+      Stripe-Should-Retry:
+      - 'false'
+      Stripe-Version:
+      - 2025-01-27.acacia
+      Vary:
+      - Origin
+      X-Stripe-Priority-Routing-Enabled:
+      - 'true'
+      X-Stripe-Routing-Context-Priority-Tier:
+      - api-testmode
+      X-Wc:
+      - ABGHI
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "id": "bps_0RVDaTm0T0GBfX0vPCfhnUS0",
+          "object": "billing_portal.session",
+          "configuration": "bpc_0QvSOWm0T0GBfX0vQCpYBJv1",
+          "created": 1748790853,
+          "customer": "cus_RohIc4uZhMPzxN",
+          "flow": null,
+          "livemode": false,
+          "locale": null,
+          "on_behalf_of": null,
+          "return_url": "http://test.host/my_account",
+          "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfU1EzaGxsOE5oOEYxWmUwQkpEOHgydkQ0Z3dnSm16bw0100QVBvhYLf"
+        }
+  recorded_at: Sun, 01 Jun 2025 15:14:13 GMT
 recorded_with: VCR 6.3.1

@@ -430,12 +430,15 @@ module API
         end
         post ":id/send_stolen_notification" do
           find_bike
-          error!("Bike is not stolen", 400) unless @bike.present? && @bike.status_stolen?
-          # Unless application is authorized....
-          authorize_bike_for_user(" (this application is not approved to send notifications)")
+          error!("Unable to find matching stolen bike", 400) unless @bike.present? && @bike.status_stolen?
+          unless doorkeeper_application.can_send_stolen_notifications
+            # if the application isn't authorized, only send notifications to the user's bikes
+            authorize_bike_for_user(" (this application is not approved to send notifications)")
+          end
           stolen_notification = StolenNotification.create(bike_id: params[:id],
             message: params[:message],
-            sender: current_user)
+            sender: current_user,
+            doorkeeper_app_id: doorkeeper_application.id)
           StolenNotificationSerializer.new(stolen_notification).as_json
         end
       end

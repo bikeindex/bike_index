@@ -2026,7 +2026,8 @@ CREATE TABLE public.mail_snippets (
     state_id bigint,
     country_id bigint,
     subject text,
-    neighborhood character varying
+    neighborhood character varying,
+    doorkeeper_app_id bigint
 );
 
 
@@ -3279,7 +3280,8 @@ CREATE TABLE public.stolen_notifications (
     oauth_application_id integer,
     reference_url text,
     send_dates json,
-    kind integer
+    kind integer,
+    doorkeeper_app_id bigint
 );
 
 
@@ -6219,6 +6221,13 @@ CREATE INDEX index_mail_snippets_on_country_id ON public.mail_snippets USING btr
 
 
 --
+-- Name: index_mail_snippets_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mail_snippets_on_doorkeeper_app_id ON public.mail_snippets USING btree (doorkeeper_app_id);
+
+
+--
 -- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6702,6 +6711,13 @@ CREATE INDEX index_stolen_bike_listings_on_tertiary_frame_color_id ON public.sto
 
 
 --
+-- Name: index_stolen_notifications_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_notifications_on_doorkeeper_app_id ON public.stolen_notifications USING btree (doorkeeper_app_id);
+
+
+--
 -- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7039,6 +7055,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250528154403'),
 ('20250519154506'),
 ('20250515190821'),
 ('20250508151610'),

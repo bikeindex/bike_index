@@ -1,5 +1,8 @@
 - @bike = @stolen_notification.bike
 
+- if @mail_snippet.present?
+  = @mail_snippet.body.html_safe
+
 .stolen-notification-from
   - sender_email = @stolen_notification.sender.email
   %p
