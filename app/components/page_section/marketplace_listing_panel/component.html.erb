@@ -5,10 +5,15 @@
     <span class="tw:text-xl! tw:opacity-65 uncap"><%= translation(".price_is_firm_#{@marketplace_listing.price_firm?}") %></span>
   </h2>
   <%= render(DefinitionList::Container::Component.new(multi_columns: true)) do %>
-    <%= render(DefinitionList::Row::Component.new(label: translation(".condition"), value: @marketplace_listing.condition_humanized)) %>
+    <%= render(DefinitionList::Row::Component.new(label: translation(".condition"))) do %>
+      <%= @marketplace_listing.condition_humanized %>
+      <em class="tw:text-sm less-strong"><%= MarketplaceListing.condition_description_humanized(@marketplace_listing.condition) %></em>
+    <% end %>
     <%= render(DefinitionList::Row::Component.new(label: translation(".location"), value: @marketplace_listing.formatted_address_string)) %>
     <%= render(DefinitionList::Row::Component.new(label: translation(".first_posted_at"), value: @marketplace_listing.published_at)) %>
-    <%= render(DefinitionList::Row::Component.new(label: translation(".still_for_sale_at"), value: @marketplace_listing.still_for_sale_at)) %>
+    <% if @marketplace_listing.published_at.to_i != @marketplace_listing.still_for_sale_at.to_i %>
+      <%= render(DefinitionList::Row::Component.new(label: translation(".still_for_sale_at"), value: @marketplace_listing.still_for_sale_at)) %>
+    <% end %>
     <%= render(DefinitionList::Row::Component.new(label: translation(".description"), value: @marketplace_listing.description, full_width: true)) %>
   <% end %>
 <% end %>

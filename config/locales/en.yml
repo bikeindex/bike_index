@@ -745,11 +745,17 @@ en:
         rearward: Rear facing
       marketplace_listing:
         condition:
-          excellent: excellent - lightly ridden
-          good: good - used but mechanically sound
-          new_in_box: new - unridden/with tags
-          poor: poor - needs service
-          salvage: for parts - not working/unrideable
+          excellent: excellent
+          good: good
+          new_in_box: new
+          poor: poor
+          salvage: for parts
+        condition_description:
+          excellent: lightly ridden
+          good: used but mechanically sound
+          new_in_box: unridden/with tags
+          poor: needs service
+          salvage: not working/unrideable
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Cycle (hand pedal)
@@ -4222,7 +4228,7 @@ en:
       bikes: bikes
       combination: Combination
       edit: edit
-      edit_bike: Edit Bike
+      edit_registration: Edit %{bike_type}
       generally_connect_to_org: >-
         Some of your bikes are associated with %{org_name}, but this one is not. Generally,
         you should connect all your bikes to %{org_name} -
@@ -4233,7 +4239,9 @@ en:
       lock_type: Lock Type
       locks: locks
       manufacturer: Manufacturer
-      mark_bike_stolen: Mark bike stolen
+      mark_stolen: Mark %{bike_type} stolen
+      list_for_sale: List for sale
+      update_marketplace_listing: Update marketplace listing!
       membership_subtitle: Thank you for being a Bike Index %{level} member!
       next: Next steps
       primary_colors: Primary colors

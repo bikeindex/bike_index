@@ -25,4 +25,4 @@ function localizeTime () {
 }
 
 document.addEventListener('DOMContentLoaded', localizeTime)
-document.addEventListener('turbo:render', localizeTime)
+document.addEventListener('turbo:load', localizeTime)

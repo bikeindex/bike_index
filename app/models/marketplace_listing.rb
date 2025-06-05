@@ -71,6 +71,16 @@ class MarketplaceListing < ApplicationRecord
       I18n.t(str, scope: %i[activerecord enums marketplace_listing condition])
     end
 
+    def condition_description_humanized(str)
+      return nil unless CONDITION_ENUM.key?(str&.to_sym)
+
+      I18n.t(str, scope: %i[activerecord enums marketplace_listing condition_description])
+    end
+
+    def condition_with_description_humanized(str)
+      [condition_humanized(str), condition_description_humanized(str)].join(" - ")
+    end
+
     def seller_permitted_parameters
       [
         :condition, :amount_with_nil, :price_negotiable, :description,

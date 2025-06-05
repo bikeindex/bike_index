@@ -849,8 +849,10 @@ RSpec.describe User, type: :model do
 
   describe "can_create_listing?" do
     let(:user) { FactoryBot.create(:user_confirmed) }
-    it "is false" do
-      expect(user.reload.can_create_listing?).to be_falsey
+    it "is true" do
+      # because MARKETPLACE_FREE_UNTIL
+      expect(user.reload.can_create_listing?).to be_truthy
+      # expect(user.reload.can_create_listing?).to be_falsey
     end
     context "superuser" do
       let(:user) { User.new(superuser: true) }

@@ -51,7 +51,7 @@
 
           = f.fields_for :current_marketplace_listing, marketplace_listing do |ml|
             = render LegacyFormWell::FormGroupRow::Component.new(form_builder: ml, label: :condition, label_translation: t(".condition"), row_classes: "unnested-field") do
-              = ml.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
+              = ml.select :condition, MarketplaceListing.conditions.keys.map { |i| [MarketplaceListing.condition_with_description_humanized(i), i] }, {prompt: t(".choose_condition")}, class: "form-control"
 
             .related-fields
               .form-group.row

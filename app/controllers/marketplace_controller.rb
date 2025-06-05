@@ -9,7 +9,7 @@ class MarketplaceController < ApplicationController
   private
 
   def searched_marketplace_listings
-    MarketplaceListing.for_sale.order(updated_at: :desc)
+    MarketplaceListing.for_sale.reorder(updated_at: :desc)
       .includes(:item)
   end
 end

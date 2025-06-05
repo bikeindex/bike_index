@@ -78,12 +78,16 @@ RSpec.describe MarketplaceListing, type: :model do
 
   describe "condition_humanized" do
     it "returns correct condition" do
-      expect(MarketplaceListing.condition_humanized("new_in_box")).to eq "new - unridden/with tags"
+      expect(MarketplaceListing.condition_humanized("new_in_box")).to eq "new"
+      expect(MarketplaceListing.condition_description_humanized("new_in_box")).to eq "unridden/with tags"
+      expect(MarketplaceListing.condition_with_description_humanized("new_in_box")).to eq "new - unridden/with tags"
     end
 
     it "has values for all conditions" do
       MarketplaceListing.conditions.keys.each do |condition|
         expect(MarketplaceListing.condition_humanized(condition)).to be_present
+        expect(MarketplaceListing.condition_description_humanized(condition)).to be_present
+        expect(MarketplaceListing.condition_with_description_humanized(condition)).to be_present
       end
     end
   end
@@ -149,15 +153,16 @@ RSpec.describe MarketplaceListing, type: :model do
       expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
     end
 
-    context "user can not create listings" do
-      let(:user) { FactoryBot.create(:user_confirmed) }
+    # MARKETPLACE_FREE_UNTIL
+    # context "user can not create listings" do
+    #   let(:user) { FactoryBot.create(:user_confirmed) }
 
-      it "updates the marketplace_listing (not creating)" do
-        expect(user.reload.can_create_listing?).to be_falsey
-        update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0, address_record_change: 0)
-        expect(bike.current_marketplace_listing&.id).to be_blank
-      end
-    end
+    #   it "updates the marketplace_listing (not creating)" do
+    #     expect(user.reload.can_create_listing?).to be_falsey
+    #     update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0, address_record_change: 0)
+    #     expect(bike.current_marketplace_listing&.id).to be_blank
+    #   end
+    # end
 
     context "existing user_account_address" do
       let!(:address_record) { FactoryBot.create(:address_record, user:, kind: :user) }
@@ -212,17 +217,18 @@ RSpec.describe MarketplaceListing, type: :model do
         expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
       end
 
-      context "user can not create listings" do
-        let(:user) { FactoryBot.create(:user_confirmed) }
+      # MARKETPLACE_FREE_UNTIL
+      # context "user can not create listings" do
+      #   let(:user) { FactoryBot.create(:user_confirmed) }
 
-        it "updates the marketplace_listing (not creating)" do
-          expect(user.reload.can_create_listing?).to be_falsey
-          update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0)
-          expect(bike.current_marketplace_listing.id).to eq marketplace_listing.id
-          expect(marketplace_listing.reload.amount_cents).to eq 30069
-          expect(marketplace_listing.condition).to eq "good"
-        end
-      end
+      #   it "updates the marketplace_listing (not creating)" do
+      #     expect(user.reload.can_create_listing?).to be_falsey
+      #     update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0)
+      #     expect(bike.current_marketplace_listing.id).to eq marketplace_listing.id
+      #     expect(marketplace_listing.reload.amount_cents).to eq 30069
+      #     expect(marketplace_listing.condition).to eq "good"
+      #   end
+      # end
     end
   end
 
