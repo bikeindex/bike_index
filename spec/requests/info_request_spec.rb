@@ -36,6 +36,15 @@ RSpec.describe InfoController, type: :request do
     end
   end
 
+  describe "membership" do
+    let!(:blog) { FactoryBot.create(:blog, title: "Bike Index Membership", info_kind: true) }
+    it "renders" do
+      get "/membership"
+      expect(assigns(:blog)&.id).to eq blog.id
+      expect(response.status).to eq(200)
+    end
+  end
+
   describe "static pages" do
     pages = %w[about protect_your_bike where serials image_resources resources security
       dev_and_design donate terms vendor_terms privacy lightspeed]

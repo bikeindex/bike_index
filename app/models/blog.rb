@@ -89,7 +89,7 @@ class Blog < ApplicationRecord
     "how-to-get-your-stolen-bike-back" # Also hard coded in routes
   end
 
-  def self.why_membership_slug
+  def self.membership_slug
     "bike-index-membership"
   end
 

@@ -52,6 +52,12 @@ class InfoController < ApplicationController
   def image_resources
   end
 
+  def membership
+    @blog = Blog.friendly_find(Blog.membership_slug)
+    @page_id = "news_show" # Override to make styles same as news
+    render "show"
+  end
+
   def why_donate
     @blog = Blog.friendly_find(Blog.why_donate_slug)
     render "/news/show"
