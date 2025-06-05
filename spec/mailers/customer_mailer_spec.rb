@@ -236,6 +236,21 @@ RSpec.describe CustomerMailer, type: :mailer do
     end
   end
 
+  describe "newsletter" do
+    let(:mail_snippet) { FactoryBot.build(:mail_snippet, kind: :newsletter) }
+    let(:user) { FactoryBot.create(:user) }
+
+    it "renders, includes unsubscribe" do
+      mail = CustomerMailer.newsletter(user:, mail_snippet:)
+
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.to).to eq([user.email])
+      expect(mail.tag).to eq "newsletter"
+      expect(mail.body.encoded).to match "unsubscribe"
+    end
+  end
+
+  # TODO: Move to its own mailer?
   describe "marketplace_message_notification" do
     let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
     it "delivers" do

@@ -59,6 +59,15 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def newsletter(user:, mail_snippet:)
+    @user = user
+    @_action_has_layout = false # layout is manually included here
+    @mail_snippet_body = mail_snippet.body
+    @title = mail_snippet.subject
+
+    mail(to: @user.email, subject: @title, tag: __callee__)
+  end
+
   def theft_survey(notification)
     mail_snippet = MailSnippet.theft_survey_2023.first
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
