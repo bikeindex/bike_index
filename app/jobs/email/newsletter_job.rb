@@ -34,7 +34,7 @@ class Email::NewsletterJob < ApplicationJob
     notification ||= Notification.create(user_id: user.id, kind: :newsletter, notifiable: mail_snippet)
 
     notification.track_email_delivery do
-      CustomerMailer.newsletter(user, mail_snippet).deliver_now
+      CustomerMailer.newsletter(user:, mail_snippet:).deliver_now
     end
   end
 end

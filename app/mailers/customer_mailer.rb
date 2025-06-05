@@ -59,8 +59,13 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
-  def newsletter(user, mail_snippet)
-    mail(to: user.email, subject: mail_snippet.subject, body: mail_snippet.body, tag: __callee__)
+  def newsletter(user:, mail_snippet:)
+    @user = user
+    @_action_has_layout = false # layout is manually included here
+    @mail_snippet_body = mail_snippet.body
+    @title = mail_snippet.subject
+
+    mail(to: @user.email, subject: @title, tag: __callee__)
   end
 
   def theft_survey(notification)
