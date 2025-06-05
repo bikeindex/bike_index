@@ -48,7 +48,8 @@ class MailSnippet < ApplicationRecord
     graduated_notification: 10,
     theft_survey_4_2022: 13,
     theft_survey_2023: 15,
-    stolen_notification_oauth: 16
+    stolen_notification_oauth: 16,
+    newsletter: 17
   }.freeze
 
   belongs_to :organization
@@ -71,49 +72,51 @@ class MailSnippet < ApplicationRecord
 
   attr_accessor :skip_update
 
-  def self.organization_snippets
-    {
-      header: {emails: "all", description: "Top of email block"},
-      welcome: {emails: "finished_registration", description: "Below header"},
-      after_welcome: {emails: "finished_registration", description: "After \"Congrats\", in \"Finished registration\""},
-      footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
-      partial_registration: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
-      security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""}
-    }.with_indifferent_access.freeze
-  end
+  class << self
+    def organization_snippets
+      {
+        header: {emails: "all", description: "Top of email block"},
+        welcome: {emails: "finished_registration", description: "Below header"},
+        after_welcome: {emails: "finished_registration", description: "After \"Congrats\", in \"Finished registration\""},
+        footer: {emails: "all", description: "Above <3 <3 <3 <3 Bike Index Team"},
+        partial_registration: {emails: "partial_registration", description: "Above \"Finish it\" button, in email \"Partial registration\""},
+        security: {emails: "finished_registration", description: "How to keep your bike safe, in email \"Finished registration\""}
+      }.with_indifferent_access.freeze
+    end
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
-  end
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
 
-  # Will become more complex probably!
-  def self.kind_humanized(str)
-    str&.humanize
-  end
+    # Will become more complex probably!
+    def kind_humanized(str)
+      str&.humanize
+    end
 
-  # TODO: not sure we need this method?
-  def self.organization_snippet_kinds
-    organization_snippets.keys
-  end
+    # TODO: not sure we need this method?
+    def organization_snippet_kinds
+      organization_snippets.keys
+    end
 
-  def self.organization_email_for(kind)
-    kind = kind&.to_s
-    return kind.to_s unless organization_snippet_kinds.include?(kind)
-    organization_snippets.dig(kind, :emails)
-  end
+    def organization_email_for(kind)
+      kind = kind&.to_s
+      return kind.to_s unless organization_snippet_kinds.include?(kind)
+      organization_snippets.dig(kind, :emails)
+    end
 
-  def self.organization_emails_with_snippets
-    # Worth noting: no snippet is named "finished_registration"
-    ParkingNotification.kinds + %w[finished_registration finished_registration_stolen partial_registration
-      graduated_notification impound_claim_approved impound_claim_denied]
-  end
+    def organization_emails_with_snippets
+      # Worth noting: no snippet is named "finished_registration"
+      ParkingNotification.kinds + %w[finished_registration finished_registration_stolen partial_registration
+        graduated_notification impound_claim_approved impound_claim_denied]
+    end
 
-  def self.organization_message_kinds
-    ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
-  end
+    def organization_message_kinds
+      ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
+    end
 
-  def self.location_triggered_kinds
-    []
+    def location_triggered_kinds
+      []
+    end
   end
 
   def which_organization_email

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ScheduledEmailSurveyJob, type: :job do
+RSpec.describe Email::ScheduledSurveyJob, type: :job do
   let(:instance) { described_class.new }
   include_context :scheduled_job
   include_examples :scheduled_job_tests
@@ -63,7 +63,7 @@ RSpec.describe ScheduledEmailSurveyJob, type: :job do
       Sidekiq::Job.clear_all
       instance.perform
       # It enqueues the bikes that we want - even though some won't be surveyed
-      enqueued_ids = ScheduledEmailSurveyJob.jobs.map { |j| j["args"] }.flatten || []
+      enqueued_ids = Email::ScheduledSurveyJob.jobs.map { |j| j["args"] }.flatten || []
       expect(enqueued_ids).to match_array target_ids
 
       # Test notification creation

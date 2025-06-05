@@ -59,6 +59,10 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def newsletter(user, mail_snippet)
+    mail(to: user.email, subject: mail_snippet.subject, body: mail_snippet.body, tag: __callee__)
+  end
+
   def theft_survey(notification)
     mail_snippet = MailSnippet.theft_survey_2023.first
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
