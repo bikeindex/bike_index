@@ -38,7 +38,7 @@ RSpec.describe Email::NewsletterJob, type: :job do
       expect(mail.subject).to eq(mail_snippet.subject)
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
-      expect(mail.body).to match mail_snippet.body
+      expect(mail.body.encoded).to match mail_snippet.body
 
       notification = Notification.last
       expect(notification).to match_hash_indifferently(target_notification_attrs)

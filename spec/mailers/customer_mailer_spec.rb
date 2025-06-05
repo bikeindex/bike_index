@@ -238,10 +238,10 @@ RSpec.describe CustomerMailer, type: :mailer do
 
   describe "newsletter" do
     let(:mail_snippet) { FactoryBot.build(:mail_snippet, kind: :newsletter) }
-    let(:user) { FactoryBot.build(:user) }
+    let(:user) { FactoryBot.create(:user) }
 
     it "renders, includes unsubscribe" do
-      mail = CustomerMailer.newsletter(user, mail_snippet)
+      mail = CustomerMailer.newsletter(user:, mail_snippet:)
 
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
