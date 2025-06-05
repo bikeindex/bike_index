@@ -3,10 +3,6 @@ class MembershipsController < ApplicationController
 
   layout "payments_layout"
 
-  def show
-    redirect_to news_path(Blog.why_membership_slug)
-  end
-
   def new
     if current_user&.membership_active.present?
       redirect_to edit_membership_path

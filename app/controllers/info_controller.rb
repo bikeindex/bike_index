@@ -8,6 +8,8 @@ class InfoController < ApplicationController
     if @blog.blank?
       flash[:error] = "unable to find that page"
       redirect_to(news_path) && return
+    elsif @blog.title_slug == Blog.membership_slug
+      redirect_to("/membership") && return
     elsif @blog.id == Blog.theft_rings_id
       redirect_to("/theft-rings") && return
     elsif @blog.blog?
@@ -50,6 +52,12 @@ class InfoController < ApplicationController
   end
 
   def image_resources
+  end
+
+  def membership
+    @blog = Blog.friendly_find(Blog.membership_slug)
+    @page_id = "news_show" # Override to make styles same as news
+    render "show"
   end
 
   def why_donate
