@@ -42,6 +42,8 @@ RSpec.describe InfoController, type: :request do
       get "/membership"
       expect(assigns(:blog)&.id).to eq blog.id
       expect(response.status).to eq(200)
+      get "/info/bike-index-membership"
+      expect(response).to redirect_to "/membership"
     end
   end
 
