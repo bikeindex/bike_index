@@ -55,63 +55,69 @@ class Blog < ApplicationRecord
 
   pg_search_scope :text_search, against: {title: "A", body: "B"}
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
 
-  def self.slugify_title(str)
-    # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
-    return nil unless str.present?
-    Slugifyer.slugify(str)[0, 70].gsub(/-$/, "")
-  end
+    def slugify_title(str)
+      # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
+      return nil unless str.present?
+      Slugifyer.slugify(str)[0, 70].gsub(/-$/, "")
+    end
 
-  def self.integer_slug?(n)
-    n.is_a?(Integer) || n.match(/\A\d+\z/).present?
-  end
+    def integer_slug?(n)
+      n.is_a?(Integer) || n.match(/\A\d+\z/).present?
+    end
 
-  def self.friendly_find(str)
-    return nil unless str.present?
-    return find_by_id(str) if integer_slug?(str)
-    slug = slugify_title(str)
-    find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
-      find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
-  end
+    def friendly_find(str)
+      return nil unless str.present?
+      return find_by_id(str) if integer_slug?(str)
+      slug = slugify_title(str)
+      find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
+        find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
+    end
 
-  def self.theft_rings_id
-    324
-  end
+    def theft_rings_id
+      324
+    end
 
-  def self.why_donate_slug
-    "end-2020-with-a-donation-to-bike-index"
-  end
+    def why_donate_slug
+      "end-2020-with-a-donation-to-bike-index"
+    end
 
-  def self.get_your_stolen_bike_back_slug
-    "how-to-get-your-stolen-bike-back" # Also hard coded in routes
-  end
+    def get_your_stolen_bike_back_slug
+      "how-to-get-your-stolen-bike-back" # Also hard coded in routes
+    end
 
-  def self.membership_slug
-    "bike-index-membership"
-  end
+    def membership_slug
+      "bike-index-membership"
+    end
 
-  # matches ALL content tag ids
-  def self.with_tag_ids(content_tag_ids)
-    content_tag_ids = Array(content_tag_ids)
-    joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-      .group("blogs.id").having("count(distinct blog_content_tags.id) = ?", content_tag_ids.count)
-  end
+    def top_level_routed
+      [membership_slug, why_donate_slug].freeze
+    end
 
-  def self.with_any_of_tag_ids(content_tag_ids)
-    content_tag_ids = Array(content_tag_ids)
-    joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-  end
+    # matches ALL content tag ids
+    def with_tag_ids(content_tag_ids)
+      content_tag_ids = Array(content_tag_ids)
+      joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+        .group("blogs.id").having("count(distinct blog_content_tags.id) = ?", content_tag_ids.count)
+    end
 
-  # TODO: This is bad, but it's better than nothing so I'm going with it
-  # NOTE: this is unscoped (so it removes the default scope)
-  def self.ids_sorted_by_matching_tag_ids_count(content_tag_ids)
-    grouped_ids = unscoped.joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-      .group("blog_content_tags.blog_id").count
-    sorted_counted_ids = grouped_ids.to_a.sort { |a, b| b[1] <=> a[1] }
-    sorted_counted_ids.map { |id, count| id }
+    def with_any_of_tag_ids(content_tag_ids)
+      content_tag_ids = Array(content_tag_ids)
+      joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+    end
+
+    # TODO: This is bad, but it's better than nothing so I'm going with it
+    # NOTE: this is unscoped (so it removes the default scope)
+    def ids_sorted_by_matching_tag_ids_count(content_tag_ids)
+      grouped_ids = unscoped.joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+        .group("blog_content_tags.blog_id").count
+      sorted_counted_ids = grouped_ids.to_a.sort { |a, b| b[1] <=> a[1] }
+      sorted_counted_ids.map { |id, count| id }
+    end
   end
 
   def content_tag_names=(val)
