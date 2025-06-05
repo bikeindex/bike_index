@@ -174,6 +174,8 @@ Rails.application.routes.draw do
   resources :impound_claims, only: [:create, :update]
   resources :review_impound_claims, only: [:show, :update]
 
+  get "marketplace", to: "marketplace#index"
+
   resources :marketplace_listings, only: %i[update]
 
   namespace :admin do
