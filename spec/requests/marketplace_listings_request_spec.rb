@@ -13,6 +13,7 @@ RSpec.describe MarketplaceController, type: :request do
 
     context "with a marketplace_listing" do
       let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+      let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, status: :draft) }
 
       it "renders" do
         get base_url

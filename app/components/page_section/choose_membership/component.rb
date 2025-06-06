@@ -30,7 +30,7 @@ module PageSection::ChooseMembership
     end
 
     def passed_membership_level(level = nil)
-      return :basic unless Membership::LEVEL_ENUM.keys.include?(level&.to_sym)
+      return :basic unless Membership::LEVEL_ENUM.key?(level&.to_sym)
 
       level.to_sym
     end

@@ -1,10 +1,11 @@
 -# somewhat gross hack to make it possible to show serial_display for the current user
 - skip_cache ||= false
+- render_second_column = bike.occurred_at.present? || bike.is_for_sale?
 
 %li.bike-box-item
   %a.bike-list-image{ href: bike.html_url, class: ('hover-expand' if bike.thumb_path), "data-turbo"=>"false" }
     = bike_thumb_image(bike)
-  .bike-information{ class: ('multi-attr-lists' if bike.current_stolen_record.present?) }
+  .bike-information{ class: ('multi-attr-lists' if render_second_column) }
     %h5.title-link
       %a{href: bike.html_url, "data-turbo"=>"false"}
         %strong
@@ -20,10 +21,15 @@
         - else # Show the user specific info
           = render_serial_display(bike, current_user)
       = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
-    - if bike.occurred_at.present?
+
+    - if render_second_column
       %ul.attr-list
-        %li
-          #{bike_status_span(bike)}:
-          %span.convertTime
-            = l bike.occurred_at, format: :convert_time
-        = attr_list_item(bike.current_record.address(country: [:iso]), t(".location"))
+        - if bike.is_for_sale?
+          %li
+            #{bike_status_span(bike)}:
+        - else
+          %li
+            #{bike_status_span(bike)}:
+            %span.convertTime
+              = l bike.occurred_at, format: :convert_time
+          = attr_list_item(bike.current_record.address(country: [:iso]), t(".location"))
