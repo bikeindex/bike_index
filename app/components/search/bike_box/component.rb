@@ -15,6 +15,10 @@ module Search::BikeBox
       @current_user = current_user unless @is_cached
     end
 
+    def render?
+      @bike.present?
+    end
+
     private
 
     def render_second_column?
