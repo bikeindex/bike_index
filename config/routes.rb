@@ -293,14 +293,14 @@ Rails.application.routes.draw do
   namespace :api, defaults: {format: "json"} do
     get "/", to: redirect("/documentation")
     namespace :v1 do
-      resources :bikes, only: [:index, :show, :create] do
+      resources :bikes, only: %i[index show create] do
         collection do
           get :search_tags
           get :close_serials
           get :stolen_ids
         end
       end
-      resources :stolen_locking_response_suggestions, only: [:index]
+      resources :stolen_locking_response_suggestions, only: %i[index]
       resources :cycle_types, only: %i[index]
       resources :wheel_sizes, only: %i[index]
       resources :component_types, only: %i[index]

@@ -1,3 +1,10 @@
+task enqueue_newsletter: :environment do
+  if Sidekiq.redis { |conn| conn.llen("queue:low_priority") < 3_000 }
+    Email::NewsletterJob.enqueue_for(94, limit: 5_000)
+  end
+end
+
+
 task run_scheduler: :environment do
   ScheduledJobRunner.perform_async if ScheduledJobRunner.should_enqueue?
 end
