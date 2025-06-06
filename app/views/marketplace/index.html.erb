@@ -8,7 +8,7 @@
     <div class="col-md-12">
         <ul class="bike-boxes">
           <% @marketplace_listings.each do |marketplace_listing| %>
-            <%= render partial: '/bikes/bike', locals: { bike: marketplace_listing.item}, cached: true %>
+            <%= render partial: '/bikes/bike', locals: { bike: marketplace_listing.item, marketplace_listing: marketplace_listing}, cached: true %>
           <% end %>
         </ul>
       </div>

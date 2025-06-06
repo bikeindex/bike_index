@@ -16,8 +16,18 @@ RSpec.describe MarketplaceListing, type: :model do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
       let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
       it "uses bike user" do
-        expect(bike.user&.id).to be_present
+        expect(bike.reload.user&.id).to be_present
         expect(marketplace_listing.seller_id).to eq bike.user.id
+        expect(bike.current_event_record&.id).to be_blank
+      end
+
+      context "for sale" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, is_for_sale: true) }
+        let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
+        it "includes marketplace_listing" do
+          expect(marketplace_listing.seller_id).to eq bike.reload.user.id
+          expect(bike.current_event_record&.id).to eq marketplace_listing.id
+        end
       end
     end
   end

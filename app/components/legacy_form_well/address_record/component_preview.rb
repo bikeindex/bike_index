@@ -2,6 +2,7 @@
 
 module LegacyFormWell::AddressRecord
   class ComponentPreview < ApplicationComponentPreview
+    # TODO: This should be merged into the normal layout, now that the normal layout includes revised styles
     layout "component_preview_form_wrap"
 
     def default

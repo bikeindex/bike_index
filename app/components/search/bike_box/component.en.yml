@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    search:
+      bike_box:
+        location: Location
+        primary_colors: Primary colors
+        serial: Serial

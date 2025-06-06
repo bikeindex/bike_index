@@ -1,6 +1,7 @@
 class BikeIndex.BikeBoxes extends BikeIndex
   constructor: ->
     @initializeHoverExpand()
+    console.log("hererer")
 
   initializeHoverExpand: ->
     hoverExpand = @hoverExpand
