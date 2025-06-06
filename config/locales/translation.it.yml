@@ -897,6 +897,12 @@ it:
           new_in_box:
           salvage:
           poor:
+        condition_description:
+          excellent:
+          good:
+          new_in_box:
+          poor:
+          salvage:
     models:
       ad: Annuncio
       ambassador: Ambasciatore
@@ -1724,10 +1730,6 @@ it:
     index:
       primary_colors: Colori primari
   bikes:
-    bike:
-      location: Luogo
-      primary_colors: Colori primari
-      serial: Seriale
     bike_show_overlays:
       add_a_picture_of_it: Aggiungi una foto, in modo che tutti possano ammirarne
         la bellezza!
@@ -3565,7 +3567,6 @@ it:
       bikes:
       combination:
       edit: Modifica
-      edit_bike:
       generally_connect_to_org:
       ignore:
       key_serial:
@@ -3573,7 +3574,6 @@ it:
       lock_type:
       locks:
       manufacturer:
-      mark_bike_stolen:
       next:
       primary_colors:
       register_new_items:
@@ -3591,6 +3591,10 @@ it:
       you_have_no_registered_locks:
       header_title:
       membership_subtitle:
+      edit_registration:
+      list_for_sale:
+      mark_stolen:
+      update_marketplace_listing:
     messages:
       form:
         body_placeholder:
@@ -4688,6 +4692,11 @@ it:
         stolenness_proximity:
         stolenness_stolen:
         within:
+      bike_box:
+        location: Luogo
+        primary_colors: Colori primari
+        serial: Seriale
+        posted_at:
     legacy_form_well:
       address_record:
         address:

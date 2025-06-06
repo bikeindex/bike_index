@@ -657,8 +657,8 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
-  def current_record
-    current_impound_record || current_stolen_record
+  def current_event_record
+    current_impound_record || current_stolen_record || current_for_sale_marketplace_listing
   end
 
   def bike_organization_ids
@@ -932,6 +932,13 @@ class Bike < ApplicationRecord
     self.current_impound_record = impound_records.current.last
   end
 
+  def current_for_sale_marketplace_listing
+    return nil unless is_for_sale
+
+    cml = current_marketplace_listing
+    (cml.present? && cml.for_sale?) ? cml : nil
+  end
+
   def authorization_requires_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
@@ -948,7 +955,7 @@ class Bike < ApplicationRecord
   end
 
   def calculated_occurred_at
-    return nil if current_record.blank?
+    return nil if current_event_record.blank? || is_for_sale
     current_impound_record&.impounded_at || current_stolen_record&.date_stolen
   end
 

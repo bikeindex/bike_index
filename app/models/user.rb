@@ -69,6 +69,7 @@ class User < ApplicationRecord
   include AddressRecorded
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
+  MARKETPLACE_FREE_UNTIL = 1750452905 # 2025-06-20 15:55 CST
 
   cattr_accessor :current_user
 
@@ -282,6 +283,8 @@ class User < ApplicationRecord
   end
 
   def can_create_listing?
+    return true if Time.current.to_i < MARKETPLACE_FREE_UNTIL
+
     superuser? || member?
   end
 

@@ -12,8 +12,9 @@
       <% if @include_time_zone %>
         <span class="localizeTimezone"></span>
       <% end %>
-    <% elsif @value.present? %>
+    <% elsif @value.present? || content.present? %>
       <%= @value %>
+      <%= content %>
     <% else %>
       <span class="tw:opacity-50 tw:text-xs">
         <%= no_value_content %>
