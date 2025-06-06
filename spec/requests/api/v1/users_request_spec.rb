@@ -53,25 +53,44 @@ RSpec.describe API::V1::UsersController, type: :request do
         let(:user) { FactoryBot.create(:organization_user, organization: organization) }
         let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
-        it "actually sends the email" do
-          expect(user).to be_present
+        let(:delete_params) do
+          {
+            request_type: "bike_delete_request",
+            user_id: user.id,
+            request_bike_id: bike.id,
+            request_reason: "Some reason"
+          }
+        end
+        before { log_in(user) }
+        def expect_bike_to_be_destroyed(passed_bike, passed_url, passed_params)
           Sidekiq::Testing.inline! do
             # We don't test that this is being added to Sidekiq
             # Because we're testing that sidekiq does what it
             # Needs to do here. Slow tests, but we know it actually works :(
-            delete_request = {
-              request_type: "bike_delete_request",
-              user_id: user.id,
-              request_bike_id: bike.id,
-              request_reason: "Some reason"
-            }
-            log_in(user)
             ActionMailer::Base.deliveries = []
-            post "#{base_url}/send_request", params: delete_request
+            post passed_url, params: passed_params
             expect(response.code).to eq("200")
             expect(ActionMailer::Base.deliveries).to be_empty
-            bike.reload
-            expect(bike.paranoia_destroyed?).to be_truthy
+            passed_bike.reload
+            expect(passed_bike.paranoia_destroyed?).to be_truthy
+          end
+        end
+        it "actually sends the email" do
+          expect(user).to be_present
+          expect_bike_to_be_destroyed(bike, "#{base_url}/send_request", delete_params)
+        end
+        context "marketplace_listing" do
+          let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
+          it "marks removed" do
+            expect_bike_to_be_destroyed(bike, "#{base_url}/send_request", delete_params)
+            expect(marketplace_listing.reload.status).to eq "removed"
+          end
+        end
+        context "marketplace_listing sold" do
+          let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :sold, item: bike) }
+          it "doesn't update marketplace_listing" do
+            expect_bike_to_be_destroyed(bike, "#{base_url}/send_request", delete_params)
+            expect(marketplace_listing.reload.status).to eq "sold"
           end
         end
       end
