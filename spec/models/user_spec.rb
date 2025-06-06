@@ -850,7 +850,7 @@ RSpec.describe User, type: :model do
   describe "can_create_listing?" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     it "is true" do
-      # because MARKETPLACE_FREE_UNTIL
+      # TODO: update when MARKETPLACE_FREE_UNTIL changes
       expect(user.reload.can_create_listing?).to be_truthy
       # expect(user.reload.can_create_listing?).to be_falsey
     end

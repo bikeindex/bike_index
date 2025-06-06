@@ -11,11 +11,13 @@ FactoryBot.define do
 
     trait :for_sale do
       published_at { Time.current - 1.minute }
+      status { :for_sale }
     end
 
     trait :sold do
       end_at { Time.current - 1.minute }
       buyer { FactoryBot.create(:user_confirmed) }
+      status { :sold }
     end
   end
 end

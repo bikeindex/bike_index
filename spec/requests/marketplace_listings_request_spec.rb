@@ -16,6 +16,7 @@ RSpec.describe MarketplaceController, type: :request do
       let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, status: :draft) }
 
       it "renders" do
+        expect(MarketplaceListing.pluck(:status)).to match_array(%w[for_sale draft])
         get base_url
         expect(flash).to be_blank
         expect(response).to render_template("index")

@@ -657,7 +657,8 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
-  def current_record
+  # TODO: rename
+  def current_event_record
     current_impound_record || current_stolen_record
   end
 
@@ -948,7 +949,7 @@ class Bike < ApplicationRecord
   end
 
   def calculated_occurred_at
-    return nil if current_record.blank?
+    return nil if current_event_record.blank?
     current_impound_record&.impounded_at || current_stolen_record&.date_stolen
   end
 

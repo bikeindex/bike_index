@@ -10,6 +10,5 @@ class MarketplaceController < ApplicationController
 
   def searched_marketplace_listings
     MarketplaceListing.for_sale.reorder(updated_at: :desc)
-      .includes(:item)
   end
 end

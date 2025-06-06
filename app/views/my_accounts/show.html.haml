@@ -70,8 +70,8 @@
                           %li
                             %strong.attr-title #{bike.status_humanized.titleize}:
                             %span.convertTime= l bike.occurred_at, format: :convert_time
-                        - if bike.current_record.present?
-                          = attr_list_item(bike.current_record.address(country: [:skip_default]), t(".location"))
+                        - if bike.current_event_record.present?
+                          = attr_list_item(bike.current_event_record.address(country: [:skip_default]), t(".location"))
 
                         %li= link_to t(".edit_registration", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: bike.default_edit_template)
                         - if bike.status_stolen?

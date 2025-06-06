@@ -153,7 +153,7 @@ RSpec.describe MarketplaceListing, type: :model do
       expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
     end
 
-    # MARKETPLACE_FREE_UNTIL
+    # TODO: update when MARKETPLACE_FREE_UNTIL changes
     # context "user can not create listings" do
     #   let(:user) { FactoryBot.create(:user_confirmed) }
 
@@ -217,7 +217,7 @@ RSpec.describe MarketplaceListing, type: :model do
         expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
       end
 
-      # MARKETPLACE_FREE_UNTIL
+      # TODO: update when MARKETPLACE_FREE_UNTIL changes
       # context "user can not create listings" do
       #   let(:user) { FactoryBot.create(:user_confirmed) }
 

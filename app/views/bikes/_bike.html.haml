@@ -32,4 +32,4 @@
             #{bike_status_span(bike)}:
             %span.convertTime
               = l bike.occurred_at, format: :convert_time
-          = attr_list_item(bike.current_record.address(country: [:iso]), t(".location"))
+          = attr_list_item(bike.current_event_record.address(country: [:iso]), t(".location"))
