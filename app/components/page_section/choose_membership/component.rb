@@ -6,7 +6,7 @@ module PageSection::ChooseMembership
       @currency = currency
       @membership = membership || Membership.new
       @membership.set_interval = @membership.interval || interval || StripePrice.interval_default
-      @membership.level ||= level || :basic
+      @membership.level ||= passed_membership_level(level)
       @referral_source = referral_source
     end
 
@@ -27,6 +27,12 @@ module PageSection::ChooseMembership
           end
         ])
       end
+    end
+
+    def passed_membership_level(level = nil)
+      return :basic unless Membership::LEVEL_ENUM.keys.include?(level&.to_sym)
+
+      level.to_sym
     end
 
     # TODO: Actually use membership levels
