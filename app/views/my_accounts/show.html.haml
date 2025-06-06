@@ -87,8 +87,8 @@
                               = link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type_titleize&.downcase}", bike_path(impound_claim.bike_claimed)
                         - elsif bike.status_with_owner?
                           %li
-                            - marketplace_translation = bike.is_for_sale ? ".update_marketplace_listing" : ".list_for_sale"
-                            = link_to t(marketplace_translation), edit_bike_path(bike, edit_template: "marketplace"), class: "less-strong"
+                            - marketplace_translation = bike.is_for_sale ? t(".update_marketplace_listing") : t(".list_for_sale")
+                            = link_to marketplace_translation, edit_bike_path(bike, edit_template: "marketplace"), class: "less-strong"
                           %li
                             = link_to t(".mark_stolen", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong"
                         - if bike.user_hidden

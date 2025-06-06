@@ -4,5 +4,6 @@ en:
     search:
       bike_box:
         location: Location
+        posted_at: Listed
         primary_colors: Primary colors
         serial: Serial

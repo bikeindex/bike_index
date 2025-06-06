@@ -936,7 +936,7 @@ class Bike < ApplicationRecord
     return nil unless is_for_sale
 
     cml = current_marketplace_listing
-    cml.present? && cml.for_sale? ? cml : nil
+    (cml.present? && cml.for_sale?) ? cml : nil
   end
 
   def authorization_requires_organization?

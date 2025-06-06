@@ -904,6 +904,12 @@ nb:
           new_in_box: ny i esken
           salvage: berging
           poor: dårlig - trenger service
+        condition_description:
+          excellent: lett ridd
+          good: brukt, men mekanisk i god stand
+          new_in_box: uberørt/med merkelapper
+          poor: trenger service
+          salvage: fungerer ikke/kan ikke kjøres
     models:
       ad: Annonse
       ambassador: Ambassadør
@@ -1757,10 +1763,6 @@ nb:
     index:
       primary_colors: Primærfarger
   bikes:
-    bike:
-      location: plassering
-      primary_colors: Primærfarger
-      serial: Seriell
     bike_show_overlays:
       add_a_picture_of_it: Legg til et bilde av den, slik at alle kan beundre dens
         skjønnhet!
@@ -4551,7 +4553,6 @@ nb:
       bikes: sykler
       combination: Kombinasjon
       edit: Endre
-      edit_bike: Rediger sykkel
       generally_connect_to_org: Noen av syklene dine er assosiert med %{org_name},
         men denne er det ikke. Vanligvis bør du koble alle syklene dine til %{org_name}
         -
@@ -4561,7 +4562,6 @@ nb:
       lock_type: Lås type
       locks: låser
       manufacturer: Produsent
-      mark_bike_stolen: Merk sykkelen som stjålet
       next: Neste skritt
       primary_colors: Primærfarger
       register_new_items: Registrer nye varer
@@ -4582,6 +4582,10 @@ nb:
       you_have_no_registered_locks: Du har ingen registrerte låser
       header_title: "%{current_user_name} på Bike Index"
       membership_subtitle: Takk for at du er medlem av Bike Index %{level}!
+      edit_registration: Rediger %{bike_type}
+      list_for_sale: Liste til salgs
+      mark_stolen: Merke %{bike_type} stjålet
+      update_marketplace_listing: Oppdater markedsplassoppføringen!
     delete_account:
       delete_account: Slett konto
       delete_my_account: Slett kontoen min og alle mine registrerte sykler
@@ -5935,6 +5939,11 @@ nb:
         stolenness_proximity: Stjålet i søkeområdet
         stolenness_stolen: Stjålet hvor som helst
         within: innenfor
+      bike_box:
+        location: plassering
+        primary_colors: Primærfarger
+        serial: Seriell
+        posted_at: Oppført
     legacy_form_well:
       address_record:
         address: gateadresse

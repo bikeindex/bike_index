@@ -4231,13 +4231,12 @@ en:
       header_title: "%{current_user_name} on Bike Index"
       ignore: ignore
       key_serial: Key Serial
+      list_for_sale: List for sale
       location: Location
       lock_type: Lock Type
       locks: locks
       manufacturer: Manufacturer
       mark_stolen: Mark %{bike_type} stolen
-      list_for_sale: List for sale
-      update_marketplace_listing: Update marketplace listing!
       membership_subtitle: Thank you for being a Bike Index %{level} member!
       next: Next steps
       primary_colors: Primary colors
@@ -4251,6 +4250,7 @@ en:
       thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
         to the Index.
       to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
+      update_marketplace_listing: Update marketplace listing!
       update_your_profile: Update your profile
       updated: Updated
       user_hidden: Hidden from other users

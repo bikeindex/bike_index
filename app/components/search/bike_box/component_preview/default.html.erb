@@ -9,7 +9,13 @@
   cycle_type: :bike,
   thumb_path: "https://files.bikeindex.org/uploads/Pu/395980/small_D3C6B1AF-F1FC-4BAA-BD39-9C107871FCAE.jpeg"
 ) %>
+<% bike2 = Bike.status_stolen.first %>
+<% bike3 = Bike.status_impounded.first %>
+<% bike3 = Bike.status_impounded.first %>
+<% marketplace_listing = MarketplaceListing.for_sale.last %>
 
 <ul class="bike-boxes">
   <%= render(Search::BikeBox::Component.new(bike:)) %>
+  <%= render(Search::BikeBox::Component.new(bike: bike2)) %>
+  <%= render(Search::BikeBox::Component.new(bike: marketplace_listing.item, current_event_record: marketplace_listing)) %>
 </ul>

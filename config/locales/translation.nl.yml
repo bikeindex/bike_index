@@ -903,6 +903,12 @@ nl:
           new_in_box: nieuw in doos
           salvage: redden
           poor: arm - heeft service nodig
+        condition_description:
+          excellent: licht bereden
+          good: gebruikt maar mechanisch gezond
+          new_in_box: onbereden/met tags
+          poor: heeft service nodig
+          salvage: niet werkend/onberijdbaar
     models:
       ad: Advertentie
       ambassador: Ambassadeur
@@ -1767,10 +1773,6 @@ nl:
     pre_authorization:
       status: Pre-authorization
   bikes:
-    bike:
-      location: Plaats
-      primary_colors: Primaire kleuren
-      serial: Serie
     bike_show_overlays:
       add_a_picture_of_it: Voeg er een foto van toe, zodat iedereen de schoonheid
         ervan kan bewonderen!
@@ -5635,13 +5637,11 @@ nl:
       bikes: fietsen
       combination: Combinatie
       edit: Bewerken
-      edit_bike: Fiets bewerken
       key_serial: Sleutel serienummer
       location: Plaats
       lock_type: Slottype
       locks: sloten
       manufacturer: Fabrikant
-      mark_bike_stolen: Markeer fiets als gestolen
       next: Volgende stappen
       primary_colors: Primaire kleuren
       register_new_items: Registreer nieuwe items
@@ -5667,6 +5667,10 @@ nl:
       updated: Bijgewerkt
       header_title: "%{current_user_name} op Fietsindex"
       membership_subtitle: Bedankt dat u lid bent van Bike Index %{level}!
+      edit_registration: Bewerken %{bike_type}
+      list_for_sale: Lijst te koop
+      mark_stolen: Markeer %{bike_type} gestolen
+      update_marketplace_listing: Update marktplaatsvermelding!
     edit:
       save_changes: Wijzigingen opslaan
       edit_pages: 'Accountpagina''s bewerken:'
@@ -6091,6 +6095,11 @@ nl:
         stolenness_proximity: Gestolen in zoekgebied
         stolenness_stolen: Overal gestolen
         within: binnen
+      bike_box:
+        location: Plaats
+        primary_colors: Primaire kleuren
+        serial: Serie
+        posted_at: Genoteerd
     legacy_form_well:
       address_record:
         address: Adres

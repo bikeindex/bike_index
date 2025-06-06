@@ -892,6 +892,12 @@ es:
           new_in_box:
           salvage:
           poor:
+        condition_description:
+          excellent:
+          good:
+          new_in_box:
+          poor:
+          salvage:
     models:
       ad:
       ambassador:
@@ -1716,10 +1722,6 @@ es:
     index:
       primary_colors:
   bikes:
-    bike:
-      location:
-      primary_colors:
-      serial:
     bike_show_overlays:
       add_a_picture_of_it:
       add_a_picture_so_people_know_what_to_look:
@@ -3543,7 +3545,6 @@ es:
       bikes:
       combination:
       edit: Editar
-      edit_bike:
       generally_connect_to_org:
       ignore:
       key_serial:
@@ -3551,7 +3552,6 @@ es:
       lock_type:
       locks:
       manufacturer:
-      mark_bike_stolen:
       next:
       primary_colors:
       register_new_items:
@@ -3569,6 +3569,10 @@ es:
       you_have_no_registered_locks:
       header_title:
       membership_subtitle:
+      edit_registration:
+      list_for_sale:
+      mark_stolen:
+      update_marketplace_listing:
     delete_account:
       delete_account:
       delete_my_account:
@@ -4681,6 +4685,11 @@ es:
         stolenness_proximity:
         stolenness_stolen:
         within:
+      bike_box:
+        location:
+        primary_colors:
+        serial:
+        posted_at:
     legacy_form_well:
       address_record:
         address:

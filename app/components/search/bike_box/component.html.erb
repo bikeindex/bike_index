@@ -32,10 +32,16 @@
             <small><%= @current_event_record.currency_name %></small>
           </li>
           <%= attr_list_item(@current_event_record.formatted_address_string, translation(".location")) %>
+          <li>
+            <strong class="attr-title"><%= translation(".posted_at") %>:</strong>
+            <span class="localizeTime">
+              <%= l @current_event_record.published_at, format: :convert_time %>
+            </span>
+          </li>
         <% else %>
           <li>
             <%= bike_status_span(@bike) %>:
-            <span class="convertTime">
+            <span class="localizeTime">
               <%= l @bike.occurred_at, format: :convert_time %>
             </span>
           </li>
