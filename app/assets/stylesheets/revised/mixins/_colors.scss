@@ -54,12 +54,6 @@ $for-sale-color: $green;
 .for-sale-color {
   color: $for-sale-color;
 }
-.container a.for-sale-color {
-  color: $for-sale-color;
-  &:hover, &:active, &.active {
-    color: darken($green, 10%);
-  }
-}
 
 $impounded-color: $stolen-color;
 .impounded-color {
