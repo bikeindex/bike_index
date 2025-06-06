@@ -1,3 +1,4 @@
+<%= stylesheet_link_tag "revised" %>
 <% bike = Bike.new(
   id: 35,
   serial_number: "XXX999 999xxxx",
@@ -16,6 +17,8 @@
 
 <ul class="bike-boxes">
   <%= render(Search::BikeBox::Component.new(bike:)) %>
-  <%= render(Search::BikeBox::Component.new(bike: bike2)) %>
-  <%= render(Search::BikeBox::Component.new(bike: marketplace_listing.item, current_event_record: marketplace_listing)) %>
+  <% if bike2.present? %>
+    <%= render(Search::BikeBox::Component.new(bike: bike2)) %>
+    <%= render(Search::BikeBox::Component.new(bike: marketplace_listing.item, current_event_record: marketplace_listing)) %>
+  <% end %>
 </ul>

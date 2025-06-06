@@ -70,7 +70,9 @@
                           %li
                             %strong.attr-title #{bike.status_humanized.titleize}:
                             %span.convertTime= l bike.occurred_at, format: :convert_time
-                        - if bike.current_event_record.present?
+
+                        -# marketplace_listing handles address differently. TODO: Reconcile that!
+                        - if bike.current_event_record.present? && !bike.is_for_sale
                           = attr_list_item(bike.current_event_record.address(country: [:skip_default]), t(".location"))
 
                         %li= link_to t(".edit_registration", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: bike.default_edit_template)
