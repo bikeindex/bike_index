@@ -32,6 +32,9 @@ class EmailDomain < ApplicationRecord
   # This also includes an env to turn if off in case things block up
   VERIFICATION_ENABLED = (!Rails.env.test? && ENV["SKIP_EMAIL_DOMAIN_VERIFICATION"] != "true").freeze
   MEMOIZE_INVALID = ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"].blank? # enable skipping for testing
+  # always reprocess once a month
+  ALWAYS_RE_PROCESS_DELAY = 1.month.to_i.freeze
+  RE_PROCESS_DELAY = 1.hour
 
   acts_as_paranoid
 
@@ -243,6 +246,19 @@ class EmailDomain < ApplicationRecord
 
   def unprocessed?
     user_count.nil?
+  end
+
+  def should_re_process?
+    return false if %w[banned ignored].include?(status)
+    return true if data&.dig("spam_score").blank? || (data["notification_count"]&.to_i || 0) < 20 ||
+      updated_at < (Time.current - ALWAYS_RE_PROCESS_DELAY)
+
+    # recalculate very likely spam or very unlikely spam
+    sscore = data["spam_score"].to_i
+    return true if sscore > 3 && sscore < 7
+    return false if sscore == 0 # leave these for a month
+
+    updated_at < (Time.current - RE_PROCESS_DELAY)
   end
 
   def processed?

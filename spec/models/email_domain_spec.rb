@@ -241,4 +241,41 @@ RSpec.describe EmailDomain, type: :model do
       expect(EmailDomain.find_matching_domain(domain)&.id).to eq email_domain.id
     end
   end
+
+  describe "should_re_process?" do
+    let(:email_domain) { EmailDomain.new }
+    it "is truthy" do
+      expect(email_domain.should_re_process?).to be_truthy
+    end
+    context "with over 10 bikes" do
+      let(:spam_score) { 2 }
+      let(:updated_at) { Time.current - 1.day }
+      let(:email_domain) do
+        FactoryBot.build(:email_domain, updated_at:, data: {bike_count: 10, spam_score:, notification_count: 20}.as_json)
+      end
+      it "is falsey" do
+        expect(email_domain.should_re_process?).to be_truthy
+      end
+      context "updated_at > 1.hour ago" do
+        let(:updated_at) { Time.current - 20.minutes }
+        it "is falsey, unless notification_count < 20" do
+          expect(email_domain.should_re_process?).to be_falsey
+          email_domain.data["notification_count"] = 19
+          expect(email_domain.should_re_process?).to be_truthy
+        end
+        context "spam_score 4" do
+          let(:spam_score) { 4 }
+          it "is truthy" do
+            expect(email_domain.should_re_process?).to be_truthy
+          end
+        end
+      end
+      context "updated before RE_PROCESS_DELAY" do
+        let(:updated_at) { Time.current - 1.year }
+        it "is truthy if spam score is below 3" do
+          expect(email_domain.should_re_process?).to be_truthy
+        end
+      end
+    end
+  end
 end

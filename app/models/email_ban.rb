@@ -36,8 +36,7 @@ class EmailBan < ApplicationRecord
       if EmailDomain::VERIFICATION_ENABLED
         email_domain = EmailDomain.find_or_create_for(user.email, skip_processing: true)
 
-        # Async processing for existing domains, inline for new ones
-        email_domain.unprocessed? ? email_domain.process! : email_domain.enqueue_processing_worker
+        process_email_domain_if_required(email_domain)
 
         if email_domain.banned?
           user.really_destroy!
@@ -90,6 +89,14 @@ class EmailBan < ApplicationRecord
       email_start.gsub!(/\+.*/, "")
 
       User.where("email ~ ?", "^#{email_start}(\\+.*)?@#{email_end}").where.not(email:)
+    end
+
+    def process_email_domain_if_required(email_domain)
+      # Inline process new email_domains
+      return email_domain.process! if email_domain.unprocessed?
+
+      # enqueue async processing for email domains
+      email_domain.enqueue_processing_worker if email_domain.should_re_process?
     end
   end
 
