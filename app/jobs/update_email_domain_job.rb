@@ -10,7 +10,7 @@ class UpdateEmailDomainJob < ScheduledJob
 
   class << self
     def frequency
-      24.hours
+      2.weeks
     end
 
     def auto_pending_ban?(email_domain)
