@@ -40,7 +40,7 @@ class UpdateEmailDomainJob < ScheduledJob
     unless email_domain.no_auto_assign_status? || email_domain.banned?
       email_domain.status = email_domain.auto_bannable? ? "provisional_ban" : "permitted"
     end
-    email_domain.save!
+    email_domain.update!(updated_at: Time.current)
     if create_tld_for_subdomains?(email_domain)
       EmailDomain.find_or_create_for(email_domain.tld)
     elsif email_domain.banned? && email_domain.user_count > 0

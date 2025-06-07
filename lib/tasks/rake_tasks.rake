@@ -4,7 +4,6 @@ task enqueue_newsletter: :environment do
   end
 end
 
-
 task run_scheduler: :environment do
   ScheduledJobRunner.perform_async if ScheduledJobRunner.should_enqueue?
 end
