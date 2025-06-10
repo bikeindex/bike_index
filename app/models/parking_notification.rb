@@ -50,7 +50,7 @@
 #
 class ParkingNotification < ActiveRecord::Base
   include Geocodeable
-  KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other: 3}.freeze
+  KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
   RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2}.freeze
   MAX_PER_PAGE = 250
@@ -104,7 +104,7 @@ class ParkingNotification < ActiveRecord::Base
       appears_abandoned_notification: "Appears abandoned",
       parked_incorrectly_notification: "Parked incorrectly",
       impound_notification: "Impounded",
-      other: "Other"
+      other_parking_notification: "Other"
     }
   end
 
