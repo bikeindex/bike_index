@@ -34,6 +34,7 @@ RSpec.describe MailSnippet, type: :model do
         partial_registration
         appears_abandoned_notification
         parked_incorrectly_notification
+        other_parking_notification
         impound_notification
         impound_claim_approved
         impound_claim_denied

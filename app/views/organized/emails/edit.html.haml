@@ -89,9 +89,11 @@
             to do <em>any</em> formatting (for instance line breaks).
             %em.less-strong.d-block{style: "line-height: 1;"}
               Need help with HTML? Check out
-              = link_to "this tutorial", "https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started"
-              \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"}.
+              = link_to "this tutorial", "https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started", target: "_blank"
+              \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org", target: "_blank"}.
       = f.text_area :body, rows: 4, maxlength: @object.max_body_length, placeholder: "Custom text", class: "form-control"
+    - if @kind == "other_parking_notification"
+      = render(Alert::Component.new(text: "Other parking notifications don't include a \"picked up the bike\" link", kind: :info, margin_classes: 'tw:mt-2 mb-4'))
 
     .form-group
       = f.check_box :is_enabled
@@ -103,10 +105,9 @@
 
     .mt-2
       = submit_tag "Save", class: "btn btn-success btn-md-lg"
+
 - else
-  .alert.alert-info.mt-4.mb-4
-    %h3.uncap.less-strong Not customizable directly
-    %p Ask Bike Index support for help
+  = render(Alert::Component.new(header: "Not customizable directly", text: "Ask Bike Index support for help", kind: :info))
 
 -# We can't preview impound_claims unless there are impound records
 - if @impound_claim_kind && @impound_claim.blank?

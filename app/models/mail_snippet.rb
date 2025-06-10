@@ -42,6 +42,7 @@ class MailSnippet < ApplicationRecord
     partial_registration: 6,
     appears_abandoned_notification: 7,
     parked_incorrectly_notification: 8,
+    other_parking_notification: 18,
     impound_notification: 9,
     impound_claim_approved: 11,
     impound_claim_denied: 12,

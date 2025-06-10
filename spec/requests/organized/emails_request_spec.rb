@@ -6,7 +6,7 @@ RSpec.describe Organized::EmailsController, type: :request do
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
   let(:all_viewable_email_kinds) do
     %w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification graduated_notification
-      impound_notification impound_claim_approved impound_claim_denied organization_stolen_message]
+      other_parking_notification impound_notification impound_claim_approved impound_claim_denied organization_stolen_message]
   end
   let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes organization_stolen_message] }
 
