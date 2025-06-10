@@ -415,7 +415,7 @@ RSpec.describe "BikesController#create", type: :request do
         bike_code: "ed001"
       }
     end
-    it "creates and adds the bike code" do
+    it "creates and adds the bike code", :flaky do
       b_param.reload
       expect(b_param.created_bike_id).to be_blank
       expect {

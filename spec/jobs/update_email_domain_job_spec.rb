@@ -76,6 +76,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         expect(email_domain.tld_matches_subdomains?).to be_truthy
         expect(EmailDomain.subdomain.pluck(:id)).to match_array([])
         expect(email_domain.calculated_subdomains.pluck(:id)).to eq([])
+        expect(email_domain.should_re_process?).to be_falsey
         expect(email_domain.data.except("spam_score")).to match_hash_indifferently invalid_data
       end
     end

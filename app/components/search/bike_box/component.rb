@@ -8,11 +8,17 @@ module Search::BikeBox
     # since current_user shows their hidden serials
     def initialize(bike:, current_user: nil, current_event_record: nil, skip_cache: false)
       @bike = bike
+      return if @bike.blank?
+
       @current_event_record = @bike.current_event_record
 
       # If this is cached (assume it is by default), don't show the serial for the user
       @is_cached = !skip_cache
       @current_user = current_user unless @is_cached
+    end
+
+    def render?
+      @bike.present?
     end
 
     private
