@@ -745,11 +745,17 @@ en:
         rearward: Rear facing
       marketplace_listing:
         condition:
-          excellent: excellent - lightly ridden
-          good: good - used but mechanically sound
-          new_in_box: new - unridden/with tags
-          poor: poor - needs service
-          salvage: for parts - not working/unrideable
+          excellent: excellent
+          good: good
+          new_in_box: new
+          poor: poor
+          salvage: for parts
+        condition_description:
+          excellent: lightly ridden
+          good: used but mechanically sound
+          new_in_box: unridden/with tags
+          poor: needs service
+          salvage: not working/unrideable
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Cycle (hand pedal)
@@ -1019,10 +1025,6 @@ en:
     index:
       primary_colors: Primary colors
   bikes:
-    bike:
-      location: Location
-      primary_colors: Primary colors
-      serial: Serial
     bike_show_overlays:
       add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what
@@ -4222,18 +4224,19 @@ en:
       bikes: bikes
       combination: Combination
       edit: edit
-      edit_bike: Edit Bike
+      edit_registration: Edit %{bike_type}
       generally_connect_to_org: >-
         Some of your bikes are associated with %{org_name}, but this one is not. Generally,
         you should connect all your bikes to %{org_name} -
       header_title: "%{current_user_name} on Bike Index"
       ignore: ignore
       key_serial: Key Serial
+      list_for_sale: List for sale
       location: Location
       lock_type: Lock Type
       locks: locks
       manufacturer: Manufacturer
-      mark_bike_stolen: Mark bike stolen
+      mark_stolen: Mark %{bike_type} stolen
       membership_subtitle: Thank you for being a Bike Index %{level} member!
       next: Next steps
       primary_colors: Primary colors
@@ -4247,6 +4250,7 @@ en:
       thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
         to the Index.
       to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
+      update_marketplace_listing: Update marketplace listing!
       update_your_profile: Update your profile
       updated: Updated
       user_hidden: Hidden from other users

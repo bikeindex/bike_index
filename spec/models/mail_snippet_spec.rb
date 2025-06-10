@@ -70,4 +70,13 @@ RSpec.describe MailSnippet, type: :model do
       end
     end
   end
+
+  describe "newsletter" do
+    let(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: :newsletter) }
+    let(:mail_snippet_2) { FactoryBot.create(:mail_snippet, kind: :newsletter) }
+    it "allows creating multiple" do
+      expect(mail_snippet).to be_valid
+      expect(mail_snippet_2).to be_valid
+    end
+  end
 end

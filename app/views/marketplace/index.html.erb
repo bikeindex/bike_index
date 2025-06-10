@@ -1,0 +1,17 @@
+<div class="container mb-5">
+  <h1>Bike Index marketplace</h1>
+  <p>
+    This is an early version - we’re working on improving it right now!
+  </p>
+
+  <div class="row bikes-searched-default mt-5">
+    <div class="col-md-12">
+        <ul class="bike-boxes">
+          <% @marketplace_listings.each do |marketplace_listing| %>
+            <%= render partial: '/bikes/bike', locals: { bike: marketplace_listing.item, marketplace_listing: marketplace_listing}, cached: true %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <%= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+</div>

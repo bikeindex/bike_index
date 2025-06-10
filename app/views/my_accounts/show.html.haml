@@ -30,7 +30,7 @@
               - @bikes.each do |bike|
                 - bike_alerts = user_alerts.select { |ua| ua.bike_id == bike.id }
                 %li.bike-box-item
-                  - cache(bike) do
+                  - cache(["my_account", bike]) do
                     - image_link = bike.thumb_path ? bike_url(bike) : edit_bike_url(bike, edit_template: 'photos')
                     %a.bike-list-image{ href: image_link, class: ('hover-expand' if bike.thumb_path) }
                       - unless bike.thumb_path
@@ -70,10 +70,12 @@
                           %li
                             %strong.attr-title #{bike.status_humanized.titleize}:
                             %span.convertTime= l bike.occurred_at, format: :convert_time
-                        - if bike.current_record.present?
-                          = attr_list_item(bike.current_record.address(country: [:skip_default]), t(".location"))
 
-                        %li= link_to t(".edit_bike"), edit_bike_path(bike, edit_template: bike.default_edit_template)
+                        -# marketplace_listing handles address differently. TODO: Reconcile that!
+                        - if bike.current_event_record.present? && !bike.is_for_sale
+                          = attr_list_item(bike.current_event_record.address(country: [:skip_default]), t(".location"))
+
+                        %li= link_to t(".edit_registration", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: bike.default_edit_template)
                         - if bike.status_stolen?
                           -# %li
                           -#   # Hide printable PDF because it isn't working right now :(
@@ -84,10 +86,13 @@
                               %span.text-warning
                                 %em= impound_claim.status_humanized.titleize
                                 claim to
-                              = link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type}", bike_path(impound_claim.bike_claimed)
+                              = link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type_titleize&.downcase}", bike_path(impound_claim.bike_claimed)
                         - elsif bike.status_with_owner?
                           %li
-                            = link_to t(".mark_bike_stolen"), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong"
+                            - marketplace_translation = bike.is_for_sale ? t(".update_marketplace_listing") : t(".list_for_sale")
+                            = link_to marketplace_translation, edit_bike_path(bike, edit_template: "marketplace"), class: "less-strong"
+                          %li
+                            = link_to t(".mark_stolen", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong"
                         - if bike.user_hidden
                           %li
                             %em.small.text-warning= t(".user_hidden")

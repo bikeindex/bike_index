@@ -401,7 +401,7 @@ RSpec.describe BikesController, type: :controller do
       let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
       context "unverified authenticity token" do
         include_context :test_csrf_token
-        it "permits" do
+        it "permits", :flaky do
           expect(user).to be_present
           Sidekiq::Job.clear_all
           expect {

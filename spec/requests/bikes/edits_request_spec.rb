@@ -15,6 +15,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       accessories: "Accessories and Components",
       groups: "Groups and Organizations",
       remove: "Transfer, Hide or Delete",
+      marketplace: "List for sale",
       report_stolen: "Report Stolen or Missing",
       versions: "Versions"
     }
@@ -27,7 +28,8 @@ RSpec.describe Bikes::EditsController, type: :request do
       report_recovered: "Mark this Bike Recovered"
     }
   end
-  let(:theft_edit_templates) { edit_templates.except(:report_stolen).merge(theft_templates) }
+  # TODO: update when MARKETPLACE_FREE_UNTIL changes
+  let(:theft_edit_templates) { edit_templates.except(:report_stolen, :marketplace).merge(theft_templates) }
 
   context "no current_user" do
     let(:current_user) { nil }
@@ -105,10 +107,11 @@ RSpec.describe Bikes::EditsController, type: :request do
     end
   end
   describe "marketplace" do
-    it "redirects" do
-      get "#{base_url}/marketplace"
-      expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
-    end
+    # TODO: update when MARKETPLACE_FREE_UNTIL changes
+    # it "redirects" do
+    #   get "#{base_url}/marketplace"
+    #   expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
+    # end
     context "with can_create_listing?" do
       let(:bike_creator) { FactoryBot.create(:superuser) }
 
@@ -245,7 +248,7 @@ RSpec.describe Bikes::EditsController, type: :request do
 
   context "with impound_record" do
     let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
-    let(:target_edit_template_keys) { edit_templates.keys.map(&:to_s) - ["report_stolen"] + ["found_details"] }
+    let(:target_edit_template_keys) { edit_templates.keys.map(&:to_s) - %w[report_stolen marketplace] + ["found_details"] }
     it "renders" do
       expect(bike.reload.status).to eq "status_impounded"
       expect(bike.owner&.id).to eq current_user.id

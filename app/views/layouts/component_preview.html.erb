@@ -7,8 +7,8 @@
     <%= stylesheet_link_tag "tailwind" %>
     <%= javascript_importmap_tags %>
   </head>
-  <%# NOTE: This sets the theme %>
-  <body class="<%= params.dig(:lookbook, :display, :theme) %>">
+  <%# NOTE: This sets the theme. Padding set to 0 because revised stylesheet in bike box %>
+  <body class="<%= params.dig(:lookbook, :display, :theme) %>" style="padding: 0;">
     <%# NOTE: at some point, make the padding optional %>
     <div class="tw:w-full tw:h-full tw:p-4">
       <%= yield %>

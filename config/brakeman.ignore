@@ -256,7 +256,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/views/my_accounts/edit.html.haml",
-      "line": 30,
+      "line": 27,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(partial => (params[:edit_template] or edit_templates.keys.first), { :locals => ({ :f => FormBuilder.new }) })",
       "render_path": [
@@ -428,40 +428,6 @@
       "confidence": "Weak",
       "cwe_id": [
         601
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "3acd7c899457bcfb54029eca31c253821d486f65012c841953ea6fd57b2a174b",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/info/show.html.haml",
-      "line": 19,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "Blog.friendly_find(params[:id]).body",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "InfoController",
-          "method": "show",
-          "line": 17,
-          "file": "app/controllers/info_controller.rb",
-          "rendered": {
-            "name": "info/show",
-            "file": "app/views/info/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "info/show"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": [
-        79
       ],
       "note": ""
     },
@@ -640,7 +606,7 @@
           "type": "controller",
           "class": "InfoController",
           "method": "why_donate",
-          "line": 57,
+          "line": 63,
           "file": "app/controllers/info_controller.rb",
           "rendered": {
             "name": "news/show",
@@ -1082,7 +1048,7 @@
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/memberships_controller.rb",
-      "line": 22,
+      "line": 21,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
       "code": "redirect_to(StripeSubscription.create_for(:stripe_price => StripePrice.active.where(stripe_price_parameters).first, :user => current_user, :referral_source => referral_source_from_params).stripe_checkout_session_url, :allow_other_host => true)",
       "render_path": null,
@@ -1537,6 +1503,40 @@
       "confidence": "High",
       "cwe_id": [
         77
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "e71616976d17c554371923f5aa8e3dff0a872a2ddbd8a44ab7e79ae1d8867a78",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/info/show.html.haml",
+      "line": 19,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Blog.friendly_find(\"bike-index-membership\").body",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "InfoController",
+          "method": "membership",
+          "line": 58,
+          "file": "app/controllers/info_controller.rb",
+          "rendered": {
+            "name": "info/show",
+            "file": "app/views/info/show.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "info/show"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        79
       ],
       "note": ""
     },

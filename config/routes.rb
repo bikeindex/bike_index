@@ -63,7 +63,7 @@ Rails.application.routes.draw do
     collection { get :success }
   end
   get "/.well-known/apple-developer-merchantid-domain-association", to: "payments#apple_verification"
-  resource :membership, only: %i[new create edit show] do
+  resource :membership, only: %i[new create edit] do
     collection { get :success }
   end
 
@@ -173,6 +173,8 @@ Rails.application.routes.draw do
   resources :locks, except: %i[show index]
   resources :impound_claims, only: [:create, :update]
   resources :review_impound_claims, only: [:show, :update]
+
+  get "marketplace", to: "marketplace#index"
 
   resources :marketplace_listings, only: %i[update]
 
@@ -291,14 +293,14 @@ Rails.application.routes.draw do
   namespace :api, defaults: {format: "json"} do
     get "/", to: redirect("/documentation")
     namespace :v1 do
-      resources :bikes, only: [:index, :show, :create] do
+      resources :bikes, only: %i[index show create] do
         collection do
           get :search_tags
           get :close_serials
           get :stolen_ids
         end
       end
-      resources :stolen_locking_response_suggestions, only: [:index]
+      resources :stolen_locking_response_suggestions, only: %i[index]
       resources :cycle_types, only: %i[index]
       resources :wheel_sizes, only: %i[index]
       resources :component_types, only: %i[index]
@@ -342,7 +344,7 @@ Rails.application.routes.draw do
 
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
     protect_your_bike serials about where vendor_terms resources image_resources privacy terms security
-    how_not_to_buy_stolen dev_and_design lightspeed].freeze.each do |page|
+    how_not_to_buy_stolen dev_and_design lightspeed membership].freeze.each do |page|
     get page, controller: "info", action: page
   end
   get "why-donate", to: "info#why_donate", as: "why_donate"

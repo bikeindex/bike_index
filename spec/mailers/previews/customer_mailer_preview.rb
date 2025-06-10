@@ -98,6 +98,12 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.bike_possibly_found_email(contact)
   end
 
+  def newsletter
+    mail_snippet = MailSnippet.newsletter.order(:id).last
+    user = User.confirmed.valid_only.reorder(:updated_at).last
+    CustomerMailer.newsletter(user:, mail_snippet:)
+  end
+
   def marketplace_message_notification
     CustomerMailer.marketplace_message_notification(MarketplaceMessage.last)
   end

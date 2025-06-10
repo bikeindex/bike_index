@@ -18,7 +18,7 @@ module DefinitionList::Row
     def render?
       return true if @render_with_no_value
 
-      @value.present?
+      @value.present? || content.present?
     end
 
     private

@@ -3,14 +3,11 @@ class MembershipsController < ApplicationController
 
   layout "payments_layout"
 
-  def show
-    redirect_to news_path(Blog.why_membership_slug)
-  end
-
   def new
     if current_user&.membership_active.present?
       redirect_to edit_membership_path
     end
+    @initial_level = params[:membership_level]
     @referral_source = referral_source_from_params
   end
 

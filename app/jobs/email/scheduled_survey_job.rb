@@ -1,4 +1,4 @@
-class ScheduledEmailSurveyJob < ScheduledJob
+class Email::ScheduledSurveyJob < ScheduledJob
   prepend ScheduledJobRecorder
   sidekiq_options retry: 2
   SURVEY_COUNT = (ENV["THEFT_SURVEY_COUNT"] || 200).to_i
@@ -41,13 +41,13 @@ class ScheduledEmailSurveyJob < ScheduledJob
     potential_recovered_bikes.limit(enqueue_count).find_each do |bike|
       next if no_survey?(bike)
       break if sent > enqueue_limit
-      ScheduledEmailSurveyJob.perform_in((enqueue_count + sent) * 5, bike.id)
+      Email::ScheduledSurveyJob.perform_in((enqueue_count + sent) * 5, bike.id)
       sent += 1
     end
     potential_stolen_bikes.limit(enqueue_count - sent).find_each do |bike|
       next if no_survey?(bike)
       break if sent > enqueue_limit
-      ScheduledEmailSurveyJob.perform_in((enqueue_count + sent) * 5, bike.id)
+      Email::ScheduledSurveyJob.perform_in((enqueue_count + sent) * 5, bike.id)
       sent += 1
     end
   end
