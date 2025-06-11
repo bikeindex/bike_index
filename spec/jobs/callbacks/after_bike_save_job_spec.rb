@@ -59,7 +59,7 @@ RSpec.describe Callbacks::AfterBikeSaveJob, type: :job do
       expect(bike.public_images.pluck(:external_image_url)).to match_array external_image_urls.uniq
       # Processing occurs in the processing job - not inline
       expect(bike.public_images.any? { |i| i.image.present? }).to be_falsey
-      expect(ExternalImageUrlStoreJob.jobs.count).to eq 2
+      expect(Images::ExternalUrlStoreJob.jobs.count).to eq 2
     end
     context "images already exist, passed some blank values" do
       let(:passed_external_image_urls) { external_image_urls + [nil, ""] }
