@@ -1,4 +1,4 @@
-class ProcessOrganizationRoleJob < ApplicationJob
+class Users::ProcessOrganizationRoleJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform(organization_role_id, user_id = nil)

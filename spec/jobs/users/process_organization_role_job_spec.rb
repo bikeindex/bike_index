@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe ProcessOrganizationRoleJob, type: :job do
+RSpec.describe Users::ProcessOrganizationRoleJob, type: :job do
   let(:instance) { described_class.new }
   before { ActionMailer::Base.deliveries = [] }
 

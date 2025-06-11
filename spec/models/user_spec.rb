@@ -849,10 +849,13 @@ RSpec.describe User, type: :model do
 
   describe "can_create_listing?" do
     let(:user) { FactoryBot.create(:user_confirmed) }
-    it "is true" do
+    it "is false if past MARKETPLACE_FREE_UNTIL" do
       # TODO: update when MARKETPLACE_FREE_UNTIL changes
-      expect(user.reload.can_create_listing?).to be_truthy
-      # expect(user.reload.can_create_listing?).to be_falsey
+      if Time.current.to_i < User::MARKETPLACE_FREE_UNTIL
+        expect(user.reload.can_create_listing?).to be_truthy
+      else
+        expect(user.reload.can_create_listing?).to be_falsey
+      end
     end
     context "superuser" do
       let(:user) { User.new(superuser: true) }
