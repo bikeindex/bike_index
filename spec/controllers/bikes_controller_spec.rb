@@ -571,7 +571,7 @@ RSpec.describe BikesController, type: :controller do
             expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
-            ImageAssociatorJob.new.perform
+            Images::AssociatorJob.new.perform
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
             expect(bike.current_ownership.origin).to eq "embed_extended"
