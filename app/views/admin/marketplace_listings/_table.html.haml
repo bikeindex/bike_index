@@ -19,44 +19,50 @@
       %th
         = sortable "condition", render_sortable: render_sortable
       %th
+        City
+      %th
         = sortable "seller_id", render_sortable: render_sortable
       %th
         = sortable "buyer_id", render_sortable: render_sortable
     %tbody
       - collection.each do |marketplace_listing|
-        %tr
-          %td
-            .less-strong-hold
-              %span.convertTime
-                = l marketplace_listing.created_at, format: :convert_time
-              - if display_dev_info?
-                %span.less-strong-right.d-none.d-md-block.only-dev-visible
-                  = marketplace_listing.id
-          - if display_dev_info?
+        - cache(marketplace_listing) do
+          %tr
             %td
-              %small.convertTime
-                = l marketplace_listing.updated_at, format: :convert_time
-          %td
-            - status_class = "text-info" if marketplace_listing.for_sale?
-            - status_class = "text-success" if marketplace_listing.sold?
-            %span{class: status_class}
-              = marketplace_listing.status_humanized
-          %td
-            - if marketplace_listing.published_at.present?
-              %span.convertTime
-                = l marketplace_listing.published_at, format: :convert_time
-          %td
-            - if marketplace_listing.end_at.present?
-              %span.convertTime
-                = l marketplace_listing.end_at, format: :convert_time
-          %td
-            = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true) }
-          %td
-            = "#{marketplace_listing.currency_symbol}#{admin_number_display(marketplace_listing.amount)}"
-          %td
-            = marketplace_listing.condition
-          %td
-            = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.seller, render_search: true, cache: true}
-          %td
-            - if marketplace_listing.buyer_id.present?
-              = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.buyer_id, render_search: true, cache: true}
+              .less-strong-hold
+                %span.convertTime
+                  = l marketplace_listing.created_at, format: :convert_time
+                - if display_dev_info?
+                  %span.less-strong-right.d-none.d-md-block.only-dev-visible
+                    = marketplace_listing.id
+            - if display_dev_info?
+              %td
+                %small.convertTime
+                  = l marketplace_listing.updated_at, format: :convert_time
+            %td
+              - status_class = "text-info" if marketplace_listing.for_sale?
+              - status_class = "text-success" if marketplace_listing.sold?
+              %span{class: status_class}
+                = marketplace_listing.status_humanized
+            %td
+              - if marketplace_listing.published_at.present?
+                %span.convertTime
+                  = l marketplace_listing.published_at, format: :convert_time
+            %td
+              - if marketplace_listing.end_at.present?
+                %span.convertTime
+                  = l marketplace_listing.end_at, format: :convert_time
+            %td
+              = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true) }
+            %td
+              = "#{marketplace_listing.currency_symbol}#{admin_number_display(marketplace_listing.amount)}"
+            %td
+              = marketplace_listing.condition
+            %td
+              - if marketplace_listing.address_record
+                = render partial: "/shared/admin/address_record_cell", locals: {address_record: marketplace_listing.address_record}
+            %td
+              = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.seller, render_search: true, cache: true}
+            %td
+              - if marketplace_listing.buyer_id.present?
+                = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.buyer_id, render_search: true, cache: true}

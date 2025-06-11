@@ -22,8 +22,9 @@ RSpec.describe Callbacks::AfterBikeSaveJob, type: :job do
   end
 
   describe "update listing order and credibility score" do
+    let(:bike) { FactoryBot.create(:bike) }
+
     it "updates the listing order" do
-      bike = FactoryBot.create(:bike)
       bike.update_attribute :listing_order, -22
       instance.perform(bike.id)
       bike.reload
@@ -33,10 +34,19 @@ RSpec.describe Callbacks::AfterBikeSaveJob, type: :job do
 
     context "unchanged listing order" do
       it "does not update the listing order or enqueue afterbikesave" do
-        bike = FactoryBot.create(:bike)
         bike.update_attribute :listing_order, bike.calculated_listing_order
         expect_any_instance_of(Bike).to_not receive(:update_attribute)
         instance.perform(bike.id)
+      end
+    end
+
+    context "with marketplace_listing" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
+      it "updates the marketplace_listing updated_at" do
+        marketplace_listing.update_column :updated_at, Time.current - 1.hour
+        expect(marketplace_listing.reload.updated_at).to be < Time.current - 50.minutes
+        instance.perform(bike.id)
+        expect(marketplace_listing.reload.updated_at).to be_within(1).of Time.current
       end
     end
   end
