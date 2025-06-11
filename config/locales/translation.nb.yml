@@ -2437,9 +2437,6 @@ nb:
           Snakk med dem for å få tilgang til denne %{bike_type}."
         you_dont_own_that: Å nei! Det ser ut til at du ikke eier den %{bike_type}.
         you_have_to_sign_in: Oops! Du må logge på for å kunne redigere det %{bike_type}.
-      index:
-        we_dont_know_location: Beklager, vi kjenner ikke plasseringen "%{location}".
-          Prøv et annet sted for å søke etter stjålne sykler i nærheten.
       new:
         please_sign_in_to_register: Logg på for å registrere en sykkel
         we_couldnt_find_that_registration: Oops! Vi kunne ikke finne den registreringen,
@@ -2741,6 +2738,11 @@ nb:
       update:
         item_published_for_sale: Din %{item_type} er publisert. Den er nå lagt ut
           for salg!
+    search:
+      registrations:
+        set_interpreted_params:
+          we_dont_know_location: Beklager, vi kjenner ikke plasseringen "%{location}".
+            Prøv et annet sted for å søke etter stjålne sykler i nærheten.
   customer_mailer:
     additional_email_confirmation:
       html:

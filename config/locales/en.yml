@@ -1753,12 +1753,6 @@ en:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:
         bike_was_updated: Bike successfully updated!
-    search:
-      registrations:
-        set_interpreted_params:
-          we_dont_know_location: >-
-            Sorry, we don't know the location "%{location}". Please try a different
-            location to search nearby stolen bikes.
     concerns:
       controller_helpers:
         authenticate_user:
@@ -1967,6 +1961,12 @@ en:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.
+    search:
+      registrations:
+        set_interpreted_params:
+          we_dont_know_location: >-
+            Sorry, we don't know the location "%{location}". Please try a different
+            location to search nearby stolen bikes.
     sessions:
       create:
         invalid_email_or_password: Invalid email/password

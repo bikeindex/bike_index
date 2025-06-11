@@ -2190,9 +2190,6 @@ nl:
           met hen om toegang te krijgen tot deze %{bike_type}."
         bike_impounded_by_organization: "%{org_name} heeft dat %{bike_type} in beslag
           genomen. Praat met hen om toegang te krijgen tot deze %{bike_type}."
-      index:
-        we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
-          een andere locatie om gestolen fietsen in de buurt te zoeken.
       new:
         please_sign_in_to_register: Meld u aan om een fiets te registreren
         we_couldnt_find_that_registration: Oops! We konden die registratie niet vinden.
@@ -2515,6 +2512,11 @@ nl:
       update:
         item_published_for_sale: Uw %{item_type} is gepubliceerd. Het staat nu te
           koop!
+    search:
+      registrations:
+        set_interpreted_params:
+          we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
+            een andere locatie om gestolen fietsen in de buurt te zoeken.
   customer_mailer:
     additional_email_confirmation:
       html:
