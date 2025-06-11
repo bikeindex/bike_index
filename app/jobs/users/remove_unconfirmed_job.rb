@@ -1,4 +1,4 @@
-class RemoveUnconfirmedUsersJob < ScheduledJob
+class Users::RemoveUnconfirmedJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   REMOVE_DELAY = 2.days

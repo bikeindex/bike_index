@@ -1,4 +1,4 @@
-class ImageAssociatorJob < ApplicationJob
+class Images::AssociatorJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform

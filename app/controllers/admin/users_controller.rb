@@ -96,7 +96,7 @@ class Admin::UsersController < Admin::BaseController
       # Manually confirm the user
       user_email.update(confirmation_token: nil) if user_email&.unconfirmed?
       user_email ||= @user.user_emails.create(email: email)
-      if MergeAdditionalEmailJob.new.perform(user_email.id)
+      if Users::MergeAdditionalEmailJob.new.perform(user_email.id)
         flash[:success] = "User #{@user.display_name} merged with '#{email}'"
       else
         flash[:error] = "Unable to merge users!"
