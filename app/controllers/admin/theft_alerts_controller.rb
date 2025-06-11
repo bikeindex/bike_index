@@ -121,8 +121,18 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       TheftAlert
     end
+    if params[:user_id].present?
+      @user = User.unscoped.friendly_find(params[:user_id])
+      theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
+    end
+    if params[:search_bike_id].present?
+      @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
+      theft_alerts = theft_alerts.where(bike_id: @bike.id) if @bike.present?
+    end
     @search_paid_admin = if available_paid_admin.include?(params[:search_paid_admin])
       params[:search_paid_admin]
+    elsif @user.present? || @bike.present?
+      "paid_and_unpaid" # by default, include all paid and unpaid if user or bike is searched
     else
       available_paid_admin.first
     end
@@ -131,6 +141,7 @@ class Admin::TheftAlertsController < Admin::BaseController
 
     @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
+
     if available_statuses.include?(params[:search_status])
       @status = params[:search_status]
       theft_alerts = if TheftAlert.statuses.include?(@status)
@@ -140,14 +151,6 @@ class Admin::TheftAlertsController < Admin::BaseController
       end
     else
       @status = "all"
-    end
-    if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
-    end
-    if params[:search_bike_id].present?
-      @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
-      theft_alerts = theft_alerts.where(bike_id: @bike.id) if @bike.present?
     end
     # We always render distance
     distance = params[:search_distance].to_i
