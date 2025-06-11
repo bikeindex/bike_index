@@ -1730,10 +1730,6 @@ en:
           this %{bike_type}.
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
         you_have_to_sign_in: Whoops! You have to sign in to be able to edit that %{bike_type}.
-      index:
-        we_dont_know_location: >-
-          Sorry, we don't know the location "%{location}". Please try a different
-          location to search nearby stolen bikes.
       new:
         please_sign_in_to_register: Please sign in to register a bike
         we_couldnt_find_that_registration: Oops! We couldn't find that registration,
@@ -1965,6 +1961,12 @@ en:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.
+    search:
+      registrations:
+        set_interpreted_params:
+          we_dont_know_location: >-
+            Sorry, we don't know the location "%{location}". Please try a different
+            location to search nearby stolen bikes.
     sessions:
       create:
         invalid_email_or_password: Invalid email/password

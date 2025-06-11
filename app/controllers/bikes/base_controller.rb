@@ -29,10 +29,6 @@ class Bikes::BaseController < ApplicationController
     end
   end
 
-  def permitted_search_params
-    params.permit(*Bike.permitted_search_params)
-  end
-
   def find_bike
     # Fix issue with sticker batches #35 & #38
     if params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)

@@ -151,7 +151,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :bikes, except: [:edit] do
+  resources :bikes, except: %i[index edit] do
     collection { get :scanned }
     member do
       get :spokecard
@@ -412,5 +412,6 @@ Rails.application.routes.draw do
     resources :impounded_bikes, only: %i[index]
   end
 
+  get "/bikes", to: redirect("search/registrations") # old search URL to new search URL
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
 end

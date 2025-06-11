@@ -2325,8 +2325,6 @@ it:
         bike_impounded_by_organization:
         you_dont_own_that:
         you_have_to_sign_in:
-      index:
-        we_dont_know_location:
       new:
         please_sign_in_to_register:
         we_couldnt_find_that_registration:
@@ -2574,6 +2572,10 @@ it:
         you_dont_own_that:
       update:
         item_published_for_sale:
+    search:
+      registrations:
+        set_interpreted_params:
+          we_dont_know_location:
   customer_mailer:
     additional_email_confirmation:
       html:
