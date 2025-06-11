@@ -1,4 +1,4 @@
-class MergeAdditionalEmailJob < ApplicationJob
+class Users::MergeAdditionalEmailJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform(user_email_id)

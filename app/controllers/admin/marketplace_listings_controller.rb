@@ -4,7 +4,8 @@ class Admin::MarketplaceListingsController < Admin::BaseController
   def index
     @per_page = params[:per_page] || 50
     @pagy, @collection = pagy(
-      matching_marketplace_listings.includes(:seller, :item, :buyer).reorder("marketplace_listings.#{sort_column} #{sort_direction}"),
+      matching_marketplace_listings.includes(:seller, :item, :buyer, :address_record)
+        .reorder("marketplace_listings.#{sort_column} #{sort_direction}"),
       limit: @per_page
     )
   end

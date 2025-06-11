@@ -45,7 +45,6 @@ class ScheduledJobRunner < ScheduledJob
       ImpoundExpirationJob,
       ProcessGraduatedNotificationJob,
       ProcessHotSheetJob,
-      RemoveUnconfirmedUsersJob,
       ScheduledAutocompleteCheckJob,
       ScheduledBikePossiblyFoundNotificationJob,
       ScheduledSearchForExternalRegistryBikesJob,
@@ -61,6 +60,7 @@ class ScheduledJobRunner < ScheduledJob
       UpdateInvoiceJob,
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
+      Users::RemoveUnconfirmedJob,
       self
     ].freeze
   end

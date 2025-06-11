@@ -1,5 +1,4 @@
-# This will replace WebhookRunner - which is brittle and not flexible enough for what I'm looking for now
-# I need to refactor that, but I don't want to right now because I don't want to break existing stuff yet
+# frozen_string_literal: true
 
 class Callbacks::AfterBikeSaveJob < ApplicationJob
   sidekiq_options retry: false
@@ -31,6 +30,8 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
     if FindOrCreateModelAuditJob.enqueue_for?(bike)
       FindOrCreateModelAuditJob.perform_async(bike.id)
     end
+    # Bump marketplace_listing to bust caches
+    bike.current_marketplace_listing&.update(updated_at: Time.current)
     return true unless bike.status_stolen? # For now, only hooking on stolen bikes
 
     StolenBike::AfterStolenRecordSaveJob.perform_async(bike.current_stolen_record_id)

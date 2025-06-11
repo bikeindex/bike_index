@@ -603,8 +603,8 @@ class BParam < ApplicationRecord
 
   def process_image_if_required
     return true if image_processed || image.blank?
-    ImageAssociatorJob.perform_in(5.seconds)
-    ImageAssociatorJob.perform_in(1.minutes)
+    Images::AssociatorJob.perform_in(5.seconds)
+    Images::AssociatorJob.perform_in(1.minutes)
   end
 
   def set_color_key(key = nil)

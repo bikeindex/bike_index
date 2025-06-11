@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UserDeleteJob, type: :job do
+RSpec.describe Users::DeleteJob, type: :job do
   let(:instance) { described_class.new }
 
   let!(:user) { FactoryBot.create(:user_confirmed, email: "owner1@A.COM") }

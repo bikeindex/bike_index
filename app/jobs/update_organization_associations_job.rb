@@ -5,7 +5,9 @@ class UpdateOrganizationAssociationsJob < ApplicationJob
     organization_ids_for_update = associated_organization_ids(org_ids)
 
     organization_ids_for_update.each do |id|
-      organization = Organization.find(id)
+      organization = Organization.find_by(id: id)
+      next if organization.blank?
+
       # Critical that locations skip_update, so we don't loop
       organization.locations.each { |l| l.update(updated_at: Time.current, skip_update: true) }
       organization.reload # Just in case default location has changed

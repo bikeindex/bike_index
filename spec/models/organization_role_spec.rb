@@ -13,7 +13,7 @@ RSpec.describe OrganizationRole, type: :model do
         Sidekiq::Job.clear_all
         expect {
           FactoryBot.create(:organization_role_claimed, organization: org, user: user)
-        }.to change(ProcessOrganizationRoleJob.jobs, :count).by 1
+        }.to change(Users::ProcessOrganizationRoleJob.jobs, :count).by 1
         Sidekiq::Job.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(2)

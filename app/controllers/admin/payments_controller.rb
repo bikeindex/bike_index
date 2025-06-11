@@ -23,7 +23,7 @@ class Admin::PaymentsController < Admin::BaseController
   def update
     if assign_to_membership_param?
       if @payment.can_assign_to_membership?
-        User::CreateOrUpdateMembershipFromPaymentJob.new.perform(@payment.id, current_user.id)
+        Users::CreateOrUpdateMembershipFromPaymentJob.new.perform(@payment.id, current_user.id)
         flash[:success] = "Payment updated"
       else
         flash[:error] = "This payment can't be assigned to a membership - maybe it already has been?"

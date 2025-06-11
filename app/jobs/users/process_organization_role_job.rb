@@ -1,8 +1,9 @@
-class ProcessOrganizationRoleJob < ApplicationJob
+class Users::ProcessOrganizationRoleJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform(organization_role_id, user_id = nil)
-    organization_role = OrganizationRole.find(organization_role_id)
+    organization_role = OrganizationRole.find_by(id: organization_role_id)
+    return if organization_role.blank?
 
     assign_organization_role_user(organization_role, user_id) if organization_role.user.blank?
     return false if remove_duplicated_organization_role!(organization_role)
