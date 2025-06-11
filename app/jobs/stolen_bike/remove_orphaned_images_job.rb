@@ -44,7 +44,9 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
   def delete_all_images!(stolen_record_id)
     delete_alert_images!(stolen_record_id)
     self.class.blobs_for(stolen_record_id).each { |blob| blob.purge }
-    attachments(stolen_record_id).destroy_all
+    # raises undefined method `attachment_reflections' if no attachments
+    found_attachments = attachments(stolen_record_id)
+    found_attachments.destroy_all if found_attachments.any?
   end
 
   def delete_alert_images!(stolen_record_id)
