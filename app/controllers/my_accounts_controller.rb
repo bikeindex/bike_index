@@ -30,10 +30,9 @@ class MyAccountsController < ApplicationController
     end
     unless @user.errors.any?
       successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations
-      @user.address_set_manually = true if params&.dig(:user, :address_record_attributes, :postal_code).present?
 
-      if params[:user].present? && @user.update(permitted_parameters)
-        successfully_updated = true
+      if params[:user].present?
+        successfully_updated = update_user_from_params(@user, permitted_parameters)
         if params.dig(:user, :password).present?
           update_user_authentication_for_new_password
           default_session_set(@user)
@@ -113,6 +112,23 @@ class MyAccountsController < ApplicationController
     @user
   end
 
+  def update_user_from_params(user, pparams)
+    address_params = pparams.delete(:address_record_attributes)
+    if address_params&.values.presence&.any?
+      address_record = AddressRecord.where(user_id: user.id).find_by(id: address_params[:id]) ||
+        AddressRecord.new(kind: :user, user_id: user.id)
+      address_record.update(address_params.except(:id).merge(skip_callback_job: true))
+
+      if address_record.valid?
+        user.address_set_manually = true
+        user.address_record = address_record.reload
+        # Updates the user association, user needs to be assigned
+        ::Callbacks::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
+      end
+    end
+    user.update(pparams)
+  end
+
   def calculated_new_registration_info
     # Select the matching key value pairs, and rename them
     new_info = params.as_json.map do |k, v|
@@ -132,12 +148,10 @@ class MyAccountsController < ApplicationController
         :show_website, :show_bikes, :show_phone, :my_bikes_link_target, :time_single_format,
         :my_bikes_link_title, :password, :password_confirmation, :preferred_language,
         user_registration_organization_attributes: [:all_bikes, :can_edit_claimed],
-        address_record_attributes: AddressRecord.permitted_params)
+        # include address_record id so we don't create new address records
+        address_record_attributes: (AddressRecord.permitted_params + [:id]))
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
-    end
-    if pparams[:address_record_attributes].present?
-      pparams[:address_record_attributes].merge!(kind: :user, user_id: current_user.id)
     end
     pparams
   end
