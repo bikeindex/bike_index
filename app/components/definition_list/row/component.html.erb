@@ -13,8 +13,13 @@
         <span class="localizeTimezone"></span>
       <% end %>
     <% elsif @value.present? || content.present? %>
-      <%= @value %>
-      <%= content %>
+      <%# By default, render full_width as user content %>
+      <% if @full_width && @value.present? %>
+        <%= render(UserTextBlockDisplay::Component.new(text: @value, max_height_class: "")) %>
+      <% else %>
+        <%= @value %>
+        <%= content %>
+      <% end %>
     <% else %>
       <span class="tw:opacity-50 tw:text-xs">
         <%= no_value_content %>
