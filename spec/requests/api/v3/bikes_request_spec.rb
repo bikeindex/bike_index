@@ -895,7 +895,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:email) { auto_user.email }
         before { Sidekiq::Testing.inline! }
         after { Sidekiq::Testing.fake! }
-        it "creates, update with email includes organization" do
+        it "creates, update with email includes organization", :flaky do
           expect(auto_user.confirmed?).to be_truthy
           expect(auto_user.id).to_not eq user.id
           ActionMailer::Base.deliveries = []

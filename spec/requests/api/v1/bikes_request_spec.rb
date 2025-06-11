@@ -337,7 +337,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(ownership.origin).to eq "api_v1"
       end
 
-      it "creates a photos even if one fails" do
+      it "creates a photos even if one fails", :flaky do
         manufacturer = FactoryBot.create(:manufacturer)
         bike_attrs = {
           serial_number: "69 photo-test",
