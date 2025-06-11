@@ -10,7 +10,7 @@
       data-legacy-form-well--address-record-with-default--component-target="nonStaticFields">
 
       <%= @builder.select(:country_id, Country.select_options,
-        {prompt: translation(".choose_country")},
+        {prompt: translation(".choose_country"), required: country_required?},
         {class: "form-control", "data-legacy-form-well--address-record--component-target" => "country" })
       %>
     </div>

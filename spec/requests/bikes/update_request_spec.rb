@@ -99,8 +99,8 @@ RSpec.describe "BikesController#update", type: :request do
     end
   end
   context "updating marketplace_listing" do
-    let(:address_record) { FactoryBot.create(:address_record, :new_york) }
-    let(:user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
+    let(:address_record) { FactoryBot.create(:address_record, :new_york, user: current_user) }
+    let(:user) { FactoryBot.create(:user_confirmed, address_set_manually: true) }
     let(:current_user) { user }
     let!(:membership) { FactoryBot.create(:membership, user: user) }
     let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, owner_email: user.email) }
@@ -136,6 +136,7 @@ RSpec.describe "BikesController#update", type: :request do
         .except(:amount, :address_record_attributes)
         .merge(amount_cents: 144242, status: "draft", price_negotiable: true)
     end
+    before { user.update(address_record_id: address_record.id) }
     it "creates the listing" do
       expect(user.reload.can_create_listing?).to be_truthy
       bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
@@ -146,12 +147,14 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.current_ownership.claimed?).to be_truthy
       expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
 
+      expect(AddressRecord.count).to eq 1
       VCR.use_cassette("bike_request-update-marketplace_listing") do
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect { patch base_url, params: update_params }.to change(MarketplaceListing, :count).by 1
         end
       end
+      expect(AddressRecord.count).to eq 1
 
       expect(bike.reload.primary_activity_id).to eq primary_activity_id
       marketplace_listing = bike.current_marketplace_listing
@@ -189,6 +192,12 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.current_marketplace_listing&.id).to eq marketplace_listing.id
         expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs
         expect(marketplace_listing.address_record_id).to eq address_record.id
+      end
+      context "with separate address record attributes" do
+        # let(:)
+      end
+      context "not user's address_record id" do
+        it "creates a new address_record"
       end
     end
   end
