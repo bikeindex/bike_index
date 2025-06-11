@@ -42,7 +42,7 @@ class AddressRecord < ApplicationRecord
   after_validation :address_record_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
   after_commit :update_associations
 
-  attr_accessor :skip_geocoding, :skip_callback_job
+  attr_accessor :force_geocoding, :skip_geocoding, :skip_callback_job
 
   class << self
     def location_attrs
@@ -158,7 +158,11 @@ class AddressRecord < ApplicationRecord
   end
 
   def should_be_geocoded?
-    !skip_geocoding && address_changed?
+    # force_geocoding used for forcing a backfill of records with only postal code, see PR #2841
+    return true if force_geocoding
+    return false if skip_geocoding
+
+    address_changed?
   end
 
   def permitted_visible_attribute(string_or_sym)
@@ -176,6 +180,7 @@ class AddressRecord < ApplicationRecord
     self.postal_code = postal_code.blank? ? nil : postal_code.strip
     self.city = city.blank? ? nil : city.strip
     self.neighborhood = neighborhood.blank? ? nil : neighborhood.strip
+    self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
     assign_region_record
   end
 
