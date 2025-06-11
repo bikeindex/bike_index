@@ -84,6 +84,7 @@ RSpec.describe API::V1::UsersController, type: :request do
           it "marks removed" do
             expect_bike_to_be_destroyed(bike, "#{base_url}/send_request", delete_params)
             expect(marketplace_listing.reload.status).to eq "removed"
+            expect(marketplace_listing.end_at).to be_within(5).of Time.current
           end
         end
         context "marketplace_listing sold" do
