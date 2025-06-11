@@ -1,9 +1,7 @@
-class Search::RegistrationsController < Bikes::BaseController
+class Search::RegistrationsController < ApplicationController
   MAX_INDEX_PAGE = 100
   before_action :render_ad
   before_action :set_interpreted_params
-  skip_before_action :find_bike # from Bikes::BaseController
-  skip_before_action :ensure_user_allowed_to_edit # from Bikes::BaseController
   around_action :set_reading_role
 
   def index
