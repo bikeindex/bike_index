@@ -1,11 +1,14 @@
+-# require inline CSS setting because of caching
+- unless display_dev_info?
+  <style>.only-dev-visible {display: none !important;} </style>
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
         = sortable "created_at", render_sortable: render_sortable
-      - if display_dev_info?
-        %th.only-dev-visible.small
-          = sortable "updated_at", render_sortable: render_sortable
+      %th.only-dev-visible.small
+        = sortable "updated_at", render_sortable: render_sortable
       %th
         = sortable "status", render_sortable: render_sortable
       %th
@@ -26,19 +29,17 @@
         = sortable "buyer_id", render_sortable: render_sortable
     %tbody
       - collection.each do |marketplace_listing|
-        - cache(marketplace_listing) do
+        - cache(["admin_marketplace_listing", marketplace_listing]) do
           %tr
             %td
               .less-strong-hold
                 %span.convertTime
                   = l marketplace_listing.created_at, format: :convert_time
-                - if display_dev_info?
-                  %span.less-strong-right.d-none.d-md-block.only-dev-visible
-                    = marketplace_listing.id
-            - if display_dev_info?
-              %td
-                %small.convertTime
-                  = l marketplace_listing.updated_at, format: :convert_time
+                %span.less-strong-right.d-none.d-md-block.only-dev-visible
+                  = marketplace_listing.id
+            %td.only-dev-visible
+              %small.convertTime
+                = l marketplace_listing.updated_at, format: :convert_time
             %td
               - status_class = "text-info" if marketplace_listing.for_sale?
               - status_class = "text-success" if marketplace_listing.sold?

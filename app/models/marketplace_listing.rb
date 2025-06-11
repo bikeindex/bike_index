@@ -182,5 +182,6 @@ class MarketplaceListing < ApplicationRecord
   def set_calculated_attributes
     self.seller_id ||= item.user&.id
     self.status ||= :draft
+    self.end_at ||= Time.current unless current?
   end
 end
