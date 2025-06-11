@@ -2,8 +2,8 @@ class Search::RegistrationsController < Bikes::BaseController
   MAX_INDEX_PAGE = 100
   before_action :render_ad
   before_action :set_interpreted_params
-  skip_before_action :find_bike # from Bikes::baseController
-  skip_before_action :ensure_user_allowed_to_edit # from Bikes::baseController
+  skip_before_action :find_bike # from Bikes::BaseController
+  skip_before_action :ensure_user_allowed_to_edit # from Bikes::BaseController
   around_action :set_reading_role
 
   def index
@@ -41,6 +41,10 @@ class Search::RegistrationsController < Bikes::BaseController
 
     @page = permitted_page(params[:page])
     @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+  end
+
+  def permitted_search_params
+    params.permit(*Bike.permitted_search_params)
   end
 
   def permitted_page(page_param)
