@@ -4,16 +4,21 @@ module LegacyFormWell::AddressRecord
   class Component < ApplicationComponent
     STATIC_FIELDS_OPTIONS = %i[shown hidden]
 
-    def initialize(form_builder:, organization: nil, no_street: false, not_related_fields: false, static_fields: false)
+    def initialize(form_builder:, organization: nil, no_street: false, not_related_fields: false, static_fields: false, current_country_id: nil)
       @builder = form_builder
       @no_street = no_street
       @organization = organization
-      @initial_country_id = form_builder.object.country_id
+      @builder.object.country_id ||= current_country_id
+      @initial_country_id = @builder.object.country_id
       @wrapper_class = not_related_fields ? "" : "related-fields"
       @static_fields = STATIC_FIELDS_OPTIONS.include?(static_fields) ? static_fields : false
     end
 
     private
+
+    def country_required?
+      @builder.object.address_present?
+    end
 
     def non_static_field_class
       return "" unless @static_fields
