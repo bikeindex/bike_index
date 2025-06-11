@@ -158,7 +158,6 @@ class AddressRecord < ApplicationRecord
   end
 
   def should_be_geocoded?
-    # force_geocoding used for forcing a backfill of records with only postal code, see PR #2841
     return true if force_geocoding
     return false if skip_geocoding
 
