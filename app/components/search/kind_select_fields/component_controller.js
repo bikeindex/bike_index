@@ -5,7 +5,7 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='search--kind-select-fields--component'
 export default class extends Controller {
-  static targets = ['distance', 'location', 'locationWrap', 'nonCount', 'stolenCount', 'proximityCount']
+  static targets = ['distance', 'location', 'locationWrap', 'nonCount', 'stolenCount', 'proximityCount', 'for_saleCount']
   static values = { apiCountUrl: String, isMarketplace: Boolean, locationStoreKey: String }
 
   connect () {
@@ -31,6 +31,9 @@ export default class extends Controller {
     if (!this.form) return
 
     this.form.addEventListener('turbo:submit-end', this.setStolennessCounts.bind(this))
+
+    // if in component preview (lookbook), run stolenness counts on load
+    if (window.inComponentPreview) { this.setStolennessCounts() }
   }
 
   updateLocationVisibility () {
@@ -118,8 +121,8 @@ export default class extends Controller {
   }
 
   insertTabCounts (counts) {
-    console.log(counts)
     for (const stolenness of Object.keys(counts)) {
+      console.log(stolenness)
       this[`${stolenness}CountTarget`].textContent = this.displayedCountNumber(counts[stolenness])
     }
   }

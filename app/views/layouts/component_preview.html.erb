@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <%= stylesheet_link_tag "tailwind" %>
     <%= javascript_importmap_tags %>
+    <script>window.inComponentPreview = true</script>
   </head>
   <%# NOTE: This sets the theme. Padding set to 0 because revised stylesheet in bike box %>
   <body class="<%= params.dig(:lookbook, :display, :theme) %>" style="padding: 0;">

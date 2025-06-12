@@ -212,8 +212,8 @@ class Bike < ApplicationRecord
   scope :with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
-  # for_sale scope doesn't use default listing order
-  scope :for_sale, -> {
+  scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
+  scope :for_sale_default_scope, -> {
     unscoped.current.includes(:marketplace_listings, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership)
       .where(marketplace_listings: {status: :for_sale})
   }

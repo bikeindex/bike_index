@@ -12,7 +12,7 @@ class MarketplaceController < ApplicationController
 
     if @render_results
       @pagy, @bikes = pagy(
-        Bike.for_sale.search(@interpreted_params).order(published_at: :desc),
+        Bike.for_sale_default_scope.search(@interpreted_params).order(published_at: :desc),
         limit: 10, page: @page, max_pages: MAX_INDEX_PAGE
       )
     end

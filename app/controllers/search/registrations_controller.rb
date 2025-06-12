@@ -5,6 +5,9 @@ class Search::RegistrationsController < ApplicationController
   around_action :set_reading_role
 
   def index
+    if params[:stolenness] == "for_sale"
+      redirect_to marketplace_path(marketplace_redirect_params) and return
+    end
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
     if @render_results
@@ -52,5 +55,10 @@ class Search::RegistrationsController < ApplicationController
 
   def render_ad
     @ad = true
+  end
+
+  def marketplace_redirect_params
+    @interpreted_params.except(:stolenness).merge(search_no_js: params[:search_no_js])
+      .to_h
   end
 end

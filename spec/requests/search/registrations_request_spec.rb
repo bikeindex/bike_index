@@ -40,6 +40,13 @@ RSpec.describe Search::RegistrationsController, type: :request do
       end
     end
 
+    context "with stolenness: for_sale" do
+      it "redirects to marketplace" do
+        get "#{base_url}?search_no_js=true&stolenness=for_sale&location=Chicago%2C+IL"
+        expect(response).to redirect_to("/marketplace?location=Chicago%2C+IL&search_no_js=true")
+      end
+    end
+
     context "turbo_stream" do
       it "renders" do
         get base_url, as: :turbo_stream

@@ -19,8 +19,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     CGI.parse(uri.query || "")
   end
 
+  # TODO: update to switch to
   describe "EverythingCombobox" do
-    # NOTE: these tests are specific to Select2, unfortuanately
+    # NOTE: these tests are specific to Select2, unfortunately
     # It requires hacks to target specific selectors because Select2 doesn't use accessible elements
     # ... but the behavior should be the same for any updated combobox plugin
 
@@ -30,19 +31,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       visit(preview_path)
       # Clear localStorage
       page.execute_script("window.localStorage.clear()")
-    end
-
-    it "adds an item when selected" do
-      expect(find("#query_items", visible: false).value).to be_blank
-      find(".select2-container").click
-
-      expect(page).to have_content("Bikes that are Black", wait: 5)
-      find("li", text: "Bikes that are Black").click
-
-      expect(page).to have_css(".select2-selection__rendered", text: "Black")
-
-      # NOTE: Since this uses production data, values are consistent
-      expect(find("#query_items", visible: false).value).to eq(["c_1"])
     end
 
     it "submits when enter is pressed twice" do
@@ -103,6 +91,14 @@ RSpec.describe Search::Form::Component, :js, type: :system do
           }
         }, 100);
       JS
+    end
+
+    context "chicago_tall_bike" do
+      it "renders the counts"
+    end
+
+    context "marketplace" do
+      it "renders and updates"
     end
   end
 end

@@ -204,7 +204,6 @@ RSpec.describe "Search API V3", type: :request do
         let(:target) { {non: 0, proximity: 0, stolen: 0, for_sale: 0} }
         it "succeeds" do
           get "/api/v3/search/count?colors%5B%5D=#{color.id}&stolenness=non&location=edmonton"
-          pp json_result
           expect(json_result).to eq target.as_json
           expect(response.status).to eq(200)
         end
