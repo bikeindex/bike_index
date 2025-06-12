@@ -58,7 +58,6 @@ class Search::RegistrationsController < ApplicationController
   end
 
   def marketplace_redirect_params
-    @interpreted_params.except(:stolenness).merge(search_no_js: params[:search_no_js])
-      .to_h
+    @interpreted_params.except(:stolenness).merge(search_no_js: params[:search_no_js]).to_h
   end
 end
