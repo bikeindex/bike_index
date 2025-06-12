@@ -2,7 +2,8 @@
 
 module Search::Form
   class Component < ApplicationComponent
-    def initialize(target_search_path:, target_frame:, interpreted_params:, selected_query_items_options:)
+    def initialize(target_search_path:, target_frame:, interpreted_params:, selected_query_items_options:, marketplace: false)
+      @marketplace = marketplace
       @target_search_path = target_search_path
       @target_frame = target_frame
       @interpreted_params = interpreted_params
@@ -20,7 +21,7 @@ module Search::Form
     end
 
     def render_serial_field?
-      true # false if bike versions, or marketplace
+      !@marketplace # false if bike versions, or marketplace
     end
 
     def serial_looks_like_not_a_serial?

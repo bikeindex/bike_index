@@ -35,7 +35,7 @@ module Search::RegistrationFields
     end
 
     def stolenness_li_classes(skip_li_border)
-      classes = "tw:w-full tw:has-checked:bg-gray-100 tw:has-checked:dark:bg-gray-700"
+      classes = "tw:w-full tw:has-checked:bg-gray-100 tw:has-checked:dark:bg-gray-800"
       return classes if skip_li_border
       classes + " tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-inherit"
     end

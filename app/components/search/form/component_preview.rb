@@ -14,6 +14,14 @@ module Search::Form
       render(Search::Form::Component.new(**default_options(interpreted_params)))
     end
 
+    # def for_sale
+    #   sale_options = default_options({stolenness: all}).merge(
+    #     target_frame: :search_marketplace_results_frame,
+    #     marketplace: true
+    #   )
+    #   render(Search::Form::Component.new(**sale_options)
+    # end
+
     private
 
     # this is the path of the raw preview - so when search is submitted, it just re-renders

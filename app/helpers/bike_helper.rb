@@ -37,7 +37,7 @@ module BikeHelper
     if thumb_image_url.present?
       image_tag(thumb_image_url, alt: bike.title_string, skip_pipeline: true)
     else
-      image_tag(bike_placeholder_image_path, alt: bike.title_string, title: "No image", class: "no-image")
+      image_tag(bike_placeholder_image_path, alt: bike.title_string, title: "No image", class: "no-image tw:bg-gray-100 tw:dark:bg-gray-800")
     end
   end
 

@@ -5,8 +5,6 @@
   border-radius: none;
 }
 
-$bike-box-bg: $gray-lighter;
-
 .bike-boxes {
   margin-top: $vertical-height;
 
@@ -22,10 +20,6 @@ $bike-box-bg: $gray-lighter;
     // Apply the background to just the width of the columns, not full row width
     padding-top: 0;
     padding-bottom: 0;
-
-    &:nth-of-type(2n + 1) {
-      background: $bike-box-bg;
-    }
   }
 
   .sticker-code {
@@ -101,7 +95,6 @@ $bike-box-bg: $gray-lighter;
   }
 
   .no-image {
-    background: $bike-box-bg;
     height: 200px;
     margin: auto;
     min-width: 70px;
