@@ -7,12 +7,15 @@ class MarketplaceController < ApplicationController
   around_action :set_reading_role
 
   def index
+    if params[:stolenness] != "for_sale"
+      redirect_to search_registrations_path(registrations_redirect_params) and return
+    end
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
     @is_marketplace = true
 
     if @render_results
       @pagy, @bikes = pagy(
-        Bike.for_sale_default_scope.search(@interpreted_params).order(published_at: :desc),
+        Bike.search(@interpreted_params).for_sale.order(published_at: :desc),
         limit: 10, page: @page, max_pages: MAX_INDEX_PAGE
       )
     end
@@ -33,7 +36,7 @@ class MarketplaceController < ApplicationController
   end
 
   def permitted_search_params
-    params.permit(*Bike.permitted_search_params).merge(stolenness: "all")
+    params.permit(*Bike.permitted_search_params).merge(stolenness: "for_sale")
   end
 
   def render_ad
@@ -43,5 +46,9 @@ class MarketplaceController < ApplicationController
   def permitted_page(page_param)
     page = (page_param.presence || 1).to_i
     page.clamp(1, MAX_INDEX_PAGE)
+  end
+
+  def registrations_redirect_params
+    @interpreted_params.merge(search_no_js: params[:search_no_js]).to_h
   end
 end

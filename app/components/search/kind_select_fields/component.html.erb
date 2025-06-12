@@ -44,15 +44,6 @@
 
             <span class="twless-strong" data-search--kind-select-fields--component-target="<%= opt %>Count"></span>
           <% end %>
-
-          <%# TODO: make these links actually preserve the current search %>
-          <% if opt == "for_sale" %>
-            <% unless @is_marketplace %>
-              <%= link_to "", marketplace_path, class: "tw:inset-0 tw:absolute tw:z-10" %>
-            <% end %>
-          <% elsif @is_marketplace %>
-            <%= link_to "", search_registrations_path, class: "tw:inset-0 tw:absolute tw:z-10" %>
-          <% end %>
         </div>
       </li>
     <% end %>
