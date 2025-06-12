@@ -175,7 +175,7 @@ RSpec.describe "Search API V3", type: :request do
         VCR.use_cassette("v3_bike_search-count") do
           get "/api/v3/search/count", params: request_query_params.merge(format: :json)
           result = JSON.parse(response.body)
-          expect(result).to match({non: 1, stolen: 2, proximity: 1}.as_json)
+          expect(result).to match({non: 1, stolen: 2, proximity: 1, for_sale: 0}.as_json)
           expect(response.status).to eq(200)
           expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
           expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -201,12 +201,18 @@ RSpec.describe "Search API V3", type: :request do
       end
       context "with colors" do
         let!(:color) { FactoryBot.create(:color, name: "Purple") }
-        let(:target) { {non: 0, proximity: 0, stolen: 0} }
+        let(:target) { {non: 0, proximity: 0, stolen: 0, for_sale: 0} }
         it "succeeds" do
           get "/api/v3/search/count?colors%5B%5D=#{color.id}&stolenness=non&location=edmonton"
+          pp json_result
           expect(json_result).to eq target.as_json
           expect(response.status).to eq(200)
         end
+      end
+    end
+
+    context "for_sale" do
+      it "returns successfully" do
       end
     end
   end

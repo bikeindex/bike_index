@@ -76,6 +76,7 @@ export default class extends Controller {
   // TODO: Should this just be getting the values from the form?
   setStolennessCounts () {
     const queryString = this.searchQuery
+    console.log(queryString)
     if (this.doNotFetchCounts(queryString)) {
       return this.resetStolennessCounts()
     }
@@ -117,6 +118,7 @@ export default class extends Controller {
   }
 
   insertTabCounts (counts) {
+    console.log(counts)
     for (const stolenness of Object.keys(counts)) {
       this[`${stolenness}CountTarget`].textContent = this.displayedCountNumber(counts[stolenness])
     }

@@ -37,7 +37,11 @@ module Search::KindSelectFields
     end
 
     def opt_selected?(opt)
-      opt == @stolenness || @is_marketplace && opt == "for_sale"
+      if @is_marketplace
+        opt == "for_sale"
+      else
+        opt == @stolenness
+      end
     end
 
     def stolenness_li_classes(skip_li_border)

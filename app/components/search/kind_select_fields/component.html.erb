@@ -31,7 +31,7 @@
     <% stolenness_options.each do |opt| %>
       <% skip_li_border = opt == stolenness_options.last %>
       <li class="<%= stolenness_li_classes(skip_li_border) %>">
-        <div class="tw:flex tw:items-center tw:ps-3">
+        <div class="tw:flex tw:items-center tw:ps-3 tw:relative">
           <%= radio_button_tag(:stolenness, opt, opt_selected?(opt),
             class: "tw:w-4 tw:h-4 tw:text-blue-600 tw:bg-gray-100 tw:border-gray-300 tw:focus:ring-blue-500 " \
               ":tw:dark:focus:ring-blue-600 tw:dark:ring-offset-gray-700 tw:dark:focus:ring-offset-gray-700 " \
@@ -43,6 +43,14 @@
             <%= translation(".stolenness_#{opt}") %>
 
             <span class="twless-strong" data-search--kind-select-fields--component-target="<%= opt %>Count"></span>
+          <% end %>
+          <%# TODO: make these links actually preserve the current search %>
+          <% if opt == "for_sale" %>
+            <% unless @is_marketplace %>
+              <%= link_to "", marketplace_path, class: "tw:inset-0 tw:absolute tw:z-10" %>
+            <% end %>
+          <% elsif @is_marketplace %>
+            <%= link_to "", search_registrations_path, class: "tw:inset-0 tw:absolute tw:z-10" %>
           <% end %>
         </div>
       </li>

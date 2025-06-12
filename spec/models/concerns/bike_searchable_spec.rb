@@ -163,6 +163,12 @@ RSpec.describe BikeSearchable do
             it "returns location and distance of 100" do
               expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
             end
+            context "with stolenness: for_sale" do
+              it "returns location and distance of 100" do
+                expect(BikeSearchable.searchable_interpreted_params(query_params.merge(stolenness: "for_sale"), ip: ip_address))
+                  .to eq target.merge(stolenness: "all")
+              end
+            end
           end
           context "with no distance" do
             let(:target) { {stolenness: "proximity", location: "these parts", distance: 100, bounding_box: bounding_box} }
