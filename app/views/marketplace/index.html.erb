@@ -1,17 +1,16 @@
-<div class="container mb-5">
-  <h1>Bike Index marketplace</h1>
-  <p>
-    This is an early version - we’re working on improving it right now!
-  </p>
+<div class="tw:px-4 tw:max-w-7xl tw:mx-auto tw:mb-6">
+  <h1 class="tw:text-3xl tw:text-slate-800 tw:mb-4">Bike Index Marketplace</h1>
+  <%= render Search::Form::Component.new(target_search_path: marketplace_path, target_frame: :marketplace_results_frame, interpreted_params: @interpreted_params, selected_query_items_options: @selected_query_items_options) %>
+</div>
 
-  <div class="row bikes-searched-default mt-5">
-    <div class="col-md-12">
-        <ul class="bike-boxes">
-          <% @marketplace_listings.each do |marketplace_listing| %>
-            <%= render partial: '/bikes/bike', locals: { bike: marketplace_listing.item, marketplace_listing: marketplace_listing}, cached: true %>
-          <% end %>
-        </ul>
-      </div>
-    </div>
-  <%= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+<%= turbo_frame_tag :marketplace_results_frame do %>
+  <% if @render_results %>
+    <%= render partial: "search/registrations/results" %>
+  <% else %>
+    <span id="loadedWithoutResults" class="tw:hidden"></span>
+  <% end %>
+<% end %>
+
+<div id="hiddenLoadingSpinner" class="tw:hidden">
+  <%= render LoadingSpinner::Component.new(text: t(".loading_results")) %>
 </div>

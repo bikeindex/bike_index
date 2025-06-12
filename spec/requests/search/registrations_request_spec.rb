@@ -51,6 +51,8 @@ RSpec.describe Search::RegistrationsController, type: :request do
         expect(response).to render_template(:index)
         expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
         expect(assigns(:bikes).pluck(:id).sort).to eq target_bike_ids
+        # Expect there to be a link to the bike url
+        expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{target_bike_ids.first}"/)
       end
 
       context "geocoder_stubbed_bounding_box" do
