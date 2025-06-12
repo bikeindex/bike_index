@@ -17,11 +17,17 @@
   }
 
   .twbtn, .twbtn-blue, .twbtn-green {
-    @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3
+    @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3 tw:text-center
     tw:cursor-pointer tw:active:outline tw:focus-visible:outline-offset-2
     tw:disabled:cursor-not-allowed tw:disabled:opacity-85
     tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2
     tw:active:outline-none tw:active:opacity-95;
+  }
+
+  .twbtn {
+    @apply tw:border tw:border-gray-200 tw:hover:bg-gray-100 tw:dark:border-gray-700 tw:dark:hover:bg-gray-800
+      tw:focus-visible:outline-gray-200 tw:disabled:hover:bg-transparent
+      tw:active:opacity-80;
   }
 
   .twbtn-green {

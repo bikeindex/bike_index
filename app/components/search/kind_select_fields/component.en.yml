@@ -3,7 +3,6 @@ en:
   components:
     search:
       kind_select_fields:
-        anywhere: Anywhere
         miles_of: miles of
         search_distance: Search distance
         search_location: Search location

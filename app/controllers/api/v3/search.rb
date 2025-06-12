@@ -91,16 +91,11 @@ module API
                else # we're probably in testing, but regardless, just skip
                  0
                end
-            for_sale = if interpreted_params[:bounding_box].present?
-                 bikes.for_sale.within_bounding_box(interpreted_params[:bounding_box]).limit(max_limit).count
-               else # we're probably in testing, but regardless, just skip
-                 0
-               end
             {
               non: bikes.status_with_owner.limit(max_limit).count,
               stolen: bikes.stolen_or_impounded.limit(max_limit).count,
               proximity:,
-              for_sale:
+              for_sale: bikes.for_sale.limit(max_limit).count
             }
           end
         end
