@@ -8,6 +8,7 @@ class MarketplaceController < ApplicationController
 
   def index
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
+    @is_marketplace = true
 
     if @render_results
       @pagy, @bikes = pagy(

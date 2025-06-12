@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-module Search::RegistrationFields
+module Search::KindSelectFields
   class Component < ApplicationComponent
     DEFAULT_DISTANCE = 100
     MAX_DISTANCE = 2_000 # IDK, seems reasonable
     API_COUNT_URL = "/api/v3/search/count"
 
-    # TODO: This only needs location and stolenness now! Drop interpreted params
-    def initialize(stolenness:, location: nil, distance: nil)
+    def initialize(stolenness:, location: nil, distance: nil, is_marketplace: false)
+      @is_marketplace = is_marketplace
       @distance = if distance.present?
         distance.to_i
       else
@@ -21,8 +21,10 @@ module Search::RegistrationFields
 
     private
 
-    def location_wrap_hidden?
-      @stolenness != "proximity" # also true for marketplace
+    def location_wrap_hidden_class
+      return "" if @is_marketplace || @stolenness == "proximity"
+
+      "tw:hidden"
     end
 
     def include_stolenness?
@@ -30,8 +32,12 @@ module Search::RegistrationFields
     end
 
     def stolenness_options
-      # TODO: add Found in search area
-      %w[proximity stolen non all]
+      # TODO: add Found, Found in search area
+      %w[proximity stolen non for_sale all]
+    end
+
+    def opt_selected?(opt)
+      opt == @stolenness || @is_marketplace && opt == "for_sale"
     end
 
     def stolenness_li_classes(skip_li_border)

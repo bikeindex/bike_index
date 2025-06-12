@@ -3,10 +3,10 @@ import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage  */
 
-// Connects to data-controller='search--registration-fields--component'
+// Connects to data-controller='search--kind-select-fields--component'
 export default class extends Controller {
   static targets = ['distance', 'location', 'locationWrap', 'nonCount', 'stolenCount', 'proximityCount']
-  static values = { apiCountUrl: String }
+  static values = { apiCountUrl: String, isMarketplace: Boolean, locationStoreKey: String }
 
   connect () {
     this.setSearchProximity()
@@ -36,14 +36,14 @@ export default class extends Controller {
   updateLocationVisibility () {
     const selectedValue = this.element.querySelector('input[name="stolenness"]:checked')?.value
 
-    if (selectedValue === 'proximity') {
+    if (selectedValue === 'proximity' || selectedValue === 'for_sale') {
       collapse('show', this.locationWrapTarget)
     } else {
       collapse('hide', this.locationWrapTarget)
     }
   }
 
-  // TODO: make this location be controller specific
+  // TODO: make this location is target_search_path specific, but falls back to general location
   setSearchProximity () {
     let location = this.locationTarget.value
     // strip the location text
