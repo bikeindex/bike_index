@@ -48,6 +48,12 @@ RSpec.describe MailSnippet, type: :model do
     end
   end
 
+  describe "organization_snippets_in_all" do
+    it "is the kinds in all" do
+      expect(MailSnippet.organization_snippets_in_all).to match_array(%w[header footer])
+    end
+  end
+
   describe "organization_email" do
     let(:mail_snippet) { MailSnippet.new(kind: kind) }
     let(:kind) { "header" }
@@ -56,6 +62,7 @@ RSpec.describe MailSnippet, type: :model do
       expect(MailSnippet.organization_email_for("header")).to eq "all"
       expect(mail_snippet.which_organization_email).to eq "all"
       expect(mail_snippet.in_email?("finished_registration")).to be_truthy
+      expect(mail_snippet.in_email?("finished_registration", exclude_all: true)).to be_falsey
       MailSnippet.organization_emails_with_snippets.each do |email|
         expect(mail_snippet.in_email?(email)).to be_truthy
       end

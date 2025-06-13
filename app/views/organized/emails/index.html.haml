@@ -4,6 +4,11 @@
   %h1
     Custom Emails
 
+- all_snippet_kinds = current_organization.mail_snippets.where(kind: MailSnippet.organization_snippets_in_all).pluck(:kind)
+- if all_snippet_kinds.any?
+  = render(Alert::Component.new(kind: :info, margin_classes: 'tw:mt-4 mb-4')) do
+    All of your emails include your custom #{all_snippet_kinds.map { MailSnippet.kind_humanized(_1)&.downcase }.to_sentence}.
+
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down
     %th Kind
@@ -14,9 +19,9 @@
   %tbody
     - (viewable_email_kinds - ["organization_stolen_message"]).each do |kind|
       - if kind == "finished_registration"
-        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("finished_registration") }
+        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("finished_registration", exclude_all: true) }
       - elsif kind == "partial_registration"
-        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("partial_registration") }
+        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("partial_registration", exclude_all: true) }
       - else
         - mail_snippets = current_organization.mail_snippets.where(kind: kind)
       %tr
