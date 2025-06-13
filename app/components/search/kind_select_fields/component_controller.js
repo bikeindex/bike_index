@@ -73,13 +73,12 @@ export default class extends Controller {
   ignoredLocation (location) {
     if (!location) { return true };
 
-    return (location.match(/anywhere/i) || location.match(/you/i))
+    return ['anywhere', 'you'].includes(location.toLowerCase().trim())
   }
 
   // TODO: Should this just be getting the values from the form?
   setStolennessCounts () {
     const queryString = this.searchQuery
-    console.log(queryString)
     if (this.doNotFetchCounts(queryString)) {
       return this.resetStolennessCounts()
     }
@@ -96,7 +95,6 @@ export default class extends Controller {
 
   setResetFieldListeners () {
     this.resetFields = this.form.querySelectorAll('.fieldResetsCounts')
-    console.log(resetFields)
 
     this.resetFields?.forEach(field => {
       // Save the bound function reference so we can remove it later
@@ -126,7 +124,6 @@ export default class extends Controller {
     for (const stolenness of Object.keys(counts)) {
       console.log(stolenness)
       this.updateCount(stolenness, this.displayedCountNumber(counts[stolenness]))
-      // this[`${stolenness}CountTarget`].textContent = this.displayedCountNumber(counts[stolenness])
     }
   }
 
