@@ -5,7 +5,7 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='search--kind-select-fields--component'
 export default class extends Controller {
-  static targets = ['distance', 'location', 'locationWrap', 'nonCount', 'stolenCount', 'proximityCount', 'for_saleCount']
+  static targets = ['distance', 'location', 'locationWrap']
   static values = { apiCountUrl: String, isMarketplace: Boolean, locationStoreKey: String }
 
   connect () {
@@ -46,7 +46,7 @@ export default class extends Controller {
     }
   }
 
-  // TODO: make this location is target_search_path specific, but falls back to general location
+  // TODO: make this location target_search_path specific, but falls back to general location
   setSearchProximity () {
     let location = this.locationTarget.value
     // strip the location text
@@ -96,8 +96,9 @@ export default class extends Controller {
 
   setResetFieldListeners () {
     this.resetFields = this.form.querySelectorAll('.fieldResetsCounts')
+    console.log(resetFields)
 
-    this.resetFields.forEach(field => {
+    this.resetFields?.forEach(field => {
       // Save the bound function reference so we can remove it later
       field._boundResetFunction = this.resetStolennessCounts.bind(this)
       field.addEventListener('change', field._boundResetFunction)
@@ -108,7 +109,8 @@ export default class extends Controller {
     console.log('resetting counts')
     // NOTE: countKeys will need to be updated if response changes
     const countKeys = ['non', 'stolen', 'proximity']
-    for (const stolenness of countKeys) { this[`${stolenness}CountTarget`].textContent = '' }
+    // for (const stolenness of countKeys) { this[`${stolenness}CountTarget`].textContent = '' }
+    for (const stolenness of countKeys) { this.updateCount(stolenness, '') }
 
     if (this.resetFields) {
       this.resetFields.forEach(field => {
@@ -123,14 +125,23 @@ export default class extends Controller {
   insertTabCounts (counts) {
     for (const stolenness of Object.keys(counts)) {
       console.log(stolenness)
-      this[`${stolenness}CountTarget`].textContent = this.displayedCountNumber(counts[stolenness])
+      this.updateCount(stolenness, this.displayedCountNumber(counts[stolenness]))
+      // this[`${stolenness}CountTarget`].textContent = this.displayedCountNumber(counts[stolenness])
+    }
+  }
+
+  updateCount(stolenness, newValue) {
+    const element = this.element.querySelector(`[data-count-target="${stolenness}"]`)
+
+    if (element) {
+      element.textContent = newValue
     }
   }
 
   displayedCountNumber (number) {
     if (number > 999) {
       if (number > 99999) {
-        number = '100k+'
+        number = '100k+' // API limits to 10k so this never shows up
       } else if (number > 9999) {
         number = '10k+'
       } else {
@@ -142,6 +153,8 @@ export default class extends Controller {
 
   // TODO: Make this no fetch counts for times where there are no query items
   doNotFetchCounts (searchQuery) {
+    // if (this.apiCountUrl === "none") { return true }
+
     // if (this.ignoredLocation(interpretedParams.location)
     // console.log(interpretedParams)
     // if (interpretedParams.query)

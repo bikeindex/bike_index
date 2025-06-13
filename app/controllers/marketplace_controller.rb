@@ -7,9 +7,9 @@ class MarketplaceController < ApplicationController
   around_action :set_reading_role
 
   def index
-    if params[:stolenness] != "for_sale"
-      redirect_to search_registrations_path(registrations_redirect_params) and return
-    end
+    # if params[:stolenness] != "for_sale"
+    #   redirect_to search_registrations_path(registrations_redirect_params) and return
+    # end
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
     @is_marketplace = true
 
