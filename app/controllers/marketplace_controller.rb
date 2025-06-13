@@ -7,9 +7,6 @@ class MarketplaceController < ApplicationController
   around_action :set_reading_role
 
   def index
-    # if params[:stolenness] != "for_sale"
-    #   redirect_to search_registrations_path(registrations_redirect_params) and return
-    # end
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
     @is_marketplace = true
 
@@ -36,7 +33,8 @@ class MarketplaceController < ApplicationController
   end
 
   def permitted_search_params
-    params.permit(*Bike.permitted_search_params).merge(stolenness: "for_sale")
+    # Switching to for_sale will get location, but it doesn't currently work
+    params.permit(*Bike.permitted_search_params).merge(stolenness: "all")
   end
 
   def render_ad

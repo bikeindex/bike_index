@@ -26,7 +26,9 @@ module Search::Form
     end
 
     def render_serial_field?
-      !@is_marketplace # false if bike versions, or marketplace
+      return true unless @is_marketplace # false if bike versions, or marketplace
+      # Render the serial field, if it was passed
+      @interpreted_params[:serial].present?
     end
 
     def serial_looks_like_not_a_serial?

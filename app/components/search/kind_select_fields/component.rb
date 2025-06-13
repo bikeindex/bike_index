@@ -41,10 +41,10 @@ module Search::KindSelectFields
     end
 
     def opt_selected?(opt)
-      if @is_marketplace
-        opt == "for_sale"
+      opt == if @is_marketplace
+        "for_sale"
       else
-        opt == @stolenness
+        @stolenness
       end
     end
 

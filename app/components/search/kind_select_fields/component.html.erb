@@ -33,7 +33,7 @@
       <% stolenness_options.each do |opt| %>
         <li class="<%= li_classes(opt) %>">
           <% if opt == "for_sale" %>
-            <a href="#" class="twbtn tw:block tw:w-full">
+            <a href="/marketplace" id="kindSelectForSaleLink" class="twbtn tw:block tw:w-full">
               <%= translation(".stolenness_#{opt}") %>
 
               <span class="twless-strong" data-count-target="<%= opt %>"></span>

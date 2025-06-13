@@ -11,10 +11,13 @@ export default class extends Controller {
   connect () {
     this.setSearchProximity()
     this.updateCountsToSubmit()
+    this.updateForSaleLink.bind(this)
+    this.form.addEventListener('change', this.updateForSaleLink.bind(this))
   }
 
   disconnect () {
     this.resetStolennessCounts() // also removes the bindings
+    this.form.removeEventListener('change', this.updateForSaleLink.bind(this))
   }
 
   get form () {
@@ -25,6 +28,14 @@ export default class extends Controller {
   get searchQuery () {
     const formData = new FormData(this.form)
     return new URLSearchParams(formData).toString()
+  }
+
+  updateForSaleLink () {
+    console.log(this.searchQuery)
+    const link = document.getElementById('kindSelectForSaleLink')
+    if (link) {
+      link.href = `/marketplace?${this.searchQuery}`
+    }
   }
 
   updateCountsToSubmit () {
@@ -106,7 +117,7 @@ export default class extends Controller {
   resetStolennessCounts () {
     console.log('resetting counts')
     // NOTE: countKeys will need to be updated if response changes
-    const countKeys = ['non', 'stolen', 'proximity']
+    const countKeys = ['non', 'stolen', 'proximity', 'for_sale']
     // for (const stolenness of countKeys) { this[`${stolenness}CountTarget`].textContent = '' }
     for (const stolenness of countKeys) { this.updateCount(stolenness, '') }
 
@@ -127,7 +138,7 @@ export default class extends Controller {
     }
   }
 
-  updateCount(stolenness, newValue) {
+  updateCount (stolenness, newValue) {
     const element = this.element.querySelector(`[data-count-target="${stolenness}"]`)
 
     if (element) {
@@ -150,11 +161,6 @@ export default class extends Controller {
 
   // TODO: Make this no fetch counts for times where there are no query items
   doNotFetchCounts (searchQuery) {
-    // if (this.apiCountUrl === "none") { return true }
-
-    // if (this.ignoredLocation(interpretedParams.location)
-    // console.log(interpretedParams)
-    // if (interpretedParams.query)
-    return false
+    return this.apiCountUrlValue === 'none'
   }
 }

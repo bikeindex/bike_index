@@ -87,10 +87,10 @@ module API
             bikes = Bike.unscoped.current.search(interpreted_params.merge(stolenness: "all"))
             # And then execute the specific BikeSearchable#search_matching_stolenness query for each
             proximity = if interpreted_params[:bounding_box].present?
-                 bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).limit(max_limit).count
-               else # we're probably in testing, but regardless, just skip
-                 0
-               end
+              bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).limit(max_limit).count
+            else # we're probably in testing, but regardless, just skip
+              0
+            end
             {
               non: bikes.status_with_owner.limit(max_limit).count,
               stolen: bikes.stolen_or_impounded.limit(max_limit).count,

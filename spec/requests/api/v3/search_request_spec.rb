@@ -196,7 +196,7 @@ RSpec.describe "Search API V3", type: :request do
       let(:target) { {non: 1, proximity: 0, stolen: 0, for_sale: 0} }
       it "succeeds" do
         get "/api/v3/search/count", params: query_params.merge(format: :json)
-        result = JSON.parse(response.body)
+        JSON.parse(response.body)
         expect(response.status).to eq(200)
         expect(json_result).to match_hash_indifferently target
         # Search color
@@ -207,7 +207,7 @@ RSpec.describe "Search API V3", type: :request do
         get "/api/v3/search/count", params: {
           query_items: [manufacturer.search_id], colors: [color.id], format: :json
         }
-        result = JSON.parse(response.body)
+        JSON.parse(response.body)
         expect(response.status).to eq(200)
         expect(json_result).to match_hash_indifferently target.merge(non: 0)
       end
