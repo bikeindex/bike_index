@@ -87,8 +87,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
       it "renders the counts" do
         expect(find("#query_items", visible: false).value).to eq(["v_9"])
-
-
       end
     end
 
