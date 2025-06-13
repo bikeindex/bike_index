@@ -1,9 +1,8 @@
 -# TODO: maybe make this only show up for relevant ones
 
 - if @mail_snippet.organization_message?
-  %h3.mt-4.mb-4
-    %span.text-warning Organization Snippet!
-    %em.small.d-block.mt-4
+  = render(Alert::Component.new(kind: :error, header: "This is an Organization Message Snippet!")) do
+    %em.small.d-block.mt-2
       This should actually be #{link_to "edited though the organization!", edit_mail_snippet_path_for(@mail_snippet)}
 
 = render(Alert::Component.new(kind: :info, header: "NOTE: Organization Message snippets are actually the entire email.")) do
