@@ -99,6 +99,14 @@ class MailSnippet < ApplicationRecord
       organization_snippets.keys
     end
 
+    def organization_snippets_in_all
+      organization_snippets.map do |k, v|
+        next unless v[:emails] == "all"
+
+        k.to_s
+      end.compact
+    end
+
     def organization_email_for(kind)
       kind = kind&.to_s
       return kind.to_s unless organization_snippet_kinds.include?(kind)
@@ -124,8 +132,12 @@ class MailSnippet < ApplicationRecord
     self.class.organization_email_for(kind)
   end
 
-  def in_email?(str)
-    which_organization_email == "all" || str.to_s == which_organization_email
+  def in_email?(str, exclude_all: false)
+    unless exclude_all
+      return true if which_organization_email == "all"
+    end
+
+    str.to_s == which_organization_email
   end
 
   def organization_message?

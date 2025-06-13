@@ -6,13 +6,20 @@
     %em.small.d-block.mt-4
       This should actually be #{link_to "edited though the organization!", edit_mail_snippet_path_for(@mail_snippet)}
 
-.alert.alert-info.mt-2.mb-4
-  %span.d-block.mb-2
-    %strong Note:
-    Organization Message snippets are actually the entire email.
+= render(Alert::Component.new(kind: :info, header: "NOTE: Organization Message snippets are actually the entire email.")) do
+  %p{class: "tw:mt-2 mb-0"}
+    Organization Messages are editable through the organization's page and should probably be edited there (rather than here). Those kinds:
+    %small.d-block.mt-2= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ")
 
-  Organization emails are editable through the organization's page and should probably be edited there (rather than here). Those kinds:
-  %small.d-block.mt-2= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ")
+- if @mail_snippet.organization.present?
+  %ul.mb-3{class: "tw:list-disc tw:list-inside tw:px-2"}
+    %li
+      View
+      = link_to "#{@mail_snippet.organization.short_name}'s email interface", organization_emails_path(organization_id: @mail_snippet.organization_id)
+    - unless @mail_snippet.which_organization_email == "all"
+      %li
+        View
+        = link_to "#{@mail_snippet.organization.short_name}'s #{@mail_snippet.which_organization_email} edit page", edit_organization_email_path(@mail_snippet.which_organization_email, organization_id: @mail_snippet.organization_id)
 
 = render(AlertForErrors::Component.new(object:@mail_snippet))
 
