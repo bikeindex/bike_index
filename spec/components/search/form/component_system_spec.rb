@@ -4,22 +4,12 @@ require "rails_helper"
 
 RSpec.describe Search::Form::Component, :js, type: :system do
   let(:preview_path) { "/rails/view_components/search/form/component/default" }
-  let(:default_params) do
-    {
-      distance: ["100"],
-      location: [""],
-      "query_items[]": [],
-      stolenness: "stolen", # TODO: above should be this
-      serial: [""]
-    }
-  end
 
   def page_query_params(url)
     uri = URI.parse(url)
     CGI.parse(uri.query || "")
   end
 
-  # TODO: update to switch to
   describe "EverythingCombobox" do
     # NOTE: these tests are specific to Select2, unfortunately
     # It requires hacks to target specific selectors because Select2 doesn't use accessible elements
@@ -96,7 +86,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     context "chicago_tall_bike" do
       let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
       it "renders the counts" do
-        expect(find("#query_items", visible: false).value).to eq "dddd"
+        expect(find("#query_items", visible: false).value).to eq(["v_9"])
+
+
       end
     end
 

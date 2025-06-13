@@ -4677,21 +4677,21 @@ es:
         doesnt_look_like_serial:
         search_for_serial_number:
         submit:
-      registration_fields:
-        anywhere:
-        miles_of:
-        search_distance:
-        search_location:
-        stolenness_all:
-        stolenness_non:
-        stolenness_proximity:
-        stolenness_stolen:
-        within:
       bike_box:
         location:
         primary_colors:
         serial:
         posted_at:
+      kind_select_fields:
+        within:
+        miles_of:
+        search_distance:
+        search_location:
+        stolenness_all:
+        stolenness_for_sale:
+        stolenness_non:
+        stolenness_proximity:
+        stolenness_stolen:
     legacy_form_well:
       address_record:
         address:
@@ -4727,3 +4727,6 @@ es:
         to:
       thread_show:
         subject:
+  marketplace:
+    index:
+      loading_results:

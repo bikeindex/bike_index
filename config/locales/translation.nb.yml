@@ -5931,21 +5931,21 @@ nb:
           så det brukes ikke til å søke.
         search_for_serial_number: Søk etter serienummer
         submit: sende inn
-      registration_fields:
-        anywhere: Hvor som helst
-        miles_of: miles av
-        search_distance: Søkeavstand
-        search_location: Søk plassering
-        stolenness_all: Alle
-        stolenness_non: Ikke merket som stjålet
-        stolenness_proximity: Stjålet i søkeområdet
-        stolenness_stolen: Stjålet hvor som helst
-        within: innenfor
       bike_box:
         location: plassering
         primary_colors: Primærfarger
         serial: Seriell
         posted_at: Oppført
+      kind_select_fields:
+        within: innenfor
+        miles_of: miles av
+        search_distance: Søkeavstand
+        search_location: Søk plassering
+        stolenness_all: Alle
+        stolenness_for_sale: Til salgs
+        stolenness_non: Ikke merket som stjålet
+        stolenness_proximity: Stjålet i søkeområdet
+        stolenness_stolen: Stjålet hvor som helst
     legacy_form_well:
       address_record:
         address: gateadresse
@@ -5982,3 +5982,6 @@ nb:
         to: Til
       thread_show:
         subject: Emne
+  marketplace:
+    index:
+      loading_results: Laster inn resultater...
