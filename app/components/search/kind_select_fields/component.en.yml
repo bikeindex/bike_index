@@ -2,12 +2,12 @@
 en:
   components:
     search:
-      registration_fields:
-        anywhere: Anywhere
+      kind_select_fields:
         miles_of: miles of
         search_distance: Search distance
         search_location: Search location
         stolenness_all: All
+        stolenness_for_sale: For sale
         stolenness_non: Not marked stolen
         stolenness_proximity: Stolen in search area
         stolenness_stolen: Stolen anywhere

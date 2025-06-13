@@ -29,7 +29,7 @@
             %ul.bike-boxes
               - @bikes.each do |bike|
                 - bike_alerts = user_alerts.select { |ua| ua.bike_id == bike.id }
-                %li.bike-box-item
+                %li.bike-box-item{class: "tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800"}
                   - cache(["my_account", bike]) do
                     - image_link = bike.thumb_path ? bike_url(bike) : edit_bike_url(bike, edit_template: 'photos')
                     %a.bike-list-image{ href: image_link, class: ('hover-expand' if bike.thumb_path) }

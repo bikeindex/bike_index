@@ -34,6 +34,6 @@
       <%= render(Alert::Component.new(text: translation(".doesnt_look_like_serial"), kind: :warning, margin_classes: "tw:my-2")) %>
     <% end %>
 
-    <%= render(Search::RegistrationFields::Component.new(**@interpreted_params.slice(:stolenness, :location, :distance))) %>
+    <%= render(Search::KindSelectFields::Component.new(**kind_select_options)) %>
   <% end %>
 </div>

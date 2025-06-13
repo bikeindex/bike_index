@@ -41,7 +41,7 @@ module DefinitionList::Row
 
     def dt_classes
       if @full_width
-        ""
+        "tw:pb-1"
       else
         "tw:@sm:text-right tw:@sm:w-1/4 tw:min-w-[100px]"
       end + " tw:text-sm tw:leading-none tw:opacity-65 tw:font-bold!"

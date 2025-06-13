@@ -6,6 +6,7 @@ module UserTextBlockDisplay
       @text = text&.strip
       @additional_classes = additional_classes || ""
       @additional_classes += " #{max_height_class}"
+      @overflow_class = max_height_class.present? ? "tw:overflow-y-auto" : ""
     end
 
     def render?

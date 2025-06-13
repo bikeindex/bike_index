@@ -4,15 +4,6 @@ require "rails_helper"
 
 RSpec.describe Search::Form::Component, :js, type: :system do
   let(:preview_path) { "/rails/view_components/search/form/component/default" }
-  let(:default_params) do
-    {
-      distance: ["100"],
-      location: [""],
-      "query_items[]": [],
-      stolenness: "stolen", # TODO: above should be this
-      serial: [""]
-    }
-  end
 
   def page_query_params(url)
     uri = URI.parse(url)
@@ -20,7 +11,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
   end
 
   describe "EverythingCombobox" do
-    # NOTE: these tests are specific to Select2, unfortuanately
+    # NOTE: these tests are specific to Select2, unfortunately
     # It requires hacks to target specific selectors because Select2 doesn't use accessible elements
     # ... but the behavior should be the same for any updated combobox plugin
 
@@ -30,19 +21,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       visit(preview_path)
       # Clear localStorage
       page.execute_script("window.localStorage.clear()")
-    end
-
-    it "adds an item when selected" do
-      expect(find("#query_items", visible: false).value).to be_blank
-      find(".select2-container").click
-
-      expect(page).to have_content("Bikes that are Black", wait: 5)
-      find("li", text: "Bikes that are Black").click
-
-      expect(page).to have_css(".select2-selection__rendered", text: "Black")
-
-      # NOTE: Since this uses production data, values are consistent
-      expect(find("#query_items", visible: false).value).to eq(["c_1"])
     end
 
     it "submits when enter is pressed twice" do
@@ -103,6 +81,17 @@ RSpec.describe Search::Form::Component, :js, type: :system do
           }
         }, 100);
       JS
+    end
+
+    context "chicago_tall_bike" do
+      let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
+      it "renders the counts" do
+        expect(find("#query_items", visible: false).value).to eq(["v_9"])
+      end
+    end
+
+    context "for_sale" do
+      it "renders and updates"
     end
   end
 end

@@ -5,7 +5,6 @@ require "rails_helper"
 #  - bikes/show_request_spec.rb
 #  - bikes/update_request_spec.rb
 #  - bikes/edit_request_spec.rb
-#  - bikes/index_request_spec.rb
 
 RSpec.describe BikesController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present

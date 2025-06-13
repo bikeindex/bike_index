@@ -40,6 +40,13 @@ RSpec.describe Search::RegistrationsController, type: :request do
       end
     end
 
+    context "with stolenness: for_sale" do
+      it "redirects to marketplace" do
+        get "#{base_url}?search_no_js=true&stolenness=for_sale&location=Chicago%2C+IL"
+        expect(response).to redirect_to("/marketplace?location=Chicago%2C+IL&search_no_js=true")
+      end
+    end
+
     context "turbo_stream" do
       it "renders" do
         get base_url, as: :turbo_stream
@@ -51,6 +58,8 @@ RSpec.describe Search::RegistrationsController, type: :request do
         expect(response).to render_template(:index)
         expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
         expect(assigns(:bikes).pluck(:id).sort).to eq target_bike_ids
+        # Expect there to be a link to the bike url
+        expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{target_bike_ids.first}"/)
       end
 
       context "geocoder_stubbed_bounding_box" do

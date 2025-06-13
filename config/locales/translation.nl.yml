@@ -6087,21 +6087,21 @@ nl:
           op een serienummer en wordt dus niet gebruikt om te zoeken.
         search_for_serial_number: Zoek naar framenummer
         submit: Voorleggen
-      registration_fields:
-        anywhere: Overal
-        miles_of: mijl van
-        search_distance: Zoek afstand
-        search_location: Zoek locatie
-        stolenness_all: Alle
-        stolenness_non: Niet gemarkeerd als gestolen
-        stolenness_proximity: Gestolen in zoekgebied
-        stolenness_stolen: Overal gestolen
-        within: binnen
       bike_box:
         location: Plaats
         primary_colors: Primaire kleuren
         serial: Serie
         posted_at: Genoteerd
+      kind_select_fields:
+        within: binnen
+        miles_of: mijl van
+        search_distance: Zoek afstand
+        search_location: Zoek locatie
+        stolenness_all: Alle
+        stolenness_for_sale: Te koop
+        stolenness_non: Niet gemarkeerd als gestolen
+        stolenness_proximity: Gestolen in zoekgebied
+        stolenness_stolen: Overal gestolen
     legacy_form_well:
       address_record:
         address: Adres
@@ -6138,3 +6138,6 @@ nl:
         to: Naar
       thread_show:
         subject: Onderwerp
+  marketplace:
+    index:
+      loading_results: Resultaten laden...

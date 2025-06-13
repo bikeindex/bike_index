@@ -14,7 +14,7 @@
       - if @bike_versions.present?
         %ul.bike-boxes
           - @bike_versions.each do |bike_version|
-            %li.bike-box-item
+            %li.bike-box-item{class: "tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800"}
               %a.bike-list-image{ href: bike_version_path(bike_version), class: ('hover-expand' if bike_version.thumb_path) }
                 = bike_thumb_image(bike_version)
               .bike-information

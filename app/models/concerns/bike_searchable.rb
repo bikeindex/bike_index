@@ -116,7 +116,8 @@ module BikeSearchable
     def searchable_query_stolenness(query_params, ip_address)
       stolennness_hash = if %w[all non found impounded].include?(query_params[:stolenness])
         {stolenness: query_params[:stolenness]}
-      elsif query_params[:stolenness] == "proximity"
+      elsif %w[for_sale proximity].include?(query_params[:stolenness])
+        query_params[:stolenness] = "all" if query_params[:stolenness] == "for_sale"
         extracted_searchable_proximity_hash(query_params, ip_address)
       end
 
@@ -167,7 +168,7 @@ module BikeSearchable
       return if bounding_box.empty? # If we can't create a bounding box, skip
       {
         bounding_box: bounding_box,
-        stolenness: "proximity",
+        stolenness: query_params[:stolenness],
         location: location, # This will overwrite the user's input
         distance: (distance && distance > 0) ? distance : 100
       }

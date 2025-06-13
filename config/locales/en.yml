@@ -738,7 +738,7 @@ en:
         titanium: Titanium
       handlebar_type:
         bmx: BMX style
-        drop_bar: Drop
+        drop_bar: Drop bars
         flat: Flat or riser
         forward: Forward facing
         other: Not handlebars
@@ -2465,7 +2465,7 @@ en:
         Cofounded by Seth Herr and Bryan Hance in 2013, Bike Index is a %{description_link}.
       craig_dalton_bio_html: |
         <strong>Craig Dalton</strong> thought he had the bike industry out of
-        his system until Bike Index came knocking. Craig is bringing his
+        his system until Bike Index came knocking. Craig brings his
         entrepreneurial experience to the business side of Bike Index.
       gavin_hoover_bio_html: |
         <strong>Gavin Hoover</strong> spent ten years of his life riding and racing bikes all
@@ -3991,6 +3991,9 @@ en:
       only_makes_components: Only makes components
       submit_a_pr_html: Suggest an update by submitting a Pull Request to the %{csv_on_github}.
       thats_not_actually_surprising: That's not actually surprising, there are a bunch.
+  marketplace:
+    index:
+      loading_results: Loading results...
   memberships:
     success:
       bike_index_team: The Bike Index team
