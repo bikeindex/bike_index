@@ -87,11 +87,15 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
       it "renders the counts" do
         expect(find("#query_items", visible: false).value).to eq(["v_9"])
+        fail
       end
     end
 
     context "for_sale" do
-      it "renders and updates"
+      let(:preview_path) { "/rails/view_components/search/form/component/for_sale" }
+      it "renders and updates" do
+        expect(find("#query_items", visible: false).value).to eq(["v_9"])
+      end
     end
   end
 end
