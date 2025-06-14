@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MarketplaceListingsController < ApplicationController
+class MyAccounts::MarketplaceListingsController < ApplicationController
   before_action :find_marketplace_listing
   before_action :ensure_user_allowed_to_edit!
 
