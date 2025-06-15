@@ -12,8 +12,7 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
     # end
 
     # redirect_back(fallback_location: user_root_url)
-    if @marketplace_listing.errors.any? || flash[:error].present?
-    else
+    if @marketplace_listing.update(permitted_update_params)
       flash[:success] ||= translation(:marketplace_listing_updated)
       return if return_to_if_present
     end
@@ -23,19 +22,32 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
 
   private
 
-  def find_marketplace_listing
-    pp params
-    if params[:id].first == "b"
-      @marketplace_listing = MarketplaceListing.find(params[:id])
-    else
-      @marketplace_listing = MarketplaceListing.find(params[:id])
+  def permitted_update_params
+    pparams = params.require(:marketplace_listing).permit(MarketplaceListing.seller_permitted_parameters)
+
+    if InputNormalizer.boolean(pparams[:address_record_attributes][:user_account_address])
+      pparams.delete(:address_record_attributes)
+      # NOTE: Not user, or else admin edits overwrite the user's address
+      pparams[:address_record_id] = @bike.user&.address_record_id
     end
+
+    pparams
+  end
+
+  def find_marketplace_listing
+    @bike = Bike.unscoped.find(params[:id].delete_prefix("b"))
+    ml_id = params.dig(:marketplace_listing, :id)
+
+    @marketplace_listing = @bike.marketplace_listings.find_by(id: ml_id) if ml_id.present?
+    @marketplace_listing ||= MarketplaceListing.find_or_build_current_for(@bike)
   end
 
   def ensure_user_allowed_to_edit!
-    return if @marketplace_listing.item&.authorized?(current_user)
+    pp "---"
+    return if @bike&.authorized?(current_user)
+    pp "[cc[ccc"
 
-    flash[:error] = translation(:you_dont_own_that, item_type: @marketplace_listing.item_type_display)
+    flash[:error] = translation(:you_dont_own_that, item_type: @bike&.type)
     redirect_back(fallback_location: user_root_url) && return
   end
 end

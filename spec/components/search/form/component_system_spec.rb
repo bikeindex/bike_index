@@ -110,7 +110,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         %w[proximity stolen non].each { |stolenness| expect_count(stolenness, 0) }
         # It hides counts when new select options chosen
         # NEEDS TO BE FIXED
-
       end
     end
 

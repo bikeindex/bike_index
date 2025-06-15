@@ -56,7 +56,8 @@ class MarketplaceListing < ApplicationRecord
   scope :current, -> { where(status: CURRENT_STATUSES) }
 
   # validate that there isn't another current listing for an item
-  # validate when marked for_sale that it has all the required attributes
+
+  delegate :primary_activity, :primary_activity_id, to: :item, allow_nil: true
 
   class << self
     # Only works for bikes currently...
@@ -83,7 +84,7 @@ class MarketplaceListing < ApplicationRecord
 
     def seller_permitted_parameters
       [
-        :condition, :amount_with_nil, :price_negotiable, :description,
+        :condition, :amount_with_nil, :price_negotiable, :description, :primary_activity_id,
         address_record_attributes: (AddressRecord.permitted_params + %i[user_account_address])
       ].freeze
     end
@@ -116,6 +117,10 @@ class MarketplaceListing < ApplicationRecord
     self.class.condition_humanized(condition)
   end
 
+  def primary_activity_id=(val)
+    item&.update(primary_activity_id: val)
+  end
+
   # make this more sophisticated!
   def still_for_sale_at
     return nil unless for_sale?
@@ -132,7 +137,7 @@ class MarketplaceListing < ApplicationRecord
   end
 
   def valid_publishable?
-    return false if id.blank? || item.blank? || !item.current? || item.primary_activity.blank?
+    return false if id.blank? || item.blank? || !item.current? || primary_activity.blank?
 
     amount_cents.present? && condition.present? && address_record&.address_present?
   end
@@ -141,7 +146,7 @@ class MarketplaceListing < ApplicationRecord
     if item.blank? || !item.current?
       # Ensure the item is still around and visible
       errors.add(:base, :item_not_visible, item_type: item_type_display)
-    elsif item.primary_activity.blank?
+    elsif primary_activity.blank?
       errors.add(:base, :primary_activity_required, item_type: item_type_display)
     end
 
