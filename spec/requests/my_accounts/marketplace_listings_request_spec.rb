@@ -142,26 +142,26 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           end
         end
 
-        # context "for_sale updated with invalid setting" do
-        #   let(:status) { :for_sale }
-        #   let(:actual_updated_attrs) { target_marketplace_attrs.except(:amount_cents).merge(status: "for_sale") }
+        context "for_sale updated with invalid setting" do
+          let(:status) { :for_sale }
+          let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, primary_activity_id:) }
+          let(:actual_updated_attrs) { target_marketplace_attrs.except(:amount_cents).merge(status: "for_sale") }
 
-        #   it "re-renders" do
-        #     bike.update(primary_activity_id:)
-        #     expect(marketplace_listing.reload.seller_id).to eq user.id
-        #     expect(marketplace_listing.status).to eq "for_sale"
-        #     expect(marketplace_listing.validate_publishable?).to be_truthy
+          it "re-renders" do
+            expect(marketplace_listing.reload.seller_id).to eq user.id
+            expect(marketplace_listing.status).to eq "for_sale"
+            expect(marketplace_listing.valid_publishable?).to be_truthy
 
-        #     make_update_bike_request(url: update_url, params:, marketplace_listing_change: 0, address_record_change: 0)
-        #     expect(flash[:error]).to be_present
+            make_update_bike_request(url: update_url, params:, marketplace_listing_change: 0, address_record_change: 0)
+            pp params, flash
+            expect(flash[:error]).to be_present
 
-        #     expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs.except(:amount_cents)
-        #     expect(marketplace_listing.address_record_id).to eq og_marketplace_address_record_id
-        #     expect(marketplace_listing.validate_publishable?).to be_falsey
-        #     # sanity check, to make absolutely sure
-        #     expect(marketplace_listing.status).to eq "draft"
-        #   end
-        # end
+            expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs.except(:amount_cents)
+            expect(marketplace_listing.address_record_id).to eq og_marketplace_address_record_id
+            # sanity check, to make absolutely sure
+            expect(marketplace_listing.status).to eq "draft"
+          end
+        end
       end
 
       context "with geocoder" do
@@ -248,11 +248,12 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           make_update_bike_request(url: update_url, params:, address_record_change: 0)
 
           expect(flash[:success]).to match "published"
-
-          marketplace_listing = bike.current_marketplace_listing
+            marketplace_listing = bike.reload.current_marketplace_listing
+          expect(marketplace_listing).to be_present
           expect(marketplace_listing.valid_publishable?).to be_truthy
-          expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs.merge(status: "for_sale")
-          expect(marketplace_listing.address_record_id).to eq user.address_record_id
+          expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs.merge(status: "for_sale",
+            amount_cents: 6969, price_negotiable: false, address_record_id: user.address_record_id)
+
           expect(bike.registration_address_source).to eq "marketplace_listing"
           expect(bike.to_coordinates).to eq user.to_coordinates
         end

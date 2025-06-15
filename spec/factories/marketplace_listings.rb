@@ -11,6 +11,7 @@ FactoryBot.define do
     trait :for_sale do
       published_at { Time.current - 1.minute }
       status { :for_sale }
+      address_record { FactoryBot.create(:address_record, user: seller, kind: :marketplace_listing) }
     end
 
     trait :sold do

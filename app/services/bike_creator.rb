@@ -138,7 +138,7 @@ class BikeCreator
   end
 
   def save_bike(b_param, bike)
-    bike.set_location_info
+    # bike.set_location_info # TODO - DELETE ONCE CONFIRMED UNNECESSARY
     bike.save
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?

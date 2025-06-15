@@ -1824,6 +1824,8 @@ en:
           marketplace_listing_updated: Your marketplace listing has been updated!
           item_published_for_sale: Your %{item_type} has been published. It is now listed
             for sale!
+          unable_to_publish: "Unable to publish %{item_type} for sale: %{errors}"
+          unable_to_update: "Unable to save %{item_type}: %{errors}"
         ensure_user_allowed_to_edit!:
           you_dont_own_that: Oh no! It looks like you don't own that %{item_type}.
       messages:

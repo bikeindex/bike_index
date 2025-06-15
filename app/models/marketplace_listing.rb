@@ -122,21 +122,22 @@ class MarketplaceListing < ApplicationRecord
     item&.updated_by_user_at
   end
 
-  def publish!
-    return false unless validate_publishable?
+  def just_published?
+    @updated_for_sale && for_sale?
+  end
 
-    update(published_at: Time.current, status: "for_sale")
-    item&.update(is_for_sale: true) # Only relevant to bikes
-    true
+  def just_failed_to_publish?
+    @failed_to_publish && draft?
   end
 
   def valid_publishable?
-    return false if id.blank? || item.blank? || !item.current? || primary_activity.blank?
+    return false if item.blank? || !item.current? || primary_activity.blank?
 
     amount_cents.present? && condition.present? && address_record&.address_present?
   end
 
-  def validate_publishable?
+  # Validate here doesn't save, but it adds errors
+  def validate_publishable!
     if item.blank? || !item.current?
       # Ensure the item is still around and visible
       errors.add(:base, :item_not_visible, item_type: item_type_display)
@@ -181,22 +182,28 @@ class MarketplaceListing < ApplicationRecord
   def update_bike_for_sale
     return unless @updated_for_sale && item_type == "Bike"
 
-    item&.update(is_for_sale: for_sale?)
+    # If updating an older marketplace_listing, make sure it doesn't update the bike
+    if item&.current_marketplace_listing.blank? || item&.current_marketplace_listing&.id == id
+      item.update(is_for_sale: for_sale?)
+    end
   end
 
   def set_calculated_attributes
     self.seller_id ||= item.user&.id
     self.status ||= "draft"
-    if status == "draft"
-      self.published_at = nil
-    elsif status == "for_sale"
-      self.published_at ||= Time.current
+
+    if status == "for_sale"
+      if valid_publishable?
+        self.published_at ||= Time.current
+      else
+        @failed_to_publish = true
+        self.status = "draft"
+      end
     end
-    if current? # only trigger bike update if draft/for_sale
-      @updated_for_sale = status_changed?
-    else
-      self.end_at ||= Time.current
-    end
+
+    @updated_for_sale = status_changed?
+    self.published_at = nil if status == "draft"
+    self.end_at ||= Time.current unless current?
 
     if address_record&.latitude.present?
       self.latitude = address_record.latitude

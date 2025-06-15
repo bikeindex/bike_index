@@ -18,15 +18,20 @@ RSpec.describe MarketplaceListing, type: :model do
       it "uses bike user" do
         expect(bike.reload.user&.id).to be_present
         expect(marketplace_listing.seller_id).to eq bike.user.id
+        expect(marketplace_listing.just_failed_to_publish?).to be_falsey
         expect(bike.current_event_record&.id).to be_blank
       end
 
       context "for sale" do
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, is_for_sale: true) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, primary_activity: FactoryBot.create(:primary_activity)) }
         let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
         it "includes marketplace_listing" do
+          expect(marketplace_listing.valid_publishable?).to be_truthy
+          expect(marketplace_listing.just_published?).to be_truthy
+          expect(marketplace_listing.just_failed_to_publish?).to be_falsey
           expect(marketplace_listing.seller_id).to eq bike.reload.user.id
           expect(bike.current_event_record&.id).to eq marketplace_listing.id
+          expect(bike.reload.is_for_sale).to be_truthy
         end
       end
     end
@@ -102,7 +107,7 @@ RSpec.describe MarketplaceListing, type: :model do
     end
   end
 
-  describe "validate_publishable?" do
+  describe "validate_publishable!" do
     let(:user_hidden) { false }
     let(:primary_activity) { FactoryBot.create(:primary_activity) }
     let(:item) { FactoryBot.create(:bike, :with_ownership_claimed, user_hidden:, cycle_type: :stroller, primary_activity:) }
@@ -111,14 +116,14 @@ RSpec.describe MarketplaceListing, type: :model do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item:, address_record:, condition: "poor") }
 
     it "is truthy" do
-      expect(marketplace_listing.validate_publishable?).to be_truthy
+      expect(marketplace_listing.validate_publishable!).to be_truthy
       expect(marketplace_listing.errors.full_messages).to eq([])
     end
 
     context "no price" do
       it "is false" do
         marketplace_listing.amount_cents = nil
-        expect(marketplace_listing.validate_publishable?).to be_falsey
+        expect(marketplace_listing.validate_publishable!).to be_falsey
         expect(marketplace_listing.errors.full_messages).to eq(["Price is required"])
       end
     end
@@ -126,7 +131,7 @@ RSpec.describe MarketplaceListing, type: :model do
       let(:user_hidden) { true }
       it "is false when item is missing" do
         expect(item.reload.current?).to be_falsey
-        expect(marketplace_listing.validate_publishable?).to be_falsey
+        expect(marketplace_listing.validate_publishable!).to be_falsey
         expect(marketplace_listing.errors.full_messages).to eq(["Stroller is not visible - maybe you marked it hidden?"])
       end
     end
@@ -141,28 +146,55 @@ RSpec.describe MarketplaceListing, type: :model do
   end
 
   describe "publishing" do
-    let(:marketplace_listing) { FactoryBot.build(:marketplace_listing, status: "for_sale", item:) }
+    let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
+    let(:marketplace_listing) do
+      FactoryBot.build(:marketplace_listing, :for_sale, item:, published_at: nil, primary_activity_id:)
+    end
     let(:item) { FactoryBot.create(:bike) }
 
-    it "assigns published_at" do
+    it "assigns published_at, then removes when marked draft" do
       expect(item.reload.is_for_sale).to be_falsey
+      expect(item.primary_activity_id).to be_blank
       expect(marketplace_listing.published_at).to be_blank
       expect(marketplace_listing.save).to be_truthy
+      expect(marketplace_listing.just_published?).to be_truthy
       expect(marketplace_listing.published_at).to be_within(1).of Time.current
       expect(item.reload.is_for_sale).to be_truthy
-      # But updating status doesn't actually validate!
-      expect(marketplace_listing.validate_publishable?).to be_falsey
-      expect(marketplace_listing.errors.full_messages).to be_present
-    end
-
-    it "removes published_at when updated to be not for sale" do
-      expect(marketplace_listing.published_at).to be_blank
-      expect(marketplace_listing.save).to be_truthy
-      expect(marketplace_listing.reload.published_at).to be_within(1).of Time.current
-      expect(item.reload.is_for_sale).to be_truthy
+      marketplace_listing.validate_publishable!
+      expect(marketplace_listing.errors.full_messages).to be_blank
+      # Marking draft again makes it not for sale
       marketplace_listing.update(status: "draft")
       expect(marketplace_listing.reload.published_at).to be_nil
       expect(item.reload.is_for_sale).to be_falsey
+    end
+
+    context "with not valid publishable" do
+      let(:primary_activity_id) { nil }
+
+      it "is saves, but as draft" do
+        expect(marketplace_listing.status).to eq "for_sale"
+        expect(marketplace_listing.save).to be_truthy
+        expect(marketplace_listing.just_published?).to be_falsey
+        expect(marketplace_listing.just_failed_to_publish?).to be_truthy
+        expect(marketplace_listing.id).to be_present
+        expect(marketplace_listing.status).to eq "draft"
+        expect(marketplace_listing.published_at).to be_nil
+
+        expect(item.reload.is_for_sale).to be_falsey
+        marketplace_listing.validate_publishable!
+        expect(marketplace_listing.errors.full_messages).to be_present
+      end
+    end
+
+    context "updating with not valid for sale params" do
+      it "saves but marks draft" do
+        expect(marketplace_listing.save).to be_truthy
+        expect(marketplace_listing.status).to eq "for_sale"
+        expect(marketplace_listing.update(amount_with_nil: nil)).to be_truthy
+        expect(marketplace_listing.reload.amount_cents).to be_nil
+        expect(marketplace_listing.status).to eq "draft"
+        expect(marketplace_listing.valid_publishable?).to be_falsey
+      end
     end
   end
 end

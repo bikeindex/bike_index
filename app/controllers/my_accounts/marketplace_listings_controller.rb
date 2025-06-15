@@ -5,16 +5,24 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
   before_action :ensure_user_allowed_to_edit!
 
   def update
+    og_status = @marketplace_listing.status
+
     if @marketplace_listing.update(permitted_params_with_permitted_address)
-      if @new_status.present?
-        pp "new status #{@new_status}"
+      if @marketplace_listing.just_published?
+        flash[:success] = translation(:item_published_for_sale, item_type: @bike&.type)
+      elsif @marketplace_listing.just_failed_to_publish?
+        @marketplace_listing.validate_publishable!
+        flash[:error] = translation(:unable_to_publish, item_type: @bike&.type,
+          errors: @marketplace_listing.errors.full_messages.to_sentence)
       else
         flash[:success] ||= translation(:marketplace_listing_updated)
       end
-      return if return_to_if_present
     else
-      flash[:error] = @marketplace_listing.errors.full_messages.to_sentence
+      flash[:error] = translation(:unable_to_update, item_type: @bike&.type,
+          errors: @marketplace_listing.errors.full_messages.to_sentence)
     end
+    return if return_to_if_present
+
     edit_template = params[:edit_template] || "marketplace"
     redirect_to edit_bike_url(@bike, edit_template:)
   end
@@ -40,10 +48,11 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
         end
       end
     end
-    new_status = pparams.delete(:status)
-    if %w[draft for_sale].include?(pparams[:status]) && @marketplace_listing.status != new_status
-      @new_status = new_status
-    end
+    pparams.delete(:status) unless %w[draft for_sale].include?(pparams[:status])
+    # if %w[draft for_sale].include?(pparams[:status]) && @marketplace_listing.status != new_status
+    #   @new_status = new_status
+    #   pparms[:status] = @new_status
+    # end
 
     pparams
   end
