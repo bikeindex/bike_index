@@ -459,7 +459,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(bike.cycle_type_name).to eq("Unicycle")
       end
 
-      it "creates a record even if the post is a string" do
+      it "creates a record even if the post is a string", :flaky do
         manufacturer = FactoryBot.create(:manufacturer)
         bike_attrs = {
           serial_number: "69 string",

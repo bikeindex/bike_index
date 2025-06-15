@@ -216,7 +216,7 @@ class BikeVersion < ApplicationRecord
     self.listing_order = calculated_listing_order
     self.thumb_path = public_images&.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
-    self.name = name.present? ? name.strip : nil
+    self.name = InputNormalizer.string(name)
   end
 
   # Method from bike that is static in bike_version

@@ -64,28 +64,15 @@ class MarketplaceMessage < ApplicationRecord
     end
 
     def decoded_marketplace_listing_id(user:, id:)
-      # marketplace_list_id is encoded as "ml_#{id}"
+      # marketplace_listing_id can be encoded as "ml_#{id}"
       return unless id.is_a?(String) && id.start_with?(/ml_/i)
 
       id.gsub(/\Aml_/i, "")
     end
 
-    def thread_for(user:, id:)
-      # marketplace_list_id is encoded as "ml_#{id}"
-      if (marketplace_listing_id = decoded_marketplace_listing_id(user:, id:))
-        # verify that the marketplace_listing_id exists and the user isn't the seller
-        if MarketplaceListing.where.not(seller_id: user.id).where(id: marketplace_listing_id).any?
-          return for_user(user).where(marketplace_listing_id:).order(:id)
-        end
-      else
-        matches = for_user(user).where(initial_record_id: id)
-        if matches.none?
-          # If the id wasn't an initial_record_id, find the record and look up by its initial_record_id
-          matches = for_user(user).where(initial_record_id: for_user(user).where(id:).pluck(:initial_record_id))
-            .order(:id)
-        end
-        return matches if matches.any?
-      end
+    def thread_for!(user:, id: nil, marketplace_listing_id: nil)
+      result = thread_for(user:, id:, marketplace_listing_id: nil)
+      return result if result.any?
 
       raise ActiveRecord::RecordNotFound
     end
@@ -96,28 +83,22 @@ class MarketplaceMessage < ApplicationRecord
 
     # TODO: permit sending message only in certain period, only to new owner post sale, etc.
     def can_send_message?(marketplace_listing:, user: nil, marketplace_message: nil)
-      return false unless can_see_messages?(user:, marketplace_listing:, marketplace_message:)
-
-      marketplace_listing.for_sale? ||
-        marketplace_message&.id.present? && marketplace_message.user_ids.include?(user.id)
+      can_see_messages?(user:, marketplace_listing:, marketplace_message:)
     end
 
     def can_see_messages?(marketplace_listing:, user: nil, marketplace_message: nil)
       return false if user.blank?
 
-      if marketplace_message.present?
-        return false unless marketplace_message.user_ids.include?(user.id)
-        if marketplace_message.initial_record.present?
-          return false unless marketplace_message.initial_record.user_ids.include?(user.id)
-        end
-      elsif marketplace_listing.seller_id == user.id
-        return false
-      end
-      # seller can't send a message unless they have an existing message
+      if marketplace_message&.id.blank?
+        # seller must include a marketplace_message, or else no idea who to see the messages
+        return false if marketplace_listing.seller_id == user.id
+        return true if marketplace_listing.for_sale?
 
-      # Block seeing messages for draft posts.
+        marketplace_message = thread_for(user:, marketplace_listing_id: marketplace_listing.id).first
+      end
+
       # TODO: maybe don't allow seeing X days after listing ended?
-      %w[for_sale sold removed].include?(marketplace_listing.status)
+      marketplace_message&.user_ids&.include?(user.id) || false
     end
 
     # Cached because this is called on every page load, to determine whether to show the messages menu item
@@ -129,6 +110,28 @@ class MarketplaceMessage < ApplicationRecord
 
     def kind_humanized(str)
       str&.to_s&.gsub("sender_", "")
+    end
+
+    private
+
+    def thread_for(user:, id: nil, marketplace_listing_id: nil)
+      # marketplace_listing_id can be encoded as "ml_#{id}"
+      marketplace_listing_id ||= decoded_marketplace_listing_id(user:, id:)
+      if marketplace_listing_id.present?
+        # verify that the marketplace_listing_id exists and the user isn't the seller
+        return none unless MarketplaceListing.where.not(seller_id: user.id).where(id: marketplace_listing_id).any?
+
+        for_user(user).where(marketplace_listing_id:).order(:id)
+      elsif id.blank? # Needs to have an id or marketplace_listing_id
+        none
+      else
+        matches = for_user(user).where(initial_record_id: id)
+        return matches if matches.any?
+
+        # If the id wasn't an initial_record_id, find the record and look up by its initial_record_id
+        for_user(user).where(initial_record_id: for_user(user).where(id:).pluck(:initial_record_id))
+          .order(:id)
+      end
     end
   end
 
