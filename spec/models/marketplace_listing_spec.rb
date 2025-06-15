@@ -139,4 +139,30 @@ RSpec.describe MarketplaceListing, type: :model do
       expect(marketplace_listing.visible_by?(marketplace_listing.seller)).to be_truthy
     end
   end
+
+  describe "publishing" do
+    let(:marketplace_listing) { FactoryBot.build(:marketplace_listing, status: "for_sale", item:) }
+    let(:item) { FactoryBot.create(:bike) }
+
+    it "assigns published_at" do
+      expect(item.reload.is_for_sale).to be_falsey
+      expect(marketplace_listing.published_at).to be_blank
+      expect(marketplace_listing.save).to be_truthy
+      expect(marketplace_listing.published_at).to be_within(1).of Time.current
+      expect(item.reload.is_for_sale).to be_truthy
+      # But updating status doesn't actually validate!
+      expect(marketplace_listing.validate_publishable?).to be_falsey
+      expect(marketplace_listing.errors.full_messages).to be_present
+    end
+
+    it "removes published_at when updated to be not for sale" do
+      expect(marketplace_listing.published_at).to be_blank
+      expect(marketplace_listing.save).to be_truthy
+      expect(marketplace_listing.reload.published_at).to be_within(1).of Time.current
+      expect(item.reload.is_for_sale).to be_truthy
+      marketplace_listing.update(status: "draft")
+      expect(marketplace_listing.reload.published_at).to be_nil
+      expect(item.reload.is_for_sale).to be_falsey
+    end
+  end
 end

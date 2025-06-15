@@ -52,6 +52,7 @@ class MarketplaceListing < ApplicationRecord
   validates_presence_of :status
 
   before_validation :set_calculated_attributes
+  after_commit :update_bike_for_sale
 
   scope :current, -> { where(status: CURRENT_STATUSES) }
 
@@ -177,10 +178,26 @@ class MarketplaceListing < ApplicationRecord
 
   private
 
+  def update_bike_for_sale
+    return unless @updated_for_sale && item_type == "Bike"
+
+    item&.update(is_for_sale: for_sale?)
+  end
+
   def set_calculated_attributes
     self.seller_id ||= item.user&.id
-    self.status ||= :draft
-    self.end_at ||= Time.current unless current?
+    self.status ||= "draft"
+    if status == "draft"
+      self.published_at = nil
+    elsif status == "for_sale"
+      self.published_at ||= Time.current
+    end
+    if current? # only trigger bike update if draft/for_sale
+      @updated_for_sale = status_changed?
+    else
+      self.end_at ||= Time.current
+    end
+
     if address_record&.latitude.present?
       self.latitude = address_record.latitude
       self.longitude = address_record.longitude

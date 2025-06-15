@@ -83,7 +83,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
         let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, item: bike, amount_cents: 400, status:) }
         let(:status) { :draft }
         let(:address_record) { marketplace_listing.address_record }
-        let(:params) { {marketplace_listing: marketplace_listing_params.merge(id: marketplace_listing.id, amount_with_nil: "") } }
+        let(:params) { {marketplace_listing: marketplace_listing_params.merge(id: marketplace_listing.id, amount_with_nil: "")} }
 
         it "updates existing marketplace_listing and address_record" do
           expect(marketplace_listing.reload.seller_id).to eq user.id
@@ -226,39 +226,39 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           expect(AddressRecord.where(user_id: current_user.id).count).to eq 2
         end
       end
-      # context "publishing (status: for_sale)" do
-      #   let(:address_record_attributes) { default_address_record_attributes.merge(user_account_address: "1") }
-      #   let(:marketplace_listing_params) do
-      #     {
-      #       primary_activity_id:,
-      #       condition: "poor",
-      #       amount_with_nil: "69.69",
-      #       description: "Cool description",
-      #       status: "for_sale",
-      #       price_negotiable: "0",
-      #       address_record_attributes:
-      #     }
-      #   end
-      #   it "updates and publishes" do
-      #     expect(user.reload.can_create_listing?).to be_truthy
-      #     expect(user.address_record_id).to be_present
-      #     expect(bike.reload.current_marketplace_listing).to be_blank
-      #     expect(bike.registration_address_source).to eq "user"
+      context "publishing (status: for_sale)" do
+        let(:address_record_attributes) { default_address_record_attributes.merge(user_account_address: "1") }
+        let(:marketplace_listing_params) do
+          {
+            primary_activity_id:,
+            condition: "poor",
+            amount_with_nil: "69.69",
+            description: "Cool description",
+            status: "for_sale",
+            price_negotiable: "0",
+            address_record_attributes:
+          }
+        end
+        it "updates and publishes" do
+          expect(user.reload.can_create_listing?).to be_truthy
+          expect(user.address_record_id).to be_present
+          expect(bike.reload.current_marketplace_listing).to be_blank
+          expect(bike.registration_address_source).to eq "user"
 
-      #     make_update_bike_request(url: update_url, params:, address_record_change: 0)
+          make_update_bike_request(url: update_url, params:, address_record_change: 0)
 
-      #     expect(flash[:success]).to match "published"
+          expect(flash[:success]).to match "published"
 
-      #     marketplace_listing = bike.current_marketplace_listing
-      #     expect(marketplace_listing.valid_publishable?).to be_truthy
-      #     expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs.merge(status: "for_sale")
-      #     expect(marketplace_listing.address_record_id).to eq user.address_record_id
-      #     expect(bike.registration_address_source).to eq "marketplace_listing"
-      #     expect(bike.to_coordinates).to eq user.to_coordinates
-      #   end
-      #   context "bike is user_hidden" do
-      #   end
-      # end
+          marketplace_listing = bike.current_marketplace_listing
+          expect(marketplace_listing.valid_publishable?).to be_truthy
+          expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs.merge(status: "for_sale")
+          expect(marketplace_listing.address_record_id).to eq user.address_record_id
+          expect(bike.registration_address_source).to eq "marketplace_listing"
+          expect(bike.to_coordinates).to eq user.to_coordinates
+        end
+        context "bike is user_hidden" do
+        end
+      end
       context "user can't publish listing" do
         # TODO: update when MARKETPLACE_FREE_UNTIL changes
         # let(:membership) { expired membership }

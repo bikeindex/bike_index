@@ -68,7 +68,7 @@ class MyAccounts::MessagesController < ApplicationController
   end
 
   def matching_marketplace_thread
-    MarketplaceMessage.thread_for(user: current_user, id: params[:id])
+    MarketplaceMessage.thread_for!(user: current_user, id: params[:id])
   end
 
   def matching_marketplace_messages

@@ -7,7 +7,7 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
   def update
     if @marketplace_listing.update(permitted_params_with_permitted_address)
       if @new_status.present?
-
+        pp "new status #{@new_status}"
       else
         flash[:success] ||= translation(:marketplace_listing_updated)
       end
@@ -40,7 +40,7 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
         end
       end
     end
-    new_status = pparams[:status]
+    new_status = pparams.delete(:status)
     if %w[draft for_sale].include?(pparams[:status]) && @marketplace_listing.status != new_status
       @new_status = new_status
     end
@@ -50,7 +50,8 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
 
   def permitted_params
     params.require(:marketplace_listing)
-      .permit(:condition, :amount_with_nil, :price_negotiable, :description, :primary_activity_id,
+      .permit(:condition, :amount_with_nil, :price_negotiable, :description, :status,
+        :primary_activity_id,
         address_record_attributes: (AddressRecord.permitted_params + %i[id user_account_address]))
   end
 
