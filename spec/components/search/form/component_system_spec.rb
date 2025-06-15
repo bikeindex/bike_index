@@ -4,7 +4,6 @@ require "rails_helper"
 
 RSpec.describe Search::Form::Component, :js, type: :system do
   let(:preview_path) { "/rails/view_components/search/form/component/default" }
-  let(:production_count_url) { "https://bikeindex.org/api/v3/search/count" }
 
   def page_query_params(url)
     uri = URI.parse(url)
@@ -19,8 +18,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     before do
       # Stub the API_URL to use the production urls, for more accurate testing
       stub_const("Search::EverythingCombobox::Component::API_URL", "https://bikeindex.org/api/autocomplete")
-      # TODO: Stub so we get real results
-      # allow_any_instance_of(Search::KindSelectFields::Component).to receive(:api_count_url).and_return(production_count_url)
       visit(preview_path)
       # Clear localStorage
       page.execute_script("window.localStorage.clear()")
@@ -104,6 +101,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     context "chicago_tall_bike" do
       let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
+      # Maybe TODO: get real results for counts
+      # let(:production_count_url) { "https://bikeindex.org/api/v3/search/count" }
+      # allow_any_instance_of(Search::KindSelectFields::Component).to receive(:api_count_url).and_return(production_count_url)
       it "renders the counts" do
         expect(find("#query_items", visible: false).value).to eq(["v_9"])
 

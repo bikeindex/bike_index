@@ -1,47 +1,100 @@
 require "rails_helper"
 
-RSpec.describe MarketplaceController, type: :request do
-  let(:base_url) { "/marketplace_listing" }
+RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
+  let(:base_url) { "/my_account/marketplace_listing" }
 
-  describe "index" do
-    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
-    let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, status: :draft) }
-    let(:bike_id) { marketplace_listing.item_id }
-
-    it "renders" do
-      get base_url
-      expect(flash).to be_blank
-      expect(response).to render_template("index")
-      expect(assigns(:interpreted_params)).to eq(stolenness: "all")
-      expect(assigns(:bikes)).to be_blank
+  describe "update" do
+    let(:address_record) { FactoryBot.create(:address_record, :new_york) }
+    let(:user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
+    let(:current_user) { user }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let!(:membership) { FactoryBot.create(:membership, user: user) }
+    let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, owner_email: user.email) }
+    let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
+    let(:state) { FactoryBot.create(:state_california) }
+    let(:address_record_attributes) do
+      {
+        country_id: Country.united_states_id.to_s,
+        city: "Los Angeles",
+        region_record_id: state.id,
+        region_string: "AB",
+        postal_code: "90021",
+        user_account_address: "false",
+        id: address_record&.id
+      }
     end
-
-    context "with search_no_js" do
-      it "renders with bikes" do
-        expect(MarketplaceListing.pluck(:status)).to match_array(%w[for_sale draft])
-        expect(Bike.for_sale.pluck(:id)).to eq([bike_id])
-        get "#{base_url}?search_no_js=true"
-        expect(response.code).to eq("200")
-        expect(response).to render_template(:index)
-        expect(assigns(:interpreted_params)).to eq(stolenness: "all")
-        expect(assigns(:bikes).pluck(:id)).to eq([bike_id])
-      end
+    let(:update_params) do
+      {
+        marketplace_listing: {
+          # primary_activity_id:,
+          # current_marketplace_listing_attributes: {
+          condition: "new_in_box",
+          amount_with_nil: "1442.42",
+          description: "some description",
+          price_negotiable: "1",
+          address_record_attributes:
+        }
+      }
     end
-
-    context "turbo_stream" do
-      it "renders" do
-        get base_url, as: :turbo_stream
-        expect(response.media_type).to eq Mime[:turbo_stream].to_s
-        expect(response.content_type).to include("text/vnd.turbo-stream.html")
-        expect(response).to have_http_status(:success)
-
-        expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_marketplace_results_frame\">")
-        expect(response).to render_template(:index)
-        expect(assigns(:interpreted_params)).to eq(stolenness: "all")
-        expect(assigns(:bikes).pluck(:id)).to eq([bike_id])
-        # Expect there to be a link to the bike url
-        expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{bike_id}"/)
-      end
+    let(:target_marketplace_attrs) do
+      update_params.dig(:bike, :current_marketplace_listing_attributes)
+        .except(:amount, :address_record_attributes)
+        .merge(amount_cents: 144242, status: "draft", price_negotiable: true)
     end
+    it "creates the listing" do
+      expect(user.reload.can_create_listing?).to be_truthy
+      bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
+
+      expect(bike.reload.primary_activity_id).to be_nil
+      expect(bike.updated_by_user_at).to be_within(1).of bike.created_at
+      # expect(bike.not_updated_by_user?).to be_truthy
+      expect(bike.current_ownership.claimed?).to be_truthy
+      expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+
+      # VCR.use_cassette("bike_request-update-marketplace_listing") do
+      #   Sidekiq::Job.clear_all
+      #   Sidekiq::Testing.inline! do
+          expect { patch base_url, params: update_params }.to change(MarketplaceListing, :count).by 1
+      #   end
+      # end
+
+      expect(bike.reload.primary_activity_id).to eq primary_activity_id
+      marketplace_listing = bike.current_marketplace_listing
+      expect(marketplace_listing).to be_present
+      expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs
+
+      address_record = marketplace_listing.address_record
+      expect(address_record).to be_present
+      expect(address_record.kind).to eq "marketplace_listing"
+      expect(address_record.user_id).to eq user.id
+      expect(address_record.region_record_id).to eq state.id
+      expect(address_record.city).to eq "Los Angeles"
+      expect(address_record.region_string).to be_blank
+    end
+    # context "existing marketplace_listing" do
+    #   let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
+    #   let(:current_user) { FactoryBot.create(:superuser, :with_address_record, address_set_manually: true) }
+    #   let(:address_record_attributes) { {user_account_address: "1"} }
+
+    #   it "updates the listing" do
+    #     expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
+    #     expect(marketplace_listing.reload.address_record_id).to be_blank
+
+    #     VCR.use_cassette("bike_request-update-marketplace_listing") do
+    #       Sidekiq::Job.clear_all
+    #       Sidekiq::Testing.inline! do
+    #         expect {
+    #           patch base_url, params: update_params
+    #           expect(flash[:success]).to be_present
+    #         }.to change(MarketplaceListing, :count).by 0
+    #       end
+    #     end
+
+    #     expect(bike.reload.primary_activity_id).to eq primary_activity_id
+    #     expect(bike.current_marketplace_listing&.id).to eq marketplace_listing.id
+    #     expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs
+    #     expect(marketplace_listing.address_record_id).to eq address_record.id
+    #   end
+    # end
   end
 end
