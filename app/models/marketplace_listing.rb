@@ -57,7 +57,7 @@ class MarketplaceListing < ApplicationRecord
 
   # validate that there isn't another current listing for an item
 
-  delegate :primary_activity, :primary_activity_id, to: :item, allow_nil: true
+  delegate :primary_activity, :primary_activity_id, :user, to: :item, allow_nil: true
 
   class << self
     # Only works for bikes currently...
@@ -80,13 +80,6 @@ class MarketplaceListing < ApplicationRecord
 
     def condition_with_description_humanized(str)
       [condition_humanized(str), condition_description_humanized(str)].join(" - ")
-    end
-
-    def seller_permitted_parameters
-      [
-        :condition, :amount_with_nil, :price_negotiable, :description, :primary_activity_id,
-        address_record_attributes: (AddressRecord.permitted_params + %i[user_account_address])
-      ].freeze
     end
 
     def status_humanized(str)
@@ -188,5 +181,9 @@ class MarketplaceListing < ApplicationRecord
     self.seller_id ||= item.user&.id
     self.status ||= :draft
     self.end_at ||= Time.current unless current?
+    if address_record&.latitude.present?
+      self.latitude = address_record.latitude
+      self.longitude = address_record.longitude
+    end
   end
 end

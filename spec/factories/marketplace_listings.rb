@@ -6,7 +6,6 @@ FactoryBot.define do
     amount_cents { 5_000 }
     condition { "excellent" }
 
-    # condition { MarketplaceListing.conditions.keys.first }
     status { "draft" }
 
     trait :for_sale do
@@ -18,6 +17,10 @@ FactoryBot.define do
       end_at { Time.current - 1.minute }
       buyer { FactoryBot.create(:user_confirmed) }
       status { :sold }
+    end
+
+    trait :with_address_record do
+      address_record { FactoryBot.build(:address_record, kind: :marketplace_listing, user: seller) }
     end
   end
 end
