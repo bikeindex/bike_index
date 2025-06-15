@@ -2,7 +2,7 @@
 
 = form_with(model: marketplace_listing, url: my_account_marketplace_listing_path("b#{@bike.id}"), method: :patch, multipart: true, html: { class: 'primary-edit-bike-form' }) do |f|
   - if marketplace_listing.id.present?
-    = f.hidden_field :id, marketplace_listing.id
+    = f.hidden_field :id, value: marketplace_listing.id
   - if params[:return_to].present?
     = hidden_field_tag :return_to, params[:return_to]
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
@@ -49,7 +49,7 @@
             %h3= @edit_templates[@edit_template]
 
           - unless @bike.primary_activity.present?
-            =# render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
+            = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
 
 
           = render LegacyFormWell::FormGroupRow::Component.new(form_builder: f, label: :condition, label_translation: t(".condition"), row_classes: "unnested-field") do

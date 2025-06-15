@@ -17,7 +17,7 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
       return if return_to_if_present
     end
     edit_template = params[:edit_template] || "marketplace"
-    edit_bike_url(@bike, edit_template:)
+    redirect_to edit_bike_url(@bike, edit_template:)
   end
 
   private
