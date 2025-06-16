@@ -84,7 +84,7 @@ RSpec.describe BikeService::CalculateStoredLocation do
         org = FactoryBot.create(:organization, :in_nyc)
         bike = FactoryBot.build(:bike, creation_organization: org)
 
-        bike.attributes = Bikes::CalculateStoredLocation.location_attrs(bike)
+        bike.attributes = described_class.location_attrs(bike)
 
         expect(bike.city).to eq("New York")
         expect(bike.zipcode).to eq("10011")
