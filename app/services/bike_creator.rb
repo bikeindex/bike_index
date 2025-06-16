@@ -138,6 +138,7 @@ class BikeCreator
   end
 
   def save_bike(b_param, bike)
+    bike.set_location_info # TODO: Figure out why this needs to be called separately first
     bike.save
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?

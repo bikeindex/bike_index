@@ -293,7 +293,7 @@ RSpec.describe BulkImportJob, type: :job do
         # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
         let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
         include_context :geocoder_real
-        let(:bike1_tareget) do
+        let(:bike1_target) do
           {
             primary_frame_color: color_green,
             serial_number: "xyz_test",
@@ -372,7 +372,7 @@ RSpec.describe BulkImportJob, type: :job do
             bike1 = bulk_import.bikes.reorder(:created_at).first
             expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
             expect(bike1.current_ownership.status).to eq "status_impounded"
-            expect(bike1).to match_hash_indifferently bike1_tareget
+            expect(bike1).to match_hash_indifferently bike1_target
             expect(bike1.created_by_notification_or_impounding?).to be_truthy
             bike1_impound_record = bike1.current_impound_record
             expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
@@ -393,6 +393,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect(bike_sticker_update.creator_kind).to eq "creator_import"
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
+            expect(bike2.id).to_not eq bike1.id
             expect(bike2).to match_hash_indifferently bike2_target
             expect(bike2.public_images.count).to eq 1
             expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
