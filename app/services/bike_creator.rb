@@ -139,7 +139,8 @@ class BikeCreator
   end
 
   def save_bike(b_param, bike)
-    bike.set_location_info # TODO: Figure out why this needs to be called separately. See PR #2848
+    # TODO: Figure out why this needs to be called separately, before save. See PR #2848
+    bike.attributes = BikeService::CalculateStoredLocation.location_attrs(bike)
     bike.save
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?

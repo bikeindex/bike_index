@@ -849,18 +849,13 @@ class Bike < ApplicationRecord
     end
   end
 
-  # TODO: Figure out why this needs to be called separately. See PR #2848
-  def set_location_info
-    self.attributes = BikeService::CalculateStoredLocation.location_attrs(self)
-  end
-
   def set_calculated_attributes
     set_calculated_unassociated_attributes
     fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.occurred_at = calculated_occurred_at
     self.current_ownership = calculated_current_ownership
-    set_location_info
+    self.attributes = BikeService::CalculateStoredLocation.location_attrs(self)
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at

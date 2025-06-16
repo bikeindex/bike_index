@@ -3,7 +3,7 @@ class BikeService::CalculateStoredLocation
     # Set the bike's location data (lat/long, city, postal code, country, etc.)
     #
     # Geolocate based on the full current stolen record address, if available.
-    # Otherwise, use the data set by set_location_info.
+    # Otherwise, use the data set by location_record_address_hash
     # Sets lat/long, will avoid a geocode API call if coordinates are found
     def location_attrs(bike)
       if bike.current_stolen_record.present?
