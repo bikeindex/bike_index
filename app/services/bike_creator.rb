@@ -18,8 +18,7 @@ class BikeCreator
       [
         stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
         impound_records_attributes: permitted_impound_attrs,
-        components_attributes: Component.permitted_attributes,
-        current_marketplace_listing_attributes: MarketplaceListing.seller_permitted_parameters
+        components_attributes: Component.permitted_attributes
       ]
     ).freeze
   end
@@ -139,7 +138,7 @@ class BikeCreator
   end
 
   def save_bike(b_param, bike)
-    bike.set_location_info
+    bike.set_location_info # TODO: Figure out why this needs to be called separately first
     bike.save
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
