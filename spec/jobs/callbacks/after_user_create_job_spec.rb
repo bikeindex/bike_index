@@ -115,7 +115,7 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
         bike.reload.update(updated_at: Time.current)
         expect(bike.reload.registration_address_source).to eq "initial_creation"
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
-        expect(bike.send(:location_record_address_hash)).to match_hash_indifferently target_address_hash.except(:latitude, :longitude).merge(skip_geocoding: false)
+        expect(BikeService::CalculateStoredLocation.location_attrs(bike)).to match_hash_indifferently target_address_hash.except(:latitude, :longitude).merge(skip_geocoding: false)
 
         Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
         user.reload

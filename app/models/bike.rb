@@ -819,31 +819,6 @@ class Bike < ApplicationRecord
     end.with_indifferent_access
   end
 
-  # Set the bike's location data (lat/long, city, postal code, country, etc.)
-  #
-  # Geolocate based on the full current stolen record address, if available.
-  # Otherwise, use the data set by set_location_info.
-  # Sets lat/long, will avoid a geocode API call if coordinates are found
-  def set_location_info
-    if current_stolen_record.present?
-      # If there is a current stolen - even if it has a blank location - use it
-      # It's used for searching and displaying stolen bikes, we don't want other information leaking
-      self.attributes = if address_set_manually # Only set coordinates if the address is set manually
-        current_stolen_record.attributes.slice("latitude", "longitude")
-      else # Set the whole address from the stolen record
-        current_stolen_record.address_hash
-      end
-    else
-      if address_set_manually # If it's not stolen, use the manual set address for the coordinates
-        return true unless user&.address_set_manually # If it's set by the user, address_set_manually is no longer correct!
-        self.address_set_manually = false
-      end
-      address_attrs = location_record_address_hash
-      return true unless address_attrs.present? # No address hash present so skip
-      self.attributes = address_attrs
-    end
-  end
-
   def external_image_urls
     b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
   end
@@ -880,7 +855,7 @@ class Bike < ApplicationRecord
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.occurred_at = calculated_occurred_at
     self.current_ownership = calculated_current_ownership
-    set_location_info
+    self.attributes = BikeService::CalculateStoredLocation.location_attrs(self)
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at
@@ -912,27 +887,6 @@ class Bike < ApplicationRecord
   end
 
   private
-
-  # Select the source from which to derive location data, in the following order
-  # of precedence:
-  #
-  # 1. The current parking notification/impound record, if one is present
-  # 2. #registration_address (which prioritizes user address)
-  # 3. The creation organization address (so we have a general area for the bike)
-  # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
-  def location_record_address_hash
-    l_hashes = [
-      current_impound_record&.address_hash,
-      current_parking_notification&.address_hash,
-      registration_address(true),
-      creation_organization&.default_location&.address_hash
-    ].compact
-    l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
-      l_hashes.find { |rec| rec&.dig("latitude").present? }
-    return {} unless l_hash.present?
-    # If the location record has coordinates, skip geocoding
-    l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
-  end
 
   def fetch_current_impound_record
     self.current_impound_record = impound_records.current.last
