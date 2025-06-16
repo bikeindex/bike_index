@@ -89,12 +89,14 @@ class MarketplaceMessage < ApplicationRecord
     def can_see_messages?(marketplace_listing:, user: nil, marketplace_message: nil)
       return false if user.blank?
 
-      if marketplace_message&.id.blank?
+      if marketplace_message.blank?
         # seller must include a marketplace_message, or else no idea who to see the messages
         return false if marketplace_listing.seller_id == user.id
         return true if marketplace_listing.for_sale?
 
         marketplace_message = thread_for(user:, marketplace_listing_id: marketplace_listing.id).first
+      elsif marketplace_message.id.blank?
+        marketplace_message.validate # set calculated attributes
       end
 
       marketplace_message&.initial_record&.user_ids&.include?(user.id) || false
@@ -113,7 +115,7 @@ class MarketplaceMessage < ApplicationRecord
 
     private
 
-    # This can return either an ActiveRecord::Collection or false
+    # This returns either an ActiveRecord::Collection or false
     def thread_for(user:, id: nil, marketplace_listing_id: nil)
       # marketplace_listing_id can be encoded as "ml_#{id}"
       marketplace_listing_id ||= decoded_marketplace_listing_id(user:, id:)
@@ -174,7 +176,7 @@ class MarketplaceMessage < ApplicationRecord
   end
 
   def initial_message
-    initial_record
+    initial_record_id.present? ? initial_record : self
   end
 
   def initial_message?

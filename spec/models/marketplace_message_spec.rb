@@ -226,6 +226,40 @@ RSpec.describe MarketplaceMessage, type: :model do
         expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
       end
     end
+
+    context "with built message" do
+      let(:marketplace_message) { FactoryBot.build(:marketplace_message, marketplace_listing:, sender: user) }
+      it "is truthy" do
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+      end
+    end
+
+    context "with built reply" do
+      let(:initial_record) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: initial_sender) }
+      let(:initial_sender) { user }
+      let(:marketplace_message) { FactoryBot.build(:marketplace_message, marketplace_listing:, sender: user, initial_record:) }
+      it "is truthy" do
+        expect(initial_record).to be_valid
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_truthy
+        expect(marketplace_message).to be_valid
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
+      end
+      context "with initial sender not user" do
+        let(:initial_sender) { FactoryBot.create(:user_confirmed) }
+        it "is falsey" do
+          expect(initial_record).to be_valid
+          expect(initial_record.user_ids).to_not include(user.id)
+          expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_falsey
+          expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_falsey
+
+          expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_falsey
+          expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_falsey
+        end
+      end
+    end
   end
 
   describe "other_user_display_name" do
