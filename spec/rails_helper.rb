@@ -241,14 +241,14 @@ module Capybara
   module RSpecMatchers
     def have_selector(expr, **options, &optional_filter_block)
       # Automatically escape colons in tailwind classes
-      expr = expr.gsub('tw:', 'tw\:') if expr.match?('tw:')
+      expr = expr.gsub("tw:", 'tw\:') if expr.match?("tw:")
 
       Matchers::HaveSelector.new(expr, **options, &optional_filter_block)
     end
 
     def have_css(expr, **options, &optional_filter_block)
       # Automatically escape colons in tailwind classes
-      expr = expr.gsub('tw:', 'tw\:') if expr.match?('tw:')
+      expr = expr.gsub("tw:", 'tw\:') if expr.match?("tw:")
 
       Matchers::HaveSelector.new(:css, expr, **options, &optional_filter_block)
     end
