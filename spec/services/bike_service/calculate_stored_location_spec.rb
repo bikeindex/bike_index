@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Bikes::CalculateStoredLocation do
+RSpec.describe BikeService::CalculateStoredLocation do
   describe "location_attrs" do
     let!(:usa) { Country.united_states }
 
