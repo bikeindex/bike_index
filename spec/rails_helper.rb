@@ -231,3 +231,26 @@ CarrierWave.configure do |config|
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
   config.enable_processing = false
 end
+
+# Override capybara methods to support tailwind selectors
+# Original methods defined in 'lib/capybara/rspec/matchers.rb'
+#
+# This is necessary because colons need to be escaped for these matchers (i.e. tw\:p-6)
+#
+module Capybara
+  module RSpecMatchers
+    def have_selector(expr, **options, &optional_filter_block)
+      # Automatically escape colons in tailwind classes
+      expr = expr.gsub('tw:', 'tw\:') if expr.match?('tw:')
+
+      Matchers::HaveSelector.new(expr, **options, &optional_filter_block)
+    end
+
+    def have_css(expr, **options, &optional_filter_block)
+      # Automatically escape colons in tailwind classes
+      expr = expr.gsub('tw:', 'tw\:') if expr.match?('tw:')
+
+      Matchers::HaveSelector.new(:css, expr, **options, &optional_filter_block)
+    end
+  end
+end
