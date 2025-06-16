@@ -893,8 +893,6 @@ class Bike < ApplicationRecord
 
   private
 
-
-
   def fetch_current_impound_record
     self.current_impound_record = impound_records.current.last
   end
