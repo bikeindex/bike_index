@@ -849,7 +849,7 @@ class Bike < ApplicationRecord
     end
   end
 
-  # TODO: Figure out why this needs to be called separately first
+  # TODO: Figure out why this needs to be called separately. See PR #2848
   def set_location_info
     self.attributes = Bikes::CalculateStoredLocation.location_attrs(self)
   end
