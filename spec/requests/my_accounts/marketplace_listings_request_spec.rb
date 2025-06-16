@@ -248,7 +248,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           make_update_bike_request(url: update_url, params:, address_record_change: 0)
 
           expect(flash[:success]).to match "published"
-            marketplace_listing = bike.reload.current_marketplace_listing
+          marketplace_listing = bike.reload.current_marketplace_listing
           expect(marketplace_listing).to be_present
           expect(marketplace_listing.valid_publishable?).to be_truthy
           expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs.merge(status: "for_sale",

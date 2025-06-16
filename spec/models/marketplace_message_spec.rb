@@ -119,14 +119,12 @@ RSpec.describe MarketplaceMessage, type: :model do
     let(:other_user) { FactoryBot.create(:user_confirmed) }
 
     it "returns the marketplace_messages if present" do
-      expect do
-        MarketplaceMessage.thread_for!(user: sender, id: marketplace_listing_id)
-      end.to raise_error(ActiveRecord::RecordNotFound)
+      expect(MarketplaceMessage.thread_for!(user: sender, id: marketplace_listing_id)).to eq([])
       expect(marketplace_message).to be_present
       expect(MarketplaceMessage.thread_for!(user: sender, id: marketplace_listing_id).pluck(:id)).to eq([marketplace_message.id])
       expect(MarketplaceMessage.thread_for!(user: sender, id: marketplace_message.id).pluck(:id)).to eq([marketplace_message.id])
       expect(MarketplaceMessage.thread_for!(user: seller, id: marketplace_message.id).pluck(:id)).to eq([marketplace_message.id])
-      expect(MarketplaceMessage.send(:thread_for, user: seller, id: marketplace_listing_id).pluck(:id)).to be_blank
+      expect(MarketplaceMessage.send(:thread_for, user: seller, id: marketplace_listing_id)).to be_blank
       expect do
         MarketplaceMessage.thread_for!(user: seller, id: marketplace_listing_id).pluck(:id)
       end.to raise_error(ActiveRecord::RecordNotFound)
@@ -151,7 +149,7 @@ RSpec.describe MarketplaceMessage, type: :model do
 
   describe "can_send_message?" do
     let(:user) { FactoryBot.create(:user) }
-    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, status:) }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, status:) }
     let(:seller) { marketplace_listing.seller }
     let(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: user) }
     let(:status) { :for_sale }

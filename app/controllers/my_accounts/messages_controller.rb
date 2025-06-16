@@ -54,6 +54,7 @@ class MyAccounts::MessagesController < ApplicationController
   end
 
   def verify_can_see_message!(marketplace_listing, marketplace_message)
+    pp "----- #{MarketplaceMessage.can_see_messages?(user: current_user, marketplace_listing:, marketplace_message:)}"
     raise ActiveRecord::RecordNotFound unless MarketplaceMessage.can_see_messages?(
       user: current_user, marketplace_listing:, marketplace_message:
     )

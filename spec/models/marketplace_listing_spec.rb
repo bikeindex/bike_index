@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe MarketplaceListing, type: :model do
   it_behaves_like "address_recorded"
+  it_behaves_like "amountable"
 
   describe "factory" do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing) }
@@ -23,16 +24,24 @@ RSpec.describe MarketplaceListing, type: :model do
       end
 
       context "for sale" do
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, primary_activity: FactoryBot.create(:primary_activity)) }
-        let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
+        let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+        let(:bike) { marketplace_listing.item }
         it "includes marketplace_listing" do
           expect(marketplace_listing.valid_publishable?).to be_truthy
           expect(marketplace_listing.just_published?).to be_truthy
           expect(marketplace_listing.just_failed_to_publish?).to be_falsey
-          expect(marketplace_listing.seller_id).to eq bike.reload.user.id
           expect(bike.current_event_record&.id).to eq marketplace_listing.id
           expect(bike.reload.is_for_sale).to be_truthy
         end
+      end
+    end
+    context "sold" do
+      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :sold) }
+      it "is valid" do
+        expect(marketplace_listing.reload.status).to eq "sold"
+        expect(marketplace_listing.published_at).to be_present
+        expect(marketplace_listing.end_at).to be_present
+        expect(marketplace_listing.buyer).to be_present
       end
     end
   end

@@ -25,6 +25,7 @@ class Bikes::CalculateStoredLocation
     end
 
     private
+
     # Select the source from which to derive location data, in the following order
     # of precedence:
     #

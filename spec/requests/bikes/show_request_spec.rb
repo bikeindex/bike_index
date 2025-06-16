@@ -571,9 +571,9 @@ RSpec.describe "BikesController#show", type: :request do
   end
 
   context "with marketplace_listing" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity) }
     let(:current_user) { bike.reload.user }
-    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, status:) }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, item: bike, status:) }
     let(:status) { :draft }
 
     it "renders with preview" do
@@ -604,7 +604,9 @@ RSpec.describe "BikesController#show", type: :request do
       let(:current_user) { FactoryBot.create(:user_confirmed) }
 
       it "doesn't render" do
-        expect(marketplace_listing.visible_by?(current_user)).to be_falsey
+        expect(marketplace_listing.reload.visible_by?(current_user)).to be_falsey
+        expect(marketplace_listing.valid_publishable?).to be_truthy
+
         get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike

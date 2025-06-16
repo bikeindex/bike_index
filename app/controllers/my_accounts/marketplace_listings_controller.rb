@@ -5,7 +5,7 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
   before_action :ensure_user_allowed_to_edit!
 
   def update
-    og_status = @marketplace_listing.status
+    @marketplace_listing.status
 
     if @marketplace_listing.update(permitted_params_with_permitted_address)
       if @marketplace_listing.just_published?
@@ -19,7 +19,7 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
       end
     else
       flash[:error] = translation(:unable_to_update, item_type: @bike&.type,
-          errors: @marketplace_listing.errors.full_messages.to_sentence)
+        errors: @marketplace_listing.errors.full_messages.to_sentence)
     end
     return if return_to_if_present
 
@@ -49,10 +49,6 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
       end
     end
     pparams.delete(:status) unless %w[draft for_sale].include?(pparams[:status])
-    # if %w[draft for_sale].include?(pparams[:status]) && @marketplace_listing.status != new_status
-    #   @new_status = new_status
-    #   pparms[:status] = @new_status
-    # end
 
     pparams
   end
