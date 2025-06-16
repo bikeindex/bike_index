@@ -13,15 +13,8 @@ RSpec.shared_examples "address_recorded" do
       unless subject.instance_of?(User)
 
         expect(instance.address_record.id).to eq address_record.id
-        expect(address_record.reload.to_coordinates.any?).to be_truthy
-
-        # MarketplaceListing sets latitude from the passed address_record on save -
-        # but the job needs to update the associations, because the address record may change independently
-        if instance.latitude.present?
-          instance.update_columns(latitude: nil, longitude: nil)
-          instance.reload
-        end
         expect(instance.to_coordinates.any?).to be_falsey
+        expect(address_record.reload.to_coordinates.any?).to be_truthy
 
         job.new.perform(address_record.id)
 
