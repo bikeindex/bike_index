@@ -860,7 +860,7 @@ class Bike < ApplicationRecord
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.occurred_at = calculated_occurred_at
     self.current_ownership = calculated_current_ownership
-    set_location_info
+    self.attributes = BikeService::CalculateStoredLocation.location_attrs(self)
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at
@@ -893,8 +893,11 @@ class Bike < ApplicationRecord
 
   private
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> main
   def fetch_current_impound_record
     self.current_impound_record = impound_records.current.last
   end
