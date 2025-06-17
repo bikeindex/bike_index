@@ -2261,12 +2261,14 @@ es:
       optional:
       preview_it:
       price_is_negitiable:
-      publish_listing:
       publish_listing_when_ready:
       sale_description_html:
       save_to_preview:
       view_listing:
       why_are_you_selling:
+      draft:
+      for_sale:
+      publicly_listed:
   controllers:
     application:
       handle_unverified_request:
@@ -2385,6 +2387,14 @@ es:
         create:
           can_not_send_message:
           message_sent:
+      marketplace_listings:
+        ensure_user_allowed_to_edit!:
+          you_dont_own_that:
+        update:
+          item_published_for_sale:
+          marketplace_listing_updated:
+          unable_to_publish:
+          unable_to_update:
     oauth:
       applications:
         ensure_app_owner!:
@@ -2550,11 +2560,6 @@ es:
       edit:
         free_membership:
         no_active_membership:
-    marketplace_listings:
-      ensure_user_allowed_to_edit!:
-        you_dont_own_that:
-      update:
-        item_published_for_sale:
     search:
       registrations:
         set_interpreted_params:

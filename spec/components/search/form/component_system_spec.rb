@@ -107,7 +107,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       it "renders the counts" do
         expect(find("#query_items", visible: false).value).to eq(["v_9"])
 
-        %w[proximity stolen non].each { |stolenness| expect_count(stolenness, 0) }
+        %w[proximity stolen non for_sale].each { |stolenness| expect_count(stolenness, 0) }
         # It hides counts when new select options chosen
         # NEEDS TO BE FIXED
       end
@@ -115,9 +115,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     context "for_sale" do
       let(:preview_path) { "/rails/view_components/search/form/component/for_sale" }
-      # it "renders and updates" do
-      #   expect(find("#query_items", visible: false).value).to eq(["v_9"])
-      # end
+      it "renders and updates" do
+        expect(find("#query_items", visible: false).value).to eq([])
+      end
     end
   end
 end
