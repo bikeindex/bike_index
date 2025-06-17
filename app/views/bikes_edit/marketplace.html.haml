@@ -80,17 +80,17 @@
               = f.text_area :description, rows: 3, class: "form-control", placeholder: t(".why_are_you_selling")
               %span.below-input-help
                 = t(".sale_description_html", item_type_display: marketplace_listing.item_type_display, edit_item_path: edit_bike_path(@bike))
-          -# .form-group.row.unnested-field.pt-4.pb-3
-          -#   .form-well-label
+
           .form-group.row.unnested-field.full-width-section.no-divider-row.mt-5
-            %label{ class: "tw:inline-flex! tw:items-center tw:cursor-pointer tw:w-full tw:justify-center" }
-              %span{ class: "tw:mr-3 tw:block tw:text-lg" } Draft
-              = f.check_box :status, { class: "tw:sr-only tw:peer" }, "for_sale", "draft"
-              %div{ class: "tw:relative tw:w-14 tw:h-7 tw:bg-gray-200 tw:rounded-full tw:peer tw:peer-focus:ring-4 tw:peer-focus:ring-blue-300 tw:dark:peer-focus:ring-blue-800 tw:dark:bg-gray-700 tw:peer-checked:after:translate-x-full tw:peer-checked:after:border-white tw:after:content-[''] tw:after:absolute tw:after:top-0.5 tw:after:start-[4px] tw:after:bg-white tw:after:border-gray-300 tw:after:border tw:after:rounded-full tw:after:h-6 tw:after:w-6 tw:after:transition-all tw:dark:border-gray-600 tw:peer-checked:bg-blue-600 tw:dark:peer-checked:bg-blue-600" }
+            %label{class: "tw:inline-flex! tw:items-center tw:cursor-pointer tw:w-full tw:justify-center"}
+              %span{class: "tw:mr-3 tw:block tw:text-lg"}
+                = t(".draft")
+              = f.check_box :status, {class: "tw:sr-only tw:peer" }, "for_sale", "draft"
+              %div{class: "tw:relative tw:w-14 tw:h-7 tw:bg-gray-200 tw:rounded-full tw:peer tw:peer-focus:ring-4 tw:peer-focus:ring-blue-300 tw:dark:peer-focus:ring-blue-800 tw:dark:bg-gray-700 tw:peer-checked:after:translate-x-full tw:peer-checked:after:border-white tw:after:content-[''] tw:after:absolute tw:after:top-0.5 tw:after:start-[4px] tw:after:bg-white tw:after:border-gray-300 tw:after:border tw:after:rounded-full tw:after:h-6 tw:after:w-6 tw:after:transition-all tw:dark:border-gray-600 tw:peer-checked:bg-blue-600 tw:dark:peer-checked:bg-blue-600"}
               %span{class: "tw:ms-3"}
                 %strong{class: "tw:text-lg tw:font-bold" }
-                  For sale
-                (publicly listed)
+                  = t(".for_sale")
+                = t(".publicly_listed")
 
 
         = render "/shared/form_well_footer_save"
