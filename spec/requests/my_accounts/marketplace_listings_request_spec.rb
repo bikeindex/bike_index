@@ -83,7 +83,11 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
         let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, item: bike, amount_cents: 400, status:) }
         let(:status) { :draft }
         let(:address_record) { marketplace_listing.address_record }
-        let(:params) { {marketplace_listing: marketplace_listing_params.merge(id: marketplace_listing.id, amount_with_nil: "")} }
+        let(:new_status) { "draft" }
+        let(:params) do
+          {marketplace_listing: marketplace_listing_params
+            .merge(id: marketplace_listing.id, amount_with_nil: "", status: new_status)}
+        end
 
         it "updates existing marketplace_listing and address_record" do
           expect(marketplace_listing.reload.seller_id).to eq user.id
@@ -145,7 +149,8 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
         context "for_sale updated with invalid setting" do
           let(:status) { :for_sale }
           let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, primary_activity_id:) }
-          let(:actual_updated_attrs) { target_marketplace_attrs.except(:amount_cents).merge(status: "for_sale") }
+          let(:new_status) { "for_sale" }
+          let(:actual_updated_attrs) { target_marketplace_attrs.merge(amount_cents: nil, status: "draft") }
 
           it "re-renders" do
             expect(marketplace_listing.reload.seller_id).to eq user.id
@@ -153,11 +158,9 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
             expect(marketplace_listing.valid_publishable?).to be_truthy
 
             make_update_bike_request(url: update_url, params:, marketplace_listing_change: 0, address_record_change: 0)
-            pp params, flash
-            expect(flash[:error]).to be_present
 
-            expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs.except(:amount_cents)
-            expect(marketplace_listing.address_record_id).to eq og_marketplace_address_record_id
+            expect(marketplace_listing.reload).to match_hash_indifferently actual_updated_attrs
+            expect(flash[:error]).to be_present
             # sanity check, to make absolutely sure
             expect(marketplace_listing.status).to eq "draft"
           end

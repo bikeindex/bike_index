@@ -5,8 +5,6 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
   before_action :ensure_user_allowed_to_edit!
 
   def update
-    @marketplace_listing.status
-
     if @marketplace_listing.update(permitted_params_with_permitted_address)
       if @marketplace_listing.just_published?
         flash[:success] = translation(:item_published_for_sale, item_type: @bike&.type)

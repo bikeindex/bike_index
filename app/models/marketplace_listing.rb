@@ -123,11 +123,11 @@ class MarketplaceListing < ApplicationRecord
   end
 
   def just_published?
-    @updated_for_sale && for_sale?
+    @updated_for_sale && status == "for_sale" || false
   end
 
   def just_failed_to_publish?
-    @failed_to_publish && draft?
+    @failed_to_publish && status == "draft" || false
   end
 
   def valid_publishable?
