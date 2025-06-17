@@ -2384,13 +2384,15 @@ nb:
       optional: valgfri
       preview_it: Forhåndsvis oppføringen
       price_is_negitiable: Prisen er omsettelig
-      publish_listing: publiser oppføring
       publish_listing_when_ready: Publiser annonsen når du er klar til å selge!
       sale_description_html: Tilleggsinformasjon spesifikk for salget. Skriv inn informasjon
         om %{item_type_display} <a href="%{edit_item_path}">her</a> .
       save_to_preview: Lagre oppføringen for å kunne forhåndsvise den
       view_listing: Se oppføringen din
       why_are_you_selling: Hvorfor selger du dette? Hva bør en potensiell kjøper vite?
+      draft: Utkast
+      for_sale: Til salgs
+      publicly_listed: "(børsnotert)"
   controllers:
     application:
       handle_unverified_request:
@@ -2524,6 +2526,15 @@ nb:
         create:
           can_not_send_message: Beklager, du kan ikke sende en melding til den oppføringen
           message_sent: Melding sendt
+      marketplace_listings:
+        ensure_user_allowed_to_edit!:
+          you_dont_own_that: Å nei! Det ser ut som du ikke eier den %{item_type}.
+        update:
+          item_published_for_sale: Din %{item_type} er publisert. Den er nå lagt ut
+            for salg!
+          marketplace_listing_updated: Markedsplassoppføringen din er oppdatert!
+          unable_to_publish: 'Kan ikke publisere %{item_type} for salg: %{errors}'
+          unable_to_update: 'Kan ikke lagre %{item_type}: %{errors}'
     oauth:
       applications:
         ensure_app_owner!:
@@ -2732,12 +2743,6 @@ nb:
           til support@bikeindex.org hvis du har spørsmål.
         no_active_membership: Du har ikke et aktivt medlemskap, du må registrere deg
           for et nytt.
-    marketplace_listings:
-      ensure_user_allowed_to_edit!:
-        you_dont_own_that: Å nei! Det ser ut som du ikke eier den %{item_type}.
-      update:
-        item_published_for_sale: Din %{item_type} er publisert. Den er nå lagt ut
-          for salg!
     search:
       registrations:
         set_interpreted_params:

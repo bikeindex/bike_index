@@ -20,6 +20,7 @@ class MyAccounts::MessagesController < ApplicationController
       @initial_record.marketplace_listing
     end
 
+    # raises if can't see
     @can_send_message = verify_can_see_message!(@marketplace_listing, @initial_record)
 
     if @can_send_message
@@ -29,10 +30,11 @@ class MyAccounts::MessagesController < ApplicationController
 
   def create
     @marketplace_message = MarketplaceMessage.new(permitted_params)
+
     @marketplace_listing ||= @marketplace_message.marketplace_listing # enables rendering!
 
-    # raise if can't see
-    verify_can_see_message!(@marketplace_listing, @marketplace_message)
+    # raises if can't see
+    @can_send_message = verify_can_see_message!(@marketplace_listing, @marketplace_message)
 
     if !@marketplace_message.can_send?
       flash[:error] = translation(:can_not_send_message)
@@ -68,7 +70,7 @@ class MyAccounts::MessagesController < ApplicationController
   end
 
   def matching_marketplace_thread
-    MarketplaceMessage.thread_for(user: current_user, id: params[:id])
+    MarketplaceMessage.thread_for!(user: current_user, id: params[:id])
   end
 
   def matching_marketplace_messages

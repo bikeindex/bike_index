@@ -1538,13 +1538,15 @@ en:
       choose_condition: Choose condition
       condition: Condition
       description: Description
+      draft: Draft
+      for_sale: For sale
       listing_draft: Listing draft
       listing_is_published: Listing is published
       optional: optional
       preview_it: Preview the listing
       price: Price
       price_is_negitiable: Price is negotiable
-      publish_listing: publish listing
+      publicly_listed: "(publicly listed)"
       publish_listing_when_ready: Publish listing when you're ready to sell!
       sale_description_html: >-
         Additional information specific to the sale. Put information about the %{item_type_display}
@@ -1804,12 +1806,6 @@ en:
         lock_created: Lock created successfully!
       find_lock:
         not_your_lock: Whoops, that's not your lock!
-    marketplace_listings:
-      ensure_user_allowed_to_edit!:
-        you_dont_own_that: Oh no! It looks like you don't own that %{item_type}.
-      update:
-        item_published_for_sale: Your %{item_type} has been published. It is now listed
-          for sale!
     memberships:
       edit:
         free_membership: >-
@@ -1825,6 +1821,15 @@ en:
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
         user_settings: User Settings
+      marketplace_listings:
+        ensure_user_allowed_to_edit!:
+          you_dont_own_that: Oh no! It looks like you don't own that %{item_type}.
+        update:
+          item_published_for_sale: Your %{item_type} has been published. It is now
+            listed for sale!
+          marketplace_listing_updated: Your marketplace listing has been updated!
+          unable_to_publish: 'Unable to publish %{item_type} for sale: %{errors}'
+          unable_to_update: 'Unable to save %{item_type}: %{errors}'
       messages:
         create:
           can_not_send_message: Sorry, you can't send a message to that listing

@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe MarketplaceListing, type: :model do
   it_behaves_like "address_recorded"
+  it_behaves_like "amountable"
 
   describe "factory" do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing) }
@@ -18,16 +19,29 @@ RSpec.describe MarketplaceListing, type: :model do
       it "uses bike user" do
         expect(bike.reload.user&.id).to be_present
         expect(marketplace_listing.seller_id).to eq bike.user.id
+        expect(marketplace_listing.just_failed_to_publish?).to be_falsey
         expect(bike.current_event_record&.id).to be_blank
       end
 
       context "for sale" do
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, is_for_sale: true) }
-        let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
+        let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+        let(:bike) { marketplace_listing.item }
         it "includes marketplace_listing" do
-          expect(marketplace_listing.seller_id).to eq bike.reload.user.id
+          expect(marketplace_listing.valid_publishable?).to be_truthy
+          expect(marketplace_listing.just_published?).to be_truthy
+          expect(marketplace_listing.just_failed_to_publish?).to be_falsey
           expect(bike.current_event_record&.id).to eq marketplace_listing.id
+          expect(bike.reload.is_for_sale).to be_truthy
         end
+      end
+    end
+    context "sold" do
+      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :sold) }
+      it "is valid" do
+        expect(marketplace_listing.reload.status).to eq "sold"
+        expect(marketplace_listing.published_at).to be_present
+        expect(marketplace_listing.end_at).to be_present
+        expect(marketplace_listing.buyer).to be_present
       end
     end
   end
@@ -102,147 +116,7 @@ RSpec.describe MarketplaceListing, type: :model do
     end
   end
 
-  describe "permitted_update" do
-    let(:user) { FactoryBot.create(:superuser) }
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
-    let(:params) { ActionController::Parameters.new(nested_params) }
-    let!(:current_ownership) { bike.reload.current_ownership }
-    let(:address_record) { nil }
-    let(:default_address_record_attrs) do
-      {
-        country_id: Country.canada_id.to_s,
-        city: "Edmonton",
-        region_record_id: "",
-        region_string: "AB",
-        postal_code: "AB T6G 2B3",
-        user_account_address: "0",
-        id: address_record&.id
-      }
-    end
-    let(:address_record_attributes) { default_address_record_attrs }
-
-    let(:nested_params) do
-      {
-        bike: {
-          current_marketplace_listing_attributes: {
-            condition: "good",
-            amount_with_nil: "300.69",
-            address_record_attributes:
-          }
-        }
-      }
-    end
-    let(:target_address_attrs) do
-      default_address_record_attrs.except(:id)
-        .merge(user_id: user.id, kind: :marketplace_listing, publicly_visible_attribute: :postal_code)
-    end
-
-    def update_with_bike_updator(user:, bike:, current_ownership:, params:, marketplace_listing_change: 1, address_record_change: 1)
-      Sidekiq::Job.clear_all
-
-      expect do
-        BikeUpdator.new(user:, bike:, params:, current_ownership:).update_available_attributes
-      end.to change(MarketplaceListing, :count).by(marketplace_listing_change)
-        .and change(AddressRecord, :count).by address_record_change
-
-      # Required to set the correct attributes on created address record
-      Callbacks::AddressRecordUpdateAssociationsJob.drain
-
-      bike.reload
-    end
-
-    it "permits the expected active controller params" do
-      update_with_bike_updator(user:, bike:, params:, current_ownership:)
-
-      expect(bike.current_marketplace_listing).to be_present
-      marketplace_listing = bike.current_marketplace_listing
-      expect(marketplace_listing.amount_cents).to eq 30069
-      expect(marketplace_listing.condition).to eq "good"
-
-      expect(marketplace_listing.address_record_id).to be_present
-      expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
-    end
-
-    # TODO: update when MARKETPLACE_FREE_UNTIL changes
-    # context "user can not create listings" do
-    #   let(:user) { FactoryBot.create(:user_confirmed) }
-
-    #   it "updates the marketplace_listing (not creating)" do
-    #     expect(user.reload.can_create_listing?).to be_falsey
-    #     update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0, address_record_change: 0)
-    #     expect(bike.current_marketplace_listing&.id).to be_blank
-    #   end
-    # end
-
-    context "existing user_account_address" do
-      let!(:address_record) { FactoryBot.create(:address_record, user:, kind: :user) }
-      before do
-        Callbacks::AddressRecordUpdateAssociationsJob.new.perform(address_record.id)
-        expect(user.reload.address_record_id).to be_present
-      end
-
-      it "permits the expected active controller params" do
-        update_with_bike_updator(user:, bike:, params:, current_ownership:)
-
-        expect(bike.current_marketplace_listing).to be_present
-        marketplace_listing = bike.current_marketplace_listing
-        expect(marketplace_listing.amount_cents).to eq 30069
-        expect(marketplace_listing.condition).to eq "good"
-
-        expect(marketplace_listing.address_record_id).to be_present
-        expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
-      end
-
-      context "with user_account_address: true" do
-        let(:address_record_attributes) { default_address_record_attrs.merge(user_account_address: "1") }
-
-        it "uses the address_record" do
-          bike.reload
-          update_with_bike_updator(user:, bike:, params:, current_ownership:, address_record_change: 0)
-          expect(bike.current_marketplace_listing).to be_present
-          marketplace_listing = bike.current_marketplace_listing
-          expect(marketplace_listing.amount_cents).to eq 30069
-          expect(marketplace_listing.condition).to eq "good"
-
-          expect(marketplace_listing.address_record_id).to eq address_record.id
-          expect(address_record.reload.kind).to eq "user"
-        end
-      end
-    end
-
-    context "with existing marketplace_listing" do
-      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, seller: bike.user, condition: :new_in_box, amount_cents: nil) }
-
-      it "doesn't create a new marketplace_listing" do
-        expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
-
-        update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0)
-        expect(bike.current_marketplace_listing.id).to eq marketplace_listing.id
-        expect(marketplace_listing.reload.amount_cents).to eq 30069
-        expect(marketplace_listing.condition).to eq "good"
-
-        # Updating without passing current_marketplace_listing_attributes doesn't remove the listing
-        BikeUpdator.new(user:, bike:, current_ownership:, permitted_params: {bike: {name: "New name"}}.as_json).update_available_attributes
-        expect(bike.reload.name).to eq "New name"
-        expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
-      end
-
-      # TODO: update when MARKETPLACE_FREE_UNTIL changes
-      # context "user can not create listings" do
-      #   let(:user) { FactoryBot.create(:user_confirmed) }
-
-      #   it "updates the marketplace_listing (not creating)" do
-      #     expect(user.reload.can_create_listing?).to be_falsey
-      #     update_with_bike_updator(user:, bike:, params:, current_ownership:, marketplace_listing_change: 0)
-      #     expect(bike.current_marketplace_listing.id).to eq marketplace_listing.id
-      #     expect(marketplace_listing.reload.amount_cents).to eq 30069
-      #     expect(marketplace_listing.condition).to eq "good"
-      #   end
-      # end
-    end
-  end
-
-  describe "validate_publishable?" do
+  describe "validate_publishable!" do
     let(:user_hidden) { false }
     let(:primary_activity) { FactoryBot.create(:primary_activity) }
     let(:item) { FactoryBot.create(:bike, :with_ownership_claimed, user_hidden:, cycle_type: :stroller, primary_activity:) }
@@ -251,14 +125,14 @@ RSpec.describe MarketplaceListing, type: :model do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item:, address_record:, condition: "poor") }
 
     it "is truthy" do
-      expect(marketplace_listing.validate_publishable?).to be_truthy
+      expect(marketplace_listing.validate_publishable!).to be_truthy
       expect(marketplace_listing.errors.full_messages).to eq([])
     end
 
     context "no price" do
       it "is false" do
         marketplace_listing.amount_cents = nil
-        expect(marketplace_listing.validate_publishable?).to be_falsey
+        expect(marketplace_listing.validate_publishable!).to be_falsey
         expect(marketplace_listing.errors.full_messages).to eq(["Price is required"])
       end
     end
@@ -266,7 +140,7 @@ RSpec.describe MarketplaceListing, type: :model do
       let(:user_hidden) { true }
       it "is false when item is missing" do
         expect(item.reload.current?).to be_falsey
-        expect(marketplace_listing.validate_publishable?).to be_falsey
+        expect(marketplace_listing.validate_publishable!).to be_falsey
         expect(marketplace_listing.errors.full_messages).to eq(["Stroller is not visible - maybe you marked it hidden?"])
       end
     end
@@ -277,6 +151,59 @@ RSpec.describe MarketplaceListing, type: :model do
     it "is visible by the user" do
       expect(marketplace_listing.visible_by?).to be_falsey
       expect(marketplace_listing.visible_by?(marketplace_listing.seller)).to be_truthy
+    end
+  end
+
+  describe "publishing" do
+    let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
+    let(:marketplace_listing) do
+      FactoryBot.build(:marketplace_listing, :for_sale, item:, published_at: nil, primary_activity_id:)
+    end
+    let(:item) { FactoryBot.create(:bike) }
+
+    it "assigns published_at, then removes when marked draft" do
+      expect(item.reload.is_for_sale).to be_falsey
+      expect(item.primary_activity_id).to be_blank
+      expect(marketplace_listing.published_at).to be_blank
+      expect(marketplace_listing.save).to be_truthy
+      expect(marketplace_listing.just_published?).to be_truthy
+      expect(marketplace_listing.published_at).to be_within(1).of Time.current
+      expect(item.reload.is_for_sale).to be_truthy
+      marketplace_listing.validate_publishable!
+      expect(marketplace_listing.errors.full_messages).to be_blank
+      # Marking draft again makes it not for sale
+      marketplace_listing.update(status: "draft")
+      expect(marketplace_listing.reload.published_at).to be_nil
+      expect(item.reload.is_for_sale).to be_falsey
+    end
+
+    context "with not valid publishable" do
+      let(:primary_activity_id) { nil }
+
+      it "is saves, but as draft" do
+        expect(marketplace_listing.status).to eq "for_sale"
+        expect(marketplace_listing.save).to be_truthy
+        expect(marketplace_listing.just_published?).to be_falsey
+        expect(marketplace_listing.just_failed_to_publish?).to be_truthy
+        expect(marketplace_listing.id).to be_present
+        expect(marketplace_listing.status).to eq "draft"
+        expect(marketplace_listing.published_at).to be_nil
+
+        expect(item.reload.is_for_sale).to be_falsey
+        marketplace_listing.validate_publishable!
+        expect(marketplace_listing.errors.full_messages).to be_present
+      end
+    end
+
+    context "updating with not valid for sale params" do
+      it "saves but marks draft" do
+        expect(marketplace_listing.save).to be_truthy
+        expect(marketplace_listing.status).to eq "for_sale"
+        expect(marketplace_listing.update(amount_with_nil: nil)).to be_truthy
+        expect(marketplace_listing.reload.amount_cents).to be_nil
+        expect(marketplace_listing.status).to eq "draft"
+        expect(marketplace_listing.valid_publishable?).to be_falsey
+      end
     end
   end
 end

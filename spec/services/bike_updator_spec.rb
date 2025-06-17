@@ -21,7 +21,7 @@ RSpec.describe BikeUpdator do
 
   describe "update_ownership" do
     let(:email) { "something@fake.com" }
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: email) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, owner_email: email) }
     let(:user) { bike.user }
     let(:ownership) { bike.ownerships.first }
     let(:passed_params) { {id: bike.id, bike: {owner_email: "another@email.co"}} }
@@ -49,12 +49,11 @@ RSpec.describe BikeUpdator do
     # NOTE: This is intended as a fallback catch
     # There should be specific functionality added for handling sales
     context "when there is a marketplace listing" do
-      let(:status) { :draft }
-      let(:published_at) { nil }
-      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike, status:, published_at:) }
-      before { bike.update(is_for_sale: true) }
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
 
       it "updates the marketplace_listing to be removed" do
+        expect(marketplace_listing.reload.status).to eq "draft"
+        bike.update_column :is_for_sale, true
         Sidekiq::Job.clear_all
 
         expect(marketplace_listing.reload.bike_ownership&.id).to eq ownership.id
@@ -71,11 +70,12 @@ RSpec.describe BikeUpdator do
       end
 
       context "with published_at" do
-        let(:published_at) { Time.current - 1 }
+        let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
         it "updates the marketplace_listing to be removed" do
+          expect(marketplace_listing.reload.status).to eq "for_sale"
+          expect(bike.reload.is_for_sale).to be_truthy
           Sidekiq::Job.clear_all
 
-          expect(marketplace_listing.reload.status).to eq "draft"
           expect(marketplace_listing.current?).to be_truthy
           expect do
             BikeUpdator.new(bike:, params:, user: user).update_available_attributes

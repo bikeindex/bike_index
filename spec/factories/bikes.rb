@@ -11,6 +11,10 @@ FactoryBot.define do
     propulsion_type { "foot-pedal" }
     skip_geocoding { true }
 
+    trait :with_primary_activity do
+      primary_activity { FactoryBot.create(:primary_activity) }
+    end
+
     trait :with_image do
       after(:create) do |bike|
         FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike)

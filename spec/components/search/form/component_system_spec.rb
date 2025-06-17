@@ -16,11 +16,27 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     # ... but the behavior should be the same for any updated combobox plugin
 
     before do
-      # Stub the API_URL to use the production autocomplete url, for more accurate testing
+      # Stub the API_URL to use the production urls, for more accurate testing
       stub_const("Search::EverythingCombobox::Component::API_URL", "https://bikeindex.org/api/autocomplete")
       visit(preview_path)
       # Clear localStorage
       page.execute_script("window.localStorage.clear()")
+    end
+
+    def expect_count(stolenness, value = :greater_than_zero)
+      stolenness_text = find("[data-count-target=\"#{stolenness}\"]").text
+      # Check that the text matches the pattern (\d+) and extract the number
+      number = stolenness_text.match(/\((\d+)\)/)
+
+      expect(number).not_to be_nil
+
+      if value == :greater_than_zero
+        expect(number.present? && number[1].to_i > 0).to be_truthy,
+          "Expected #{stolenness} count be > 0 in parentheses, but got: '#{number}'"
+      else
+        expect(number.present? && number[1].to_i).to eq(value),
+          "Expected #{stolenness} count eq(#{value}) in parentheses, but got: '#{number}'"
+      end
     end
 
     it "submits when enter is pressed twice" do
@@ -85,13 +101,23 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     context "chicago_tall_bike" do
       let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
+      # Maybe TODO: get real results for counts
+      # let(:production_count_url) { "https://bikeindex.org/api/v3/search/count" }
+      # allow_any_instance_of(Search::KindSelectFields::Component).to receive(:api_count_url).and_return(production_count_url)
       it "renders the counts" do
         expect(find("#query_items", visible: false).value).to eq(["v_9"])
+
+        %w[proximity stolen non for_sale].each { |stolenness| expect_count(stolenness, 0) }
+        # It hides counts when new select options chosen
+        # NEEDS TO BE FIXED
       end
     end
 
     context "for_sale" do
-      it "renders and updates"
+      let(:preview_path) { "/rails/view_components/search/form/component/for_sale" }
+      it "renders and updates" do
+        expect(find("#query_items", visible: false).value).to eq([])
+      end
     end
   end
 end

@@ -2500,18 +2500,21 @@ nl:
         create:
           can_not_send_message: Helaas kunt u geen bericht naar deze advertentie sturen
           message_sent: Bericht verzonden
+      marketplace_listings:
+        ensure_user_allowed_to_edit!:
+          you_dont_own_that: Oh nee! Het lijkt erop dat je die %{item_type} niet hebt.
+        update:
+          item_published_for_sale: Uw %{item_type} is gepubliceerd. Het staat nu te
+            koop!
+          marketplace_listing_updated: Uw marktplaatsvermelding is bijgewerkt!
+          unable_to_publish: 'Kan %{item_type} niet te koop aanbieden: %{errors}'
+          unable_to_update: 'Kan %{item_type} niet opslaan: %{errors}'
     memberships:
       edit:
         free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
           een e-mail naar support@bikeindex.org als u vragen hebt.
         no_active_membership: Als u nog geen actief lidmaatschap heeft, moet u zich
           aanmelden voor een nieuw lidmaatschap.
-    marketplace_listings:
-      ensure_user_allowed_to_edit!:
-        you_dont_own_that: Oh nee! Het lijkt erop dat je die %{item_type} niet hebt.
-      update:
-        item_published_for_sale: Uw %{item_type} is gepubliceerd. Het staat nu te
-          koop!
     search:
       registrations:
         set_interpreted_params:
@@ -6038,7 +6041,6 @@ nl:
       optional: optioneel
       preview_it: Bekijk een voorbeeld van de aanbieding
       price_is_negitiable: Prijs is onderhandelbaar
-      publish_listing: lijst publiceren
       publish_listing_when_ready: Publiceer de advertentie wanneer u klaar bent om
         te verkopen!
       sale_description_html: Aanvullende informatie specifiek voor de verkoop. Plaats
@@ -6046,6 +6048,9 @@ nl:
       save_to_preview: Sla de aanbieding op om er een voorbeeld van te kunnen bekijken
       view_listing: Bekijk uw vermelding
       why_are_you_selling: Waarom verkoop je dit? Wat moet een potentiële koper weten?
+      draft: Voorlopige versie
+      for_sale: Te koop
+      publicly_listed: "(openbaar genoteerd)"
   bike_versions:
     index:
       primary_colors: Primaire kleuren

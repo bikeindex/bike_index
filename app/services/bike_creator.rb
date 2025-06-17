@@ -18,8 +18,7 @@ class BikeCreator
       [
         stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
         impound_records_attributes: permitted_impound_attrs,
-        components_attributes: Component.permitted_attributes,
-        current_marketplace_listing_attributes: MarketplaceListing.seller_permitted_parameters
+        components_attributes: Component.permitted_attributes
       ]
     ).freeze
   end

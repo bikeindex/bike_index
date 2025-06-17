@@ -52,11 +52,13 @@ class MarketplaceListing < ApplicationRecord
   validates_presence_of :status
 
   before_validation :set_calculated_attributes
+  after_commit :update_bike_for_sale
 
   scope :current, -> { where(status: CURRENT_STATUSES) }
 
   # validate that there isn't another current listing for an item
-  # validate when marked for_sale that it has all the required attributes
+
+  delegate :primary_activity, :primary_activity_id, :user, to: :item, allow_nil: true
 
   class << self
     # Only works for bikes currently...
@@ -79,13 +81,6 @@ class MarketplaceListing < ApplicationRecord
 
     def condition_with_description_humanized(str)
       [condition_humanized(str), condition_description_humanized(str)].join(" - ")
-    end
-
-    def seller_permitted_parameters
-      [
-        :condition, :amount_with_nil, :price_negotiable, :description,
-        address_record_attributes: (AddressRecord.permitted_params + %i[user_account_address])
-      ].freeze
     end
 
     def status_humanized(str)
@@ -116,6 +111,10 @@ class MarketplaceListing < ApplicationRecord
     self.class.condition_humanized(condition)
   end
 
+  def primary_activity_id=(val)
+    item&.update(primary_activity_id: val)
+  end
+
   # make this more sophisticated!
   def still_for_sale_at
     return nil unless for_sale?
@@ -123,25 +122,26 @@ class MarketplaceListing < ApplicationRecord
     item&.updated_by_user_at
   end
 
-  def publish!
-    return false unless validate_publishable?
+  def just_published?
+    @updated_for_sale && status == "for_sale" || false
+  end
 
-    update(published_at: Time.current, status: "for_sale")
-    item&.update(is_for_sale: true) # Only relevant to bikes
-    true
+  def just_failed_to_publish?
+    @failed_to_publish && status == "draft" || false
   end
 
   def valid_publishable?
-    return false if id.blank? || item.blank? || !item.current? || item.primary_activity.blank?
+    return false if item.blank? || !item.current? || primary_activity.blank?
 
     amount_cents.present? && condition.present? && address_record&.address_present?
   end
 
-  def validate_publishable?
+  # Validate here doesn't save, but it adds errors
+  def validate_publishable!
     if item.blank? || !item.current?
       # Ensure the item is still around and visible
       errors.add(:base, :item_not_visible, item_type: item_type_display)
-    elsif item.primary_activity.blank?
+    elsif primary_activity.blank?
       errors.add(:base, :primary_activity_required, item_type: item_type_display)
     end
 
@@ -179,9 +179,35 @@ class MarketplaceListing < ApplicationRecord
 
   private
 
+  def update_bike_for_sale
+    return unless @updated_for_sale && item_type == "Bike"
+
+    # If updating an older marketplace_listing, make sure it doesn't update the bike
+    if item&.current_marketplace_listing.blank? || item&.current_marketplace_listing&.id == id
+      item.update(is_for_sale: for_sale?)
+    end
+  end
+
   def set_calculated_attributes
     self.seller_id ||= item.user&.id
-    self.status ||= :draft
+    self.status ||= "draft"
+
+    if status == "for_sale"
+      if valid_publishable?
+        self.published_at ||= Time.current
+      else
+        @failed_to_publish = true
+        self.status = "draft"
+      end
+    end
+
+    @updated_for_sale = status_changed?
+    self.published_at = nil if status == "draft"
     self.end_at ||= Time.current unless current?
+
+    if address_record&.latitude.present?
+      self.latitude = address_record.latitude
+      self.longitude = address_record.longitude
+    end
   end
 end
