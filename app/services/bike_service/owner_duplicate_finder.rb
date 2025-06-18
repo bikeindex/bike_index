@@ -1,5 +1,5 @@
 # Used when registering new bikes, to prevent registering duplicate bikes
-module OwnerDuplicateBikeFinder
+module BikeService::OwnerDuplicateFinder
   # Finds bikes with the given serial number `serial` associated with email
   # address `owner_email`.
   #

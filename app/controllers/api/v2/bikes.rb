@@ -95,7 +95,7 @@ module API
 
         def owner_duplicate_bike(bikes: nil)
           @manufacturer_id ||= Manufacturer.friendly_find_id(params[:manufacturer])
-          OwnerDuplicateBikeFinder.matching(serial: params[:serial],
+          BikeService::OwnerDuplicateFinder.matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
             manufacturer_id: @manufacturer_id,

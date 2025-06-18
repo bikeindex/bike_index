@@ -471,7 +471,7 @@ RSpec.describe BikeService::Creator do
       let(:bike_params) { default_params }
       let(:email) { "something@gmail.com" }
       let(:new_email) { "Something@GMAIL.com" }
-      let(:found_duplicate) { OwnerDuplicateBikeFinder.matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email], manufacturer_id: bike_params[:manufacturer_id]).first }
+      let(:found_duplicate) { BikeService::OwnerDuplicateFinder.matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email], manufacturer_id: bike_params[:manufacturer_id]).first }
       def expect_duplicate_found
         expect(b_param.no_duplicate?).to be_truthy
         expect(found_duplicate&.id).to eq existing_bike.id
