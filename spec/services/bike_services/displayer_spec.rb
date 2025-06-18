@@ -324,9 +324,9 @@ RSpec.describe BikeServices::Displayer do
           expect(marketplace_listing.reload.status).to eq "for_sale"
           expect(bike.reload.status).to eq "status_with_owner"
           expect(bike.is_for_sale).to be_truthy
-          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
-          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
-          expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
+          expect(BikeServices::Displayer.display_edit_address_fields?(bike, user)).to be_falsey
+          expect(BikeServices::Displayer.user_edit_bike_address?(bike, user)).to be_truthy
+          expect(BikeServices::Displayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
       context "user_registration_organization" do
