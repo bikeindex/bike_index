@@ -48,7 +48,7 @@
   <%= select_tag :query_items,
     options_for_select(@opt_vals, selected: @opt_vals.map(&:last)),
     placeholder: translation(".search_descriptions"),
-    class: "tw:w-full tw:hidden fieldResetsCounts",
+    class: "tw:w-full tw:hidden fieldResetsCounts", # note: resetting counts is actually handled by select2 callback
     multiple: true,
     "data-search--everything-combobox--component-target" => "input" %>
 

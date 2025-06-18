@@ -108,8 +108,24 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         expect(find("#query_items", visible: false).value).to eq(["v_9"])
 
         %w[proximity stolen non for_sale].each { |stolenness| expect_count(stolenness, 0) }
-        # It hides counts when new select options chosen
-        # NEEDS TO BE FIXED
+
+        find(".select2-container").click
+        # Wait for select2 to load
+        expect(page).to have_content("Bikes that are Black", wait: 5)
+
+        page.send_keys :arrow_down
+        page.send_keys :arrow_down
+        page.send_keys :arrow_down
+
+        page.send_keys :return
+
+        # NOTE: Since this uses production data, values are consistent
+        expect(find("#query_items", visible: false).value).to match_array(%w[v_9 c_5])
+
+        proximity_text = find("[data-test-id=\"Search::KindOption-proximity\"]").text
+
+        # Counts should have been hidden because a new item was added
+        expect(proximity_text.strip).to eq("Stolen in search area")
       end
     end
 

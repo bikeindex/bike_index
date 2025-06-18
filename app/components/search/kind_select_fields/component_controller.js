@@ -18,6 +18,8 @@ export default class extends Controller {
   disconnect () {
     this.resetStolennessCounts() // also removes the bindings
     this.form.removeEventListener('change', this.updateForSaleLink.bind(this))
+    // Remove reset count function from window
+    window.resetStolennessCounts = null;
   }
 
   get form () {
@@ -33,8 +35,9 @@ export default class extends Controller {
   updateForSaleLink () {
     console.log(this.searchQuery)
     const link = document.getElementById('kindSelectForSaleLink')
+
     if (link) {
-      link.href = `/marketplace?${this.searchQuery}`
+      link.href = `${link.getAttribute('data-basepath')}?${this.searchQuery}`
     }
   }
 
@@ -112,6 +115,8 @@ export default class extends Controller {
       field._boundResetFunction = this.resetStolennessCounts.bind(this)
       field.addEventListener('change', field._boundResetFunction)
     })
+    // Add reset function to window so it can be called by select2 callback
+    window.resetStolennessCounts = this.resetStolennessCounts.bind(this)
   }
 
   resetStolennessCounts () {
@@ -133,7 +138,6 @@ export default class extends Controller {
 
   insertTabCounts (counts) {
     for (const stolenness of Object.keys(counts)) {
-      console.log(stolenness)
       this.updateCount(stolenness, this.displayedCountNumber(counts[stolenness]))
     }
   }

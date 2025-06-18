@@ -34,7 +34,7 @@
         <li class="<%= li_classes(opt) %>">
           <%= render(Search::KindOption::Component.new(
                 option_kind: :stolenness, option: opt, option_text: translation(".stolenness_#{opt}"),
-                is_selected: opt_selected?(opt), is_button: opt_is_button?(opt)
+                is_selected: opt_selected?(opt), button_url: opt_url(opt)
               )) %>
         </li>
       <% end %>
