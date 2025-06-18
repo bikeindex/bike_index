@@ -50,9 +50,9 @@ export default class extends Controller {
   }
 
   updateLocationVisibility () {
-    const selectedValue = this.element.querySelector(`input[name="${this.optionKinds}"]:checked`)?.value
+    const selectedValue = this.element.querySelector(`input[name="${this.optionKindsValue}"]:checked`)?.value
 
-    if (selectedValue === 'proximity' || selectedValue === 'for_sale') {
+    if (selectedValue === 'proximity' || selectedValue === 'for_sale_proximity') {
       collapse('show', this.locationWrapTarget)
     } else {
       collapse('hide', this.locationWrapTarget)
