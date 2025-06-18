@@ -92,7 +92,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def update
-    updator = BikeUpdator.new(user: current_user, bike: @bike, params:)
+    updator = BikeServices::Updator.new(user: current_user, bike: @bike, params:)
     updator.update_ownership
     updator.update_stolen_record
     if params[:mark_recovered_reason].present?
@@ -134,7 +134,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:bike).permit(BikeCreator.old_attr_accessible + [bike_organization_ids: []])
+    params.require(:bike).permit(BikeServices::Creator.old_attr_accessible + [bike_organization_ids: []])
   end
 
   def destroy_bike

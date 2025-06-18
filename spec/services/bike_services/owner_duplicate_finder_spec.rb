@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe OwnerDuplicateBikeFinder do
+RSpec.describe BikeServices::OwnerDuplicateFinder do
   describe ".find_matching" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     it "returns nil when the target email is not present on any bike, user, or user_email record" do

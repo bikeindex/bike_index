@@ -1,7 +1,7 @@
 :ruby
   # NOTE: In addition to bikes_search, this renders for model_audit show
   skip_view_just_stolen ||= @bike_sticker.present?
-  cycle_type = BikeDisplayer.vehicle_search?(params.merge(@interpreted_params)) ? t(".vehicle") : t(".bike")
+  cycle_type = BikeServices::Displayer.vehicle_search?(params.merge(@interpreted_params)) ? t(".vehicle") : t(".bike")
   only_show_bikes ||= false
 
   search_params = (sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: current_organization.to_param))

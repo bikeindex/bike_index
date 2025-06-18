@@ -49,7 +49,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(flash[:error]).to be_present
       expect(session[:return_to]).to be_blank
       # Because user is not bike#user
-      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
+      expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
     end
     context "current_user present but hasn't claimed the bike" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership, user: current_user) }
@@ -89,7 +89,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     expect(assigns(:bike).id).to eq bike.id
     expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates
     # Because user is bike#user
-    expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+    expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     # If passed an unknown template, it renders default template
     get base_url, params: {id: bike.id, edit_template: "root_party"}
     expect(response).to redirect_to(edit_bike_url(bike, edit_template: :bike_details))
@@ -123,7 +123,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(assigns(:bike).id).to eq bike.id
         expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates.merge(marketplace: "List for sale")
         # Because user is bike#user
-        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
         # If passed an unknown template, it renders default template
         get "#{base_url}/marketplace"
         expect(response).to render_template(:marketplace)
@@ -165,7 +165,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(assigns(:edit_template)).to eq "theft_details"
       expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
       expect(bike.user_id).to eq current_user.id
-      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
+      expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       # It redirects "alert" to new_bike_theft_alert, for backward compatibility
       # Maybe sometime after merging #2041, stop redirecting?
       get "#{base_url}?edit_template=alert"
@@ -180,7 +180,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(flash).to be_blank
         expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
         expect(bike.reload.user_id).to eq current_user.id
-        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
       end
     end
   end

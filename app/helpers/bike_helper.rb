@@ -1,4 +1,4 @@
-# There is also BikeDisplayer for things that aren't only used in view files
+# There is also BikeServices::Displayer for things that aren't only used in view files
 module BikeHelper
   def render_serial_display(bike, user = nil, skip_explanation: false)
     serial_text = bike.serial_display(user)&.downcase
@@ -33,7 +33,7 @@ module BikeHelper
   end
 
   def bike_thumb_image(bike)
-    thumb_image_url = BikeDisplayer.thumb_image_url(bike)
+    thumb_image_url = BikeServices::Displayer.thumb_image_url(bike)
     if thumb_image_url.present?
       image_tag(thumb_image_url, alt: bike.title_string, skip_pipeline: true)
     else

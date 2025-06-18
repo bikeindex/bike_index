@@ -1,4 +1,4 @@
-class BikeService::CalculateStoredLocation
+class BikeServices::CalculateStoredLocation
   class << self
     # Set the bike's location data (lat/long, city, postal code, country, etc.)
     #

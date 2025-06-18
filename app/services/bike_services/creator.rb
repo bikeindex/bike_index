@@ -1,4 +1,4 @@
-class BikeCreator
+class BikeServices::Creator
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator
   def self.old_attr_accessible
@@ -139,7 +139,7 @@ class BikeCreator
 
   def save_bike(b_param, bike)
     # TODO: Figure out why this needs to be called separately, before save. See PR #2848
-    bike.attributes = BikeService::CalculateStoredLocation.location_attrs(bike)
+    bike.attributes = BikeServices::CalculateStoredLocation.location_attrs(bike)
     bike.save
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
@@ -172,7 +172,7 @@ class BikeCreator
 
     if b_param.no_duplicate?
       # If a dupe is found, return that rather than the just built bike
-      dupe = OwnerDuplicateBikeFinder.matching(serial: bike.serial_number,
+      dupe = BikeServices::OwnerDuplicateFinder.matching(serial: bike.serial_number,
         owner_email: bike.owner_email, manufacturer_id: bike.manufacturer_id).first
 
       if dupe.present?
@@ -201,7 +201,7 @@ class BikeCreator
     attrs
   end
 
-  # previously BikeCreatorOrganizer
+  # previously BikeServices::CreatorOrganizer
   def check_organization(b_param, bike)
     organization_id = b_param.params.dig("creation_organization_id").presence ||
       b_param.params.dig("bike", "creation_organization_id")

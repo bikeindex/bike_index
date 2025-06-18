@@ -1,13 +1,13 @@
-class BikeUpdatorError < StandardError
+class BikeServices::UpdatorError < StandardError
 end
 
-class BikeUpdator
+class BikeServices::Updator
   class << self
     def permitted_params(params, bike, user)
       # TODO: improve this entire thing. Maybe using BParam.safe_bike_attrs
       # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
       {
-        bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)
+        bike: params.require(:bike).permit(BikeServices::Creator.old_attr_accessible)
       }.as_json
     end
   end
@@ -103,7 +103,7 @@ class BikeUpdator
   def ensure_ownership!
     return true if @current_ownership && @current_ownership.owner == @user # So we can pass in ownership and skip query
     return true if @bike.authorized?(@user)
-    raise BikeUpdatorError, "Oh no! It looks like you don't own that bike."
+    raise BikeServices::UpdatorError, "Oh no! It looks like you don't own that bike."
   end
 
   def remove_blank_components

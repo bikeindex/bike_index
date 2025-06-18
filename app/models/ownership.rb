@@ -231,7 +231,7 @@ class Ownership < ApplicationRecord
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_id ||= impound_record&.organization_id
       self.organization_pre_registration ||= calculated_organization_pre_registration?
-      # Would this be better in BikeCreator? Maybe, but specs depend on this always being set
+      # Would this be better in BikeServices::Creator? Maybe, but specs depend on this always being set
       self.origin ||= if impound_record_id.present?
         "impound_process"
       elsif first?
@@ -260,7 +260,7 @@ class Ownership < ApplicationRecord
       bike&.update_column :current_ownership_id, id
       prior_ownerships.current.each { |o| o.update(current: false) }
     end
-    # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
+    # Note: this has to be performed later; we create ownerships and then delete them, in BikeServices::Creator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
     Email::OwnershipInvitationJob.perform_in(2.seconds, id)
   end

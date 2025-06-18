@@ -834,7 +834,7 @@ class Bike < ApplicationRecord
     end
   end
 
-  # Called in BikeCreator, so that the serial and email can be used for dupe finding
+  # Called in BikeServices::Creator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
     self.manufacturer_other = InputNormalizer.string(manufacturer_other)
@@ -859,7 +859,7 @@ class Bike < ApplicationRecord
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.occurred_at = calculated_occurred_at
     self.current_ownership = calculated_current_ownership
-    self.attributes = BikeService::CalculateStoredLocation.location_attrs(self)
+    self.attributes = BikeServices::CalculateStoredLocation.location_attrs(self)
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at

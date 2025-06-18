@@ -60,7 +60,7 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def thumb
-    @thumb ||= BikeDisplayer.thumb_image_url(object)
+    @thumb ||= BikeServices::Displayer.thumb_image_url(object)
   end
 
   def large_img

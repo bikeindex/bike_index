@@ -40,7 +40,7 @@ class OrganizationsController < ApplicationController
   # Additional parameter included in shop printouts: shop_display=true
   # currently not used, but may use it someday!
   def embed
-    @bike = BikeCreator.new.build_bike(@b_param)
+    @bike = BikeServices::Creator.new.build_bike(@b_param)
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
     @stolen = @bike.status_stolen?
@@ -49,7 +49,7 @@ class OrganizationsController < ApplicationController
   end
 
   def embed_extended
-    @bike = BikeCreator.new.build_bike(@b_param)
+    @bike = BikeServices::Creator.new.build_bike(@b_param)
     if params[:email].present?
       @bike.owner_email = params[:email]
       @persist_email = true unless defined?(@persist_email)
