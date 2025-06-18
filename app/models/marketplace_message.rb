@@ -59,8 +59,9 @@ class MarketplaceMessage < ApplicationRecord
     to: :marketplace_listing, allow_nil: true
 
   class << self
-    def for_user(user)
-      where(sender_id: user.id).or(where(receiver_id: user.id))
+    def for_user(user_or_id)
+      user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
+      where(sender_id: user_id).or(where(receiver_id: user_id))
     end
 
     def decoded_marketplace_listing_id(user:, id:)

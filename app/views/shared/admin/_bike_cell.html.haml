@@ -9,7 +9,6 @@
   - if bike.blank? && bike_id.present? # If email is present, the email will be shown
     %code.small= bike_id
 
-
 - if bike.present?
   - bike_content = capture_haml do
     = bike.title_string

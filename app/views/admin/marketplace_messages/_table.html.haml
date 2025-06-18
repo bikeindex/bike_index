@@ -4,11 +4,13 @@
       %th
         = sortable "created_at", render_sortable: render_sortable
       %th
-        = sortable "kind", render_sortable: render_sortable
+        = sortable "amount_cents", "amount", render_sortable: render_sortable
       %th
         = sortable "marketplace_listing", render_sortable: render_sortable
       %th
         Body
+      %th
+        = sortable "kind", "From", render_sortable: render_sortable
       %th
         = sortable "sender_id", render_sortable: render_sortable
       -# I don't think this is necessary...
@@ -25,13 +27,13 @@
                 %span.less-strong-right.d-none.d-md-block.only-dev-visible
                   = marketplace_message.id
           %td
-            = marketplace_message.kind_humanized
+            %small= "#{marketplace_message.marketplace_listing.currency_symbol}#{admin_number_display(marketplace_message.marketplace_listing.amount)}"
           %td
-            %small.less-strong= "#{marketplace_message.marketplace_listing.currency_symbol}#{admin_number_display(marketplace_message.marketplace_listing.amount)}"
-
-            = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_link_path: bike_path(marketplace_message.item_id, show_marketplace_preview: true) }
+            = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_link_path: admin_bike_path(marketplace_message.item_id, show_marketplace_preview: true), render_search: true}
           %td
             = marketplace_message.body.truncate(100)
+          %td
+            = marketplace_message.kind_humanized
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: marketplace_message.sender, render_search: true, cache: true}
           -# %td

@@ -797,7 +797,8 @@ class Bike < ApplicationRecord
   end
 
   def registration_address_source
-    # NOTE: User address is the preferred address! If user address is set, address fields don't show on bike!
+    # NOTE: Marketplace Listing and User address are the preferred addresses!
+    # If either is set, address fields don't show on bike!
     if is_for_sale && current_marketplace_listing.present?
       "marketplace_listing"
     elsif user&.address_set_manually
@@ -813,10 +814,10 @@ class Bike < ApplicationRecord
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
     @registration_address = case registration_address_source
+    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
     when "user" then user&.address_hash_legacy
     when "bike_update" then address_hash
     when "initial_creation" then current_ownership.address_hash
-    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
     else
       {}
     end.with_indifferent_access
