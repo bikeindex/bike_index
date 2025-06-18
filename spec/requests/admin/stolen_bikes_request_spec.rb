@@ -124,7 +124,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, bike:) }
 
       it "updates the bike and calls update_ownership and serial_normalizer" do
-        expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
+        expect_any_instance_of(BikeService::Updator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         put "#{base_url}/#{bike.id}", params: {bike: {serial_number: "stuff"}}
         expect(response).to redirect_to(:edit_admin_stolen_bike)

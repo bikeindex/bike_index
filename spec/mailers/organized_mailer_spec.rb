@@ -177,7 +177,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect_render_donation(true, mail)
           expect_render_supporters(false, mail)
           # Transferred registration
-          BikeUpdator.new(user: user, bike: bike, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
+          BikeService::Updator.new(user: user, bike: bike, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
           ::Callbacks::AfterBikeSaveJob.new.perform(bike.id, true, true)
           ownership2 = bike.reload.current_ownership
           expect(ownership2.id).to_not eq ownership.id

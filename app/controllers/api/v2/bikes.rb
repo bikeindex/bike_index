@@ -274,7 +274,7 @@ module API
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
               permitted_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :no_duplicate))
-              BikeUpdator
+              BikeService::Updator
                 .new(user: current_user, bike: @bike, permitted_params:)
                 .update_available_attributes
             rescue => e
@@ -324,7 +324,7 @@ module API
           b_param.clean_params
           @bike.load_external_images(b_param.params["bike"]["external_image_urls"]) if b_param.params.dig("bike", "external_image_urls").present?
           begin
-            BikeUpdator.new(user: current_user, bike: @bike, permitted_params: b_param.params).update_available_attributes
+            BikeService::Updator.new(user: current_user, bike: @bike, permitted_params: b_param.params).update_available_attributes
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end

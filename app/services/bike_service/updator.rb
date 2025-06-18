@@ -1,7 +1,7 @@
-class BikeUpdatorError < StandardError
+class BikeService::UpdatorError < StandardError
 end
 
-class BikeUpdator
+class BikeService::Updator
   class << self
     def permitted_params(params, bike, user)
       # TODO: improve this entire thing. Maybe using BParam.safe_bike_attrs
@@ -103,7 +103,7 @@ class BikeUpdator
   def ensure_ownership!
     return true if @current_ownership && @current_ownership.owner == @user # So we can pass in ownership and skip query
     return true if @bike.authorized?(@user)
-    raise BikeUpdatorError, "Oh no! It looks like you don't own that bike."
+    raise BikeService::UpdatorError, "Oh no! It looks like you don't own that bike."
   end
 
   def remove_blank_components

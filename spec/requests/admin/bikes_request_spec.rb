@@ -147,7 +147,7 @@ RSpec.describe Admin::BikesController, type: :request do
       let(:bike) { FactoryBot.create(:stolen_bike) }
       let(:organization) { FactoryBot.create(:organization) }
       it "updates the bike and calls update_ownership and serial_normalizer" do
-        expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
+        expect_any_instance_of(BikeService::Updator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         stolen_record = bike.fetch_current_stolen_record
         expect(stolen_record).to be_present

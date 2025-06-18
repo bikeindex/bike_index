@@ -45,7 +45,7 @@ class Admin::StolenBikesController < Admin::BaseController
     if %w[regenerate_alert_image delete].include?(params[:update_action])
       update_image
     else
-      BikeUpdator.new(user: current_user, bike: @bike, params:).update_ownership
+      BikeService::Updator.new(user: current_user, bike: @bike, params:).update_ownership
 
       if @bike.update(permitted_parameters)
         SerialNormalizer.new(serial: @bike.serial_number).save_segments(@bike.id)

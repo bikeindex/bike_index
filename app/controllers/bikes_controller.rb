@@ -144,7 +144,7 @@ class BikesController < Bikes::BaseController
   def update
     if params[:bike].present?
       begin
-        @bike = BikeUpdator.new(user: current_user, bike: @bike, params:, current_ownership: @current_ownership).update_available_attributes
+        @bike = BikeService::Updator.new(user: current_user, bike: @bike, params:, current_ownership: @current_ownership).update_available_attributes
       rescue => e
         flash[:error] = e.message
         # Sometimes, weird things error. In production, Don't show a 500 page to the user
