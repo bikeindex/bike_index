@@ -316,6 +316,19 @@ RSpec.describe BikeServices::Displayer do
           expect(BikeServices::Displayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
+      context "for_sale" do
+        let!(:marketplace_listing) do
+          FactoryBot.create(:marketplace_listing, :for_sale, item: bike, primary_activity_id: FactoryBot.create(:primary_activity).id)
+        end
+        it "is falsey" do
+          expect(marketplace_listing.reload.status).to eq "for_sale"
+          expect(bike.reload.status).to eq "status_with_owner"
+          expect(bike.is_for_sale).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, user)).to be_falsey
+          expect(BikeDisplayer.user_edit_bike_address?(bike, user)).to be_truthy
+          expect(BikeDisplayer.display_edit_address_fields?(bike, admin)).to be_falsey
+        end
+      end
       context "user_registration_organization" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_address"]) }
         let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, organization: organization, user: user) }
