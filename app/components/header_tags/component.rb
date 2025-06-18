@@ -187,7 +187,7 @@ module HeaderTags
 
       @page_description = bike_page_description(bike, status_prefix)
 
-      if (header_image_urls = BikeDisplayer.header_image_urls(bike))
+      if (header_image_urls = BikeService::Displayer.header_image_urls(bike))
         @image_dimensions = [1200, 630]
         @page_image = header_image_urls[:facebook]
         @facebook_image = header_image_urls[:facebook]

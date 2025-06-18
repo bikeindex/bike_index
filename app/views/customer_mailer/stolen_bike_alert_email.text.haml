@@ -18,7 +18,7 @@
 = @customer_contact.bike.serial_number
 
 = t(".text.color")
-- if BikeDisplayer.paint_description?(@customer_contact.bike)
+- if BikeService::Displayer.paint_description?(@customer_contact.bike)
   = @customer_contact.bike.paint_description
 = @customer_contact.bike.frame_colors.to_sentence
 

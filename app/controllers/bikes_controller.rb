@@ -14,7 +14,7 @@ class BikesController < Bikes::BaseController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
-    if current_user.present? && BikeDisplayer.display_impound_claim?(@bike, current_user)
+    if current_user.present? && BikeService::Displayer.display_impound_claim?(@bike, current_user)
       impound_claims = @bike.impound_claims_claimed.where(user_id: current_user.id)
       @contact_owner_open = params[:contact_owner].present?
       @impound_claim = impound_claims.not_rejected.last

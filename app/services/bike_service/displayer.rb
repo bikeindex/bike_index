@@ -2,7 +2,7 @@
 # Use BikeHelper for methods that do return HTML
 
 # TODO: Figure out a more consistent way of handling Displayers while preserving Functionalness
-class BikeDisplayer
+class BikeService::Displayer
   # Not sure if I like everything being class methods, but doing that for now anyway because functional-ish
   class << self
     # This is just a quick hack, will improve

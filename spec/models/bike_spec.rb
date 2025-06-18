@@ -1064,20 +1064,20 @@ RSpec.describe Bike, type: :model do
         expect(bike.contact_owner?).to be_falsey
         expect(bike.contact_owner?(user)).to be_falsey
         expect(bike.contact_owner?(user, organization)).to be_falsey
-        expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
+        expect(BikeService::Displayer.display_contact_owner?(bike, user)).to be_falsey
 
         # Add user to the unstolen org
         expect(organization_role.reload).to be_present
         user.reload
         expect(bike.contact_owner?(user)).to be_truthy
         expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
-        expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
+        expect(BikeService::Displayer.display_contact_owner?(bike, user)).to be_falsey
         # But still false if passing old organization
         expect(bike.contact_owner?(user, organization)).to be_falsey
-        expect(BikeDisplayer.display_contact_owner?(bike, user)).to be_falsey
+        expect(BikeService::Displayer.display_contact_owner?(bike, user)).to be_falsey
         # Passing the organization doesn't permit the user to do something unpermitted
         expect(bike.contact_owner?(user_unorganized, organization_unstolen)).to be_falsey
-        expect(BikeDisplayer.display_contact_owner?(bike, user_unorganized)).to be_falsey
+        expect(BikeService::Displayer.display_contact_owner?(bike, user_unorganized)).to be_falsey
         # And if the owner has set notification_unstolen to false, block organization access
         owner.notification_unstolen = false
         expect(bike.contact_owner?(user, organization_unstolen)).to be_falsey
@@ -1093,9 +1093,9 @@ RSpec.describe Bike, type: :model do
           expect(bike.contact_owner?).to be false
           expect(bike.contact_owner?(user)).to be false
           expect(bike.contact_owner?(user, organization)).to be false
-          expect(BikeDisplayer.display_contact_owner?(bike, user)).to be false
+          expect(BikeService::Displayer.display_contact_owner?(bike, user)).to be false
           # Check superusers
-          expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be false
+          expect(BikeService::Displayer.display_contact_owner?(bike, admin)).to be false
           expect(bike.contact_owner?(admin, organization)).to be false
           expect(bike.current_ownership.organization_direct_unclaimed_notifications?).to be false
           expect(bike.contact_owner_user?(admin, organization)).to be true
@@ -1104,7 +1104,7 @@ RSpec.describe Bike, type: :model do
           user.reload
           expect(bike.contact_owner?(user)).to be true
           expect(bike.contact_owner?(user, organization_unstolen)).to be true
-          expect(BikeDisplayer.display_contact_owner?(bike, user)).to be false # Handled through org panel
+          expect(BikeService::Displayer.display_contact_owner?(bike, user)).to be false # Handled through org panel
           expect(bike.contact_owner_user?(user, organization)).to be false
           expect(bike.contact_owner_email(user)).to eq "notparty@party.com"
 
@@ -1113,7 +1113,7 @@ RSpec.describe Bike, type: :model do
           expect(bike2.current_ownership.organization_direct_unclaimed_notifications?).to be true
           expect(bike2.contact_owner?(user)).to be true
           expect(bike2.contact_owner?(user, organization_unstolen)).to be true
-          expect(BikeDisplayer.display_contact_owner?(bike2, user)).to be false # Handled through org panel
+          expect(BikeService::Displayer.display_contact_owner?(bike2, user)).to be false # Handled through org panel
           expect(bike2.contact_owner_user?(user, organization)).to be true
           expect(bike2.contact_owner_email(user)).to eq "party@party.com"
           # Random user doesn't have contact_owner? - but still directed to user email, because direct_unclaimed_notification
@@ -1130,7 +1130,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.contact_owner?).to be false
         expect(bike.contact_owner?(User.new)).to be false
         expect(bike.contact_owner?(admin)).to be false
-        expect(BikeDisplayer.display_contact_owner?(bike, admin)).to be false
+        expect(BikeService::Displayer.display_contact_owner?(bike, admin)).to be false
       end
     end
   end

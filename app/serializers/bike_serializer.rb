@@ -75,7 +75,7 @@ class BikeSerializer < ApplicationSerializer
   end
 
   def thumb
-    BikeDisplayer.thumb_image_url(object)
+    BikeService::Displayer.thumb_image_url(object)
   end
 
   def frame_material

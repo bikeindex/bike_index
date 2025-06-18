@@ -100,7 +100,7 @@
                   - if bike.thumb_path.present?
                     %small 📷
                   %span.d-none.d-lg-inline.less-strong= bike.frame_colors.to_sentence
-                  - if BikeDisplayer.paint_description?(bike)
+                  - if BikeService::Displayer.paint_description?(bike)
                     %small.less-strong.d-none.d-lg-inline
                       = link_to bike.paint_description, edit_admin_paint_url(bike.paint)
                   - if bike.status_stolen?
