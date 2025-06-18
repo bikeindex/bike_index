@@ -92,8 +92,8 @@ export default class extends Controller {
     $queryField.on('change', (e) => {
       this.setCategories($queryField)
 
-      // Reset the stolenness counts if it's around
-      window.resetStolennessCounts?.()
+      // Reset the kind counts if it's around
+      window.resetKindCounts?.()
     })
   }
 
