@@ -89,7 +89,7 @@ class BikesController < Bikes::BaseController
     redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= BikeCreator.new.build_bike(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
+    @bike ||= BikeService::Creator.new.build_bike(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
@@ -108,7 +108,7 @@ class BikesController < Bikes::BaseController
       end
       @b_param.update(params: permitted_bparams,
         origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
-      @bike = BikeCreator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
+      @bike = BikeService::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
@@ -128,7 +128,7 @@ class BikesController < Bikes::BaseController
         redirect_to(edit_bike_url(@b_param.created_bike)) && return
       end
       @b_param.clean_params(permitted_bparams)
-      @bike = BikeCreator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
+      @bike = BikeService::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
       if @bike.errors.any?
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else

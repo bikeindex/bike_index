@@ -287,7 +287,7 @@ module API
           b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
             params: declared_p.merge(creation_state_params).as_json)
           b_param.save
-          bike = BikeCreator.new.create_bike(b_param)
+          bike = BikeService::Creator.new.create_bike(b_param)
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
             created_bike_serialized(bike, true)

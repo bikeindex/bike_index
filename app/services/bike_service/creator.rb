@@ -1,4 +1,4 @@
-class BikeCreator
+class BikeService::Creator
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator
   def self.old_attr_accessible
@@ -201,7 +201,7 @@ class BikeCreator
     attrs
   end
 
-  # previously BikeCreatorOrganizer
+  # previously BikeService::CreatorOrganizer
   def check_organization(b_param, bike)
     organization_id = b_param.params.dig("creation_organization_id").presence ||
       b_param.params.dig("bike", "creation_organization_id")

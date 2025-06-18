@@ -834,7 +834,7 @@ class Bike < ApplicationRecord
     end
   end
 
-  # Called in BikeCreator, so that the serial and email can be used for dupe finding
+  # Called in BikeService::Creator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
     self.manufacturer_other = InputNormalizer.string(manufacturer_other)

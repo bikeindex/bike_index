@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BikeCreator do
+RSpec.describe BikeService::Creator do
   let(:subject) { described_class }
   let(:user) { FactoryBot.create(:user) }
   let(:bike_params) { {} }
@@ -573,7 +573,7 @@ RSpec.describe BikeCreator do
       b_param = BParam.new
       bike = FactoryBot.create(:bike)
       bike.errors.add(:rando_error, "LOLZ")
-      creator = BikeCreator.new.send(:clear_bike, b_param, bike)
+      creator = BikeService::Creator.new.send(:clear_bike, b_param, bike)
       expect(creator.errors.messages[:rando_error]).not_to be_nil
       expect(Bike.where(id: bike.id)).to be_empty
     end

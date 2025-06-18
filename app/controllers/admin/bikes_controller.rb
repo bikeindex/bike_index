@@ -134,7 +134,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:bike).permit(BikeCreator.old_attr_accessible + [bike_organization_ids: []])
+    params.require(:bike).permit(BikeService::Creator.old_attr_accessible + [bike_organization_ids: []])
   end
 
   def destroy_bike

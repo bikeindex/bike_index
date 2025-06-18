@@ -406,7 +406,7 @@ class BParam < ApplicationRecord
     true unless owner_email.present? && bike_errors.blank?
   end
 
-  # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
+  # Right now this is a partial update. It's improved from where it was, but it still uses the BikeService::Creator
   # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
   # write illegal things to the bikes
   # args are not named so we can pass in the params
