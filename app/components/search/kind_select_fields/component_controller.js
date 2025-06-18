@@ -33,7 +33,6 @@ export default class extends Controller {
   }
 
   updateForSaleLink () {
-    console.log(this.searchQuery)
     const link = document.getElementById('kindSelectForSaleLink')
 
     if (link) {

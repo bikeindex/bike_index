@@ -12,3 +12,5 @@ en:
         stolenness_proximity: Stolen in search area
         stolenness_stolen: Stolen anywhere
         within: within
+        marketplace_scope_for_sale_proximity: For sale in search area
+        marketplace_scope_for_sale: For sale anywhere
