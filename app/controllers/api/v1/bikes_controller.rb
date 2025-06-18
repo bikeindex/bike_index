@@ -31,7 +31,7 @@ module API
           info = {ip: params[:proximity], location: GeocodeHelper.assignable_address_hash_for(params[:proximity])}
           render json: info && return
         end
-        render json: BikeSearcher.new(params).find_bikes.limit(20), each_serializer: BikeSerializer
+        render json: BikeService::Searcher.new(params).find_bikes.limit(20), each_serializer: BikeSerializer
       end
 
       def stolen_ids
@@ -51,7 +51,7 @@ module API
 
       def close_serials
         response = {bikes: []}
-        response = BikeSearcher.new(params).close_serials.limit(20) if params[:serial].present?
+        response = BikeService::Searcher.new(params).close_serials.limit(20) if params[:serial].present?
         render json: response, each_serializer: BikeSerializer
       end
 

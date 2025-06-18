@@ -20,7 +20,7 @@ module API
         end
 
         def find_bikes
-          BikeSearcher.new(params.merge(api_search: true)).find_bikes
+          BikeService::Searcher.new(params.merge(api_search: true)).find_bikes
         end
 
         def bikes_serialized(bikes)
@@ -107,7 +107,7 @@ module API
         get "/count" do
           params[:proximity] = params[:proximity] || "ip"
           set_proximity
-          BikeSearcher.new(params.except("format")).find_bike_counts
+          BikeService::Searcher.new(params.except("format")).find_bike_counts
         end
 
         desc "Close serials", {
@@ -122,7 +122,7 @@ module API
           requires :serial, type: String, desc: "Serial to search for"
         end
         get "/close_serials" do
-          close_bikes = BikeSearcher.new(params.merge(api_search: true)).close_serials
+          close_bikes = BikeService::Searcher.new(params.merge(api_search: true)).close_serials
           bikes_serialized(paginate(close_bikes))
         end
 

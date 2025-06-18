@@ -1,6 +1,6 @@
 # THIS IS DEPRECATED!!!
 # Use BikeSearchable instead
-class BikeSearcher
+class BikeService::Searcher
   def initialize(creation_params = {}, reverse_geocode = nil)
     # override reverse_geocode if passed as params
     @params = creation_params.merge(reverse_geocode: reverse_geocode)
