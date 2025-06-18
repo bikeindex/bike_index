@@ -57,9 +57,7 @@
         .col-lg-5.col-9.mt-auto.mb-2.pr-lg-0
           %p.strong.mb-0
             = link_to edit_admin_bike_path(bike.to_param) do
-              - if bike.status_stolen?
-                %span.text-danger
-                  Stolen
+              = bike_status_span(@bike)
               = bike.title_string
             = link_to "non-admin view", bike_path(bike.to_param, organization_id: bike.creation_organization.to_param), class: "text-muted float-right"
           %table.table-list.mb-0

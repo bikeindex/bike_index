@@ -55,7 +55,9 @@ class BikeDisplayer
     def display_edit_address_fields?(bike, user = nil)
       return false unless user_edit_bike_address?(bike, user)
       # Make absolutely sure with stolen bikes
-      return false if bike.version? || bike.current_stolen_record_id.present?
+      return false if bike.version? || bike.current_stolen_record_id.present? ||
+        bike.registration_address_source == "marketplace_listing"
+
       # parking notifications, impounded, stolen etc use the associated record for their address
       %w[status_impounded unregistered_parking_notification status_stolen].exclude?(bike.status)
     end
