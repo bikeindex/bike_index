@@ -40,6 +40,10 @@ module Search::KindSelectFields
       %w[proximity stolen non all for_sale]
     end
 
+    def opt_is_button?(opt)
+      opt == "for_sale" && !@is_marketplace
+    end
+
     def opt_selected?(opt)
       opt == if @is_marketplace
         "for_sale"
