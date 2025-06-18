@@ -26,7 +26,7 @@ RSpec.describe BikesController, type: :request do
       expect(response.body).to match("<title>Register a bike!</title>")
       expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
       # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
-      expect(BikeService::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+      expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
     context "with bike_sticker" do
       let(:organization) { FactoryBot.create(:organization) }
@@ -60,7 +60,7 @@ RSpec.describe BikesController, type: :request do
         expect(response.body).to match("<title>Register a stolen bike</title>")
         expect(response.body).to match('<meta name="description" content="Register a stolen bike on Bike Index quickly')
         # Make sure it renders without address fields for a stolen bikes
-        expect(BikeService::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
+        expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       end
       it "renders a new stolen bike from status" do
         country = FactoryBot.create(:country_canada)

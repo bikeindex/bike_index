@@ -95,7 +95,7 @@ module API
 
         def owner_duplicate_bike(bikes: nil)
           @manufacturer_id ||= Manufacturer.friendly_find_id(params[:manufacturer])
-          BikeService::OwnerDuplicateFinder.matching(serial: params[:serial],
+          BikeServices::OwnerDuplicateFinder.matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
             manufacturer_id: @manufacturer_id,
@@ -274,7 +274,7 @@ module API
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
               permitted_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :no_duplicate))
-              BikeService::Updator
+              BikeServices::Updator
                 .new(user: current_user, bike: @bike, permitted_params:)
                 .update_available_attributes
             rescue => e
@@ -287,7 +287,7 @@ module API
           b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
             params: declared_p.merge(creation_state_params).as_json)
           b_param.save
-          bike = BikeService::Creator.new.create_bike(b_param)
+          bike = BikeServices::Creator.new.create_bike(b_param)
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
             created_bike_serialized(bike, true)
@@ -324,7 +324,7 @@ module API
           b_param.clean_params
           @bike.load_external_images(b_param.params["bike"]["external_image_urls"]) if b_param.params.dig("bike", "external_image_urls").present?
           begin
-            BikeService::Updator.new(user: current_user, bike: @bike, permitted_params: b_param.params).update_available_attributes
+            BikeServices::Updator.new(user: current_user, bike: @bike, permitted_params: b_param.params).update_available_attributes
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end

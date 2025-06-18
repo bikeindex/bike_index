@@ -1,7 +1,7 @@
 class OwnershipNotSavedError < StandardError
 end
 
-class BikeService::UpdatorError < StandardError
+class BikeServices::UpdatorError < StandardError
 end
 
 class Bikes::BaseController < ApplicationController

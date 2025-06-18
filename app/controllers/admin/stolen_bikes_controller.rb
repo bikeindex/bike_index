@@ -45,7 +45,7 @@ class Admin::StolenBikesController < Admin::BaseController
     if %w[regenerate_alert_image delete].include?(params[:update_action])
       update_image
     else
-      BikeService::Updator.new(user: current_user, bike: @bike, params:).update_ownership
+      BikeServices::Updator.new(user: current_user, bike: @bike, params:).update_ownership
 
       if @bike.update(permitted_parameters)
         SerialNormalizer.new(serial: @bike.serial_number).save_segments(@bike.id)
@@ -66,7 +66,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:bike).permit(BikeService::Creator.old_attr_accessible)
+    params.require(:bike).permit(BikeServices::Creator.old_attr_accessible)
   end
 
   def find_bike

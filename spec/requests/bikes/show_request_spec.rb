@@ -523,7 +523,7 @@ RSpec.describe "BikesController#show", type: :request do
       it "uses impound_claim" do
         expect(impound_record.creator_public_display_name).to eq "bike finder"
         expect(bike.reload.owner).to_not eq current_user
-        expect(BikeService::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
@@ -539,7 +539,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(impound_claim.status).to eq "pending"
         bike.reload
         expect(bike.impound_claims_claimed.pluck(:id)).to eq([impound_claim.id])
-        expect(BikeService::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
@@ -547,21 +547,21 @@ RSpec.describe "BikesController#show", type: :request do
         # It renders if submitting
         impound_claim.update(status: "submitting")
         expect(impound_claim.reload.status).to eq "submitting"
-        expect(BikeService::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
         expect(assigns(:impound_claim)&.id).to eq impound_claim.id
         # It renders if approved
         impound_claim.update(status: "approved")
         expect(impound_claim.reload.status).to eq "approved"
-        expect(BikeService::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
         expect(assigns(:impound_claim)&.id).to eq impound_claim.id
 
         impound_claim.update(status: "denied")
         expect(impound_claim.reload.status).to eq "denied"
-        expect(BikeService::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
         get "#{base_url}/#{bike.id}"
         expect(flash).to be_blank
         expect(assigns(:impound_claim)&.id).to be_blank

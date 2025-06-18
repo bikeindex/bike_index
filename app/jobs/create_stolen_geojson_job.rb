@@ -33,6 +33,6 @@ class CreateStolenGeojsonJob < ScheduledJob
   def geojson_bike_features
     Bike.unscoped.status_stolen.current.where.not(latitude: nil).where.not(occurred_at: nil)
       .order(occurred_at: :desc).pluck(:id, :occurred_at, :latitude, :longitude)
-      .map { |id, oc, lat, lng| BikeService::Geojsoner.feature_from_plucked(id, oc, lat, lng) }
+      .map { |id, oc, lat, lng| BikeServices::Geojsoner.feature_from_plucked(id, oc, lat, lng) }
   end
 end

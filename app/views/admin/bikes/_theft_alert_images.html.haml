@@ -16,7 +16,7 @@
           = link_to "Regenerate alert using this image", admin_stolen_bike_path(bike, public_image_id: image.id, update_action: "regenerate_alert_image"), method: :put, action: "update", class: "btn btn-sm btn-outline-info"
 
 
-- alert_image_versions = BikeService::Displayer.header_image_urls(bike)
+- alert_image_versions = BikeServices::Displayer.header_image_urls(bike)
 
 %h3.mt-4 Promoted Alert Images
 

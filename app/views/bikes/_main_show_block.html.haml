@@ -57,7 +57,7 @@
       = render(DefinitionList::Row::Component.new(label: t(".model"), value: @bike.frame_model))
       = render(DefinitionList::Row::Component.new(label: t(".year"), value: @bike.year))
       = render(DefinitionList::Row::Component.new(label: t(".primary_colors"), value: @bike.frame_colors.to_sentence))
-      - if BikeService::Displayer.paint_description?(@bike)
+      - if BikeServices::Displayer.paint_description?(@bike)
         = render(DefinitionList::Row::Component.new(label: t(".paint_description"), value: @bike.paint_description))
       = render(DefinitionList::Row::Component.new(label: t(".frame_size"), value: @bike.frame_size&.upcase))
       = render(DefinitionList::Row::Component.new(label: t(".frame_material"), value: @bike.frame_material_name))

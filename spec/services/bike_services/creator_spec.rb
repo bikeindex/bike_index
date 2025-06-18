@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BikeService::Creator do
+RSpec.describe BikeServices::Creator do
   let(:subject) { described_class }
   let(:user) { FactoryBot.create(:user) }
   let(:bike_params) { {} }
@@ -471,7 +471,7 @@ RSpec.describe BikeService::Creator do
       let(:bike_params) { default_params }
       let(:email) { "something@gmail.com" }
       let(:new_email) { "Something@GMAIL.com" }
-      let(:found_duplicate) { BikeService::OwnerDuplicateFinder.matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email], manufacturer_id: bike_params[:manufacturer_id]).first }
+      let(:found_duplicate) { BikeServices::OwnerDuplicateFinder.matching(serial: bike_params[:serial_number], owner_email: bike_params[:owner_email], manufacturer_id: bike_params[:manufacturer_id]).first }
       def expect_duplicate_found
         expect(b_param.no_duplicate?).to be_truthy
         expect(found_duplicate&.id).to eq existing_bike.id
@@ -573,7 +573,7 @@ RSpec.describe BikeService::Creator do
       b_param = BParam.new
       bike = FactoryBot.create(:bike)
       bike.errors.add(:rando_error, "LOLZ")
-      creator = BikeService::Creator.new.send(:clear_bike, b_param, bike)
+      creator = BikeServices::Creator.new.send(:clear_bike, b_param, bike)
       expect(creator.errors.messages[:rando_error]).not_to be_nil
       expect(Bike.where(id: bike.id)).to be_empty
     end

@@ -51,7 +51,7 @@ class BulkImportJob < ApplicationJob
     b_param = BParam.create(creator_id: creator_id,
       params: b_param_hash,
       origin: "bulk_import_worker")
-    BikeService::Creator.new.create_bike(b_param)
+    BikeServices::Creator.new.create_bike(b_param)
   end
 
   def row_to_b_param_hash(row_with_whitespaces)

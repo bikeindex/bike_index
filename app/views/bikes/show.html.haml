@@ -127,7 +127,7 @@
           - else
             = t(".share_it")
         = render 'shared/share_this'
-      - if BikeService::Displayer.display_contact_owner?(@bike, current_user)
+      - if BikeServices::Displayer.display_contact_owner?(@bike, current_user)
         .contact-the-owner
           %p.preface
             %em
@@ -157,7 +157,7 @@
               = phone_link(@stolen_record.phone)
 
       -# Don't show if contact_owner is open - because then we're rendering impound_claim in the main page
-      - if BikeService::Displayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
+      - if BikeServices::Displayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
         - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
 
         .contact-the-owner#write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
@@ -171,7 +171,7 @@
 
           %a.btn.btn-primary.btn-lg{ href: '#impound_claim', 'aria-controls' => 'impound_claim', 'data-toggle' => 'collapse' }
             Open claim
-      - if BikeService::Displayer.display_marketplace_message?(@bike)
+      - if BikeServices::Displayer.display_marketplace_message?(@bike)
         .contact-the-owner.mt-5.pt-4.pb-4
           %h3.uncap
             Interested in purchasing this #{@bike.type}?

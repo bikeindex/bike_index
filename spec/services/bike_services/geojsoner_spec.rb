@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BikeService::Geojsoner do
+RSpec.describe BikeServices::Geojsoner do
   describe "geojson_feature" do
     let(:bike) { FactoryBot.build(:bike, :in_amsterdam) }
     it "returns nil" do

@@ -208,7 +208,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "transferred", authorized_bike_id: nil} }
         it "returns target" do
           ownership = bike.current_ownership
-          BikeService::Updator.new(user: ownership.user, bike: bike, permitted_params: {bike: {owner_email: "newemail@example.com"}}.as_json).update_ownership
+          BikeServices::Updator.new(user: ownership.user, bike: bike, permitted_params: {bike: {owner_email: "newemail@example.com"}}.as_json).update_ownership
           expect(ownership.reload.current).to be_falsey
           expect(bike.reload.current_ownership.id).to_not eq ownership.id
           expect(bike.reload.owner_email).to eq "newemail@example.com"

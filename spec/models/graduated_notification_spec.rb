@@ -661,7 +661,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification.user_id).to be_blank
 
         expect(bike.ownerships.count).to eq 1
-        BikeService::Updator.new(bike: bike, user: user2, permitted_params: {bike: {owner_email: user2.email}}.as_json).update_ownership
+        BikeServices::Updator.new(bike: bike, user: user2, permitted_params: {bike: {owner_email: user2.email}}.as_json).update_ownership
         expect(bike.reload.owner_email).to eq user2.email
         expect(bike.user.id).to eq user2.id
         expect(bike.ownerships.count).to eq 2

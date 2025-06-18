@@ -1,4 +1,4 @@
-class BikeService::Geojsoner
+class BikeServices::Geojsoner
   def self.feature(bike, extended_properties = false)
     return nil unless bike.status_stolen?
     date_stolen = bike.occurred_at || Time.current

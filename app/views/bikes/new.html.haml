@@ -126,7 +126,7 @@
             = fields_for @bike.impound_records.last do |irecord|
               = render partial: '/bikes_edit/bike_fields/stolen_location', locals: {srecord: irecord}
 
-          - if include_field_reg_address?(@organization, current_user) && BikeService::Displayer.display_edit_address_fields?(@bike, current_user)
+          - if include_field_reg_address?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user)
             .related-fields
               .form-group.row
                 -# Set all the bike address attrs

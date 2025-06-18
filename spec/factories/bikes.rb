@@ -1,4 +1,4 @@
-# Warning: BikeService::Creator forces every bike to have an ownership
+# Warning: BikeServices::Creator forces every bike to have an ownership
 # ... But this factory allows creating bikes without ownerships
 FactoryBot.define do
   factory :bike do
