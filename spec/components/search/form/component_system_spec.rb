@@ -40,7 +40,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     end
 
     it "submits when enter is pressed twice" do
+
       expect(find("#query_items", visible: false).value).to be_blank
+      expect(page).not_to have_content("within miles of", normalize_ws: true)
 
       find("label", text: "Stolen in search area").click
 
@@ -101,11 +103,15 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     context "chicago_tall_bike" do
       let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
+      include_context :geocoder_real
       # Maybe TODO: get real results for counts
       # let(:production_count_url) { "https://bikeindex.org/api/v3/search/count" }
       # allow_any_instance_of(Search::KindSelectFields::Component).to receive(:api_count_url).and_return(production_count_url)
-      it "renders the counts" do
+      it "renders the counts", vcr: { cassette_name: :search_form_component_chicago_tall_bike } do
         expect(find("#query_items", visible: false).value).to eq(["v_9"])
+
+        # TODO: Why doesn't this work?
+        # expect(page).to have_content("within miles of", normalize_ws: true)
 
         %w[proximity stolen non for_sale].each { |stolenness| expect_count(stolenness, 0) }
 
@@ -133,6 +139,11 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       let(:preview_path) { "/rails/view_components/search/form/component/for_sale" }
       it "renders and updates" do
         expect(find("#query_items", visible: false).value).to eq([])
+        expect(page).not_to have_content("within miles of", normalize_ws: true)
+
+        find("label", text: "For sale in search area").click
+
+        expect(page).to have_content("within miles of", normalize_ws: true)
       end
     end
   end
