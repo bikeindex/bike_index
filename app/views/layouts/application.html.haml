@@ -26,10 +26,10 @@
   %body{id: page_id, class:  body_class}
 
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache(["main_navbar2", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar3", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
-          %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
+          %a.primary-logo{ href: user_root_url, class: "" }
             = image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home"
           = link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do
             = t(".the_nonprofit_bike_registry")
@@ -46,12 +46,15 @@
             .center-navbar-signup-link-container
               = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
           - bike_search_active = controller_namespace == "search" && controller_name == "registrations" && action_name == "index"
+          - marketplace_search_active = controller_namespace == "search" && controller_name == "marketplace" && action_name == "index"
           %a#menu-opened-backdrop{ "aria-hidden" => "true" }
           .hamburgler{ "aria-hidden" => "true" }
             %a#primary_nav_hamburgler
           %ul.primary-main-menu
             %li.primary-nav-item.d-lg-none
-              = link_to t(".search"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", id: "search_bikes_header_link"
+              = link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}"
+            %li.primary-nav-item.d-lg-none
+              = link_to t(".marketplace"), search_marketplace_path, class: "nav-link #{marketplace_search_active ? 'active' : ''}"
             %li.divider-nav-item.d-lg-none{ "aria-hidden" => "true" }
             - if current_user_or_unconfirmed_user.present?
               %li.primary-nav-item
@@ -96,8 +99,10 @@
               = active_link t(".donate"), why_donate_path, class: 'nav-link'
             %li.primary-nav-item
               = active_link t(".blog"), news_index_path, class: 'nav-link', match_controller: true
+            %li.primary-nav-item.d-lg-block
+              = link_to t(".marketplace"), search_marketplace_path, class: "nav-link #{marketplace_search_active ? 'active' : ''}"
             %li.primary-nav-item.d-none.d-lg-block
-              = link_to t(".search"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", match_controller: true
+              = link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}", match_controller: true
     = render partial: "/layouts/revised_messages"
 
     - if current_page_skeleton.present?

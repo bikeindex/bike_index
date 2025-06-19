@@ -3314,6 +3314,7 @@ es:
       search: Buscar
       marketplace_messages:
       your_registrations: Sus registros
+      marketplace:
     application_bikehub:
       accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
         Bike Index, el principal registro de bicicletas.

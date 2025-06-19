@@ -27,19 +27,19 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       page.execute_script("window.localStorage.clear()")
     end
 
-    def expect_count(stolenness, value = :greater_than_zero)
-      stolenness_text = find("[data-count-target=\"#{stolenness}\"]").text
+    def expect_count(kind_scope, value = :greater_than_zero)
+      kind_scope_text = find("[data-count-target=\"#{kind_scope}\"]").text
       # Check that the text matches the pattern (\d+) and extract the number
-      number = stolenness_text.match(/\((\d+)\)/)
+      number = kind_scope_text.match(/\((\d+)\)/)
 
       expect(number).not_to be_nil
 
       if value == :greater_than_zero
         expect(number.present? && number[1].to_i > 0).to be_truthy,
-          "Expected #{stolenness} count be > 0 in parentheses, but got: '#{number}'"
+          "Expected #{kind_scope} count be > 0 in parentheses, but got: '#{number}'"
       else
         expect(number.present? && number[1].to_i).to eq(value),
-          "Expected #{stolenness} count eq(#{value}) in parentheses, but got: '#{number}'"
+          "Expected #{kind_scope} count eq(#{value}) in parentheses, but got: '#{number}'"
       end
     end
 
@@ -119,7 +119,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         # TODO: Why doesn't this show up?
         # expect(page_text(page.text)).to match("miles of")
 
-        %w[proximity stolen non for_sale].each { |stolenness| expect_count(stolenness, 0) }
+        %w[proximity stolen non for_sale].each { |kind_scope| expect_count(kind_scope, 0) }
 
         find(".select2-container").click
         # Wait for select2 to load
@@ -147,11 +147,17 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         expect(find("#query_items", visible: false).value).to eq([])
         expect(page_text(page.text)).not_to match("miles of")
 
+        %w[for_sale for_sale_proximity].each { |kind_scope| expect_count(kind_scope, 0) }
+
         find("label", text: "For sale in search area").click
 
         find("#distance").set("251")
         find("#location").set("Edmonton, AB")
         expect(page_text(page.text)).to match("miles of")
+
+        proximity_text = find("[data-test-id=\"Search::KindOption-for_sale_proximity\"]").text
+        # Counts should have been hidden because a new item was added
+        expect(proximity_text.strip).to eq("For sale in search area")
       end
     end
   end
