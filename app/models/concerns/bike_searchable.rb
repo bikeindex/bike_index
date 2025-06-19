@@ -55,6 +55,21 @@ module BikeSearchable
       items.flatten.compact
     end
 
+    # returns nil OR [location, [lat, lng]] OR [location, nil]
+    def search_location(location, ip_address = nil)
+      location = location.to_s.strip
+      return if location.match?(/anywhere/i)
+
+      if ["", "ip", "you"].include?(location.strip.downcase)
+        result = IpAddressParser.location_hash_geocoder(ip_address)
+        return if result.blank?
+
+        [result[:formatted_address], [result[:latitude], result[:longitude]]]
+      else
+        [location, nil]
+      end
+    end
+
     private
 
     def searchable_query_items_query(query_params)
@@ -116,8 +131,7 @@ module BikeSearchable
     def searchable_query_stolenness(query_params, ip_address)
       stolennness_hash = if %w[all non found impounded].include?(query_params[:stolenness])
         {stolenness: query_params[:stolenness]}
-      elsif %w[for_sale proximity].include?(query_params[:stolenness])
-        query_params[:stolenness] = "all" if query_params[:stolenness] == "for_sale"
+      elsif query_params[:stolenness] == "proximity"
         extracted_searchable_proximity_hash(query_params, ip_address)
       end
 
@@ -153,14 +167,12 @@ module BikeSearchable
     end
 
     def extracted_searchable_proximity_hash(query_params, ip_address)
-      location = query_params[:location].to_s.strip
-      return if location.match?(/anywhere/i)
+      location, coordinates = search_location(query_params[:location], ip_address)
+      return if location.blank?
 
-      distance = query_params[:distance]&.to_i
-      bounding_box = if ["", "ip", "you"].include?(location.strip.downcase)
-        address_hash = IpAddressParser.location_hash_geocoder(ip_address)
-        location = address_hash[:formatted_address]
-        GeocodeHelper.bounding_box([address_hash[:latitude], address_hash[:longitude]], distance)
+      distance = GeocodeHelper.permitted_distance(query_params[:distance])
+      bounding_box = if coordinates.present?
+        GeocodeHelper.bounding_box(coordinates, distance)
       else
         GeocodeHelper.bounding_box(location, distance)
       end
@@ -169,8 +181,8 @@ module BikeSearchable
       {
         bounding_box: bounding_box,
         stolenness: query_params[:stolenness],
-        location: location, # This will overwrite the user's input
-        distance: (distance && distance > 0) ? distance : 100
+        location:, # This will overwrite the user's input
+        distance:
       }
     end
   end

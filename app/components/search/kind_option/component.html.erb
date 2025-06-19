@@ -1,0 +1,25 @@
+<% if is_button? %>
+  <%# Currently only for_sale on /search/registrations is a button %>
+  <a href="<%= @button_url %>" data-basepath="<%= @button_url %>" id="kindSelectForSaleLink"
+    class="twbtn tw:block tw:w-full" data-test-id="<%= test_id %>">
+    <%= @option_text %>
+
+    <span class="twless-strong" data-count-target="<%= @option %>"></span>
+  </a>
+<% else %>
+  <div class="tw:flex tw:items-center tw:ps-3 tw:relative" data-test-id="<%= test_id %>">
+
+    <%= radio_button_tag(@option_kind, @option, @is_selected,
+      class: "tw:w-4 tw:h-4 tw:text-blue-600 tw:bg-gray-100 tw:border-gray-300 tw:focus:ring-blue-500 " \
+        ":tw:dark:focus:ring-blue-600 tw:dark:ring-offset-gray-700 tw:dark:focus:ring-offset-gray-700 " \
+        "tw:focus:ring-2 tw:dark:bg-gray-600 tw:dark:border-gray-500",
+        "data-action" => "change->search--kind-select-fields--component#updateLocationVisibility")
+    %>
+
+    <%= label_tag("#{@option_kind}_#{@option}", class: "tw:w-full tw:py-3 tw:ms-2 tw:cursor-pointer") do %>
+      <%= @option_text %>
+
+      <span class="twless-strong" data-count-target="<%= @option %>"></span>
+    <% end %>
+  </div>
+<% end %>

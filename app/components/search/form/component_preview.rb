@@ -17,7 +17,7 @@ module Search::Form
     def for_sale
       sale_options = default_options({stolenness: :all}).merge(
         target_frame: :search_marketplace_results_frame,
-        is_marketplace: true
+        marketplace_scope: "for_sale"
       )
       render(Search::Form::Component.new(**sale_options))
     end

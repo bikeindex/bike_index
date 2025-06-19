@@ -91,6 +91,9 @@ export default class extends Controller {
     // Every time the select changes, check the categories
     $queryField.on('change', (e) => {
       this.setCategories($queryField)
+
+      // Reset the kind counts if it's around
+      window.resetKindCounts?.()
     })
   }
 

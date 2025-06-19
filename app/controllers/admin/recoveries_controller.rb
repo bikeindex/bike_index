@@ -66,8 +66,7 @@ class Admin::RecoveriesController < Admin::BaseController
     end
 
     # We always render distance
-    distance = params[:search_distance].to_i
-    @distance = (distance.present? && distance > 0) ? distance : 50
+    @distance = GeocodeHelper.permitted_distance(params[:search_distance], default_distance: 50)
     if params[:search_location].present?
       bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       recoveries = recoveries.within_bounding_box(bounding_box)

@@ -6076,12 +6076,17 @@ nl:
         no_matched: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
         search_for_containing: Zoeken naar series die uw zoekopdracht bevatten...
         search_for_similar: Zoeken naar soortgelijke series...
+        no_matched_marketplace: Er zijn geen vermeldingen die exact aan uw zoekopdracht
+          voldoen
       serials_containing:
         no_matched: Geen registraties met serienummers die %{serial} bevatten
         with_serials_containing: Registraties met series die %{serial} bevatten
       similar_serials:
         no_matched: Geen registraties met serienummers vergelijkbaar met %{serial}
         with_similar_serials: Registraties met series vergelijkbaar met %{serial}
+    marketplace:
+      index:
+        loading_results: Resultaten laden...
   components:
     search:
       everything_combobox:
@@ -6107,6 +6112,8 @@ nl:
         stolenness_non: Niet gemarkeerd als gestolen
         stolenness_proximity: Gestolen in zoekgebied
         stolenness_stolen: Overal gestolen
+        marketplace_scope_for_sale: Overal te koop
+        marketplace_scope_for_sale_proximity: Te koop in zoekgebied
     legacy_form_well:
       address_record:
         address: Adres
@@ -6143,6 +6150,3 @@ nl:
         to: Naar
       thread_show:
         subject: Onderwerp
-  marketplace:
-    index:
-      loading_results: Resultaten laden...

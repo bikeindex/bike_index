@@ -6,7 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='search--kind-select-fields--component'
 export default class extends Controller {
   static targets = ['distance', 'location', 'locationWrap']
-  static values = { apiCountUrl: String, isMarketplace: Boolean, locationStoreKey: String }
+  static values = { apiCountUrl: String, isMarketplace: Boolean, locationStoreKey: String, optionKinds: String }
 
   connect () {
     this.setSearchProximity()
@@ -16,8 +16,10 @@ export default class extends Controller {
   }
 
   disconnect () {
-    this.resetStolennessCounts() // also removes the bindings
+    this.resetKindCounts() // also removes the bindings
     this.form.removeEventListener('change', this.updateForSaleLink.bind(this))
+    // Remove reset count function from window
+    window.resetKindCounts = null
   }
 
   get form () {
@@ -31,26 +33,27 @@ export default class extends Controller {
   }
 
   updateForSaleLink () {
-    console.log(this.searchQuery)
     const link = document.getElementById('kindSelectForSaleLink')
+
     if (link) {
-      link.href = `/marketplace?${this.searchQuery}`
+      link.href = `${link.getAttribute('data-basepath')}?${this.searchQuery}`
     }
   }
 
   updateCountsToSubmit () {
     if (!this.form) return
 
-    this.form.addEventListener('turbo:submit-end', this.setStolennessCounts.bind(this))
+    this.form.addEventListener('turbo:submit-end', this.setKindCounts.bind(this))
 
-    // if in component preview (lookbook), run stolenness counts on load
-    if (window.inComponentPreview) { this.setStolennessCounts() }
+    // if in component preview (lookbook), run kind counts on load
+    if (window.inComponentPreview) { this.setKindCounts() }
   }
 
   updateLocationVisibility () {
-    const selectedValue = this.element.querySelector('input[name="stolenness"]:checked')?.value
+    const selectedValue = this.element.querySelector(`input[name="${this.optionKindsValue}"]:checked`)?.value
 
-    if (selectedValue === 'proximity' || selectedValue === 'for_sale') {
+    if (['proximity', 'for_sale_proximity'].includes(selectedValue)) {
+      console.log('show location')
       collapse('show', this.locationWrapTarget)
     } else {
       collapse('hide', this.locationWrapTarget)
@@ -88,10 +91,10 @@ export default class extends Controller {
   }
 
   // TODO: Should this just be getting the values from the form?
-  setStolennessCounts () {
+  setKindCounts () {
     const queryString = this.searchQuery
     if (this.doNotFetchCounts(queryString)) {
-      return this.resetStolennessCounts()
+      return this.resetKindCounts()
     }
 
     fetch(`${this.apiCountUrlValue}?${queryString}`, {
@@ -109,17 +112,20 @@ export default class extends Controller {
 
     this.resetFields?.forEach(field => {
       // Save the bound function reference so we can remove it later
-      field._boundResetFunction = this.resetStolennessCounts.bind(this)
+      field._boundResetFunction = this.resetKindCounts.bind(this)
       field.addEventListener('change', field._boundResetFunction)
     })
+    // Add reset function to window so it can be called by select2 callback
+    window.resetKindCounts = this.resetKindCounts.bind(this)
   }
 
-  resetStolennessCounts () {
+  resetKindCounts () {
     console.log('resetting counts')
-    // NOTE: countKeys will need to be updated if response changes
-    const countKeys = ['non', 'stolen', 'proximity', 'for_sale']
-    // for (const stolenness of countKeys) { this[`${stolenness}CountTarget`].textContent = '' }
-    for (const stolenness of countKeys) { this.updateCount(stolenness, '') }
+    // dataCountTargets looks like: ['non', 'stolen', 'proximity', 'for_sale']
+    const dataCountTargets = [...this.element.querySelectorAll('[data-count-target]')]
+      .map(el => el.dataset.countTarget).filter(item => item !== 'all')
+
+    for (const kind of dataCountTargets) { this.updateCount(kind, '') }
 
     if (this.resetFields) {
       this.resetFields.forEach(field => {
@@ -132,14 +138,13 @@ export default class extends Controller {
   }
 
   insertTabCounts (counts) {
-    for (const stolenness of Object.keys(counts)) {
-      console.log(stolenness)
-      this.updateCount(stolenness, this.displayedCountNumber(counts[stolenness]))
+    for (const kind of Object.keys(counts)) {
+      this.updateCount(kind, this.displayedCountNumber(counts[kind]))
     }
   }
 
-  updateCount (stolenness, newValue) {
-    const element = this.element.querySelector(`[data-count-target="${stolenness}"]`)
+  updateCount (kind, newValue) {
+    const element = this.element.querySelector(`[data-count-target="${kind}"]`)
 
     if (element) {
       element.textContent = newValue

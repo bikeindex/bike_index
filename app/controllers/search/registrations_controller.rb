@@ -6,7 +6,7 @@ class Search::RegistrationsController < ApplicationController
 
   def index
     if params[:stolenness] == "for_sale"
-      redirect_to marketplace_path(marketplace_redirect_params) and return
+      redirect_to search_marketplace_path(marketplace_redirect_params) and return
     end
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
