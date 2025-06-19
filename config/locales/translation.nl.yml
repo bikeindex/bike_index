@@ -6076,6 +6076,8 @@ nl:
         no_matched: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
         search_for_containing: Zoeken naar series die uw zoekopdracht bevatten...
         search_for_similar: Zoeken naar soortgelijke series...
+        no_matched_marketplace: Er zijn geen vermeldingen die exact aan uw zoekopdracht
+          voldoen
       serials_containing:
         no_matched: Geen registraties met serienummers die %{serial} bevatten
         with_serials_containing: Registraties met series die %{serial} bevatten

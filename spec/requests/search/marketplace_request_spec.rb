@@ -56,6 +56,16 @@ RSpec.describe Search::MarketplaceController, type: :request do
         expect(assigns(:bikes).pluck(:id)).to eq([item.id])
         # Expect there to be a link to the bike url
         expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{item.id}"/)
+
+        # Searching with serial doesn't render registrations with serials similar
+        get "#{base_url}?serial=xxxz", as: :turbo_stream
+        expect(response).to render_template(:index)
+        expect(assigns(:bikes).pluck(:id)).to eq([])
+        expect(response.body).to match "xxxz"
+        # Verify that it shows marketplace, not registrations text
+        expect(response.body).to match "No listings exactly matched your search"
+        # FWIW, this doesn't fail anyway - but it's a reminder, don't search similar serials on marketplace
+        expect(response.body).to_not match "with serials similar"
       end
 
       context "geocoder_stubbed_bounding_box" do

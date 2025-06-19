@@ -1,4 +1,5 @@
 <%# This will become a view component, but for now just rendering old styled results %>
+<% not_marketplace = @marketplace_scope.blank? %>
 
 <div class="container mb-5">
   <div class="row bikes-searched-default">
@@ -21,7 +22,7 @@
         </div>
       <% else %>
         <h3 class="text-center uncap">
-          <%= t(".no_matched") %>
+          <%= not_marketplace ? t(".no_matched") : t(".no_matched_marketplace") %>
         </h3>
       <% end %>
     </div>
@@ -35,7 +36,7 @@
 <% end %>
 
 <%# render near serials %>
-<% if @interpreted_params[:serial].present? %>
+<% if not_marketplace && @interpreted_params[:serial].present? %>
   <%=
     turbo_frame_tag :search_registrations_similar_serials_frame,
     src: similar_serials_search_registrations_path(@interpreted_params),
