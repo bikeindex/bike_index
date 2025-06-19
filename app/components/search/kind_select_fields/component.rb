@@ -23,7 +23,7 @@ module Search::KindSelectFields
     end
 
     def api_count_url
-      @is_marketplace ? "none" : "/api/v3/search/count"
+      @is_marketplace ? "/search/marketplace/counts" : "/api/v3/search/count"
     end
 
     def location_initially_shown?
