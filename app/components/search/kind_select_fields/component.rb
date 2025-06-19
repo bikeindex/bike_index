@@ -26,10 +26,8 @@ module Search::KindSelectFields
       @is_marketplace ? "none" : "/api/v3/search/count"
     end
 
-    def location_wrap_hidden_class
-      return "" if %w[proximity for_sale_proximity].include?(@kind_scope)
-
-      "tw:hidden"
+    def location_initially_shown?
+      %w[proximity for_sale_proximity].include?(@kind_scope)
     end
 
     def kind_options

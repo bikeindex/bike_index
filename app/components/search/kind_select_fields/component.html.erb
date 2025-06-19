@@ -5,7 +5,7 @@
   data-search--kind-select-fields--component-option-kinds-value="<%= option_kind.to_s %>">
 
   <div
-    class="tw:mt-5 tw:sm:mt-2 tw:flex tw:flex-wrap tw:sm:flex-nowrap tw:w-full tw:sm:w-min tw:ml-auto <%= location_wrap_hidden_class %>"
+    class="tw:mt-5 tw:sm:mt-2 tw:flex tw:flex-wrap tw:sm:flex-nowrap tw:w-full tw:sm:w-min tw:ml-auto <%= location_initially_shown? ? '' : 'tw:hidden' %>"
     data-search--kind-select-fields--component-target="locationWrap">
 
     <span class="tw:flex tw:flex-nowrap">
@@ -21,7 +21,7 @@
       <span class="tw:block tw:text-nowrap tw:py-1.5 tw:mr-2"><%= translation(".miles_of") %></span>
       <%= label_tag :location, translation(".search_location"), class: "twlabel tw:sr-only" %>
       <%=
-        text_field_tag :location, @location, placeholder: translation(".search_location"), required: true,
+        text_field_tag :location, @location, placeholder: translation(".search_location"), required: location_initially_shown?,
         class: "twinput tw:min-w-50 fieldResetsCounts",
         "data-search--kind-select-fields--component-target" => "location"
       %>
