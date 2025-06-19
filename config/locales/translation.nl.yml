@@ -6082,6 +6082,9 @@ nl:
       similar_serials:
         no_matched: Geen registraties met serienummers vergelijkbaar met %{serial}
         with_similar_serials: Registraties met series vergelijkbaar met %{serial}
+    marketplace:
+      index:
+        loading_results: Resultaten laden...
   components:
     search:
       everything_combobox:
@@ -6107,6 +6110,8 @@ nl:
         stolenness_non: Niet gemarkeerd als gestolen
         stolenness_proximity: Gestolen in zoekgebied
         stolenness_stolen: Overal gestolen
+        marketplace_scope_for_sale: Overal te koop
+        marketplace_scope_for_sale_proximity: Te koop in zoekgebied
     legacy_form_well:
       address_record:
         address: Adres
@@ -6143,6 +6148,3 @@ nl:
         to: Naar
       thread_show:
         subject: Onderwerp
-  marketplace:
-    index:
-      loading_results: Resultaten laden...

@@ -53,6 +53,7 @@ export default class extends Controller {
     const selectedValue = this.element.querySelector(`input[name="${this.optionKindsValue}"]:checked`)?.value
 
     if (['proximity', 'for_sale_proximity'].includes(selectedValue)) {
+      console.log('show location')
       collapse('show', this.locationWrapTarget)
     } else {
       collapse('hide', this.locationWrapTarget)

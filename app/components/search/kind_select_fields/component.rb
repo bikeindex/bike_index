@@ -27,7 +27,7 @@ module Search::KindSelectFields
     end
 
     def location_wrap_hidden_class
-      return "" if %w[proximity for_sale_proximity].include?(@kinde_scope)
+      return "" if %w[proximity for_sale_proximity].include?(@kind_scope)
 
       "tw:hidden"
     end

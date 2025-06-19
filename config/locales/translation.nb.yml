@@ -5926,6 +5926,9 @@ nb:
       similar_serials:
         no_matched: Ingen registreringer med serienummer som ligner på %{serial}
         with_similar_serials: Registreringer med serier som ligner på %{serial}
+    marketplace:
+      index:
+        loading_results: Laster inn resultater...
   components:
     search:
       everything_combobox:
@@ -5951,6 +5954,8 @@ nb:
         stolenness_non: Ikke merket som stjålet
         stolenness_proximity: Stjålet i søkeområdet
         stolenness_stolen: Stjålet hvor som helst
+        marketplace_scope_for_sale: Til salgs hvor som helst
+        marketplace_scope_for_sale_proximity: Til salgs i søkeområdet
     legacy_form_well:
       address_record:
         address: gateadresse
@@ -5987,6 +5992,3 @@ nb:
         to: Til
       thread_show:
         subject: Emne
-  marketplace:
-    index:
-      loading_results: Laster inn resultater...

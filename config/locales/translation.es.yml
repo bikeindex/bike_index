@@ -4673,6 +4673,9 @@ es:
       similar_serials:
         no_matched:
         with_similar_serials:
+    marketplace:
+      index:
+        loading_results:
   components:
     search:
       everything_combobox:
@@ -4697,6 +4700,8 @@ es:
         stolenness_non:
         stolenness_proximity:
         stolenness_stolen:
+        marketplace_scope_for_sale:
+        marketplace_scope_for_sale_proximity:
     legacy_form_well:
       address_record:
         address:
@@ -4732,6 +4737,3 @@ es:
         to:
       thread_show:
         subject:
-  marketplace:
-    index:
-      loading_results:
