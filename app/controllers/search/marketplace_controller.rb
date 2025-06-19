@@ -22,6 +22,12 @@ class Search::MarketplaceController < ApplicationController
     end
   end
 
+  def counts
+    render json: {
+      for_sale: searched_bikes_not_proximity.count, for_sale_proximity: searched_bikes_proximity.count
+    }
+  end
+
   private
 
   def permitted_scopes
@@ -29,16 +35,15 @@ class Search::MarketplaceController < ApplicationController
   end
 
   def searched_bikes
-    bikes = Bike.search(@interpreted_params).for_sale
+    @interpreted_params[:bounding_box].blank? ? searched_bikes_not_proximity : searched_bikes_proximity
+  end
 
-    if @marketplace_scope == "for_sale_proximity"
-      @interpreted_params.merge!(proximity_hash)
+  def searched_bikes_not_proximity
+    Bike.search(@interpreted_params).for_sale
+  end
 
-      if @interpreted_params[:bounding_box].present?
-        return bikes.within_bounding_box(@interpreted_params[:bounding_box])
-      end
-    end
-    bikes
+  def searched_bikes_proximity
+    searched_bikes_not_proximity.within_bounding_box(@interpreted_params[:bounding_box])
   end
 
   def proximity_hash
@@ -56,10 +61,13 @@ class Search::MarketplaceController < ApplicationController
 
   def set_interpreted_params
     @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
+    @marketplace_scope = permitted_scopes.include?(params[:marketplace_scope]) ? params[:marketplace_scope] : permitted_scopes.first
+    if @marketplace_scope == "for_sale_proximity" || action_name == "counts"
+      @interpreted_params.merge!(proximity_hash)
+    end
 
     @page = permitted_page(params[:page])
     @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
-    @marketplace_scope = permitted_scopes.include?(params[:marketplace_scope]) ? params[:marketplace_scope] : permitted_scopes.first
   end
 
   def permitted_search_params

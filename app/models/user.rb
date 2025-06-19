@@ -69,7 +69,7 @@ class User < ApplicationRecord
   include AddressRecorded
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
-  MARKETPLACE_FREE_UNTIL = 1750787705 # 2025-06-24 10:55 CST
+  MARKETPLACE_FREE_UNTIL = 1751950800 # 2025-07-08 12:00 CST
 
   cattr_accessor :current_user
 

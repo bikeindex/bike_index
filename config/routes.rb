@@ -151,6 +151,9 @@ Rails.application.routes.draw do
       end
     end
     get "/marketplace", to: "marketplace#index", as: :marketplace
+    resources :marketplace, only: [] do
+      collection { get :counts }
+    end
   end
 
   resources :bikes, except: %i[index edit] do

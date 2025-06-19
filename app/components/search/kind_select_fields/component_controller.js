@@ -12,12 +12,12 @@ export default class extends Controller {
     this.setSearchProximity()
     this.updateCountsToSubmit()
     this.updateForSaleLink.bind(this)
-    this.form.addEventListener('change', this.updateForSaleLink.bind(this))
+    this.form?.addEventListener('change', this.updateForSaleLink.bind(this))
   }
 
   disconnect () {
     this.resetKindCounts() // also removes the bindings
-    this.form.removeEventListener('change', this.updateForSaleLink.bind(this))
+    this.form?.removeEventListener('change', this.updateForSaleLink.bind(this))
     // Remove reset count function from window
     window.resetKindCounts = null
   }

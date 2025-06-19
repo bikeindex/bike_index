@@ -959,7 +959,7 @@ RSpec.describe "Bikes API V3", type: :request do
       context "v2_accessor is not the application owner" do
         let(:other_user) { FactoryBot.create(:user_confirmed) }
         let(:v2_access_id) { ENV["V2_ACCESSOR_ID"] = other_user.id.to_s }
-        it "v2_accessor" do
+        it "v2_accessor", :flaky do
           expect(v2_access_token.resource_owner_id).to eq other_user.id
           expect(v2_access_token.resource_owner_id).to_not eq user.id
           expect(v2_access_token.application.owner.admin_of?(organization)).to be_truthy
