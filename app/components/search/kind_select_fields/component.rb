@@ -4,19 +4,22 @@ module Search::KindSelectFields
   class Component < ApplicationComponent
     DEFAULT_DISTANCE = 100
     MAX_DISTANCE = 2_000 # IDK, seems reasonable
+    MARKETPLACE_SCOPES = %w[for_sale_proximity for_sale].freeze
+    # TODO: add Found, Found in search area
+    STOLENNESS_SCOPES = %w[proximity stolen non all for_sale].freeze
 
-    def initialize(stolenness:, location: nil, distance: nil, is_marketplace: false)
-      @is_marketplace = is_marketplace
+    def initialize(kind_scope:, location: nil, distance: nil)
+      @kind_scope = kind_scope
+      @is_marketplace = MARKETPLACE_SCOPES.include?(@kind_scope)
+
       @distance = GeocodeHelper.permitted_distance(distance, default_distance:)
-
       @location = location
-      @stolenness = stolenness
     end
 
     private
 
     def default_distance
-      @is_marketplace ? 50 : 100
+      @is_marketplace ? Search::MarketplaceController::DEFAULT_DISTANCE : GeocodeHelper::DEFAULT_DISTANCE
     end
 
     def api_count_url
@@ -24,23 +27,13 @@ module Search::KindSelectFields
     end
 
     def location_wrap_hidden_class
-      # TODO: Show marketplace for location search too!
-      return "" if @stolenness == "proximity" # if @is_marketplace
+      return "" if %w[proximity for_sale_proximity].include?(@kinde_scope)
 
       "tw:hidden"
     end
 
-    def include_stolenness?
-      !@is_marketplace
-    end
-
     def kind_options
-      if @is_marketplace
-        %w[for_sale_proximity for_sale]
-      else
-        # TODO: add Found, Found in search area
-        %w[proximity stolen non all for_sale]
-      end
+      @is_marketplace ? MARKETPLACE_SCOPES : STOLENNESS_SCOPES
     end
 
     def option_kind
@@ -48,11 +41,7 @@ module Search::KindSelectFields
     end
 
     def opt_selected?(opt)
-      opt == if @is_marketplace
-        "for_sale"
-      else
-        @stolenness
-      end
+      opt == @kind_scope
     end
 
     # Button only shows up on registration search

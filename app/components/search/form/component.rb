@@ -2,8 +2,8 @@
 
 module Search::Form
   class Component < ApplicationComponent
-    def initialize(target_search_path:, target_frame:, interpreted_params:, selected_query_items_options:, is_marketplace: false)
-      @is_marketplace = is_marketplace
+    def initialize(target_search_path:, target_frame:, interpreted_params:, selected_query_items_options:, marketplace_scope: nil)
+      @marketplace_scope = marketplace_scope
       @target_search_path = target_search_path
       @target_frame = target_frame
       @interpreted_params = interpreted_params
@@ -13,8 +13,9 @@ module Search::Form
     private
 
     def kind_select_options
-      @interpreted_params.slice(:stolenness, :location, :distance)
-        .merge(is_marketplace: @is_marketplace)
+      kind_scope = @marketplace_scope || @interpreted_params[:stolenness]
+
+      @interpreted_params.slice(:location, :distance).merge(kind_scope:)
     end
 
     def query
@@ -26,7 +27,9 @@ module Search::Form
     end
 
     def render_serial_field?
-      return true unless @is_marketplace # false if bike versions, or marketplace
+      # Always render serial unless viewing marketplace - TODO: bike versions too
+      return true if @marketplace_scope.blank?
+
       # Render the serial field, if it was passed
       @interpreted_params[:serial].present?
     end

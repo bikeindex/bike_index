@@ -55,14 +55,18 @@ module BikeSearchable
       items.flatten.compact
     end
 
-    def search_location(location, ip_address)
+    # returns nil OR [location, [lat, lng]] OR [location, nil]
+    def search_location(location, ip_address = nil)
       location = location.to_s.strip
       return if location.match?(/anywhere/i)
 
       if ["", "ip", "you"].include?(location.strip.downcase)
-        IpAddressParser.location_hash_geocoder(ip_address)
+        result = IpAddressParser.location_hash_geocoder(ip_address)
+        return if result.blank?
+
+        [result[:formatted_address], [result[:latitude], result[:longitude]]]
       else
-        {formatted_address: location} # for consistency
+        [location, nil]
       end
     end
 
@@ -127,8 +131,7 @@ module BikeSearchable
     def searchable_query_stolenness(query_params, ip_address)
       stolennness_hash = if %w[all non found impounded].include?(query_params[:stolenness])
         {stolenness: query_params[:stolenness]}
-      elsif %w[for_sale proximity].include?(query_params[:stolenness])
-        query_params[:stolenness] = "all" if query_params[:stolenness] == "for_sale"
+      elsif query_params[:stolenness] == "proximity"
         extracted_searchable_proximity_hash(query_params, ip_address)
       end
 
@@ -164,22 +167,21 @@ module BikeSearchable
     end
 
     def extracted_searchable_proximity_hash(query_params, ip_address)
-      location_hash = search_location(query_params[:location], ip_address)
-      return if location_hash.blank?
-
+      location, coordinates = search_location(query_params[:location], ip_address)
+      return if location.blank?
 
       distance = GeocodeHelper.permitted_distance(query_params[:distance])
-      bounding_box = if location_hash[:latitude].present?
-        GeocodeHelper.bounding_box([location_hash[:latitude], location_hash[:longitude]], distance)
+      bounding_box = if coordinates.present?
+        GeocodeHelper.bounding_box(coordinates, distance)
       else
-        GeocodeHelper.bounding_box(location_hash[:formatted_address], distance)
+        GeocodeHelper.bounding_box(location, distance)
       end
 
       return if bounding_box.empty? # If we can't create a bounding box, skip
       {
         bounding_box: bounding_box,
         stolenness: query_params[:stolenness],
-        location: location_hash[:formatted_address], # This will overwrite the user's input
+        location:, # This will overwrite the user's input
         distance:
       }
     end

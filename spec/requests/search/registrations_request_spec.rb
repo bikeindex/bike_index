@@ -72,32 +72,30 @@ RSpec.describe Search::RegistrationsController, type: :request do
         include_context :geocoder_default_location
 
         describe "assignment" do
-          context "no params" do
-            it "assigns defaults, stolenness: stolen" do
-              get base_url, as: :turbo_stream
-              expect(response.status).to eq 200
-              expect(response).to render_template(:index)
-              expect(flash).to_not be_present
-              expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
-              expect(assigns(:selected_query_items_options)).to eq([])
-              expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
-              # Test cycle_type
-              get "#{base_url}?query_items%5B%5D=v_16", as: :turbo_stream
-              expect(response.status).to eq 200
-              expect(response).to render_template(:index)
-              expect(flash).to_not be_present
-              expect(assigns(:interpreted_params)).to eq(stolenness: "stolen", cycle_type: :"e-scooter")
-              expect(assigns(:bikes).map(&:id)).to eq([stolen_bike_2.id])
-              # Test impounded
-              get "#{base_url}?stolenness=found", as: :turbo_stream
-              expect(assigns(:interpreted_params)).to eq(stolenness: "found")
-              expect(assigns(:selected_query_items_options)).to eq([])
-              expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
-              get base_url, params: {stolenness: "impounded"}, as: :turbo_stream
-              expect(assigns(:interpreted_params)).to eq(stolenness: "impounded")
-              expect(assigns(:selected_query_items_options)).to eq([])
-              expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
-            end
+          it "assigns defaults, stolenness: stolen" do
+            get base_url, as: :turbo_stream
+            expect(response.status).to eq 200
+            expect(response).to render_template(:index)
+            expect(flash).to_not be_present
+            expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
+            expect(assigns(:selected_query_items_options)).to eq([])
+            expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
+            # Test cycle_type
+            get "#{base_url}?query_items%5B%5D=v_16", as: :turbo_stream
+            expect(response.status).to eq 200
+            expect(response).to render_template(:index)
+            expect(flash).to_not be_present
+            expect(assigns(:interpreted_params)).to eq(stolenness: "stolen", cycle_type: :"e-scooter")
+            expect(assigns(:bikes).map(&:id)).to eq([stolen_bike_2.id])
+            # Test impounded
+            get "#{base_url}?stolenness=found", as: :turbo_stream
+            expect(assigns(:interpreted_params)).to eq(stolenness: "found")
+            expect(assigns(:selected_query_items_options)).to eq([])
+            expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
+            get base_url, params: {stolenness: "impounded"}, as: :turbo_stream
+            expect(assigns(:interpreted_params)).to eq(stolenness: "impounded")
+            expect(assigns(:selected_query_items_options)).to eq([])
+            expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
           end
           context "query_items and serial search" do
             let(:manufacturer) { non_stolen_bike.manufacturer }

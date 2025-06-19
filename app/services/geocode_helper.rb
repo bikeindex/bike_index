@@ -5,6 +5,7 @@
 class GeocodeHelper
   MIN_DISTANCE = 1
   MAX_DISTANCE = 1_000
+  DEFAULT_DISTANCE = 100
 
   class << self
     # Always returns latitude and longitude
@@ -17,10 +18,11 @@ class GeocodeHelper
       address_hash_for(lookup_string).slice(:formatted_address)
     end
 
-    def permitted_distance(distance, default_distance: 100)
+    def permitted_distance(distance = nil, default_distance: DEFAULT_DISTANCE)
       return default_distance if distance.blank? || (distance.is_a?(String) && !distance.match?(/\d/))
 
-      distance.to_f.clamp(MIN_DISTANCE, MAX_DISTANCE)
+      clamped_distance = distance.to_f.clamp(MIN_DISTANCE, MAX_DISTANCE)
+      (clamped_distance % 1 == 0) ? clamped_distance.to_i : clamped_distance
     end
 
     def bounding_box(lookup_string, distance)

@@ -16,6 +16,7 @@ RSpec.describe BikeVersionsController, type: :request do
       get "#{base_url}?query_items%5B%5D=boo"
       expect(response.code).to eq("200")
       expect(response).to render_template(:index)
+      pp assigns(:interpreted_params)
       expect(assigns(:bike_versions).pluck(:id)).to eq([bike_version.id])
 
       get "#{base_url}?query_items%5B%5D=booboo"

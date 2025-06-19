@@ -12,7 +12,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
   describe "index" do
     let(:seller) { FactoryBot.create(:user, :with_address_record) }
-    let(:item) { FactoryBot.create(:bike, cycle_type: "personal-mobility", propulsion_type: "throttle") }
+    let(:item) { FactoryBot.create(:bike, :with_primary_activity, cycle_type: "personal-mobility", propulsion_type: "throttle") }
     let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, address_record: seller.address_record, seller:, item:) }
     let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, :with_address_record, status: :draft, seller:) }
 
@@ -26,9 +26,13 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
     context "with search_no_js" do
       let!(:marketplace_listing_sold) { FactoryBot.create(:marketplace_listing, :sold, seller:) }
-      let!(:marketplace_listing_removed) { FactoryBot.create(:marketplace_listing, status: :removed, seller:) }
+      let!(:marketplace_listing_removed) do
+        FactoryBot.create(:marketplace_listing, status: :removed, seller:, item:,
+          created_at: Time.current - 1.year, published_at: Time.current - 2.months, end_at: Time.current - 1.month)
+      end
 
       it "renders with bikes" do
+        expect(marketplace_listing_removed.reload.published_at).to be < marketplace_listing_removed.end_at
         expect(MarketplaceListing.pluck(:status)).to match_array(%w[for_sale draft sold removed])
         expect(Bike.for_sale.pluck(:id)).to eq([item.id])
         get "#{base_url}?search_no_js=true"
@@ -59,13 +63,13 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
         let!(:marketplace_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, address_record:) }
         let(:ip_address) { "23.115.69.69" }
-        let(:target_location) { default_location[:formatted_address] }
+        let(:interpreted_params_location) { {stolenness: "all", location: default_location[:formatted_address], bounding_box:, distance: 50} }
         let(:headers) { {"HTTP_CF_CONNECTING_IP" => ip_address} }
         include_context :geocoder_stubbed_bounding_box
         include_context :geocoder_default_location
 
         describe "assignment" do
-          xit "assigns defaults, stolenness: stolen" do
+          it "assigns defaults, stolenness: stolen" do
             expect(marketplace_listing_nyc.reload.to_coordinates).to eq default_location_coordinates
             expect(marketplace_listing_nyc.item.motorized?).to be_falsey
             expect(marketplace_listing.reload.longitude).to be_within(1).of(-121) # Davis
@@ -83,16 +87,16 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(response).to render_template(:index)
             expect(assigns(:interpreted_params)).to eq(stolenness: "all", cycle_type: :"personal-mobility")
             expect(assigns(:bikes).map(&:id)).to eq([item.id])
-            # Test motorized
-            get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=p_10", as: :turbo_stream
+            # Test motorized, invalid marketplace_scope
+            get "#{base_url}?marketplace_scope=not_for_sale&query_items%5B%5D=p_10", as: :turbo_stream
             expect(response).to render_template(:index)
             expect(assigns(:interpreted_params)).to eq(stolenness: "all", propulsion_type: :motorized)
             expect(assigns(:bikes).map(&:id)).to eq([item.id])
             # Test location
-            get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=p_10", as: :turbo_stream
+            get "#{base_url}?marketplace_scope=for_sale_proximity", as: :turbo_stream
             expect(response).to render_template(:index)
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all", propulsion_type: :motorized)
-            expect(assigns(:bikes).map(&:id)).to eq([item.id])
+            expect(assigns(:interpreted_params)).to eq interpreted_params_location
+            expect(assigns(:bikes).map(&:id)).to eq([marketplace_listing_nyc.item_id])
           end
         end
       end

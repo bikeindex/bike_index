@@ -194,10 +194,11 @@ RSpec.describe GeocodeHelper do
   describe "permitted_distance" do
     it "returns value if passed valid value" do
       expect(described_class.permitted_distance(1)).to eq 1
-      expect(described_class.permitted_distance(" 0")).to eq 0
       expect(described_class.permitted_distance(44.4, default_distance: 3)).to eq 44.4
       expect(described_class.permitted_distance("696.9")).to eq 696.9
-      expect(described_class.permitted_distance(1000)).to eq 1_000
+      expect(described_class.permitted_distance(999.00)).to eq 999
+      expect(described_class.permitted_distance(999.00)).to be_an_integer
+      expect(described_class.permitted_distance(1000.0)).to eq 1_000
     end
     it "returns default_distance if blank or invalid" do
       expect(described_class.permitted_distance(nil)).to eq 100
@@ -207,7 +208,8 @@ RSpec.describe GeocodeHelper do
     context "outside bands" do
       it "returns clamped" do
         expect(described_class.permitted_distance(5_000)).to eq 1_000
-        expect(described_class.permitted_distance("-2", default_distance: 10)).to eq 0
+        expect(described_class.permitted_distance("-2", default_distance: 10)).to eq 1
+        expect(described_class.permitted_distance(" 0")).to eq 1
       end
     end
   end
