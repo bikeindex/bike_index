@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MarketplaceController < ApplicationController
+class Search::MarketplaceController < ApplicationController
   MAX_INDEX_PAGE = 100
   before_action :render_ad
   before_action :set_interpreted_params

@@ -63,7 +63,7 @@ module Search::KindSelectFields
 
     def opt_button_url(opt)
       if opt_is_button?(opt)
-        "/marketplace"
+        search_marketplace_path
       end
     end
 

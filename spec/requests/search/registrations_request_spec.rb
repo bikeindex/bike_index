@@ -43,7 +43,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
     context "with stolenness: for_sale" do
       it "redirects to marketplace" do
         get "#{base_url}?search_no_js=true&stolenness=for_sale&location=Chicago%2C+IL"
-        expect(response).to redirect_to("/marketplace?location=Chicago%2C+IL&search_no_js=true")
+        expect(response).to redirect_to("/search/marketplace?location=Chicago%2C+IL&search_no_js=true")
       end
     end
 

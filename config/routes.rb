@@ -150,6 +150,7 @@ Rails.application.routes.draw do
         get :serials_containing
       end
     end
+    get "/marketplace", to: "marketplace#index", as: :marketplace
   end
 
   resources :bikes, except: %i[index edit] do
@@ -174,8 +175,6 @@ Rails.application.routes.draw do
   resources :locks, except: %i[show index]
   resources :impound_claims, only: [:create, :update]
   resources :review_impound_claims, only: [:show, :update]
-
-  get "marketplace", to: "marketplace#index"
 
   namespace :admin do
     root to: "dashboard#index", as: :root
@@ -411,6 +410,10 @@ Rails.application.routes.draw do
     resources :impounded_bikes, only: %i[index]
   end
 
-  get "/bikes", to: redirect("search/registrations") # old search URL to new search URL
+  # old search URLs to new search URLs
+  get "/bikes", to: redirect("search/registrations")
+  # ENABLE ENABLE ENABLE!
+  # Commenting to catch any places missed
+  # get "/marketplace", to: redirect("search/marketplace")
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
 end

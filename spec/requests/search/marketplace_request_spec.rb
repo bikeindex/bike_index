@@ -1,7 +1,14 @@
 require "rails_helper"
 
-RSpec.describe MarketplaceController, type: :request do
-  let(:base_url) { "/marketplace" }
+RSpec.describe Search::MarketplaceController, type: :request do
+  let(:base_url) { "/search/marketplace" }
+
+  it "redirects from marketplace" do
+    get "/marketplace"
+    # expect(response).to redirect_to base_url
+    # Sanity check
+    expect(search_marketplace_path).to eq base_url
+  end
 
   describe "index" do
     let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }

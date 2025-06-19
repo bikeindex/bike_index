@@ -3996,9 +3996,6 @@ en:
       only_makes_components: Only makes components
       submit_a_pr_html: Suggest an update by submitting a Pull Request to the %{csv_on_github}.
       thats_not_actually_surprising: That's not actually surprising, there are a bunch.
-  marketplace:
-    index:
-      loading_results: Loading results...
   memberships:
     success:
       bike_index_team: The Bike Index team
@@ -5105,6 +5102,9 @@ en:
       vehicle_manufacturer: Vehicle manufacturer
       your: your
   search:
+    marketplace:
+      index:
+        loading_results: Loading results...
     registrations:
       index:
         loading_results: Loading results...
