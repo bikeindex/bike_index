@@ -4,7 +4,6 @@ class LogSearcher::Parser
     "API::V1::BikesController#index" => :api_v1_bikes,
     "API::V1::BikesController#stolen_ids" => :api_v1_stolen_ids,
     "API::V1::BikesController#close_serials" => :api_v1_close_serials,
-    "BikesController#index" => :web_bikes,
     "Organized::BikesController#index" => :org_bikes,
     "Admin::BikesController#index" => :admin_bikes,
     "OrgPublic::ImpoundedBikesController#index" => :org_public_impounded,
@@ -12,7 +11,9 @@ class LogSearcher::Parser
     "Organized::ParkingNotificationsController#index" => :org_parking_notifications,
     "Search::RegistrationsController#index" => :web_bikes,
     "Search::RegistrationsController#serials_containing" => :web_serials_containing,
-    "Search::RegistrationsController#similar_serials" => :web_close_serials
+    "Search::RegistrationsController#similar_serials" => :web_close_serials,
+    "Search::MarketplaceController#index" => :web_marketplace,
+    "Search::MarketplaceController#counts" => :web_marketplace_counts
   }.freeze
 
   ROUTE_ENDPOINTS = {
@@ -37,6 +38,7 @@ class LogSearcher::Parser
     def parse_log_line(log_line)
       raise "Multiple line_data matches for log line #{log_line}" if log_line.match?(/\] \{.*\] \{/)
       line_data, opts = log_line.split("] {")
+      # pp opts
       opts = JSON.parse("{#{opts}")
       endpoint = parse_endpoint(opts)
       return nil unless LoggedSearch.endpoints_sym.include?(endpoint)
@@ -103,6 +105,8 @@ class LogSearcher::Parser
         :impounded
       elsif endpoint == :api_v1_stolen_ids
         :stolen
+      elsif endpoint.match?(/marketplace/)
+        :for_sale
       else
         case opts.dig("params", "stolenness")
         when "stolen", "proximity" then :stolen
