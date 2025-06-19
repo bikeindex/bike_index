@@ -7,18 +7,17 @@ module Search::KindSelectFields
 
     def initialize(stolenness:, location: nil, distance: nil, is_marketplace: false)
       @is_marketplace = is_marketplace
-      @distance = if distance.present?
-        distance.to_i
-      else
-        DEFAULT_DISTANCE
-      end
-      @distance.clamp(1, MAX_DISTANCE)
+      @distance = GeocodeHelper.permitted_distance(distance, default_distance:)
 
       @location = location
       @stolenness = stolenness
     end
 
     private
+
+    def default_distance
+      @is_marketplace ? 50 : 100
+    end
 
     def api_count_url
       @is_marketplace ? "none" : "/api/v3/search/count"

@@ -37,9 +37,8 @@ module API
       def stolen_ids
         stolen = StolenRecord.where(approved: true)
         if params[:proximity].present?
-          radius = 50
-          radius = params[:proximity_radius] if params[:proximity_radius].present? && params[:proximity_radius].strip.length > 0
-          box = GeocodeHelper.bounding_box(params[:proximity], radius)
+          distance = GeocodeHelper.permitted_distance(params[:proximity_radius], default_distance: 50)
+          box = GeocodeHelper.bounding_box(params[:proximity], distance)
           stolen = stolen.within_bounding_box(box)
         end
         if params[:updated_since]

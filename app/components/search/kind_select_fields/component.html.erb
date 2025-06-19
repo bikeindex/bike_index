@@ -13,7 +13,7 @@
       <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
       <%=
         number_field_tag :distance, @distance,
-        placeholder: "100", min: 1, class: "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
+        placeholder: default_distance, min: GeocodeHelper::MIN_DISTANCE, class: "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
         "data-search--kind-select-fields--component-target" => "distance"
       %>
     </span>

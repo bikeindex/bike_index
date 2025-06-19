@@ -3,6 +3,9 @@
 # A few things to make working with locations easier
 # e.g. geocoder returns arrays and varies slightly depending on the provider
 class GeocodeHelper
+  MIN_DISTANCE = 1
+  MAX_DISTANCE = 1_000
+
   class << self
     # Always returns latitude and longitude
     def coordinates_for(lookup_string)
@@ -12,6 +15,12 @@ class GeocodeHelper
 
     def address_string_for(lookup_string)
       address_hash_for(lookup_string).slice(:formatted_address)
+    end
+
+    def permitted_distance(distance, default_distance: 100)
+      return default_distance if distance.blank? || (distance.is_a?(String) && !distance.match?(/\d/))
+
+      distance.to_f.clamp(MIN_DISTANCE, MAX_DISTANCE)
     end
 
     def bounding_box(lookup_string, distance)
