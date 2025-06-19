@@ -412,8 +412,7 @@ Rails.application.routes.draw do
 
   # old search URLs to new search URLs
   get "/bikes", to: redirect("search/registrations")
-  # ENABLE ENABLE ENABLE!
-  # Commenting to catch any places missed
-  # get "/marketplace", to: redirect("search/marketplace")
+  get "/marketplace", to: redirect("search/marketplace")
+
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
 end

@@ -3,6 +3,8 @@ en:
   components:
     search:
       kind_select_fields:
+        marketplace_scope_for_sale: For sale anywhere
+        marketplace_scope_for_sale_proximity: For sale in search area
         miles_of: miles of
         search_distance: Search distance
         search_location: Search location
@@ -12,5 +14,3 @@ en:
         stolenness_proximity: Stolen in search area
         stolenness_stolen: Stolen anywhere
         within: within
-        marketplace_scope_for_sale_proximity: For sale in search area
-        marketplace_scope_for_sale: For sale anywhere

@@ -11,9 +11,10 @@ RSpec.describe Search::MarketplaceController, type: :request do
   end
 
   describe "index" do
-    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
-    let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, status: :draft) }
-    let(:bike_id) { marketplace_listing.item_id }
+    let(:seller) { FactoryBot.create(:user, :with_address_record) }
+    let(:item) { FactoryBot.create(:bike, cycle_type: "personal-mobility", propulsion_type: "throttle") }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, address_record: seller.address_record, seller:, item:) }
+    let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, :with_address_record, status: :draft, seller:) }
 
     it "renders" do
       get base_url
@@ -24,14 +25,17 @@ RSpec.describe Search::MarketplaceController, type: :request do
     end
 
     context "with search_no_js" do
+      let!(:marketplace_listing_sold) { FactoryBot.create(:marketplace_listing, :sold, seller:) }
+      let!(:marketplace_listing_removed) { FactoryBot.create(:marketplace_listing, status: :removed, seller:) }
+
       it "renders with bikes" do
-        expect(MarketplaceListing.pluck(:status)).to match_array(%w[for_sale draft])
-        expect(Bike.for_sale.pluck(:id)).to eq([bike_id])
+        expect(MarketplaceListing.pluck(:status)).to match_array(%w[for_sale draft sold removed])
+        expect(Bike.for_sale.pluck(:id)).to eq([item.id])
         get "#{base_url}?search_no_js=true"
         expect(response.code).to eq("200")
         expect(response).to render_template(:index)
         expect(assigns(:interpreted_params)).to eq(stolenness: "all")
-        expect(assigns(:bikes).pluck(:id)).to eq([bike_id])
+        expect(assigns(:bikes).pluck(:id)).to eq([item.id])
       end
     end
 
@@ -45,9 +49,52 @@ RSpec.describe Search::MarketplaceController, type: :request do
         expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_marketplace_results_frame\">")
         expect(response).to render_template(:index)
         expect(assigns(:interpreted_params)).to eq(stolenness: "all")
-        expect(assigns(:bikes).pluck(:id)).to eq([bike_id])
+        expect(assigns(:bikes).pluck(:id)).to eq([item.id])
         # Expect there to be a link to the bike url
-        expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{bike_id}"/)
+        expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{item.id}"/)
+      end
+
+      context "geocoder_stubbed_bounding_box" do
+        let!(:address_record) { FactoryBot.create(:address_record, :new_york, kind: :marketplace_listing, user: seller) }
+
+        let!(:marketplace_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, address_record:) }
+        let(:ip_address) { "23.115.69.69" }
+        let(:target_location) { default_location[:formatted_address] }
+        let(:headers) { {"HTTP_CF_CONNECTING_IP" => ip_address} }
+        include_context :geocoder_stubbed_bounding_box
+        include_context :geocoder_default_location
+
+        describe "assignment" do
+          xit "assigns defaults, stolenness: stolen" do
+            expect(marketplace_listing_nyc.reload.to_coordinates).to eq default_location_coordinates
+            expect(marketplace_listing_nyc.item.motorized?).to be_falsey
+            expect(marketplace_listing.reload.longitude).to be_within(1).of(-121) # Davis
+            expect(marketplace_listing.item.motorized?).to be_truthy
+
+            get base_url, as: :turbo_stream
+            expect(response.status).to eq 200
+            expect(response).to render_template(:index)
+            expect(flash).to_not be_present
+            expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+            expect(assigns(:selected_query_items_options)).to eq([])
+            expect(assigns(:bikes).map(&:id)).to match_array([item.id, marketplace_listing_nyc.item_id])
+            # Test cycle_type
+            get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=v_18", as: :turbo_stream
+            expect(response).to render_template(:index)
+            expect(assigns(:interpreted_params)).to eq(stolenness: "all", cycle_type: :"personal-mobility")
+            expect(assigns(:bikes).map(&:id)).to eq([item.id])
+            # Test motorized
+            get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=p_10", as: :turbo_stream
+            expect(response).to render_template(:index)
+            expect(assigns(:interpreted_params)).to eq(stolenness: "all", propulsion_type: :motorized)
+            expect(assigns(:bikes).map(&:id)).to eq([item.id])
+            # Test location
+            get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=p_10", as: :turbo_stream
+            expect(response).to render_template(:index)
+            expect(assigns(:interpreted_params)).to eq(stolenness: "all", propulsion_type: :motorized)
+            expect(assigns(:bikes).map(&:id)).to eq([item.id])
+          end
+        end
       end
     end
   end
