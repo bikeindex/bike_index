@@ -57,7 +57,7 @@ class BikeServices::Updator
 
   # This is a separate method because it's called in admin
   def update_stolen_record
-    StolenRecordUpdator.new(bike: @bike, b_param: BParam.new(params: @bike_params)).update_records
+    BikeServices::StolenRecordUpdator.new(bike: @bike, b_param: BParam.new(params: @bike_params)).update_records
   end
 
   def set_protected_attributes

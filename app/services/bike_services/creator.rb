@@ -16,7 +16,7 @@ class BikeServices::Creator
       stock_photo_url pdf send_email skip_email listing_order approved_stolen primary_activity_id
       marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
       [
-        stolen_records_attributes: StolenRecordUpdator.old_attr_accessible,
+        stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
         impound_records_attributes: permitted_impound_attrs,
         components_attributes: Component.permitted_attributes
       ]
@@ -233,7 +233,7 @@ class BikeServices::Creator
     ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
     bike.create_normalized_serial_segments
     assign_user_attributes(bike, ownership&.user)
-    StolenRecordUpdator.new(bike: bike, b_param: b_param).update_records
+    BikeServices::StolenRecordUpdator.new(bike: bike, b_param: b_param).update_records
     attach_photo(b_param, bike)
     attach_photos(b_param, bike)
     bike.save
