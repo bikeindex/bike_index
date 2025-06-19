@@ -68,36 +68,34 @@ RSpec.describe Search::MarketplaceController, type: :request do
         include_context :geocoder_stubbed_bounding_box
         include_context :geocoder_default_location
 
-        describe "assignment" do
-          it "assigns defaults, stolenness: stolen" do
-            expect(marketplace_listing_nyc.reload.to_coordinates).to eq default_location_coordinates
-            expect(marketplace_listing_nyc.item.motorized?).to be_falsey
-            expect(marketplace_listing.reload.longitude).to be_within(1).of(-121) # Davis
-            expect(marketplace_listing.item.motorized?).to be_truthy
+        it "assigns defaults, searches by proximity" do
+          expect(marketplace_listing_nyc.reload.to_coordinates).to eq default_location_coordinates
+          expect(marketplace_listing_nyc.item.motorized?).to be_falsey
+          expect(marketplace_listing.reload.longitude).to be_within(1).of(-121) # Davis
+          expect(marketplace_listing.item.motorized?).to be_truthy
 
-            get base_url, as: :turbo_stream
-            expect(response.status).to eq 200
-            expect(response).to render_template(:index)
-            expect(flash).to_not be_present
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all")
-            expect(assigns(:selected_query_items_options)).to eq([])
-            expect(assigns(:bikes).map(&:id)).to match_array([item.id, marketplace_listing_nyc.item_id])
-            # Test cycle_type
-            get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=v_18", as: :turbo_stream
-            expect(response).to render_template(:index)
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all", cycle_type: :"personal-mobility")
-            expect(assigns(:bikes).map(&:id)).to eq([item.id])
-            # Test motorized, invalid marketplace_scope
-            get "#{base_url}?marketplace_scope=not_for_sale&query_items%5B%5D=p_10", as: :turbo_stream
-            expect(response).to render_template(:index)
-            expect(assigns(:interpreted_params)).to eq(stolenness: "all", propulsion_type: :motorized)
-            expect(assigns(:bikes).map(&:id)).to eq([item.id])
-            # Test location
-            get "#{base_url}?marketplace_scope=for_sale_proximity", as: :turbo_stream
-            expect(response).to render_template(:index)
-            expect(assigns(:interpreted_params)).to eq interpreted_params_location
-            expect(assigns(:bikes).map(&:id)).to eq([marketplace_listing_nyc.item_id])
-          end
+          get base_url, as: :turbo_stream
+          expect(response.status).to eq 200
+          expect(response).to render_template(:index)
+          expect(flash).to_not be_present
+          expect(assigns(:interpreted_params)).to eq(stolenness: "all")
+          expect(assigns(:selected_query_items_options)).to eq([])
+          expect(assigns(:bikes).map(&:id)).to match_array([item.id, marketplace_listing_nyc.item_id])
+          # Test cycle_type
+          get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=v_18", as: :turbo_stream
+          expect(response).to render_template(:index)
+          expect(assigns(:interpreted_params)).to eq(stolenness: "all", cycle_type: :"personal-mobility")
+          expect(assigns(:bikes).map(&:id)).to eq([item.id])
+          # Test motorized, invalid marketplace_scope
+          get "#{base_url}?marketplace_scope=not_for_sale&query_items%5B%5D=p_10", as: :turbo_stream
+          expect(response).to render_template(:index)
+          expect(assigns(:interpreted_params)).to eq(stolenness: "all", propulsion_type: :motorized)
+          expect(assigns(:bikes).map(&:id)).to eq([item.id])
+          # Test location
+          get "#{base_url}?marketplace_scope=for_sale_proximity", as: :turbo_stream
+          expect(response).to render_template(:index)
+          expect(assigns(:interpreted_params)).to eq interpreted_params_location
+          expect(assigns(:bikes).map(&:id)).to eq([marketplace_listing_nyc.item_id])
         end
       end
     end

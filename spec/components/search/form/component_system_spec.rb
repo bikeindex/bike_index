@@ -149,7 +149,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
         find("label", text: "For sale in search area").click
 
-        # TODO: Why is this not working?
         find("#distance").set("251")
         find("#location").set("Edmonton, AB")
         expect(page_text(page.text)).to match("miles of")

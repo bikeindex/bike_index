@@ -170,7 +170,6 @@ RSpec.describe GeocodeHelper do
   end
 
   describe "bounding_box" do
-    let(:ip_address) { "x.x.x.x" }
     context "san francisco" do
       let(:target) do
         [37.63019771688915, -122.60252221724598, 37.91966128311085, -122.23630878275402]
