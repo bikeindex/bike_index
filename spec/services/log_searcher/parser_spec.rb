@@ -2,26 +2,6 @@ require "rails_helper"
 
 RSpec.describe LogSearcher::Parser do
   describe "parse_log_line" do
-    let(:log_line) do
-      "I, [2023-10-23T00:20:01.681937 #6669]  INFO -- : [6473c6f5-51f6-422b-bb3c-7e94b670f520] " \
-      "{\"method\":\"GET\",\"path\":\"/bikes\",\"format\":\"html\"," \
-      "\"controller\":\"BikesController\",\"action\":\"index\",\"status\":200," \
-      "\"duration\":1001.79,\"view\":52.68,\"db\":946.26,\"remote_ip\":\"11.222.33.4\"," \
-      "\"u_id\":null,\"params\":{\"page\": 2},\"@timestamp\":\"2023-10-23T00:20:01.681Z\"," \
-      "\"@version\":\"1\",\"message\":\"[200] GET /bikes (BikesController#index)\"}"
-    end
-    let(:time) { Time.parse("2023-10-23T00:20:01.681937 UTC") }
-    let(:target) do
-      {request_at: time, request_id: "6473c6f5-51f6-422b-bb3c-7e94b670f520",
-       duration_ms: 1002, user_id: nil, organization_id: nil, endpoint: :web_bikes,
-       ip_address: "11.222.33.4", query_items: {}, page: 2, serial_normalized: nil,
-       stolenness: :all, includes_query: false}
-    end
-    it "parses into attrs" do
-      # request_time actually takes line_data (not log_line) - but, it works either way
-      expect(described_class.send(:parse_request_time, log_line)).to eq time
-      expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
-    end
     context "search" do
       context "registrations" do
         let(:log_line) { 'I, [2025-04-03T05:18:55.534592 #4024194]  INFO -- : [d22faa57-0d50-4d24-bf72-3db7c500b8ef] {"method":"GET","path":"/search/registrations","format":"html","controller":"Search::RegistrationsController","action":"index","status":200,"allocations":14389,"duration":871.01,"view":28.81,"db":823.43,"remote_ip":"157.131.200.8","u_id":85,"params":{"serial":"adsfadsfadfadsfasdfasdfasdf","distance":"100","location":"San Francisco","stolenness":"stolen","button":""},"@timestamp":"2025-04-03T05:18:55.534Z","@version":"1","message":"[200] GET /search/registrations (Search::RegistrationsController#index)"}' }
@@ -47,6 +27,50 @@ RSpec.describe LogSearcher::Parser do
           it "parses" do
             expect(described_class.send(:parse_request_time, log_line)).to eq time
             expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target_containing
+          end
+        end
+      end
+      context "marketplace" do
+        let(:log_line) { 'I, [2025-06-19T22:42:11.977671 #476502]  INFO -- : [3d819221-d975-462b-abb6-1dcc26ceb47b] {"method":"GET","path":"/search/marketplace","format":"html","controller":"Search::MarketplaceController","action":"index","status":200,"allocations":18272,"duration":91.09,"view":18.83,"db":12.74,"remote_ip":"198.27.190.253","u_id":69,"params":{"query_items":["m_244"],"distance":"50","location":"Chicago, IL","marketplace_scope":"for_sale_proximity"},"@timestamp":"2025-06-19T22:42:11.977Z","@version":"1","message":"[200] GET /search/marketplace (Search::MarketplaceController#index)"}' }
+        let(:request_at) { Time.parse("2025-06-19 22:42:11.977671000 UTC") }
+        let(:target) do
+          {request_at:,
+           request_id: "3d819221-d975-462b-abb6-1dcc26ceb47b",
+           duration_ms: 91,
+           user_id: 69,
+           endpoint: :web_marketplace,
+           ip_address: "198.27.190.253",
+           query_items: {query_items: ["m_244"], distance: "50", location: "Chicago, IL", marketplace_scope: "for_sale_proximity"},
+           stolenness: :for_sale,
+           includes_query: true,
+           organization_id: nil,
+           page: nil,
+           serial_normalized: nil}
+        end
+        it "parses" do
+          expect(described_class.send(:parse_request_time, log_line)).to eq request_at
+          expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
+        end
+
+        context "count" do
+          let(:log_line) { 'I, [2025-06-19T22:42:11.977671 #476516]  INFO -- : [29e848c7-c6ac-4a7d-bc3a-34bbf44dc8ce] {"method":"GET","path":"/search/marketplace/counts","format":"*/*","controller":"Search::MarketplaceController","action":"counts","status":200,"allocations":8787,"duration":50.22,"view":0.33,"db":12.42,"remote_ip":"198.27.190.253","u_id":69,"params":{"query_items":["m_244"],"distance":"50","location":"Chicago, IL","marketplace_scope":"for_sale_proximity","marketplace":{}},"@timestamp":"2025-06-19T22:42:12.090Z","@version":"1","message":"[200] GET /search/marketplace/counts (Search::MarketplaceController#counts)"}' }
+          let(:target) do
+            {request_at:,
+             request_id: "29e848c7-c6ac-4a7d-bc3a-34bbf44dc8ce",
+             duration_ms: 50,
+             user_id: 69,
+             endpoint: :web_marketplace_count,
+             ip_address: "198.27.190.253",
+             query_items: {query_items: ["m_244"], distance: "50", location: "Chicago, IL", marketplace_scope: "for_sale_proximity"},
+             stolenness: :for_sale,
+             includes_query: true,
+             organization_id: nil,
+             page: nil,
+             serial_normalized: nil}
+          end
+          it "parses" do
+            expect(described_class.send(:parse_request_time, log_line)).to eq request_at
+            expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
           end
         end
       end
@@ -133,9 +157,11 @@ RSpec.describe LogSearcher::Parser do
     let(:log_path) { Rails.root.join("spec", "fixtures", "example_log.log") }
     it "parses all the lines from the example" do
       log_lines = File.read(log_path).split("\n")
-      expect(log_lines.count).to be > 15
       parsed_log_lines = log_lines.map { |l| described_class.parse_log_line(l) }.compact
-      expect(parsed_log_lines.count).to be < log_lines.count
+      # These numbers will need to be updated, every time the example_log.log updates
+      expect(log_lines.count).to eq 31
+      expect(parsed_log_lines.count).to eq 25
+
       # It should have every endpoint
       logged_endpoints = parsed_log_lines.map { |l| l[:endpoint] }.uniq.sort
       expect(LoggedSearch.endpoints_sym - logged_endpoints).to eq([])
