@@ -55,19 +55,19 @@ RSpec.describe LogSearcher::Parser do
         context "count" do
           let(:log_line) { 'I, [2025-06-19T22:42:11.977671 #476516]  INFO -- : [29e848c7-c6ac-4a7d-bc3a-34bbf44dc8ce] {"method":"GET","path":"/search/marketplace/counts","format":"*/*","controller":"Search::MarketplaceController","action":"counts","status":200,"allocations":8787,"duration":50.22,"view":0.33,"db":12.42,"remote_ip":"198.27.190.253","u_id":69,"params":{"query_items":["m_244"],"distance":"50","location":"Chicago, IL","marketplace_scope":"for_sale_proximity","marketplace":{}},"@timestamp":"2025-06-19T22:42:12.090Z","@version":"1","message":"[200] GET /search/marketplace/counts (Search::MarketplaceController#counts)"}' }
           let(:target) do
-          {request_at:,
-           request_id: "29e848c7-c6ac-4a7d-bc3a-34bbf44dc8ce",
-           duration_ms: 91,
-           user_id: 69,
-           endpoint: :web_marketplace_count,
-           ip_address: "198.27.190.253",
-           query_items: {query_items: ["m_244"], distance: "50", location: "Chicago, IL", marketplace_scope: "for_sale_proximity"},
-           stolenness: :for_sale,
-           includes_query: true,
-           organization_id: nil,
-           page: nil,
-           serial_normalized: nil}
-         end
+            {request_at:,
+             request_id: "29e848c7-c6ac-4a7d-bc3a-34bbf44dc8ce",
+             duration_ms: 50,
+             user_id: 69,
+             endpoint: :web_marketplace_count,
+             ip_address: "198.27.190.253",
+             query_items: {query_items: ["m_244"], distance: "50", location: "Chicago, IL", marketplace_scope: "for_sale_proximity"},
+             stolenness: :for_sale,
+             includes_query: true,
+             organization_id: nil,
+             page: nil,
+             serial_normalized: nil}
+          end
           it "parses" do
             expect(described_class.send(:parse_request_time, log_line)).to eq request_at
             expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
@@ -157,9 +157,11 @@ RSpec.describe LogSearcher::Parser do
     let(:log_path) { Rails.root.join("spec", "fixtures", "example_log.log") }
     it "parses all the lines from the example" do
       log_lines = File.read(log_path).split("\n")
-      expect(log_lines.count).to be > 15
       parsed_log_lines = log_lines.map { |l| described_class.parse_log_line(l) }.compact
-      expect(parsed_log_lines.count).to be < log_lines.count
+      # These numbers will need to be updated, every time the example_log.log updates
+      expect(log_lines.count).to eq 31
+      expect(parsed_log_lines.count).to eq 25
+
       # It should have every endpoint
       logged_endpoints = parsed_log_lines.map { |l| l[:endpoint] }.uniq.sort
       expect(LoggedSearch.endpoints_sym - logged_endpoints).to eq([])

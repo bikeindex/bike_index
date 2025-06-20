@@ -30,12 +30,12 @@ RSpec.describe LogSearcher::Reader do
     end
   end
 
-  describe 'rgrep_log_lines_count' do
+  describe "rgrep_log_lines_count" do
     let(:total_lines) { File.foreach(log_path).count }
     it "returns the expected log line count" do
-      # When new lines are added to the example, this will fail
-      # Added as a failsafe because Seth didn't update the reader when he updated the parser in 2025
-      # ... and didn't store web searches for a few months because of that
+      # When new lines are added to the example log file, this will fail.
+      # Added as a failsafe because Seth didn't update the Reader when he updated the Parser in 2025-4
+      # ... and didn't store web searches for ~ 2 months because of that
       expect(total_lines).to eq 31
       expect(LogSearcher::Reader.rgrep_log_lines_count(log_path:)).to eq 21
     end

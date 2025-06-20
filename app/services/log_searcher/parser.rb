@@ -13,7 +13,7 @@ class LogSearcher::Parser
     "Search::RegistrationsController#serials_containing" => :web_serials_containing,
     "Search::RegistrationsController#similar_serials" => :web_close_serials,
     "Search::MarketplaceController#index" => :web_marketplace,
-    "Search::MarketplaceController#counts" => :web_marketplace_counts
+    "Search::MarketplaceController#counts" => :web_marketplace_count
   }.freeze
 
   ROUTE_ENDPOINTS = {
@@ -38,7 +38,6 @@ class LogSearcher::Parser
     def parse_log_line(log_line)
       raise "Multiple line_data matches for log line #{log_line}" if log_line.match?(/\] \{.*\] \{/)
       line_data, opts = log_line.split("] {")
-      # pp opts
       opts = JSON.parse("{#{opts}")
       endpoint = parse_endpoint(opts)
       return nil unless LoggedSearch.endpoints_sym.include?(endpoint)
