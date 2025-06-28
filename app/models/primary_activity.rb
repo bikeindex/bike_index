@@ -39,6 +39,9 @@ class PrimaryActivity < ApplicationRecord
   scope :flavor, -> { where(family: false) }
   scope :by_priority, -> { order(priority: :desc) }
   scope :alphabetized, -> { order(Arel.sql("LOWER(name)")) }
+  # top_level means that there isn't a family
+  scope :top_level, -> { where("primary_activity_family_id = id") }
+  scope :not_top_level, -> { where("primary_activity_family_id != id") }
 
   class << self
     def friendly_find(str)
@@ -55,12 +58,14 @@ class PrimaryActivity < ApplicationRecord
     end
 
     # This returns just the id if it's
-    def friendly_find_family_ids(str)
+    def friendly_find_id_and_family_ids(str)
       return [] if str.blank?
       str.strip! if str.is_a?(String)
       if integer_string?(str)
         ids = ids_matching_family_id(str)
-        return ids.any? ? ids : by_priority.where(id: str).pluck(:id)
+        ids = by_priority.where(id: str).pluck(:id) if ids.none?
+
+        return ids.any? ? [str.to_i, ids] : []
       end
 
       result = friendly_find_id_select(str, select_attrs: %i[id primary_activity_family_id family])
@@ -68,7 +73,8 @@ class PrimaryActivity < ApplicationRecord
 
       # If the object that was found was a flavor, no need to search again
       # but if it's a family, search for the family ids
-      result.family ? ids_matching_family_id(result.id) : [result.id]
+      ids = result.family ? ids_matching_family_id(result.id) : [result.id]
+      [result.id, ids]
     end
 
     private
@@ -93,6 +99,10 @@ class PrimaryActivity < ApplicationRecord
 
   def flavor?
     !family?
+  end
+
+  def top_level?
+    primary_activity_family_id == id
   end
 
   def display_name
@@ -122,7 +132,7 @@ class PrimaryActivity < ApplicationRecord
   def set_calculated_attributes
     self.name = name&.strip
     self.slug ||= Slugifyer.slugify(name)
-    self.priority = calculated_priority
+    self.priority ||= calculated_priority
     # If it doesn't have a family, assign primary_activity_family_id to its own ID, so it's searchable
     # EVEN if it's a flavor
     self.primary_activity_family_id = id if primary_activity_family.blank?
@@ -137,7 +147,7 @@ class PrimaryActivity < ApplicationRecord
 
   def calculated_priority
     return calculated_family_priority if family?
-    return primary_activity_family.priority - 1 if primary_activity_family.present?
+    return primary_activity_family.priority - 100 if primary_activity_family.present?
 
     401
   end

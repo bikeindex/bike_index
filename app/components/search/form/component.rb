@@ -38,12 +38,19 @@ module Search::Form
       @interpreted_params[:serial].present?
     end
 
+    def serial_looks_like_not_a_serial?
+      @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
+    end
+
     def render_primary_activity_field?
       is_marketplace? # Also show on bike versions
     end
 
-    def serial_looks_like_not_a_serial?
-      @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
+    def primary_activity_select_opts
+      options_for_select(PrimaryActivity.by_priority.map { |pa| [pa.display_name, pa.id] },
+        selected: @interpreted_params[:primary_activity])
+      # :primary_activity_id, PrimaryActivity.by_priority, :id, :display_name, {include_blank: true, prompt: t(".choose_activity")}, {class: "form-control"}
+      # BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id]  }
     end
   end
 end

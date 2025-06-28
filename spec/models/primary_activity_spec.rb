@@ -62,17 +62,18 @@ RSpec.describe PrimaryActivity, type: :model do
     let(:primary_activity) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:) }
     it "is expected" do
       expect(primary_activity_family.reload.priority).to eq 490
-      expect(primary_activity.reload.priority).to eq 489
+      expect(primary_activity.reload.priority).to eq 390
     end
   end
 
-  describe "friendly_find_family_ids" do
+  describe "friendly_find_id_and_family_ids" do
     let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Bike)") }
     let!(:primary_activity) { FactoryBot.create(:primary_activity, primary_activity_family:) }
     let!(:primary_activity2) { FactoryBot.create(:primary_activity, primary_activity_family:) }
     let!(:primary_activity_other) { FactoryBot.create(:primary_activity, :with_family) }
     let!(:primary_activity_other_family) { primary_activity_other.primary_activity_family }
-    let(:family_ids) { [primary_activity_family.id, primary_activity.id, primary_activity2.id] }
+    let(:family_ids) { [primary_activity_family.id, primary_activity.id, primary_activity2.id].sort }
+    let(:other_family_ids) { [primary_activity_other_family.id, primary_activity_other.id].sort }
 
     it "returns the primary_activity id" do
       expect(primary_activity.reload.primary_activity_family_id).to eq primary_activity_family.id
@@ -80,24 +81,31 @@ RSpec.describe PrimaryActivity, type: :model do
       expect(described_class.friendly_find_id(primary_activity.id)).to eq(primary_activity.id)
       expect(described_class.friendly_find_id(primary_activity_family.id)).to eq(primary_activity_family.id)
 
-      expect(described_class.friendly_find_family_ids(primary_activity.id)).to eq([primary_activity.id])
-      expect(described_class.friendly_find_family_ids(primary_activity.slug)).to eq([primary_activity.id])
-      expect(described_class.friendly_find_family_ids(primary_activity.name)).to eq([primary_activity.id])
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity.id))
+        .to eq([primary_activity.id, [primary_activity.id]])
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity.slug))
+        .to eq([primary_activity.id, [primary_activity.id]])
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity.name))
+        .to eq([primary_activity.id, [primary_activity.id]])
 
-      expect(described_class.friendly_find_family_ids(primary_activity2.id)).to eq([primary_activity2.id])
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity2.id))
+        .to eq([primary_activity2.id, [primary_activity2.id]])
 
-      expect(described_class.friendly_find_family_ids(primary_activity_family.id).sort).to eq family_ids.sort
-      expect(described_class.friendly_find_family_ids(primary_activity_family.slug).sort).to eq family_ids.sort
-      expect(described_class.friendly_find_family_ids("ATB").sort).to eq family_ids.sort
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity_family.id))
+        .to eq([primary_activity_family.id, family_ids])
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity_family.slug))
+        .to eq([primary_activity_family.id, family_ids])
+      expect(described_class.friendly_find_id_and_family_ids("ATB"))
+        .to eq([primary_activity_family.id, family_ids])
 
-      expect(described_class.friendly_find_family_ids(primary_activity_other_family.id).sort)
-        .to eq([primary_activity_other_family.id, primary_activity_other.id])
-      expect(described_class.friendly_find_family_ids(primary_activity_other_family.slug).sort)
-        .to eq([primary_activity_other_family.id, primary_activity_other.id])
-      expect(described_class.friendly_find_family_ids(primary_activity_other_family.slug).sort)
-        .to eq([primary_activity_other_family.id, primary_activity_other.id])
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity_other_family.id))
+        .to eq([primary_activity_other_family.id, other_family_ids])
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity_other_family.slug))
+        .to eq([primary_activity_other_family.id, other_family_ids])
+      expect(described_class.friendly_find_id_and_family_ids(primary_activity_other_family.slug))
+        .to eq([primary_activity_other_family.id, other_family_ids])
 
-      expect(described_class.friendly_find_family_ids("dafdsfasdf")).to eq([])
+      expect(described_class.friendly_find_id_and_family_ids("dafdsfasdf")).to eq([])
     end
   end
 end

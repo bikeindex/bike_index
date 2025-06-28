@@ -1,0 +1,35 @@
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      %th
+        = sortable "name", render_sortable: render_sortable
+      %th
+        %small Display name
+      %th
+        = sortable "family", render_sortable: render_sortable
+      %th
+        = sortable "primary_activity_family_id", "Family", render_sortable: render_sortable
+      %th
+        = sortable "priority", render_sortable: render_sortable
+    %tbody
+      - collection.each do |primary_activity|
+        %tr
+          %td
+            .less-strong-hold
+              %a.convertTime{href: edit_admin_primary_activity_path(primary_activity.id)}
+                = l primary_activity.created_at, format: :convert_time
+              %span.less-strong-right.d-none.d-md-block
+                = primary_activity.id
+          %td
+            = primary_activity.name
+          %td
+            %small= primary_activity.display_name
+          %td.checkbox
+            = check_mark if primary_activity.family
+          %td
+            - unless primary_activity.primary_activity_family_id == primary_activity.id
+              = primary_activity.family_name
+          %td
+            = admin_number_display(primary_activity.priority)
