@@ -92,8 +92,8 @@ export default class extends Controller {
     $queryField.on('change', (e) => {
       this.setCategories($queryField)
 
-      // Reset the kind counts if it's around
-      window.resetKindCounts?.()
+      // trigger the kind controller actions if it's around
+      window.kindControllerPerformChangeActions?.()
     })
   }
 
