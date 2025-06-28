@@ -9,6 +9,7 @@ module BikeSearchable
     #   query: full text search string. Overrides query_items if passed explicitly
     #   colors: array of colors, friendly found, faster if integers. Overrides query_items if passed explicitly
     #   manufacturer: friendly found, faster if integer. Overrides query_items if passed explicitly.
+    #   primary_activity: friendly found, faster if integer. NOT INCLUDED in query_items
     #   stolenness: can be 'all', 'non', 'stolen', 'found', 'proximity'. Defaults to 'stolen'
     #   location: location for proximity search. Only for stolenness == 'proximity'. 'ip'/'you' uses IP geocoding and returns location object
     #   distance: distance in miles for matches. Only for stolenness == 'proximity'
@@ -30,6 +31,7 @@ module BikeSearchable
         .merge(searchable_query_items_colors(query_params)) # color if present
         .merge(searchable_query_items_cycle_type(query_params)) # cycle_type if present
         .merge(searchable_query_items_propulsion_type(query_params)) # propulsion_type if present
+        .merge(searchable_query_items_primary_activity(query_params)) # primary_activity if present
         .merge(searchable_query_stolenness(query_params, ip))
         .to_h
     end
@@ -128,6 +130,16 @@ module BikeSearchable
       propulsion_type ? {propulsion_type: propulsion_type} : {}
     end
 
+    # Returns an array of primary_activity ids, if a primary activity is found
+    # (to handle primary_activity family matching)
+    def searchable_query_items_primary_activity(query_params)
+      # Only supported as a separate parameter
+      return {} if query_params[:primary_activity].blank?
+
+      primary_activity_ids = PrimaryActivity.friendly_find_family_ids(query_params[:primary_activity])
+      primary_activity_ids.any? ? {primary_activity: primary_activity_ids} : {}
+    end
+
     def searchable_query_stolenness(query_params, ip_address)
       stolennness_hash = if %w[all non found impounded].include?(query_params[:stolenness])
         {stolenness: query_params[:stolenness]}
@@ -211,7 +223,7 @@ module BikeSearchable
     end
 
     def permitted_search_params
-      [:cycle_type, :distance, :location, :manufacturer, :query, :propulsion_type,
+      [:cycle_type, :distance, :location, :manufacturer, :query, :propulsion_type, :primary_activity,
         :serial, :stolenness, colors: [], query_items: []].freeze
     end
 
@@ -235,6 +247,7 @@ module BikeSearchable
         .search_matching_query(interpreted_params[:query])
         .search_matching_cycle_type(interpreted_params[:cycle_type])
         .search_matching_propulsion_type(interpreted_params[:propulsion_type])
+        .search_matching_primary_activity(interpreted_params[:primary_activity])
         .where(interpreted_params[:manufacturer] ? {manufacturer_id: interpreted_params[:manufacturer]} : {})
     end
 
@@ -254,6 +267,11 @@ module BikeSearchable
     def search_matching_propulsion_type(propulsion_type)
       return all unless propulsion_type.present?
       where(propulsion_type: (propulsion_type == :motorized) ? PropulsionType::MOTORIZED : propulsion_type)
+    end
+
+    def search_matching_primary_activity(primary_activity_id)
+      return all unless primary_activity_id.present?
+      where(primary_activity_id:)
     end
 
     def search_matching_query(query)

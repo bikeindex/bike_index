@@ -138,7 +138,7 @@ export default class extends Controller {
     })
   }
 
-  updateAfterComboboxChange() {
+  updateAfterComboboxChange () {
     this.updateForSaleLink()
     this.resetKindCounts()
   }

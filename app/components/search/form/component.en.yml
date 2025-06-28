@@ -7,4 +7,5 @@ en:
           The serial you entered doesn't look like a serial number, so it isn't being
           used to search.
         search_for_serial_number: Search for serial number
+        search_for_primary_activity: Search for primary activity
         submit: submit
