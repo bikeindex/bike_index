@@ -43,6 +43,17 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       end
     end
 
+    def get_local_storage
+      page.execute_script(<<~JS)
+        let storage = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          let key = localStorage.key(i);
+          storage[key] = localStorage.getItem(key);
+        }
+        return storage;
+      JS
+    end
+
     it "submits when enter is pressed twice" do
       expect(find("#query_items", visible: false).value).to be_blank
       expect(page_text(page.text)).to_not match("miles of")
@@ -69,6 +80,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       page.send_keys(:return)
       expect(page).to have_current_path(/\?/, wait: 5)
+      expect(get_local_storage).to eq({somethign: 'dafdsf'})
 
       target_params = {
         distance: ["251"],

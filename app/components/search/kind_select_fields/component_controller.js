@@ -6,18 +6,22 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='search--kind-select-fields--component'
 export default class extends Controller {
   static targets = ['distance', 'location', 'locationWrap']
-  static values = { apiCountUrl: String, isMarketplace: Boolean, locationStoreKey: String, optionKinds: String }
+  static values = { apiCountUrl: String, optionKinds: String, storageKeyLocation: String, storageKeyDistance: String }
 
   connect () {
+    this.setLocalstorageKeys()
     this.setSearchProximity()
-    this.updateCountsToSubmit()
     this.updateForSaleLink.bind(this)
     this.form?.addEventListener('change', this.updateForSaleLink.bind(this))
+    this.form?.addEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
+    // if in component preview (lookbook), run kind counts on load
+    if (window.inComponentPreview) { this.setKindCounts() }
   }
 
   disconnect () {
     this.resetKindCounts() // also removes the bindings
     this.form?.removeEventListener('change', this.updateForSaleLink.bind(this))
+    this.form?.removeEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
     // Remove reset count function from window
     window.resetKindCounts = null
   }
@@ -32,6 +36,16 @@ export default class extends Controller {
     return new URLSearchParams(formData).toString()
   }
 
+  setLocalstorageKeys () {
+    if (window.inComponentPreview) {
+      this.storageKeyLocation = 'preview-searchLocation'
+      this.storageKeyDistance = 'preview-searchDistance'
+    } else {
+      this.storageKeyLocation = 'searchLocation'
+      this.storageKeyDistance = 'searchDistance'
+    }
+  }
+
   updateForSaleLink () {
     const link = document.getElementById('kindSelectForSaleLink')
 
@@ -40,13 +54,11 @@ export default class extends Controller {
     }
   }
 
-  updateCountsToSubmit () {
-    if (!this.form) return
-
-    this.form.addEventListener('turbo:submit-end', this.setKindCounts.bind(this))
-
-    // if in component preview (lookbook), run kind counts on load
-    if (window.inComponentPreview) { this.setKindCounts() }
+  performSubmitActions () {
+    // store search proximity on form submit
+    this.setSearchProximity()
+    // Update kind counts
+    this.setKindCounts()
   }
 
   updateLocationVisibility () {
@@ -60,7 +72,6 @@ export default class extends Controller {
     }
   }
 
-  // TODO: make this location target_search_path specific, but falls back to general location
   setSearchProximity () {
     let location = this.locationTarget.value
     // strip the location text
@@ -69,12 +80,17 @@ export default class extends Controller {
     // Store location in localStorage if it's there, otherwise -
     // Set from localStorage - so we don't override if it's already set
     if (location && location.length > 0) {
-      // Don't save location if user entered 'Anywhere'
-      if (!location.match(/anywhere/i)) {
-        localStorage.setItem('location', location)
+      // Don't save location if location is an ignored string
+      if (!this.ignoredLocation(location)) {
+        console.log(`setting location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
+        localStorage.setItem(this.storageKeyLocation, location)
+        // save distance if location is being saved
+        const distance = this.distanceTarget.value
+        localStorage.setItem(this.storageKeyDistince, distance)
       }
     } else {
-      location = localStorage.getItem('location')
+      location = localStorage.getItem(this.storageKeyLocation)
+      console.log(`got location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
       // Make location 'you' if location is anywhere or blank, so user isn't stuck and unable to use location
       if (this.ignoredLocation(location)) {
         location = 'you'
@@ -92,6 +108,7 @@ export default class extends Controller {
 
   // TODO: Should this just be getting the values from the form?
   setKindCounts () {
+    console.log('setting kind counts')
     const queryString = this.searchQuery
     if (this.doNotFetchCounts(queryString)) {
       return this.resetKindCounts()

@@ -1,7 +1,6 @@
 <div
   data-controller="search--kind-select-fields--component"
   data-search--kind-select-fields--component-api-count-url-value="<%= api_count_url %>"
-  data-search--kind-select-fields--component-is-marketplace-value="<%= @is_marketplace %>"
   data-search--kind-select-fields--component-option-kinds-value="<%= option_kind.to_s %>">
 
   <div
@@ -13,7 +12,8 @@
       <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
       <%=
         number_field_tag :distance, @distance,
-        placeholder: default_distance, min: GeocodeHelper::MIN_DISTANCE, class: "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
+        placeholder: default_distance, min: GeocodeHelper::MIN_DISTANCE,
+        class: "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
         "data-search--kind-select-fields--component-target" => "distance"
       %>
     </span>
