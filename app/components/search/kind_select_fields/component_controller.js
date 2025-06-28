@@ -11,9 +11,12 @@ export default class extends Controller {
   connect () {
     this.setLocalstorageKeys()
     this.setSearchProximity()
-    this.updateForSaleLink.bind(this)
+    this.updateForSaleLink()
     this.form?.addEventListener('change', this.updateForSaleLink.bind(this))
     this.form?.addEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
+
+    // Add function to window so it can be called by select2 callback
+    window.kindControllerUpdateAfterComboboxChange = this.updateAfterComboboxChange.bind(this)
     // if in component preview (lookbook), run kind counts on load
     if (window.inComponentPreview) { this.setKindCounts() }
   }
@@ -23,7 +26,7 @@ export default class extends Controller {
     this.form?.removeEventListener('change', this.updateForSaleLink.bind(this))
     this.form?.removeEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
     // Remove reset count function from window
-    window.resetKindCounts = null
+    window.kindControllerUpdateAfterComboboxChange = null
   }
 
   get form () {
@@ -107,7 +110,6 @@ export default class extends Controller {
     return ['anywhere', 'you'].includes(location.toLowerCase().trim())
   }
 
-  // TODO: Should this just be getting the values from the form?
   setKindCounts () {
     // console.log('setting kind counts')
 
@@ -134,8 +136,11 @@ export default class extends Controller {
       field._boundResetFunction = this.resetKindCounts.bind(this)
       field.addEventListener('change', field._boundResetFunction)
     })
-    // Add reset function to window so it can be called by select2 callback
-    window.resetKindCounts = this.resetKindCounts.bind(this)
+  }
+
+  updateAfterComboboxChange() {
+    this.updateForSaleLink()
+    this.resetKindCounts()
   }
 
   resetKindCounts () {
