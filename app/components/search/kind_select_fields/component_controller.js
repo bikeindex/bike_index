@@ -11,9 +11,8 @@ export default class extends Controller {
   connect () {
     this.setLocalstorageKeys()
     this.setSearchProximity()
-    this.updateForSaleLink()
-
-    this.form?.addEventListener('change', this.performChangeActions.bind(this))
+    this.updateForSaleLink.bind(this)
+    this.form?.addEventListener('change', this.updateForSaleLink.bind(this))
     this.form?.addEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
     // if in component preview (lookbook), run kind counts on load
     if (window.inComponentPreview) { this.setKindCounts() }
@@ -21,10 +20,10 @@ export default class extends Controller {
 
   disconnect () {
     this.resetKindCounts() // also removes the bindings
-    this.form?.removeEventListener('change', this.performChangeActions.bind(this))
+    this.form?.removeEventListener('change', this.updateForSaleLink.bind(this))
     this.form?.removeEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
     // Remove reset count function from window
-    window.kindControllerPerformChangeActions = null
+    window.resetKindCounts = null
   }
 
   get form () {
@@ -51,17 +50,8 @@ export default class extends Controller {
     const link = document.getElementById('kindSelectForSaleLink')
 
     if (link) {
-      console.log(this.searchQuery)
-
       link.href = `${link.getAttribute('data-basepath')}?${this.searchQuery}`
     }
-  }
-
-  performChangeActions() {
-    console.log("in performChangeActions")
-
-    this.updateForSaleLink()
-    this.resetKindCounts()
   }
 
   performSubmitActions () {
@@ -144,13 +134,12 @@ export default class extends Controller {
       field._boundResetFunction = this.resetKindCounts.bind(this)
       field.addEventListener('change', field._boundResetFunction)
     })
-
-    // Add change function to window so it can be called by select2 callback
-    window.kindControllerPerformChangeActions = this.performChangeActions.bind(this)
+    // Add reset function to window so it can be called by select2 callback
+    window.resetKindCounts = this.resetKindCounts.bind(this)
   }
 
   resetKindCounts () {
-    console.log('resetting counts')
+    // console.log('resetting counts')
 
     // dataCountTargets looks like: ['non', 'stolen', 'proximity', 'for_sale']
     const dataCountTargets = [...this.element.querySelectorAll('[data-count-target]')]
