@@ -65,7 +65,6 @@ export default class extends Controller {
     const selectedValue = this.element.querySelector(`input[name="${this.optionKindsValue}"]:checked`)?.value
 
     if (['proximity', 'for_sale_proximity'].includes(selectedValue)) {
-      console.log('show location')
       collapse('show', this.locationWrapTarget)
     } else {
       collapse('hide', this.locationWrapTarget)
@@ -86,7 +85,9 @@ export default class extends Controller {
         localStorage.setItem(this.storageKeyLocation, location)
         // save distance if location is being saved
         const distance = this.distanceTarget.value
-        localStorage.setItem(this.storageKeyDistince, distance)
+        if (distance && distance.length > 0) {
+          localStorage.setItem(this.storageKeyDistance, distance)
+        }
       }
     } else {
       location = localStorage.getItem(this.storageKeyLocation)
@@ -108,7 +109,8 @@ export default class extends Controller {
 
   // TODO: Should this just be getting the values from the form?
   setKindCounts () {
-    console.log('setting kind counts')
+    // console.log('setting kind counts')
+
     const queryString = this.searchQuery
     if (this.doNotFetchCounts(queryString)) {
       return this.resetKindCounts()
@@ -137,7 +139,8 @@ export default class extends Controller {
   }
 
   resetKindCounts () {
-    console.log('resetting counts')
+    // console.log('resetting counts')
+
     // dataCountTargets looks like: ['non', 'stolen', 'proximity', 'for_sale']
     const dataCountTargets = [...this.element.querySelectorAll('[data-count-target]')]
       .map(el => el.dataset.countTarget).filter(item => item !== 'all')

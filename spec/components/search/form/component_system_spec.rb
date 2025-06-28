@@ -43,8 +43,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       end
     end
 
-    def get_local_storage
-      page.execute_script(<<~JS)
+    def expect_localstorage_location(location:, distance:)
+      local_storage = page.execute_script(<<~JS)
         let storage = {};
         for (let i = 0; i < localStorage.length; i++) {
           let key = localStorage.key(i);
@@ -52,6 +52,11 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         }
         return storage;
       JS
+
+      location_key = local_storage.find { |k, _| k.match?(/location/i) }&.first
+      distance_key = local_storage.find { |k, _| k.match?(/distance/i) }&.first
+
+      expect(local_storage).to match_hash_indifferently({location_key => location, distance_key => distance})
     end
 
     it "submits when enter is pressed twice" do
@@ -73,18 +78,21 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       # NOTE: Since this uses production data, values are consistent
       expect(find("#query_items", visible: false).value).to eq(["c_5"])
 
+      distance = "251"
+      location = "Portland, OR"
       # Enter location info
-      find("#distance").set("251")
-      find("#location").set("Portland, OR")
+      find("#distance").set(distance)
+      find("#location").set(location)
       expect(page_text(page.text)).to match("miles of")
 
       page.send_keys(:return)
       expect(page).to have_current_path(/\?/, wait: 5)
-      expect(get_local_storage).to eq({somethign: 'dafdsf'})
+
+      expect_localstorage_location(location:, distance:)
 
       target_params = {
-        distance: ["251"],
-        location: ["Portland, OR"],
+        distance: [distance],
+        location: [location],
         "query_items[]": ["c_5"],
         query: "",
         button: [""],
