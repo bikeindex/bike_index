@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Spreadsheets::PrimaryActivities do
-  let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Bike Polo") }
+  let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Bike Polo", priority: 1) }
 
   describe "to_csv" do
     let(:target) { ["flavor,families", "Bike Polo,"] }
@@ -13,8 +13,8 @@ RSpec.describe Spreadsheets::PrimaryActivities do
       expect(result.length).to eq target.length
     end
     context "with family" do
-      let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Bike)") }
-      let!(:primary_activity_2) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:) }
+      let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Bike)", priority: 10) }
+      let!(:primary_activity_2) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:, priority: 4) }
       let(:target) { ["flavor,families", "All Road,ATB (All Terrain Bike)", "Bike Polo,"] }
 
       it "generates" do
@@ -27,8 +27,8 @@ RSpec.describe Spreadsheets::PrimaryActivities do
       end
 
       context "with multiple families" do
-        let(:primary_activity_family_2) { FactoryBot.create(:primary_activity_family, name: "Road Bike") }
-        let!(:primary_activity_3) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family: primary_activity_family_2) }
+        let(:primary_activity_family_2) { FactoryBot.create(:primary_activity_family, name: "Road Bike", priority: 9) }
+        let!(:primary_activity_3) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family: primary_activity_family_2, priority: 3) }
         let(:target) { ["flavor,families", "All Road,ATB (All Terrain Bike) & Road Bike", "Bike Polo,"] }
 
         it "generates" do

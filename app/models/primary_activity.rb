@@ -124,7 +124,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def family_display_name
-    return nil if skip_family_display_name? || primary_activity_family.blank?
+    return nil if skip_family_display_name? || primary_activity_family.blank? || top_level?
 
     family_name
   end

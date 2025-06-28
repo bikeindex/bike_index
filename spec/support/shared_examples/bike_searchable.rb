@@ -204,7 +204,7 @@ RSpec.shared_examples "bike_searchable" do
           expect(Bike.search(i_params_activity(primary_activity.id)).pluck(:id)).to match_array([bike1.id, bike2.id])
           expect(Bike.search(i_params_activity(primary_activity.slug)).pluck(:id)).to match_array([bike1.id, bike2.id])
           expect(Bike.search(i_params_activity(primary_activity.name)).pluck(:id)).to match_array([bike1.id, bike2.id])
-          expect(Bike.search(interpreted_params.merge(primary_activity: primary_activity2.id)).pluck(:id)).to eq([bike2.id])
+          expect(Bike.search(i_params_activity(primary_activity2.short_name)).pluck(:id)).to eq([bike2.id])
         end
       end
     end

@@ -20,7 +20,7 @@
         <% end %>
         <% if render_primary_activity_field? %>
           <%= label_tag :primary_activity, translation(".search_for_primary_activity"), class: "twlabel tw:sr-only" %>
-          <%= select_tag :primary_activity, primary_activity_select_opts, include_blank: true, prompt: translation(".search_for_primary_activity"), class: "twinput" %>
+          <%= select_tag :primary_activity, primary_activity_select_opts, include_blank: true, prompt: translation(".search_for_primary_activity"), class: "twinput tw:mt-2 tw:max-w-xl" %>
         <% end %>
       </div>
       <div class="tw:w-20">

@@ -27,14 +27,17 @@ RSpec.describe PrimaryActivity, type: :model do
   describe "display_name" do
     let(:primary_activity) { FactoryBot.create(:primary_activity, name: "Bike Polo") }
     it "is the name" do
-      expect(primary_activity.name).to eq "Bike Polo"
+      expect(primary_activity.reload.name).to eq "Bike Polo"
+      expect(primary_activity.reload.display_name).to eq "Bike Polo"
+      expect(primary_activity.flavor?).to be_truthy
+      expect(primary_activity.top_level?).to be_truthy
     end
     context "with family" do
       let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Bike)") }
       let(:primary_activity) { FactoryBot.create(:primary_activity, name:, primary_activity_family:) }
       let(:name) { "All Road" }
       it "is the name with the family" do
-        expect(primary_activity.primary_activity_family.short_name).to eq "ATB"
+        expect(primary_activity.reload.primary_activity_family.short_name).to eq "ATB"
         expect(primary_activity.display_name).to eq "ATB (All Terrain Bike): All Road"
       end
       context "with other primary_activity with same name" do
