@@ -19,8 +19,10 @@
           <%= text_field_tag :serial, serial_value, placeholder: translation(".search_for_serial_number"), class: "twinput tw:mt-2 fieldResetsCounts" %>
         <% end %>
         <% if render_primary_activity_field? %>
-          <%= label_tag :primary_activity, translation(".search_for_primary_activity"), class: "twlabel tw:sr-only" %>
-          <%= select_tag :primary_activity, primary_activity_select_opts, include_blank: true, prompt: translation(".search_for_primary_activity"), class: "twinput tw:mt-2 tw:max-w-xl" %>
+          <div class="tw:mt-2 tw:max-w-xl tw:ml-auto fancy-select-placeholder unfancy">
+            <%= label_tag :primary_activity, translation(".search_for_primary_activity"), class: "twlabel tw:sr-only" %>
+            <%= select_tag :primary_activity, primary_activity_select_opts, include_blank: true, prompt: translation(".search_for_primary_activity"), class: "" %>
+          </div>
         <% end %>
       </div>
       <div class="tw:w-20">

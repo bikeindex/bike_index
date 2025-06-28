@@ -84,7 +84,7 @@ export default class extends Controller {
     if (location && location.length > 0) {
       // Don't save location if location is an ignored string
       if (!this.ignoredLocation(location)) {
-        console.log(`setting location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
+        // console.log(`setting location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
         localStorage.setItem(this.storageKeyLocation, location)
         // save distance if location is being saved
         const distance = this.distanceTarget.value
@@ -94,7 +94,7 @@ export default class extends Controller {
       }
     } else {
       location = localStorage.getItem(this.storageKeyLocation)
-      console.log(`got location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
+      // console.log(`got location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
       // Make location 'you' if location is anywhere or blank, so user isn't stuck and unable to use location
       if (this.ignoredLocation(location)) {
         location = 'you'

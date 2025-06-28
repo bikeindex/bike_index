@@ -120,7 +120,7 @@ class PrimaryActivity < ApplicationRecord
   private
 
   def skip_family_display_name?
-    %w[gravel cyclocross].include?(name.downcase)
+    %w[cyclocross].include?(name.downcase)
   end
 
   def family_display_name
