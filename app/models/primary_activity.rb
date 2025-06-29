@@ -19,6 +19,11 @@ class PrimaryActivity < ApplicationRecord
   include FriendlyNameFindable
   include ShortNameable
 
+  SPECIAL_SHORT_NAMES = {
+    "road" => "road-bike",
+    "track" => "track-racing"
+  }.freeze
+
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"
 
   has_many :primary_activity_flavors, class_name: "PrimaryActivity",
@@ -45,16 +50,11 @@ class PrimaryActivity < ApplicationRecord
 
   class << self
     def friendly_find(str)
-      return nil if str.blank?
-      str.strip! if str.is_a?(String)
-      return by_priority.where(id: str).first if integer_string?(str)
-
-      by_priority.find_by_slug(Slugifyer.slugify(str)) ||
-        by_priority.where("lower(name) = ?", str.downcase.strip).first
+      friendly_find_with_select(str, select_attrs: ["*"])
     end
 
     def friendly_find_id(str)
-      friendly_find_id_select(str)&.id
+      friendly_find_with_select(str)&.id
     end
 
     # This returns just the id if it's
@@ -68,7 +68,7 @@ class PrimaryActivity < ApplicationRecord
         return ids.any? ? [str.to_i, ids] : []
       end
 
-      result = friendly_find_id_select(str, select_attrs: %i[id primary_activity_family_id family])
+      result = friendly_find_with_select(str, select_attrs: %i[id primary_activity_family_id family])
       return [] if result.blank?
 
       # If the object that was found was a flavor, no need to search again
@@ -83,10 +83,13 @@ class PrimaryActivity < ApplicationRecord
       by_priority.where(primary_activity_family_id: integer).pluck(:id)
     end
 
-    def friendly_find_id_select(str, select_attrs: [:id])
+    def friendly_find_with_select(str, select_attrs: [:id])
       return nil if str.blank?
       str.strip! if str.is_a?(String)
       return by_priority.where(id: str).select(*select_attrs).first if integer_string?(str)
+      # Special short slugs
+      special_short_slug = SPECIAL_SHORT_NAMES[str.downcase]
+      return where(slug: special_short_slug).select(*select_attrs).first if special_short_slug.present?
 
       by_priority.where(slug: Slugifyer.slugify(str)).select(*select_attrs).first ||
         by_priority.where("lower(name) = ?", str.downcase.strip).select(*select_attrs).first
@@ -109,6 +112,10 @@ class PrimaryActivity < ApplicationRecord
     [family_display_name, name].compact.join(": ")
   end
 
+  def display_name_search
+    [family_display_name(include_skipped_family_name: true), name].compact.join(": ONLY ")
+  end
+
   def family_name
     primary_activity_family&.name
   end
@@ -117,16 +124,24 @@ class PrimaryActivity < ApplicationRecord
     primary_activity_family&.short_name
   end
 
+  def short_name
+    return "Road" if slug == "road-bike"
+    return "Track" if slug == "track-racing"
+
+    super
+  end
+
   private
 
   def skip_family_display_name?
-    %w[cyclocross].include?(name.downcase)
+    %w[cyclocross gravel].include?(name.downcase)
   end
 
-  def family_display_name
-    return nil if skip_family_display_name? || primary_activity_family.blank? || top_level?
+  def family_display_name(include_skipped_family_name: false)
+    return nil if primary_activity_family.blank? || top_level?
+    return nil if skip_family_display_name? && !include_skipped_family_name
 
-    family_name
+    family_short_name
   end
 
   def set_calculated_attributes

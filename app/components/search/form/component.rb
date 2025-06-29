@@ -47,10 +47,10 @@ module Search::Form
     end
 
     def primary_activity_select_opts
-      options_for_select(PrimaryActivity.by_priority.map { |pa| [pa.display_name, pa.id] },
-        selected: @interpreted_params[:primary_activity])
-      # :primary_activity_id, PrimaryActivity.by_priority, :id, :display_name, {include_blank: true, prompt: t(".choose_activity")}, {class: "form-control"}
-      # BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id]  }
+      options_for_select(
+        PrimaryActivity.by_priority.map { |pa| [pa.display_name_search, pa.id] },
+        selected: @interpreted_params[:primary_activity]
+      )
     end
   end
 end

@@ -5,6 +5,9 @@
         = sortable "created_at", render_sortable: render_sortable
       %th
         = sortable "name", render_sortable: render_sortable
+      - if display_dev_info?
+        %th.only-dev-visible
+          %small slug
       %th
         %small Display name
       %th
@@ -20,10 +23,14 @@
             .less-strong-hold
               %a.convertTime{href: edit_admin_primary_activity_path(primary_activity.id)}
                 = l primary_activity.created_at, format: :convert_time
-              %span.less-strong-right.d-none.d-md-block
-                = primary_activity.id
+              - if display_dev_info?
+                %span.less-strong-right.d-none.d-md-block
+                  = primary_activity.id
           %td
             = primary_activity.name
+          - if display_dev_info?
+            %td
+              %small= primary_activity.slug
           %td
             %small= primary_activity.display_name
           %td.checkbox
