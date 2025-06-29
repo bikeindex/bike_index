@@ -43,7 +43,10 @@ module Search::Form
     end
 
     def render_primary_activity_field?
-      is_marketplace? # Also show on bike versions
+      return true if is_marketplace? # Also show on bike versions
+
+      # Render the primary_activity field, if it was passed
+      @interpreted_params[:primary_activity].present?
     end
 
     def primary_activity_select_opts
