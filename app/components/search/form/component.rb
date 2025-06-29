@@ -55,5 +55,13 @@ module Search::Form
         selected: @interpreted_params[:primary_activity]
       )
     end
+
+    def primary_activity_prompt
+      if @interpreted_params[:primary_activity].present?
+        translation(".any_primary_activity")
+      else
+        translation(".search_for_primary_activity")
+      end
+    end
   end
 end
