@@ -200,6 +200,7 @@ class Notification < ApplicationRecord
   def set_calculated_attributes
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
+    self.bike_id ||= notifiable.item_id if defined?(notifiable.item_id)
     self.delivery_status ||= "delivery_pending"
     self.message_channel_target ||= calculated_message_channel_target
   end

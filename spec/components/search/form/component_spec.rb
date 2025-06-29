@@ -10,8 +10,7 @@ RSpec.describe Search::Form::Component, type: :component do
     {
       target_search_path: Rails.application.routes.url_helpers.search_registrations_path,
       target_frame: :search_registrations_results_frame,
-      interpreted_params:,
-      selected_query_items_options: BikeSearchable.selected_query_items_options(interpreted_params)
+      interpreted_params:
     }
   end
 
@@ -46,8 +45,7 @@ RSpec.describe Search::Form::Component, type: :component do
         marketplace_scope: "for_sale",
         target_search_path: Rails.application.routes.url_helpers.search_registrations_path,
         target_frame: :search_registrations_results_frame,
-        interpreted_params:,
-        selected_query_items_options: BikeSearchable.selected_query_items_options(interpreted_params)
+        interpreted_params:
       }
     end
     it "renders" do

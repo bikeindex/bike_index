@@ -1,4 +1,9 @@
 -# require inline CSS setting because of caching
+- skip_item ||= false
+
+- if skip_item
+  <style>.item-cell {display: none !important;} </style>
+
 - unless display_dev_info?
   <style>.only-dev-visible {display: none !important;} </style>
 
@@ -15,7 +20,7 @@
         = sortable "published_at", render_sortable: render_sortable
       %th
         = sortable "end_at", render_sortable: render_sortable
-      %th
+      %th.item-cell
         Item
       %th
         = sortable "amount_cents", "amount", render_sortable: render_sortable
@@ -53,8 +58,8 @@
               - if marketplace_listing.end_at.present?
                 %span.convertTime
                   = l marketplace_listing.end_at, format: :convert_time
-            %td
-              = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true) }
+            %td.item-cell
+              = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)}
             %td
               = "#{marketplace_listing.currency_symbol}#{admin_number_display(marketplace_listing.amount)}"
             %td

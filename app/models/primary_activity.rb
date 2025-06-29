@@ -60,7 +60,7 @@ class PrimaryActivity < ApplicationRecord
     # This returns just the id if it's
     def friendly_find_id_and_family_ids(str)
       return [] if str.blank?
-      str.strip! if str.is_a?(String)
+      strip_if_str!(str)
       if integer_string?(str)
         ids = ids_matching_family_id(str)
         ids = by_priority.where(id: str).pluck(:id) if ids.none?
@@ -85,7 +85,7 @@ class PrimaryActivity < ApplicationRecord
 
     def friendly_find_with_select(str, select_attrs: [:id])
       return nil if str.blank?
-      str.strip! if str.is_a?(String)
+      strip_if_str!(str)
       return by_priority.where(id: str).select(*select_attrs).first if integer_string?(str)
       # Special short slugs
       special_short_slug = SPECIAL_SHORT_NAMES[str.downcase]

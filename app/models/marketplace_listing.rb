@@ -55,6 +55,7 @@ class MarketplaceListing < ApplicationRecord
   after_commit :update_bike_for_sale
 
   scope :current, -> { where(status: CURRENT_STATUSES) }
+  scope :removed_or_sold, -> { where(status: %i[removed sold]) }
 
   # validate that there isn't another current listing for an item
 
@@ -85,6 +86,20 @@ class MarketplaceListing < ApplicationRecord
 
     def status_humanized(str)
       str&.to_s&.tr("_", " ")
+    end
+
+    def search(items, price_min_amount: nil, price_max_amount: nil)
+      return items if price_min_amount.blank? && price_max_amount.blank?
+
+      min_cents = Amountable.to_cents(price_min_amount)
+      max_cents = Amountable.to_cents(price_max_amount)
+
+      query_hash = if min_cents.present?
+        max_cents.present? ? {amount_cents: min_cents..max_cents} : {amount_cents: min_cents..}
+      else
+        {amount_cents: ..max_cents}
+      end
+      items.joins(:current_marketplace_listing).where(marketplace_listings: query_hash)
     end
 
     private

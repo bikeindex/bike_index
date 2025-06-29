@@ -3,6 +3,7 @@
 - skip_bike ||= false
 - skip_sender ||= false
 - skip_error ||= false
+- show_message_preview ||= false
 
 - unless display_dev_info?
   <style>.only-dev-visible {display: none !important;} </style>
@@ -15,6 +16,8 @@
   <style>.sender-cell {display: none !important;} </style>
 - if skip_error
   <style>.error-cell {display: none !important;} </style>
+- unless show_message_preview
+  <style>.message-preview {display: none !important;} </style>
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
@@ -37,7 +40,7 @@
         Delivery Errors
     %tbody
       - notifications.each do |notification|
-        - cache(["admin_notifications_table", notification]) do
+        - cache(["admin_notifications_table-1", notification]) do
           %tr
             %td
               %span.convertTime
@@ -68,6 +71,11 @@
                 = link_to admin_path_for_object(notification.notifiable) do
                   = notification.notifiable.class.to_s.titleize
                   %code.text-link.small= "##{notification.notifiable_id}"
+                -# TODO: include more previews
+                - if notification.notifiable.is_a?(MarketplaceMessage)
+                  - notification_text = notification.notifiable.body
+                  %small.message-preview.d-block{title: notification_text}
+                    = notification_text.truncate(100)
             %td.sender-cell
               - sender_display_name = notification.sender_display_name
               - if notification.sender.is_a?(User)

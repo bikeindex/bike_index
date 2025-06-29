@@ -31,7 +31,7 @@
       = link_to admin_number_display(@bike.notifications.count), admin_notifications_path(search_bike_id: @bike.id)
   - if @bike.notifications.any?
     .mt-2
-      = render partial: "/admin/notifications/table", locals: {notifications: @bike.notifications.order(created_at: :desc), skip_bike: true}
+      = render partial: "/admin/notifications/table", locals: {notifications: @bike.notifications.includes(:notifiable).order(created_at: :desc), skip_bike: true, show_message_preview: true}
     .mb-4
 
   - feedbacks = Feedback.bike(@bike.id).order(created_at: :desc)

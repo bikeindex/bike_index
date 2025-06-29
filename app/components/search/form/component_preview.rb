@@ -23,6 +23,15 @@ module Search::Form
       render(Search::Form::Component.new(**sale_options))
     end
 
+    def for_sale_san_francisco_atb
+      sale_options = default_options(BikeSearchable.searchable_interpreted_params({
+        stolenness: :all, location: "San Francisco, CA", distance: 101, primary_activity: "ATB"
+      }), preview_name: "for_sale_san_francisco_atb")
+        .merge(target_frame: :search_marketplace_results_frame, marketplace_scope: "for_sale_proximity")
+
+      render(Search::Form::Component.new(**sale_options))
+    end
+
     private
 
     # this is the path of the raw preview - so when search is submitted, it just re-renders
@@ -35,8 +44,7 @@ module Search::Form
       {
         target_search_path: target_search_path(preview_name),
         target_frame: :search_registrations_results_frame,
-        interpreted_params:,
-        selected_query_items_options: BikeSearchable.selected_query_items_options(interpreted_params)
+        interpreted_params:
       }
     end
   end

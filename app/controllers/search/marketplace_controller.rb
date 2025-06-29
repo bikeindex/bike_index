@@ -12,7 +12,7 @@ class Search::MarketplaceController < ApplicationController
     @is_marketplace = true
 
     if @render_results
-      @pagy, @bikes = pagy(searched_bikes.order(published_at: :desc),
+      @pagy, @bikes = pagy(searched_bikes.reorder("marketplace_listings.published_at DESC"),
         limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
     end
 
@@ -39,7 +39,14 @@ class Search::MarketplaceController < ApplicationController
   end
 
   def searched_bikes_not_proximity
-    Bike.search(@interpreted_params).for_sale
+    bikes = Bike.search(@interpreted_params).for_sale
+
+    # Not doing anything with currency yet, so always use default
+    @currency = Currency.default
+    @price_min_amount = amount_for(listing_search_params[:price_min_amount])
+    @price_max_amount = amount_for(listing_search_params[:price_max_amount])
+
+    MarketplaceListing.search(bikes, price_min_amount: @price_min_amount, price_max_amount: @price_max_amount)
   end
 
   def searched_bikes_proximity
@@ -67,12 +74,21 @@ class Search::MarketplaceController < ApplicationController
     end
 
     @page = permitted_page(params[:page])
-    @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
   end
 
   def permitted_search_params
     # Switching to for_sale will get location, but it doesn't currently work
     params.permit(*Bike.permitted_search_params).merge(stolenness: "all")
+  end
+
+  def listing_search_params
+    params.permit(:currency, :price_min_amount, :price_max_amount)
+  end
+
+  def amount_for(value)
+    return nil if value.blank?
+
+    value.to_f
   end
 
   def render_ad

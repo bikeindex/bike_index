@@ -3,6 +3,12 @@
 module Amountable
   extend ActiveSupport::Concern
 
+  def self.to_cents(amount_float)
+    return nil if amount_float.blank?
+
+    ((amount_float || 0).to_f * 100.00).round
+  end
+
   def amount
     amnt = (amount_cents.to_i / 100.00)
     (amnt % 1 != 0) ? amnt : amnt.round

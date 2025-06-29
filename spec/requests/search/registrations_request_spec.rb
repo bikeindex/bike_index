@@ -78,7 +78,6 @@ RSpec.describe Search::RegistrationsController, type: :request do
             expect(response).to render_template(:index)
             expect(flash).to_not be_present
             expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
-            expect(assigns(:selected_query_items_options)).to eq([])
             expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
             # Test cycle_type
             get "#{base_url}?query_items%5B%5D=v_16", as: :turbo_stream
@@ -90,23 +89,19 @@ RSpec.describe Search::RegistrationsController, type: :request do
             # Test impounded
             get "#{base_url}?stolenness=found", as: :turbo_stream
             expect(assigns(:interpreted_params)).to eq(stolenness: "found")
-            expect(assigns(:selected_query_items_options)).to eq([])
             expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
             get base_url, params: {stolenness: "impounded"}, as: :turbo_stream
             expect(assigns(:interpreted_params)).to eq(stolenness: "impounded")
-            expect(assigns(:selected_query_items_options)).to eq([])
             expect(assigns(:bikes).map(&:id)).to match_array([impounded_bike.id])
           end
           context "query_items and serial search" do
             let(:manufacturer) { non_stolen_bike.manufacturer }
             let(:color) { non_stolen_bike.primary_frame_color }
             let(:query_params) { {serial: "#{serial}0d", query_items: [color.search_id, manufacturer.search_id], stolenness: "non"} }
-            let(:target_selected_query_items_options) { BikeSearchable.selected_query_items_options(target_interpreted_params) }
             it "assigns passed parameters, assigns close_serials" do
               get base_url, params: query_params, as: :turbo_stream
               expect(response.status).to eq 200
               expect(assigns(:interpreted_params)).to eq target_interpreted_params
-              expect(assigns(:selected_query_items_options)).to eq target_selected_query_items_options
               expect(assigns(:bikes).map(&:id)).to eq([])
             end
           end
