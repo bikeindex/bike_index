@@ -27,11 +27,12 @@
 
   .slick-prev,
   .slick-next {
-    &:before {
-      color: $gray;
-      font-size: 30px;
-      font-weight: 600;
-    }
+    color: $gray;
+    // &:before {
+    //   color: $gray;
+    //   font-size: 30px;
+    //   font-weight: 600;
+    // }
   }
 
   // Avoid having a flash where all the recoveries are shown
