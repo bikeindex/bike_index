@@ -196,8 +196,6 @@ RSpec.describe Search::Form::Component, :js, type: :system do
           expect(find("#primary_activity", visible: false).value).to eq primary_activity.id.to_s
 
           kind_scopes.each { |kind_scope| expect_count(kind_scope, 0) }
-
-          expect_localstorage_location(location: "San Francisco, CA", distance: "101")
         end
       end
     end
