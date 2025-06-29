@@ -88,7 +88,6 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(response).to render_template(:index)
             expect(flash).to_not be_present
             expect(assigns(:interpreted_params)).to eq(stolenness: "all")
-            expect(assigns(:selected_query_items_options)).to eq([])
             expect(assigns(:bikes).map(&:id)).to match_array([item.id, marketplace_listing_nyc.item_id])
             # Test cycle_type
             get "#{base_url}?marketplace_scope=for_sale&query_items%5B%5D=v_18", as: :turbo_stream

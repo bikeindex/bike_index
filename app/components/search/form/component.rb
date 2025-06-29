@@ -2,12 +2,16 @@
 
 module Search::Form
   class Component < ApplicationComponent
-    def initialize(target_search_path:, target_frame:, interpreted_params:, selected_query_items_options:, marketplace_scope: nil)
+    def initialize(target_search_path:, target_frame:, interpreted_params:, marketplace_scope: nil,
+      current_currency: nil, price_min_amount: nil, price_max_amount: nil)
       @marketplace_scope = marketplace_scope
       @target_search_path = target_search_path
       @target_frame = target_frame
       @interpreted_params = interpreted_params
-      @selected_query_items_options = selected_query_items_options
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+      @currency = current_currency || Currency.default
+      @price_min_amount = price_min_amount
+      @price_max_amount = price_max_amount
     end
 
     private
@@ -48,6 +52,9 @@ module Search::Form
 
     def render_price_field?
       is_marketplace? # only on marketplace
+    end
+
+    def currency_symbol
     end
 
     def render_primary_activity_field?

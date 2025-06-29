@@ -67,7 +67,6 @@ class Search::MarketplaceController < ApplicationController
     end
 
     @page = permitted_page(params[:page])
-    @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
   end
 
   def permitted_search_params

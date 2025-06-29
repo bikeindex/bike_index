@@ -44,8 +44,7 @@ module Search::Form
       {
         target_search_path: target_search_path(preview_name),
         target_frame: :search_registrations_results_frame,
-        interpreted_params:,
-        selected_query_items_options: BikeSearchable.selected_query_items_options(interpreted_params)
+        interpreted_params:
       }
     end
   end
