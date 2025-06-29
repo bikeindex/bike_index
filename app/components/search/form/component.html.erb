@@ -18,9 +18,18 @@
           <%= label_tag :serial, translation(".search_for_serial_number"), class: "twlabel tw:sr-only" %>
           <%= text_field_tag :serial, serial_value, placeholder: translation(".search_for_serial_number"), class: "twinput tw:mt-2 fieldResetsCounts" %>
         <% end %>
-        <% if render_primary_activity_field? %>
-          <%= label_tag :primary_activity, translation(".search_for_primary_activity"), class: "twlabel tw:sr-only" %>
-          <%= select_tag :primary_activity, primary_activity_select_opts, prompt: primary_activity_prompt, class: "twinput tw:mt-2 tw:max-w-xl tw:ml-auto fieldResetsCounts" %>
+        <% if render_activity_and_price_wrapper? %>
+          <div class="">
+            <% if render_primary_activity_field? %>
+              <%= label_tag :primary_activity, translation(".search_for_primary_activity"), class: "twlabel tw:sr-only" %>
+              <%= select_tag :primary_activity, primary_activity_select_opts,
+                include_blank: true, prompt: translation(".search_for_primary_activity"),
+                class: "twinput tw:mt-2 tw:max-w-xl tw:ml-auto fieldResetsCounts" %>
+            <% end %>
+            <% if render_price_field? %>
+
+            <% end %>
+          </div>
         <% end %>
       </div>
       <div class="tw:w-20">

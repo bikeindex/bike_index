@@ -55,7 +55,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       location_key = local_storage.find { |k, _| k.match?(/location/i) }&.first
       distance_key = local_storage.find { |k, _| k.match?(/distance/i) }&.first
-
+      # pp local_storage
       expect(local_storage).to match_hash_indifferently({location_key => location, distance_key => distance})
     end
 
@@ -129,6 +129,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
     context "chicago_tall_bike" do
       let(:preview_path) { "/rails/view_components/search/form/component/chicago_tall_bike" }
+      let(:kind_scopes) { %w[proximity stolen non for_sale] }
       include_context :geocoder_real
       # Maybe TODO: get real results for counts
       # let(:production_count_url) { "https://bikeindex.org/api/v3/search/count" }
@@ -139,7 +140,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         # TODO: Why doesn't this show up?
         # expect(page_text(page.text)).to match("miles of")
 
-        %w[proximity stolen non for_sale].each { |kind_scope| expect_count(kind_scope, 0) }
+        kind_scopes.each { |kind_scope| expect_count(kind_scope, 0) }
 
         find(".select2-container").click
         # Wait for select2 to load
@@ -162,10 +163,12 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     end
 
     context "for_sale" do
+      let(:kind_scopes) { %w[for_sale for_sale_proximity] }
       let(:preview_path) { "/rails/view_components/search/form/component/for_sale" }
       it "renders and updates" do
         expect(find("#query_items", visible: false).value).to eq([])
         expect(page_text(page.text)).not_to match("miles of")
+        expect(find("#primary_activity", visible: false).value).to eq ""
 
         %w[for_sale for_sale_proximity].each { |kind_scope| expect_count(kind_scope, 0) }
 
@@ -178,6 +181,24 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         proximity_text = find("[data-test-id=\"Search::KindOption-for_sale_proximity\"]").text
         # Counts should have been hidden because a new item was added
         expect(proximity_text.strip).to eq("For sale in search area")
+      end
+
+      context "for_sale_san_francisco_atb" do
+        let(:preview_path) do
+          primary_activity # Needs to happen before page is rendered
+          "/rails/view_components/search/form/component/for_sale_san_francisco_atb"
+        end
+        let(:primary_activity) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)") }
+
+        it "renders and updates" do
+          expect(find("#query_items", visible: false).value).to eq([])
+          expect(page_text(page.text)).to match("miles of")
+          expect(find("#primary_activity", visible: false).value).to eq primary_activity.id.to_s
+
+          kind_scopes.each { |kind_scope| expect_count(kind_scope, 0) }
+
+          expect_localstorage_location(location: "San Francisco, CA", distance: "101")
+        end
       end
     end
   end

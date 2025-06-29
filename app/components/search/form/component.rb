@@ -42,6 +42,14 @@ module Search::Form
       @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
     end
 
+    def render_activity_and_price_wrapper?
+      render_price_field? || render_primary_activity_field?
+    end
+
+    def render_price_field?
+      is_marketplace? # only on marketplace
+    end
+
     def render_primary_activity_field?
       return true if is_marketplace? # Also show on bike versions
 
@@ -54,14 +62,6 @@ module Search::Form
         PrimaryActivity.by_priority.map { |pa| [pa.display_name_search, pa.id] },
         selected: @interpreted_params[:primary_activity]
       )
-    end
-
-    def primary_activity_prompt
-      if @interpreted_params[:primary_activity].present?
-        translation(".any_primary_activity")
-      else
-        translation(".search_for_primary_activity")
-      end
     end
   end
 end
