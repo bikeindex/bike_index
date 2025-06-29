@@ -39,7 +39,7 @@ RSpec.describe PrimaryActivity, type: :model do
       it "is the name with the family" do
         expect(primary_activity.reload.primary_activity_family.short_name).to eq "ATB"
         expect(primary_activity.display_name).to eq "ATB: All Road"
-        expect(primary_activity.display_name_search).to eq "ATB: All Road"
+        expect(primary_activity.display_name_search).to eq "ATB: ONLY All Road"
         expect(PrimaryActivity.friendly_find_id("ATB")).to eq primary_activity_family.id
       end
       context "with other primary_activity with same name" do
@@ -70,7 +70,7 @@ RSpec.describe PrimaryActivity, type: :model do
         it "does not include family in name" do
           expect(primary_activity.reload.name).to eq "Gravel"
           expect(primary_activity.display_name).to eq "Gravel"
-          expect(primary_activity.display_name_search).to eq "ATB: Gravel"
+          expect(primary_activity.display_name_search).to eq "ATB: ONLY Gravel"
         end
       end
 
