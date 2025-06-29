@@ -22,6 +22,8 @@
           <div class="tw:mt-2 tw:flex tw:flex-wrap tw:md:flex-nowrap tw:gap-2">
             <% if render_price_field? %>
               <span class="tw:flex tw:flex-nowrap">
+                <%= hidden_field_tag :currency, @currency %>
+                <span class="tw:block tw:py-1.5 tw:mr-2"><%= @currency.symbol %></span>
                 <%= label_tag :min_price_amount, translation(".minimum_price"), class: "twlabel tw:sr-only" %>
                 <%=
                   number_field_tag :min_price_amount, @min_price_amount, placeholder: translation(".min"),

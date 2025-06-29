@@ -2,7 +2,7 @@
   <h1 class="tw:text-3xl tw:text-slate-800 tw:mb-4">Bike Index Marketplace</h1>
   <%= render Search::Form::Component.new(target_search_path: search_marketplace_path,
     target_frame: :marketplace_results_frame, interpreted_params: @interpreted_params,
-    current_currency:, marketplace_scope: @marketplace_scope, price_min_amount: @price_min_amount,
+    currency: @currency, marketplace_scope: @marketplace_scope, price_min_amount: @price_min_amount,
     price_max_amount: @price_max_amount) %>
 </div>
 

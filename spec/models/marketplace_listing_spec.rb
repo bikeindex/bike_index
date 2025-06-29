@@ -116,6 +116,49 @@ RSpec.describe MarketplaceListing, type: :model do
     end
   end
 
+  describe "search" do
+    let!(:marketplace_listing_low) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 10_00) }
+    let!(:marketplace_listing_mid) { FactoryBot.create(:marketplace_listing, amount_cents: 100_00) }
+    let!(:marketplace_listing_high) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 1000_00) }
+    let(:item_low_id) { marketplace_listing_low.item_id }
+    let(:item_mid_id) { marketplace_listing_mid.item_id }
+    let(:item_high_id) { marketplace_listing_high.item_id }
+    let(:item_ids) { [item_low_id, item_mid_id, item_high_id] }
+
+    def expect_target_search_results
+      expect(MarketplaceListing.search(Bike).pluck(:id).sort).to eq item_ids
+      expect(MarketplaceListing.search(Bike, price_min_amount: 99).pluck(:id).sort).to eq([item_mid_id, item_high_id])
+      expect(MarketplaceListing.search(Bike, price_max_amount: 500).pluck(:id).sort).to eq([item_low_id, item_mid_id])
+      expect(MarketplaceListing.search(Bike, price_min_amount: 99, price_max_amount: 5000).pluck(:id).sort)
+        .to eq([item_mid_id, item_high_id])
+      expect(MarketplaceListing.search(Bike, price_min_amount: 10.1, price_max_amount: 999).pluck(:id).sort)
+        .to eq([item_mid_id])
+    end
+
+    it "searches" do
+      expect(Bike.pluck(:id).sort).to eq item_ids
+      expect(Bike.all.map(&:current_marketplace_listing).compact.map(&:id).sort)
+        .to eq([marketplace_listing_low.id, marketplace_listing_mid.id, marketplace_listing_high.id])
+
+      expect_target_search_results
+    end
+
+    context "with a sold listing" do
+      let!(:marketplace_listing_previous) { FactoryBot.create(:marketplace_listing, :sold, item: marketplace_listing_low.item, end_at: Time.current - 3.days) }
+      let!(:marketplace_listing_sold) { FactoryBot.create(:marketplace_listing, :sold) }
+      let(:item_sold_id) { marketplace_listing_sold.item_id }
+      let(:item_ids) { [item_low_id, item_mid_id, item_high_id, item_sold_id] }
+
+      it "searches" do
+        expect(Bike.pluck(:id).sort).to eq item_ids
+        expect(Bike.all.map(&:current_marketplace_listing).compact.map(&:id).sort)
+          .to eq([marketplace_listing_low.id, marketplace_listing_mid.id, marketplace_listing_high.id])
+
+        expect_target_search_results
+      end
+    end
+  end
+
   describe "validate_publishable!" do
     let(:user_hidden) { false }
     let(:primary_activity) { FactoryBot.create(:primary_activity) }

@@ -214,7 +214,7 @@ class Bike < ApplicationRecord
 
   scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
   scope :for_sale_default_scope, -> {
-    unscoped.current.includes(:marketplace_listings, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership)
+    unscoped.current.joins(:marketplace_listings, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership)
       .where(marketplace_listings: {status: :for_sale})
   }
 

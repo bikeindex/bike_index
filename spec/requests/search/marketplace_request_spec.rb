@@ -13,10 +13,10 @@ RSpec.describe Search::MarketplaceController, type: :request do
   context "with listings" do
     let(:seller) { FactoryBot.create(:user, :with_address_record) }
     let(:item) { FactoryBot.create(:bike, :with_primary_activity, cycle_type: "personal-mobility", propulsion_type: "throttle") }
-    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, address_record: seller.address_record, seller:, item:) }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, address_record: seller.address_record, seller:, item:, amount_cents: 1000_00) }
     let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, :with_address_record, status: :draft, seller:) }
     let(:address_record) { FactoryBot.create(:address_record, :new_york, kind: :marketplace_listing, user: seller) }
-    let(:marketplace_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, address_record:) }
+    let(:marketplace_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, address_record:, amount_cents: 500_00) }
     describe "index" do
       it "renders" do
         get base_url
@@ -43,15 +43,26 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(assigns(:interpreted_params)).to eq(stolenness: "all")
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
 
+          expect(marketplace_listing_nyc).to be_present
           # Searching with serial doesn't render registrations with serials similar
-          get "#{base_url}?search_no_js=true&serial=xxxz"
+          get "#{base_url}?search_no_js=true&serial=xxxz&currency=zzz"
           expect(response).to render_template(:index)
           expect(assigns(:bikes).pluck(:id)).to eq([])
+          expect(assigns(:currency).symbol).to eq "$"
           expect(response.body).to match "xxxz"
           # Verify that it shows marketplace, not registrations text
           expect(response.body).to match "No listings exactly matched your search"
           # FWIW, this doesn't fail anyway - but it's a reminder, don't search similar serials on marketplace
           expect(response.body).to_not match "with serials similar"
+
+          get "#{base_url}?search_no_js=true&currency=eur&price_min_amount=501"
+          expect(response).to render_template(:index)
+          # Not doing anything with currency yet, so it only uses default
+          # expect(assigns(:currency).symbol).to eq "€"
+          expect(assigns(:currency).symbol).to eq "$"
+          expect(assigns(:price_min_amount)).to eq 501
+          expect(assigns(:price_max_amount)).to be_nil
+          expect(assigns(:bikes).pluck(:id)).to eq([marketplace_listing.item_id])
         end
       end
 
@@ -68,6 +79,17 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
           # Expect there to be a link to the bike url
           expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{item.id}"/)
+
+          expect(marketplace_listing_nyc).to be_present
+          get "#{base_url}?price_max_amount=500", as: :turbo_stream
+          expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_marketplace_results_frame\">")
+          expect(response).to render_template(:index)
+          expect(assigns(:bikes).pluck(:id)).to eq([marketplace_listing_nyc.item_id])
+
+          get "#{base_url}?price_max_amount=5000&price_min_amount=600", as: :turbo_stream
+          expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_marketplace_results_frame\">")
+          expect(response).to render_template(:index)
+          expect(assigns(:bikes).pluck(:id)).to eq([item.id])
         end
 
         context "geocoder_stubbed_bounding_box" do
