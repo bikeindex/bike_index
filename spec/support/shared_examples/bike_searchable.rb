@@ -180,6 +180,34 @@ RSpec.shared_examples "bike_searchable" do
         end
       end
     end
+
+    describe "primary_activity" do
+      let(:primary_activity) { FactoryBot.create(:primary_activity) }
+      let(:primary_activity2) { nil }
+      let(:interpreted_params) { BikeSearchable.searchable_interpreted_params({primary_activity: primary_activity.id, stolenness: "all"}, ip: ip_address) }
+      let!(:bike1) { FactoryBot.create(:bike, primary_activity:) }
+      let!(:bike2) { FactoryBot.create(:bike, primary_activity: primary_activity2) }
+      it "finds the matching bike" do
+        expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike1.id])
+      end
+
+      context "primary_activity family" do
+        let(:primary_activity) { FactoryBot.create(:primary_activity_family) }
+        let(:primary_activity2) { FactoryBot.create(:primary_activity, :with_family, primary_activity_family: primary_activity) }
+
+        def i_params_activity(primary_activity_id)
+          BikeSearchable.searchable_interpreted_params({primary_activity: primary_activity_id, stolenness: "all"}, ip: ip_address)
+        end
+
+        it "finds the matching bike" do
+          expect(primary_activity2.reload.primary_activity_family_id).to eq(primary_activity.id)
+          expect(Bike.search(i_params_activity(primary_activity.id)).pluck(:id)).to match_array([bike1.id, bike2.id])
+          expect(Bike.search(i_params_activity(primary_activity.slug)).pluck(:id)).to match_array([bike1.id, bike2.id])
+          expect(Bike.search(i_params_activity(primary_activity.name)).pluck(:id)).to match_array([bike1.id, bike2.id])
+          expect(Bike.search(i_params_activity(primary_activity2.short_name)).pluck(:id)).to eq([bike2.id])
+        end
+      end
+    end
   end
 
   describe "search_close_serials and serials_containing" do

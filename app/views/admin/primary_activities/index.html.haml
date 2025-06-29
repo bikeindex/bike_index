@@ -1,0 +1,14 @@
+- nav_header_list_items = capture_haml do
+  %li.nav-item.dropdown.dropleft
+    %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@scope.present? ? "active" : "")}
+      - if @scope.blank?
+        All
+      - else
+        #{@scope.titleize} only
+    .dropdown-menu
+      = link_to "All scopes", url_for(sortable_search_params.merge(search_scope: nil)), class: "dropdown-item #{@scope.present? ? '' : 'active'}"
+      .dropdown-divider
+      - searchable_scopes.each do |kind|
+        = link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_scope: kind)), class: "dropdown-item #{@scope == kind ? 'active' : ''}"
+= render partial: "/shared/admin/index_skeleton", locals: {chart_collection: @render_chart && primary_activities, nav_header_list_items:}
+

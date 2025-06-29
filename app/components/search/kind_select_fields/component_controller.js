@@ -6,20 +6,27 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='search--kind-select-fields--component'
 export default class extends Controller {
   static targets = ['distance', 'location', 'locationWrap']
-  static values = { apiCountUrl: String, isMarketplace: Boolean, locationStoreKey: String, optionKinds: String }
+  static values = { apiCountUrl: String, optionKinds: String, storageKeyLocation: String, storageKeyDistance: String }
 
   connect () {
+    this.setLocalstorageKeys()
     this.setSearchProximity()
-    this.updateCountsToSubmit()
-    this.updateForSaleLink.bind(this)
+    this.updateForSaleLink()
     this.form?.addEventListener('change', this.updateForSaleLink.bind(this))
+    this.form?.addEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
+
+    // Add function to window so it can be called by select2 callback
+    window.kindControllerUpdateAfterComboboxChange = this.updateAfterComboboxChange.bind(this)
+    // if in component preview (lookbook), run kind counts on load
+    if (window.inComponentPreview) { this.setKindCounts() }
   }
 
   disconnect () {
     this.resetKindCounts() // also removes the bindings
     this.form?.removeEventListener('change', this.updateForSaleLink.bind(this))
+    this.form?.removeEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
     // Remove reset count function from window
-    window.resetKindCounts = null
+    window.kindControllerUpdateAfterComboboxChange = null
   }
 
   get form () {
@@ -32,6 +39,16 @@ export default class extends Controller {
     return new URLSearchParams(formData).toString()
   }
 
+  setLocalstorageKeys () {
+    if (window.inComponentPreview) {
+      this.storageKeyLocation = 'preview-searchLocation'
+      this.storageKeyDistance = 'preview-searchDistance'
+    } else {
+      this.storageKeyLocation = 'searchLocation'
+      this.storageKeyDistance = 'searchDistance'
+    }
+  }
+
   updateForSaleLink () {
     const link = document.getElementById('kindSelectForSaleLink')
 
@@ -40,27 +57,23 @@ export default class extends Controller {
     }
   }
 
-  updateCountsToSubmit () {
-    if (!this.form) return
-
-    this.form.addEventListener('turbo:submit-end', this.setKindCounts.bind(this))
-
-    // if in component preview (lookbook), run kind counts on load
-    if (window.inComponentPreview) { this.setKindCounts() }
+  performSubmitActions () {
+    // store search proximity on form submit
+    this.setSearchProximity()
+    // Update kind counts
+    this.setKindCounts()
   }
 
   updateLocationVisibility () {
     const selectedValue = this.element.querySelector(`input[name="${this.optionKindsValue}"]:checked`)?.value
 
     if (['proximity', 'for_sale_proximity'].includes(selectedValue)) {
-      console.log('show location')
       collapse('show', this.locationWrapTarget)
     } else {
       collapse('hide', this.locationWrapTarget)
     }
   }
 
-  // TODO: make this location target_search_path specific, but falls back to general location
   setSearchProximity () {
     let location = this.locationTarget.value
     // strip the location text
@@ -69,12 +82,19 @@ export default class extends Controller {
     // Store location in localStorage if it's there, otherwise -
     // Set from localStorage - so we don't override if it's already set
     if (location && location.length > 0) {
-      // Don't save location if user entered 'Anywhere'
-      if (!location.match(/anywhere/i)) {
-        localStorage.setItem('location', location)
+      // Don't save location if location is an ignored string
+      if (!this.ignoredLocation(location)) {
+        // console.log(`setting location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
+        localStorage.setItem(this.storageKeyLocation, location)
+        // save distance if location is being saved
+        const distance = this.distanceTarget.value
+        if (distance && distance.length > 0) {
+          localStorage.setItem(this.storageKeyDistance, distance)
+        }
       }
     } else {
-      location = localStorage.getItem('location')
+      location = localStorage.getItem(this.storageKeyLocation)
+      // console.log(`got location: '${location}' (storageKeyLocation: ${this.storageKeyLocation})`)
       // Make location 'you' if location is anywhere or blank, so user isn't stuck and unable to use location
       if (this.ignoredLocation(location)) {
         location = 'you'
@@ -90,8 +110,9 @@ export default class extends Controller {
     return ['anywhere', 'you'].includes(location.toLowerCase().trim())
   }
 
-  // TODO: Should this just be getting the values from the form?
   setKindCounts () {
+    // console.log('setting kind counts')
+
     const queryString = this.searchQuery
     if (this.doNotFetchCounts(queryString)) {
       return this.resetKindCounts()
@@ -115,12 +136,16 @@ export default class extends Controller {
       field._boundResetFunction = this.resetKindCounts.bind(this)
       field.addEventListener('change', field._boundResetFunction)
     })
-    // Add reset function to window so it can be called by select2 callback
-    window.resetKindCounts = this.resetKindCounts.bind(this)
+  }
+
+  updateAfterComboboxChange () {
+    this.updateForSaleLink()
+    this.resetKindCounts()
   }
 
   resetKindCounts () {
-    console.log('resetting counts')
+    // console.log('resetting counts')
+
     // dataCountTargets looks like: ['non', 'stolen', 'proximity', 'for_sale']
     const dataCountTargets = [...this.element.querySelectorAll('[data-count-target]')]
       .map(el => el.dataset.countTarget).filter(item => item !== 'all')

@@ -209,6 +209,35 @@ RSpec.describe BikeSearchable do
         # end
       end
     end
+    context "with primary_activity" do
+      let!(:primary_activity) { FactoryBot.create(:primary_activity) }
+      let(:query_params) { {primary_activity: " #{primary_activity.id}", query_items: nil, stolenness: "non"} }
+      let(:target) { {primary_activity: primary_activity.id, primary_activity_family_ids: [primary_activity.id], stolenness: "non"} }
+      it "includes primary_activity" do
+        expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+      end
+      context "primary_activity_slug" do
+        let(:query_params) { {primary_activity: "#{primary_activity.slug} \n", query_items: nil, stolenness: "non"} }
+        it "includes primary_activity" do
+          expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+        end
+      end
+      context "unknown primary activity" do
+        let(:query_params) { {primary_activity: "IDK, whatever", query_items: nil, stolenness: "non"} }
+        let(:target) { {stolenness: "non"} }
+        it "returns without primary_activity" do
+          expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+        end
+      end
+      context "with family" do
+        let!(:primary_activity) { FactoryBot.create(:primary_activity_family) }
+        let!(:primary_activity_flavor) { FactoryBot.create(:primary_activity, :with_family, primary_activity_family: primary_activity) }
+        let(:target_with_family) { target.merge(primary_activity_family_ids: [primary_activity.id, primary_activity_flavor.id]) }
+        it "includes primary_activity_family_ids" do
+          expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target_with_family
+        end
+      end
+    end
   end
 
   describe "selected_query_items_options" do

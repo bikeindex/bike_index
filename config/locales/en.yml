@@ -1067,15 +1067,6 @@ en:
         You sent this %{bike_type} to <em>%{owner_email}</em> and it hasn't been claimed
         yet. You can update it.
       your_bike: Your %{bike_type}
-    index:
-      all: All
-      miles_of: miles of
-      no_bikes_matched: No bikes exactly matched your search
-      not_marked_stolen: Not marked stolen
-      search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
-      stolen_anywhere: Stolen anywhere
-      stolen_within: Stolen within
-      you: you
     main_show_block:
       abandoned_title: This is an abandoned %{bike_type} that was %{impound_kind}
       bike_photo: "%{bike_type} photo"

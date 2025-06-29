@@ -1806,15 +1806,6 @@ nb:
       you_sent_this_bike_html: Du sendte denne %{bike_type} til <em>%{owner_email}</em>
         , og den er ikke gjort krav på ennå. Du kan oppdatere den.
       your_bike: Din %{bike_type}
-    index:
-      all: Alle
-      miles_of: miles av
-      no_bikes_matched: Ingen sykler samsvarte nøyaktig med søket ditt
-      not_marked_stolen: Ikke merket som stjålet
-      search_for_stolenness_desc_bikes: Søk etter %{stolenness_desc} sykler
-      stolen_anywhere: Stjålet hvor som helst
-      stolen_within: Stjålet innenfor
-      you: du
     main_show_block:
       bike_photo: "%{bike_type} bilde"
       color_may_not_match: Fargen stemmer kanskje ikke!
@@ -5941,6 +5932,7 @@ nb:
           så det brukes ikke til å søke.
         search_for_serial_number: Søk etter serienummer
         submit: sende inn
+        search_for_primary_activity: Søk etter primær aktivitetstype
       bike_box:
         location: plassering
         primary_colors: Primærfarger

@@ -227,13 +227,14 @@ Rails.application.routes.draw do
       :payments,
       :recovery_displays,
       :superuser_abilities,
-      :theft_alerts
+      :theft_alerts,
+      :primary_activities
 
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data marketplace_listings model_attestations model_audits
-      notifications organization_statuses parking_notifications stripe_prices stripe_subscriptions
-      user_alerts user_registration_organizations
+      notifications organization_statuses parking_notifications
+      stripe_prices stripe_subscriptions user_alerts user_registration_organizations
     ].each { resources _1, only: %i[index] }
 
     resources :marketplace_messages, only: %i[index show]

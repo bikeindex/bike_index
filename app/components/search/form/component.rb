@@ -12,6 +12,10 @@ module Search::Form
 
     private
 
+    def is_marketplace?
+      @marketplace_scope.present?
+    end
+
     def kind_select_options
       kind_scope = @marketplace_scope || @interpreted_params[:stolenness]
 
@@ -28,7 +32,7 @@ module Search::Form
 
     def render_serial_field?
       # Always render serial unless viewing marketplace - TODO: bike versions too
-      return true if @marketplace_scope.blank?
+      return true unless is_marketplace?
 
       # Render the serial field, if it was passed
       @interpreted_params[:serial].present?
@@ -36,6 +40,17 @@ module Search::Form
 
     def serial_looks_like_not_a_serial?
       @interpreted_params[:raw_serial].present? && @interpreted_params[:serial].blank?
+    end
+
+    def render_primary_activity_field?
+      is_marketplace? # Also show on bike versions
+    end
+
+    def primary_activity_select_opts
+      options_for_select(
+        PrimaryActivity.by_priority.map { |pa| [pa.display_name_search, pa.id] },
+        selected: @interpreted_params[:primary_activity]
+      )
     end
   end
 end
