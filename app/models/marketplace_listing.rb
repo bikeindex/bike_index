@@ -55,6 +55,7 @@ class MarketplaceListing < ApplicationRecord
   after_commit :update_bike_for_sale
 
   scope :current, -> { where(status: CURRENT_STATUSES) }
+  scope :removed_or_sold, -> { where(status: %i[removed sold]) }
 
   # validate that there isn't another current listing for an item
 

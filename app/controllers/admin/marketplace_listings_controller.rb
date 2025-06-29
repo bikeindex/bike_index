@@ -19,7 +19,7 @@ class Admin::MarketplaceListingsController < Admin::BaseController
   end
 
   def searchable_statuses
-    MarketplaceListing.statuses.keys.map(&:to_s)
+    MarketplaceListing.statuses.keys.map(&:to_s) + ['removed_or_sold']
   end
 
   def matching_marketplace_listings
