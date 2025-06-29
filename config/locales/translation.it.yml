@@ -1771,15 +1771,6 @@ it:
       you_have_already_marked_resolved:
       you_sent_this_bike_html:
       your_bike:
-    index:
-      all:
-      miles_of:
-      no_bikes_matched:
-      not_marked_stolen:
-      search_for_stolenness_desc_bikes:
-      stolen_anywhere:
-      stolen_within:
-      you:
     main_show_block:
       bike_photo:
       color_may_not_match:
@@ -4694,6 +4685,7 @@ it:
         doesnt_look_like_serial:
         search_for_serial_number:
         submit:
+        search_for_primary_activity:
       bike_box:
         location: Luogo
         primary_colors: Colori primari

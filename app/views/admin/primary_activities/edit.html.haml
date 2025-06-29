@@ -47,6 +47,10 @@
           %td Family
           %td
             = @primary_activity.family_name
+        %tr
+          %td Bike count
+          %td
+            = admin_number_display(Bike.where(primary_activity_id: @primary_activity.id).count)
 
 - if @primary_activity.family?
   .mt-5.mb-5

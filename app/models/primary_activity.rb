@@ -20,7 +20,7 @@ class PrimaryActivity < ApplicationRecord
   include ShortNameable
 
   SPECIAL_SHORT_NAMES = {
-    "road" => "road-bike",
+    "road" => "road-biking",
     "track" => "track-racing"
   }.freeze
 
@@ -92,7 +92,8 @@ class PrimaryActivity < ApplicationRecord
       return where(slug: special_short_slug).select(*select_attrs).first if special_short_slug.present?
 
       by_priority.where(slug: Slugifyer.slugify(str)).select(*select_attrs).first ||
-        by_priority.where("lower(name) = ?", str.downcase.strip).select(*select_attrs).first
+        by_priority.where("lower(name) = ?", str.downcase).select(*select_attrs).first ||
+        by_priority.where("name ILIKE ?", "%#{str}%").select(*select_attrs).first
     end
   end
 
@@ -125,7 +126,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def short_name
-    return "Road" if slug == "road-bike"
+    return "Road" if slug == "road-biking"
     return "Track" if slug == "track-racing"
 
     super
