@@ -18,6 +18,18 @@ RSpec.describe Search::Form::Component, type: :component do
   it "renders with serial" do
     expect(component).to have_css "div"
     expect(component).to have_css("#serial")
+    expect(component).to_not have_css("#primary_activity")
+  end
+
+  context "with primary_activity" do
+    let!(:primary_activity) { FactoryBot.create(:primary_activity) }
+    let(:interpreted_params) { BikeSearchable.searchable_interpreted_params({primary_activity: primary_activity.id}) }
+
+    it "renders with serial and primary_activity" do
+      expect(component).to have_css "div"
+      expect(component).to have_css("#serial")
+      expect(component).to have_css("#primary_activity")
+    end
   end
 
   describe "component_translation_scope" do
@@ -42,6 +54,15 @@ RSpec.describe Search::Form::Component, type: :component do
       expect(component).to have_css "div"
       expect(component).to_not have_css("#serial")
       expect(component).to have_css("#primary_activity")
+    end
+    context "with serial" do
+      let(:interpreted_params) { BikeSearchable.searchable_interpreted_params({serial: "xxx"}) }
+
+      it "renders with serial and primary_activity" do
+        expect(component).to have_css "div"
+        expect(component).to have_css("#serial")
+        expect(component).to have_css("#primary_activity")
+      end
     end
   end
 end
