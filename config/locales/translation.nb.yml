@@ -5933,6 +5933,10 @@ nb:
         search_for_serial_number: Søk etter serienummer
         submit: sende inn
         search_for_primary_activity: Søk etter primær aktivitetstype
+        max: maks
+        min: min
+        price_maximum: Minimumspris
+        price_minimum: Minimumspris
       bike_box:
         location: plassering
         primary_colors: Primærfarger

@@ -27,6 +27,12 @@ class Admin::MarketplaceListingsController < Admin::BaseController
     @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
     marketplace_listings = marketplace_listings.send(@status) if @status.present?
 
+    if params[:search_bike_id].present?
+      @bike = Bike.unscoped.find_by(id: params[:search_bike_id])
+
+      marketplace_listings = marketplace_listings.where(item_id: params[:search_bike_id], item_type: "Bike")
+    end
+
     @time_range_column = sort_column if %w[updated_at published_at end_at].include?(sort_column)
     @time_range_column ||= "created_at"
     marketplace_listings.where(@time_range_column => @time_range)

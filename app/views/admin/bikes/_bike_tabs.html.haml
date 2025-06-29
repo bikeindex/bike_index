@@ -348,7 +348,7 @@
   - if bike.present?
     #bike-tab-wrapper{"data-activetab" => active_tab}
       .nav.nav-tabs
-        - cache(["admin_bike_tabs", bike, stolen_record]) do
+        - cache(["admin_bike_tabs-1", bike, stolen_record]) do
           - impound_count = bike.impound_records.count + ImpoundClaim.involving_bike_id(bike.id).count
 
           .nav-item
@@ -363,6 +363,11 @@
               M<span class="d-none d-md-inline">essages</span>
               %small
                 (#{admin_number_display(bike.messages_count)})
+          .nav-item
+            = link_to admin_marketplace_listings_path(search_bike_id: bike.id), class: "nav-link marketplace_listings-index" do
+              L<span class="d-none d-md-inline">istings</span>
+              %small
+                (#{admin_number_display(bike.marketplace_listings.count)})
           .nav-item
             = link_to admin_bike_path(bike.id, active_tab: "ownerships"), class: "nav-link bikes-ownerships" do
               O<span class="d-none d-md-inline">wnerships</span>

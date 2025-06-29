@@ -29,9 +29,10 @@
           %td
             %small= "#{marketplace_message.marketplace_listing.currency_symbol}#{admin_number_display(marketplace_message.marketplace_listing.amount)}"
           %td
-            = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_link_path: admin_bike_path(marketplace_message.item_id, show_marketplace_preview: true), render_search: true}
+            = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), render_search: true}
           %td
-            = marketplace_message.body.truncate(100)
+            %span{title: marketplace_message.body}
+              = marketplace_message.body.truncate(100)
           %td
             = marketplace_message.kind_humanized
           %td

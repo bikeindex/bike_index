@@ -4679,6 +4679,10 @@ es:
         search_for_serial_number:
         submit:
         search_for_primary_activity:
+        max:
+        min:
+        price_maximum:
+        price_minimum:
       bike_box:
         location:
         primary_colors:

@@ -6090,6 +6090,10 @@ nl:
         search_for_serial_number: Zoek naar framenummer
         submit: Voorleggen
         search_for_primary_activity: Zoek primair activiteitstype
+        max: maximaal
+        min: mijn
+        price_maximum: Minimumprijs
+        price_minimum: Minimumprijs
       bike_box:
         location: Plaats
         primary_colors: Primaire kleuren

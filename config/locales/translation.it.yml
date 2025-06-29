@@ -4686,6 +4686,10 @@ it:
         search_for_serial_number:
         submit:
         search_for_primary_activity:
+        max:
+        min:
+        price_maximum:
+        price_minimum:
       bike_box:
         location: Luogo
         primary_colors: Colori primari

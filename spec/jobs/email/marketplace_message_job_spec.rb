@@ -9,7 +9,8 @@ RSpec.describe Email::MarketplaceMessageJob, type: :job do
       delivery_status: "delivery_success",
       notifiable: marketplace_message,
       user_id: marketplace_message.receiver_id,
-      message_id: be_present
+      message_id: be_present,
+      bike_id: marketplace_message.marketplace_listing.item_id
     }
   end
   it "sends an email" do

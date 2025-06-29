@@ -42,7 +42,7 @@ class Search::MarketplaceController < ApplicationController
     bikes = Bike.search(@interpreted_params).for_sale
 
     # Not doing anything with currency yet, so always use default
-    @currency = Currency.default # Currency.friendly_find(listing_search_params[:currency]) || Currency.default
+    @currency = Currency.default
     @price_min_amount = amount_for(listing_search_params[:price_min_amount])
     @price_max_amount = amount_for(listing_search_params[:price_max_amount])
 
