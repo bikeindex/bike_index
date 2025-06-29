@@ -7,7 +7,6 @@
     = stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/82eb17360c.js"></script>
     = javascript_include_tag 'application_revised'
     = javascript_importmap_tags
     = hotwire_livereload_tags if Rails.env.development?
@@ -26,7 +25,7 @@
   %body{id: page_id, class:  body_class}
 
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache(["main_navbar3", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar4", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
           %a.primary-logo{ href: user_root_url, class: "" }
@@ -38,7 +37,7 @@
             %span.current-organization-nav-item
               %a#passive_organization_submenu{ href: "#", "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
                 = passive_organization.short_name
-                %i.fas.fa-chevron-down.caret-down
+                = inline_svg_tag "icons/chevron-right.svg", class: "tw:rotate-90 tw:inline-block tw:w-3 tw:h-3 tw:ml-1"
               %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
                 = render partial: "/shared/organized_menu_items", locals: { passed_organization: passive_organization, is_dropdown: true }
 
