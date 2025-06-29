@@ -9,7 +9,7 @@ module Search::Form
       @target_frame = target_frame
       @interpreted_params = interpreted_params
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
-      @currency = currency || Currency.default
+      @currency_sym = (currency || Currency.default).symbol.to_s
       @price_min_amount = price_min_amount
       @price_max_amount = price_max_amount
     end

@@ -12,7 +12,7 @@ class Search::MarketplaceController < ApplicationController
     @is_marketplace = true
 
     if @render_results
-      @pagy, @bikes = pagy(searched_bikes.order("marketplace_listings.published_at DESC"),
+      @pagy, @bikes = pagy(searched_bikes.reorder("marketplace_listings.published_at DESC"),
         limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
     end
 
@@ -40,7 +40,6 @@ class Search::MarketplaceController < ApplicationController
 
   def searched_bikes_not_proximity
     bikes = Bike.search(@interpreted_params).for_sale
-    # bikes = Bike.for_sale_default_scope.search(@interpreted_params)
 
     # Not doing anything with currency yet, so always use default
     @currency = Currency.default # Currency.friendly_find(listing_search_params[:currency]) || Currency.default

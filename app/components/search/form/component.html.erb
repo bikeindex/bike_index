@@ -19,23 +19,32 @@
           <%= text_field_tag :serial, serial_value, placeholder: translation(".search_for_serial_number"), class: "twinput tw:mt-2 fieldResetsCounts" %>
         <% end %>
         <% if render_activity_and_price_wrapper? %>
-          <div class="tw:mt-2 tw:flex tw:flex-wrap tw:md:flex-nowrap tw:gap-2">
-            <% if render_price_field? %>
-              <span class="tw:flex tw:flex-nowrap">
-                <%= hidden_field_tag :currency, @currency %>
-                <span class="tw:block tw:py-1.5 tw:mr-2"><%= @currency.symbol %></span>
-                <%= label_tag :min_price_amount, translation(".minimum_price"), class: "twlabel tw:sr-only" %>
-                <%=
-                  number_field_tag :min_price_amount, @min_price_amount, placeholder: translation(".min"),
-                  class: "twinput tw:min-w-50 fieldResetsCounts"
-                %>
-              </span>
-            <% end %>
+          <div class="tw:mt-2 tw:flex tw:flex-wrap tw:md:flex-nowrap tw:justify-between tw:gap-3">
             <% if render_primary_activity_field? %>
               <%= label_tag :primary_activity, translation(".search_for_primary_activity"), class: "twlabel tw:sr-only" %>
               <%= select_tag :primary_activity, primary_activity_select_opts,
                 include_blank: true, prompt: translation(".search_for_primary_activity"),
                 class: "twinput tw:md:max-w-xl fieldResetsCounts" %>
+            <% end %>
+            <% if render_price_field? %>
+              <span class="tw:flex tw:flex-nowrap tw:max-w-60">
+                <%# NOTE: This isn't used yet, including it because it will be someday! %>
+                <%= hidden_field_tag :currency, @currency_sym %>
+
+                <span class="tw:block tw:py-1.5 tw:mr-1"><%= @currency_sym %></span>
+                <%= label_tag :price_min_amount, translation(".price_minimum"), class: "twlabel tw:sr-only" %>
+                <%=
+                  number_field_tag :price_min_amount, @price_min_amount, placeholder: translation(".min"),
+                  class: "twinput tw:min-w-20 fieldResetsCounts"
+                %>
+
+                <span class="tw:block tw:py-1.5 tw:min-w-6 tw:ml-2 tw:mr-1">– <%= @currency_sym %></span>
+                <%= label_tag :price_max_amount, translation(".price_maximum"), class: "twlabel tw:sr-only" %>
+                <%=
+                  number_field_tag :price_max_amount, @price_max_amount, placeholder: translation(".max"),
+                  class: "twinput tw:min-w-20 fieldResetsCounts"
+                %>
+              </span>
             <% end %>
           </div>
         <% end %>

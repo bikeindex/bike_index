@@ -8,8 +8,8 @@ en:
           used to search.
         search_for_primary_activity: Search primary activity type
         search_for_serial_number: Search for serial number
-        minimum_price: Minimum price
-        maximum_price: Minimum price
+        price_minimum: Minimum price
+        price_maximum: Minimum price
         min: min
         max: max
         submit: submit
