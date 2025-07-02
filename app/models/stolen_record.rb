@@ -57,6 +57,7 @@
 class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
   include Geocodeable
+  include DefaultCurrencyable
 
   RECOVERY_DISPLAY_STATUS_ENUM = {
     not_eligible: 0,

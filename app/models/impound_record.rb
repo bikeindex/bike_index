@@ -37,6 +37,7 @@
 #
 class ImpoundRecord < ApplicationRecord
   include Geocodeable
+  include DefaultCurrencyable
 
   belongs_to :bike, touch: true
   belongs_to :user
