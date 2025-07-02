@@ -27,6 +27,14 @@ module Search::BikeBox
       @current_event_record.present?
     end
 
+    def render_for_sale_info?
+      @bike.is_for_sale? && @current_event_record.is_a?(MarketplaceListing)
+    end
+
+    def occurred_at_with_fallback
+      @bike.occurred_at || @current_event_record&.updated_at || @bike.updated_at
+    end
+
     # copied from application_helper
     def attr_list_item(desc, title)
       return nil unless desc.present?

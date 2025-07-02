@@ -208,6 +208,7 @@ class BikesController < Bikes::BaseController
   private
 
   def show_for_sale?(bike)
+    return false unless bike.status_with_owner?
     return true if bike.is_for_sale?
 
     marketplace_listing = bike.current_marketplace_listing
