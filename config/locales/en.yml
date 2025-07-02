@@ -848,6 +848,8 @@ en:
           item_not_visible: "%{item_type} is not visible - maybe you marked it hidden?"
           price_required: Price is required
           primary_activity_required: Primary activity is required
+          bike_is_stolen: "%{item_type} can't be stolen (mark it recovered)"
+          not_with_owner: "%{item_type} mark the bike recovered to list it"
         organization_message:
           latlon_required: latitude and longitude required
           required: required
