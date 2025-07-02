@@ -242,6 +242,10 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
             address_record_attributes:
           }
         end
+        let(:target_for_sale_attrs) do
+          target_marketplace_attrs.merge(status: "for_sale",
+            amount_cents: 6969, price_negotiable: false, address_record_id: user.address_record_id)
+        end
         it "updates and publishes" do
           expect(user.reload.can_create_listing?).to be_truthy
           expect(user.address_record_id).to be_present
@@ -254,13 +258,28 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           marketplace_listing = bike.reload.current_marketplace_listing
           expect(marketplace_listing).to be_present
           expect(marketplace_listing.valid_publishable?).to be_truthy
-          expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs.merge(status: "for_sale",
-            amount_cents: 6969, price_negotiable: false, address_record_id: user.address_record_id)
+          expect(marketplace_listing).to match_hash_indifferently target_for_sale_attrs
 
           expect(bike.registration_address_source).to eq "marketplace_listing"
           expect(bike.to_coordinates).to eq user.to_coordinates
         end
         context "bike is user_hidden" do
+          before { bike.update(user_hidden: true) }
+          it "doesn't publish" do
+            make_update_bike_request(url: update_url, params:, address_record_change: 0)
+
+            expect(flash[:error]).to match "hidden"
+            expect(bike.reload.current_marketplace_listing.reload).to match_hash_indifferently target_for_sale_attrs.merge(status: "draft")
+          end
+        end
+        context "bike is stolen" do
+          let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+          it "doesn't publish" do
+            make_update_bike_request(url: update_url, params:, address_record_change: 0)
+
+            expect(flash[:error]).to match "stolen"
+            expect(bike.reload.current_marketplace_listing.reload).to match_hash_indifferently target_for_sale_attrs.merge(status: "draft")
+          end
         end
       end
       context "user can't publish listing" do

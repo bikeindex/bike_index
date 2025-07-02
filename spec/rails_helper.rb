@@ -239,18 +239,23 @@ end
 #
 module Capybara
   module RSpecMatchers
-    def have_selector(expr, **options, &optional_filter_block)
-      # Automatically escape colons in tailwind classes
-      expr = expr.gsub("tw:", 'tw\:') if expr.match?("tw:")
-
-      Matchers::HaveSelector.new(expr, **options, &optional_filter_block)
+    def have_selector(expr, **, &)
+      Matchers::HaveSelector.new(escape_colon_classes(expr), **, &)
     end
 
-    def have_css(expr, **options, &optional_filter_block)
-      # Automatically escape colons in tailwind classes
-      expr = expr.gsub("tw:", 'tw\:') if expr.match?("tw:")
+    def have_css(expr, **, &)
+      Matchers::HaveSelector.new(:css, escape_colon_classes(expr), **, &)
+    end
 
-      Matchers::HaveSelector.new(:css, expr, **options, &optional_filter_block)
+    private
+
+    # Automatically escape colons in tailwind classes
+    def escape_colon_classes(expr)
+      # Don't change anything unless it looks like a colon class
+      return expr unless expr.match?(/\.\w+[^\\]:/)
+
+      # remove colon, unless it's for :disabled
+      expr.gsub(":", '\:').gsub('\:disabled', ":disabled").gsub('\:not(', ":not(")
     end
   end
 end
