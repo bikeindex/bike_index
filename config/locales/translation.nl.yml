@@ -260,6 +260,10 @@ nl:
             als verborgen gemarkeerd?"
           price_required: Prijs is vereist
           primary_activity_required: Primaire activiteit is vereist
+          bike_is_stolen: "%{item_type} kan niet gestolen worden (markeer het als
+            teruggevonden)"
+          not_with_owner: "%{item_type} Markeer de teruggevonden fiets om deze op
+            te sommen"
       organization:
         duplicate_short_name: al in gebruik bij een andere organisatie. Als je denkt
           dat dat niet het geval zou moeten zijn, neem dan contact op met support@bikeindex.org

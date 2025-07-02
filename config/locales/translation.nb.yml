@@ -261,6 +261,9 @@ nb:
             som skjult?"
           price_required: Pris er påkrevd
           primary_activity_required: Primæraktivitet er påkrevd
+          bike_is_stolen: "%{item_type} kan ikke stjeles (merk den som gjenopprettet)"
+          not_with_owner: "%{item_type} merk sykkelen som er funnet for å liste den
+            opp"
       organization:
         duplicate_short_name: allerede i bruk av en annen organisasjon. Hvis du ikke
           synes det burde være tilfelle, kontakt support@bikeindex.org
