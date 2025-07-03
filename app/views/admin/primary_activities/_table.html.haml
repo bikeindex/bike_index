@@ -1,3 +1,5 @@
+- show_count ||= false
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
@@ -16,6 +18,8 @@
         = sortable "primary_activity_family_id", "Family", render_sortable: render_sortable
       %th
         = sortable "priority", render_sortable: render_sortable
+      - if show_count
+        %th Bike Count
     %tbody
       - collection.each do |primary_activity|
         %tr
@@ -40,3 +44,6 @@
               = primary_activity.family_name
           %td
             = admin_number_display(primary_activity.priority)
+          - if show_count
+            %td
+              = link_to admin_number_display(Bike.where(primary_activity_id: primary_activity.id).count), admin_bikes_path(primary_activity: primary_activity.id)
