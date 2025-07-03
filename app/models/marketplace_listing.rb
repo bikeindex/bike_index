@@ -147,6 +147,7 @@ class MarketplaceListing < ApplicationRecord
 
   def valid_publishable?
     return false if item.blank? || !item.current? || primary_activity.blank?
+    return false if item.is_a?(Bike) && !item.status_with_owner?
 
     amount_cents.present? && condition.present? && address_record&.address_present?
   end
@@ -158,6 +159,13 @@ class MarketplaceListing < ApplicationRecord
       errors.add(:base, :item_not_visible, item_type: item_type_display)
     elsif primary_activity.blank?
       errors.add(:base, :primary_activity_required, item_type: item_type_display)
+    end
+    if item.is_a?(Bike) && !item.status_with_owner?
+      if item.status_stolen?
+        errors.add(:base, :bike_is_stolen, item_type: item_type_display)
+      else
+        errors.add(:base, :not_with_owner, item_type: item_type_display)
+      end
     end
 
     errors.add(:base, :price_required) if amount_cents.blank?

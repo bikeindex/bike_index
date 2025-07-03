@@ -83,7 +83,7 @@ class ImpoundRecordUpdate < ApplicationRecord
       move_location: "Update location",
       retrieved_by_owner: "Owner retrieved bike",
       removed_from_bike_index: "Removed from Bike Index",
-      transferred_to_new_owner: "Transferred to new owner",
+      transferred_to_new_owner: "Transferred to owner",
       claim_approved: "Claim approved",
       claim_denied: "Claim denied",
       expired: "Removed after expiration period"

@@ -590,7 +590,7 @@ RSpec.describe "BikesController#show", type: :request do
       expect(assigns(:show_for_sale)).to be_truthy
     end
 
-    context "current_user not owner" do
+    context "current_user superadmin" do
       let(:current_user) { FactoryBot.create(:superuser) }
       it "doesn't render" do
         get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
@@ -611,15 +611,30 @@ RSpec.describe "BikesController#show", type: :request do
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
-        # when status: for_sale it does render
-        marketplace_listing.update(status: :for_sale, address_record: FactoryBot.create(:address_record, user: bike.user))
-        bike.update(is_for_sale: true)
-        expect(marketplace_listing.reload.status).to eq "for_sale"
-        expect(marketplace_listing.visible_by?(current_user)).to be_truthy
-        get "#{base_url}/#{bike.id}"
-        expect(flash).to be_blank
-        expect(assigns(:bike)).to eq bike
-        expect(assigns(:show_for_sale)).to be_truthy
+      end
+
+      context "marketplace_listing: for_sale" do
+        let(:status) { :for_sale }
+        it "renders" do
+          expect(marketplace_listing.reload.visible_by?(current_user)).to be_truthy
+          expect(marketplace_listing.visible_by?(nil)).to be_truthy
+          get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+          expect(flash).to be_blank
+          expect(assigns(:bike)).to eq bike
+          expect(assigns(:show_for_sale)).to be_truthy
+        end
+
+        context "with current_stolen_record" do
+          let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+
+          it "doesn't render" do
+            expect(bike.reload.status).to eq "status_stolen"
+            get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+            expect(flash).to be_blank
+            expect(assigns(:bike)).to eq bike
+            expect(assigns(:show_for_sale)).to be_falsey
+          end
+        end
       end
     end
 

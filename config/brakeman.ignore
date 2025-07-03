@@ -79,29 +79,6 @@
       "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
     },
     {
-      "warning_type": "Dangerous Send",
-      "warning_code": 23,
-      "fingerprint": "0b51de177edac034a43ad204a423f68a20aaeb8fc3f48779db7b2d3d2de9c2b6",
-      "check_name": "Send",
-      "message": "User controlled method execution",
-      "file": "app/controllers/admin/primary_activities_controller.rb",
-      "line": 46,
-      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
-      "code": "PrimaryActivity.send(params[:search_scope])",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Admin::PrimaryActivitiesController",
-        "method": "primary_activities"
-      },
-      "user_input": "params[:search_scope]",
-      "confidence": "High",
-      "cwe_id": [
-        77
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "0ffefb46fb11b12f2129c2b96c51cade952dc489a83a3a4886062071e2ad6410",
@@ -438,7 +415,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/stolen_record.rb",
-      "line": 121,
+      "line": 122,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "where(\"tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'\")",
       "render_path": null,
@@ -1436,6 +1413,29 @@
         77
       ],
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "d6a8955f6da5c6a57a376c7a3be4667fb8d99a32fa6ccaa061b5b0ed831a79f2",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "app/controllers/admin/primary_activities_controller.rb",
+      "line": 47,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "PrimaryActivity.send(params[:search_scope])",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::PrimaryActivitiesController",
+        "method": "matching_primary_activities"
+      },
+      "user_input": "params[:search_scope]",
+      "confidence": "High",
+      "cwe_id": [
+        77
+      ],
+      "note": ""
     },
     {
       "warning_type": "Mass Assignment",

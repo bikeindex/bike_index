@@ -844,8 +844,10 @@ en:
           cannot_match_a_color_name: cannot be the same as a color name
         marketplace_listing:
           address_required: Location is required - please set at least a city
+          bike_is_stolen: "%{item_type} can't be stolen (mark it recovered)"
           condition_required: Condition is required
           item_not_visible: "%{item_type} is not visible - maybe you marked it hidden?"
+          not_with_owner: "%{item_type} mark the bike recovered to list it"
           price_required: Price is required
           primary_activity_required: Primary activity is required
         organization_message:

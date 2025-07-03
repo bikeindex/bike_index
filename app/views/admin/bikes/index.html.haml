@@ -142,7 +142,7 @@
         = link_to "view all manufacturer bikes", url_for(sortable_search_params.merge(search_manufacturer: nil)), class: "gray-link small"
   .col-md-6.order-1.order-md-2
     = form_tag admin_bikes_path, method: :get do
-      = render partial: "/shared/hidden_search_fields"
+      = render partial: "/shared/hidden_search_fields", locals: {include_primary_activity: true}
 
       = hidden_field_tag :search_pos, params[:search_pos]
       = hidden_field_tag :search_origin, params[:search_origin]

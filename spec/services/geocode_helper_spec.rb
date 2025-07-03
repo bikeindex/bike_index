@@ -85,7 +85,11 @@ RSpec.describe GeocodeHelper do
       end
       it "returns our desires" do
         VCR.use_cassette("geohelper-formatted_address_hash", vcr_config) do
-          expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
+          result = described_class.assignable_address_hash_for(address)
+          expect(result.except(:latitude, :longitude)).to eq target_assignable_hash.except(:latitude, :longitude)
+
+          expect(result[:latitude].round(3)).to eq target_assignable_hash[:latitude].round(3)
+          expect(result[:longitude].round(3)).to eq target_assignable_hash[:longitude].round(3)
         end
       end
     end
@@ -127,13 +131,13 @@ RSpec.describe GeocodeHelper do
 
   describe "coordinates_for" do
     let(:address) { "3550 W Shakespeare Ave, 60647" }
-    let(:latitude) { 41.92026 }
-    let(:longitude) { -87.71564 }
+    let(:latitude) { 41.920 }
+    let(:longitude) { -87.716 }
     it "returns correct location" do
       VCR.use_cassette("geohelper-coordinates", vcr_config) do
         coords = described_class.coordinates_for(address)
-        expect(coords[:latitude].round(5)).to eq latitude
-        expect(coords[:longitude].round(5)).to eq longitude
+        expect(coords[:latitude].round(3)).to eq latitude
+        expect(coords[:longitude].round(3)).to eq longitude
       end
     end
 

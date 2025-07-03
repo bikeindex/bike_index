@@ -253,6 +253,8 @@ it:
           item_not_visible:
           price_required:
           primary_activity_required:
+          bike_is_stolen:
+          not_with_owner:
       organization:
         duplicate_short_name: già in uso da un'altra organizzazione. Se pensate che
           non sia corretto, contattate support@bikeindex.org

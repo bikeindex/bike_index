@@ -440,8 +440,8 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
     context "direction, sort, search param" do
       let(:time) { Time.current.to_i }
-      let(:passed_params) { {direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom"} }
-      let(:target) { {direction: "asc", sort: "stolen", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom"} }
+      let(:passed_params) { {direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom", primary_activity: "mtb"} }
+      let(:target) { {direction: "asc", sort: "stolen", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom", primary_activity: "mtb"} }
       it "returns target hash" do
         expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
       end

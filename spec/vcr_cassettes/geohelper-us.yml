@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Thu, 03 Apr 2025 01:39:16 GMT
+      - Thu, 03 Jul 2025 16:54:21 GMT
       Pragma:
       - no-cache
       Expires:
@@ -45,7 +45,7 @@ http_interactions:
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=66
+      - gfet4t7; dur=49
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -69,5 +69,5 @@ http_interactions:
         \              }\n            }\n         },\n         \"place_id\" : \"ChIJCzYy5IS16lQRQrfeQ5K5Oxw\",\n
         \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-  recorded_at: Thu, 03 Apr 2025 01:39:16 GMT
+  recorded_at: Thu, 03 Jul 2025 16:54:21 GMT
 recorded_with: VCR 6.3.1

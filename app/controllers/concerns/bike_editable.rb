@@ -109,9 +109,8 @@ module BikeEditable
   end
 
   def show_listing_link?(bike, user)
-    return true if bike.current_marketplace_listing&.current?
-
     return false unless bike.status_with_owner?
+    return true if bike.current_marketplace_listing&.current?
 
     user&.can_create_listing?
   end

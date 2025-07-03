@@ -1,7 +1,7 @@
 - viewing ||= controller_name.humanize
 
 
-- header_present = params.keys & %i[user_id organization_id search_bike_id search_kind search_membership_id]
+- header_present = params.keys & %i[user_id organization_id search_bike_id search_kind search_membership_id primary_activity]
 
 - if header_present
   .col-12.mt-4
@@ -61,3 +61,16 @@
         %strong= kind_humanized
 
         = link_to "view for all kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "gray-link small"
+
+    - if params[:primary_activity].present?
+      - primary_activity = @primary_activity || PrimaryActivity.find_by_id(params[:primary_activity])
+
+      %p
+        #{viewing.pluralize} for
+        %strong
+          - if primary_activity.present?
+            = link_to primary_activity.name, admin_primary_activity_path(primary_activity)
+          - else
+            %span.text-danger unknown primary activity "#{params[:primary_activity]}"
+
+        = link_to "view for all primary activities", url_for(sortable_search_params.merge(primary_activity: nil)), class: "gray-link small"

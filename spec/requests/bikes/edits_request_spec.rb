@@ -197,7 +197,9 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(session[:return_to]).to be_blank
     end
     context "stolen bike" do
-      let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
+
       it "renders with stolen as first template, different description" do
         expect(bike.reload.status).to eq "status_stolen"
         expect(bike.current_stolen_record.without_location?).to be_truthy
