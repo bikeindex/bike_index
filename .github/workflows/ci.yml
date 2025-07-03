@@ -19,6 +19,14 @@ jobs:
         run: bin/lint --no-fix
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
+      - name: check recent commits
+        run: |
+          # Check for recent merges to main (which may not have CircleCI pipelines running yet)
+          cutoff_time=$(date -u -d '1 minute ago' +%Y-%m-%dT%H:%M:%SZ)
+          commits=$(gh api repos/${{ github.repository }}/charity-api/commits \
+            --jq ".[] | select(.commit.author.date > \"$cutoff_time\")" \
+            -F sha=main \
+            -F since="$cutoff_time")
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies
       #   run: bin/importmap audit
