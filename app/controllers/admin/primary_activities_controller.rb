@@ -4,8 +4,9 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
 
   def index
     @per_page = params[:per_page] || 60
+    @search_show_count = InputNormalizer.boolean(params[:search_show_count])
     @pagy, @collection = pagy(
-      primary_activities.includes(:primary_activity_family).reorder("primary_activities.#{sort_column} #{sort_direction}"),
+      matching_primary_activities.includes(:primary_activity_family).reorder("primary_activities.#{sort_column} #{sort_direction}"),
       limit: @per_page
     )
   end
@@ -27,7 +28,7 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
     end
   end
 
-  helper_method :primary_activities, :searchable_scopes
+  helper_method :matching_primary_activities, :searchable_scopes
 
   protected
 
@@ -39,7 +40,7 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
     %w[family flavor top_level]
   end
 
-  def primary_activities
+  def matching_primary_activities
     primary_activities = PrimaryActivity
     if params[:search_scope].present? && searchable_scopes.include?(params[:search_scope])
       @scope = params[:search_scope]
