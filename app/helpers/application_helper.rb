@@ -187,7 +187,7 @@ module ApplicationHelper
       :direction, :sort, # sorting params
       :period, :start_time, :end_time, :time_range_column, :render_chart, # Time period params
       :user_id, :organization_id, :query, # General search params
-      :serial, :stolenness, :location, :distance, query_items: []) # Bike searching params
+      :serial, :stolenness, :location, :distance, :primary_activity, query_items: []) # Bike searching params
   end
 
   def button_to_toggle_task_completion_status(ambassador_task_assignment, current_user, current_organization)

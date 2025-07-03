@@ -1,10 +1,13 @@
 - kind ||= "admin"
 - skip_organization ||= false
+- include_primary_activity ||= false
 
 -# Sortable
 - if defined?(sort_column)
   = hidden_field_tag :sort, sort_column
   = hidden_field_tag :sort_direction, sort_direction
+- if include_primary_activity
+  = hidden_field_tag :primary_activity, params[:primary_activity]
 -# Period
 = hidden_field_tag :render_chart, @render_chart
 = hidden_field_tag :period, params[:period]

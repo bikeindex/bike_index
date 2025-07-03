@@ -200,6 +200,11 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
     end
 
+    if params[:primary_activity].present?
+      @primary_activity = PrimaryActivity.friendly_find(params[:primary_activity])
+      bikes = bikes.where(primary_activity_id: @primary_activity.id) if @primary_activity.present?
+    end
+
     search_statuses = DEFAULT_SEARCH_STATUSES + (current_user.su_option?(:no_hide_spam) ? ["spam"] : [])
     bikes = admin_search_bike_statuses(bikes, default_statuses: search_statuses)
 

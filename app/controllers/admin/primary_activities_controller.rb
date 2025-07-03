@@ -11,7 +11,7 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_primary_activity_url(@primary_activity)
+    redirect_to edit_admin_primary_activity_url(@primary_activity)
   end
 
   def edit
@@ -50,7 +50,7 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
   end
 
   def find_primary_activity
-    @primary_activity = PrimaryActivity.find(params[:id])
+    @primary_activity = PrimaryActivity.friendly_find(params[:id])
   end
 
   def permitted_parameters
