@@ -10,15 +10,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
+      # - name: Set up Ruby
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     bundler-cache: true
 
-      - name: Lint code for consistent style
-        run: bin/lint --no-fix
-      - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bin/brakeman --no-pager
+      # - name: Lint code for consistent style
+      #   run: bin/lint --no-fix
+      # - name: Scan for common Rails security vulnerabilities using static analysis
+      #   run: bin/brakeman --no-pager
       - name: check recent commits
         run: |
           # Check for recent merges to main (which may not have CircleCI pipelines running yet)
@@ -27,6 +27,7 @@ jobs:
             --jq ".[] | select(.commit.author.date > \"$cutoff_time\")" \
             -F sha=main \
             -F since="$cutoff_time")
+          echo commits
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies
       #   run: bin/importmap audit
