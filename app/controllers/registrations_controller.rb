@@ -53,7 +53,7 @@ class RegistrationsController < ApplicationController
 
   # returns up to 6 letters/numbers, for safety
   def valid_hex(str)
-    "##{str.strip.gsub(/\W/, '')[0..5]}"
+    "##{str.strip.gsub(/\W/, "")[0..5]}"
   end
 
   def permitted_params
