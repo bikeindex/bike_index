@@ -12,7 +12,8 @@
         %header.reg-header
           = image_tag 'revised/logo.svg', class: 'reg-header-logo'
       - elsif @simple_header
-        %header
+        - header_style = @button_and_header.blank? ? '' : "background: #{@button_and_header}"
+        %header{style: header_style}
           %h3= @vehicle_select ? t(".register_your_vehicle") : t(".register_your_bike")
       - else
         %header.reg-header
