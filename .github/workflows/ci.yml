@@ -23,7 +23,7 @@ jobs:
       # and bin/lint doesn't seem to be running it :/
       # so run it here and check for changes
       - name: Run erb-formatter
-        run: erb-format --write app/components/**/*.html.erb
+        run: bundle exec erb-formatter app/components/**/*.html.erb --write
       - name: Check for changes from erb-formatter
         run: git diff --quiet app
       # Eventually this should be added:
