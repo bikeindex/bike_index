@@ -1,7 +1,15 @@
 <a
   href="<%= message_path %>"
-  class="tw:w-full tw:py-2 tw:px-3 tw:border-t tw:last:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:flex tw:max-lg:flex-wrap tw:hover:shadow-md tw:dark:hover:shadow-slate-300/10">
-  <span class="tw:max-lg:grow tw:lg:w-60 tw:lg:min-w-60 tw:truncate" title="<%= translation(".from") %>: <%= sender_full_text %>">
+  class="
+    tw:w-full tw:py-2 tw:px-3 tw:border-t tw:last:border-b tw:border-gray-200
+    tw:dark:border-gray-700 tw:flex tw:max-lg:flex-wrap tw:hover:shadow-md
+    tw:dark:hover:shadow-slate-300/10
+  "
+>
+  <span
+    class="tw:max-lg:grow tw:lg:w-60 tw:lg:min-w-60 tw:truncate"
+    title="<%= translation(".from") %>: <%= sender_full_text %>"
+  >
     <%= sender_display_html %>
   </span>
   <div class="tw:w-30 tw:text-right tw:lg:order-last">

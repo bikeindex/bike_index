@@ -14,22 +14,18 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-def html_files
-  # Dir.glob("app/**/*.{html}{+*,}.erb").map { |f| "'#{f}'" }.join(" ")
-  # Currently just doing components
-  Dir.glob("app/components/**/*.{html}{+*,}.erb").map { |f| "'#{f}'" }.join(" ")
-end
-
 chdir APP_ROOT do
   if lint_test
     puts "Testing lint (will not autofix)"
     system!("bundle exec standardrb --no-fix")
     # TEMPORARILY commented out, js not installed on CI
     # system!("npm run lint")
-    # system!("bundle exec htmlbeautifier --keep-blank-lines 1 --lint-only #{html_files}")
   else
     system!("bundle exec standardrb --fix")
-    system!("bundle exec htmlbeautifier --keep-blank-lines 1 #{html_files}")
     system!("npm run lint")
   end
+  # Unfortuanately, erb-formatter doesn't support returning a status code
+  # So always lint the files, and in the CI action, check if the files changed
+  # See github.com/nebulab/erb-formatter/issues/79
+  `bundle exec erb-formatter app/components/**/*.html.erb --write`
 end

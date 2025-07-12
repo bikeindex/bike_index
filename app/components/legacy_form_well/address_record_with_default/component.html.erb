@@ -1,21 +1,26 @@
 <div
   class="related-fields"
-  data-controller="legacy-form-well--address-record-with-default--component">
-  <%= render(LegacyFormWell::AddressRecord::Component.new(
+  data-controller="legacy-form-well--address-record-with-default--component"
+>
+  <%= render(
+    LegacyFormWell::AddressRecord::Component.new(
       form_builder: @builder,
       not_related_fields: true,
       no_street: true,
-      static_fields: @address_static_fields
-    )) %>
+      static_fields: @address_static_fields,
+    ),
+  ) %>
   <% if render_user_account_address? %>
     <div class="form-group row unnested-field no-divider-row">
       <label class="form-well-label"></label>
       <div class="form-well-input form-well-input-checks">
-        <label><%=
-          @builder.check_box :user_account_address, {
-            "data-action" => "change->legacy-form-well--address-record-with-default--component#toggleUseAccount",
-            "data-legacy-form-well--address-record-with-default--component-target" => "useAccountCheckbox"
-          } %>
+        <label><%= @builder.check_box :user_account_address,
+                             {
+                               "data-action" =>
+                                 "change->legacy-form-well--address-record-with-default--component#toggleUseAccount",
+                               "data-legacy-form-well--address-record-with-default--component-target" =>
+                                 "useAccountCheckbox",
+                             } %>
           <span class="tw:cursor-pointer">
             <%= translation(".use_account_address") %>
           </span>

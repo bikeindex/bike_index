@@ -2,10 +2,12 @@
 <% @user.address_record = AddressRecord.new(country: Country.united_states) %>
 <%= form_for @user, url: my_account_path, method: :patch, multipart: true do |f| %>
   <%= f.fields_for :address_record do |address_form| %>
-    <%= render(LegacyFormWell::AddressRecord::Component.new(
+    <%= render(
+      LegacyFormWell::AddressRecord::Component.new(
         form_builder: address_form,
         organization: @user.uro_organization_reg_address,
-        no_street: @user.no_address?
-    )) %>
+        no_street: @user.no_address?,
+      ),
+    ) %>
   <% end %>
 <% end %>
