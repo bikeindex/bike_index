@@ -23,10 +23,9 @@ chdir APP_ROOT do
   else
     system!("bundle exec standardrb --fix")
     system!("npm run lint")
-    system!("bundle exec erb-formatter --write app/components/**/*.html.erb")
   end
   # Unfortuanately, erb-formatter doesn't support returning a status code
   # So always lint the files, and in the CI action, check if the files changed
   # See github.com/nebulab/erb-formatter/issues/79
-  # `bundle exec erb-formatter --write app/components/**/*.html.erb`
+  `bundle exec erb-formatter app/components/**/*.html.erb --write`
 end

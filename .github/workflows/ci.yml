@@ -17,12 +17,15 @@ jobs:
 
       - name: Lint code for consistent style
         run: bin/lint --no-fix
-      - name: Check for changes from erb-formatter
-        # unfortuanately, erb-formatter doesn't support an exit code -
-        # Linting updates the files in place, check for changes here
-        run: git diff --quiet app
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
+      # unfortuanately, erb-formatter doesn't support an exit code -
+      # and bin/lint doesn't seem to be running it :/
+      # so run it here and check for changes
+      - name: Run erb-formatter
+        run: erb-format --write app/components/**/*.html.erb
+      - name: Check for changes from erb-formatter
+        run: git diff --quiet app
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies
       #   run: bin/importmap audit
