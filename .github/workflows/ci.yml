@@ -25,7 +25,7 @@ jobs:
       - name: Run erb-formatter
         run: bundle exec erb-formatter app/components/**/*.html.erb --write
       - name: Check for changes from erb-formatter
-        run: git diff --quiet app
+        run: git diff HEAD --exit-code app/
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies
       #   run: bin/importmap audit
