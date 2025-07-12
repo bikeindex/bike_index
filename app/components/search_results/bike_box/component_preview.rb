@@ -9,7 +9,7 @@ module SearchResults::BikeBox
     # - serial user_hidden
 
     def default
-      {template: "search/bike_box/component_preview/default"}
+      {template: "search_results/bike_box/component_preview/default"}
     end
   end
 end

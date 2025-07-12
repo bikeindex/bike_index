@@ -35,7 +35,8 @@ module SearchResults::BikeBox
       @bike.occurred_at || @current_event_record&.updated_at || @bike.updated_at
     end
 
-    # copied from application_helper
+    # copies from application_helper
+    # TODO: replace with DefinitionList::Container::Component
     def attr_list_item(desc, title)
       return nil unless desc.present?
       content_tag(:li) do

@@ -12,13 +12,17 @@
 ) %>
 <% bike2 = Bike.status_stolen.first %>
 <% bike3 = Bike.status_impounded.first %>
-<% bike3 = Bike.status_impounded.first %>
 <% marketplace_listing = MarketplaceListing.for_sale.last %>
 
 <ul class="bike-boxes">
   <%= render(SearchResults::BikeBox::Component.new(bike:)) %>
   <% if bike2.present? %>
     <%= render(SearchResults::BikeBox::Component.new(bike: bike2)) %>
+  <% end %>
+  <% if marketplace_listing.present? %>
     <%= render(SearchResults::BikeBox::Component.new(bike: marketplace_listing.item, current_event_record: marketplace_listing)) %>
+  <% end %>
+  <% if bike3.present? %>
+    <%= render(SearchResults::BikeBox::Component.new(bike: bike3)) %>
   <% end %>
 </ul>

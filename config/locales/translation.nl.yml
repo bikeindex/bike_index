@@ -6098,11 +6098,6 @@ nl:
         min: mijn
         price_maximum: Minimumprijs
         price_minimum: Minimumprijs
-      bike_box:
-        location: Plaats
-        primary_colors: Primaire kleuren
-        serial: Serie
-        posted_at: Genoteerd
       kind_select_fields:
         within: binnen
         miles_of: mijl van
@@ -6151,3 +6146,9 @@ nl:
         to: Naar
       thread_show:
         subject: Onderwerp
+    search_results:
+      bike_box:
+        serial: Serie
+        location: Plaats
+        posted_at: Genoteerd
+        primary_colors: Primaire kleuren
