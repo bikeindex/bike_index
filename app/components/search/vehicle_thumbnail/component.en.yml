@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    search:
+      vehicle_thumbnail:
+        vehicle: Vehicle
+        current_event_record: Current_event_record
+        skip_cache: Skip_cache
