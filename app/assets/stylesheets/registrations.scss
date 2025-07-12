@@ -1,4 +1,4 @@
-@import 'legacy_includes/selectize.bootstrap3';
+@import "legacy_includes/selectize.bootstrap3";
 
 // TODO: import a manifest for assets here.
 // import the same manifest in general stylesheet,
@@ -11,7 +11,7 @@
  */
 
 // Core variables and mixins
-@import 'bootstrap/variables';
+@import "bootstrap/variables";
 
 //
 // Overrides
@@ -19,19 +19,19 @@ $border-radius: 1px;
 $border-radius-lg: 1px;
 $border-radius-sm: 1px;
 
-@import 'revised/mixins/colors';
+@import "revised/mixins/colors";
 
 //
 // More bootstrap
-@import 'bootstrap/mixins';
+@import "bootstrap/mixins";
 
 // Reset and dependencies
-@import 'bootstrap/normalize';
+@import "bootstrap/normalize";
 
 // @import "bootstrap/print";
 
 // Core CSS
-@import 'bootstrap/reboot';
+@import "bootstrap/reboot";
 
 // @import "bootstrap/type";
 // @import "bootstrap/images";
@@ -57,7 +57,7 @@ $border-radius-sm: 1px;
 // }
 // @import "bootstrap/grid";
 // @import "bootstrap/tables";
-@import 'bootstrap/forms';
+@import "bootstrap/forms";
 
 // @import "bootstrap/buttons"; // Override buttons with our own buttons
 
@@ -65,8 +65,8 @@ $border-radius-sm: 1px;
 // @import "bootstrap/animation";
 // @import "bootstrap/dropdown";
 // @import "bootstrap/button-group";
-@import 'bootstrap/input-group';
-@import 'bootstrap/custom-forms';
+@import "bootstrap/input-group";
+@import "bootstrap/custom-forms";
 
 // @import "bootstrap/nav";
 // @import "bootstrap/navbar";
@@ -79,8 +79,8 @@ $border-radius-sm: 1px;
 // @import "bootstrap/progress";
 // @import "bootstrap/media";
 // @import "bootstrap/list-group";
-@import 'bootstrap/responsive-embed';
-@import 'bootstrap/close';
+@import "bootstrap/responsive-embed";
+@import "bootstrap/close";
 
 // // Components w/ JavaScript
 // $modal-backdrop-bg: $blue-dark;
@@ -91,7 +91,7 @@ $border-radius-sm: 1px;
 // @import "bootstrap/carousel";
 
 // Utility classes
-@import 'bootstrap/utilities';
+@import "bootstrap/utilities";
 
 /*!
  * Bike Index styles
@@ -99,15 +99,15 @@ $border-radius-sm: 1px;
  */
 
 // Settings
-@import 'revised/vars';
-@import 'revised/fonts';
+@import "revised/vars";
+@import "revised/fonts";
 
 // Bootstrap overrides
-@import 'revised/mixins/buttons';
+@import "revised/mixins/buttons";
 
 // @import "revised/sections/modals";
-@import 'revised/sections/alerts';
-@import 'revised/sections/forms';
+@import "revised/sections/alerts";
+@import "revised/sections/forms";
 
 // Bike Index mixins
 // @import "revised/mixins/trash_can_icon";
@@ -280,7 +280,7 @@ img {
   }
 
   header.reg-header {
-    background: url('revised/spokebg.png');
+    background: url("revised/spokebg.png");
     background-size: cover;
     background-position: center center;
     padding: $vertical-height 0;
@@ -319,7 +319,7 @@ img {
     margin: 0 auto;
   }
 
-  input[type='email'],
+  input[type="email"],
   select,
   .form-control {
     width: 100%;
@@ -366,15 +366,16 @@ img {
     background: #4062a8;
   }
   &.princeton .submit-wrapper .btn {
-    background: #EE7F2D;
+    background: #ee7f2d;
   }
   &.iu .submit-wrapper .btn {
     background: #990000;
   }
   &.msu .submit-wrapper .btn {
-    background: #18453B;
+    background: #18453b;
   }
-  &.uc-davis .submit-wrapper .btn, &.uc-davis-health .submit-wrapper .btn {
+  &.uc-davis .submit-wrapper .btn,
+  &.uc-davis-health .submit-wrapper .btn {
     background: #022851;
   }
   // UIowa has waffled on their abbreviation
@@ -384,8 +385,6 @@ img {
   }
   //
   // NOTE: Colors should now be passed in params[:button] or params[:button_and_header]
-  // NOT assigned in here
-  // see github.com/bikeindex/bike_index/pull/2866
+  // NOT assigned in here. see PR#2866
   //
 }
-
