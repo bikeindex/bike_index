@@ -24,12 +24,14 @@ chdir APP_ROOT do
   if lint_test
     puts "Testing lint (will not autofix)"
     system!("bundle exec standardrb --no-fix")
-    system!("erb-format app/components/**/*.html.erb")
     # TEMPORARILY commented out, js not installed on CI
     # system!("npm run lint")
   else
     system!("bundle exec standardrb --fix")
-    system!("erb-format app/components/**/*.html.erb --write")
+    # system!("erb-format app/components/**/*.html.erb --write")
     system!("npm run lint")
   end
+  # Unfortuanately, erb-formatter doesn't support returning a status code
+  # So always lint the files, and in the CI action, check if the files changed
+  system!("bundle exec erb-formatter app/components/**/*.html.erb --write")
 end
