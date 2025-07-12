@@ -140,6 +140,7 @@ end
 
 group :development, :test do
   gem "brakeman", require: false
+  gem "ruby-lsp" # Ruby language server (used by editor integrations)
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "factory_bot_rails"
@@ -151,7 +152,7 @@ group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem "standard" # Ruby linter
-  gem "htmlbeautifier" # html linter
+  gem "erb-formatter" # html linter
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"

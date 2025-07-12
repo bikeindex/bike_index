@@ -1,23 +1,31 @@
 <div
   class="<%= @wrapper_class %>"
   data-controller="legacy-form-well--address-record--component"
-  data-legacy-form-well--address-record--component-us-id-value="<%= Country.united_states_id %>">
+  data-legacy-form-well--address-record--component-us-id-value="<%= Country.united_states_id %>"
+>
   <div class="form-group row unfancy">
     <label class="form-well-label"></label>
     <div
       class="form-well-input <%= non_static_field_class %>"
       data-usid="<%= Country.united_states_id %>"
-      data-legacy-form-well--address-record-with-default--component-target="nonStaticFields">
+      data-legacy-form-well--address-record-with-default--component-target="nonStaticFields"
+    >
 
-      <%= @builder.select(:country_id, Country.select_options,
-        {prompt: translation(".choose_country"), required: country_required?},
-        {class: "form-control", "data-legacy-form-well--address-record--component-target" => "country" })
-      %>
+      <%= @builder.select(
+        :country_id,
+        Country.select_options,
+        { prompt: translation(".choose_country"), required: country_required? },
+        {
+          :class => "form-control",
+          "data-legacy-form-well--address-record--component-target" => "country",
+        },
+      ) %>
     </div>
     <% if @static_fields %>
       <p
         class="form-well-input-static tw:py-0!"
-        data-legacy-form-well--address-record-with-default--component-target="staticFields">
+        data-legacy-form-well--address-record-with-default--component-target="staticFields"
+      >
         <%= @builder.object.country_name %>
       </p>
     <% end %>
@@ -27,8 +35,11 @@
       <%= @builder.label :street, address_label, class: "form-well-label" %>
       <div
         class="form-well-input <%= non_static_field_class %>"
-        data-legacy-form-well--address-record-with-default--component-target="nonStaticFields">
-        <%= @builder.text_field :street, placeholder: street_placeholder, class: "form-control" %>
+        data-legacy-form-well--address-record-with-default--component-target="nonStaticFields"
+      >
+        <%= @builder.text_field :street,
+                            placeholder: street_placeholder,
+                            class: "form-control" %>
         <% if street_requires_below_helper? %>
           <span class="below-input-help text-warning">
             <%= translation(:your_full_address_is_required, org_name: @organization.short_name) %>
@@ -38,7 +49,8 @@
       <% if @static_fields %>
         <p
           class="form-well-input-static tw:py-0!"
-          data-legacy-form-well--address-record-with-default--component-target="staticFields">
+          data-legacy-form-well--address-record-with-default--component-target="staticFields"
+        >
           <%= @builder.object.street %>
         </p>
       <% end %>
@@ -52,13 +64,17 @@
     <% end %>
     <div
       class="form-well-input <%= non_static_field_class %>"
-      data-legacy-form-well--address-record-with-default--component-target="nonStaticFields">
-      <%= @builder.text_field :city, placeholder: translation(".city"), class: "form-control" %>
+      data-legacy-form-well--address-record-with-default--component-target="nonStaticFields"
+    >
+      <%= @builder.text_field :city,
+                          placeholder: translation(".city"),
+                          class: "form-control" %>
     </div>
     <% if @static_fields %>
       <p
         class="form-well-input-static tw:py-0!"
-        data-legacy-form-well--address-record-with-default--component-target="staticFields">
+        data-legacy-form-well--address-record-with-default--component-target="staticFields"
+      >
         <%= @builder.object.city %>
       </p>
     <% end %>
@@ -67,19 +83,31 @@
     <label class="form-well-label"></label>
     <div
       class="form-well-input <%= non_static_field_class %>"
-      data-legacy-form-well--address-record-with-default--component-target="nonStaticFields">
-      <%= @builder.collection_select(:region_record_id, State.united_states, :id, :name,
-        {include_blank: true, prompt: translation(".state")},
-        {class: "form-control #{initial_state_class}", "data-legacy-form-well--address-record--component-target" => "state" })
-      %>
-      <%= @builder.text_field(:region_string, placeholder: translation(".region"),
-        class: "form-control #{initial_region_class}", "data-legacy-form-well--address-record--component-target" => "region")
-      %>
+      data-legacy-form-well--address-record-with-default--component-target="nonStaticFields"
+    >
+      <%= @builder.collection_select(
+        :region_record_id,
+        State.united_states,
+        :id,
+        :name,
+        { include_blank: true, prompt: translation(".state") },
+        {
+          :class => "form-control #{initial_state_class}",
+          "data-legacy-form-well--address-record--component-target" => "state",
+        },
+      ) %>
+      <%= @builder.text_field(
+        :region_string,
+        :placeholder => translation(".region"),
+        :class => "form-control #{initial_region_class}",
+        "data-legacy-form-well--address-record--component-target" => "region",
+      ) %>
     </div>
     <% if @static_fields %>
       <p
         class="form-well-input-static tw:py-0!"
-        data-legacy-form-well--address-record-with-default--component-target="staticFields">
+        data-legacy-form-well--address-record-with-default--component-target="staticFields"
+      >
         <%= @builder.object.region %>
       </p>
     <% end %>
@@ -88,13 +116,17 @@
     <label class="form-well-label"></label>
     <div
       class="form-well-input <%= non_static_field_class %>"
-      data-legacy-form-well--address-record-with-default--component-target="nonStaticFields">
-      <%= @builder.text_field :postal_code, placeholder: translation(".postal_code"), class: "form-control" %>
+      data-legacy-form-well--address-record-with-default--component-target="nonStaticFields"
+    >
+      <%= @builder.text_field :postal_code,
+                          placeholder: translation(".postal_code"),
+                          class: "form-control" %>
     </div>
     <% if @static_fields %>
       <p
         class="form-well-input-static tw:py-0!"
-        data-legacy-form-well--address-record-with-default--component-target="staticFields">
+        data-legacy-form-well--address-record-with-default--component-target="staticFields"
+      >
         <%= @builder.object.postal_code %>
       </p>
     <% end %>

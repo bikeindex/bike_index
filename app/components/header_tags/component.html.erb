@@ -5,8 +5,12 @@
 <meta name="handheldfriendly" content="true">
 <meta name="viewport" content="width=device-width">
 <meta name="description" content="<%= @page_description %>">
-<meta http-equiv="Content-Language" content="<%= I18n.locale %>" />
-<% if @display_auto_discovery %><%= auto_discovery_link_tag(:atom, news_index_url(format: "atom"), title: "Bike Index news atom feed") %><% end %>
+<meta http-equiv="Content-Language" content="<%= I18n.locale %>"/>
+<% if @display_auto_discovery %><%= auto_discovery_link_tag(
+    :atom,
+    news_index_url(format: "atom"),
+    title: "Bike Index news atom feed",
+  ) %><% end %>
 <% if @author %><%= tag(:link, rel: "author", href: @author) %><% end %>
 
 <meta property="og:site_name" content="Bike Index">

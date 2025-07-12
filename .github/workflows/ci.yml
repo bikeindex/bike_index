@@ -19,6 +19,16 @@ jobs:
         run: bin/lint --no-fix
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
+      # Unfortunately, erb-formatter doesn't support an exit code -
+      # and bin/lint doesn't seem to be running it :/
+      # so run it here and check for changes
+      - name: Run erb-formatter
+        run: bundle exec erb-formatter app/components/**/*.html.erb --write
+      - name: Run erb-formatter
+        run: bundle exec erb-formatter app/components/**/*.html.erb
+      - name: Check for changes from erb-formatter
+        run: git diff HEAD --exit-code app/
+
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies
       #   run: bin/importmap audit

@@ -4685,11 +4685,6 @@ es:
         min:
         price_maximum:
         price_minimum:
-      bike_box:
-        location:
-        primary_colors:
-        serial:
-        posted_at:
       kind_select_fields:
         within:
         miles_of:
@@ -4702,6 +4697,11 @@ es:
         stolenness_stolen:
         marketplace_scope_for_sale:
         marketplace_scope_for_sale_proximity:
+      bike_box:
+        location:
+        posted_at:
+        primary_colors:
+        serial:
     legacy_form_well:
       address_record:
         address:
@@ -4737,3 +4737,9 @@ es:
         to:
       thread_show:
         subject:
+    search_results:
+      bike_box:
+        serial:
+        location:
+        posted_at:
+        primary_colors:

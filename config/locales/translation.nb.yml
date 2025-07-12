@@ -5940,11 +5940,6 @@ nb:
         min: min
         price_maximum: Minimumspris
         price_minimum: Minimumspris
-      bike_box:
-        location: plassering
-        primary_colors: Primærfarger
-        serial: Seriell
-        posted_at: Oppført
       kind_select_fields:
         within: innenfor
         miles_of: miles av
@@ -5957,6 +5952,11 @@ nb:
         stolenness_stolen: Stjålet hvor som helst
         marketplace_scope_for_sale: Til salgs hvor som helst
         marketplace_scope_for_sale_proximity: Til salgs i søkeområdet
+      bike_box:
+        location: plassering
+        posted_at: Oppført
+        primary_colors: Primærfarger
+        serial: Seriell
     legacy_form_well:
       address_record:
         address: gateadresse
@@ -5993,3 +5993,9 @@ nb:
         to: Til
       thread_show:
         subject: Emne
+    search_results:
+      bike_box:
+        serial: Seriell
+        location: plassering
+        posted_at: Oppført
+        primary_colors: Primærfarger

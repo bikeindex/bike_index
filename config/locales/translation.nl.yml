@@ -6098,11 +6098,6 @@ nl:
         min: mijn
         price_maximum: Minimumprijs
         price_minimum: Minimumprijs
-      bike_box:
-        location: Plaats
-        primary_colors: Primaire kleuren
-        serial: Serie
-        posted_at: Genoteerd
       kind_select_fields:
         within: binnen
         miles_of: mijl van
@@ -6115,6 +6110,11 @@ nl:
         stolenness_stolen: Overal gestolen
         marketplace_scope_for_sale: Overal te koop
         marketplace_scope_for_sale_proximity: Te koop in zoekgebied
+      bike_box:
+        location: Plaats
+        posted_at: Genoteerd
+        primary_colors: Primaire kleuren
+        serial: Serie
     legacy_form_well:
       address_record:
         address: Adres
@@ -6151,3 +6151,9 @@ nl:
         to: Naar
       thread_show:
         subject: Onderwerp
+    search_results:
+      bike_box:
+        serial: Serie
+        location: Plaats
+        posted_at: Genoteerd
+        primary_colors: Primaire kleuren

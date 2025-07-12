@@ -1,6 +1,11 @@
 <div data-controller="messages--thread-show--component">
   <ul class="bike-boxes">
-    <%= render(Search::BikeBox::Component::new(bike: @marketplace_listing.item, current_user: @current_user)) %>
+    <%= render(
+      SearchResults::BikeBox::Component.new(
+        bike: @marketplace_listing.item,
+        current_user: @current_user,
+      ),
+    ) %>
   </ul>
   <%# TODO: show this too! %>
   <%#= render(PageSection::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing)) %>
@@ -9,7 +14,11 @@
     <% @marketplace_messages.each do |marketplace_message| %>
       <div
         id="message-<%= marketplace_message.id %>"
-        class="tw:p-4 tw:bg-white tw:border tw:border-gray-200 tw:rounded-sm tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:mt-4">
+        class="
+          tw:p-4 tw:bg-white tw:border tw:border-gray-200 tw:rounded-sm
+          tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:mt-4
+        "
+      >
         <div class="tw:w-full tw:mb-2 tw:gap-x-6 tw:flex tw:flex-nowrap">
           <span class="tw:block tw:grow"><%= user_display(marketplace_message.sender_id) %></span>
           <span class="tw:block localizeTime preciseTime">
@@ -22,7 +31,13 @@
             <%= @initial_message.subject %>
           </h2>
         <% end %>
-        <%= render(UserTextBlockDisplay::Component.new(text: marketplace_message.body, max_height_class: "", additional_classes: "tw:mt-4")) %>
+        <%= render(
+          UserTextBlockDisplay::Component.new(
+            text: marketplace_message.body,
+            max_height_class: "",
+            additional_classes: "tw:mt-4",
+          ),
+        ) %>
       </div>
     <% end %>
   <% end %>
