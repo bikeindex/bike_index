@@ -6151,3 +6151,9 @@ nl:
         to: Naar
       thread_show:
         subject: Onderwerp
+    search_results:
+      bike_box:
+        serial: Serie
+        location: Plaats
+        posted_at: Genoteerd
+        primary_colors: Primaire kleuren

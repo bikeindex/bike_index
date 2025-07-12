@@ -1,7 +1,7 @@
 <div data-controller="messages--thread-show--component">
   <ul class="bike-boxes">
     <%= render(
-      Search::BikeBox::Component.new(
+      SearchResults::BikeBox::Component.new(
         bike: @marketplace_listing.item,
         current_user: @current_user,
       ),

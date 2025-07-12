@@ -4737,3 +4737,9 @@ es:
         to:
       thread_show:
         subject:
+    search_results:
+      bike_box:
+        serial:
+        location:
+        posted_at:
+        primary_colors:

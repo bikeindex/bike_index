@@ -4744,3 +4744,9 @@ it:
         to:
       thread_show:
         subject: Oggetto
+    search_results:
+      bike_box:
+        serial: Seriale
+        location: Luogo
+        posted_at:
+        primary_colors: Colori primari

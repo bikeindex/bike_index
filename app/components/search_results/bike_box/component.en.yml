@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    search:
+    search_results:
       bike_box:
         location: Location
         posted_at: Listed

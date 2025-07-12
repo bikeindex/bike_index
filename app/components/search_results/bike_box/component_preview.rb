@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Search::BikeBox
+module SearchResults::BikeBox
   class ComponentPreview < ApplicationComponentPreview
     # TODO: pass bikes from here, rather than in the template :/
     # Other previews to include:
@@ -9,7 +9,7 @@ module Search::BikeBox
     # - serial user_hidden
 
     def default
-      {template: "search/bike_box/component_preview/default"}
+      {template: "search_results/bike_box/component_preview/default"}
     end
   end
 end
