@@ -14,12 +14,6 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-def html_files
-  # Dir.glob("app/**/*.{html}{+*,}.erb").map { |f| "'#{f}'" }.join(" ")
-  # Currently just doing components
-  Dir.glob("app/components/**/*.{html}{+*,}.erb").map { |f| "'#{f}'" }.join(" ")
-end
-
 chdir APP_ROOT do
   if lint_test
     puts "Testing lint (will not autofix)"
@@ -29,9 +23,10 @@ chdir APP_ROOT do
   else
     system!("bundle exec standardrb --fix")
     system!("npm run lint")
+    system!("bundle exec erb-formatter --write app/components/**/*.html.erb")
   end
   # Unfortuanately, erb-formatter doesn't support returning a status code
   # So always lint the files, and in the CI action, check if the files changed
   # See github.com/nebulab/erb-formatter/issues/79
-  system!("bundle exec erb-formatter app/components/**/*.html.erb --write")
+  # `bundle exec erb-formatter --write app/components/**/*.html.erb`
 end
