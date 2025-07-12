@@ -1,0 +1,45 @@
+{
+  "languages": {
+    "HTML/ERB": {
+      "tab_size": 2
+      // "formatter": {
+      //   "external": {
+      //     "command": "erb-formatter",
+      //     "arguments": ["--stdin-filename", "{buffer_path}"],
+      //   },
+      // }
+    },
+    "Markdown": {
+      "soft_wrap": "editor_width",
+      "tab_size": 2
+    },
+    "Ruby": {
+      "language_servers": [
+        "ruby-lsp",
+        "tailwindcss-language-server",
+        "!rubocop",
+        "!sorbet",
+        "..."
+      ]
+    }
+  },
+  "lsp": {
+    "ruby-lsp": {
+      "initialization_options": {
+        "formatter": "standard",
+        "linters": ["standard"]
+      }
+    },
+    "tailwindcss-language-server": {
+      "settings": {
+        "includeLanguages": {
+          "html/erb": "html",
+          "ruby": "html"
+        },
+        "experimental": {
+          "classRegex": ["\\bclass:\\s*['\"]([^'\"]*)['\"]"]
+        }
+      }
+    }
+  }
+}

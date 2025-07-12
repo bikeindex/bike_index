@@ -622,6 +622,8 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rbs (3.9.4)
+      logger
     rdoc (6.14.1)
       erb
       psych (>= 4.0.0)
@@ -692,6 +694,10 @@ GEM
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.38.0, < 2.0)
+    ruby-lsp (0.25.0)
+      language_server-protocol (~> 3.17.0)
+      prism (>= 1.2, < 2.0)
+      rbs (>= 3, < 5)
     ruby-progressbar (1.13.0)
     ruby-vips (2.2.3)
       ffi (~> 1.12)
@@ -932,6 +938,7 @@ DEPENDENCIES
   rspec-rails
   rspec-retry
   rspec-sidekiq
+  ruby-lsp
   ruby-vips
   secure_headers (~> 2.5.0)
   selenium-webdriver

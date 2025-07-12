@@ -140,6 +140,7 @@ end
 
 group :development, :test do
   gem "brakeman", require: false
+  gem "ruby-lsp" # Ruby language server (used by editor integrations)
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "factory_bot_rails"
