@@ -6110,6 +6110,11 @@ nl:
         stolenness_stolen: Overal gestolen
         marketplace_scope_for_sale: Overal te koop
         marketplace_scope_for_sale_proximity: Te koop in zoekgebied
+      bike_box:
+        location: Plaats
+        posted_at: Genoteerd
+        primary_colors: Primaire kleuren
+        serial: Serie
     legacy_form_well:
       address_record:
         address: Adres

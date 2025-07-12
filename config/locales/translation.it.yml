@@ -4704,6 +4704,11 @@ it:
         stolenness_stolen:
         marketplace_scope_for_sale:
         marketplace_scope_for_sale_proximity:
+      bike_box:
+        location: Luogo
+        posted_at:
+        primary_colors: Colori primari
+        serial: Seriale
     legacy_form_well:
       address_record:
         address:
