@@ -1,40 +1,59 @@
 <div
   data-controller="search--kind-select-fields--component"
   data-search--kind-select-fields--component-api-count-url-value="<%= api_count_url %>"
-  data-search--kind-select-fields--component-option-kinds-value="<%= option_kind.to_s %>">
+  data-search--kind-select-fields--component-option-kinds-value="<%= option_kind.to_s %>"
+>
 
   <div
-    class="tw:mt-5 tw:sm:mt-2 tw:flex tw:flex-wrap tw:sm:flex-nowrap tw:w-full tw:sm:w-min tw:ml-auto <%= location_initially_shown? ? '' : 'tw:hidden' %>"
-    data-search--kind-select-fields--component-target="locationWrap">
+    class="
+      tw:mt-5 tw:sm:mt-2 tw:flex tw:flex-wrap tw:sm:flex-nowrap tw:w-full tw:sm:w-min
+      tw:ml-auto <%= location_initially_shown? ? '' : 'tw:hidden' %>
+    "
+    data-search--kind-select-fields--component-target="locationWrap"
+  >
 
     <span class="tw:flex tw:flex-nowrap">
       <span class="tw:block tw:py-1.5 tw:mr-2"><%= translation(".within") %></span>
-      <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
-      <%=
-        number_field_tag :distance, @distance,
-        placeholder: default_distance, min: GeocodeHelper::MIN_DISTANCE,
-        class: "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
-        "data-search--kind-select-fields--component-target" => "distance"
-      %>
+      <%= label_tag :distance,
+      translation(".search_distance"),
+      class: "twlabel tw:sr-only" %>
+      <%= number_field_tag :distance,
+      @distance,
+      :placeholder => default_distance,
+      :min => GeocodeHelper::MIN_DISTANCE,
+      :class => "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
+      "data-search--kind-select-fields--component-target" => "distance" %>
     </span>
     <span class="tw:flex tw:flex-nowrap tw:mt-3 tw:sm:mt-0">
       <span class="tw:block tw:text-nowrap tw:py-1.5 tw:mr-2"><%= translation(".miles_of") %></span>
-      <%= label_tag :location, translation(".search_location"), class: "twlabel tw:sr-only" %>
-      <%=
-        text_field_tag :location, @location, placeholder: translation(".search_location"),
-        class: "twinput tw:min-w-50 fieldResetsCounts",
-        "data-search--kind-select-fields--component-target" => "location"
-      %>
+      <%= label_tag :location,
+      translation(".search_location"),
+      class: "twlabel tw:sr-only" %>
+      <%= text_field_tag :location,
+      @location,
+      :placeholder => translation(".search_location"),
+      :class => "twinput tw:min-w-50 fieldResetsCounts",
+      "data-search--kind-select-fields--component-target" => "location" %>
     </span>
   </div>
 
-  <ul class="tw:items-center tw:w-full tw:text-sm tw:font-medium tw:text-gray-900 tw:md:flex tw:dark:text-white tw:mt-6">
+  <ul
+    class="
+      tw:items-center tw:w-full tw:text-sm tw:font-medium tw:text-gray-900 tw:md:flex
+      tw:dark:text-white tw:mt-6
+    "
+  >
     <% kind_options.each do |opt| %>
       <li class="<%= li_classes(opt) %>">
-        <%= render(Search::KindOption::Component.new(
-              option_kind:, option: opt, option_text: translation(".#{option_kind}_#{opt}"),
-              is_selected: opt_selected?(opt), button_url: opt_button_url(opt)
-            )) %>
+        <%= render(
+          Search::KindOption::Component.new(
+            option_kind:,
+            option: opt,
+            option_text: translation(".#{option_kind}_#{opt}"),
+            is_selected: opt_selected?(opt),
+            button_url: opt_button_url(opt),
+          ),
+        ) %>
       </li>
     <% end %>
   </ul>
