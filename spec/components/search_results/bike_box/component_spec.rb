@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Search::BikeBox::Component, type: :component do
+RSpec.describe SearchResults::BikeBox::Component, type: :component do
   let(:options) { {bike:, current_user:} }
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }

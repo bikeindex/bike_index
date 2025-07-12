@@ -16,9 +16,9 @@
 <% marketplace_listing = MarketplaceListing.for_sale.last %>
 
 <ul class="bike-boxes">
-  <%= render(Search::BikeBox::Component.new(bike:)) %>
+  <%= render(SearchResults::BikeBox::Component.new(bike:)) %>
   <% if bike2.present? %>
-    <%= render(Search::BikeBox::Component.new(bike: bike2)) %>
-    <%= render(Search::BikeBox::Component.new(bike: marketplace_listing.item, current_event_record: marketplace_listing)) %>
+    <%= render(SearchResults::BikeBox::Component.new(bike: bike2)) %>
+    <%= render(SearchResults::BikeBox::Component.new(bike: marketplace_listing.item, current_event_record: marketplace_listing)) %>
   <% end %>
 </ul>

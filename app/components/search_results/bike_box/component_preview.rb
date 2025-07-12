@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Search::BikeBox
+module SearchResults::BikeBox
   class ComponentPreview < ApplicationComponentPreview
     # TODO: pass bikes from here, rather than in the template :/
     # Other previews to include:

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Search::BikeBox
+module SearchResults::BikeBox
   class Component < ApplicationComponent
     include BikeHelper
 
