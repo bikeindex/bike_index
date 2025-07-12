@@ -1,13 +1,13 @@
 {
   "languages": {
     "HTML/ERB": {
-      "tab_size": 2
-      // "formatter": {
-      //   "external": {
-      //     "command": "erb-formatter",
-      //     "arguments": ["--stdin-filename", "{buffer_path}"],
-      //   },
-      // }
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "erb-formatter",
+          "arguments": ["--stdin-filename", "{buffer_path}"]
+        }
+      }
     },
     "Markdown": {
       "soft_wrap": "editor_width",
@@ -19,6 +19,8 @@
         "tailwindcss-language-server",
         "!rubocop",
         "!sorbet",
+        "!steep",
+        "!solargraph",
         "..."
       ]
     }

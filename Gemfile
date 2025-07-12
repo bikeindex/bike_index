@@ -152,7 +152,7 @@ group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem "standard" # Ruby linter
-  gem "htmlbeautifier" # html linter
+  gem "erb-formatter" # html linter
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"

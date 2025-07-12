@@ -1,2 +1,7 @@
 <%# NOTE: needs to all be on one line, or the text has whitespace at the beginning %>
-<div class="<% @overflow_class %> tw:whitespace-pre-wrap <%= @additional_classes %>"><%= @text.strip %></div>
+<div
+  class="
+    <% @overflow_class %> tw:whitespace-pre-wrap
+    <%= @additional_classes %>
+  "
+><%= @text.strip %></div>
