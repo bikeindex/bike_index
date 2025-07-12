@@ -382,4 +382,10 @@ img {
   &.university-of-iowa .submit-wrapper .btn {
     background: #ffcd00;
   }
+  //
+  // NOTE: Colors should now be passed in params[:button] or params[:button_and_header]
+  // NOT assigned in here
+  // see github.com/bikeindex/bike_index/pull/2866
+  //
 }
+
