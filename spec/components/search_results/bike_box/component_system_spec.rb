@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe Search::BikeBox::Component, :js, type: :system do
-  let(:preview_path) { "/rails/view_components/search/bike_box/component/default" }
+RSpec.describe SearchResults::BikeBox::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/search_results/bike_box/component/default" }
 
   it "default preview" do
     visit(preview_path)

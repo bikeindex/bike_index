@@ -4692,11 +4692,6 @@ it:
         min:
         price_maximum:
         price_minimum:
-      bike_box:
-        location: Luogo
-        primary_colors: Colori primari
-        serial: Seriale
-        posted_at:
       kind_select_fields:
         within:
         miles_of:
@@ -4744,3 +4739,9 @@ it:
         to:
       thread_show:
         subject: Oggetto
+    search_results:
+      bike_box:
+        serial: Seriale
+        location: Luogo
+        posted_at:
+        primary_colors: Colori primari
