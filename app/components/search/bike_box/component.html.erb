@@ -1,12 +1,18 @@
 <li class="bike-box-item tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800">
-  <a class="bike-list-image <%= 'hover-expand' if @bike.thumb_path %>" href="<%= @bike.html_url %>" data-turbo="false">
+  <a
+    class="bike-list-image <%= 'hover-expand' if @bike.thumb_path %>"
+    href="<%= @bike.html_url %>"
+    data-turbo="false"
+  >
     <%= bike_thumb_image(@bike) %>
   </a>
-  <div class="bike-information <%= 'multi-attr-lists' if render_second_column? %>">
+  <div
+    class="bike-information <%= 'multi-attr-lists' if render_second_column? %>"
+  >
     <h5 class="title-link">
       <a href="<%= @bike.html_url %>" data-turbo="false">
         <strong>
-          <%= [@bike.year, @bike.mnfg_name].reject(&:blank?).join(' ') %>
+          <%= [@bike.year, @bike.mnfg_name].reject(&:blank?).join(" ") %>
         </strong>
         <%= @bike.frame_model.to_s %>
         <% unless @bike.type == 'bike' %>
@@ -31,7 +37,10 @@
             <%= @current_event_record.currency_symbol %><%= number_display(@current_event_record.amount) %>
             <small><%= @current_event_record.currency_name %></small>
           </li>
-          <%= attr_list_item(@current_event_record.formatted_address_string, translation(".location")) %>
+          <%= attr_list_item(
+            @current_event_record.formatted_address_string,
+            translation(".location"),
+          ) %>
           <li>
             <strong class="attr-title"><%= translation(".posted_at") %>:</strong>
             <span class="localizeTime">
@@ -45,7 +54,10 @@
               <%= l occurred_at_with_fallback, format: :convert_time %>
             </span>
           </li>
-          <%= attr_list_item(@current_event_record.address(country: [:iso]), translation(".location")) %>
+          <%= attr_list_item(
+            @current_event_record.address(country: [:iso]),
+            translation(".location"),
+          ) %>
         <% end %>
       </ul>
     <% end %>

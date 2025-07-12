@@ -5,10 +5,12 @@
   <%= f.fields_for :current_marketplace_listing, MarketplaceListing.find_or_build_current_for(@bike) do |ml| %>
     <%= ml.fields_for :address_record do |address_form| %>
       <%# Here we provide the form_builder to the component %>
-      <%= render(LegacyFormWell::AddressRecordWithDefault::Component.new(
-        form_builder: address_form,
-        user: @user
-      )) %>
+      <%= render(
+        LegacyFormWell::AddressRecordWithDefault::Component.new(
+          form_builder: address_form,
+          user: @user,
+        ),
+      ) %>
     <% end %>
   <% end %>
 <% end %>
