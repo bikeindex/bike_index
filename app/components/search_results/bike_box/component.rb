@@ -10,9 +10,9 @@ module SearchResults::BikeBox
       @bike = bike
       return if @bike.blank?
 
-      @current_event_record = @bike.current_event_record
+      @current_event_record ||= @bike.current_event_record
 
-      # If this is cached (assume it is by default), don't show the serial for the user
+      # If this is cached (it is by default), don't show the serial for the user
       @is_cached = !skip_cache
       @current_user = current_user unless @is_cached
     end
