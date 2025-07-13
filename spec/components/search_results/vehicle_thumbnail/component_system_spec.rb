@@ -2,12 +2,12 @@
 
 require "rails_helper"
 
-RSpec.describe Search::VehicleThumbnail::Component, :js, type: :system do
+RSpec.describe SearchResults::VehicleThumbnail::Component, :js, type: :system do
   let(:preview_path) { "/rails/view_components/search/vehicle_thumbnail/component/default" }
 
   it "default preview" do
     visit(preview_path)
 
-    expect(page).to have_content "Search::VehicleThumbnail::Component"
+    expect(page).to have_content "SearchResults::VehicleThumbnail::Component"
   end
 end

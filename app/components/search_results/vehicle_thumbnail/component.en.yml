@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    search:
+    search_results:
       vehicle_thumbnail:
         vehicle: Vehicle
         current_event_record: Current_event_record
