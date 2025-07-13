@@ -3,7 +3,10 @@
 module SearchResults::VehicleThumbnail
   class ComponentPreview < ApplicationComponentPreview
     def default
-      {template: "search_results/vehicle_thumbnail/component_preview/default"}
+      render(SearchResults::Container::Component.new(
+        component_class: SearchResults::VehicleThumbnail::Component,
+        vehicles: SearchResults::BikeBox::ComponentPreview.vehicles
+      ))
     end
   end
 end
