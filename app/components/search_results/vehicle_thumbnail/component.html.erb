@@ -1,3 +1,14 @@
-<div data-controller="search--vehicle-thumbnail--component">
-  SearchResults::VehicleThumbnail::Component component
-</div>
+<li class="">
+  <%= bike_thumb_image(@bike) %>
+  <h5 class="">
+    <a href="<%= @bike.html_url %>" data-turbo="false">
+      <strong>
+        <%= [@bike.year, @bike.mnfg_name].reject(&:blank?).join(" ") %>
+      </strong>
+      <%= @bike.frame_model.to_s %>
+      <% unless @bike.type == 'bike' %>
+        <em class="less-strong"><%= @bike.type %></em>
+      <% end %>
+    </a>
+  </h5>
+</li>

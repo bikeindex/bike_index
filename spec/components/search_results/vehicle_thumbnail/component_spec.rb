@@ -15,7 +15,7 @@ RSpec.describe SearchResults::VehicleThumbnail::Component, type: :component do
     expect(component).to have_content bike.mnfg_name
     expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
 
-    expect(component).to_not have_text(serial.upcase)
-    expect(instance.instance_variable_get(:@is_cached)).to be_true
+    expect(component).to_not have_text(bike.serial_number.upcase)
+    expect(instance.instance_variable_get(:@is_cached)).to be true
   end
 end

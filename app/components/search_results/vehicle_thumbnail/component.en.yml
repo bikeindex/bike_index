@@ -3,6 +3,7 @@ en:
   components:
     search_results:
       vehicle_thumbnail:
-        vehicle: Vehicle
-        current_event_record: Current_event_record
-        skip_cache: Skip_cache
+        location: Location
+        posted_at: Listed
+        primary_colors: Primary colors
+        serial: Serial

@@ -8,6 +8,6 @@ RSpec.describe SearchResults::VehicleThumbnail::Component, :js, type: :system do
   it "default preview" do
     visit(preview_path)
 
-    expect(page).to have_content "SearchResults::VehicleThumbnail::Component"
+    expect(page).to have_content "Humble Frameworks"
   end
 end
