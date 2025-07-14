@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 13 Apr 2025 22:48:41 GMT
+      - Mon, 14 Jul 2025 18:31:31 GMT
       Pragma:
       - no-cache
       Expires:
@@ -39,13 +39,13 @@ http_interactions:
       Server:
       - mafe
       Content-Length:
-      - '26576'
+      - '26574'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=120
+      - gfet4t7; dur=110
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -340,14 +340,14 @@ http_interactions:
         : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
         : \n               {\n                  \"lat\" : 43.501897,\n                  \"lng\"
         : -106.0705689\n               },\n               \"southwest\" : \n               {\n
-        \                 \"lat\" : 42.4304879,\n                  \"lng\" : -107.543526\n
+        \                 \"lat\" : 42.430488,\n                  \"lng\" : -107.543526\n
         \              }\n            },\n            \"location\" : \n            {\n
         \              \"lat\" : 42.8313837,\n               \"lng\" : -106.912251\n
         \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
         : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
         : 43.501897,\n                  \"lng\" : -106.0705689\n               },\n
         \              \"southwest\" : \n               {\n                  \"lat\"
-        : 42.4304879,\n                  \"lng\" : -107.543526\n               }\n
+        : 42.430488,\n                  \"lng\" : -107.543526\n               }\n
         \           }\n         },\n         \"place_id\" : \"ChIJ6ZENbZKQYIcR1BVum_c3z9s\",\n
         \        \"types\" : \n         [\n            \"administrative_area_level_2\",\n
         \           \"political\"\n         ]\n      },\n      {\n         \"address_components\"
@@ -390,7 +390,7 @@ http_interactions:
         \              }\n            }\n         },\n         \"place_id\" : \"ChIJCzYy5IS16lQRQrfeQ5K5Oxw\",\n
         \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-  recorded_at: Sun, 13 Apr 2025 22:48:41 GMT
+  recorded_at: Mon, 14 Jul 2025 18:31:31 GMT
 - request:
     method: get
     uri: https://maps.googleapis.com/maps/api/geocode/json?key=<GOOGLE_GEOCODER>&language=en&latlng=42.8490197,-106.3015341&sensor=false
@@ -412,7 +412,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 13 Apr 2025 22:48:42 GMT
+      - Mon, 14 Jul 2025 18:31:31 GMT
       Pragma:
       - no-cache
       Expires:
@@ -430,13 +430,13 @@ http_interactions:
       Server:
       - mafe
       Content-Length:
-      - '26576'
+      - '26574'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=67
+      - gfet4t7; dur=60
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -731,14 +731,14 @@ http_interactions:
         : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
         : \n               {\n                  \"lat\" : 43.501897,\n                  \"lng\"
         : -106.0705689\n               },\n               \"southwest\" : \n               {\n
-        \                 \"lat\" : 42.4304879,\n                  \"lng\" : -107.543526\n
+        \                 \"lat\" : 42.430488,\n                  \"lng\" : -107.543526\n
         \              }\n            },\n            \"location\" : \n            {\n
         \              \"lat\" : 42.8313837,\n               \"lng\" : -106.912251\n
         \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
         : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
         : 43.501897,\n                  \"lng\" : -106.0705689\n               },\n
         \              \"southwest\" : \n               {\n                  \"lat\"
-        : 42.4304879,\n                  \"lng\" : -107.543526\n               }\n
+        : 42.430488,\n                  \"lng\" : -107.543526\n               }\n
         \           }\n         },\n         \"place_id\" : \"ChIJ6ZENbZKQYIcR1BVum_c3z9s\",\n
         \        \"types\" : \n         [\n            \"administrative_area_level_2\",\n
         \           \"political\"\n         ]\n      },\n      {\n         \"address_components\"
@@ -781,5 +781,5 @@ http_interactions:
         \              }\n            }\n         },\n         \"place_id\" : \"ChIJCzYy5IS16lQRQrfeQ5K5Oxw\",\n
         \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-  recorded_at: Sun, 13 Apr 2025 22:48:42 GMT
+  recorded_at: Mon, 14 Jul 2025 18:31:31 GMT
 recorded_with: VCR 6.3.1
