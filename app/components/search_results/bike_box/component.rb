@@ -6,10 +6,11 @@ module SearchResults::BikeBox
 
     # NOTE: be cautious about passing in current_user and caching,
     # since current_user shows their hidden serials
-    def initialize(bike:, current_user: nil, current_event_record: nil, skip_cache: false)
+    def initialize(bike:, current_user: nil, current_event_record: nil, search_kind: nil, skip_cache: false)
       @bike = bike
       return if @bike.blank?
 
+      @search_kind = SearchResults::Container::Component.permitted_search_kind(search_kind)
       @current_event_record ||= @bike.current_event_record
 
       # If this is cached (it is by default), don't show the serial for the user

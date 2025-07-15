@@ -4,8 +4,9 @@ module SearchResults::VehicleThumbnail
   class ComponentPreview < ApplicationComponentPreview
     def default
       render(SearchResults::Container::Component.new(
-        kind: :thumbnail,
-        vehicles: SearchResults::BikeBox::ComponentPreview.vehicles
+        li_kind: :thumbnail,
+        search_kind: :marketplace,
+        vehicles: SearchResults::BikeBox::ComponentPreview.vehicles + SearchResults::BikeBox::ComponentPreview.vehicles
       ))
     end
   end
