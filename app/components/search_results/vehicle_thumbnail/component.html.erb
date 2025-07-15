@@ -1,5 +1,5 @@
-<%# 256px to 512px tw:min-w-3xs tw:max-w-lg %>
-<li class="">
+<%# The width of these is controlled by the container component %>
+<li class="tw:cursor-pointer tw:hover:underline tw:relative tw:isolate">
   <%= vehicle_image_tag %>
   <% if render_h5? %>
     <h5>
@@ -13,14 +13,9 @@
     </h5>
   <% end %>
   <h4 class="">
-    <a href="<%= @bike.html_url %>" data-turbo="false">
-      <strong>
-        <%= [@bike.year, @bike.mnfg_name].reject(&:blank?).join(" ") %>
-      </strong>
-      <%= @bike.frame_model.to_s %>
-      <% unless @bike.type == 'bike' %>
-        <em class="less-strong"><%= @bike.type %></em>
-      <% end %>
-    </a>
+    <%= link_to @bike.html_url, data: { turbo: false } do %>
+      <%= bike_title_html(@bike) %>
+      <span class="tw:inset-0 tw:absolute tw:z-10" "data-test-id"="vehicle-thumbnail-linkspan-#{@bike.id}"></span>
+    <% end %>
   </h4>
 </li>

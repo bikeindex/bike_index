@@ -51,7 +51,7 @@ module BikeHelper
       concat(content_tag(:strong, year_and_mnfg))
       concat(" #{bike.frame_model_truncated}") if bike.frame_model.present?
       if bike.type != "bike"
-        concat(content_tag(:em, " #{bike.type_titleize}"))
+        concat(content_tag(:em, " #{bike.type_titleize}", class: "less-strong"))
       end
     end
   end
