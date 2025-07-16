@@ -3,7 +3,4 @@ en:
   components:
     search_results:
       vehicle_thumbnail:
-        location: Location
-        posted_at: Listed
-        primary_colors: Primary colors
-        serial: Serial
+        registered_not_stolen: registered, not stolen

@@ -1,7 +1,8 @@
 <div data-controller="messages--thread-show--component">
   <%= render(
     SearchResults::Container::Component.new(
-      kind: :thumbnail,
+      li_kind: :bike_box,
+      search_kind: :marketplace,
       vehicles: [@marketplace_listing.item],
       current_user: @current_user,
     ),

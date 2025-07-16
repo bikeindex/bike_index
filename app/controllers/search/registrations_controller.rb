@@ -41,6 +41,8 @@ class Search::RegistrationsController < ApplicationController
     end
 
     @page = permitted_page(params[:page])
+    @search_kind = :registration
+    @li_kind = params[:search_li_kind] || :bike_boxes
   end
 
   def permitted_search_params

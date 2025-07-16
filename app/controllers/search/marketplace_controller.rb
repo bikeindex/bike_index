@@ -74,6 +74,8 @@ class Search::MarketplaceController < ApplicationController
     end
 
     @page = permitted_page(params[:page])
+    @search_kind = :marketplace
+    @li_kind = params[:search_li_kind] || :thumbnail
   end
 
   def permitted_search_params
