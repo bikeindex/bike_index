@@ -22,7 +22,7 @@ module SearchResults::Container
       end
     end
 
-    def initialize(li_kind:, search_kind:, current_user: nil, vehicles: nil, skip_cache: false)
+    def initialize(li_kind: nil, search_kind: nil, current_user: nil, vehicles: nil, skip_cache: false)
       @component_class = self.class.component_class_for_li_kind(li_kind)
       @search_kind = self.class.permitted_search_kind(search_kind)
 
