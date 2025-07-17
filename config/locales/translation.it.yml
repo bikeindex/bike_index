@@ -4704,11 +4704,9 @@ it:
         stolenness_stolen:
         marketplace_scope_for_sale:
         marketplace_scope_for_sale_proximity:
-      bike_box:
-        location: Luogo
-        posted_at:
-        primary_colors: Colori primari
-        serial: Seriale
+      result_view_select:
+        bike_box_view:
+        thumbnail_view:
     legacy_form_well:
       address_record:
         address:
@@ -4746,7 +4744,11 @@ it:
         subject: Oggetto
     search_results:
       bike_box:
-        serial: Seriale
         location: Luogo
         posted_at:
         primary_colors: Colori primari
+        serial: Seriale
+      vehicle_thumbnail:
+        registered_not_stolen:
+      container:
+        no_results:

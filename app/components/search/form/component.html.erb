@@ -93,6 +93,8 @@
     <% end %>
 
     <%= render(Search::KindSelectFields::Component.new(**kind_select_options)) %>
-    <%= render(Search::ResultViewSelect::Component.new(result_view: @result_view)) if render_result_view? %>
+    <%= if render_result_view?
+      render(Search::ResultViewSelect::Component.new(result_view: @result_view))
+    end %>
   <% end %>
 </div>

@@ -6110,11 +6110,9 @@ nl:
         stolenness_stolen: Overal gestolen
         marketplace_scope_for_sale: Overal te koop
         marketplace_scope_for_sale_proximity: Te koop in zoekgebied
-      bike_box:
-        location: Plaats
-        posted_at: Genoteerd
-        primary_colors: Primaire kleuren
-        serial: Serie
+      result_view_select:
+        bike_box_view: Bekijk als lijst
+        thumbnail_view: Bekijken als miniaturen
     legacy_form_well:
       address_record:
         address: Adres
@@ -6153,7 +6151,11 @@ nl:
         subject: Onderwerp
     search_results:
       bike_box:
-        serial: Serie
         location: Plaats
         posted_at: Genoteerd
         primary_colors: Primaire kleuren
+        serial: Serie
+      vehicle_thumbnail:
+        registered_not_stolen: geregistreerd, niet gestolen
+      container:
+        no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
