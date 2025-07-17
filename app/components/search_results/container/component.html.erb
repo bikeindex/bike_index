@@ -1,17 +1,23 @@
-<ul class="<%= container_class %>">
-  <% if @vehicles.present? %>
-    <% @vehicles.each do |vehicle| %>
-      <%= render(
-        @component_class.new(
-          bike: vehicle,
-          current_user: @current_user,
-          skip_cache: @skip_cache,
-          search_kind: @search_kind,
-        ),
-      ) %>
+<% if render_no_results? %>
+  <h3 class="tw:text-center tw:text-xl uncap">
+    <%= @no_results  %>
+  </h3>
+<% else %>
+  <ul class="<%= container_class %>">
+    <% if @vehicles.present? %>
+      <% @vehicles.each do |vehicle| %>
+        <%= render(
+          @component_class.new(
+            bike: vehicle,
+            current_user: @current_user,
+            skip_cache: @skip_cache,
+            search_kind: @search_kind,
+          ),
+        ) %>
+      <% end %>
+    <% else %>
+      <%# Most views render themselves, for caching purposes %>
+      <%= content %>
     <% end %>
-  <% else %>
-    <%# Most views render themselves, for caching purposes %>
-    <%= content %>
-  <% end %>
-</ul>
+  </ul>
+<% end %>

@@ -18,6 +18,14 @@ module SearchResults::VehicleThumbnail
       ))
     end
 
+    def no_results
+      render(SearchResults::Container::Component.new(
+        li_kind: :thumbnail,
+        search_kind: :marketplace,
+        vehicles: nil
+      ))
+    end
+
     private
 
     def marketplace_vehicles

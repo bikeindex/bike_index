@@ -22,20 +22,21 @@ module SearchResults::Container
       end
     end
 
-    def initialize(li_kind: nil, search_kind: nil, current_user: nil, vehicles: nil, skip_cache: false)
+    def initialize(li_kind: nil, search_kind: nil, current_user: nil, vehicles: nil, skip_cache: false, no_results: nil)
       @component_class = self.class.component_class_for_li_kind(li_kind)
       @search_kind = self.class.permitted_search_kind(search_kind)
 
       @current_user = current_user
       @vehicles = vehicles
       @skip_cache = skip_cache
-    end
-
-    def render?
-      @vehicles.present? || content.present?
+      @no_results = no_results || translation(".no_results")
     end
 
     private
+
+    def render_no_results?
+      @vehicles.blank? && content.blank?
+    end
 
     def container_class
       if @component_class == SearchResults::VehicleThumbnail::Component

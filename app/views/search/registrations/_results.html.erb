@@ -1,24 +1,6 @@
-<% if @search_kind == :marketplace %>
-  <div class="tw:px-4 tw:max-w-7xl tw:mx-auto tw:mt-8 tw:lg:mt-12 tw:mb-6">
-    <% component_class = SearchResults::Container::Component.component_class_for_li_kind(@li_kind) %>
+<% not_marketplace = @search_kind != :marketplace %>
 
-    <%= render(SearchResults::Container::Component.new(li_kind: @li_kind,search_kind: @search_kind)) do %>
-      <% @bikes.each do |bike| %>
-        <% cache(["search_results", @search_kind, @li_kind, bike]) do %>
-          <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
-        <% end %>
-      <% end %>
-    <% end %>
-  </div>
-
-  <% if @pagy.present? %>
-    <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
-      size: :lg, data: {turbo_action: "advance"})) %>
-  <% end %>
-<% else %>
-  <%# This will become a view component, but for now just rendering old styled results %>
-  <% not_marketplace = @marketplace_scope.blank? %>
-
+<% if not_marketplace %>
   <div class="container mb-5">
     <div class="row bikes-searched-default">
       <div class="col-md-12">
@@ -40,35 +22,48 @@
           </div>
         <% else %>
           <h3 class="text-center uncap">
-            <%= not_marketplace ? t(".no_matched") : t(".no_matched_marketplace") %>
+            <%= t(".no_matched")  %>
           </h3>
         <% end %>
       </div>
     </div>
   </div>
+<% else %>
+  <div class="tw:px-4 tw:max-w-7xl tw:mx-auto tw:mt-8 tw:lg:mt-12 tw:mb-6">
+    <% component_class = SearchResults::Container::Component.component_class_for_li_kind(@li_kind) %>
 
-  <%# This is now a view component, so it needs to be outside the bootstrap container for styling %>
-  <% if @bikes.present? && @pagy.present? %>
-    <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
-      size: :lg, data: {turbo_action: "advance"})) %>
+    <%= render(SearchResults::Container::Component.new(li_kind: @li_kind, search_kind: @search_kind, no_results: t(".no_matched_marketplace"))) do %>
+      <% @bikes.each do |bike| %>
+        <% cache(["search_results", @search_kind, @li_kind, bike]) do %>
+          <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+
+<%# This is now a view component, so it needs to be outside the bootstrap container for styling %>
+<% if @bikes.present? && @pagy.present? %>
+  <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
+    size: :lg, data: {turbo_action: "advance"})) %>
+<% end %>
+
+<%# render near serials %>
+<% if not_marketplace && @interpreted_params[:serial].present? %>
+  <%=
+    turbo_frame_tag :search_registrations_similar_serials_frame,
+    src: similar_serials_search_registrations_path(@interpreted_params),
+    loading: :lazy do
+  %>
+    <%= render LoadingSpinner::Component.new(text: t(".search_for_similar")) %>
   <% end %>
 
-  <%# render near serials %>
-  <% if not_marketplace && @interpreted_params[:serial].present? %>
-    <%=
-      turbo_frame_tag :search_registrations_similar_serials_frame,
-      src: similar_serials_search_registrations_path(@interpreted_params),
-      loading: :lazy do
-    %>
-      <%= render LoadingSpinner::Component.new(text: t(".search_for_similar")) %>
-    <% end %>
-
-    <%=
-      turbo_frame_tag :search_registrations_serials_containing_frame,
-      src: serials_containing_search_registrations_path(@interpreted_params),
-      loading: :lazy do
-    %>
-      <%= render LoadingSpinner::Component.new(text: t(".search_for_containing")) %>
-    <% end %>
+  <%=
+    turbo_frame_tag :search_registrations_serials_containing_frame,
+    src: serials_containing_search_registrations_path(@interpreted_params),
+    loading: :lazy do
+  %>
+    <%= render LoadingSpinner::Component.new(text: t(".search_for_containing")) %>
   <% end %>
 <% end %>
