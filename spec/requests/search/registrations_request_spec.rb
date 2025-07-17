@@ -35,6 +35,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template(:index)
         expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
+        expect(assigns(:result_view)).to eq :bike_box
 
         expect(assigns(:bikes).pluck(:id).sort).to eq target_bike_ids
       end

@@ -5,9 +5,9 @@ require "rails_helper"
 RSpec.describe SearchResults::Container::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
-  let(:options) { {li_kind:, search_kind:, vehicles:, skip_cache:, no_results:} }
+  let(:options) { {result_view:, search_kind:, vehicles:, skip_cache:, no_results:} }
   let(:vehicles) { [FactoryBot.build(:bike, id: 42)] }
-  let(:li_kind) { :thumbnail }
+  let(:result_view) { :thumbnail }
   let(:search_kind) { :registration }
   let(:skip_cache) { nil }
   let(:no_results) { nil }
@@ -20,8 +20,8 @@ RSpec.describe SearchResults::Container::Component, type: :component do
     expect(component.css("a").first["href"]).to match("/bikes/42")
   end
 
-  context "li_kind :bike_box" do
-    let(:li_kind) { :bike_box }
+  context "result_view :bike_box" do
+    let(:result_view) { :bike_box }
     it "renders" do
       expect(component).to be_present
       expect(component.css("ul")).to be_present

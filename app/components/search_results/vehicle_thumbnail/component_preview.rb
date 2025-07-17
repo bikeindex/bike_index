@@ -4,7 +4,7 @@ module SearchResults::VehicleThumbnail
   class ComponentPreview < ApplicationComponentPreview
     def default
       render(SearchResults::Container::Component.new(
-        li_kind: :thumbnail,
+        result_view: :thumbnail,
         search_kind: :registration,
         vehicles: SearchResults::BikeBox::ComponentPreview.vehicles + SearchResults::BikeBox::ComponentPreview.vehicles
       ))
@@ -12,7 +12,7 @@ module SearchResults::VehicleThumbnail
 
     def marketplace
       render(SearchResults::Container::Component.new(
-        li_kind: :thumbnail,
+        result_view: :thumbnail,
         search_kind: :marketplace,
         vehicles: marketplace_vehicles
       ))
@@ -20,7 +20,7 @@ module SearchResults::VehicleThumbnail
 
     def no_results
       render(SearchResults::Container::Component.new(
-        li_kind: :thumbnail,
+        result_view: :thumbnail,
         search_kind: :marketplace,
         vehicles: nil
       ))

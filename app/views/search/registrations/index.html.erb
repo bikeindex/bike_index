@@ -1,7 +1,7 @@
 <div class="tw:px-4 tw:max-w-7xl tw:mx-auto tw:mb-6">
   <h1 class="tw:text-3xl tw:text-slate-800 tw:mb-4">Search all registrations</h1>
   <%= render Search::Form::Component.new(target_search_path: search_registrations_path,
-    target_frame: :search_registrations_results_frame, interpreted_params: @interpreted_params) %>
+    target_frame: :search_registrations_results_frame, interpreted_params: @interpreted_params, result_view: @result_view) %>
 </div>
 
 <%= turbo_frame_tag :search_registrations_results_frame do %>

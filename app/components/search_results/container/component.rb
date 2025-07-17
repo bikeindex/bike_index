@@ -2,7 +2,7 @@
 
 module SearchResults::Container
   class Component < ApplicationComponent
-    LI_KINDS_COMPONENTS = {
+    RESULT_VIEW_COMPONENT = {
       bike_box: SearchResults::BikeBox::Component,
       thumbnail: SearchResults::VehicleThumbnail::Component
     }.freeze
@@ -13,17 +13,19 @@ module SearchResults::Container
       SEARCH_KINDS.include?(kind_sym) ? kind_sym : SEARCH_KINDS.first
     end
 
-    def self.component_class_for_li_kind(li_kind)
-      kind_sym = li_kind&.to_sym
-      if LI_KINDS_COMPONENTS.key?(kind_sym)
-        LI_KINDS_COMPONENTS[kind_sym]
-      else
-        LI_KINDS_COMPONENTS.values.first
-      end
+    def self.permitted_result_view(result_view, default: nil)
+      kind_sym = result_view&.to_sym
+      default ||= RESULT_VIEW_COMPONENT.keys.first
+      raise "Unknown default '#{default}'" unless RESULT_VIEW_COMPONENT.key?(default)
+      RESULT_VIEW_COMPONENT.key?(kind_sym) ? kind_sym : default
     end
 
-    def initialize(li_kind: nil, search_kind: nil, current_user: nil, vehicles: nil, skip_cache: false, no_results: nil)
-      @component_class = self.class.component_class_for_li_kind(li_kind)
+    def self.component_class_for_result_view(result_view)
+      RESULT_VIEW_COMPONENT[permitted_result_view(result_view)]
+    end
+
+    def initialize(result_view: nil, search_kind: nil, current_user: nil, vehicles: nil, skip_cache: false, no_results: nil)
+      @component_class = self.class.component_class_for_result_view(result_view)
       @search_kind = self.class.permitted_search_kind(search_kind)
 
       @current_user = current_user
@@ -32,7 +34,7 @@ module SearchResults::Container
       @no_results = no_results || translation(".no_results")
     end
 
-    private
+
 
     def render_no_results?
       @vehicles.blank? && content.blank?

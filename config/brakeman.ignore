@@ -611,7 +611,7 @@
       "file": "app/views/search/registrations/_results.html.erb",
       "line": 8,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(action => SearchResults::Container::Component.component_class_for_li_kind((params[:search_li_kind] or :thumbnail)).new(:bike => bike, :search_kind => :marketplace), {})",
+      "code": "render(action => SearchResults::Container::Component.component_class_for_result_view((params[:search_result_view] or :thumbnail)).new(:bike => bike, :search_kind => :marketplace), {})",
       "render_path": [
         {
           "type": "controller",
@@ -639,7 +639,7 @@
         "type": "template",
         "template": "search/registrations/_results"
       },
-      "user_input": "params[:search_li_kind]",
+      "user_input": "params[:search_result_view]",
       "confidence": "Weak",
       "cwe_id": [
         22

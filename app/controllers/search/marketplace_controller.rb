@@ -75,7 +75,8 @@ class Search::MarketplaceController < ApplicationController
 
     @page = permitted_page(params[:page])
     @search_kind = :marketplace
-    @li_kind = params[:search_li_kind] || :thumbnail
+    @result_view = SearchResults::Container::Component
+      .permitted_result_view(params[:search_result_view], default: :thumbnail)
   end
 
   def permitted_search_params
