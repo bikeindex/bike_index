@@ -34,8 +34,6 @@ module SearchResults::Container
       @no_results = no_results || translation(".no_results")
     end
 
-
-
     def render_no_results?
       @vehicles.blank? && content.blank?
     end
