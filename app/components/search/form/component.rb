@@ -12,7 +12,7 @@ module Search::Form
       @currency_sym = (currency || Currency.default).symbol.to_s
       @price_min_amount = price_min_amount
       @price_max_amount = price_max_amount
-      @result_view = result_view || Search::ResultViewSelect::Component::RESULT_VIEWS.first
+      @result_view = SearchResults::Container::Component.permitted_result_view(result_view)
     end
 
     private

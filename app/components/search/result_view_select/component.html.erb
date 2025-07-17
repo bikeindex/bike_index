@@ -1,24 +1,25 @@
 <ul class="tw:flex tw:flex-row-reverse tw:gap-4 tw:mt-2">
-  <li class="<%= label_classes %>">
-    <%= label_tag :result_view_thumbnail, class: "tw:block" do %>
+  <li class="<%= 'label_classes' %>">
+    <%= label_tag :search_result_view_thumbnail, class: label_classes do %>
       <%= inline_svg_tag "icons/image.svg", class: "tw:block tw:w-6 tw:h-6 tw:cursor-pointer" %>
       <span class="tw:sr-only"><%= translation(".thumbnail_view") %></span>
+
+      <%= radio_button_tag(
+        :search_result_view,
+        :thumbnail,
+        selected?(:thumbnail),
+        class: "tw:hidden") %>
     <% end %>
-    <%= radio_button_tag(
-      :result_view,
-      :thumbnail,
-      selected?(:thumbnail),
-      class: "tw:hidden") %>
   </li>
-  <li class="<%= label_classes %>">
-    <%= label_tag :result_view_bike_boxk, class: "tw:block" do %>
+  <li class="<%= 'label_classes' %>">
+    <%= label_tag :search_result_view_bike_box, class: label_classes do %>
       <%= inline_svg_tag "icons/list.svg", class: "tw:block tw:w-6 tw:h-6 tw:cursor-pointer" %>
       <span class="tw:sr-only"><%= translation(".bike_box_view") %></span>
+      <%= radio_button_tag(
+        :search_result_view,
+        :bike_box,
+        selected?(:bike_box),
+        class: "tw:hidden") %>
     <% end %>
-    <%= radio_button_tag(
-      :result_view,
-      :bike_boxk,
-      selected?(:bike_box),
-      class: "tw:hidden") %>
   </li>
 </ul>

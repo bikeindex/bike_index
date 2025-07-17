@@ -13,7 +13,8 @@ module Search::ResultViewSelect
     end
 
     def label_classes
-      "tw:cursor-pointer tw:p-2 tw:rounded tw:block tw:has-checked:bg-gray-100 tw:has-checked:dark:bg-gray-800 tw:border tw:border-gray-200 tw:dark:border-gray-600"
+      "tw:cursor-pointer tw:p-2 tw:rounded tw:block tw:has-checked:bg-gray-100 " \
+      "tw:has-checked:dark:bg-gray-800 tw:border tw:border-gray-200 tw:dark:border-gray-600"
     end
   end
 end

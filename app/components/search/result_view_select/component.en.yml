@@ -3,5 +3,5 @@ en:
   components:
     search:
       result_view_select:
-        thumbnail_view: View as thumbnails
         bike_box_view: View as List
+        thumbnail_view: View as thumbnails
