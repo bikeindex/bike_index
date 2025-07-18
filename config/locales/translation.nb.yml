@@ -5952,11 +5952,9 @@ nb:
         stolenness_stolen: Stjålet hvor som helst
         marketplace_scope_for_sale: Til salgs hvor som helst
         marketplace_scope_for_sale_proximity: Til salgs i søkeområdet
-      bike_box:
-        location: plassering
-        posted_at: Oppført
-        primary_colors: Primærfarger
-        serial: Seriell
+      result_view_select:
+        bike_box_view: Vis som liste
+        thumbnail_view: Vis som miniatyrbilder
     legacy_form_well:
       address_record:
         address: gateadresse
@@ -5995,7 +5993,11 @@ nb:
         subject: Emne
     search_results:
       bike_box:
-        serial: Seriell
         location: plassering
         posted_at: Oppført
         primary_colors: Primærfarger
+        serial: Seriell
+      vehicle_thumbnail:
+        registered_not_stolen: registrert, ikke stjålet
+      container:
+        no_results: Ingen registreringer samsvarte nøyaktig med søket ditt

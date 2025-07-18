@@ -1,0 +1,34 @@
+<%# The width of these is mostly handled by the container component %>
+<li
+  class="
+    tw:max-w-xs tw:min-w-[150px] tw:cursor-pointer tw:hover:underline tw:relative
+    tw:isolate
+  "
+>
+  <%= vehicle_image_tag %>
+  <h4 class="tw:text-lg">
+    <% if render_status? %><%= bike_status_span(@bike) %>:<% end %>
+    <% if render_for_sale_info? %>
+      <%= @current_event_record.currency_symbol %><%= number_display(@current_event_record.amount) %>
+    <% elsif render_event_date? %>
+      <span class="localizeTime">
+        <%= l occurred_at_with_fallback, format: :convert_time %>
+      </span>
+    <% elsif @bike.status_with_owner? %>
+      <em class="twless-strong tw:text-sm"><%= translation(:registered_not_stolen) %></em>
+    <% end %>
+  </h4>
+
+  <h3 class="tw:text-base tw:base-font">
+    <%= link_to @bike.html_url, data: { turbo: false } do %>
+      <%= bike_title_html(@bike) %>
+      <span
+        class="tw:inset-0 tw:absolute tw:z-10"
+        data-test-id="vehicle-thumbnail-linkspan-<%= @bike.id %>"
+      ></span>
+    <% end %>
+  </h3>
+  <% if render_footer? %>
+    <h5 class="tw:text-sm twless-strong"><%= address_formatted %></h5>
+  <% end %>
+</li>

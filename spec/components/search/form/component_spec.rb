@@ -10,9 +10,11 @@ RSpec.describe Search::Form::Component, type: :component do
     {
       target_search_path: Rails.application.routes.url_helpers.search_registrations_path,
       target_frame: :search_registrations_results_frame,
-      interpreted_params:
+      interpreted_params:,
+      result_view:
     }
   end
+  let(:result_view) { nil }
 
   it "renders with serial" do
     expect(component).to have_css "div"
@@ -45,13 +47,15 @@ RSpec.describe Search::Form::Component, type: :component do
         marketplace_scope: "for_sale",
         target_search_path: Rails.application.routes.url_helpers.search_registrations_path,
         target_frame: :search_registrations_results_frame,
-        interpreted_params:
+        interpreted_params:,
+        result_view: nil
       }
     end
     it "renders" do
       expect(component).to have_css "div"
       expect(component).to_not have_css("#serial")
       expect(component).to have_css("#primary_activity")
+      expect(instance.instance_variable_get(:@result_view)).to eq :bike_box
     end
     context "with serial" do
       let(:interpreted_params) { BikeSearchable.searchable_interpreted_params({serial: "xxx"}) }

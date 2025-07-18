@@ -3,7 +3,7 @@
 module Search::Form
   class Component < ApplicationComponent
     def initialize(target_search_path:, target_frame:, interpreted_params:, marketplace_scope: nil,
-      currency: nil, price_min_amount: nil, price_max_amount: nil)
+      currency: nil, price_min_amount: nil, price_max_amount: nil, result_view: nil)
       @marketplace_scope = marketplace_scope
       @target_search_path = target_search_path
       @target_frame = target_frame
@@ -12,12 +12,17 @@ module Search::Form
       @currency_sym = (currency || Currency.default).symbol.to_s
       @price_min_amount = price_min_amount
       @price_max_amount = price_max_amount
+      @result_view = SearchResults::Container::Component.permitted_result_view(result_view)
     end
 
     private
 
     def is_marketplace?
       @marketplace_scope.present?
+    end
+
+    def render_result_view?
+      is_marketplace? # only marketplace for now
     end
 
     def kind_select_options

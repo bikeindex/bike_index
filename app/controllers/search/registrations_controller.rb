@@ -41,6 +41,9 @@ class Search::RegistrationsController < ApplicationController
     end
 
     @page = permitted_page(params[:page])
+    @search_kind = :registration
+    @result_view = params[:search_result_view] || :bike_boxes
+    @result_view = SearchResults::Container::Component.permitted_result_view(params[:search_result_view])
   end
 
   def permitted_search_params

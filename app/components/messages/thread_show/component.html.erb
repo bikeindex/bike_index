@@ -1,12 +1,12 @@
 <div data-controller="messages--thread-show--component">
-  <ul class="bike-boxes">
-    <%= render(
-      SearchResults::BikeBox::Component.new(
-        bike: @marketplace_listing.item,
-        current_user: @current_user,
-      ),
-    ) %>
-  </ul>
+  <%= render(
+    SearchResults::Container::Component.new(
+      result_view: :bike_box,
+      search_kind: :marketplace,
+      vehicles: [@marketplace_listing.item],
+      current_user: @current_user,
+    ),
+  ) %>
   <%# TODO: show this too! %>
   <%#= render(PageSection::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing)) %>
 

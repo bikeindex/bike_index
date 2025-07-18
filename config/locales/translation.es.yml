@@ -4697,11 +4697,9 @@ es:
         stolenness_stolen:
         marketplace_scope_for_sale:
         marketplace_scope_for_sale_proximity:
-      bike_box:
-        location:
-        posted_at:
-        primary_colors:
-        serial:
+      result_view_select:
+        bike_box_view:
+        thumbnail_view:
     legacy_form_well:
       address_record:
         address:
@@ -4739,7 +4737,11 @@ es:
         subject:
     search_results:
       bike_box:
-        serial:
         location:
         posted_at:
         primary_colors:
+        serial:
+      vehicle_thumbnail:
+        registered_not_stolen:
+      container:
+        no_results:

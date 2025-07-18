@@ -42,6 +42,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(response).to render_template(:index)
           expect(assigns(:interpreted_params)).to eq(stolenness: "all")
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
+          expect(assigns(:result_view)).to eq :thumbnail
 
           expect(marketplace_listing_nyc).to be_present
           # Searching with serial doesn't render registrations with serials similar
@@ -55,13 +56,14 @@ RSpec.describe Search::MarketplaceController, type: :request do
           # FWIW, this doesn't fail anyway - but it's a reminder, don't search similar serials on marketplace
           expect(response.body).to_not match "with serials similar"
 
-          get "#{base_url}?search_no_js=true&currency=eur&price_min_amount=501"
+          get "#{base_url}?search_no_js=true&currency=eur&price_min_amount=501&search_result_view=bike_box"
           expect(response).to render_template(:index)
           # Not doing anything with currency yet, so it only uses default
           # expect(assigns(:currency).symbol).to eq "€"
           expect(assigns(:currency).symbol).to eq "$"
           expect(assigns(:price_min_amount)).to eq 501
           expect(assigns(:price_max_amount)).to be_nil
+          expect(assigns(:result_view)).to eq :bike_box
           expect(assigns(:bikes).pluck(:id)).to eq([marketplace_listing.item_id])
         end
       end

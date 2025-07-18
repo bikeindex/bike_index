@@ -70,7 +70,7 @@ RSpec.describe BikeHelper, type: :helper do
     end
     context "year and cycle_type and status" do
       let(:bike) { Bike.new(frame_model: '"Love Ride"', cycle_type: "trailer", year: 2020, status: "status_stolen", mnfg_name: "Bullit") }
-      let(:target_no_span) { "<strong>2020 Bullit</strong> &quot;Love Ride&quot;<em> Bike Trailer</em></span>" }
+      let(:target_no_span) { "<strong>2020 Bullit</strong> &quot;Love Ride&quot;<em class=\"less-strong\"> Bike Trailer</em></span>" }
       it "escapes the HTML" do
         expect(bike_title_html(bike)).to eq "<span>#{target_no_span}"
         expect(bike_title_html(bike, include_status: false)).to eq "<span>#{target_no_span}"

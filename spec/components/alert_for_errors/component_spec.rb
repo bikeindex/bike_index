@@ -11,7 +11,6 @@ RSpec.describe AlertForErrors::Component, type: :component do
 
   it "renders" do
     expect(object).to_not be_valid
-    pp object.errors.full_messages
     expect(component).to be_present
     expect(instance.render?).to be_truthy
   end

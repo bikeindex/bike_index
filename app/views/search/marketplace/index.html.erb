@@ -3,7 +3,7 @@
   <%= render Search::Form::Component.new(target_search_path: search_marketplace_path,
     target_frame: :marketplace_results_frame, interpreted_params: @interpreted_params,
     currency: @currency, marketplace_scope: @marketplace_scope, price_min_amount: @price_min_amount,
-    price_max_amount: @price_max_amount) %>
+    price_max_amount: @price_max_amount, result_view: @result_view) %>
 </div>
 
 <%= turbo_frame_tag :marketplace_results_frame do %>
