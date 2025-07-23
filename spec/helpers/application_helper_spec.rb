@@ -416,49 +416,4 @@ RSpec.describe ApplicationHelper, type: :helper do
       expect(html).to eq(target)
     end
   end
-
-  describe "sortable_search_params" do
-    before { controller.params = ActionController::Parameters.new(passed_params) }
-    context "no sortable_search_params" do
-      let(:passed_params) { {party: "stuff"} }
-      it "returns an empty hash" do
-        expect(sortable_search_params.to_unsafe_h).to eq({})
-      end
-    end
-    context "query items" do
-      let(:passed_params) { {query_items: %w[something iiiiii], search_email: "stttt"} }
-      it "includes the query items" do
-        expect(sortable_search_params.to_unsafe_h).to eq passed_params.as_json
-      end
-    end
-    context "direction, sort" do
-      let(:passed_params) { {direction: "asc", sort: "stolen", party: "long"} }
-      let(:target) { {direction: "asc", sort: "stolen"} }
-      it "returns target hash" do
-        expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
-      end
-    end
-    context "direction, sort, search param" do
-      let(:time) { Time.current.to_i }
-      let(:passed_params) { {direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom", primary_activity: "mtb"} }
-      let(:target) { {direction: "asc", sort: "stolen", search_stuff: "xxx", user_id: 21, organization_id: "xxx", start_time: time, end_time: time, period: "custom", primary_activity: "mtb"} }
-      it "returns target hash" do
-        expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
-      end
-    end
-    context "direction, sort, period: all " do
-      let(:passed_params) { {direction: "asc", sort: "stolen", period: "all"} }
-      let(:target) { {direction: "asc", sort: "stolen", period: "all"} }
-      it "returns an empty hash" do
-        expect(sortable_search_params?).to be_falsey
-      end
-    end
-    context "direction, sort, period: week" do
-      let(:passed_params) { {direction: "asc", sort: "stolen", period: "week"} }
-      let(:target) { {direction: "asc", sort: "stolen", period: "week"} }
-      it "returns an empty hash" do
-        expect(sortable_search_params?).to be_truthy
-      end
-    end
-  end
 end

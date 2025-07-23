@@ -155,41 +155,6 @@ module ApplicationHelper
     c
   end
 
-  def sortable(column, title = nil, html_options = {})
-    if title.is_a?(Hash) # If title is a hash, it wasn't passed
-      html_options = title
-      title = nil
-    end
-    title ||= column.gsub(/_(id|at)\z/, "").titleize
-    # Check for render_sortable - otherwise default to rendering
-    render_sortable = html_options.key?(:render_sortable) ? html_options[:render_sortable] : !html_options[:skip_sortable]
-    return title unless render_sortable
-    html_options[:class] = "#{html_options[:class]} sortable-link"
-    direction = (column == sort_column && sort_direction == "desc") ? "asc" : "desc"
-    if column == sort_column
-      html_options[:class] += " active"
-      span_content = (direction == "asc") ? "\u2193" : "\u2191"
-    end
-    link_to(sortable_search_params.merge(sort: column, direction: direction), html_options) do
-      concat(title.html_safe)
-      concat(content_tag(:span, span_content, class: "sortable-direction"))
-    end
-  end
-
-  def sortable_search_params?
-    s_params = sortable_search_params.except(:direction, :sort, :period).values.reject(&:blank?).any?
-    return true if s_params
-    params[:period].present? && params[:period] != "all"
-  end
-
-  def sortable_search_params
-    @sortable_search_params ||= params.permit(*params.keys.select { |k| k.to_s.start_with?("search_") }, # params starting with search_
-      :direction, :sort, # sorting params
-      :period, :start_time, :end_time, :time_range_column, :render_chart, # Time period params
-      :user_id, :organization_id, :query, # General search params
-      :serial, :stolenness, :location, :distance, :primary_activity, query_items: []) # Bike searching params
-  end
-
   def button_to_toggle_task_completion_status(ambassador_task_assignment, current_user, current_organization)
     is_complete = ambassador_task_assignment.completed?
     button_label = is_complete ? "Mark Pending" : "Mark Complete"

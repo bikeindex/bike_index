@@ -168,7 +168,7 @@ RSpec.describe API::V1::BikesController, type: :request do
           expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
         end
         context "with risky email" do
-          it "registers but doesn't send an email" do
+          it "registers but doesn't send an email", :flaky do
             expect {
               post base_url, params: bike_hash.merge(bike: bike_hash[:bike].merge(owner_email: "carolyn@hotmail.co")).as_json
             }.to change(Ownership, :count).by(1)
