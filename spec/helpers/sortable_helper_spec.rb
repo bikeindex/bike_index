@@ -49,43 +49,42 @@ RSpec.describe SortableHelper, type: :helper do
     end
   end
 
-  describe '#sortable' do
+  describe "#sortable" do
     let(:passed_params) { {} }
-    let(:sort_column) { 'name' }
-    let(:sort_direction) { 'asc' }
+    let(:sort_column) { "name" }
+    let(:sort_direction) { "asc" }
 
     before { allow_any_instance_of(SortableHelper).to receive(:sortable_url).and_return("/") }
 
-    context 'when render_sortable is false' do
-      it 'returns only the title string when skip_sortable is true' do
-        result = sortable('name', 'Full Name', skip_sortable: true)
-        expect(result).to eq('Full Name')
+    context "when render_sortable is false" do
+      it "returns only the title string when skip_sortable is true" do
+        result = sortable("name", "Full Name", skip_sortable: true)
+        expect(result).to eq("Full Name")
       end
 
-      it 'returns only the title string when render_sortable is explicitly false' do
-        result = sortable('name', 'Full Name', render_sortable: false)
-        expect(result).to eq('Full Name')
+      it "returns only the title string when render_sortable is explicitly false" do
+        result = sortable("name", "Full Name", render_sortable: false)
+        expect(result).to eq("Full Name")
       end
     end
 
-    context 'when render_sortable is true or default' do
-      it 'generates a link with sortable class' do
-        result = sortable('email')
+    context "when render_sortable is true or default" do
+      it "generates a link with sortable class" do
+        result = sortable("email")
         expect(result).to match(/class=..?sortable-link/)
-        expect(result).to include('Email')
+        expect(result).to include("Email")
       end
 
-      it 'preserves existing CSS classes' do
-        result = sortable('name', 'Name', class: 'existing-class')
+      it "preserves existing CSS classes" do
+        result = sortable("name", "Name", class: "existing-class")
         expect(result).to match(/class=..?existing-class sortable-link active/)
       end
 
-      it 'includes data attributes and other html options' do
-        result = sortable('email', 'Email', { data: { turbo: false }, id: 'sort-link' })
+      it "includes data attributes and other html options" do
+        result = sortable("email", "Email", {data: {turbo: false}, id: "sort-link"})
         expect(result).to include('data-turbo="false"')
         expect(result).to include('id="sort-link"')
       end
     end
   end
 end
-
