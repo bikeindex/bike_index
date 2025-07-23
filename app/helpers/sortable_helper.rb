@@ -27,8 +27,7 @@ module SortableHelper
     end
 
     link_to(sortable_url(column, direction), html_options) do
-      # yield ||
-      concat(title.html_safe)
+      concat(block_given? ? capture(&block) : title.html_safe)
       concat(content_tag(:span, span_content, class: "sortable-direction"))
     end
   end
