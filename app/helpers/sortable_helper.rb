@@ -50,7 +50,7 @@ module SortableHelper
 
   private
 
-  # This is a separate method purely for testing purposes
+  # This is a separate method purely for testing purposes, so it can be stubbed
   def sortable_url(sort, direction)
     url_for(sortable_search_params.merge(sort:, direction:))
   end
