@@ -1,0 +1,65 @@
+name: Copilot Coding Agent Setup
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+
+    # Read permission required to be able to clone the repository in setup
+    permissions:
+      contents: read
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        # needed because the postgres container does not provide a healthcheck
+        # tmpfs makes DB faster by using RAM
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    env:
+      RAILS_ENV: test
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: password
+      TZ: "America/Chicago"
+
+    steps:
+      - name: Get CPU cores
+        id: cpu-info
+        run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
+      # install system dependencies
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          version: 1.0
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # Install Ruby dependencies
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: bundle install
+      - name: Set up database
+        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
