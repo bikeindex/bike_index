@@ -88,7 +88,6 @@ jobs:
             google-chrome-stable \
             curl \
             gettext \
-            imagemagick \
             libvips \
             libcurl4-gnutls-dev \
             libexpat1-dev \
@@ -96,6 +95,7 @@ jobs:
             libz-dev \
             postgresql-client \
             ripgrep
+      - uses: mfinelli/setup-imagemagick@v6
       - name: Checkout code
         uses: actions/checkout@v4
       # Install Ruby dependencies
