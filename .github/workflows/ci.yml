@@ -81,21 +81,10 @@ jobs:
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
       # install system dependencies
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install \
-            google-chrome-stable \
-            curl \
-            gettext \
-            imagemagick \
-            libvips \
-            libcurl4-gnutls-dev \
-            libexpat1-dev \
-            libssl-dev \
-            libz-dev \
-            postgresql-client \
-            ripgrep
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          version: 1.0
       - name: Checkout code
         uses: actions/checkout@v4
       # Install Ruby dependencies
