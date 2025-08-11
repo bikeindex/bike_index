@@ -6,7 +6,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   helper_method :searchable_statuses, :matching_email_domains
 
   def index
-    @per_page = permitted_per_page(default: 25)
+    @per_page = permitted_per_page
 
     @pagy, @email_domains = pagy(ordered_email_domains, limit: @per_page, page: permitted_page)
   end

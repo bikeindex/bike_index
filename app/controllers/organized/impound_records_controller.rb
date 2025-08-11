@@ -5,7 +5,7 @@ module Organized
     before_action :find_impound_record, except: [:index]
 
     def index
-      @per_page = permitted_per_page(default: 25)
+      @per_page = permitted_per_page
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 

@@ -5,7 +5,7 @@ module Organized
     before_action :find_impound_claim, except: [:index]
 
     def index
-      @per_page = permitted_per_page(default: 25)
+      @per_page = permitted_per_page
 
       @pagy, @impound_claims = pagy(available_impound_claims.reorder("impound_claims.#{sort_column} #{sort_direction}")
         .includes(:user, :stolen_record, :impound_record), limit: @per_page, page: permitted_page)

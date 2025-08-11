@@ -43,7 +43,7 @@ class Admin::BikesController < Admin::BaseController
     else
       DuplicateBikeGroup.unignored.order("created_at desc")
     end
-    @per_page = permitted_per_page(default: 25)
+    @per_page = permitted_per_page
     @duplicate_groups_count = duplicate_groups.size
     @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page, page: permitted_page)
   end

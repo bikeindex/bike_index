@@ -4,7 +4,7 @@ class Admin::OrganizationsController < Admin::BaseController
   before_action :find_organization, only: [:show, :edit, :update, :destroy]
 
   def index
-    @per_page = permitted_per_page(default: 25)
+    @per_page = permitted_per_page
     organizations = if sort_column == "bikes"
       matching_organizations.left_joins(:bikes).group(:id)
         .order("COUNT(bikes.id) #{sort_direction}")

@@ -42,7 +42,7 @@ module Organized
     def recoveries
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
       set_period
-      @per_page = permitted_per_page(default: 25)
+      @per_page = permitted_per_page
       # Default to showing regional recoveries
       @search_only_organization = InputNormalizer.boolean(params[:search_only_organization])
       # ... but if organization isn't regional, we can't show regional
@@ -58,7 +58,7 @@ module Organized
     def incompletes
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
       set_period
-      @per_page = permitted_per_page(default: 25)
+      @per_page = permitted_per_page
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
 

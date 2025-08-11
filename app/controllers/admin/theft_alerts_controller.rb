@@ -4,7 +4,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   before_action :find_theft_alert, only: [:edit, :update]
 
   def index
-    @per_page = permitted_per_page(default: 25)
+    @per_page = permitted_per_page
     @pagy, @theft_alerts =
       pagy(searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
         .includes(:theft_alert_plan, :stolen_record), limit: @per_page, page: permitted_page)

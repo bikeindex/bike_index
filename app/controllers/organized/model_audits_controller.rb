@@ -5,7 +5,7 @@ module Organized
 
     def index
       @page_title = "E-Vehicle Audits"
-      @per_page = permitted_per_page(default: 25)
+      @per_page = permitted_per_page
       @model_attestation ||= ModelAttestation.new
       @pagy, @organization_model_audits = pagy(organization_model_audits
         .reorder(sort_ordered), limit: @per_page, page: permitted_page)
