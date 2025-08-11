@@ -37,10 +37,10 @@
   %thead.small-header
     %th
       = sortable "created_at", t(".added")
-    %th= t(".progress")
     - if @show_kind
       %th
         = sortable "kind", t(".kind")
+    %th= t(".progress")
     %th= t(".errors")
     %th
       = sortable "user_id", t(".creator")

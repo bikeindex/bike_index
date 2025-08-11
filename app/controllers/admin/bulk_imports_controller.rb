@@ -67,9 +67,11 @@ class Admin::BulkImportsController < Admin::BaseController
   def matching_bulk_imports
     return @matching_bulk_imports if defined?(@matching_bulk_imports)
     bulk_imports = BulkImport
-    if params[:search_ascend].present?
+    if params[:search_ascend] == "only_ascend"
+      @only_ascend = true
       bulk_imports = bulk_imports.ascend
-    elsif params[:search_not_ascend].present?
+    elsif params[:search_ascend] == "not_ascend"
+      @not_ascend = true
       bulk_imports = bulk_imports.not_ascend
     end
 

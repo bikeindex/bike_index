@@ -105,4 +105,4 @@
           = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
           for paginated list
 
-= render partial: "/admin/bikes/table", locals: { bikes: @bulk_import.bikes.reorder(created_at: :desc).limit(25) }
+= render partial: "/admin/bikes/table", locals: { bikes: @bulk_import.bikes.reorder(id: :desc).limit(25) }
