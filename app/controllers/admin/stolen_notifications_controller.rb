@@ -4,7 +4,7 @@ class Admin::StolenNotificationsController < Admin::BaseController
   before_action :find_notification, only: [:show, :resend]
 
   def index
-    @per_page = params[:per_page] || 100
+    @per_page = permitted_per_page(default: 100)
     @pagy, @stolen_notifications = pagy(searched_stolen_notifications
       .reorder("#{sort_column} #{sort_direction}")
       .includes(:bike), limit: @per_page, page: permitted_page)

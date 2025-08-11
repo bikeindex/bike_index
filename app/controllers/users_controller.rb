@@ -103,7 +103,7 @@ class UsersController < ApplicationController
     unless user == current_user || @user.show_bikes
       redirect_to(my_account_url, notice: translation(:user_not_sharing)) && return
     end
-    @per_page = params[:per_page] || 15
+    @per_page = permitted_per_page(default: 15)
     @pagy, @bikes = pagy(user.bikes(false), limit: @per_page, page: permitted_page)
   end
 

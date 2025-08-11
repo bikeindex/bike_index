@@ -2,7 +2,7 @@ class Admin::InvoicesController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @invoices =
       pagy(matching_invoices
         .includes(:organization, :payments, :organization_features, :first_invoice)

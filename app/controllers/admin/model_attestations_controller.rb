@@ -2,7 +2,7 @@ class Admin::ModelAttestationsController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @model_attestations =
       pagy(matching_model_attestations
         .includes(:model_audit, :user, :organization)

@@ -9,7 +9,7 @@ module Organized
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.enabled?("bike_search")
 
-        @per_page = params[:per_page] || 10
+        @per_page = permitted_per_page(default: 10)
         search_organization_bikes
         if current_organization.enabled?("csv_exports") && InputNormalizer.boolean(params[:create_export])
           if @available_bikes.count > 10_000 # Don't want everything to explode...
@@ -29,7 +29,7 @@ module Organized
           end
         end
       else
-        @per_page = params[:per_page] || 50
+        @per_page = permitted_per_page(default: 50)
         @available_bikes = if current_organization.enabled?("claimed_ownerships")
           claimed_ownerships_search
         else
@@ -42,7 +42,7 @@ module Organized
     def recoveries
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
       set_period
-      @per_page = params[:per_page] || 25
+      @per_page = permitted_per_page(default: 25)
       # Default to showing regional recoveries
       @search_only_organization = InputNormalizer.boolean(params[:search_only_organization])
       # ... but if organization isn't regional, we can't show regional
@@ -58,7 +58,7 @@ module Organized
     def incompletes
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
       set_period
-      @per_page = params[:per_page] || 25
+      @per_page = permitted_per_page(default: 25)
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
 

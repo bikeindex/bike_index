@@ -4,7 +4,7 @@ class MyAccounts::MessagesController < ApplicationController
 
   def index
     params[:page] || 1
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @marketplace_messages = matching_marketplace_messages
     @pagy, @marketplace_messages = pagy(matching_marketplace_messages
       .includes(:marketplace_listing, :sender, :receiver, :initial_record), limit: @per_page, page: permitted_page)

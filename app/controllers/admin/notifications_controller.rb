@@ -3,7 +3,7 @@ class Admin::NotificationsController < Admin::BaseController
 
   def index
     params[:page] || 1
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @notifications = pagy(matching_notifications.reorder("notifications.#{sort_column} #{sort_direction}")
       .includes(:bike, :notifiable, :user), limit: @per_page, page: permitted_page)
     @render_kind_counts = InputNormalizer.boolean(params[:search_kind_counts])

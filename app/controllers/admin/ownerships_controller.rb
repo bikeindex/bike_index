@@ -4,7 +4,7 @@ class Admin::OwnershipsController < Admin::BaseController
   before_action :find_ownership, except: [:index]
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @ownerships = pagy(matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
       .includes(:bike, :organization, :creator, :user), limit: @per_page, page: permitted_page)
   end

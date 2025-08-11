@@ -2,7 +2,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 10
+    @per_page = permitted_per_page(default: 10)
     @pagy, @organization_statuses =
       pagy(matching_organization_statuses
         .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)

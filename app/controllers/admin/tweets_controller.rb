@@ -4,7 +4,7 @@ class Admin::TweetsController < Admin::BaseController
   before_action :find_tweet, except: [:new, :create, :index]
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @tweets = pagy(matching_tweets
       .includes(:twitter_account, :public_images, :stolen_record, :retweets, :original_tweet)
       .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)

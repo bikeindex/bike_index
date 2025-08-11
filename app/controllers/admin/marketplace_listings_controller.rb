@@ -2,7 +2,7 @@ class Admin::MarketplaceListingsController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(
       matching_marketplace_listings.includes(:seller, :item, :buyer, :address_record)
         .reorder("marketplace_listings.#{sort_column} #{sort_direction}"),

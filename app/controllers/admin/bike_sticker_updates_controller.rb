@@ -2,7 +2,7 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page(default: 25)
     @pagy, @bike_sticker_updates =
       pagy(matching_bike_sticker_updates
         .reorder("bike_sticker_updates.#{sort_column} #{sort_direction}")

@@ -2,7 +2,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 10
+    @per_page = permitted_per_page(default: 10)
     @pagy, @logged_searches =
       pagy(matching_logged_searches
         .reorder("logged_searches.#{sort_column} #{sort_direction}")
