@@ -5,9 +5,9 @@ class Admin::ImpoundRecordsController < Admin::BaseController
 
   def index
     params[:page] || 1
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @impound_records = pagy(matching_impound_records.includes(:user, :organization, :bike, :impound_claims)
-      .order("impound_records.#{sort_column}" + " " + sort_direction), limit: @per_page)
+      .order("impound_records.#{sort_column}" + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def show

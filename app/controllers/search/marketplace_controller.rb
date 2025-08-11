@@ -73,7 +73,7 @@ class Search::MarketplaceController < ApplicationController
       @interpreted_params.merge!(proximity_hash)
     end
 
-    @page = permitted_page(params[:page])
+    @page = permitted_page(max: MAX_INDEX_PAGE)
     @search_kind = :marketplace
     @result_view = SearchResults::Container::Component
       .permitted_result_view(params[:search_result_view], default: :thumbnail)
@@ -96,10 +96,5 @@ class Search::MarketplaceController < ApplicationController
 
   def render_ad
     @ad = true
-  end
-
-  def permitted_page(page_param)
-    page = (page_param.presence || 1).to_i
-    page.clamp(1, MAX_INDEX_PAGE)
   end
 end

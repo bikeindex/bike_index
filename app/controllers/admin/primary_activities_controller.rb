@@ -3,11 +3,12 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
   before_action :find_primary_activity, except: %i[index]
 
   def index
-    @per_page = params[:per_page] || 60
+    @per_page = permitted_per_page(default: 60)
     @search_show_count = InputNormalizer.boolean(params[:search_show_count])
     @pagy, @collection = pagy(
       matching_primary_activities.includes(:primary_activity_family).reorder("primary_activities.#{sort_column} #{sort_direction}"),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

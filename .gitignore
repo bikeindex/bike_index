@@ -64,3 +64,6 @@ spec/vcr_cassettes/facebook/*
 
 # Ignore editor temp files
 .idea
+
+# Ignore .claude settings
+.claude/

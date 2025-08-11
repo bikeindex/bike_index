@@ -2,11 +2,11 @@ class Admin::ModelAuditsController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @model_audits =
       pagy(matching_model_audits
         .includes(:organization_model_audits, :model_attestations)
-        .reorder(sort_ordered), limit: @per_page)
+        .reorder(sort_ordered), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_model_audits
