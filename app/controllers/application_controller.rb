@@ -50,7 +50,7 @@ class ApplicationController < ActionController::Base
 
   def permitted_per_page(default: 25)
     per_page = params[:per_page]&.to_i
-    per_page.present? && per_page > 0 ? per_page : default
+    (per_page.present? && per_page > 0) ? per_page : default
   end
 
   def permitted_page(max: nil)
