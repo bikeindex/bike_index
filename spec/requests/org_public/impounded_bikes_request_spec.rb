@@ -26,10 +26,11 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
         expect(current_organization.public_impound_bikes?).to be_falsey
         expect(current_user.authorized?(current_organization)).to be_truthy
         expect(current_organization.enabled?("impound_bikes"))
-        get base_url
+        get "#{base_url}?per_page=%27&page=%27"
         expect(flash[:success]).to be_present
         expect(response.status).to eq(200)
         expect(response).to render_template :index
+        expect(assigns(:per_page)).to eq 25
       end
     end
   end

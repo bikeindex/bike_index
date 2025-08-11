@@ -2,20 +2,23 @@
 
 module SetPeriod
   extend ActiveSupport::Concern
-  DEFAULT_EARLIEST_TIME = Date.parse("2024-1-1").freeze
+  DEFAULT_EARLIEST_TIME = Time.at(1134972000) # Earliest bike created at
   PERIOD_TYPES = %w[hour day month year week all next_week next_month].freeze
 
   # For setting periods, particularly for graphing
   def set_period
-    set_timezone
+    @timezone ||= Time.zone
     # Set time period
     @period ||= params[:period]
     if @period == "custom"
       if params[:start_time].present?
         @start_time = TimeParser.parse(params[:start_time], @timezone)
-        @end_time = TimeParser.parse(params[:end_time], @timezone) || Time.current
-
-        @start_time, @end_time = @end_time, @start_time if @start_time > @end_time
+        @end_time = TimeParser.parse(params[:end_time], @timezone) || latest_period_date
+        if @start_time > @end_time
+          new_end_time = @start_time
+          @start_time = @end_time
+          @end_time = new_end_time
+        end
       else
         set_time_range_from_period
       end
@@ -28,9 +31,8 @@ module SetPeriod
     else
       set_time_range_from_period
     end
-
     # Add this render_chart in here so we don't have to define it in all the controllers
-    @render_chart = ActiveRecord::Type::Boolean.new.cast(params[:render_chart].to_s.strip)
+    @render_chart = InputNormalizer.boolean(params[:render_chart])
     @time_range = @start_time..@end_time
   end
 
@@ -58,8 +60,9 @@ module SetPeriod
       @end_time = Time.current.beginning_of_day + 1.week
     when "all"
       @start_time = earliest_period_date
+      @end_time = latest_period_date
     end
-    @end_time ||= latest_period_date
+    @end_time ||= Time.current
   end
 
   # Separate method so it can be overridden on per controller basis
@@ -67,9 +70,22 @@ module SetPeriod
     "all"
   end
 
-  # Separate method so it can be overriden
+  # Separate method so it can be overriden, specifically in invoices
   def latest_period_date
     Time.current
+  end
+
+  def earliest_organization_period_date
+    return nil if current_organization.blank?
+    start_time = current_organization.created_at - 6.months
+    start_time = Time.current - 1.year if start_time > (Time.current - 1.year)
+    start_time
+  end
+
+  # Separate method so it can be overridden on per controller basis
+  # Copied
+  def earliest_period_date
+    earliest_organization_period_date || DEFAULT_EARLIEST_TIME
   end
 
   def set_timezone
@@ -89,9 +105,5 @@ module SetPeriod
     end
 
     @timezone ||= TimeParser::DEFAULT_TIME_ZONE
-  end
-
-  def earliest_period_date
-    DEFAULT_EARLIEST_TIME
   end
 end
