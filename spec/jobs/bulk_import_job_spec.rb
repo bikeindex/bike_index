@@ -58,6 +58,9 @@ RSpec.describe BulkImportJob, type: :job do
     end
     context "erroring" do
       let!(:color) { FactoryBot.create(:color, name: "White") }
+      before do
+        allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+      end
       after { tempfile.close && tempfile.unlink }
 
       def bike_matches_target(bike)
@@ -80,7 +83,6 @@ RSpec.describe BulkImportJob, type: :job do
           ]
         end
         it "registers bike, adds row that is an error" do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
           expect {
             instance.perform(bulk_import.id)
           }.to change(Bike, :count).by 1
@@ -101,7 +103,6 @@ RSpec.describe BulkImportJob, type: :job do
           ]
         end
         it "stores error line, resumes post errored line successfully" do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
           # It should throw an error and not create a bike
           expect {
             expect { instance.perform(bulk_import.id) }.to raise_error(CSV::MalformedCSVError)
@@ -122,6 +123,25 @@ RSpec.describe BulkImportJob, type: :job do
           # And make sure it hasn't updated the file_errors
           expect(bulk_import.file_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
           expect(bulk_import.progress).to eq "finished"
+        end
+      end
+      context "CSV file exceeds maximum size" do
+        let(:csv_lines) do
+          lines = [%w[manufacturer model year color owner_email serial_number]]
+          12_000.times do |i|
+            lines << ["", "", "", "", "", ""]
+          end
+          lines
+        end
+
+        it "adds file error when file has more than allowed lines" do
+          # expect do
+            instance.perform(bulk_import.id)
+          # end.to change(Bike, :count).by 0
+
+          bulk_import.reload
+          expect(bulk_import.progress).to eq "finished"
+          expect(bulk_import.file_errors.join('')).to match("CSV is too big! Max allowed size 14000 lines")
         end
       end
     end

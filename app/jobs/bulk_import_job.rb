@@ -1,6 +1,7 @@
 require "csv"
 
 class BulkImportJob < ApplicationJob
+  MAX_LINES = 11_000
   sidekiq_options retry: false
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
@@ -8,6 +9,16 @@ class BulkImportJob < ApplicationJob
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
     return true if @bulk_import.ascend? && !@bulk_import.check_ascend_import_processable!
+    return true if @bulk_import.finished? # Exit early if already finished
+
+    # Check file size before processing
+    open_file = @bulk_import.open_file
+
+    line_count = count_file_lines(open_file)
+    if line_count > MAX_LINES
+      return @bulk_import.add_file_error("CSV is too big! Max allowed size #{MAX_LINES - 1000} lines")
+    end
+
     process_csv(@bulk_import.open_file)
 
     @bulk_import.progress = "finished"
@@ -138,6 +149,13 @@ class BulkImportJob < ApplicationJob
   end
 
   private
+
+  def count_file_lines(file)
+    line_count = 0
+    file.each_line { line_count += 1 }
+    file.rewind # Reset file position for subsequent reading
+    line_count
+  end
 
   def validate_headers(attrs)
     required_headers = if @bulk_import.impounded?
