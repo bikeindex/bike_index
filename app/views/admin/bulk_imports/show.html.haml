@@ -38,12 +38,12 @@
       %tr
         %td Send email?
         %td
-          = check_mark if @bulk_import.send_email
+          = @bulk_import.send_email ? check_mark : cross_mark
           %small.less-strong Email is sent by default
       %tr
         %td No dupe
         %td
-          = check_mark if @bulk_import.send_email
+          = @bulk_import.send_email ? check_mark : cross_mark
           %small.less-strong Only true by default for Ascend
 
   .col-sm-6
