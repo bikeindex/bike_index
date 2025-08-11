@@ -44,6 +44,7 @@ class BulkImport < ApplicationRecord
   scope :not_ascend, -> { where.not(kind: "ascend") }
 
   before_save :set_calculated_attributes
+  after_commit :enqueue_job, on: :create
 
   def self.ascend_api_token
     ENV["ASCEND_API_TOKEN"]
@@ -219,6 +220,10 @@ class BulkImport < ApplicationRecord
   rescue => e
     add_file_error(e.message)
     raise e
+  end
+
+  def enqueue_job
+    BulkImportJob.perform_async(id) if persisted?
   end
 
   private

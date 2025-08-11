@@ -20,7 +20,7 @@ class Admin::BulkImportsController < Admin::BaseController
 
   def update
     if params[:reprocess]
-      BulkImportJob.perform_async(@bulk_import.id)
+      @bulk_import.enqueue_job
       flash[:success] = "Bulk Import enqueued for processing"
     else
       flash[:error] = "Ooooops, can't do that, how the hell did you manage to?"
@@ -31,7 +31,6 @@ class Admin::BulkImportsController < Admin::BaseController
   def create
     @bulk_import = BulkImport.new(permitted_parameters.merge(user_id: current_user.id))
     if @bulk_import.save
-      BulkImportJob.perform_async(@bulk_import.id)
       flash[:success] = "Bulk Import created!"
       redirect_to admin_bulk_imports_url
     else

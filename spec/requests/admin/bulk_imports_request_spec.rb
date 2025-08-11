@@ -89,7 +89,8 @@ RSpec.describe Admin::BulkImportsController, type: :request do
   end
 
   describe "update" do
-    let(:bulk_import) { FactoryBot.create(:bulk_import) }
+    let!(:bulk_import) { FactoryBot.create(:bulk_import) }
+
     it "reenqueues" do
       Sidekiq::Job.clear_all
       expect {
