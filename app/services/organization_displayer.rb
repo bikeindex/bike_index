@@ -16,6 +16,7 @@ class OrganizationDisplayer
 
     def subscription_expired_alert?(organization)
       return false if organization&.invoices.blank? || organization.paid_money?
+
       organization.invoices.expired.any? do |invoice|
         invoice.was_active? && invoice.end_at > (Time.current - 3.months)
       end

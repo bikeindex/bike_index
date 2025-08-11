@@ -15,17 +15,15 @@ Ruby is formatted with the standard gem. Run `bin/lint` to automatically format 
 Code guidelines:
 
 - Code in a functional way. Avoid mutation (side effects) when you can.
-- Avoid mutating arguments
-- Avoid monkeypatching
-- Avoid using view helpers
+- Don't mutate arguments
+- Don't monkeypatch
+- Omit named arguments' values from hashes (ie prefer `{x:, y:}` instead of `{x: x, y: y}`)
 
 This project uses Rspec for tests. All business logic should be tested.
 
 - Tests should either: help make the code correct now or prevent bugs in the future. Don't add tests that don't do one of those things.
-- Use request specs, not controller specs
-- use `context` and `let` to make the differences are between tests clear
-- Don't create view specs
-
+- Use `context` and `let` to make the differences between tests clear
+- Use request specs, not controller specs. Everything making the same request should be in a single test
 
 ### Running Tests
 
