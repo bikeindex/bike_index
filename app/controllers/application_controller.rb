@@ -54,7 +54,7 @@ class ApplicationController < ActionController::Base
   end
 
   def permitted_page(max: nil)
-    page = params[:page]&.to_i
+    page = params[:page]&.to_i || 1
     page = 1 if page < 1
     max.present? ? page.clamp(1, max) : page
   end
