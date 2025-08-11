@@ -68,7 +68,9 @@ class GeocodeHelper
         [37.09024, -95.71289], # USA can't find
         [37.751, -97.822], # USA can't find
         [38.79460, -106.53484] # USA can't find also
-      ].any? { |coord| coord[0] == latitude.round(5) && coord[1] == longitude.round(5) }
+      ].any? do |coord|
+        coord[0]&.round(3) == latitude.round(3) && coord[1]&.round(3) == longitude.round(3)
+      end
     end
 
     def address_hash_from_reverse_geocode(latitude, longitude, new_attrs:)
