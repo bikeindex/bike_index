@@ -9,7 +9,7 @@ module Organized
 
     def index
       @search_bounding_box = search_bounding_box
-      @per_page = permitted_per_page(default: DEFAULT_PER_PAGE).clamp(1, ParkingNotification::MAX_PER_PAGE)
+      @per_page = permitted_per_page(default: DEFAULT_PER_PAGE, max: DEFAULT_PER_PAGE)
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         per_page: @per_page,
