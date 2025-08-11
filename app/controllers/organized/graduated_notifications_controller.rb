@@ -11,7 +11,7 @@ module Organized
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       @pagy, @graduated_notifications = pagy(available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
-        .includes(:user, :bike, :secondary_notifications), limit: @per_page)
+        .includes(:user, :bike, :secondary_notifications), limit: @per_page, page: permitted_page)
     end
 
     def show

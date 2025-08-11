@@ -5,7 +5,8 @@ class Admin::EmailBansController < Admin::BaseController
     @per_page = params[:per_page] || 50
     @pagy, @collection = pagy(
       matching_email_bans.includes(:user).reorder("email_bans.#{sort_column} #{sort_direction}"),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

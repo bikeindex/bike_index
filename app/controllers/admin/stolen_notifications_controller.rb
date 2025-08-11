@@ -7,7 +7,7 @@ class Admin::StolenNotificationsController < Admin::BaseController
     @per_page = params[:per_page] || 100
     @pagy, @stolen_notifications = pagy(searched_stolen_notifications
       .reorder("#{sort_column} #{sort_direction}")
-      .includes(:bike), limit: @per_page)
+      .includes(:bike), limit: @per_page, page: permitted_page)
   end
 
   def resend

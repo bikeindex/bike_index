@@ -5,7 +5,7 @@ class Admin::BParamsController < Admin::BaseController
     @per_page = params[:per_page] || 25
     @pagy, @b_params = pagy(matching_b_params
       .includes(:creator, :organization)
-      .reorder("b_params.#{sort_column} #{sort_direction}"), limit: @per_page)
+      .reorder("b_params.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def show

@@ -4,7 +4,7 @@ class Admin::ParkingNotificationsController < Admin::BaseController
   def index
     @per_page = params[:per_page] || 50
     @pagy, @parking_notifications = pagy(matching_parking_notifications.includes(:user, :organization, :bike)
-      .order(sort_column + " " + sort_direction), limit: @per_page)
+      .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_parking_notifications

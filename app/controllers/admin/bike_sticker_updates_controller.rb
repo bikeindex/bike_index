@@ -6,7 +6,7 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
     @pagy, @bike_sticker_updates =
       pagy(matching_bike_sticker_updates
         .reorder("bike_sticker_updates.#{sort_column} #{sort_direction}")
-        .includes(:organization, :user, :bike), limit: @per_page)
+        .includes(:organization, :user, :bike), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_bike_sticker_updates

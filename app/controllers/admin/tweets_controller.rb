@@ -7,7 +7,7 @@ class Admin::TweetsController < Admin::BaseController
     @per_page = params[:per_page] || 50
     @pagy, @tweets = pagy(matching_tweets
       .includes(:twitter_account, :public_images, :stolen_record, :retweets, :original_tweet)
-      .reorder(sort_column + " " + sort_direction), limit: @per_page)
+      .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def show

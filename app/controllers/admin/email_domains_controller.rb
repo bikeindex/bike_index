@@ -8,7 +8,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   def index
     @per_page = params[:per_page] || 25
 
-    @pagy, @email_domains = pagy(ordered_email_domains, limit: @per_page)
+    @pagy, @email_domains = pagy(ordered_email_domains, limit: @per_page, page: permitted_page)
   end
 
   def new

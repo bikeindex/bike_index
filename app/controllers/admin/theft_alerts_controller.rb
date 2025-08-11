@@ -7,7 +7,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     @per_page = params[:per_page] || 25
     @pagy, @theft_alerts =
       pagy(searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
-        .includes(:theft_alert_plan, :stolen_record), limit: @per_page)
+        .includes(:theft_alert_plan, :stolen_record), limit: @per_page, page: permitted_page)
     @page_title = "Admin | Promoted alerts"
     @location_counts = InputNormalizer.boolean(params[:search_location_counts])
   end

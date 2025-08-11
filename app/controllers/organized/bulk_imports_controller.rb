@@ -10,7 +10,7 @@ module Organized
     def index
       params[:per_page] || 25
       @pagy, @bulk_imports = pagy(available_bulk_imports.includes(:ownerships)
-        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page)
+        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1
     end
 
@@ -21,7 +21,7 @@ module Organized
         redirect_to(organization_bulk_imports_path(organization_id: current_organization.to_param)) && return
       end
       @per_page = params[:per_page] || 25
-      @pagy, @bikes = pagy(@bulk_import.bikes.order(created_at: :desc), limit: @per_page)
+      @pagy, @bikes = pagy(@bulk_import.bikes.order(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def new

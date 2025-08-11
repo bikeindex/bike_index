@@ -35,7 +35,7 @@ module Organized
         else
           organization_bikes.where(created_at: @time_range)
         end
-        @pagy, @bikes = pagy(@available_bikes.order("bikes.created_at desc"), limit: @per_page)
+        @pagy, @bikes = pagy(@available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
       end
     end
 
@@ -50,7 +50,7 @@ module Organized
       recovered_records = @search_only_organization ? current_organization.recovered_records : current_organization.nearby_recovered_records
 
       @matching_recoveries = recovered_records.where(recovered_at: @time_range)
-      @pagy, @recoveries = pagy(@matching_recoveries.reorder(recovered_at: :desc), limit: @per_page)
+      @pagy, @recoveries = pagy(@matching_recoveries.reorder(recovered_at: :desc), limit: @per_page, page: permitted_page)
       # When selecting through the organization bikes, it fails. Lazy solution: Don't permit doing that ;)
       @render_chart = !@search_only_organization && InputNormalizer.boolean(params[:render_chart])
     end
@@ -63,7 +63,7 @@ module Organized
       b_params = b_params.email_search(params[:query]) if params[:query].present?
 
       @b_params_total = incompletes_sorted(b_params.where(created_at: @time_range))
-      @pagy, @b_params = pagy(@b_params_total, limit: @per_page)
+      @pagy, @b_params = pagy(@b_params_total, limit: @per_page, page: permitted_page)
     end
 
     def resend_incomplete_email
@@ -232,7 +232,7 @@ module Organized
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
-      @pagy, @bikes = pagy(@available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
+      @pagy, @bikes = pagy(@available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end

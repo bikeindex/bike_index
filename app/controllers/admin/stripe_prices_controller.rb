@@ -5,7 +5,8 @@ class Admin::StripePricesController < Admin::BaseController
     @per_page = params[:per_page] || 50
     @pagy, @collection = pagy(
       matching_stripe_prices.reorder("stripe_prices.#{sort_column} #{sort_direction}"),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

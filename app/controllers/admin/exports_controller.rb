@@ -7,6 +7,6 @@ class Admin::ExportsController < Admin::BaseController
       Export.all
     end
     @pagy, @exports = pagy(exports.includes(:organization, :user).order(created_at: :desc),
-      limit: @per_page)
+      limit: @per_page, page: permitted_page)
   end
 end

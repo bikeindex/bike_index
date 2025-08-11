@@ -10,7 +10,8 @@ class Admin::OrganizationRolesController < Admin::BaseController
     @per_page = params[:per_page] || 50
     @pagy, @collection = pagy(
       matching_organization_roles.includes(:user, :sender, :organization).reorder("organization_roles.#{sort_column} #{sort_direction}"),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

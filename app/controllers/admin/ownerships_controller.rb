@@ -6,7 +6,7 @@ class Admin::OwnershipsController < Admin::BaseController
   def index
     @per_page = params[:per_page] || 50
     @pagy, @ownerships = pagy(matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
-      .includes(:bike, :organization, :creator, :user), limit: @per_page)
+      .includes(:bike, :organization, :creator, :user), limit: @per_page, page: permitted_page)
   end
 
   def edit

@@ -8,7 +8,8 @@ class Admin::ImpoundClaimsController < Admin::BaseController
     @pagy, @impound_claims = pagy(
       matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
         .order(sort_column + " " + sort_direction),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

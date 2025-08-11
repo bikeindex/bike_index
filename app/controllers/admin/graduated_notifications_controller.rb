@@ -4,7 +4,7 @@ class Admin::GraduatedNotificationsController < Admin::BaseController
   def index
     @per_page = params[:per_page] || 50
     @pagy, @graduated_notifications = pagy(matching_graduated_notifications.includes(:user, :organization, :bike)
-      .order(sort_column + " " + sort_direction), limit: @per_page)
+      .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_graduated_notifications

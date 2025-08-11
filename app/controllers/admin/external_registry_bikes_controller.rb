@@ -7,7 +7,7 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
     @per_page = params[:page] || 100
     @pagy, @bikes =
       pagy(matching_bikes
-        .reorder("external_registry_bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
+        .reorder("external_registry_bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def show

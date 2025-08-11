@@ -6,7 +6,7 @@ class Admin::MailSnippetsController < Admin::BaseController
   def index
     @per_page = params[:per_page] || 25
     @pagy, @mail_snippets = pagy(matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
-      .includes(:organization), limit: @per_page)
+      .includes(:organization), limit: @per_page, page: permitted_page)
   end
 
   def show

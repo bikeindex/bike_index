@@ -6,7 +6,7 @@ class Admin::ModelAttestationsController < Admin::BaseController
     @pagy, @model_attestations =
       pagy(matching_model_attestations
         .includes(:model_audit, :user, :organization)
-        .reorder("model_attestations.#{sort_column} #{sort_direction}"), limit: @per_page)
+        .reorder("model_attestations.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_model_attestations

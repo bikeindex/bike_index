@@ -7,7 +7,8 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
     @search_show_count = InputNormalizer.boolean(params[:search_show_count])
     @pagy, @collection = pagy(
       matching_primary_activities.includes(:primary_activity_family).reorder("primary_activities.#{sort_column} #{sort_direction}"),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

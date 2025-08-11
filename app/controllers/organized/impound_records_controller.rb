@@ -10,7 +10,7 @@ module Organized
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       @pagy, @impound_records = pagy(available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-        .includes(:user, :bike, :location), limit: @per_page)
+        .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
     end
 
     def show

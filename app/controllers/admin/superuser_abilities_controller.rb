@@ -6,7 +6,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   def index
     @per_page = params[:per_page] || 50
     @pagy, @superuser_abilities = pagy(searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
-      .includes(:user), limit: @per_page)
+      .includes(:user), limit: @per_page, page: permitted_page)
   end
 
   def edit

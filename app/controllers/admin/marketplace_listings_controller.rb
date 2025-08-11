@@ -6,7 +6,8 @@ class Admin::MarketplaceListingsController < Admin::BaseController
     @pagy, @collection = pagy(
       matching_marketplace_listings.includes(:seller, :item, :buyer, :address_record)
         .reorder("marketplace_listings.#{sort_column} #{sort_direction}"),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

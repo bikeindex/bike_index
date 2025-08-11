@@ -8,14 +8,15 @@ class Admin::BikesController < Admin::BaseController
     @per_page = params[:per_page] || 100
 
     @pagy, @bikes = pagy(available_bikes.includes(:creation_organization, :current_ownership, :paint)
-      .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
+      .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def missing_manufacturer
     @per_page = params[:per_page] || 100
     @pagy, @bikes = pagy(
       missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 
@@ -44,7 +45,7 @@ class Admin::BikesController < Admin::BaseController
     end
     @per_page = params[:per_page] || 25
     @duplicate_groups_count = duplicate_groups.size
-    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page)
+    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page, page: permitted_page)
   end
 
   def ignore_duplicate_toggle

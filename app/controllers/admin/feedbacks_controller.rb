@@ -5,7 +5,7 @@ class Admin::FeedbacksController < Admin::BaseController
     params[:page] || 1
     @per_page = params[:per_page] || 50
     @pagy, @feedbacks = pagy(available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}"),
-      limit: @per_page)
+      limit: @per_page, page: permitted_page)
     @render_kind_counts = InputNormalizer.boolean(params[:search_kind_counts])
   end
 

@@ -8,7 +8,7 @@ class Admin::UsersController < Admin::BaseController
     @per_page = params[:per_page] || 25
     @pagy, @users = pagy(matching_users.reorder("users.#{sort_column} #{sort_direction}")
       .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :organization_roles, :ambassador_tasks, :email_bans_active),
-      limit: @per_page)
+      limit: @per_page, page: permitted_page)
   end
 
   def show

@@ -12,7 +12,7 @@ class Admin::OrganizationsController < Admin::BaseController
       matching_organizations
         .reorder("organizations.#{sort_column} #{sort_direction}")
     end
-    @pagy, @organizations = pagy(organizations, limit: @per_page)
+    @pagy, @organizations = pagy(organizations, limit: @per_page, page: permitted_page)
   end
 
   def show
@@ -20,7 +20,7 @@ class Admin::OrganizationsController < Admin::BaseController
     @deleted_organization_roles = @organization.deleted? || InputNormalizer.boolean(params[:deleted_organization_roles])
     bikes = @organization.bikes.reorder("created_at desc")
     @bikes_count = bikes.size
-    @pagy, @bikes = pagy(bikes, limit: 10)
+    @pagy, @bikes = pagy(bikes, limit: 10, page: permitted_page)
   end
 
   def show_deleted

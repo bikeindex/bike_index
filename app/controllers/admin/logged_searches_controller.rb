@@ -6,7 +6,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
     @pagy, @logged_searches =
       pagy(matching_logged_searches
         .reorder("logged_searches.#{sort_column} #{sort_direction}")
-        .includes(:organization, :user), limit: @per_page)
+        .includes(:organization, :user), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_logged_searches, :special_endpoints

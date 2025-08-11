@@ -8,7 +8,7 @@ class Admin::BulkImportsController < Admin::BaseController
     @per_page = params[:per_page] || 10
     @org_count = InputNormalizer.boolean(params[:search_org_count])
     @pagy, @bulk_imports = pagy(matching_bulk_imports.includes(:organization, :user, :ownerships)
-      .reorder(sort_column + " " + sort_direction), limit: @per_page)
+      .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def show

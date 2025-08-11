@@ -137,7 +137,7 @@ class Admin::BikeStickersController < Admin::BaseController
   def scoped_bike_stickers(stickers)
     @per_page = params[:per_page] || 25
     pagy(stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
-      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike), limit: @per_page)
+      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike), limit: @per_page, page: permitted_page)
   end
 
   def permitted_parameters

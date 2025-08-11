@@ -6,7 +6,7 @@ class Admin::InvoicesController < Admin::BaseController
     @pagy, @invoices =
       pagy(matching_invoices
         .includes(:organization, :payments, :organization_features, :first_invoice)
-        .reorder(sort_column + " " + sort_direction), limit: @per_page)
+        .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_invoices
