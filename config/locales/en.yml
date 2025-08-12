@@ -4705,7 +4705,7 @@ en:
         sent_to_a_new_owner: "(sent to a new owner)"
     exports:
       index:
-        bikes_in_export: Registrations in export
+        bikes_in_export: Bikes in export
         created: Created
         creator: Creator
         delete: Delete
