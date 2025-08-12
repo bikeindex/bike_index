@@ -6,10 +6,12 @@
     %em.small.less-strong
       - if bulk_import.failed_timeout?
         Processing timed out
-        - if display_dev_info?
-          %small.only-dev-visible currently #{bulk_import.progress}
       - else
         could not import, blocking error
+    - if bulk_import.failed_timeout? && display_dev_info?
+      %small.only-dev-visible
+        currently
+        %code= bulk_import.progress
 - else
   - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
   %span{class: bulk_import_progress_class}
