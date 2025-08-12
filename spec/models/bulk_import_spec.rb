@@ -159,7 +159,7 @@ RSpec.describe BulkImport, type: :model do
       VCR.use_cassette("bulk_import-open_file") do
         tempfile = bulk_import.open_file
         expect(tempfile).to be_an_instance_of(Tempfile)
-        expect(bulk_import.tempfile).to eq tempfile
+        expect(bulk_import.unlink_tempfile).to be_truthy
       end
     end
   end

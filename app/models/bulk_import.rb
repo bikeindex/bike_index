@@ -166,9 +166,10 @@ class BulkImport < ApplicationRecord
   end
 
   def unlink_tempfile
-    return if tempfile.blank?
+    return if @tempfile.blank?
 
-    tempfile.close && tempfile.unlink
+    @tempfile.close && @tempfile.unlink && @tempfile = nil
+    true
   end
 
   def check_ascend_import_processable!
@@ -237,10 +238,6 @@ class BulkImport < ApplicationRecord
 
   def fetch_tempfile
     @tempfile ||= Down.download(file.url)
-  end
-
-  def tempfile
-    @tempfile
   end
 
   def calculated_kind
