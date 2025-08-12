@@ -55,17 +55,13 @@
           %td
             = bulk_import.kind_humanized
         %td
-          - if bulk_import.blocking_error?
-            %span.text-danger
-              = t(".unable_to_process")
-          - else
-            = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
+          = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
         %td
           = render partial: "/organized/bulk_imports/error_type", locals: {bulk_import: bulk_import}
         %td
           = bulk_import.user.display_name if bulk_import.user_id.present?
         %td
-          = bulk_import.ownerships.count # Don't need to do bikes through ownerships
+          = admin_number_display(bulk_import.ownerships.count) # Don't need to do bikes through ownerships
 
 .pb-4.pt-4
   = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

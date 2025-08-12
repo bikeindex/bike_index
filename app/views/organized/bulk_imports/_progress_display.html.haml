@@ -4,7 +4,7 @@
     Failed
   - if show_extended
     %em.small.less-strong
-      - if bulk_import.pending_timeout?
+      - if bulk_import.failed_timeout?
         Processing failed
         - if display_dev_info?
           %small.only-dev-visible still pending

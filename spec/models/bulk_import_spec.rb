@@ -50,18 +50,29 @@ RSpec.describe BulkImport, type: :model do
     let(:bulk_import) { BulkImport.new(import_errors: {line: [2, "dddd"]}.as_json, progress: "finished", created_at: Time.current - 1.month) }
     it "is be_falsey" do
       expect(bulk_import.blocking_error?).to be_falsey
+      expect(bulk_import.failed_timeout?).to be_falsey
     end
     context "file error" do
       let(:bulk_import) { BulkImport.new(import_errors: {file: "dddd"}.as_json) }
       it "is be_falsey" do
         expect(bulk_import.blocking_error?).to be_truthy
+        expect(bulk_import.failed_timeout?).to be_falsey
       end
     end
-    context "pending and more than a minute old" do
+    context "pending and more than a few minutes old" do
       let(:bulk_import) { BulkImport.new(created_at: Time.current - 10.minutes, progress: "pending") }
       it "is truthy" do
         # Fallback because we failed to parse it
         expect(bulk_import.blocking_error?).to be_truthy
+        expect(bulk_import.failed_timeout?).to be_truthy
+      end
+    end
+    context "ongoing and more than 20 minutes old" do
+      let(:bulk_import) { BulkImport.new(created_at: Time.current - 30.minutes, progress: "ongoing") }
+      it "is truthy" do
+        # Fallback because we failed to parse it
+        expect(bulk_import.blocking_error?).to be_truthy
+        expect(bulk_import.failed_timeout?).to be_truthy
       end
     end
   end
