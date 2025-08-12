@@ -94,7 +94,7 @@
                   = link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "em less-strong"
             %td
               = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
-              - if bulk_import.failed_timeout?
+              - if bulk_import.timeout_failure?
                 %em.small import failed to process
                 %small.only-dev-visible still pending
             %td

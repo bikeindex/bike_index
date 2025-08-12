@@ -4,11 +4,11 @@
     Failed
   - if show_extended
     %em.small.less-strong
-      - if bulk_import.failed_timeout?
+      - if bulk_import.timeout_failure?
         Processing timed out
       - else
         could not import, blocking error
-    - if bulk_import.failed_timeout? && display_dev_info?
+    - if bulk_import.timeout_failure? && display_dev_info?
       %small.only-dev-visible
         currently
         %code= bulk_import.progress

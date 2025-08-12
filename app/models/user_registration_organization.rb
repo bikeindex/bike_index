@@ -117,7 +117,7 @@ class UserRegistrationOrganization < ApplicationRecord
   def create_or_update_bike_organizations
     return true unless all_bikes # only overrides bike_organizations if all_bikes is checked
     # Only update the most recent bikes.
-    # This is particularly important when bulk importing a bunch of bikes to a single user
+    # This is particularly important when bulk importing thousands of bikes to a single user
     bikes.order(id: :desc).limit(100).pluck(:id).each do |bike_id|
       BikeOrganization.unscoped
         .where(organization_id:, bike_id:).first_or_initialize

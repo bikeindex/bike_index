@@ -20,6 +20,7 @@ class BulkImportJob < ApplicationJob
     end
 
     process_csv(open_file)
+
     @bulk_import.unlink_tempfile
     @bulk_import.progress = "finished"
     return @bulk_import.save unless @line_errors.any?
