@@ -4388,7 +4388,6 @@ nl:
     bulk_imports:
       index:
         added: Toegevoegd
-        bikes: Bikes
         creator: Schepper
         errors: fouten
         exclude_empty_imports: Lege invoer uitsluiten
@@ -4397,8 +4396,8 @@ nl:
         org_ascend_imports_html: "<em>%{org_name}</em> Importeren <em>ascenderen</em>"
         org_bulk_imports_html: "<em>%{org_name} Bulkimport</em>"
         progress: Vooruitgang
-        unable_to_process: Niet in staat te verwerken
         kind: Soort
+        registrations: Registraties
       new:
         choose_file: Kies bestand...
         correct_actual_image_url_html: '<span class="text-success">Juist</span> :
@@ -4444,7 +4443,6 @@ nl:
           toegewezen.
       show:
         ascend_import: Ascending importeren
-        bikes: Bikes
         bulk_import: Bulk import
         color: Kleur
         created: Gemaakt
@@ -4462,6 +4460,7 @@ nl:
         bulk_import_impounded: In beslag genomen bulkimport
         impounded_at: In beslag genomen bij
         impounded_id: In beslag genomen identiteitsbewijs
+        registrations: Registraties
       error_type:
         file: file
         line: Lijn

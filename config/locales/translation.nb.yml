@@ -4911,7 +4911,6 @@ nb:
         line: Linje
       index:
         added: La til
-        bikes: Sykler
         creator: Skaper
         errors: Feil
         exclude_empty_imports: Ekskluder tom import
@@ -4921,7 +4920,7 @@ nb:
         org_ascend_imports_html: "<em>%{org_name}</em> Stigende import"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulkimport"
         progress: Framgang
-        unable_to_process: Kan ikke behandle
+        registrations: Registreringer
       new:
         choose_file: Velg Fil...
         correct_actual_image_url_html: '<span class="text-success">Riktig</span> :
@@ -4963,7 +4962,6 @@ nb:
           vil ikke importen fungere.
       show:
         ascend_import: Ascend import
-        bikes: Sykler
         bulk_import: Masseimport
         bulk_import_impounded: Beslaglagt bulkimport
         color: Farge
@@ -4981,6 +4979,7 @@ nb:
         progress: Framgang
         sent_to: Sendt til
         sent_to_a_new_owner: "(sendt til ny eier)"
+        registrations: Registreringer
     exports:
       index:
         bikes_in_export: Sykler på eksport

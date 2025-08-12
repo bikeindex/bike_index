@@ -20,7 +20,7 @@ class BulkImport < ApplicationRecord
   PROGRESS_ENUM = {pending: 0, ongoing: 1, finished: 2}.freeze
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
   VALID_FILE_EXTENSIONS = %(csv tsv).freeze
-  PENDING_TIMEOUT = 15.minutes
+  TIMEOUT_FAILURE_DELAY = 20.minutes.freeze
   mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
@@ -36,8 +36,9 @@ class BulkImport < ApplicationRecord
   scope :file_errors, -> { where("(import_errors -> 'file') IS NOT NULL") }
   scope :line_errors, -> { where("(import_errors -> 'line') IS NOT NULL") }
   scope :ascend_errors, -> { where("(import_errors -> 'ascend') IS NOT NULL") }
-  scope :pending_timeout, -> { pending.where("created_at < ?", Time.current - PENDING_TIMEOUT) }
-  scope :import_errors, -> { file_errors.or(line_errors).or(pending_timeout) }
+  # NOTE: the timeout_failure? method is slightly different - it has a shorter timeout for pending status
+  scope :timeout_failure, -> { not_finished.where("created_at < ?", Time.current - TIMEOUT_FAILURE_DELAY) }
+  scope :import_errors, -> { file_errors.or(line_errors).or(timeout_failure) }
   scope :no_import_errors, -> { where("(import_errors -> 'line') IS NULL").where("(import_errors -> 'file') IS NULL") }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') IS NOT NULL") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') IS NOT NULL") }
@@ -93,16 +94,16 @@ class BulkImport < ApplicationRecord
     line_errors.present? || file_errors.present? || ascend_errors.present?
   end
 
-  def pending_timeout?
-    return false unless pending? && created_at.present?
-    # If there are some ownerships created, give it more time before pronouncing timed out
-    # doesn't match the scope exactly, the scope just matches PENDING_TIMEOUT
-    timeout = ownerships.any? ? PENDING_TIMEOUT : 5.minutes
+  def timeout_failure?
+    return false if finished? || created_at.blank?
+    # If pending, fail if older than 5 minutes (it should have started processing by then!)
+    # Doesn't match the scope exactly, which just uses TIMEOUT_FAILURE_DELAY
+    timeout = pending? ? 5.minutes : TIMEOUT_FAILURE_DELAY
     created_at < Time.current - timeout
   end
 
   def blocking_error?
-    ascend_errors.present? || file_errors.present? || pending_timeout?
+    ascend_errors.present? || file_errors.present? || timeout_failure?
   end
 
   def no_bikes?
@@ -164,6 +165,13 @@ class BulkImport < ApplicationRecord
     file_filename.split("_-_").last.gsub(/\.\w{3,5}\z/, "")
   end
 
+  def unlink_tempfile
+    return if @tempfile.blank?
+
+    @tempfile.close && @tempfile.unlink && @tempfile = nil
+    true
+  end
+
   def check_ascend_import_processable!
     self.import_errors = (import_errors || {}).except("ascend")
     if organization_id.blank?
@@ -216,7 +224,7 @@ class BulkImport < ApplicationRecord
   # To enable stream processing, so that we aren't loading the whole file into memory all at once
   # also so we can separately deal with the header line
   def open_file
-    @open_file ||= local_file? ? File.open(file.path, "r") : URI.parse(file.url).open
+    @open_file ||= local_file? ? File.open(file.path, "r") : fetch_tempfile
   rescue => e
     add_file_error(e.message)
     raise e
@@ -227,6 +235,10 @@ class BulkImport < ApplicationRecord
   end
 
   private
+
+  def fetch_tempfile
+    @tempfile ||= Down.download(file.url)
+  end
 
   def calculated_kind
     return "unorganized" if organization_id.blank?
