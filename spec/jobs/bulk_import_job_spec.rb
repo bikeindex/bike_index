@@ -141,7 +141,7 @@ RSpec.describe BulkImportJob, type: :job do
 
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
-          expect(bulk_import.file_errors.join('')).to match("CSV is too big! Max allowed size is 10000 lines")
+          expect(bulk_import.file_errors.join("")).to match("CSV is too big! Max allowed size is 10000 lines")
         end
       end
     end
@@ -201,7 +201,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect {
             instance.perform(bulk_import.id)
             # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-            pp "Error line: valid file", bulk_import.import_errors if bulk_import.reload.blocking_error?
+            pp "Error valid file", bulk_import.import_errors if bulk_import.reload.blocking_error?
           }.to change(Bike, :count).by 2
           expect(PublicImage.count).to eq 1
           bulk_import.reload
@@ -277,7 +277,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-              pp "Error line: 259", bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error no_duplicate", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
           end
           # It doesn't duplicate if no duplicate is true
@@ -382,7 +382,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101
-              pp "Error line: 364", bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error valid file impounded", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
             bulk_import.reload
             expect(bulk_import.progress).to eq "finished"
@@ -578,7 +578,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(Bike.count).to eq 0
           new_bike = instance.register_bike(instance.row_to_b_param_hash(passed_row))
           # This test is being flaky! Add debug printout #2101
-          pp "Error line: 560", new_bike.errors if new_bike.errors.any?
+          pp "Error expect_registered_bike", new_bike.errors if new_bike.errors.any?
           expect(Bike.count).to eq 1
           bike = Bike.last
 
