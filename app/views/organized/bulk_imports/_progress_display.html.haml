@@ -5,9 +5,9 @@
   - if show_extended
     %em.small.less-strong
       - if bulk_import.failed_timeout?
-        Processing failed
+        Processing timed out
         - if display_dev_info?
-          %small.only-dev-visible still pending
+          %small.only-dev-visible currently #{bulk_import.progress}
       - else
         could not import, blocking error
 - else
