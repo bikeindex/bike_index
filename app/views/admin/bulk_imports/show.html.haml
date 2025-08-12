@@ -95,7 +95,7 @@
   = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary float-right"
 
 %h2.mt-4
-  Bikes - #{@bulk_import.bikes.count}
+  Bikes - #{admin_number_display(@bulk_import.bikes.count)}
   - if @bulk_import.bikes.count > 25
     %small
       Last 25 shown
@@ -105,4 +105,4 @@
           = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
           for paginated list
 
-= render partial: "/admin/bikes/table", locals: { bikes: @bulk_import.bikes.reorder(created_at: :desc).limit(25) }
+= render partial: "/admin/bikes/table", locals: { bikes: @bulk_import.bikes.reorder(id: :desc).limit(25) }

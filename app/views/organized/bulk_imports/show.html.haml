@@ -49,13 +49,13 @@
   %h2= t(".errors")
   - if @bulk_import.import_errors.present?
     = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
-  %hr
+  %hr.tw:mt-4
 
-.paginate-container
-  %h2.uncap.float-left{ style: "margin-top: 28px;" }
+.tw:flex.tw:flex-wrap.tw:justify-between.tw:mt-4.tw:mb-4
+  %h2.uncap
     = t(".bikes")
     %small
-      = @pagy.count
+      = admin_number_display @pagy.count
   .pt-4.pb-4
     = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
 

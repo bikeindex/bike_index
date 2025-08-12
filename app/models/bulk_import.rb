@@ -20,6 +20,7 @@ class BulkImport < ApplicationRecord
   PROGRESS_ENUM = {pending: 0, ongoing: 1, finished: 2}.freeze
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
   VALID_FILE_EXTENSIONS = %(csv tsv).freeze
+  PENDING_TIMEOUT = 15.minutes
   mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
@@ -35,13 +36,15 @@ class BulkImport < ApplicationRecord
   scope :file_errors, -> { where("(import_errors -> 'file') IS NOT NULL") }
   scope :line_errors, -> { where("(import_errors -> 'line') IS NOT NULL") }
   scope :ascend_errors, -> { where("(import_errors -> 'ascend') IS NOT NULL") }
-  scope :import_errors, -> { file_errors.or(line_errors) }
+  scope :pending_timeout, -> { pending.where("created_at < ?", Time.current - PENDING_TIMEOUT) }
+  scope :import_errors, -> { file_errors.or(line_errors).or(pending_timeout) }
   scope :no_import_errors, -> { where("(import_errors -> 'line') IS NULL").where("(import_errors -> 'file') IS NULL") }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') IS NOT NULL") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') IS NOT NULL") }
   scope :not_ascend, -> { where.not(kind: "ascend") }
 
   before_save :set_calculated_attributes
+  after_commit :enqueue_job, on: :create
 
   def self.ascend_api_token
     ENV["ASCEND_API_TOKEN"]
@@ -90,9 +93,16 @@ class BulkImport < ApplicationRecord
     line_errors.present? || file_errors.present? || ascend_errors.present?
   end
 
+  def pending_timeout?
+    return false unless pending? && created_at.present?
+    # If there are some ownerships created, give it more time before pronouncing timed out
+    # doesn't match the scope exactly, the scope just matches PENDING_TIMEOUT
+    timeout = ownerships.any? ? PENDING_TIMEOUT : 5.minutes
+    created_at < Time.current - timeout
+  end
+
   def blocking_error?
-    ascend_errors.present? || file_errors.present? ||
-      pending? && created_at && created_at < Time.current - 5.minutes
+    ascend_errors.present? || file_errors.present? || pending_timeout?
   end
 
   def no_bikes?
@@ -210,6 +220,10 @@ class BulkImport < ApplicationRecord
   rescue => e
     add_file_error(e.message)
     raise e
+  end
+
+  def enqueue_job
+    BulkImportJob.perform_async(id) if persisted?
   end
 
   private

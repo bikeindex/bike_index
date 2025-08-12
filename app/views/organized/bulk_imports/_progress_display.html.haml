@@ -4,7 +4,12 @@
     Failed
   - if show_extended
     %em.small.less-strong
-      could not import, blocking error
+      - if bulk_import.pending_timeout?
+        Processing failed
+        - if display_dev_info?
+          %small.only-dev-visible still pending
+      - else
+        could not import, blocking error
 - else
   - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
   %span{class: bulk_import_progress_class}
