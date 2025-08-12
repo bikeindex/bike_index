@@ -4397,7 +4397,6 @@ nl:
         org_ascend_imports_html: "<em>%{org_name}</em> Importeren <em>ascenderen</em>"
         org_bulk_imports_html: "<em>%{org_name} Bulkimport</em>"
         progress: Vooruitgang
-        unable_to_process: Niet in staat te verwerken
         kind: Soort
       new:
         choose_file: Kies bestand...

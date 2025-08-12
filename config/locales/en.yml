@@ -4639,7 +4639,6 @@ en:
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
         progress: Progress
-        unable_to_process: Unable to process
       new:
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:

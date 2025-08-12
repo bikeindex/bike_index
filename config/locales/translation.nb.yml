@@ -4921,7 +4921,6 @@ nb:
         org_ascend_imports_html: "<em>%{org_name}</em> Stigende import"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulkimport"
         progress: Framgang
-        unable_to_process: Kan ikke behandle
       new:
         choose_file: Velg Fil...
         correct_actual_image_url_html: '<span class="text-success">Riktig</span> :
