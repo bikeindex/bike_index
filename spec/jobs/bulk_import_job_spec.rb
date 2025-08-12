@@ -135,13 +135,13 @@ RSpec.describe BulkImportJob, type: :job do
         end
 
         it "adds file error when file has more than allowed lines" do
-          # expect do
+          expect do
             instance.perform(bulk_import.id)
-          # end.to change(Bike, :count).by 0
+          end.to change(Bike, :count).by 0
 
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
-          expect(bulk_import.file_errors.join('')).to match("CSV is too big! Max allowed size 14000 lines")
+          expect(bulk_import.file_errors.join('')).to match("CSV is too big! Max allowed size is 10000 lines")
         end
       end
     end
@@ -201,8 +201,9 @@ RSpec.describe BulkImportJob, type: :job do
           expect {
             instance.perform(bulk_import.id)
             # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-            pp "Error line: 184", bulk_import.import_errors if bulk_import.reload.blocking_error?
+            pp "Error line: valid file", bulk_import.import_errors if bulk_import.reload.blocking_error?
           }.to change(Bike, :count).by 2
+          expect(PublicImage.count).to eq 1
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
           expect(bulk_import.bikes.count).to eq 2

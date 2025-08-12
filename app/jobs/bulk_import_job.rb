@@ -16,10 +16,10 @@ class BulkImportJob < ApplicationJob
 
     line_count = count_file_lines(open_file)
     if line_count > MAX_LINES
-      return @bulk_import.add_file_error("CSV is too big! Max allowed size #{MAX_LINES - 1000} lines")
+      return @bulk_import.add_file_error("CSV is too big! Max allowed size is #{MAX_LINES - 1000} lines")
     end
 
-    process_csv(@bulk_import.open_file)
+    process_csv(open_file)
 
     @bulk_import.progress = "finished"
     return @bulk_import.save unless @line_errors.any?
