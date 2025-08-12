@@ -119,10 +119,9 @@ class UserRegistrationOrganization < ApplicationRecord
     # Only update the most recent bikes.
     # This is particularly important when bulk importing a bunch of bikes to a single user
     bikes.order(id: :desc).limit(100).pluck(:id).each do |bike_id|
-      bike_organization = BikeOrganization.unscoped
-        .where(organization_id: organization_id, bike_id: bike_id)
-        .first_or_initialize
-      bike_organization.update(deleted_at: nil, can_not_edit_claimed: can_not_edit_claimed)
+      BikeOrganization.unscoped
+        .where(organization_id:, bike_id:).first_or_initialize
+        .update(deleted_at: nil, can_not_edit_claimed:)
     end
   end
 end
