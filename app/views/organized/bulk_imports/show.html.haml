@@ -59,7 +59,7 @@
 
 .tw:flex.tw:flex-wrap.tw:justify-between.tw:mt-8.tw:mb-4
   %h2.uncap.mt-0.mb-0
-    = t(".bikes")
+    = t(".registrations")
     %small
       = admin_number_display @pagy.count
   %div= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

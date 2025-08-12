@@ -3833,7 +3833,6 @@ es:
         line:
       index:
         added:
-        bikes:
         creator:
         errors:
         exclude_empty_imports:
@@ -3843,6 +3842,7 @@ es:
         org_ascend_imports_html:
         org_bulk_imports_html:
         progress:
+        registrations:
       new:
         choose_file:
         correct_actual_image_url_html:
@@ -3868,7 +3868,6 @@ es:
         your_headers_must_match_html:
       show:
         ascend_import:
-        bikes:
         bulk_import:
         bulk_import_impounded:
         color:
@@ -3885,6 +3884,7 @@ es:
         progress:
         sent_to:
         sent_to_a_new_owner:
+        registrations:
     exports:
       index:
         bikes_in_export:
