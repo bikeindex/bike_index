@@ -165,6 +165,12 @@ class BulkImport < ApplicationRecord
     file_filename.split("_-_").last.gsub(/\.\w{3,5}\z/, "")
   end
 
+  def unlink_tempfile
+    return if tempfile.blank?
+
+    tempfile.close && tempfile.unlink
+  end
+
   def check_ascend_import_processable!
     self.import_errors = (import_errors || {}).except("ascend")
     if organization_id.blank?
@@ -217,7 +223,7 @@ class BulkImport < ApplicationRecord
   # To enable stream processing, so that we aren't loading the whole file into memory all at once
   # also so we can separately deal with the header line
   def open_file
-    @open_file ||= local_file? ? File.open(file.path, "r") : URI.parse(file.url).open
+    @open_file ||= local_file? ? File.open(file.path, "r") : fetch_tempfile
   rescue => e
     add_file_error(e.message)
     raise e
@@ -228,6 +234,14 @@ class BulkImport < ApplicationRecord
   end
 
   private
+
+  def fetch_tempfile
+    @tempfile ||= Down.download(file.url)
+  end
+
+  def tempfile
+    @tempfile
+  end
 
   def calculated_kind
     return "unorganized" if organization_id.blank?

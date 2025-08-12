@@ -145,4 +145,22 @@ RSpec.describe BulkImport, type: :model do
       end
     end
   end
+
+  describe "open_file" do
+    let(:bulk_import) { BulkImport.new }
+    let(:url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv" }
+    let(:file_stub) { Struct.new(:url, keyword_init: true).new(url:) }
+    before do
+      allow(bulk_import).to receive(:local_file?).and_return(false)
+      allow(bulk_import).to receive(:file).and_return(file_stub)
+    end
+
+    it "downloads a tempfile" do
+      VCR.use_cassette("bulk_import-open_file") do
+        tempfile = bulk_import.open_file
+        expect(tempfile).to be_an_instance_of(Tempfile)
+        expect(bulk_import.tempfile).to eq tempfile
+      end
+    end
+  end
 end
