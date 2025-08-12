@@ -42,6 +42,12 @@
       %tr
         %td Kind
         %td= @bulk_import.kind_humanized
+    - if @bulk_import.no_notify
+      %tr
+        %td notes
+        %td
+          This import did <strong>not</strong> send emails
+
 
 
 
