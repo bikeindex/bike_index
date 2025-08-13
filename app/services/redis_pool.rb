@@ -9,7 +9,9 @@ class RedisPool
     private
 
     def pool
-      @pool ||= ConnectionPool.new(timeout: 1, size: 2) { Redis.new }
+      @pool ||= ConnectionPool.new(timeout: 1, size: 2) do
+        Redis.new(url: Bikeindex::Application.config.redis_cache_url)
+      end
     end
   end
 end
