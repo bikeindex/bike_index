@@ -12,13 +12,16 @@ This will start a dev server at [http://localhost:3042](http://localhost:3042)
 
 Ruby is formatted with the standard gem. Run `bin/lint` to automatically format the code.
 
-Code guidelines:
+### Code guidelines:
 
 - Code in a functional way. Avoid mutation (side effects) when you can.
 - Don't mutate arguments
 - Don't monkeypatch
+- make methods private if possible
 - Omit named arguments' values from hashes (ie prefer `{x:, y:}` instead of `{x: x, y: y}`)
-- Make methods private if possible
+- Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
+
+## Testing
 
 This project uses Rspec for tests. All business logic should be tested.
 
@@ -32,3 +35,9 @@ This project uses Rspec for tests. All business logic should be tested.
 
 Running the entire spec suite takes too long - only run the specs for specific files. CI will run the whole test suite.
 
+Run specs with:
+
+
+```
+bundle exec rspec {FILE OR FOLDER}
+```
