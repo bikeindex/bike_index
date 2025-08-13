@@ -13,7 +13,7 @@ class Search::MarketplaceController < ApplicationController
 
     if @render_results
       @pagy, @bikes = pagy(searched_bikes.reorder("marketplace_listings.published_at DESC"),
-        limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
+        limit:, page: @page, max_pages: MAX_INDEX_PAGE)
     end
 
     respond_to do |format|
@@ -29,6 +29,10 @@ class Search::MarketplaceController < ApplicationController
   end
 
   private
+
+  def limit
+    12
+  end
 
   def permitted_scopes
     %w[for_sale for_sale_proximity].freeze
