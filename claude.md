@@ -28,8 +28,16 @@ This project uses Rspec for tests. All business logic should be tested.
 - Tests should either: help make the code correct now or prevent bugs in the future. Don't add tests that don't do one of those things.
 - Use `context` and `let` to make the differences between tests clear
 - Use request specs, not controller specs. Everything making the same request should be in a single test
+- Avoid testing private methods
+- Avoid mocking objects
 
 ### Running Tests
 
 Running the entire spec suite takes too long - only run the specs for specific files. CI will run the whole test suite.
 
+Run specs with:
+
+
+```
+bundle exec rspec {FILE OR FOLDER}
+```
