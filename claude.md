@@ -33,11 +33,34 @@ This project uses Rspec for tests. All business logic should be tested.
 
 ### Running Tests
 
-Running the entire spec suite takes too long - only run the specs for specific files. CI will run the whole test suite.
+Run tests with turbo_tests:
 
-Run specs with:
-
-
+```bash
+bundle exec turbo_tests
+# Or, to run just specific tests
+bundle exec turbo_tests {FILE OR FOLDER}
 ```
-bundle exec rspec {FILE OR FOLDER}
+
+## Frontend Development
+
+This project uses Stimulus.js for JavaScript interactivity and Tailwind CSS for styling. There are scss styles and coffeescript files, but that is all deprecated.
+
+The `bin/dev` command handles building and updating tailwind and JS.
+
+- Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`)
+- Form fields should use the `twinput` class
+- labels should use the `twlabel` class
+- basic links should use the `twlink` class
+
+This project also uses the ViewComponent gem to render components.
+
+- Prefer view components to partials
+- Generate a new view component with `rails generate component ComponentName argument1 argument2`
+- View components must initialize with keyword arguments
+
+# Initial setup
+
+```bash
+bundle install # install ruby dependencies
+bundle exec rails db:create db:migrate # create the databases
 ```
