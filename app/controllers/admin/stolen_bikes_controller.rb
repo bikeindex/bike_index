@@ -4,9 +4,9 @@ class Admin::StolenBikesController < Admin::BaseController
   helper_method :available_stolen_records
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @stolen_records = pagy(available_stolen_records.includes(:bike)
-      .reorder("stolen_records.#{sort_column} #{sort_direction}"), limit: @per_page)
+      .reorder("stolen_records.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def approve

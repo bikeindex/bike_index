@@ -27,9 +27,9 @@
           - BulkImport.progresses.each do |progress|
             = link_to progress.humanize, url_for(sortable_search_params.merge(search_progress: progress)), class: "dropdown-item #{@progress == progress ? 'active' : '' }"
       %li.nav-item
-        = link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: true)), class: "nav-link #{params[:search_ascend].present? ? 'active' : ''}"
+        = link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @only_ascend ? nil : "only_ascend")), class: "nav-link #{@only_ascend ? 'active' : ''}"
       %li.nav-item
-        = link_to "Not Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_not_ascend: true)), class: "nav-link #{params[:search_not_ascend].present? ? 'active' : ''}"
+        = link_to "Not Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @not_ascend ? nil : "not_ascend")), class: "nav-link #{@not_ascend ? 'active' : ''}"
       %li.nav-item
         = link_to "New bulk import", new_admin_bulk_import_url, class: "nav-link"
 
@@ -63,6 +63,10 @@
 
 = render partial: "/shared/admin/pagination", locals: {collection: @bulk_imports, count: matching_bulk_imports.size}
 
+-# require inline CSS setting because of caching
+- unless display_dev_info?
+  <style>.only-dev-visible {display: none !important;} </style>
+
 .full-screen-table.pt-2
   %table.table.table-striped.table-bordered.sortable.table-sm
     %thead.thead-light
@@ -90,6 +94,9 @@
                   = link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "em less-strong"
             %td
               = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
+              - if bulk_import.timeout_failure?
+                %em.small import failed to process
+                %small.only-dev-visible still pending
             %td
               = render partial: "/organized/bulk_imports/error_type", locals: {bulk_import: bulk_import}
             %td

@@ -4629,7 +4629,6 @@ en:
         line: Line
       index:
         added: Added
-        bikes: Bikes
         creator: Creator
         errors: Errors
         exclude_empty_imports: Exclude Empty imports
@@ -4639,7 +4638,7 @@ en:
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
         progress: Progress
-        unable_to_process: Unable to process
+        registrations: Registrations
       new:
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:
@@ -4686,7 +4685,6 @@ en:
           have 'serial #' as a header, the import will not work.
       show:
         ascend_import: Ascend import
-        bikes: Bikes
         bulk_import: Bulk import
         bulk_import_impounded: Impounded bulk import
         color: Color
@@ -4702,11 +4700,12 @@ en:
         manufacturer: Manufacturer
         model: Model
         progress: Progress
+        registrations: Registrations
         sent_to: Sent to
         sent_to_a_new_owner: "(sent to a new owner)"
     exports:
       index:
-        bikes_in_export: Bikes in export
+        bikes_in_export: Registrations in export
         created: Created
         creator: Creator
         delete: Delete

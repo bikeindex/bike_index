@@ -82,6 +82,8 @@
             %td
               %span.convertTime.preciseTime
                 = l(bike_sticker_update.created_at, format: :convert_time)
+              - if display_dev_info?
+                %small.code.only-dev-visible= bike_sticker_update.id
             %td
               = bike_sticker_update.creator_kind_humanized
             %td

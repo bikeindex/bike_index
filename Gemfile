@@ -69,6 +69,7 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "0.10.1" # QR Codes
 gem "inline_svg" # render SVGs inline and give them classes
+gem "down" # used to generate a local tempfile
 
 # API wrappers
 gem "twitter" # Twitter. For rendering tweets

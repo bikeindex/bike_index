@@ -50,18 +50,29 @@ RSpec.describe BulkImport, type: :model do
     let(:bulk_import) { BulkImport.new(import_errors: {line: [2, "dddd"]}.as_json, progress: "finished", created_at: Time.current - 1.month) }
     it "is be_falsey" do
       expect(bulk_import.blocking_error?).to be_falsey
+      expect(bulk_import.timeout_failure?).to be_falsey
     end
     context "file error" do
       let(:bulk_import) { BulkImport.new(import_errors: {file: "dddd"}.as_json) }
       it "is be_falsey" do
         expect(bulk_import.blocking_error?).to be_truthy
+        expect(bulk_import.timeout_failure?).to be_falsey
       end
     end
-    context "pending and more than a minute old" do
+    context "pending and more than a few minutes old" do
       let(:bulk_import) { BulkImport.new(created_at: Time.current - 10.minutes, progress: "pending") }
       it "is truthy" do
         # Fallback because we failed to parse it
         expect(bulk_import.blocking_error?).to be_truthy
+        expect(bulk_import.timeout_failure?).to be_truthy
+      end
+    end
+    context "ongoing and more than 20 minutes old" do
+      let(:bulk_import) { BulkImport.new(created_at: Time.current - 30.minutes, progress: "ongoing") }
+      it "is truthy" do
+        # Fallback because we failed to parse it
+        expect(bulk_import.blocking_error?).to be_truthy
+        expect(bulk_import.timeout_failure?).to be_truthy
       end
     end
   end
@@ -131,6 +142,24 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.organization_id).to eq organization.id
         expect(bulk_import.creator).to eq organization.auto_user
         expect(bulk_import.reload.organization_id).to be_present
+      end
+    end
+  end
+
+  describe "open_file" do
+    let(:bulk_import) { BulkImport.new }
+    let(:url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv" }
+    let(:file_stub) { Struct.new(:url, keyword_init: true).new(url:) }
+    before do
+      allow(bulk_import).to receive(:local_file?).and_return(false)
+      allow(bulk_import).to receive(:file).and_return(file_stub)
+    end
+
+    it "downloads a tempfile" do
+      VCR.use_cassette("bulk_import-open_file") do
+        tempfile = bulk_import.open_file
+        expect(tempfile).to be_an_instance_of(Tempfile)
+        expect(bulk_import.unlink_tempfile).to be_truthy
       end
     end
   end

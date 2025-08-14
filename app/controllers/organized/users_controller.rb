@@ -11,7 +11,8 @@ module Organized
       @show_matching_count = @show_user_search && params[:query].present?
       @pagy, @organization_roles = pagy(
         matching_organization_roles.reorder("organization_roles.#{sort_column} #{sort_direction}"),
-        limit: per_page
+        limit: per_page,
+        page: permitted_page
       )
     end
 

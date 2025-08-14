@@ -9,7 +9,7 @@ module Organized
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.enabled?("bike_search")
 
-        @per_page = params[:per_page] || 10
+        @per_page = permitted_per_page(default: 10)
         search_organization_bikes
         if current_organization.enabled?("csv_exports") && InputNormalizer.boolean(params[:create_export])
           if @available_bikes.count > 10_000 # Don't want everything to explode...
@@ -29,20 +29,20 @@ module Organized
           end
         end
       else
-        @per_page = params[:per_page] || 50
+        @per_page = permitted_per_page(default: 50)
         @available_bikes = if current_organization.enabled?("claimed_ownerships")
           claimed_ownerships_search
         else
           organization_bikes.where(created_at: @time_range)
         end
-        @pagy, @bikes = pagy(@available_bikes.order("bikes.created_at desc"), limit: @per_page)
+        @pagy, @bikes = pagy(@available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
       end
     end
 
     def recoveries
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
       set_period
-      @per_page = params[:per_page] || 25
+      @per_page = permitted_per_page
       # Default to showing regional recoveries
       @search_only_organization = InputNormalizer.boolean(params[:search_only_organization])
       # ... but if organization isn't regional, we can't show regional
@@ -50,7 +50,7 @@ module Organized
       recovered_records = @search_only_organization ? current_organization.recovered_records : current_organization.nearby_recovered_records
 
       @matching_recoveries = recovered_records.where(recovered_at: @time_range)
-      @pagy, @recoveries = pagy(@matching_recoveries.reorder(recovered_at: :desc), limit: @per_page)
+      @pagy, @recoveries = pagy(@matching_recoveries.reorder(recovered_at: :desc), limit: @per_page, page: permitted_page)
       # When selecting through the organization bikes, it fails. Lazy solution: Don't permit doing that ;)
       @render_chart = !@search_only_organization && InputNormalizer.boolean(params[:render_chart])
     end
@@ -58,12 +58,12 @@ module Organized
     def incompletes
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
       set_period
-      @per_page = params[:per_page] || 25
+      @per_page = permitted_per_page
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
 
       @b_params_total = incompletes_sorted(b_params.where(created_at: @time_range))
-      @pagy, @b_params = pagy(@b_params_total, limit: @per_page)
+      @pagy, @b_params = pagy(@b_params_total, limit: @per_page, page: permitted_page)
     end
 
     def resend_incomplete_email
@@ -232,7 +232,7 @@ module Organized
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
-      @pagy, @bikes = pagy(@available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
+      @pagy, @bikes = pagy(@available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end

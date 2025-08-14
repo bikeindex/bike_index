@@ -9,8 +9,7 @@ module Organized
 
     def index
       @search_bounding_box = search_bounding_box
-      @per_page = params[:per_page]
-      @per_page = DEFAULT_PER_PAGE if @per_page.blank? || @per_page.to_i > ParkingNotification::MAX_PER_PAGE
+      @per_page = permitted_per_page(default: DEFAULT_PER_PAGE, max: ParkingNotification::MAX_PER_PAGE)
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         per_page: @per_page,
@@ -41,7 +40,7 @@ module Organized
         format.html
         format.json do
           pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-            .includes(:user, :bike, :impound_record), limit: @per_page)
+            .includes(:user, :bike, :impound_record), limit: @per_page, page: permitted_page)
           # This was already set up, so I left it when upgrading to pagy
           set_pagination_headers(pagy, @per_page)
           render json: records,
