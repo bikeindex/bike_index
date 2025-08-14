@@ -3,6 +3,23 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   it_behaves_like "search_radius_metricable"
 
+  describe "factory" do
+    let(:organization) { FactoryBot.create(:organization, :paid) }
+    it "is paid and valid" do
+      expect(organization.reload.is_paid).to be_truthy
+      expect(organization.enabled_feature_slugs).to eq([])
+      expect(organization.invoices.last.invoice_organization_features.pluck(:id)).to eq([])
+    end
+    context "organization_features" do
+      let(:organization) { FactoryBot.create(:organization, :organization_features) }
+      it "is valid" do
+        expect(organization.reload.is_paid).to be_truthy
+        expect(organization.enabled_feature_slugs).to eq(["csv_export"])
+        expect(organization.invoices.last.invoice_organization_features.pluck(:id).count).to eq 1
+      end
+    end
+  end
+
   describe "#nearby_bikes" do
     it "returns bikes within the search radius" do
       FactoryBot.create(:bike, :in_los_angeles)
@@ -380,7 +397,7 @@ RSpec.describe Organization, type: :model do
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update(updated_at: Time.current)
-        expect(regional_parent.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
+        expect(regional_parent.reload.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
