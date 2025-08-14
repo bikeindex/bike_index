@@ -567,7 +567,7 @@ GEM
     puma (6.6.0)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (3.1.16)
+    rack (3.2.0)
     rack-mini-profiler (3.3.1)
       rack (>= 1.2.0)
     rack-protection (4.1.1)
@@ -635,7 +635,7 @@ GEM
     redcarpet (3.6.1)
     redis (5.3.0)
       redis-client (>= 0.22.0)
-    redis-client (0.23.2)
+    redis-client (0.25.2)
       connection_pool
     redlock (2.0.6)
       redis-client (>= 0.14.1, < 1.0.0)
@@ -729,14 +729,12 @@ GEM
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     shellany (0.0.1)
-    sidekiq (7.3.8)
-      base64
-      connection_pool (>= 2.3.0)
-      logger
-      rack (>= 2.2.4)
-      redis-client (>= 0.22.2)
-    sidekiq-failures (1.0.0)
-      sidekiq (>= 4.0.0)
+    sidekiq (8.0.7)
+      connection_pool (>= 2.5.0)
+      json (>= 2.9.0)
+      logger (>= 1.6.2)
+      rack (>= 3.1.0)
+      redis-client (>= 0.23.2)
     simple_oauth (0.3.1)
     simplecov (0.22.0)
       docile (~> 1.1)
@@ -951,7 +949,6 @@ DEPENDENCIES
   secure_headers (~> 2.5.0)
   selenium-webdriver
   sidekiq
-  sidekiq-failures
   simplecov
   simplecov_json_formatter
   sitemap_generator (~> 6)
