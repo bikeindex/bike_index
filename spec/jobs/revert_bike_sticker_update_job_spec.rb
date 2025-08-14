@@ -19,7 +19,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
       let(:bike_sticker_update) do
         bike_sticker.claim(bike:, organization: new_organization, user:)
         bike_sticker.update_columns(claimed_at: sticker_update_at, updated_at: sticker_update_at)
-        bike_sticker_update = bike_sticker.bike_sticker_updates.last
+        bike_sticker.bike_sticker_updates.last
       end
       let(:target_initial) do
         {
@@ -34,7 +34,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
       end
       let(:initial_update) do
         {kind: "initial_claim", organization_kind: "other_paid_organization", update_number: 1,
-          user_id: user.id, organization_id: new_organization.id}
+         user_id: user.id, organization_id: new_organization.id}
       end
       it "removes" do
         expect(organization.reload.is_paid).to be_truthy
