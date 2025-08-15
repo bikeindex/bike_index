@@ -65,16 +65,14 @@ class BikeSticker < ApplicationRecord
       "#{result}0"
     end
 
-    def code_integer_and_prefix_search(str)
-      normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
-      code_integer = calculated_code_integer(normalized_code_with_zeroes)
-      return none if code_integer.present? && code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
-      code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
-      lookup_query = {}
-      lookup_query[:code_integer] = code_integer if code_integer.present?
-      code_prefix = calculated_code_prefix(normalized_code_with_zeroes)
-      lookup_query[:code_prefix] = code_prefix if code_prefix.present?
-      where(lookup_query).of_length(code_number_length).order(:id)
+    def calculated_code_integer(str)
+      return str if str.is_a?(Integer)
+      numbers = calculated_code_numbers(str)
+      numbers.present? ? numbers.to_i : nil
+    end
+
+    def calculated_code_prefix(str)
+      str.present? ? str.gsub(/\d+\z/, "").upcase : nil
     end
 
     # organization_id can be any organization identifier (name, slug, id)
@@ -107,6 +105,12 @@ class BikeSticker < ApplicationRecord
       bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
     end
 
+    def next_unclaimed_code(after_id = nil)
+      after_id ||= claimed.order(:id).last&.id || 1 # So we can pass in the id to iterate from.
+      # If there aren't any claimed stickers, we need to include a number or this returns nil
+      unclaimed.reorder(:id).where("id > ?", after_id || 1).first
+    end
+
     def user_can_claim_sticker?(user, bike_sticker = nil)
       return false if user.blank?
       return true if user.superuser?
@@ -124,23 +128,19 @@ class BikeSticker < ApplicationRecord
       where("bike_stickers.code_number_length >= ?", int)
     end
 
-    def next_unclaimed_code(after_id = nil)
-      after_id ||= claimed.order(:id).last&.id || 1 # So we can pass in the id to iterate from.
-      # If there aren't any claimed stickers, we need to include a number or this returns nil
-      unclaimed.reorder(:id).where("id > ?", after_id || 1).first
-    end
-
-    def calculated_code_integer(str)
-      return str if str.is_a?(Integer)
-      numbers = calculated_code_numbers(str)
-      numbers.present? ? numbers.to_i : nil
-    end
-
-    def calculated_code_prefix(str)
-      str.present? ? str.gsub(/\d+\z/, "").upcase : nil
-    end
-
     private
+
+    def code_integer_and_prefix_search(str)
+      normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+      code_integer = calculated_code_integer(normalized_code_with_zeroes)
+      return none if code_integer.present? && code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
+      code_number_length = calculated_code_numbers(normalized_code_with_zeroes).length
+      lookup_query = {}
+      lookup_query[:code_integer] = code_integer if code_integer.present?
+      code_prefix = calculated_code_prefix(normalized_code_with_zeroes)
+      lookup_query[:code_prefix] = code_prefix if code_prefix.present?
+      where(lookup_query).of_length(code_number_length).order(:id)
+    end
 
     def sticker_code_search(str)
       normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
