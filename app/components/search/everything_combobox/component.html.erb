@@ -1,7 +1,7 @@
 <div
   class="tw:w-full"
-  data-controller="search--everything-combobox--component"
-  data-search--everything-combobox--component-api-url-value="<%= API_URL %>"
+  data-controller="search--everything-combobox"
+  data-search--everything-combobox-api-url-value="<%= API_URL %>"
 >
 
   <link
@@ -56,15 +56,15 @@
   :placeholder => translation(".search_descriptions"),
   :class => "tw:w-full tw:hidden fieldResetsCounts", # note: resetting counts is actually handled by select2 callback, not class
   :multiple => true,
-  "data-search--everything-combobox--component-target" => "input" %>
+  "data-search--everything-combobox-target" => "input" %>
 
   <%= label_tag :query,
   translation(".search_descriptions"),
   :class => "twlabel tw:sr-only",
-  "data-search--everything-combobox--component-target" => "nonjsfields" %>
+  "data-search--everything-combobox-target" => "nonjsfields" %>
   <%= text_field_tag :query,
   @query,
   :placeholder => translation(".search_descriptions"),
   :class => "twinput",
-  "data-search--everything-combobox--component-target" => "nonjsfields" %>
+  "data-search--everything-combobox-target" => "nonjsfields" %>
 </div>
