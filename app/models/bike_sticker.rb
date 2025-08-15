@@ -65,16 +65,6 @@ class BikeSticker < ApplicationRecord
       "#{result}0"
     end
 
-    def calculated_code_integer(str)
-      return str if str.is_a?(Integer)
-      numbers = calculated_code_numbers(str)
-      numbers.present? ? numbers.to_i : nil
-    end
-
-    def calculated_code_prefix(str)
-      str.present? ? str.gsub(/\d+\z/, "").upcase : nil
-    end
-
     def code_integer_and_prefix_search(str)
       normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
       code_integer = calculated_code_integer(normalized_code_with_zeroes)
@@ -91,7 +81,8 @@ class BikeSticker < ApplicationRecord
     # generally don't pass in normalized_code
     def lookup(str, organization_id: nil)
       matching_codes = code_integer_and_prefix_search(str)
-      matching_codes.organization_search(organization_id).first || matching_codes.first
+      org_matching_codes = organization_search(organization_id)
+      matching_codes.where(id: org_matching_codes.pluck(:id)).first || matching_codes.first
     end
 
     # Similar to lookup, but attempts to find the sticker even if it isn't an exact match
@@ -102,7 +93,8 @@ class BikeSticker < ApplicationRecord
         str, organization_id = str.split("organization_id=")
       end
       matching_codes = code_integer_and_prefix_search(str)
-      bike_sticker ||= matching_codes.organization_search(organization_id).first
+      org_matching_codes = organization_search(organization_id)
+      bike_sticker ||= matching_codes.where(id: org_matching_codes.pluck(:id)).first
       return bike_sticker if bike_sticker.present?
       user_organization_ids = user&.organization_roles&.pluck(:organization_id) || []
       if user_organization_ids.any?
@@ -113,24 +105,6 @@ class BikeSticker < ApplicationRecord
       normalized_code = normalize_code(str)
       bike_sticker ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
       bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
-    end
-
-    def sticker_code_search(str)
-      normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
-      return all unless normalized_code_with_zeroes.present?
-
-      if search_matches_start_with?(str, normalized_code_with_zeroes)
-        sticker_code_search_starting_with(normalized_code_with_zeroes)
-      else
-        normalized_code = normalize_code(normalized_code_with_zeroes)
-        where("code ILIKE ?", "%#{normalized_code}%")
-      end
-    end
-
-    def next_unclaimed_code(after_id = nil)
-      after_id ||= claimed.order(:id).last&.id || 1 # So we can pass in the id to iterate from.
-      # If there aren't any claimed stickers, we need to include a number or this returns nil
-      unclaimed.reorder(:id).where("id > ?", after_id || 1).first
     end
 
     def user_can_claim_sticker?(user, bike_sticker = nil)
@@ -150,6 +124,36 @@ class BikeSticker < ApplicationRecord
       where("bike_stickers.code_number_length >= ?", int)
     end
 
+    def next_unclaimed_code(after_id = nil)
+      after_id ||= claimed.order(:id).last&.id || 1 # So we can pass in the id to iterate from.
+      # If there aren't any claimed stickers, we need to include a number or this returns nil
+      unclaimed.reorder(:id).where("id > ?", after_id || 1).first
+    end
+
+    def calculated_code_integer(str)
+      return str if str.is_a?(Integer)
+      numbers = calculated_code_numbers(str)
+      numbers.present? ? numbers.to_i : nil
+    end
+
+    def calculated_code_prefix(str)
+      str.present? ? str.gsub(/\d+\z/, "").upcase : nil
+    end
+
+    private
+
+    def sticker_code_search(str)
+      normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+      return all unless normalized_code_with_zeroes.present?
+
+      if search_matches_start_with?(str, normalized_code_with_zeroes)
+        sticker_code_search_starting_with(normalized_code_with_zeroes)
+      else
+        normalized_code = normalize_code(normalized_code_with_zeroes)
+        where("code ILIKE ?", "%#{normalized_code}%")
+      end
+    end
+
     def organization_search(organization_id)
       if organization_id.present?
         org = Organization.friendly_find(organization_id)
@@ -157,8 +161,6 @@ class BikeSticker < ApplicationRecord
       end
       BikeSticker.none
     end
-
-    private
 
     def search_matches_start_with?(str = nil, normalized_code_with_zeroes = nil)
       normalized_code_with_zeroes ||= normalize_code(str, leading_zeros: true)
