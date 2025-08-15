@@ -60,7 +60,7 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Store uploaded files on the local file system (see config/storage.yml for options)
-  config.active_storage.service = :local
+  config.active_storage.service = :cloudflare_production
 
   # Mount Action Cable outside main process or domain
   # config.action_cable.mount_path = nil
@@ -108,11 +108,25 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   config.action_mailer.default_url_options = {protocol: "https", host: "bikeindex.org"}
+  routes.default_url_options = config.action_mailer.default_url_options
 
-  config.action_mailer.delivery_method = :postmark
-  config.action_mailer.postmark_settings = {
-    api_token: ENV["POSTMARK_API_TOKEN"]
-  }
+  if ENV["SENDGRID_ENABLED"] == "true"
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: "smtp.sendgrid.net",
+      port: 587,
+      domain: "bikeindex.org",
+      user_name: ENV["SENDGRID_USERNAME"],
+      password: ENV["SENDGRID_API_KEY"],
+      authentication: "plain",
+      enable_starttls_auto: true
+    }
+  else
+    config.action_mailer.delivery_method = :postmark
+    config.action_mailer.postmark_settings = {
+      api_token: ENV["POSTMARK_API_TOKEN"]
+    }
+  end
 
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]

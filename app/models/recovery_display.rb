@@ -19,7 +19,7 @@
 class RecoveryDisplay < ActiveRecord::Base
   validates_presence_of :quote, :recovered_at
   mount_uploader :image, CircularImageUploader
-  process_in_background :image, CarrierWaveProcessWorker
+  process_in_background :image, CarrierWaveProcessJob
   attr_writer :image_cache
   belongs_to :stolen_record
 

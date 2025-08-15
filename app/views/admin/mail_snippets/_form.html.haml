@@ -1,30 +1,40 @@
 -# TODO: maybe make this only show up for relevant ones
 
 - if @mail_snippet.organization_message?
-  %h3.mt-4.mb-4
-    %span.text-warning Organization Snippet!
-    %em.small.d-block.mt-4
+  = render(Alert::Component.new(kind: :error, header: "This is an Organization Message Snippet!")) do
+    %em.small.d-block.mt-2
       This should actually be #{link_to "edited though the organization!", edit_mail_snippet_path_for(@mail_snippet)}
 
-.alert.alert-info.mt-2.mb-4
-  %span.d-block.mb-2
-    %strong Note:
-    Organization Message snippets are actually the entire email.
+= render(Alert::Component.new(kind: :info, header: "NOTE: Organization Message snippets are actually the entire email.")) do
+  %p{class: "tw:mt-2 mb-0"}
+    Organization Messages are editable through the organization's page and should probably be edited there (rather than here). Those kinds:
+    %small.d-block.mt-2= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ")
 
-  Organization emails are editable through the organization's page and should probably be edited there (rather than here). Those kinds:
-  %small.d-block.mt-2= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ")
+- if @mail_snippet.organization.present?
+  %ul.mb-3{class: "tw:list-disc tw:list-inside tw:px-2"}
+    %li
+      View
+      = link_to "#{@mail_snippet.organization.short_name}'s email interface", organization_emails_path(organization_id: @mail_snippet.organization_id)
+    - unless @mail_snippet.which_organization_email == "all"
+      %li
+        View
+        = link_to "#{@mail_snippet.organization.short_name}'s #{@mail_snippet.which_organization_email} edit page", edit_organization_email_path(@mail_snippet.which_organization_email, organization_id: @mail_snippet.organization_id)
 
-- if @mail_snippet.errors.any?
-  = render partial: "/shared/errors", locals: {name: "Mail Snippet", obj: @mail_snippet}
+= render(AlertForErrors::Component.new(object:@mail_snippet))
 
 - def select_display(k); "#{MailSnippet.kind_humanized(k)} - in #{MailSnippet.organization_email_for(k)} emails" end
 .form-group.fancy-select.unfancy
   = f.label :kind
   = f.select :kind, MailSnippet.kinds.map { |k| [select_display(k), k] }, {required: true}, class: "form-control"
 
-.form-group.fancy-select.unfancy
-  = f.label :organization_id
-  = f.collection_select(:organization_id, @organizations, :id, :name, {prompt: "Choose organization"}, {class: "form-control"})
+- if @mail_snippet.kind == "stolen_notification_oauth"
+  .form-group.fancy-select.unfancy
+    = f.label :doorkeeper_app_id
+    = f.collection_select(:doorkeeper_app_id, Doorkeeper::Application.where(can_send_stolen_notifications: true), :id, :name, {prompt: "Choose Doorkeeper App"}, {class: "form-control"})
+- else
+  .form-group.fancy-select.unfancy
+    = f.label :organization_id
+    = f.collection_select(:organization_id, @organizations, :id, :name, {prompt: "Choose organization"}, {class: "form-control"})
 
 .form-group
   = f.label :subject

@@ -30,6 +30,12 @@ RSpec.shared_context :geocoder_default_location do
     }.as_json
   end
 
+  let(:default_location_registration_address_new) do
+    Geocodeable.new_address_hash(default_location_registration_address)
+  end
+
+  let(:default_location_coordinates) { default_location.slice(:latitude, :longitude).values }
+
   let(:geo_hash) do
     {
       data: ["US", "NY", "New York", default_location[:latitude].to_s, default_location[:longitude].to_s],

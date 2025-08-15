@@ -3,18 +3,25 @@ default: &default
   # manually set db_pool, separate from threads, because sidekiq
   pool: <%= ENV.fetch("DB_POOL") { 20 } %>
 
+default_local: &default_local
+  <<: *default
+  host: <%= ENV.fetch("PGHOST", "localhost") %>
+  port: <%= ENV.fetch("PGPORT", 5432) %>
+  username: <%= ENV["PGUSER"] %>
+  password: <%= ENV["PGPASSWORD"] %>
+
 development:
   primary:
-    <<: *default
+    <<: *default_local
     database: bikeindex_development
   primary_replica:
-    <<: *default
+    <<: *default_local
     # Using primary database, replica not actually replicating
     database: bikeindex_development
     # database: bikeindex_development_replica
     # replica: true
   analytics:
-    <<: *default
+    <<: *default_local
     database: bikeindex_analytics_development
     migrations_paths: db/analytics_migrate
 
@@ -24,14 +31,14 @@ development:
 # Do not set this db to the same as development or production.
 test:
   primary:
-    <<: *default
+    <<: *default_local
     database: bikeindex_test<%= ENV["TEST_ENV_NUMBER"] %>
   primary_replica:
-    <<: *default
+    <<: *default_local
     database: bikeindex_test_replica<%= ENV["TEST_ENV_NUMBER"] %>
     replica: true
   analytics:
-    <<: *default
+    <<: *default_local
     database: bikeindex_analytics_test<%= ENV["TEST_ENV_NUMBER"] %>
     migrations_paths: db/analytics_migrate
 

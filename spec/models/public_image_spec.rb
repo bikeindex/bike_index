@@ -42,7 +42,7 @@ RSpec.describe PublicImage, type: :model do
       it "does not enqueue after_bike_save_worker" do
         expect {
           public_image.enqueue_after_commit_jobs
-        }.to change(AfterBikeSaveWorker.jobs, :size).by(0)
+        }.to change(::Callbacks::AfterBikeSaveJob.jobs, :size).by(0)
       end
     end
     context "bike" do
@@ -51,8 +51,8 @@ RSpec.describe PublicImage, type: :model do
         expect {
           expect {
             public_image.enqueue_after_commit_jobs
-          }.to change(AfterBikeSaveWorker.jobs, :size).by(1)
-        }.to_not change(ExternalImageUrlStoreWorker.jobs, :size)
+          }.to change(::Callbacks::AfterBikeSaveJob.jobs, :size).by(1)
+        }.to_not change(Images::ExternalUrlStoreJob.jobs, :size)
       end
     end
     context "remote_image_url" do
@@ -64,7 +64,7 @@ RSpec.describe PublicImage, type: :model do
         expect(public_image.bike_type).to eq "bike"
         expect {
           expect(public_image.save).to be_truthy
-        }.to change(ExternalImageUrlStoreWorker.jobs, :size).by(1)
+        }.to change(Images::ExternalUrlStoreJob.jobs, :size).by(1)
       end
       context "image present" do
         let(:public_image) { PublicImage.new(imageable: bike, external_image_url: "http://example.com/image.png", image: File.open(Rails.root.join("spec", "fixtures", "bike.jpg"))) }
@@ -72,8 +72,8 @@ RSpec.describe PublicImage, type: :model do
           expect {
             expect {
               expect(public_image.save).to be_truthy
-            }.to change(AfterBikeSaveWorker.jobs, :size).by(1)
-          }.to_not change(ExternalImageUrlStoreWorker.jobs, :size)
+            }.to change(::Callbacks::AfterBikeSaveJob.jobs, :size).by(1)
+          }.to_not change(Images::ExternalUrlStoreJob.jobs, :size)
         end
       end
     end

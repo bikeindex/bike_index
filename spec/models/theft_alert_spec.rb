@@ -50,21 +50,98 @@ RSpec.describe TheftAlert, type: :model do
       expect(theft_alert.notify?).to be_falsey
     end
     context "is activateable" do
-      let(:bike) { FactoryBot.create(:bike) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike, approved: true) }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {campaign_id: "xxxx"}) }
+      # let(:bike) { FactoryBot.create(:bike) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver, approved: true) }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {}) }
       it "is truthy" do
-        expect(theft_alert.missing_location?).to be_falsey
+        expect(theft_alert.reload.missing_location?).to be_falsey
+        expect(stolen_record.reload.images_attached?).to be_truthy
         expect(theft_alert.missing_photo?).to be_falsey
         expect(theft_alert.stolen_record_approved?).to be_truthy
         expect(theft_alert.paid?).to be_truthy
         expect(theft_alert.activateable?).to be_truthy
         expect(theft_alert.posted?).to be_falsey
+        expect(theft_alert.failed_to_activate?).to be_falsey
+        expect(TheftAlert.activating.pluck(:id)).to eq([])
+        expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
+        # Also, test notify? in here too
+        expect(theft_alert.notify?).to be_falsey
+        theft_alert.update(facebook_data: {campaign_id: "xxxx"})
+        expect(theft_alert.reload.activateable?).to be_truthy
+        expect(theft_alert.posted?).to be_falsey
+        expect(theft_alert.failed_to_activate?).to be_falsey
+        expect(theft_alert.notify?).to be_truthy
+        stolen_record.update(receive_notifications: false)
+        expect(theft_alert.reload.notify?).to be_falsey
+      end
+      context "bike user hidden" do
+        let!(:bike) { stolen_record.reload.bike }
+        it "is falsey" do
+          bike.update(user_hidden: true)
+          expect(bike.reload.current?).to be_falsey
+          expect(Bike.where(id: bike.id).count).to eq 0 # Because default scope
+          expect(theft_alert.reload.missing_location?).to be_falsey
+          expect(stolen_record.reload.images_attached?).to be_truthy
+          expect(theft_alert.missing_photo?).to be_falsey
+          expect(theft_alert.stolen_record_approved?).to be_truthy
+          expect(theft_alert.paid?).to be_truthy
+          expect(theft_alert.activateable?).to be_falsey
+          expect(theft_alert.bike).to be_present
+          theft_alert.update(status: :inactive)
+          expect(theft_alert.reload.failed_to_activate?).to be_falsey
+          expect(theft_alert.manual_override_inactive?).to be_truthy
+        end
+      end
+    end
+    context "with alert_image" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, approved: true) }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {campaign_id: "xxxx"}) }
+      it "is activateable" do
+        expect(theft_alert.missing_location?).to be_falsey
+        expect(stolen_record.reload.images_attached?).to be_falsey
+        expect(stolen_record.alert_image.present?).to be_truthy
+        expect(theft_alert.missing_photo?).to be_falsey
+        expect(theft_alert.stolen_record_approved?).to be_truthy
+        expect(theft_alert.paid?).to be_truthy
+        expect(theft_alert.activateable?).to be_truthy
+        expect(theft_alert.posted?).to be_falsey
+        expect(theft_alert.failed_to_activate?).to be_falsey
+        expect(TheftAlert.activating.pluck(:id)).to eq([])
+        expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
         # Also, test notify? in here too
         expect(theft_alert.notify?).to be_truthy
         stolen_record.update(receive_notifications: false)
         theft_alert.reload
         expect(theft_alert.notify?).to be_falsey
+      end
+    end
+  end
+
+  describe "failed_to_activate?" do
+    let(:theft_alert) do
+      FactoryBot.create(:theft_alert, status: "pending", facebook_data: {activating_at:})
+    end
+    let(:activating_at) { (Time.current - 6.minutes).to_i }
+    let(:start_at) { nil }
+    it "is falsey" do
+      expect(theft_alert.reload.start_at).to be_nil
+      expect(theft_alert.failed_to_activate?).to be_truthy
+      expect(TheftAlert.activating.pluck(:id)).to eq([theft_alert.id])
+      expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([theft_alert.id])
+
+      theft_alert.update(start_at: Time.current, end_at: Time.current + 1.day, status: "active")
+      expect(theft_alert.reload.start_at).to be_present
+      expect(theft_alert.failed_to_activate?).to be_falsey
+      expect(TheftAlert.activating.pluck(:id)).to eq([])
+      expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
+    end
+    context "start_at more recently" do
+      let(:activating_at) { (Time.current - 2.minutes).to_i }
+
+      it "is falsey" do
+        expect(theft_alert.reload.failed_to_activate?).to be_falsey
+        expect(TheftAlert.activating.pluck(:id)).to eq([theft_alert.id])
+        expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
       end
     end
   end
@@ -117,7 +194,7 @@ RSpec.describe TheftAlert, type: :model do
 
   describe "admin differences" do
     let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan, ad_radius_miles: 24) }
-    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, approved: true) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver, approved: true) }
     let(:theft_alert) do
       FactoryBot.create(:theft_alert,
         theft_alert_plan: theft_alert_plan,
@@ -141,6 +218,30 @@ RSpec.describe TheftAlert, type: :model do
         theft_alert.facebook_data = {activating_at: Time.current.to_i}
         expect(theft_alert.notify?).to be_falsey
       end
+    end
+  end
+
+  describe "stolen_record scoping" do
+    let(:payment_unpaid) { FactoryBot.create(:payment, paid_at: nil) }
+    let(:theft_alert_unpaid) { FactoryBot.create(:theft_alert, payment: payment_unpaid, user: payment_unpaid.user) }
+    let!(:stolen_record_unpaid_id) { theft_alert_unpaid.stolen_record_id }
+    let(:theft_alert_paid) { FactoryBot.create(:theft_alert, :paid) }
+    let!(:stolen_record_paid_id) { theft_alert_paid.stolen_record_id }
+    let(:theft_alert_admin) { FactoryBot.create(:theft_alert, admin: true) }
+    let!(:stolen_record_admin_id) { theft_alert_admin.stolen_record_id }
+    let(:theft_alert_admin_and_unpaid) { FactoryBot.create(:theft_alert, admin: true) }
+    let!(:stolen_record_admin_and_unpaid_id) { theft_alert_admin_and_unpaid.stolen_record_id }
+    let!(:theft_alert_admin_unpaid) { FactoryBot.create(:theft_alert, stolen_record_id: stolen_record_admin_and_unpaid_id) }
+    let(:stolen_record_ids) { [stolen_record_unpaid_id, stolen_record_paid_id, stolen_record_admin_id, stolen_record_admin_and_unpaid_id] }
+
+    it "finds the pertinent stolen_records" do
+      expect(Payment.paid.pluck(:id)).to eq([theft_alert_paid.payment_id])
+      expect(StolenRecord.pluck(:id)).to match_array stolen_record_ids
+      expect(StolenRecord.with_theft_alerts.pluck(:id)).to match_array stolen_record_ids
+      expect(TheftAlert.paid.pluck(:id)).to match_array([theft_alert_paid.id])
+      expect(TheftAlert.admin.pluck(:id)).to match_array([theft_alert_admin.id, theft_alert_admin_and_unpaid.id])
+      expect(TheftAlert.paid_or_admin.pluck(:id)).to match_array([theft_alert_paid.id, theft_alert_admin.id, theft_alert_admin_and_unpaid.id])
+      expect(StolenRecord.with_theft_alerts_paid_or_admin.pluck(:id)).to match_array(stolen_record_ids - [stolen_record_unpaid_id])
     end
   end
 end

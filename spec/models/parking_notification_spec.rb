@@ -177,7 +177,7 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.user_hidden).to be_truthy
       expect(parking_notification1.unregistered_bike?).to be_truthy
       expect(parking_notification1.resolved_at).to be_blank
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
       expect(parking_notification2.unregistered_bike?).to be_truthy
       expect(parking_notification2.resolved_at).to be_within(1).of Time.current
@@ -203,7 +203,7 @@ RSpec.describe ParkingNotification, type: :model do
     let(:organization) { parking_notification.organization }
     it "is default with snippet" do
       expect(parking_notification.mail_snippet).to be_blank
-      expect(parking_notification.subject).to eq "Your pedi cab (rickshaw) is parked incorrectly"
+      expect(parking_notification.subject).to eq "Your pedi cab is parked incorrectly"
     end
     context "with mail_snippet" do
       let!(:mail_snippet) do
@@ -319,7 +319,7 @@ RSpec.describe ParkingNotification, type: :model do
       parking_notification.retrieved_by_id = 12121212
       expect {
         parking_notification.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "organization_recovery")
-      }.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+      }.to change(ProcessParkingNotificationJob.jobs, :count).by 1
       parking_notification.reload
       expect(parking_notification.active?).to be_falsey
       expect(parking_notification.retrieved?).to be_truthy
@@ -328,14 +328,14 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification.associated_retrieved_notification).to eq parking_notification
       expect {
         parking_notification.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "organization_recovery")
-      }.to_not change(ProcessParkingNotificationWorker.jobs, :count)
+      }.to_not change(ProcessParkingNotificationJob.jobs, :count)
     end
     context "mark_retrieved without a user" do
       it "retrieves" do
         expect(parking_notification.active?).to be_truthy
         expect {
           parking_notification.mark_retrieved!(retrieved_kind: "link_token_recovery")
-        }.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+        }.to change(ProcessParkingNotificationJob.jobs, :count).by 1
         parking_notification.reload
         expect(parking_notification.active?).to be_falsey
         expect(parking_notification.retrieved?).to be_truthy
@@ -355,16 +355,16 @@ RSpec.describe ParkingNotification, type: :model do
           delivery_status: "email_success")
       end
       it "retrieves" do
-        ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
+        ProcessParkingNotificationJob.new.perform(parking_notification2.id)
         expect(parking_notification.reload.active?).to be_truthy
         expect(parking_notification.status).to eq "replaced"
         expect(parking_notification2.reload.active?).to be_truthy
         expect(parking_notification2.status).to eq "current"
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           parking_notification.mark_retrieved!(retrieved_kind: "organization_recovery", retrieved_by_id: 12)
-        }.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
-        ProcessParkingNotificationWorker.drain
+        }.to change(ProcessParkingNotificationJob.jobs, :count).by 1
+        ProcessParkingNotificationJob.drain
         # It updates the current notification, even though mark_retrieved! was called on a different notification
         parking_notification2.reload
         expect(parking_notification2.active?).to be_falsey
@@ -398,7 +398,7 @@ RSpec.describe ParkingNotification, type: :model do
         expect {
           new_parking_notification = parking_notification.retrieve_or_repeat_notification!(user_id: user.id, kind: "mark_retrieved")
           expect(new_parking_notification.id).to eq parking_notification.id # Just checking
-        }.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+        }.to change(ProcessParkingNotificationJob.jobs, :count).by 1
         parking_notification.reload
         expect(parking_notification.retrieved?).to be_truthy
         expect(parking_notification.resolved_at).to be_within(1.second).of Time.current
@@ -426,7 +426,7 @@ RSpec.describe ParkingNotification, type: :model do
         expect(parking_notification.retrieved?).to be_falsey
         expect {
           parking_notification.retrieve_or_repeat_notification!(user_id: user.id, kind: "appears_abandoned_notification")
-        }.to change(ProcessParkingNotificationWorker.jobs, :count).by 1
+        }.to change(ProcessParkingNotificationJob.jobs, :count).by 1
 
         new_parking_notification = ParkingNotification.last
         expect(new_parking_notification.bike).to eq parking_notification.bike

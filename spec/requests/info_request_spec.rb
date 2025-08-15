@@ -36,6 +36,17 @@ RSpec.describe InfoController, type: :request do
     end
   end
 
+  describe "membership" do
+    let!(:blog) { FactoryBot.create(:blog, title: "Bike Index Membership", info_kind: true) }
+    it "renders" do
+      get "/membership"
+      expect(assigns(:blog)&.id).to eq blog.id
+      expect(response.status).to eq(200)
+      get "/info/bike-index-membership"
+      expect(response).to redirect_to "/membership"
+    end
+  end
+
   describe "static pages" do
     pages = %w[about protect_your_bike where serials image_resources resources security
       dev_and_design donate terms vendor_terms privacy lightspeed]
@@ -138,6 +149,14 @@ RSpec.describe InfoController, type: :request do
     it "redirects to current_tsv" do
       get "/how_not_to_buy_stolen"
       expect(response).to redirect_to InfoController::DONT_BUY_STOLEN_URL
+    end
+  end
+
+  context "primary_activities" do
+    it "gets a csv" do
+      get "/primary_activities.csv"
+      expect(response.status).to eq(200)
+      expect(response.content_type).to match("text/csv")
     end
   end
 end

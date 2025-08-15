@@ -23,9 +23,17 @@ Bundler.require(*Rails.groups)
 module Bikeindex
   class Application < Rails::Application
     config.redis_default_url = ENV["REDIS_URL"]
-    config.redis_cache_url = ENV["REDIS_CACHE_URL"]
+    # If in test, add the TEST_ENV_NUMBER to the redis
+    if config.redis_default_url.blank? && Rails.env.test? && ENV["TEST_ENV_NUMBER"].present?
+      config.redis_default_url = "redis://localhost:6379/#{ENV["TEST_ENV_NUMBER"]&.to_i || 0}"
+    end
+    config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
 
     config.load_defaults 8.0
+
+    # directly using Sidekiq is preferred, but some things (e.g. active_storage) use active job
+    config.active_job.queue_adapter = :sidekiq
+    config.active_job.default_queue_name = :low_priority
 
     # Use our custom error pages
     config.exceptions_app = routes
@@ -51,6 +59,7 @@ module Bikeindex
     config.i18n.available_locales = %i[en es it nl nb]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
+    config.middleware.insert 0, Rack::UTF8Sanitizer
     config.middleware.use Rack::Throttle::Minute,
       max: ENV["MIN_MAX_RATE"].to_i,
       cache: Redis.new(url: config.redis_cache_url),

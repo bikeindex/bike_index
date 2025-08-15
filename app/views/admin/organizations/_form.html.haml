@@ -1,6 +1,4 @@
-- if @organization.errors.any?
-  = render partial: "/shared/errors", locals: {name: "Organization", obj: @organization}
-
+= render(AlertForErrors::Component.new(object: @organization))
 
 .row
   .form-group.col-md-6

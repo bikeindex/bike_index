@@ -8,7 +8,7 @@ module ControllerHelpers
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
       :controller_namespace, :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
-      :display_dev_info?
+      :display_dev_info?, :current_country_id, :current_currency
     before_action :enable_rack_profiler
 
     before_action do
@@ -34,7 +34,20 @@ module ControllerHelpers
   end
 
   def forwarded_ip_address
-    @forwarded_ip_address ||= ForwardedIpAddress.parse(request)
+    @forwarded_ip_address ||= IpAddressParser.forwarded_address(request)
+  end
+
+  def request_location_hash
+    @request_location_hash ||= IpAddressParser.location_hash(request)
+  end
+
+  # TODO: make this actually use the request location
+  def current_currency
+    Currency.default
+  end
+
+  def current_country_id
+    request_location_hash[:country_id]
   end
 
   def enable_rack_profiler
@@ -54,6 +67,13 @@ module ControllerHelpers
     ActiveRecord::Base.connected_to(role: :reading) do
       yield
     end
+  end
+
+  def store_return_and_authenticate_user(translation_key: nil, flash_type: :error)
+    return if current_user&.confirmed? && current_user.terms_of_service
+
+    store_return_to
+    authenticate_user(flash_type:) && return
   end
 
   def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error)
@@ -120,7 +140,7 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
-    bikes_path(stolenness: "all")
+    search_registrations_path(stolenness: "all")
   end
 
   def ensure_current_organization!
@@ -131,7 +151,9 @@ module ControllerHelpers
   # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(target = nil)
     # fallback to the return to parameters, or the current path
-    target ||= params[:return_to] || request.env["PATH_INFO"]
+    target ||= params[:return_to] ||
+      [request.env["PATH_INFO"], request.env["QUERY_STRING"]].reject(&:blank?).join("?")
+
     session[:return_to] = target unless invalid_return_to?(target)
   end
 
@@ -205,7 +227,7 @@ module ControllerHelpers
         caller_locations
           .slice(0, 2)
           .map(&:label)
-          .reject { |label| label =~ /rescue in/ }
+          .reject { |label| label.include?("rescue in") }
           .first
     end
 
@@ -235,37 +257,6 @@ module ControllerHelpers
     @passive_organization = organization
   end
 
-  # For setting periods, particularly for graphing
-  def set_period
-    @timezone ||= Time.zone
-    # Set time period
-    @period ||= params[:period]
-    if @period == "custom"
-      if params[:start_time].present?
-        @start_time = TimeParser.parse(params[:start_time], @timezone)
-        @end_time = TimeParser.parse(params[:end_time], @timezone) || latest_period_date
-        if @start_time > @end_time
-          new_end_time = @start_time
-          @start_time = @end_time
-          @end_time = new_end_time
-        end
-      else
-        set_time_range_from_period
-      end
-    elsif params[:search_at].present?
-      @period = "custom"
-      @search_at = TimeParser.parse(params[:search_at], @timezone)
-      offset = params[:period].present? ? params[:period].to_i : 10.minutes.to_i
-      @start_time = @search_at - offset
-      @end_time = @search_at + offset
-    else
-      set_time_range_from_period
-    end
-    # Add this render_chart in here so we don't have to define it in all the controllers
-    @render_chart = InputNormalizer.boolean(params[:render_chart])
-    @time_range = @start_time..@end_time
-  end
-
   def sign_in_if_not!
     return true unless params[:sign_in_if_not].present? && current_user.blank?
     return ensure_member_of!(current_organization) if params[:organization_id].present?
@@ -273,6 +264,10 @@ module ControllerHelpers
     flash[:notice] = translation(:please_sign_in,
       scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(new_session_path) && return
+  end
+
+  def turbo_request?
+    request.format.turbo_stream? || turbo_frame_request?
   end
 
   protected
@@ -412,54 +407,5 @@ module ControllerHelpers
     valid_redirect_urls = Doorkeeper::Application.where(id: [264, 356]).pluck(:redirect_uri)
       .map { |u| u.downcase.split("\s") }.flatten.map(&:strip)
     (valid_redirect_urls.any? { |u| u.start_with?(redirect_site) }) ? redirect_site : nil
-  end
-
-  def set_time_range_from_period
-    @period = default_period unless %w[hour day month year week all next_week next_month].include?(@period)
-    case @period
-    when "hour"
-      @start_time = Time.current - 1.hour
-    when "day"
-      @start_time = Time.current.beginning_of_day - 1.day
-    when "month"
-      @start_time = Time.current.beginning_of_day - 30.days
-    when "year"
-      @start_time = Time.current.beginning_of_day - 1.year
-    when "week"
-      @start_time = Time.current.beginning_of_day - 1.week
-    when "next_month"
-      @start_time ||= Time.current
-      @end_time = Time.current.beginning_of_day + 30.days
-    when "next_week"
-      @start_time = Time.current
-      @end_time = Time.current.beginning_of_day + 1.week
-    when "all"
-      @start_time = earliest_period_date
-      @end_time = latest_period_date
-    end
-    @end_time ||= Time.current
-  end
-
-  # Separate method so it can be overridden on per controller basis
-  def default_period
-    "all"
-  end
-
-  # Separate method so it can be overriden, specifically in invoices
-  def latest_period_date
-    Time.current
-  end
-
-  def earliest_organization_period_date
-    return nil if current_organization.blank?
-    start_time = current_organization.created_at - 6.months
-    start_time = Time.current - 1.year if start_time > (Time.current - 1.year)
-    start_time
-  end
-
-  # Separate method so it can be overridden on per controller basis
-  # Copied
-  def earliest_period_date
-    earliest_organization_period_date || Time.at(1134972000) # Earliest bike created at
   end
 end

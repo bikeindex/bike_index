@@ -1,0 +1,33 @@
+.card
+  .card-body
+    = form_for [:admin, @membership] do |f|
+      - if @membership.errors.any?
+        = render(AlertForErrors::Component.new(object: @membership, dismissable: true))
+
+      - if @membership.id.blank?
+        .form-group
+          = f.label :user_email
+          = f.email_field :user_email, required: true, class: "form-control"
+
+      .form-group
+        = f.label :start_at
+        = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+        = f.datetime_local_field :start_at, step: 60, required: true, class: "form-control"
+
+      .form-group
+        = f.label :end_at
+        = f.datetime_local_field :end_at, step: 60, class: "form-control"
+        %small.below-input-help
+          %em leave blank if you want to give a membership for forever. In general, set an end at
+
+      .form-group
+        %label
+          Membership Level
+        - Membership.levels.keys.each do |level|
+          .form-check
+            %label
+              = f.radio_button :level, level, class: "form-check-input"
+              = Membership.level_humanized(level)
+
+      .form-group.mt-4
+        = f.submit 'Save', class: 'btn btn-success'

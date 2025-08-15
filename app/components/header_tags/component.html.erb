@@ -1,0 +1,71 @@
+<title><%= @page_title %></title>
+
+<meta charset="utf-8">
+<meta content="ie=edge" http-equiv="x-ua-compatible">
+<meta name="handheldfriendly" content="true">
+<meta name="viewport" content="width=device-width">
+<meta name="description" content="<%= @page_description %>">
+<meta http-equiv="Content-Language" content="<%= I18n.locale %>"/>
+<% if @display_auto_discovery %><%= auto_discovery_link_tag(
+    :atom,
+    news_index_url(format: "atom"),
+    title: "Bike Index news atom feed",
+  ) %><% end %>
+<% if @author %><%= tag(:link, rel: "author", href: @author) %><% end %>
+
+<meta property="og:site_name" content="Bike Index">
+<meta property="og:title" content="<%= @page_title %>">
+<meta property="og:description" content="<%= @page_description %>">
+<meta property="og:image" content="<%= facebook_image %>">
+<% if known_image_dimensions? %>
+  <meta property="og:image:width" content="<%= image_width %>">
+  <meta property="og:image:height" content="<%= image_height %>">
+<% end %>
+<meta property="og:url" content="<%= @page_url %>">
+<meta content="223376277803071" property="fb:app_id">
+<% if @meta_type.present? %><meta property="og:type" content="<%= @meta_type %>"><% end %>
+<% if @published_at.present? %><meta property="article:published_time" content="<%= @published_at %>"><% end %>
+<% if @updated_at.present? %><meta property="<%= og_updated_property %>" content="<%= @updated_at %>"><% end %>
+
+<meta name="twitter:title" content="<%= @page_title %>">
+<meta name="twitter:description" content="<%= @page_description %>">
+<meta name="twitter:image" content="<%= twitter_image %>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="<%= twitter_creator %>">
+<meta name="twitter:site" content="@bikeindex">
+<meta name="twitter:image:alt" content="<%= @page_description %>">
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Bike Index",
+    "description": "<%= default_description %>",
+    "url": "https://bikeindex.org",
+    "image": "https://bikeindex.org/opengraph.png"
+  }
+</script>
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Bike Index",
+    "url": "https://bikeindex.org"
+  }
+</script>
+<script type="application/ld+json">
+  <%= raw page_json_ld.to_json %>
+</script>
+
+<link rel="canonical" href="<%= url_canonical %>">
+
+<%# favicons! %>
+<% if Rails.env.development? %>
+  <%# don't include an svg version in development, we only want to show the dev icon %>
+  <link rel="icon" href="/favicon_dev.ico">
+<% else %>
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/icon-dark.svg" media="(prefers-color-scheme: dark)">
+<% end %>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">

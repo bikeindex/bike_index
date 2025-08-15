@@ -58,10 +58,14 @@ class LoggedSearch < AnalyticsRecord
     org_bikes: 12,
     org_parking_notifications: 13,
     org_impounded: 14,
-    org_public_impounded: 15
+    org_public_impounded: 15,
+    web_serials_containing: 19,
+    web_close_serials: 20,
+    web_marketplace: 21,
+    web_marketplace_count: 22
   }.freeze
 
-  STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3}.freeze
+  STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3, for_sale: 4}.freeze
 
   # TODO: make the belongs to work across tables
   belongs_to :user

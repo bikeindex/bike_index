@@ -37,7 +37,7 @@
           - unless skip_user
             %td
               - if superuser_ability.user_id.present?
-                = render partial: "/shared/admin_user_cell", locals: {user_id: superuser_ability.user_id, user: superuser_ability.user, render_search: render_sortable, cache: true}
+                = render partial: "/shared/admin/user_cell", locals: {user_id: superuser_ability.user_id, user: superuser_ability.user, render_search: render_sortable, cache: true}
           %td= superuser_ability.kind.titleize
           %td
             = superuser_ability.controller_name

@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Thu, 02 Jan 2025 19:33:48 GMT
+      - Thu, 03 Jul 2025 16:54:21 GMT
       Pragma:
       - no-cache
       Expires:
@@ -33,21 +33,21 @@ http_interactions:
       X-Goog-Maps-Metro-Area:
       - San Francisco, CA
       Content-Security-Policy-Report-Only:
-      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:229:0
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:228:0
       Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to=coop_reporting
+      - same-origin; report-to=msaifdggmnwc:228:0
       Report-To:
-      - '{"group":"coop_reporting","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:229:0"}],}'
+      - '{"group":"msaifdggmnwc:228:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:228:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '3120'
+      - '2979'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=71
+      - gfet4t7; dur=107
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -79,20 +79,16 @@ http_interactions:
         \              ]\n            }\n         ],\n         \"formatted_address\"
         : \"717 Market St, San Francisco, CA 94103, USA\",\n         \"geometry\"
         : \n         {\n            \"location\" : \n            {\n               \"lat\"
-        : 37.78698199999999,\n               \"lng\" : -122.403855\n            },\n
-        \           \"location_type\" : \"ROOFTOP\",\n            \"viewport\" : \n
-        \           {\n               \"northeast\" : \n               {\n                  \"lat\"
-        : 37.7884582802915,\n                  \"lng\" : -122.4025791197085\n               },\n
-        \              \"southwest\" : \n               {\n                  \"lat\"
-        : 37.7857603197085,\n                  \"lng\" : -122.4052770802915\n               }\n
-        \           }\n         },\n         \"navigation_points\" : \n         [\n
-        \           {\n               \"location\" : \n               {\n                  \"latitude\"
-        : 37.7871928,\n                  \"longitude\" : -122.4039456\n               }\n
-        \           }\n         ],\n         \"place_id\" : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n
-        \        \"plus_code\" : \n         {\n            \"compound_code\" : \"QHPW+QF
-        Yerba Buena, San Francisco, CA\",\n            \"global_code\" : \"849VQHPW+QF\"\n
-        \        },\n         \"types\" : \n         [\n            \"street_address\"\n
-        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-    http_version:
-  recorded_at: Thu, 02 Jan 2025 19:33:48 GMT
-recorded_with: VCR 5.0.0
+        : 37.7870205,\n               \"lng\" : -122.403928\n            },\n            \"location_type\"
+        : \"ROOFTOP\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 37.78847753029149,\n                  \"lng\"
+        : -122.4026156197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 37.7857795697085,\n                  \"lng\"
+        : -122.4053135802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 37.7871928,\n                  \"longitude\"
+        : -122.4039456\n               }\n            }\n         ],\n         \"place_id\"
+        : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n         \"types\" : \n         [\n            \"street_address\",\n
+        \           \"subpremise\"\n         ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+  recorded_at: Thu, 03 Jul 2025 16:54:21 GMT
+recorded_with: VCR 6.3.1

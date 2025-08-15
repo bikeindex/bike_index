@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe User, type: :model do
-  it_behaves_like "geocodeable"
+  it_behaves_like "address_recorded"
 
   describe ".ambassadors" do
     context "given ambassadors and no org filter" do
@@ -43,6 +43,12 @@ RSpec.describe User, type: :model do
       subject { User.new(FactoryBot.attributes_for(:user)) }
       before :each do
         expect(subject.valid?).to be_truthy
+      end
+
+      it "is invalid if email is invalid" do
+        subject.email = "+response.write(9515797*9796573)+"
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages.to_s).to match(/email/i)
       end
 
       it "requires password on create" do
@@ -206,7 +212,7 @@ RSpec.describe User, type: :model do
     end
 
     context "with superuser" do
-      let(:user) { FactoryBot.build(:admin) }
+      let(:user) { FactoryBot.build(:superuser) }
 
       it "is true for superuser attribute" do
         expect(user.superuser?).to be_truthy
@@ -363,13 +369,13 @@ RSpec.describe User, type: :model do
     context "with phone_verification" do
       before { Flipper.enable(:phone_verification) }
       it "adds user phone, if blank" do
-        UserPhoneConfirmationWorker.new # Instantiate for stubbing
-        stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+        UserPhoneConfirmationJob.new # Instantiate for stubbing
+        stub_const("UserPhoneConfirmationJob::UPDATE_TWILIO", true)
         user.reload
         user.skip_update = false # Manually set, because it's set to be true in perform_create_jobs
         expect(user.user_phones.count).to eq 0
         expect(user.phone).to be_blank
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             user.update(phone: "6669996666")
@@ -542,7 +548,7 @@ RSpec.describe User, type: :model do
       user = FactoryBot.create(:user)
       expect {
         expect(user.send_password_reset_email).to be_truthy
-      }.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
       expect(user.reload.token_for_password_reset).not_to be_nil
     end
 
@@ -554,7 +560,7 @@ RSpec.describe User, type: :model do
       expect {
         expect(user.send_password_reset_email).to be_falsey
         expect(user.send_password_reset_email).to be_falsey
-      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      }.to change(Email::ResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.token_for_password_reset).to eq current_token
     end
@@ -566,7 +572,7 @@ RSpec.describe User, type: :model do
       expect(user.magic_link_token).to be_nil
       expect {
         user.send_magic_link_email
-      }.to change(EmailMagicLoginLinkWorker.jobs, :size).by(1)
+      }.to change(Email::MagicLoginLinkJob.jobs, :size).by(1)
       expect(user.reload.magic_link_token).not_to be_nil
     end
 
@@ -577,7 +583,7 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       expect {
         user.send_magic_link_email
-      }.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      }.to change(Email::ResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
     end
@@ -696,10 +702,12 @@ RSpec.describe User, type: :model do
   describe "donations" do
     let(:user) { FactoryBot.create(:user) }
     it "returns the payment amount" do
-      Payment.create(user: user, amount_cents: 200)
+      Payment.create(user: user, amount_cents: 200, paid_at: Time.current)
       expect(user.donations).to eq 200
       expect(user.donor?).to be_falsey
       Payment.create(user: user, amount_cents: 800)
+      expect(user.donor?).to be_falsey
+      Payment.create(user: user, amount_cents: 800, paid_at: Time.current)
       expect(user.donor?).to be_truthy
     end
   end
@@ -799,7 +807,7 @@ RSpec.describe User, type: :model do
       end
     end
     context "superadmin" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "returns true" do
         expect(user.member_of?(organization)).to be_truthy
         expect(user.member_of?(organization, no_superuser_override: true)).to be_falsey
@@ -839,6 +847,22 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "can_create_listing?" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    context "superuser" do
+      let(:user) { User.new(superuser: true) }
+      it "returns true" do
+        expect(user.can_create_listing?).to be_truthy
+      end
+    end
+    context "member" do
+      let!(:membership) { FactoryBot.create(:membership, user:) }
+      it "returns true" do
+        expect(user.can_create_listing?).to be_truthy
+      end
+    end
+  end
+
   describe "admin_of?" do
     let(:organization) { FactoryBot.create(:organization) }
     context "admin of organization" do
@@ -854,7 +878,7 @@ RSpec.describe User, type: :model do
       end
     end
     context "superadmin" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "returns true" do
         expect(user.admin_of?(organization)).to be_truthy
       end

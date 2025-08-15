@@ -1,6 +1,6 @@
 -# TODO: use organized/manages/location_fields instead of this
 
-- f.object.country_id ||= @organization.locations.first&.country_id || Country.united_states.id
+- f.object.country_id ||= @organization.locations.first&.country_id || Country.united_states_id
 - f.object.name ||= @organization.name
 .col-md-6.mt-4
   %fieldset.mr-2.ml-2
@@ -23,7 +23,7 @@
         .row
           .col-lg-6
             .form-group.fancy-select.unfancy.no-restore-on-backspace
-              = f.collection_select(:state_id, State.all, :id, :name, {prompt: "State", include_blank: true}, class: "form-control mt-1" )
+              = f.collection_select(:state_id, State.united_states, :id, :name, {prompt: "State", include_blank: true}, class: "form-control mt-1" )
           .col-lg-6
             .form-group
               = f.text_field :zipcode, placeholder: "Zipcode", class: "form-control mt-1"

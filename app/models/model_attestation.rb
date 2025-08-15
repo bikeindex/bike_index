@@ -66,7 +66,7 @@ class ModelAttestation < ApplicationRecord
   end
 
   def update_model_audit
-    UpdateModelAuditWorker.perform_async(model_audit_id)
+    UpdateModelAuditJob.perform_async(model_audit_id)
     # Also lazy set the replaced attribute
     previous_attesations.update_all(replaced: true)
   end

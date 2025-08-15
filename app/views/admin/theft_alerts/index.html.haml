@@ -21,14 +21,11 @@
               = link_to "#{status.humanize} alerts", url_for(sortable_search_params.merge(search_status: status)), class: "dropdown-item #{@status == status ? 'active' : '' }"
         %li.nav-item.dropdown
           %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_paid_admin.present? ? "active" : "") }
-            - if @search_paid_admin.present?
-              = @search_paid_admin.humanize
-            - else
-              Any paid/admin
+            = @search_paid_admin.humanize
           .dropdown-menu
-            = link_to "Any paid/admin", url_for(sortable_search_params.merge(search_paid_admin: nil)), class: "dropdown-item #{@search_paid_admin == 'all' ? 'active' : '' }"
-            .dropdown-divider
             - available_paid_admin.each do |paid_admin|
+              - if paid_admin == "paid_and_unpaid"
+                .dropdown-divider
               = link_to paid_admin.humanize, url_for(sortable_search_params.merge(search_paid_admin: paid_admin)), class: "dropdown-item #{@search_paid_admin == paid_admin ? 'active' : '' }"
         %li.nav-item
           = link_to "fbook data", url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), class: "nav-link #{@search_facebook_data ? 'active' : ''}"
@@ -38,7 +35,7 @@
           = link_to "location counts", admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), class: "nav-link #{@location_counts ? 'active' : ''}"
         %li.nav-item
           = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-    = render partial: "/shared/admin_current_header", locals: { viewing: "Promoted Alerts" }
+    = render partial: "/shared/admin/current_header", locals: { viewing: "Promoted Alerts" }
 
   - theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| searched_theft_alerts.where(theft_alert_plan: plan).any? }
   - stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {id: searched_theft_alerts.pluck(:id)})
@@ -137,7 +134,7 @@
                 %tr
                   %td
                     = theft_alert_plan.name
-                    %small= MoneyFormater.money_format(theft_alert_plan.amount_cents_facebook)
+                    %small= MoneyFormatter.money_format(theft_alert_plan.amount_cents_facebook)
                   %td
                     - alert_count = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).count
                     - alert_count_total += alert_count
@@ -149,11 +146,11 @@
                   %td
                     - fbook_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).sum(:amount_cents_facebook_spent)
                     - fbook_cents_total += fbook_cents
-                    = MoneyFormater.money_format(fbook_cents)
+                    = MoneyFormatter.money_format(fbook_cents)
                   %td.small
                     - revenue_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).paid_cents
                     - revenue_cents_total += revenue_cents
-                    = MoneyFormater.money_format(revenue_cents)
+                    = MoneyFormatter.money_format(revenue_cents)
                   %td.small
                     - recovered_count = stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count
                     - recovered_count_total += recovered_count
@@ -163,14 +160,14 @@
                   %strong Total
                 %td= admin_number_display(alert_count_total)
                 %td= admin_number_display(fbook_reach_total)
-                %td= MoneyFormater.money_format(fbook_cents_total)
+                %td= MoneyFormatter.money_format(fbook_cents_total)
                 %td
-                  %small= MoneyFormater.money_format(revenue_cents_total)
+                  %small= MoneyFormatter.money_format(revenue_cents_total)
                 %td.small= admin_number_display(recovered_count_total)
 
 
-= render partial: "/shared/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert"}
+= render partial: "/shared/admin/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert"}
 
 = render partial: "/admin/theft_alerts/table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: @bike.present?}
 
-= render partial: "/shared/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert", skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert", skip_total: true}

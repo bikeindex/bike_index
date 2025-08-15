@@ -16,6 +16,7 @@ RSpec.describe BikeVersionsController, type: :request do
       get "#{base_url}?query_items%5B%5D=boo"
       expect(response.code).to eq("200")
       expect(response).to render_template(:index)
+      expect(assigns(:interpreted_params)).to eq({query: "boo", stolenness: "non"})
       expect(assigns(:bike_versions).pluck(:id)).to eq([bike_version.id])
 
       get "#{base_url}?query_items%5B%5D=booboo"
@@ -36,7 +37,7 @@ RSpec.describe BikeVersionsController, type: :request do
       expect(response).to render_template(:show)
     end
     context "superadmin" do
-      let(:current_user) { FactoryBot.create(:admin) }
+      let(:current_user) { FactoryBot.create(:superuser) }
       it "renders" do
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"

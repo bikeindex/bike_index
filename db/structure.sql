@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -41,6 +40,147 @@ COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statist
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: active_storage_attachments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.active_storage_attachments (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    record_type character varying NOT NULL,
+    record_id bigint NOT NULL,
+    blob_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: active_storage_attachments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.active_storage_attachments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: active_storage_attachments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.active_storage_attachments_id_seq OWNED BY public.active_storage_attachments.id;
+
+
+--
+-- Name: active_storage_blobs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.active_storage_blobs (
+    id bigint NOT NULL,
+    key character varying NOT NULL,
+    filename character varying NOT NULL,
+    content_type character varying,
+    metadata text,
+    service_name character varying NOT NULL,
+    byte_size bigint NOT NULL,
+    checksum character varying,
+    created_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: active_storage_blobs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.active_storage_blobs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: active_storage_blobs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.active_storage_blobs_id_seq OWNED BY public.active_storage_blobs.id;
+
+
+--
+-- Name: active_storage_variant_records; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.active_storage_variant_records (
+    id bigint NOT NULL,
+    blob_id bigint NOT NULL,
+    variation_digest character varying NOT NULL
+);
+
+
+--
+-- Name: active_storage_variant_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.active_storage_variant_records_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: active_storage_variant_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.active_storage_variant_records_id_seq OWNED BY public.active_storage_variant_records.id;
+
+
+--
+-- Name: address_records; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.address_records (
+    id bigint NOT NULL,
+    user_id bigint,
+    country_id bigint,
+    region_record_id bigint,
+    region_string character varying,
+    street character varying,
+    city character varying,
+    neighborhood character varying,
+    postal_code character varying,
+    latitude double precision,
+    longitude double precision,
+    kind integer,
+    publicly_visible_attribute integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: address_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.address_records_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: address_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.address_records_id_seq OWNED BY public.address_records.id;
+
 
 --
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
@@ -227,39 +367,6 @@ CREATE SEQUENCE public.b_params_id_seq
 --
 
 ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
-
-
---
--- Name: banned_email_domains; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.banned_email_domains (
-    id bigint NOT NULL,
-    domain character varying,
-    creator_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    deleted_at timestamp(6) without time zone
-);
-
-
---
--- Name: banned_email_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.banned_email_domains_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: banned_email_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.banned_email_domains_id_seq OWNED BY public.banned_email_domains.id;
 
 
 --
@@ -460,7 +567,8 @@ CREATE TABLE public.bike_versions (
     start_at timestamp without time zone,
     end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    primary_activity_id bigint
 );
 
 
@@ -557,7 +665,8 @@ CREATE TABLE public.bikes (
     likely_spam boolean DEFAULT false,
     serial_segments_migrated_at timestamp without time zone,
     model_audit_id bigint,
-    neighborhood character varying
+    neighborhood character varying,
+    primary_activity_id bigint
 );
 
 
@@ -710,7 +819,8 @@ CREATE TABLE public.cgroups (
     slug character varying(255),
     description character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    priority integer DEFAULT 1
 );
 
 
@@ -981,6 +1091,77 @@ CREATE SEQUENCE public.duplicate_bike_groups_id_seq
 --
 
 ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bike_groups.id;
+
+
+--
+-- Name: email_bans; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_bans (
+    id bigint NOT NULL,
+    user_id bigint,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    reason integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: email_bans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.email_bans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: email_bans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.email_bans_id_seq OWNED BY public.email_bans.id;
+
+
+--
+-- Name: email_domains; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_domains (
+    id bigint NOT NULL,
+    domain character varying,
+    creator_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone,
+    status integer DEFAULT 0,
+    user_count integer,
+    status_changed_at timestamp(6) without time zone,
+    data jsonb
+);
+
+
+--
+-- Name: email_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.email_domains_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: email_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.email_domains_id_seq OWNED BY public.email_domains.id;
 
 
 --
@@ -1639,8 +1820,8 @@ CREATE TABLE public.invoices (
     updated_at timestamp without time zone NOT NULL,
     notes text,
     child_enabled_feature_slugs jsonb,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
-    is_endless boolean DEFAULT false
+    is_endless boolean DEFAULT false,
+    currency_enum integer
 );
 
 
@@ -1845,7 +2026,8 @@ CREATE TABLE public.mail_snippets (
     state_id bigint,
     country_id bigint,
     subject text,
-    neighborhood character varying
+    neighborhood character varying,
+    doorkeeper_app_id bigint
 );
 
 
@@ -1986,6 +2168,125 @@ ALTER SEQUENCE public.manufacturers_id_seq OWNED BY public.manufacturers.id;
 
 
 --
+-- Name: marketplace_listings; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_listings (
+    id bigint NOT NULL,
+    seller_id bigint,
+    buyer_id bigint,
+    item_type character varying,
+    item_id bigint,
+    address_record_id bigint,
+    latitude double precision,
+    longitude double precision,
+    published_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    currency_enum integer,
+    amount_cents integer,
+    status integer,
+    condition integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    price_negotiable boolean DEFAULT false,
+    description text
+);
+
+
+--
+-- Name: marketplace_listings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_listings_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_listings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_listings_id_seq OWNED BY public.marketplace_listings.id;
+
+
+--
+-- Name: marketplace_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_messages (
+    id bigint NOT NULL,
+    marketplace_listing_id bigint,
+    initial_record_id bigint,
+    sender_id bigint,
+    receiver_id bigint,
+    subject text,
+    body text,
+    kind integer,
+    messages_prior_count integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_messages_id_seq OWNED BY public.marketplace_messages.id;
+
+
+--
+-- Name: memberships; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.memberships (
+    id bigint NOT NULL,
+    user_id bigint,
+    level integer,
+    status integer,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    creator_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: memberships_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.memberships_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: memberships_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.memberships_id_seq OWNED BY public.memberships.id;
+
+
+--
 -- Name: model_attestations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2103,7 +2404,6 @@ CREATE TABLE public.notifications (
     id bigint NOT NULL,
     user_id bigint,
     kind integer,
-    delivery_status character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     notifiable_type character varying,
@@ -2111,7 +2411,10 @@ CREATE TABLE public.notifications (
     message_channel integer DEFAULT 0,
     twilio_sid text,
     bike_id bigint,
-    message_channel_target character varying
+    message_channel_target character varying,
+    delivery_status integer,
+    delivery_error character varying,
+    message_id character varying
 );
 
 
@@ -2260,7 +2563,7 @@ CREATE TABLE public.organization_features (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     feature_slugs text[] DEFAULT '{}'::text[],
-    currency character varying DEFAULT 'USD'::character varying NOT NULL
+    currency_enum integer
 );
 
 
@@ -2661,9 +2964,12 @@ CREATE TABLE public.payments (
     payment_method integer DEFAULT 0,
     organization_id integer,
     invoice_id integer,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
     kind integer,
-    referral_source text
+    referral_source text,
+    currency_enum integer,
+    membership_id bigint,
+    stripe_subscription_id bigint,
+    stripe_status character varying
 );
 
 
@@ -2719,6 +3025,41 @@ CREATE SEQUENCE public.pghero_query_stats_id_seq
 --
 
 ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_stats.id;
+
+
+--
+-- Name: primary_activities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.primary_activities (
+    id bigint NOT NULL,
+    name character varying,
+    slug character varying,
+    primary_activity_family_id bigint,
+    family boolean,
+    priority integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: primary_activities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.primary_activities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: primary_activities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.primary_activities_id_seq OWNED BY public.primary_activities.id;
 
 
 --
@@ -2893,13 +3234,13 @@ CREATE TABLE public.stolen_bike_listings (
     frame_size_number double precision,
     listed_at timestamp without time zone,
     amount_cents integer,
-    currency character varying,
     listing_text text,
     data jsonb,
     line integer,
     "group" integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    currency_enum integer
 );
 
 
@@ -2939,7 +3280,8 @@ CREATE TABLE public.stolen_notifications (
     oauth_application_id integer,
     reference_url text,
     send_dates json,
-    kind integer
+    kind integer,
+    doorkeeper_app_id bigint
 );
 
 
@@ -3034,6 +3376,113 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 
 --
+-- Name: stripe_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_events (
+    id bigint NOT NULL,
+    stripe_id character varying,
+    name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_events_id_seq OWNED BY public.stripe_events.id;
+
+
+--
+-- Name: stripe_prices; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_prices (
+    id bigint NOT NULL,
+    membership_level integer,
+    "interval" integer,
+    stripe_id character varying,
+    currency_enum integer,
+    amount_cents integer,
+    live boolean DEFAULT false,
+    active boolean DEFAULT false,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_prices_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_prices_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_prices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_prices_id_seq OWNED BY public.stripe_prices.id;
+
+
+--
+-- Name: stripe_subscriptions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_subscriptions (
+    id bigint NOT NULL,
+    membership_id bigint,
+    user_id bigint,
+    stripe_price_stripe_id character varying,
+    stripe_id character varying,
+    end_at timestamp(6) without time zone,
+    start_at timestamp(6) without time zone,
+    stripe_status character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    referral_source text
+);
+
+
+--
+-- Name: stripe_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_subscriptions_id_seq OWNED BY public.stripe_subscriptions.id;
+
+
+--
 -- Name: superuser_abilities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3084,9 +3533,9 @@ CREATE TABLE public.theft_alert_plans (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     language integer DEFAULT 0 NOT NULL,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL,
     amount_cents_facebook integer,
-    ad_radius_miles integer
+    ad_radius_miles integer,
+    currency_enum integer
 );
 
 
@@ -3333,7 +3782,8 @@ CREATE TABLE public.user_emails (
     old_user_id integer,
     confirmation_token text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    last_email_errored boolean DEFAULT false
 );
 
 
@@ -3485,7 +3935,8 @@ CREATE TABLE public.users (
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
-    neighborhood character varying
+    neighborhood character varying,
+    address_record_id bigint
 );
 
 
@@ -3543,6 +3994,34 @@ ALTER SEQUENCE public.wheel_sizes_id_seq OWNED BY public.wheel_sizes.id;
 
 
 --
+-- Name: active_storage_attachments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.active_storage_attachments ALTER COLUMN id SET DEFAULT nextval('public.active_storage_attachments_id_seq'::regclass);
+
+
+--
+-- Name: active_storage_blobs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.active_storage_blobs ALTER COLUMN id SET DEFAULT nextval('public.active_storage_blobs_id_seq'::regclass);
+
+
+--
+-- Name: active_storage_variant_records id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.active_storage_variant_records ALTER COLUMN id SET DEFAULT nextval('public.active_storage_variant_records_id_seq'::regclass);
+
+
+--
+-- Name: address_records id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.address_records ALTER COLUMN id SET DEFAULT nextval('public.address_records_id_seq'::regclass);
+
+
+--
 -- Name: ads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3575,13 +4054,6 @@ ALTER TABLE ONLY public.ambassador_tasks ALTER COLUMN id SET DEFAULT nextval('pu
 --
 
 ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_params_id_seq'::regclass);
-
-
---
--- Name: banned_email_domains id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.banned_email_domains ALTER COLUMN id SET DEFAULT nextval('public.banned_email_domains_id_seq'::regclass);
 
 
 --
@@ -3701,6 +4173,20 @@ ALTER TABLE ONLY public.customer_contacts ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('public.duplicate_bike_groups_id_seq'::regclass);
+
+
+--
+-- Name: email_bans id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_bans ALTER COLUMN id SET DEFAULT nextval('public.email_bans_id_seq'::regclass);
+
+
+--
+-- Name: email_domains id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_domains ALTER COLUMN id SET DEFAULT nextval('public.email_domains_id_seq'::regclass);
 
 
 --
@@ -3886,6 +4372,27 @@ ALTER TABLE ONLY public.manufacturers ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: marketplace_listings id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_listings ALTER COLUMN id SET DEFAULT nextval('public.marketplace_listings_id_seq'::regclass);
+
+
+--
+-- Name: marketplace_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_messages ALTER COLUMN id SET DEFAULT nextval('public.marketplace_messages_id_seq'::regclass);
+
+
+--
+-- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.memberships ALTER COLUMN id SET DEFAULT nextval('public.memberships_id_seq'::regclass);
+
+
+--
 -- Name: model_attestations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4012,6 +4519,13 @@ ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: primary_activities id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primary_activities ALTER COLUMN id SET DEFAULT nextval('public.primary_activities_id_seq'::regclass);
+
+
+--
 -- Name: public_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4058,6 +4572,27 @@ ALTER TABLE ONLY public.stolen_notifications ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('public.stolen_records_id_seq'::regclass);
+
+
+--
+-- Name: stripe_events id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_events ALTER COLUMN id SET DEFAULT nextval('public.stripe_events_id_seq'::regclass);
+
+
+--
+-- Name: stripe_prices id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_prices ALTER COLUMN id SET DEFAULT nextval('public.stripe_prices_id_seq'::regclass);
+
+
+--
+-- Name: stripe_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.stripe_subscriptions_id_seq'::regclass);
 
 
 --
@@ -4145,6 +4680,38 @@ ALTER TABLE ONLY public.wheel_sizes ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: active_storage_attachments active_storage_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.active_storage_attachments
+    ADD CONSTRAINT active_storage_attachments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: active_storage_blobs active_storage_blobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.active_storage_blobs
+    ADD CONSTRAINT active_storage_blobs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: active_storage_variant_records active_storage_variant_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.active_storage_variant_records
+    ADD CONSTRAINT active_storage_variant_records_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: address_records address_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.address_records
+    ADD CONSTRAINT address_records_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: ads ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4190,14 +4757,6 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
-
-
---
--- Name: banned_email_domains banned_email_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.banned_email_domains
-    ADD CONSTRAINT banned_email_domains_pkey PRIMARY KEY (id);
 
 
 --
@@ -4334,6 +4893,22 @@ ALTER TABLE ONLY public.customer_contacts
 
 ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: email_bans email_bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_bans
+    ADD CONSTRAINT email_bans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: email_domains email_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_domains
+    ADD CONSTRAINT email_domains_pkey PRIMARY KEY (id);
 
 
 --
@@ -4545,6 +5120,30 @@ ALTER TABLE ONLY public.manufacturers
 
 
 --
+-- Name: marketplace_listings marketplace_listings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_listings
+    ADD CONSTRAINT marketplace_listings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: marketplace_messages marketplace_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_messages
+    ADD CONSTRAINT marketplace_messages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: memberships memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.memberships
+    ADD CONSTRAINT memberships_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: model_attestations model_attestations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4689,6 +5288,14 @@ ALTER TABLE ONLY public.pghero_query_stats
 
 
 --
+-- Name: primary_activities primary_activities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primary_activities
+    ADD CONSTRAINT primary_activities_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: public_images public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4742,6 +5349,30 @@ ALTER TABLE ONLY public.stolen_bike_listings
 
 ALTER TABLE ONLY public.stolen_notifications
     ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_events stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_events
+    ADD CONSTRAINT stripe_events_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_prices stripe_prices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_prices
+    ADD CONSTRAINT stripe_prices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_subscriptions stripe_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_subscriptions
+    ADD CONSTRAINT stripe_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
@@ -4841,6 +5472,55 @@ ALTER TABLE ONLY public.wheel_sizes
 
 
 --
+-- Name: index_active_storage_attachments_on_blob_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_active_storage_attachments_on_blob_id ON public.active_storage_attachments USING btree (blob_id);
+
+
+--
+-- Name: index_active_storage_attachments_uniqueness; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_active_storage_attachments_uniqueness ON public.active_storage_attachments USING btree (record_type, record_id, name, blob_id);
+
+
+--
+-- Name: index_active_storage_blobs_on_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_active_storage_blobs_on_key ON public.active_storage_blobs USING btree (key);
+
+
+--
+-- Name: index_active_storage_variant_records_uniqueness; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.active_storage_variant_records USING btree (blob_id, variation_digest);
+
+
+--
+-- Name: index_address_records_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_country_id ON public.address_records USING btree (country_id);
+
+
+--
+-- Name: index_address_records_on_region_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_region_record_id ON public.address_records USING btree (region_record_id);
+
+
+--
+-- Name: index_address_records_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id);
+
+
+--
 -- Name: index_alert_images_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4866,13 +5546,6 @@ CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks U
 --
 
 CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
-
-
---
--- Name: index_banned_email_domains_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_banned_email_domains_on_creator_id ON public.banned_email_domains USING btree (creator_id);
 
 
 --
@@ -5016,6 +5689,13 @@ CREATE INDEX index_bike_versions_on_paint_id ON public.bike_versions USING btree
 
 
 --
+-- Name: index_bike_versions_on_primary_activity_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions USING btree (primary_activity_id);
+
+
+--
 -- Name: index_bike_versions_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5128,6 +5808,13 @@ CREATE INDEX index_bikes_on_paint_id ON public.bikes USING btree (paint_id);
 
 
 --
+-- Name: index_bikes_on_primary_activity_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_primary_activity_id ON public.bikes USING btree (primary_activity_id);
+
+
+--
 -- Name: index_bikes_on_primary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5202,6 +5889,20 @@ CREATE INDEX index_components_on_bike_version_id ON public.components USING btre
 --
 
 CREATE INDEX index_components_on_manufacturer_id ON public.components USING btree (manufacturer_id);
+
+
+--
+-- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_id ON public.email_bans USING btree (user_id);
+
+
+--
+-- Name: index_email_domains_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_domains_on_creator_id ON public.email_domains USING btree (creator_id);
 
 
 --
@@ -5520,6 +6221,13 @@ CREATE INDEX index_mail_snippets_on_country_id ON public.mail_snippets USING btr
 
 
 --
+-- Name: index_mail_snippets_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mail_snippets_on_doorkeeper_app_id ON public.mail_snippets USING btree (doorkeeper_app_id);
+
+
+--
 -- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5538,6 +6246,76 @@ CREATE INDEX index_mail_snippets_on_state_id ON public.mail_snippets USING btree
 --
 
 CREATE INDEX index_mailchimp_data_on_user_id ON public.mailchimp_data USING btree (user_id);
+
+
+--
+-- Name: index_marketplace_listings_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_address_record_id ON public.marketplace_listings USING btree (address_record_id);
+
+
+--
+-- Name: index_marketplace_listings_on_buyer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_buyer_id ON public.marketplace_listings USING btree (buyer_id);
+
+
+--
+-- Name: index_marketplace_listings_on_item; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_item ON public.marketplace_listings USING btree (item_type, item_id);
+
+
+--
+-- Name: index_marketplace_listings_on_seller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_seller_id ON public.marketplace_listings USING btree (seller_id);
+
+
+--
+-- Name: index_marketplace_messages_on_initial_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_initial_record_id ON public.marketplace_messages USING btree (initial_record_id);
+
+
+--
+-- Name: index_marketplace_messages_on_marketplace_listing_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_marketplace_listing_id ON public.marketplace_messages USING btree (marketplace_listing_id);
+
+
+--
+-- Name: index_marketplace_messages_on_receiver_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_receiver_id ON public.marketplace_messages USING btree (receiver_id);
+
+
+--
+-- Name: index_marketplace_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_sender_id ON public.marketplace_messages USING btree (sender_id);
+
+
+--
+-- Name: index_memberships_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_memberships_on_creator_id ON public.memberships USING btree (creator_id);
+
+
+--
+-- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_memberships_on_user_id ON public.memberships USING btree (user_id);
 
 
 --
@@ -5835,6 +6613,20 @@ CREATE INDEX index_parking_notifications_on_user_id ON public.parking_notificati
 
 
 --
+-- Name: index_payments_on_membership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_payments_on_membership_id ON public.payments USING btree (membership_id);
+
+
+--
+-- Name: index_payments_on_stripe_subscription_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_payments_on_stripe_subscription_id ON public.payments USING btree (stripe_subscription_id);
+
+
+--
 -- Name: index_payments_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5846,6 +6638,13 @@ CREATE INDEX index_payments_on_user_id ON public.payments USING btree (user_id);
 --
 
 CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghero_query_stats USING btree (database, captured_at);
+
+
+--
+-- Name: index_primary_activities_on_primary_activity_family_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_primary_activities_on_primary_activity_family_id ON public.primary_activities USING btree (primary_activity_family_id);
 
 
 --
@@ -5912,6 +6711,13 @@ CREATE INDEX index_stolen_bike_listings_on_tertiary_frame_color_id ON public.sto
 
 
 --
+-- Name: index_stolen_notifications_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_notifications_on_doorkeeper_app_id ON public.stolen_notifications USING btree (doorkeeper_app_id);
+
+
+--
 -- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5944,6 +6750,27 @@ CREATE INDEX index_stolen_records_on_organization_stolen_message_id ON public.st
 --
 
 CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records USING btree (recovering_user_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_membership_id ON public.stripe_subscriptions USING btree (membership_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_stripe_price_stripe_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_stripe_price_stripe_id ON public.stripe_subscriptions USING btree (stripe_price_stripe_id);
+
+
+--
+-- Name: index_stripe_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_subscriptions_on_user_id ON public.stripe_subscriptions USING btree (user_id);
 
 
 --
@@ -6115,6 +6942,13 @@ CREATE INDEX index_user_registration_organizations_on_user_id ON public.user_reg
 
 
 --
+-- Name: index_users_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_address_record_id ON public.users USING btree (address_record_id);
+
+
+--
 -- Name: index_users_on_auth_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6191,6 +7025,22 @@ ALTER TABLE ONLY public.alert_images
 
 
 --
+-- Name: active_storage_variant_records fk_rails_993965df05; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.active_storage_variant_records
+    ADD CONSTRAINT fk_rails_993965df05 FOREIGN KEY (blob_id) REFERENCES public.active_storage_blobs(id);
+
+
+--
+-- Name: active_storage_attachments fk_rails_c3b3935057; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.active_storage_attachments
+    ADD CONSTRAINT fk_rails_c3b3935057 FOREIGN KEY (blob_id) REFERENCES public.active_storage_blobs(id);
+
+
+--
 -- Name: ambassador_task_assignments fk_rails_d557be2cfa; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6205,6 +7055,31 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250528154403'),
+('20250519154506'),
+('20250515190821'),
+('20250508151610'),
+('20250508151602'),
+('20250421153929'),
+('20250413160560'),
+('20250413160556'),
+('20250319024056'),
+('20250319010935'),
+('20250313035336'),
+('20250312225116'),
+('20250312171401'),
+('20250311144643'),
+('20250311013102'),
+('20250227195412'),
+('20250226182610'),
+('20250217173339'),
+('20250217173338'),
+('20250217173337'),
+('20250217173308'),
+('20250216191639'),
+('20250216183834'),
+('20250207221053'),
+('20250207193640'),
 ('20250205135704'),
 ('20250203011709'),
 ('20250130185756'),

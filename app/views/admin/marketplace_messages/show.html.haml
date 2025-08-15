@@ -1,0 +1,92 @@
+.admin-subnav
+  .col-md-12
+    %h1
+      Marketplace Message
+
+.row.mt-4
+  .col-md-6
+    %table.table-list
+      %tbody
+        - if display_dev_info?
+          %tr
+            %td.only-dev-visible ID
+            %td
+              %code=@marketplace_message.id
+        %tr
+          %td
+            Sender
+          %td
+            = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.sender, user_id: @marketplace_message.sender_id}
+        %tr
+          %td
+            Receiver
+          %td
+            = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id}
+        %tr.small
+          %td
+            Created
+          %td
+            %span.convertTime.preciseTime
+              = l @marketplace_message.created_at, format: :convert_time
+        %tr.small
+          %td
+            Updated
+          %td
+            %span.convertTime.preciseTime
+              = l @marketplace_message.updated_at, format: :convert_time
+        %tr
+          %td
+            Status
+          %td
+            = @marketplace_message.kind_humanized
+
+  .col-md-6
+    %table.table-list
+      %tbody
+
+        %tr
+          %td Marketplace Listing
+          %td
+            %span.convertTime
+              = l @marketplace_listing.created_at, format: :convert_time
+            - if display_dev_info?
+              %code.only-dev-visible
+                = @marketplace_listing.id
+
+        %tr
+          %td Listing status
+          %td
+            - status_class = "text-info" if @marketplace_listing.for_sale?
+            - status_class = "text-success" if @marketplace_listing.sold?
+            %span{class: status_class}
+              = @marketplace_listing.status_humanized
+        %tr
+          %td Listing published
+          %td
+            - if @marketplace_listing.published_at.present?
+              %span.convertTime
+                = l @marketplace_listing.published_at, format: :convert_time
+        %tr
+          %td Listing end
+          %td
+            - if @marketplace_listing.end_at.present?
+              %span.convertTime
+                = l @marketplace_listing.end_at, format: :convert_time
+        %tr
+          %td price
+          %td
+            = "#{@marketplace_listing.currency_symbol}#{admin_number_display(@marketplace_listing.amount)}"
+        %tr
+          %td Condition
+          %td= @marketplace_listing.condition
+        %tr
+          %td Item
+          %td
+            = render partial: "/shared/admin/bike_cell", locals: {bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, show_marketplace_preview: true) }
+.mt-4
+  = render(Card::Component.new(shadow: true)) do
+    %p
+      %strong subject:
+      = @marketplace_message.subject
+
+    = render(UserTextBlockDisplay::Component.new(text: @marketplace_message.body, max_height_class: ""))

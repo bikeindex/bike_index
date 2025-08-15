@@ -1,13 +1,12 @@
 class Admin::ModelAttestationsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @model_attestations =
       pagy(matching_model_attestations
         .includes(:model_audit, :user, :organization)
-        .reorder("model_attestations.#{sort_column} #{sort_direction}"), limit: @per_page)
+        .reorder("model_attestations.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_model_attestations

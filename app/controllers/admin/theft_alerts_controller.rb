@@ -1,14 +1,13 @@
 class Admin::TheftAlertsController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
   before_action :find_theft_alert, only: [:edit, :update]
 
   def index
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page
     @pagy, @theft_alerts =
       pagy(searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
-        .includes(:theft_alert_plan, :stolen_record), limit: @per_page)
+        .includes(:theft_alert_plan, :stolen_record), limit: @per_page, page: permitted_page)
     @page_title = "Admin | Promoted alerts"
     @location_counts = InputNormalizer.boolean(params[:search_location_counts])
   end
@@ -24,11 +23,11 @@ class Admin::TheftAlertsController < Admin::BaseController
     if InputNormalizer.boolean(params[:activate_theft_alert])
       new_data = @theft_alert.facebook_data || {}
       @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
-      ActivateTheftAlertWorker.perform_async(@theft_alert.id, true)
+      StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id, true)
       flash[:success] = "Activating, please wait"
       redirect_to admin_theft_alert_path(@theft_alert)
     elsif InputNormalizer.boolean(params[:update_theft_alert])
-      UpdateTheftAlertFacebookWorker.new.perform(@theft_alert.id)
+      StolenBike::UpdateTheftAlertFacebookJob.new.perform(@theft_alert.id)
       flash[:success] = "Updating Facebook data"
       redirect_to admin_theft_alerts_path
     elsif @theft_alert.update(permitted_update_params)
@@ -50,9 +49,6 @@ class Admin::TheftAlertsController < Admin::BaseController
     @stolen_record = @bike.current_stolen_record
     @theft_alerts = @stolen_record&.theft_alerts || []
 
-    bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-    @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
-
     @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
 
     @theft_alert = TheftAlert.new(stolen_record: @stolen_record,
@@ -65,7 +61,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   def create
     @theft_alert = TheftAlert.new(permitted_create_params)
     if @theft_alert.save
-      ActivateTheftAlertWorker.perform_async(@theft_alert.id) if @theft_alert.activateable?
+      StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id) if @theft_alert.activateable?
       flash[:success] = "Promoted alert created!"
       redirect_to edit_admin_theft_alert_path(@theft_alert)
     else
@@ -109,11 +105,11 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def available_statuses
-    TheftAlert.statuses + ["posted"]
+    TheftAlert.statuses + %w[posted failed_to_activate]
   end
 
   def available_paid_admin
-    %w[paid admin paid_or_admin]
+    %w[paid_or_admin paid admin unpaid paid_and_unpaid]
   end
 
   def searched_theft_alerts
@@ -125,21 +121,6 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       TheftAlert
     end
-    @search_paid_admin = available_paid_admin.include?(params[:search_paid_admin]) ? params[:search_paid_admin] : nil
-    theft_alerts = theft_alerts.public_send(@search_paid_admin) if @search_paid_admin.present?
-
-    @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
-    theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
-    if available_statuses.include?(params[:search_status])
-      @status = params[:search_status]
-      theft_alerts = if @status == "posted"
-        theft_alerts.posted
-      else
-        theft_alerts.where(status: @status)
-      end
-    else
-      @status = "all"
-    end
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])
       theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
@@ -148,9 +129,31 @@ class Admin::TheftAlertsController < Admin::BaseController
       @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
       theft_alerts = theft_alerts.where(bike_id: @bike.id) if @bike.present?
     end
+    @search_paid_admin = if available_paid_admin.include?(params[:search_paid_admin])
+      params[:search_paid_admin]
+    elsif @user.present? || @bike.present?
+      "paid_and_unpaid" # by default, include all paid and unpaid if user or bike is searched
+    else
+      available_paid_admin.first
+    end
+    # paid_and_unpaid is "all"
+    theft_alerts = theft_alerts.public_send(@search_paid_admin) if @search_paid_admin != "paid_and_unpaid"
+
+    @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
+    theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
+
+    if available_statuses.include?(params[:search_status])
+      @status = params[:search_status]
+      theft_alerts = if TheftAlert.statuses.include?(@status)
+        theft_alerts.where(status: @status)
+      else # It must be one of the special statuses - which must be valid to send!
+        theft_alerts.send(@status)
+      end
+    else
+      @status = "all"
+    end
     # We always render distance
-    distance = params[:search_distance].to_i
-    @distance = (distance.present? && distance > 0) ? distance : 50
+    @distance = GeocodeHelper.permitted_distance(params[:search_distance], default_distance: 50)
     if params[:search_location].present?
       bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       theft_alerts = theft_alerts.within_bounding_box(bounding_box)

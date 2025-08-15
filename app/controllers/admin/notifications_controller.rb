@@ -1,12 +1,11 @@
 class Admin::NotificationsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
     params[:page] || 1
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @notifications = pagy(matching_notifications.reorder("notifications.#{sort_column} #{sort_direction}")
-      .includes(:bike, :notifiable, :user), limit: @per_page)
+      .includes(:bike, :notifiable, :user), limit: @per_page, page: permitted_page)
     @render_kind_counts = InputNormalizer.boolean(params[:search_kind_counts])
   end
 
@@ -44,7 +43,7 @@ class Admin::NotificationsController < Admin::BaseController
     end
     if InputNormalizer.boolean(params[:search_undelivered])
       @undelivered = true
-      notifications = notifications.undelivered
+      notifications = notifications.not_delivery_success
     end
     if params[:user_id].present?
       @user = User.unscoped.friendly_find(params[:user_id])

@@ -1,0 +1,133 @@
+<div
+  class="tw:block tw:max-w-4xl tw:mx-auto"
+  data-controller="page-section--choose-membership--component"
+>
+  <%= render(Card::Component.new(shadow: true)) do %>
+    <h1
+      class="
+        tw:mb-5 tw:text-xl tw:font-medium tw:text-gray-900 tw:dark:text-gray-100
+        tw:text-center tw:font-header
+      "
+    >
+      Become a Bike Index member!
+    </h1>
+    <%= form_for @membership, builder: BikeIndexFormBuilder, url: membership_path, method: :post do |f| %>
+      <%= hidden_field_tag :currency, @currency.slug %>
+      <%= hidden_field_tag :referral_source, @referral_source %>
+
+      <div class="tw:text-center" id="intervalSelector">
+        <label class="tw:cursor-pointer tw:mx-1">
+          <%= f.radio_button :set_interval,
+                         :monthly,
+                         required: true,
+                         class: "tw:cursor-pointer",
+                         data: {
+                           action:
+                             "change->page-section--choose-membership--component#updateIntervalVisibility",
+                         } %>
+          Monthly donation
+        </label>
+        <label class="tw:cursor-pointer tw:mx-1">
+          <%= f.radio_button :set_interval,
+                         :yearly,
+                         required: true,
+                         class: "tw:cursor-pointer",
+                         data: {
+                           action:
+                             "change->page-section--choose-membership--component#updateIntervalVisibility",
+                         } %>
+          Yearly donation
+        </label>
+      </div>
+      <ul
+        class="
+          tw:grid tw:w-full tw:gap-6 tw:md:grid-cols-3 tw:mt-6 tw:mb-8
+          tw:justify-items-stretch tw:items-stretch
+        "
+      >
+        <li class="tw:inline-flex tw:items-center tw:justify-between">
+          <label
+            class="
+              tw:w-full tw:p-5 tw:shadow-sm tw:rounded-md tw:border tw:cursor-pointer
+              tw:border-gray-200 tw:dark:border-gray-700 tw:hover:bg-gray-100
+              tw:dark:hover:bg-gray-700 tw:focus-visible:outline tw:focus-visible:outline-2
+              tw:focus-visible:outline-offset-2 tw:focus-visible:outline-gray-200
+              tw:focus-visible:dark:outline-gray-600 tw:has-checked:bg-gray-200
+              tw:has-checked:dark:bg-gray-600 tw:h-full
+            "
+          >
+            <%= f.radio_button :level, :basic, required: true, class: "tw:hidden" %>
+            <h3 class="tw:font-semibold tw:text-xl">Basic</h3>
+            <ul class="tw:list-disc tw:mt-2 tw:mb-4">
+              <li>List bikes in the marketplace</li>
+              <li>Quarterly Member update</li>
+              <li>Membership Badge on Bike Index</li>
+              <li>Faster support responses</li>
+            </ul>
+            <%= price_display(499, "monthly") %>
+            <%= price_display(4999, "yearly") %>
+          </label>
+        </li>
+        <li class="tw:inline-flex tw:items-center tw:justify-between">
+          <label
+            class="
+              tw:w-full tw:p-5 tw:shadow-sm tw:rounded-md tw:border tw:cursor-pointer
+              tw:border-gray-200 tw:dark:border-gray-700 tw:hover:bg-gray-100
+              tw:dark:hover:bg-gray-700 tw:focus-visible:outline tw:focus-visible:outline-2
+              tw:focus-visible:outline-offset-2 tw:focus-visible:outline-gray-200
+              tw:focus-visible:dark:outline-gray-600 tw:has-checked:bg-gray-200
+              tw:has-checked:dark:bg-gray-600 tw:h-full
+            "
+          >
+            <%= f.radio_button :level, :plus, required: true, class: "tw:hidden" %>
+            <h3 class="tw:font-semibold tw:text-xl">Plus</h3>
+            <ul class="tw:list-disc tw:mt-2 tw:mb-4">
+              <li>All benefits from Basic</li>
+              <li>No ads (if we start showing ads)</li>
+              <li>Free promoted alert if your bike is stolen</li>
+              <li>Bike Index member cycling cap</li>
+            </ul>
+            <%= price_display(999, "monthly") %>
+            <%= price_display(9999, "yearly") %>
+          </label>
+        </li>
+        <li class="tw:inline-flex tw:items-center tw:justify-between">
+          <label
+            class="
+              tw:w-full tw:p-5 tw:shadow-sm tw:rounded-md tw:border tw:cursor-pointer
+              tw:border-gray-200 tw:dark:border-gray-700 tw:hover:bg-gray-100
+              tw:dark:hover:bg-gray-700 tw:focus-visible:outline tw:focus-visible:outline-2
+              tw:focus-visible:outline-offset-2 tw:focus-visible:outline-gray-200
+              tw:focus-visible:dark:outline-gray-600 tw:has-checked:bg-gray-200
+              tw:has-checked:dark:bg-gray-600 tw:h-full
+            "
+          >
+            <%= f.radio_button :level, :patron, required: true, class: "tw:hidden" %>
+            <h3 class="tw:font-semibold tw:text-xl">Patron</h3>
+            <ul class="tw:list-disc tw:mt-2 tw:mb-4">
+              <li>All benefits from Basic & Plus</li>
+              <li>Bike Index Patron shirt</li>
+              <li>Patron badge on Bike Index</li>
+              <li>Top listing placements on marketplace</li>
+            </ul>
+            <%= price_display(4999, "monthly") %>
+            <%= price_display(49_999, "yearly") %>
+          </label>
+        </li>
+      </ul>
+      <%= f.submit "Enroll >", class: "twbtn-blue" %>
+    <% end %>
+
+    <p class="tw:pt-6 tw:mb-0">
+      <%= link_to "Why become a member?",
+      news_path(Blog.membership_slug),
+      target: "_blank",
+      class: "tw:underline tw:inline-block" %>
+    </p>
+    <p class="tw:pt-3 tw:mb-0">
+      <%= link_to "Or, make a one time donation",
+      donate_path,
+      class: "tw:underline tw:inline-block twless-strong" %>
+    </p>
+  <% end %>
+</div>

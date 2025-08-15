@@ -57,8 +57,9 @@ RSpec.shared_examples "bike_attributable" do
       let(:type) { "personal-mobility" }
       let(:propulsion_type) { "throttle" }
       it "returns expected" do
-        expect(obj.type).to eq "e-skateboard (e-unicycle, personal mobility device, etc)"
-        expect(obj.type_titleize).to eq "e-Skateboard (e-Unicycle, Personal mobility device, etc)"
+        expect(obj.cycle_type_name).to eq "e-Skateboard (e-Unicycle, Personal mobility device, etc)"
+        expect(obj.type).to eq "e-skateboard"
+        expect(obj.type_titleize).to eq "e-Skateboard"
         expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end
@@ -85,6 +86,22 @@ RSpec.shared_examples "bike_attributable" do
     it "returns the normalized name" do
       normalized_name = PropulsionType.new(obj.propulsion_type).name
       expect(obj.propulsion_type_name).to eq(normalized_name)
+    end
+  end
+
+  describe "drivetrain_attributes" do
+    let(:obj) { FactoryBot.build(model_sym, coaster_brake:, belt_drive:) }
+    let(:coaster_brake) { false }
+    let(:belt_drive) { false }
+    it "returns empty" do
+      expect(obj.drivetrain_attributes).to eq ""
+    end
+    context "with belt_drive and coaster_brake" do
+      let(:coaster_brake) { true }
+      let(:belt_drive) { true }
+      it "returns empty" do
+        expect(obj.drivetrain_attributes).to eq "Coaster brake, Belt drive"
+      end
     end
   end
 

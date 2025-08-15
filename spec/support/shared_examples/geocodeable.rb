@@ -32,7 +32,7 @@ RSpec.shared_examples "geocodeable" do
         city: "New York",
         state: FactoryBot.build_stubbed(:state_new_york),
         zipcode: "10016",
-        country: FactoryBot.build_stubbed(:country_us)
+        country: FactoryBot.build_stubbed(:country_united_states)
       )
     end
     context "given booleans for address components" do
@@ -148,7 +148,7 @@ RSpec.shared_examples "geocodeable" do
         end
       end
       context "larkspur" do
-        let!(:state) { FactoryBot.create(:state, name: "Colorado", abbreviation: "CO") }
+        let!(:state) { FactoryBot.create(:state, :find_or_create, name: "Colorado", abbreviation: "CO") }
         let(:object) { subject.class.new(country: Country.united_states, state: state, city: " larkspur . co\n") }
         it "removes co" do
           expect(object.city).to eq "larkspur"

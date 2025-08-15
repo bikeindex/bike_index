@@ -6,15 +6,19 @@ class MyAccountsController < ApplicationController
 
   def show
     @locks_active_tab = params[:active_tab] == "locks"
-    @per_page = params[:per_page] || 20
-    @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page)
-    @locks = current_user.locks
+    @per_page = permitted_per_page
+    @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page, page: permitted_page)
+    @locks = current_user.locks.reorder(created_at: :desc)
   end
 
   def edit
     @user = current_user
     @page_errors = @user.errors
     @page_title = @edit_templates[@edit_template]
+
+    if @edit_template&.to_sym == :root
+      Backfills::AddressRecordsForUsersJob.build_or_create_for(@user, country_id: current_country_id)
+    end
   end
 
   def update
@@ -26,9 +30,9 @@ class MyAccountsController < ApplicationController
     end
     unless @user.errors.any?
       successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations
-      @user.address_set_manually = true if params&.dig(:user, :street).present?
-      if params[:user].present? && @user.update(permitted_parameters)
-        successfully_updated = true
+
+      if params[:user].present?
+        successfully_updated = update_user_from_params(@user, permitted_parameters)
         if params.dig(:user, :password).present?
           update_user_authentication_for_new_password
           default_session_set(@user)
@@ -46,7 +50,7 @@ class MyAccountsController < ApplicationController
 
   def destroy
     if current_user.deletable?
-      UserDeleteWorker.new.perform(current_user.id, user: current_user)
+      Users::DeleteJob.new.perform(current_user.id, user: current_user)
       remove_session
       redirect_to goodbye_url, notice: "Account deleted!"
     else
@@ -62,16 +66,13 @@ class MyAccountsController < ApplicationController
 
   private
 
-  def authenticate_user_for_my_accounts_controller
-    authenticate_user(translation_key: :create_account, flash_type: :info)
-  end
-
   def edit_templates
     @edit_templates ||= {
       root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
       password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
       sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
-      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit])
+      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit]),
+      membership: translation(:membership, scope: [:controllers, :my_accounts, :edit])
     }.merge(registration_organization_template).as_json
   end
 
@@ -107,8 +108,25 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeWorker
+    @user.update(updated_at: Time.current) # Bump user to enqueue ::Callbacks::AfterUserChangeJob
     @user
+  end
+
+  def update_user_from_params(user, pparams)
+    address_params = pparams.delete(:address_record_attributes)
+    if address_params&.values.presence&.any?
+      address_record = AddressRecord.where(user_id: user.id).find_by(id: address_params[:id]) ||
+        AddressRecord.new(kind: :user, user_id: user.id)
+      address_record.update(address_params.except(:id).merge(skip_callback_job: true))
+
+      if address_record.valid?
+        user.address_set_manually = true
+        user.address_record = address_record.reload
+        # Updates the user association, user needs to be assigned
+        ::Callbacks::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
+      end
+    end
+    user.update(pparams)
   end
 
   def calculated_new_registration_info
@@ -129,7 +147,9 @@ class MyAccountsController < ApplicationController
         :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :instagram, :show_instagram,
         :show_website, :show_bikes, :show_phone, :my_bikes_link_target, :time_single_format,
         :my_bikes_link_title, :password, :password_confirmation, :preferred_language,
-        user_registration_organization_attributes: [:all_bikes, :can_edit_claimed])
+        user_registration_organization_attributes: [:all_bikes, :can_edit_claimed],
+        # include address_record id so we don't create new address records
+        address_record_attributes: (AddressRecord.permitted_params + [:id]))
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end

@@ -3,12 +3,12 @@
 
 # Ignore all logfiles and tempfiles.
 /log/*.log*
+/storage/*
 /tmp
 .DS_Store
 coverage/*
 public/uploads/*
 public/caches
-.sass-cache
 public/partner
 .vagrant
 ubuntu-xenial-16.04-cloudimg-console.log
@@ -64,3 +64,6 @@ spec/vcr_cassettes/facebook/*
 
 # Ignore editor temp files
 .idea
+
+# Ignore .claude settings
+.claude/

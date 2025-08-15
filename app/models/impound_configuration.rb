@@ -44,7 +44,7 @@ class ImpoundConfiguration < ApplicationRecord
 
   def calculated_display_id_next_integer
     # TODO: display_id_next_integer input needs to be validated
-    # currently, in ProcessImpoundUpdatesWorker it's removed if it's been used
+    # currently, in ProcessImpoundUpdatesJob it's removed if it's been used
     return display_id_next_integer if display_id_next_integer.present?
     last_display_id_integer + 1
   end

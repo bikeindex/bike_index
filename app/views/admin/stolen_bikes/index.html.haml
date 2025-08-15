@@ -5,6 +5,8 @@
   .col-md-7
     %ul
       %li.nav-item
+        = link_to "promoted alerts", admin_stolen_bikes_url(sortable_search_params.merge(search_with_promoted_alert: !@with_promoted_alert)), class: "nav-link #{@with_promoted_alert ? 'active' : ''}"
+      %li.nav-item
         - if @unapproved_only
           = link_to "All stolen (not just unverified)", admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: true)), class: "nav-link"
         - else
@@ -58,7 +60,7 @@
           unapproved records
           = link_to "without location", url_for(sortable_search_params.merge(search_without_location: true))
 
-= render partial: "/shared/pagination", locals: {collection: @stolen_records, viewing: "Stolen Bike", count: available_stolen_records.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @stolen_records, viewing: "Stolen Bike", count: available_stolen_records.size}
 
 = form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post do
   .full-screen-table
@@ -142,4 +144,4 @@
                 = user_icon(bike&.user)
   .mb-3.text-center
     = submit_tag 'Approve selected', class: 'btn btn-outline-primary'
-= render partial: "/shared/pagination", locals: {collection: @stolen_records, count: available_stolen_records.count, viewing: "Stolen Bike", views_prefix: "admin", skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @stolen_records, count: available_stolen_records.count, viewing: "Stolen Bike", views_prefix: "admin", skip_total: true}

@@ -9,19 +9,32 @@
           %span.less-strong= payment.payment_method
       %tr
         %td Amount
-        %td= payment.amount_formatted
+        %td
+          = payment.amount_formatted
+      %tr
+        %td Currency
+        %td
+          %span{class: (payment.currency_enum == Currency.default.slug ? "less-strong" : "text-info")}
+            = payment.currency_name
       - if payment.stripe_id.present?
         %tr
           %td Stripe ID
           %td
-            = link_to payment.stripe_id.truncate(20), "https://dashboard.stripe.com/payments/#{payment.stripe_id}", title: payment.stripe_id
+            = link_to payment.stripe_id.truncate(20), payment.stripe_admin_url, title: payment.stripe_id
       %tr
         %td For
         %td
           - if payment.theft_alert.present?
             = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
-          - else
-            = payment.kind_humanized
+          - elsif payment.invoice_id.present?
+            = render partial: "payment_invoice_cell", locals: {payment:}
+          - elsif payment.membership_id.present?
+            = link_to "Membership", admin_membership_path(payment.membership_id)
+          %small.less-strong
+            (#{payment.kind_humanized})
+
+          - if payment.stripe? && payment.membership_id.present?
+            = link_to "membership's payments", admin_payments_path(search_membership_id: payment.membership_id), class: "small less-strong ml-1"
   .col-md-6
     %table.table-list
       %tr
@@ -37,11 +50,18 @@
               = l payment.paid_at, format: :convert_time
           - else
             %span.text-danger Incomplete!
+      - if payment.stripe? && display_dev_info?
+        %tr
+          %td.only-dev-visible Stripe Status
+          %td
+            %code= payment.stripe_status
       %tr
         %td User
         %td
           - search_url = payment.user_id.present? ? admin_payments_path(user_id: payment.user_id) : admin_payments_path(search_email: payment.email)
-          = render partial: "/shared/admin_user_cell", locals: {user: payment.user, email: payment.email, search_url: search_url}
+          = render partial: "/shared/admin/user_cell", locals: {user: payment.user, email: payment.email, search_url: search_url}
+          - if payment.user_id.blank? && payment.email.present?
+            %code= payment.email
       %tr
         %td Referral source
         %td

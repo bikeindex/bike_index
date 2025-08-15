@@ -4,13 +4,12 @@ module Organized
     include SortableTable
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
-    before_action :set_period, only: [:index]
+
     before_action :set_failed_and_repeated_ivars
 
     def index
       @search_bounding_box = search_bounding_box
-      @per_page = params[:per_page]
-      @per_page = DEFAULT_PER_PAGE if @per_page.blank? || @per_page.to_i > ParkingNotification::MAX_PER_PAGE
+      @per_page = permitted_per_page(default: DEFAULT_PER_PAGE, max: ParkingNotification::MAX_PER_PAGE)
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         per_page: @per_page,
@@ -19,8 +18,8 @@ module Organized
         map_center_lng: map_center(@search_bounding_box).last
       }
 
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       # These are set here because we render them in HTML
       @search_kind = if ParkingNotification.kinds.include?(params[:search_kind]).present?
@@ -41,7 +40,7 @@ module Organized
         format.html
         format.json do
           pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-            .includes(:user, :bike, :impound_record), limit: @per_page)
+            .includes(:user, :bike, :impound_record), limit: @per_page, page: permitted_page)
           # This was already set up, so I left it when upgrading to pagy
           set_pagination_headers(pagy, @per_page)
           render json: records,

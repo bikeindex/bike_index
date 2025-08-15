@@ -1,4 +1,4 @@
-# Warning: BikeCreator forces every bike to have an ownership
+# Warning: BikeServices::Creator forces every bike to have an ownership
 # ... But this factory allows creating bikes without ownerships
 FactoryBot.define do
   factory :bike do
@@ -10,6 +10,10 @@ FactoryBot.define do
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }
     skip_geocoding { true }
+
+    trait :with_primary_activity do
+      primary_activity { FactoryBot.create(:primary_activity) }
+    end
 
     trait :with_image do
       after(:create) do |bike|

@@ -57,6 +57,7 @@
 class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
   include Geocodeable
+  include DefaultCurrencyable
 
   RECOVERY_DISPLAY_STATUS_ENUM = {
     not_eligible: 0,
@@ -100,6 +101,10 @@ class StolenRecord < ApplicationRecord
   has_one :recovery_display
   has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
 
+  has_one_attached :image_four_by_five, dependent: false
+  has_one_attached :image_square, dependent: false
+  has_one_attached :image_opengraph, dependent: false
+
   validates_presence_of :date_stolen
 
   enum :recovery_display_status, RECOVERY_DISPLAY_STATUS_ENUM
@@ -119,7 +124,8 @@ class StolenRecord < ApplicationRecord
 
   scope :recovered, -> { unscoped.where(current: false) }
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
-  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}) }
+  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}).distinct(true) }
+  scope :with_theft_alerts_paid_or_admin, -> { joins(:theft_alerts).merge(TheftAlert.paid_or_admin).distinct(true) }
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
@@ -186,6 +192,15 @@ class StolenRecord < ApplicationRecord
       end
       date
     end
+  end
+
+  # In Images::StolenProcessor we set metadata["removed"] when we remove an image
+  def images_attached?
+    image_four_by_five&.attached? && image_four_by_five.blob&.metadata&.dig("removed") != true
+  end
+
+  def images_attached_id
+    image_four_by_five&.blob&.metadata&.dig("image_id")
   end
 
   # override to enable reverse geocoding if applicable
@@ -348,54 +363,20 @@ class StolenRecord < ApplicationRecord
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
   def theft_alert_missing_photo?
-    current_alert_image.blank? && theft_alerts.any?
+    missing_photo? && theft_alerts.any?
   end
 
   # The associated bike's first public image, if available. Else nil.
   def bike_main_image
-    bike&.public_images&.first
+    Bike.unscoped.find_by_id(bike_id)&.public_images&.first
+  end
+
+  def missing_photo?
+    !images_attached? && alert_image.blank?
   end
 
   def current_alert_image
-    return @current_alert_image if defined?(@current_alert_image)
-
-    @current_alert_image = if alert_image
-      alert_image
-    elsif ApplicationRecord.current_role != :reading
-      # Generate alert image, unless in read replica
-      generate_alert_image
-    else
-      enqueue_worker
-      nil
-    end
-  end
-
-  # Generate the "promoted alert image"
-  # (One of the stolen bike's public images, placed on a branded template)
-  #
-  # The URL is available immediately - processing is performed in the background.
-  # bike_image: [PublicImage]
-  def generate_alert_image(bike_image: bike_main_image)
-    alert_image&.destroy # Destroy before returning if the bike has no images - in case image was removed
-    return if bike_image&.image.blank? && bike&.stock_photo_url.blank?
-
-    new_image = AlertImage.new(stolen_record: self)
-
-    # Try to fallback to main image
-    bike_image = bike_main_image if bike_image&.image.blank?
-    if bike_image&.image.blank?
-      new_image.remote_image_url = bike.stock_photo_url
-    else
-      new_image.image = bike_image.image
-    end
-    new_image.save
-
-    if new_image.valid?
-      new_image
-    else
-      update(alert_image: nil) if alert_image.id.present?
-      nil
-    end
+    alert_image
   end
 
   def update_associations
@@ -404,26 +385,26 @@ class StolenRecord < ApplicationRecord
     if current || bike&.current_stolen_record_id == id
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
-    AfterStolenRecordSaveWorker.perform_async(id, @alert_location_changed)
-    AfterUserChangeWorker.perform_async(bike.user_id) if bike&.user_id.present?
+    enqueue_worker(@alert_location_changed)
+    ::Callbacks::AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
   end
 
   private
 
   # The read replica can't make database changes, but can enqueue the worker - which will make the changes
-  def enqueue_worker
-    AfterStolenRecordSaveWorker.perform_async(id)
+  def enqueue_worker(location_changed = false)
+    StolenBike::AfterStolenRecordSaveJob.perform_async(id, location_changed)
   end
 
   def notify_of_promoted_alert_recovery
     return unless recovered? && theft_alerts.any?
 
-    EmailTheftAlertNotificationWorker
+    Email::TheftAlertNotificationJob
       .perform_async(theft_alerts.last.id, "theft_alert_recovered")
   end
 
   def all_location_attributes_present?
     return false if country_id.blank? || city.blank? || zipcode.blank?
-    (country_id == Country.united_states.id) ? state_id.present? : true
+    (country_id == Country.united_states_id) ? state_id.present? : true
   end
 end

@@ -4,6 +4,8 @@ module AdminHelper
     [
       # Impound claims index is currently busted, so ignoring for now
       {title: "Dev: Impound Claims", path: admin_impound_claims_path, match_controller: true},
+      {title: "Dev: Stripe Subscriptions", path: admin_stripe_subscriptions_path, match_controller: true},
+      {title: "Dev: Stripe Prices", path: admin_stripe_prices_path, match_controller: true},
       {title: "Dev: Feature Flags", path: admin_feature_flags_path, match_controller: false},
       {title: "Dev: Mail Snippets", path: admin_mail_snippets_path, match_controller: true},
       {title: "Dev: Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
@@ -14,7 +16,8 @@ module AdminHelper
       {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match_controller: false},
       {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
       {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true},
-      {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true}
+      {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true},
+      {title: "Dev: IP Location", path: admin_ip_location_path, match_controller: false}
     ]
   end
 
@@ -34,6 +37,7 @@ module AdminHelper
       {title: "Completed Ambassador Activities", path: admin_ambassador_task_assignments_path, match_controller: true},
       {title: "Promoted Alerts", path: admin_theft_alerts_path, match_controller: true},
       {title: "Promoted Alert Plans", path: admin_theft_alert_plans_path, match_controller: true},
+      {title: "Memberships", path: admin_memberships_path, match_controller: true},
       {title: "Payments", path: admin_payments_path, match_controller: true},
       {title: "Organization Features", path: admin_organization_features_path, match_controller: true},
       {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true},
@@ -59,11 +63,15 @@ module AdminHelper
       {title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true},
       {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false},
       {title: "Model Audits", path: admin_model_audits_path, match_controller: true},
+      {title: "Marketplace Listings", path: admin_marketplace_listings_path, match_controller: true},
+      {title: "Marketplace Messages", path: admin_marketplace_messages_path, match_controller: true},
       {title: "Logged bike searches", path: admin_logged_searches_path, match_controller: true},
       {title: "Organization statuses", path: admin_organization_statuses_path, match_controller: true},
-      {title: "Config: Banned Email Domains", path: admin_banned_email_domains_path, match_controller: true},
+      {title: "Config: Email Domains", path: admin_email_domains_path, match_controller: true},
+      {title: "Config: Email Bans", path: admin_email_bans_path, match_controller: true},
       {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
+      {title: "Config: Primary Activities", path: admin_primary_activities_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
     ] + dev_nav_select_links).sort_by { |a| a[:title] }
   end
@@ -117,6 +125,16 @@ module AdminHelper
     content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
   end
 
+  def admin_email_domain_spam_color(spam_score)
+    if spam_score > 9
+      "text-danger"
+    elsif spam_score < EmailDomain::SPAM_SCORE_AUTO_BAN
+      "text-info"
+    else
+      ""
+    end
+  end
+
   def user_icon_hash(user = nil)
     icon_hash = {tags: []}
     return icon_hash if user&.id.blank?
@@ -125,6 +143,7 @@ module AdminHelper
       return icon_hash
     end
     icon_hash[:tags] += [:donor] if user.donor?
+    icon_hash[:tags] += [:member] if user.membership_active.present?
     icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
     icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
     org = user.organization_prioritized
@@ -135,6 +154,7 @@ module AdminHelper
     icon_hash
   end
 
+  # Add icon for unconfirmed, email banned
   def user_icon(user = nil, full_text: false)
     icon_hash = user_icon_hash(user)
     return "" if icon_hash[:tags].empty?
@@ -143,6 +163,10 @@ module AdminHelper
       if icon_hash[:tags].include?(:donor)
         concat(content_tag(:span, "D", class: "donor-icon user-icon ml-1", title: "Donor"))
         concat(content_tag(:span, "onor", class: "less-strong")) if full_text
+      end
+      if icon_hash[:tags].include?(:member)
+        concat(content_tag(:span, "M", class: "donor-icon user-icon ml-1", title: "Member"))
+        concat(content_tag(:span, "ember", class: "less-strong")) if full_text
       end
       if icon_hash[:tags].include?(:organization_role)
         org_full_text = [

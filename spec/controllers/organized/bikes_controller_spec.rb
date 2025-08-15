@@ -39,7 +39,7 @@ RSpec.describe Organized::BikesController, type: :controller do
       expect(session[:passive_organization_id]).to eq "0" # sets it to zero so we don't look it up again
     end
     context "admin user" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "renders, doesn't reassign passive_organization_id" do
         session[:passive_organization_id] = organization.to_param # Admin, so user has access
         get :index, params: {organization_id: organization.to_param}
@@ -99,11 +99,11 @@ RSpec.describe Organized::BikesController, type: :controller do
         }
       end
       it "creates" do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect(organization.auto_user_id).to_not eq user.id
-        expect(UpdateMailchimpDatumWorker).to be_present
-        stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
+        expect(UpdateMailchimpDatumJob).to be_present
+        stub_const("UpdateMailchimpDatumJob::UPDATE_MAILCHIMP", false)
         Sidekiq::Testing.inline! do
           expect {
             post :create, params: {bike: attrs, organization_id: organization.to_param}

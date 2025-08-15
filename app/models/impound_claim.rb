@@ -27,6 +27,8 @@
 #  index_impound_claims_on_user_id             (user_id)
 #
 class ImpoundClaim < ApplicationRecord
+  include StatusHumanizable
+
   STATUS_ENUM = {
     pending: 0,
     submitting: 1, # TOD: change this to submitted
@@ -139,10 +141,6 @@ class ImpoundClaim < ApplicationRecord
     @bike_claimed ||= bike_claimed_id.present? ? Bike.unscoped.find_by_id(bike_claimed_id) : nil
   end
 
-  def status_humanized
-    self.class.status_humanized(status)
-  end
-
   # return private images too
   def bike_submitting_images
     return [] unless bike_submitting.present?
@@ -175,7 +173,7 @@ class ImpoundClaim < ApplicationRecord
 
   def send_triggered_notifications
     return true if skip_update
-    EmailImpoundClaimWorker.perform_async(id)
+    Email::ImpoundClaimJob.perform_async(id)
   end
 
   private

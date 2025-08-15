@@ -1,13 +1,13 @@
 class Admin::ExternalRegistryBikesController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_bike, only: %i[show]
 
   def index
-    @per_page = params[:page] || 100
+    @per_page = permitted_per_page(default: 100)
     @pagy, @bikes =
       pagy(matching_bikes
-        .reorder("external_registry_bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
+        .reorder("external_registry_bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def show

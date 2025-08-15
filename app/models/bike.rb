@@ -65,6 +65,7 @@
 #  manufacturer_id             :integer
 #  model_audit_id              :bigint
 #  paint_id                    :integer
+#  primary_activity_id         :bigint
 #  primary_frame_color_id      :integer
 #  rear_gear_type_id           :integer
 #  rear_wheel_size_id          :integer
@@ -86,6 +87,7 @@
 #  index_bikes_on_model_audit_id             (model_audit_id)
 #  index_bikes_on_organization_id            (creation_organization_id)
 #  index_bikes_on_paint_id                   (paint_id)
+#  index_bikes_on_primary_activity_id        (primary_activity_id)
 #  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)
 #  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id)
 #  index_bikes_on_state_id                   (state_id)
@@ -105,7 +107,7 @@ class Bike < ApplicationRecord
   acts_as_paranoid without_default_scope: true
 
   mount_uploader :pdf, PdfUploader
-  process_in_background :pdf, CarrierWaveProcessWorker
+  process_in_background :pdf, CarrierWaveProcessJob
 
   STATUS_ENUM = {
     status_with_owner: 0,
@@ -149,10 +151,14 @@ class Bike < ApplicationRecord
   has_many :notifications
   has_many :theft_surveys, -> { theft_survey }, class_name: "Notification"
   has_many :theft_alerts
+  has_many :marketplace_listings, as: :item
+
+  has_one :current_marketplace_listing, -> { current }, class_name: "MarketplaceListing", as: :item
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records
   accepts_nested_attributes_for :components, allow_destroy: true
+  accepts_nested_attributes_for :current_marketplace_listing
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type
@@ -206,6 +212,8 @@ class Bike < ApplicationRecord
   scope :with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
+  scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
+
   default_scope -> { default_includes.current.order(listing_order: :desc) }
 
   before_validation :set_calculated_attributes
@@ -234,7 +242,7 @@ class Bike < ApplicationRecord
 
     def status_humanized_translated(str)
       return "" unless str.present?
-      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :status_humanized, :bike])
+      I18n.t(str.tr(" ", "_"), scope: [:activerecord, :bike_attributable, :status_humanized, :bike])
     end
 
     def text_search(query)
@@ -369,6 +377,10 @@ class Bike < ApplicationRecord
         .includes(:current_stolen_record)
         .where(stolen_records: location)
     end
+
+    def matching_domain(str)
+      where("bikes.owner_email ILIKE ?", "%#{str.to_s.strip}")
+    end
   end
 
   # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
@@ -405,7 +417,7 @@ class Bike < ApplicationRecord
   end
 
   def display_name
-    name.presence || cycle_type.titleize
+    name.presence || type_titleize
   end
 
   def user?
@@ -422,6 +434,11 @@ class Bike < ApplicationRecord
 
   def avery_exportable?
     !impounded? && owner_name.present? && valid_mailing_address?
+  end
+
+  # matches current scope
+  def current?
+    !example? && !user_hidden && deleted_at.blank? && !likely_spam
   end
 
   def current_parking_notification
@@ -642,8 +659,8 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
-  def current_record
-    current_impound_record || current_stolen_record
+  def current_event_record
+    current_impound_record || current_stolen_record || current_for_sale_marketplace_listing
   end
 
   def bike_organization_ids
@@ -763,8 +780,8 @@ class Bike < ApplicationRecord
 
   # THIS IS FUCKING OBNOXIOUS.
   # Somehow we need to get rid of needing to have this method. country should default to optional
-  def address
-    Geocodeable.address(self, country: [:optional])
+  def address(country: [:optional])
+    Geocodeable.address(self, country:)
   end
 
   def valid_mailing_address?
@@ -776,8 +793,11 @@ class Bike < ApplicationRecord
   end
 
   def registration_address_source
-    # NOTE: User address is the preferred address! If user address is set, address fields don't show on bike!
-    if user&.address_set_manually
+    # NOTE: Marketplace Listing and User address are the preferred addresses!
+    # If either is set, address fields don't show on bike!
+    if is_for_sale && current_marketplace_listing.present?
+      "marketplace_listing"
+    elsif user&.address_set_manually
       "user"
     elsif address_set_manually
       "bike_update"
@@ -790,41 +810,13 @@ class Bike < ApplicationRecord
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
     @registration_address = case registration_address_source
-    when "user" then user&.address_hash
+    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
+    when "user" then user&.address_hash_legacy
     when "bike_update" then address_hash
     when "initial_creation" then current_ownership.address_hash
     else
       {}
     end.with_indifferent_access
-  end
-
-  # Set the bike's location data (lat/long, city, postal code, country, etc.)
-  #
-  # Geolocate based on the full current stolen record address, if available.
-  # Otherwise, use the data set by set_location_info.
-  # Sets lat/long, will avoid a geocode API call if coordinates are found
-  def set_location_info
-    if current_stolen_record.present?
-      # If there is a current stolen - even if it has a blank location - use it
-      # It's used for searching and displaying stolen bikes, we don't want other information leaking
-      self.attributes = if address_set_manually # Only set coordinates if the address is set manually
-        current_stolen_record.attributes.slice("latitude", "longitude")
-      else # Set the whole address from the stolen record
-        current_stolen_record.address_hash
-      end
-    else
-      if address_set_manually # If it's not stolen, use the manual set address for the coordinates
-        return true unless user&.address_set_manually # If it's set by the user, address_set_manually is no longer correct!
-        self.address_set_manually = false
-      end
-      address_attrs = location_record_address_hash
-      return true unless address_attrs.present? # No address hash present so skip
-      self.attributes = address_attrs
-    end
-  end
-
-  def alert_image_url(version = nil)
-    current_stolen_record&.current_alert_image&.image_url(version)
   end
 
   def external_image_urls
@@ -838,7 +830,7 @@ class Bike < ApplicationRecord
     end
   end
 
-  # Called in BikeCreator, so that the serial and email can be used for dupe finding
+  # Called in BikeServices::Creator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
     self.manufacturer_other = InputNormalizer.string(manufacturer_other)
@@ -863,7 +855,7 @@ class Bike < ApplicationRecord
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.occurred_at = calculated_occurred_at
     self.current_ownership = calculated_current_ownership
-    set_location_info
+    self.attributes = BikeServices::CalculateStoredLocation.location_attrs(self)
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at
@@ -891,34 +883,20 @@ class Bike < ApplicationRecord
   end
 
   def enqueue_duplicate_bike_finder_worker
-    DuplicateBikeFinderWorker.perform_async(id)
+    DuplicateBikeFinderJob.perform_async(id)
   end
 
   private
 
-  # Select the source from which to derive location data, in the following order
-  # of precedence:
-  #
-  # 1. The current parking notification/impound record, if one is present
-  # 2. #registration_address (which prioritizes user address)
-  # 3. The creation organization address (so we have a general area for the bike)
-  # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
-  def location_record_address_hash
-    l_hashes = [
-      current_impound_record&.address_hash,
-      current_parking_notification&.address_hash,
-      registration_address(true),
-      creation_organization&.default_location&.address_hash
-    ].compact
-    l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
-      l_hashes.find { |rec| rec&.dig("latitude").present? }
-    return {} unless l_hash.present?
-    # If the location record has coordinates, skip geocoding
-    l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
-  end
-
   def fetch_current_impound_record
     self.current_impound_record = impound_records.current.last
+  end
+
+  def current_for_sale_marketplace_listing
+    return nil unless is_for_sale
+
+    cml = current_marketplace_listing
+    (cml.present? && cml.for_sale?) ? cml : nil
   end
 
   def authorization_requires_organization?
@@ -937,7 +915,7 @@ class Bike < ApplicationRecord
   end
 
   def calculated_occurred_at
-    return nil if current_record.blank?
+    return nil if current_event_record.blank? || is_for_sale
     current_impound_record&.impounded_at || current_stolen_record&.date_stolen
   end
 

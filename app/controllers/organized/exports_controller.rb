@@ -4,8 +4,8 @@ module Organized
     before_action :find_export, except: %i[index new create]
 
     def index
-      @per_page = params[:per_page] || 25
-      @pagy, @exports = pagy(exports.order(created_at: :desc), limit: @per_page)
+      @per_page = permitted_per_page
+      @pagy, @exports = pagy(exports.order(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -25,7 +25,7 @@ module Organized
         @export.options[:partial_registrations] = partial_registration_params
       end
       if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
-        OrganizationExportWorker.perform_async(@export.id)
+        OrganizationExportJob.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
           flash[:success] = translation(:with_avery_redirect)
           redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id, avery_redirect: true)

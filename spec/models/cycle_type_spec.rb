@@ -29,6 +29,8 @@ RSpec.describe CycleType, type: :model do
         expect(CycleType.find_sym("CARGO BIKE")).to eq :cargo
         finder = CycleType.friendly_find(name)
         expect(finder.slug).to eq :cargo
+        expect(finder.name).to eq "Cargo Bike (front storage)"
+        expect(finder.short_name).to eq "Cargo Bike"
       end
     end
   end
@@ -45,7 +47,7 @@ RSpec.describe CycleType, type: :model do
     it "has the values" do
       expect(CycleType.select_options).to include(["Bike", "bike"])
       expect(CycleType.select_options(traditional_bike: true)).to include(trad_bike)
-      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 21
+      expect(CycleType.select_options(traditional_bike: true).uniq.count).to eq 22
     end
   end
 

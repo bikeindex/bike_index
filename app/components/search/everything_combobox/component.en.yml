@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    search:
+      everything_combobox:
+        query_items_description: Search descriptions combobox
+        search_descriptions: Search descriptions

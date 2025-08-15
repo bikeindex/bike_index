@@ -1,0 +1,62 @@
+- collection ||= @email_domains
+- render_sortable ||= false
+
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th= sortable "created_at"
+      %th
+        %small= sortable "updated_at"
+      %th
+        %small= sortable "status_changed_at"
+      %th= sortable "domain"
+      %th= sortable "status"
+      %th= sortable "creator_id"
+      %th= sortable "user_count", "Users"
+      %th
+        %small= sortable "bike_count", "Bikes"
+      %th
+        %small Notifications
+      %th.small= sortable "spam_score"
+      %th &nbsp;
+
+    %tbody
+      - collection.each do |email_domain|
+        %tr
+          %td
+            %a.convertTime{href: admin_email_domain_path(email_domain)}
+              = l(email_domain.created_at, format: :convert_time)
+            - if display_dev_info?
+              %code.small.only-dev-visible= email_domain.id
+          %td
+            %small.convertTime
+              = l(email_domain.updated_at, format: :convert_time)
+          %td
+            - if email_domain.status_changed_after_create?
+              %small.convertTime
+                = l(email_domain.updated_at, format: :convert_time)
+          %td= email_domain.domain
+          %td
+            - status_class = "text-danger" if email_domain.status.match?("ban")
+            - status_class = "text-warning font-weight-bold" if email_domain.ignored?
+            %span{class: status_class}
+              = email_domain.status_humanized
+            - if email_domain&.no_auto_assign_status?
+              %small{class: "tw:ml-1 tw:text-sky-400"} no auto status
+          %td
+            = render partial: "/shared/admin/user_cell", locals: {user: email_domain.creator, user_id: email_domain.creator_id, cache: false}
+          %td
+            = link_to admin_number_display(email_domain.user_count), admin_users_path(search_domain: email_domain.domain, render_chart: true), class: "text-link"
+          %td
+            - if email_domain.bike_count > 0
+              = link_to admin_number_display(email_domain.bike_count), admin_bikes_path(search_domain: email_domain.domain, render_chart: true), class: "text-link"
+            - else
+              = admin_number_display(email_domain.bike_count)
+          %td
+            = admin_number_display(email_domain.notification_count)
+          %td
+            - spam_score = email_domain.spam_score.round(0)
+            %span{class: admin_email_domain_spam_color(spam_score)}
+              = email_domain.spam_score.round(0)
+          %td
+            = render partial: "data_details", locals: {email_domain:}

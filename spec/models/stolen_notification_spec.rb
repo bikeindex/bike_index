@@ -5,7 +5,7 @@ RSpec.describe StolenNotification, type: :model do
     it "enqueues an email job" do
       expect {
         FactoryBot.create(:stolen_notification)
-      }.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+      }.to change(Email::StolenNotificationJob.jobs, :size).by(1)
     end
   end
 
@@ -32,7 +32,7 @@ RSpec.describe StolenNotification, type: :model do
     def expect_stolen_notification_to_send(stolen_notification, receiver)
       expect {
         stolen_notification.save
-      }.to change(EmailStolenNotificationWorker.jobs, :size).by 1
+      }.to change(Email::StolenNotificationJob.jobs, :size).by 1
       expect(stolen_notification.receiver).to eq receiver
     end
 

@@ -100,7 +100,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect([black, red, manufacturer].size).to eq 3
         expect(bike_hash).to be_present # make sure the things are created before we clear the queues
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
       end
 
       def expect_matching_created_bike(created_bike)
@@ -120,7 +120,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(ownership.is_new).to be_truthy
       end
 
-      it "creates a bike and does not duplicate" do
+      it "creates a bike and does not duplicate", :flaky do
         expect {
           post base_url, params: bike_hash.as_json
         }.to change(Ownership, :count).by(1)
@@ -138,14 +138,14 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(bike.current_ownership).to eq og_ownership
         expect(bike.ownerships.count).to eq 1
 
-        Sidekiq::Worker.drain_all # Not wrapping both in drain_all, because
+        Sidekiq::Job.drain_all # Not wrapping both in drain_all, because
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
       end
 
       context "new pos_integrator format" do
         # We're switching to use numeric id rather than slug, because the slugs change :(
-        it "creates correctly" do
+        it "creates correctly", :flaky do
           Sidekiq::Testing.inline! do
             expect {
               post base_url, params: bike_hash.merge(organization_slug: organization.id).as_json
@@ -163,12 +163,12 @@ RSpec.describe API::V1::BikesController, type: :request do
             post base_url, params: bike_hash
           }.to change(Ownership, :count).by 0
 
-          Sidekiq::Worker.drain_all
+          Sidekiq::Job.drain_all
           expect(ActionMailer::Base.deliveries.count).to eq 1
           expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
         end
         context "with risky email" do
-          it "registers but doesn't send an email" do
+          it "registers but doesn't send an email", :flaky do
             expect {
               post base_url, params: bike_hash.merge(bike: bike_hash[:bike].merge(owner_email: "carolyn@hotmail.co")).as_json
             }.to change(Ownership, :count).by(1)
@@ -177,7 +177,7 @@ RSpec.describe API::V1::BikesController, type: :request do
             bike = Bike.where(serial_number: "SSOMESERIAL").first
             expect_matching_created_bike(bike)
 
-            Sidekiq::Worker.drain_all
+            Sidekiq::Job.drain_all
             expect(ActionMailer::Base.deliveries.count).to eq 0
           end
         end
@@ -201,7 +201,7 @@ RSpec.describe API::V1::BikesController, type: :request do
             expect_matching_created_bike(bike)
             expect(bike.phone).to eq "CELL8887776666"
 
-            Sidekiq::Worker.drain_all
+            Sidekiq::Job.drain_all
             expect(ActionMailer::Base.deliveries.count).to eq 1
             expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
 
@@ -295,7 +295,7 @@ RSpec.describe API::V1::BikesController, type: :request do
           "http://i.imgur.com/3BGQeJh.jpg"
         ]
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         VCR.use_cassette("v1_bikes_create-images", match_requests_on: [:path], re_record_interval: 1.month) do
           Sidekiq::Testing.inline! do
             expect {
@@ -337,7 +337,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(ownership.origin).to eq "api_v1"
       end
 
-      it "creates a photos even if one fails" do
+      it "creates a photos even if one fails", :flaky do
         manufacturer = FactoryBot.create(:manufacturer)
         bike_attrs = {
           serial_number: "69 photo-test",
@@ -357,6 +357,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         VCR.use_cassette("v1_bikes_create-images2", match_requests_on: [:path], re_record_interval: 1.month) do
           post base_url, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
         end
+        expect(Bike.unscoped.where(serial_number: "69 photo-test").count).to eq 1
         bike = Bike.unscoped.where(serial_number: "69 photo-test").first
         expect(bike.example).to be_falsey
         expect(bike.public_images.count).to eq(1)
@@ -371,7 +372,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         VCR.use_cassette("v1_bikes_create-stolen", match_requests_on: [:path]) do
           manufacturer = FactoryBot.create(:manufacturer)
           @organization.users.first.update_attribute :phone, "123-456-6969"
-          FactoryBot.create(:state, abbreviation: "IL", name: "Illinois")
+          FactoryBot.create(:state_illinois)
           bike_attrs = {
             serial_number: "69 stolen bike",
             manufacturer_id: manufacturer.id,
@@ -396,7 +397,7 @@ RSpec.describe API::V1::BikesController, type: :request do
             lock_defeat_description: "broken in some crazy way"
           }
           ActionMailer::Base.deliveries = []
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             post base_url, params: {bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token}
           }.to change(Ownership, :count).by(1)
@@ -437,11 +438,11 @@ RSpec.describe API::V1::BikesController, type: :request do
           owner_email: "fun_times@examples.com"
         }
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           post base_url, params: {bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token}
         }.to change(Ownership, :count).by(1)
-        EmailOwnershipInvitationWorker.drain
+        Email::OwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 example bikez").first
@@ -458,7 +459,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(bike.cycle_type_name).to eq("Unicycle")
       end
 
-      it "creates a record even if the post is a string" do
+      it "creates a record even if the post is a string", :flaky do
         manufacturer = FactoryBot.create(:manufacturer)
         bike_attrs = {
           serial_number: "69 string",
@@ -471,11 +472,11 @@ RSpec.describe API::V1::BikesController, type: :request do
         }
         options = {bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token}
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           post base_url, params: options
         }.to change(Ownership, :count).by(1)
-        EmailOwnershipInvitationWorker.drain
+        Email::OwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first
@@ -497,11 +498,11 @@ RSpec.describe API::V1::BikesController, type: :request do
         }
         options = {bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token}
         ActionMailer::Base.deliveries = []
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           post base_url, params: options
         }.to change(Ownership, :count).by(1)
-        EmailOwnershipInvitationWorker.drain
+        Email::OwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq(0)
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first

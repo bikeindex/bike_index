@@ -13,8 +13,8 @@
           class: "form-control"
     .col-sm-4.col-6
       .form-group
-        = f.label :currency, "Currency"
-        = f.select :currency, options_for_select(available_currencies, selected: record.currency), {},  class: "form-control"
+        = f.label :currency_enum, "Currency"
+        = f.select :currency_enum, options_for_select(Currency.select_options), {},  class: "form-control"
     .col-sm-4.col-6
       .form-group
         = f.label :amount_cents, "Price (cents)", class: "form-label"

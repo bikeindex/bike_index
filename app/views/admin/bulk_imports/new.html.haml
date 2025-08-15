@@ -5,8 +5,7 @@
 .row
   .col-sm-6
     = form_for [:admin, @bulk_import] do |f|
-      - if @bulk_import.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Bulk Import", obj: @bulk_import }
+      = render(AlertForErrors::Component.new(object: @bulk_import))
 
       .form-group.fancy-select.unfancy
         = f.label :organization_id

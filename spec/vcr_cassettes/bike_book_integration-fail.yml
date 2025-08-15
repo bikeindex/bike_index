@@ -16,42 +16,39 @@ http_interactions:
   response:
     status:
       code: 404
-      message: 'Not Found '
+      message: Not Found
     headers:
-      Report-To:
-      - '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1737417412&sid=af571f24-03ee-46d1-9f90-ab9030c2c74c&s=W4GzhyKyMTmNUJWvswUdOzFuGXGnnygGilI9Mm2Z5TI%3D"}]}'
-      Reporting-Endpoints:
-      - heroku-nel=https://nel.heroku.com/reports?ts=1737417412&sid=af571f24-03ee-46d1-9f90-ab9030c2c74c&s=W4GzhyKyMTmNUJWvswUdOzFuGXGnnygGilI9Mm2Z5TI%3D
-      Nel:
-      - '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
-      Connection:
-      - keep-alive
-      Content-Type:
-      - application/json;charset=utf-8
-      Access-Control-Allow-Origin:
-      - "*"
       Access-Control-Allow-Headers:
       - Origin, X-Requested-With, Content-Type, Accept, Authorization
       Access-Control-Allow-Methods:
       - GET, OPTIONS
+      Access-Control-Allow-Origin:
+      - "*"
       Access-Control-Request-Method:
       - "*"
-      X-Cascade:
-      - pass
       Content-Length:
       - '159'
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Mon, 04 Aug 2025 20:08:44 GMT
+      Nel:
+      - '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+      Report-To:
+      - '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=0mtiw%2B64aR7Ih68L5KgehSjVP46ov14lnFW0hYpR%2Bio%3D\u0026sid=af571f24-03ee-46d1-9f90-ab9030c2c74c\u0026ts=1754338124"}],"max_age":3600}'
+      Reporting-Endpoints:
+      - heroku-nel="https://nel.heroku.com/reports?s=0mtiw%2B64aR7Ih68L5KgehSjVP46ov14lnFW0hYpR%2Bio%3D&sid=af571f24-03ee-46d1-9f90-ab9030c2c74c&ts=1754338124"
+      Server:
+      - Heroku
+      Via:
+      - 1.1 heroku-router
+      X-Cascade:
+      - pass
       X-Content-Type-Options:
       - nosniff
-      Server:
-      - WEBrick/1.3.1 (Ruby/2.1.0/2013-12-25)
-      Date:
-      - Mon, 20 Jan 2025 23:56:52 GMT
-      Via:
-      - 1.1 vegur
     body:
       encoding: UTF-8
       string: '{"code":404,"message":"Shucks, no we couldn''t find that","description":"View
         all bikes: http://bikebook.io or documentation: http://bikebook.io/documentation"}'
-    http_version:
-  recorded_at: Mon, 20 Jan 2025 23:56:52 GMT
-recorded_with: VCR 5.0.0
+  recorded_at: Mon, 04 Aug 2025 20:08:44 GMT
+recorded_with: VCR 6.3.1

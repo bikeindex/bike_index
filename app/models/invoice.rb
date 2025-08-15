@@ -8,7 +8,7 @@
 #  amount_due_cents            :integer
 #  amount_paid_cents           :integer
 #  child_enabled_feature_slugs :jsonb
-#  currency                    :string           default("USD"), not null
+#  currency_enum               :integer
 #  force_active                :boolean          default(FALSE), not null
 #  is_active                   :boolean          default(FALSE), not null
 #  is_endless                  :boolean          default(FALSE)
@@ -28,7 +28,9 @@
 
 # daily_maintenance_tasks updates all invoices that have expiring subscriptions every day
 class Invoice < ApplicationRecord
+  include Currencyable
   include Amountable # included for formatting stuff
+
   belongs_to :organization
   belongs_to :first_invoice, class_name: "Invoice" # Use subscription_first_invoice_id + subscription_first_invoice, NOT THIS
 
@@ -36,7 +38,7 @@ class Invoice < ApplicationRecord
   has_many :organization_features, through: :invoice_organization_features
   has_many :payments
 
-  validates :organization, :currency, presence: true
+  validates :organization, presence: true
 
   before_save :set_calculated_attributes
   after_commit :update_organization
@@ -48,7 +50,7 @@ class Invoice < ApplicationRecord
   scope :paid, -> { where.not(amount_due_cents: 0) }
   scope :free, -> { where(amount_due_cents: 0) }
   scope :current, -> { active.where("subscription_end_at > ? AND subscription_start_at < ?", Time.current, Time.current) }
-  scope :expired, -> { where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.current) }
+  scope :expired, -> { not_endless.where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.current) }
   scope :future, -> { where("subscription_start_at > ?", Time.current) }
   scope :endless, -> { where(is_endless: true) }
   scope :not_endless, -> { where.not(is_endless: true) }
@@ -218,15 +220,15 @@ class Invoice < ApplicationRecord
   end
 
   def amount_due_formatted
-    MoneyFormater.money_format(amount_due_cents, currency)
+    MoneyFormatter.money_format(amount_due_cents, currency_name)
   end
 
   def amount_paid_formatted
-    MoneyFormater.money_format(amount_paid_cents, currency)
+    MoneyFormatter.money_format(amount_paid_cents, currency_name)
   end
 
   def discount_formatted
-    MoneyFormater.money_format(-(discount_cents || 0), currency)
+    MoneyFormatter.money_format(-(discount_cents || 0), currency_name)
   end
 
   def previous_invoice
@@ -267,6 +269,6 @@ class Invoice < ApplicationRecord
   end
 
   def update_organization
-    UpdateOrganizationAssociationsWorker.perform_async(organization_id)
+    UpdateOrganizationAssociationsJob.perform_async(organization_id)
   end
 end

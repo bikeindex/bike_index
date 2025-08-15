@@ -1,14 +1,14 @@
 class Admin::RecoveryDisplaysController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_recovery_displays, only: [:edit, :update, :destroy]
 
   helper_method :matching_recovery_displays
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @recovery_displays = pagy(matching_recovery_displays
-      .order(@time_range_column => sort_direction), limit: @per_page)
+      .order(@time_range_column => sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def new

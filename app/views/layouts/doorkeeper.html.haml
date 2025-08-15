@@ -1,8 +1,9 @@
 !!!
 %html.doorkeeper{ lang: I18n.locale }
   %head
-    = header_tags
-    = stylesheet_link_tag 'revised', media: 'all'
+    = render(HeaderTags::Component.new(**header_tags_component_options))
+    = csrf_meta_tags
+    = stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <script src="/vendored_assets/application_standalone.js"></script>

@@ -6,7 +6,7 @@
 #
 #  id            :integer          not null, primary key
 #  amount_cents  :integer
-#  currency      :string           default("USD"), not null
+#  currency_enum :integer
 #  description   :text
 #  details_link  :string
 #  feature_slugs :text             default([]), is an Array
@@ -17,7 +17,9 @@
 #
 
 class OrganizationFeature < ApplicationRecord
+  include Currencyable
   include Amountable
+
   KIND_ENUM = {standard: 0, standard_one_time: 1, custom: 2, custom_one_time: 3}.freeze
   # Organizations have enabled_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
@@ -75,7 +77,6 @@ class OrganizationFeature < ApplicationRecord
   has_many :invoices, through: :invoice_organization_features
 
   validates_uniqueness_of :name
-  validates :currency, presence: true
 
   enum :kind, KIND_ENUM
 
@@ -86,42 +87,44 @@ class OrganizationFeature < ApplicationRecord
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :has_feature_slugs, -> { where.not(feature_slugs: []) }
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
 
-  # used by organization right now, but might be useful in other places
-  def self.matching_slugs(slugs)
-    slug_array = slugs.is_a?(Array) ? slugs : slugs.split(" ").reject(&:blank?)
-    matching_slugs = EXPECTED_SLUGS & slug_array
-    matching_slugs.any? ? matching_slugs : nil
-  end
+    # used by organization right now, but might be useful in other places
+    def matching_slugs(slugs)
+      slug_array = slugs.is_a?(Array) ? slugs : slugs.split(" ").reject(&:blank?)
+      matching_slugs = EXPECTED_SLUGS & slug_array
+      matching_slugs.any? ? matching_slugs : nil
+    end
 
-  def self.reg_field_to_bike_attrs(reg_field)
-    reg_field.to_s.gsub("reg_", "")
-  end
+    def reg_field_to_bike_attrs(reg_field)
+      reg_field.to_s.gsub("reg_", "")
+    end
 
-  def self.reg_fields
-    REG_FIELDS
-  end
+    def reg_fields
+      REG_FIELDS
+    end
 
-  def self.reg_fields_with_customizable_labels
-    # Can't rename bike_stickers
-    %w[owner_email] + reg_fields - %w[reg_bike_sticker]
-  end
+    def reg_fields_with_customizable_labels
+      # Can't rename bike_stickers
+      %w[owner_email] + reg_fields - %w[reg_bike_sticker]
+    end
 
-  def self.reg_fields_organization_uniq
-    %w[reg_organization_affiliation reg_student_id]
-  end
+    def reg_fields_organization_uniq
+      %w[reg_organization_affiliation reg_student_id]
+    end
 
-  # These are attributes that add fields to admin organization edit
-  def self.with_admin_organization_attributes
-    reg_fields_with_customizable_labels +
-      %w[regional_bike_counts passwordless_users graduated_notifications organization_stolen_message]
-  end
+    # These are attributes that add fields to admin organization edit
+    def with_admin_organization_attributes
+      reg_fields_with_customizable_labels +
+        %w[regional_bike_counts passwordless_users graduated_notifications organization_stolen_message]
+    end
 
-  def self.feature_slugs
-    pluck(:feature_slugs).flatten.uniq
+    def feature_slugs
+      pluck(:feature_slugs).flatten.uniq
+    end
   end
 
   def has_feature_slugs?

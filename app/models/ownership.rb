@@ -222,7 +222,7 @@ class Ownership < ApplicationRecord
         self.creator_id ||= bike.creator_id
         self.example = bike.example
         # Calculate current_impound_record, if it isn't assigned
-        self.impound_record_id ||= bike.impound_records.current.last&.id
+        self.impound_record_id ||= calculated_impound_record_id
       end
       # Previous attrs to #2110
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
@@ -231,7 +231,7 @@ class Ownership < ApplicationRecord
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_id ||= impound_record&.organization_id
       self.organization_pre_registration ||= calculated_organization_pre_registration?
-      # Would this be better in BikeCreator? Maybe, but specs depend on this always being set
+      # Would this be better in BikeServices::Creator? Maybe, but specs depend on this always being set
       self.origin ||= if impound_record_id.present?
         "impound_process"
       elsif first?
@@ -260,9 +260,9 @@ class Ownership < ApplicationRecord
       bike&.update_column :current_ownership_id, id
       prior_ownerships.current.each { |o| o.update(current: false) }
     end
-    # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
+    # Note: this has to be performed later; we create ownerships and then delete them, in BikeServices::Creator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
-    EmailOwnershipInvitationWorker.perform_in(2.seconds, id)
+    Email::OwnershipInvitationJob.perform_in(2.seconds, id)
   end
 
   def create_user_registration_for_phone_registration!(user)
@@ -315,6 +315,13 @@ class Ownership < ApplicationRecord
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
     return true if pos?
     embed? && organization&.spam_registrations?
+  end
+
+  def calculated_impound_record_id
+    # if the previous ownership is :status_with_owner, the new ownership should be too (not registered impounded)
+    return if bike.ownerships.where.not(id: nil).last&.status == "status_with_owner"
+
+    bike.impound_records.current.last&.id
   end
 
   # Some organizations pre-register bikes and then transfer them.

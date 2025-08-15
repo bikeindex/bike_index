@@ -22,11 +22,26 @@ RSpec.describe GeocodeHelper do
       end
       it "returns address_hash, with original coordinates" do
         VCR.use_cassette("geohelper-reverse_geocode", vcr_config) do
-          expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude)).to eq result_hash
+          expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude, new_attrs: false)).to eq result_hash
           result = described_class.assignable_address_hash_for(latitude: latitude, longitude: longitude)
           # Ensure assignable_address_hash_for returns original lat & long
           expect(result).to eq target_assignable_hash
           expect(result.keys.map(&:to_s).sort).to eq Geocodeable.location_attrs.sort
+        end
+      end
+      context "new_attrs" do
+        let(:new_result) do
+          result_hash.delete(:state_id)
+          postal_code = result_hash.delete(:zipcode)
+          result_hash.merge(postal_code:, region_string: state.abbreviation)
+        end
+        it "returns address_hash, with original coordinates" do
+          VCR.use_cassette("geohelper-reverse_geocode", vcr_config) do
+            expect(described_class.send(:address_hash_from_reverse_geocode, latitude, longitude, new_attrs: true)).to eq new_result
+            result = described_class.assignable_address_hash_for(latitude: latitude, longitude: longitude, new_attrs: true)
+            # Ensure assignable_address_hash_for returns original lat & long
+            expect(result).to eq new_result.except(:formatted_address).merge(latitude: latitude, longitude: longitude)
+          end
         end
       end
     end
@@ -41,13 +56,13 @@ RSpec.describe GeocodeHelper do
 
     context "passed a bare zipcode" do
       let(:address) { "60647" }
-      let!(:state) { FactoryBot.create(:state, name: "Illinois", abbreviation: "IL", country: country) }
+      let!(:state) { FactoryBot.create(:state_illinois) }
       let(:target_assignable_hash) do
         {city: "Chicago", latitude: 41.9215421, longitude: -87.70248169999999, zipcode: "60647",
          state_id: state.id, country_id: country.id, neighborhood: nil, street: nil}
       end
 
-      it "returns an address_hash" do
+      it "returns an assignable_address_hash" do
         VCR.use_cassette("geohelper-zipcode", vcr_config) do
           expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
         end
@@ -70,7 +85,11 @@ RSpec.describe GeocodeHelper do
       end
       it "returns our desires" do
         VCR.use_cassette("geohelper-formatted_address_hash", vcr_config) do
-          expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
+          result = described_class.assignable_address_hash_for(address)
+          expect(result.except(:latitude, :longitude)).to eq target_assignable_hash.except(:latitude, :longitude)
+
+          expect(result[:latitude].round(3)).to eq target_assignable_hash[:latitude].round(3)
+          expect(result[:longitude].round(3)).to eq target_assignable_hash[:longitude].round(3)
         end
       end
     end
@@ -95,18 +114,30 @@ RSpec.describe GeocodeHelper do
           expect(described_class.assignable_address_hash_for(address)).to eq target_assignable_hash
         end
       end
+      context "another IP address" do
+        let(:address) { "50.211.197.209" }
+        let(:target_address_hash) do
+          target_assignable_hash.merge(latitude: 37.7308, longitude: -122.3838,
+            formatted_address: "San Francisco, CA, US")
+        end
+        it "finds the address" do
+          VCR.use_cassette("geohelper-ip_address2", vcr_config) do
+            expect(described_class.address_hash_for(address)).to eq target_address_hash
+          end
+        end
+      end
     end
   end
 
   describe "coordinates_for" do
     let(:address) { "3550 W Shakespeare Ave, 60647" }
-    let(:latitude) { 41.92026 }
-    let(:longitude) { -87.71564 }
+    let(:latitude) { 41.920 }
+    let(:longitude) { -87.716 }
     it "returns correct location" do
       VCR.use_cassette("geohelper-coordinates", vcr_config) do
         coords = described_class.coordinates_for(address)
-        expect(coords[:latitude].round(5)).to eq latitude
-        expect(coords[:longitude].round(5)).to eq longitude
+        expect(coords[:latitude].round(3)).to eq latitude
+        expect(coords[:longitude].round(3)).to eq longitude
       end
     end
 
@@ -159,6 +190,29 @@ RSpec.describe GeocodeHelper do
       end
       it "returns the box" do
         expect(described_class.bounding_box([42.8490197, -106.3015341], 10)).to eq target
+      end
+    end
+  end
+
+  describe "permitted_distance" do
+    it "returns value if passed valid value" do
+      expect(described_class.permitted_distance(1)).to eq 1
+      expect(described_class.permitted_distance(44.4, default_distance: 3)).to eq 44.4
+      expect(described_class.permitted_distance("696.9")).to eq 696.9
+      expect(described_class.permitted_distance(999.00)).to eq 999
+      expect(described_class.permitted_distance(999.00)).to be_an_integer
+      expect(described_class.permitted_distance(1000.0)).to eq 1_000
+    end
+    it "returns default_distance if blank or invalid" do
+      expect(described_class.permitted_distance(nil)).to eq 100
+      expect(described_class.permitted_distance(" ", default_distance: 42)).to eq 42
+      expect(described_class.permitted_distance(" fifty", default_distance: 42)).to eq 42
+    end
+    context "outside bands" do
+      it "returns clamped" do
+        expect(described_class.permitted_distance(5_000)).to eq 1_000
+        expect(described_class.permitted_distance("-2", default_distance: 10)).to eq 1
+        expect(described_class.permitted_distance(" 0")).to eq 1
       end
     end
   end

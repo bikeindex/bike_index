@@ -53,7 +53,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.kind).to eq "donation"
         expect(payment.amount_cents).to eq 0
         VCR.use_cassette("payments_controller-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           expect(Notification.count).to eq 0
           Sidekiq::Testing.inline! do
@@ -86,7 +86,7 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.paid?).to be_falsey
           expect(payment.amount_cents).to eq 0
           VCR.use_cassette("payments_controller-success-customer", match_requests_on: [:method], re_record_interval: re_record_interval) do
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             ActionMailer::Base.deliveries = []
             expect(Notification.count).to eq 0
             Sidekiq::Testing.inline! do
@@ -97,7 +97,7 @@ RSpec.describe PaymentsController, type: :request do
             expect(flash).to_not be_present
             expect(assigns(:payment)&.id).to eq payment.id
             payment.reload
-            expect(payment.reload.email).to eq "testly@bikeindex.org"
+            expect(payment.reload.email).to eq current_user.email
             expect(payment.paid?).to be_truthy
             expect(payment.amount_cents).to eq 500000
           end
@@ -114,7 +114,7 @@ RSpec.describe PaymentsController, type: :request do
   describe "create" do
     it "makes a onetime payment" do
       VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:method], re_record_interval: re_record_interval) do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect(Notification.count).to eq 0
         Sidekiq::Testing.inline! do
@@ -134,7 +134,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.user_id).to be_blank
         expect(payment.stripe_id).to be_present
         expect(payment.kind).to eq "payment"
-        expect(payment.currency).to eq "USD"
+        expect(payment.currency_name).to eq "USD"
         expect(payment.amount_cents).to eq 4000
         expect(payment.paid_at).to be_blank # Ensure this gets set
         expect(payment.paid?).to be_falsey
@@ -189,7 +189,7 @@ RSpec.describe PaymentsController, type: :request do
               is_arbitrary: false,
               payment: {
                 amount_cents: "4000",
-                currency: "USD",
+                currency: "MXN",
                 kind: "donation"
               }
             }
@@ -198,11 +198,11 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.user_id).to eq current_user.id
           expect(payment.stripe_id).to be_present
           expect(payment.kind).to eq "donation"
-          expect(payment.currency).to eq "USD"
+          expect(payment.currency_name).to eq "MXN"
           expect(payment.amount_cents).to eq 4000
           expect(payment.paid_at).to be_blank # Ensure this gets set
           expect(payment.paid?).to be_falsey
-          expect(payment.stripe_customer).to be_blank
+          expect(payment.user.stripe_id).to be_blank
         end
       end
       context "user is a stripe customer" do
@@ -225,12 +225,11 @@ RSpec.describe PaymentsController, type: :request do
             expect(payment.user_id).to eq current_user.id
             expect(payment.stripe_id).to be_present
             expect(payment.kind).to eq "donation"
-            expect(payment.currency).to eq "USD"
+            expect(payment.currency_name).to eq "USD"
             expect(payment.amount_cents).to eq 7500
             expect(payment.paid_at).to be_blank # Ensure this gets set
             expect(payment.paid?).to be_falsey
-            expect(payment.stripe_customer).to be_present
-            expect(payment.stripe_customer.id).to eq customer_stripe_id
+            expect(payment.user.stripe_id).to be_present
           end
         end
       end

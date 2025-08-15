@@ -24,7 +24,7 @@ module RequestSpecHelpers
   end
 
   RSpec.shared_context :request_spec_logged_in_as_superuser do
-    let(:current_user) { FactoryBot.create(:admin) }
+    let(:current_user) { FactoryBot.create(:superuser) }
     before { log_in(current_user) }
   end
 

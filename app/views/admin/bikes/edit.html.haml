@@ -11,8 +11,8 @@
     = render partial: "/bikes/credibility_score", locals: { bike: @bike }
 
 = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
-  - if @bike.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Bike", obj: @bike }
+  = render(AlertForErrors::Component.new(object: @bike))
+
   .row
     .col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
@@ -63,6 +63,9 @@
       .form-group
         = f.label :description
         = f.text_area :description, class: "form-control"
+    .col-md-4.col-lg-3
+      = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f, wrapper_class: "form-group fancy-select unfancy"}
+
   .row.mt-2
     .col-md-4.col-lg-6
       .form-group
@@ -101,10 +104,10 @@
                 = label :country, "Country"
                 = s.select(:country_id, Country.select_options, prompt: "Choose country")
                 %p.d-none
-                  = Country.united_states.id
+                  = Country.united_states_id
             .form-group.fancy-select.unfancy.col-6
               = s.label :state, "State"
-              = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State")
+              = s.collection_select(:state_id, State.united_states, :id, :name, include_blank: true, prompt: "State")
           .form-group
             = label :street, "Intersection or address"
             = s.text_field :street, placeholder: "Intersection or address", class: "form-control"

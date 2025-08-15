@@ -285,7 +285,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                 })
             end
             it "does not remove" do
-              UpdateOrganizationAssociationsWorker.new.perform(location1.organization_id)
+              UpdateOrganizationAssociationsJob.new.perform(location1.organization_id)
               location1.reload
               expect(location1.default_impound_location?).to be_truthy
               expect(location1.destroy_forbidden?).to be_truthy
@@ -331,8 +331,8 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.search_coordinates_set?).to be_falsey
 
             VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
-              Sidekiq::Worker.clear_all
-              # Need to inline to process UpdateOrganizationAssociationsWorker
+              Sidekiq::Job.clear_all
+              # Need to inline to process UpdateOrganizationAssociationsJob
               Sidekiq::Testing.inline! do
                 expect {
                   patch base_url,

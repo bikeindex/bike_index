@@ -1,0 +1,153 @@
+@import "tailwindcss" prefix(tw);
+@config "../../../config/tailwind.config.js";
+
+@theme {
+  --font-sans: "Open Sans", sans-serif;
+  --font-header: "Montserrat", sans-serif;
+  --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
+}
+
+@layer components {
+  .twlink {
+    @apply tw:text-blue-500 tw:underline;
+  }
+
+  .twless-strong {
+    @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
+  }
+
+  .twbtn,
+  .twbtn-blue,
+  .twbtn-green {
+    @apply tw:inline-block tw:shadow-sm tw:rounded-md tw:p-3 tw:text-center
+    tw:cursor-pointer tw:active:outline tw:focus-visible:outline-offset-2
+    tw:disabled:cursor-not-allowed tw:disabled:opacity-85
+    tw:focus-visible:outline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2
+    tw:active:outline-none tw:active:opacity-95;
+  }
+
+  .twbtn {
+    @apply tw:border tw:border-gray-200 tw:hover:bg-gray-100 tw:dark:border-gray-700 tw:dark:hover:bg-gray-800
+      tw:focus-visible:outline-gray-200 tw:disabled:hover:bg-transparent
+      tw:active:opacity-80;
+  }
+
+  .twbtn-green {
+    @apply tw:text-white tw:bg-green-600
+      tw:hover:bg-green-500 tw:focus-visible:outline-green-600 tw:disabled:hover:bg-green-600;
+  }
+
+  .twbtn-blue {
+    @apply tw:text-white tw:bg-blue-600
+      tw:hover:bg-blue-500 tw:focus-visible:outline-blue-600
+      tw:disabled:hover:bg-blue-600;
+  }
+
+  .twinput {
+    @apply tw:bg-white tw:border tw:border-gray-300 tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:rounded-sm
+      tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
+      tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-blue-400 tw:focus-visible:border-blue-400 tw:dark:focus-visible:ring-blue-500 tw:dark:focus:border-blue-500
+      tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
+  }
+  .twlabel {
+    @apply tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
+  }
+}
+
+@utility base-font {
+  @apply tw:antialiased tw:font-sans tw:text-gray-900 tw:dark:text-gray-400;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  input:where([type="button"], [type="reset"], [type="submit"]):not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+body {
+  @apply tw:base-font;
+}
+/*
+  'dark:' syntax isn't working for the body element, unclear why - hacking with this for now
+*/
+body.dark {
+  @apply tw:bg-gray-900 tw:text-gray-400;
+}
+
+/* TODO: use this in the body instead of separately */
+.twtext-color {
+  @apply tw:text-gray-900 tw:dark:text-gray-400;
+}
+
+.twtext-color\! {
+  @apply tw:text-gray-900! tw:dark:text-gray-400!;
+}
+
+/* select2 is used by everythingcombox. Here are styles to make it look like the other inputs */
+.select2 .select2-selection--multiple {
+  /* There is some funky padding stuff that goes on in select2. This makes it mostly match */
+  @apply tw:pt-1.5 tw:px-2.5 tw:pb-0;
+}
+
+.select2-container.select2-container--default .select2-selection--multiple {
+  @apply tw:border tw:border-gray-300 tw:dark:border-gray-600;
+}
+
+.select2-container .select2-dropdown,
+.select2-container.select2-container--default .select2-selection--multiple {
+  @apply tw:bg-white tw:dark:bg-gray-700 tw:rounded-sm
+    tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200;
+}
+
+.select2-search__field {
+  @apply tw:placeholder-gray-500 tw:dark:placeholder-gray-400;
+}
+
+.select2-container .select2-dropdown,
+.select2.select2-container--default.select2-container--focus
+  .select2-selection--multiple {
+  @apply tw:outline-0 tw:ring tw:ring-blue-400 tw:border-blue-400 tw:dark:ring-blue-500 tw:dark:focus:border-blue-500;
+}
+
+.select2-container--default
+  .select2-selection--multiple
+  .select2-selection__choice,
+.select2-container .select2-search--inline .select2-search__field {
+  margin-top: 0 !important;
+}
+
+.select2-container--default
+  .select2-selection--multiple
+  .select2-selection__rendered {
+  padding: 0 !important;
+}
+
+/* This is a container that matches the width of the bootstrap container */
+.twbootcontainer {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+@media (min-width: 544px) {
+  .twbootcontainer {
+    max-width: 576px;
+  }
+}
+@media (min-width: 768px) {
+  .twbootcontainer {
+    max-width: 720px;
+  }
+}
+@media (min-width: 992px) {
+  .twbootcontainer {
+    max-width: 940px;
+  }
+}
+@media (min-width: 1200px) {
+  .twbootcontainer {
+    max-width: 1140px;
+  }
+}

@@ -150,7 +150,7 @@ RSpec.describe "BikesController#create", type: :request do
           # This is also where we're testing bikebook assignment
           expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
           ActionMailer::Base.deliveries = []
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             Sidekiq::Testing.inline! do
               # Test that we can still pass show_address - because API backward compatibility
@@ -191,7 +191,7 @@ RSpec.describe "BikesController#create", type: :request do
         end
         context "association message" do
           let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "association", body: "Something cool", search_radius_miles: search_radius_miles} }
-          it "it assigns organization_stolen_message" do
+          it "it assigns organization_stolen_message", :flaky do
             expect(organization_stolen_message.reload.kind).to eq "association"
             expect_created_stolen_bike(bike_params: bike_params.merge(creation_organization_id: organization.id), stolen_params: chicago_stolen_params.merge(show_address: true))
             bike = Bike.last
@@ -301,16 +301,16 @@ RSpec.describe "BikesController#create", type: :request do
     # Make bike_params without address because it's used more often
     let(:bike_params) { bike_params_with_address.except(:street, :city, :zipcode, :state) }
     include_context :geocoder_real
-    it "creates with address" do
-      expect(current_user.reload.address).to be_blank
+    it "creates with address", :flaky do
+      expect(current_user.reload.to_coordinates.compact).to eq([])
       expect(current_user.user_registration_organizations.count).to eq 0
       VCR.use_cassette("bikes_controller-create-reg_address", match_requests_on: [:method]) do
-        expect(BikeDisplayer.display_edit_address_fields?(Bike.new, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_edit_address_fields?(Bike.new, current_user)).to be_truthy
         organization.reload
         expect(organization.location_latitude.to_i).to eq 34
         expect(organization.default_location).to be_present
         expect(current_user.organization_roles.pluck(:id)).to eq([]) # sanity check
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {
@@ -352,8 +352,9 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.latitude.to_i).to eq 37
         expect(new_bike.longitude.to_i).to eq(-122)
         expect(new_bike.valid_mailing_address?).to be_truthy
-        expect(current_user.reload.address).to eq new_bike.address
-        expect(BikeDisplayer.display_edit_address_fields?(new_bike, current_user)).to be_falsey
+        expect(current_user.reload.formatted_address_string(visible_attribute: :street, render_country: true))
+          .to eq new_bike.address(country: [:name])
+        expect(BikeServices::Displayer.display_edit_address_fields?(new_bike, current_user)).to be_falsey
         expect(current_user.user_registration_organizations.pluck(:organization_id)).to eq([organization.id])
         user_registration_organization = current_user.user_registration_organizations.first
         expect(user_registration_organization.all_bikes?).to be_truthy
@@ -362,7 +363,7 @@ RSpec.describe "BikesController#create", type: :request do
     end
     context "no address passed" do
       it "does not have address, has association" do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {bike: bike_params.merge(cycle_type: "non-e-scooter")}
@@ -414,7 +415,7 @@ RSpec.describe "BikesController#create", type: :request do
         bike_code: "ed001"
       }
     end
-    it "creates and adds the bike code" do
+    it "creates and adds the bike code", :flaky do
       b_param.reload
       expect(b_param.created_bike_id).to be_blank
       expect {

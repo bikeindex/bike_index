@@ -1,8 +1,6 @@
 = form_for [:admin, @organization_feature] do |f|
-  .row
-    .col-xs-12
-      - if @organization_feature.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Organization feature", obj: @organization_feature }
+  = render(AlertForErrors::Component.new(object: @organization_feature))
+
   .row
     .col-md-6.col-xs-12
       .form-group
@@ -29,7 +27,7 @@
         = f.label :amount
         .input-group.mb-2
           .input-group-prepend
-            = f.select :currency, options_for_select(currency_symbols.zip(available_currencies)), {}, class: "form-control small"
+            = f.select :currency_enum, options_for_select(Currency.select_options), {}, class: "form-control small"
           = f.number_field :amount, step: 1, min: 0, class: "form-control"
     .col-xs-12.col-md-6
       .form-group

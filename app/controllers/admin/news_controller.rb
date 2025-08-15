@@ -1,6 +1,6 @@
 class Admin::NewsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_blog, only: [:show, :edit, :update, :destroy]
   before_action :set_dignified_name
 
@@ -31,7 +31,7 @@ class Admin::NewsController < Admin::BaseController
       @blog.reload
 
       if @blog.listicles.present?
-        @blog.listicles.pluck(:id).each { |id| ListicleImageSizeWorker.perform_in(1.minutes, id) }
+        @blog.listicles.pluck(:id).each { |id| ListicleImageSizeJob.perform_in(1.minutes, id) }
       end
 
       flash[:success] = "#{@blog.info? ? "Info post" : "Blog"} saved!"

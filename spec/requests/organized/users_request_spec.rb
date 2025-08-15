@@ -161,7 +161,7 @@ RSpec.describe Organized::UsersController, type: :request do
     end
 
     describe "create" do
-      before { Sidekiq::Worker.clear_all }
+      before { Sidekiq::Job.clear_all }
       let(:organization_role_params) do
         {
           role: "member",

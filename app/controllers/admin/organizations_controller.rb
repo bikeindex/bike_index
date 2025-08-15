@@ -1,10 +1,10 @@
 class Admin::OrganizationsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_organization, only: [:show, :edit, :update, :destroy]
 
   def index
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page
     organizations = if sort_column == "bikes"
       matching_organizations.left_joins(:bikes).group(:id)
         .order("COUNT(bikes.id) #{sort_direction}")
@@ -12,7 +12,7 @@ class Admin::OrganizationsController < Admin::BaseController
       matching_organizations
         .reorder("organizations.#{sort_column} #{sort_direction}")
     end
-    @pagy, @organizations = pagy(organizations, limit: @per_page)
+    @pagy, @organizations = pagy(organizations, limit: @per_page, page: permitted_page)
   end
 
   def show
@@ -20,7 +20,7 @@ class Admin::OrganizationsController < Admin::BaseController
     @deleted_organization_roles = @organization.deleted? || InputNormalizer.boolean(params[:deleted_organization_roles])
     bikes = @organization.bikes.reorder("created_at desc")
     @bikes_count = bikes.size
-    @pagy, @bikes = pagy(bikes, limit: 10)
+    @pagy, @bikes = pagy(bikes, limit: 10, page: permitted_page)
   end
 
   def show_deleted
@@ -59,7 +59,7 @@ class Admin::OrganizationsController < Admin::BaseController
     if @organization.update(permitted_parameters)
       update_organization_stolen_message
       flash[:success] = "Organization Saved!"
-      UpdateOrganizationPosKindWorker.perform_async(@organization.id) if run_update_pos_kind
+      UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
       redirect_to admin_organization_url(@organization)
     else
       render action: :edit

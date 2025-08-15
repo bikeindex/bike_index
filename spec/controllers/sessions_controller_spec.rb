@@ -313,7 +313,7 @@ RSpec.describe SessionsController, type: :controller do
         end
 
         context "admin" do
-          let(:user) { FactoryBot.create(:admin) }
+          let(:user) { FactoryBot.create(:superuser) }
           it "authenticates and redirects to admin" do
             expect(user).to receive(:authenticate).and_return(true)
             request.env["HTTP_REFERER"] = my_account_url
@@ -396,7 +396,7 @@ RSpec.describe SessionsController, type: :controller do
             post :create, params: {session: {password: "would be correct"}}
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
             expect(session[:render_donation_request]).to eq "law_enforcement"
-            expect(response).to redirect_to bikes_path(stolenness: "all")
+            expect(response).to redirect_to search_registrations_path(stolenness: "all")
           end
         end
       end

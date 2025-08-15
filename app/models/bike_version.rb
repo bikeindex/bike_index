@@ -39,6 +39,7 @@
 #  manufacturer_id           :bigint
 #  owner_id                  :bigint
 #  paint_id                  :bigint
+#  primary_activity_id       :bigint
 #  primary_frame_color_id    :bigint
 #  rear_gear_type_id         :bigint
 #  rear_wheel_size_id        :bigint
@@ -53,6 +54,7 @@
 #  index_bike_versions_on_manufacturer_id           (manufacturer_id)
 #  index_bike_versions_on_owner_id                  (owner_id)
 #  index_bike_versions_on_paint_id                  (paint_id)
+#  index_bike_versions_on_primary_activity_id       (primary_activity_id)
 #  index_bike_versions_on_primary_frame_color_id    (primary_frame_color_id)
 #  index_bike_versions_on_rear_gear_type_id         (rear_gear_type_id)
 #  index_bike_versions_on_rear_wheel_size_id        (rear_wheel_size_id)
@@ -121,6 +123,11 @@ class BikeVersion < ApplicationRecord
   end
 
   # Necessary to duplicate bike
+  def is_for_sale?
+    false
+  end
+
+  # Necessary to duplicate bike
   def pos?
     false
   end
@@ -157,6 +164,14 @@ class BikeVersion < ApplicationRecord
 
   # Necessary to duplicate bike
   def stock_photo_url
+    nil
+  end
+
+  def current_impound_record
+    nil
+  end
+
+  def current_stolen_record
     nil
   end
 
@@ -201,7 +216,7 @@ class BikeVersion < ApplicationRecord
     self.listing_order = calculated_listing_order
     self.thumb_path = public_images&.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
-    self.name = name.present? ? name.strip : nil
+    self.name = InputNormalizer.string(name)
   end
 
   # Method from bike that is static in bike_version

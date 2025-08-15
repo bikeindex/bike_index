@@ -28,7 +28,7 @@ RSpec.describe Organized::ExportsController, type: :request do
     end
 
     context "logged in as super admin" do
-      let(:current_user) { FactoryBot.create(:admin) }
+      let(:current_user) { FactoryBot.create(:superuser) }
       describe "index" do
         it "renders" do
           expect(current_user.member_of?(current_organization, no_superuser_override: true)).to be_falsey
@@ -192,7 +192,7 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(export.start_at.to_i).to be_within(1).of start_at
         expect(export.end_at).to_not be_present
         expect(export.options["partial_registrations"]).to be_falsey
-        expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+        expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
       end
       context "with partial export" do
         let(:enabled_feature_slugs) { %w[csv_exports show_partial_registrations] }
@@ -214,7 +214,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(export.options["partial_registrations"]).to eq "only"
           expect(export.partial_registrations).to eq "only"
           expect(export.assign_bike_codes).to be_falsey
-          expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+          expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
         end
         context "with include_full_registrations" do
           it "creates with both" do
@@ -234,7 +234,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.start_at.to_i).to be_within(1).of start_at
             expect(export.end_at).to_not be_present
             expect(export.options["partial_registrations"]).to be_truthy
-            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+            expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end
         end
         context "with assign_bike_codes" do
@@ -256,7 +256,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.end_at).to_not be_present
             expect(export.partial_registrations).to be_falsey
             expect(export.assign_bike_codes?).to be_truthy
-            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+            expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end
         end
       end
@@ -290,7 +290,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(export.end_at.to_i).to be_within(1).of start_at + 2.days.to_i
           expect(export.bike_code_start).to be_nil
           expect(export.options["partial_registrations"]).to be_falsey # Both were false, so it defaults to just full
-          expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+          expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           expect(export.avery_export?).to be_falsey
           expect(export.custom_bike_ids).to eq([1222, 999])
         end
@@ -319,7 +319,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.start_at.to_i).to be_within(1).of 1535173200
             expect(export.end_at.to_i).to be_within(1).of 1538283600 # Explicitly testing this in TimeParser
             expect(export.assign_bike_codes?).to be_falsey
-            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+            expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end
         end
         context "avery export" do
@@ -343,7 +343,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.end_at.to_i).to be_within(1).of end_at
             expect(export.options["partial_registrations"]).to be_falsey # Avery exports can't include partials
             expect(export.bike_code_start).to eq "A221"
-            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+            expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end
           context "avery export with already assigned bike_sticker" do
             let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, code: "a0221") }

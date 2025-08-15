@@ -1,13 +1,11 @@
 class Admin::OrganizationStatusesController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
-
   def index
-    @per_page = params[:per_page] || 10
+    @per_page = permitted_per_page(default: 10)
     @pagy, @organization_statuses =
       pagy(matching_organization_statuses
-        .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page)
+        .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_organization_statuses, :grouped_pos_kinds

@@ -1,0 +1,35 @@
+<%= stylesheet_link_tag "revised" %>
+<% bike =
+  Bike.new(
+    id: 35,
+    serial_number: "XXX999 999xxxx",
+    mnfg_name: "Humble Frameworks",
+    year: "2015",
+    primary_frame_color_id: Color.where(name: "Purple").first_or_create,
+    frame_model: "self titled",
+    frame_material: :steel,
+    cycle_type: :bike,
+    thumb_path:
+      "https://files.bikeindex.org/uploads/Pu/395980/small_D3C6B1AF-F1FC-4BAA-BD39-9C107871FCAE.jpeg",
+  ) %>
+<% bike2 = Bike.status_stolen.first %>
+<% bike3 = Bike.status_impounded.first %>
+<% marketplace_listing = MarketplaceListing.for_sale.last %>
+
+<ul class="bike-boxes">
+  <%= render(SearchResults::BikeBox::Component.new(bike:)) %>
+  <% if bike2.present? %>
+    <%= render(SearchResults::BikeBox::Component.new(bike: bike2)) %>
+  <% end %>
+  <% if marketplace_listing.present? %>
+    <%= render(
+      SearchResults::BikeBox::Component.new(
+        bike: marketplace_listing.item,
+        current_event_record: marketplace_listing,
+      ),
+    ) %>
+  <% end %>
+  <% if bike3.present? %>
+    <%= render(SearchResults::BikeBox::Component.new(bike: bike3)) %>
+  <% end %>
+</ul>

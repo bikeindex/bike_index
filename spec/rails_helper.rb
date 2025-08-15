@@ -1,5 +1,5 @@
 # simplecov must be required before anything else
-if ENV["COVERAGE"]
+if ENV["COVERAGE"] == "true"
   require "simplecov"
   require "simplecov_json_formatter"
   SimpleCov.start("rails") do
@@ -9,7 +9,6 @@ if ENV["COVERAGE"]
 
     add_group "Serializers", "app/serializers"
     add_group "Services", "app/services"
-    add_group "Uploaders", "app/uploaders"
   end
 
   Rails.application.eager_load! if defined?(Rails)
@@ -18,7 +17,7 @@ end
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"
-ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"] = "true"
+ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
 
 require "spec_helper"
 require File.expand_path("../../config/environment", __FILE__)
@@ -48,6 +47,13 @@ ActiveRecord::Migration.maintain_test_schema!
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
 
+# If on GitHub actions, enable knapsack pro to optimize test splitting
+if ENV["GITHUB_ACTIONS"] == "true"
+  require "knapsack_pro"
+
+  KnapsackPro::Adapters::RSpecAdapter.bind
+end
+
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.render_views
@@ -71,6 +77,7 @@ RSpec.configure do |config|
   config.include ViewComponent::TestHelpers, type: :component
   config.include ViewComponent::SystemTestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
+  config.before(:each, :browser, type: :system) { driven_by(:selenium) }
   config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
 end
 
@@ -87,7 +94,8 @@ VCR.configure do |config|
   }
   config.ignore_hosts("127.0.0.1", "0.0.0.0") # for capybara selenium
 
-  %w[GOOGLE_GEOCODER MAILCHIMP_KEY FACEBOOK_AD_TOKEN CLOUDFLARE_TOKEN MAXMIND_KEY].each do |key|
+  %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
+    MAXMIND_KEY SENDGRID_EMAIL_VALIDATION_KEY].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end
 
@@ -222,4 +230,32 @@ end
 CarrierWave.configure do |config|
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
   config.enable_processing = false
+end
+
+# Override capybara methods to support tailwind selectors
+# Original methods defined in 'lib/capybara/rspec/matchers.rb'
+#
+# This is necessary because colons need to be escaped for these matchers (i.e. tw\:p-6)
+#
+module Capybara
+  module RSpecMatchers
+    def have_selector(expr, **, &)
+      Matchers::HaveSelector.new(escape_colon_classes(expr), **, &)
+    end
+
+    def have_css(expr, **, &)
+      Matchers::HaveSelector.new(:css, escape_colon_classes(expr), **, &)
+    end
+
+    private
+
+    # Automatically escape colons in tailwind classes
+    def escape_colon_classes(expr)
+      # Don't change anything unless it looks like a colon class
+      return expr unless expr.match?(/\.\w+[^\\]:/)
+
+      # remove colon, unless it's for :disabled
+      expr.gsub(":", '\:').gsub('\:disabled', ":disabled").gsub('\:not(', ":not(")
+    end
+  end
 end

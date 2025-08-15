@@ -128,12 +128,4 @@ RSpec.describe MoneyHelper, type: :helper do
       end
     end
   end
-
-  describe "#currency_symbols" do
-    let(:target) { ["$ (USD)", "€ (EUR)"] }
-
-    it "returns the available currencies" do
-      expect(currency_symbols).to eq target
-    end
-  end
 end

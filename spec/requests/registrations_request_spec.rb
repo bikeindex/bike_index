@@ -134,12 +134,53 @@ RSpec.describe RegistrationsController, type: :request do
           expect(assigns(:creator)).to be_nil
           expect(assigns(:simple_header)).to be_truthy
           expect(assigns(:vehicle_select)).to be_truthy
+          expect(assigns(:button)).to be_nil
+          expect(assigns(:button_and_header)).to be_nil
           # Since we're creating these in line, actually test the rendered body
           body = response.body
           inputs = page_form_inputs(body)
           expect(inputs.find { |i| i[:name] == "creation_organization_id" }[:value]).to eq organization.id.to_s
           expect(inputs.map { |i| i[:name] }.sort).to eq vehicle_field_names
           expect(body).to match(/register your vehicle/i)
+        end
+      end
+      context "with button" do
+        let(:color) { "ee7e2c" }
+        it "assigns button" do
+          get "#{base_url}/embed?organization_id=#{organization.to_param}&simple_header=1&button=#{color}"
+
+          expect_it_to_render_embed_correctly
+          expect(assigns(:organization)).to eq organization
+          expect(assigns(:selectable_child_organizations)).to eq []
+          expect(assigns(:creator)).to be_nil
+          expect(assigns(:simple_header)).to be_truthy
+          expect(assigns(:button)).to eq "##{color}"
+          expect(assigns(:button_and_header)).to be_nil
+        end
+        context "with button malicious" do
+          let(:color) { "@user + 1233" }
+          it "renders" do
+            get "#{base_url}/embed?organization_id=#{organization.to_param}&simple_header=1&button=#{color}"
+            expect_it_to_render_embed_correctly
+            expect(assigns(:organization)).to eq organization
+            expect(assigns(:selectable_child_organizations)).to eq []
+            expect(assigns(:creator)).to be_nil
+            expect(assigns(:simple_header)).to be_truthy
+            expect(assigns(:button)).to eq "#user12"
+            expect(assigns(:button_and_header)).to be_nil
+          end
+        end
+      end
+      context "with button_and_header" do
+        it "assigns button" do
+          get "#{base_url}/embed?organization_id=#{organization.to_param}&simple_header=1&button_and_header=696969"
+
+          expect_it_to_render_embed_correctly
+          expect(assigns(:organization)).to eq organization
+          expect(assigns(:selectable_child_organizations)).to eq []
+          expect(assigns(:creator)).to be_nil
+          expect(assigns(:simple_header)).to be_truthy
+          expect(assigns(:button_and_header)).to eq "#696969"
         end
       end
     end
@@ -189,7 +230,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect(b_param.partial_registration?).to be_truthy
           expect(b_param.motorized?).to be_falsey
           expect(b_param.params["propulsion_type_motorized"]).to be_blank
-          expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
+          expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
           expect(assigns(:simple_header)).to be_truthy
         end
       end
@@ -213,7 +254,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect(attrs).to match_hash_indifferently b_param
           expect(b_param.origin).to eq "embed_partial"
           expect(b_param.motorized?).to be_truthy
-          expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
+          expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
           expect(b_param.partial_registration?).to be_truthy
         end
 
@@ -228,7 +269,7 @@ RSpec.describe RegistrationsController, type: :request do
             expect(b_param.origin).to eq "embed_partial"
             expect(b_param.cycle_type).to eq "bike"
             expect(b_param.motorized?).to be_truthy
-            expect(EmailPartialRegistrationWorker).to have_enqueued_sidekiq_job(b_param.id)
+            expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
             expect(b_param.partial_registration?).to be_truthy
           end
         end

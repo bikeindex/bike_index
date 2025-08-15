@@ -6,7 +6,7 @@
 #
 #  id                       :bigint           not null, primary key
 #  amount_cents             :integer
-#  currency                 :string
+#  currency_enum            :integer
 #  data                     :jsonb
 #  frame_model              :text
 #  frame_size               :string
@@ -41,6 +41,7 @@
 # Initially created for mexican stolen bike ring
 class StolenBikeListing < ActiveRecord::Base
   include PgSearch::Model
+  include Currencyable
   include Amountable
   include BikeSearchable
 
@@ -92,12 +93,12 @@ class StolenBikeListing < ActiveRecord::Base
 
   def amount_usd_formatted
     cents_usd = data["amount_cents_usd"] || calculated_amount_cents_usd
-    MoneyFormater.money_format_without_cents(cents_usd, :USD)
+    MoneyFormatter.money_format_without_cents(cents_usd, :USD)
   end
 
   def calculated_amount_cents_usd
     return 0 unless amount_cents.present?
-    Money.new(amount_cents, currency).exchange_to(:USD).cents
+    Money.new(amount_cents, currency_name).exchange_to(:USD).cents
   end
 
   def updated_photo_folder
@@ -168,7 +169,7 @@ class StolenBikeListing < ActiveRecord::Base
   def set_calculated_attributes
     self.data ||= {}
     self.mnfg_name = if manufacturer.present?
-      manufacturer.other? ? manufacturer_other : manufacturer.simple_name
+      manufacturer.other? ? manufacturer_other : manufacturer.short_name
     end
     self.listed_at ||= Time.current
     self.listing_order = listed_at.to_i

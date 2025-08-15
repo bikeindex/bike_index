@@ -1,0 +1,100 @@
+<div data-controller="search--form--component">
+  <%= form_with(url: @target_search_path,
+      builder: BikeIndexFormBuilder,
+      method: :get,
+      id: "Search_Form",
+      data: { turbo_frame: @target_frame, turbo_action: "advance",
+        turbo: true, "search--form--component-target" => "form"}) do |f| %>
+
+    <%# search_no_js is removed in the search--form--component stimulus controller. If it's present, the results render synchronously (rather than as a turbo frame) %>
+    <%= hidden_field_tag :search_no_js, true %>
+
+    <div class="tw:flex tw:flex-nowrap tw:gap-4">
+      <div class="tw:flex-grow search-fields">
+        <%= render(
+          Search::EverythingCombobox::Component.new(
+            selected_query_items_options: @selected_query_items_options,
+            query:,
+          ),
+        ) %>
+
+        <% if render_serial_field? %>
+          <%= label_tag :serial,
+          translation(".search_for_serial_number"),
+          class: "twlabel tw:sr-only" %>
+          <%= text_field_tag :serial,
+          serial_value,
+          placeholder: translation(".search_for_serial_number"),
+          class: "twinput tw:mt-2 fieldResetsCounts" %>
+        <% end %>
+        <% if render_activity_and_price_wrapper? %>
+          <div
+            class="
+              tw:mt-2 tw:flex tw:flex-wrap tw:md:flex-nowrap tw:justify-between tw:gap-3
+            "
+          >
+            <% if render_primary_activity_field? %>
+              <%= label_tag :primary_activity,
+              translation(".search_for_primary_activity"),
+              class: "twlabel tw:sr-only" %>
+              <%= select_tag :primary_activity,
+              primary_activity_select_opts,
+              include_blank: true,
+              prompt: translation(".search_for_primary_activity"),
+              class: "twinput tw:md:max-w-xl fieldResetsCounts" %>
+            <% end %>
+            <% if render_price_field? %>
+              <span class="tw:flex tw:flex-nowrap tw:max-w-60">
+                <%# NOTE: This isn't used yet, including it because it will be someday! %>
+                <%= hidden_field_tag :currency, @currency_sym %>
+
+                <span class="tw:block tw:py-1.5 tw:mr-1"><%= @currency_sym %></span>
+                <%= label_tag :price_min_amount,
+                translation(".price_minimum"),
+                class: "twlabel tw:sr-only" %>
+                <%= number_field_tag :price_min_amount,
+                @price_min_amount,
+                placeholder: translation(".min"),
+                class: "twinput tw:min-w-20 fieldResetsCounts" %>
+
+                <span class="tw:block tw:py-1.5 tw:min-w-6 tw:ml-2 tw:mr-1">&ndash;
+                  <%= @currency_sym %></span>
+                <%= label_tag :price_max_amount,
+                translation(".price_maximum"),
+                class: "twlabel tw:sr-only" %>
+                <%= number_field_tag :price_max_amount,
+                @price_max_amount,
+                placeholder: translation(".max"),
+                class: "twinput tw:min-w-20 fieldResetsCounts" %>
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <div class="tw:w-20">
+        <%= button_tag(type: translation(".submit"),
+            class: "twbtn-blue tw:w-full tw:h-full tw:disabled:cursor-wait",
+            "data-search--form--component-target" => "button") do %>
+          <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>
+                .cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}
+              </style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
+        <% end %>
+      </div>
+    </div>
+
+    <% if render_serial_field? && serial_looks_like_not_a_serial? %>
+      <%= render(
+        Alert::Component.new(
+          text: translation(".doesnt_look_like_serial"),
+          kind: :warning,
+          margin_classes: "tw:my-2",
+        ),
+      ) %>
+    <% end %>
+
+    <%= render(Search::KindSelectFields::Component.new(**kind_select_options)) %>
+    <%= if render_result_view?
+      render(Search::ResultViewSelect::Component.new(result_view: @result_view))
+    end %>
+  <% end %>
+</div>

@@ -1,12 +1,12 @@
 class Admin::OwnershipsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_ownership, except: [:index]
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @ownerships = pagy(matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
-      .includes(:bike, :organization, :creator, :user), limit: @per_page)
+      .includes(:bike, :organization, :creator, :user), limit: @per_page, page: permitted_page)
   end
 
   def edit
@@ -37,7 +37,7 @@ class Admin::OwnershipsController < Admin::BaseController
     end
   end
 
-  helper_method :matching_ownerships
+  helper_method :matching_ownerships, :organization_kind_options
 
   private
 
@@ -49,8 +49,22 @@ class Admin::OwnershipsController < Admin::BaseController
     Ownership.origins + %w[only_initial]
   end
 
+  def organization_kind_options
+    %w[without_organization only_with_organization]
+  end
+
   def matching_ownerships
     ownerships = Ownership.unscoped
+    if organization_kind_options.include?(params[:search_organization_kind])
+      @search_organization_kind = params[:search_organization_kind]
+      ownerships = if @search_organization_kind == "without_organization"
+        ownerships.where(organization_id: nil)
+      else
+        ownerships.where.not(organization_id: nil)
+      end
+    end
+    ownerships = ownerships.where(organization_id: current_organization.id) if current_organization.present?
+
     @search_origin = ownership_origins.include?(params[:search_origin]) ? params[:search_origin] : "all"
     unless @search_origin == "all"
       ownerships = if @search_origin == "only_initial"

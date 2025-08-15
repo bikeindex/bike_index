@@ -5,7 +5,6 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-# Update CircleCI config if Ruby version is bumped
 ruby "3.4.1"
 
 # Gems that are no longer in standard library as Ruby 3.4
@@ -20,8 +19,11 @@ gem "puma" # App server
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres
-gem "paranoia"
+gem "paranoia" # soft delete
 gem "pg_search"
+gem "lograge" # Structure log data, put it in single lines to improve the functionality
+gem "logstash-event" # Use logstash format for logging data
+gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 
 # Speed
 gem "fast_blank", "~> 1.0"
@@ -43,7 +45,8 @@ gem "translation"
 # Redis and redis dependents
 gem "redis"
 gem "sidekiq" # Background job processing
-gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+# Sidekiq failure tracking and viewing. Broken for sidekiq 8. see github.com/mhfs/sidekiq-failures/pull/159
+gem "sidekiq-failures", github: "navidemad/sidekiq-failures", branch: "feat-compatibility-sidekiq-8", ref: "63252253b1a17b7115fe086a910881467cd0e55d"
 gem "redlock" # Locking
 
 gem "faraday_middleware" # Manage faraday request flow
@@ -56,7 +59,9 @@ gem "money-rails", "~> 1.11"
 gem "sitemap_generator", "~> 6"
 
 # Making other files
+gem "image_processing" # what it says
 gem "mini_magick" # Required for image processing
+gem "ruby-vips" # Faster image processing, should eventually replace mini_magick
 gem "carrierwave", "~> 2.2.6" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
@@ -64,12 +69,16 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "0.10.1" # QR Codes
+gem "inline_svg" # render SVGs inline and give them classes
+gem "down" # used to generate a local tempfile
 
 # API wrappers
 gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
 gem "fog-aws" # Aws used with carrierwave for S3 to store images
+gem "aws-sdk-s3", "1.170", require: false # Used by ActiveStorage for Cloudflare R2
+gem "aws-sdk-core", "3.211" # Required for S3 compatibility, see github.com/rails/rails/issues/54374
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
@@ -79,22 +88,20 @@ gem "api-pagination"
 gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
-gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
+gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 
 # Secure things
 gem "rack-throttle" # Rate limiting
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
-gem "jquery-rails" # Javascript framework?
-gem "bootstrap", "4.0.0.alpha4" # Bootstrap 4 - used for revised stylesheets (locked to current version)
 gem "chartkick" # Display charts
 gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
-gem "sass-rails"
 gem "sprockets-rails"
+gem "dartsass-rails"
 
 # new frontend
 gem "importmap-rails" # New JS setup
@@ -113,28 +120,6 @@ gem "pghero" # PG Info
 
 gem "responders"
 gem "thor"
-gem "net-http" # Required to remove error printouts, PR#2408
-
-source "https://rails-assets.org" do # JS land is crazy, so lock everything
-  gem "rails-assets-jquery", "~> 3.4.1"
-  gem "rails-assets-jquery.dirtyforms", "~> 2.0.0" # Alert on attempts to leave with dirt on forms
-  gem "rails-assets-lodash", "~> 4.9.0"
-  gem "rails-assets-mailcheck", "~> 1.1.2" # Check for common email errors
-  gem "rails-assets-moment", "~> 2.18.1" # Javascript Time - localizing :)
-  gem "rails-assets-moment-timezone", "~> 0.5.13" # Timezones for moment
-  gem "rails-assets-mustache", "~> 2.2.1"
-  gem "rails-assets-select2", "~> 4.0.3" # Use select2 for a few things, it's a bit better sometimes
-  gem "rails-assets-selectize", "~> 0.12.1" # Manually configured scss
-  gem "rails-assets-Stickyfill", "~> 1.1.3" # Affix bike edit menu
-  gem "rails-assets-tether", "~> 1.1.0" # Required by bootstrap 4, but not included :(
-  gem "rails-assets-waypoints", "~> 3.1.1" # For documentation pages
-  # Sortable breaks assets:precompile, so it's included manually
-  # gem 'rails-assets-jquery-sortable', '~> 0.9.12' # Sort photo order
-end
-
-gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
-gem "lograge" # Structure log data, put it in single lines to improve the functionality
-gem "logstash-event" # Use logstash format for logging data
 
 group :production do
   gem "skylight" # Performance monitoring
@@ -150,23 +135,26 @@ group :development do
   gem "guard-rspec", require: false
   gem "letter_opener"
   gem "rerun" # restart sidekiq processes in development on app change
+  gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
   gem "annotate_rb", github: "sethherr/annotate_rb", branch: "rename-annotate_rb"
 end
 
 group :development, :test do
   gem "brakeman", require: false
+  gem "ruby-lsp" # Ruby language server (used by editor integrations)
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "factory_bot_rails"
   gem "foreman"
-  gem "parallel_tests"
+  gem "turbo_tests" # parallel tests
+  gem "knapsack_pro" # parallel test optimization (for CI)
   gem "pry-byebug"
   gem "pry-rails"
   gem "rspec"
   gem "rspec-rails"
-  gem "rspec_junit_formatter" # For circle ci
   gem "standard" # Ruby linter
+  gem "erb-formatter" # html linter
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"
@@ -176,9 +164,12 @@ group :test do
   gem "rails-controller-testing"
   gem "rspec-sidekiq"
   gem "simplecov", require: false
+  gem "simplecov_json_formatter", require: false # Fix json error
+  gem "rspec-github", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
   gem "capybara" # For view components
   gem "selenium-webdriver" # For capybara
+  gem "chunky_png" # used to test that generated images match their targets
 end

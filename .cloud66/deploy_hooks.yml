@@ -1,7 +1,7 @@
 production:
   # Install postgres (to enable db:structure:load) and ripgrep
   first_thing:
-    - command: sudo apt-get -y install postgresql-client-common ripgrep
+    - command: sudo apt-get -y install postgresql-client-common ripgrep libvips
       target: rails
       sudo: true
       apply_during: build_only

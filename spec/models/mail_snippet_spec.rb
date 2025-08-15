@@ -34,6 +34,7 @@ RSpec.describe MailSnippet, type: :model do
         partial_registration
         appears_abandoned_notification
         parked_incorrectly_notification
+        other_parking_notification
         impound_notification
         impound_claim_approved
         impound_claim_denied
@@ -47,6 +48,12 @@ RSpec.describe MailSnippet, type: :model do
     end
   end
 
+  describe "organization_snippets_in_all" do
+    it "is the kinds in all" do
+      expect(MailSnippet.organization_snippets_in_all).to match_array(%w[header footer])
+    end
+  end
+
   describe "organization_email" do
     let(:mail_snippet) { MailSnippet.new(kind: kind) }
     let(:kind) { "header" }
@@ -55,6 +62,7 @@ RSpec.describe MailSnippet, type: :model do
       expect(MailSnippet.organization_email_for("header")).to eq "all"
       expect(mail_snippet.which_organization_email).to eq "all"
       expect(mail_snippet.in_email?("finished_registration")).to be_truthy
+      expect(mail_snippet.in_email?("finished_registration", exclude_all: true)).to be_falsey
       MailSnippet.organization_emails_with_snippets.each do |email|
         expect(mail_snippet.in_email?(email)).to be_truthy
       end
@@ -68,6 +76,15 @@ RSpec.describe MailSnippet, type: :model do
           expect(message_mail_snippet.in_email?("finished_registration")).to be_falsey
         end
       end
+    end
+  end
+
+  describe "newsletter" do
+    let(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: :newsletter) }
+    let(:mail_snippet_2) { FactoryBot.create(:mail_snippet, kind: :newsletter) }
+    it "allows creating multiple" do
+      expect(mail_snippet).to be_valid
+      expect(mail_snippet_2).to be_valid
     end
   end
 end

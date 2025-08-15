@@ -1,24 +1,11 @@
 class BikesController < Bikes::BaseController
-  MAX_INDEX_PAGE = 100
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
-  before_action :render_ad, only: %i[index show]
+  before_action :render_ad, only: %i[show]
   skip_before_action :find_bike, except: %i[show update pdf resolve_token]
-  skip_before_action :assign_current_organization, except: %i[index show]
+  skip_before_action :assign_current_organization, except: %i[show]
   skip_before_action :ensure_user_allowed_to_edit, except: %i[update pdf]
-  around_action :set_reading_role, only: %i[index show]
-
-  def index
-    @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
-    @stolenness = @interpreted_params[:stolenness]
-
-    if params[:stolenness] == "proximity" && @stolenness != "proximity"
-      flash[:info] = translation(:we_dont_know_location, location: params[:location])
-    end
-    @page = permitted_page(params[:page])
-    @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page, max_pages: MAX_INDEX_PAGE)
-    @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
-  end
+  around_action :set_reading_role, only: %i[show]
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
@@ -27,7 +14,7 @@ class BikesController < Bikes::BaseController
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record
     end
-    if current_user.present? && BikeDisplayer.display_impound_claim?(@bike, current_user)
+    if current_user.present? && BikeServices::Displayer.display_impound_claim?(@bike, current_user)
       impound_claims = @bike.impound_claims_claimed.where(user_id: current_user.id)
       @contact_owner_open = params[:contact_owner].present?
       @impound_claim = impound_claims.not_rejected.last
@@ -40,6 +27,7 @@ class BikesController < Bikes::BaseController
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
+    @show_for_sale = show_for_sale?(@bike)
     find_token
     respond_to do |format|
       format.html { render :show }
@@ -101,7 +89,7 @@ class BikesController < Bikes::BaseController
     redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= BikeCreator.new.build_bike(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
+    @bike ||= BikeServices::Creator.new.build_bike(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
@@ -120,7 +108,7 @@ class BikesController < Bikes::BaseController
       end
       @b_param.update(params: permitted_bparams,
         origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
-      @bike = BikeCreator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
+      @bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
@@ -140,7 +128,7 @@ class BikesController < Bikes::BaseController
         redirect_to(edit_bike_url(@b_param.created_bike)) && return
       end
       @b_param.clean_params(permitted_bparams)
-      @bike = BikeCreator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
+      @bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
       if @bike.errors.any?
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
@@ -156,7 +144,7 @@ class BikesController < Bikes::BaseController
   def update
     if params[:bike].present?
       begin
-        @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
+        @bike = BikeServices::Updator.new(user: current_user, bike: @bike, params:, current_ownership: @current_ownership).update_available_attributes
       rescue => e
         flash[:error] = e.message
         # Sometimes, weird things error. In production, Don't show a 500 page to the user
@@ -217,11 +205,18 @@ class BikesController < Bikes::BaseController
     redirect_to bike_path(@bike.id)
   end
 
-  protected
+  private
 
-  def permitted_page(page_param)
-    page = (page_param.presence || 1).to_i
-    page.clamp(1, MAX_INDEX_PAGE)
+  def show_for_sale?(bike)
+    return false unless bike.status_with_owner?
+    return true if bike.is_for_sale?
+
+    marketplace_listing = bike.current_marketplace_listing
+    return false if marketplace_listing.blank? ||
+      !InputNormalizer.boolean(params[:show_marketplace_preview])
+
+    return false unless marketplace_listing.visible_by?(current_user)
+    @marketplace_preview = true
   end
 
   def render_ad

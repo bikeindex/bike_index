@@ -1,3 +1,4 @@
+-# requires being passed locals: bike:, stolen_record:
 %h3
   Bike Images
   - if bike.public_images.any?
@@ -15,17 +16,17 @@
           = link_to "Regenerate alert using this image", admin_stolen_bike_path(bike, public_image_id: image.id, update_action: "regenerate_alert_image"), method: :put, action: "update", class: "btn btn-sm btn-outline-info"
 
 
-- alert_image_versions = bike&.current_stolen_record&.current_alert_image&.image&.versions || []
+- alert_image_versions = BikeServices::Displayer.header_image_urls(bike)
 
 %h3.mt-4 Promoted Alert Images
 
-- if alert_image_versions.blank?
+- if alert_image_versions.blank? || !(stolen_record.images_attached? || stolen_record.alert_image.present?)
   .mb-4 None
 - else
   .stolen-bike-image-editing-list-group-wrapper
     %ul.mb-4.list-group.list-group-horizontal.stolen-bike-image-editing-list-group#promoted-images-display
-      - alert_image_versions.each do |name, image|
+      - alert_image_versions.each do |name, image_url|
         %li.list-group-item
-          = link_to image_tag(image.url.to_s), image.url.to_s, target: "_blank"
+          = link_to image_tag(image_url), image_url, target: "_blank"
           .mt-2.text-center
-            = name
+            = name.to_s

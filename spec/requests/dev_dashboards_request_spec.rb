@@ -9,7 +9,7 @@ RSpec.describe "Dev dashboards", type: :request do
     # IDK, doesn't render in test - most important to test that it doesn't render so ignoring for now
     # context "signed in as dev" do
     #   include_context :request_spec_logged_in_as_superuser
-    #   let(:current_user) { FactoryBot.create(:admin, developer: true) }
+    #   let(:current_user) { FactoryBot.create(:superuser, developer: true) }
 
     #   it "renders" do
     #     get "/sidekiq"
@@ -27,7 +27,7 @@ RSpec.describe "Dev dashboards", type: :request do
     # IDK, doesn't render in test - most important to test that it doesn't render so ignoring for now
     # context "signed in as dev" do
     #   include_context :request_spec_logged_in_as_superuser
-    #   let(:current_user) { FactoryBot.create(:admin, developer: true) }
+    #   let(:current_user) { FactoryBot.create(:superuser, developer: true) }
 
     #   it "renders" do
     #     get "/pghero"

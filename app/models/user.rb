@@ -53,19 +53,22 @@
 #  zipcode                            :string(255)
 #  created_at                         :datetime         not null
 #  updated_at                         :datetime         not null
+#  address_record_id                  :bigint
 #  country_id                         :integer
 #  state_id                           :integer
 #  stripe_id                          :string(255)
 #
 # Indexes
 #
+#  index_users_on_address_record_id         (address_record_id)
 #  index_users_on_auth_token                (auth_token)
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
 #
 class User < ApplicationRecord
-  include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable
-  include Geocodeable
+  include AddressRecorded
+
+  EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
 
   cattr_accessor :current_user
 
@@ -78,48 +81,49 @@ class User < ApplicationRecord
   mount_uploader :avatar, AvatarUploader
 
   has_many :ambassador_task_assignments
-  has_many :ambassador_tasks, through: :ambassador_task_assignments
-  has_many :payments
-  has_many :notifications
-  has_many :organization_roles
-  has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
-  has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
-  has_many :organizations, through: :organization_roles
-  has_many :ownerships
   has_many :bike_sticker_updates
-  has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
+  has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
+  has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
   has_many :current_ownerships, -> { current }, class_name: "Ownership"
-  has_many :owned_bikes, through: :ownerships, source: :bike
-  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
-  has_many :user_registration_organizations
-  has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
-
-  has_many :integrations, dependent: :destroy
+  has_many :email_bans, dependent: :destroy
+  has_many :email_bans_active, -> { period_active }, class_name: "EmailBan"
+  has_many :feedbacks
   has_many :impound_claims
   has_many :impound_records
-  has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
-  has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
+  has_many :integrations, dependent: :destroy
   has_many :locks, dependent: :destroy
+  has_many :marketplace_listings
+  has_many :marketplace_messages_received, class_name: "MarketplaceMessage", foreign_key: :receiver_id
+  has_many :marketplace_messages_sent, class_name: "MarketplaceMessage", foreign_key: :sender_id
+  has_many :memberships
+  has_many :notifications
+  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
+  has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
+  has_many :organization_roles
+  has_many :ownerships
+  has_many :payments
+  has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
+  has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
+  has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
+  has_many :stripe_subscriptions
+  has_many :superuser_abilities
+  has_many :theft_alerts
+  has_many :user_alerts
   has_many :user_emails, dependent: :destroy
   has_many :user_phones
-  has_many :user_alerts
-  has_many :superuser_abilities
+  has_many :user_registration_organizations
 
-  has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
-  has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
-  has_many :theft_alerts
-  has_many :feedbacks
+  has_many :ambassador_tasks, through: :ambassador_task_assignments
+  has_many :organizations, through: :organization_roles
+  has_many :owned_bikes, through: :ownerships, source: :bike
+  has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
+  has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
 
+  has_one :membership_active, -> { active }, class_name: "Membership"
   has_one :mailchimp_datum
   has_one :user_ban
-  accepts_nested_attributes_for :user_ban
 
-  scope :banned, -> { where(banned: true) }
-  scope :confirmed, -> { where(confirmed: true) }
-  scope :unconfirmed, -> { where(confirmed: false) }
-  scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
-  scope :ambassadors, -> { where(id: OrganizationRole.ambassador_organizations.select(:user_id)) }
-  scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
+  accepts_nested_attributes_for :user_ban
 
   validates_uniqueness_of :username, case_sensitive: false
 
@@ -143,9 +147,23 @@ class User < ApplicationRecord
 
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
+  validates :email, format: {with: EMAIL_REGEX, message: "Email invalid"}
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
+
+  scope :email_banned, -> { left_joins(:email_bans_active).where.not(email_bans: {id: nil}) }
+  scope :no_email_bans, -> { left_joins(:email_bans_active).where(email_bans: {id: nil}) }
+  scope :banned, -> { where(banned: true) }
+  scope :valid_only, -> { no_email_bans.where(banned: false) }
+  scope :confirmed, -> { where(confirmed: true) }
+  scope :unconfirmed, -> { where(confirmed: false) }
+  scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
+  scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
+  scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
+  scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
+  scope :donated, -> { joins(:payments).merge(Payment.paid) }
+  scope :member, -> { includes(:memberships).merge(Membership.active) }
 
   attr_accessor :skip_update
 
@@ -186,7 +204,7 @@ class User < ApplicationRecord
     end
 
     def matching_domain(str)
-      where("email ILIKE ?", "%#{str.to_s.strip}")
+      where("users.email ILIKE ?", "%#{str.to_s.strip}")
     end
 
     def search_phone(str)
@@ -217,7 +235,12 @@ class User < ApplicationRecord
   def ensure_unique_email
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
     return true if id.present? # Because existing users shouldn't see this error
+
     errors.add(:email, :email_already_exists)
+  end
+
+  def member?
+    membership_active.present?
   end
 
   def confirmed?
@@ -230,11 +253,11 @@ class User < ApplicationRecord
 
   # Performed inline
   def perform_create_jobs
-    AfterUserCreateWorker.new.perform(id, "new", user: self)
+    ::Callbacks::AfterUserCreateJob.new.perform(id, "new", user: self)
   end
 
   def perform_user_update_jobs
-    AfterUserChangeWorker.perform_async(id) if id.present? && !skip_update
+    ::Callbacks::AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
   end
 
   def superuser?(controller_name: nil, action_name: nil)
@@ -258,8 +281,16 @@ class User < ApplicationRecord
     organization_roles.ambassador_organizations.limit(1).any?
   end
 
+  def can_create_listing?
+    true # Currently, marketplace is free
+  end
+
   def to_param
     username
+  end
+
+  def marketplace_message_name
+    InputNormalizer.sanitize(name.present? ? name : short_username)
   end
 
   def display_name
@@ -271,7 +302,7 @@ class User < ApplicationRecord
   end
 
   def donations
-    payments.donation.sum(:amount_cents)
+    payments.donation.paid.sum(:amount_cents)
   end
 
   def donor?
@@ -337,10 +368,10 @@ class User < ApplicationRecord
 
   def send_password_reset_email
     # If the auth token was just created, don't create a new one, it's too error prone
-    return false if auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
+    return false if password_reset_just_sent?
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailResetPasswordWorker.perform_async(id)
+    Email::ResetPasswordJob.perform_async(id)
     true
   end
 
@@ -349,7 +380,7 @@ class User < ApplicationRecord
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailMagicLoginLinkWorker.perform_async(id)
+    Email::MagicLoginLinkJob.perform_async(id)
   end
 
   def update_last_login(ip_address)
@@ -363,7 +394,7 @@ class User < ApplicationRecord
     self.confirmed = true
     save
     reload
-    AfterUserCreateWorker.new.perform(id, "confirmed", user: self)
+    ::Callbacks::AfterUserCreateJob.new.perform(id, "confirmed", user: self)
     true
   end
 
@@ -462,6 +493,10 @@ class User < ApplicationRecord
     user_phones.confirmed.limit(1).any?
   end
 
+  def email_banned?
+    email_bans_active.any?
+  end
+
   def set_calculated_attributes
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
@@ -527,6 +562,14 @@ class User < ApplicationRecord
   end
 
   private
+
+  def short_username
+    username&.truncate(11)
+  end
+
+  def password_reset_just_sent?
+    auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
+  end
 
   def claimed_organization_roles_for(organization_id)
     OrganizationRole.claimed.where(user_id: id, organization_id: organization_id)

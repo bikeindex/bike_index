@@ -55,11 +55,11 @@ RSpec.describe ImpoundConfiguration, type: :model do
         expect(impound_configuration.calculated_display_id_next_integer).to eq 1212
         expect(impound_configuration.calculated_display_id_next).to eq "A1212"
         # The process worker is the thing that removes the display_id_next - so we have to run it
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           organization.impound_records.create(bike: FactoryBot.create(:bike))
-        }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
-        ProcessImpoundUpdatesWorker.drain
+        }.to change(ProcessImpoundUpdatesJob.jobs, :count).by 1
+        ProcessImpoundUpdatesJob.drain
         expect(impound_configuration.reload.calculated_display_id_next_integer).to eq 1213
         expect(impound_configuration.calculated_display_id_next).to eq "A1213"
         expect(impound_configuration.display_id_next_integer).to eq nil

@@ -8,12 +8,12 @@ class LogSearcher::Reader
     API::V1::BikesController#index
     API::V1::BikesController#stolen_ids
     API::V1::BikesController#close_serial
-    BikesController#index
     Organized::BikesController#index
     Admin::BikesController#index
     OrgPublic::ImpoundedBikesController#index
     Organized::ImpoundRecordsController#index
-    ParkingNotificationsController#index].freeze
+    ParkingNotificationsController#index
+    Search::].freeze
 
   class << self
     # Remove search matches that contain bikesController index (which are already matched)
@@ -26,7 +26,7 @@ class LogSearcher::Reader
     # If no time is included, it returns all the lines from the file
     def rgrep_command_str(time = nil, log_path: nil)
       log_path ||= DEFAULT_LOG_PATH
-      "rg '#{searches_regex}' '#{log_path}'" + time_rgrep(time)
+      "rg '#{searches_regex}' '#{log_path}'" + time_rgrep(time) + " | sort -u"
     end
 
     # This is for diagnostics, to count how many are returned

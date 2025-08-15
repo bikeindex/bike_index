@@ -1,12 +1,15 @@
 !!!
 %html{ lang: I18n.locale }
   %head
-    = header_tags
-    = stylesheet_link_tag 'revised'
+    = render(HeaderTags::Component.new(**header_tags_component_options))
+    -# TODO: Cache this ^
+    = csrf_meta_tags
+    = stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/82eb17360c.js"></script>
     = javascript_include_tag 'application_revised'
+    = javascript_importmap_tags
+    = hotwire_livereload_tags if Rails.env.development?
     :javascript
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
@@ -22,10 +25,10 @@
   %body{id: page_id, class:  body_class}
 
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache(["main_navbar", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar4", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
-          %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
+          %a.primary-logo{ href: user_root_url, class: "" }
             = image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home"
           = link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do
             = t(".the_nonprofit_bike_registry")
@@ -34,20 +37,23 @@
             %span.current-organization-nav-item
               %a#passive_organization_submenu{ href: "#", "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
                 = passive_organization.short_name
-                %i.fas.fa-chevron-down.caret-down
+                = inline_svg_tag "icons/chevron-right.svg", class: "tw:rotate-90 tw:inline-block tw:w-3 tw:h-3 tw:ml-1"
               %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
                 = render partial: "/shared/organized_menu_items", locals: { passed_organization: passive_organization, is_dropdown: true }
 
           - elsif current_user.blank?
             .center-navbar-signup-link-container
               = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
-          - bike_search_active = controller_namespace.blank? && controller_name == "bikes" && action_name == "index"
+          - bike_search_active = controller_namespace == "search" && controller_name == "registrations" && action_name == "index"
+          - marketplace_search_active = controller_namespace == "search" && controller_name == "marketplace" && action_name == "index"
           %a#menu-opened-backdrop{ "aria-hidden" => "true" }
           .hamburgler{ "aria-hidden" => "true" }
             %a#primary_nav_hamburgler
           %ul.primary-main-menu
             %li.primary-nav-item.d-lg-none
-              = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", id: "search_bikes_header_link"
+              = link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}"
+            %li.primary-nav-item.d-lg-none
+              = link_to t(".marketplace"), search_marketplace_path, class: "nav-link #{marketplace_search_active ? 'active' : ''}"
             %li.divider-nav-item.d-lg-none{ "aria-hidden" => "true" }
             - if current_user_or_unconfirmed_user.present?
               %li.primary-nav-item
@@ -65,9 +71,13 @@
                           = t(".view_org", org_name: organization.name)
                     %li.divider-nav-item
                   %li
-                    = active_link t(".register_a_new_bike"), choose_registration_path, class: 'nav-link'
+                    = active_link t(".your_registrations"), my_account_path, class: 'nav-link'
+                  -# .any_for_user? caches
+                  - if MarketplaceMessage.any_for_user?(current_user)
+                    %li
+                      = active_link t(".marketplace_messages"), my_account_messages_path, class: 'nav-link'
                   %li
-                    = active_link t(".your_bikes"), my_account_path, class: 'nav-link'
+                    = active_link t(".register_a_new_bike"), choose_registration_path, class: 'nav-link'
                   %li
                     = active_link t(".user_settings", user_email: current_user_or_unconfirmed_user.email), edit_my_account_path, class: 'nav-link', id: "navUserSettingLink", "data-email" => current_user_or_unconfirmed_user.email
                   %li.divider-nav-item
@@ -88,8 +98,10 @@
               = active_link t(".donate"), why_donate_path, class: 'nav-link'
             %li.primary-nav-item
               = active_link t(".blog"), news_index_path, class: 'nav-link', match_controller: true
+            %li.primary-nav-item.d-lg-block
+              = link_to t(".marketplace"), search_marketplace_path, class: "nav-link #{marketplace_search_active ? 'active' : ''}"
             %li.primary-nav-item.d-none.d-lg-block
-              = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", match_controller: true
+              = link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}", match_controller: true
     = render partial: "/layouts/revised_messages"
 
     - if current_page_skeleton.present?
@@ -105,7 +117,7 @@
       = render partial: "/shared/user_general_alert"
 
 
-    - cache(["footer_1", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["footer_2", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       = render partial: "/shared/footer_revised"
 
 :javascript

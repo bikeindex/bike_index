@@ -3,8 +3,9 @@ require "rails_helper"
 RSpec.describe Bikes::EditsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bikes/#{bike.to_param}/edit" }
-  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-  let(:current_user) { bike.creator }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: bike_creator) }
+  let(:bike_creator) { FactoryBot.create(:user_confirmed) }
+  let(:current_user) { bike_creator }
 
   let(:edit_templates) do
     {
@@ -12,10 +13,11 @@ RSpec.describe Bikes::EditsController, type: :request do
       photos: "Photos",
       drivetrain: "Wheels and Drivetrain",
       accessories: "Accessories and Components",
-      ownership: "Transfer Ownership",
       groups: "Groups and Organizations",
-      remove: "Hide or Delete",
-      report_stolen: "Report Stolen or Missing"
+      remove: "Transfer, Hide or Delete",
+      marketplace: "List for sale",
+      report_stolen: "Report Stolen or Missing",
+      versions: "Versions"
     }
   end
   let(:theft_templates) do
@@ -26,7 +28,8 @@ RSpec.describe Bikes::EditsController, type: :request do
       report_recovered: "Mark this Bike Recovered"
     }
   end
-  let(:theft_edit_templates) { edit_templates.except(:report_stolen).merge(theft_templates) }
+  # TODO: update when MARKETPLACE_FREE_UNTIL changes
+  let(:theft_edit_templates) { edit_templates.except(:report_stolen, :marketplace).merge(theft_templates) }
 
   context "no current_user" do
     let(:current_user) { nil }
@@ -46,7 +49,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(flash[:error]).to be_present
       expect(session[:return_to]).to be_blank
       # Because user is not bike#user
-      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
+      expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
     end
     context "current_user present but hasn't claimed the bike" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership, user: current_user) }
@@ -60,6 +63,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(bike.user_id).to eq current_user.id
         expect(response).to be_ok
         expect(assigns(:edit_template)).to eq "bike_details"
+        expect(response.body).to match(/<title>Details:/)
         expect(session[:return_to]).to be_blank
       end
     end
@@ -85,14 +89,13 @@ RSpec.describe Bikes::EditsController, type: :request do
     expect(assigns(:bike).id).to eq bike.id
     expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates
     # Because user is bike#user
-    expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+    expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     # If passed an unknown template, it renders default template
     get base_url, params: {id: bike.id, edit_template: "root_party"}
     expect(response).to redirect_to(edit_bike_url(bike, edit_template: :bike_details))
   end
   context "with bike_versions" do
     it "renders" do
-      Flipper.enable :bike_versions # Simpler to just enable it all
       get base_url
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
@@ -100,32 +103,61 @@ RSpec.describe Bikes::EditsController, type: :request do
       get "#{base_url}/versions"
       expect(response.status).to eq 200
       expect(response).to render_template(:versions)
+      expect(response.body).to match(/<title>Versions: #{bike.title_string}/)
+    end
+  end
+  describe "marketplace" do
+    # TODO: update when MARKETPLACE_FREE_UNTIL changes
+    # it "redirects" do
+    #   get "#{base_url}/marketplace"
+    #   expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
+    # end
+    context "with can_create_listing?" do
+      let(:bike_creator) { FactoryBot.create(:superuser) }
+
+      it "includes marketplace in edit_templates" do
+        expect(bike_creator.reload.can_create_listing?).to be_truthy
+        get base_url
+        expect(flash).to be_blank
+        expect(response).to render_template(:bike_details)
+        expect(assigns(:bike).id).to eq bike.id
+        expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates.merge(marketplace: "List for sale")
+        # Because user is bike#user
+        expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+        # If passed an unknown template, it renders default template
+        get "#{base_url}/marketplace"
+        expect(response).to render_template(:marketplace)
+      end
     end
   end
   context "with owner_email" do
-    it "renders with owner_email in ownership" do
+    it "renders with owner_email in remove" do
       get "#{base_url}?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
       expect(response).to render_template(:bike_details)
       expect(assigns(:new_email_assigned)).to be_blank
       expect(assigns(:bike).owner_email).to eq bike.owner_email
+      # Preserve previous ownership functionality
       get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      expect(response).to redirect_to(edit_bike_path(bike.to_param, edit_template: "remove", owner_email: "new_email@stuff.com"))
+      # And then, test the previous assign email functionality
+      get "#{base_url}/remove?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
-      expect(response).to render_template(:ownership)
+      expect(response).to render_template(:remove)
       expect(assigns(:bike).owner_email).to eq "new_email@stuff.com"
       expect(assigns(:new_email_assigned)).to be_truthy
       expect {
         put "/bikes/#{bike.to_param}", params: {bike: {owner_email: "new_email@stuff.com"}}
       }.to change(Ownership, :count).by 1
-      get "#{base_url}/ownership?owner_email=new_email@stuff.com"
+      get "#{base_url}/remove?owner_email=new_email@stuff.com"
       expect(response.status).to eq 200
-      expect(response).to render_template(:ownership)
+      expect(response).to render_template(:remove)
       expect(assigns(:new_email_assigned)).to be_falsey
       expect(assigns(:bike).owner_email).to eq "new_email@stuff.com"
     end
   end
   context "stolen bike" do
-    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+    let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: bike_creator) }
     it "renders" do
       get base_url
       expect(flash).to be_blank
@@ -133,7 +165,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(assigns(:edit_template)).to eq "theft_details"
       expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
       expect(bike.user_id).to eq current_user.id
-      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
+      expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       # It redirects "alert" to new_bike_theft_alert, for backward compatibility
       # Maybe sometime after merging #2041, stop redirecting?
       get "#{base_url}?edit_template=alert"
@@ -148,7 +180,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(flash).to be_blank
         expect(response).to redirect_to(edit_bike_path(bike.id, edit_template: "bike_details"))
         expect(bike.reload.user_id).to eq current_user.id
-        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
       end
     end
   end
@@ -165,7 +197,9 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(session[:return_to]).to be_blank
     end
     context "stolen bike" do
-      let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
+
       it "renders with stolen as first template, different description" do
         expect(bike.reload.status).to eq "status_stolen"
         expect(bike.current_stolen_record.without_location?).to be_truthy
@@ -216,7 +250,7 @@ RSpec.describe Bikes::EditsController, type: :request do
 
   context "with impound_record" do
     let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
-    let(:target_edit_template_keys) { edit_templates.keys.map(&:to_s) - ["report_stolen"] + ["found_details"] }
+    let(:target_edit_template_keys) { edit_templates.keys.map(&:to_s) - %w[report_stolen marketplace] + ["found_details"] }
     it "renders" do
       expect(bike.reload.status).to eq "status_impounded"
       expect(bike.owner&.id).to eq current_user.id
@@ -233,7 +267,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     end
     context "organized impound_record" do
       let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
-      before { ProcessImpoundUpdatesWorker.new.perform(impound_record.id) }
+      before { ProcessImpoundUpdatesJob.new.perform(impound_record.id) }
       it "redirects with flash error" do
         expect(bike.reload.status).to eq "status_impounded"
         get base_url
@@ -286,7 +320,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     let(:bike) { parking_notification.bike }
     let(:current_organization) { parking_notification.organization }
     let(:current_user) { parking_notification.user }
-    before { ProcessParkingNotificationWorker.new.perform(parking_notification.id) }
+    before { ProcessParkingNotificationJob.new.perform(parking_notification.id) }
     it "renders" do
       parking_notification.reload
       impound_record = parking_notification.impound_record

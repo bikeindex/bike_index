@@ -1,7 +1,7 @@
 <script src="/vendored_assets/bikes_search1.js"></script>
 
 .container
-  .row.first-row
+  .row
     .col-md-12
       %h1
         Search for bike versions
@@ -14,7 +14,7 @@
       - if @bike_versions.present?
         %ul.bike-boxes
           - @bike_versions.each do |bike_version|
-            %li.bike-box-item
+            %li.bike-box-item{class: "tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800"}
               %a.bike-list-image{ href: bike_version_path(bike_version), class: ('hover-expand' if bike_version.thumb_path) }
                 = bike_thumb_image(bike_version)
               .bike-information
@@ -31,7 +31,7 @@
             .ad-block.ad-binx.ad468x60
           .col-md-8.col-lg-4.mt-4
             .paginate-container.paginate-container-bottom
-              = pagy_bootstrap_nav(@pagy).html_safe
+              = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
         .row
           .col-md-8.mt-4.offset-md-2
             = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}

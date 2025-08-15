@@ -4,17 +4,17 @@ RSpec.describe OrganizationRole, type: :model do
   describe "#ensure_ambassador_tasks_assigned!" do
     context "given an ambassador organization" do
       it "enqueues a job to assign ambassador tasks to the given user" do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         user = FactoryBot.create(:user_confirmed)
         org = FactoryBot.create(:organization_ambassador)
         tasks = FactoryBot.create_list(:ambassador_task, 2)
         expect(AmbassadorTaskAssignment.count).to eq(0)
 
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         expect {
           FactoryBot.create(:organization_role_claimed, organization: org, user: user)
-        }.to change(ProcessOrganizationRoleWorker.jobs, :count).by 1
-        Sidekiq::Worker.drain_all
+        }.to change(Users::ProcessOrganizationRoleJob.jobs, :count).by 1
+        Sidekiq::Job.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(2)
         expect(Ambassador.find(user.id).ambassador_tasks).to match_array(tasks)
@@ -28,7 +28,7 @@ RSpec.describe OrganizationRole, type: :model do
         expect(AmbassadorTaskAssignment.count).to eq(0)
 
         FactoryBot.create(:organization_role_claimed, organization: org, user: user)
-        Sidekiq::Worker.drain_all
+        Sidekiq::Job.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(0)
       end
@@ -65,12 +65,12 @@ RSpec.describe OrganizationRole, type: :model do
     let(:email) { "new@ambassador.edu" }
     let(:organization_role) { FactoryBot.build(:organization_role, organization: organization, invited_email: email) }
     it "creates the tasks when it can create the tasks" do
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       organization_role.save
       expect(organization_role.ambassador?).to be_truthy
-      Sidekiq::Worker.drain_all
+      Sidekiq::Job.drain_all
       user = FactoryBot.create(:user, email: email)
-      Sidekiq::Worker.drain_all
+      Sidekiq::Job.drain_all
       user.reload
       expect(user.ambassador?).to be_truthy
       expect(user.ambassador_tasks).to eq([ambassador_task])

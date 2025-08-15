@@ -28,7 +28,7 @@
       %li.nav-item
         = link_to "graph", admin_tweets_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-  = render partial: "/shared/admin_current_header", locals: { viewing: "Tweets" }
+  = render partial: "/shared/admin/current_header", locals: { viewing: "Tweets" }
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_tweets), stacked: true, thousands: ","
@@ -54,6 +54,6 @@
         = text_field_tag :query, params[:query], placeholder: "Search tweets", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render partial: "/shared/pagination", locals: {collection: @tweets, count: matching_tweets.size}
+= render partial: "/shared/admin/pagination", locals: {collection: @tweets, count: matching_tweets.size}
 
 = render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true, skip_total: true}

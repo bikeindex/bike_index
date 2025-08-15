@@ -5,7 +5,7 @@ RSpec.describe LocksController, type: :request do
   include_context :request_spec_logged_in_as_user
   before do
     # We have to create all the lock types.... Could be improved ;)
-    ["U-lock", "Chain with lock", "Cable", "Locking skewer", "Other style"].each do |name|
+    ["U-lock", "Chain with lock", "Cable", "Locking skewer", "Other style", "Battery or e-bike key"].each do |name|
       LockType.create(name: name)
     end
   end

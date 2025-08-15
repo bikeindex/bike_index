@@ -4,8 +4,7 @@
       New Tweet
 
 #tweetForm
-  - if @tweet.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Tweet", obj: @tweet }
+  = render(AlertForErrors::Component.new(object: @tweet))
 
   = form_for [:admin, @tweet], url: { action: "create", controller: "tweets" } do |f|
     .row

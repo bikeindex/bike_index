@@ -5,9 +5,6 @@ class Bikes::TheftAlertsController < Bikes::BaseController
   def new
     return unless setup_edit_template("alert")
 
-    bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-    @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
-
     @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
     @selected_theft_alert_plan =
       @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
@@ -22,7 +19,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     redirect_to new_bike_theft_alert_path(bike_id: @bike.id) unless @payment.present?
     return unless setup_edit_template("alert_purchase_confirmation")
 
-    @payment&.update_from_stripe_session
+    @payment&.update_from_stripe!
   end
 
   def create
@@ -33,19 +30,15 @@ class Bikes::TheftAlertsController < Bikes::BaseController
       user: current_user
     )
     @payment = Payment.new(create_parameters(theft_alert))
+    @payment.stripe_checkout_session(item_name: product_description(theft_alert))
 
-    stripe_session = Stripe::Checkout::Session.create(
-      @payment.stripe_session_hash(item_name: product_description(theft_alert))
-    )
-
-    @payment.update!(stripe_id: stripe_session.id)
     theft_alert.update(payment: @payment)
 
-    redirect_to stripe_session.url, allow_other_host: true
-    image_id = params[:selected_bike_image_id]
-    if image_id.present? && image_id != @bike.public_images&.first&.id
-      @bike.current_stolen_record&.generate_alert_image(bike_image: PublicImage.find_by_id(image_id))
-    end
+    # Enqueue creation of the image with the specified image
+    StolenBike::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, false,
+      params[:selected_bike_image_id])
+
+    redirect_to @payment.stripe_checkout_session.url, allow_other_host: true
   end
 
   private
@@ -58,7 +51,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
       amount_cents: theft_alert.amount_cents,
       user_id: current_user.id,
       email: current_user.email,
-      currency: params[:currency] || MoneyFormater.default_currency # TODO: handle this better
+      currency: params[:currency] || Currency.default.name # TODO: handle this better
     }
   end
 

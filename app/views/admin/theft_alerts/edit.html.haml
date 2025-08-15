@@ -6,6 +6,13 @@
     alert status:
     %span{class: theft_alert_status_class(@theft_alert)}
       = @theft_alert.status
+- if @theft_alert.manual_override_inactive?
+  %p.pt-2.pb-2
+    %span.text-danger
+      Facebook Activation failed
+    %small
+      this alert has be marked inactive, but it never ran.
+      %span.less-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
 %h4
   - if @theft_alert.facebook_updateable?
     = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
@@ -66,6 +73,8 @@
                 %li Alert is missing photo
               - if @theft_alert.missing_location?
                 %li Alert is missing location
+              - if @theft_alert.bike_not_current?
+                %li Bike is hidden, deleted, or spam
 
 .row.mt-4
   .col-sm-6
@@ -95,8 +104,9 @@
                 = l @theft_alert.facebook_updated_at, format: :convert_time
               %small.ml-2.less-strong
                 = @theft_alert.live? ? "alert ends" : "alert ended"
-                %span.convertTime
-                  = l @theft_alert.end_at, format: :convert_time
+                - if @theft_alert.end_at.present?
+                  %span.convertTime
+                    = l @theft_alert.end_at, format: :convert_time
         %tr
           %td Notify?
           %td
@@ -166,7 +176,7 @@
   No payment present!
 
 .mt-3
-= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
+= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike, stolen_record: @stolen_record }
 
 
 - if @theft_alert.notifications.any?

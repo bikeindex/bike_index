@@ -31,6 +31,8 @@
 #  index_graduated_notifications_on_user_id                  (user_id)
 #
 class GraduatedNotification < ApplicationRecord
+  include StatusHumanizable
+
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze
 
@@ -140,10 +142,6 @@ class GraduatedNotification < ApplicationRecord
 
   def message
     nil # for parity with parking_notifications
-  end
-
-  def status_humanized
-    self.class.status_humanized(status)
   end
 
   # Get it unscoped, because we really want it
@@ -267,9 +265,9 @@ class GraduatedNotification < ApplicationRecord
 
   def mark_remaining!(marked_remaining_by_id: nil, skip_async: false)
     unless skip_async
-      MarkGraduatedNotificationRemainingWorker.perform_in(5, id, marked_remaining_by_id)
+      MarkGraduatedNotificationRemainingJob.perform_in(5, id, marked_remaining_by_id)
     end
-    MarkGraduatedNotificationRemainingWorker.new.perform(id, marked_remaining_by_id)
+    MarkGraduatedNotificationRemainingJob.new.perform(id, marked_remaining_by_id)
   end
 
   def set_calculated_attributes
@@ -298,7 +296,7 @@ class GraduatedNotification < ApplicationRecord
     if primary_notification? && associated_bike_ids_missing_notifications.any?
       # We haven't created all the relevant graduated notifications, create them before processing
       associated_bike_ids_missing_notifications.each do |b_id|
-        CreateGraduatedNotificationWorker.perform_async(organization_id, b_id)
+        CreateGraduatedNotificationJob.perform_async(organization_id, b_id)
       end
       return false
     end

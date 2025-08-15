@@ -3,8 +3,8 @@
 
 - url = {action: "create", controller: "news"}
 = form_for [:admin, @blog], :url => url do |f|
-  - if @blog.errors.any?
-    = render partial: "shared/errors", locals: { name: "Blog", obj: @blog }
+  = render(AlertForErrors::Component.new(object: @blog))
+
   .row
     .col-auto
       .form-group

@@ -1,0 +1,68 @@
+.admin-subnav
+  .col-md-12
+    %h1
+      Edit Primary Activity
+
+.row.mt-4
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr.small
+          %td
+            Created
+          %td
+            %span.convertTime.preciseTime
+              = l @primary_activity.created_at, format: :convert_time
+        %tr.small
+          %td
+            Updated
+          %td
+            %span.convertTime.preciseTime
+              = l @primary_activity.updated_at, format: :convert_time
+        %tr
+          %td Name
+          %td
+            = @primary_activity.name
+        %tr.small
+          %td Short name
+          %td
+            = @primary_activity.short_name
+        %tr.small
+          %td Display name
+          %td
+            = @primary_activity.display_name
+
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Top level?
+          %td
+            = check_mark if @primary_activity.top_level?
+        %tr
+          %td Family
+          %td
+            = check_mark if @primary_activity.family
+        %tr
+          %td Family
+          %td
+            = @primary_activity.family_name
+        %tr
+          %td Bike count
+          %td
+            = link_to admin_number_display(Bike.where(primary_activity_id: @primary_activity.id).count), admin_bikes_path(primary_activity: @primary_activity.id)
+
+- if @primary_activity.family?
+  .mt-5.mb-5
+    %h4 Flavors
+    = render(partial: "table", locals: {collection: @primary_activity_flavors, render_sortable: false})
+
+.row
+  .col-sm-6
+    = form_for [:admin, @primary_activity],
+      html: { class: "form" } do |f|
+      .form-group
+        = f.label :priority, class: "form-label"
+        = f.number_field :priority, class: "form-control"
+      .mt-4
+        = submit_tag "Save", class: "btn btn-success btn-lg"

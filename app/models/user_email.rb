@@ -5,6 +5,7 @@
 #  id                 :integer          not null, primary key
 #  confirmation_token :text
 #  email              :string(255)
+#  last_email_errored :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  old_user_id        :integer
@@ -21,42 +22,51 @@ class UserEmail < ActiveRecord::Base
 
   scope :confirmed, -> { where("confirmation_token IS NULL") }
   scope :unconfirmed, -> { where("confirmation_token IS NOT NULL") }
+  scope :last_email_errored, -> { where(last_email_errored: true) }
 
   before_validation :normalize_email
 
-  def normalize_email
-    self.email = EmailNormalizer.normalize(email)
-  end
+  class << self
+    def create_confirmed_primary_email(user)
+      return false unless user.confirmed
+      where(user_id: user.id, email: user.email).first_or_create
+    end
 
-  def self.create_confirmed_primary_email(user)
-    return false unless user.confirmed
-    where(user_id: user.id, email: user.email).first_or_create
-  end
+    def add_emails_for_user_id(user_id, email_list)
+      email_list.to_s.split(",").reject(&:blank?).each do |str|
+        email = EmailNormalizer.normalize(str)
+        next if where(user_id: user_id, email: email).present?
+        ue = new(user_id: user_id, email: email)
+        ue.generate_confirmation
+        ue.save
+        ue.send_confirmation_email
+      end
+    end
 
-  def self.add_emails_for_user_id(user_id, email_list)
-    email_list.to_s.split(",").reject(&:blank?).each do |str|
-      email = EmailNormalizer.normalize(str)
-      next if where(user_id: user_id, email: email).present?
-      ue = new(user_id: user_id, email: email)
-      ue.generate_confirmation
-      ue.save
-      ue.send_confirmation_email
+    def friendly_find(str)
+      return nil if str.blank?
+      find_by_email(EmailNormalizer.normalize(str))
+    end
+
+    def fuzzy_user_id_find(str)
+      ue = friendly_find(str)
+      ue&.user_id
+    end
+
+    def fuzzy_user_find(str)
+      ue = friendly_find(str)
+      ue&.user
     end
   end
 
-  def self.friendly_find(str)
-    return nil if str.blank?
-    find_by_email(EmailNormalizer.normalize(str))
+  def update_last_email_errored!(email_errored:)
+    return if last_email_errored == email_errored
+
+    update(last_email_errored: email_errored)
   end
 
-  def self.fuzzy_user_id_find(str)
-    ue = friendly_find(str)
-    ue&.user_id
-  end
-
-  def self.fuzzy_user_find(str)
-    ue = friendly_find(str)
-    ue&.user
+  def normalize_email
+    self.email = EmailNormalizer.normalize(email)
   end
 
   def confirmed?
@@ -87,12 +97,12 @@ class UserEmail < ActiveRecord::Base
   def confirm(token)
     return false if token != confirmation_token
     update_attribute :confirmation_token, nil
-    MergeAdditionalEmailWorker.perform_async(id)
+    Users::MergeAdditionalEmailJob.perform_async(id)
     true
   end
 
   def send_confirmation_email
-    AdditionalEmailConfirmationWorker.perform_async(id) unless confirmed?
+    Email::AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
   end
 
   def generate_confirmation

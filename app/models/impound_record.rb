@@ -37,6 +37,7 @@
 #
 class ImpoundRecord < ApplicationRecord
   include Geocodeable
+  include DefaultCurrencyable
 
   belongs_to :bike, touch: true
   belongs_to :user
@@ -232,9 +233,9 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_associations
-    # We call this job inline in ProcessParkingNotificationWorker
+    # We call this job inline in ProcessParkingNotificationJob
     return true if skip_update || !persisted?
-    ProcessImpoundUpdatesWorker.perform_async(id)
+    ProcessImpoundUpdatesJob.perform_async(id)
   end
 
   def set_calculated_attributes
@@ -307,11 +308,12 @@ class ImpoundRecord < ApplicationRecord
   def calculated_unregistered_bike?
     return true if parking_notification&.unregistered_bike?
     b_created_at = bike&.created_at || Time.current
-    if id.blank? & bike.present?
-      return true if bike.created_at.blank? || bike.created_at > Time.current - 1.hour
+
+    if id.blank?
+      return true if bike.present? && bike.created_at.blank?
+      return true if b_created_at > Time.current - 1.hour
     end
-    return true if id.blank? && b_created_at > Time.current - 1.hour
-    return false unless (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
-    bike&.current_ownership&.status == "status_impounded" || false
+    bike&.current_ownership&.status == "status_impounded" &&
+      (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
   end
 end

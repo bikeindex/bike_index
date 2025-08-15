@@ -24,7 +24,7 @@
               = l feedback.created_at, format: :convert_time
           - unless skip_user
             %td
-              = render partial: "/shared/admin_user_cell", locals: {email: feedback.email, user: feedback.user, render_search: render_sortable, cache: true}
+              = render partial: "/shared/admin/user_cell", locals: {email: feedback.email, user: feedback.user, render_search: render_sortable, cache: true}
             %td
               = feedback.name
           %td

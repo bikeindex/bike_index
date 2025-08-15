@@ -7,27 +7,29 @@ RSpec.describe Autocomplete::Loader do
   # manufacturer.count == 1 tests are failing, because manufacturers are sticking around
   before { Manufacturer.delete_all }
 
+  cycle_type_count = 22
+
   describe "load_all" do
     let!(:color) { Color.black }
     let!(:manufacturer) { Manufacturer.other }
     it "stores", :flaky do
-      expect(CycleType.all.count).to eq 21
+      expect(CycleType.all.count).to eq cycle_type_count
       expect(Manufacturer.count).to eq 1
       expect(Color.count).to eq 1
       expect(PropulsionType.autocomplete_hashes.count).to eq 1
       subject.clear_redis
       total_count = subject.load_all
-      expect(total_count).to eq 24 * category_count_for_1_item
+      expect(total_count).to eq (cycle_type_count + 3) * category_count_for_1_item
       info = subject.info
       # IDK, db0 seems to cause problems
       expect(info.keys - [:db0]).to match_array(%i[category_keys cache_keys used_memory used_memory_peak])
-      expect(info[:category_keys]).to eq 3648
+      expect(info[:category_keys]).to eq 4128
       expect(info[:cache_keys]).to eq 0
     end
 
     context "passing individual types" do
       it "stores the passed kind", :flaky do
-        expect(CycleType.all.count).to eq 21
+        expect(CycleType.all.count).to eq cycle_type_count
         expect(Manufacturer.count).to eq 1
         expect(Color.count).to eq 1
         subject.clear_redis
@@ -37,8 +39,8 @@ RSpec.describe Autocomplete::Loader do
         manufacturer_count = subject.load_all(["Manufacturer"])
         expect(manufacturer_count).to eq category_count_for_1_item
 
-        cycle_type_count = subject.load_all(["CycleType"])
-        expect(cycle_type_count).to eq 21 * category_count_for_1_item
+        cycle_types_and_category = subject.load_all(["CycleType"])
+        expect(cycle_types_and_category).to eq cycle_type_count * category_count_for_1_item
       end
     end
   end

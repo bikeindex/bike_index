@@ -64,6 +64,30 @@ RSpec.describe Admin::PaymentsController, type: :request do
         expect(subject.kind).to eq "invoice_payment"
         expect(invoice.reload.updated_at).to be_within(1.second).of Time.current
       end
+      context "assign_to_membership" do
+        let(:target_attrs) { {creator_id: current_user.id, status: "active"} }
+        it "assigns to membership" do
+          expect(subject.reload.can_assign_to_membership?).to be_truthy
+          expect do
+            patch "#{base_url}/#{subject.to_param}", params: {assign_to_membership: true}
+          end.to change(Membership, :count).by 1
+
+          expect(flash[:success]).to be_present
+          expect(subject.reload.membership).to be_present
+          expect(subject.membership).to match_hash_indifferently target_attrs
+        end
+        context "invoice payment" do
+          before { subject.update(invoice_id: 42) }
+          it "does not assign to membership" do
+            expect(subject.reload.can_assign_to_membership?).to be_falsey
+            expect do
+              patch "#{base_url}/#{subject.to_param}", params: {assign_to_membership: true}
+            end.to change(Membership, :count).by 0
+
+            expect(flash[:error]).to be_present
+          end
+        end
+      end
     end
     context "check payment" do
       let(:subject) { FactoryBot.create(:payment_check, organization: nil, amount_cents: 55_555, user: current_user) }
@@ -119,7 +143,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
     end
     context "check payment" do
       it "creates" do
-        payment_attrs = params.merge(payment_method: "check")
+        payment_attrs = params.merge(payment_method: "check", currency_enum: "mxn")
 
         expect {
           post base_url, params: {payment: payment_attrs}
@@ -133,6 +157,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
         expect(payment.amount_cents).to eq 22_222
         expect(payment.payment_method).to eq "check"
         expect(payment.created_at).to be_within(1.minute).of create_time
+        expect(payment.currency_name).to eq "MXN"
         expect(payment.paid?).to be_truthy
       end
       context "no organization" do
