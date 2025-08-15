@@ -3,7 +3,7 @@ import TimeLocalizer from 'utils/time_localizer'
 
 /* global window  */
 
-// Connects to data-controller='search--form--component'
+// Connects to data-controller='search--form'
 export default class extends Controller {
   static targets = ['form', 'button']
   static values = { spinnerId: { type: String, default: 'hiddenLoadingSpinner' } }

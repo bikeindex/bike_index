@@ -4,7 +4,7 @@ import 'select2'
 
 /* global $ */
 
-// Connects to data-controller='search-everything-combobox'
+// Connects to data-controller='search--everything-combobox'
 export default class extends Controller {
   static targets = ['input', 'nonjsfields']
   static values = { apiUrl: String }

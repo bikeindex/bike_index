@@ -3,7 +3,7 @@ import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage  */
 
-// Connects to data-controller='search-kind-select-fields'
+// Connects to data-controller='search--kind-select-fields'
 export default class extends Controller {
   static targets = ['distance', 'location', 'locationWrap']
   static values = { apiCountUrl: String, optionKinds: String, storageKeyLocation: String, storageKeyDistance: String }
