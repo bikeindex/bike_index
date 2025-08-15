@@ -48,7 +48,7 @@ class UpdateEmailDomainJob < ScheduledJob
       email_domain.calculated_users.find_each { |user| user.really_destroy! }
     elsif email_domain.provisional_ban? && email_domain.tld_matches_subdomains?
       email_domain.calculated_subdomains.where.not(status: email_domain.status).pluck(:id)
-        .each { UpdateEmailDomainJob.perform_async(_1) }
+        .each { UpdateEmailDomainJob.perform_async(it) }
     end
     email_domain
   end

@@ -36,12 +36,12 @@ class Stripe::UpdatePricesJob < ApplicationJob
     return @product_membership_level if defined?(@product_membership_level)
 
     membership_products = Stripe::Product.list({active: true, limit: 100})
-      .select { _1.name.match?(/member/i) }
+      .select { it.name.match?(/member/i) }
 
     @product_membership_level = [
-      [membership_products.find { _1.name.downcase == "membership" }&.id, :basic],
-      [membership_products.find { _1.name.match?(/plus|\+/i) }&.id, :plus],
-      [membership_products.find { _1.name.match?(/patron/i) }&.id, :patron]
+      [membership_products.find { it.name.downcase == "membership" }&.id, :basic],
+      [membership_products.find { it.name.match?(/plus|\+/i) }&.id, :plus],
+      [membership_products.find { it.name.match?(/patron/i) }&.id, :patron]
     ].to_h
   end
 end

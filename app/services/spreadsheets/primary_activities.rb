@@ -11,7 +11,7 @@ class Spreadsheets::PrimaryActivities
 
       CSV.generate do |csv|
         csv << EXPORT_COLUMNS
-        names_and_families(primary_activities).each { csv << _1 }
+        names_and_families(primary_activities).each { csv << it }
       end
     end
 

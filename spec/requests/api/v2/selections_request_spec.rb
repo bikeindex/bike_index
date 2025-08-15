@@ -17,7 +17,7 @@ RSpec.describe "Selections API V2", type: :request do
       selection = FactoryBot.create(:ctype)
       get "/api/v2/selections/component_types"
       expect(response.code).to eq("200")
-      response_names = json_result["component_types"].map { _1["name"] }
+      response_names = json_result["component_types"].map { it["name"] }
       expect(response_names.sort).to eq([selection.name, "unknown"])
     end
   end

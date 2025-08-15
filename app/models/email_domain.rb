@@ -98,7 +98,7 @@ class EmailDomain < ApplicationRecord
       return INVALID_DOMAIN if invalid_domain?(domain)
       return domain if domain.split(".").count == 1
 
-      multi_subdomain = TLD_HAS_SUBDOMAIN.any? { domain.end_with?(_1) }
+      multi_subdomain = TLD_HAS_SUBDOMAIN.any? { domain.end_with?(it) }
       return domain if multi_subdomain && domain.split(".").count < 3
 
       start_subdomain = multi_subdomain ? -3 : -2

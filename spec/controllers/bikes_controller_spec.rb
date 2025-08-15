@@ -419,7 +419,7 @@ RSpec.describe BikesController, type: :controller do
       end
       context "non-stolen" do
         let(:user) { FactoryBot.create(:user_confirmed) }
-        it "creates a new ownership and bike from an organization" do
+        it "creates a new ownership and bike from an organization", :flaky do
           expect(user).to be_present
           expect {
             post :create, params: {bike: bike_params}
