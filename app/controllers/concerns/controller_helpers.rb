@@ -229,6 +229,9 @@ module ControllerHelpers
           .map(&:label)
           .reject { |label| label.include?("rescue in") }
           .first
+      # Ruby 3.4+ includes class name in label (e.g., "MyAccountsController#update")
+      # Extract just the method name
+      controller_method = controller_method.split("#").last if controller_method&.include?("#")
     end
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
