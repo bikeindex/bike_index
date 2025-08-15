@@ -43,7 +43,7 @@ bundle exec turbo_tests {FILE OR FOLDER}
 
 ## Frontend Development
 
-This project uses Stimulus.js for JavaScript interactivity and Tailwind CSS for styling. There are scss styles and coffeescript files, but that is all deprecated.
+This project uses Stimulus.js for JavaScript interactivity and Tailwind CSS for styling. There are scss styles and coffeescript files, but they are deprecated.
 
 The `bin/dev` command handles building and updating tailwind and JS.
 

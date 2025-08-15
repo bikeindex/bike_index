@@ -1,12 +1,12 @@
-<div data-controller="search--form--component">
+<div data-controller="search-form">
   <%= form_with(url: @target_search_path,
       builder: BikeIndexFormBuilder,
       method: :get,
       id: "Search_Form",
       data: { turbo_frame: @target_frame, turbo_action: "advance",
-        turbo: true, "search--form--component-target" => "form"}) do |f| %>
+        turbo: true, "search-form-target" => "form"}) do |f| %>
 
-    <%# search_no_js is removed in the search--form--component stimulus controller. If it's present, the results render synchronously (rather than as a turbo frame) %>
+    <%# search_no_js is removed in the search-form stimulus controller. If it's present, the results render synchronously (rather than as a turbo frame) %>
     <%= hidden_field_tag :search_no_js, true %>
 
     <div class="tw:flex tw:flex-nowrap tw:gap-4">
@@ -74,7 +74,7 @@
       <div class="tw:w-20">
         <%= button_tag(type: translation(".submit"),
             class: "twbtn-blue tw:w-full tw:h-full tw:disabled:cursor-wait",
-            "data-search--form--component-target" => "button") do %>
+            "data-search-form-target" => "button") do %>
           <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>
                 .cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}
               </style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>

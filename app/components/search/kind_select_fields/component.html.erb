@@ -1,7 +1,7 @@
 <div
-  data-controller="search--kind-select-fields--component"
-  data-search--kind-select-fields--component-api-count-url-value="<%= api_count_url %>"
-  data-search--kind-select-fields--component-option-kinds-value="<%= option_kind.to_s %>"
+  data-controller="search-kind-select-fields"
+  data-search-kind-select-fields-api-count-url-value="<%= api_count_url %>"
+  data-search-kind-select-fields-option-kinds-value="<%= option_kind.to_s %>"
 >
 
   <div
@@ -9,7 +9,7 @@
       tw:mt-5 tw:sm:mt-2 tw:flex tw:flex-wrap tw:sm:flex-nowrap tw:w-full tw:sm:w-min
       tw:ml-auto <%= location_initially_shown? ? '' : 'tw:hidden' %>
     "
-    data-search--kind-select-fields--component-target="locationWrap"
+    data-search-kind-select-fields-target="locationWrap"
   >
 
     <span class="tw:flex tw:flex-nowrap">
@@ -22,7 +22,7 @@
       :placeholder => default_distance,
       :min => GeocodeHelper::MIN_DISTANCE,
       :class => "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
-      "data-search--kind-select-fields--component-target" => "distance" %>
+      "data-search-kind-select-fields-target" => "distance" %>
     </span>
     <span class="tw:flex tw:flex-nowrap tw:mt-3 tw:sm:mt-0">
       <span class="tw:block tw:text-nowrap tw:py-1.5 tw:mr-2"><%= translation(".miles_of") %></span>
@@ -33,7 +33,7 @@
       @location,
       :placeholder => translation(".search_location"),
       :class => "twinput tw:min-w-50 fieldResetsCounts",
-      "data-search--kind-select-fields--component-target" => "location" %>
+      "data-search-kind-select-fields-target" => "location" %>
     </span>
   </div>
 
