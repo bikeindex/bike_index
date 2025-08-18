@@ -235,7 +235,7 @@ Rails.application.routes.draw do
       mailchimp_data marketplace_listings model_attestations model_audits
       notifications organization_statuses parking_notifications
       stripe_prices stripe_subscriptions user_alerts user_registration_organizations
-    ].each { resources _1, only: %i[index] }
+    ].each { resources it, only: %i[index] }
 
     resources :marketplace_messages, only: %i[index show]
 

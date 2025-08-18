@@ -22,7 +22,7 @@ class Callbacks::AddressRecordUpdateAssociationsJob < ApplicationJob
       end
     end
 
-    address_record.marketplace_listings.each { update_association(address_record, _1) }
+    address_record.marketplace_listings.each { update_association(address_record, it) }
   end
 
   private

@@ -450,4 +450,64 @@ http_interactions:
       encoding: UTF-8
       string: ''
   recorded_at: Thu, 14 Aug 2025 17:07:13 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Fri, 15 Aug 2025 16:55:53 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Fri, 15 Aug 2025 16:55:53 GMT
+- request:
+    method: head
+    uri: http://rustymails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 307
+      message: Temporary Redirect
+    headers:
+      Location:
+      - https://rustymails.com:443/
+      Date:
+      - Fri, 15 Aug 2025 16:58:56 GMT
+      Content-Length:
+      - '18'
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Fri, 15 Aug 2025 16:58:56 GMT
 recorded_with: VCR 6.3.1

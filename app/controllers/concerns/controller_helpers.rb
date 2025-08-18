@@ -223,12 +223,12 @@ module ControllerHelpers
   # maps to controllers.locks.find_lock.not_your_lock.
   def translation(key, scope: nil, controller_method: nil, **kwargs)
     if scope.blank? && controller_method.blank?
-      controller_method =
-        caller_locations
-          .slice(0, 2)
-          .map(&:label)
-          .reject { |label| label.include?("rescue in") }
-          .first
+      controller_method = caller_locations
+        .first(2)
+        .map(&:label)
+        .find { |label| !label.include?("rescue in") }
+        &.split("#")
+        &.last
     end
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
