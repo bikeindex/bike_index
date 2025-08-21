@@ -137,7 +137,7 @@ group :development do
   gem "rerun" # restart sidekiq processes in development on app change
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
-  gem "annotate_rb", github: "sethherr/annotate_rb", branch: "rename-annotate_rb"
+  gem "annotaterb"
 end
 
 group :development, :test do
