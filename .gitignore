@@ -1,5 +1,7 @@
 # Ignore local config files
 /.bundle
+# Ignore vendored gems
+/vendor/bundle
 
 # Ignore all logfiles and tempfiles.
 /log/*.log*
