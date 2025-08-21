@@ -33,6 +33,8 @@ output "${YELLOW}" "Stashing translation.io timestamp file"
 set -x
 git stash -- config/locales/.translation_io
 git status --short
+# Reset the migrations, in case of postgres artifacts changing things
+git checkout HEAD db/
 set +x
 
 if [[ -z "$(git --no-pager diff)" ]]; then
