@@ -5,10 +5,16 @@ default: &default
 
 default_local: &default_local
   <<: *default
-  host: <%= ENV.fetch("PGHOST", "localhost") %>
   port: <%= ENV.fetch("PGPORT", 5432) %>
+  <% if ENV["CI"] %>
+  host: 127.0.0.1
+  username: rails
+  password: password
+  <% else %>
+  host: <%= ENV["PGHOST"] %>
   username: <%= ENV["PGUSER"] %>
   password: <%= ENV["PGPASSWORD"] %>
+  <% end %>
 
 development:
   primary:
