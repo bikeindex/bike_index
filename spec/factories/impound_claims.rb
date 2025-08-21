@@ -1,31 +1,3 @@
-# == Schema Information
-#
-# Table name: impound_claims
-#
-#  id                 :bigint           not null, primary key
-#  message            :text
-#  resolved_at        :datetime
-#  response_message   :text
-#  status             :integer
-#  submitted_at       :datetime
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  bike_claimed_id    :bigint
-#  bike_submitting_id :bigint
-#  impound_record_id  :bigint
-#  organization_id    :bigint
-#  stolen_record_id   :bigint
-#  user_id            :bigint
-#
-# Indexes
-#
-#  index_impound_claims_on_bike_claimed_id     (bike_claimed_id)
-#  index_impound_claims_on_bike_submitting_id  (bike_submitting_id)
-#  index_impound_claims_on_impound_record_id   (impound_record_id)
-#  index_impound_claims_on_organization_id     (organization_id)
-#  index_impound_claims_on_stolen_record_id    (stolen_record_id)
-#  index_impound_claims_on_user_id             (user_id)
-#
 FactoryBot.define do
   factory :impound_claim do
     transient do

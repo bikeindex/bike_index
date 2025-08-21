@@ -1,26 +1,3 @@
-# == Schema Information
-#
-# Table name: organization_stolen_messages
-#
-#  id                  :bigint           not null, primary key
-#  body                :text
-#  content_added_at    :datetime
-#  is_enabled          :boolean          default(FALSE)
-#  kind                :integer
-#  latitude            :float
-#  longitude           :float
-#  report_url          :string
-#  search_radius_miles :float
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  organization_id     :bigint
-#  updator_id          :bigint
-#
-# Indexes
-#
-#  index_organization_stolen_messages_on_organization_id  (organization_id)
-#  index_organization_stolen_messages_on_updator_id       (updator_id)
-#
 require "rails_helper"
 
 RSpec.describe OrganizationStolenMessage, type: :model do

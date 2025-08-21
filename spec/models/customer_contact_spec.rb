@@ -1,20 +1,3 @@
-# == Schema Information
-#
-# Table name: customer_contacts
-#
-#  id            :integer          not null, primary key
-#  body          :text
-#  creator_email :string(255)
-#  info_hash     :jsonb
-#  kind          :integer          default("stolen_contact"), not null
-#  title         :string(255)
-#  user_email    :string(255)
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  bike_id       :integer
-#  creator_id    :integer
-#  user_id       :integer
-#
 require "rails_helper"
 
 RSpec.describe CustomerContact, type: :model do

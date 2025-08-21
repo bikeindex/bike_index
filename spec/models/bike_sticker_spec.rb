@@ -1,29 +1,3 @@
-# == Schema Information
-#
-# Table name: bike_stickers
-#
-#  id                        :integer          not null, primary key
-#  claimed_at                :datetime
-#  code                      :string
-#  code_integer              :bigint
-#  code_number_length        :integer
-#  code_prefix               :string
-#  kind                      :integer          default("sticker")
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  bike_id                   :integer
-#  bike_sticker_batch_id     :integer
-#  organization_id           :integer
-#  previous_bike_id          :integer
-#  secondary_organization_id :bigint
-#  user_id                   :integer
-#
-# Indexes
-#
-#  index_bike_stickers_on_bike_id                    (bike_id)
-#  index_bike_stickers_on_bike_sticker_batch_id      (bike_sticker_batch_id)
-#  index_bike_stickers_on_secondary_organization_id  (secondary_organization_id)
-#
 require "rails_helper"
 
 RSpec.describe BikeSticker, type: :model do

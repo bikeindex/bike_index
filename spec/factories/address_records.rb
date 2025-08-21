@@ -1,29 +1,3 @@
-# == Schema Information
-#
-# Table name: address_records
-#
-#  id                         :bigint           not null, primary key
-#  city                       :string
-#  kind                       :integer
-#  latitude                   :float
-#  longitude                  :float
-#  neighborhood               :string
-#  postal_code                :string
-#  publicly_visible_attribute :integer
-#  region_string              :string
-#  street                     :string
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  country_id                 :bigint
-#  region_record_id           :bigint
-#  user_id                    :bigint
-#
-# Indexes
-#
-#  index_address_records_on_country_id        (country_id)
-#  index_address_records_on_region_record_id  (region_record_id)
-#  index_address_records_on_user_id           (user_id)
-#
 FactoryBot.define do
   factory :address_record do
     city { "Davis" }

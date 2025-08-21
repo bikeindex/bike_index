@@ -1,18 +1,3 @@
-# == Schema Information
-#
-# Table name: exchange_rates
-#
-#  id         :bigint           not null, primary key
-#  from       :string           not null
-#  rate       :float            not null
-#  to         :string           not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#
-# Indexes
-#
-#  index_exchange_rates_on_from_and_to  (from,to) UNIQUE
-#
 FactoryBot.define do
   factory :exchange_rate do
     from { "USD" }

@@ -1,20 +1,3 @@
-# == Schema Information
-#
-# Table name: primary_activities
-#
-#  id                         :bigint           not null, primary key
-#  family                     :boolean
-#  name                       :string
-#  priority                   :integer
-#  slug                       :string
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  primary_activity_family_id :bigint
-#
-# Indexes
-#
-#  index_primary_activities_on_primary_activity_family_id  (primary_activity_family_id)
-#
 FactoryBot.define do
   factory :primary_activity do
     sequence(:name) { |n| "Bike Activity Type #{n}" }

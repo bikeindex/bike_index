@@ -1,20 +1,3 @@
-# == Schema Information
-#
-# Table name: user_phones
-#
-#  id                :bigint           not null, primary key
-#  confirmation_code :string
-#  confirmed_at      :datetime
-#  deleted_at        :datetime
-#  phone             :string
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  user_id           :bigint
-#
-# Indexes
-#
-#  index_user_phones_on_user_id  (user_id)
-#
 require "rails_helper"
 
 RSpec.describe UserPhone, type: :model do

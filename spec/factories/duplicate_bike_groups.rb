@@ -1,14 +1,4 @@
 # This is a little hacky, but it follows the way the code actually generates the duplicate bikes
-# == Schema Information
-#
-# Table name: duplicate_bike_groups
-#
-#  id            :integer          not null, primary key
-#  added_bike_at :datetime
-#  ignore        :boolean          default(FALSE), not null
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#
 FactoryBot.define do
   factory :duplicate_bike_group do
     transient do

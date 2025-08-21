@@ -1,15 +1,3 @@
-# == Schema Information
-#
-# Table name: cgroups
-#
-#  id          :integer          not null, primary key
-#  description :string(255)
-#  name        :string(255)
-#  priority    :integer          default(1)
-#  slug        :string(255)
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#
 require "rails_helper"
 
 RSpec.describe Cgroup, type: :model do

@@ -1,18 +1,3 @@
-# == Schema Information
-#
-# Table name: stripe_prices
-#
-#  id               :bigint           not null, primary key
-#  active           :boolean          default(FALSE)
-#  amount_cents     :integer
-#  currency_enum    :integer
-#  interval         :integer
-#  live             :boolean          default(FALSE)
-#  membership_level :integer
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  stripe_id        :string
-#
 require "rails_helper"
 
 RSpec.describe StripePrice, type: :model do
