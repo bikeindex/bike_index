@@ -1,27 +1,42 @@
+
 # frozen_string_literal: true
 
 require "rails_helper"
 
 RSpec.describe ApplicationComponentHelper, type: :helper do
   describe "number_display" do
-    it "formats numbers with delimiter" do
-      result = helper.number_display(1234)
-      expect(result).to eq '<span class="">1,234</span>'
+    subject(:result) { helper.number_display(number) }
+
+    context "with large number" do
+      let(:number) { 1234 }
+
+      it "formats numbers with delimiter" do
+        expect(result).to eq '<span class="">1,234</span>'
+      end
     end
 
-    it "applies less-less-strong class for zero values" do
-      result = helper.number_display(0)
-      expect(result).to eq '<span class="less-less-strong">0</span>'
+    context "with zero value" do
+      let(:number) { 0 }
+
+      it "applies less-less-strong class" do
+        expect(result).to eq '<span class="less-less-strong">0</span>'
+      end
     end
 
-    it "does not apply class for non-zero values" do
-      result = helper.number_display(42)
-      expect(result).to eq '<span class="">42</span>'
+    context "with non-zero value" do
+      let(:number) { 42 }
+
+      it "does not apply class" do
+        expect(result).to eq '<span class="">42</span>'
+      end
     end
 
-    it "handles negative numbers" do
-      result = helper.number_display(-100)
-      expect(result).to eq '<span class="">-100</span>'
+    context "with negative number" do
+      let(:number) { -100 }
+
+      it "handles negative numbers" do
+        expect(result).to eq '<span class="">-100</span>'
+      end
     end
   end
 end
