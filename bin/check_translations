@@ -37,10 +37,10 @@ git status --short
 git checkout HEAD db/
 set +x
 
-# if [[ -z "$(git --no-pager diff)" ]]; then
-#   output "${GREEN}" "No uncommitted translations. Done."
-#   exit 0
-# else
+if [[ -z "$(git --no-pager diff)" ]]; then
+  output "${GREEN}" "No uncommitted translations. Done."
+  exit 0
+else
   output "${RED}" "Uncommitted Translations"
   git --no-pager diff
 
@@ -79,4 +79,4 @@ set +x
   output "${YELLOW}" "Create a new Pull Request"
 
   exit 1
-# fi
+fi
