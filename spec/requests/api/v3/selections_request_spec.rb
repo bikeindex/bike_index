@@ -18,7 +18,7 @@ RSpec.describe "Selections API V3", type: :request do
       expect(Ctype.count).to eq 2
       get "/api/v3/selections/component_types"
       expect(response.code).to eq("200")
-      response_names = json_result["component_types"].map { _1["name"] }
+      response_names = json_result["component_types"].map { it["name"] }
       expect(response_names.sort).to eq([selection.name, "unknown"])
     end
   end
