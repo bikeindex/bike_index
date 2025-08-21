@@ -1,8 +1,3 @@
-\restrict rreyd5kgP9eQ1aOtdf6Q2KMLR7vFFWeTshBnyrZ9gWHJEVHWsOATUqGenBOuTbc
-
--- Dumped from database version 16.10
--- Dumped by pg_dump version 16.10 (Ubuntu 16.10-1.pgdg24.04+1)
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -218,8 +213,6 @@ CREATE INDEX index_organization_statuses_on_organization_id ON public.organizati
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict rreyd5kgP9eQ1aOtdf6Q2KMLR7vFFWeTshBnyrZ9gWHJEVHWsOATUqGenBOuTbc
 
 SET search_path TO "$user", public;
 

@@ -1,5 +1,4 @@
 module AdminHelper
-  include ApplicationComponentHelper
   def dev_nav_select_links
     return [] unless current_user&.developer?
     [
