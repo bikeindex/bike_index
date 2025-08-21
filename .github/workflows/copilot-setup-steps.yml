@@ -53,5 +53,4 @@ jobs:
           bundler-cache: true
       - run: bundle install
       - name: Set up database
-        run: |
-          bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
+        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
