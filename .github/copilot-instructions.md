@@ -1,1 +1,1 @@
-../claude.md
+../agents.md
