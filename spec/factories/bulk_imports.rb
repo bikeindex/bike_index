@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: bulk_imports
+#
+#  id              :integer          not null, primary key
+#  data            :jsonb
+#  file            :text
+#  file_cleaned    :boolean          default(FALSE)
+#  import_errors   :json
+#  is_ascend       :boolean          default(FALSE)
+#  kind            :integer
+#  no_notify       :boolean          default(FALSE)
+#  progress        :integer          default("pending")
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  organization_id :integer
+#  user_id         :integer
+#
 FactoryBot.define do
   factory :bulk_import do
     sequence(:id) { |n| n } # WTF Travis? Travis is blowing up, something to do with different postgres version I'm sure

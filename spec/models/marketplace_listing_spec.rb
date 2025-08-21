@@ -1,3 +1,33 @@
+# == Schema Information
+#
+# Table name: marketplace_listings
+#
+#  id                :bigint           not null, primary key
+#  amount_cents      :integer
+#  condition         :integer
+#  currency_enum     :integer
+#  description       :text
+#  end_at            :datetime
+#  item_type         :string
+#  latitude          :float
+#  longitude         :float
+#  price_negotiable  :boolean          default(FALSE)
+#  published_at      :datetime
+#  status            :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  address_record_id :bigint
+#  buyer_id          :bigint
+#  item_id           :bigint
+#  seller_id         :bigint
+#
+# Indexes
+#
+#  index_marketplace_listings_on_address_record_id  (address_record_id)
+#  index_marketplace_listings_on_buyer_id           (buyer_id)
+#  index_marketplace_listings_on_item               (item_type,item_id)
+#  index_marketplace_listings_on_seller_id          (seller_id)
+#
 require "rails_helper"
 
 RSpec.describe MarketplaceListing, type: :model do

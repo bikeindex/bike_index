@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: duplicate_bike_groups
+#
+#  id            :integer          not null, primary key
+#  added_bike_at :datetime
+#  ignore        :boolean          default(FALSE), not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
 require "rails_helper"
 
 RSpec.describe DuplicateBikeGroup, type: :model do

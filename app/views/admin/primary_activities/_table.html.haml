@@ -43,7 +43,7 @@
             - unless primary_activity.primary_activity_family_id == primary_activity.id
               = primary_activity.family_name
           %td
-            = admin_number_display(primary_activity.priority)
+            = number_display(primary_activity.priority)
           - if show_count
             %td
-              = link_to admin_number_display(Bike.where(primary_activity_id: primary_activity.id).count), admin_bikes_path(primary_activity: primary_activity.id)
+              = link_to number_display(Bike.where(primary_activity_id: primary_activity.id).count), admin_bikes_path(primary_activity: primary_activity.id)

@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: mailchimp_data
+#
+#  id                   :bigint           not null, primary key
+#  data                 :jsonb
+#  email                :string
+#  mailchimp_updated_at :datetime
+#  status               :integer
+#  user_deleted_at      :datetime
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  user_id              :bigint
+#
+# Indexes
+#
+#  index_mailchimp_data_on_user_id  (user_id)
+#
 require "rails_helper"
 
 RSpec.describe MailchimpDatum, type: :model do

@@ -13,9 +13,9 @@
 %h3
   Invoices with this feature
 %p.mt-4.mb-4
-  = admin_number_display(@invoices.count)
+  = number_display(@invoices.count)
   total,
   %span.less-strong
-    = admin_number_display(@invoices.active.count)
+    = number_display(@invoices.active.count)
     active
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: false, display_organization: true }

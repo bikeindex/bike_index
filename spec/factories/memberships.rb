@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: memberships
+#
+#  id         :bigint           not null, primary key
+#  end_at     :datetime
+#  level      :integer
+#  start_at   :datetime
+#  status     :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  creator_id :bigint
+#  user_id    :bigint
+#
+# Indexes
+#
+#  index_memberships_on_creator_id  (creator_id)
+#  index_memberships_on_user_id     (user_id)
+#
 FactoryBot.define do
   factory :membership do
     user { FactoryBot.create(:user_confirmed) }

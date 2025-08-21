@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: tweets
+#
+#  id                 :integer          not null, primary key
+#  alignment          :string
+#  body               :text
+#  body_html          :text
+#  image              :string
+#  kind               :integer
+#  twitter_response   :json
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  original_tweet_id  :integer
+#  stolen_record_id   :integer
+#  twitter_account_id :integer
+#  twitter_id         :string
+#
+# Indexes
+#
+#  index_tweets_on_original_tweet_id   (original_tweet_id)
+#  index_tweets_on_stolen_record_id    (stolen_record_id)
+#  index_tweets_on_twitter_account_id  (twitter_account_id)
+#
 require "rails_helper"
 
 RSpec.describe Tweet, type: :model do

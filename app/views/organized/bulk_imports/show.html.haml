@@ -61,7 +61,7 @@
   %h2.uncap.mt-0.mb-0
     = t(".registrations")
     %small
-      = admin_number_display @pagy.count
+      = number_display @pagy.count
   %div= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
 
 - show_impounded_id = @bulk_import.impounded? && @bulk_import.headers.present? && @bulk_import.headers.include?("impounded_id")

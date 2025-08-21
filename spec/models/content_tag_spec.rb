@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: content_tags
+#
+#  id          :bigint           not null, primary key
+#  description :text
+#  name        :string
+#  priority    :integer
+#  slug        :string
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
 require "rails_helper"
 
 RSpec.describe ContentTag, type: :model do

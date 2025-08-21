@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: stripe_subscriptions
+#
+#  id                     :bigint           not null, primary key
+#  end_at                 :datetime
+#  referral_source        :text
+#  start_at               :datetime
+#  stripe_status          :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  membership_id          :bigint
+#  stripe_id              :string
+#  stripe_price_stripe_id :string
+#  user_id                :bigint
+#
+# Indexes
+#
+#  index_stripe_subscriptions_on_membership_id           (membership_id)
+#  index_stripe_subscriptions_on_stripe_price_stripe_id  (stripe_price_stripe_id)
+#  index_stripe_subscriptions_on_user_id                 (user_id)
+#
 require "rails_helper"
 
 RSpec.describe StripeSubscription, type: :model do

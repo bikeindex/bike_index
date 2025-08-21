@@ -1,3 +1,8 @@
+\restrict LDW8ShSzmr9gtmnDvVt54zXMgs5aBB0MuJQTBRkxsb9xwzisBbSx47tDek3fmdi
+
+-- Dumped from database version 16.10
+-- Dumped by pg_dump version 16.10 (Ubuntu 16.10-1.pgdg24.04+1)
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -7051,6 +7056,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict LDW8ShSzmr9gtmnDvVt54zXMgs5aBB0MuJQTBRkxsb9xwzisBbSx47tDek3fmdi
 
 SET search_path TO "$user", public;
 

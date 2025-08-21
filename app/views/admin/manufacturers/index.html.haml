@@ -22,14 +22,14 @@
           %strong with logos
           = link_to "view with and without logos", url_for(sortable_search_params.merge(search_with_logos: nil)), class: "gray-link small"
       %h4.mt-4
-        #{admin_number_display(@manufacturers.count)} matching manufacturers
+        #{number_display(@manufacturers.count)} matching manufacturers
 
     - else
       %h4
-        #{admin_number_display(@manufacturers.count)} total,
+        #{number_display(@manufacturers.count)} total,
         %span.less-strong
-          #{admin_number_display(Manufacturer.with_websites.count)} with #{link_to "websites", url_for(sortable_search_params.merge(search_with_websites: !@with_websites))},
-          #{admin_number_display(Manufacturer.with_logos.count)} with #{link_to "logos", url_for(sortable_search_params.merge(search_with_logos: !@with_logos))}.
+          #{number_display(Manufacturer.with_websites.count)} with #{link_to "websites", url_for(sortable_search_params.merge(search_with_websites: !@with_websites))},
+          #{number_display(Manufacturer.with_logos.count)} with #{link_to "logos", url_for(sortable_search_params.merge(search_with_logos: !@with_logos))}.
 
 .full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm
@@ -64,7 +64,7 @@
               = l manufacturer.created_at, format: :convert_time
           - if display_dev_info?
             %td
-              = admin_number_display(manufacturer.priority)
+              = number_display(manufacturer.priority)
 
 
 = form_tag import_admin_manufacturers_path, multipart: true do

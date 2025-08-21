@@ -1,4 +1,5 @@
 module AdminHelper
+  include ApplicationComponentHelper
   def dev_nav_select_links
     return [] unless current_user&.developer?
     [
@@ -119,10 +120,6 @@ module AdminHelper
 
   def credibility_scorer_color_table(score)
     (score < 31) ? credibility_scorer_color(score) : ""
-  end
-
-  def admin_number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
   end
 
   def admin_email_domain_spam_color(spam_score)

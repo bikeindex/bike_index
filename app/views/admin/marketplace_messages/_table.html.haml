@@ -27,7 +27,7 @@
                 %span.less-strong-right.d-none.d-md-block.only-dev-visible
                   = marketplace_message.id
           %td
-            %small= "#{marketplace_message.marketplace_listing.currency_symbol}#{admin_number_display(marketplace_message.marketplace_listing.amount)}"
+            %small= "#{marketplace_message.marketplace_listing.currency_symbol}#{number_display(marketplace_message.marketplace_listing.amount)}"
           %td
             = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), render_search: true}
           %td

@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: ambassador_tasks
+#
+#  id          :integer          not null, primary key
+#  description :string           default(""), not null
+#  title       :string           default(""), not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
+# Indexes
+#
+#  index_ambassador_tasks_on_title  (title) UNIQUE
+#
 require "rails_helper"
 
 RSpec.describe AmbassadorTask, type: :model do

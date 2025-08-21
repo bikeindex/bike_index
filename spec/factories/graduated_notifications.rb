@@ -1,3 +1,35 @@
+# == Schema Information
+#
+# Table name: graduated_notifications
+#
+#  id                          :bigint           not null, primary key
+#  delivery_status             :string
+#  email                       :string
+#  marked_remaining_at         :datetime
+#  marked_remaining_link_token :text
+#  not_most_recent             :boolean          default(FALSE)
+#  processed_at                :datetime
+#  status                      :integer          default("pending")
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  bike_id                     :bigint
+#  bike_organization_id        :bigint
+#  marked_remaining_by_id      :bigint
+#  organization_id             :bigint
+#  primary_bike_id             :bigint
+#  primary_notification_id     :bigint
+#  user_id                     :bigint
+#
+# Indexes
+#
+#  index_graduated_notifications_on_bike_id                  (bike_id)
+#  index_graduated_notifications_on_bike_organization_id     (bike_organization_id)
+#  index_graduated_notifications_on_marked_remaining_by_id   (marked_remaining_by_id)
+#  index_graduated_notifications_on_organization_id          (organization_id)
+#  index_graduated_notifications_on_primary_bike_id          (primary_bike_id)
+#  index_graduated_notifications_on_primary_notification_id  (primary_notification_id)
+#  index_graduated_notifications_on_user_id                  (user_id)
+#
 FactoryBot.define do
   factory :graduated_notification do
     transient do

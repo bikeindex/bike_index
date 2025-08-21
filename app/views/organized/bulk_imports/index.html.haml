@@ -61,7 +61,7 @@
         %td
           = bulk_import.user.display_name if bulk_import.user_id.present?
         %td
-          = admin_number_display(bulk_import.ownerships.count) # Don't need to do bikes through ownerships
+          = number_display(bulk_import.ownerships.count) # Don't need to do bikes through ownerships
 
 .pb-4.pt-4
   = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: organization_features
+#
+#  id            :integer          not null, primary key
+#  amount_cents  :integer
+#  currency_enum :integer
+#  description   :text
+#  details_link  :string
+#  feature_slugs :text             default([]), is an Array
+#  kind          :integer          default("standard")
+#  name          :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
 FactoryBot.define do
   factory :organization_feature do
     kind { "standard" }

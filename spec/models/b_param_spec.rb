@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: b_params
+#
+#  id              :integer          not null, primary key
+#  bike_errors     :text
+#  bike_title      :string(255)
+#  email           :string
+#  id_token        :text
+#  image           :string(255)
+#  image_processed :boolean          default(FALSE)
+#  image_tmp       :string(255)
+#  origin          :string
+#  params          :jsonb
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  created_bike_id :integer
+#  creator_id      :integer
+#  organization_id :integer
+#
+# Indexes
+#
+#  index_b_params_on_organization_id  (organization_id)
+#
 require "rails_helper"
 
 RSpec.describe BParam, type: :model do

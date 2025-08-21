@@ -14,7 +14,7 @@
   .col-12.mt-4
     - unless @bike_sticker_batch.present? # Doesn't make sense to count if there is a batch
       %h5
-        = admin_number_display(@bike_sticker_batches.count)
+        = number_display(@bike_sticker_batches.count)
         - if @matching_batches
           matching
           = "batch".pluralize(@bike_sticker_batches.count)
@@ -27,7 +27,7 @@
           most recent batches
           %small.less-strong
             \-
-            = admin_number_display(BikeStickerBatch.count)
+            = number_display(BikeStickerBatch.count)
             = link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "less-strong"
 
     = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false, matching_count: @matching_batches}
@@ -74,7 +74,7 @@
 .row.mt-4
   .col-md-6
     %p
-      = admin_number_display(matching_bike_stickers.size)
+      = number_display(matching_bike_stickers.size)
       matching
       = "sticker".pluralize(matching_bike_stickers.size)
       - unless @search_claimed

@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: marketplace_messages
+#
+#  id                     :bigint           not null, primary key
+#  body                   :text
+#  kind                   :integer
+#  messages_prior_count   :integer
+#  subject                :text
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  initial_record_id      :bigint
+#  marketplace_listing_id :bigint
+#  receiver_id            :bigint
+#  sender_id              :bigint
+#
+# Indexes
+#
+#  index_marketplace_messages_on_initial_record_id       (initial_record_id)
+#  index_marketplace_messages_on_marketplace_listing_id  (marketplace_listing_id)
+#  index_marketplace_messages_on_receiver_id             (receiver_id)
+#  index_marketplace_messages_on_sender_id               (sender_id)
+#
 FactoryBot.define do
   factory :marketplace_message do
     marketplace_listing { FactoryBot.create(:marketplace_listing, :for_sale) }

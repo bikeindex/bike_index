@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: states
+#
+#  id           :integer          not null, primary key
+#  abbreviation :string(255)
+#  name         :string(255)
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  country_id   :integer
+#
+# Indexes
+#
+#  index_states_on_country_id  (country_id)
+#
 FactoryBot.define do
   factory :state do
     sequence(:name) { |n| "State #{n}" }

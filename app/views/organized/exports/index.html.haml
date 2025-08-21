@@ -45,7 +45,7 @@
               %td.text-center
                 = check_mark if (export.avery_export? || export.assign_bike_codes?)
             %td
-              = admin_number_display(export.rows) if export.finished?
+              = number_display(export.rows) if export.finished?
             %td
               = link_to(t(".download"), export.file.url) if export.file.url.present?
             %td

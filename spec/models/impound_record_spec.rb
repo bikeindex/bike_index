@@ -1,3 +1,40 @@
+# == Schema Information
+#
+# Table name: impound_records
+#
+#  id                    :integer          not null, primary key
+#  city                  :text
+#  display_id_integer    :bigint
+#  display_id_prefix     :string
+#  impounded_at          :datetime
+#  impounded_description :text
+#  latitude              :float
+#  longitude             :float
+#  neighborhood          :text
+#  resolved_at           :datetime
+#  status                :integer          default("current")
+#  street                :text
+#  unregistered_bike     :boolean          default(FALSE)
+#  zipcode               :text
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  bike_id               :integer
+#  country_id            :bigint
+#  display_id            :string
+#  location_id           :bigint
+#  organization_id       :integer
+#  state_id              :bigint
+#  user_id               :integer
+#
+# Indexes
+#
+#  index_impound_records_on_bike_id          (bike_id)
+#  index_impound_records_on_country_id       (country_id)
+#  index_impound_records_on_location_id      (location_id)
+#  index_impound_records_on_organization_id  (organization_id)
+#  index_impound_records_on_state_id         (state_id)
+#  index_impound_records_on_user_id          (user_id)
+#
 require "rails_helper"
 
 RSpec.describe ImpoundRecord, type: :model do

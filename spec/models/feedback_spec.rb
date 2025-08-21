@@ -1,3 +1,25 @@
+# == Schema Information
+#
+# Table name: feedbacks
+#
+#  id                 :integer          not null, primary key
+#  body               :text
+#  email              :string(255)
+#  feedback_hash      :jsonb
+#  feedback_type      :string(255)
+#  kind               :integer
+#  name               :string(255)
+#  title              :string(255)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  mailchimp_datum_id :bigint
+#  user_id            :integer
+#
+# Indexes
+#
+#  index_feedbacks_on_mailchimp_datum_id  (mailchimp_datum_id)
+#  index_feedbacks_on_user_id             (user_id)
+#
 require "rails_helper"
 
 RSpec.describe Feedback, type: :model do
