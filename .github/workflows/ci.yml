@@ -41,7 +41,7 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
         # needed because the postgres container does not provide a healthcheck
         # tmpfs makes DB faster by using RAM

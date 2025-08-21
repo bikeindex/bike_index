@@ -55,4 +55,3 @@ jobs:
       - name: Set up database
         run: |
           bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
-          bin/rake parallel:setup
