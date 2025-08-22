@@ -69,14 +69,14 @@
                     %div{style: "width: 1em; height: 1em; background: #{color}; float: right; margin-left: 0.4rem;"}
                     = link_to Notification.kind_humanized(kind).titleize, url_for(sortable_search_params.merge(search_kind: kind))
                   %td
-                    = admin_number_display(count)
+                    = number_display(count)
               - nil_count = matching_notifications.where(kind: nil).count
               - if nil_count > 0
                 %tr
                   %td
                     Nil
                   %td
-                    = admin_number_display(nil_count)
+                    = number_display(nil_count)
 
 = render partial: "/shared/period_select"
 

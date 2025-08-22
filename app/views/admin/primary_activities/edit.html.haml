@@ -50,7 +50,7 @@
         %tr
           %td Bike count
           %td
-            = link_to admin_number_display(Bike.where(primary_activity_id: @primary_activity.id).count), admin_bikes_path(primary_activity: @primary_activity.id)
+            = link_to number_display(Bike.where(primary_activity_id: @primary_activity.id).count), admin_bikes_path(primary_activity: @primary_activity.id)
 
 - if @primary_activity.family?
   .mt-5.mb-5

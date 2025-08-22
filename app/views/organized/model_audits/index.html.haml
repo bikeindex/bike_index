@@ -58,7 +58,7 @@
               %span.less-strong= l(organization_model_audit.updated_at, format: :convert_time)
         %td
           %strong
-            = admin_number_display(organization_model_audit.bikes_count)
+            = number_display(organization_model_audit.bikes_count)
         %td
           - if organization_model_audit.certification_status.present?
             %span{class: status_display_class(organization_model_audit.certification_status)}

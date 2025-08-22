@@ -56,7 +56,7 @@
                   = link_to "No organization", url_for(sortable_search_params.merge(organization_id: "none"))
                   %span.text-danger missing org!
               %td
-                = admin_number_display(matching_bulk_imports.where(organization_id: id).count)
+                = number_display(matching_bulk_imports.where(organization_id: id).count)
 
 .mt-4
   = render partial: "/shared/period_select"
@@ -119,4 +119,4 @@
                 - else
                   = bulk_import.file_filename
             %td
-              = admin_number_display bulk_import.ownerships.count # Don't need to do bikes through ownerships
+              = number_display bulk_import.ownerships.count # Don't need to do bikes through ownerships

@@ -135,7 +135,7 @@
             - unless logged_search.stolenness_all?
               %small= logged_search.stolenness
           %td.small
-            = admin_number_display(logged_search.page)
+            = number_display(logged_search.page)
           - if sort_column == "serial_normalized"
             %td.small
               - if logged_search.serial_normalized.present?
@@ -143,7 +143,7 @@
           %td
             - if logged_search.duration_ms.present?
               %span{title: "#{logged_search.duration_ms} ms"}
-                = admin_number_display((logged_search.duration_ms * 0.001).round(2))
+                = number_display((logged_search.duration_ms * 0.001).round(2))
 
 
 = render partial: "/shared/admin/pagination", locals: {collection: @logged_searches, skip_total: true}

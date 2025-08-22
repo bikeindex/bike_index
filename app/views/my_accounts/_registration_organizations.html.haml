@@ -29,7 +29,7 @@
                     = t(".all_bikes_with_organization")
                   - else
                     -# TODO: translations here
-                    = admin_number_display(user_registration_organization.bikes.count)
+                    = number_display(user_registration_organization.bikes.count)
                     = t(".bike").pluralize(user_registration_organization.bikes.count)
                     = t(".registered_with")
                     %em= organization.short_name

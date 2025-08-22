@@ -93,7 +93,7 @@
   %h4.pt-4.pb-2
     Payments
     %small
-      = link_to admin_number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
+      = link_to number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
       - if @payments.count > 25
         %em (only first 25 shown)
 - if @payments.any?

@@ -61,7 +61,7 @@
             %td.item-cell
               = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)}
             %td
-              = "#{marketplace_listing.currency_symbol}#{admin_number_display(marketplace_listing.amount)}"
+              = "#{marketplace_listing.currency_symbol}#{number_display(marketplace_listing.amount)}"
             %td
               = marketplace_listing.condition
             %td

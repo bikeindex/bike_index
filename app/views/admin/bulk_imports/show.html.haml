@@ -95,7 +95,7 @@
   = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary float-right"
 
 %h2.mt-4
-  Bikes - #{admin_number_display(@bulk_import.bikes.count)}
+  Bikes - #{number_display(@bulk_import.bikes.count)}
   - if @bulk_import.bikes.count > 25
     %small
       Last 25 shown

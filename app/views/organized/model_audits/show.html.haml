@@ -34,7 +34,7 @@
         %tr
           %td Total vehicles
           %td
-            = admin_number_display @bikes_count
+            = number_display @bikes_count
             %small= link_to "search matching vehicles", organization_bikes_path(organization_id: current_organization.id, search_model_audit_id: @model_audit.id)
         %tr
           %td Most recent
