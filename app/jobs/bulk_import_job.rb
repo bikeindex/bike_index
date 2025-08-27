@@ -1,7 +1,7 @@
 require "csv"
 
 class BulkImportJob < ApplicationJob
-  MAX_LINES = 11_000
+  MAX_LINES = 25_100
   sidekiq_options retry: false
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
@@ -16,7 +16,7 @@ class BulkImportJob < ApplicationJob
 
     line_count = count_file_lines(open_file)
     if line_count > MAX_LINES
-      return @bulk_import.add_file_error("CSV is too big! Max allowed size is #{MAX_LINES - 1000} lines")
+      return @bulk_import.add_file_error("CSV is too big! Max allowed size is #{MAX_LINES - 100} lines")
     end
 
     process_csv(open_file)

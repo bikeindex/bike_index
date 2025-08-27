@@ -55,7 +55,7 @@ The `bin/dev` command handles building and updating tailwind and JS.
 This project also uses the ViewComponent gem to render components.
 
 - Prefer view components to partials
-- Generate a new view component with `rails generate component ComponentName argument1 argument2`
+  - Generate a new view component with `rails generate component ComponentName argument1 argument2`
 - View components must initialize with keyword arguments
 
 # Initial setup
