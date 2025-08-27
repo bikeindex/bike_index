@@ -58,4 +58,11 @@ Rails.application.configure do
   routes.default_url_options = config.action_mailer.default_url_options
 
   config.cache_store = :file_store, Rails.root.join("tmp", "cache", "test#{ENV["TEST_ENV_NUMBER"]}")
+
+  # Configure Sidekiq to suppress INFO logs in test environment
+  if defined?(Sidekiq)
+    Sidekiq.configure_client { |config| config.logger.level = Logger::WARN }
+
+    Sidekiq.configure_server { |config| config.logger.level = Logger::WARN }
+  end
 end

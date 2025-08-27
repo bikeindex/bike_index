@@ -128,7 +128,7 @@ RSpec.describe BulkImportJob, type: :job do
       context "CSV file exceeds maximum size" do
         let(:csv_lines) do
           lines = [%w[manufacturer model year color owner_email serial_number]]
-          12_000.times do |i|
+          26_000.times do |i|
             lines << ["", "", "", "", "", ""]
           end
           lines
@@ -141,7 +141,7 @@ RSpec.describe BulkImportJob, type: :job do
 
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
-          expect(bulk_import.file_errors.join("")).to match("CSV is too big! Max allowed size is 10000 lines")
+          expect(bulk_import.file_errors.join("")).to match("CSV is too big! Max allowed size is 25000 lines")
         end
       end
     end
