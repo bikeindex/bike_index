@@ -265,7 +265,9 @@
                         = link_to organized_bike_text(other_bike, skip_creation: true), bike_path(other_bike)
             - if other_user_bikes.count > 25
               %p.text-center.less-strong.m-0
-                User has #{other_user_bikes.count} registrations, only 25 most recent shown.
+                User has
+                = number_display(other_user_bikes.count)
+                registrations, only 25 most recent shown.
 
         - duplicate_bikes = @bike.duplicate_bikes
         - if duplicate_bikes.any?
