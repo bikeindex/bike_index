@@ -20,7 +20,9 @@
           Include
           %code
             = Doorkeeper.configuration.native_redirect_uri
-          for local tests
+          for local tests.
+      %p
+        Include <code>bikeindex://</code> for #{link_to "iOS app deeplinks", "https://github.com/bikeindex/bike_index_ios?tab=readme-ov-file#quick-start", tabindex: -1}.
       %p
         Include <code>#{authorize_documentation_index_url}</code> to be able to add new tokens #{link_to "from the documentation", api_v3_documentation_index_url, tabindex: -1}.
   .form-group
