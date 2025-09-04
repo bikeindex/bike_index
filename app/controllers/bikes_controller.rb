@@ -21,7 +21,9 @@ class BikesController < Bikes::BaseController
       @impound_claim ||= @bike.current_impound_record&.impound_claims&.build
       @submitted_impound_claims = impound_claims.where.not(id: @impound_claim.id).submitted
     end
-    # These ivars are here primarily to make testing possible
+
+    # TODO: this logic is duplicated in Org::BikeAccessPanel::Component
+    # Test the rendering logic in the Org::BikeAccessPanel
     @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
     @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
     if params[:scanned_id].present?
