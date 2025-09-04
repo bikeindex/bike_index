@@ -31,7 +31,7 @@ en:
         claimed: Claimed
         contact_the_owner_it_is_stolen: to the owner of this %{bike_type} that you believe
           is stolen.
-        creation_description: Source
+        creation_source: Source
         creator: Creator
         edit: Edit
         email_to_deal_with_this_html: Email %{support_link} to deal with this.

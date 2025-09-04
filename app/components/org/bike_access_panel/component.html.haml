@@ -28,21 +28,19 @@
           - else
             %p.text-warning.text-right
               %span.hidden-md-down
-                = translation(".bike_is_not_registered_html", bike_type: @bike.type, org_name: @organization.short_name)
+                = translation(".bike_is_not_registered_html", bike_type: @bike.type, org_name: @organization.short_name).html_safe
               %span.hidden-lg-up
-                = translation(".is_not_registered_html", org_name: @organization.short_name)
+                = translation(".is_not_registered_html", org_name: @organization.short_name).html_safe
     .card-body
       .row
-        -# Only show the unstolen notification form if bike is with_owner (ie, not if bike is found)
-        - display_unstolen_notification_form = @bike.status_with_owner? && @organization.enabled?("unstolen_notifications")
         - if @organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
-              = translation(".as_a_bikeindex_ambassador_html")
+              = translation(".as_a_bikeindex_ambassador_html").html_safe
 
               = link_to translation(".mark_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token), class: "btn btn-success btn-sm"
 
-        .mb-2{class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12"}
+        .mb-2{class: display_unstolen_notification_form? ? "col-md-7" : "col-sm-12"}
           %table.table-list
             %tbody
               %tr
@@ -115,7 +113,7 @@
                   %td
                     = @bike.creator&.display_name
                 %tr
-                  %td= translation(".creation_description")
+                  %td= translation(".creation_source")
                   %td
                     %em.less-strong
                       = origin_display(@bike.creation_description)
@@ -195,7 +193,7 @@
             %p.less-strong.mt-4
               %em
                 = translation(".unable_to_display_additional_information", bike_type: @bike.type, org_name: @organization.name)
-        - if display_unstolen_notification_form
+        - if display_unstolen_notification_form?
           .col-md-5.unstolen-notification-box
             %p.mb-2
               %em= translation(".bike_not_marked_stolen", bike_type: @bike.type_titleize)
@@ -222,14 +220,14 @@
 
               - if @bike.phoneable_by?(@user)
                 %p.phoneable-by.mt-4
-                  = translation(".or_call_owner_html")
+                  = translation(".or_call_owner_html").html_safe
                   = phone_link(@bike.phone)
             - else
               %p
-                = translation(".user_revoked_permission_html")
+                = translation(".user_revoked_permission_html").html_safe
               %p
                 = support_link = link_to(translation(".support_email"), "mailto:#{translation('.support_email')}")
-                = translation(".email_to_deal_with_this_html", support_link: support_link)
+                = translation(".email_to_deal_with_this_html", support_link: support_link).html_safe
 
       / Additional law enforcement information
       - if @organization.enabled?("additional_registrations_information")
@@ -461,7 +459,7 @@
                       {class: 'country-select-input form-control'} )
             .col-md-6
               .form-group.less-strong
-                = f.label :internal_notes, translation(".parking_notification_notes_html", org_name: @organization.short_name)
+                = f.label :internal_notes, translation(".parking_notification_notes_html", org_name: @organization.short_name).html_safe
                 = f.text_area :internal_notes, class: "form-control"
 
 - if show_sticker_modal
