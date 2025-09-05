@@ -29,5 +29,10 @@ module Org::BikeAccessPanel
     def display_unstolen_notification_form?
       @bike.status_with_owner? && @organization.enabled?("unstolen_notifications")
     end
+
+    def show_sticker_modal?
+      # display stickers if org has paid for them
+      @organization.enabled?("bike_stickers")
+    end
   end
 end

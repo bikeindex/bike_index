@@ -245,7 +245,7 @@
                   %th
                     = translation(".additional_registrations_registered_at")
                   %th
-                    = translation(".creation_description")
+                    = translation(".creation_source")
                   %th
 
                 - other_user_bikes.reorder(created_at: :desc).limit(25).each do |other_bike|
