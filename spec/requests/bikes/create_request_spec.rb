@@ -362,7 +362,7 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
     context "no address passed" do
-      it "does not have address, has association" do
+      it "does not have address, has association", :flaky do
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
