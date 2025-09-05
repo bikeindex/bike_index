@@ -22,10 +22,6 @@ class BikesController < Bikes::BaseController
       @submitted_impound_claims = impound_claims.where.not(id: @impound_claim.id).submitted
     end
 
-    # TODO: this logic is duplicated in Org::BikeAccessPanel::Component
-    # Test the rendering logic in the Org::BikeAccessPanel
-    @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
-    @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end

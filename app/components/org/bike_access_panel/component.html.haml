@@ -1,4 +1,3 @@
-- show_sticker_modal = false
 - if @organization.enabled?("graduated_notifications") && @bike.graduated?(@organization)
   %h5.mt-4
     %strong.text-warning This is a graduated #{@bike.type}
@@ -51,13 +50,12 @@
                     - if @bike.can_edit_claimed_organizations.pluck(:id).include?(@organization.id)
                       %em.small
                         = translation(".organization_can_edit_after_claimed", bike_type: @bike.type)
-                    - if @bike.authorized?(@user)
+                    - if user_can_edit?
                       = link_to translation(".edit"), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "btn btn-success btn-sm float-right"
                   - else
                     %em.small.less-strong
                       = translation(".org_cannot_edit", org_name: @organization.short_name)
-              - if @organization.enabled?("bike_stickers") # Always display stickers if org has paid for them
-                - show_sticker_modal = true
+              - if @organization.enabled?("bike_stickers")
                 %tr
                   %td
                     = translation(".sticker")
@@ -462,7 +460,7 @@
                 = f.label :internal_notes, translation(".parking_notification_notes_html", org_name: @organization.short_name).html_safe
                 = f.text_area :internal_notes, class: "form-control"
 
-- if show_sticker_modal
+- if show_sticker_modal?
   - sticker_modal_body = capture_haml do
     .modal-body
       = form_for BikeSticker.new, {url: organization_sticker_path(id: "code", organization_id: @organization.to_param), action: "update", method: "PUT"} do |f|

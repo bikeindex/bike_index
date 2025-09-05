@@ -25,6 +25,10 @@ module Org::BikeAccessPanel
       @bike.authorized_by_organization?(org: @organization)
     end
 
+    def user_can_edit?
+      @bike.authorized?(@user)
+    end
+
     # Only show the unstolen notification form if bike is with_owner (ie, not if bike is found)
     def display_unstolen_notification_form?
       @bike.status_with_owner? && @organization.enabled?("unstolen_notifications")

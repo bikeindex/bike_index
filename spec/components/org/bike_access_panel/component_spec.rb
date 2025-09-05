@@ -13,6 +13,8 @@ RSpec.describe Org::BikeAccessPanel::Component, type: :component do
   it "renders" do
     expect(instance.render?).to be_truthy
     expect(component).to have_css "div"
+    expect(instance.send(:organization_registered?)).to be_falsey
+    expect(instance.send(:organization_authorized?)).to be_truthy
   end
 
   context "not organization bike" do
