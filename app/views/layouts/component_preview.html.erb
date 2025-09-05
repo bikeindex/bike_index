@@ -16,9 +16,9 @@
     <%= javascript_importmap_tags %>
     <script>window.inComponentPreview = true</script>
 
-    <%# Use Lookbook's display options to include the legacy stylesheet %>
-    <%# add '# @display legacy_stylesheet true' above your preview method to render it %>
-    <% if InputNormalizer.boolean(params.dig(:lookbook, :display, :legacy_stylesheet))
+    <%# Use Lookbook's display options to include the legacy stylesheet
+        add '# @display legacy_stylesheet true' above your preview method to render it %>
+    <% if InputNormalizer.boolean(params.dig(:lookbook, :display, :legacy_stylesheet)) %>
       <%= stylesheet_link_tag "revised" %>
     <% end %>
   </head>
