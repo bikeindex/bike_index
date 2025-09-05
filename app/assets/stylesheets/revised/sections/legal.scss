@@ -19,10 +19,42 @@
     font-weight: normal;
     line-height: 1.25em;
     margin: 1em 0 0.75em;
+    position: relative;
   }
 
   h1 {
     margin: 1.5em 0 0.5em;
+  }
+
+  a {
+    text-decoration: underline;
+    color: $link-color;
+    &:hover, &.active, &:active {
+      color: darken($link-color, 15%);
+    }
+    &.active, &:active {
+      text-decoration: none;
+    }
+  }
+}
+
+.anchor {
+  display: block;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: -1.5rem;
+  height: 100%;
+  &:hover .mini-icon-link {
+    margin-top: 0.25em;
+    // NOTE: This is the link.svg inlined
+    background-image: url("data:image/svg+xml,%3Csvg fill='none' stroke='currentColor' stroke-width='1.5' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' aria-hidden='true'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 0.75em 0.75em;
+    background-position: center;
+    display: block;
+    width: 0.75em;
+    height: 0.75em;
   }
 }
 
