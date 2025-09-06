@@ -12,13 +12,15 @@ module Org::BikeAccessPanel
 
     def render?
       @bike.present? && @organization.present? && @user.present? &&
-        @user.authorized?(@organization)
+        @user.authorized?(@organization) && @bike.visible_by?(@user)
     end
 
     private
 
     def organization_registered?
-      @bike.organized?(@organization)
+      return @organization_registered if defined?(@organization_registered)
+
+      @organization_registered = @bike.organized?(@organization)
     end
 
     def organization_authorized?
