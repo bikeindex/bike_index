@@ -112,9 +112,11 @@ class Ownership < ApplicationRecord
     Bike.find_by_id(bike_id)
   end
 
-  def first?
-    # If the ownership is created, use the id created in set_calculated_attributes
-    id.present? ? previous_ownership_id.blank? : prior_ownerships.none?
+  def initial?
+    return previous_ownership_id.blank? if id.present?
+
+    # If the ownership isn't finished being created, use the id created in set_calculated_attributes
+    prior_ownerships.none?
   end
 
   def second?
@@ -130,7 +132,8 @@ class Ownership < ApplicationRecord
   end
 
   def new_registration?
-    return true if first? || impound_record_id.present?
+    return true if initial? || impound_record_id.present?
+
     previous_ownership.present? && previous_ownership.organization_pre_registration?
   end
 
@@ -234,7 +237,7 @@ class Ownership < ApplicationRecord
       # Would this be better in BikeServices::Creator? Maybe, but specs depend on this always being set
       self.origin ||= if impound_record_id.present?
         "impound_process"
-      elsif first?
+      elsif initial?
         "web"
       else
         "transferred_ownership"

@@ -1417,7 +1417,7 @@ RSpec.describe Bike, type: :model do
       let(:ownership) { Ownership.new(user: user) }
       it "returns users phone" do
         allow(bike).to receive(:current_ownership) { ownership }
-        expect(ownership.first?).to be_truthy
+        expect(ownership.initial?).to be_truthy
         expect(user.phone).to eq "7659871234"
         expect(bike.phone).to eq "7659871234"
       end

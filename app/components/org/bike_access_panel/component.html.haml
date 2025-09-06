@@ -72,7 +72,7 @@
                             - if bike_sticker.claimed_at.present?
                               %small.less-strong
                                 claimed
-                                %em.convertTime.preciseTime
+                                %em.localizeTime.preciseTime
                                   = l bike_sticker.claimed_at, format: :convert_time
                     .small.text-right
                       %a.less-strong{href: "#", style: "opacity: 0.8; text-align: right;", data: {toggle: "modal", target: "#assignStickerModal"}}
@@ -101,11 +101,14 @@
                 %tr
                   %td= translation(".registered")
                   %td
-                    %span.convertTime
+                    %span.localizeTime
                       = l @bike.created_at, format: :convert_time
                 %tr
                   %td= translation(".claimed")
-                  %td= check_mark if @bike.claimed?
+                  %td
+                    - if @bike.claimed?
+                      = check_mark
+                      %small.localizeTime.ml-2= l current_ownership.claimed_at, format: :convert_time
                 %tr
                   %td= translation(".creator")
                   %td
@@ -113,8 +116,15 @@
                 %tr
                   %td= translation(".creation_source")
                   %td
-                    %em.less-strong
+                    %em
                       = origin_display(@bike.creation_description)
+                      - unless current_ownership.initial?
+                        %span.localizeTime= l current_ownership.created_at, format: :convert_time
+                    - if display_original_ownership?
+                      %small.less-strong.ml-2
+                        = translation(".initial_registration")
+                        %em
+                          = origin_display(original_ownership.creation_description)
 
                 -# Bike Stickers are handled separately, so skip it
                 - (@organization.additional_registration_fields - ["reg_bike_sticker"]).each do |reg_field|
@@ -249,7 +259,7 @@
                 - other_user_bikes.reorder(created_at: :desc).limit(25).each do |other_bike|
                   %tr
                     %td
-                      %span.convertTime
+                      %span.localizeTime
                         = l other_bike.created_at, format: :convert_time
                     %td
                       %em.less-strong
@@ -276,7 +286,7 @@
               - duplicate_bikes.reorder(created_at: :desc).limit(25).each do |duplicate_bike|
                 %tr
                   %td
-                    %span.convertTime
+                    %span.localizeTime
                       = l duplicate_bike.created_at, format: :convert_time
                   %td
                     = link_to organized_bike_textranslation(duplicate_bike), bike_path(duplicate_bike)

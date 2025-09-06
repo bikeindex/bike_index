@@ -31,6 +31,7 @@ en:
         claimed: Claimed
         contact_the_owner_it_is_stolen: to the owner of this %{bike_type} that you believe
           is stolen.
+        initial_registration: "initial registration:"
         creation_source: Source
         creator: Creator
         edit: Edit

@@ -40,5 +40,18 @@ module Org::BikeAccessPanel
       # display stickers if org has paid for them
       @organization.enabled?("bike_stickers")
     end
+
+    def display_original_ownership?
+      original_ownership.id != @bike.current_ownership_id &&
+        original_ownership.organization_id == @organization.id
+    end
+
+    def current_ownership
+      @current_ownership ||= @bike.current_ownership
+    end
+
+    def original_ownership
+      @original_ownership ||= @bike.ownerships.initial.first
+    end
   end
 end
