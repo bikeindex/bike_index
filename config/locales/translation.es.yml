@@ -1852,65 +1852,6 @@ es:
     organization_stolen_message:
       report_link_text:
       report_the_theft_to_the_organization_html:
-    organized_access_panel:
-      access_panel:
-      added_to_track_parking_notification:
-      additional_registrations_information:
-      additional_registrations_information_visible_because:
-      additional_registrations_potential_duplicates:
-      additional_registrations_registered_at:
-      additional_registrations_this_bike:
-      address:
-      address_or_intersection:
-      as_a_bikeindex_ambassador_html:
-      assign_sticker:
-      avery_exportable:
-      believe_it_is_anyway:
-      bike_is_not_registered_html:
-      bike_is_registered:
-      bike_not_marked_stolen:
-      choose_country:
-      city:
-      claimed:
-      contact_the_owner_it_is_stolen:
-      creation_description:
-      creator:
-      edit: Editar
-      email_to_deal_with_this_html:
-      is_false:
-      is_not_registered_html:
-      is_registered:
-      is_true:
-      link_sticker:
-      link_url_for_online_sighting:
-      mark_bike_recovered:
-      missing_address:
-      missing_owner_name:
-      model_audit:
-      not_audited:
-      or_call_owner_html:
-      org_can_edit_bike:
-      org_cannot_edit:
-      organization_can_edit_after_claimed:
-      organization_child:
-      organization_registered:
-      owner_email:
-      owner_name:
-      parking_notification_notes_html:
-      permission:
-      registered:
-      send_message:
-      state:
-      sticker:
-      sticker_code:
-      support_email:
-      unable_to_display_additional_information:
-      unregistered_parking_notification:
-      user_revoked_permission_html:
-      waiting_on_device_location:
-      where_did_you_see_this_bike:
-      write_a_message:
-      zipcode:
     pdf:
       bike_description:
       bike_serial:
@@ -4744,3 +4685,64 @@ es:
         registered_not_stolen:
       container:
         no_results:
+    org:
+      bike_access_panel:
+        access_panel:
+        added_to_track_parking_notification:
+        additional_registrations_information:
+        additional_registrations_information_visible_because:
+        additional_registrations_potential_duplicates:
+        additional_registrations_registered_at:
+        additional_registrations_this_bike:
+        address:
+        address_or_intersection:
+        as_a_bikeindex_ambassador_html:
+        assign_sticker:
+        avery_exportable:
+        believe_it_is_anyway:
+        bike_is_not_registered_html:
+        bike_is_registered:
+        bike_not_marked_stolen:
+        choose_country:
+        city:
+        claimed:
+        contact_the_owner_it_is_stolen:
+        creation_source:
+        creator:
+        edit: Editar
+        email_to_deal_with_this_html:
+        initial_registration:
+        is_false:
+        is_not_registered_html:
+        is_registered:
+        is_true:
+        link_sticker:
+        link_url_for_online_sighting:
+        mark_bike_recovered:
+        missing_address:
+        missing_owner_name:
+        model_audit:
+        not_audited:
+        or_call_owner_html:
+        org_can_edit_bike:
+        org_cannot_edit:
+        organization_can_edit_after_claimed:
+        organization_child:
+        organization_registered:
+        owner_email:
+        owner_name:
+        parking_notification_notes_html:
+        permission:
+        registered:
+        send_message:
+        state:
+        sticker:
+        sticker_code:
+        support_email:
+        unable_to_display_additional_information:
+        unregistered_parking_notification:
+        user_revoked_permission_html:
+        waiting_on_device_location:
+        where_did_you_see_this_bike:
+        write_a_message:
+        zipcode:

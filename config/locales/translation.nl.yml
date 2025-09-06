@@ -1874,78 +1874,6 @@ nl:
       very_very_few_bikes_html: 'Er zijn heel <em>weinig</em> %{type_html} gemaakt
         zonder serienummers. Tenzij dit %{type_html}:'
       electric_motorized: Elektrisch (gemotoriseerd)
-    organized_access_panel:
-      access_panel: Toegangspaneel
-      address: 'Adres:'
-      as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">Als ambassadeur
-        van Bike Index kunt</span> u deze markeren als hersteld:</em>
-      assign_sticker: Sticker toewijzen
-      avery_exportable: Avery Exporteerbaar
-      believe_it_is_anyway: Geloof het toch is?
-      bike_is_not_registered_html: Deze %{bike_type} is <em>niet</em> geregistreerd
-        bij %{org_name}
-      bike_is_registered: Deze %{bike_type} is geregistreerd bij %{org_name}
-      bike_not_marked_stolen: "%{bike_type} is niet gemarkeerd als gestolen."
-      claimed: beweerde
-      creator: Schepper
-      edit: Bewerken
-      email_to_deal_with_this_html: E-mail %{support_link} om dit aan te pakken.
-      is_false: vals
-      is_not_registered_html: "<em>niet</em> bespaard met %{org_name}"
-      is_registered: reged met %{org_name}
-      is_true: waar
-      link_sticker: Link sticker
-      link_url_for_online_sighting: Link-URL voor online waarneming
-      mark_bike_recovered: Mark fiets hersteld
-      missing_address: adres ontbreekt
-      missing_owner_name: gebruikersnaam ontbreekt
-      or_call_owner_html: "<em>Of bel</em> <strong>het telefoonnummer van de eigenaar:</strong>"
-      org_can_edit_bike: "%{org_name} kan deze %{bike_type} bewerken"
-      org_cannot_edit: "%{org_name} kan niet bewerken"
-      organization_can_edit_after_claimed: en kunnen bewerken nadat %{bike_type} is
-        geclaimd
-      owner_email: E-mailadres eigenaar
-      owner_name: Eigenaar naam
-      permission: Toestemming
-      registered: 'Geregistreerd:'
-      send_message: Verstuur bericht
-      sticker: Sticker
-      sticker_code: Stickercode
-      support_email: support@bikeindex.org
-      unable_to_display_additional_information: Kan geen aanvullende informatie weergeven
-        omdat %{bike_type} niet is geregistreerd bij %{org_name}
-      user_revoked_permission_html: Deze gebruiker <strong>heeft de</strong> toestemming
-        <strong>ingetrokken</strong> om contact met hem op te nemen voordat zijn fiets
-        als gestolen wordt gemarkeerd.
-      waiting_on_device_location: Wachten op apparaatlocatie
-      where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als u contact
-        opneemt over een advertentie die u online hebt gevonden, neemt u een link
-        op in het onderstaande veld
-      organization_child: Child organisatie
-      organization_registered: Organisatie
-      address_or_intersection: Adres of kruispunt
-      choose_country: Kies land
-      city: City
-      parking_notification_notes_html: "%{org_name} interne notities worden <small>niet
-        getoond aan de gebruiker</small>"
-      state: Staat
-      zipcode: Postcode
-      added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
-        bij een gebruiker. Het is toegevoegd om parkeermeldingen te volgen.
-      unregistered_parking_notification: gemaakt voor parkeermelding
-      additional_registrations_information: Registratie door gebruiker
-      additional_registrations_information_visible_because: zichtbaar met %{org_name}
-        toegang voor rechtshandhaving
-      additional_registrations_potential_duplicates: 'Potentiële dubbele fietsen die
-        overeenkomen met seriële segmenten:'
-      additional_registrations_registered_at: Geregistreerd bij
-      additional_registrations_this_bike: Deze %{bike_type}
-      creation_description: Bron
-      contact_the_owner_it_is_stolen: aan de eigenaar van deze %{bike_type} waarvan
-        u denkt dat deze is gestolen.
-      write_a_message: Schrijf een bericht
-      model_audit: Audit van e-voertuigen
-      not_audited: Niet gecontroleerd
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
@@ -6158,3 +6086,77 @@ nl:
         registered_not_stolen: geregistreerd, niet gestolen
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
+    org:
+      bike_access_panel:
+        access_panel: Toegangspaneel
+        added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
+          bij een gebruiker. Het is toegevoegd om parkeermeldingen te volgen.
+        additional_registrations_information: Registratie door gebruiker
+        additional_registrations_information_visible_because: zichtbaar met %{org_name}
+          toegang voor rechtshandhaving
+        additional_registrations_potential_duplicates: 'Potentiële dubbele fietsen
+          die overeenkomen met seriële segmenten:'
+        additional_registrations_registered_at: Geregistreerd bij
+        additional_registrations_this_bike: Deze %{bike_type}
+        address: 'Adres:'
+        address_or_intersection: Adres of kruispunt
+        as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">Als ambassadeur
+          van Bike Index kunt</span> u deze markeren als hersteld:</em>
+        assign_sticker: Sticker toewijzen
+        avery_exportable: Avery Exporteerbaar
+        believe_it_is_anyway: Geloof het toch is?
+        bike_is_not_registered_html: Deze %{bike_type} is <em>niet</em> geregistreerd
+          bij %{org_name}
+        bike_is_registered: Deze %{bike_type} is geregistreerd bij %{org_name}
+        bike_not_marked_stolen: "%{bike_type} is niet gemarkeerd als gestolen."
+        choose_country: Kies land
+        city: City
+        claimed: beweerde
+        contact_the_owner_it_is_stolen: aan de eigenaar van deze %{bike_type} waarvan
+          u denkt dat deze is gestolen.
+        creation_source: Bron
+        creator: Schepper
+        edit: Bewerken
+        email_to_deal_with_this_html: E-mail %{support_link} om dit aan te pakken.
+        initial_registration: 'eerste registratie:'
+        is_false: vals
+        is_not_registered_html: "<em>niet</em> bespaard met %{org_name}"
+        is_registered: reged met %{org_name}
+        is_true: waar
+        link_sticker: Link sticker
+        link_url_for_online_sighting: Link-URL voor online waarneming
+        mark_bike_recovered: Mark fiets hersteld
+        missing_address: adres ontbreekt
+        missing_owner_name: gebruikersnaam ontbreekt
+        model_audit: Audit van e-voertuigen
+        not_audited: Niet gecontroleerd
+        or_call_owner_html: "<em>Of bel</em> <strong>het telefoonnummer van de eigenaar:</strong>"
+        org_can_edit_bike: "%{org_name} kan deze %{bike_type} bewerken"
+        org_cannot_edit: "%{org_name} kan niet bewerken"
+        organization_can_edit_after_claimed: en kunnen bewerken nadat %{bike_type}
+          is geclaimd
+        organization_child: Child organisatie
+        organization_registered: Organisatie
+        owner_email: E-mailadres eigenaar
+        owner_name: Eigenaar naam
+        parking_notification_notes_html: "%{org_name} interne notities worden <small>niet
+          getoond aan de gebruiker</small>"
+        permission: Toestemming
+        registered: Geregistreerd
+        send_message: Verstuur bericht
+        state: Staat
+        sticker: Sticker
+        sticker_code: Stickercode
+        support_email: support@bikeindex.org
+        unable_to_display_additional_information: Kan geen aanvullende informatie
+          weergeven omdat %{bike_type} niet is geregistreerd bij %{org_name}
+        unregistered_parking_notification: gemaakt voor parkeermelding
+        user_revoked_permission_html: Deze gebruiker <strong>heeft de</strong> toestemming
+          <strong>ingetrokken</strong> om contact met hem op te nemen voordat zijn
+          fiets als gestolen wordt gemarkeerd.
+        waiting_on_device_location: Wachten op apparaatlocatie
+        where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als u contact
+          opneemt over een advertentie die u online hebt gevonden, neemt u een link
+          op in het onderstaande veld
+        write_a_message: Schrijf een bericht
+        zipcode: Postcode

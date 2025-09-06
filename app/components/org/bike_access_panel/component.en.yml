@@ -10,32 +10,32 @@ en:
         additional_registrations_information: Registrations by user
         additional_registrations_information_visible_because: visible with %{org_name}
           law enforcement access
-        additional_registrations_potential_duplicates: 'Potential duplicate bikes matching
-          serial segments:'
+        additional_registrations_potential_duplicates: 'Potential duplicate bikes
+          matching serial segments:'
         additional_registrations_registered_at: Registered at
         additional_registrations_this_bike: This %{bike_type}
         address: Registration Address
         address_or_intersection: Address or intersection
         as_a_bikeindex_ambassador_html: >-
-          <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can
-          mark it as recovered:</em>
+          <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you
+          can mark it as recovered:</em>
         assign_sticker: Assign sticker
         avery_exportable: Avery Exportable
         believe_it_is_anyway: Believe it is anyway?
-        bike_is_not_registered_html: This %{bike_type} is <em>not</em> registered with
-          %{org_name}
+        bike_is_not_registered_html: This %{bike_type} is <em>not</em> registered
+          with %{org_name}
         bike_is_registered: This %{bike_type} is registered with %{org_name}
         bike_not_marked_stolen: "%{bike_type} is not marked stolen."
         choose_country: Choose country
         city: City
         claimed: Claimed
-        contact_the_owner_it_is_stolen: to the owner of this %{bike_type} that you believe
-          is stolen.
-        initial_registration: "initial registration:"
+        contact_the_owner_it_is_stolen: to the owner of this %{bike_type} that you
+          believe is stolen.
         creation_source: Source
         creator: Creator
         edit: Edit
         email_to_deal_with_this_html: Email %{support_link} to deal with this.
+        initial_registration: 'initial registration:'
         is_false: 'false'
         is_not_registered_html: "<em>not</em> reged with %{org_name}"
         is_registered: reged with %{org_name}
