@@ -5,22 +5,6 @@ module ApplicationHelper
     super([key, locale: I18n.locale], options, &block)
   end
 
-  def check_mark
-    "&#x2713;".html_safe
-  end
-
-  def cross_mark
-    "&#x274C;".html_safe
-  end
-
-  def search_emoji
-    "🔎"
-  end
-
-  def link_emoji
-    image_tag("link.svg", class: "link-emoji")
-  end
-
   def notification_delivery_display(status)
     text = if status == "delivery_success"
       check_mark

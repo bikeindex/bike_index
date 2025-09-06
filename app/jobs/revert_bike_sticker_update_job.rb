@@ -26,7 +26,7 @@ class RevertBikeStickerUpdateJob < ApplicationJob
       .where("update_number > ?", bike_sticker_update.update_number)
 
     if following_updates.present?
-      raise "Following claim failed"
+      raise "Following claim, failing"
 
     elsif previous_updates.present?
       last_update = previous_updates.first

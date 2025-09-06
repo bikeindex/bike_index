@@ -99,10 +99,10 @@ RSpec.describe Ownership, type: :model do
         expect(ownership1.current?).to be_falsey
         expect(ownership1.claim_message).to be_blank
         expect(ownership1.organization&.id).to eq bike.organizations.first.id
-        expect(ownership1.first?).to be_truthy
+        expect(ownership1.initial?).to be_truthy
         expect(ownership1.previous_ownership_id).to be_blank
         expect(ownership2.current?).to be_truthy
-        expect(ownership2.first?).to be_falsey
+        expect(ownership2.initial?).to be_falsey
         expect(ownership2.second?).to be_truthy
         expect(ownership2.organization&.id).to be_blank
         expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
@@ -135,23 +135,23 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.claimed?).to be_truthy
           expect(ownership.current?).to be_truthy
           expect(ownership.organization&.id).to eq organization.id
-          expect(ownership.first?).to be_truthy
+          expect(ownership.initial?).to be_truthy
           expect(ownership.previous_ownership_id).to be_blank
           expect(ownership.organization_pre_registration?).to be_truthy
           expect(ownership.send_email).to be_truthy # still defaults to true
           # Before save, still works
           expect(ownership2.current).to be_truthy
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
-          expect(ownership2.first?).to be_falsey
+          expect(ownership2.initial?).to be_falsey
           expect(ownership2.second?).to be_truthy
           ownership2.save
           ownership2.reload
           ownership.reload
           expect(ownership.current?).to be_falsey
-          expect(ownership.first?).to be_truthy
+          expect(ownership.initial?).to be_truthy
           expect(ownership2.current?).to be_truthy
           expect(ownership2.self_made?).to be_falsey
-          expect(ownership2.first?).to be_falsey
+          expect(ownership2.initial?).to be_falsey
           expect(ownership2.second?).to be_truthy
           expect(ownership2.organization_pre_registration?).to be_falsey
           expect(ownership2.previous_ownership_id).to eq ownership.id
@@ -169,7 +169,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership3.organization_pre_registration?).to be_falsey
           expect(ownership3.previous_ownership.organization_pre_registration?).to be_falsey
           expect(ownership3.prior_ownerships.pluck(:id)).to match_array([ownership.id, ownership2.id])
-          expect(ownership3.first?).to be_falsey
+          expect(ownership3.initial?).to be_falsey
           expect(ownership3.second?).to be_falsey
           expect(ownership3.new_registration?).to be_falsey
           expect(ownership3.self_made?).to be_falsey
@@ -356,7 +356,7 @@ RSpec.describe Ownership, type: :model do
         # There was some trouble with CI on this, so now we're just updating a bunch
         ownership.update(updated_at: Time.current)
         expect(organization.enabled?("skip_ownership_email")).to be_truthy
-        expect(ownership.first?).to be_truthy
+        expect(ownership.initial?).to be_truthy
         expect(ownership.calculated_send_email).to be_falsey
         ownership2 = FactoryBot.create(:ownership, bike: bike, created_at: Time.current)
         ownership2.update(updated_at: Time.current)

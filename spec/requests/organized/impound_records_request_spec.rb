@@ -210,7 +210,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(bike.current_ownership.impound_record).to eq impound_record
         expect(bike.current_ownership.organization).to eq current_organization
         expect(bike.current_ownership.owner_email).to eq "a@b.c"
-        expect(bike.current_ownership.first?).to be_falsey
+        expect(bike.current_ownership.initial?).to be_falsey
         expect(bike.current_ownership.new_registration?).to be_truthy
       end
       context "without a transfer_email" do
