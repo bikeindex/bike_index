@@ -56,10 +56,7 @@
             .col-sm-4.col-lg-2.mt-4
               = submit_tag t(".update"), class: "btn btn-success"
 
-  -# Authorize check here, even though we're checking in controller too, because
-  -# otherwise we're displaying user data - so it's critical to be sure
-  - if current_user.present? && passive_organization.present? && current_user.authorized?(passive_organization)
-    = render partial: "organized_access_panel"
+  = render(Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:))
 
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status_alerts"

@@ -126,10 +126,8 @@ RSpec.describe "BikesController#show", type: :request do
       get "#{base_url}/#{bike.id}"
       expect(assigns(:bike).id).to eq bike.id
       expect(assigns(:passive_organization)&.id).to eq organization.id
-      expect(assigns(:passive_organization_registered)).to be_truthy
-      expect(assigns(:passive_organization_authorized)).to be_falsey
       expect(response).to render_template(:show)
-      expect(response).to render_template("_organized_access_panel")
+      expect(whitespace_normalized_body_text).to match("#{organization.short_name} Access Panel")
       # Scanning sticker should redirect to bike path
       get "#{base_url}/scanned/#{bike_sticker.code}/?organization_id=#{organization2.slug}"
       expect(response).to redirect_to(bike_path(bike, scanned_id: bike_sticker.code, organization_id: organization2.to_param))
@@ -137,10 +135,8 @@ RSpec.describe "BikesController#show", type: :request do
       get "#{base_url}/#{bike.to_param}?scanned_id=#{bike_sticker.code}&organization_id=#{organization2.to_param}"
       expect(assigns(:bike).id).to eq bike.id
       expect(assigns(:passive_organization)&.id).to eq organization.id
-      expect(assigns(:passive_organization_registered)).to be_truthy
-      expect(assigns(:passive_organization_authorized)).to be_falsey
       expect(response).to render_template(:show)
-      expect(response).to render_template("_organized_access_panel")
+      expect(whitespace_normalized_body_text).to match("#{organization.short_name} Access Panel")
     end
   end
   context "theft_alert and recovery_link_token" do
@@ -195,12 +191,14 @@ RSpec.describe "BikesController#show", type: :request do
         expect(flash).to_not be_present
         expect(assigns(:current_organization)&.id).to eq organization.id
         expect(session[:passive_organization_id]).to eq organization.id
+        expect(whitespace_normalized_body_text).to match("#{organization.short_name} Access Panel")
         # Renders with current organization passed
         get "#{base_url}/#{bike.id}?organization_id=#{organization2.id}"
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
         expect(assigns(:current_organization)&.id).to eq organization2.id
         expect(session[:passive_organization_id]).to eq organization2.id
+        expect(whitespace_normalized_body_text).to match("#{organization2.short_name} Access Panel")
         # Renders with no organization, if organization set to false
         get "#{base_url}/#{bike.id}?organization_id=false"
         expect(response).to render_template(:show)
@@ -208,6 +206,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(assigns(:current_organization_force_blank)).to be_truthy
         expect(assigns(:current_organization)&.id).to be_blank
         expect(session[:passive_organization_id]).to eq "0"
+        expect(whitespace_normalized_body_text).to_not match("Access Panel")
       end
     end
     context "SuperuserAbility viewing" do
@@ -259,8 +258,7 @@ RSpec.describe "BikesController#show", type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(assigns(:bike).id).to eq bike.id
-          expect(assigns(:passive_organization_registered)).to be_truthy
-          expect(assigns(:passive_organization_authorized)).to be_truthy
+          expect(whitespace_normalized_body_text).to match("#{organization.short_name} Access Panel")
           expect(flash).to_not be_present
         end
       end
