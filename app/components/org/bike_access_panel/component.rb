@@ -17,6 +17,19 @@ module Org::BikeAccessPanel
 
     private
 
+    def phone_display(str)
+      return "" if str.blank?
+      phone_components = Phonifyer.components(str)
+      number_to_phone(phone_components[:number], phone_components.except(:number))
+    end
+
+    def phone_link(phone, html_options = {})
+      return "" if phone.blank?
+      phone_d = phone_display(phone)
+      # Switch extension to be pause in link
+      link_to(phone_d, "tel:#{phone_d.tr("x", ";")}", html_options)
+    end
+
     def organization_registered?
       return @organization_registered if defined?(@organization_registered)
 
