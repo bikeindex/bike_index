@@ -289,7 +289,7 @@
                     %span.localizeTime
                       = l duplicate_bike.created_at, format: :convert_time
                   %td
-                    = link_to organized_bike_textranslation(duplicate_bike), bike_path(duplicate_bike)
+                    = link_to organized_bike_text(duplicate_bike), bike_path(duplicate_bike)
                     %small.less-strong
                       = duplicate_bike.normalized_serial_segments.considered_for_duplicate.pluck(:segment).join(", ")
       - # TODO: add translations
