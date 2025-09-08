@@ -142,7 +142,7 @@
                         - else
                           -# Don't show address if it's the organizations default address
                           - unless address == @organization.default_location&.address_hash
-                            - address.exceptranslation("latitude", "longitude", "country").each do |k, v|
+                            - address.except("latitude", "longitude", "country").each do |k, v|
                               %span.less-strong
                                 #{k == "address" ? "street" : k}:
                               = v
