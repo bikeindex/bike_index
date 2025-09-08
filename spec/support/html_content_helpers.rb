@@ -5,6 +5,6 @@ module HtmlContentHelpers
     # Remove all script and style elements completely
     doc.css("script, style").remove
     # Spaces and also non-breaking spaces
-    doc.text.strip.gsub(/\s+/, " ").gsub("\u00A0", " ")
+    doc.text.strip.gsub(/\s+/, " ").tr("\u00A0", " ")
   end
 end

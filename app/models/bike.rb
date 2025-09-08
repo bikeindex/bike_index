@@ -833,6 +833,7 @@ class Bike < ApplicationRecord
   # Called in BikeServices::Creator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
+    self.manufacturer_id = Manufacturer.other.id if manufacturer_id == 0
     self.manufacturer_other = InputNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.frame_model = InputNormalizer.string(frame_model)

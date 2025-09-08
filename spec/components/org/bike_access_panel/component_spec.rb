@@ -79,7 +79,7 @@ RSpec.describe Org::BikeAccessPanel::Component, type: :component do
 
     context "with model audit and duplicate bike" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["model_audits"]) }
-      let(:model_audit) { FactoryBot.create(:model_audit, frame_model: "Some crazy model", manufacturer: bike.manufacturer ) }
+      let(:model_audit) { FactoryBot.create(:model_audit, frame_model: "Some crazy model", manufacturer: bike.manufacturer) }
       let!(:organization_model_audit) { FactoryBot.create(:organization_model_audit, organization:, model_audit:) }
       let!(:model_attestation) { FactoryBot.create(:model_attestation, organization:, model_audit:) }
       before { bike.update(model_audit_id: model_audit.id) }

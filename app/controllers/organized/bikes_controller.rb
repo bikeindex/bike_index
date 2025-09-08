@@ -1,6 +1,9 @@
 module Organized
   class BikesController < Organized::BaseController
     include SortableTable
+
+    SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
+
     skip_before_action :set_x_frame_options_header, only: [:new_iframe, :create]
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
@@ -139,8 +142,7 @@ module Organized
     end
 
     def sortable_columns
-      %w[id updated_by_user_at owner_email manufacturer_id frame_model cycle_type] +
-        %w[email motorized] # incompletes/b_param specific
+      SORTABLE_COLUMNS + %w[email motorized] # incompletes/b_param specific
     end
 
     def incompletes_sorted(b_params)
