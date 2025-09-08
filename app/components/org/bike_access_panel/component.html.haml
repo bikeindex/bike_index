@@ -183,7 +183,7 @@
                           - unless @bike.valid_mailing_address?
                             = translation(".missing_address")
 
-                - if @organization.enabled?("model_audits") && @bike.motorized?
+                - if @organization.enabled?("model_audits")
                   %tr
                     %td= translation(".model_audit")
                     %td
