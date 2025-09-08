@@ -3,6 +3,7 @@
 module Org::BikeAccessPanel
   class Component < ApplicationComponent
     include OrganizedHelper
+    include VehicleHelper
 
     def initialize(bike: nil, organization: nil, current_user: nil)
       @bike = bike
