@@ -44,7 +44,8 @@ module Organized
     private
 
     def sortable_columns
-      %w[last_bike_created_at bikes_count certification_status mnfg_name frame_model]
+      Organized::BikesController::SORTABLE_COLUMNS +
+        %w[last_bike_created_at bikes_count certification_status]
     end
 
     def permitted_attestation_kinds
