@@ -1484,6 +1484,13 @@ RSpec.describe Bike, type: :model do
         expect(bike.mnfg_name).to eq "Other"
       end
     end
+    context "manufacturer_id 0" do
+      let(:bike) { FactoryBot.create(:bike, manufacturer_id: 0) }
+      it "assigns to Other" do
+        expect(bike.reload.manufacturer_id).to eq Manufacturer.other.id
+        expect(bike.mnfg_name).to eq "Other"
+      end
+    end
   end
 
   describe "cache_photo" do

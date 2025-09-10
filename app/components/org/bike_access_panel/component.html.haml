@@ -183,7 +183,7 @@
                           - unless @bike.valid_mailing_address?
                             = translation(".missing_address")
 
-                - if @organization.enabled?("model_audits") && @bike.motorized?
+                - if @organization.enabled?("model_audits")
                   %tr
                     %td= translation(".model_audit")
                     %td
@@ -237,10 +237,8 @@
                 = support_link = link_to(translation(".support_email"), "mailto:#{translation('.support_email')}")
                 = translation(".email_to_deal_with_this_html", support_link: support_link).html_safe
 
-      / Additional law enforcement information
+      -# Additional law enforcement information
       - if @organization.enabled?("additional_registrations_information")
-        -# If user isn't present, use email to search
-        - other_user_bikes = @bike.user.present? ? @bike.user.bikes : Bike.where(owner_email: @bike.owner_email)
         .row.law-enforcement-wrapper.mt-4
           .col-xs-12.mt-2
             %p.mt-2.mb-2
@@ -256,7 +254,7 @@
                     = translation(".creation_source")
                   %th
 
-                - other_user_bikes.reorder(created_at: :desc).limit(25).each do |other_bike|
+                - other_user_bikes.limit(25).each do |other_bike|
                   %tr
                     %td
                       %span.localizeTime
@@ -269,13 +267,12 @@
                         %em.less-strong= translation(".additional_registrations_this_bike", bike_type: @bike.type)
                       - else
                         = link_to organized_bike_text(other_bike, skip_creation: true), bike_path(other_bike)
-            - if other_user_bikes.count > 25
+            - if other_user_bikes_count > 25
               %p.text-center.less-strong.m-0
                 User has
-                = number_display(other_user_bikes.count)
+                = number_display(other_user_bikes_count)
                 registrations, only 25 most recent shown.
 
-        - duplicate_bikes = @bike.duplicate_bikes
         - if duplicate_bikes.any?
           %p.mt-2.mb-2
             = translation(".additional_registrations_potential_duplicates")
@@ -283,7 +280,7 @@
               %code= normalized_segment.segment
           %table.table.table-striped.table-bordered.table-sm.without-exterior-border
             %tbody
-              - duplicate_bikes.reorder(created_at: :desc).limit(25).each do |duplicate_bike|
+              - duplicate_bikes.each do |duplicate_bike|
                 %tr
                   %td
                     %span.localizeTime
@@ -292,7 +289,7 @@
                     = link_to organized_bike_text(duplicate_bike), bike_path(duplicate_bike)
                     %small.less-strong
                       = duplicate_bike.normalized_serial_segments.considered_for_duplicate.pluck(:segment).join(", ")
-      - # TODO: add translations
+      -# TODO: add translations
       -# if the bike was initially an unregistered parking notification, but no longer is, show that information
       - if @bike.creator_unregistered_parking_notification? && !@bike.unregistered_parking_notification? && @bike.parking_notifications.reorder(:created_at).first.organization_id == @organization.id
         - unregistered_parking_notification = @bike.parking_notifications.reorder(:created_at).first

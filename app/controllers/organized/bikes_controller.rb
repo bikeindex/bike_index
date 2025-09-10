@@ -2,6 +2,8 @@ module Organized
   class BikesController < Organized::BaseController
     include SortableTable
 
+    SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
+
     skip_before_action :set_x_frame_options_header, only: [:new_iframe, :create]
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
@@ -42,7 +44,6 @@ module Organized
 
     def recoveries
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
-
       set_period
       @per_page = permitted_per_page
       # Default to showing regional recoveries
@@ -59,7 +60,6 @@ module Organized
 
     def incompletes
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
-
       set_period
       @per_page = permitted_per_page
       b_params = current_organization.incomplete_b_params
@@ -71,7 +71,6 @@ module Organized
 
     def resend_incomplete_email
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
-
       @b_param = current_organization.incomplete_b_params.find_by_id(params[:id])
       if @b_param.present?
         Email::PartialRegistrationJob.perform_async(@b_param.id)
@@ -143,8 +142,7 @@ module Organized
     end
 
     def sortable_columns
-      %w[id updated_by_user_at owner_email manufacturer_id frame_model cycle_type] +
-        %w[email motorized] # incompletes/b_param specific
+      SORTABLE_COLUMNS + %w[email motorized] # incompletes/b_param specific
     end
 
     def incompletes_sorted(b_params)
@@ -245,7 +243,6 @@ module Organized
 
     def search_status
       return @search_status if defined?(@search_status)
-
       valid_statuses = %w[with_owner stolen all]
       valid_statuses += %w[impounded not_impounded] if current_organization.enabled?("impound_bikes")
       @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : valid_statuses.last

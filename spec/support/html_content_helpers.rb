@@ -4,6 +4,7 @@ module HtmlContentHelpers
     doc = Nokogiri::HTML::DocumentFragment.parse(content.split("</head>").last)
     # Remove all script and style elements completely
     doc.css("script, style").remove
-    doc.text.strip.gsub(/\s+/, " ")
+    # Spaces and also non-breaking spaces
+    doc.text.strip.gsub(/\s+/, " ").tr("\u00A0", " ")
   end
 end
