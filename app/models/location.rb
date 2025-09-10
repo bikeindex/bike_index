@@ -88,6 +88,7 @@ class Location < ApplicationRecord
 
   def update_associations
     return true if skip_update
+
     # If this wasn't set by the organization callback (which uses skip_update: true)
     # And this location was updated with default_impound_location, ensure there aren't any others
     if default_impound_location
@@ -101,12 +102,14 @@ class Location < ApplicationRecord
 
   def display_name
     return "" if organization.blank?
+
     (name == organization.name) ? name : "#{organization.name} - #{name}"
   end
 
   # Quick and dirty hack to ensure it's blocked - frontend should prevent doing this normally
   def ensure_destroy_permitted!
     return true unless destroy_forbidden?
+
     raise StandardError, "Can't destroy a location with impounded bikes"
   end
 
@@ -114,6 +117,7 @@ class Location < ApplicationRecord
 
   def calculated_shown
     return false if not_publicly_visible
+
     organization.present? && organization.allowed_show?
   end
 end

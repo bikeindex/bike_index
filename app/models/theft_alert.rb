@@ -125,6 +125,7 @@ class TheftAlert < ApplicationRecord
   # Override because of recovered bikes not being in default scope
   def stolen_record
     return nil unless stolen_record_id.present?
+
     StolenRecord.current_and_not.find_by_id(stolen_record_id)
   end
 
@@ -143,6 +144,7 @@ class TheftAlert < ApplicationRecord
 
   def notify?
     return false if admin? || facebook_data.blank? || facebook_data&.dig("no_notify").present?
+
     stolen_record.present? && stolen_record.receive_notifications?
   end
 
@@ -167,12 +169,14 @@ class TheftAlert < ApplicationRecord
   def should_update_facebook?
     return false unless facebook_updateable?
     return false if end_at < self.class.update_end_buffer
+
     facebook_updated_at.blank? || facebook_updated_at < Time.current - 3.hours
   end
 
   # literally CAN NOT activate
   def activateable_except_approval?
     return false if missing_photo? || missing_location? || bike_not_current?
+
     admin ? true : paid?
   end
 
@@ -228,11 +232,13 @@ class TheftAlert < ApplicationRecord
   def facebook_name(kind = "campaign")
     n = "Theft Alert #{id} - #{amount_facebook}"
     return n if kind == "campaign"
+
     "#{n} - #{kind}"
   end
 
   def amount_cents_facebook
     return facebook_data["amount_cents"] if facebook_data&.dig("amount_cents").present?
+
     theft_alert_plan&.amount_cents_facebook
   end
 
@@ -251,6 +257,7 @@ class TheftAlert < ApplicationRecord
 
   def facebook_post_url
     return nil unless facebook_data&.dig("effective_object_story_id").present?
+
     "https://facebook.com/#{facebook_data&.dig("effective_object_story_id")}"
   end
 
@@ -272,11 +279,13 @@ class TheftAlert < ApplicationRecord
 
   def objective_campaign
     return nil if campaign_id.blank?
+
     facebook_data&.dig("objective_campaign")
   end
 
   def objective_adset
     return nil if campaign_id.blank?
+
     facebook_data&.dig("objective_adset")
   end
 

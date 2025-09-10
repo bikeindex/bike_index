@@ -51,6 +51,7 @@ class Admin::MailSnippetsController < Admin::BaseController
 
   def matching_mail_snippets
     return @matching_mail_snippets if defined?(@matching_mail_snippets)
+
     matching_mail_snippets = MailSnippet
     if MailSnippet.kinds.include?(params[:search_kind])
       @search_kind = params[:search_kind]

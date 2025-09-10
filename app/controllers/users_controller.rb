@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   include Sessionable
+
   before_action :skip_if_signed_in, only: %i[new]
   before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
 
@@ -24,6 +25,7 @@ class UsersController < ApplicationController
 
   def please_confirm_email
     redirect_to(user_root_url) && return if current_user.present?
+
     if params[:require_sign_in].present?
       redirect_to(new_session_path) && return unless unconfirmed_current_user.present?
     end
@@ -98,11 +100,13 @@ class UsersController < ApplicationController
     unless user
       raise ActionController::RoutingError.new("Not Found")
     end
+
     @owner = user
     @user = user
     unless user == current_user || @user.show_bikes
       redirect_to(my_account_url, notice: translation(:user_not_sharing)) && return
     end
+
     @per_page = permitted_per_page(default: 15)
     @pagy, @bikes = pagy(user.bikes(false), limit: @per_page, page: permitted_page)
   end
@@ -186,6 +190,7 @@ class UsersController < ApplicationController
     @token = params[:token]
     @user = User.find_by_token_for_password_reset(@token) if @token.present?
     return true if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
+
     remove_session
     flash[:error] = @user.blank? ? translation(:does_not_match_token) : translation(:token_expired)
     redirect_to(request_password_reset_form_users_path) && return

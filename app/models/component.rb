@@ -63,6 +63,7 @@ class Component < ApplicationRecord
 
   def set_front_or_rear
     return true unless front_or_rear.present?
+
     position = front_or_rear.downcase.strip
     self.front_or_rear = ""
     if position == "both"
@@ -93,11 +94,13 @@ class Component < ApplicationRecord
 
   def component_group
     return "Additional parts" unless ctype.present?
+
     ctype.cgroup.name
   end
 
   def set_is_stock
     return true if setting_is_stock
+
     if id.present? && is_stock && description_changed? || component_model_changed?
       self.is_stock = false
     end

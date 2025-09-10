@@ -38,6 +38,7 @@ module BikeServices::OwnerDuplicateFinder
 
   def self.find_matching_user_ids(email = nil, phone = nil)
     return [] if email.blank? && phone.blank?
+
     users = User.joins("LEFT JOIN user_emails ON user_emails.user_id = users.id")
       .joins("LEFT JOIN user_phones ON user_phones.user_id = users.id")
     if email.present? && phone.present?

@@ -1,6 +1,6 @@
 Bike Index is a Rails webapp
 
-[asdf](https://asdf-vm.com/) is used for Ruby and Node version management.
+[mise](https://mise.jdx.dev/) is used for Ruby and Node version management.
 
 # Development
 

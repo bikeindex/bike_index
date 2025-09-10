@@ -65,16 +65,19 @@ module GraphingHelper
   def humanized_time_range_column(time_range_column, return_value_for_all: false)
     return_value_for_all = true if @render_chart # Because otherwise it's confusing
     return nil unless return_value_for_all || !(@period == "all")
+
     humanized_text = time_range_column.to_s.gsub("_at", "").humanize.downcase
     return humanized_text.gsub("request", "requested") if time_range_column&.match?("request_at")
     return humanized_text.gsub("start", "starts") if time_range_column&.match?("start_at")
     return humanized_text.gsub("end", "ends") if time_range_column&.match?("end_at")
     return humanized_text.gsub("needs", "need") if time_range_column&.match?("needs_renewal_at")
+
     humanized_text
   end
 
   def humanized_time_range(time_range)
     return nil if @period == "all"
+
     unless @period == "custom"
       period_display = @period.match?("next_") ? @period.tr("_", " ") : "past #{@period}"
       return "in the #{period_display}"
@@ -102,6 +105,7 @@ module GraphingHelper
   # Initially just used by scheduled jobs display, but could be used by other things!
   def period_in_words(seconds)
     return "" if seconds.blank?
+
     seconds = seconds.to_i.abs
     if seconds >= 365.days
       pluralize((seconds / 31556952.0).round(1), "year")
@@ -124,6 +128,7 @@ module GraphingHelper
       data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at")
     }
     return [org_registrations] unless current_organization.regional?
+
     [
       org_registrations,
       {

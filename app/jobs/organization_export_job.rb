@@ -7,9 +7,11 @@ class OrganizationExportJob < ApplicationJob
   def perform(export_id)
     @export = Export.find(export_id)
     return true if @export.finished_processing?
+
     @export.update_attribute :progress, "ongoing"
     write_spreadsheet(@export.file_format, @export.tmp_file)
     return if @export_ebraked
+
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.options = @export.options.merge(bike_codes_assigned: @bike_stickers) if @export.assign_bike_codes?
@@ -39,18 +41,21 @@ class OrganizationExportJob < ApplicationJob
       @export.bikes_scoped.find_each(batch_size: 100) do |bike|
         check_export_ebrake(row_index) # Run first thing in case it's already broken
         next unless export_bike?(bike)
+
         row_index += 1
         sheet.add_row(bike_to_row(bike))
       end
       @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
         check_export_ebrake(row_index) # Run first thing in case it's already broken
         next unless export_bike?(b_param)
+
         row_index += 1
         sheet.add_row(b_param_to_row(b_param))
       end
       @export.rows = row_index
     end
     return if @export_ebraked
+
     file.write(axlsx_package.to_stream.read)
     @export.tmp_file.close
     true
@@ -63,12 +68,14 @@ class OrganizationExportJob < ApplicationJob
     @export.bikes_scoped.find_each(batch_size: 100) do |bike|
       check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(bike)
+
       row_index += 1
       file.write(comma_wrapped_string(bike_to_row(bike)))
     end
     @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
       check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(b_param)
+
       row_index += 1
       file.write(comma_wrapped_string(b_param_to_row(b_param)))
     end
@@ -85,10 +92,12 @@ class OrganizationExportJob < ApplicationJob
   # Currently avery_exports are the only ones that need to do this
   def export_bike?(bike_or_b_param)
     return false if @export_ebraked
+
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # The address must include a street for it to be valid
     return false unless bike_or_b_param.is_a?(Bike)
+
     bike_or_b_param.avery_exportable?
   end
 
@@ -116,6 +125,7 @@ class OrganizationExportJob < ApplicationJob
 
   def export_headers
     return @export_headers if defined?(@export_headers)
+
     @export_headers = @export.headers
     if @export_headers.include?("address")
       # Remove address and re-add, because we want to keep them in line
@@ -135,6 +145,7 @@ class OrganizationExportJob < ApplicationJob
 
   def value_for_header(header, bike)
     return bike.send(header) if MATCHING_KEYS.include?(header)
+
     case header
     when "link" then LINK_BASE + bike.id.to_s
     when "registration_method" then bike.creation_description
@@ -160,6 +171,7 @@ class OrganizationExportJob < ApplicationJob
 
   def assign_bike_code_and_increment(bike)
     return "" unless @bike_sticker.present?
+
     code = @bike_sticker.code
     pretty_code = @bike_sticker.pretty_code
     @bike_sticker.claim(user: @export.user,
@@ -177,12 +189,15 @@ class OrganizationExportJob < ApplicationJob
     return true if @export_ebraked # If it's already braked, don't check again
     # only check every so often, so we can halt processing via an external trip switch
     return true unless (row % 50).zero?
+
     reloaded_export = Export.where(id: @export.id).first
     # Specifically - if this export has been deleted, errored or somehow finished, halt processing
     return true unless reloaded_export.blank? || reloaded_export.finished_processing?
+
     @export_ebraked = true
     # And because this might have processed some bike_stickers after the export was deleted, remove them here
     return true unless @export.assign_bike_codes?
+
     @export.options = @export.options.merge(bike_codes_assigned: @bike_stickers)
     @export.remove_bike_stickers
   end

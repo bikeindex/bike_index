@@ -42,6 +42,7 @@ class Images::StolenProcessor
         existing_blob.metadata["removed"] = true
         # We don't want to update the bike.updated_at unless this is a change
         return unless existing_blob.changed?
+
         existing_blob.save
       end
       stolen_record.bike&.update(updated_at: Time.current)
@@ -205,6 +206,7 @@ class Images::StolenProcessor
     # single-quotes
     def stolen_record_location(stolen_record)
       return nil unless stolen_record.to_coordinates.any?
+
       Geocodeable.address(stolen_record, street: false, zipcode: false, country: [:skip_default, :name])
         .gsub("'", "\\'")
     end

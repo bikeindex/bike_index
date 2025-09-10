@@ -47,12 +47,14 @@ class ExternalRegistryCredential < ApplicationRecord
   # not yet expired.
   def access_token_valid?
     return false if access_token_expires_at.blank?
+
     Time.current < access_token_expires_at
   end
 
   # Set an error and return false if access_token is not yet expired.
   def access_token_can_be_reset?
     return true unless access_token_expires_at.present? && access_token_valid?
+
     errors.add(:access_token, "not expired")
     false
   end

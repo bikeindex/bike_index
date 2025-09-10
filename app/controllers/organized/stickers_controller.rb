@@ -1,6 +1,7 @@
 module Organized
   class StickersController < Organized::BaseController
     include SortableTable
+
     before_action :ensure_access_to_bike_stickers! # Because this checks ensure_admin
     before_action :find_bike_sticker, only: %i[edit update]
 
@@ -52,6 +53,7 @@ module Organized
       # use the loosest lookup
       @bike_sticker = bike_sticker if bike_sticker.present?
       return @bike_sticker if @bike_sticker.present?
+
       flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker_code)
       redirect_to(organization_stickers_path(organization_id: current_organization.to_param)) && return
     end
@@ -68,6 +70,7 @@ module Organized
 
     def ensure_access_to_bike_stickers!
       return true if current_organization.enabled?("bike_stickers") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

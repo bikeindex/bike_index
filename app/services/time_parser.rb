@@ -12,6 +12,7 @@ module TimeParser
 
       if looks_like_timestamp?(time_str)
         return parse("#{time_str}-01-01") if time_str.to_s.length == 4 # Looks like year, valid 8601 format
+
         # otherwise it's a timestamp
         time = Time.at(time_str.to_i)
       else
@@ -40,6 +41,7 @@ module TimeParser
 
       # If we end up with an unreasonable year, throw an error
       raise e unless new_str.split("-").first.to_i.between?(EARLIEST_YEAR, LATEST_YEAR)
+
       # Add the day, if there isn't one
       new_str += "-01" unless regex_match.names.include?("day")
       # If it's paychex_formatted there is an hour and minute

@@ -186,6 +186,7 @@ class Invoice < ApplicationRecord
 
   def child_enabled_feature_slugs_string=(val)
     return if val.blank?
+
     unless val.is_a?(Array)
       val = val.strip.split(",").map(&:strip)
     end
@@ -233,6 +234,7 @@ class Invoice < ApplicationRecord
 
   def previous_invoice
     return nil unless renewal_invoice?
+
     subscription_invoices.where("id < ?", id).reorder(:id).last || subscription_first_invoice
   end
 
@@ -251,6 +253,7 @@ class Invoice < ApplicationRecord
   def create_following_invoice
     return nil unless active? || was_active? || future?
     return following_invoice if following_invoice.present?
+
     new_invoice = organization.invoices.create(start_at: subscription_end_at,
       first_invoice_id: subscription_first_invoice_id)
     new_invoice.organization_feature_ids = organization_features.recurring.pluck(:id)

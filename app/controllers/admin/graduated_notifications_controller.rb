@@ -17,6 +17,7 @@ class Admin::GraduatedNotificationsController < Admin::BaseController
 
   def matching_graduated_notifications
     return @matching_graduated_notifications if defined?(@matching_graduated_notifications)
+
     graduated_notifications = GraduatedNotification
     if GraduatedNotification.statuses.include?(params[:search_status])
       @search_status = params[:search_status]

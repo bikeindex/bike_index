@@ -5,6 +5,7 @@ class SpamEstimator
     def estimate_bike(bike, stolen_record = nil)
       estimate = 0
       return estimate if bike.blank?
+
       estimate += 35 if bike.creation_organization&.spam_registrations
       estimate += 0.2 * string_spaminess(bike.frame_model)
       estimate += 0.4 * string_spaminess(bike.manufacturer_other)
@@ -18,8 +19,10 @@ class SpamEstimator
     # Currently, doing a weird vowel count thing
     def string_spaminess(str)
       return 0 if str.blank?
+
       str_length ||= str.length.to_f
       return 10 if str_length == 1
+
       str_downlate ||= downcase_transliterate(str)
 
       total = vowel_frequency_suspiciousness(str, str_length, str_downlate) +
@@ -46,6 +49,7 @@ class SpamEstimator
     def estimate_stolen_record(stolen_record)
       estimate = 0
       return 0 if stolen_record.blank?
+
       estimate += string_spaminess(stolen_record.theft_description)
       if stolen_record.street.present?
         street_letters = stolen_record.street.gsub(/[^a-z|\s]/, "") # Ignore non letter things from street

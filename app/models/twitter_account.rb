@@ -70,12 +70,14 @@ class TwitterAccount < ApplicationRecord
 
   def self.fuzzy_screen_name_find(name)
     return if name.blank?
+
     where("lower(screen_name) = ?", name.downcase.strip).first
   end
 
   def self.friendly_find(str)
     return nil if str.blank?
     return where(id: str).first if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
+
     fuzzy_screen_name_find(str)
   end
 
@@ -112,6 +114,7 @@ class TwitterAccount < ApplicationRecord
 
   def self.in_proximity(obj = nil)
     return [] unless obj&.to_coordinates&.compact.present?
+
     [
       active.near(obj.to_coordinates, 50),
       default_account_for_country(obj&.country)
@@ -124,6 +127,7 @@ class TwitterAccount < ApplicationRecord
 
   def fetch_account_info
     return twitter_account_url if twitter_account_info.present?
+
     self.twitter_account_info = twitter_user
     self.created_at = TimeParser.parse(twitter_account_info["created_at"])
     twitter_account_info
@@ -135,11 +139,13 @@ class TwitterAccount < ApplicationRecord
 
   def account_info_name
     return if twitter_account_info.blank?
+
     twitter_account_info["name"]
   end
 
   def account_info_image
     return if twitter_account_info.blank?
+
     twitter_account_info["profile_image_url_https"]
   end
 

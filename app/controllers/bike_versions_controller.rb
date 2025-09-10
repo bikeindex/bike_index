@@ -68,11 +68,13 @@ class BikeVersionsController < ApplicationController
     @bike = @bike_version
     @bike_og = @bike_version.bike
     return @bike_version if @bike_version.visible_by?(current_user)
+
     fail ActiveRecord::RecordNotFound
   end
 
   def ensure_user_allowed_to_edit_version
     return if @bike_version.authorized?(current_user)
+
     flash[:error] = "You don't appear to own that bike version"
     redirect_to(bike_version_path(@bike_version)) && return
   end

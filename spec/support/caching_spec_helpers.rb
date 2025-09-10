@@ -15,6 +15,7 @@ end
 class MemoryCacheStore
   def fetch(key)
     return store[key] if store[key]
+
     store[key] = yield
   end
 

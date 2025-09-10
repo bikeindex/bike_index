@@ -1,6 +1,7 @@
 module Organized
   class ModelAuditsController < Organized::BaseController
     include SortableTable
+
     before_action :ensure_access_to_model_audits!
 
     def index
@@ -44,7 +45,8 @@ module Organized
     private
 
     def sortable_columns
-      %w[last_bike_created_at bikes_count certification_status mnfg_name frame_model]
+      Organized::BikesController::SORTABLE_COLUMNS +
+        %w[last_bike_created_at bikes_count certification_status]
     end
 
     def permitted_attestation_kinds
@@ -90,6 +92,7 @@ module Organized
 
     def ensure_access_to_model_audits!
       return true if current_organization.enabled?("model_audits") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

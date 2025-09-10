@@ -41,12 +41,14 @@ class RecoveryDisplay < ActiveRecord::Base
 
   def quote_not_too_long
     return true if quote.blank? || quote.length < 301
+
     errors.add :base, :quote_too_long
   end
 
   def from_stolen_record(sr_id)
     sr = StolenRecord.current_and_not.where(id: sr_id).first
     return true unless sr.present?
+
     self.stolen_record = sr
     self.recovered_at = sr.recovered_at
     self.quote = sr.recovered_description
@@ -55,11 +57,13 @@ class RecoveryDisplay < ActiveRecord::Base
 
   def calculated_owner_name
     return nil unless bike&.current_ownership&.present? && bike&.owner.present?
+
     bike.owner.name
   end
 
   def image_processing?
     return false unless image.present? && updated_at > Time.current - 1.minute
+
     !image_exists?
   end
 
@@ -74,6 +78,7 @@ class RecoveryDisplay < ActiveRecord::Base
   def bike
     bike_id = stolen_record&.bike_id
     return nil unless bike_id.present?
+
     Bike.unscoped.find_by_id(bike_id)
   end
 

@@ -38,6 +38,7 @@ RSpec.describe ScheduledJobRunner, type: :lib do
       # Goofy name to make spec clearer
       too_many_scheduled_jobs_with_same_frequency = frequencies.select do |_name, frequency|
         next if frequency > 23.hours # if they are very infrequent, it's ok
+
         matches = frequencies.values.select { |v| v == frequency }
         matches.count > 2
       end

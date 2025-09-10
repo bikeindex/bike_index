@@ -53,6 +53,7 @@ class ModelAttestation < ApplicationRecord
 
   def self.kind_humanized(str)
     return nil if str.blank?
+
     str.to_s.gsub("_org", " organization").tr("_", " ")
   end
 

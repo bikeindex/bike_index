@@ -1,6 +1,7 @@
 module OrgPublic
   class ImpoundedBikesController < OrgPublic::BaseController
     include SortableTable
+
     before_action :ensure_public_impound_bikes!
 
     def index
@@ -17,8 +18,10 @@ module OrgPublic
     def ensure_public_impound_bikes!
       # It will 404 if there isn't an current_organization because of OrgPublic before action
       return ensure_current_organization! unless current_organization.present?
+
       if current_organization.enabled?("impound_bikes")
         return true if current_organization.public_impound_bikes?
+
         if current_user&.authorized?(current_organization)
           flash[:success] = "This page is not publicly visible (it's only visible to organization members)"
           return true
@@ -38,6 +41,7 @@ module OrgPublic
 
     def available_impound_records
       return @available_impound_records if defined?(@available_impound_records)
+
       a_impound_records = current_organization.impound_records.active
 
       if bike_search_params_present?

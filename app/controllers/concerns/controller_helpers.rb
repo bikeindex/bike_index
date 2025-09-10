@@ -52,11 +52,13 @@ module ControllerHelpers
 
   def enable_rack_profiler
     return false unless current_user&.developer? && !Rails.env.test?
+
     Rack::MiniProfiler.authorize_request
   end
 
   def display_dev_info?
     return @display_dev_info if defined?(@display_dev_info)
+
     # Tie display_dev_info to the rack mini profiler display
     # add ?pp=disable to the URL to disable miniprofiler temporarily
     @display_dev_info = !Rails.env.test? && current_user&.developer? &&
@@ -82,6 +84,7 @@ module ControllerHelpers
     # Make absolutely sure the current user is confirmed - mainly for testing
     if current_user&.confirmed?
       return true if current_user.terms_of_service
+
       redirect_to(accept_terms_url) && return
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to(please_confirm_email_users_path) && return
@@ -123,6 +126,7 @@ module ControllerHelpers
     return root_url unless current_user.present? && current_user.confirmed?
     return admin_root_url if current_user.superuser?
     return my_account_url unless current_user.default_organization.present?
+
     if user_root_bike_search?
       default_bike_search_path
     else
@@ -132,6 +136,7 @@ module ControllerHelpers
 
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank?
+
     ignored_alerts = Flipper.enabled?(:phone_verification) ? [] : %w[phone_waiting_confirmation]
     return @show_general_alert = false unless (current_user.alert_slugs - ignored_alerts).any?
 
@@ -145,6 +150,7 @@ module ControllerHelpers
 
   def ensure_current_organization!
     return true if current_organization.present?
+
     fail ActiveRecord::RecordNotFound
   end
 
@@ -165,6 +171,7 @@ module ControllerHelpers
       cookies[:return_to] = nil
 
       return false if invalid_return_to?(target)
+
       handle_target(target)
     elsif session[:discourse_redirect]
       redirect_to(discourse_authentication_url, allow_other_host: true) && (return true)
@@ -188,6 +195,7 @@ module ControllerHelpers
   def permitted_return_to
     target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
     return nil if invalid_return_to?(target)
+
     # Either starting with our URL or /
     target if target.start_with?(/#{ENV["BASE_URL"]}/, "/")
   end
@@ -237,6 +245,7 @@ module ControllerHelpers
 
   def controller_namespace
     return @controller_namespace if defined?(@controller_namespace)
+
     @controller_namespace = if self.class.module_parent.name != "Object"
       self.class.module_parent.name.underscore.downcase
     end
@@ -260,6 +269,7 @@ module ControllerHelpers
   def sign_in_if_not!
     return true unless params[:sign_in_if_not].present? && current_user.blank?
     return ensure_member_of!(current_organization) if params[:organization_id].present?
+
     store_return_to
     flash[:notice] = translation(:please_sign_in,
       scope: [:controllers, :concerns, :controller_helpers, __method__])
@@ -276,8 +286,10 @@ module ControllerHelpers
   # The user may or may not be interacting with the current_organization in any given request
   def passive_organization
     return @passive_organization if defined?(@passive_organization)
+
     if session[:passive_organization_id].present?
       return @passive_organization = nil if session[:passive_organization_id].to_i == 0
+
       @passive_organization = Organization.friendly_find(session[:passive_organization_id])
     end
     @passive_organization ||= set_passive_organization(current_user&.default_organization)
@@ -288,6 +300,7 @@ module ControllerHelpers
   def current_organization
     # We call this multiple times - make sure nil stays nil
     return @current_organization if defined?(@current_organization)
+
     if params[:organization_id] == "false" # Enable removing current organization
       @current_organization = nil
       @current_organization_force_blank = true
@@ -303,6 +316,7 @@ module ControllerHelpers
     # We call this multiple times - make sure nil stays nil
     return @current_location if defined?(@current_location)
     return @current_location = nil unless current_organization.present?
+
     if params[:location_id].present?
       @current_location = current_organization.locations.friendly_find(params[:location_id])
     elsif current_organization.locations.count == 1 # If there is only one location, just use that one
@@ -328,6 +342,7 @@ module ControllerHelpers
 
   def sign_in_partner
     return @sign_in_partner if defined?(@sign_in_partner)
+
     # We set partner in session because of AuthorizationsController - but we don't want the session to stick around
     # so people can navigate around the site and return to the sign in without unexpected results
     # we ALWAYS want to remove the session partner
@@ -344,12 +359,14 @@ module ControllerHelpers
 
   def require_member!
     return true if current_user.member_of?(current_organization)
+
     flash[:error] = translation(:not_an_org_member, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(my_account_url) && return
   end
 
   def require_admin!
     return true if current_user.admin_of?(current_organization)
+
     flash[:error] = translation(:not_an_org_admin, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to(my_account_url) && return
   end
@@ -366,6 +383,7 @@ module ControllerHelpers
   def ensure_member_of!(passed_organization)
     if current_user&.member_of?(passed_organization)
       return true if current_user.accepted_vendor_terms_of_service?
+
       flash[:success] = translation(:accept_tos_for_orgs,
         scope: [:controllers, :concerns, :controller_helpers, __method__])
       redirect_to(accept_vendor_terms_path) && return
@@ -384,6 +402,7 @@ module ControllerHelpers
 
   def invalid_return_to?(target)
     return true if target.blank?
+
     # return_to can't be a sign in/up page, or we'll loop
     ["/users/new", "/session/new", "/session/magic_link", "/integrations", "/users/please_confirm_email"].any? { |r| target.match?(r) }
   end
@@ -402,6 +421,7 @@ module ControllerHelpers
     redirect_redirect_uri ||= session[:return_to] || params[:return_to]
     redirect_site = Addressable::URI.parse(redirect_redirect_uri)&.site&.downcase
     return nil if redirect_site.blank?
+
     # redirect_site = Addressable::URI.parse(redirect_redirect_uri)&
     # Get redirect uris from BikeHub app and BikeHub dev app (by their ids)
     valid_redirect_urls = Doorkeeper::Application.where(id: [264, 356]).pluck(:redirect_uri)

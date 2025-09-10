@@ -103,11 +103,13 @@ class BikeServices::Updator
   def ensure_ownership!
     return true if @current_ownership && @current_ownership.owner == @user # So we can pass in ownership and skip query
     return true if @bike.authorized?(@user)
+
     raise BikeServices::UpdatorError, "Oh no! It looks like you don't own that bike."
   end
 
   def remove_blank_components
     return false unless @bike.components.any?
+
     @bike.components.each do |c|
       c.destroy unless c.ctype_id.present? || c.description.present?
     end
@@ -119,6 +121,7 @@ class BikeServices::Updator
     impound_params = @bike_params.dig("bike", "impound_records_attributes")&.values&.reject(&:blank?)&.first
     impound_record = @bike.current_impound_record
     return unless impound_params.present? && impound_record.present?
+
     impound_record.update(impound_params)
   end
 

@@ -48,6 +48,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
 
   def stolen_record
     return nil unless current_stolen_record.present?
+
     StolenRecordV2Serializer.new(current_stolen_record, scope: scope, root: false, event: object)
   end
 
@@ -73,6 +74,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
 
   def frame_material_slug
     return nil unless object.frame_material.present?
+
     FrameMaterial.new(object.frame_material).slug
   end
 

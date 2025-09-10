@@ -1,5 +1,5 @@
 class LogSearcher::Reader
-  KEY = "logSrch#{Rails.env.test? ? ":test" : ""}:".freeze
+  KEY = "logSrch#{":test" if Rails.env.test?}:".freeze
   DEFAULT_LOG_PATH = (ENV["LOG_SEARCH_PATH"] || "#{Rails.root}/log/#{Rails.env}.log").freeze
   SEARCHES_MATCHES = %w[api/v2/bikes_search
     api/v2/bikes/check_if_registered
@@ -56,6 +56,7 @@ class LogSearcher::Reader
 
     def time_rgrep(time)
       return "" if time.blank?
+
       " | rg '\\AI,\\s\\[#{time.utc.strftime("%Y-%m-%dT%H")}'"
     end
   end

@@ -104,6 +104,7 @@ class AddressRecord < ApplicationRecord
   def include_country?(render_country: nil, current_country_id: nil, current_country_iso: nil)
     render_country = render_country&.to_s
     return render_country == "true" if %w[true false].include?(render_country)
+
     render_sym = render_country&.to_sym
     RENDER_COUNTRY_OPTIONS.first unless RENDER_COUNTRY_OPTIONS.include?(render_sym)
 

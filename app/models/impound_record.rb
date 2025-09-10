@@ -129,6 +129,7 @@ class ImpoundRecord < ApplicationRecord
   def authorized?(u = nil)
     return false if u.blank?
     return true if u.superuser?
+
     organized? ? u.authorized?(organization) : u.id == user_id
   end
 
@@ -172,6 +173,7 @@ class ImpoundRecord < ApplicationRecord
 
   def notification_notes_and_messages
     return nil unless parking_notification.present?
+
     msgs = parking_notification.associated_notifications_including_self
       .map { |pn| [pn.internal_notes, pn.message] }.flatten.reject(&:blank?)
     msgs.any? ? msgs : nil
@@ -208,6 +210,7 @@ class ImpoundRecord < ApplicationRecord
 
   def update_kinds
     return ["note"] if resolved?
+
     u_kinds = ImpoundRecordUpdate.kinds - ["expired"]
     u_kinds -= %w[move_location] unless organization&.enabled?("impound_bikes_locations")
     if impound_claims.approved.any? || impound_claims.active.none?
@@ -223,6 +226,7 @@ class ImpoundRecord < ApplicationRecord
   def update_multi_kinds
     u_kinds = update_kinds - %w[current expired]
     return u_kinds if resolved? || impound_claims.submitted.active.none?
+
     # If there are approved claims, you can have the bike retrieved_by_owner, but can't approve other claims
     u_kinds - if impound_claims.approved.any?
       %w[removed_from_bike_index transferred_to_new_owner claim_approved]
@@ -235,6 +239,7 @@ class ImpoundRecord < ApplicationRecord
   def update_associations
     # We call this job inline in ProcessParkingNotificationJob
     return true if skip_update || !persisted?
+
     ProcessImpoundUpdatesJob.perform_async(id)
   end
 
@@ -249,6 +254,7 @@ class ImpoundRecord < ApplicationRecord
     self.unregistered_bike ||= calculated_unregistered_bike?
     # Don't geocode if location is present and address hasn't changed
     return if !address_changed? && with_location?
+
     self.attributes = if parking_notification.present?
       parking_notification.attributes.slice(*Geocodeable.location_attrs)
     else
@@ -259,6 +265,7 @@ class ImpoundRecord < ApplicationRecord
   def reply_to_email
     # Delegate to parking notification, since that's the original email
     return parking_notification.reply_to_email if parking_notification.present?
+
     organization&.fetch_impound_configuration&.email ||
       organization&.auto_user&.email ||
       user&.email
@@ -271,6 +278,7 @@ class ImpoundRecord < ApplicationRecord
       # Force nil display_id for non-organized records
       return self.attributes = {display_id: nil, display_id_prefix: nil, display_id_integer: nil}
     end
+
     if @display_id_from_calculation
       # Blank the integer if calculated, so it can be reassigned
       self.display_id_integer = nil
@@ -287,12 +295,14 @@ class ImpoundRecord < ApplicationRecord
 
   def calculated_status
     return resolving_update.kind if resolving_update.present?
+
     "current"
   end
 
   def calculated_location_id
     # Return the existing location_id if the organization doesn't have locations enabled - just to be safe and not lose data
     return location_id unless organization&.enabled?("impound_bikes_locations")
+
     # If any impound records have a set location, use that, otherwise, use the existing. Fall back to the default location
     impound_record_updates.with_location.order(:id).last&.location_id || location_id.presence || organization.default_impound_location&.id
   end
@@ -307,6 +317,7 @@ class ImpoundRecord < ApplicationRecord
 
   def calculated_unregistered_bike?
     return true if parking_notification&.unregistered_bike?
+
     b_created_at = bike&.created_at || Time.current
 
     if id.blank?

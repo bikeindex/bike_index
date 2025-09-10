@@ -29,6 +29,7 @@ class UserEmail < ActiveRecord::Base
   class << self
     def create_confirmed_primary_email(user)
       return false unless user.confirmed
+
       where(user_id: user.id, email: user.email).first_or_create
     end
 
@@ -36,6 +37,7 @@ class UserEmail < ActiveRecord::Base
       email_list.to_s.split(",").reject(&:blank?).each do |str|
         email = EmailNormalizer.normalize(str)
         next if where(user_id: user_id, email: email).present?
+
         ue = new(user_id: user_id, email: email)
         ue.generate_confirmation
         ue.save
@@ -45,6 +47,7 @@ class UserEmail < ActiveRecord::Base
 
     def friendly_find(str)
       return nil if str.blank?
+
       find_by_email(EmailNormalizer.normalize(str))
     end
 
@@ -87,6 +90,7 @@ class UserEmail < ActiveRecord::Base
 
   def make_primary
     return false unless confirmed? && !primary?
+
     if user.user_emails.where(email: user.email).present?
       # Ensure we aren't somehow deleting an email
       # because it doesn't have a user_email associated with it
@@ -96,6 +100,7 @@ class UserEmail < ActiveRecord::Base
 
   def confirm(token)
     return false if token != confirmation_token
+
     update_attribute :confirmation_token, nil
     Users::MergeAdditionalEmailJob.perform_async(id)
     true

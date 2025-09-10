@@ -54,6 +54,7 @@ class PublicImage < ApplicationRecord
     self.kind ||= "photo_uncategorized"
     self.name = (name || default_name).truncate(100)
     return true if listing_order && listing_order > 0
+
     self.listing_order = imageable&.public_images&.length || 0
   end
 
@@ -64,6 +65,7 @@ class PublicImage < ApplicationRecord
   # Method to make create_revised.js easier to handle
   def bike_type
     return false unless %w[Bike BikeVersion].include?(imageable_type)
+
     imageable.present? ? imageable.cycle_type : "bike" # hidden bike handling
   end
 
@@ -73,6 +75,7 @@ class PublicImage < ApplicationRecord
     if external_image_url.present? && image.blank?
       return Images::ExternalUrlStoreJob.perform_async(id)
     end
+
     imageable&.update(updated_at: Time.current)
     return true unless bike?
 

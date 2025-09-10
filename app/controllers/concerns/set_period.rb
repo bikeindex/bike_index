@@ -2,6 +2,7 @@
 
 module SetPeriod
   extend ActiveSupport::Concern
+
   DEFAULT_EARLIEST_TIME = Time.at(1134972000) # Earliest bike created at
   PERIOD_TYPES = %w[hour day month year week all next_week next_month].freeze
 
@@ -77,6 +78,7 @@ module SetPeriod
 
   def earliest_organization_period_date
     return nil if current_organization.blank?
+
     start_time = current_organization.created_at - 6.months
     start_time = Time.current - 1.year if start_time > (Time.current - 1.year)
     start_time

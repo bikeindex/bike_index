@@ -108,6 +108,7 @@ class RspecHashMatcher
         InputNormalizer.boolean(value) == InputNormalizer.boolean(match_value)
       else
         return true if !options[:match_blanks] && value.blank? && match_value.blank?
+
         value == match_value
       end
     end
@@ -115,6 +116,7 @@ class RspecHashMatcher
     # By default, match within 1 second
     def times_match?(time_1, time_2, match_time_within: nil)
       return false if time_1.blank? || time_2.blank?
+
       time_1 = TimeParser.parse(time_1) unless time_1.is_a?(Time)
       time_2 = TimeParser.parse(time_2) unless time_2.is_a?(Time)
       match_time_within ||= 1.5

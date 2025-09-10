@@ -9,6 +9,7 @@ module BikeEditable
 
   def edit_templates
     return @edit_templates if @edit_templates.present?
+
     @theft_templates = @bike.status_stolen? ? theft_templates : {}
     @bike_templates = bike_templates
     @edit_templates = @theft_templates.merge(@bike_templates)

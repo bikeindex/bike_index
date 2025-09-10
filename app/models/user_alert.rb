@@ -66,6 +66,7 @@ class UserAlert < ApplicationRecord
 
   def self.kind_humanized(str)
     return "" unless str.present?
+
     str.tr("_", " ")
   end
 
@@ -187,11 +188,13 @@ class UserAlert < ApplicationRecord
 
   def dismiss!
     return true if dismissed?
+
     update(dismissed_at: Time.current)
   end
 
   def resolve!
     return true if resolved?
+
     update(resolved_at: Time.current)
   end
 
@@ -199,6 +202,7 @@ class UserAlert < ApplicationRecord
     return false if inactive? || notification.present? ||
       !self.class.notify_period.cover?(updated_at) ||
       self.class.notification_kinds.exclude?(kind)
+
     # Check if the relevant object is updated since
     if theft_alert_without_photo? || stolen_bike_without_location?
       return false if bike.blank? || !self.class.notify_period.cover?(bike.updated_at) ||

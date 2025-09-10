@@ -98,6 +98,7 @@ class Spreadsheets::TsvCreator
     output.puts stolen_with_reports_header
     stolen_records.joins(:bike, :state).merge(Bike.with_known_serial).find_each do |sr|
       next unless sr.police_report_number.present?
+
       row = sr.tsv_row(false, with_stolen_locations: true)
       output.puts row if row.present?
     end

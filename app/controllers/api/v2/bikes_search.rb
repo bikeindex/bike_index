@@ -2,6 +2,7 @@ module API
   module V2
     class BikesSearch < API::Base
       include API::V2::Defaults
+
       helpers do
         params :search_bikes do
           optional :colors, type: String, desc: "Comma separated list. Results will match **all** colors"
@@ -33,6 +34,7 @@ module API
           params[:proximity_radius] ||= params[:proximity_square] if params[:proximity_square].present?
           params[:proximity_radius] ||= 100
           return nil unless params[:proximity] == "ip"
+
           if Rails.env == "production"
             params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(",")[0]
           end

@@ -69,6 +69,7 @@ class MailchimpDatum < ApplicationRecord
   def self.find_and_update_or_create_for(obj)
     mailchimp_datum = find_or_create_for(obj)
     return mailchimp_datum unless mailchimp_datum.should_update?
+
     mailchimp_datum.update(updated_at: Time.current)
     mailchimp_datum
   end
@@ -80,8 +81,10 @@ class MailchimpDatum < ApplicationRecord
   # This finds the organization from the existing merge field, or uses the most recent organization
   def mailchimp_organization_role
     return @mailchimp_organization_role if defined?(@mailchimp_organization_role)
+
     organization_roles = user&.organization_roles&.admin&.reorder(created_at: :desc)&.reject { |m| m.organization.ambassador? }
     return nil unless organization_roles.present? && organization_roles.any?
+
     existing_name = data&.dig("merge_fields", "organization_name")
     existing_org = Organization.friendly_find(existing_name) if existing_name.present?
     if existing_org.present?
@@ -96,12 +99,14 @@ class MailchimpDatum < ApplicationRecord
 
   def stolen_records_recovered
     return StolenRecord.none if user.blank?
+
     StolenRecord.recovered.where(index_helped_recovery: true, bike_id: user.ownerships.pluck(:bike_id))
   end
 
   def should_update?(prev_status = nil)
     return false if id.blank? || mailchimp_archived_at.present?
     return true unless mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
+
     prev_status ||= status # Enable passing previous_status in after_commit
     prev_status != calculated_status # If status doesn't match, we should update!
   end
@@ -156,6 +161,7 @@ class MailchimpDatum < ApplicationRecord
 
     new_interests = val.map do |key, value|
       next unless InputNormalizer.boolean(value)
+
       MailchimpValue.interest.friendly_find(key, list: list)&.slug || key
     end.compact
     self.data ||= {}
@@ -165,8 +171,10 @@ class MailchimpDatum < ApplicationRecord
   def mailchimp_merge_fields(list)
     managed_merge_fields.dup.map do |k, v|
       next unless v.present?
+
       m_key = MailchimpValue.merge_field.friendly_find(k, list: list)&.mailchimp_id
       next unless m_key.present?
+
       [m_key, v]
     end.compact.to_h.merge(address_merge(list))
   end
@@ -174,10 +182,12 @@ class MailchimpDatum < ApplicationRecord
   def add_mailchimp_merge_fields(list, val)
     kept_merge_fields = merge_fields.dup.map do |k, v|
       next if MailchimpValue.merge_field.friendly_find(k, list: list)&.present?
+
       [k, v]
     end.compact.to_h
     new_merge_fields = val.map do |key, value|
       next unless value.present?
+
       [MailchimpValue.merge_field.friendly_find(key, list: list)&.slug || key, value]
     end.compact.to_h
     self.data ||= {}
@@ -188,6 +198,7 @@ class MailchimpDatum < ApplicationRecord
     tag_slugs = tags.dup.map { |t| MailchimpValue.tag.friendly_find(t, list: list)&.slug }.compact
     MailchimpValue.tag.where(list: list).order(:name).map do |mailchimp_value|
       next unless MANAGED_TAGS.include?(mailchimp_value.slug)
+
       present = tag_slugs.include?(mailchimp_value.slug)
       {name: mailchimp_value.name, status: present ? "active" : "inactive"}
     end.compact
@@ -234,17 +245,21 @@ class MailchimpDatum < ApplicationRecord
 
   def update_association_and_mailchimp
     return true if skip_update
+
     calculated_feedbacks.each do |f|
       next if f.mailchimp_datum_id.present?
+
       f.update(mailchimp_datum_id: id)
     end
     return true unless should_update?(@previous_status)
     return true if data == @previous_data && status == @previous_status
+
     UpdateMailchimpDatumJob.perform_async(id)
   end
 
   def ensure_subscription_required
     return true if !no_subscription_required? || on_mailchimp?
+
     errors.add(:base, "No mailchimp subscription required, so not creating")
   end
 
@@ -278,6 +293,7 @@ class MailchimpDatum < ApplicationRecord
   def address_merge(list)
     if list == "organization"
       return {} unless mailchimp_organization&.default_location.present? && mailchimp_organization&.city.present?
+
       {"O_CITY" => mailchimp_organization.city,
        "O_STATE" => mailchimp_organization.state&.abbreviation || "",
        "O_COUNTRY" => mailchimp_organization.country&.iso || ""}
@@ -294,6 +310,7 @@ class MailchimpDatum < ApplicationRecord
 
   def most_recent_donation_at
     return nil unless user.present?
+
     mailchimp_date(user.payments.donation.maximum(:created_at))
   end
 
@@ -334,6 +351,7 @@ class MailchimpDatum < ApplicationRecord
       # If the mailchimp_datum is created, we need to persist it, otherwise - don't save
       return id.present? ? "archived" : "no_subscription_required"
     end
+
     "subscribed"
   end
 

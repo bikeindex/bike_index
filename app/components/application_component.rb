@@ -2,6 +2,7 @@
 
 class ApplicationComponent < ViewComponent::Base
   include ApplicationComponentHelper
+
   def raise_if_invalid_value!(attribute, value, options = {})
     return if options.include?(value)
 
@@ -10,6 +11,7 @@ class ApplicationComponent < ViewComponent::Base
 
   def component_list_item(desc, title)
     return nil unless desc.present?
+
     content_tag(:li) do
       content_tag(:strong, "#{title}: ", class: "") +
         content_tag(:span, desc)

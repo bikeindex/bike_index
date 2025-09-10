@@ -5,6 +5,7 @@ class StolenBike::ApproveStolenListingJob < ApplicationJob
 
   def perform(bike_id)
     return if TWEETING_DISABLED
+
     bike = Bike.find(bike_id)
     new_tweet = Integrations::TwitterTweeter.new(bike).create_tweet
     send_stolen_bike_alert_email(bike, new_tweet)

@@ -1,6 +1,7 @@
 module Organized
   class GraduatedNotificationsController < Organized::BaseController
     include SortableTable
+
     before_action :ensure_access_to_graduated_notifications!
 
     before_action :find_graduated_notification, except: [:index]
@@ -44,6 +45,7 @@ module Organized
 
     def available_graduated_notifications
       return @available_graduated_notifications if defined?(@available_graduated_notifications)
+
       if params[:search_status] == "all"
         @search_status = "all"
         a_graduated_notifications = graduated_notifications
@@ -83,6 +85,7 @@ module Organized
 
     def ensure_access_to_graduated_notifications!
       return true if current_organization.enabled?("graduated_notifications") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

@@ -1,5 +1,6 @@
 class Admin::StolenBikesController < Admin::BaseController
   include SortableTable
+
   before_action :find_bike, only: %i[edit update]
   helper_method :available_stolen_records
 
@@ -107,6 +108,7 @@ class Admin::StolenBikesController < Admin::BaseController
 
   def available_stolen_records
     return @available_stolen_records if defined?(@available_stolen_records)
+
     @unapproved_only = !InputNormalizer.boolean(params[:search_unapproved])
     @only_without_location = InputNormalizer.boolean(params[:search_without_location])
     if @unapproved_only

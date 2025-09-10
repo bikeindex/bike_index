@@ -1,5 +1,6 @@
 class Admin::PrimaryActivitiesController < Admin::BaseController
   include SortableTable
+
   before_action :find_primary_activity, except: %i[index]
 
   def index

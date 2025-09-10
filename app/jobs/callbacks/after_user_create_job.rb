@@ -107,6 +107,7 @@ class Callbacks::AfterUserCreateJob < ApplicationJob
     matching_organization = Organization.passwordless_email_matching(user.email)
     return false unless matching_organization.present?
     return false if user.organization_roles.pluck(:organization_id).include?(matching_organization.id)
+
     OrganizationRole.create_passwordless(organization_id: matching_organization.id,
       invited_email: user.email)
     user.reload

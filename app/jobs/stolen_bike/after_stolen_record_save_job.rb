@@ -4,6 +4,7 @@ class StolenBike::AfterStolenRecordSaveJob < ApplicationJob
   def perform(stolen_record_id, force_regenerate_images = false, public_image_id = nil)
     stolen_record = StolenRecord.unscoped.find_by_id(stolen_record_id)
     return if stolen_record.blank?
+
     stolen_record.skip_update = true
 
     stolen_record.theft_alerts.each { |t| t.update(updated_at: Time.current) }
