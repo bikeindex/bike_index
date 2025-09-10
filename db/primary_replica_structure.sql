@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3894,7 +3895,6 @@ CREATE TABLE public.users (
     password_digest character varying(255),
     banned boolean DEFAULT false NOT NULL,
     phone character varying(255),
-    zipcode character varying(255),
     twitter character varying(255),
     show_twitter boolean DEFAULT false NOT NULL,
     show_website boolean DEFAULT false NOT NULL,
@@ -3917,10 +3917,6 @@ CREATE TABLE public.users (
     partner_data jsonb,
     latitude double precision,
     longitude double precision,
-    street character varying,
-    city character varying,
-    country_id integer,
-    state_id integer,
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
     preferred_language character varying,
@@ -3935,7 +3931,6 @@ CREATE TABLE public.users (
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
-    neighborhood character varying,
     address_record_id bigint
 );
 
@@ -7055,6 +7050,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250910182759'),
 ('20250528154403'),
 ('20250519154506'),
 ('20250515190821'),
