@@ -7,7 +7,7 @@ class Backfills::AddressRecordsForUsersJob < ApplicationJob
 
   class << self
     def iterable_scope
-      User.where.not(latitude: nil).where(address_record_id: nil)
+      User.where(address_record_id: nil).where.not(city: nil, street: nil)
     end
 
     def build_or_create_for(user, country_id: nil)
@@ -17,9 +17,6 @@ class Backfills::AddressRecordsForUsersJob < ApplicationJob
       return user.update(address_record: existing_address_record) if existing_address_record.present?
 
       user.address_record = AddressRecord.new(user_id: user.id, kind: :user, country_id:)
-
-      return user.address_record if user.latitude.blank? || user.longitude.blank?
-
       user.address_record.attributes = AddressRecord.attrs_from_legacy(user)
       user.skip_update = true
       user.save
