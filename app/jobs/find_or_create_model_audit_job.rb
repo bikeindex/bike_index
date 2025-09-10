@@ -4,6 +4,7 @@ class FindOrCreateModelAuditJob < ApplicationJob
   def self.enqueue_for?(bike)
     return false if bike.example? || bike.deleted? || bike.likely_spam?
     return true if bike.model_audit_id.present?
+
     ModelAudit.audit?(bike)
   end
 
@@ -18,16 +19,19 @@ class FindOrCreateModelAuditJob < ApplicationJob
       matching_bikes = ModelAudit.matching_bikes_for(bike)
       # If there are no counted bike (i.e. this bike is a non-counted bike), don't create a model_audit
       return if ModelAudit.counted_matching_bikes_count(matching_bikes) == 0
+
       model_audit = create_model_audit_for_bike(bike, matching_bikes)
     end
     bike.update(model_audit_id: model_audit.id)
 
     return unless UpdateModelAuditJob.enqueue_for?(model_audit.reload)
+
     UpdateModelAuditJob.perform_async(model_audit.id)
   end
 
   def enqueue_existing_model_audit_update?(bike)
     return if bike.model_audit_id.blank?
+
     if bike.model_audit&.matching_bike?(bike)
       if UpdateModelAuditJob.enqueue_for?(bike.model_audit)
         UpdateModelAuditJob.perform_async(bike.model_audit_id)

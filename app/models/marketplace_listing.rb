@@ -197,6 +197,7 @@ class MarketplaceListing < ApplicationRecord
     return true if passed_user.superuser?
 
     return true if passed_user.id == seller_id
+
     sold? && passed_user.id == buyer_id
   end
 

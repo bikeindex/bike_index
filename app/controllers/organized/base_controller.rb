@@ -11,6 +11,7 @@ module Organized
     def ensure_admin!
       return true if current_user&.admin_of?(current_organization)
       return false unless ensure_member! # if this fails, we're already redirecting
+
       flash[:error] = translation(:must_be_org_admin,
         scope: [:controllers, :organized, :base, __method__])
       redirect_to(organization_root_path) && return
@@ -19,6 +20,7 @@ module Organized
     def ensure_ambassador_authorized!
       if current_organization&.ambassador?
         return true if current_user&.superuser? || current_user&.ambassador?
+
         flash[:error] = translation(:must_be_ambassador,
           scope: [:controllers, :organized, :base, __method__])
       else
@@ -30,6 +32,7 @@ module Organized
 
     def ensure_not_ambassador_organization!
       return true unless current_organization&.ambassador?
+
       flash[:error] = translation(:must_be_an_admin,
         scope: [:controllers, :organized, :base, __method__])
       redirect_to(organization_root_path) && return

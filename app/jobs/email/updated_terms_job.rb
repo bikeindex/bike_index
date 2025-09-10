@@ -6,10 +6,12 @@ class Email::UpdatedTermsJob < ApplicationJob
 
   def perform
     return true unless redis.llen(enqueued_emails_key) > 0
+
     begin
       user_id = redis.lpop enqueued_emails_key
       user = User.where(id: user_id).first if user_id.present?
       return true unless user_id.present? && user.present?
+
       CustomerMailer.updated_terms_email(user).deliver_now
     rescue => e
       # rpush so that if we run into an error, we don't keep running the exact same one

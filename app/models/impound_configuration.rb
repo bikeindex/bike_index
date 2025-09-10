@@ -46,6 +46,7 @@ class ImpoundConfiguration < ApplicationRecord
     # TODO: display_id_next_integer input needs to be validated
     # currently, in ProcessImpoundUpdatesJob it's removed if it's been used
     return display_id_next_integer if display_id_next_integer.present?
+
     last_display_id_integer + 1
   end
 
@@ -69,6 +70,7 @@ class ImpoundConfiguration < ApplicationRecord
 
   def impound_records_to_expire
     return ImpoundRecord.none unless expiration?
+
     impound_records.active.where("impound_records.created_at < ?", expired_before)
   end
 

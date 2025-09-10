@@ -37,6 +37,7 @@ module BikeAttributable
 
   def status_found?
     return false unless status_impounded?
+
     (id.present? ? current_impound_record&.kind : impound_records.last&.kind) == "found"
   end
 
@@ -94,6 +95,7 @@ module BikeAttributable
   def propulsion_titleize
     return "" unless propulsion_type.present?
     return "Pedal" if propulsion_type == "foot-pedal"
+
     propulsion_type.split(/(\s|-)/).map(&:capitalize).join("")
   end
 
@@ -109,12 +111,14 @@ module BikeAttributable
 
   def video_embed_src
     return nil unless video_embed.present?
+
     code = Nokogiri::HTML(video_embed)
     code.xpath("//iframe/@src")[0]&.value
   end
 
   def render_paint_description?
     return false unless pos? && primary_frame_color == Color.black
+
     secondary_frame_color_id.blank? && paint.present?
   end
 
@@ -199,8 +203,10 @@ module BikeAttributable
     if thumb_path.blank?
       return stock_photo_url.present? ? stock_photo_url : nil
     end
+
     image_col = public_images.limit(1).first&.image
     return nil if image_col.blank? && !REMOTE_IMAGE_FALLBACK_URLS
+
     image_url = image_col&.send(:url, size)
     # image_col.blank? and image_url.present? indicates it's a remote file in local development
     if REMOTE_IMAGE_FALLBACK_URLS && image_col.blank? && image_url.present?
@@ -216,6 +222,7 @@ module BikeAttributable
   def components_cache_array
     components.includes(:manufacturer, :ctype).map do |c|
       next unless c.ctype.present? || c.component_model.present?
+
       [c.year, c.mnfg_name, c.component_model].compact
     end
   end

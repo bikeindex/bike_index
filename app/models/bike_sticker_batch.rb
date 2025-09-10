@@ -36,6 +36,7 @@ class BikeStickerBatch < ApplicationRecord
   # Should be called through CreateBikeStickerCodesJob generally
   def create_codes(number_to_create, initial_code_integer: nil, kind: "sticker")
     raise "Prefix required to create sequential codes!" unless prefix.present?
+
     initial_code_integer ||= max_code_integer
     initial_code_integer += 1 if bike_stickers.where(code_integer: initial_code_integer).present?
     number_to_create.times do |i|
@@ -51,6 +52,7 @@ class BikeStickerBatch < ApplicationRecord
 
   def calculated_code_number_length
     return code_number_length if code_number_length.present?
+
     to_create_count = stickers_to_create_count&.to_i || 0
     estimated_finish_integer = (initial_code_integer&.to_i || max_code_integer) + to_create_count
     estimated_code_length = estimated_finish_integer.to_s.length
@@ -62,6 +64,7 @@ class BikeStickerBatch < ApplicationRecord
   def duplicated_integers
     bike_sticker_integers.map { |int|
       next unless bike_sticker_integers.count(int) > 1
+
       int
     }.reject(&:blank?)
   end

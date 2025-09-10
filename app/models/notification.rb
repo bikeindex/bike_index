@@ -65,6 +65,7 @@ class Notification < ApplicationRecord
 
     def kind_humanized(str)
       return "" unless str.present?
+
       str.tr("_", " ")
     end
 
@@ -117,6 +118,7 @@ class Notification < ApplicationRecord
 
     def search_message_channel_target(str)
       return none unless str.present?
+
       where("message_channel_target ILIKE ?", "%#{str.strip.downcase}%")
     end
 
@@ -166,6 +168,7 @@ class Notification < ApplicationRecord
 
   def twilio_response
     return nil unless twilio_sid.present?
+
     Integrations::Twilio.new.get_message(twilio_sid)
   end
 
@@ -177,12 +180,14 @@ class Notification < ApplicationRecord
 
   def notifiable_display_name
     return nil if notifiable.blank?
+
     "#{notifiable.class.to_s.titleize} ##{notifiable_id}"
   end
 
   # Update notifications_sent_or_received_by if changing
   def sender
     return nil if self.class.sender_auto_kinds.include?(kind)
+
     if notifiable_type == "CustomerContact"
       notifiable&.creator
     elsif notifiable_type == "StolenNotification"
@@ -194,6 +199,7 @@ class Notification < ApplicationRecord
 
   def sender_display_name
     return "auto" if self.class.sender_auto_kinds.include?(kind)
+
     sender&.display_name
   end
 
@@ -207,17 +213,20 @@ class Notification < ApplicationRecord
 
   def survey_id
     raise "Not a theft survey!" unless theft_survey?
+
     id_searched = id || self.class.where(kind: kind).maximum(:id)
     self.class.where(kind: kind).where("id < ?", id_searched).count + 1
   end
 
   def bike_with_fallback
     return nil if bike_id.blank?
+
     bike || Bike.unscoped.find_by_id(bike_id)
   end
 
   def calculated_message_channel_target
     return calculated_phone if message_channel == "text" || phone_verification?
+
     calculated_email
   end
 
@@ -266,6 +275,7 @@ class Notification < ApplicationRecord
 
   def calculated_user_id
     return notifiable&.receiver_id if notifiable_type == "StolenNotification"
+
     notifiable&.user_id if defined?(notifiable.user_id)
   end
 end

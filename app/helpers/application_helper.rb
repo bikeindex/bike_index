@@ -18,6 +18,7 @@ module ApplicationHelper
 
   def attr_list_item(desc, title)
     return nil unless desc.present?
+
     content_tag(:li) do
       content_tag(:strong, "#{title}: ", class: "attr-title") +
         content_tag(:span, desc)
@@ -52,6 +53,7 @@ module ApplicationHelper
     return "organized_skeleton" if controller_namespace == "organized" && action_name != "landing"
     return nil if controller_namespace == "search"
     return nil if @force_landing_page_render
+
     case controller_name
     when "bikes"
       "edit_bike_skeleton" if %w[update].include?(action_name)
@@ -185,6 +187,7 @@ module ApplicationHelper
       # Show false values, just not empty or nil things
       data.select do |k, v|
         next unless InputNormalizer.present_or_false?(v)
+
         [k, v]
       end.compact.to_h
     else

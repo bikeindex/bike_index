@@ -191,11 +191,13 @@ class BikeVersion < ApplicationRecord
   def authorized?(passed_user, no_superuser_override: false)
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?
+
     passed_user == owner
   end
 
   def visible_by?(passed_user = nil)
     return true unless user_hidden?
+
     if passed_user.present?
       return true if passed_user.superuser?
       return true if user_hidden? && authorized?(passed_user)

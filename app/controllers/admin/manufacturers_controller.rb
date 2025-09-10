@@ -1,5 +1,6 @@
 class Admin::ManufacturersController < Admin::BaseController
   include SortableTable
+
   before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
   def index

@@ -17,6 +17,7 @@ class CaseInsensitiveColor < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
     return if val.present? && Color.friendly_find(val)
+
     raise Grape::Exceptions::Validation.new params: [@scope.full_name(attr_name)], message: "must be one of: #{Color::ALL_NAMES}"
   end
 end
@@ -25,6 +26,7 @@ class CaseInsensitiveCtype < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
     return if val.present? && Ctype.friendly_find(val)
+
     raise Grape::Exceptions::Validation.new params: [@scope.full_name(attr_name)], message: "must be one of: #{Ctype.pluck(:name).map(&:downcase)}"
   end
 end
@@ -33,6 +35,7 @@ class CaseInsensitiveCountry < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
     return if val.present? && Country.friendly_find(val)
+
     raise Grape::Exceptions::Validation.new params: [@scope.full_name(attr_name)], message: "must be one of: #{Country.pluck(:name).map(&:downcase)}"
   end
 end
@@ -41,6 +44,7 @@ class CaseInsensitivePropulsionType < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
     return if val.present? && PropulsionType.friendly_find(val)
+
     raise Grape::Exceptions::Validation.new params: [@scope.full_name(attr_name)], message: "must be one of: #{PropulsionType::SLUGS}"
   end
 end
@@ -49,6 +53,7 @@ class CaseInsensitiveCycleType < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
     return if val.present? && CycleType.friendly_find(val)
+
     raise Grape::Exceptions::Validation.new params: [@scope.full_name(attr_name)], message: "must be one of: #{CycleType::NAMES.values.map(&:downcase)}"
   end
 end

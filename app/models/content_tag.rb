@@ -12,6 +12,7 @@
 #
 class ContentTag < ApplicationRecord
   include FriendlySlugFindable
+
   has_many :blog_content_tags, dependent: :destroy
   has_many :blogs, through: :blog_content_tags
 
@@ -22,6 +23,7 @@ class ContentTag < ApplicationRecord
 
   def self.matching_ids(str_or_array)
     return [] if str_or_array.blank?
+
     array = str_or_array.is_a?(Array) ? str_or_array : str_or_array.split(/,|\n/)
     array.map { |s| friendly_find_id(s) }.compact.uniq
   end

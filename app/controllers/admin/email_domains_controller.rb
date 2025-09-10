@@ -2,6 +2,7 @@
 
 class Admin::EmailDomainsController < Admin::BaseController
   include SortableTable
+
   before_action :find_email_domain, only: %i[show update]
   helper_method :searchable_statuses, :matching_email_domains
 

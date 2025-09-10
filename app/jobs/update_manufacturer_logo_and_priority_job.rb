@@ -23,6 +23,7 @@ class UpdateManufacturerLogoAndPriorityJob < ScheduledJob
 
   def update_priority_if_changed(manufacturer)
     return true if manufacturer.priority == manufacturer.calculated_priority
+
     manufacturer.update(updated_at: Time.current)
   end
 

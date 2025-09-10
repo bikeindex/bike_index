@@ -1,5 +1,6 @@
 class Admin::BikesController < Admin::BaseController
   include SortableTable
+
   before_action :find_bike, only: %i[edit update show]
   before_action :set_period, only: %i[index missing_manufacturer]
   around_action :set_reading_role, only: %i[index show]
@@ -107,6 +108,7 @@ class Admin::BikesController < Admin::BaseController
     if @bike.update(permitted_parameters.except(:stolen_records_attributes))
       @bike.create_normalized_serial_segments
       return if return_to_if_present
+
       flash[:success] = "Bike was successfully updated."
       redirect_to(edit_admin_bike_url(@bike)) && return
     else

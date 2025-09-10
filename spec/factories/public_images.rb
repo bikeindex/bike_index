@@ -8,6 +8,7 @@ FactoryBot.define do
 
     after(:build) do |public_image, evaluator|
       next if public_image.image.present?
+
       model_type = public_image.imageable_type.underscore
       model_id = public_image.imageable.id
       filename = evaluator.filename || "#{model_type}-#{model_id}.jpg"

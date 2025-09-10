@@ -63,11 +63,13 @@ class UpdateOrganizationAssociationsJob < ApplicationJob
 
   def add_organization_manufacturers(organization)
     return unless organization.bike_shop?
+
     manufacturer_ids = Organization.with_enabled_feature_slugs("official_manufacturer")
       .where.not(manufacturer_id: nil).pluck(:manufacturer_id)
     new_manufacturer_ids = manufacturer_ids - organization.organization_manufacturers.pluck(:manufacturer_id)
     new_manufacturer_ids.each do |manufacturer_id|
       next unless organization.bikes.where(manufacturer_id: manufacturer_id).any?
+
       OrganizationManufacturer.create(manufacturer_id: manufacturer_id,
         organization_id: organization.id)
     end

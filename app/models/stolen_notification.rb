@@ -62,6 +62,7 @@ class StolenNotification < ApplicationRecord
   # NOTE: This is legacy. Should be updated to check notifications rather than this
   def send_dates_parsed
     return [] unless send_dates
+
     send_dates.is_a?(String) ? JSON.parse(send_dates) : send_dates
   end
 
@@ -96,6 +97,7 @@ class StolenNotification < ApplicationRecord
       permitted_send? ? "stolen_permitted" : "stolen_blocked"
     else
       return "unstolen_blocked" unless permitted_send?
+
       if bike&.claimed?
         "unstolen_claimed_permitted"
       elsif bike&.current_ownership&.organization_direct_unclaimed_notifications?

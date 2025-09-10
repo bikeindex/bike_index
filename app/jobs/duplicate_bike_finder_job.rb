@@ -23,6 +23,7 @@ class DuplicateBikeFinderJob < ApplicationJob
           duplicate_group = DuplicateBikeGroup.create
           duplicate_segments.each do |duplicate_segment|
             next if duplicate_segment.duplicate_bike_group_id.present?
+
             duplicate_segment.update_attribute :duplicate_bike_group_id, duplicate_group.id
           end
           duplicate_group.destroy if duplicate_group.normalized_serial_segments.empty?

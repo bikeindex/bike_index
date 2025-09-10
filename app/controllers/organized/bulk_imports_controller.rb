@@ -1,6 +1,7 @@
 module Organized
   class BulkImportsController < Organized::BaseController
     include SortableTable
+
     skip_before_action :ensure_member!
 
     skip_before_action :ensure_current_organization!, only: [:create]
@@ -32,6 +33,7 @@ module Organized
 
     def create
       return unless ensure_can_create_import!
+
       @bulk_import = BulkImport.new(permitted_parameters)
       if @bulk_import.save
         if @is_api
@@ -92,11 +94,13 @@ module Organized
       return false unless ensure_admin!
 
       return true if current_user.superuser? || current_organization.show_bulk_import?
+
       raise_do_not_have_access!
     end
 
     def permitted_kinds
       return @permitted_kinds if defined?(@permitted_kinds)
+
       permitted_kinds = []
       permitted_kinds += ["ascend"] if current_organization.ascend_or_broken_ascend?
       permitted_kinds += ["organization_import"] if current_organization.enabled?("show_bulk_import")

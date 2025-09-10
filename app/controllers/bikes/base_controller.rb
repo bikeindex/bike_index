@@ -17,14 +17,17 @@ class Bikes::BaseController < ApplicationController
     org = current_organization || passive_organization # actually call #current_organization first
     # If forced false, or no user present, skip everything else
     return true if @current_organization_force_blank || current_user.blank?
+
     # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
     # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
     if current_user.default_organization.present? && params[:organization_id].present?
       return true if org.present? && current_user.authorized?(org)
+
       set_passive_organization(current_user.default_organization)
     else
       # If current_user isn't authorized for the organization, force assign nil
       return true if org.blank? || org.present? && current_user.authorized?(org)
+
       set_passive_organization(nil)
     end
   end
@@ -43,6 +46,7 @@ class Bikes::BaseController < ApplicationController
       raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
     end
     return @bike if @bike.visible_by?(current_user)
+
     fail ActiveRecord::RecordNotFound
   end
 
@@ -82,6 +86,7 @@ class Bikes::BaseController < ApplicationController
     end
 
     return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
+
     flash[:error] = error
     redirect_to(bike_path(@bike)) && return
   end
@@ -116,6 +121,7 @@ class Bikes::BaseController < ApplicationController
     # Then deal with parking notification and graduated notification tokens
     @token = params[:parking_notification_retrieved].presence || params[:graduated_notification_remaining].presence
     return false if @token.blank?
+
     if params[:parking_notification_retrieved].present?
       @matching_notification = @bike.parking_notifications.where(retrieval_link_token: @token).first
       @token_type = @matching_notification&.kind

@@ -65,6 +65,7 @@ class Admin::BulkImportsController < Admin::BaseController
 
   def matching_bulk_imports
     return @matching_bulk_imports if defined?(@matching_bulk_imports)
+
     bulk_imports = BulkImport
     if params[:search_ascend] == "only_ascend"
       @only_ascend = true

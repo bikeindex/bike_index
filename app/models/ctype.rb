@@ -47,6 +47,7 @@ class Ctype < ApplicationRecord
 
   def set_calculated_attributes
     return true unless cgroup_name.present?
+
     self.cgroup_id = Cgroup.friendly_find(cgroup_name)&.id
   end
 end

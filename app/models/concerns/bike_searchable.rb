@@ -76,6 +76,7 @@ module BikeSearchable
 
     def searchable_query_items_query(query_params)
       return {query: query_params[:query]} if query_params[:query].present?
+
       query = query_params[:query_items]&.select { |i| !(/\A[cmvp]_/ =~ i) }&.join(" ")
       query.present? ? {query: query} : {}
     end
@@ -86,6 +87,7 @@ module BikeSearchable
       if manufacturer_id && !manufacturer_id.is_a?(Integer)
         manufacturer_id = [manufacturer_id].flatten.map { |m_id|
           next m_id.to_i if m_id.is_a?(Integer) || m_id.strip =~ /\A\d*\z/
+
           Manufacturer.friendly_find_id(m_id)
         }.compact
         manufacturer_id = manufacturer_id.first if manufacturer_id.count == 1
@@ -103,6 +105,7 @@ module BikeSearchable
       if color_ids && !color_ids.is_a?(Integer)
         color_ids = color_ids.map { |c_id|
           next c_id.to_i if c_id.is_a?(Integer) || c_id.strip =~ /\A\d*\z/
+
           Color.friendly_find_id(c_id)
         }
       end
@@ -138,6 +141,7 @@ module BikeSearchable
 
       id_and_family_ids = PrimaryActivity.friendly_find_id_and_family_ids(query_params[:primary_activity])
       return {} if id_and_family_ids.none?
+
       {primary_activity: id_and_family_ids.first, primary_activity_family_ids: id_and_family_ids.last}
     end
 
@@ -153,29 +157,37 @@ module BikeSearchable
 
     def extracted_query_items_manufacturer_id(query_params)
       return query_params[:manufacturer] if query_params[:manufacturer].present?
+
       manufacturer_id = query_params[:query_items]&.select { |i| i.start_with?("m_") }
       return nil unless manufacturer_id&.any?
+
       manufacturer_id.map { |i| i.gsub("m_", "").to_i }
     end
 
     def extracted_query_items_propulsion_type_id(query_params)
       return query_params[:propulsion_type] if query_params[:propulsion_type].present?
+
       propulsion_type_id = query_params[:query_items]&.select { |i| i.start_with?("p_") }
       return nil unless propulsion_type_id&.any?
+
       propulsion_type_id.map { |i| i.gsub("p_", "").to_i }
     end
 
     def extracted_query_items_cycle_type_id(query_params)
       return query_params[:cycle_type] if query_params[:cycle_type].present?
+
       cycle_type_id = query_params[:query_items]&.select { |i| i.start_with?("v_") }
       return nil unless cycle_type_id&.any?
+
       cycle_type_id.map { |i| i.gsub("v_", "").to_i }
     end
 
     def extracted_query_items_color_ids(query_params)
       return query_params[:colors] if query_params[:colors].present?
+
       color_ids = query_params[:query_items]&.select { |i| i.start_with?("c_") }
       return nil unless color_ids&.any?
+
       color_ids.map { |i| i.gsub("c_", "").to_i }
     end
 
@@ -191,6 +203,7 @@ module BikeSearchable
       end
 
       return if bounding_box.empty? # If we can't create a bounding box, skip
+
       {
         bounding_box: bounding_box,
         stolenness: query_params[:stolenness],
@@ -232,6 +245,7 @@ module BikeSearchable
     # This method is called from outside this class
     def matching_serial(serial, serial_no_space = nil)
       return all unless serial.present?
+
       serial_no_space ||= SerialNormalizer.no_space(serial)
       # Note: @@ is postgres fulltext search
       where("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
@@ -257,16 +271,19 @@ module BikeSearchable
 
     def search_matching_color_ids(color_id)
       return all unless color_id # So we can chain this if we don't have any colors
+
       where("primary_frame_color_id=? OR secondary_frame_color_id=? OR tertiary_frame_color_id =?", color_id, color_id, color_id)
     end
 
     def search_matching_cycle_type(cycle_type)
       return all unless cycle_type.present?
+
       where(cycle_type: cycle_type)
     end
 
     def search_matching_propulsion_type(propulsion_type)
       return all unless propulsion_type.present?
+
       where(propulsion_type: (propulsion_type == :motorized) ? PropulsionType::MOTORIZED : propulsion_type)
     end
 
@@ -283,18 +300,21 @@ module BikeSearchable
     # TODO: Better way of matching this with matching_serial
     def not_matching_serial(serial, serial_no_space)
       return all unless serial.present?
+
       where.not("serial_normalized @@ ? OR serial_normalized_no_space = ?", serial, serial_no_space)
     end
 
     # NOTE: THis query should exactly match serials_not_containing
     def serials_containing(serial, serial_no_space)
       return all unless serial.present?
+
       where("serial_normalized_no_space LIKE ?", "%#{serial_no_space}%")
     end
 
     # TODO: Better way of matching this with serials_containing
     def serials_not_containing(serial, serial_no_space)
       return all unless serial.present?
+
       where.not("serial_normalized_no_space LIKE ?", "%#{serial_no_space}%")
     end
 

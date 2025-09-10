@@ -96,6 +96,7 @@ class Export < ApplicationRecord
 
   def self.permitted_headers(organization_or_overide = nil)
     return PERMITTED_HEADERS unless organization_or_overide.present?
+
     if organization_or_overide == "include_paid" # passing include_paid overrides
       additional_headers = OrganizationFeature::REG_FIELDS
     elsif organization_or_overide.is_a?(Organization)
@@ -168,6 +169,7 @@ class Export < ApplicationRecord
 
   def remove_bike_stickers_and_record!(passed_user = nil)
     return true unless assign_bike_codes? && !bike_codes_removed?
+
     remove_bike_stickers(passed_user)
     update_attribute :options, options.merge(bike_codes_removed: true)
   end
@@ -203,6 +205,7 @@ class Export < ApplicationRecord
 
   def bike_code_start=(val)
     return unless val.present?
+
     self.options = options.merge(bike_code_start: BikeSticker.normalize_code(val, leading_zeros: true))
   end
 
@@ -225,6 +228,7 @@ class Export < ApplicationRecord
 
   def avery_export_url
     return nil unless avery_export? && finished?
+
     (ENV["AVERY_EXPORT_URL"] || "") + CGI.escape(file_url)
   end
 
@@ -274,13 +278,16 @@ class Export < ApplicationRecord
     return Bike.none if partial_registrations == "only"
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
     return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
+
     bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
   end
 
   def incompletes_scoped
     return BParam.none unless partial_registrations.present?
+
     incompletes = organization.incomplete_b_params
     return incompletes unless option?("start_at") || option?("end_at")
+
     if option?("start_at")
       option?("end_at") ? incompletes.where(created_at: start_at..end_at) : incompletes.where("b_params.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
@@ -297,6 +304,7 @@ class Export < ApplicationRecord
   # Generally, use calculated_progress rather than progress directly for display
   def calculated_progress
     return progress unless pending? || ongoing?
+
     ((created_at || Time.current) < Time.current - 10.minutes) ? "errored" : progress
   end
 
@@ -312,6 +320,7 @@ class Export < ApplicationRecord
 
   def bikes_within_time(bikes)
     return bikes unless option?("start_at") || option?("end_at")
+
     if option?("start_at")
       option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
@@ -322,6 +331,7 @@ class Export < ApplicationRecord
   def bike_id_from_url(bike_url)
     return nil unless bike_url.present?
     return bike_url if bike_url.is_a?(Integer) # integers passed directly in organized bikes_controller
+
     id_str = bike_url.strip
     if id_str.match?(/\A\d+\z/)
       id_str.to_i

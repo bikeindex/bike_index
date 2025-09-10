@@ -26,6 +26,7 @@ class BikeServices::Displayer
       return false if bike.owner.present? && bike.owner == user
       return true if bike.current_impound_record.present?
       return false if user.blank?
+
       bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
         bike.impound_claims_claimed.active.where(user_id: user.id).any?
     end
@@ -45,8 +46,10 @@ class BikeServices::Displayer
       bike_ids = user.bike_ids
       # Return false if no bikes
       return false if bike_ids.none?
+
       sticker_ids = BikeStickerUpdate.where(bike_id: bike_ids).distinct.pluck(:bike_sticker_id)
       return true if BikeSticker.where(id: sticker_ids).any?(&:user_editable?)
+
       # Any organizations, for any bikes from user, with stickers
       Organization.where(id: BikeOrganization.where(bike_id: bike_ids).pluck(:organization_id))
         .with_enabled_feature_slugs("bike_stickers_user_editable").any?
@@ -65,6 +68,7 @@ class BikeServices::Displayer
     # Intended as an internal method, splitting out for testing purposes
     def user_edit_bike_address?(bike, user = nil)
       return false if user.blank?
+
       if bike.user.present?
         # If the user has set their address, that's the only way to update bike addresses
         return false if bike.user.address_set_manually
@@ -80,12 +84,14 @@ class BikeServices::Displayer
 
     def edit_street_address?(bike, user = nil)
       return false if bike.user&.no_address? || bike.creation_organization&.enabled?("no_address")
+
       bike.street.present? || bike.creation_organization&.enabled?("reg_address")
     end
 
     def thumb_image_url(bike)
       return bike.thumb_path if bike.thumb_path.present?
       return nil if bike.stock_photo_url.blank?
+
       small = bike.stock_photo_url.split("/")
       ext = "/small_" + small.pop
       small.join("/") + ext
@@ -94,6 +100,7 @@ class BikeServices::Displayer
     def header_image_urls(bike)
       if bike.thumb_path.blank?
         return single_image_hash(bike.stock_photo_url) if bike.stock_photo_url.present?
+
         return false # Because there are no images
       end
 

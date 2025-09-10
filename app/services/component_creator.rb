@@ -6,17 +6,22 @@ class ComponentCreator
 
   def manufacturer_hash(component)
     return component.slice(:manufacturer_id, :manufacturer_other) if component[:manufacturer_other].present?
+
     mnfg_input = component[:manufacturer_id] || component[:manufacturer] || component[:mnfg_name]
     return {} unless mnfg_input.present?
+
     manufacturer = Manufacturer.friendly_find(mnfg_input)
     return {manufacturer_id: manufacturer.id} if manufacturer.present?
+
     {manufacturer_id: Manufacturer.other.id, manufacturer_other: mnfg_input}
   end
 
   def component_type_hash(component)
     return component.slice(:ctype_id, :ctype_other) unless component[:component_type].present?
+
     ctype = Ctype.friendly_find(component[:component_type])
     return {ctype_id: ctype.id} if ctype.present?
+
     {ctype_id: Ctype.other.id, ctype_other: component[:component_type]}
   end
 

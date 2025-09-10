@@ -1,6 +1,7 @@
 module Organized
   class UsersController < Organized::AdminController
     include SortableTable
+
     before_action :find_organization_role, only: [:edit, :update, :destroy]
     before_action :reject_self_updates, only: [:update, :destroy]
 
@@ -77,6 +78,7 @@ module Organized
     def matching_organization_roles
       m_organization_roles = current_organization.organization_roles.includes(:user, :sender)
       return m_organization_roles unless params[:query].present?
+
       m_organization_roles.admin_text_search(params[:query])
     end
 

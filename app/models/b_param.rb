@@ -131,6 +131,7 @@ class BParam < ApplicationRecord
 
     def email_search(str)
       return all unless str.present?
+
       where("email ilike ?", "%#{str.strip}%")
     end
 
@@ -144,6 +145,7 @@ class BParam < ApplicationRecord
         return {status: status} if Bike.statuses.include?(status)
       end
       return {status: "status_stolen"} if InputNormalizer.boolean(url_params[:stolen])
+
       {}
     end
 
@@ -269,6 +271,7 @@ class BParam < ApplicationRecord
     return "unregistered_parking_notification" if parking_notification_params.present?
     return "status_impounded" if impound_attrs.present?
     return "status_stolen" if stolen_attrs.present? || InputNormalizer.boolean(bike["stolen"])
+
     "status_with_owner"
   end
 
@@ -318,6 +321,7 @@ class BParam < ApplicationRecord
 
   def pos_kind
     return "lightspeed_pos" if is_pos
+
     bulk_import&.ascend? ? "ascend_pos" : "no_pos"
   end
 
@@ -371,6 +375,7 @@ class BParam < ApplicationRecord
 
   def skip_email?
     return true if status_impounded? || unregistered_parking_notification?
+
     send_email = params.dig("bike", "send_email").to_s
     send_email.present? && !InputNormalizer.boolean(send_email)
   end
@@ -430,6 +435,7 @@ class BParam < ApplicationRecord
 
   def set_foreign_keys
     return true unless bike.present?
+
     set_wheel_size_key
     set_manufacturer_key
     set_color_keys
@@ -481,9 +487,11 @@ class BParam < ApplicationRecord
 
   def set_manufacturer_key
     return false unless bike.present?
+
     m = params["bike"].delete("manufacturer")
     m = params["bike"].delete("manufacturer_id") unless m.present?
     return nil unless m.present?
+
     b_manufacturer = Manufacturer.friendly_find(m)
     unless b_manufacturer.present?
       b_manufacturer = Manufacturer.other
@@ -544,6 +552,7 @@ class BParam < ApplicationRecord
 
   def parking_notification_params
     return nil unless params&.dig("parking_notification").present?
+
     attrs = params["parking_notification"].with_indifferent_access
       .slice(:latitude, :longitude, :kind, :internal_notes, :message, :accuracy,
         :use_entered_address, :street, :city, :zipcode, :state_id, :country_id)
@@ -559,6 +568,7 @@ class BParam < ApplicationRecord
 
   def partial_notification_resends
     return partial_notifications if partial_notification_pre_tracking?
+
     partial_notifications.offset(1)
   end
 
@@ -603,6 +613,7 @@ class BParam < ApplicationRecord
 
   def process_image_if_required
     return true if image_processed || image.blank?
+
     Images::AssociatorJob.perform_in(5.seconds)
     Images::AssociatorJob.perform_in(1.minutes)
   end

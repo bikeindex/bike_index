@@ -102,15 +102,18 @@ module Organized
 
     def partial_registration_params
       return false unless current_organization.enabled?("show_partial_registrations")
+
       include_full = InputNormalizer.boolean(params[:include_full_registrations])
       include_partial = InputNormalizer.boolean(params[:include_partial_registrations])
       return false unless include_full || include_partial
       return "only" if !include_full && include_partial
+
       include_partial ? true : false
     end
 
     def ensure_access_to_exports!
       return true if current_organization.enabled?("csv_exports") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

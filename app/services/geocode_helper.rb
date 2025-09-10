@@ -63,6 +63,7 @@ class GeocodeHelper
 
     def ignored_coordinates?(latitude, longitude)
       return true if latitude.blank?
+
       [
         [71.53880, -66.88542], # Google general can't find
         [37.09024, -95.71289], # USA can't find
@@ -79,6 +80,7 @@ class GeocodeHelper
 
     def address_hash_from_geocoder_result(results, new_attrs:)
       return {} unless results&.first.present?
+
       result = results.first # Maybe someday use multiple results? Not a priority
       address_hash = if result.respond_to?(:city)
         hash_for_geocoder_response(result, new_attrs:)
@@ -89,6 +91,7 @@ class GeocodeHelper
         {}
       end
       return {} if ignored_coordinates?(address_hash[:latitude], address_hash[:longitude])
+
       address_hash.transform_values { |v| v.blank? ? nil : v }
     end
 

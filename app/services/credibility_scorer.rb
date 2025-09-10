@@ -52,6 +52,7 @@ class CredibilityScorer
   def self.permitted_badges_array(badges_array)
     badges_array = Array(badges_array)
     return %i[example_bike] if badges_array.include?(:example_bike)
+
     if (badges_array & %i[user_ambassador creation_organization_trusted]).count == 2
       badges_array -= [:creation_organization_trusted]
     end
@@ -73,12 +74,14 @@ class CredibilityScorer
     return [] unless ownership.present?
     return [:example_bike] if bike&.example?
     return [:created_at_point_of_sale] if ownership.pos?
+
     c_badges = [creation_age_badge(bike || ownership.bike)].compact
     c_badges << :no_creator if ownership.creator.blank?
     c_badges << :likely_spam if bike&.likely_spam?
     if ownership.organization_id.present?
       organization = Organization.unscoped.find_by_id(ownership.organization_id)
       return [:created_at_point_of_sale] if organization&.does_not_need_pos?
+
       c_badges << :creation_organization_suspicious if organization_suspicious?(organization)
       if ownership.origin == "embed" && organization.spam_registrations?
         unless bike&.likely_spam?
@@ -93,6 +96,7 @@ class CredibilityScorer
 
   def self.ownership_badges(bike)
     return [] unless bike.current_ownership.present?
+
     [
       (bike.ownerships.count > 1) ? :multiple_ownerships : nil,
       bike.claimed? ? :current_ownership_claimed : nil
@@ -104,6 +108,7 @@ class CredibilityScorer
     badges = users.map { |u| user_badges(u) }.flatten.uniq
     return [:user_banned] if badges.include?(:user_banned)
     return [:user_ambassador] if badges.include?(:user_ambassador)
+
     badges
   end
 
@@ -120,6 +125,7 @@ class CredibilityScorer
     return [] unless user.present?
     return [:user_banned] if user.banned
     return [:user_ambassador] if user.ambassador?
+
     badges = []
     badges += [:user_trusted_organization_role] if user.organizations.any? { |o| organization_trusted?(o) }
     badges += [:user_has_bike_recovered] if user.recovered_records.limit(1).present?
@@ -138,6 +144,7 @@ class CredibilityScorer
   # This badge is displayed on the organization show page
   def self.organization_suspicious?(organization)
     return true if organization.blank? || organization.deleted?
+
     !organization.approved
   end
 
@@ -145,6 +152,7 @@ class CredibilityScorer
   def self.organization_trusted?(organization)
     return false unless organization.present?
     return true if organization.paid?
+
     %w[other_pos lightspeed_pos ascend_pos does_not_need_pos].include?(organization.manual_pos_kind)
   end
 
@@ -155,17 +163,20 @@ class CredibilityScorer
 
   def self.creation_age_badge(obj)
     return :long_time_registration if obj.created_at < Time.current - 1.year
+
     (obj.created_at > Time.current - 1.month) ? :created_this_month : nil
   end
 
   def self.suspiscious_handle?(str)
     return false unless str.present?
+
     str = str.downcase.strip
     return true if str.match?("thief")
     return false if str.match?(/@.*\.edu/)
     return true if str.match?("5150") && CHECK_SUSPISCIOUS_NUMBERS
     return true if str.match?("shady")
     return true if BadWordCleaner.clean(str).count("*") > str.count("*")
+
     str.length < 4
   end
 
@@ -200,6 +211,7 @@ class CredibilityScorer
   def score
     badge_value = BASE_SCORE + self.class.badge_value(badges)
     return 0 if badge_value < 0
+
     (badge_value > MAX_SCORE) ? MAX_SCORE : badge_value
   end
 

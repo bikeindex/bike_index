@@ -87,6 +87,7 @@ class Ambassador < User
 
   def percent_complete
     return 0.0 if ambassador_task_assignments.empty?
+
     (completed_tasks_count / tasks_count.to_f).round(2)
   end
 

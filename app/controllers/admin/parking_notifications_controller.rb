@@ -21,6 +21,7 @@ class Admin::ParkingNotificationsController < Admin::BaseController
 
   def matching_parking_notifications
     return @matching_parking_notifications if defined?(@matching_parking_notifications)
+
     parking_notifications = ParkingNotification
     parking_notifications.resolved if sort_column == "resolved_at"
     if ParkingNotification.statuses.include?(params[:search_status])

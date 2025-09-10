@@ -10,6 +10,7 @@ class ProcessImpoundUpdatesJob < ApplicationJob
       if matching_display_ids.where.not(id: impound_record.id).any?
         matching_display_ids.reorder(:id).each_with_index do |irecord, index|
           next if index == 0 # don't change the ID of the first one
+
           irecord.update(display_id: nil, display_id_integer: nil, skip_update: true)
         end
       end

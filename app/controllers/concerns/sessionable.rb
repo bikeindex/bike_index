@@ -7,8 +7,10 @@ module Sessionable
     if unconfirmed_current_user.present? || current_user&.unconfirmed?
       redirect_to(please_confirm_email_users_path) && return
     end
+
     if current_user.present?
       return if return_to_if_present # If this returns true, we're returning already
+
       flash[:success] = translation(:already_signed_in, scope: [:controllers, :concerns, :sessionable, __method__])
       redirect_to(user_root_url) && return
     end

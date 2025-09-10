@@ -26,6 +26,7 @@ class BikeServices::Searcher
   def interpreted_params(i_params)
     query = (i_params[:query] || "").gsub("%23", "#") # ... ensure string so we can gsub it
     return i_params unless query.present?
+
     # serial segment looks like s#SERIAL#
     serial_matcher = /s#[^#]*#/i
     query.gsub!(serial_matcher) do |match|
@@ -65,22 +66,26 @@ class BikeServices::Searcher
   def stolenness
     return nil unless @params[:non_stolen].present? || @params[:stolen].present?
     return "stolen" if @params[:stolen].present? && @params[:stolen]
+
     "non_stolen" if @params[:non_stolen].present? && @params[:non_stolen]
   end
 
   def is_proximity
     return false if @params[:non_proximity]&.present?
+
     params[:proximity].present?
   end
 
   def stolenness_type
     return "all" unless stolenness.present?
     return "stolen_proximity" if stolenness == "stolen" && is_proximity
+
     stolenness
   end
 
   def matching_stolenness(bikes)
     return @bikes unless stolenness.present?
+
     @bikes = (stolenness == "stolen") ? bikes.status_stolen : bikes.not_stolen
   end
 
@@ -88,12 +93,14 @@ class BikeServices::Searcher
     if @params[:find_bike_attributes]
       attr_ids = @params[:find_bike_attributes][:ids].reject(&:empty?)
       return attr_ids if attr_ids.any?
+
       nil
     end
   end
 
   def matching_query(bikes)
     return nil unless @params[:query].present?
+
     @bikes = bikes.text_search(stripped_query.tr(",", " "))
     @bikes
   end
@@ -140,6 +147,7 @@ class BikeServices::Searcher
   def friendly_find_serial_ids(bike_ids = [])
     @normer.normalized_segments.each do |seg|
       next unless seg.length > 3
+
       bike_ids += NormalizedSerialSegment.where("LEVENSHTEIN(segment, ?) < 3", seg).map(&:bike_id)
     end
     bike_ids
@@ -147,6 +155,7 @@ class BikeServices::Searcher
 
   def friendly_find_serial
     return [] unless @normer.normalized_segments.present?
+
     bike_ids = friendly_find_serial_ids
     # Don't return exact matches
     bike_ids = bike_ids.uniq - matching_serial.map(&:id)
@@ -155,8 +164,10 @@ class BikeServices::Searcher
 
   def by_proximity
     return unless is_proximity
+
     stolen_ids = @bikes.pluck(:current_stolen_record_id)
     return unless stolen_ids.present?
+
     if @params[:proximity_radius].present? && @params[:proximity_radius].to_i > 1
       radius = @params[:proximity_radius].to_i
     end
@@ -173,6 +184,7 @@ class BikeServices::Searcher
   def by_date
     return unless stolenness == "stolen"
     return @bikes unless @params[:stolen_before].present? || @params[:stolen_after].present?
+
     stolen_records = StolenRecord.where(id: @bikes.pluck(:current_stolen_record_id))
     if @params[:stolen_before].present?
       before = Time.at(@params[:stolen_before]).utc.to_datetime

@@ -72,6 +72,7 @@ class HotSheetConfiguration < ApplicationRecord
   def send_today_now?
     return false if off? ||
       hot_sheets.where(sheet_date: current_date).email_success.any?
+
     time_in_zone > send_today_at
   end
 
@@ -90,6 +91,7 @@ class HotSheetConfiguration < ApplicationRecord
   def ensure_location_if_on
     return true unless on?
     return true if search_coordinates.count(&:present?) == 2
+
     self.is_on = false
     errors.add(:base, MISSING_LOCATION_ERROR)
   end

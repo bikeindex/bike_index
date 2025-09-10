@@ -63,6 +63,7 @@ class Blog < ApplicationRecord
     def slugify_title(str)
       # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
       return nil unless str.present?
+
       Slugifyer.slugify(str)[0, 70].gsub(/-$/, "")
     end
 
@@ -73,6 +74,7 @@ class Blog < ApplicationRecord
     def friendly_find(str)
       return nil unless str.present?
       return find_by_id(str) if integer_slug?(str)
+
       slug = slugify_title(str)
       find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
         find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
@@ -154,6 +156,7 @@ class Blog < ApplicationRecord
 
   def pretty_canonical
     return nil unless canonical_url?
+
     canonical_url.gsub(/https?:\/\//i, "").truncate(90)
   end
 
@@ -183,6 +186,7 @@ class Blog < ApplicationRecord
 
   def description
     return description_abbr if description_abbr.present?
+
     body_abbr
   end
 
@@ -198,6 +202,7 @@ class Blog < ApplicationRecord
 
   def update_title_save
     return true unless InputNormalizer.boolean(update_title)
+
     self.old_title_slug = title_slug
     set_title_slug
   end

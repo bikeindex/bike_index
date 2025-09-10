@@ -4,6 +4,7 @@ class UserPhoneConfirmationJob < ApplicationJob
 
   def perform(user_phone_id, skip_user_update = false)
     return unless Flipper.enabled?(:phone_verification)
+
     user_phone = UserPhone.find(user_phone_id)
     notification = Notification.create(user: user_phone.user,
       kind: "phone_verification",
@@ -17,6 +18,7 @@ class UserPhoneConfirmationJob < ApplicationJob
     end
 
     return true if skip_user_update
+
     # Manually run after user change to add a user alert
     # (rather than spinning up a new worker)
     ::Callbacks::AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)

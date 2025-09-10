@@ -79,6 +79,7 @@ module Geocodeable
     def format_postal_code(str, country_id = nil)
       str = str.strip.upcase.gsub(/\s*,\z/, "")
       return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
+
       str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
     end
 
@@ -107,12 +108,14 @@ module Geocodeable
   def latitude_public
     return nil if latitude.blank?
     return latitude unless defined?(show_address)
+
     show_address ? latitude : latitude.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def longitude_public
     return nil if longitude.blank?
     return longitude unless defined?(show_address)
+
     show_address ? longitude : longitude.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
@@ -126,6 +129,7 @@ module Geocodeable
   # logic.
   def should_be_geocoded?
     return false if skip_geocoding?
+
     address_changed?
   end
 

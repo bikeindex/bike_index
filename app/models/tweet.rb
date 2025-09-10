@@ -53,6 +53,7 @@ class Tweet < ApplicationRecord
 
   def self.friendly_find(id)
     return nil if id.blank?
+
     id = id.to_s
     query = (id.length > 15) ? {twitter_id: id} : {id: id}
     order(created_at: :desc).find_by(query)
@@ -70,6 +71,7 @@ class Tweet < ApplicationRecord
 
   def self.admin_search(str)
     return none unless str.present?
+
     text = str.strip
     # If passed a number, assume it is a bike ID and search for that bike_id
     if text.is_a?(Integer) || text.match(/\A\d+\z/).present?
@@ -85,6 +87,7 @@ class Tweet < ApplicationRecord
   # TODO: Add actual testing of this. It isn't tested right now, sorry :/
   def send_tweet
     return true unless app_tweet? && twitter_response.blank?
+
     if image.present?
       Tempfile.open("foto.jpg") do |foto|
         foto.binmode
@@ -103,6 +106,7 @@ class Tweet < ApplicationRecord
   # TODO: Add actual testing of this. It isn't tested right now, sorry :/
   def retweet_to_account(retweet_account)
     return nil if retweet_account.id.to_i == twitter_account_id.to_i
+
     posted_retweet = retweet_account.retweet(twitter_id)
     return nil if posted_retweet.blank?
 
@@ -122,6 +126,7 @@ class Tweet < ApplicationRecord
   # Because of recoveries
   def stolen_record
     return nil unless stolen_record_id.present?
+
     # Using super because maybe it will benefit from includes?
     super || StolenRecord.current_and_not.find(stolen_record_id)
   end
@@ -166,6 +171,7 @@ class Tweet < ApplicationRecord
 
   def tweeted_image
     return nil unless trh.dig(:entities, :media).present?
+
     trh.dig(:entities, :media).first&.dig(:media_url_https)
   end
 
@@ -175,6 +181,7 @@ class Tweet < ApplicationRecord
 
   def tweetor
     return twitter_account.screen_name if twitter_account&.screen_name.present?
+
     trh.dig(:user, :screen_name)
   end
 
@@ -227,6 +234,7 @@ class Tweet < ApplicationRecord
   def calculated_kind
     return "stolen_tweet" if stolen_record_id.present?
     return "imported_tweet" if twitter_id.present?
+
     "app_tweet"
   end
 end
