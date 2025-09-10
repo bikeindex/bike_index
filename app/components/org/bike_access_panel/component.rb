@@ -54,5 +54,22 @@ module Org::BikeAccessPanel
     def original_ownership
       @original_ownership ||= @bike.ownerships.initial.first
     end
+
+    def other_user_bikes
+      # If user isn't present, use email to search
+      @other_user_bikes ||= if @bike.user.present?
+        @bike.user.bikes
+      else
+        Bike.where(owner_email: @bike.owner_email)
+      end.reorder(id: :desc)
+    end
+
+    def other_user_bikes_count
+      @other_user_bikes_count ||= other_user_bikes.count
+    end
+
+    def duplicate_bikes
+      @duplicate_bikes ||= @bike.duplicate_bikes.reorder(id: :desc).limit(25)
+    end
   end
 end

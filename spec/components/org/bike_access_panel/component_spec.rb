@@ -78,23 +78,29 @@ RSpec.describe Org::BikeAccessPanel::Component, type: :component do
     end
 
     context "with model audit and duplicate bike" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["model_audits"]) }
+      let(:enabled_feature_slugs) { %w[model_audits additional_registration_information] }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
       let(:model_audit) { FactoryBot.create(:model_audit, frame_model: "Some crazy model", manufacturer: bike.manufacturer) }
       let!(:organization_model_audit) { FactoryBot.create(:organization_model_audit, organization:, model_audit:) }
       let!(:model_attestation) { FactoryBot.create(:model_attestation, organization:, model_audit:) }
+      let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike) }
       before { bike.update(model_audit_id: model_audit.id) }
 
       it "renders the model_audit" do
+        expect(duplicate_bike_group.reload.bikes.count).to eq 2
+        expect(bike.reload.duplicate_bike_groups.pluck(:id)).to eq([duplicate_bike_group.id])
+
         expect(instance.render?).to be_truthy
         expect(component).to have_css "div"
         expect(instance.send(:organization_registered?)).to be_truthy
         expect(instance.send(:organization_authorized?)).to be_truthy
         expect(instance.send(:user_can_edit?)).to be_truthy
-        expect(whitespace_normalized_body_text(component.to_html)).to match(/#{bike.mnfg_name} Some crazy model/)
-      end
-    end
 
-    context "with duplicate bike" do
+        component_text = whitespace_normalized_body_text(component.to_html)
+        expect(component_text).to match(/#{bike.mnfg_name} Some crazy model/)
+        pp component_text
+        expect(component_text).to match(/duplicate bikeddd/)
+      end
     end
 
     context "phoneable by" do
