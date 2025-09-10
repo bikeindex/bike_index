@@ -7,7 +7,14 @@ RSpec.describe Org::BikeAccessPanel::Component, type: :component do
   let(:component) { render_inline(instance) }
   let(:options) { {bike:, organization:, current_user:} }
   let(:bike) { FactoryBot.create(:bike) }
-  let(:organization) { FactoryBot.create(:organization) }
+  let(:enabled_feature_slugs) { nil }
+  let(:organization) do
+    if enabled_feature_slugs.present?
+      FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:)
+    else
+      FactoryBot.create(:organization)
+    end
+  end
   let(:current_user) { FactoryBot.create(:organization_user, organization:) }
 
   it "renders" do
@@ -21,7 +28,7 @@ RSpec.describe Org::BikeAccessPanel::Component, type: :component do
   context "bike_authorized" do
     let(:bike) do
       FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization,
-        can_edit_claimed:, marked_user_hidden:)
+        can_edit_claimed:, marked_user_hidden:, phone: "1112223333")
     end
     let(:can_edit_claimed) { true }
     let(:marked_user_hidden) { false }
@@ -77,18 +84,15 @@ RSpec.describe Org::BikeAccessPanel::Component, type: :component do
       end
     end
 
-    context "with model audit and duplicate bike" do
-      let(:enabled_feature_slugs) { %w[model_audits additional_registration_information] }
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+    context "with model audit and parking notifications" do
+      let(:enabled_feature_slugs) { %w[model_audits parking_notifications] }
       let(:model_audit) { FactoryBot.create(:model_audit, frame_model: "Some crazy model", manufacturer: bike.manufacturer) }
       let!(:organization_model_audit) { FactoryBot.create(:organization_model_audit, organization:, model_audit:) }
       let!(:model_attestation) { FactoryBot.create(:model_attestation, organization:, model_audit:) }
-      let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike) }
       before { bike.update(model_audit_id: model_audit.id) }
 
       it "renders the model_audit" do
-        expect(duplicate_bike_group.reload.bikes.count).to eq 2
-        expect(bike.reload.duplicate_bike_groups.pluck(:id)).to eq([duplicate_bike_group.id])
+        expect(organization.reload.enabled_feature_slugs).to eq(enabled_feature_slugs)
 
         expect(instance.render?).to be_truthy
         expect(component).to have_css "div"
@@ -98,12 +102,33 @@ RSpec.describe Org::BikeAccessPanel::Component, type: :component do
 
         component_text = whitespace_normalized_body_text(component.to_html)
         expect(component_text).to match(/#{bike.mnfg_name} Some crazy model/)
-        pp component_text
-        expect(component_text).to match(/duplicate bikeddd/)
+        expect(component_text).to match(/parking notification/i)
+
+        expect(component_text).to_not match(/potential duplicate bikes/)
       end
     end
 
-    context "phoneable by" do
+    context "phoneable by and duplicate bikes" do
+      let(:enabled_feature_slugs) { %w[additional_registrations_information unstolen_notifications] }
+      let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike) }
+
+      it "shows phone link and duplicate bikes" do
+        expect(organization.reload.enabled_feature_slugs).to eq(enabled_feature_slugs)
+        duplicate_bike_ids = duplicate_bike_group.reload.bikes.pluck(:id).sort
+        bike_duplicate_id = duplicate_bike_ids.last
+        expect(duplicate_bike_ids).to eq([bike.id, bike_duplicate_id])
+
+        expect(bike.reload.phoneable_by?(current_user)).to be_truthy
+        expect(bike.contact_owner?(current_user)).to be_truthy
+
+        expect(component).to have_content("111-222-3333")
+        expect(component).to have_css("a[href='tel:111-222-3333']")
+        expect(component).to have_css("a[href='/bikes/#{bike_duplicate_id}']")
+
+        component_text = whitespace_normalized_body_text(component.to_html)
+        expect(component_text).to match(/potential duplicate bikes/i)
+        expect(component_text).to_not match(/parking notification/i)
+      end
     end
   end
 
