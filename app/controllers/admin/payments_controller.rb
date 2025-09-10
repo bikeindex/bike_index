@@ -74,6 +74,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def matching_payments
     return @matching_payments if defined?(@matching_payments)
+
     matching_payments = Payment
     if sort_column == "invoice_id"
       matching_payments = matching_payments.where.not(invoice_id: nil)
@@ -138,6 +139,7 @@ class Admin::PaymentsController < Admin::BaseController
     invoice_parameters # To parse the invoice params
     return true unless @params_invoice.present?
     return true if @params_invoice.organization_id&.to_s == invoice_parameters[:organization_id]&.to_s
+
     organization_name = Organization.friendly_find(invoice_parameters[:organization_id])&.short_name
     flash[:error] = "Invoice #{invoice_parameters[:invoice_id]} is not owned by #{organization_name}"
     false
@@ -145,6 +147,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def invoice_parameters
     return @invoice_parameters if defined?(@invoice_parameters)
+
     iparams = params.require(:payment).permit(:organization_id, :invoice_id, :referral_source)
     @params_invoice = Invoice.friendly_find(iparams[:invoice_id])
     if @params_invoice.present?

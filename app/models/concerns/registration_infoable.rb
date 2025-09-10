@@ -21,6 +21,7 @@ module RegistrationInfoable
   class_methods do
     def org_id_for_org(org = nil)
       return nil if org.blank?
+
       is_a?(Organization) ? org.id : Organization.friendly_find_id(org)
     end
 
@@ -47,6 +48,7 @@ module RegistrationInfoable
     end
     return "student_id" if reg_info.key?("student_id")
     return nil if org.present?
+
     reg_info.keys.find { |k| k.start_with?("student_id") } || "student_id"
   end
 
@@ -64,6 +66,7 @@ module RegistrationInfoable
     end
     return "organization_affiliation" if reg_info.key?("organization_affiliation")
     return nil if org.present?
+
     reg_info.keys.find { |k| k.start_with?("organization_affiliation") } || "organization_affiliation"
   end
 

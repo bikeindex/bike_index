@@ -135,6 +135,7 @@ class OrganizedMailer < ApplicationMailer
 
   def finished_registration_type
     return "_stolen" if @bike.status_stolen?
+
     @ownership.claimed ? "_owned" : ""
   end
 

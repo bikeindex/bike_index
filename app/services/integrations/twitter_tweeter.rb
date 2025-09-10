@@ -64,6 +64,7 @@ class Integrations::TwitterTweeter
 
   def retweetable_accounts
     return [] if MAX_RETWEET_COUNT < 1
+
     close_twitter_accounts.reject { |t| t.id == nearest_twitter_account.id }[0..MAX_RETWEET_COUNT]
   end
 
@@ -181,6 +182,7 @@ class Integrations::TwitterTweeter
 
   def post_tweet_with_account(account, text, **opts)
     return if account.blank?
+
     tweet = nil
 
     if bike_photo_url.present?

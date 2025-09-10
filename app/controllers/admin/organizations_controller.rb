@@ -125,6 +125,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def matching_organizations
     return @matching_organizations if defined?(@matching_organizations)
+
     @search_paid = InputNormalizer.boolean(params[:search_paid])
     matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
     matching_organizations = matching_organizations.paid if @search_paid
@@ -198,12 +199,14 @@ class Admin::OrganizationsController < Admin::BaseController
                       kind: params[:organization_stolen_message_kind],
                       search_radius_kilometers: params[:organization_stolen_message_search_radius_kilometers]}
     return unless message_params.values.reject(&:blank?).any?
+
     OrganizationStolenMessage.for(@organization).update(message_params)
   end
 
   def find_organization
     @organization = Organization.unscoped.friendly_find(params[:id])
     return true if @organization.present?
+
     raise ActiveRecord::RecordNotFound # Because this should have been raised
   end
 end

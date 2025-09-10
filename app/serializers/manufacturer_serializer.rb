@@ -6,6 +6,7 @@ class ManufacturerSerializer < ApplicationSerializer
 
   def company_url
     return "" unless object.website
+
     object.website
   end
 

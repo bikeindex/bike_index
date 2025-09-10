@@ -1,6 +1,7 @@
 module Organized
   class ModelAuditsController < Organized::BaseController
     include SortableTable
+
     before_action :ensure_access_to_model_audits!
 
     def index
@@ -91,6 +92,7 @@ module Organized
 
     def ensure_access_to_model_audits!
       return true if current_organization.enabled?("model_audits") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

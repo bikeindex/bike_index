@@ -108,14 +108,17 @@ class UserRegistrationOrganization < ApplicationRecord
 
   def update_associations
     return true if @skip_update_associations
+
     create_or_update_bike_organizations
     return true if skip_after_user_change_worker
+
     ::Callbacks::AfterUserChangeJob.perform_async(user_id)
   end
 
   # Manually called from ::Callbacks::AfterUserChangeJob
   def create_or_update_bike_organizations
     return true unless all_bikes # only overrides bike_organizations if all_bikes is checked
+
     # Only update the most recent bikes.
     # This is particularly important when bulk importing thousands of bikes to a single user
     bikes.order(id: :desc).limit(100).pluck(:id).each do |bike_id|

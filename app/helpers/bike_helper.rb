@@ -3,6 +3,7 @@ module BikeHelper
   def render_serial_display(bike, user = nil, skip_explanation: false)
     serial_text = bike.serial_display(user)&.downcase
     return "" if serial_text.blank?
+
     serial_html = if ["hidden", "unknown", "made without serial"].include?(serial_text)
       content_tag(:span,
         I18n.t(serial_text.tr(" ", "_"), scope: %i[helpers bike_helper]),
@@ -11,6 +12,7 @@ module BikeHelper
       content_tag(:code, bike.serial_display(user), class: "bike-serial")
     end
     return serial_html unless bike.serial_hidden? && !skip_explanation
+
     serial_html << " "
     serial_html << content_tag(:em, class: "small less-less-strong") do
       if bike.authorized?(user)

@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include SetPeriod
   include Turbo::Redirection
   include Pagy::Backend
+
   protect_from_forgery
 
   around_action :set_locale
@@ -112,6 +113,7 @@ class ApplicationController < ActionController::Base
     if controller_namespace == "admin"
       return I18n.with_locale(I18n.default_locale, &action)
     end
+
     I18n.with_locale(requested_locale, &action)
   ensure # Make sure we reset default timezone
     Time.zone = TimeParser::DEFAULT_TIME_ZONE

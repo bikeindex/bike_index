@@ -40,6 +40,7 @@
 #
 class Ownership < ApplicationRecord
   include RegistrationInfoable
+
   ORIGIN_ENUM = {
     web: 0,
     embed: 1,
@@ -100,6 +101,7 @@ class Ownership < ApplicationRecord
 
   def self.origin_humanized(str)
     return nil unless str.present?
+
     str.titleize.downcase
   end
 
@@ -162,6 +164,7 @@ class Ownership < ApplicationRecord
       return "org reg" if %w[embed_extended organization_form].include?(origin)
       return "landing page" if origin == "embed_partial"
       return "parking notification" if origin == "unregistered_parking_notification"
+
       self.class.origin_humanized(origin)
     end
   end
@@ -197,17 +200,20 @@ class Ownership < ApplicationRecord
 
   def overridden_by_user_registration?
     return false if user.blank?
+
     user.user_registration_organizations.where.not(registration_info: {}).any?
   end
 
   def claim_message
     return nil if claimed? || !current? || user.present?
+
     new_registration? ? "new_registration" : "transferred_registration"
   end
 
   def calculated_send_email
     return false if skip_email || bike.blank? || phone_registration? || bike.example? || bike.likely_spam?
     return false if spam_risky_email? || user&.no_non_theft_notification
+
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     true unless organization.present? && organization.enabled?("skip_ownership_email")
   end
@@ -270,6 +276,7 @@ class Ownership < ApplicationRecord
 
   def create_user_registration_for_phone_registration!(user)
     return true unless phone_registration? && current
+
     update(claimed: true, user_id: user.id)
     bike.update(owner_email: user.email, is_phone: false)
     bike.ownerships.create(skip_email: true, owner_email: user.email, creator_id: user.id)
@@ -290,6 +297,7 @@ class Ownership < ApplicationRecord
 
   def info_with_organization_uniq(r_info, org_id = nil)
     return r_info if org_id.blank? || r_info.blank?
+
     # NOTE: This is deleted when the user_registration_organization processes (or will be)
     if r_info["student_id"].present?
       r_info["student_id_#{org_id}"] ||= r_info["student_id"]
@@ -304,6 +312,7 @@ class Ownership < ApplicationRecord
     r_info ||= {}
     # skip cleaning if it's blank
     return {} if r_info.blank?
+
     # The only place user_name comes from, other than a user setting it themselves, is bulk_import
     r_info["phone"] = Phonifyer.phonify(r_info["phone"])
     # bike_code should be renamed bike_sticker. Legacy ownership issue
@@ -317,6 +326,7 @@ class Ownership < ApplicationRecord
     risky_domains = ["@yahoo.co", "@hotmail.co"]
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
     return true if pos?
+
     embed? && organization&.spam_registrations?
   end
 
@@ -331,13 +341,16 @@ class Ownership < ApplicationRecord
   # This may be more complicated in the future! For now, calling this good enough.
   def calculated_organization_pre_registration?
     return false if organization_id.blank?
+
     self.origin = "creator_unregistered_parking_notification" if status == "unregistered_parking_notification"
     return true if creator_unregistered_parking_notification?
+
     self_made? && creator_id == organization&.auto_user_id
   end
 
   def fallback_owner_name
     return registration_info["user_name"] if registration_info["user_name"].present?
+
     # If it's made by PSU and not from a member of PSU, use the creator name
     if new_registration? && organization_id == 553 && !creator.member_of?(organization)
       creator.name

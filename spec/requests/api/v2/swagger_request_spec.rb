@@ -31,6 +31,7 @@ RSpec.describe "Swagger API V2 docs", type: :request do
         code = /deprecated/i.match?(desc) ? 404 : 200
         expect(response.status).to eq(code)
         next if code == 404
+
         endpoint_response = JSON.parse(response.body)
 
         expect(endpoint_response["resourcePath"]).to eq path

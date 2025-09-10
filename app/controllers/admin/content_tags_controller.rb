@@ -1,5 +1,6 @@
 class Admin::ContentTagsController < Admin::BaseController
   include SortableTable
+
   before_action :find_content_tag, only: %i[edit update]
 
   def index

@@ -82,6 +82,7 @@ class BulkImport < ApplicationRecord
 
   def file_errors_with_lines
     return nil unless file_errors.present?
+
     [file_errors].flatten.zip(file_import_error_lines)
   end
 
@@ -96,6 +97,7 @@ class BulkImport < ApplicationRecord
 
   def timeout_failure?
     return false if finished? || created_at.blank?
+
     # If pending, fail if older than 5 minutes (it should have started processing by then!)
     # Doesn't match the scope exactly, which just uses TIMEOUT_FAILURE_DELAY
     timeout = pending? ? 5.minutes : TIMEOUT_FAILURE_DELAY
@@ -117,11 +119,13 @@ class BulkImport < ApplicationRecord
   def add_file_error(error_msg, line_error = "", skip_save: false)
     self.progress = "finished"
     return if file_errors.present? && file_errors.include?(error_msg)
+
     updated_file_error_data = {
       "file" => [file_errors, error_msg.to_s].compact.flatten,
       "file_lines" => [file_import_error_lines, line_error].flatten
     }
     return true if skip_save # Don't get stuck in a loop during creation
+
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
     update_attribute :import_errors, (import_errors || {}).merge(updated_file_error_data)
   end
@@ -182,6 +186,7 @@ class BulkImport < ApplicationRecord
       InvalidExtensionForAscendImportJob.perform_async(id)
     end
     return true if organization_id.present?
+
     add_ascend_import_error!
     UnknownOrganizationForAscendImportJob.perform_async(id)
     false # must return false, otherwise BulkImportJob enqueues processing
@@ -190,6 +195,7 @@ class BulkImport < ApplicationRecord
   def organization_for_ascend_name
     org = Organization.where(ascend_name: ascend_name).first
     return org if org.present?
+
     regex_matcher = ascend_name.gsub(/-|_|\s/, "")
     Organization.ascend_pos.find { |org|
       org.ascend_name.present? && org.ascend_name.gsub(/-|_|\s/, "").match(/#{regex_matcher}/i)
@@ -198,6 +204,7 @@ class BulkImport < ApplicationRecord
 
   def stolen_record_attrs
     return {} unless stolen? && data&.dig("stolen_record").present?
+
     data["stolen_record"].merge(proof_of_ownership: true, receive_notifications: true)
   end
 
@@ -206,6 +213,7 @@ class BulkImport < ApplicationRecord
     self.no_notify = true if kind == "stolen"
     # we're managing ascend errors separately because we need to lookup organization
     return true if ascend_unprocessable?
+
     unless creator.present?
       add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end
@@ -242,6 +250,7 @@ class BulkImport < ApplicationRecord
 
   def calculated_kind
     return "unorganized" if organization_id.blank?
+
     "organization_import" # Default
   end
 

@@ -31,6 +31,7 @@ module Organized
 
     def ensure_valid_hot_sheet_configuration!
       return true if @hot_sheet_configuration&.is_on? || current_organization.search_coordinates_set?
+
       flash[:error] = HotSheetConfiguration::MISSING_LOCATION_ERROR
       url_to_redirect_to = current_user&.admin_of?(current_organization) ? edit_organization_hot_sheet_path(current_organization) : organization_root_url(current_organization)
       redirect_to(url_to_redirect_to) && return
@@ -41,6 +42,7 @@ module Organized
 
       # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
       return true if current_organization.enabled?("hot_sheet") || current_user.superuser?
+
       raise_do_not_have_access!
     end
 

@@ -4,11 +4,12 @@ class Slugifyer
       transliterate(remove_parens(string))
         .gsub("%20", " ").gsub(/\s/, "-")
         .gsub("-&-", "-amp-") # Replace singular & with amp - since we permit & in names
-        .gsub(/([^A-Za-z0-9_\-]+)/, "") # Remove any weird characters
+        .gsub(/([^A-Za-z0-9_-]+)/, "") # Remove any weird characters
     end
 
     def manufacturer(string)
       return nil unless string
+
       book_slug(
         remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
       )

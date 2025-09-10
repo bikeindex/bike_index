@@ -98,11 +98,13 @@ class StolenBikeListing < ActiveRecord::Base
 
   def calculated_amount_cents_usd
     return 0 unless amount_cents.present?
+
     Money.new(amount_cents, currency_name).exchange_to(:USD).cents
   end
 
   def updated_photo_folder
     return nil if photo_folder.blank?
+
     suffix = photo_folder[/_\d+\z/].to_s
     if suffix.blank? # Sometimes there folders like 2021_OMFG
       suffix = photo_folder[/20\d\d_.*\z/].to_s
@@ -124,6 +126,7 @@ class StolenBikeListing < ActiveRecord::Base
   # TODO: Refactor - this duplicates bike#clean_frame_size, they should both be better
   def clean_frame_size
     return true unless frame_size.present? || frame_size_number.present?
+
     if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
       # Don't overwrite frame_size_number if frame_size_number was passed
       if frame_size_number.blank? || !frame_size_number_changed?

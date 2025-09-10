@@ -37,6 +37,7 @@ class LogSearcher::Parser
   class << self
     def parse_log_line(log_line)
       raise "Multiple line_data matches for log line #{log_line}" if log_line.match?(/\] \{.*\] \{/)
+
       line_data, opts = log_line.split("] {")
       opts = JSON.parse("{#{opts}")
       endpoint = parse_endpoint(opts)
@@ -85,6 +86,7 @@ class LogSearcher::Parser
 
     def organization_from_params(params)
       return nil if params.blank?
+
       Organization.friendly_find_id(params["organization_id"] || params["organization_slug"])
     end
 

@@ -106,6 +106,7 @@ module API
           state = bike&.status&.gsub("status_", "")
           if state.present?
             return state if state == "stolen"
+
             if %w[abandoned impounded unregistered_parking_notification].include?(state)
               "impounded"
             elsif StolenRecord.recovered.where(bike_id: bike.id)
@@ -136,6 +137,7 @@ module API
 
         def authorize_bike_for_user(addendum = "")
           return true if @bike.authorize_and_claim_for_user(current_user)
+
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
 

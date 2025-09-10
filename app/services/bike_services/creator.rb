@@ -60,6 +60,7 @@ class BikeServices::Creator
     bike = find_or_build_bike(b_param)
     # Skip processing if this bike is already created
     return bike if bike.id.present? && bike.id == b_param.created_bike_id
+
     # There could be errors during the build - or during the save
     bike = save_bike(b_param, bike) if bike.errors.none?
     if bike.errors.any?
@@ -71,6 +72,7 @@ class BikeServices::Creator
   # Called from ImageAssociatorJob, so can't be private
   def attach_photo(b_param, bike)
     return true unless b_param.image.present?
+
     public_image = PublicImage.new(image: b_param.image)
     public_image.imageable = bike
     public_image.save
@@ -86,6 +88,7 @@ class BikeServices::Creator
   def add_bike_book_data(b_param = nil)
     return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
     return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
+
     bb_data = Integrations::BikeBook.new.get_model({
       manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
       year: b_param.bike["year"],
@@ -93,6 +96,7 @@ class BikeServices::Creator
     })
 
     return true unless bb_data && bb_data["bike"].present?
+
     b_param.params["bike"]["cycle_type"] = bb_data["bike"]["cycle_type"] if bb_data["bike"] && bb_data["bike"]["cycle_type"].present?
     if bb_data["bike"]["paint_description"].present?
       b_param.params["bike"]["paint_name"] = bb_data["bike"]["paint_description"] unless b_param.params["bike"]["paint_name"].present?
@@ -128,6 +132,7 @@ class BikeServices::Creator
 
   def validate_record(b_param, bike)
     return clear_bike(b_param, bike) if bike.errors.present?
+
     if b_param.created_bike_id.present? && b_param.created_bike_id != bike.id
       clear_bike(b_param, bike)
       return b_param.created_bike
@@ -145,6 +150,7 @@ class BikeServices::Creator
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
     bike = validate_record(b_param, bike)
     return bike unless bike.present? && bike.id.present?
+
     # NOTE: spaminess is recalculated in Email::OwnershipInvitationJob as a failsafe
     if SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
       bike.update(likely_spam: true)
@@ -167,6 +173,7 @@ class BikeServices::Creator
 
   def find_or_build_bike(b_param)
     return b_param.created_bike if b_param&.created_bike&.present?
+
     bike = build_bike(b_param)
     bike.set_calculated_unassociated_attributes
 
@@ -265,6 +272,7 @@ class BikeServices::Creator
   def create_bike_organizations(ownership)
     organization = ownership.organization
     return true unless organization.present?
+
     unless BikeOrganization.where(bike_id: ownership.bike_id, organization_id: organization.id).present?
       BikeOrganization.create(bike_id: ownership.bike_id, organization_id: organization.id, can_edit_claimed: ownership.can_edit_claimed)
     end
@@ -285,6 +293,7 @@ class BikeServices::Creator
   def assign_user_attributes(bike, user = nil)
     user ||= bike.user
     return true unless user.present?
+
     if bike.phone.present?
       user.phone = bike.phone if user.phone.blank?
     end
@@ -294,6 +303,7 @@ class BikeServices::Creator
 
   def attach_photos(b_param, bike)
     return nil unless b_param.params["photos"].present?
+
     photos = b_param.params["photos"].uniq.take(7)
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
   end

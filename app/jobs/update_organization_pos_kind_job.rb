@@ -1,5 +1,6 @@
 class UpdateOrganizationPosKindJob < ScheduledJob
   prepend ScheduledJobRecorder
+
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
@@ -8,6 +9,7 @@ class UpdateOrganizationPosKindJob < ScheduledJob
 
   def self.calculated_pos_kind(organization)
     return organization.manual_pos_kind if organization.manual_pos_kind.present?
+
     bikes = organization.created_bikes # NOTE: Only created, so regional orgs don't get them
     recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
     if organization.ascend_name.present? || recent_bikes.ascend_pos.count > 0
@@ -16,20 +18,24 @@ class UpdateOrganizationPosKindJob < ScheduledJob
     end
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
+
     if organization.bike_shop? && recent_bikes.count > 2
       return "does_not_need_pos" if organization.created_at < Time.current - 1.week ||
         bikes.where("bikes.created_at > ?", Time.current - 1.year).count > 100
     end
     return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
+
     (bikes.any_pos.count > 0) ? "broken_ascend_pos" : "no_pos"
   end
 
   def perform(org_id = nil)
     return enqueue_workers unless org_id.present?
+
     organization = Organization.unscoped.find(org_id)
     pos_kind = self.class.calculated_pos_kind(organization)
     organization_status = current_organization_status(organization)
     return true if organization.pos_kind == pos_kind
+
     status_change_at = status_change_at(organization)
     organization_status.update(end_at: status_change_at)
     organization.update(pos_kind: pos_kind)

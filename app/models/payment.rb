@@ -74,11 +74,13 @@ class Payment < ApplicationRecord
     def kind_humanized(kind)
       return "NO KIND!" unless kind.present?
       return "Promoted alert" if kind == "theft_alert"
+
       kind&.humanize&.gsub("payment", "")&.strip
     end
 
     def normalize_referral_source(str)
       return nil if str.blank?
+
       str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "").gsub(/\/|_/, "-")
       Slugifyer.slugify(str)
     end
@@ -86,6 +88,7 @@ class Payment < ApplicationRecord
     # NOTE: Currently only searches by referral_source - in the future it might do other stuff
     def admin_search(str)
       return all if str.blank?
+
       where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
     end
   end
@@ -194,17 +197,20 @@ class Payment < ApplicationRecord
 
   def email_or_organization_or_stripe_present
     return if email.present? || organization_id.present? || stripe_id.present?
+
     errors.add(:organization, :requires_email_or_org)
     errors.add(:email, :requires_email_or_org)
   end
 
   def update_associations
     return if skip_update
+
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
     if stripe? && paid? && email.present? && !theft_alert?
       Email::ReceiptJob.perform_async(id)
     end
     return true unless invoice.present?
+
     invoice.update(updated_at: Time.current) # Manually trigger invoice update
   end
 
@@ -291,6 +297,7 @@ class Payment < ApplicationRecord
     else
       email = email.presence || user&.email
       return {} unless email.present?
+
       {customer_email: user.email}
     end
   end

@@ -19,6 +19,7 @@ module Organized
 
     def update
       return multi_update_response(params[:ids].as_json) if params[:id] == "multi_update"
+
       @impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
       is_valid_kind = @impound_record.update_kinds.include?(@impound_record_update.kind)
       if @impound_record.update_kinds.include?(@impound_record_update.kind) && @impound_record_update.save
@@ -49,6 +50,7 @@ module Organized
     def available_statuses
       # current ordered the way we want to display
       return @available_statuses if defined?(@available_statuses)
+
       available_statuses = %w[current resolved all] + (ImpoundRecord.statuses - ["current"])
       available_statuses -= ["expired"] unless current_organization.fetch_impound_configuration.expiration?
       @available_statuses = available_statuses
@@ -60,6 +62,7 @@ module Organized
 
     def available_impound_records
       return @available_impound_records if defined?(@available_impound_records)
+
       if params[:search_status] == "all"
         @search_status = "all"
         a_impound_records = impound_records
@@ -95,6 +98,7 @@ module Organized
 
     def find_impound_record
       return if params[:id] == "multi_update" # Can't find a single impound_record!
+
       # NOTE: Uses display_id, not normal id, unless id starts with pkey-
       @impound_record = impound_records.friendly_find!(params[:id])
     end
@@ -118,6 +122,7 @@ module Organized
       else
         successful = selected_records.select { |impound_record|
           next unless impound_record.update_multi_kinds.include?(permitted_parameters[:kind])
+
           impound_record.impound_record_updates.create(permitted_parameters)
         }
         flash[:success] = "Updated #{successful.count} impound record"

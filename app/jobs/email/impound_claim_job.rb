@@ -8,6 +8,7 @@ class Email::ImpoundClaimJob < ApplicationJob
 
     email_to_send = calculated_email_to_send(impound_claim)
     return nil if email_to_send.blank?
+
     notification = Notification.create(kind: "impound_claim_#{email_to_send}",
       notifiable: impound_claim,
       bike_id: impound_claim.bike_claimed_id)

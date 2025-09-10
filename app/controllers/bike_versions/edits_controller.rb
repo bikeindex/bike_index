@@ -1,5 +1,6 @@
 class BikeVersions::EditsController < BikeVersionsController
   include BikeEditable
+
   before_action :ensure_user_allowed_to_edit_version
 
   def show

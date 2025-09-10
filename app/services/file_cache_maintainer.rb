@@ -9,6 +9,7 @@ class FileCacheMaintainer
 
     def blocklist
       return [] unless redis.type(info_id) == "set"
+
       RedisPool.conn { |r| r.smembers blocklist_id }
     end
 
@@ -40,6 +41,7 @@ class FileCacheMaintainer
       rescue => e
         # Make sure it doesn't loop infinitely
         raise e if retrying
+
         # Sometimes key errors from wrong type, so reset it!
         reset_file_info(filename, updated_at.to_i)
       end
@@ -66,6 +68,7 @@ class FileCacheMaintainer
 
     def files
       return [] unless RedisPool.conn { |r| r.type(info_id) } == "hash"
+
       @result = RedisPool.conn { |r| r.hgetall(info_id) }
       @result.keys.map { |k| file_info_hash(k).with_indifferent_access }
         .sort_by { |t| t[:filename] }.sort_by { |t| t[:daily] ? 1 : 0 }

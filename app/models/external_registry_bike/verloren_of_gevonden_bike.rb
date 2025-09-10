@@ -41,6 +41,7 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
 
   def image_url
     return if info_hash["object_id"].blank?
+
     [registry_url, "assets", "image", info_hash["object_id"]].join("/")
   end
 
@@ -115,6 +116,7 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
     def parse_serial_number(description)
       match_data = SERIAL_NUMBER_REGEX.match(description)
       return "absent" if match_data.blank? || absent?(match_data[1])
+
       match_data[1]
     end
   end

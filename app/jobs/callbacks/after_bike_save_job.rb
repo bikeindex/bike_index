@@ -9,6 +9,7 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
   def perform(bike_id, skip_user_update = false, resave_bike = false)
     bike = Bike.unscoped.where(id: bike_id).first
     return true unless bike.present?
+
     bike.update(updated_at: Time.current) && bike.reload if resave_bike
     bike.load_external_images
     update_matching_partial_registrations(bike)
@@ -40,6 +41,7 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
 
   def post_bike_to_webhook(post_body)
     return true unless POST_URL.present?
+
     Faraday.new(url: POST_URL).post do |req|
       req.headers["Content-Type"] = "application/json"
       req.body = post_body.to_json
@@ -56,6 +58,7 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
 
   def update_matching_partial_registrations(bike)
     return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
+
     matches = BParam.partial_registrations.without_bike.where("email ilike ?", "%#{bike.owner_email}%")
       .reorder(:created_at)
     if matches.count > 1
@@ -65,6 +68,7 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
     end
     matching_b_param = matches.last # Because we want the last created
     return true unless matching_b_param.present?
+
     matching_b_param.update(created_bike_id: bike.id)
     # Only set ownership
     ownership = bike.current_ownership
@@ -86,11 +90,13 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
 
   def create_user_registration_organizations(bike)
     return if bike.reload.user.blank?
+
     bike.bike_organizations.each do |bike_organization|
       # If there is notification that is graduated for the organization, don't create new reg organizations
       organization = bike_organization.organization
       next if organization.blank? || UserRegistrationOrganization.unscoped
         .where(user_id: bike.user.id, organization_id: organization.id).any?
+
       user_registration_organization = UserRegistrationOrganization.new(user_id: bike.user.id, organization_id: organization.id)
       user_registration_organization.all_bikes = organization.user_registration_all_bikes?
       user_registration_organization.can_not_edit_claimed = bike_organization.can_not_edit_claimed

@@ -101,11 +101,13 @@ class PropulsionType
 
     def default_non_motorized_type(cycle_type)
       return nil if CycleType.strict_motorized(cycle_type) == :always
+
       CycleType.pedal_type?(cycle_type) ? :"foot-pedal" : :"human-not-pedal"
     end
 
     def default_motorized_type(cycle_type)
       return nil if CycleType.strict_motorized(cycle_type) == :never
+
       CycleType.pedal_type?(cycle_type) ? :"pedal-assist" : :throttle
     end
 

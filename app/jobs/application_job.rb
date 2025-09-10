@@ -1,5 +1,6 @@
 class ApplicationJob
   include Sidekiq::Job
+
   sidekiq_options queue: "low_priority", backtrace: true
 
   def self.skip_env_var

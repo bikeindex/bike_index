@@ -30,6 +30,7 @@ class ScheduledJob < ApplicationJob
     Sidekiq.redis do |conn|
       # Don't try to find the job if the queue is over max size
       return true if conn.llen(redis_queue) > queue_maximum_addition_size
+
       # Jobs are json encoded in redis. Grab all of them and just match them by string
       conn.lrange(redis_queue, 0, -1).any? { |job| job.match(/class...#{name}/).present? }
     end
@@ -45,6 +46,7 @@ class ScheduledJob < ApplicationJob
   def self.redis
     # Basically, crib what is done in sidekiq
     raise ArgumentError, "requires a block" unless block_given?
+
     redis_pool.with { |conn| yield conn }
   end
 

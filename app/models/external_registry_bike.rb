@@ -49,9 +49,11 @@ class ExternalRegistryBike < ApplicationRecord
   class << self
     def registry_name(str)
       return nil unless str.present?
+
       reg = str.to_s.split("::").last.gsub("Bike", "")
       return "StopHeling.nl" if reg == "StopHeling"
       return "VerlorenOfGevonden.nl" if reg == "VerlorenOfGevonden"
+
       reg.titleize
     end
 
@@ -88,11 +90,13 @@ class ExternalRegistryBike < ApplicationRecord
 
     def brand(brand_name)
       return "unknown_brand" if absent?(brand_name)
+
       brand_name
     end
 
     def colors(frame_color)
       return "unknown" if absent?(frame_color)
+
       frame_color
     end
 
@@ -103,6 +107,7 @@ class ExternalRegistryBike < ApplicationRecord
 
   def short_address
     return nil unless location_found.present?
+
     addy = location_found.split(",")
     shorter_length = (addy.length > 3) ? 3 : addy.length
     addy[-shorter_length..].reject(&:blank?).map(&:strip).join(", ")
@@ -111,6 +116,7 @@ class ExternalRegistryBike < ApplicationRecord
   def status_humanized
     shuman = Bike.status_humanized(status)
     return self.class.impounded_kind if shuman == "impounded"
+
     shuman
   end
 

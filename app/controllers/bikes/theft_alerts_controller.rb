@@ -1,5 +1,6 @@
 class Bikes::TheftAlertsController < Bikes::BaseController
   include BikeEditable
+
   before_action :get_existing_theft_alerts, except: [:create]
 
   def new
@@ -57,11 +58,13 @@ class Bikes::TheftAlertsController < Bikes::BaseController
 
   def current_customer_data
     return {customer_email: current_user.email} if current_user.stripe_id.blank?
+
     {customer: current_user.stripe_id}
   end
 
   def product_description(theft_alert)
     return params[:description] if params[:description].present?
+
     theft_alert.theft_alert_plan&.name
   end
 
@@ -75,6 +78,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
       .references(:theft_alert_plan)
     # Only show non-user theft_alerts to superuser
     return @theft_alerts if current_user.superuser?
+
     @theft_alerts = @theft_alerts.where(user: current_user)
   end
 end

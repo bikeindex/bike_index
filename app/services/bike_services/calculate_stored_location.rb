@@ -18,6 +18,7 @@ class BikeServices::CalculateStoredLocation
         attrs = {}
         if bike.address_set_manually # If it's not stolen, use the manual set address for the coordinates
           return {} unless bike.user&.address_set_manually # If it's set by the user, address_set_manually is no longer correct!
+
           attrs[:address_set_manually] = false
         end
         attrs.merge(location_record_address_hash(bike))
@@ -43,6 +44,7 @@ class BikeServices::CalculateStoredLocation
       l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
         l_hashes.find { |rec| rec&.dig("latitude").present? }
       return {} unless l_hash.present?
+
       # If the location record has coordinates, skip geocoding
       l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
     end

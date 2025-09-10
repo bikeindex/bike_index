@@ -18,6 +18,7 @@ module SortableHelper
     # Check for render_sortable - otherwise default to rendering
     render_sortable = html_options.key?(:render_sortable) ? html_options[:render_sortable] : !html_options[:skip_sortable]
     return title unless render_sortable
+
     html_options[:class] = "#{html_options[:class]} sortable-link"
     direction = (column == sort_column && sort_direction == "desc") ? "asc" : "desc"
 
@@ -38,6 +39,7 @@ module SortableHelper
 
     return true if s_params
     return false if except.map(&:to_s).include?("period")
+
     params[:period].present? && params[:period] != "all"
   end
 

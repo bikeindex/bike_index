@@ -216,6 +216,7 @@ class User < ApplicationRecord
 
     def from_auth(auth)
       return nil unless auth&.is_a?(Array)
+
       where(id: auth[0], auth_token: auth[1]).first
     end
   end
@@ -315,6 +316,7 @@ class User < ApplicationRecord
 
   def organization_prioritized
     return nil if organization_roles.limit(1).none?
+
     orgs = organizations.reorder(:created_at)
     # Prioritization of organizations
     orgs.ambassador.limit(1).first ||
@@ -331,6 +333,7 @@ class User < ApplicationRecord
 
   def authorized?(obj, no_superuser_override: false)
     return true if !no_superuser_override && superuser?
+
     case obj.class.name
     when "Bike", "BikeVersion"
       obj.authorized?(self, no_superuser_override: no_superuser_override)
@@ -345,6 +348,7 @@ class User < ApplicationRecord
     features = OrganizationFeature.matching_slugs(slugs)
     return false if features.blank?
     return true if !no_superuser_override && superuser?
+
     organizations.with_enabled_feature_slugs(features).limit(1).any?
   end
 
@@ -362,6 +366,7 @@ class User < ApplicationRecord
 
   def accepted_vendor_terms_of_service=(val)
     return unless InputNormalizer.boolean(val)
+
     self.vendor_terms_of_service = true
     self.when_vendor_terms_of_service = Time.current
   end
@@ -369,6 +374,7 @@ class User < ApplicationRecord
   def send_password_reset_email
     # If the auth token was just created, don't create a new one, it's too error prone
     return false if password_reset_just_sent?
+
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
     Email::ResetPasswordJob.perform_async(id)
@@ -378,6 +384,7 @@ class User < ApplicationRecord
   def send_magic_link_email
     # If the auth token was just created, don't create a new one, it's too error prone
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
+
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
     Email::MagicLoginLinkJob.perform_async(id)
@@ -390,6 +397,7 @@ class User < ApplicationRecord
 
   def confirm(token)
     return false if token != confirmation_token
+
     self.confirmation_token = nil
     self.confirmed = true
     save
@@ -406,18 +414,21 @@ class User < ApplicationRecord
   def member_of?(organization, no_superuser_override: false)
     return false unless organization.present?
     return true if claimed_organization_roles_for(organization.id).limit(1).any?
+
     superuser? && !no_superuser_override
   end
 
   def member_bike_edit_of?(organization, no_superuser_override: false)
     return false unless organization.present?
     return true if claimed_organization_roles_for(organization.id).not_member_no_bike_edit.limit(1).any?
+
     superuser? && !no_superuser_override
   end
 
   def admin_of?(organization, no_superuser_override: false)
     return false unless organization.present?
     return true if claimed_organization_roles_for(organization.id).admin.limit(1).any?
+
     superuser? && !no_superuser_override
   end
 
@@ -439,6 +450,7 @@ class User < ApplicationRecord
 
   def default_organization
     return @default_organization if defined?(@default_organization) # Memoize, permit nil
+
     @default_organization = organizations&.first # Maybe at some point use organization_roles to get the most recent, for now, speed
   end
 
@@ -477,6 +489,7 @@ class User < ApplicationRecord
 
   def render_donation_request
     return nil unless has_police_organization_role? && !organizations.law_enforcement.paid.limit(1).any?
+
     "law_enforcement"
   end
 
@@ -578,6 +591,7 @@ class User < ApplicationRecord
   def preferred_language_is_an_available_locale
     return if preferred_language.blank?
     return if I18n.available_locales.include?(preferred_language.to_sym)
+
     errors.add(:preferred_language, :not_an_available_language)
   end
 end

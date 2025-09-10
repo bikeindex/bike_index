@@ -1,5 +1,6 @@
 class StolenBike::UpdateTheftAlertFacebookJob < ScheduledJob
   prepend ScheduledJobRecorder
+
   sidekiq_options queue: "low_priority", retry: 3 # It will retry because of scheduling
 
   def self.frequency
@@ -16,10 +17,12 @@ class StolenBike::UpdateTheftAlertFacebookJob < ScheduledJob
     if theft_alert.facebook_data&.dig("ad_id").blank? || theft_alert.failed_to_activate?
       return StolenBike::ActivateTheftAlertJob.perform_async(theft_alert_id)
     end
+
     Facebook::AdsIntegration.new.update_facebook_data(theft_alert)
 
     return true unless theft_alert.notify? &&
       theft_alert.notifications.theft_alert_posted.none?
+
     # Perform inline rather than re-querying for objects
     Email::TheftAlertNotificationJob.new.perform(theft_alert_id, "theft_alert_posted", theft_alert)
   end

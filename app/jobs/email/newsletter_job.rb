@@ -28,6 +28,7 @@ class Email::NewsletterJob < ApplicationJob
 
       # If we sent already, don't send again
       return false if notifications.delivery_success.any?
+
       notification = notifications.last
     end
 

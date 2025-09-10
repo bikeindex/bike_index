@@ -22,7 +22,7 @@
 class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
-  INVALID_REGEX = /[\/\\\(\)\[\]=\s!"']/
+  INVALID_REGEX = /[\/\\()\[\]=\s!"']/
   INVALID_DOMAIN = "(invalid).domain"
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
   STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}.freeze
@@ -63,6 +63,7 @@ class EmailDomain < ApplicationRecord
     def find_or_create_for(email_or_domain, skip_processing: false)
       domain = email_or_domain&.split("@")&.last&.strip
       return if domain.blank?
+
       domain = "@#{domain}" if email_or_domain.match?("@")
 
       find_matching_domain(domain) || create(domain:, skip_processing:)

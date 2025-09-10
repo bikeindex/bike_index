@@ -52,6 +52,7 @@ class BikeV2Serializer < ApplicationSerializer
   def location_found
     return object.location_found if defined?(object.location)
     return nil unless object.status_impounded?
+
     object.address
   end
 
@@ -81,6 +82,7 @@ class BikeV2Serializer < ApplicationSerializer
 
   def stolen_coordinates
     return nil unless current_stolen_record&.latitude_public&.present?
+
     [current_stolen_record.latitude_public, current_stolen_record.longitude_public]
   end
 

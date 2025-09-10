@@ -60,6 +60,7 @@ class BulkImportJob < ApplicationJob
 
   def register_bike(b_param_hash)
     return nil if b_param_hash.blank?
+
     b_param = BParam.create(creator_id: creator_id,
       params: b_param_hash,
       origin: "bulk_import_worker")
@@ -167,6 +168,7 @@ class BulkImportJob < ApplicationJob
     valid_headers = (attrs & required_headers).count == 3
     # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers
+
     missing_headers = required_headers - (attrs & required_headers)
     @bulk_import.add_file_error("Invalid CSV Headers: #{attrs.join(", ")} - missing #{missing_headers.join(", ")}")
   end

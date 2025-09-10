@@ -110,6 +110,7 @@ class MailSnippet < ApplicationRecord
     def organization_email_for(kind)
       kind = kind&.to_s
       return kind.to_s unless organization_snippet_kinds.include?(kind)
+
       organization_snippets.dig(kind, :emails)
     end
 
@@ -168,6 +169,7 @@ class MailSnippet < ApplicationRecord
 
   def update_associations
     return true if skip_update
+
     # Because we need to update the organization and make sure mail snippet calculations are included
     # Manually update to ensure that it runs the before save stuff
     organization&.update(updated_at: Time.current)

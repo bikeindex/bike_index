@@ -7,6 +7,7 @@ class Users::ProcessOrganizationRoleJob < ApplicationJob
 
     assign_organization_role_user(organization_role, user_id) if organization_role.user.blank?
     return false if remove_duplicated_organization_role!(organization_role)
+
     auto_generate_user_for_organization(organization_role)
     if organization_role.send_invitation_email?
       OrganizedMailer.organization_invitation(organization_role).deliver_now
@@ -26,6 +27,7 @@ class Users::ProcessOrganizationRoleJob < ApplicationJob
   def assign_organization_role_user(organization_role, user_id)
     user_id ||= User.fuzzy_confirmed_or_unconfirmed_email_find(organization_role.invited_email)&.id
     return false unless user_id.present?
+
     organization_role.update(user_id: user_id)
     organization_role.reload
     User.find_by_id(user_id)&.update(updated_at: Time.current)
@@ -35,12 +37,14 @@ class Users::ProcessOrganizationRoleJob < ApplicationJob
     return false unless organization_role.user.present? &&
       organization_role.user.organization_roles.where.not(id: organization_role.id)
         .where(organization_id: organization_role.organization_id).any?
+
     organization_role.destroy
   end
 
   def auto_generate_user_for_organization(organization_role)
     return false unless organization_role.organization.enabled?("passwordless_users") &&
       organization_role.user.blank?
+
     password = SecurityTokenizer.new_password_token
     user = User.new(skip_update: true,
       email: organization_role.invited_email,
