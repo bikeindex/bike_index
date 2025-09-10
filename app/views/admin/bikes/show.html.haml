@@ -28,17 +28,17 @@
   %h3.mt-4
     Notifications
     %small.less-strong
-      = link_to admin_number_display(@bike.notifications.count), admin_notifications_path(search_bike_id: @bike.id)
+      = link_to number_display(@bike.notifications.count), admin_notifications_path(search_bike_id: @bike.id)
   - if @bike.notifications.any?
     .mt-2
-      = render partial: "/admin/notifications/table", locals: {notifications: @bike.notifications.order(created_at: :desc), skip_bike: true}
+      = render partial: "/admin/notifications/table", locals: {notifications: @bike.notifications.includes(:notifiable).order(created_at: :desc), skip_bike: true, show_message_preview: true}
     .mb-4
 
   - feedbacks = Feedback.bike(@bike.id).order(created_at: :desc)
   %h3.mt-3
     Feedbacks
     %small.less-strong
-      = link_to admin_number_display(feedbacks.count), admin_feedbacks_path(search_bike_id: @bike.id)
+      = link_to number_display(feedbacks.count), admin_feedbacks_path(search_bike_id: @bike.id)
 
   - if feedbacks.any?
     .mt-2
@@ -49,7 +49,7 @@
   %h3.mt-3
     User Alerts
     %small.less-strong
-      = link_to admin_number_display(user_alerts.count), admin_user_alerts_path(search_bike_id: @bike.id)
+      = link_to number_display(user_alerts.count), admin_user_alerts_path(search_bike_id: @bike.id)
   - if user_alerts.any?
     .mt-2
     = render partial: "/admin/user_alerts/table", locals: {user_alerts: user_alerts}
@@ -59,7 +59,7 @@
   %h3.mt-3
     Parking Notifications
     %small.less-strong
-      = link_to admin_number_display(parking_notifications.count), admin_parking_notifications_path(search_bike_id: @bike.id)
+      = link_to number_display(parking_notifications.count), admin_parking_notifications_path(search_bike_id: @bike.id)
   - if parking_notifications.any?
     .mt-2
     = render partial: "/admin/parking_notifications/table", locals: {parking_notifications: parking_notifications}
@@ -69,7 +69,7 @@
   %h3.mt-3
     Graduated Notifications
     %strong
-      = link_to admin_number_display(GraduatedNotification.where(bike_id: @bike.id).count), admin_graduated_notifications_path(search_bike_id: @bike.id)
+      = link_to number_display(GraduatedNotification.where(bike_id: @bike.id).count), admin_graduated_notifications_path(search_bike_id: @bike.id)
 
 - elsif @active_tab == "recoveries"
   = render partial: "/admin/recoveries/table", locals: {recoveries: @bike.recovered_records, skip_bike: true}
@@ -90,13 +90,13 @@
   %h3.mt-4
     Impound records for this bike
     %small.less-strong
-      = link_to admin_number_display(@bike.impound_records.count), admin_impound_records_path(search_bike_id: @bike.id)
+      = link_to number_display(@bike.impound_records.count), admin_impound_records_path(search_bike_id: @bike.id)
   = render partial: "/admin/impound_records/table", locals: {impound_records: @bike.impound_records.reorder(created_at: :desc), skip_claims: true}
 
   - impound_claims = ImpoundClaim.involving_bike_id(@bike.id).reorder(created_at: :desc)
   %h3.mt-4
     Impound claims involving this bike
     %small.less-strong
-      = link_to admin_number_display(impound_claims.count), admin_impound_claims_path(search_bike_id: @bike.id)
+      = link_to number_display(impound_claims.count), admin_impound_claims_path(search_bike_id: @bike.id)
 
   = render partial: "/admin/impound_claims/table", locals: {impound_claims: impound_claims}

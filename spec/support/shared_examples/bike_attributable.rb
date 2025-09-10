@@ -89,6 +89,22 @@ RSpec.shared_examples "bike_attributable" do
     end
   end
 
+  describe "drivetrain_attributes" do
+    let(:obj) { FactoryBot.build(model_sym, coaster_brake:, belt_drive:) }
+    let(:coaster_brake) { false }
+    let(:belt_drive) { false }
+    it "returns empty" do
+      expect(obj.drivetrain_attributes).to eq ""
+    end
+    context "with belt_drive and coaster_brake" do
+      let(:coaster_brake) { true }
+      let(:belt_drive) { true }
+      it "returns empty" do
+        expect(obj.drivetrain_attributes).to eq "Coaster brake, Belt drive"
+      end
+    end
+  end
+
   describe "propulsion_type_slug" do
     let(:obj) { FactoryBot.build(model_sym, propulsion_type_slug: propulsion_type, cycle_type: cycle_type) }
     let(:cycle_type) { "bike" }

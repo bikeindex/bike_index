@@ -15,6 +15,7 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  bike_id                :bigint
+#  message_id             :string
 #  notifiable_id          :bigint
 #  user_id                :bigint
 #
@@ -55,6 +56,7 @@ class Notification < ApplicationRecord
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
+  scope :with_message_id, -> { where.not(message_id: nil) }
 
   class << self
     def kinds
@@ -198,6 +200,7 @@ class Notification < ApplicationRecord
   def set_calculated_attributes
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
+    self.bike_id ||= notifiable.item_id if defined?(notifiable.item_id)
     self.delivery_status ||= "delivery_pending"
     self.message_channel_target ||= calculated_message_channel_target
   end
@@ -222,8 +225,9 @@ class Notification < ApplicationRecord
   def track_email_delivery
     return if delivery_success?
 
-    yield
+    delivery = yield
 
+    self.message_id ||= message_id_from_delivery(delivery)
     update(delivery_status: "delivery_success")
     user_email&.update_last_email_errored!(email_errored: false)
   rescue => e
@@ -242,6 +246,10 @@ class Notification < ApplicationRecord
   end
 
   private
+
+  def message_id_from_delivery(delivery)
+    defined?(delivery.message_id) ? delivery.message_id : nil
+  end
 
   def calculated_phone
     notifiable&.phone

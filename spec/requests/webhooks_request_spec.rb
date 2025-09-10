@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe WebhooksController, type: :request do
-  let(:re_record_interval) { 30.days }
+  let(:re_record_interval) { 6.months }
 
   describe "POST stripe" do
     let(:webhook_url) { "/webhooks/stripe" }
@@ -128,8 +128,9 @@ RSpec.describe WebhooksController, type: :request do
       end
     end
 
-    context "unknown event type" do
-      it "returns 400"
-    end
+    # TODO: Someday, handle this - not a high priority though
+    # context "unknown event type" do
+    #   it "returns 400"
+    # end
   end
 end

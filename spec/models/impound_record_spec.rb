@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe ImpoundRecord, type: :model do
   it_behaves_like "geocodeable"
+  it_behaves_like "default_currencyable"
+
   let!(:bike) { FactoryBot.create(:bike, created_at: Time.current - 1.day) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:impound_configuration) { organization.fetch_impound_configuration }

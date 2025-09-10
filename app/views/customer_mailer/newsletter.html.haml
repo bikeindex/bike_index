@@ -1,0 +1,35 @@
+!!!
+%html
+  %head
+    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type" }
+    %title= @title
+    = stylesheet_link_tag "email"
+
+  %body
+    .binx-wrapper
+      %table.binx-header
+        %tbody
+          %td
+            -# Not including an alt tag because it renders in the text version
+            %img.bike-index-logo{src: "https://files.bikeindex.org/email_assets/logo.png", height: "70"}
+
+      .binx-body
+        = @mail_snippet_body.html_safe
+
+      .binx-pstscpt.mt-5
+        .hearts
+          %span &#9829;
+          %span &#9829;
+          %span &#9829;
+          %span &#9829;
+          %span &#9829;
+        %h4 The Bike Index Team
+
+        %p.less-strong.text-center.mt-5{style: "font-size: 85%"}
+          Don't want to receive Bike Index newsletters?
+          = link_to "update your contact preferences", edit_my_account_url, class: "gray-link"
+          - if @user.present?
+            or
+            = link_to "unsubscribe", unsubscribe_user_url(@user.username), class: "gray-link"
+
+

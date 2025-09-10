@@ -39,8 +39,8 @@
 %hr.mb-4
 
 = form_for [:admin, @recovery_display] do |f|
-  - if @recovery_display.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Recovery Display", obj: @recovery_display }
+  = render(AlertForErrors::Component.new(object: @recovery_display, dismissable: true))
+
   - if @recovery_display.stolen_record_id.present?
     = f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id
   .row

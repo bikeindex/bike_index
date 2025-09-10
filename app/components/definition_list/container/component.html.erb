@@ -1,0 +1,15 @@
+<% if @multi_columns %>
+  <div class="tw:@container tw:w-full">
+    <dl
+      class="
+        tw:break-words tw:@md:grid tw:@md:grid-cols-2 tw:gap-x-4 tw:@container
+      "
+    >
+      <%= content %>
+    </dl>
+  </div>
+<% else %>
+  <dl class="tw:break-words tw:@container">
+    <%= content %>
+  </dl>
+<% end %>

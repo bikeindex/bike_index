@@ -84,6 +84,22 @@ RSpec.describe Membership, type: :model do
         end
       end
     end
+
+    context "it validates user's presence on create" do
+      let(:membership_existing) { FactoryBot.build(:membership, user: nil) }
+      it "is not valid" do
+        expect(membership_existing).to_not be_valid
+        expect(membership_existing.errors.full_messages).to eq(["User can't be blank"])
+      end
+    end
+
+    context "it doesn't validate user's presence on update" do
+      it "is valid on update, even if user is deleted" do
+        expect(membership_existing).to be_valid
+        user.destroy
+        expect(membership_existing.reload).to be_valid
+      end
+    end
   end
 
   describe "user member and scope" do

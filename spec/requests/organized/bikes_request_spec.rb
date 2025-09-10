@@ -221,7 +221,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end
         # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
-        ImageAssociatorJob.new.perform
+        Images::AssociatorJob.new.perform
 
         b_param.reload
         expect(b_param.creation_organization).to eq current_organization

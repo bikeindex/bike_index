@@ -58,6 +58,9 @@ RSpec.describe BulkImportJob, type: :job do
     end
     context "erroring" do
       let!(:color) { FactoryBot.create(:color, name: "White") }
+      before do
+        allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+      end
       after { tempfile.close && tempfile.unlink }
 
       def bike_matches_target(bike)
@@ -80,7 +83,6 @@ RSpec.describe BulkImportJob, type: :job do
           ]
         end
         it "registers bike, adds row that is an error" do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
           expect {
             instance.perform(bulk_import.id)
           }.to change(Bike, :count).by 1
@@ -101,7 +103,6 @@ RSpec.describe BulkImportJob, type: :job do
           ]
         end
         it "stores error line, resumes post errored line successfully" do
-          allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
           # It should throw an error and not create a bike
           expect {
             expect { instance.perform(bulk_import.id) }.to raise_error(CSV::MalformedCSVError)
@@ -122,6 +123,25 @@ RSpec.describe BulkImportJob, type: :job do
           # And make sure it hasn't updated the file_errors
           expect(bulk_import.file_errors_with_lines).to eq([["Any value after quoted field isn't allowed in line 1.", 1]])
           expect(bulk_import.progress).to eq "finished"
+        end
+      end
+      context "CSV file exceeds maximum size" do
+        let(:csv_lines) do
+          lines = [%w[manufacturer model year color owner_email serial_number]]
+          26_000.times do |i|
+            lines << ["", "", "", "", "", ""]
+          end
+          lines
+        end
+
+        it "adds file error when file has more than allowed lines" do
+          expect do
+            instance.perform(bulk_import.id)
+          end.to change(Bike, :count).by 0
+
+          bulk_import.reload
+          expect(bulk_import.progress).to eq "finished"
+          expect(bulk_import.file_errors.join("")).to match("CSV is too big! Max allowed size is 25000 lines")
         end
       end
     end
@@ -181,8 +201,9 @@ RSpec.describe BulkImportJob, type: :job do
           expect {
             instance.perform(bulk_import.id)
             # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-            pp "Error line: 184", bulk_import.import_errors if bulk_import.reload.blocking_error?
+            pp "Error valid file", bulk_import.import_errors if bulk_import.reload.blocking_error?
           }.to change(Bike, :count).by 2
+          expect(PublicImage.count).to eq 1
           bulk_import.reload
           expect(bulk_import.progress).to eq "finished"
           expect(bulk_import.bikes.count).to eq 2
@@ -256,7 +277,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101 (actually after, but still...)
-              pp "Error line: 259", bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error no_duplicate", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
           end
           # It doesn't duplicate if no duplicate is true
@@ -293,7 +314,7 @@ RSpec.describe BulkImportJob, type: :job do
         # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
         let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
         include_context :geocoder_real
-        let(:bike1_tareget) do
+        let(:bike1_target) do
           {
             primary_frame_color: color_green,
             serial_number: "xyz_test",
@@ -361,7 +382,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect {
               instance.perform(bulk_import.id)
               # This test is being flaky! Add debug printout #2101
-              pp "Error line: 364", bulk_import.import_errors if bulk_import.reload.blocking_error?
+              pp "Error valid file impounded", bulk_import.import_errors if bulk_import.reload.blocking_error?
             }.to change(Bike, :count).by 2
             bulk_import.reload
             expect(bulk_import.progress).to eq "finished"
@@ -372,7 +393,7 @@ RSpec.describe BulkImportJob, type: :job do
             bike1 = bulk_import.bikes.reorder(:created_at).first
             expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
             expect(bike1.current_ownership.status).to eq "status_impounded"
-            expect(bike1).to match_hash_indifferently bike1_tareget
+            expect(bike1).to match_hash_indifferently bike1_target
             expect(bike1.created_by_notification_or_impounding?).to be_truthy
             bike1_impound_record = bike1.current_impound_record
             expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
@@ -393,6 +414,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect(bike_sticker_update.creator_kind).to eq "creator_import"
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
+            expect(bike2.id).to_not eq bike1.id
             expect(bike2).to match_hash_indifferently bike2_target
             expect(bike2.public_images.count).to eq 1
             expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
@@ -556,7 +578,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(Bike.count).to eq 0
           new_bike = instance.register_bike(instance.row_to_b_param_hash(passed_row))
           # This test is being flaky! Add debug printout #2101
-          pp "Error line: 560", new_bike.errors if new_bike.errors.any?
+          pp "Error expect_registered_bike", new_bike.errors if new_bike.errors.any?
           expect(Bike.count).to eq 1
           bike = Bike.last
 

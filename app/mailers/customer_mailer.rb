@@ -59,6 +59,15 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def newsletter(user:, mail_snippet:)
+    @user = user
+    @_action_has_layout = false # layout is manually included here
+    @mail_snippet_body = mail_snippet.body
+    @title = mail_snippet.subject
+
+    mail(to: @user.email, subject: @title, tag: __callee__)
+  end
+
   def theft_survey(notification)
     mail_snippet = MailSnippet.theft_survey_2023.first
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
@@ -132,6 +141,7 @@ class CustomerMailer < ApplicationMailer
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
     @user = stolen_notification.receiver
+    @mail_snippet = stolen_notification.mail_snippet
 
     I18n.with_locale(@user&.preferred_language) do
       mail(
@@ -198,6 +208,25 @@ class CustomerMailer < ApplicationMailer
       mail(to: @user.email,
         from: '"Gavin Hoover" <gavin@bikeindex.org>',
         tag: __callee__)
+    end
+  end
+
+  def marketplace_message_notification(marketplace_message)
+    @marketplace_message = marketplace_message
+    @user = @marketplace_message.receiver
+    @marketplace_listing = @marketplace_message.marketplace_listing
+    # TODO: Specific layout for these, rather than just skipping header
+    @skip_header = true
+
+    @message_url = my_account_message_url(id: @marketplace_message.id, anchor: "message-#{@marketplace_message.id}")
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @user.email,
+        subject: @marketplace_message.subject,
+        references: @marketplace_message.email_references_id,
+        tag: __callee__
+      )
     end
   end
 end

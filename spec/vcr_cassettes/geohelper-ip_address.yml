@@ -19,7 +19,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 03 Apr 2025 01:39:17 GMT
+      - Thu, 03 Jul 2025 16:54:21 GMT
       Content-Type:
       - text/plain; charset=ISO-8859-1
       Content-Length:
@@ -39,11 +39,11 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - 92a4d9f05b0bf97b-SJC
+      - 9597e7806ea1232c-SJC
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
       encoding: UTF-8
       string: US,CA,San Francisco,37.750600,-122.412100
-  recorded_at: Thu, 03 Apr 2025 01:39:17 GMT
+  recorded_at: Thu, 03 Jul 2025 16:54:21 GMT
 recorded_with: VCR 6.3.1

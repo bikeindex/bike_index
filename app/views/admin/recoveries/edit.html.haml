@@ -50,8 +50,8 @@
   Only edit if you want to change what is stored about this recovery.
 
 = form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" } , html: { class: "form form-horizontal" }) do |f|
-  - if @recovery.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Recovery", obj: @recovery}
+  = render(AlertForErrors::Component.new(name: "Recovery", object: @recovery))
+
   .row.mt-4
     .col-md-6
       .form-group

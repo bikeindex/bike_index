@@ -109,6 +109,7 @@ class Feedback < ApplicationRecord
         impound_update = bike.current_impound_record.impound_record_updates.new(user_id: user_id, kind: "removed_from_bike_index")
         impound_update.save
       else
+        bike.current_marketplace_listing&.update(status: "removed")
         bike.destroy
       end
     end

@@ -1,10 +1,10 @@
 # Seed the component groups
-cgroups = [{name: "Frame and fork", description: "Frame and fork. Also headset."},
-  {name: "Wheels", description: "wheels and everything to do with them (including freehub bodies, not including cassettes)."},
-  {name: "Drivetrain and brakes", description: "Shifters, cranks, chain, brake levers brake calipers."},
-  {name: "Additional parts", description: "Seat, handlebars, accessories (computer, rack, lights, etc)."}]
+cgroups = [{name: "Frame and fork", description: "Frame and fork. Also headset.", priority: 1},
+  {name: "Wheels", description: "wheels and everything to do with them (including freehub bodies, not including cassettes).", priority: 2},
+  {name: "Drivetrain and brakes", description: "Shifters, cranks, chain, brake levers brake calipers.", priority: 3},
+  {name: "Additional parts", description: "Seat, handlebars, accessories (computer, rack, lights, etc).", priority: 4}]
 cgroups.each do |component_group|
-  cg = Cgroup.create(name: component_group[:name], description: component_group[:description])
+  cg = Cgroup.create(name: component_group[:name], description: component_group[:description], priority: component_group[:priority])
   cg.save
 end
 

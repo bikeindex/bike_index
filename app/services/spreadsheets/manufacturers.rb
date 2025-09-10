@@ -8,11 +8,11 @@ class Spreadsheets::Manufacturers
 
   class << self
     def to_csv(manufacturers = nil)
-      manufacturers ||= Manufacturer.all
+      manufacturers ||= Manufacturer.except_other
 
       CSV.generate do |csv|
         csv << EXPORT_COLUMNS
-        manufacturers.each { csv << row_for(_1) }
+        manufacturers.each { csv << row_for(it) }
       end
     end
 

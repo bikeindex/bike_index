@@ -1,5 +1,8 @@
 # Ignore local config files
 /.bundle
+# Ignore vendored gems
+/vendor/bundle
+vendor/bundle
 
 # Ignore all logfiles and tempfiles.
 /log/*.log*
@@ -64,3 +67,6 @@ spec/vcr_cassettes/facebook/*
 
 # Ignore editor temp files
 .idea
+
+# Ignore .claude settings
+.claude/

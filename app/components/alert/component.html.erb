@@ -1,14 +1,35 @@
 <div
-  class="tw:flex tw:items-center tw:rounded-lg tw:border tw:p-4 <%= @margin_classes %> <%= color_classes %> tw:transition-all tw:duration-300"
+  class="
+    tw:flex tw:items-baseline tw:rounded-sm tw:border tw:p-4 tw:gap-4
+    <%= @margin_classes %> <%= color_classes %>
+    tw:transition-all tw:duration-300
+  "
   role="alert"
-  data-controller="alert--component">
+  data-controller="alert"
+>
 
-  <%# currently always showing the same icon, but... could update to do better in the future %>
-  <svg class="tw:shrink-0 tw:w-4 tw:h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-  </svg>
-  <span class="tw:sr-only"><%= @kind.to_s.titleize %></span>
-  <div class="tw:ms-3 ">
+  <div class="tw:w-4">
+    <%# currently always showing the same icon, but... could update to do better in the future %>
+    <svg
+      class="tw:shrink-0 tw:w-4 tw:h-4 tw:-mb-0.5"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+      />
+    </svg>
+    <span class="tw:sr-only"><%= @kind.to_s.titleize %></span>
+  </div>
+
+  <div class="tw:grow">
+    <% if @header.present? %>
+      <h4 class="tw:text-lg! tw:mb-0! uncap <%= text_color_classes_important %>">
+        <%= @header %>
+      </h4>
+    <% end %>
     <%= @text %>
     <%= content %>
   </div>
@@ -16,13 +37,30 @@
   <% if @dismissable %>
     <button
       type="button"
-      class="tw:ms-auto tw:-mx-1.5 tw:-my-1.5 tw:rounded-lg tw:focus:ring-2 tw:p-1.5 tw:inline-flex tw:items-center tw:justify-center tw:h-8 tw:w-8 <%= dismissable_color_classes %>"
+      class="
+        tw:ms-auto tw:-mx-1.5 tw:-my-1.5 tw:rounded-sm tw:focus:ring-2 tw:p-1.5
+        tw:inline-flex tw:items-center tw:justify-center tw:h-8 tw:w-8
+        <%= dismissable_color_classes %>
+      "
       aria-label="Close"
-      data-action="click->alert--component#close">
+      data-action="click->alert#close"
+    >
 
       <span class="tw:sr-only">Close</span>
-      <svg class="tw:w-3 tw:h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+      <svg
+        class="tw:w-3 tw:h-3"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 14 14"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+        />
       </svg>
     </button>
   <% end %>

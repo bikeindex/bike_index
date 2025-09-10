@@ -1,6 +1,6 @@
 .form.form-horizontal.clearfix
-  - if @organization.errors.any?
-    = render partial: "/shared/errors", locals: {name: "Organization", obj: @organization}
+  = render(AlertForErrors::Component.new(object: @organization))
+
   = form_for @organization, {as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update'} do |f|
     = f.fields_for :mail_snippets do |snippet|
       - snippet_kind = snippet.object.kind

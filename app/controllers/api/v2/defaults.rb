@@ -41,6 +41,10 @@ module API
             env["doorkeeper_authorized_no_user"]
           end
 
+          def doorkeeper_application
+            current_token&.application
+          end
+
           private
 
           # overridden in v3/me. All others require a confirmed user

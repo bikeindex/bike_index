@@ -21,7 +21,7 @@
 
           %a.magic_link-login{ href: magic_link_session_path }
             %span.oauth-logo-block
-              %i.fas.fa-envelope-open-text
+              = inline_svg_tag "icons/envelope.svg", class: "tw:block tw:w-6 tw:h-6 tw:mx-auto"
             %span.oauth-text-block= t(".sign_in_using_magic_link")
         .sign-in-up-or
           %h3= t(".or")

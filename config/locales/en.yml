@@ -686,6 +686,19 @@ en:
         iso_bsd: Iso bsd
         name: Name
         priority: Priority
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive: Belt drive
+        coaster_brake: Coaster brake
+      status_humanized:
+        bike:
+          abandoned: abandoned
+          for_sale: for sale
+          found: found
+          impounded: impounded
+          stolen: stolen
+          unregistered: unregistered
+          with_owner: with owner
     enums:
       currency:
         cad: CAD
@@ -725,11 +738,24 @@ en:
         titanium: Titanium
       handlebar_type:
         bmx: BMX style
-        drop_bar: Drop
+        drop_bar: Drop bars
         flat: Flat or riser
         forward: Forward facing
         other: Not handlebars
         rearward: Rear facing
+      marketplace_listing:
+        condition:
+          excellent: excellent
+          good: good
+          new_in_box: new
+          poor: poor
+          salvage: for parts
+        condition_description:
+          excellent: lightly ridden
+          good: used but mechanically sound
+          new_in_box: unridden/with tags
+          poor: needs service
+          salvage: not working/unrideable
       propulsion_type:
         foot_pedal: Foot Pedal
         hand_pedal: Hand Cycle (hand pedal)
@@ -770,6 +796,7 @@ en:
           expired: The access token expired
           revoked: The access token was revoked
           unknown: The access token is invalid
+        re: 'Re: %{original_subject}'
         record_invalid: 'Validation failed: %{errors}'
         resource_owner_authenticator_not_configured: >-
           Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator
@@ -793,6 +820,8 @@ en:
           response mode.
         unsupported_response_type: The authorization server does not support this
           response type.
+        user_not_in_initial_record: user isn't one of the original message users
+        user_removed: "(user removed)"
       models:
         bike:
           not_found: not found
@@ -813,6 +842,14 @@ en:
         manufacturer:
           cannot_include_quote: cannot include double quote
           cannot_match_a_color_name: cannot be the same as a color name
+        marketplace_listing:
+          address_required: Location is required - please set at least a city
+          bike_is_stolen: "%{item_type} can't be stolen (mark it recovered)"
+          condition_required: Condition is required
+          item_not_visible: "%{item_type} is not visible - maybe you marked it hidden?"
+          not_with_owner: "%{item_type} mark the bike recovered to list it"
+          price_required: Price is required
+          primary_activity_required: Primary activity is required
         organization_message:
           latlon_required: latitude and longitude required
           required: required
@@ -981,14 +1018,6 @@ en:
         two_u_locks: Two U-locks
         u_lock: U-lock
         u_lock_and_cable: U-lock and cable
-    status_humanized:
-      bike:
-        abandoned: abandoned
-        found: found
-        impounded: impounded
-        stolen: stolen
-        unregistered: unregistered
-        with_owner: with owner
   attributes:
     bikes:
       location: Location
@@ -998,10 +1027,6 @@ en:
     index:
       primary_colors: Primary colors
   bikes:
-    bike:
-      location: Location
-      primary_colors: Primary colors
-      serial: Serial
     bike_show_overlays:
       add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what
@@ -1044,27 +1069,25 @@ en:
         You sent this %{bike_type} to <em>%{owner_email}</em> and it hasn't been claimed
         yet. You can update it.
       your_bike: Your %{bike_type}
-    index:
-      all: All
-      miles_of: miles of
-      no_bikes_matched: No bikes exactly matched your search
-      not_marked_stolen: Not marked stolen
-      search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
-      stolen_anywhere: Stolen anywhere
-      stolen_within: Stolen within
-      you: you
     main_show_block:
+      abandoned_title: This is an abandoned %{bike_type} that was %{impound_kind}
       bike_photo: "%{bike_type} photo"
       color_may_not_match: Color may not match!
+      component_no_info: "-"
       componentyear: "%{componentyear}"
       department_city: Department & city
       description_of_incident: Description of incident
       distinguishing_features: Distinguishing features
+      drivetrain: Drivetrain
+      drivetrain_fixed: Fixed gear
+      drivetrain_front: Drivetrain front
+      drivetrain_rear: Drivetrain rear
       found_at: Found at
       frame_material: Frame Material
       frame_size: Frame size
       front: Front
       front_rear: Front & rear
+      front_tire_width: Front tire width
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
       impounded_at: Impounded
@@ -1082,11 +1105,15 @@ en:
       primary_colors: Primary colors
       propulsion_type: Propulsion
       rear: Rear
+      rear_tire_width: Front tire width
       rear_wheel_diameter: Rear wheel diameter
       serial: Serial
       stock_photo: Stock photo of a %{year} %{model}
       stolen_at: Stolen at
       stolen_details: Theft Details
+      tire_width: Tire width
+      tire_width_narrow_false: Wide tire
+      tire_width_narrow_true: Narrow tire
       vehicle_type: Vehicle type
       wheel_diameter: Wheel diameter
       year: Year
@@ -1147,80 +1174,6 @@ en:
       report_the_theft_to_the_organization_html: >-
         <span class="text-warning">Report the theft</span> to %{organization} <strong>%{report_link}</strong>
         to get a police report number
-    organized_access_panel:
-      access_panel: Access Panel
-      added_to_track_parking_notification: >-
-        This %{bike_type} is not registered to a user. It was added to track parking
-        notifications.
-      additional_registrations_information: Registrations by user
-      additional_registrations_information_visible_because: visible with %{org_name}
-        law enforcement access
-      additional_registrations_potential_duplicates: 'Potential duplicate bikes matching
-        serial segments:'
-      additional_registrations_registered_at: Registered at
-      additional_registrations_this_bike: This %{bike_type}
-      address: Registration Address
-      address_or_intersection: Address or intersection
-      as_a_bikeindex_ambassador_html: >-
-        <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can
-        mark it as recovered:</em>
-      assign_sticker: Assign sticker
-      avery_exportable: Avery Exportable
-      believe_it_is_anyway: Believe it is anyway?
-      bike_is_not_registered_html: This %{bike_type} is <em>not</em> registered with
-        %{org_name}
-      bike_is_registered: This %{bike_type} is registered with %{org_name}
-      bike_not_marked_stolen: "%{bike_type} is not marked stolen."
-      choose_country: Choose country
-      city: City
-      claimed: Claimed
-      contact_the_owner_it_is_stolen: to the owner of this %{bike_type} that you believe
-        is stolen.
-      creation_description: Source
-      creator: Creator
-      edit: Edit
-      email_to_deal_with_this_html: Email %{support_link} to deal with this.
-      is_false: 'false'
-      is_not_registered_html: "<em>not</em> reged with %{org_name}"
-      is_registered: reged with %{org_name}
-      is_true: 'true'
-      link_sticker: Link Sticker
-      link_url_for_online_sighting: Link url for online sighting (optional)
-      mark_bike_recovered: Mark bike recovered
-      missing_address: missing address
-      missing_owner_name: missing user name
-      model_audit: E-Vehicle audit
-      not_audited: Not audited
-      or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
-      org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
-      org_cannot_edit: "%{org_name} can not edit"
-      organization_can_edit_after_claimed: and can edit after %{bike_type} claimed
-      organization_child: Child organization
-      organization_registered: Organization
-      owner_email: Owner email
-      owner_name: Owner name
-      parking_notification_notes_html: "%{org_name} internal notes <small>not shown
-        to user</small>"
-      permission: Permission
-      registered: Registered
-      send_message: Send message
-      state: State
-      sticker: Sticker
-      sticker_code: Sticker Code
-      support_email: support@bikeindex.org
-      unable_to_display_additional_information: >-
-        Unable to display additional information because %{bike_type} is not registered
-        with %{org_name}
-      unregistered_parking_notification: created for parking notification
-      user_revoked_permission_html: >-
-        This user <strong>revoked</strong> permission to contact them prior to their
-        bike being marked stolen.
-      waiting_on_device_location: Waiting on device location
-      where_did_you_see_this_bike: >-
-        Where did you see this %{bike_type}? If you're contacting about an ad you
-        found online, include a link in the field below
-      write_a_message: Write a message
-      zipcode: Postal code
     pdf:
       bike_description: 'Bike description:'
       bike_serial: Bike Serial
@@ -1299,7 +1252,10 @@ en:
       switch_to_new_bike_id: Switch to a new bike ID
       test_registration: test registration
       update: Update
+      view_public_non_listing: View public registration
       view_users_other_registrations: View user's other registrations
+      viewing_listing_preview: This is a preview of your "for sale" listing. It is
+        not publicly visible.
       where_did_you_see_this_bike: >-
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below
@@ -1402,7 +1358,6 @@ en:
       nevermind: Nevermind
       other_serial_or_registration_number: Other serial or registration number
       please_fill_in_both_fields: Please fill in both fields
-      primary_activity: Primary activity
       reason_for_update: Reason for update
       remove_end: Remove end
       remove_start: Remove start
@@ -1424,6 +1379,9 @@ en:
       version_name: Version Name
       zipcode: Postal code
     bike_fields:
+      primary_activity:
+        choose_activity: Choose activity
+        primary_activity: Primary activity
       revised_colors:
         add_a_color: Add a color
         choose_color: Choose color
@@ -1494,22 +1452,28 @@ en:
       groups_and_organizations: Groups and Organizations
       other_organizations: Other organizations
       remove: Remove
-    ownership:
-      enter_new_owner_email_to_transfer: Enter the new owner's email to transfer the
-        registration.
-      impound_record_page: Impound record page
-      new_email_assigned_save_to_update: A new email is entered, click "save changes"
-        to transfer.
-      sell_trade_or_give_away_this_bike: Are you selling, trading or giving away this
-        %{bike_type}?
-      this_bike_is_currently_impounded_html: >-
-        This %{bike_type} is currently impounded with impound record <strong>#%{impound_record_id}</strong>.
-        If you update the email address here, <em class="text-warning">the %{bike_type}
-        will still be impounded</em>.
-      to_transfer_use_impound_record_page_html: >-
-        If you want to transfer the bike to a new owner, update it with "Transferred
-        To New Owner" from the %{link_to_impound_record_page}.
-      transfer_ownership: Transfer Ownership
+    marketplace:
+      add_required_information: Add required information (condition, price, address)
+      choose_condition: Choose condition
+      condition: Condition
+      description: Description
+      draft: Draft
+      for_sale: For sale
+      listing_draft: Listing draft
+      listing_is_published: Listing is published
+      optional: optional
+      preview_it: Preview the listing
+      price: Price
+      price_is_negitiable: Price is negotiable
+      publicly_listed: "(publicly listed)"
+      publish_listing_when_ready: Publish listing when you're ready to sell!
+      sale_description_html: >-
+        Additional information specific to the sale. Put information about the %{item_type_display}
+        <a href="%{edit_item_path}">here</a>.
+      save_to_preview: Save the listing to be able to preview it
+      view_listing: View your listing
+      why_are_you_selling: Why are you selling this? What should a potential buyer
+        know?
     photos:
       drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload
         Photos</strong> button
@@ -1531,18 +1495,36 @@ en:
         knows to watch out for your %{bike_type}!
     remove:
       delete_bike: Delete bike
+      delete_registration: Delete this registration
       delete_this_bike: Delete this %{bike_type} from Bike Index
       delete_this_version_html: Delete <em>%{version_name}</em>
+      enter_new_owner_email_to_transfer: Enter the new owner's email to transfer the
+        registration.
       faqs: FAQs
+      hide_registration: Hide this registration
       hide_this_bike: Hide this %{bike_type} from other users
+      impound_record_page: Impound record page
       keeping_your_bike_public: >-
         Keeping your bike public is the best way to help recover stolen bikes and
         deter theft.
       modal_title: Are you sure you want to delete this %{bike_type}?
       nevermind: Nevermind
+      new_email_assigned_save_to_update: A new email is entered, click "save changes"
+        to transfer.
       reason_for_deletion: Reason for deletion
       reason_modal_body: Please fill in the reason for the %{bike_type} deletion
       reason_modal_title: We want to know why!
+      save_changes: Update ownership
+      sell_trade_or_give_away_this_bike: Are you selling, trading or giving away this
+        %{bike_type}?
+      this_bike_is_currently_impounded_html: >-
+        This %{bike_type} is currently impounded with impound record <strong>#%{impound_record_id}</strong>.
+        If you update the email address here, <em class="text-warning">the %{bike_type}
+        will still be impounded</em>.
+      to_transfer_use_impound_record_page_html: >-
+        If you want to transfer the bike to a new owner, update it with "Transferred
+        To New Owner" from the %{link_to_impound_record_page}.
+      transfer_ownership: Transfer Ownership
       unhide_this_bike: Un-hide this %{bike_type}
       visibility: Visibility
       we_strongly_recommend: >-
@@ -1649,10 +1631,12 @@ en:
         drivetrain: Wheels and Drivetrain
         found_details: Information about finding
         groups: Groups and Organizations
-        ownership: Transfer Ownership
+        marketplace_list: List for sale
+        marketplace_on_sale: Update marketplace listing
         photos: Photos
         publicize: Share on Social Media
         remove: Hide or Delete
+        remove_or_transfer: Transfer, Hide or Delete
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
         theft_details: Theft details
@@ -1667,10 +1651,6 @@ en:
           this %{bike_type}.
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
         you_have_to_sign_in: Whoops! You have to sign in to be able to edit that %{bike_type}.
-      index:
-        we_dont_know_location: >-
-          Sorry, we don't know the location "%{location}". Please try a different
-          location to search nearby stolen bikes.
       new:
         please_sign_in_to_register: Please sign in to register a bike
         we_couldnt_find_that_registration: Oops! We couldn't find that registration,
@@ -1760,6 +1740,19 @@ en:
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
         user_settings: User Settings
+      marketplace_listings:
+        ensure_user_allowed_to_edit!:
+          you_dont_own_that: Oh no! It looks like you don't own that %{item_type}.
+        update:
+          item_published_for_sale: Your %{item_type} has been published. It is now
+            listed for sale!
+          marketplace_listing_updated: Your marketplace listing has been updated!
+          unable_to_publish: 'Unable to publish %{item_type} for sale: %{errors}'
+          unable_to_update: 'Unable to save %{item_type}: %{errors}'
+      messages:
+        create:
+          can_not_send_message: Sorry, you can't send a message to that listing
+          message_sent: Message sent
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
@@ -1892,6 +1885,12 @@ en:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.
+    search:
+      registrations:
+        set_interpreted_params:
+          we_dont_know_location: >-
+            Sorry, we don't know the location "%{location}". Please try a different
+            location to search nearby stolen bikes.
     sessions:
       create:
         invalid_email_or_password: Invalid email/password
@@ -2390,7 +2389,7 @@ en:
         Cofounded by Seth Herr and Bryan Hance in 2013, Bike Index is a %{description_link}.
       craig_dalton_bio_html: |
         <strong>Craig Dalton</strong> thought he had the bike industry out of
-        his system until Bike Index came knocking. Craig is bringing his
+        his system until Bike Index came knocking. Craig brings his
         entrepreneurial experience to the business side of Bike Index.
       gavin_hoover_bio_html: |
         <strong>Gavin Hoover</strong> spent ten years of his life riding and racing bikes all
@@ -3831,14 +3830,16 @@ en:
       help: Help
       log_in: log in
       logout: Logout
+      marketplace: Marketplace
+      marketplace_messages: Marketplace messages
       register_a_new_bike: Register a new bike
-      search_bikes: Search bikes
+      search: Search
       sign_up: Sign up
       stolen_bike: Stolen bike?
       the_nonprofit_bike_registry: the non-profit bike registry
       user_settings: "%{user_email} settings"
       view_org: View %{org_name}
-      your_bikes: Your bikes
+      your_registrations: Your registrations
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index –
         the premier bike registry.
@@ -3863,7 +3864,6 @@ en:
     embed_layout:
       error: error
       please_fix_the_following: Please fix the following
-      register_through_org: Register a bike through %{org_name}
     payments_layout:
       be_a_bike_saver: Be a bike saver.
       support_bike_index_today: Support Bike Index today.
@@ -3903,22 +3903,6 @@ en:
       pinhead_locking_skewer_key: Pinhead locking skewer key
       small_kryptonite_key: Small Kryptonite key
       update_the_lock: Update the lock!
-    lock_home:
-      add_a_new_lock: Add a new lock
-      any_lock_information_you_enter_on_bike_in: Any lock information you enter on
-        Bike Index is private and visible only to you.
-      if_you_want_you_can_save_serial_html: >-
-        If you want, you can <strong>save the serial numbers of your keys</strong>
-        on Bike Index&mdash;so you won't be out of luck if you lose them.
-      lock_keys_often_have_serial_numbers_so_yo: >-
-        Lock keys often have serial numbers, so you can order replacements if you
-        lose the keys.
-      lock_type: Lock Type
-      manufacturer: Manufacturer
-      save_information_about_a_lock: Save information about a lock
-      save_information_about_your_bike_lock: Save information about your bike lock!
-      you_can_also_record_your_lock_html: You can also <strong>record your lock combinations</strong>.
-      your_locks: Your locks
     new:
       save_information_about_one_of_your_locks: Save information about one of your
         locks
@@ -3982,6 +3966,9 @@ en:
       and then some.
     my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
+    registrations_embed: >-
+      Embedable %{organization} Bike Index registration form. Register your bike for
+      free, right now
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
     stolen_index: Bike Index helps recover your stolen bike
@@ -4019,6 +4006,7 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
+    registrations_embed: Register a bike with %{organization}
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
@@ -4049,6 +4037,17 @@ en:
     edit:
       edit_pages: 'Edit account pages:'
       save_changes: Save changes
+    messages:
+      form:
+        body_placeholder: Add some message text
+        message: message
+        new_message: New message
+        reply_to_message: Reply to message
+        send_message: Send message
+      index:
+        marketplace_messages: Marketplace messages
+      show:
+        can_not_send_new_message: Sorry, you can't send a new message.
     password:
       better_password: better
       for_password_update: For password update
@@ -4152,18 +4151,20 @@ en:
       bikes: bikes
       combination: Combination
       edit: edit
-      edit_bike: Edit Bike
+      edit_registration: Edit %{bike_type}
       generally_connect_to_org: >-
         Some of your bikes are associated with %{org_name}, but this one is not. Generally,
         you should connect all your bikes to %{org_name} -
+      header_title: "%{current_user_name} on Bike Index"
       ignore: ignore
       key_serial: Key Serial
-      list_a_bike_on_bikefair: List a bike on BikeFair
+      list_for_sale: List for sale
       location: Location
       lock_type: Lock Type
       locks: locks
       manufacturer: Manufacturer
-      mark_bike_stolen: Mark bike stolen
+      mark_stolen: Mark %{bike_type} stolen
+      membership_subtitle: Thank you for being a Bike Index %{level} member!
       next: Next steps
       primary_colors: Primary colors
       register_new_items: Register new items
@@ -4176,11 +4177,10 @@ en:
       thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
         to the Index.
       to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
+      update_marketplace_listing: Update marketplace listing!
       update_your_profile: Update your profile
       updated: Updated
-      user_bikes: "%{current_user_name} bikes"
       user_hidden: Hidden from other users
-      want_to_sell_your_bikes: Want to sell one of your registered bikes?
       welcome: Welcome
       you_have_no_registered_bikes: You have no registered bikes
       you_have_no_registered_locks: You have no registered locks
@@ -4555,7 +4555,6 @@ en:
         line: Line
       index:
         added: Added
-        bikes: Bikes
         creator: Creator
         errors: Errors
         exclude_empty_imports: Exclude Empty imports
@@ -4565,7 +4564,7 @@ en:
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
         progress: Progress
-        unable_to_process: Unable to process
+        registrations: Registrations
       new:
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:
@@ -4612,7 +4611,6 @@ en:
           have 'serial #' as a header, the import will not work.
       show:
         ascend_import: Ascend import
-        bikes: Bikes
         bulk_import: Bulk import
         bulk_import_impounded: Impounded bulk import
         color: Color
@@ -4628,11 +4626,12 @@ en:
         manufacturer: Manufacturer
         model: Model
         progress: Progress
+        registrations: Registrations
         sent_to: Sent to
         sent_to_a_new_owner: "(sent to a new owner)"
     exports:
       index:
-        bikes_in_export: Bikes in export
+        bikes_in_export: Registrations in export
         created: Created
         creator: Creator
         delete: Delete
@@ -5022,11 +5021,15 @@ en:
       vehicle_manufacturer: Vehicle manufacturer
       your: your
   search:
+    marketplace:
+      index:
+        loading_results: Loading results...
     registrations:
       index:
         loading_results: Loading results...
       results:
         no_matched: No registrations exactly matched your search
+        no_matched_marketplace: No listings exactly matched your search
         search_for_containing: Searching for serials containing your search...
         search_for_similar: Searching for similar serials...
       serials_containing:
@@ -5138,10 +5141,6 @@ en:
       serial: 'Serial:'
       stolen_at: 'Stolen at:'
       stolen_from: 'Stolen from:'
-    errors:
-      error: error
-      errors_prevented_this_from_being_saved: "%{errors_count} prevented this %{object_name}
-        from being saved:"
     faq:
       absolutely: Absolutely!
       add_a_stolen_bike_link: add your your stolen bike to Bike Index!

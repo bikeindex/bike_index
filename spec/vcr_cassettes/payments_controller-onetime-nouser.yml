@@ -10,9 +10,9 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_h2pzFdJizPmAqm","request_duration_ms":112}}'
+      - '{"last_request_metrics":{"request_id":"req_yme9CZ4tiA4xKH","request_duration_ms":124}}'
       Idempotency-Key:
-      - 7aee7f7b-50bf-4bf1-9fe4-2a67ffe376c0
+      - 331e520a-1934-4752-919e-92ec475ab8bb
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -29,11 +29,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 07 Mar 2025 23:05:28 GMT
+      - Mon, 04 Aug 2025 20:08:37 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2556'
+      - '2652'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -52,19 +52,13 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=8H-tPleMFlSkfpVfpeqeXBgeCMMIoaoVdepwX7H3VkvcLxXrfiudXZbi9ej1C0eLLTyGcX3jnkLBFtR9
-      Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to="coop"
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=sMknCNYFuKKg6zO06PEX7mPSUZhD6rekk5liahOH0Ga_q434XbQUdppgCEdmWX5nu-lgS5v12T2vzvMB
       Idempotency-Key:
-      - 7aee7f7b-50bf-4bf1-9fe4-2a67ffe376c0
+      - 331e520a-1934-4752-919e-92ec475ab8bb
       Original-Request:
-      - req_WM40Yfpiw99Zh7
-      Report-To:
-      - '{"group":"coop","max_age":8640,"endpoints":[{"url":"https://q.stripe.com/coop-report"}],"include_subdomains":true}'
-      Reporting-Endpoints:
-      - coop="https://q.stripe.com/coop-report"
+      - req_YX7Tr894FrYIDw
       Request-Id:
-      - req_WM40Yfpiw99Zh7
+      - req_YX7Tr894FrYIDw
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -76,17 +70,17 @@ http_interactions:
       X-Stripe-Routing-Context-Priority-Tier:
       - api-testmode
       X-Wc:
-      - AB
+      - ABGHIJ
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
     body:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1fsQuMCV9Ix2ShRWX6uKBBSJ8VDwPYraLzHiINGiAu3xdNGl4RvL5Svgn",
+          "id": "cs_test_a18vsJJoeS9oG5Vw3efMDm7Lwzzn4qf2xUVRG8gMUiBs8qSoGLohsyWPcn",
           "object": "checkout.session",
           "adaptive_pricing": {
-            "enabled": false
+            "enabled": true
           },
           "after_expiration": null,
           "allow_promotion_codes": null,
@@ -95,6 +89,7 @@ http_interactions:
           "automatic_tax": {
             "enabled": false,
             "liability": null,
+            "provider": null,
             "status": null
           },
           "billing_address_collection": null,
@@ -104,7 +99,7 @@ http_interactions:
           "collected_information": null,
           "consent": null,
           "consent_collection": null,
-          "created": 1741388728,
+          "created": 1754338117,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -119,7 +114,7 @@ http_interactions:
           "customer_details": null,
           "customer_email": null,
           "discounts": [],
-          "expires_at": 1741475127,
+          "expires_at": 1754424516,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -137,6 +132,7 @@ http_interactions:
           "locale": null,
           "metadata": {},
           "mode": "payment",
+          "origin_context": null,
           "payment_intent": null,
           "payment_link": null,
           "payment_method_collection": "if_required",
@@ -154,6 +150,7 @@ http_interactions:
             "cashapp"
           ],
           "payment_status": "unpaid",
+          "permissions": null,
           "phone_number_collection": {
             "enabled": false
           },
@@ -174,7 +171,8 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1fsQuMCV9Ix2ShRWX6uKBBSJ8VDwPYraLzHiINGiAu3xdNGl4RvL5Svgn#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a18vsJJoeS9oG5Vw3efMDm7Lwzzn4qf2xUVRG8gMUiBs8qSoGLohsyWPcn#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+          "wallet_options": null
         }
-  recorded_at: Fri, 07 Mar 2025 23:05:28 GMT
+  recorded_at: Mon, 04 Aug 2025 20:08:37 GMT
 recorded_with: VCR 6.3.1

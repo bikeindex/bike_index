@@ -52,14 +52,14 @@
                     %div{style: "width: 1em; height: 1em; background: #{color}; float: right; margin-left: 0.4rem;"}
                     = link_to Feedback.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind))
                   %td
-                    = admin_number_display(count)
+                    = number_display(count)
               - nil_count = available_feedbacks.where(kind: nil).count
               - if nil_count > 0
                 %tr
                   %td
                     Nil
                   %td
-                    = admin_number_display(nil_count)
+                    = number_display(nil_count)
 
 = form_tag url_for, method: :get do
   = render partial: "/shared/hidden_search_fields"

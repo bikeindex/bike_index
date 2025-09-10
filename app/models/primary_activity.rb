@@ -19,10 +19,15 @@ class PrimaryActivity < ApplicationRecord
   include FriendlyNameFindable
   include ShortNameable
 
+  SPECIAL_SHORT_NAMES = {
+    "road" => "road-biking",
+    "track" => "track-racing"
+  }.freeze
+
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"
 
   has_many :primary_activity_flavors, class_name: "PrimaryActivity",
-    foreign_key: :primary_notification_id
+    foreign_key: :primary_activity_family_id
   has_many :bikes
   has_many :bike_versions
 
@@ -33,23 +38,62 @@ class PrimaryActivity < ApplicationRecord
   validates_uniqueness_of :slug, scope: [:primary_activity_family_id], allow_nil: false
 
   before_validation :set_calculated_attributes
+  after_create :assign_family_id_if_self
 
   scope :family, -> { where(family: true) }
   scope :flavor, -> { where(family: false) }
   scope :by_priority, -> { order(priority: :desc) }
   scope :alphabetized, -> { order(Arel.sql("LOWER(name)")) }
+  # top_level means that there isn't a family
+  scope :top_level, -> { where("primary_activity_family_id = id") }
+  scope :not_top_level, -> { where("primary_activity_family_id != id") }
 
   class << self
-    def friendly_find(n)
-      return nil if n.blank?
-      return by_priority.where(id: n).first if n.is_a?(Integer) || n.strip.match(/\A\d+\z/).present?
-      by_priority.find_by_slug(Slugifyer.slugify(n)) ||
-        by_priority.where("lower(name) = ?", n.downcase.strip).first
+    def friendly_find(str)
+      friendly_find_with_select(str, select_attrs: ["*"])
     end
 
     def friendly_find_id(str)
-      o = friendly_find(str)
-      o.present? ? o.id : nil
+      friendly_find_with_select(str)&.id
+    end
+
+    # This returns just the id if it's
+    def friendly_find_id_and_family_ids(str)
+      return [] if str.blank?
+      strip_if_str!(str)
+      if integer_string?(str)
+        ids = ids_matching_family_id(str)
+        ids = by_priority.where(id: str).pluck(:id) if ids.none?
+
+        return ids.any? ? [str.to_i, ids] : []
+      end
+
+      result = friendly_find_with_select(str, select_attrs: %i[id primary_activity_family_id family])
+      return [] if result.blank?
+
+      # If the object that was found was a flavor, no need to search again
+      # but if it's a family, search for the family ids
+      ids = result.family ? ids_matching_family_id(result.id) : [result.id]
+      [result.id, ids]
+    end
+
+    private
+
+    def ids_matching_family_id(integer)
+      by_priority.where(primary_activity_family_id: integer).pluck(:id)
+    end
+
+    def friendly_find_with_select(str, select_attrs: [:id])
+      return nil if str.blank?
+      strip_if_str!(str)
+      return by_priority.where(id: str).select(*select_attrs).first if integer_string?(str)
+      # Special short slugs
+      special_short_slug = SPECIAL_SHORT_NAMES[str.downcase]
+      return where(slug: special_short_slug).select(*select_attrs).first if special_short_slug.present?
+
+      by_priority.where(slug: Slugifyer.slugify(str)).select(*select_attrs).first ||
+        by_priority.where("lower(name) = ?", str.downcase).select(*select_attrs).first ||
+        by_priority.where("name ILIKE ?", "%#{str}%").select(*select_attrs).first
     end
   end
 
@@ -61,8 +105,16 @@ class PrimaryActivity < ApplicationRecord
     !family?
   end
 
+  def top_level?
+    primary_activity_family_id == id
+  end
+
   def display_name
     [family_display_name, name].compact.join(": ")
+  end
+
+  def display_name_search
+    [family_display_name(include_skipped_family_name: true), name].compact.join(": ONLY ")
   end
 
   def family_name
@@ -73,27 +125,45 @@ class PrimaryActivity < ApplicationRecord
     primary_activity_family&.short_name
   end
 
+  def short_name
+    return "Road" if slug == "road-biking"
+    return "Track" if slug == "track-racing"
+
+    super
+  end
+
   private
 
   def skip_family_display_name?
-    %w[gravel cyclocross].include?(name.downcase)
+    %w[cyclocross gravel].include?(name.downcase)
   end
 
-  def family_display_name
-    return nil if skip_family_display_name? || primary_activity_family.blank?
+  def family_display_name(include_skipped_family_name: false)
+    return nil if primary_activity_family.blank? || top_level?
+    return nil if skip_family_display_name? && !include_skipped_family_name
 
-    family_name
+    family_short_name
   end
 
   def set_calculated_attributes
     self.name = name&.strip
     self.slug ||= Slugifyer.slugify(name)
-    self.priority = calculated_priority
+    self.priority ||= calculated_priority
+    # If it doesn't have a family, assign primary_activity_family_id to its own ID, so it's searchable
+    # EVEN if it's a flavor
+    self.primary_activity_family_id = id if primary_activity_family.blank?
+  end
+
+  # After create, update with family id if it's blank
+  def assign_family_id_if_self
+    return if primary_activity_family_id.present?
+
+    update(primary_activity_family_id: id)
   end
 
   def calculated_priority
     return calculated_family_priority if family?
-    return primary_activity_family.priority - 1 if primary_activity_family.present?
+    return primary_activity_family.priority - 100 if primary_activity_family.present?
 
     401
   end

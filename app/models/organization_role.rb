@@ -56,14 +56,14 @@ class OrganizationRole < ApplicationRecord
   def self.create_passwordless(**create_attrs)
     new_passwordless_attrs = {skip_processing: true, role: "member"}
     if create_attrs[:invited_email].present? # This should always be present...
-      # We need to check for existing organization_roles because the AfterUserCreateJob calls this
+      # We need to check for existing organization_roles because the ::Callbacks::AfterUserCreateJob calls this
       existing_organization_role = OrganizationRole.find_by_invited_email(create_attrs[:invited_email])
       return existing_organization_role if existing_organization_role.present?
     end
     organization_role = create!(new_passwordless_attrs.merge(create_attrs))
-    # ProcessOrganizationRoleJob creates a user if the user doesn't exist, for passwordless organizations
+    # Users::ProcessOrganizationRoleJob creates a user if the user doesn't exist, for passwordless organizations
     # because of that, we want to process this inline
-    ProcessOrganizationRoleJob.new.perform(organization_role.id)
+    Users::ProcessOrganizationRoleJob.new.perform(organization_role.id)
     organization_role.reload
     organization_role
   end
@@ -99,11 +99,11 @@ class OrganizationRole < ApplicationRecord
 
   def enqueue_processing_worker
     return true if skip_processing
-    # We manually update the user, because ProcessOrganizationRoleJob won't find this organization_role
+    # We manually update the user, because Users::ProcessOrganizationRoleJob won't find this organization_role
     if deleted? && user_id.present?
-      AfterUserChangeJob.perform_async(user_id)
+      ::Callbacks::AfterUserChangeJob.perform_async(user_id)
     else
-      ProcessOrganizationRoleJob.perform_async(id)
+      Users::ProcessOrganizationRoleJob.perform_async(id)
     end
   end
 

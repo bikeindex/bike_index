@@ -1,17 +1,17 @@
-class Search::RegistrationsController < Bikes::BaseController
+class Search::RegistrationsController < ApplicationController
   MAX_INDEX_PAGE = 100
   before_action :render_ad
-  before_action :enable_importmaps
   before_action :set_interpreted_params
-  skip_before_action :find_bike # from Bikes::baseController
-  skip_before_action :ensure_user_allowed_to_edit # from Bikes::baseController
   around_action :set_reading_role
 
   def index
+    if params[:stolenness] == "for_sale"
+      redirect_to search_marketplace_path(marketplace_redirect_params) and return
+    end
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
     if @render_results
-      @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit: 10, page: @page,
+      @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit:, page: @page,
         max_pages: MAX_INDEX_PAGE)
     end
 
@@ -22,16 +22,20 @@ class Search::RegistrationsController < Bikes::BaseController
   end
 
   def similar_serials
-    @pagy, @bikes = pagy(Bike.search_close_serials(@interpreted_params), limit: 10, page: @page,
+    @pagy, @bikes = pagy(Bike.search_close_serials(@interpreted_params), limit:, page: @page,
       max_pages: MAX_INDEX_PAGE)
   end
 
   def serials_containing
-    @pagy, @bikes = pagy(Bike.search_serials_containing(@interpreted_params), limit: 10, page: @page,
+    @pagy, @bikes = pagy(Bike.search_serials_containing(@interpreted_params), limit:, page: @page,
       max_pages: MAX_INDEX_PAGE)
   end
 
   private
+
+  def limit
+    10
+  end
 
   def set_interpreted_params
     @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
@@ -40,16 +44,21 @@ class Search::RegistrationsController < Bikes::BaseController
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
 
-    @page = permitted_page(params[:page])
-    @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+    @page = permitted_page(max: MAX_INDEX_PAGE)
+    @search_kind = :registration
+    @result_view = params[:search_result_view] || :bike_boxes
+    @result_view = SearchResults::Container::Component.permitted_result_view(params[:search_result_view])
   end
 
-  def permitted_page(page_param)
-    page = (page_param.presence || 1).to_i
-    page.clamp(1, MAX_INDEX_PAGE)
+  def permitted_search_params
+    params.permit(*Bike.permitted_search_params)
   end
 
   def render_ad
     @ad = true
+  end
+
+  def marketplace_redirect_params
+    @interpreted_params.except(:stolenness).merge(search_no_js: params[:search_no_js]).to_h
   end
 end

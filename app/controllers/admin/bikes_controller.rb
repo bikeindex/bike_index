@@ -5,17 +5,18 @@ class Admin::BikesController < Admin::BaseController
   around_action :set_reading_role, only: %i[index show]
 
   def index
-    @per_page = params[:per_page] || 100
+    @per_page = permitted_per_page(default: 100)
 
     @pagy, @bikes = pagy(available_bikes.includes(:creation_organization, :current_ownership, :paint)
-      .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
+      .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def missing_manufacturer
-    @per_page = params[:per_page] || 100
+    @per_page = permitted_per_page(default: 100)
     @pagy, @bikes = pagy(
       missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 
@@ -42,9 +43,9 @@ class Admin::BikesController < Admin::BaseController
     else
       DuplicateBikeGroup.unignored.order("created_at desc")
     end
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page
     @duplicate_groups_count = duplicate_groups.size
-    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page)
+    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page, page: permitted_page)
   end
 
   def ignore_duplicate_toggle
@@ -65,7 +66,7 @@ class Admin::BikesController < Admin::BaseController
       if bike_ids.any?
         bike_ids.each do |id|
           Bike.unscoped.find(id).destroy!
-          AfterBikeSaveJob.perform_async(id)
+          ::Callbacks::AfterBikeSaveJob.perform_async(id)
         end
         # Lazy pluralize hack
         flash[:success] = "#{bike_ids.count} #{(bike_ids.count == 1) ? "bike" : "bikes"} deleted!"
@@ -92,7 +93,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def update
-    updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}.as_json)
+    updator = BikeServices::Updator.new(user: current_user, bike: @bike, params:)
     updator.update_ownership
     updator.update_stolen_record
     if params[:mark_recovered_reason].present?
@@ -134,13 +135,13 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:bike).permit(BikeCreator.old_attr_accessible + [bike_organization_ids: []])
+    params.require(:bike).permit(BikeServices::Creator.old_attr_accessible + [bike_organization_ids: []])
   end
 
   def destroy_bike
     find_bike
     @bike.destroy
-    AfterBikeSaveJob.perform_async(@bike.id)
+    ::Callbacks::AfterBikeSaveJob.perform_async(@bike.id)
     flash[:success] = "Bike deleted!"
     redirect_to admin_bikes_url
   end
@@ -198,6 +199,11 @@ class Admin::BikesController < Admin::BaseController
     if params[:search_model_audit_id].present?
       @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
       bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
+    end
+
+    if params[:primary_activity].present?
+      @primary_activity = PrimaryActivity.friendly_find(params[:primary_activity])
+      bikes = bikes.where(primary_activity_id: @primary_activity.id) if @primary_activity.present?
     end
 
     search_statuses = DEFAULT_SEARCH_STATUSES + (current_user.su_option?(:no_hide_spam) ? ["spam"] : [])

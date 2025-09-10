@@ -4,9 +4,9 @@ class Admin::PaymentsController < Admin::BaseController
   before_action :find_payment, only: %i[edit update]
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @payments = pagy(matching_payments.includes(:user, :organization, :invoice)
-      .order(sort_column + " " + sort_direction), limit: @per_page)
+      .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def new
@@ -23,7 +23,7 @@ class Admin::PaymentsController < Admin::BaseController
   def update
     if assign_to_membership_param?
       if @payment.can_assign_to_membership?
-        User::CreateOrUpdateMembershipFromPaymentJob.new.perform(@payment.id, current_user.id)
+        Users::CreateOrUpdateMembershipFromPaymentJob.new.perform(@payment.id, current_user.id)
         flash[:success] = "Payment updated"
       else
         flash[:error] = "This payment can't be assigned to a membership - maybe it already has been?"

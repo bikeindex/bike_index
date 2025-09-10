@@ -1,4 +1,6 @@
 // TODO: add ability to show in og time zone
+// 2025-5-15 - switch to using .localizeTime class (instead of .convertTime)
+// 2025-5-12 - add onlyTodayWithoutDate option
 // 2024-11-24 - refactor code to better take advantage of luxon
 // 2024-11-13 - switch moment to luxon!
 // 2023-8-25 - Updated withPreposition
@@ -6,7 +8,7 @@
 
 import { DateTime } from 'luxon'
 
-// TimeLocalizer updates all HTML elements with class '.convertTime', making them:
+// TimeLocalizer updates all HTML elements with class '.localizeTime', making them:
 // - Human readable
 // - Displayed with time in provided timezone
 // - With context relevant data (e.g. today shows hour, last month just date)
@@ -24,8 +26,6 @@ import { DateTime } from 'luxon'
 // To get span with the localized time:
 // localizedTimeHtml("1604337131", {})
 //
-// You can add this to a react component:
-// componentDidUpdate() { window.timeLocalizer.localize() }
 
 export default class TimeLocalizer {
   constructor () {
@@ -34,13 +34,15 @@ export default class TimeLocalizer {
     }
     this.singleFormat = !!window.timeLocalizerSingleFormat
     this.localTimezone = window.localTimezone
+    this.now = DateTime.now().setZone(this.localTimezone)
     // Create all DateTime instances with the local timezone
-    this.now = DateTime.local().setZone(this.localTimezone)
     this.yesterdayStart = this.now.minus({ days: 1 }).startOf('day') - 1
     this.todayStart = this.now.startOf('day')
     this.todayEnd = this.now.endOf('day')
     this.tomorrowEnd = this.now.plus({ days: 1 }).endOf('day')
     this.todayYear = this.now.year
+    // may configure differently for different pages someday. Currently, this is what gmail does
+    this.onlyTodayWithoutDate = true
   }
 
   // Directly render localized time elements. Returns an HTML string
@@ -71,13 +73,13 @@ export default class TimeLocalizer {
   // Removes the classes that trigger localization, so it doesn't reupdate the times
   localize () {
     // Write times
-    Array.from(document.getElementsByClassName('convertTime')).forEach((el) =>
+    Array.from(document.getElementsByClassName('localizeTime')).forEach((el) =>
       this.writeTime(el)
     )
 
     // Write timezones
     Array.from(
-      document.getElementsByClassName('convertTimezone')
+      document.getElementsByClassName('localizeTimezone')
     ).forEach((el) => this.writeTimezone(el))
 
     // Write hidden timezone fields - so if we're submitting a form, it includes the current timezone
@@ -101,9 +103,9 @@ export default class TimeLocalizer {
     const text = el.textContent.trim()
     const time = this.parse(text)
     // So running this again doesn't reapply to this element
-    el.classList.remove('convertTime')
+    el.classList.remove('localizeTime')
     // So we know which were updated (for styling, future updates, etc)
-    el.classList.add('convertedTime')
+    el.classList.add('localizedTime')
 
     // If we couldn't parse the time, exit
     if (!(text.length > 0) || time === null) {
@@ -135,6 +137,15 @@ export default class TimeLocalizer {
     }
   }
 
+  renderWithoutDate (time) {
+    if (this.onlyTodayWithoutDate) {
+      // If it's in the past 4 hours (in milliseconds), return true (so e.g. it returns 11:30pm at 12:30pm)
+      return (time < this.now && time > (this.now.minus(14400000))) || (time < this.todayEnd && time > this.todayStart)
+    } else {
+      return (time < this.tomorrowEnd && time > this.yesterdayStart)
+    }
+  }
+
   localizedDateText (
     time,
     singleFormat,
@@ -142,13 +153,32 @@ export default class TimeLocalizer {
     includeSeconds,
     withPreposition
   ) {
-    const currentThreeDays = (time < this.tomorrowEnd && time > this.yesterdayStart)
+    const timeInZone = time.setZone(this.localTimezone) // TODO: this is where we could pass in
+    const withoutDate = this.renderWithoutDate(timeInZone)
 
     // If it's preciseTime (or preciseTimeSeconds), always show the hours and mins
-    let hourEl = (preciseTime || includeSeconds || currentThreeDays) ? ` ${this.hourFormat(time, 'h:mm', includeSeconds, withPreposition)}` : ''
+    let hourEl = (preciseTime || includeSeconds || withoutDate) ? ` ${this.hourFormat(timeInZone, 'h:mm', includeSeconds, withPreposition)}` : ''
 
     if (singleFormat) {
-      return time.toFormat('yyyy-MM-dd') + hourEl
+      return timeInZone.toFormat('yyyy-MM-dd') + hourEl
+    }
+
+    let prefix = ''
+    // If we're doing inconsistent formatting, add a prefix if we're dealing with the current 3 days
+    if (withoutDate) {
+      // ... unless we're only showing today without day (in which case, don't prefix)
+      if (this.onlyTodayWithoutDate) {
+        // no-op
+      } else if (timeInZone < this.todayStart) {
+        prefix = 'Yesterday'
+      } else if (timeInZone > this.todayEnd) {
+        prefix = 'Tomorrow'
+      } else {
+        prefix = 'Today'
+      }
+      return (
+        prefix + (prefix.length > 0 ? ', ' : '') + hourEl
+      )
     }
 
     // If not withPreposition, include a comma
@@ -156,28 +186,11 @@ export default class TimeLocalizer {
       hourEl = ', ' + hourEl
     }
 
-    let prefix = ''
-    // If we're doing inconsistent formatting, add a prefix if we're dealing with yesterday or today (not the future)
-    if (currentThreeDays) {
-      // If we're dealing with yesterday or tomorrow, we prepend that
-      if (time < this.todayStart) {
-        prefix = 'Yesterday'
-      } else if (time > this.todayEnd) {
-        prefix = 'Tomorrow'
-      } else {
-        prefix = 'Today'
-      }
-      return (
-        // Always return yday, today, tomorrow with hours
-        prefix + hourEl
-      )
-    }
-
     // Only show the year if it isn't this year
-    if (time.year - this.todayYear !== 0) {
-      return prefix + time.toLocaleString({ month: 'short', day: 'numeric', year: 'numeric' }) + hourEl
+    if (timeInZone.year - this.todayYear !== 0) {
+      return prefix + timeInZone.toLocaleString({ month: 'short', day: 'numeric', year: 'numeric' }) + hourEl
     } else {
-      return prefix + time.toLocaleString({ month: 'short', day: 'numeric' }) + hourEl
+      return prefix + timeInZone.toLocaleString({ month: 'short', day: 'numeric' }) + hourEl
     }
   }
 
@@ -213,6 +226,6 @@ export default class TimeLocalizer {
 
   writeTimezone (el) {
     el.textContent = this.now.toFormat('z')
-    el.classList.remove('convertTimezone')
+    el.classList.remove('localizeTimezone')
   }
 }

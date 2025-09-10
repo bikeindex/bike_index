@@ -1,1 +1,7 @@
-<div class="tw:overflow-y-scroll tw:max-h-80" style="white-space: pre-wrap;"><%= @text %></div>
+<%# NOTE: tag open and close needs to be on one line, or the text has whitespace at the beginning %>
+<div
+  class="
+    <% @overflow_class %> tw:whitespace-pre-wrap
+    <%= @additional_classes %>
+  "
+><%= @text.strip %></div>

@@ -4,9 +4,9 @@ class Admin::StolenBikesController < Admin::BaseController
   helper_method :available_stolen_records
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @stolen_records = pagy(available_stolen_records.includes(:bike)
-      .reorder("stolen_records.#{sort_column} #{sort_direction}"), limit: @per_page)
+      .reorder("stolen_records.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def approve
@@ -45,7 +45,8 @@ class Admin::StolenBikesController < Admin::BaseController
     if %w[regenerate_alert_image delete].include?(params[:update_action])
       update_image
     else
-      BikeUpdator.new(user: current_user, bike: @bike, b_params: {bike: permitted_parameters}).update_ownership
+      BikeServices::Updator.new(user: current_user, bike: @bike, params:).update_ownership
+
       if @bike.update(permitted_parameters)
         SerialNormalizer.new(serial: @bike.serial_number).save_segments(@bike.id)
         flash[:success] = "Bike was successfully updated."
@@ -65,7 +66,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:bike).permit(BikeCreator.old_attr_accessible)
+    params.require(:bike).permit(BikeServices::Creator.old_attr_accessible)
   end
 
   def find_bike
@@ -121,9 +122,13 @@ class Admin::StolenBikesController < Admin::BaseController
       available_stolen_records = available_stolen_records.not_spam
     end
 
+    @with_promoted_alert = InputNormalizer.boolean(params[:search_with_promoted_alert])
+    if @with_promoted_alert
+      available_stolen_records = available_stolen_records.with_theft_alerts_paid_or_admin
+    end
+
     # We always render distance
-    distance = params[:search_distance].to_i
-    @distance = (distance.present? && distance > 0) ? distance : 50
+    @distance = GeocodeHelper.permitted_distance(params[:search_distance], default_distance: 50)
     if !@only_without_location && params[:search_location].present?
       bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       available_stolen_records = available_stolen_records.within_bounding_box(bounding_box)

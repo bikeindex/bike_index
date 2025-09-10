@@ -63,12 +63,15 @@ module AdminHelper
       {title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true},
       {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false},
       {title: "Model Audits", path: admin_model_audits_path, match_controller: true},
+      {title: "Marketplace Listings", path: admin_marketplace_listings_path, match_controller: true},
+      {title: "Marketplace Messages", path: admin_marketplace_messages_path, match_controller: true},
       {title: "Logged bike searches", path: admin_logged_searches_path, match_controller: true},
       {title: "Organization statuses", path: admin_organization_statuses_path, match_controller: true},
       {title: "Config: Email Domains", path: admin_email_domains_path, match_controller: true},
       {title: "Config: Email Bans", path: admin_email_bans_path, match_controller: true},
       {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
+      {title: "Config: Primary Activities", path: admin_primary_activities_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
     ] + dev_nav_select_links).sort_by { |a| a[:title] }
   end
@@ -118,8 +121,14 @@ module AdminHelper
     (score < 31) ? credibility_scorer_color(score) : ""
   end
 
-  def admin_number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
+  def admin_email_domain_spam_color(spam_score)
+    if spam_score > 9
+      "text-danger"
+    elsif spam_score < EmailDomain::SPAM_SCORE_AUTO_BAN
+      "text-info"
+    else
+      ""
+    end
   end
 
   def user_icon_hash(user = nil)
@@ -141,6 +150,7 @@ module AdminHelper
     icon_hash
   end
 
+  # Add icon for unconfirmed, email banned
   def user_icon(user = nil, full_text: false)
     icon_hash = user_icon_hash(user)
     return "" if icon_hash[:tags].empty?

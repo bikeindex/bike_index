@@ -7,10 +7,18 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <link href="/vendored_assets/admin.css" rel='stylesheet' type='text/css'>
     <script src="/vendored_assets/application_standalone.js"></script>
+    = stylesheet_link_tag 'tailwind', "data-turbo-track": "reload"
+    = javascript_importmap_tags
+    =# hotwire_livereload_tags if Rails.env.development?
+    -# assets are vendored, lazy solution
+    <style>.for-sale-color {color: #2ecc71;} .stolen-color, impounded-color {color: #e74c3c;} .found-color {color: oklch(59.1% 0.293 322.896);} .unregistered-color { color: #f0ad4e};</style>
+    %styles
+
   -# manually override body_class in a few situations :/
   - admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - admin_body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - admin_body_class = "news-page" if controller_name == "news"
+
   %body{ id: page_id, class:  admin_body_class || body_class }
     %nav.navbar.navbar-expand-md.navbar-light.bg-light.admin-navbar.more
       %span.navbar-brand
@@ -52,5 +60,3 @@
     %section#admin-content.pb-4.mb-4
       .container-fluid.mt-4.pb-4
         = yield
-
-

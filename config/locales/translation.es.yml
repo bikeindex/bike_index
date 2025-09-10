@@ -203,6 +203,9 @@ es:
         unsupported_response_mode:
         unsupported_response_type: El servidor de autorización no soporta este tipo
           de respuesta.
+        user_removed:
+        re:
+        user_not_in_initial_record:
       models:
         doorkeeper/application:
           attributes:
@@ -242,6 +245,14 @@ es:
         user:
           email_already_exists:
           not_an_available_language:
+        marketplace_listing:
+          address_required:
+          condition_required:
+          item_not_visible:
+          price_required:
+          primary_activity_required:
+          bike_is_stolen:
+          not_with_owner:
       organization:
         duplicate_short_name:
     attributes:
@@ -876,6 +887,19 @@ es:
         eur:
         mxn:
         usd:
+      marketplace_listing:
+        condition:
+          excellent:
+          good:
+          new_in_box:
+          salvage:
+          poor:
+        condition_description:
+          excellent:
+          good:
+          new_in_box:
+          poor:
+          salvage:
     models:
       ad:
       ambassador:
@@ -1022,14 +1046,19 @@ es:
         two_u_locks:
         u_lock:
         u_lock_and_cable:
-    status_humanized:
-      bike:
-        abandoned:
-        found:
-        impounded:
-        stolen:
-        unregistered:
-        with_owner:
+    bike_attributable:
+      drivetrain_attributes:
+        belt_drive:
+        coaster_brake:
+      status_humanized:
+        bike:
+          abandoned: abandonado
+          for_sale: en venta
+          found: encontrado
+          impounded: incautado
+          stolen: robado
+          unregistered: no registrado
+          with_owner: con el propietario
   datetime:
     distance_in_words:
       half_a_minute: medio minuto
@@ -1695,10 +1724,6 @@ es:
     index:
       primary_colors:
   bikes:
-    bike:
-      location:
-      primary_colors:
-      serial:
     bike_show_overlays:
       add_a_picture_of_it:
       add_a_picture_so_people_know_what_to_look:
@@ -1731,15 +1756,6 @@ es:
       you_have_already_marked_resolved:
       you_sent_this_bike_html:
       your_bike:
-    index:
-      all:
-      miles_of:
-      no_bikes_matched:
-      not_marked_stolen:
-      search_for_stolenness_desc_bikes:
-      stolen_anywhere:
-      stolen_within:
-      you:
     main_show_block:
       bike_photo:
       color_may_not_match:
@@ -1777,6 +1793,17 @@ es:
       year: Año
       vehicle_type:
       primary_activity:
+      abandoned_title:
+      component_no_info:
+      drivetrain:
+      drivetrain_fixed:
+      drivetrain_front:
+      drivetrain_rear:
+      front_tire_width:
+      rear_tire_width:
+      tire_width:
+      tire_width_narrow_false:
+      tire_width_narrow_true:
     new:
       additional_serial_sticker_number:
       affiliation:
@@ -1825,65 +1852,6 @@ es:
     organization_stolen_message:
       report_link_text:
       report_the_theft_to_the_organization_html:
-    organized_access_panel:
-      access_panel:
-      added_to_track_parking_notification:
-      additional_registrations_information:
-      additional_registrations_information_visible_because:
-      additional_registrations_potential_duplicates:
-      additional_registrations_registered_at:
-      additional_registrations_this_bike:
-      address:
-      address_or_intersection:
-      as_a_bikeindex_ambassador_html:
-      assign_sticker:
-      avery_exportable:
-      believe_it_is_anyway:
-      bike_is_not_registered_html:
-      bike_is_registered:
-      bike_not_marked_stolen:
-      choose_country:
-      city:
-      claimed:
-      contact_the_owner_it_is_stolen:
-      creation_description:
-      creator:
-      edit: Editar
-      email_to_deal_with_this_html:
-      is_false:
-      is_not_registered_html:
-      is_registered:
-      is_true:
-      link_sticker:
-      link_url_for_online_sighting:
-      mark_bike_recovered:
-      missing_address:
-      missing_owner_name:
-      model_audit:
-      not_audited:
-      or_call_owner_html:
-      org_can_edit_bike:
-      org_cannot_edit:
-      organization_can_edit_after_claimed:
-      organization_child:
-      organization_registered:
-      owner_email:
-      owner_name:
-      parking_notification_notes_html:
-      permission:
-      registered:
-      send_message:
-      state:
-      sticker:
-      sticker_code:
-      support_email:
-      unable_to_display_additional_information:
-      unregistered_parking_notification:
-      user_revoked_permission_html:
-      waiting_on_device_location:
-      where_did_you_see_this_bike:
-      write_a_message:
-      zipcode:
     pdf:
       bike_description:
       bike_serial:
@@ -1958,6 +1926,8 @@ es:
       where_did_you_see_this_bike:
       write_them_a_message:
       you_scanned_this_sticker_html:
+      view_public_non_listing:
+      viewing_listing_preview:
     stolen_checklist:
       a_photo_of_your_bike_type:
       add:
@@ -2055,7 +2025,6 @@ es:
       updated_serial:
       version_name:
       zipcode:
-      primary_activity:
     bike_fields:
       revised_colors:
         add_a_color:
@@ -2084,6 +2053,9 @@ es:
         state:
         where_was_it_stolen_type:
         zipcode:
+      primary_activity:
+        choose_activity:
+        primary_activity:
     drivetrain:
       belt_drive:
       coaster_brake:
@@ -2119,14 +2091,6 @@ es:
       groups_and_organizations:
       other_organizations:
       remove:
-    ownership:
-      enter_new_owner_email_to_transfer:
-      impound_record_page:
-      new_email_assigned_save_to_update:
-      sell_trade_or_give_away_this_bike:
-      this_bike_is_currently_impounded_html:
-      to_transfer_use_impound_record_page_html:
-      transfer_ownership:
     photos:
       drag_and_drop_files_here_html:
       drag_the_uploaded_photos:
@@ -2158,6 +2122,16 @@ es:
       visibility:
       we_strongly_recommend:
       you_can_read_more_html:
+      delete_registration:
+      enter_new_owner_email_to_transfer:
+      hide_registration:
+      impound_record_page:
+      new_email_assigned_save_to_update:
+      save_changes:
+      sell_trade_or_give_away_this_bike:
+      this_bike_is_currently_impounded_html:
+      to_transfer_use_impound_record_page_html:
+      transfer_ownership:
     report_recovered:
       can_we_share_your_story:
       did_we_help:
@@ -2210,6 +2184,25 @@ es:
       wide:
       wide_help:
       wide_title:
+    marketplace:
+      choose_condition:
+      condition:
+      price:
+      add_required_information:
+      description:
+      listing_draft:
+      listing_is_published:
+      optional:
+      preview_it:
+      price_is_negitiable:
+      publish_listing_when_ready:
+      sale_description_html:
+      save_to_preview:
+      view_listing:
+      why_are_you_selling:
+      draft:
+      for_sale:
+      publicly_listed:
   controllers:
     application:
       handle_unverified_request:
@@ -2235,7 +2228,6 @@ es:
         drivetrain:
         found_details:
         groups:
-        ownership:
         photos:
         publicize:
         remove:
@@ -2243,14 +2235,15 @@ es:
         report_stolen:
         theft_details:
         versions:
+        remove_or_transfer:
+        marketplace_list:
+        marketplace_on_sale:
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet:
         bike_impounded:
         bike_impounded_by_organization:
         you_dont_own_that:
         you_have_to_sign_in:
-      index:
-        we_dont_know_location:
       new:
         please_sign_in_to_register:
         we_couldnt_find_that_registration:
@@ -2324,6 +2317,18 @@ es:
       update:
         current_password_doesnt_match:
         successfully_updated:
+      messages:
+        create:
+          can_not_send_message:
+          message_sent:
+      marketplace_listings:
+        ensure_user_allowed_to_edit!:
+          you_dont_own_that:
+        update:
+          item_published_for_sale:
+          marketplace_listing_updated:
+          unable_to_publish:
+          unable_to_update:
     oauth:
       applications:
         ensure_app_owner!:
@@ -2489,6 +2494,10 @@ es:
       edit:
         free_membership:
         no_active_membership:
+    search:
+      registrations:
+        set_interpreted_params:
+          we_dont_know_location:
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -3231,13 +3240,15 @@ es:
       log_in: conectarse
       logout: Cierre de sesión
       register_a_new_bike: Registre su bicicleta
-      search_bikes: Buscar bicicletas
       sign_up: Inscríbete
       stolen_bike: "¿Bicicleta robada?"
       the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
       user_settings: "%{user_email} ajustes"
       view_org: Ver %{org_name}
-      your_bikes: Sus bicicletas
+      search: Buscar
+      marketplace_messages:
+      your_registrations: Sus registros
+      marketplace: Mercado
     application_bikehub:
       accounts_powered_by_bike_index: Las cuentas de BikeHub están gestionadas por
         Bike Index, el principal registro de bicicletas.
@@ -3256,7 +3267,6 @@ es:
     embed_layout:
       error:
       please_fix_the_following:
-      register_through_org:
     payments_layout:
       be_a_bike_saver:
       support_bike_index_today:
@@ -3295,17 +3305,6 @@ es:
       pinhead_locking_skewer_key:
       small_kryptonite_key:
       update_the_lock:
-    lock_home:
-      add_a_new_lock:
-      any_lock_information_you_enter_on_bike_in:
-      if_you_want_you_can_save_serial_html:
-      lock_keys_often_have_serial_numbers_so_yo:
-      lock_type:
-      manufacturer:
-      save_information_about_a_lock:
-      save_information_about_your_bike_lock:
-      you_can_also_record_your_lock_html:
-      your_locks:
     new:
       save_information_about_one_of_your_locks:
   manufacturers:
@@ -3346,6 +3345,7 @@ es:
     stolen_merging:
     users_new:
     welcome_index: 'El mejor registro de bicicletas: Sencillo, seguro y gratuito.'
+    registrations_embed:
   meta_titles:
     bikes_index:
     bikes_new:
@@ -3387,6 +3387,7 @@ es:
     welcome_index:
     my_accounts_show:
     search_registrations_index:
+    registrations_embed:
   money:
     currencies:
       en:
@@ -3427,11 +3428,8 @@ es:
       add_additional_email:
       add_new_phone_number:
       additional_email:
-      address:
       any_use_of_your_personal_information_html:
-      choose_country:
       choose_language:
-      city:
       confirmed_emails:
       daily_hot_sheet_notifications_html:
       give_us_permission_html:
@@ -3446,7 +3444,6 @@ es:
       remove_email:
       remove_number:
       resend_confirmation:
-      state:
       stolen_hot_sheets:
       time_single_format:
       time_single_format_small:
@@ -3454,7 +3451,6 @@ es:
       unconfirmed_emails:
       verified:
       why_you_should_text:
-      zipcode:
     sharing:
       choose_file:
       create_page:
@@ -3491,16 +3487,13 @@ es:
       bikes:
       combination:
       edit: Editar
-      edit_bike:
       generally_connect_to_org:
       ignore:
       key_serial:
-      list_a_bike_on_bikefair:
       location:
       lock_type:
       locks:
       manufacturer:
-      mark_bike_stolen:
       next:
       primary_colors:
       register_new_items:
@@ -3512,18 +3505,33 @@ es:
       to_bike_index_thanks_for_signing_up:
       update_your_profile:
       updated:
-      user_bikes:
       user_hidden:
-      want_to_sell_your_bikes:
       welcome:
       you_have_no_registered_bikes:
       you_have_no_registered_locks:
+      header_title:
+      membership_subtitle:
+      edit_registration:
+      list_for_sale:
+      mark_stolen:
+      update_marketplace_listing:
     delete_account:
       delete_account:
       delete_my_account:
       delete_warning_html:
       modal_title:
       nevermind:
+    messages:
+      form:
+        body_placeholder:
+        message:
+        new_message:
+        reply_to_message:
+        send_message:
+      index:
+        marketplace_messages:
+      show:
+        can_not_send_new_message:
   news:
     index:
       bike_index_blog:
@@ -3766,7 +3774,6 @@ es:
         line:
       index:
         added:
-        bikes:
         creator:
         errors:
         exclude_empty_imports:
@@ -3776,7 +3783,7 @@ es:
         org_ascend_imports_html:
         org_bulk_imports_html:
         progress:
-        unable_to_process:
+        registrations:
       new:
         choose_file:
         correct_actual_image_url_html:
@@ -3802,7 +3809,6 @@ es:
         your_headers_must_match_html:
       show:
         ascend_import:
-        bikes:
         bulk_import:
         bulk_import_impounded:
         color:
@@ -3819,6 +3825,7 @@ es:
         progress:
         sent_to:
         sent_to_a_new_owner:
+        registrations:
     exports:
       index:
         bikes_in_export:
@@ -4235,9 +4242,6 @@ es:
       serial:
       stolen_at:
       stolen_from:
-    errors:
-      error:
-      errors_prevented_this_from_being_saved:
     faq:
       absolutely:
       add_a_stolen_bike_link:
@@ -4597,12 +4601,16 @@ es:
         no_matched:
         search_for_containing:
         search_for_similar:
+        no_matched_marketplace:
       serials_containing:
         no_matched:
         with_serials_containing:
       similar_serials:
         no_matched:
         with_similar_serials:
+    marketplace:
+      index:
+        loading_results:
   components:
     search:
       everything_combobox:
@@ -4612,16 +4620,26 @@ es:
         doesnt_look_like_serial:
         search_for_serial_number:
         submit:
-      registration_fields:
-        anywhere:
+        search_for_primary_activity:
+        max:
+        min:
+        price_maximum:
+        price_minimum:
+      kind_select_fields:
+        within:
         miles_of:
         search_distance:
         search_location:
         stolenness_all:
+        stolenness_for_sale:
         stolenness_non:
         stolenness_proximity:
         stolenness_stolen:
-        within:
+        marketplace_scope_for_sale:
+        marketplace_scope_for_sale_proximity:
+      result_view_select:
+        bike_box_view:
+        thumbnail_view:
     legacy_form_well:
       address_record:
         address:
@@ -4632,3 +4650,99 @@ es:
         region:
         state:
         your_full_address_is_required:
+        address_no_street:
+      address_record_with_default:
+        edit_my_account_path:
+        use_account_address:
+    definition_list:
+      row:
+        no_value:
+    page_section:
+      marketplace_listing_panel:
+        condition:
+        description:
+        first_posted_at:
+        location:
+        price_is_firm_false:
+        price_is_firm_true:
+        still_for_sale_at:
+    alert_for_errors:
+      errors_prevented_this_from_being_saved:
+    messages:
+      thread:
+        from:
+        me:
+        to:
+      thread_show:
+        subject:
+    search_results:
+      bike_box:
+        location:
+        posted_at:
+        primary_colors:
+        serial:
+      vehicle_thumbnail:
+        registered_not_stolen:
+      container:
+        no_results:
+    org:
+      bike_access_panel:
+        access_panel:
+        added_to_track_parking_notification:
+        additional_registrations_information:
+        additional_registrations_information_visible_because:
+        additional_registrations_potential_duplicates:
+        additional_registrations_registered_at:
+        additional_registrations_this_bike:
+        address:
+        address_or_intersection:
+        as_a_bikeindex_ambassador_html:
+        assign_sticker:
+        avery_exportable:
+        believe_it_is_anyway:
+        bike_is_not_registered_html:
+        bike_is_registered:
+        bike_not_marked_stolen:
+        choose_country:
+        city:
+        claimed:
+        contact_the_owner_it_is_stolen:
+        creation_source:
+        creator:
+        edit: Editar
+        email_to_deal_with_this_html:
+        initial_registration:
+        is_false:
+        is_not_registered_html:
+        is_registered:
+        is_true:
+        link_sticker:
+        link_url_for_online_sighting:
+        mark_bike_recovered:
+        missing_address:
+        missing_owner_name:
+        model_audit:
+        not_audited:
+        or_call_owner_html:
+        org_can_edit_bike:
+        org_cannot_edit:
+        organization_can_edit_after_claimed:
+        organization_child:
+        organization_registered:
+        owner_email:
+        owner_name:
+        parking_notification_notes_html:
+        permission:
+        registered:
+        send_message:
+        state:
+        sticker:
+        sticker_code:
+        support_email:
+        unable_to_display_additional_information:
+        unregistered_parking_notification:
+        user_revoked_permission_html:
+        waiting_on_device_location:
+        where_did_you_see_this_bike:
+        write_a_message:
+        zipcode:

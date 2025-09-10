@@ -9,6 +9,7 @@ module BikeSearchable
     #   query: full text search string. Overrides query_items if passed explicitly
     #   colors: array of colors, friendly found, faster if integers. Overrides query_items if passed explicitly
     #   manufacturer: friendly found, faster if integer. Overrides query_items if passed explicitly.
+    #   primary_activity: friendly found, faster if integer. NOT INCLUDED in query_items
     #   stolenness: can be 'all', 'non', 'stolen', 'found', 'proximity'. Defaults to 'stolen'
     #   location: location for proximity search. Only for stolenness == 'proximity'. 'ip'/'you' uses IP geocoding and returns location object
     #   distance: distance in miles for matches. Only for stolenness == 'proximity'
@@ -30,6 +31,7 @@ module BikeSearchable
         .merge(searchable_query_items_colors(query_params)) # color if present
         .merge(searchable_query_items_cycle_type(query_params)) # cycle_type if present
         .merge(searchable_query_items_propulsion_type(query_params)) # propulsion_type if present
+        .merge(searchable_query_items_primary_activity(query_params)) # primary_activity if present
         .merge(searchable_query_stolenness(query_params, ip))
         .to_h
     end
@@ -53,6 +55,21 @@ module BikeSearchable
         items += [PropulsionType.autocomplete_result_hash_for(interpreted_params[:propulsion_type])]
       end
       items.flatten.compact
+    end
+
+    # returns nil OR [location, [lat, lng]] OR [location, nil]
+    def search_location(location, ip_address = nil)
+      location = location.to_s.strip
+      return if location.match?(/anywhere/i)
+
+      if ["", "ip", "you"].include?(location.strip.downcase)
+        result = IpAddressParser.location_hash_geocoder(ip_address)
+        return if result.blank?
+
+        [result[:formatted_address], [result[:latitude], result[:longitude]]]
+      else
+        [location, nil]
+      end
     end
 
     private
@@ -113,6 +130,17 @@ module BikeSearchable
       propulsion_type ? {propulsion_type: propulsion_type} : {}
     end
 
+    # Returns an array of primary_activity ids, if a primary activity is found
+    # (to handle primary_activity family matching)
+    def searchable_query_items_primary_activity(query_params)
+      # Only supported as a separate parameter
+      return {} if query_params[:primary_activity].blank?
+
+      id_and_family_ids = PrimaryActivity.friendly_find_id_and_family_ids(query_params[:primary_activity])
+      return {} if id_and_family_ids.none?
+      {primary_activity: id_and_family_ids.first, primary_activity_family_ids: id_and_family_ids.last}
+    end
+
     def searchable_query_stolenness(query_params, ip_address)
       stolennness_hash = if %w[all non found impounded].include?(query_params[:stolenness])
         {stolenness: query_params[:stolenness]}
@@ -152,14 +180,12 @@ module BikeSearchable
     end
 
     def extracted_searchable_proximity_hash(query_params, ip_address)
-      location = query_params[:location].to_s.strip
-      return if location.match?(/anywhere/i)
+      location, coordinates = search_location(query_params[:location], ip_address)
+      return if location.blank?
 
-      distance = query_params[:distance]&.to_i
-      bounding_box = if ["", "ip", "you"].include?(location.strip.downcase)
-        address_hash = IpAddressParser.location_hash_geocoder(ip_address)
-        location = address_hash[:formatted_address]
-        GeocodeHelper.bounding_box([address_hash[:latitude], address_hash[:longitude]], distance)
+      distance = GeocodeHelper.permitted_distance(query_params[:distance])
+      bounding_box = if coordinates.present?
+        GeocodeHelper.bounding_box(coordinates, distance)
       else
         GeocodeHelper.bounding_box(location, distance)
       end
@@ -167,9 +193,9 @@ module BikeSearchable
       return if bounding_box.empty? # If we can't create a bounding box, skip
       {
         bounding_box: bounding_box,
-        stolenness: "proximity",
-        location: location, # This will overwrite the user's input
-        distance: (distance && distance > 0) ? distance : 100
+        stolenness: query_params[:stolenness],
+        location:, # This will overwrite the user's input
+        distance:
       }
     end
   end
@@ -198,7 +224,7 @@ module BikeSearchable
     end
 
     def permitted_search_params
-      [:cycle_type, :distance, :location, :manufacturer, :query, :propulsion_type,
+      [:cycle_type, :distance, :location, :manufacturer, :query, :propulsion_type, :primary_activity,
         :serial, :stolenness, colors: [], query_items: []].freeze
     end
 
@@ -222,6 +248,7 @@ module BikeSearchable
         .search_matching_query(interpreted_params[:query])
         .search_matching_cycle_type(interpreted_params[:cycle_type])
         .search_matching_propulsion_type(interpreted_params[:propulsion_type])
+        .search_matching_primary_activity(interpreted_params[:primary_activity_family_ids])
         .where(interpreted_params[:manufacturer] ? {manufacturer_id: interpreted_params[:manufacturer]} : {})
     end
 
@@ -241,6 +268,12 @@ module BikeSearchable
     def search_matching_propulsion_type(propulsion_type)
       return all unless propulsion_type.present?
       where(propulsion_type: (propulsion_type == :motorized) ? PropulsionType::MOTORIZED : propulsion_type)
+    end
+
+    def search_matching_primary_activity(family_ids)
+      return all unless family_ids.present?
+
+      where(primary_activity_id: family_ids)
     end
 
     def search_matching_query(query)

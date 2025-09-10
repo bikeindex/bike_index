@@ -43,15 +43,15 @@
         .alert.alert-danger.mb-4
           %h4.text-danger User's email banned (not delivered)
           Reasons:
-          - @user.email_bans_active.pluck(:reason).each do |reason|
-            = EmailBan.reason_humanized(reason)
+          - @user.email_bans_active.each do |email_ban|
+            = email_ban.reason_humanized
             %small.less-strong
-              - if reason == "email_domain"
-                The email domain was banned
-              - elsif reason == "email_duplicate"
-                The email looks like a duplicate of another email. In 2025, we were getting a lot of user sign up spam with emails that just had extra periods added in (which still deliver to gmail)
-              - elsif reason == "delivery_failure"
-                A recent email to them failed to be delivered. Have them check their spam folder!
+              - if email_ban.reason == "email_domain"
+                \- the #{link_to "email domain", admin_email_domain_path(email_ban.email_domain)} was banned.
+              - elsif email_ban.reason == "email_duplicate"
+                \- the email looks like a duplicate of another email. In 2025, we were getting a lot of user sign up spam with emails that just had extra periods added in (which still deliver to gmail)
+              - elsif email_ban.reason == "delivery_failure"
+                \- a recent email to them failed to be delivered. Have them check their spam folder!
 .row
   .col-md-6
     %h1
@@ -248,7 +248,7 @@
 
 %h4.mt-4
   Bikes
-  %small= link_to admin_number_display(@bikescount), admin_bikes_path(user_id: @user.id)
+  %small= link_to number_display(@bikescount), admin_bikes_path(user_id: @user.id)
 
 - if @bikescount > 0
   = render partial: "admin/bikes/table", locals: {bikes: @bikes, skip_user: true}
@@ -260,7 +260,7 @@
 %h4.mt-4
   Memberships
   %small
-    = link_to admin_number_display(memberships.count), admin_memberships_path(user_id: @user.id)
+    = link_to number_display(memberships.count), admin_memberships_path(user_id: @user.id)
     - if memberships.count > object_limit
       %em (only #{object_limit} most recent shown)
 - if memberships.count > 0
@@ -269,7 +269,7 @@
 - user_alerts = @user.user_alerts.order(created_at: :desc)
 %h4.mt-4
   = "Active Alert".pluralize(user_alerts.active.count)
-  = admin_number_display(user_alerts.active.count)
+  = number_display(user_alerts.active.count)
   %em.small.ml-2= link_to "#{user_alerts.count} total", admin_user_alerts_path(user_id: @user.id)
 - if user_alerts.any?
   = render partial: "admin/user_alerts/table", locals: {user_alerts: user_alerts.active, skip_user: true}
@@ -279,7 +279,7 @@
 %h4.mt-4
   Donations/payments
   %small
-    = link_to admin_number_display(payments.count), admin_payments_path(user_id: @user.id, period: "all")
+    = link_to number_display(payments.count), admin_payments_path(user_id: @user.id, period: "all")
     - if payments.count > object_limit
       %em (only #{object_limit} most recent shown)
 - if payments.any?
@@ -287,11 +287,11 @@
 
 %h4.mt-4
   OrganizationRoles
-  %small.less-strong.mr-3= admin_number_display(@user.organization_roles.count)
+  %small.less-strong.mr-3= number_display(@user.organization_roles.count)
   %small.d-inline-block.less-strong
     - reg_orgs_count = @user.user_registration_organizations.count
     = link_to admin_user_registration_organizations_path(user_id: @user.id) do
-      = admin_number_display(reg_orgs_count)
+      = number_display(reg_orgs_count)
     = "registration org".pluralize(reg_orgs_count)
 - if @user.organization_roles.count > 0
   = render partial: "/admin/organization_roles/table", locals: {organization_roles: @user.organization_roles}
@@ -300,7 +300,7 @@
 %h4.mt-4
   Notifications
   %small
-    = link_to admin_number_display(notifications.count), admin_notifications_path(user_id: @user.id)
+    = link_to number_display(notifications.count), admin_notifications_path(user_id: @user.id)
     - if notifications.count > object_limit
       %em (only #{object_limit} most recent shown)
 - if notifications.count > 0
@@ -310,7 +310,7 @@
 %h4.mt-4
   Feedbacks
   %small
-    = link_to admin_number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id)
+    = link_to number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id)
     - if notifications.count > object_limit
       %em (only #{object_limit} most recent shown)
 - if feedbacks.count > 0
@@ -395,8 +395,8 @@
 %hr.mt-4
 %h4 Edit
 = form_for @user, url: admin_user_path, method: :patch  do |f|
-  - if @user.errors.any?
-    = render partial: "/shared/errors", locals: { name: "User", obj: @user }
+  = render(AlertForErrors::Component.new(object: @user))
+
   .row.mt-4
     .col-md-6
       .form-group

@@ -30,8 +30,8 @@
 
 .row.mb-4.mt-4
   .col-md-6
-    .paginate-container.text-left
-      = pagy_bootstrap_nav(@pagy).html_safe
+    .pt-4.pb-4
+      = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
   - if @show_user_search
     .col-md-6.text-right{ style: "margin-top: 0.25rem;" }
       = form_tag organization_users_path(organization_id: current_organization.to_param), method: :get, class: "form-inline" do

@@ -5,6 +5,8 @@
   .col-md-7
     %ul
       %li.nav-item
+        = link_to "promoted alerts", admin_stolen_bikes_url(sortable_search_params.merge(search_with_promoted_alert: !@with_promoted_alert)), class: "nav-link #{@with_promoted_alert ? 'active' : ''}"
+      %li.nav-item
         - if @unapproved_only
           = link_to "All stolen (not just unverified)", admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: true)), class: "nav-link"
         - else
@@ -54,7 +56,7 @@
           = link_to "records with location", url_for(sortable_search_params.merge(search_without_location: false))
       - else
         %small.less-strong
-          = admin_number_display(@unapproved_without_location_count) # use the available_stolen_records count because of special scoping
+          = number_display(@unapproved_without_location_count) # use the available_stolen_records count because of special scoping
           unapproved records
           = link_to "without location", url_for(sortable_search_params.merge(search_without_location: true))
 

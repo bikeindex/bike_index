@@ -3,13 +3,12 @@
   %head
     = render(HeaderTags::Component.new(**header_tags_component_options))
     = csrf_meta_tags
-    = stylesheet_link_tag 'revised', media: 'all'
+    = stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     = javascript_include_tag 'application_revised'
-    - if @include_importmaps
-      = stylesheet_link_tag 'tailwind'
-      = javascript_importmap_tags
+    = javascript_importmap_tags
+    = hotwire_livereload_tags if Rails.env.development?
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
     :javascript
       window.BikeIndex.translator = (keyspace) => {

@@ -3,6 +3,10 @@
 # A few things to make working with locations easier
 # e.g. geocoder returns arrays and varies slightly depending on the provider
 class GeocodeHelper
+  MIN_DISTANCE = 1
+  MAX_DISTANCE = 1_000
+  DEFAULT_DISTANCE = 100
+
   class << self
     # Always returns latitude and longitude
     def coordinates_for(lookup_string)
@@ -12,6 +16,13 @@ class GeocodeHelper
 
     def address_string_for(lookup_string)
       address_hash_for(lookup_string).slice(:formatted_address)
+    end
+
+    def permitted_distance(distance = nil, default_distance: DEFAULT_DISTANCE)
+      return default_distance if distance.blank? || (distance.is_a?(String) && !distance.match?(/\d/))
+
+      clamped_distance = distance.to_f.clamp(MIN_DISTANCE, MAX_DISTANCE)
+      (clamped_distance % 1 == 0) ? clamped_distance.to_i : clamped_distance
     end
 
     def bounding_box(lookup_string, distance)
@@ -57,7 +68,9 @@ class GeocodeHelper
         [37.09024, -95.71289], # USA can't find
         [37.751, -97.822], # USA can't find
         [38.79460, -106.53484] # USA can't find also
-      ].any? { |coord| coord[0] == latitude.round(5) && coord[1] == longitude.round(5) }
+      ].any? do |coord|
+        coord[0]&.round(3) == latitude.round(3) && coord[1]&.round(3) == longitude.round(3)
+      end
     end
 
     def address_hash_from_reverse_geocode(latitude, longitude, new_attrs:)

@@ -17,8 +17,8 @@ end
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"
-ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"] = "true"
-
+ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
+ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly
 require "spec_helper"
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
@@ -66,6 +66,7 @@ RSpec.configure do |config|
   config.include ControllerSpecHelpers, type: :controller
   config.include JsonHelpers, type: :controller
   config.include JsonHelpers, type: :request
+  config.include HtmlContentHelpers, type: :request
   config.include StripeHelpers, type: :request
   config.include StripeHelpers, type: :controller
   config.include StripeHelpers, type: :service
@@ -77,6 +78,7 @@ RSpec.configure do |config|
   config.include ViewComponent::TestHelpers, type: :component
   config.include ViewComponent::SystemTestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
+  config.before(:each, :browser, type: :system) { driven_by(:selenium) }
   config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
 end
 
@@ -229,4 +231,32 @@ end
 CarrierWave.configure do |config|
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
   config.enable_processing = false
+end
+
+# Override capybara methods to support tailwind selectors
+# Original methods defined in 'lib/capybara/rspec/matchers.rb'
+#
+# This is necessary because colons need to be escaped for these matchers (i.e. tw\:p-6)
+#
+module Capybara
+  module RSpecMatchers
+    def have_selector(expr, **, &)
+      Matchers::HaveSelector.new(escape_colon_classes(expr), **, &)
+    end
+
+    def have_css(expr, **, &)
+      Matchers::HaveSelector.new(:css, escape_colon_classes(expr), **, &)
+    end
+
+    private
+
+    # Automatically escape colons in tailwind classes
+    def escape_colon_classes(expr)
+      # Don't change anything unless it looks like a colon class
+      return expr unless expr.match?(/\.\w+[^\\]:/)
+
+      # remove colon, unless it's for :disabled
+      expr.gsub(":", '\:').gsub('\:disabled', ":disabled").gsub('\:not(', ":not(")
+    end
+  end
 end

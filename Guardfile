@@ -16,9 +16,6 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^spec/.+_spec\.rb$})
     watch(%r{^config/initializers/(.+)\.rb$}) { |m| "spec/initializers/#{m[1]}_spec.rb" }
 
-    watch("spec/spec_helper.rb") { "spec" }
-    watch("spec/rails_helper.rb") { "spec" }
-
     watch("config/routes.rb") { "spec/routing" }
     watch("app/controllers/application_controller.rb") { "spec/controllers" }
 
@@ -26,6 +23,7 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^app/controllers/(.+)_controller\.rb$}) { |m| "spec/requests/#{m[1]}_controller_spec.rb" }
 
     watch(%r{^app/services/(.+)\.rb$}) { |m| "spec/services/#{m[1]}_spec.rb" }
+    watch(%r{^app/jobs/(.+)\.rb$}) { |m| "spec/jobs/#{m[1]}_spec.rb" }
     watch(%r{^app/models/concerns/(.+)\.rb$}) { |m| "spec/models/concerns/#{m[1]}_spec.rb" }
     watch(%r{^app/components/(.+)rb$}) { |m| "spec/components/#{m[1]}_spec.rb" }
     watch(%r{^app/components/(.+)rb$}) { |m| "spec/components/#{m[1]}_system_spec.rb" }

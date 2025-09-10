@@ -11,7 +11,7 @@ class HandlebarType
   }.freeze
 
   NAMES = {
-    drop_bar: "Drop",
+    drop_bar: "Drop bars",
     forward: "Forward facing",
     rearward: "Rear facing",
     other: "Not handlebars",

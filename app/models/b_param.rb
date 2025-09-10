@@ -406,7 +406,7 @@ class BParam < ApplicationRecord
     true unless owner_email.present? && bike_errors.blank?
   end
 
-  # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
+  # Right now this is a partial update. It's improved from where it was, but it still uses the BikeServices::Creator
   # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
   # write illegal things to the bikes
   # args are not named so we can pass in the params
@@ -603,8 +603,8 @@ class BParam < ApplicationRecord
 
   def process_image_if_required
     return true if image_processed || image.blank?
-    ImageAssociatorJob.perform_in(5.seconds)
-    ImageAssociatorJob.perform_in(1.minutes)
+    Images::AssociatorJob.perform_in(5.seconds)
+    Images::AssociatorJob.perform_in(1.minutes)
   end
 
   def set_color_key(key = nil)

@@ -56,4 +56,4 @@
         - unless skip_claims
           %td
             - if impound_record.bike_id.present?
-              = link_to admin_number_display(impound_record.impound_claims.count), admin_impound_claims_path(search_bike_id: impound_record.bike_id)
+              = link_to number_display(impound_record.impound_claims.count), admin_impound_claims_path(search_bike_id: impound_record.bike_id)

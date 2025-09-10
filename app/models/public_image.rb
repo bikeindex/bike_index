@@ -71,12 +71,12 @@ class PublicImage < ApplicationRecord
     return if skip_update
 
     if external_image_url.present? && image.blank?
-      return ExternalImageUrlStoreJob.perform_async(id)
+      return Images::ExternalUrlStoreJob.perform_async(id)
     end
     imageable&.update(updated_at: Time.current)
     return true unless bike?
 
-    AfterBikeSaveJob.perform_async(imageable_id, false, true)
+    ::Callbacks::AfterBikeSaveJob.perform_async(imageable_id, false, true)
   end
 
   # Because the way we load the file is different if it's remote or local

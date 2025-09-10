@@ -1,11 +1,7 @@
 !!!
 %html{ lang: I18n.locale, style: 'background: none;'}
   %head
-    %meta{charset: 'utf-8'}
-    %meta{'http-equiv' => 'X-UA-Compatible', content: 'IE=edge,chrome=1'}
-    %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1'}
-    %meta{name: 'description', content: 'Embedable Bike Index registration form. Register your bike for free, right now' }
-    %title= t(".protect_your_bike_today")
+    = render(HeaderTags::Component.new(**header_tags_component_options))
     = csrf_meta_tags
     = stylesheet_link_tag 'registrations', media: 'all'
     = javascript_include_tag 'registrations'
@@ -16,7 +12,8 @@
         %header.reg-header
           = image_tag 'revised/logo.svg', class: 'reg-header-logo'
       - elsif @simple_header
-        %header
+        - header_style = @button_and_header.blank? ? '' : "background: #{@button_and_header}"
+        %header{style: header_style}
           %h3= @vehicle_select ? t(".register_your_vehicle") : t(".register_your_bike")
       - else
         %header.reg-header

@@ -3,9 +3,9 @@ class Admin::ContentTagsController < Admin::BaseController
   before_action :find_content_tag, only: %i[edit update]
 
   def index
-    @per_page = params[:per_page] || 100
+    @per_page = permitted_per_page(default: 100)
     @pagy, @content_tags = pagy(matching_content_tags
-      .order(sort_column + " " + sort_direction), limit: @per_page)
+      .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def new

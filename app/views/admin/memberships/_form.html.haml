@@ -2,7 +2,7 @@
   .card-body
     = form_for [:admin, @membership] do |f|
       - if @membership.errors.any?
-        = render partial: "/shared/errors", locals: { name: "OrganizationRole", obj: @membership }
+        = render(AlertForErrors::Component.new(object: @membership, dismissable: true))
 
       - if @membership.id.blank?
         .form-group

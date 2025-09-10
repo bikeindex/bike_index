@@ -31,15 +31,14 @@ module API
           info = {ip: params[:proximity], location: GeocodeHelper.assignable_address_hash_for(params[:proximity])}
           render json: info && return
         end
-        render json: BikeSearcher.new(params).find_bikes.limit(20), each_serializer: BikeSerializer
+        render json: BikeServices::Searcher.new(params).find_bikes.limit(20), each_serializer: BikeSerializer
       end
 
       def stolen_ids
         stolen = StolenRecord.where(approved: true)
         if params[:proximity].present?
-          radius = 50
-          radius = params[:proximity_radius] if params[:proximity_radius].present? && params[:proximity_radius].strip.length > 0
-          box = GeocodeHelper.bounding_box(params[:proximity], radius)
+          distance = GeocodeHelper.permitted_distance(params[:proximity_radius], default_distance: 50)
+          box = GeocodeHelper.bounding_box(params[:proximity], distance)
           stolen = stolen.within_bounding_box(box)
         end
         if params[:updated_since]
@@ -51,7 +50,7 @@ module API
 
       def close_serials
         response = {bikes: []}
-        response = BikeSearcher.new(params).close_serials.limit(20) if params[:serial].present?
+        response = BikeServices::Searcher.new(params).close_serials.limit(20) if params[:serial].present?
         render json: response, each_serializer: BikeSerializer
       end
 
@@ -64,7 +63,7 @@ module API
         raise StandardError unless params[:bike].present?
         params[:bike][:creation_organization_id] = @organization.id
         @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params, origin: "api_v1")
-        bike = BikeCreator.new.create_bike(@b_param)
+        bike = BikeServices::Creator.new.create_bike(@b_param)
         if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
           render(json: {bike: {web_url: bike_url(bike), api_url: api_v1_bike_url(bike)}}) && return
         else

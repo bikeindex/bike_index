@@ -6,10 +6,11 @@ class Admin::MembershipsController < Admin::BaseController
   before_action :find_membership, only: %i[show update]
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(
       matching_memberships.includes(:user, :creator, :stripe_subscriptions).reorder("memberships.#{sort_column} #{sort_direction}"),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

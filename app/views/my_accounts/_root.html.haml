@@ -67,7 +67,7 @@
                   - else
                     = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
   = f.fields_for :address_record do |address_form|
-    = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @user.uro_organization_reg_address, no_street: @user.no_address?))
+    = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @user.uro_organization_reg_address, no_street: @user.no_address?, current_country_id:))
 
 
   .related-fields.my-account-checks
@@ -107,7 +107,7 @@
               - unless labeled
                 = t(".confirmed_emails")
                 - labeled = true
-            %p.form-well-input-static
+            %p.form-well-input-static{style: "overflow-x: scroll"}
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post, class: "d-block"

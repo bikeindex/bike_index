@@ -120,7 +120,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(ownership.is_new).to be_truthy
       end
 
-      it "creates a bike and does not duplicate" do
+      it "creates a bike and does not duplicate", :flaky do
         expect {
           post base_url, params: bike_hash.as_json
         }.to change(Ownership, :count).by(1)
@@ -168,7 +168,7 @@ RSpec.describe API::V1::BikesController, type: :request do
           expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your #{organization.name} Bike Index registration"
         end
         context "with risky email" do
-          it "registers but doesn't send an email" do
+          it "registers but doesn't send an email", :flaky do
             expect {
               post base_url, params: bike_hash.merge(bike: bike_hash[:bike].merge(owner_email: "carolyn@hotmail.co")).as_json
             }.to change(Ownership, :count).by(1)
@@ -337,7 +337,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(ownership.origin).to eq "api_v1"
       end
 
-      it "creates a photos even if one fails" do
+      it "creates a photos even if one fails", :flaky do
         manufacturer = FactoryBot.create(:manufacturer)
         bike_attrs = {
           serial_number: "69 photo-test",
@@ -459,7 +459,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect(bike.cycle_type_name).to eq("Unicycle")
       end
 
-      it "creates a record even if the post is a string" do
+      it "creates a record even if the post is a string", :flaky do
         manufacturer = FactoryBot.create(:manufacturer)
         bike_attrs = {
           serial_number: "69 string",

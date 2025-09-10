@@ -11,8 +11,8 @@
     = render partial: "/bikes/credibility_score", locals: { bike: @bike }
 
 = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
-  - if @bike.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Bike", obj: @bike }
+  = render(AlertForErrors::Component.new(object: @bike))
+
   .row
     .col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
@@ -63,6 +63,9 @@
       .form-group
         = f.label :description
         = f.text_area :description, class: "form-control"
+    .col-md-4.col-lg-3
+      = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f, wrapper_class: "form-group fancy-select unfancy"}
+
   .row.mt-2
     .col-md-4.col-lg-6
       .form-group

@@ -1,9 +1,13 @@
 <div
   class="tw:w-full"
-  data-controller="search--everything-combobox--component"
-  data-search--everything-combobox--component-api-url-value="<%= API_URL %>">
+  data-controller="search--everything-combobox"
+  data-search--everything-combobox-api-url-value="<%= API_URL %>"
+>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.8/dist/css/select2.min.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/select2@4.0.8/dist/css/select2.min.css"
+  />
 
   <style>
     <%#
@@ -44,19 +48,23 @@
     }
   </style>
 
-  <%= label_tag :query_items, translation(".query_items_description"), class: "twlabel tw:sr-only" %>
+  <%= label_tag :query_items,
+  translation(".query_items_description"),
+  class: "twlabel tw:sr-only" %>
   <%= select_tag :query_items,
-    options_for_select(@opt_vals, selected: @opt_vals.map(&:last)),
-    placeholder: translation(".search_descriptions"),
-    class: "tw:w-full tw:hidden fieldResetsCounts",
-    multiple: true,
-    "data-search--everything-combobox--component-target" => "input" %>
+  options_for_select(@opt_vals, selected: @opt_vals.map(&:last)),
+  :placeholder => translation(".search_descriptions"),
+  :class => "tw:w-full tw:hidden fieldResetsCounts", # note: resetting counts is actually handled by select2 callback, not class
+  :multiple => true,
+  "data-search--everything-combobox-target" => "input" %>
 
-  <%= label_tag :query, translation(".search_descriptions"),
-    class: "twlabel tw:sr-only",
-    "data-search--everything-combobox--component-target" => "nonjsfields" %>
-  <%= text_field_tag :query, @query,
-    placeholder: translation(".search_descriptions"),
-    class: "twinput",
-    "data-search--everything-combobox--component-target" => "nonjsfields" %>
+  <%= label_tag :query,
+  translation(".search_descriptions"),
+  :class => "twlabel tw:sr-only",
+  "data-search--everything-combobox-target" => "nonjsfields" %>
+  <%= text_field_tag :query,
+  @query,
+  :placeholder => translation(".search_descriptions"),
+  :class => "twinput",
+  "data-search--everything-combobox-target" => "nonjsfields" %>
 </div>

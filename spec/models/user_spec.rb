@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe User, type: :model do
+  it_behaves_like "address_recorded"
+
   describe ".ambassadors" do
     context "given ambassadors and no org filter" do
       it "returns any and only users who are ambassadors" do
@@ -842,6 +844,22 @@ RSpec.describe User, type: :model do
     it "returns false if the user has no ambassadorships" do
       user = FactoryBot.create(:organization_user)
       expect(user).to_not be_ambassador
+    end
+  end
+
+  describe "can_create_listing?" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    context "superuser" do
+      let(:user) { User.new(superuser: true) }
+      it "returns true" do
+        expect(user.can_create_listing?).to be_truthy
+      end
+    end
+    context "member" do
+      let!(:membership) { FactoryBot.create(:membership, user:) }
+      it "returns true" do
+        expect(user.can_create_listing?).to be_truthy
+      end
     end
   end
 

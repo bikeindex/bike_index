@@ -819,7 +819,8 @@ CREATE TABLE public.cgroups (
     slug character varying(255),
     description character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    priority integer DEFAULT 1
 );
 
 
@@ -1099,7 +1100,6 @@ ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bik
 CREATE TABLE public.email_bans (
     id bigint NOT NULL,
     user_id bigint,
-    user_email_id bigint,
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
     reason integer,
@@ -2026,7 +2026,8 @@ CREATE TABLE public.mail_snippets (
     state_id bigint,
     country_id bigint,
     subject text,
-    neighborhood character varying
+    neighborhood character varying,
+    doorkeeper_app_id bigint
 );
 
 
@@ -2179,14 +2180,16 @@ CREATE TABLE public.marketplace_listings (
     address_record_id bigint,
     latitude double precision,
     longitude double precision,
-    for_sale_at timestamp(6) without time zone,
-    sold_at timestamp(6) without time zone,
+    published_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
     currency_enum integer,
     amount_cents integer,
-    status integer DEFAULT 0,
+    status integer,
     condition integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    price_negotiable boolean DEFAULT false,
+    description text
 );
 
 
@@ -2207,6 +2210,44 @@ CREATE SEQUENCE public.marketplace_listings_id_seq
 --
 
 ALTER SEQUENCE public.marketplace_listings_id_seq OWNED BY public.marketplace_listings.id;
+
+
+--
+-- Name: marketplace_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_messages (
+    id bigint NOT NULL,
+    marketplace_listing_id bigint,
+    initial_record_id bigint,
+    sender_id bigint,
+    receiver_id bigint,
+    subject text,
+    body text,
+    kind integer,
+    messages_prior_count integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_messages_id_seq OWNED BY public.marketplace_messages.id;
 
 
 --
@@ -2372,7 +2413,8 @@ CREATE TABLE public.notifications (
     bike_id bigint,
     message_channel_target character varying,
     delivery_status integer,
-    delivery_error character varying
+    delivery_error character varying,
+    message_id character varying
 );
 
 
@@ -3238,7 +3280,8 @@ CREATE TABLE public.stolen_notifications (
     oauth_application_id integer,
     reference_url text,
     send_dates json,
-    kind integer
+    kind integer,
+    doorkeeper_app_id bigint
 );
 
 
@@ -3851,6 +3894,7 @@ CREATE TABLE public.users (
     password_digest character varying(255),
     banned boolean DEFAULT false NOT NULL,
     phone character varying(255),
+    zipcode character varying(255),
     twitter character varying(255),
     show_twitter boolean DEFAULT false NOT NULL,
     show_website boolean DEFAULT false NOT NULL,
@@ -3873,6 +3917,10 @@ CREATE TABLE public.users (
     partner_data jsonb,
     latitude double precision,
     longitude double precision,
+    street character varying,
+    city character varying,
+    country_id integer,
+    state_id integer,
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
     preferred_language character varying,
@@ -3887,6 +3935,7 @@ CREATE TABLE public.users (
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
+    neighborhood character varying,
     address_record_id bigint
 );
 
@@ -4327,6 +4376,13 @@ ALTER TABLE ONLY public.manufacturers ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.marketplace_listings ALTER COLUMN id SET DEFAULT nextval('public.marketplace_listings_id_seq'::regclass);
+
+
+--
+-- Name: marketplace_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_messages ALTER COLUMN id SET DEFAULT nextval('public.marketplace_messages_id_seq'::regclass);
 
 
 --
@@ -5069,6 +5125,14 @@ ALTER TABLE ONLY public.manufacturers
 
 ALTER TABLE ONLY public.marketplace_listings
     ADD CONSTRAINT marketplace_listings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: marketplace_messages marketplace_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_messages
+    ADD CONSTRAINT marketplace_messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -5828,13 +5892,6 @@ CREATE INDEX index_components_on_manufacturer_id ON public.components USING btre
 
 
 --
--- Name: index_email_bans_on_user_email_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_email_bans_on_user_email_id ON public.email_bans USING btree (user_email_id);
-
-
---
 -- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6164,6 +6221,13 @@ CREATE INDEX index_mail_snippets_on_country_id ON public.mail_snippets USING btr
 
 
 --
+-- Name: index_mail_snippets_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mail_snippets_on_doorkeeper_app_id ON public.mail_snippets USING btree (doorkeeper_app_id);
+
+
+--
 -- Name: index_mail_snippets_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6210,6 +6274,34 @@ CREATE INDEX index_marketplace_listings_on_item ON public.marketplace_listings U
 --
 
 CREATE INDEX index_marketplace_listings_on_seller_id ON public.marketplace_listings USING btree (seller_id);
+
+
+--
+-- Name: index_marketplace_messages_on_initial_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_initial_record_id ON public.marketplace_messages USING btree (initial_record_id);
+
+
+--
+-- Name: index_marketplace_messages_on_marketplace_listing_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_marketplace_listing_id ON public.marketplace_messages USING btree (marketplace_listing_id);
+
+
+--
+-- Name: index_marketplace_messages_on_receiver_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_receiver_id ON public.marketplace_messages USING btree (receiver_id);
+
+
+--
+-- Name: index_marketplace_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_messages_on_sender_id ON public.marketplace_messages USING btree (sender_id);
 
 
 --
@@ -6619,6 +6711,13 @@ CREATE INDEX index_stolen_bike_listings_on_tertiary_frame_color_id ON public.sto
 
 
 --
+-- Name: index_stolen_notifications_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_notifications_on_doorkeeper_app_id ON public.stolen_notifications USING btree (doorkeeper_app_id);
+
+
+--
 -- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6956,10 +7055,14 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20250419023411'),
+('20250528154403'),
+('20250519154506'),
+('20250515190821'),
+('20250508151610'),
+('20250508151602'),
+('20250421153929'),
 ('20250413160560'),
 ('20250413160556'),
-('20250406215746'),
 ('20250319024056'),
 ('20250319010935'),
 ('20250313035336'),

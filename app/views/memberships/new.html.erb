@@ -1,1 +1,1 @@
-<%= render(ChooseMembership::Component.new(currency: Currency.default, referral_source: @referral_source)) %>
+<%= render(PageSection::ChooseMembership::Component.new(currency: Currency.default, referral_source: @referral_source, level: @initial_level)) %>

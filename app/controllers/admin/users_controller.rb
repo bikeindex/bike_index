@@ -5,10 +5,10 @@ class Admin::UsersController < Admin::BaseController
   helper_method :invalid_user_options
 
   def index
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page
     @pagy, @users = pagy(matching_users.reorder("users.#{sort_column} #{sort_direction}")
       .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :organization_roles, :ambassador_tasks, :email_bans_active),
-      limit: @per_page)
+      limit: @per_page, page: permitted_page)
   end
 
   def show
@@ -96,7 +96,7 @@ class Admin::UsersController < Admin::BaseController
       # Manually confirm the user
       user_email.update(confirmation_token: nil) if user_email&.unconfirmed?
       user_email ||= @user.user_emails.create(email: email)
-      if MergeAdditionalEmailJob.new.perform(user_email.id)
+      if Users::MergeAdditionalEmailJob.new.perform(user_email.id)
         flash[:success] = "User #{@user.display_name} merged with '#{email}'"
       else
         flash[:error] = "Unable to merge users!"

@@ -61,7 +61,7 @@
               = link_to stripe_subscription.stripe_id.truncate(20), stripe_subscription.stripe_admin_url, title: stripe_subscription.stripe_id
           %td
             - payment_count = stripe_subscription.payments.count
-            %small= admin_number_display(payment_count)
+            %small= number_display(payment_count)
             - stripe_subscription.payments.order(id: :desc).limit(1).pluck(:id, :stripe_status).each do |id, stripe_status|
               = link_to admin_payment_path(id), class: "small" do
                 - if stripe_status.blank? || payment_count > 1

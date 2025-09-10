@@ -6,5 +6,10 @@ en:
         doesnt_look_like_serial: >-
           The serial you entered doesn't look like a serial number, so it isn't being
           used to search.
+        max: max
+        min: min
+        price_maximum: Minimum price
+        price_minimum: Minimum price
+        search_for_primary_activity: Search primary activity type
         search_for_serial_number: Search for serial number
         submit: submit

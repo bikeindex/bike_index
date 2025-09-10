@@ -12,6 +12,8 @@ class Backfills::AddressRecordsForUsersJob < ApplicationJob
 
     def build_or_create_for(user, country_id: nil)
       return user.address_record if user.address_record.present?
+      existing_address_record = AddressRecord.where(kind: :user, user_id: user.id).order(:id).last
+      return user.update(address_record: existing_address_record) if existing_address_record.present?
 
       user.address_record = AddressRecord.new(user_id: user.id, kind: :user, country_id:)
 
@@ -26,6 +28,8 @@ class Backfills::AddressRecordsForUsersJob < ApplicationJob
   end
 
   def build_enumerator(cursor:)
+    return if skip_job?
+
     active_record_records_enumerator(self.class.iterable_scope, cursor:)
   end
 

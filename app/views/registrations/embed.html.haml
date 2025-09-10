@@ -40,4 +40,6 @@
       = @vehicle_select ? t(".this_vehicle_is_either_missing_or_stolen") : t(".this_bike_is_either_missing_or_stolen")
 
   .submit-wrapper
-    = submit_tag t(".register"), class: "btn btn-lg btn-primary"
+    - button_color = @button_and_header || @button
+    - button_style = button_color.blank? ? '' : "background: #{button_color}"
+    = submit_tag t(".register"), class: "btn btn-lg btn-primary", style: button_style

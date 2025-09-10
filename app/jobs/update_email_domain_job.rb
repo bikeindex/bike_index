@@ -10,7 +10,7 @@ class UpdateEmailDomainJob < ScheduledJob
 
   class << self
     def frequency
-      24.hours
+      2.weeks
     end
 
     def auto_pending_ban?(email_domain)
@@ -40,13 +40,15 @@ class UpdateEmailDomainJob < ScheduledJob
     unless email_domain.no_auto_assign_status? || email_domain.banned?
       email_domain.status = email_domain.auto_bannable? ? "provisional_ban" : "permitted"
     end
-
-    email_domain.save!
+    email_domain.update!(updated_at: Time.current)
     if create_tld_for_subdomains?(email_domain)
       EmailDomain.find_or_create_for(email_domain.tld)
     elsif email_domain.banned? && email_domain.user_count > 0
       email_domain.calculated_subdomains.each(&:destroy)
       email_domain.calculated_users.find_each { |user| user.really_destroy! }
+    elsif email_domain.provisional_ban? && email_domain.tld_matches_subdomains?
+      email_domain.calculated_subdomains.where.not(status: email_domain.status).pluck(:id)
+        .each { UpdateEmailDomainJob.perform_async(it) }
     end
     email_domain
   end
@@ -61,7 +63,7 @@ class UpdateEmailDomainJob < ScheduledJob
     broader_domain_exists = if email_domain.ignored?
       false
     else
-      EmailDomain.find_matching_domain(email_domain.domain)&.id != email_domain.id
+      EmailDomain.broadest_matching_domains(email_domain.domain).first&.id != email_domain.id
     end
     {
       broader_domain_exists:,
@@ -78,6 +80,8 @@ class UpdateEmailDomainJob < ScheduledJob
   end
 
   def domain_resolves?(domain)
+    return false if EmailDomain.invalid_domain?(domain)
+
     conn = Faraday.new do |faraday|
       faraday.use FaradayMiddleware::FollowRedirects, limit: 15
       faraday.adapter Faraday.default_adapter
@@ -99,18 +103,13 @@ class UpdateEmailDomainJob < ScheduledJob
   end
 
   def create_tld_for_subdomains?(email_domain)
-    return false if email_domain.tld? || email_domain.permitted?
+    return false if email_domain.tld?
 
-    tld = email_domain.tld
-    return false if EmailDomain.tld_matches_subdomains.matching_domain(tld).any?
-
-    return false if EmailDomain.matching_domain(tld).count < CREATE_TLD_SUBDOMAIN_COUNT
-
-    true
+    EmailDomain.broadest_matching_domains(email_domain.domain).count > CREATE_TLD_SUBDOMAIN_COUNT
   end
 
   def validate_with_sendgrid?(email_domain)
-    return false if !VALIDATE_WITH_SENDGRID || email_domain.has_ban_blockers?
+    return false if !VALIDATE_WITH_SENDGRID || email_domain.ban_blockers.any?
 
     email_domain.data["sendgrid_validations"].blank?
   end

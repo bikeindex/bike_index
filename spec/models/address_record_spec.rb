@@ -42,10 +42,10 @@ RSpec.describe AddressRecord, type: :model do
     let(:target_attrs) do
       {
         region_record_id:,
-        postal_code: "95616",
+        region_string: nil,
+        postal_code: postal_code.strip,
         street: nil,
         city: nil,
-        region_string: nil,
         latitude: nil,
         longitude: nil
       }
@@ -63,10 +63,10 @@ RSpec.describe AddressRecord, type: :model do
       let(:target_attrs) do
         {
           region_record_id:,
+          region_string: nil,
           postal_code: "95616",
           street: nil,
           city: "Davis",
-          region_string: nil,
           latitude: 38.5474428,
           longitude: -121.7765309
         }
@@ -88,16 +88,43 @@ RSpec.describe AddressRecord, type: :model do
             expect(address_record.reload).to match_hash_indifferently target_attrs
           end
 
-          address_record.reload
           # not wrapped in VCR, so will error if it attempts to geocode
-
-          address_record.update(kind: :marketplace, publicly_visible_attribute: :city, user_id: 121212)
+          address_record.reload.update(kind: :marketplace_listing, publicly_visible_attribute: :city, user_id: 121212)
 
           VCR.use_cassette("address-record-assignment_geocode-again") do
             address_record.update(street: "100 Shields Ave")
 
             expect(address_record.reload.latitude).to_not eq target_attrs[:latitude]
           end
+        end
+      end
+    end
+
+    context "Canada, force geocoding" do
+      let(:region_string) { "  " }
+      let!(:region_record_id) { nil }
+      let(:postal_code) { "T4N4E4" }
+      let(:country_id) { Country.canada_id }
+      let(:target_attrs) do
+        {
+          region_record_id: nil,
+          region_string: "AB",
+          postal_code: "T4N 4E4",
+          street: nil,
+          city: "Red Deer",
+          latitude: 52.2977406,
+          longitude: -113.812812
+        }
+      end
+      it "updates with force update" do
+        expect(address_record).to be_valid
+        # postal_code is formatted by Geocodeable.format_postal_code
+        expect(address_record.reload).to match_hash_indifferently({postal_code: "T4N 4E4", region_string: nil, city: nil})
+
+        VCR.use_cassette("address-record-assignment_geocode-canada") do
+          address_record.update(force_geocoding: true)
+
+          expect(address_record.reload).to match_hash_indifferently target_attrs
         end
       end
     end

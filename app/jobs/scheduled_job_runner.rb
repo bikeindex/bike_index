@@ -39,15 +39,14 @@ class ScheduledJobRunner < ScheduledJob
       CreateGraduatedNotificationJob,
       CreateStolenGeojsonJob,
       CreateUserAlertNotificationJob,
+      Email::ScheduledSurveyJob,
       FetchProject529BikesJob,
       FileCacheMaintenanceJob,
       ImpoundExpirationJob,
       ProcessGraduatedNotificationJob,
       ProcessHotSheetJob,
-      RemoveUnconfirmedUsersJob,
       ScheduledAutocompleteCheckJob,
       ScheduledBikePossiblyFoundNotificationJob,
-      ScheduledEmailSurveyJob,
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
       Spreadsheets::TsvCreatorJob,
@@ -61,6 +60,7 @@ class ScheduledJobRunner < ScheduledJob
       UpdateInvoiceJob,
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
+      Users::RemoveUnconfirmedJob,
       self
     ].freeze
   end

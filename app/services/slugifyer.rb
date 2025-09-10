@@ -19,7 +19,7 @@ class Slugifyer
       slug = transliterate(string)
       key_hash = {
         "%20" => " ",
-        '\s((bi)?cycles?|bikes?)' => " ",
+        '\s(e(lectric)?.?)?((bi)?cycles?|bikes?)' => " ",
         '\+' => "plus",
         "&" => "amp",
         "([^A-Za-z0-9])" => " "

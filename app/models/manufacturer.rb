@@ -25,7 +25,7 @@ class Manufacturer < ApplicationRecord
   include AutocompleteHashable
   include ShortNameable
 
-  MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"].blank? # enable skipping for testing
+  MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"].blank? # enable skipping for testing
 
   has_many :bikes
   has_many :locks
@@ -34,13 +34,14 @@ class Manufacturer < ApplicationRecord
 
   mount_uploader :logo, ManufacturerLogoUploader
 
-  before_validation :set_calculated_attributes
-
   validates_presence_of :name
   validates_uniqueness_of :name
   validates_uniqueness_of :slug
   validates_uniqueness_of :secondary_slug, allow_nil: true
   validate :ensure_non_blocking_name
+
+  before_validation :set_calculated_attributes
+  after_commit :run_callback_job, on: %i[create update]
 
   default_scope { alphabetized }
 
@@ -48,6 +49,7 @@ class Manufacturer < ApplicationRecord
   scope :frame_makers, -> { where(frame_maker: true) }
   scope :with_websites, -> { where("website is NOT NULL and website != ''") }
   scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
+  scope :except_other, -> { where.not(id: Manufacturer.other.id) }
 
   class << self
     # Secondary_slug is the slug of the stuff in the paretheses
@@ -73,6 +75,7 @@ class Manufacturer < ApplicationRecord
 
     def other
       return @other if MEMOIZE_OTHER && defined?(@other)
+
       @other = where(name: "Other", frame_maker: true).first_or_create
     end
 
@@ -117,6 +120,7 @@ class Manufacturer < ApplicationRecord
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
     self.description = nil if description.blank?
     self.priority = calculated_priority # scheduled updates via UpdateManufacturerLogoAndPriorityJob
+    @run_callback_job = name_changed?
     true
   end
 
@@ -155,6 +159,12 @@ class Manufacturer < ApplicationRecord
   end
 
   private
+
+  def run_callback_job
+    return unless @run_callback_job
+
+    ::Callbacks::AfterManufacturerChangeJob.perform_async(id)
+  end
 
   def b_count
     @b_count ||= bikes.limit(1000).count

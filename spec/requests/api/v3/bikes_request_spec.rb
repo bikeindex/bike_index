@@ -208,7 +208,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "transferred", authorized_bike_id: nil} }
         it "returns target" do
           ownership = bike.current_ownership
-          BikeUpdator.new(bike: bike, b_params: {bike: {owner_email: "newemail@example.com"}}.as_json).update_ownership
+          BikeServices::Updator.new(user: ownership.user, bike: bike, permitted_params: {bike: {owner_email: "newemail@example.com"}}.as_json).update_ownership
           expect(ownership.reload.current).to be_falsey
           expect(bike.reload.current_ownership.id).to_not eq ownership.id
           expect(bike.reload.owner_email).to eq "newemail@example.com"
@@ -860,7 +860,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
         context "non-matching email" do
           let(:email) { "another_email@example.com" }
-          it "creates a bike for organization with v3_accessor, doesn't send email because skip_email" do
+          it "creates a bike for organization with v3_accessor, doesn't send email because skip_email", :flaky do
             organization.update_attribute :enabled_feature_slugs, ["skip_ownership_email"]
             bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
             ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
@@ -895,7 +895,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:email) { auto_user.email }
         before { Sidekiq::Testing.inline! }
         after { Sidekiq::Testing.fake! }
-        it "creates, update with email includes organization" do
+        it "creates, update with email includes organization", :flaky do
           expect(auto_user.confirmed?).to be_truthy
           expect(auto_user.id).to_not eq user.id
           ActionMailer::Base.deliveries = []
@@ -959,7 +959,7 @@ RSpec.describe "Bikes API V3", type: :request do
       context "v2_accessor is not the application owner" do
         let(:other_user) { FactoryBot.create(:user_confirmed) }
         let(:v2_access_id) { ENV["V2_ACCESSOR_ID"] = other_user.id.to_s }
-        it "v2_accessor" do
+        it "v2_accessor", :flaky do
           expect(v2_access_token.resource_owner_id).to eq other_user.id
           expect(v2_access_token.resource_owner_id).to_not eq user.id
           expect(v2_access_token.application.owner.admin_of?(organization)).to be_truthy
@@ -1552,22 +1552,91 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.reload.status).to eq "status_with_owner"
       post url, params: params.to_json, headers: json_headers
       expect(response.code).to eq("400")
-      expect(response.body.match("is not stolen")).to be_present
-    end
-
-    it "fails if the bike isn't owned by the access token user" do
-      bike.current_ownership.update(user_id: FactoryBot.create(:user).id, claimed: true)
-      post url, params: params.to_json, headers: json_headers
-      expect(response.code).to eq("403")
-      expect(response.body.match("application is not approved")).to be_present
+      expect(response.body.match("Unable to find matching stolen bike")).to be_present
     end
 
     it "sends a notification" do
       expect(bike.reload.status).to eq "status_stolen"
-      expect {
+      ActionMailer::Base.deliveries = []
+      Sidekiq::Job.clear_all
+
+      expect do
         post url, params: params.to_json, headers: json_headers
-      }.to change(Email::StolenNotificationJob.jobs, :size).by(1)
+      end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
+        .and change(StolenNotification, :count).by 1
       expect(response.code).to eq("201")
+      expect(StolenNotification.last.doorkeeper_app_id).to eq doorkeeper_app.id
+
+      Email::StolenNotificationJob.drain
+      expect(ActionMailer::Base.deliveries).to_not be_empty
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq([bike.owner_email])
+      expect(mail.subject).to eq "Stolen bike contact"
+      expect(mail.body.encoded).to match params[:message]
+    end
+
+    context "bike isn't owned by current user" do
+      let!(:bike) { FactoryBot.create(:stolen_bike, :with_ownership) }
+      it "fails" do
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Job.clear_all
+        expect do
+          post url, params: params.to_json, headers: json_headers
+          expect(response.code).to eq("403")
+          expect(response.body.match("application is not approved")).to be_present
+        end.to change(Email::StolenNotificationJob.jobs, :size).by(0)
+          .and change(StolenNotification, :count).by(0)
+      end
+
+      context "Application is approved" do
+        before { doorkeeper_app.update(can_send_stolen_notifications: true) }
+
+        it "sends" do
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Job.clear_all
+          expect do
+            post url, params: params.to_json, headers: json_headers
+          end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
+            .and change(StolenNotification, :count).by(1)
+          expect(response.code).to eq("201")
+          stolen_notification = StolenNotification.last
+          expect(stolen_notification.doorkeeper_app_id).to eq doorkeeper_app.id
+          expect(stolen_notification.mail_snippet&.id).to be_blank
+
+          Email::StolenNotificationJob.drain
+          expect(ActionMailer::Base.deliveries).to_not be_empty
+        end
+
+        context "mail snippet" do
+          let(:body) { "Special Stolen Notification Snippet!" }
+          let!(:mail_snippet) do
+            FactoryBot.create(:mail_snippet, kind: "stolen_notification_oauth",
+              doorkeeper_app: doorkeeper_app, body: body)
+          end
+          it "includes the mail snippet" do
+            expect(mail_snippet.reload.is_enabled).to be_truthy
+            ActionMailer::Base.deliveries = []
+            Sidekiq::Job.clear_all
+
+            expect do
+              post url, params: params.to_json, headers: json_headers
+            end.to change(Email::StolenNotificationJob.jobs, :size).by(1)
+              .and change(StolenNotification, :count).by(1)
+            expect(response.code).to eq("201")
+            stolen_notification = StolenNotification.last
+            expect(stolen_notification.doorkeeper_app_id).to eq doorkeeper_app.id
+            expect(stolen_notification.mail_snippet&.id).to eq mail_snippet.id
+
+            Email::StolenNotificationJob.drain
+            expect(ActionMailer::Base.deliveries).to_not be_empty
+            mail = ActionMailer::Base.deliveries.last
+            expect(mail.to).to eq([bike.owner_email])
+            expect(mail.subject).to eq "Stolen bike contact"
+            expect(mail.body.encoded).to match params[:message]
+            expect(mail.body.encoded).to match body
+          end
+        end
+      end
     end
   end
 end

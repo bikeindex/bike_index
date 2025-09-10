@@ -39,7 +39,7 @@ export class CollapseUtils {
   static toggle (element, duration) {
     if (!element) return
 
-    const isHidden = element.classList.contains('tw:hidden!')
+    const isHidden = element.classList.contains('tw:hidden!') || element.classList.contains('tw:hidden')
     this.collapse(isHidden ? 'show' : 'hide', element, duration)
   }
 
@@ -49,8 +49,10 @@ export class CollapseUtils {
    * @param {number} duration - Animation duration in milliseconds
    */
   static show (element, duration) {
+    // Return early if already visible
+    if (this.isVisible(element)) return
     // Remove the hidden
-    element.classList.remove('tw:hidden!')
+    element.classList.remove('tw:hidden!', 'tw:hidden')
     // First, ensure the hidden attributes are set
     element.classList.add('tw:scale-y-0')
     element.style.height = 0
@@ -73,6 +75,9 @@ export class CollapseUtils {
    * @param {number} duration - Animation duration in milliseconds
    */
   static hide (element, duration) {
+    // Return early if already hidden
+    if (!this.isVisible(element)) return
+
     // Always add transition classes (moving toward a more generalizable collapse method)
     element.classList.add('tw:transition-all', `tw:duration-${duration}`)
     // Add the tailwind class to shrink
@@ -86,6 +91,20 @@ export class CollapseUtils {
     setTimeout(() => {
       element.classList.add('tw:hidden!')
     }, duration)
+  }
+
+  /**
+   * Checks if an element is visible in the viewport
+   * @param {HTMLElement} element - The element to check
+   * @return {boolean} - True if element is visible
+   */
+  static isVisible (element) {
+    // check display, visibility and opacity
+    if (window.getComputedStyle(element).display === 'none') return false
+    if (window.getComputedStyle(element).visibility === 'hidden') return false
+    if (window.getComputedStyle(element).opacity === '0') return false
+
+    return true
   }
 }
 

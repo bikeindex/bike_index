@@ -155,10 +155,7 @@
               .form-well-input
                 = f.text_field :name, class: "form-control"
 
-          .form-group.row.fancy-select-placeholder.unfancy.hidden-other.unhidden
-            = f.label :primary_activity_id, t(".primary_activity"), class: "form-well-label"
-            .form-well-input
-              = f.collection_select(:primary_activity_id, PrimaryActivity.by_priority, :id, :display_name, {include_blank: true, prompt: " "}, {class: "form-control"})
+          = render partial: "/bikes_edit/bike_fields/primary_activity", locals: {f: f}
 
           .form-group.row.unnested-field
             = f.label :description, t(".general_description"), class: "form-well-label form-well-label-large-input"
@@ -170,9 +167,9 @@
             .form-well-input
               = f.text_field :extra_registration_number, class: "form-control"
 
-          - if BikeDisplayer.display_edit_address_fields?(@bike, current_user)
+          - if BikeServices::Displayer.display_edit_address_fields?(@bike, current_user)
             .related-fields.no-divider-row
-              - if BikeDisplayer.edit_street_address?(@bike, current_user)
+              - if BikeServices::Displayer.edit_street_address?(@bike, current_user)
                 .form-group.row
                   = f.label :street, class: "form-well-label"
                   .form-well-input
@@ -201,7 +198,7 @@
                     = f.collection_select(:state_id, State.united_states, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
 
           -# need to check if any stickers, because maybe it has some that aren't user editable
-          - if @bike.bike_stickers.none? && !BikeDisplayer.display_sticker_edit?(@bike, current_user)
+          - if @bike.bike_stickers.none? && !BikeServices::Displayer.display_sticker_edit?(@bike, current_user)
             = render "/shared/form_well_footer_save"
 
           - else
@@ -216,7 +213,7 @@
                     - @bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker|
                       = bike_sticker.pretty_code
                       %br
-              - if BikeDisplayer.display_sticker_edit?(@bike, current_user)
+              - if BikeServices::Displayer.display_sticker_edit?(@bike, current_user)
                 .form-group.row.no-divider-row.mb-0
                   = label_tag :bike_sticker, class: "form-well-label" do
                     - sticker_information_link = link_to t(".a_qr_sticker"), "https://bikeindex.org/news/bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa"

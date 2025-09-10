@@ -6,12 +6,13 @@ module Organized
 
     def index
       params[:page] || 1
-      per_page = params[:per_page] || 25
+      per_page = (params[:per_page] || 25).to_i
       @show_user_search = params[:query].present? || current_organization.organization_roles.count > per_page
       @show_matching_count = @show_user_search && params[:query].present?
       @pagy, @organization_roles = pagy(
         matching_organization_roles.reorder("organization_roles.#{sort_column} #{sort_direction}"),
-        limit: @per_page
+        limit: per_page,
+        page: permitted_page
       )
     end
 

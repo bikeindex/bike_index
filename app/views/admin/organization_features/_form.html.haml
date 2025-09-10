@@ -1,8 +1,6 @@
 = form_for [:admin, @organization_feature] do |f|
-  .row
-    .col-xs-12
-      - if @organization_feature.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Organization feature", obj: @organization_feature }
+  = render(AlertForErrors::Component.new(object: @organization_feature))
+
   .row
     .col-md-6.col-xs-12
       .form-group

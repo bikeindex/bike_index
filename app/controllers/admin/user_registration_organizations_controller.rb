@@ -2,10 +2,10 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @user_registration_organizations = pagy(matching_user_registration_organizations
       .reorder("user_registration_organizations.#{sort_column} #{sort_direction}")
-      .includes(:user, :organization), limit: @per_page)
+      .includes(:user, :organization), limit: @per_page, page: permitted_page)
     @render_org_counts = InputNormalizer.boolean(params[:search_org_counts])
   end
 

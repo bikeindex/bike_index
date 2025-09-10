@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
   it_behaves_like "geocodeable"
+  it_behaves_like "default_currencyable"
 
   describe "factories" do
     let(:stolen_record) { FactoryBot.create(:stolen_record) }

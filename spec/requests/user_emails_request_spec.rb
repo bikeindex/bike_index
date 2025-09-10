@@ -48,7 +48,7 @@ RSpec.describe UserEmailsController, type: :request do
         it "confirms and enqueues merge job" do
           expect {
             get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: user_email.confirmation_token}
-          }.to change(MergeAdditionalEmailJob.jobs, :size).by 1
+          }.to change(Users::MergeAdditionalEmailJob.jobs, :size).by 1
           user_email.reload
           expect(user_email.confirmed?).to be_truthy
           expect(flash[:success]).to be_present
@@ -59,7 +59,7 @@ RSpec.describe UserEmailsController, type: :request do
           user_email.confirm(user_email.confirmation_token)
           expect {
             get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: "sometoken-or-something"}
-          }.to change(MergeAdditionalEmailJob.jobs, :size).by 0
+          }.to change(Users::MergeAdditionalEmailJob.jobs, :size).by 0
           expect(flash[:info]).to be_present
         end
       end
@@ -67,7 +67,7 @@ RSpec.describe UserEmailsController, type: :request do
         it "sets flash error and does not add job" do
           expect {
             get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: "somethingelse-"}
-          }.to change(MergeAdditionalEmailJob.jobs, :size).by 0
+          }.to change(Users::MergeAdditionalEmailJob.jobs, :size).by 0
           expect(flash[:error]).to be_present
         end
       end

@@ -7,7 +7,7 @@
     - else
       = t(".bulk_import")
     = link_to "superadmin", admin_bulk_import_path(@bulk_import.to_param), class: "btn btn-outline-info less-strong float-right"
-%table.table-list
+%table.table-list.mb-4
   %tbody
     %tr
       %td
@@ -42,22 +42,27 @@
       %tr
         %td Kind
         %td= @bulk_import.kind_humanized
+    - if @bulk_import.no_notify
+      %tr
+        %td notes
+        %td
+          This import did <strong>not</strong> send emails
 
 
-%hr{ style: "margin: 15px 0;" }
+
+
 - if @bulk_import.import_errors?
-  %h2= t(".errors")
+  %h2.mt-2.mb-2= t(".errors")
   - if @bulk_import.import_errors.present?
     = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
-  %hr
+  %hr.tw:mt-4
 
-.paginate-container
-  %h2.uncap.float-left{ style: "margin-top: 28px;" }
-    = t(".bikes")
+.tw:flex.tw:flex-wrap.tw:justify-between.tw:mt-8.tw:mb-4
+  %h2.uncap.mt-0.mb-0
+    = t(".registrations")
     %small
-      = @pagy.count
-  .paginate{ style: "margin: 12px auto 12px 0;" }
-    = pagy_bootstrap_nav(@pagy).html_safe
+      = number_display @pagy.count
+  %div= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
 
 - show_impounded_id = @bulk_import.impounded? && @bulk_import.headers.present? && @bulk_import.headers.include?("impounded_id")
 

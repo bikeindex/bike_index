@@ -1,32 +1,47 @@
-<%# This will become a view component, but for now just rendering old styled results %>
+<% not_marketplace = @search_kind != :marketplace %>
 
-<div class="container mb-5">
-  <div class="row bikes-searched-default">
-    <div class="col-md-12">
-      <% if @bikes.present? %>
-        <ul class="bike-boxes">
-          <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
-        </ul>
-        <%# hidden, no ads  %>
-        <div class="row d-none">
-          <div class="col-md-4 mt-4 offset-md-2">
-            <div class="ad-block ad-binx ad468x60">
+<% if not_marketplace %>
+  <div class="container mb-5">
+    <div class="row bikes-searched-default">
+      <div class="col-md-12">
+        <% if @bikes.present? %>
+          <ul class="bike-boxes">
+            <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
+          </ul>
+          <%# hidden, no ads  %>
+          <div class="row d-none">
+            <div class="col-md-4 mt-4 offset-md-2">
+              <div class="ad-block ad-binx ad468x60">
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row d-none">
-          <div class="col-md-8 mt-4 offset-md-2">
-            <%= render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"} %>
+          <div class="row d-none">
+            <div class="col-md-8 mt-4 offset-md-2">
+              <%= render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"} %>
+            </div>
           </div>
-        </div>
-      <% else %>
-        <h3 class="text-center uncap">
-          <%= t(".no_matched") %>
-        </h3>
-      <% end %>
+        <% else %>
+          <h3 class="text-center uncap">
+            <%= t(".no_matched")  %>
+          </h3>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>
+<% else %>
+  <div class="tw:px-4 tw:max-w-7xl tw:mx-auto tw:mt-8 tw:lg:mt-12 tw:mb-6">
+    <% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
+
+    <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t(".no_matched_marketplace"))) do %>
+      <% @bikes.each do |bike| %>
+        <% cache(["search_results", @search_kind, @result_view, bike]) do %>
+          <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
 
 <%# This is now a view component, so it needs to be outside the bootstrap container for styling %>
 <% if @bikes.present? && @pagy.present? %>
@@ -35,7 +50,7 @@
 <% end %>
 
 <%# render near serials %>
-<% if @interpreted_params[:serial].present? %>
+<% if not_marketplace && @interpreted_params[:serial].present? %>
   <%=
     turbo_frame_tag :search_registrations_similar_serials_frame,
     src: similar_serials_search_registrations_path(@interpreted_params),

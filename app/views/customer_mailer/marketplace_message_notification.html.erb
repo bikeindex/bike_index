@@ -1,0 +1,10 @@
+<div style="white-space: pre-wrap;"><%= @marketplace_message.body %></div>
+
+<p style="margin-top: 20px;"><%= link_to "reply to the message here", @message_url %></p>
+
+<hr style="margin-top: 34px;">
+
+<p>
+  This email is about this <%= @marketplace_listing.item_type_display %>:
+  <strong><%= link_to @marketplace_listing.item&.title_string, bike_url(@marketplace_listing.item_id) %></strong>.
+</p>

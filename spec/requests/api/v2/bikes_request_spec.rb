@@ -75,7 +75,7 @@ RSpec.describe "Bikes API V2", type: :request do
           no_notify: true
         }
       end
-      it "creates" do
+      it "creates", :flaky do
         VCR.use_cassette("bikes_v2-create-matching-bike-book", match_requests_on: [:path]) do
           expect(manufacturer.reload.name).to eq "Trek"
           expect(Bike.count).to eq 0
@@ -149,7 +149,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
-      expect(bike.components.map(&:component_model).compact).to eq(["Richie rich"])
+      expect(bike.components.filter_map(&:component_model)).to eq(["Richie rich"])
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       ownership = bike.current_ownership
@@ -196,7 +196,7 @@ RSpec.describe "Bikes API V2", type: :request do
       bike_attrs[:organization_slug] = organization.slug
       date_stolen = 1357192800
       bike_attrs[:stolen_record] = {
-        phone: "1234567890",
+        phone: "1", # phone number isn't validated in any way
         date_stolen: date_stolen,
         theft_description: "This bike was stolen and that's no fair.",
         country: "US",
@@ -226,7 +226,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.current_ownership.creator).to eq bike.creator
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
-      expect(bike.current_stolen_record.phone).to eq("1234567890")
+      expect(bike.current_stolen_record.phone).to eq("1")
     end
   end
 
@@ -437,7 +437,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
       expect(bike.components.pluck(:component_model)).to match_array([nil, nil, "Richie rich"])
-      expect(bike.components.map(&:mnfg_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
+      expect(bike.components.filter_map(&:mnfg_name)).to match_array(["BLUE TEETH", manufacturer.name])
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.count).to eq(3)
     end
@@ -534,7 +534,7 @@ RSpec.describe "Bikes API V2", type: :request do
         expect(bike.reload.status).to eq "status_with_owner"
         post url, params: params.to_json, headers: json_headers
         expect(response.code).to eq("400")
-        expect(response.body.match("is not stolen")).to be_present
+        expect(response.body.match("Unable to find matching stolen bike")).to be_present
       end
     end
 

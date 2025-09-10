@@ -11,7 +11,7 @@
     - elsif ownership.creator&.name.present?
       = ownership.creator.name
     - else
-      = EmailNormalizer.obfuscate(ownership&.creator.email)
+      = EmailNormalizer.obfuscate(ownership&.creator&.email)
   = t(".registered_your_bike_on_index", bike_type: bike.type)
 
 

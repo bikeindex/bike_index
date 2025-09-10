@@ -447,7 +447,7 @@ RSpec.describe GraduatedNotification, type: :model do
       let(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: user, organization: organization, all_bikes: true) }
       it "removes all_bikes" do
         expect(user_registration_organization.reload.bikes.pluck(:id)).to eq([bike1.id])
-        AfterUserChangeJob.new.perform(user.id)
+        ::Callbacks::AfterUserChangeJob.new.perform(user.id)
         graduated_notification1.save
         expect(graduated_notification1.reload.user).to be_present
         expect(graduated_notification1.processed?).to be_falsey
@@ -465,7 +465,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification1.processed?).to be_truthy
         expect(graduated_notification1.send_email?).to be_truthy
         Sidekiq::Testing.inline! do
-          AfterUserChangeJob.new.perform(user.id)
+          ::Callbacks::AfterUserChangeJob.new.perform(user.id)
         end
         expect(bike1.reload.bike_organizations.count).to eq 0
         expect(bike1.graduated?).to be_truthy
@@ -485,7 +485,7 @@ RSpec.describe GraduatedNotification, type: :model do
         let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, created_at: bike1.created_at + 1.hour) }
         it "removes all_bikes" do
           expect(user_registration_organization.reload.bikes.pluck(:id)).to eq([bike1.id, bike2.id])
-          AfterUserChangeJob.new.perform(user.id)
+          ::Callbacks::AfterUserChangeJob.new.perform(user.id)
           graduated_notification1.save
           # Manually create graduated_notification2 because whateves
           graduated_notification2 = GraduatedNotification.create(bike_id: bike2.id, organization_id: organization.id)
@@ -661,7 +661,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification.user_id).to be_blank
 
         expect(bike.ownerships.count).to eq 1
-        BikeUpdator.new(bike: bike, user: user2, b_params: {bike: {owner_email: user2.email}}.as_json).update_ownership
+        BikeServices::Updator.new(bike: bike, user: user2, permitted_params: {bike: {owner_email: user2.email}}.as_json).update_ownership
         expect(bike.reload.owner_email).to eq user2.email
         expect(bike.user.id).to eq user2.id
         expect(bike.ownerships.count).to eq 2

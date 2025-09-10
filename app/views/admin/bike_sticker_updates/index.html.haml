@@ -84,18 +84,18 @@
               - if @search_kind == "all"
                 - update_kinds.each do |kind|
                   %td
-                    %small= admin_number_display(values[kind])
+                    %small= number_display(values[kind])
               %td
-                = admin_number_display(values[:total])
+                = number_display(values[:total])
           %tr
             %td Total
             - if @search_kind == "all"
               - update_kinds.each do |kind|
                 %td
                   %small
-                    = admin_number_display(matching_sticker_per_org_id.map { |id, values| values[kind] }.sum)
+                    = number_display(matching_sticker_per_org_id.map { |id, values| values[kind] }.sum)
             %td
-              = admin_number_display(matching_sticker_per_org_id.map { |id, values| values[:total] }.sum)
+              = number_display(matching_sticker_per_org_id.map { |id, values| values[:total] }.sum)
 
 .mt-2
   = render partial: "/shared/period_select"
@@ -103,7 +103,7 @@
 .row.mt-4.mb-2
   .col-md-6
     %p
-      = admin_number_display(matching_bike_sticker_updates.size)
+      = number_display(matching_bike_sticker_updates.size)
       matching sticker updates
       %em
         = humanized_time_range(@time_range)
@@ -125,7 +125,7 @@
           = link_to "bike stickers", admin_bike_stickers_path(search_query: params[:search_query])
         - else
           bike stickers
-        %small= admin_number_display(@searched_bike_stickers.count)
+        %small= number_display(@searched_bike_stickers.count)
       - if @searched_bike_stickers.count > 100
         %h3 More than 100 matching stickers, just showing the first 100
       = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)}

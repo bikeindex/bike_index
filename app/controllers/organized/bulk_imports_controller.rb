@@ -8,9 +8,9 @@ module Organized
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
     def index
-      params[:per_page] || 25
+      @per_page = permitted_per_page
       @pagy, @bulk_imports = pagy(available_bulk_imports.includes(:ownerships)
-        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page)
+        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1
     end
 
@@ -20,8 +20,8 @@ module Organized
         flash[:error] = translation(:unable_to_find_import)
         redirect_to(organization_bulk_imports_path(organization_id: current_organization.to_param)) && return
       end
-      @per_page = params[:per_page] || 25
-      @pagy, @bikes = pagy(@bulk_import.bikes.order(created_at: :desc), limit: @per_page)
+      @per_page = permitted_per_page
+      @pagy, @bikes = pagy(@bulk_import.bikes.order(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def new
@@ -34,7 +34,6 @@ module Organized
       return unless ensure_can_create_import!
       @bulk_import = BulkImport.new(permitted_parameters)
       if @bulk_import.save
-        BulkImportJob.perform_async(@bulk_import.id)
         if @is_api
           render json: {success: translation(:file_imported)}, status: 201
         else
@@ -135,7 +134,7 @@ module Organized
 
     def stolen_attributes
       {data: {stolen_record:
-        params.require(:stolen_record).permit(*StolenRecordUpdator.old_attr_accessible)}}
+        params.require(:stolen_record).permit(*BikeServices::StolenRecordUpdator.old_attr_accessible)}}
     end
   end
 end

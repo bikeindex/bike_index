@@ -177,8 +177,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect_render_donation(true, mail)
           expect_render_supporters(false, mail)
           # Transferred registration
-          BikeUpdator.new(user: user, bike: bike, b_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
-          AfterBikeSaveJob.new.perform(bike.id, true, true)
+          BikeServices::Updator.new(user: user, bike: bike, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
+          ::Callbacks::AfterBikeSaveJob.new.perform(bike.id, true, true)
           ownership2 = bike.reload.current_ownership
           expect(ownership2.id).to_not eq ownership.id
           expect(ownership.reload.current).to be_falsey
@@ -326,6 +326,18 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.body.encoded).to match target_retrieval_link_url
       expect(mail.reply_to).to eq([parking_notification.reply_to_email])
       expect(mail.tag).to eq "parking_notification"
+    end
+    context "parking_notification kind: other_notification" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, kind: :other_parking_notification) }
+      it "renders email" do
+        expect(parking_notification.retrieval_link_token).to be_present
+        expect(mail.body.encoded).to match header_mail_snippet.body
+        expect(mail.body.encoded).to match "map" # includes location
+        expect(mail.body.encoded).to_not match "I picked up my"
+        expect(mail.body.encoded).to_not match target_retrieval_link_url
+        expect(mail.reply_to).to eq([parking_notification.reply_to_email])
+        expect(mail.tag).to eq "parking_notification"
+      end
     end
     context "impound" do
       let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, kind: "impound_notification") }

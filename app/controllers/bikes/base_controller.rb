@@ -1,7 +1,7 @@
 class OwnershipNotSavedError < StandardError
 end
 
-class BikeUpdatorError < StandardError
+class BikeServices::UpdatorError < StandardError
 end
 
 class Bikes::BaseController < ApplicationController
@@ -27,10 +27,6 @@ class Bikes::BaseController < ApplicationController
       return true if org.blank? || org.present? && current_user.authorized?(org)
       set_passive_organization(nil)
     end
-  end
-
-  def permitted_search_params
-    params.permit(*Bike.permitted_search_params)
   end
 
   def find_bike
@@ -132,12 +128,6 @@ class Bikes::BaseController < ApplicationController
 
   def scanned_id
     params[:id] || params[:scanned_id] || params[:card_id]
-  end
-
-  # TODO: Remove this, should be in updator. Probably using BParam.safe_bike_attrs
-  # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
-  def permitted_bike_params
-    {bike: params.require(:bike).permit(BikeCreator.old_attr_accessible)}
   end
 
   # still manually managing permission of params, so skip it

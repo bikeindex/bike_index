@@ -57,6 +57,7 @@
 class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
   include Geocodeable
+  include DefaultCurrencyable
 
   RECOVERY_DISPLAY_STATUS_ENUM = {
     not_eligible: 0,
@@ -123,7 +124,8 @@ class StolenRecord < ApplicationRecord
 
   scope :recovered, -> { unscoped.where(current: false) }
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
-  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}) }
+  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}).distinct(true) }
+  scope :with_theft_alerts_paid_or_admin, -> { joins(:theft_alerts).merge(TheftAlert.paid_or_admin).distinct(true) }
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
@@ -384,7 +386,7 @@ class StolenRecord < ApplicationRecord
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
     enqueue_worker(@alert_location_changed)
-    AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
+    ::Callbacks::AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
   end
 
   private

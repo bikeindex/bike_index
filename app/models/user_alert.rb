@@ -113,7 +113,7 @@ class UserAlert < ApplicationRecord
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
     else # Don't create just to resolve
-      user_alert.id.blank? ? true : user_alert.resolve!
+      user_alert.id.blank? || user_alert.resolve!
     end
   end
 
@@ -123,7 +123,7 @@ class UserAlert < ApplicationRecord
     if bike.current_stolen_record&.without_location?
       user_alert.save
     else # Don't create just to resolve
-      user_alert.id.blank? ? true : user_alert.resolve!
+      user_alert.id.blank? || user_alert.resolve!
     end
   end
 
@@ -134,7 +134,7 @@ class UserAlert < ApplicationRecord
       user_alert.save
     else
       # Don't create if theft alert already has a photo
-      user_alert.id.blank? ? true : user_alert.resolve!
+      user_alert.id.blank? || user_alert.resolve!
     end
   end
 
@@ -143,7 +143,7 @@ class UserAlert < ApplicationRecord
       user_id: user.id, user_phone_id: user_phone.id)
     if user_phone.confirmed?
       # Don't create if phone is already confirmed
-      user_alert.id.blank? ? true : user_alert.resolve!
+      user_alert.id.blank? || user_alert.resolve!
     else
       user_alert.save unless user_phone.legacy?
     end

@@ -56,10 +56,7 @@
             .col-sm-4.col-lg-2.mt-4
               = submit_tag t(".update"), class: "btn btn-success"
 
-  -# Authorize check here, even though we're checking in controller too, because
-  -# otherwise we're displaying user data - so it's critical to be sure
-  - if current_user.present? && passive_organization.present? && current_user.authorized?(passive_organization)
-    = render partial: "organized_access_panel"
+  = render(Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:))
 
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status_alerts"
@@ -77,10 +74,15 @@
     - @contact_owner_open = true if @impound_claim.id.present? && !@contact_owner_open
     = render partial: "impound_claim", locals: { impound_record: @bike.current_impound_record, impound_claim: @impound_claim, start_open: @contact_owner_open }
 
+  -# alert
+  - if @marketplace_preview
+    = render(Alert::Component.new(kind: :notice)) do
+      = t(".viewing_listing_preview")
+      #{link_to(t(".view_public_non_listing"), bike_path(@bike))}.
   .row
     .col-md-8
       %h1.bike-title
-        = bike_status_span(@bike)
+        = bike_status_span(@bike, override_to_for_sale: @show_for_sale)
         %span.uncap= bike_title_html(@bike)
         - if @bike.example?
           %small.text-warning.uncap= t(".test_registration")
@@ -122,7 +124,7 @@
           - else
             = t(".share_it")
         = render 'shared/share_this'
-      - if BikeDisplayer.display_contact_owner?(@bike, current_user)
+      - if BikeServices::Displayer.display_contact_owner?(@bike, current_user)
         .contact-the-owner
           %p.preface
             %em
@@ -144,7 +146,7 @@
               .send-message
                 = f.submit t(".send_message"), class: 'btn btn-primary btn-lg'
           - if @bike.phoneable_by?(current_user)
-            %p.phoneable-by
+            %p.phoneable-by.mt-2
               %em
                 = t(".or_call")
               %strong
@@ -152,7 +154,7 @@
               = phone_link(@stolen_record.phone)
 
       -# Don't show if contact_owner is open - because then we're rendering impound_claim in the main page
-      - if BikeDisplayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
+      - if BikeServices::Displayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open
         - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
 
         .contact-the-owner#write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
@@ -166,6 +168,11 @@
 
           %a.btn.btn-primary.btn-lg{ href: '#impound_claim', 'aria-controls' => 'impound_claim', 'data-toggle' => 'collapse' }
             Open claim
+      - if BikeServices::Displayer.display_marketplace_message?(@bike)
+        .contact-the-owner.mt-5.pt-4.pb-4
+          %h3.uncap
+            Interested in purchasing this #{@bike.type}?
+          = link_to "contact the owner", my_account_message_path("ml_#{@bike.current_marketplace_listing.id}"), class: "btn btn-primary btn-lg"
 
       .ad-block.ad-binx.ad300x600
       = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-2"}

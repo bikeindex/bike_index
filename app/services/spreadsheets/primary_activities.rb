@@ -11,7 +11,7 @@ class Spreadsheets::PrimaryActivities
 
       CSV.generate do |csv|
         csv << EXPORT_COLUMNS
-        names_and_families(primary_activities).each { csv << _1 }
+        names_and_families(primary_activities).each { csv << it }
       end
     end
 
@@ -27,7 +27,7 @@ class Spreadsheets::PrimaryActivities
       flavors_families = {}
 
       primary_activities.flavor.each do |primary_activity|
-        family_name = primary_activity.family_name
+        family_name = primary_activity.top_level? ? nil : primary_activity.family_name
         flavors_families[primary_activity.name] ||= family_name
         next if flavors_families[primary_activity.name] == family_name
 

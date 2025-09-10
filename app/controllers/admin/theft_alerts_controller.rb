@@ -4,10 +4,10 @@ class Admin::TheftAlertsController < Admin::BaseController
   before_action :find_theft_alert, only: [:edit, :update]
 
   def index
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page
     @pagy, @theft_alerts =
       pagy(searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
-        .includes(:theft_alert_plan, :stolen_record), limit: @per_page)
+        .includes(:theft_alert_plan, :stolen_record), limit: @per_page, page: permitted_page)
     @page_title = "Admin | Promoted alerts"
     @location_counts = InputNormalizer.boolean(params[:search_location_counts])
   end
@@ -121,8 +121,18 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       TheftAlert
     end
+    if params[:user_id].present?
+      @user = User.unscoped.friendly_find(params[:user_id])
+      theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
+    end
+    if params[:search_bike_id].present?
+      @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
+      theft_alerts = theft_alerts.where(bike_id: @bike.id) if @bike.present?
+    end
     @search_paid_admin = if available_paid_admin.include?(params[:search_paid_admin])
       params[:search_paid_admin]
+    elsif @user.present? || @bike.present?
+      "paid_and_unpaid" # by default, include all paid and unpaid if user or bike is searched
     else
       available_paid_admin.first
     end
@@ -131,6 +141,7 @@ class Admin::TheftAlertsController < Admin::BaseController
 
     @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
+
     if available_statuses.include?(params[:search_status])
       @status = params[:search_status]
       theft_alerts = if TheftAlert.statuses.include?(@status)
@@ -141,17 +152,8 @@ class Admin::TheftAlertsController < Admin::BaseController
     else
       @status = "all"
     end
-    if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
-    end
-    if params[:search_bike_id].present?
-      @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
-      theft_alerts = theft_alerts.where(bike_id: @bike.id) if @bike.present?
-    end
     # We always render distance
-    distance = params[:search_distance].to_i
-    @distance = (distance.present? && distance > 0) ? distance : 50
+    @distance = GeocodeHelper.permitted_distance(params[:search_distance], default_distance: 50)
     if params[:search_location].present?
       bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       theft_alerts = theft_alerts.within_bounding_box(bounding_box)
