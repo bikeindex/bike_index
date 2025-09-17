@@ -368,6 +368,7 @@ class Ownership < ApplicationRecord
     reg_info_location["region_string"] = reg_info_location.delete("state")
     reg_info_location["country"] ||= "US"
 
-    AddressRecord.new(bike_id: bike_id, kind: :ownership, user_id:, **reg_info_location)
+    AddressRecord.new(bike_id: bike_id, kind: :ownership, user_id:,
+      skip_geocoding: reg_info_location["latitude"].present?, **reg_info_location)
   end
 end
