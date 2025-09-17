@@ -1,5 +1,6 @@
 class ProcessHotSheetJob < ScheduledJob
   prepend ScheduledJobRecorder
+
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
@@ -8,8 +9,10 @@ class ProcessHotSheetJob < ScheduledJob
 
   def perform(org_id = nil)
     return enqueue_workers unless org_id.present?
+
     hot_sheet = HotSheet.for(org_id, Time.current.to_date)
     return hot_sheet if hot_sheet&.email_success?
+
     hot_sheet ||= HotSheet.create!(organization_id: org_id, sheet_date: Time.current.to_date)
     hot_sheet.fetch_stolen_records
     hot_sheet.fetch_recipients
@@ -24,6 +27,7 @@ class ProcessHotSheetJob < ScheduledJob
   def enqueue_workers
     organizations.each do |organization|
       next unless organization.hot_sheet_configuration&.send_today_now?
+
       self.class.perform_async(organization.id)
     end
   end

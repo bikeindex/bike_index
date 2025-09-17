@@ -61,6 +61,7 @@ module API
       def create
         params = de_string_params
         raise StandardError unless params[:bike].present?
+
         params[:bike][:creation_organization_id] = @organization.id
         @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params, origin: "api_v1")
         bike = BikeServices::Creator.new.create_bike(@b_param)

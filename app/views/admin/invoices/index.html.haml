@@ -59,32 +59,32 @@
               %tr.text-left
                 - payments = matching_invoices.first_invoice
                 %td First invoice
-                %td= admin_number_display(payments.count)
+                %td= number_display(payments.count)
                 %td= MoneyFormatter.money_format(payments.sum(:amount_due_cents))
                 %td= MoneyFormatter.money_format(payments.sum(:amount_paid_cents))
               %tr.text-left
                 - payments = matching_invoices.renewal_invoice
                 %td Renewals
-                %td= admin_number_display(payments.count)
+                %td= number_display(payments.count)
                 %td= MoneyFormatter.money_format(payments.sum(:amount_due_cents))
                 %td= MoneyFormatter.money_format(payments.sum(:amount_paid_cents))
               %tr.text-left
                 - payments = matching_invoices.free
                 %td Free invoices
-                %td= admin_number_display(payments.count)
+                %td= number_display(payments.count)
                 %td= MoneyFormatter.money_format(payments.sum(:amount_due_cents))
                 %td= MoneyFormatter.money_format(payments.sum(:amount_paid_cents))
               %tr.text-left
                 - payments = matching_invoices.paid
                 %td Not free
-                %td= admin_number_display(payments.count)
+                %td= number_display(payments.count)
                 %td= MoneyFormatter.money_format(payments.sum(:amount_due_cents))
                 %td= MoneyFormatter.money_format(payments.sum(:amount_paid_cents))
               %tr.text-left
                 %td
                   %strong All
                 %td
-                  %strong= admin_number_display(matching_invoices.count)
+                  %strong= number_display(matching_invoices.count)
                 %td
                   %strong= MoneyFormatter.money_format(matching_invoices.sum(:amount_due_cents))
                 %td

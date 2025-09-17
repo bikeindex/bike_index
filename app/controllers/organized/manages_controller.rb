@@ -55,6 +55,7 @@ module Organized
 
     def permitted_kind
       return "ambassador" if @organization.ambassador?
+
       new_kind = params.dig(:organization, :kind)
       Organization.user_creatable_kinds.include?(new_kind) ? new_kind : @organization.kind
     end

@@ -25,6 +25,7 @@ class Callbacks::AfterUserChangeJob < ApplicationJob
   def perform(user_id, user = nil, skip_bike_update = false)
     user ||= User.find_by_id(user_id)
     return false unless user.present?
+
     # Bump updated_at to bust cache
     user.update(updated_at: Time.current, skip_update: true)
     update_superuser_abilities(user)
@@ -51,6 +52,7 @@ class Callbacks::AfterUserChangeJob < ApplicationJob
     # Activate activateable theft alerts!
     user.theft_alerts.paid.where(start_at: nil).each do |theft_alert|
       next unless theft_alert.activateable?
+
       StolenBike::ActivateTheftAlertJob.perform_async(theft_alert.id)
     end
 
@@ -108,6 +110,7 @@ class Callbacks::AfterUserChangeJob < ApplicationJob
   def add_phones_for_verification(user)
     return false if user.phone.blank?
     return false if user.user_phones.unscoped.where(phone: user.phone).present?
+
     user_phone = user.user_phones.create!(phone: user.phone)
     # Run this in the same process, rather than a different job, so we update the user alerts
     UserPhoneConfirmationJob.new.perform(user_phone.id, true)

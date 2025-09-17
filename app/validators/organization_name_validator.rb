@@ -20,12 +20,14 @@ class OrganizationNameValidator < ActiveModel::Validator
     return false if INVALID_NAMES.include?(slugged.delete_suffix("s"))
     # If you add an s and it's an invalid name, reject it too
     return false if INVALID_NAMES.include?("#{slugged}s")
+
     true
   end
 
   def validate(record)
     # There's gotta be a way to put these attrs together, but too lazy to figure it out right now
     return true if [record[:name], record[:short_name], record[:slug]].all? { |str| self.class.valid?(str) }
+
     record.errors.add(:base, "Invalid name")
   end
 end

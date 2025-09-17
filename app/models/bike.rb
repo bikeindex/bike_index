@@ -242,6 +242,7 @@ class Bike < ApplicationRecord
 
     def status_humanized_translated(str)
       return "" unless str.present?
+
       I18n.t(str.tr(" ", "_"), scope: [:activerecord, :bike_attributable, :status_humanized, :bike])
     end
 
@@ -251,6 +252,7 @@ class Bike < ApplicationRecord
 
     def organized_email_and_name_search(query)
       return all unless query.present?
+
       query_string = "%#{query.strip}%"
       includes(:current_ownership)
         .where("bikes.owner_email ilike ? OR ownerships.owner_name ilike ?", query_string, query_string)
@@ -270,6 +272,7 @@ class Bike < ApplicationRecord
 
     def friendly_find(bike_str)
       return nil unless bike_str.present?
+
       bike_str = bike_str.to_s.strip
       bike_id = if /^\d+\z/.match?(bike_str) # it's only numbers
         bike_str
@@ -279,12 +282,14 @@ class Bike < ApplicationRecord
       end.to_i
       # Return nil if above max unsinged 4 bit integer size (how we're storing IDs)
       return nil if bike_id.blank? || bike_id > 2147483647
+
       where(id: bike_id).first
     end
 
     # This method only accepts numerical org ids
     def bike_sticker(organization_id = nil)
       return includes(:bike_stickers).where.not(bike_stickers: {bike_id: nil}) if organization_id.blank?
+
       includes(:bike_stickers).where(bike_stickers: {organization_id: organization_id})
     end
 
@@ -396,6 +401,7 @@ class Bike < ApplicationRecord
   def calculated_listing_order
     return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
     return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
+
     t = (updated_by_user_fallback || Time.current).to_i / 10000
     (stock_photo_url.present? || public_images.limit(1).present?) ? t : t / 100
   end
@@ -407,6 +413,7 @@ class Bike < ApplicationRecord
   # TODO: for impound CSV - this is a little bit of a stub, update
   def created_by_notification_or_impounding?
     return false if current_ownership.blank?
+
     %w[unregistered_parking_notification impound_import].include?(current_ownership.origin) ||
       current_ownership.status == "status_impounded"
   end
@@ -478,6 +485,7 @@ class Bike < ApplicationRecord
       return "Hidden" unless can_see_hidden_serial?(u)
     end
     return serial_number.humanize if no_serial?
+
     serial_number&.upcase
   end
 
@@ -529,6 +537,7 @@ class Bike < ApplicationRecord
     # Only the impound organization can edit it if it's impounded
     return Organization.where(id: current_impound_record.organization_id) if current_impound_record.present?
     return organizations if first_ownership? && organized? && !claimed?
+
     can_edit_claimed_organizations
   end
 
@@ -538,11 +547,13 @@ class Bike < ApplicationRecord
     return true unless u.present? || org.present?
     # We have either a org or a user - if no user, we only need to check org
     return editable_organization_ids.include?(org.id) if u.blank?
+
     unless current_impound_record.present?
       return false if claimable_by?(u) || u == owner # authorized by owner, not organization
     end
     # Ensure the user is part of the organization and the organization can edit if passed both
     return u.member_bike_edit_of?(org) && editable_organization_ids.include?(org.id) if org.present?
+
     editable_organizations.any? { |o| u.member_bike_edit_of?(o) }
   end
 
@@ -552,12 +563,14 @@ class Bike < ApplicationRecord
 
   def claimable_by?(u)
     return false if u.blank? || current_ownership.blank? || current_ownership.claimed?
+
     user == u || current_ownership.claimable_by?(u)
   end
 
   def authorized?(passed_user, no_superuser_override: false)
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?
+
     # authorization requires organization if impounded or marked abandoned by an organization
     unless authorization_requires_organization?
       # Since it doesn't require an organization, authorize by user
@@ -568,6 +581,7 @@ class Bike < ApplicationRecord
 
   def authorize_and_claim_for_user(passed_user)
     return authorized?(passed_user) unless claimable_by?(passed_user)
+
     current_ownership.mark_claimed
     authorized?(passed_user)
   end
@@ -582,11 +596,13 @@ class Bike < ApplicationRecord
     return true if status_stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
     return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
+
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 
   def contact_owner_user?(u = nil, organization = nil)
     return true if user? || status_stolen? || u&.superuser?
+
     current_ownership&.organization_direct_unclaimed_notifications?
   end
 
@@ -600,6 +616,7 @@ class Bike < ApplicationRecord
 
   def phone
     return owner_email if phone_registration?
+
     # use @phone because attr_accessor
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
@@ -611,19 +628,23 @@ class Bike < ApplicationRecord
   def phoneable_by?(passed_user = nil)
     return false unless phone.present?
     return true if passed_user&.superuser?(controller_name: "bikes", action_name: "show")
+
     if current_stolen_record.blank?
       return false unless contact_owner?(passed_user) # This return false if user isn't present
+
       return !passed_user.ambassador? # we aren't giving ambassadors access to phones rn
     end
     return true if current_stolen_record.phone_for_everyone
     return false if passed_user.blank?
     return true if current_stolen_record.phone_for_shops && passed_user.has_shop_organization_role?
     return true if current_stolen_record.phone_for_police && passed_user.has_police_organization_role?
+
     current_stolen_record.phone_for_users
   end
 
   def visible_by?(passed_user = nil)
     return true unless user_hidden || deleted?
+
     if passed_user.present?
       return true if passed_user.superuser?(controller_name: "bikes", action_name: "show")
       return false if deleted?
@@ -655,6 +676,7 @@ class Bike < ApplicationRecord
 
   def fetch_current_stolen_record
     return current_stolen_record if defined?(manual_csr)
+
     # Don't access through association, or else it won't find without a reload
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
@@ -692,6 +714,7 @@ class Bike < ApplicationRecord
 
   def set_user_hidden
     return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
+
     if marked_user_hidden.present? && InputNormalizer.boolean(marked_user_hidden)
       self.user_hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
@@ -726,6 +749,7 @@ class Bike < ApplicationRecord
 
   def clean_frame_size
     return true unless frame_size.present? || frame_size_number.present?
+
     if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
       # Don't overwrite frame_size_number if frame_size_number was passed
       if frame_size_number.blank? || !frame_size_number_changed?
@@ -771,8 +795,10 @@ class Bike < ApplicationRecord
   def set_paints
     self.paint_id = nil if paint_id.present? && paint_name.blank? && !paint_name.nil?
     return true unless paint_name.present?
+
     self.paint_name = paint_name[0] if paint_name.is_a?(Array)
     return true if Color.friendly_find(paint_name).present?
+
     paint = Paint.friendly_find(paint_name)
     paint = Paint.create(name: paint_name) unless paint.present?
     self.paint_id = paint.id
@@ -789,6 +815,7 @@ class Bike < ApplicationRecord
     return false if addy.blank? || addy.values.all?(&:blank?)
     return false if addy["street"].blank? || addy["city"].blank?
     return true if creation_organization&.default_location.blank?
+
     creation_organization.default_location.address_hash != addy
   end
 
@@ -809,6 +836,7 @@ class Bike < ApplicationRecord
   def registration_address(unmemoize = false)
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
+
     @registration_address = case registration_address_source
     when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
     when "user" then user&.address_hash_legacy
@@ -826,6 +854,7 @@ class Bike < ApplicationRecord
   def load_external_images(urls = nil)
     (urls || external_image_urls).reject(&:blank?).each do |url|
       next if public_images.where(external_image_url: url).present?
+
       public_images.create(external_image_url: url)
     end
   end
@@ -833,6 +862,7 @@ class Bike < ApplicationRecord
   # Called in BikeServices::Creator, so that the serial and email can be used for dupe finding
   def set_calculated_unassociated_attributes
     clean_frame_size
+    self.manufacturer_id = Manufacturer.other.id if manufacturer_id == 0
     self.manufacturer_other = InputNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
     self.frame_model = InputNormalizer.string(frame_model)
@@ -869,6 +899,7 @@ class Bike < ApplicationRecord
   # Only geocode if address is set manually (and not skipping geocoding)
   def should_be_geocoded?
     return false if skip_geocoding?
+
     address_changed?
   end
 
@@ -916,6 +947,7 @@ class Bike < ApplicationRecord
 
   def calculated_occurred_at
     return nil if current_event_record.blank? || is_for_sale
+
     current_impound_record&.impounded_at || current_stolen_record&.date_stolen
   end
 
@@ -924,6 +956,7 @@ class Bike < ApplicationRecord
     unless owner_email_changed?
       return user.present? ? user.email : owner_email
     end
+
     existing_user = User.fuzzy_email_find(owner_email)
     if existing_user.present?
       existing_user.email

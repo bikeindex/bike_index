@@ -12,11 +12,13 @@ class ManufacturerV2ShowSerializer < ApplicationSerializer
 
   def company_url
     return "" unless object.website
+
     object.website
   end
 
   def image
     return "" unless object.logo_url.present? && object.logo_url.match("/blank.png").blank?
+
     object.logo_url
   end
 

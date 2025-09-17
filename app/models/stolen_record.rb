@@ -140,6 +140,7 @@ class StolenRecord < ApplicationRecord
 
     def find_matching_token(bike_id:, recovery_link_token:)
       return nil unless bike_id.present? && recovery_link_token.present?
+
       unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
     end
 
@@ -219,6 +220,7 @@ class StolenRecord < ApplicationRecord
     end
     # Try to fill in missing attributes by reverse geocoding
     return if latitude.blank? || longitude.blank? || all_location_attributes_present?
+
     geohelper_attrs = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude)
     attrs_to_assign = geohelper_attrs.keys.reject { |gattr| self[gattr].present? }
     self.attributes = geohelper_attrs.slice(*attrs_to_assign)
@@ -287,6 +289,7 @@ class StolenRecord < ApplicationRecord
 
   def tsv_col(i)
     return "" unless i.present?
+
     i.gsub(/\\?(\t|\\t)+/i, " ").gsub(/\\?(\r|\\r)+/i, " ")
       .gsub(/\\?(\n|\\n)+/i, " ").gsub(/\\?\\?('|")+/, " ")
   end
@@ -294,6 +297,7 @@ class StolenRecord < ApplicationRecord
   def tsv_row(with_article = true, with_stolen_locations: false)
     b = bike
     return "" unless b.present?
+
     row = ""
     if with_stolen_locations
       row << "#{tsv_col(city)}\t#{tsv_col(state && state.abbreviation)}\t"
@@ -324,6 +328,7 @@ class StolenRecord < ApplicationRecord
     return "not_eligible" unless can_share_recovery
     return "not_displayed" if not_displayed?
     return "recovery_displayed" if recovery_display.present?
+
     if bike&.thumb_path&.present?
       "waiting_on_decision"
     else
@@ -381,6 +386,7 @@ class StolenRecord < ApplicationRecord
 
   def update_associations
     return true if skip_update
+
     # Bump bike only if it looks like this is bike's current_stolen_record
     if current || bike&.current_stolen_record_id == id
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
@@ -405,6 +411,7 @@ class StolenRecord < ApplicationRecord
 
   def all_location_attributes_present?
     return false if country_id.blank? || city.blank? || zipcode.blank?
+
     (country_id == Country.united_states_id) ? state_id.present? : true
   end
 end

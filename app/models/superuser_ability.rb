@@ -54,6 +54,7 @@ class SuperuserAbility < ApplicationRecord
   def self.can_access?(controller_name: nil, action_name: nil)
     return true if universal.any? || controller.where(controller_name: controller_name).any?
     return false if action_name.blank?
+
     # if permitted to view edit, also permitted to view show (lazy hack because there aren't RBAC roles)
     action_name = %w[show edit] if action_name == "show"
     action.where(controller_name: controller_name).where(action_name: action_name).any?
@@ -95,6 +96,7 @@ class SuperuserAbility < ApplicationRecord
 
   def calculated_kind
     return "universal" if controller_name.blank?
+
     action_name.blank? ? "controller" : "action"
   end
 end

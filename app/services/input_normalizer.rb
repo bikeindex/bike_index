@@ -2,11 +2,13 @@ class InputNormalizer
   class << self
     def boolean(param = nil)
       return false if param.blank?
+
       ActiveRecord::Type::Boolean.new.cast(param.to_s.strip)
     end
 
     def string(val)
       return nil if val.blank?
+
       val.strip.gsub(/\s+/, " ")
     end
 

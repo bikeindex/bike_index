@@ -1,6 +1,7 @@
 class Phonifyer
   def self.phonify(string)
     return nil unless string.present?
+
     number = string.to_s.strip
     number, country_code = split_with_country_code(number)
     number, extension = split_with_extension(number)
@@ -14,12 +15,14 @@ class Phonifyer
 
   def self.strip_ignored_parts(number)
     return nil unless number.present?
+
     # Formatting bits that we don't care about
     number.gsub(/\s|\.|-|\(|\)|\//, "")
   end
 
   def self.split_with_country_code(number)
     return [number] unless number.start_with?("+") # skip if it doesn't look like it has a country code!
+
     # grab the country_code
     country_code = number[/\A\+\d*/]
     if country_code.length > 10 # Looks like the whole number is in country code
@@ -32,8 +35,10 @@ class Phonifyer
 
   def self.split_with_extension(number)
     return [number] unless number.match?(/x/i)
+
     number, extension = number.split(/e?x[a-z]*/i)
     return [number, nil] unless extension.present?
+
     # Remove things we don't care about
     extension = extension.strip.gsub(/\A(-|\.|:)/, "")
     [number.strip, "x#{extension.strip}"]
@@ -41,6 +46,7 @@ class Phonifyer
 
   def self.components(string)
     return nil unless string.present?
+
     number = string.to_s.strip
     number, country_code = split_with_country_code(number)
     number, extension = split_with_extension(number)

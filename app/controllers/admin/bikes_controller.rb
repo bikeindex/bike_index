@@ -1,21 +1,23 @@
 class Admin::BikesController < Admin::BaseController
   include SortableTable
+
   before_action :find_bike, only: %i[edit update show]
   before_action :set_period, only: %i[index missing_manufacturer]
   around_action :set_reading_role, only: %i[index show]
 
   def index
-    @per_page = params[:per_page] || 100
+    @per_page = permitted_per_page(default: 100)
 
     @pagy, @bikes = pagy(available_bikes.includes(:creation_organization, :current_ownership, :paint)
-      .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page)
+      .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def missing_manufacturer
-    @per_page = params[:per_page] || 100
+    @per_page = permitted_per_page(default: 100)
     @pagy, @bikes = pagy(
       missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 
@@ -42,9 +44,9 @@ class Admin::BikesController < Admin::BaseController
     else
       DuplicateBikeGroup.unignored.order("created_at desc")
     end
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page
     @duplicate_groups_count = duplicate_groups.size
-    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page)
+    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page, page: permitted_page)
   end
 
   def ignore_duplicate_toggle
@@ -106,6 +108,7 @@ class Admin::BikesController < Admin::BaseController
     if @bike.update(permitted_parameters.except(:stolen_records_attributes))
       @bike.create_normalized_serial_segments
       return if return_to_if_present
+
       flash[:success] = "Bike was successfully updated."
       redirect_to(edit_admin_bike_url(@bike)) && return
     else

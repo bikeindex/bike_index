@@ -6,6 +6,7 @@ class Email::DonationJob < ApplicationJob
   def perform(id)
     payment = Payment.find(id)
     return unless payment.present? && payment.donation?
+
     @user = payment.user
     notification_kind = calculated_notification_kind(payment)
     notification = payment.notifications.where(kind: notification_kind).first
@@ -57,6 +58,7 @@ class Email::DonationJob < ApplicationJob
 
   def matching_recovered_bikes(payment)
     return [] if payment.user.blank?
+
     payment.user.bikes.select do |b|
       b.stolen_recovery? && b.recovered_records.where(recovered_at: relevant_period(payment)).any?
     end.sort do |a, b|
@@ -67,6 +69,7 @@ class Email::DonationJob < ApplicationJob
 
   def matching_stolen_bikes(payment)
     return [] if payment.user.blank?
+
     payment.user.bikes.status_stolen.map(&:current_stolen_record).reject(&:blank?)
       .select { |s| relevant_period(payment).cover?(s.date_stolen) }
       .sort_by(&:date_stolen) # most recent stolen
@@ -75,6 +78,7 @@ class Email::DonationJob < ApplicationJob
 
   def matching_theft_alert_bikes(payment)
     return [] if payment.user.blank?
+
     payment.user.theft_alerts.paid.where(created_at: relevant_period(payment)).order(:created_at)
       .map(&:bike)
   end

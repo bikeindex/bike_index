@@ -94,6 +94,7 @@ class Counts
     def redis
       # Basically, crib what is done in sidekiq
       raise ArgumentError, "requires a block" unless block_given?
+
       redis_pool.with { |conn| yield conn }
     end
 

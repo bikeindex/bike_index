@@ -86,6 +86,7 @@ module APIAuthorization
     def before
       @endpoint_auth_declaration = env["api.endpoint"]&.options&.dig(:route_options, :authorizations)
       return unless endpoint_protected?
+
       doorkeeper_authorize!
       # Assign the access_token and the user to the request object, so it can be accessed
       env["doorkeeper_access_token"] = doorkeeper_access_token

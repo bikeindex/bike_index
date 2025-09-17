@@ -154,6 +154,7 @@ class MarketplaceMessage < ApplicationRecord
     user_id = user_or_id&.is_a?(User) ? user_or_id.id : user_or_id
 
     return [receiver, :receiver] if user_id == sender_id
+
     [sender, :sender] if user_id == receiver_id
   end
 
@@ -162,6 +163,7 @@ class MarketplaceMessage < ApplicationRecord
     user_id = user_or_id&.is_a?(User) ? user_or_id.id : user_or_id
 
     return [receiver, receiver_id] if user_id == sender_id
+
     [sender, sender_id] if user_id == receiver_id
   end
 

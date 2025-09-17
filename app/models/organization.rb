@@ -215,6 +215,7 @@ class Organization < ApplicationRecord
     return nil unless n.present?
     return n if n.is_a?(Organization)
     return find_by_id(n) if integer_slug?(n)
+
     slug = Slugifyer.slugify(n)
     # First try slug, then previous slug, and finally, just give finding by name a shot
     find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
@@ -230,6 +231,7 @@ class Organization < ApplicationRecord
 
   def self.admin_text_search(n)
     return nil unless n.present?
+
     str = "%#{n.strip}%"
     match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
@@ -240,12 +242,14 @@ class Organization < ApplicationRecord
   def self.with_enabled_feature_slugs(slugs)
     matching_slugs = OrganizationFeature.matching_slugs(slugs)
     return none unless matching_slugs.present?
+
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
   def self.with_any_enabled_feature_slugs(slugs)
     matching_slugs = OrganizationFeature.matching_slugs(slugs)
     return none unless matching_slugs.present?
+
     where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
   end
 
@@ -256,6 +260,7 @@ class Organization < ApplicationRecord
   def self.passwordless_email_matching(str)
     str = EmailNormalizer.normalize(str)
     return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
+
     domain = str.split("@").last
     permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
   end
@@ -429,12 +434,14 @@ class Organization < ApplicationRecord
 
   def organization_view_counts
     return Organization.none unless manufacturer_id.present?
+
     Organization.left_joins(:organization_manufacturers)
       .where(organization_manufacturers: {can_view_counts: true, manufacturer_id: manufacturer_id})
   end
 
   def mail_snippet_body(snippet_kind)
     return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
+
     snippet = mail_snippets.enabled.where(kind: snippet_kind).first
     snippet&.body
   end
@@ -478,12 +485,14 @@ class Organization < ApplicationRecord
   # Bikes geolocated within `search_radius` miles.
   def nearby_bikes
     return Bike.none unless regional? && search_coordinates_set?
+
     # Need to unscope it so that we can call group-by on it
     Bike.unscoped.current.within_bounding_box(bounding_box)
   end
 
   def nearby_recovered_records
     return StolenRecord.none unless regional? && search_coordinates_set?
+
     # Don't use recovered scope because it orders them
     StolenRecord.recovered.within_bounding_box(bounding_box)
   end
@@ -494,6 +503,7 @@ class Organization < ApplicationRecord
 
   def graduated_notification_interval_days
     return nil unless graduated_notification_interval.present?
+
     graduated_notification_interval / ActiveSupport::Duration::SECONDS_PER_DAY
   end
 
@@ -506,6 +516,7 @@ class Organization < ApplicationRecord
   def enabled?(feature_name)
     features = OrganizationFeature.matching_slugs(feature_name)
     return false unless features.present? && enabled_feature_slugs.is_a?(Array)
+
     features.all? { |feature| enabled_feature_slugs.include?(feature) }
   end
 
@@ -516,6 +527,7 @@ class Organization < ApplicationRecord
 
   def set_calculated_attributes
     return true unless name.present?
+
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
@@ -552,6 +564,7 @@ class Organization < ApplicationRecord
 
   def ensure_auto_user
     return true if auto_user.present?
+
     self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
     save
   end
@@ -578,12 +591,14 @@ class Organization < ApplicationRecord
       end
     elsif auto_user_id.blank?
       return nil unless users.any?
+
       self.auto_user_id = users.first.id
     end
   end
 
   def update_associations
     return true if skip_update
+
     UpdateOrganizationAssociationsJob.perform_async(id)
   end
 
@@ -591,6 +606,7 @@ class Organization < ApplicationRecord
 
   def nearby_organizations_including_siblings
     return self.class.none unless regional? && search_coordinates_set?
+
     self.class.within_bounding_box(bounding_box).where.not(id: child_ids + [id, parent_organization_id])
       .reorder(id: :asc)
   end
@@ -606,6 +622,7 @@ class Organization < ApplicationRecord
     end
     str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
     return str unless deleted_at.present?
+
     str.match?("-deleted") ? str : "#{str}-deleted"
   end
 

@@ -13,6 +13,7 @@ class Integrations::BikeBook
 
     response = JSON.parse(res.body)
     return response if response.is_a?(Array)
+
     response.with_indifferent_access
   end
 
@@ -25,6 +26,7 @@ class Integrations::BikeBook
       }
     end
     return nil unless options[:year].present? && options[:manufacturer].present? && options[:frame_model].present?
+
     # We're book sluging everything because, url safe (It's the same method bikebook uses)
     query = {manufacturer: Slugifyer.manufacturer(options[:manufacturer]),
              year: options[:year],
@@ -35,6 +37,7 @@ class Integrations::BikeBook
 
   def get_model_list(options = {})
     return nil unless options[:manufacturer].present?
+
     query = {manufacturer: Slugifyer.manufacturer(options[:manufacturer])}
     query[:year] = options[:year] if options[:year].present?
 

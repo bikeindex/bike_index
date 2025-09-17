@@ -4,8 +4,10 @@ module FriendlyNameFindable
   module ClassMethods
     def friendly_find(str)
       return nil if str.blank?
+
       strip_if_str!(str)
       return where(id: str).first if integer_string?(str)
+
       where("lower(name) = ?", str.downcase.strip).first
     end
 

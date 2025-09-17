@@ -2,10 +2,11 @@ class Admin::StripeSubscriptionsController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(
       matching_stripe_subscriptions.includes(:user, :stripe_price, :payments).reorder("stripe_subscriptions.#{sort_column} #{sort_direction}"),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

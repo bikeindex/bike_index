@@ -40,6 +40,7 @@ module SearchResults::BikeBox
     # TODO: replace with DefinitionList::Container::Component
     def attr_list_item(desc, title)
       return nil unless desc.present?
+
       content_tag(:li) do
         content_tag(:strong, "#{title}: ", class: "attr-title") +
           content_tag(:span, desc)

@@ -4,9 +4,9 @@ class Admin::MailSnippetsController < Admin::BaseController
   before_action :find_snippet, except: [:index, :new, :create]
 
   def index
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page
     @pagy, @mail_snippets = pagy(matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
-      .includes(:organization), limit: @per_page)
+      .includes(:organization), limit: @per_page, page: permitted_page)
   end
 
   def show
@@ -51,6 +51,7 @@ class Admin::MailSnippetsController < Admin::BaseController
 
   def matching_mail_snippets
     return @matching_mail_snippets if defined?(@matching_mail_snippets)
+
     matching_mail_snippets = MailSnippet
     if MailSnippet.kinds.include?(params[:search_kind])
       @search_kind = params[:search_kind]

@@ -2,9 +2,9 @@ class Admin::ParkingNotificationsController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @parking_notifications = pagy(matching_parking_notifications.includes(:user, :organization, :bike)
-      .order(sort_column + " " + sort_direction), limit: @per_page)
+      .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_parking_notifications
@@ -21,6 +21,7 @@ class Admin::ParkingNotificationsController < Admin::BaseController
 
   def matching_parking_notifications
     return @matching_parking_notifications if defined?(@matching_parking_notifications)
+
     parking_notifications = ParkingNotification
     parking_notifications.resolved if sort_column == "resolved_at"
     if ParkingNotification.statuses.include?(params[:search_status])

@@ -72,6 +72,7 @@ class Feedback < ApplicationRecord
 
   def self.bike(bike_or_bike_id = nil)
     return where("(feedback_hash->>'bike_id') IS NOT NULL") if bike_or_bike_id.blank?
+
     bike_id = bike_or_bike_id.is_a?(Bike) ? bike_or_bike_id.id : bike_or_bike_id
     where("(feedback_hash->>'bike_id') = ?", bike_id.to_s)
   end
@@ -92,6 +93,7 @@ class Feedback < ApplicationRecord
   def self.kind_humanized(str)
     return nil unless str.present?
     return "#{str.gsub("lead_for_", "").strip.humanize} lead" if str.match?("lead")
+
     str.gsub("_request", "").strip.humanize
   end
 
@@ -114,6 +116,7 @@ class Feedback < ApplicationRecord
       end
     end
     return true if self.class.no_notification_kinds.include?(kind)
+
     Email::FeedbackNotificationJob.perform_async(id)
   end
 
@@ -169,17 +172,20 @@ class Feedback < ApplicationRecord
 
   def looks_like_spam?
     return false if user.present?
+
     # We're permitting unsigned in users to send messages for leads, if they try to send additional
     additional.present?
   end
 
   def generate_title
     return true if title.present? || lead_type.blank?
+
     self.title = "New #{lead_type} lead: #{name}"
   end
 
   def set_user_attrs
     return true unless user.present?
+
     self.name ||= user.name
     self.email ||= user.email
   end
@@ -190,6 +196,7 @@ class Feedback < ApplicationRecord
 
   def lead_type
     return nil unless lead?
+
     kind_str = feedback_type if feedback_type.present?
     kind_str ||= kind
     kind_str.gsub("lead_for_", "").humanize
@@ -204,6 +211,7 @@ class Feedback < ApplicationRecord
     if feedback_type == "stolen_information"
       return title&.match?(/chop.?shop/i) ? "tip_chop_shop" : "tip_stolen_bike"
     end
+
     "message"
   end
 end

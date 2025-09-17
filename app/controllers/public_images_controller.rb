@@ -99,6 +99,7 @@ class PublicImagesController < ApplicationController
     # Otherwise, it's a blog image or an organization image (or someone messing about),
     # so ensure the current user is admin authorized
     return true if current_user&.superuser?
+
     render(json: {error: "Access denied"}, status: 401) && return
   end
 

@@ -18,7 +18,7 @@ end
 ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
-
+ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly
 require "spec_helper"
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
@@ -66,6 +66,7 @@ RSpec.configure do |config|
   config.include ControllerSpecHelpers, type: :controller
   config.include JsonHelpers, type: :controller
   config.include JsonHelpers, type: :request
+  config.include HtmlContentHelpers, type: :request
   config.include StripeHelpers, type: :request
   config.include StripeHelpers, type: :controller
   config.include StripeHelpers, type: :service
@@ -77,6 +78,7 @@ RSpec.configure do |config|
   config.include ViewComponent::TestHelpers, type: :component
   config.include ViewComponent::SystemTestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
+  config.include HtmlContentHelpers, type: :component
   config.before(:each, :browser, type: :system) { driven_by(:selenium) }
   config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
 end

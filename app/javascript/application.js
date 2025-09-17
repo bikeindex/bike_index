@@ -16,8 +16,7 @@ const application = Application.start()
 // Configure Stimulus development experience
 application.debug = false
 window.Stimulus = application
-
-lazyLoadControllersFrom('components', application)
+lazyLoadControllersFrom('controllers', application)
 
 function localizeTime () {
   if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()

@@ -20,9 +20,8 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: rails
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
         # needed because the postgres container does not provide a healthcheck
         # tmpfs makes DB faster by using RAM
         options: >-
@@ -36,14 +35,6 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
 
-    env:
-      RAILS_ENV: test
-      PGHOST: localhost
-      PGPORT: 5432
-      PGUSER: postgres
-      PGPASSWORD: password
-      TZ: "America/Chicago"
-
     steps:
       - name: Get CPU cores
         id: cpu-info
@@ -54,7 +45,7 @@ jobs:
           packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.0
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1

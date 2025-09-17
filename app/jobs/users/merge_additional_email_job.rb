@@ -4,6 +4,7 @@ class Users::MergeAdditionalEmailJob < ApplicationJob
   def perform(user_email_id)
     user_email = UserEmail.find(user_email_id)
     return true unless user_email.confirmed?
+
     old_user = find_old_user(user_email.email, user_email.user_id)
     merge_old_user(user_email, old_user) if old_user.present?
     ::Callbacks::AfterUserCreateJob.new.perform(user_email.user_id, "merged", user: user_email.user, email: user_email.email)
@@ -87,6 +88,7 @@ class Users::MergeAdditionalEmailJob < ApplicationJob
   def find_old_user(email, user_id)
     user = User.fuzzy_unconfirmed_primary_email_find(email)
     return user if user.present?
+
     user_email = UserEmail.where("user_id != ?", user_id).where(email: email).first
     user_email&.user
   end

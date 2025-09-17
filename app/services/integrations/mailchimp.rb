@@ -51,6 +51,7 @@ class Integrations::Mailchimp
         mailchimp_datum.subscriber_hash)
     rescue MailchimpMarketing::ApiError => e
       return if e.status == 404
+
       raise e # re-raise if it isn't a 404
     end
   end
@@ -64,6 +65,7 @@ class Integrations::Mailchimp
       # SHIT method to get error detail. e.detail returns nil
       return {"error" => e.to_s.gsub(/\A.*detail/, "").gsub(/",.*/, "").gsub(/\\+/, "")}
     end
+
     raise e # re-raise if it isn't a 404
   end
 
@@ -86,6 +88,7 @@ class Integrations::Mailchimp
     client.lists.delete_list_member(self.class.list_id(list), mailchimp_datum.subscriber_hash)
   rescue MailchimpMarketing::ApiError => e
     return if e.status == 404
+
     raise e # re-raise if it isn't a 404
   end
 

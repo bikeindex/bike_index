@@ -17,6 +17,7 @@ module SearchResults::Container
       kind_sym = result_view&.to_sym
       default ||= RESULT_VIEW_COMPONENT.keys.first
       raise "Unknown default '#{default}'" unless RESULT_VIEW_COMPONENT.key?(default)
+
       RESULT_VIEW_COMPONENT.key?(kind_sym) ? kind_sym : default
     end
 

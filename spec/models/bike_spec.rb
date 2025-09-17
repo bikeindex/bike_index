@@ -1417,7 +1417,7 @@ RSpec.describe Bike, type: :model do
       let(:ownership) { Ownership.new(user: user) }
       it "returns users phone" do
         allow(bike).to receive(:current_ownership) { ownership }
-        expect(ownership.first?).to be_truthy
+        expect(ownership.initial?).to be_truthy
         expect(user.phone).to eq "7659871234"
         expect(bike.phone).to eq "7659871234"
       end
@@ -1481,6 +1481,13 @@ RSpec.describe Bike, type: :model do
       let(:bike) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: " ") }
       it "is nil" do
         expect(bike.manufacturer_other).to eq nil
+        expect(bike.mnfg_name).to eq "Other"
+      end
+    end
+    context "manufacturer_id 0" do
+      let(:bike) { FactoryBot.create(:bike, manufacturer_id: 0) }
+      it "assigns to Other" do
+        expect(bike.reload.manufacturer_id).to eq Manufacturer.other.id
         expect(bike.mnfg_name).to eq "Other"
       end
     end

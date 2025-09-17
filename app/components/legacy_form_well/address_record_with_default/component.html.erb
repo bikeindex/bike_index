@@ -1,6 +1,6 @@
 <div
   class="related-fields"
-  data-controller="legacy-form-well--address-record-with-default--component"
+  data-controller="legacy-form-well--address-record-with-default"
 >
   <%= render(
     LegacyFormWell::AddressRecord::Component.new(
@@ -17,8 +17,8 @@
         <label><%= @builder.check_box :user_account_address,
                              {
                                "data-action" =>
-                                 "change->legacy-form-well--address-record-with-default--component#toggleUseAccount",
-                               "data-legacy-form-well--address-record-with-default--component-target" =>
+                                 "change->legacy-form-well--address-record-with-default#toggleUseAccount",
+                               "data-legacy-form-well--address-record-with-default-target" =>
                                  "useAccountCheckbox",
                              } %>
           <span class="tw:cursor-pointer">

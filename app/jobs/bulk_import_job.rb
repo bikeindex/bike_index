@@ -1,6 +1,7 @@
 require "csv"
 
 class BulkImportJob < ApplicationJob
+  MAX_LINES = 25_100
   sidekiq_options retry: false
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
@@ -8,8 +9,19 @@ class BulkImportJob < ApplicationJob
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
     return true if @bulk_import.ascend? && !@bulk_import.check_ascend_import_processable!
-    process_csv(@bulk_import.open_file)
+    return true if @bulk_import.finished? # Exit early if already finished
 
+    # Check file size before processing
+    open_file = @bulk_import.open_file
+
+    line_count = count_file_lines(open_file)
+    if line_count > MAX_LINES
+      return @bulk_import.add_file_error("CSV is too big! Max allowed size is #{MAX_LINES - 100} lines")
+    end
+
+    process_csv(open_file)
+
+    @bulk_import.unlink_tempfile
     @bulk_import.progress = "finished"
     return @bulk_import.save unless @line_errors.any?
 
@@ -48,6 +60,7 @@ class BulkImportJob < ApplicationJob
 
   def register_bike(b_param_hash)
     return nil if b_param_hash.blank?
+
     b_param = BParam.create(creator_id: creator_id,
       params: b_param_hash,
       origin: "bulk_import_worker")
@@ -139,6 +152,13 @@ class BulkImportJob < ApplicationJob
 
   private
 
+  def count_file_lines(file)
+    line_count = 0
+    file.each_line { line_count += 1 }
+    file.rewind # Reset file position for subsequent reading
+    line_count
+  end
+
   def validate_headers(attrs)
     required_headers = if @bulk_import.impounded?
       %i[manufacturer serial_number impounded_at]
@@ -148,6 +168,7 @@ class BulkImportJob < ApplicationJob
     valid_headers = (attrs & required_headers).count == 3
     # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers
+
     missing_headers = required_headers - (attrs & required_headers)
     @bulk_import.add_file_error("Invalid CSV Headers: #{attrs.join(", ")} - missing #{missing_headers.join(", ")}")
   end

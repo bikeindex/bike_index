@@ -1,13 +1,14 @@
 class MyAccounts::MessagesController < ApplicationController
   include Sessionable
+
   before_action :authenticate_user_for_my_accounts_controller
 
   def index
     params[:page] || 1
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @marketplace_messages = matching_marketplace_messages
     @pagy, @marketplace_messages = pagy(matching_marketplace_messages
-      .includes(:marketplace_listing, :sender, :receiver, :initial_record), limit: @per_page)
+      .includes(:marketplace_listing, :sender, :receiver, :initial_record), limit: @per_page, page: permitted_page)
   end
 
   def show

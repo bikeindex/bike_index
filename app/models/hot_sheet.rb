@@ -58,6 +58,7 @@ class HotSheet < ApplicationRecord
 
   def next_sheet
     return nil if current?
+
     HotSheet.where(organization_id: organization_id).where("sheet_date > ?", sheet_date)
       .reorder(:sheet_date).first
   end

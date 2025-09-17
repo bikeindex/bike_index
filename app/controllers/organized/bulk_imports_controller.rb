@@ -1,6 +1,7 @@
 module Organized
   class BulkImportsController < Organized::BaseController
     include SortableTable
+
     skip_before_action :ensure_member!
 
     skip_before_action :ensure_current_organization!, only: [:create]
@@ -8,9 +9,9 @@ module Organized
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
     def index
-      params[:per_page] || 25
+      @per_page = permitted_per_page
       @pagy, @bulk_imports = pagy(available_bulk_imports.includes(:ownerships)
-        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page)
+        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1
     end
 
@@ -20,8 +21,8 @@ module Organized
         flash[:error] = translation(:unable_to_find_import)
         redirect_to(organization_bulk_imports_path(organization_id: current_organization.to_param)) && return
       end
-      @per_page = params[:per_page] || 25
-      @pagy, @bikes = pagy(@bulk_import.bikes.order(created_at: :desc), limit: @per_page)
+      @per_page = permitted_per_page
+      @pagy, @bikes = pagy(@bulk_import.bikes.order(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def new
@@ -32,9 +33,9 @@ module Organized
 
     def create
       return unless ensure_can_create_import!
+
       @bulk_import = BulkImport.new(permitted_parameters)
       if @bulk_import.save
-        BulkImportJob.perform_async(@bulk_import.id)
         if @is_api
           render json: {success: translation(:file_imported)}, status: 201
         else
@@ -93,11 +94,13 @@ module Organized
       return false unless ensure_admin!
 
       return true if current_user.superuser? || current_organization.show_bulk_import?
+
       raise_do_not_have_access!
     end
 
     def permitted_kinds
       return @permitted_kinds if defined?(@permitted_kinds)
+
       permitted_kinds = []
       permitted_kinds += ["ascend"] if current_organization.ascend_or_broken_ascend?
       permitted_kinds += ["organization_import"] if current_organization.enabled?("show_bulk_import")

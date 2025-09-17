@@ -74,15 +74,15 @@
             %td
               = model_audit_frame_model_display(model_audit, truncate: true)
             %td
-              = link_to admin_number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id)
+              = link_to number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id)
             %td
               - model_audit.organization_model_audits.where.not(bikes_count: 0).pluck(:bikes_count, :organization_id).each do |bikes_count, org_id|
                 %a.small{href: organization_model_audits_path(organization_id: org_id, model_audit_id: model_audit.id)}
                   #{org_names_hash[org_id]}:
-                  = admin_number_display(bikes_count)
+                  = number_display(bikes_count)
 
             %td
-              =  admin_number_display(model_audit.model_attestations.count)
+              =  number_display(model_audit.model_attestations.count)
 
 
 

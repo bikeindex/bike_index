@@ -5,7 +5,7 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-ruby "3.3.8"
+ruby "3.4.5"
 
 # Gems that are no longer in standard library as Ruby 3.4
 gem "csv"
@@ -45,7 +45,8 @@ gem "translation"
 # Redis and redis dependents
 gem "redis"
 gem "sidekiq" # Background job processing
-gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+# Sidekiq failure tracking and viewing. Broken for sidekiq 8. see github.com/mhfs/sidekiq-failures/pull/159
+gem "sidekiq-failures", github: "navidemad/sidekiq-failures", branch: "feat-compatibility-sidekiq-8", ref: "63252253b1a17b7115fe086a910881467cd0e55d"
 gem "redlock" # Locking
 
 gem "faraday_middleware" # Manage faraday request flow
@@ -69,6 +70,7 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "0.10.1" # QR Codes
 gem "inline_svg" # render SVGs inline and give them classes
+gem "down" # used to generate a local tempfile
 
 # API wrappers
 gem "twitter" # Twitter. For rendering tweets
@@ -135,7 +137,7 @@ group :development do
   gem "rerun" # restart sidekiq processes in development on app change
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
-  gem "annotate_rb", github: "sethherr/annotate_rb", branch: "rename-annotate_rb"
+  gem "annotaterb"
 end
 
 group :development, :test do

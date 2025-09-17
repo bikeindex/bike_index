@@ -126,6 +126,7 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def update_associations
     return true if skip_update
+
     impound_record&.update(updated_at: Time.current)
     impound_claim&.update(updated_at: Time.current)
   end

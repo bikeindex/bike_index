@@ -13,6 +13,7 @@ class Email::MarketplaceMessageJob < ApplicationJob
 
     # track_email_delivery returns if delivery_success, but return early here to prevent updating the cache
     return if notification.delivery_success?
+
     delivery = nil
     notification.track_email_delivery do
       delivery = CustomerMailer.marketplace_message_notification(marketplace_message).deliver_now

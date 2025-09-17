@@ -29,7 +29,7 @@
                   %td
                     = link_to org_name, url_for(sortable_search_params.merge(organization_id: org_id))
                   %td
-                    = admin_number_display(org_reg_count)
+                    = number_display(org_reg_count)
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_user_registration_organizations, column: @time_range_column), stacked: true, thousands: ","
@@ -75,4 +75,4 @@
           %td.table-cell-check
             = check_mark if user_registration_organization.can_edit_claimed
           %td
-            = admin_number_display(user_registration_organization.bikes.count)
+            = number_display(user_registration_organization.bikes.count)

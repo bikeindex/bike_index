@@ -36,6 +36,7 @@ class BikeVersionCreatorJob < ApplicationJob
 
     bike.public_images.each do |public_image|
       next if bike_version.public_images.where(external_image_url: public_image.image_url).present?
+
       bike_version.public_images.create(name: public_image.name,
         external_image_url: public_image.image_url)
     end

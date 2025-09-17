@@ -25,9 +25,9 @@ module Pagination
 
     def pagy_series_link(item)
       if item.is_a?(Integer)
-        link_to(item, @params.merge(page: item), class: active_classes, data: @data)
+        link_to(number_display(item), @params.merge(page: item), class: active_classes, data: @data)
       elsif item.is_a?(String) # it's the current page
-        content_tag(:a, item, role: "link", class: current_link_class, disabled: true, "aria-disabled": "true")
+        content_tag(:a, number_display(item), role: "link", class: current_link_class, disabled: true, "aria-disabled": "true")
       else
         content_tag(:a, pagy_t("pagy.gap").html_safe, role: "link", class: "px-2", disabled: true, "aria-disabled": "true")
       end

@@ -55,11 +55,13 @@ class Manufacturer < ApplicationRecord
     # Secondary_slug is the slug of the stuff in the paretheses
     def find_by_secondary_slug(str)
       return nil if str.blank?
+
       super
     end
 
     def friendly_find(n)
       return nil if n.blank?
+
       if n.is_a?(Integer) || n.match(/\A\d+\z/).present?
         where(id: n).first
       else
@@ -86,6 +88,7 @@ class Manufacturer < ApplicationRecord
 
     def calculated_mnfg_name(manufacturer, manufacturer_other)
       return nil if manufacturer.blank?
+
       if manufacturer.other? && manufacturer_other.present?
         InputNormalizer.sanitize(manufacturer_other)
       else
@@ -154,6 +157,7 @@ class Manufacturer < ApplicationRecord
   def calculated_priority
     return 100 if b_count > 999
     return 0 if (b_count + c_count) == 0
+
     pop = (2 * b_count + c_count) / 20 + 10
     (pop > 100) ? 100 : pop
   end

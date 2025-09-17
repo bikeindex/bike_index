@@ -1,5 +1,6 @@
 class Admin::TwitterAccountsController < Admin::BaseController
   include SortableTable
+
   before_action :find_twitter_account, only: %i[show edit update destroy check_credentials]
 
   def index

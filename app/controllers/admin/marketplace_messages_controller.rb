@@ -2,10 +2,11 @@ class Admin::MarketplaceMessagesController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
+    @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(
       matching_marketplace_messages.includes(:marketplace_listing, :sender, :receiver).reorder(sortable_opts),
-      limit: @per_page
+      limit: @per_page,
+      page: permitted_page
     )
   end
 

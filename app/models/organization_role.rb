@@ -82,6 +82,7 @@ class OrganizationRole < ApplicationRecord
   def send_invitation_email?
     return false if created_by_magic_link # Don't send an email if they're already being emailed
     return false if email_invitation_sent_at.present?
+
     invited_email.present?
   end
 
@@ -99,6 +100,7 @@ class OrganizationRole < ApplicationRecord
 
   def enqueue_processing_worker
     return true if skip_processing
+
     # We manually update the user, because Users::ProcessOrganizationRoleJob won't find this organization_role
     if deleted? && user_id.present?
       ::Callbacks::AfterUserChangeJob.perform_async(user_id)

@@ -74,17 +74,20 @@ class BikeStickerUpdate < ApplicationRecord
   def self.kind_humanized(str)
     return "" unless str.present?
     return str.tr("_", "-") if %w[re_claim un_claim].include?(str)
+
     str.tr("_", " ")
   end
 
   def self.creator_kind_humanized(str)
     return "" unless str.present?
     return "bike registration" if str == "creator_bike_creation"
+
     str.gsub("creator_", "").tr("_", " ")
   end
 
   def self.organization_kind_humanized(str)
     return "" unless str.present?
+
     str.tr("_", " ")
   end
 
@@ -118,6 +121,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def safe_assign_creator_kind=(val)
     return unless CREATOR_KIND_ENUM.keys.map(&:to_s).include?(val.to_s)
+
     if val == "creator_bike_creation"
       set_creator_kind!
     else
@@ -148,6 +152,7 @@ class BikeStickerUpdate < ApplicationRecord
 
   def calculated_organization_kind
     return "no_organization" unless organization.present?
+
     if organization_id == bike_sticker.organization_id
       "primary_organization"
     elsif bike_sticker.organization&.regional? && organization.regional_parents.pluck(:id).include?(bike_sticker.organization_id)
@@ -162,6 +167,7 @@ class BikeStickerUpdate < ApplicationRecord
   def calculated_kind
     return "failed_claim" if failed_claim_errors.present?
     return "un_claim" if bike.blank? && bike_id.blank?
+
     previous_successful_updates.any? ? "re_claim" : "initial_claim"
   end
 end

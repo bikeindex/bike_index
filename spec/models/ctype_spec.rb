@@ -21,12 +21,12 @@ RSpec.describe Ctype, type: :model do
       I18n.with_locale(:nl) do
         options = Ctype.select_options
 
-        localized_axle_nuts = options.find { _1.last == axle_nuts.id }
+        localized_axle_nuts = options.find { it.last == axle_nuts.id }
         expect(localized_axle_nuts.first).to be_an_instance_of(String)
         expect(localized_axle_nuts.first).to_not eq(axle_nuts.name)
         expect(localized_axle_nuts.last).to eq(axle_nuts.id)
 
-        localized_basket = options.find { _1.last == basket.id }
+        localized_basket = options.find { it.last == basket.id }
         expect(localized_axle_nuts.first).to be_an_instance_of(String)
         expect(localized_basket.first).to_not eq(basket.name)
         expect(localized_basket.last).to eq(basket.id)

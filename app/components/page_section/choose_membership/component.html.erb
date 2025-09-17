@@ -1,6 +1,6 @@
 <div
   class="tw:block tw:max-w-4xl tw:mx-auto"
-  data-controller="page-section--choose-membership--component"
+  data-controller="page-section-choose-membership"
 >
   <%= render(Card::Component.new(shadow: true)) do %>
     <h1
@@ -23,7 +23,7 @@
                          class: "tw:cursor-pointer",
                          data: {
                            action:
-                             "change->page-section--choose-membership--component#updateIntervalVisibility",
+                             "change->page-section-choose-membership#updateIntervalVisibility",
                          } %>
           Monthly donation
         </label>
@@ -34,7 +34,7 @@
                          class: "tw:cursor-pointer",
                          data: {
                            action:
-                             "change->page-section--choose-membership--component#updateIntervalVisibility",
+                             "change->page-section-choose-membership#updateIntervalVisibility",
                          } %>
           Yearly donation
         </label>

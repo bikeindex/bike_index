@@ -14,6 +14,7 @@ class ImportStolenBikeListingJob < ApplicationJob
   def perform(group, line, row_str)
     row = self.class.row_from_str(row_str)
     return nil if skip_storing?(row)
+
     stolen_bike_listing = StolenBikeListing.where(group: group, line: line).first
     stolen_bike_listing ||= StolenBikeListing.new(group: group, line: line)
     stolen_bike_listing.attributes = {
@@ -39,6 +40,7 @@ class ImportStolenBikeListingJob < ApplicationJob
   def manufacturer_attrs(str)
     mnfg = Manufacturer.friendly_find(str)
     return {manufacturer_id: mnfg.id} if mnfg.present?
+
     {manufacturer_id: Manufacturer.other.id, manufacturer_other: str}
   end
 
@@ -54,15 +56,18 @@ class ImportStolenBikeListingJob < ApplicationJob
 
   def find_bike_id(str)
     return nil if str.blank?
+
     # Just grab any integers longer than 2 digits, good enough for now
     str[/\d\d+/]
   end
 
   def skip_storing?(row)
     return true if row[:bike].to_s.match?(/no|raffle/i)
+
     # We aren't storing reposts - just for now, we'll add sometime
     repost = row[:repost].present? && !row[:repost].to_s.match?(/no/i)
     return true if repost
+
     # Don't store if there is data that is useful in any columns
     row.slice(:color, :manufacturer, :model, :listing_text)
       .values.join("").gsub(/\s+/, " ").gsub("blank", "").gsub("raffle", "")

@@ -21,6 +21,7 @@ class ScheduledJobRunner < ScheduledJob
 
   def self.record_key(worker_string, record)
     raise ArgumentError, "Unknown history record type: #{record}" unless valid_history_records[record]
+
     "#{worker_string}-#{valid_history_records[record]}"
   end
 

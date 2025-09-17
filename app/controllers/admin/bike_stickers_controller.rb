@@ -85,6 +85,7 @@ class Admin::BikeStickersController < Admin::BaseController
 
   def matching_bike_stickers
     return @matching_bike_stickers if defined?(@matching_bike_stickers)
+
     bike_stickers = BikeSticker.all
     if current_organization.present?
       @matching_batches = true
@@ -110,6 +111,7 @@ class Admin::BikeStickersController < Admin::BaseController
 
   def selected_bike_stickers
     return @selected_bike_stickers if defined?(@selected_bike_stickers)
+
     bike_stickers = BikeSticker.all
     if params[:search_sticker1].present?
       @bike_sticker1 = bike_stickers.lookup(params[:search_sticker1])
@@ -135,9 +137,9 @@ class Admin::BikeStickersController < Admin::BaseController
   end
 
   def scoped_bike_stickers(stickers)
-    @per_page = params[:per_page] || 25
+    @per_page = permitted_per_page
     pagy(stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
-      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike), limit: @per_page)
+      .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike), limit: @per_page, page: permitted_page)
   end
 
   def permitted_parameters

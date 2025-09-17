@@ -87,9 +87,9 @@
                 %small{title: "Campaign: #{theft_alert.objective_campaign}\nAdset: #{theft_alert.objective_adset}\n"}
                   = theft_alert.objective_campaign.humanize.downcase.gsub("outcome", "").strip
           %td
-            = admin_number_display(theft_alert.reach)
+            = number_display(theft_alert.reach)
           %td
-            %small= admin_number_display(theft_alert.engagement&.dig("unique_clicks"))
+            %small= number_display(theft_alert.engagement&.dig("unique_clicks"))
           %td
             = theft_alert.city
             - if theft_alert.state.present?

@@ -1,13 +1,14 @@
 class MyAccountsController < ApplicationController
   include Sessionable
+
   before_action :assign_edit_template, only: %i[edit update destroy]
   before_action :authenticate_user_for_my_accounts_controller
   around_action :set_reading_role, only: %i[show]
 
   def show
     @locks_active_tab = params[:active_tab] == "locks"
-    @per_page = params[:per_page] || 20
-    @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page)
+    @per_page = permitted_per_page
+    @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page, page: permitted_page)
     @locks = current_user.locks.reorder(created_at: :desc)
   end
 
@@ -78,6 +79,7 @@ class MyAccountsController < ApplicationController
 
   def registration_organization_template
     return {} unless current_user&.user_registration_organizations.present?
+
     {registration_organizations: translation(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
   end
 
@@ -87,10 +89,12 @@ class MyAccountsController < ApplicationController
 
   def update_hot_sheet_notifications
     return false unless params[:hot_sheet_organization_ids].present?
+
     params[:hot_sheet_organization_ids].split(",").each do |org_id|
       notify = params.dig(:hot_sheet_notifications, org_id).present?
       organization_role = @user.organization_roles.where(organization_id: org_id).first
       next unless organization_role.present?
+
       organization_role.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
       flash[:success] ||= "Notification setting updated"
     end
@@ -99,6 +103,7 @@ class MyAccountsController < ApplicationController
 
   def update_user_registration_organizations
     return false unless params.key?(:user_registration_organization_all_bikes)
+
     uro_all_bikes = (params[:user_registration_organization_all_bikes] || []).reject(&:blank?).map(&:to_i)
     uro_can_edit_claimed = (params[:user_registration_organization_can_edit_claimed] || []).reject(&:blank?).map(&:to_i)
     new_registration_info = calculated_new_registration_info
@@ -133,6 +138,7 @@ class MyAccountsController < ApplicationController
     # Select the matching key value pairs, and rename them
     new_info = params.as_json.map do |k, v|
       next unless k.match?(/reg_field-/)
+
       [k.gsub("reg_field-", ""), v]
     end.compact.to_h
     # merge in existing registration_info

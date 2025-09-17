@@ -2,8 +2,8 @@ class Admin::UserAlertsController < Admin::BaseController
   include SortableTable
 
   def index
-    @per_page = params[:per_page] || 50
-    @pagy, @user_alerts = pagy(matching_user_alerts.order(sort_column => sort_direction), limit: @per_page)
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @user_alerts = pagy(matching_user_alerts.order(sort_column => sort_direction), limit: @per_page, page: permitted_page)
     @render_kind_counts = InputNormalizer.boolean(params[:search_kind_counts])
   end
 

@@ -1911,77 +1911,6 @@ nb:
       report_the_theft_to_the_organization_html: <span class="text-warning">Rapporter
         tyveriet</span> til %{organization} <strong>%{report_link}</strong> for å
         få politianmeldelsesnummer
-    organized_access_panel:
-      access_panel: Tilgangspanel
-      added_to_track_parking_notification: Denne %{bike_type} er ikke registrert på
-        en bruker. Den ble lagt til for å spore parkeringsvarsler.
-      additional_registrations_information: Registreringer etter bruker
-      additional_registrations_information_visible_because: synlig med %{org_name}
-        rettshåndhevelsestilgang
-      additional_registrations_potential_duplicates: 'Potensielle duplikatsykler som
-        matcher seriesegmenter:'
-      additional_registrations_registered_at: Registrert kl
-      additional_registrations_this_bike: Denne %{bike_type}
-      address: Registreringsadresse
-      address_or_intersection: Adresse eller veikryss
-      as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">Som Bike Index-ambassadør</span>
-        kan du merke den som gjenopprettet:</em>
-      assign_sticker: Tildel klistremerke
-      avery_exportable: Avery eksporterbar
-      believe_it_is_anyway: Tror du det er det uansett?
-      bike_is_not_registered_html: Denne %{bike_type} er <em>ikke</em> registrert
-        med %{org_name}
-      bike_is_registered: Denne %{bike_type} er registrert med %{org_name}
-      bike_not_marked_stolen: "%{bike_type} er ikke merket som stjålet."
-      choose_country: Velg land
-      city: By
-      claimed: Hevdet
-      contact_the_owner_it_is_stolen: til eieren av denne %{bike_type} som du tror
-        er stjålet.
-      creation_description: Kilde
-      creator: Skaper
-      edit: Endre
-      email_to_deal_with_this_html: Send e-post til %{support_link} for å håndtere
-        dette.
-      is_false: falsk
-      is_not_registered_html: "<em>ikke</em> reged med %{org_name}"
-      is_registered: reged med %{org_name}
-      is_true: ekte
-      link_sticker: Link-klistremerke
-      link_url_for_online_sighting: Link url for online sighting (valgfritt)
-      mark_bike_recovered: Mark sykkelen gjenfunnet
-      missing_address: manglende adresse
-      missing_owner_name: mangler brukernavn
-      or_call_owner_html: "<em>Eller ring</em> <strong>eierens telefonnummer:</strong>"
-      org_can_edit_bike: "%{org_name} kan redigere denne %{bike_type}"
-      org_cannot_edit: "%{org_name} kan ikke redigere"
-      organization_can_edit_after_claimed: og kan redigere etter %{bike_type} gjort
-        krav på
-      organization_child: Barneorganisasjon
-      organization_registered: Organisasjon
-      owner_email: E-post eier
-      owner_name: Eiers navn
-      parking_notification_notes_html: "%{org_name} interne notater <small>vises ikke
-        til brukeren</small>"
-      permission: Tillatelse
-      registered: Registrert
-      send_message: Sende melding
-      state: Stat
-      sticker: Klistremerke
-      sticker_code: Klistremerkekode
-      support_email: support@bikeindex.org
-      unable_to_display_additional_information: Kan ikke vise tilleggsinformasjon
-        fordi %{bike_type} ikke er registrert med %{org_name}
-      unregistered_parking_notification: opprettet for parkeringsvarsling
-      user_revoked_permission_html: Denne brukeren <strong>tilbakekalte</strong> tillatelsen
-        til å kontakte dem før sykkelen deres ble merket som stjålet.
-      waiting_on_device_location: Venter på enhetens plassering
-      where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
-        om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
-      write_a_message: Skrive en melding
-      zipcode: Postnummer
-      model_audit: E-kjøretøy revisjon
-      not_audited: Ikke revidert
     pdf:
       bike_description: 'Sykkelbeskrivelse:'
       bike_serial: Sykkelserie
@@ -4911,7 +4840,6 @@ nb:
         line: Linje
       index:
         added: La til
-        bikes: Sykler
         creator: Skaper
         errors: Feil
         exclude_empty_imports: Ekskluder tom import
@@ -4921,7 +4849,7 @@ nb:
         org_ascend_imports_html: "<em>%{org_name}</em> Stigende import"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulkimport"
         progress: Framgang
-        unable_to_process: Kan ikke behandle
+        registrations: Registreringer
       new:
         choose_file: Velg Fil...
         correct_actual_image_url_html: '<span class="text-success">Riktig</span> :
@@ -4963,7 +4891,6 @@ nb:
           vil ikke importen fungere.
       show:
         ascend_import: Ascend import
-        bikes: Sykler
         bulk_import: Masseimport
         bulk_import_impounded: Beslaglagt bulkimport
         color: Farge
@@ -4981,6 +4908,7 @@ nb:
         progress: Framgang
         sent_to: Sendt til
         sent_to_a_new_owner: "(sendt til ny eier)"
+        registrations: Registreringer
     exports:
       index:
         bikes_in_export: Sykler på eksport
@@ -6001,3 +5929,76 @@ nb:
         registered_not_stolen: registrert, ikke stjålet
       container:
         no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
+    org:
+      bike_access_panel:
+        access_panel: Tilgangspanel
+        added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
+          på en bruker. Den ble lagt til for å spore parkeringsvarsler.
+        additional_registrations_information: Registreringer etter bruker
+        additional_registrations_information_visible_because: synlig med %{org_name}
+          rettshåndhevelsestilgang
+        additional_registrations_potential_duplicates: 'Potensielle duplikatsykler
+          som matcher seriesegmenter:'
+        additional_registrations_registered_at: Registrert kl
+        additional_registrations_this_bike: Denne %{bike_type}
+        address: Registreringsadresse
+        address_or_intersection: Adresse eller veikryss
+        as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">Som Bike
+          Index-ambassadør</span> kan du merke den som gjenopprettet:</em>
+        assign_sticker: Tildel klistremerke
+        avery_exportable: Avery eksporterbar
+        believe_it_is_anyway: Tror du det er det uansett?
+        bike_is_not_registered_html: Denne %{bike_type} er <em>ikke</em> registrert
+          med %{org_name}
+        bike_is_registered: Denne %{bike_type} er registrert med %{org_name}
+        bike_not_marked_stolen: "%{bike_type} er ikke merket som stjålet."
+        choose_country: Velg land
+        city: By
+        claimed: Hevdet
+        contact_the_owner_it_is_stolen: til eieren av denne %{bike_type} som du tror
+          er stjålet.
+        creation_source: Kilde
+        creator: Skaper
+        edit: Endre
+        email_to_deal_with_this_html: Send e-post til %{support_link} for å håndtere
+          dette.
+        initial_registration: 'første registrering:'
+        is_false: falsk
+        is_not_registered_html: "<em>ikke</em> reged med %{org_name}"
+        is_registered: reged med %{org_name}
+        is_true: ekte
+        link_sticker: Link-klistremerke
+        link_url_for_online_sighting: Link url for online sighting (valgfritt)
+        mark_bike_recovered: Mark sykkelen gjenfunnet
+        missing_address: manglende adresse
+        missing_owner_name: mangler brukernavn
+        model_audit: E-kjøretøy revisjon
+        not_audited: Ikke revidert
+        or_call_owner_html: "<em>Eller ring</em> <strong>eierens telefonnummer:</strong>"
+        org_can_edit_bike: "%{org_name} kan redigere denne %{bike_type}"
+        org_cannot_edit: "%{org_name} kan ikke redigere"
+        organization_can_edit_after_claimed: og kan redigere etter %{bike_type} gjort
+          krav på
+        organization_child: Barneorganisasjon
+        organization_registered: Organisasjon
+        owner_email: E-post eier
+        owner_name: Eiers navn
+        parking_notification_notes_html: "%{org_name} interne notater <small>vises
+          ikke til brukeren</small>"
+        permission: Tillatelse
+        registered: Registrert
+        send_message: Sende melding
+        state: Stat
+        sticker: Klistremerke
+        sticker_code: Klistremerkekode
+        support_email: support@bikeindex.org
+        unable_to_display_additional_information: Kan ikke vise tilleggsinformasjon
+          fordi %{bike_type} ikke er registrert med %{org_name}
+        unregistered_parking_notification: opprettet for parkeringsvarsling
+        user_revoked_permission_html: Denne brukeren <strong>tilbakekalte</strong>
+          tillatelsen til å kontakte dem før sykkelen deres ble merket som stjålet.
+        waiting_on_device_location: Venter på enhetens plassering
+        where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
+          om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
+        write_a_message: Skrive en melding
+        zipcode: Postnummer

@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='page-section--choose-membership--component'
+// Connects to data-controller='page-section-choose-membership'
 export default class extends Controller {
   updateIntervalVisibility () {
     const checkedElement = this.element.querySelector('#intervalSelector input:checked')

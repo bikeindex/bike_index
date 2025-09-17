@@ -248,7 +248,7 @@
 
 %h4.mt-4
   Bikes
-  %small= link_to admin_number_display(@bikescount), admin_bikes_path(user_id: @user.id)
+  %small= link_to number_display(@bikescount), admin_bikes_path(user_id: @user.id)
 
 - if @bikescount > 0
   = render partial: "admin/bikes/table", locals: {bikes: @bikes, skip_user: true}
@@ -260,7 +260,7 @@
 %h4.mt-4
   Memberships
   %small
-    = link_to admin_number_display(memberships.count), admin_memberships_path(user_id: @user.id)
+    = link_to number_display(memberships.count), admin_memberships_path(user_id: @user.id)
     - if memberships.count > object_limit
       %em (only #{object_limit} most recent shown)
 - if memberships.count > 0
@@ -269,7 +269,7 @@
 - user_alerts = @user.user_alerts.order(created_at: :desc)
 %h4.mt-4
   = "Active Alert".pluralize(user_alerts.active.count)
-  = admin_number_display(user_alerts.active.count)
+  = number_display(user_alerts.active.count)
   %em.small.ml-2= link_to "#{user_alerts.count} total", admin_user_alerts_path(user_id: @user.id)
 - if user_alerts.any?
   = render partial: "admin/user_alerts/table", locals: {user_alerts: user_alerts.active, skip_user: true}
@@ -279,7 +279,7 @@
 %h4.mt-4
   Donations/payments
   %small
-    = link_to admin_number_display(payments.count), admin_payments_path(user_id: @user.id, period: "all")
+    = link_to number_display(payments.count), admin_payments_path(user_id: @user.id, period: "all")
     - if payments.count > object_limit
       %em (only #{object_limit} most recent shown)
 - if payments.any?
@@ -287,11 +287,11 @@
 
 %h4.mt-4
   OrganizationRoles
-  %small.less-strong.mr-3= admin_number_display(@user.organization_roles.count)
+  %small.less-strong.mr-3= number_display(@user.organization_roles.count)
   %small.d-inline-block.less-strong
     - reg_orgs_count = @user.user_registration_organizations.count
     = link_to admin_user_registration_organizations_path(user_id: @user.id) do
-      = admin_number_display(reg_orgs_count)
+      = number_display(reg_orgs_count)
     = "registration org".pluralize(reg_orgs_count)
 - if @user.organization_roles.count > 0
   = render partial: "/admin/organization_roles/table", locals: {organization_roles: @user.organization_roles}
@@ -300,7 +300,7 @@
 %h4.mt-4
   Notifications
   %small
-    = link_to admin_number_display(notifications.count), admin_notifications_path(user_id: @user.id)
+    = link_to number_display(notifications.count), admin_notifications_path(user_id: @user.id)
     - if notifications.count > object_limit
       %em (only #{object_limit} most recent shown)
 - if notifications.count > 0
@@ -310,7 +310,7 @@
 %h4.mt-4
   Feedbacks
   %small
-    = link_to admin_number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id)
+    = link_to number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id)
     - if notifications.count > object_limit
       %em (only #{object_limit} most recent shown)
 - if feedbacks.count > 0

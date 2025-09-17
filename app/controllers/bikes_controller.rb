@@ -9,6 +9,7 @@ class BikesController < Bikes::BaseController
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
+
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
@@ -21,9 +22,7 @@ class BikesController < Bikes::BaseController
       @impound_claim ||= @bike.current_impound_record&.impound_claims&.build
       @submitted_impound_claims = impound_claims.where.not(id: @impound_claim.id).submitted
     end
-    # These ivars are here primarily to make testing possible
-    @passive_organization_registered = passive_organization.present? && @bike.organized?(passive_organization)
-    @passive_organization_authorized = passive_organization.present? && @bike.authorized_by_organization?(org: passive_organization)
+
     if params[:scanned_id].present?
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
@@ -87,6 +86,7 @@ class BikesController < Bikes::BaseController
     end
     find_or_new_b_param
     redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
+
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= BikeServices::Creator.new.build_bike(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
@@ -127,6 +127,7 @@ class BikesController < Bikes::BaseController
       if @b_param.created_bike.present?
         redirect_to(edit_bike_url(@b_param.created_bike)) && return
       end
+
       @b_param.clean_params(permitted_bparams)
       @bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
       if @bike.errors.any?
@@ -165,6 +166,7 @@ class BikesController < Bikes::BaseController
     else
       flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present
+
       # Go directly to theft_details after reporting stolen
       next_template = params[:edit_template]
       next_template = "theft_details" if next_template == "report_stolen" && @bike.status_stolen?
@@ -216,6 +218,7 @@ class BikesController < Bikes::BaseController
       !InputNormalizer.boolean(params[:show_marketplace_preview])
 
     return false unless marketplace_listing.visible_by?(current_user)
+
     @marketplace_preview = true
   end
 

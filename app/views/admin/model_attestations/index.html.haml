@@ -67,7 +67,7 @@
             - if model_attestation.organization_id.present?
               = link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "small d-inline-block less-strong"
           %td
-            = link_to admin_number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id)
+            = link_to number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id)
           %td
             = model_attestation.kind_humanized
           %td

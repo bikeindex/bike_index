@@ -45,7 +45,7 @@
 .row.mt-4.mb-2
   .col-md-5
     %p
-      = admin_number_display(@matching_bikes.count)
+      = number_display(@matching_bikes.count)
       matching external registry bikes
       %em
         = humanized_time_range(@time_range)

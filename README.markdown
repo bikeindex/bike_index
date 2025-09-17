@@ -13,7 +13,7 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ### Dependencies
 
-_We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of required versions of:_
+_We recommend [mise](https://mise.jdx.dev/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of required versions of:_
 
 - [Ruby](http://www.ruby-lang.org/en/)
 

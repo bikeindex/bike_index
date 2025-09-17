@@ -2,6 +2,7 @@ module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
     include SortableTable
+
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
 
@@ -9,8 +10,7 @@ module Organized
 
     def index
       @search_bounding_box = search_bounding_box
-      @per_page = params[:per_page]
-      @per_page = DEFAULT_PER_PAGE if @per_page.blank? || @per_page.to_i > ParkingNotification::MAX_PER_PAGE
+      @per_page = permitted_per_page(default: DEFAULT_PER_PAGE, max: ParkingNotification::MAX_PER_PAGE)
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         per_page: @per_page,
@@ -41,7 +41,7 @@ module Organized
         format.html
         format.json do
           pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-            .includes(:user, :bike, :impound_record), limit: @per_page)
+            .includes(:user, :bike, :impound_record), limit: @per_page, page: permitted_page)
           # This was already set up, so I left it when upgrading to pagy
           set_pagination_headers(pagy, @per_page)
           render json: records,
@@ -88,6 +88,7 @@ module Organized
 
     def matching_parking_notifications
       return @matching_parking_notifications if defined?(@matching_parking_notifications)
+
       notifications = parking_notifications
       if params[:search_bike_id].present?
         notifications = notifications.where(bike_id: params[:search_bike_id])
@@ -157,6 +158,7 @@ module Organized
         target_notification = parking_notification.current_associated_notification
         # Don't repeat notifications already sent, or previous to ones already targeted
         next if (ids_repeated + success_ids).include?(target_notification.id)
+
         ids_repeated << target_notification.id
         new_notification = target_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
         success_ids << new_notification.id
@@ -178,6 +180,7 @@ module Organized
 
     def set_failed_and_repeated_ivars
       return true unless session[:repeated_kind].present?
+
       @repeated_kind = session.delete(:repeated_kind)
       notifications_failed_resolved_ids = session.delete(:notifications_failed_resolved_ids)
       notifications_repeated_ids = session.delete(:notifications_repeated_ids)
@@ -193,6 +196,7 @@ module Organized
 
     def ensure_access_to_parking_notifications!
       return true if current_organization.enabled?("parking_notifications") || current_user.superuser?
+
       raise_do_not_have_access!
     end
 
@@ -209,11 +213,13 @@ module Organized
 
     def search_bounding_box
       return nil unless params[:search_southwest_coords].present? && params[:search_northeast_coords].present?
+
       [params[:search_southwest_coords].split(","), params[:search_northeast_coords].split(",")].flatten.map(&:to_f)
     end
 
     def map_center(bounding_box)
       return current_organization.map_focus_coordinates.values unless bounding_box.present?
+
       lat_dif = bounding_box[0] - bounding_box[2]
       lng_dif = bounding_box[1] - bounding_box[3]
       [bounding_box[0] + lat_dif, bounding_box[1] + lng_dif]

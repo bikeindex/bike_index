@@ -31,6 +31,7 @@ class ProcessParkingNotificationJob < ApplicationJob
     end
 
     return true unless parking_notification.send_email? && parking_notification.delivery_status.blank?
+
     OrganizedMailer.parking_notification(parking_notification).deliver_now
     parking_notification.update_attribute :delivery_status, "email_success" # I'm not sure how to make this more representative
   end

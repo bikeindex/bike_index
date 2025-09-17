@@ -1,14 +1,15 @@
 module Organized
   class ModelAuditsController < Organized::BaseController
     include SortableTable
+
     before_action :ensure_access_to_model_audits!
 
     def index
       @page_title = "E-Vehicle Audits"
-      @per_page = params[:per_page] || 25
+      @per_page = permitted_per_page
       @model_attestation ||= ModelAttestation.new
       @pagy, @organization_model_audits = pagy(organization_model_audits
-        .reorder(sort_ordered), limit: @per_page)
+        .reorder(sort_ordered), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -19,7 +20,7 @@ module Organized
       bikes = @organization_model_audit&.bikes&.reorder(created_at: :desc) || Bike.none
       @bikes_count = @organization_model_audit&.bikes_count || 0
       @per_page = 10
-      @pagy, @bikes = pagy(bikes, limit: @per_page)
+      @pagy, @bikes = pagy(bikes, limit: @per_page, page: permitted_page)
     end
 
     # NOTE: This is really "create model_attestation"
@@ -44,7 +45,8 @@ module Organized
     private
 
     def sortable_columns
-      %w[last_bike_created_at bikes_count certification_status mnfg_name frame_model]
+      Organized::BikesController::SORTABLE_COLUMNS +
+        %w[last_bike_created_at bikes_count certification_status]
     end
 
     def permitted_attestation_kinds
@@ -90,6 +92,7 @@ module Organized
 
     def ensure_access_to_model_audits!
       return true if current_organization.enabled?("model_audits") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

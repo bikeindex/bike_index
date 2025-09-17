@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationComponent < ViewComponent::Base
+  include ApplicationComponentHelper
+
   def raise_if_invalid_value!(attribute, value, options = {})
     return if options.include?(value)
 
@@ -9,6 +11,7 @@ class ApplicationComponent < ViewComponent::Base
 
   def component_list_item(desc, title)
     return nil unless desc.present?
+
     content_tag(:li) do
       content_tag(:strong, "#{title}: ", class: "") +
         content_tag(:span, desc)
@@ -16,10 +19,6 @@ class ApplicationComponent < ViewComponent::Base
   end
 
   private
-
-  def number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "tw:opacity-40" : ""))
-  end
 
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.

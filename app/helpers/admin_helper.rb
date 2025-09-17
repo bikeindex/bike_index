@@ -1,6 +1,7 @@
 module AdminHelper
   def dev_nav_select_links
     return [] unless current_user&.developer?
+
     [
       # Impound claims index is currently busted, so ignoring for now
       {title: "Dev: Impound Claims", path: admin_impound_claims_path, match_controller: true},
@@ -78,6 +79,7 @@ module AdminHelper
 
   def admin_nav_select_link_active
     return @admin_nav_select_link_active if defined?(@admin_nav_select_link_active)
+
     @admin_nav_select_link_active = admin_nav_select_links.detect { |link| current_page_active?(link[:path], link[:match_controller]) }
     unless @admin_nav_select_link_active.present?
       # Because organization invoices edit doesn't match controller
@@ -98,6 +100,7 @@ module AdminHelper
     return true unless current_page_active?(admin_nav_select_link_active[:path])
     # Don't show "view all" if the path is the exact same
     return true if params[:period].present? && params[:period] != "all"
+
     # If there are any parameters that aren't
     ignored_keys = %w[render_chart sort period direction]
     (sortable_search_params.reject { |_k, v| v.blank? }.keys - ignored_keys).any?
@@ -114,15 +117,12 @@ module AdminHelper
   def credibility_scorer_color(score)
     return "#dc3545" if score < 31
     return "#ffc107" if score < 70
+
     "#28a745"
   end
 
   def credibility_scorer_color_table(score)
     (score < 31) ? credibility_scorer_color(score) : ""
-  end
-
-  def admin_number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
   end
 
   def admin_email_domain_spam_color(spam_score)
@@ -138,6 +138,7 @@ module AdminHelper
   def user_icon_hash(user = nil)
     icon_hash = {tags: []}
     return icon_hash if user&.id.blank?
+
     if user.superuser?
       icon_hash[:tags] = [:superuser]
       return icon_hash
@@ -158,6 +159,7 @@ module AdminHelper
   def user_icon(user = nil, full_text: false)
     icon_hash = user_icon_hash(user)
     return "" if icon_hash[:tags].empty?
+
     # TODO: return individual tags, so you can show them e.g. for organizations
     content_tag :span do
       if icon_hash[:tags].include?(:donor)
@@ -195,6 +197,7 @@ module AdminHelper
 
   def admin_path_for_object(obj = nil)
     return nil unless obj&.id.present?
+
     if obj.instance_of?(StolenRecord)
       admin_stolen_bike_path(obj.id, stolen_record_id: obj.id)
     elsif obj.instance_of?(ImpoundRecord)

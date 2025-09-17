@@ -20,6 +20,7 @@ class BikeServices::StolenRecordUpdator
 
   def update_records
     return if @stolen_params.blank? || @bike.id.blank? # If no bike ID, bike has errored
+
     @bike.reload
     stolen_record = @bike.fetch_current_stolen_record
     stolen_record ||= @bike.build_new_stolen_record
@@ -33,6 +34,7 @@ class BikeServices::StolenRecordUpdator
 
   def update_with_params(stolen_record)
     return stolen_record unless @stolen_params.present?
+
     stolen_record.attributes = permitted_attributes(@stolen_params)
 
     if @stolen_params["date_stolen"].present?

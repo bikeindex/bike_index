@@ -14,7 +14,7 @@ module PageSection::ChooseMembership
 
     def price_display(amount_cents, interval)
       interval_display = (interval == "monthly") ? "month" : "year"
-      interval_classes = "intervalDisplay #{interval} #{(@membership.set_interval == interval) ? "" : "tw:hidden!"}"
+      interval_classes = "intervalDisplay #{interval} #{"tw:hidden!" unless @membership.set_interval == interval}"
 
       tag.h3(class: "tw:inline-flex tw:items-stretch #{interval_classes}") do
         safe_join([

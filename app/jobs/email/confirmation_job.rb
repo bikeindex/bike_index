@@ -15,6 +15,7 @@ class Email::ConfirmationJob < ApplicationJob
     notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
     # If we just sent it, don't send again
     return false if notifications.delivery_success.any?
+
     notification = notifications.last || Notification.create(user_id: user.id, kind: "confirmation_email")
 
     notification.track_email_delivery do

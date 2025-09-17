@@ -6,6 +6,7 @@ class FetchMailchimpMembersJob < ApplicationJob
       find_or_create_datum(list, data)
     end
     return true unless enqueue_all_pages
+
     # Calculated pages
     (mailchimp_integration.total_items / count).times do |page|
       FetchMailchimpMembersJob.perform_async(list, page + 1, count)

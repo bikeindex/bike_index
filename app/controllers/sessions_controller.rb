@@ -1,5 +1,6 @@
 class SessionsController < ApplicationController
   include Sessionable
+
   before_action :skip_if_signed_in, only: [:new, :magic_link]
 
   def new
@@ -70,6 +71,7 @@ class SessionsController < ApplicationController
         redirect_to(new_user_path, notice: "Logged out!") && return
       end
     end
+
     redirect_to goodbye_url, notice: "Logged out!"
   end
 
