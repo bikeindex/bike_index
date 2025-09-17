@@ -2,9 +2,6 @@ class Callbacks::AfterUserChangeJob < ApplicationJob
   sidekiq_options retry: false
 
   def self.assign_user_address_from_bikes(user, bikes: nil, save_user: false)
-    # if the user has address info that hasn't been backfilled, don't overwrite that
-    return user unless [user.street, user.city, user.zipcode].reject(&:blank?).none?
-
     bikes ||= user.bikes
     address_bike = bikes.with_street.first || bikes.with_location.first
     if address_bike.present?
