@@ -355,7 +355,7 @@ class Ownership < ApplicationRecord
     return registration_info["user_name"] if registration_info["user_name"].present?
 
     # If it's made by PSU and not from a member of PSU, use the creator name
-    if new_registration? && organization_id == 553 && !creator.member_of?(organization)
+    if new_registration? && organization_id == 553 && creator.present? && !creator.member_of?(organization)
       creator.name
     end
   end

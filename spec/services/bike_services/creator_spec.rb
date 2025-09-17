@@ -233,7 +233,7 @@ RSpec.describe BikeServices::Creator do
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-          expect(bike.registration_address).to eq({"street" => "Somewhere Ville"})
+          expect(bike.registration_address.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville", "country" => "United States"})
           expect(bike).to match_hash_indifferently bike_params.except(:user_name, :propulsion_type_slug, :manufacturer_id, :manufacturer_other)
           expect(bike.manufacturer_id).to eq manufacturer.id
           expect(bike.manufacturer_other).to be_nil
@@ -250,7 +250,7 @@ RSpec.describe BikeServices::Creator do
           expect(ownership.organization_id).to eq organization.id
           expect(ownership.owner_email).to eq "stuff@stuff.com"
           expect(ownership.owner_name).to eq "Sally"
-          expect(ownership.address_hash).to eq({"street" => "Somewhere Ville"})
+          expect(ownership.address_hash_legacy.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville", "country" => "United States"})
         end
       end
     end

@@ -3,7 +3,7 @@
 class Backfills::AddressRecordsForOwnershipsJob < ApplicationJob
   include Sidekiq::IterableJob
 
-  sidekiq_options queue: "low_priority"
+  sidekiq_options queue: "low_priority", retry: false
 
   class << self
     def iterable_scope
