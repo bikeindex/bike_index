@@ -45,8 +45,8 @@ class BikeServices::CalculateStoredLocation
         l_hashes.find { |rec| rec&.dig("latitude").present? }
       return {} unless l_hash.present?
 
-      # If the location record has coordinates, skip geocoding
-      l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
+      # Only ever respond with the coordinates
+      l_hash.slice("latitude", "longitude")
     end
   end
 end

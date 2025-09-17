@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
-  it_behaves_like "geocodeable"
+  it_behaves_like "address_recorded"
   it_behaves_like "bike_attributable"
 
   describe "address factories" do
@@ -16,8 +16,9 @@ RSpec.describe Bike, type: :model do
     it "is valid" do
       expect(address_record).to have_attributes target_attrs
       expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
-      # expect(bike.to_coordinates).to eq(address_record.to_coordinates)
+      expect(bike.to_coordinates).to eq(address_record.to_coordinates)
       expect(AddressRecord.pluck(:id)).to eq([address_record.id])
+      expect(Bike.with_street.pluck(:id)).to eq([bike.id])
     end
   end
 

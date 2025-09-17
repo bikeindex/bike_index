@@ -101,7 +101,6 @@ class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
   include BikeAttributable
-  include Geocodeable
   include AddressRecorded
   include PgSearch::Model
 
@@ -217,6 +216,9 @@ class Bike < ApplicationRecord
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
   scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
+
+  # TODO: remove when bike AddressRecords have finished migration, use AddressRecorded.with_street
+  scope :with_street, -> { where.not(street: nil) }
 
   default_scope -> { default_includes.current.order(listing_order: :desc) }
 
@@ -844,7 +846,7 @@ class Bike < ApplicationRecord
     @registration_address = case registration_address_source
     when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
     when "user" then user&.address_hash_legacy
-    when "bike_update" then address_hash
+    when "bike_update" then address_record&.address_hash_legacy
     when "initial_creation" then current_ownership.address_hash
     else
       {}

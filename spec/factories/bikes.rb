@@ -9,7 +9,6 @@ FactoryBot.define do
     primary_frame_color { Color.black }
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }
-    skip_geocoding { true }
 
     trait :with_primary_activity do
       primary_activity { FactoryBot.create(:primary_activity) }

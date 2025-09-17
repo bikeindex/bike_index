@@ -158,7 +158,7 @@ class AddressRecord < ApplicationRecord
   private
 
   def update_associations
-    return if skip_callback_job
+    return if skip_callback_job || bike? # Bikes handle address assignment separately
 
     ::Callbacks::AddressRecordUpdateAssociationsJob.perform_async(id)
   end
