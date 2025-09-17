@@ -228,7 +228,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.1)
       zeitwerk (~> 2.6)
-    dry-types (1.8.2)
+    dry-types (1.8.3)
       bigdecimal (~> 3.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 1.0)
@@ -327,14 +327,14 @@ GEM
     google-protobuf (4.29.3-x86_64-linux)
       bigdecimal
       rake (>= 13)
-    grape (2.2.0)
-      activesupport (>= 6)
+    grape (2.4.0)
+      activesupport (>= 6.1)
       dry-types (>= 1.1)
       mustermann-grape (~> 1.1.0)
       rack (>= 2)
       zeitwerk
-    grape_logging (1.8.4)
-      grape
+    grape_logging (3.0.0)
+      grape (>= 2.4.0)
       rack
     groupdate (6.5.1)
       activesupport (>= 7)
@@ -493,7 +493,7 @@ GEM
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
     multipart-post (2.4.1)
-    mustermann (3.0.3)
+    mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
     mustermann-grape (1.1.0)
       mustermann (>= 1.0.0)
