@@ -1183,6 +1183,11 @@ es:
         length_is:
         length_min:
         length_max:
+        conflicting_types:
+        invalid_parameters:
+        too_deep_parameters:
+        unknown_auth_strategy:
+        unknown_params_builder:
   flash:
     actions:
       create:
@@ -1260,6 +1265,7 @@ es:
           one:
           other:
         pass_forest:
+        invalid_backend:
     common:
       continue_q:
       key:
@@ -1305,6 +1311,11 @@ es:
     yandex_translate:
       errors:
         no_api_key:
+        no_results:
+    watsonx_translate:
+      errors:
+        no_api_key:
+        no_project_id:
         no_results:
   countries:
     AC:

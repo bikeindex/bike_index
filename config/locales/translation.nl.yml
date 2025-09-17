@@ -1227,6 +1227,7 @@ nl:
           one: 'ongeldig type: %{invalid}. geldig: %{valid}.'
           other: 'onbekende typen: %{invalid}. geldig: %{valid}.'
         pass_forest: passeren locale bos
+        invalid_backend: 'Ongeldige backend: %{invalid}. Moet een van %{valid} zijn.'
     common:
       continue_q: Doorgaan?
       key: Sleutel
@@ -1287,6 +1288,15 @@ nl:
           of translation.openai_api_key in config/i18n-tasks.yml. Haal de sleutel
           op https://openai.com/.
         no_results: OpenAI heeft geen resultaten opgeleverd.
+    watsonx_translate:
+      errors:
+        no_api_key: Stel de Watsonx API-sleutel in via de omgevingsvariabele WATSONX_API_KEY
+          of translation.watsonx_api_key in config/i18n-tasks.yml. Download de sleutel
+          via https://www.ibm.com/products/watsonx-ai.
+        no_project_id: Stel de Watsonx Project-ID in via de WATSONX_PROJECT_ID omgevingsvariabele
+          of translation.watsonx_api_key in config/i18n-tasks.yml. De sleutel is te
+          vinden op https://www.ibm.com/products/watsonx-ai.
+        no_results: watsonx leverde geen resultaten op.
   grape:
     errors:
       format: "%{attributes} %{message}"
@@ -1349,6 +1359,12 @@ nl:
           is aan %{min}
         length_max: wordt verwacht een lengte te hebben die kleiner is dan of gelijk
           is aan %{max}
+        conflicting_types: query-parameters bevatten conflicterende typen
+        invalid_parameters: query-parameters bevatten ongeldige opmaak of bytevolgorde
+        too_deep_parameters: queryparameters worden recursief genest over de opgegeven
+          limiet (%{limit})
+        unknown_auth_strategy: 'onbekende autorisatiestrategie: %{strategy}'
+        unknown_params_builder: 'onbekende params_builder: %{params_builder_type}'
   flash:
     actions:
       create:
