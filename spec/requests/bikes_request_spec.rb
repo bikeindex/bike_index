@@ -63,14 +63,12 @@ RSpec.describe BikesController, type: :request do
         expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       end
       it "renders a new stolen bike from status" do
-        country = FactoryBot.create(:country_canada)
-        current_user.update(country_id: country.id)
         get "#{base_url}/new?status=stolen"
         expect(response.code).to eq("200")
         bike = assigns(:bike)
         expect(bike.status_humanized).to eq "stolen"
         expect(bike.stolen_records.last).to be_present
-        expect(bike.stolen_records.last.country_id).to eq country.id
+        expect(bike.stolen_records.last.country_id).to eq Country.united_states.id
         expect(response).to render_template(:new)
       end
     end

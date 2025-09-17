@@ -2,12 +2,12 @@
 -# Note - this has to have a separate div with collapse, because the fieldset breaks styles
 -# The collapse class is what the slideup is called on
 - organization ||= @organization || current_organization
-- default_country ||= organization.locations.first&.country_id || current_user&.country_id || Country.united_states_id
+- default_country ||= organization.locations.first&.country_id || current_user&.address_record&.country_id || Country.united_states_id
 - default_name ||= organization.name
 
 - f.object.country_id ||= default_country
 - f.object.name ||= default_name
-- f.object.state_id ||= organization.locations.first&.state_id || current_user&.state_id
+- f.object.state_id ||= organization.locations.first&.state_id || current_user&.address_record&.region_record_id
 - state_class = (f.object.country_id == Country.united_states_id) ? "unhidden" : ""
 
 -# This is primarily used for the new form

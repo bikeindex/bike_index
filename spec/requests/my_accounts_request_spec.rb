@@ -152,7 +152,7 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
     context "Backfills::AddressRecordsForUsersJob" do
-      let(:current_user) { FactoryBot.create(:user_confirmed, :address_in_edmonton) }
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
       it "creates an address_record on render" do
         expect(current_user.reload.address_record).to be_blank
 
@@ -161,21 +161,22 @@ RSpec.describe MyAccountsController, type: :request do
         expect(response).to be_ok
         expect(current_user.reload.address_record).to be_blank
 
-        # Root view creates!
+        # Root view creates an address record with just country_id!
         expect do
           get "#{base_url}/edit"
           get "#{base_url}/edit"
         end.to change(AddressRecord, :count).by 1
         expect(response).to be_ok
         expect(current_user.reload.address_record).to be_present
-        expect(current_user.address_record.city).to eq "Edmonton"
+        expect(current_user.address_record.country_id).to be_present
       end
       context "with address_record" do
         let!(:address_record) { FactoryBot.create(:address_record, kind: :user, user_id: current_user.id) }
-        it "updates the address_record on render" do
-          expect(current_user.reload.address_record).to be_blank
+        it "doesn't create a new address record" do
+          current_user.update!(address_record:)
+          expect(current_user.reload.address_record).to be_present
 
-          # Root view creates!
+          # Root view doesn't create a new one!
           expect do
             get "#{base_url}/edit"
           end.to change(AddressRecord, :count).by 0

@@ -94,6 +94,7 @@ class AddressRecord < ApplicationRecord
     l_hash = address_hash(visible_attribute: :street, render_country: true).dup
     l_hash[:zipcode] = l_hash.delete(:postal_code)
     l_hash[:state] = l_hash.delete(:region)
+    l_hash[:country] = country&.iso if country.present?
     l_hash.with_indifferent_access
   end
 

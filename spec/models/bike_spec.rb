@@ -1389,7 +1389,8 @@ RSpec.describe Bike, type: :model do
     context "with user with address" do
       let(:country) { Country.united_states }
       let(:state) { FactoryBot.create(:state_new_york) }
-      let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007", address_set_manually: true) }
+      let(:address_record) { FactoryBot.create(:address_record, country: country, region_record: state, city: "New York", street: "278 Broadway", postal_code: "10007", latitude: nil, longitude: nil) }
+      let(:user) { FactoryBot.create(:user, address_record: address_record, address_set_manually: true) }
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do

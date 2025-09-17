@@ -103,7 +103,7 @@ FactoryBot.define do
   trait :address_in_nyc do
     with_address_record
 
-    address_record { FactoryBot.create(:address_record, :nyc, kind: address_record_kind) }
+    address_record { FactoryBot.create(:address_record, :new_york, kind: address_record_kind) }
   end
 
   trait :address_in_vancouver do
