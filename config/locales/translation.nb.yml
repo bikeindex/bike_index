@@ -1204,6 +1204,12 @@ nb:
         length_is: forventes å ha lengde nøyaktig lik %{is}
         length_min: forventes å ha lengde større enn eller lik %{min}
         length_max: forventes å ha lengde mindre enn eller lik %{max}
+        conflicting_types: spørreparametere inneholder motstridende typer
+        invalid_parameters: Spørreparameterne inneholder ugyldig format eller bytesekvens
+        too_deep_parameters: Spørreparametere nestes rekursivt over den angitte grensen
+          (%{limit})
+        unknown_auth_strategy: 'ukjent autentiseringsstrategi: %{strategy}'
+        unknown_params_builder: 'ukjent params_builder: %{params_builder_type}'
   flash:
     actions:
       create:
@@ -1289,6 +1295,7 @@ nb:
           one: 'ugyldig type: %{invalid}. gyldig: %{valid}.'
           other: 'ukjente typer: %{invalid}. gyldig: %{valid}.'
         pass_forest: passere lokalskog
+        invalid_backend: 'Ugyldig backend: %{invalid}. Må være en av %{valid}.'
     common:
       continue_q: Fortsette?
       key: Nøkkel
@@ -1346,6 +1353,14 @@ nb:
         no_api_key: Angi Yandex API-nøkkel via YANDEX_API_KEY miljøvariabel eller
           translation.yandex_api_key i config/i18n-tasks.yml. Få nøkkelen på https://tech.yandex.com/translate.
         no_results: Yandex ga ingen resultater.
+    watsonx_translate:
+      errors:
+        no_api_key: Angi watsonx API-nøkkel via miljøvariabelen WATSONX_API_KEY eller
+          translation.watsonx_api_key i config/i18n-tasks.yml. Hent nøkkelen på https://www.ibm.com/products/watsonx-ai.
+        no_project_id: Angi watsonx-prosjekt-ID via miljøvariabelen WATSONX_PROJECT_ID
+          eller translation.watsonx_api_key i config/i18n-tasks.yml. Hent nøkkelen
+          på https://www.ibm.com/products/watsonx-ai.
+        no_results: watsonx returnerte ingen resultater.
   countries:
     AC: Ascension Island
     AD: Andorra
