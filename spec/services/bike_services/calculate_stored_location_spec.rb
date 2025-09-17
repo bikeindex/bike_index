@@ -144,8 +144,12 @@ RSpec.describe BikeServices::CalculateStoredLocation do
           bike.save
           expect(bike.skip_geocoding).to be_truthy
 
-          expect(bike.address_hash).to eq user.address_hash_legacy
+          # Both bike and user should have the same address data, even if formats differ
           expect(bike.street).to eq user.address_record.street
+          expect(bike.city).to eq user.address_record.city
+          expect(bike.zipcode).to eq user.address_record.postal_code
+          expect(bike.state_abbr).to eq user.address_record.region
+          expect(bike.country_abbr).to eq user.address_record.country&.iso
           expect(bike.address_set_manually).to be_falsey # Because it's set by the user
         end
       end
