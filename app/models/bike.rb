@@ -54,7 +54,6 @@
 #  zipcode                     :string(255)
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
-#  address_record_id           :bigint
 #  country_id                  :integer
 #  creation_organization_id    :integer
 #  creator_id                  :integer
@@ -77,7 +76,6 @@
 #
 # Indexes
 #
-#  index_bikes_on_address_record_id          (address_record_id)
 #  index_bikes_on_current_impound_record_id  (current_impound_record_id)
 #  index_bikes_on_current_ownership_id       (current_ownership_id)
 #  index_bikes_on_current_stolen_record_id   (current_stolen_record_id)

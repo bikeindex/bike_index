@@ -1,10 +1,8 @@
 require "rails_helper"
 
-RSpec.describe Backfills::AddressRecordsForBikesJob, type: :job do
+RSpec.describe Backfills::AddressRecordsForOwnershipsJob, type: :job do
   let(:instance) { described_class.new }
-  let(:bike) { FactoryBot.create(:bike) }
-  let(:bike_amsterdam) { FactoryBot.create(:bike, :with_ownership_claimed, :in_amsterdam) }
-  let(:bike_chicago) { FactoryBot.create(:bike, :with_ownership, :in_chicago) }
+  let(:ownership) { FactoryBot.create(:ownership) }
 
   describe "build_or_create_for" do
     let(:target_attrs) do

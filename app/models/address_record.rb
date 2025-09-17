@@ -14,14 +14,12 @@
 #  street                     :string
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  bike_id                    :bigint
 #  country_id                 :bigint
 #  region_record_id           :bigint
 #  user_id                    :bigint
 #
 # Indexes
 #
-#  index_address_records_on_bike_id           (bike_id)
 #  index_address_records_on_country_id        (country_id)
 #  index_address_records_on_region_record_id  (region_record_id)
 #  index_address_records_on_user_id           (user_id)

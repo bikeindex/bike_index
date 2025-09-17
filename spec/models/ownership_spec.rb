@@ -678,7 +678,7 @@ RSpec.describe Ownership, type: :model do
     let(:registration_info) { {city: "State College", state: "PA", street: "100 W College Ave", zipcode: "16801", organization_affiliation: "student"} }
     let(:target_attrs) do
       {city: "State College", region_string: nil, street: "100 W College Ave", postal_code: "16801",
-        region_record_id: state.id, country_id: Country.united_states_id}
+       region_record_id: state.id, country_id: Country.united_states_id, bike_id: ownership.bike_id}
     end
     include_context :geocoder_real
 
@@ -699,7 +699,7 @@ RSpec.describe Ownership, type: :model do
       let(:registration_info) { {city: "Edmonton", state: "AB", street: "2 Sir Winston Churchill Sq", zipcode: "T5J 2C1", organization_affiliation: "student", country: "canada"} }
       let(:target_attrs) do
         {city: "Edmonton", region_string: "AB", street: "2 Sir Winston Churchill Sq", postal_code: "T5J 2C1",
-          region_record_id: nil, country_id: Country.canada_id}
+         region_record_id: nil, country_id: Country.canada_id}
       end
       it "creates an address_record" do
         VCR.use_cassette("Ownership-address_record_from_registration_info-edmonton") do
