@@ -18,7 +18,7 @@ class MyAccountsController < ApplicationController
     @page_title = @edit_templates[@edit_template]
 
     if @edit_template&.to_sym == :root
-      Backfills::AddressRecordsForUsersJob.build_or_create_for(@user, country_id: current_country_id)
+      @user.find_or_build_address_record(country_id: current_country_id)
     end
   end
 

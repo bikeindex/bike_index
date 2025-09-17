@@ -215,6 +215,18 @@ class User < ApplicationRecord
     end
   end
 
+  def find_or_build_address_record(country_id: nil)
+    return address_record if address_record.present?
+
+    orphaned_address_record = AddressRecord.user.where(user_id: id).first
+    if orphaned_address_record.present?
+      update(address_record_id: orphaned_address_record.id)
+      orphaned_address_record
+    else
+      AddressRecord.new(user_id: id, kind: :user, country_id:)
+    end
+  end
+
   def additional_emails=(value)
     UserEmail.add_emails_for_user_id(id, value)
   end
