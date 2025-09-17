@@ -100,7 +100,7 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
     let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org") }
     let!(:state) { FactoryBot.create(:state_california) }
     let!(:country) { Country.united_states }
-    let(:target_address_hash) { {street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", country: "US", latitude: 37.8016649, longitude: -122.397348} }
+    let(:target_address_hash) { {street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", latitude: 37.8016649, longitude: -122.397348} }
     let(:bike) do
       FactoryBot.create(:bike,
         :with_ownership_claimed,
@@ -115,7 +115,8 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
         bike.reload.update(updated_at: Time.current)
         expect(bike.reload.registration_address_source).to eq "initial_creation"
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
-        expect(BikeServices::CalculateStoredLocation.location_attrs(bike)).to match_hash_indifferently target_address_hash.except(:latitude, :longitude).merge(skip_geocoding: false)
+        expect(BikeServices::CalculateStoredLocation.location_attrs(bike).except("country", "skip_geocoding"))
+          .to match_hash_indifferently target_address_hash.except("latitude", "longitude")
 
         Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
         user.reload

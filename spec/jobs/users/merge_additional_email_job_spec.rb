@@ -160,8 +160,8 @@ RSpec.describe Users::MergeAdditionalEmailJob, type: :job do
     context "address_records" do
       let!(:address_record_current) { FactoryBot.create(:address_record, user:, kind: :user) }
       let!(:address_record_old) { FactoryBot.create(:address_record, user: old_user, kind: :user) }
-      let!(:address_record_stolen_record) { FactoryBot.create(:address_record, user:, kind: :stolen_record) }
-      let!(:address_record_stolen_record_old) { FactoryBot.create(:address_record, user: old_user, kind: :stolen_record) }
+      let!(:address_record_stolen_record) { FactoryBot.create(:address_record, user:, kind: :ownership) }
+      let!(:address_record_stolen_record_old) { FactoryBot.create(:address_record, user: old_user, kind: :bike) }
       let(:merged_address_record_ids) { [address_record_current.id, address_record_stolen_record.id, address_record_stolen_record_old.id] }
       it "updates non-user records and deletes the user one" do
         expect(AddressRecord.count).to eq 4

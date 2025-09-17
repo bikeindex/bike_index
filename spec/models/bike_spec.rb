@@ -1372,6 +1372,7 @@ RSpec.describe Bike, type: :model do
           creation_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
       # let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
+      let(:target_address) { {city: "State College", country: "United States", latitude: 40.7712808, longitude: -77.8738966, state: "PA", street: "102 Washington Pl", zipcode: "16801"} }
       include_context :geocoder_real
       it "is exportable" do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
@@ -1380,7 +1381,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.reload.user&.id).to eq user.id
           # We test that the bike has a location saved
           expect(bike.registration_address_source).to eq "initial_creation"
-          expect(bike.registration_address(true)).to eq({street: "102 Washington Pl", city: "State College"}.as_json)
+          expect(bike.registration_address(true)).to eq(target_address.as_json)
           expect(bike.latitude).to be_present
           expect(bike.longitude).to be_present
           expect(bike.owner_name).to eq "some name"

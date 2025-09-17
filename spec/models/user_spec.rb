@@ -966,7 +966,7 @@ RSpec.describe User, type: :model do
 
     context "when user has an address_record not for themselves" do
       let(:user) { FactoryBot.create(:user) }
-      let!(:address_record) { FactoryBot.create(:address_record, user_id: user.id, kind: :stolen_record) }
+      let!(:address_record) { FactoryBot.create(:address_record, user_id: user.id, kind: :ownership) }
 
       it "finds the existing orphaned address_record" do
         expect(user.reload.address_record_id).to be_blank

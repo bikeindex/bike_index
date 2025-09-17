@@ -1,4 +1,4 @@
-\restrict hqVdawyZa9GIrtw3d5EY5limw3B1qNzhcyMo5LahDNkh2zYM7Hr3Uc4Y5jHluEP
+\restrict 0a42vag5T4BLcyjbliGuqbhgaCjgvCfMt3izwFtJxWRjyJPmHDa1lYgkUMZshFD
 
 -- Dumped from database version 17.6 (Homebrew)
 -- Dumped by pg_dump version 17.6 (Homebrew)
@@ -6,7 +6,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -7076,7 +7075,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 -- PostgreSQL database dump complete
 --
 
-\unrestrict hqVdawyZa9GIrtw3d5EY5limw3B1qNzhcyMo5LahDNkh2zYM7Hr3Uc4Y5jHluEP
+\unrestrict 0a42vag5T4BLcyjbliGuqbhgaCjgvCfMt3izwFtJxWRjyJPmHDa1lYgkUMZshFD
 
 SET search_path TO "$user", public;
 
