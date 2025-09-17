@@ -113,7 +113,6 @@ RSpec.describe BikeServices::CalculateStoredLocation do
         expect(user.address_set_manually).to be_falsey
         expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
         expect(bike.reload.current_ownership_id).to eq ownership.id
-        expect(bike.current_ownership.address_hash[:latitude]).to be_blank
         expect(bike.registration_address_source).to eq "initial_creation"
         expect(bike.registration_address(true)["zipcode"]).to eq "99999"
 

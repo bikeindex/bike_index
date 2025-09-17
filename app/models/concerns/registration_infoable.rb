@@ -90,11 +90,6 @@ module RegistrationInfoable
     update_registration_information(student_id_key(org), val)
   end
 
-  def address_hash
-    reg_info.slice("street", "city", "state", "zipcode", "state", "country")
-      .with_indifferent_access
-  end
-
   private
 
   # Only internal, nil protection. Only should be nil when unsaved
