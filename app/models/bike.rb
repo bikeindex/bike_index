@@ -843,8 +843,7 @@ class Bike < ApplicationRecord
     when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
     when "user" then user&.address_hash_legacy
     when "bike_update" then address_hash
-    when "initial_creation"
-      current_ownership.address_hash_legacy
+    when "initial_creation" then current_ownership.address_hash_legacy
     else
       {}
     end.with_indifferent_access

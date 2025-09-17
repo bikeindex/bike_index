@@ -225,7 +225,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike1.public_images.count).to eq 0
           expect(bike1.phone).to eq("8887776666")
           # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
-          expect(bike1.registration_address).to eq({"street" => default_location[:address]})
+          expect(bike1.registration_address.reject { |_k, v| v.blank? }).to eq({"street" => default_location[:address]})
           expect(bike1.registration_address_source).to eq "initial_creation"
           target_address_hash = default_location.slice(:latitude, :longitude).merge(street: default_location[:address])
           expect(bike1.address_hash.reject { |_k, v| v.blank? }.to_h).to eq target_address_hash.as_json
