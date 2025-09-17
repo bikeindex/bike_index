@@ -1324,7 +1324,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.registration_info).to eq registration_info.as_json
       end
       context "user with address address_set_manually" do
-        let(:user) { FactoryBot.create(:user, :in_vancouver, address_set_manually: true) }
+        let(:user) { FactoryBot.create(:user, :address_in_vancouver, address_set_manually: true) }
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, city: "Lancaster", zipcode: 17601) }
         it "returns user address" do
           bike.reload

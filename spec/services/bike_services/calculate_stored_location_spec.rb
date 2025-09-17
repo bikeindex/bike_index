@@ -127,7 +127,7 @@ RSpec.describe BikeServices::CalculateStoredLocation do
         expect(bike.street).to eq "main main street"
       end
       context "user street is present" do
-        let(:user) { FactoryBot.create(:user_confirmed, :in_nyc, address_set_manually: true) }
+        let(:user) { FactoryBot.create(:user_confirmed, :address_in_nyc, address_set_manually: true) }
         it "uses user address" do
           bike.update(updated_at: Time.current)
           bike.reload

@@ -3,6 +3,22 @@ require "rails_helper"
 RSpec.describe User, type: :model do
   it_behaves_like "address_recorded"
 
+  describe "address factories" do
+    let(:user) { FactoryBot.create(:user, :address_in_amsterdam) }
+    let(:address_record) { user.reload.address_record }
+    let(:target_attrs) do
+      {city: "Amsterdam", region_string: "North Holland", country_id: Country.netherlands.id,
+       user_id: user.id, kind: "user"}
+    end
+
+    it "is valid" do
+      expect(address_record).to have_attributes target_attrs
+      expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
+      expect(user.to_coordinates).to eq(address_record.to_coordinates)
+      expect(AddressRecord.pluck(:id)).to eq([address_record.id])
+    end
+  end
+
   describe ".ambassadors" do
     context "given ambassadors and no org filter" do
       it "returns any and only users who are ambassadors" do

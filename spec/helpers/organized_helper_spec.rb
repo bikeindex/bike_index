@@ -249,10 +249,10 @@ RSpec.describe OrganizedHelper, type: :helper do
             expect(include_field_reg_student_id?(organization, user)).to be_truthy
           end
           context "with registration_info" do
-            let(:user) { FactoryBot.create(:user_confirmed, :in_edmonton, phone: "7773335555", address_set_manually: true) }
+            let(:user) { FactoryBot.create(:user_confirmed, :address_in_edmonton, phone: "7773335555", address_set_manually: true) }
             let(:registration_info) { {student_id: "12", organization_affiliation: "staff"} }
             it "is falsey" do
-              expect(user.reload.street).to be_present
+              expect(user.reload.address_record.street).to be_present
               expect(include_field_reg_phone?(organization, user)).to be_falsey # Purely based on whether user has phone
               expect(include_field_reg_address?(organization, user)).to be_falsey
               expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey

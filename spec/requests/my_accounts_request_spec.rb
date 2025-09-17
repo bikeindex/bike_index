@@ -152,7 +152,7 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
     context "Backfills::AddressRecordsForUsersJob" do
-      let(:current_user) { FactoryBot.create(:user_confirmed, :in_edmonton) }
+      let(:current_user) { FactoryBot.create(:user_confirmed, :address_in_edmonton) }
       it "creates an address_record on render" do
         expect(current_user.reload.address_record).to be_blank
 
