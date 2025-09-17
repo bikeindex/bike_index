@@ -14,18 +14,20 @@
 #  street                     :string
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  bike_id                    :bigint
 #  country_id                 :bigint
 #  region_record_id           :bigint
 #  user_id                    :bigint
 #
 # Indexes
 #
+#  index_address_records_on_bike_id           (bike_id)
 #  index_address_records_on_country_id        (country_id)
 #  index_address_records_on_region_record_id  (region_record_id)
 #  index_address_records_on_user_id           (user_id)
 #
 class AddressRecord < ApplicationRecord
-  KIND_ENUM = {user: 0, stolen_record: 1, marketplace_listing: 2}.freeze
+  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, stolen_record: 3}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
 
@@ -33,6 +35,7 @@ class AddressRecord < ApplicationRecord
   enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
 
   belongs_to :user
+  belongs_to :bike # TODO: Make this polymorphic?
   belongs_to :country
   belongs_to :region_record, class_name: "State"
 
@@ -55,6 +58,8 @@ class AddressRecord < ApplicationRecord
     end
 
     def attrs_from_legacy(obj)
+      user_attrs = obj.is_a?(User) ? {} : {user_id: obj.user_id}
+
       {
         skip_geocoding: true, # Skip geocoding, this is a direct copy
         skip_callback_job: true, # they're already in sync
@@ -65,7 +70,7 @@ class AddressRecord < ApplicationRecord
         country_id: obj.country_id,
         latitude: obj.latitude,
         longitude: obj.longitude
-      }
+      }.merge(user_attrs)
     end
 
     def default_visibility_for(kind)

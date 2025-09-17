@@ -23,6 +23,16 @@ FactoryBot.define do
       end
     end
 
+    trait :with_address_record do
+      transient { address_record_kind { :bike } }
+
+      address_record { FactoryBot.build(:address_record, kind: address_record_kind) }
+
+      after(:create) do |bike, _evaluator|
+        bike.address_record.update(bike_id: bike.id)
+      end
+    end
+
     trait :with_ownership do
       transient do
         user { nil }

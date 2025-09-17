@@ -54,6 +54,7 @@
 #  zipcode                     :string(255)
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
+#  address_record_id           :bigint
 #  country_id                  :integer
 #  creation_organization_id    :integer
 #  creator_id                  :integer
@@ -76,6 +77,7 @@
 #
 # Indexes
 #
+#  index_bikes_on_address_record_id          (address_record_id)
 #  index_bikes_on_current_impound_record_id  (current_impound_record_id)
 #  index_bikes_on_current_ownership_id       (current_ownership_id)
 #  index_bikes_on_current_stolen_record_id   (current_stolen_record_id)
@@ -100,6 +102,7 @@ class Bike < ApplicationRecord
   include BikeSearchable
   include BikeAttributable
   include Geocodeable
+  include AddressRecorded
   include PgSearch::Model
 
   PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
@@ -125,6 +128,7 @@ class Bike < ApplicationRecord
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
   belongs_to :paint, counter_cache: true # Not in BikeAttributable because of counter cache
   belongs_to :model_audit
+  belongs_to :address_record
 
   has_many :bike_organizations
   has_many :organizations, through: :bike_organizations
