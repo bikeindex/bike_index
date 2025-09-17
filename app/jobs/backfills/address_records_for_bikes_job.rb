@@ -14,7 +14,10 @@ class Backfills::AddressRecordsForBikesJob < ApplicationJob
       return bike.address_record if bike.address_record.present?
 
       existing_address_record = AddressRecord.where(kind: :bike, bike_id: bike.id).order(:id).last
-      return bike.update(address_record: existing_address_record) if existing_address_record.present?
+      if existing_address_record.present?
+        bike.update(address_record: existing_address_record)
+        existing_address_record
+      end
 
       bike.address_record = AddressRecord.new(bike_id: bike.id, kind: :bike, country_id:)
       bike.address_record.attributes = AddressRecord.attrs_from_legacy(bike)

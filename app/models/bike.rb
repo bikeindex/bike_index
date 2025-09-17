@@ -127,7 +127,6 @@ class Bike < ApplicationRecord
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
   belongs_to :paint, counter_cache: true # Not in BikeAttributable because of counter cache
   belongs_to :model_audit
-  belongs_to :address_record
 
   has_many :bike_organizations
   has_many :organizations, through: :bike_organizations
@@ -392,6 +391,10 @@ class Bike < ApplicationRecord
     def matching_domain(str)
       where("bikes.owner_email ILIKE ?", "%#{str.to_s.strip}")
     end
+  end
+
+  def find_or_build_address_record(country_id: nil)
+    Backfills::AddressRecordsForBikesJob.build_or_create_for(self, country_id:)
   end
 
   # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
