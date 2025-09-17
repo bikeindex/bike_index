@@ -74,8 +74,8 @@ RSpec.describe OrganizationExportJob, type: :job do
             })
         end
         # Force unmemoize - TODO: might not be necessary
-        let!(:bike_for_avery) { Bike.find(bike_for_avery_og.id) }
-        let!(:bike_not_avery) do
+        let(:bike_for_avery) { Bike.find(bike_for_avery_og.id) }
+        let(:bike_not_avery) do
           FactoryBot.create(:bike_organized,
             manufacturer: trek,
             primary_frame_color: black,
@@ -100,8 +100,8 @@ RSpec.describe OrganizationExportJob, type: :job do
         include_context :geocoder_real
         it "exports only bike with name, email and address" do
           VCR.use_cassette("organization_export_worker-avery") do
-            pp bike_not_avery.reload.current_ownership.address_record
-            pp bike_for_avery.reload.current_ownership.address_record
+            expect(bike_not_avery.reload.current_ownership.address_record.street).to be_blank
+            expect(bike_for_avery_og.reload.current_ownership.address_record.street).to be_present
             bike.reload
             expect(bike_sticker.claimed?).to be_falsey
             export.update(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
@@ -126,7 +126,6 @@ RSpec.describe OrganizationExportJob, type: :job do
 
           export.reload
           expect(export.progress).to eq "finished"
-          pp export.file.read
           expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
           # NOTE: This header needs to stay exactly the same or the avery export will break
