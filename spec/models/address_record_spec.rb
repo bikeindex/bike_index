@@ -163,4 +163,24 @@ RSpec.describe AddressRecord, type: :model do
       end
     end
   end
+
+  describe "country" do
+    let(:country) { "US" }
+    let(:address_record) { FactoryBot.build(:address_record, country_id: nil) }
+    before { address_record.country = country }
+
+    it "assigns" do
+      expect(Country.united_states).to be_present
+      expect(address_record.save).to be_truthy
+      expect(address_record.reload.country_id).to eq Country.united_states_id
+    end
+    context "country: CA" do
+      let(:country) { "CA" }
+      it "assigns" do
+        expect(Country.canada).to be_present
+        expect(address_record.save).to be_truthy
+        expect(address_record.reload.country_id).to eq Country.canada_id
+      end
+    end
+  end
 end

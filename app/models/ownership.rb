@@ -21,6 +21,7 @@
 #  user_hidden                   :boolean          default(FALSE), not null
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
+#  address_record_id             :bigint
 #  bike_id                       :integer
 #  bulk_import_id                :bigint
 #  creator_id                    :integer
@@ -31,6 +32,7 @@
 #
 # Indexes
 #
+#  index_ownerships_on_address_record_id  (address_record_id)
 #  index_ownerships_on_bike_id            (bike_id)
 #  index_ownerships_on_bulk_import_id     (bulk_import_id)
 #  index_ownerships_on_creator_id         (creator_id)
@@ -40,6 +42,7 @@
 #
 class Ownership < ApplicationRecord
   include RegistrationInfoable
+  include AddressRecorded
 
   ORIGIN_ENUM = {
     web: 0,
@@ -256,6 +259,7 @@ class Ownership < ApplicationRecord
       # Update owner name always! Keep it in track
       self.owner_name = user.name if user.present?
     end
+    self.address_record ||= address_record_from_registration_info
   end
 
   def prior_ownerships
@@ -355,5 +359,17 @@ class Ownership < ApplicationRecord
     if new_registration? && organization_id == 553 && !creator.member_of?(organization)
       creator.name
     end
+  end
+
+  def address_record_from_registration_info
+    reg_info_location = registration_info.slice(*LOCATION_KEYS).reject { |_k, v| v.blank? }
+    return unless reg_info_location.present?
+
+    reg_info_location["postal_code"] = reg_info_location.delete("zipcode")
+    reg_info_location["region_string"] = reg_info_location.delete("state")
+    reg_info_location["country"] ||= "US"
+
+    address_record = AddressRecord.new(bike_id: bike_id, kind: :ownership, user_id:, **reg_info_location)
+    address_record
   end
 end

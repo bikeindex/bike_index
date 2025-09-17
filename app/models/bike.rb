@@ -813,12 +813,6 @@ class Bike < ApplicationRecord
     self.paint_id = paint.id
   end
 
-  # THIS IS FUCKING OBNOXIOUS.
-  # Somehow we need to get rid of needing to have this method. country should default to optional
-  def address(country: [:optional])
-    Geocodeable.address(self, country:)
-  end
-
   def valid_mailing_address?
     addy = registration_address
     return false if addy.blank? || addy.values.all?(&:blank?)
@@ -837,7 +831,7 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
-    elsif current_ownership&.address_hash.present?
+    elsif current_ownership&.address_record.present?
       "initial_creation"
     end
   end
@@ -850,7 +844,7 @@ class Bike < ApplicationRecord
     when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
     when "user" then user&.address_hash_legacy
     when "bike_update" then address_record&.address_hash_legacy
-    when "initial_creation" then current_ownership.address_hash
+    when "initial_creation" then current_ownership.address_hash_legacy
     else
       {}
     end.with_indifferent_access
@@ -903,13 +897,6 @@ class Bike < ApplicationRecord
     self.all_description = cached_description_and_stolen_description
     self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
-  end
-
-  # Only geocode if address is set manually (and not skipping geocoding)
-  def should_be_geocoded?
-    return false if skip_geocoding?
-
-    address_changed?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)

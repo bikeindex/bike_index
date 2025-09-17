@@ -1,4 +1,4 @@
-\restrict MtubWZMpCyMoWt1ixE9mYCh1q53ealaGVihw1lwfYQk9FlXaw2NCA0cdi0676rr
+\restrict KiLYJa9U676cLbfEEk9j5usgl69LyGl36qJGlCaahUcVaF27iQdaSnhUwS4xQDd
 
 -- Dumped from database version 17.6 (Homebrew)
 -- Dumped by pg_dump version 17.6 (Homebrew)
@@ -6,6 +6,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2837,7 +2838,8 @@ CREATE TABLE public.ownerships (
     registration_info jsonb DEFAULT '{}'::jsonb,
     pos_kind integer,
     is_new boolean DEFAULT false,
-    skip_email boolean DEFAULT false
+    skip_email boolean DEFAULT false,
+    address_record_id bigint
 );
 
 
@@ -6530,6 +6532,13 @@ CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING bt
 
 
 --
+-- Name: index_ownerships_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_address_record_id ON public.ownerships USING btree (address_record_id);
+
+
+--
 -- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7067,7 +7076,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 -- PostgreSQL database dump complete
 --
 
-\unrestrict MtubWZMpCyMoWt1ixE9mYCh1q53ealaGVihw1lwfYQk9FlXaw2NCA0cdi0676rr
+\unrestrict KiLYJa9U676cLbfEEk9j5usgl69LyGl36qJGlCaahUcVaF27iQdaSnhUwS4xQDd
 
 SET search_path TO "$user", public;
 
