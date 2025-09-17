@@ -151,39 +151,6 @@ RSpec.describe MyAccountsController, type: :request do
         end
       end
     end
-    context "Backfills::AddressRecordsForUsersJob" do
-      let(:current_user) { FactoryBot.create(:user_confirmed, :in_edmonton) }
-      it "creates an address_record on render" do
-        expect(current_user.reload.address_record).to be_blank
-
-        # non-root view doesn't create the address record
-        get "#{base_url}/edit/password"
-        expect(response).to be_ok
-        expect(current_user.reload.address_record).to be_blank
-
-        # Root view creates!
-        expect do
-          get "#{base_url}/edit"
-          get "#{base_url}/edit"
-        end.to change(AddressRecord, :count).by 1
-        expect(response).to be_ok
-        expect(current_user.reload.address_record).to be_present
-        expect(current_user.address_record.city).to eq "Edmonton"
-      end
-      context "with address_record" do
-        let!(:address_record) { FactoryBot.create(:address_record, kind: :user, user_id: current_user.id) }
-        it "updates the address_record on render" do
-          expect(current_user.reload.address_record).to be_blank
-
-          # Root view creates!
-          expect do
-            get "#{base_url}/edit"
-          end.to change(AddressRecord, :count).by 0
-          expect(response).to be_ok
-          expect(current_user.reload.address_record_id).to eq address_record.id
-        end
-      end
-    end
     context "with user_registration_organization" do
       let(:target_templates) { default_edit_templates.merge(registration_organizations: "Registration Organizations") }
       let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: current_user) }

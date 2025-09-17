@@ -10,7 +10,6 @@
 #  avatar                             :string(255)
 #  banned                             :boolean          default(FALSE), not null
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
-#  city                               :string
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
 #  deleted_at                         :datetime
@@ -25,7 +24,6 @@
 #  magic_link_token                   :text
 #  my_bikes_hash                      :jsonb
 #  name                               :string(255)
-#  neighborhood                       :string
 #  no_address                         :boolean          default(FALSE)
 #  no_non_theft_notification          :boolean          default(FALSE)
 #  notification_newsletters           :boolean          default(FALSE), not null
@@ -40,7 +38,6 @@
 #  show_phone                         :boolean          default(TRUE)
 #  show_twitter                       :boolean          default(FALSE), not null
 #  show_website                       :boolean          default(FALSE), not null
-#  street                             :string
 #  superuser                          :boolean          default(FALSE), not null
 #  terms_of_service                   :boolean          default(FALSE), not null
 #  time_single_format                 :boolean          default(FALSE)
@@ -50,12 +47,9 @@
 #  username                           :string(255)
 #  vendor_terms_of_service            :boolean
 #  when_vendor_terms_of_service       :datetime
-#  zipcode                            :string(255)
 #  created_at                         :datetime         not null
 #  updated_at                         :datetime         not null
 #  address_record_id                  :bigint
-#  country_id                         :integer
-#  state_id                           :integer
 #  stripe_id                          :string(255)
 #
 # Indexes

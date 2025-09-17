@@ -126,16 +126,18 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
       end
     end
     context "existing attributes" do
-      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999") }
+      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292") }
+      let!(:address_record) { FactoryBot.create(:address_record, user:, postal_code: "89999", kind: :user, street: nil, city: nil, region_record: nil) }
       it "doesn't import" do
+        user.update!(address_record:)
         instance.perform(user.id, "new")
         user.reload
         expect(user.phone).to eq "929292"
-        expect(user.street).to be_nil
-        expect(user.city).to be_nil
-        expect(user.zipcode).to eq "89999"
-        expect(user.state_id).to be_nil
-        expect(user.country_id).to be_nil
+        expect(user.address_record.street).to be_nil
+        expect(user.address_record.city).to be_nil
+        expect(user.address_record.postal_code).to eq "89999"
+        expect(user.address_record.region_record_id).to be_nil
+        expect(user.address_record.country_id).to be_present
       end
     end
   end

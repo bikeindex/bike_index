@@ -102,14 +102,14 @@ RSpec.describe BikeServices::CalculateStoredLocation do
     context "given no creation org location" do
       let(:city) { "New York" }
       let(:zipcode) { "10011" }
-      let(:address_record) { FactoryBot.create(:address_record, :new_york) }
+      let(:address_record) { FactoryBot.create(:address_record, :new_york, street: nil) }
       let(:user) { FactoryBot.create(:user_confirmed, address_record:) }
       let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"}) }
       let(:bike) { ownership.bike }
       it "takes location from the creation state" do
         bike.update(updated_at: Time.current)
         bike.reload # Set current_ownership_id
-        expect(user.reload.street).to be_blank
+        expect(user.reload.address_record.street).to be_blank
         expect(user.address_set_manually).to be_falsey
         expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
         expect(bike.reload.current_ownership_id).to eq ownership.id
@@ -127,11 +127,11 @@ RSpec.describe BikeServices::CalculateStoredLocation do
         expect(bike.street).to eq "main main street"
       end
       context "user street is present" do
-        let(:user) { FactoryBot.create(:user_confirmed, :in_nyc, address_set_manually: true) }
+        let(:user) { FactoryBot.create(:user_confirmed, :address_in_nyc, address_set_manually: true) }
         it "uses user address" do
           bike.update(updated_at: Time.current)
           bike.reload
-          expect(user.reload.street).to be_present
+          expect(user.reload.address_record.street).to be_present
           expect(user.address_set_manually).to be_truthy
           expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
           expect(bike.reload.current_ownership_id).to eq ownership.id
@@ -144,8 +144,12 @@ RSpec.describe BikeServices::CalculateStoredLocation do
           bike.save
           expect(bike.skip_geocoding).to be_truthy
 
-          expect(bike.address_hash).to eq user.address_hash_legacy
-          expect(bike.street).to eq user.street
+          # Both bike and user should have the same address data, even if formats differ
+          expect(bike.street).to eq user.address_record.street
+          expect(bike.city).to eq user.address_record.city
+          expect(bike.zipcode).to eq user.address_record.postal_code
+          expect(bike.state_abbr).to eq user.address_record.region
+          expect(bike.country_abbr).to eq user.address_record.country&.iso
           expect(bike.address_set_manually).to be_falsey # Because it's set by the user
         end
       end

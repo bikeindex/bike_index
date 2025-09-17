@@ -3,6 +3,22 @@ require "rails_helper"
 RSpec.describe User, type: :model do
   it_behaves_like "address_recorded"
 
+  describe "address factories" do
+    let(:user) { FactoryBot.create(:user, :address_in_amsterdam) }
+    let(:address_record) { user.reload.address_record }
+    let(:target_attrs) do
+      {city: "Amsterdam", region_string: "North Holland", country_id: Country.netherlands.id,
+       user_id: user.id, kind: "user"}
+    end
+
+    it "is valid" do
+      expect(address_record).to have_attributes target_attrs
+      expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
+      expect(user.to_coordinates).to eq(address_record.to_coordinates)
+      expect(AddressRecord.pluck(:id)).to eq([address_record.id])
+    end
+  end
+
   describe ".ambassadors" do
     context "given ambassadors and no org filter" do
       it "returns any and only users who are ambassadors" do
@@ -896,6 +912,67 @@ RSpec.describe User, type: :model do
         it "returns false" do
           expect(user.admin_of?(nil)).to be_falsey
         end
+      end
+    end
+  end
+
+  describe "find_or_build_address_record" do
+    let(:user) { FactoryBot.build(:user) }
+    let(:country) { Country.united_states }
+
+    context "when user has no address_record" do
+      it "creates a new AddressRecord" do
+        expect(user.address_record).to be_nil
+
+        address_record = user.find_or_build_address_record
+
+        expect(address_record).to be_a(AddressRecord)
+        expect(address_record.persisted?).to be_falsey
+        expect(address_record.user_id).to eq(user.id)
+        expect(address_record.kind).to eq("user")
+        expect(address_record.country_id).to be_nil
+      end
+
+      it "creates a new AddressRecord with country_id" do
+        address_record = user.find_or_build_address_record(country_id: country.id)
+
+        expect(address_record).to be_a(AddressRecord)
+        expect(address_record.persisted?).to be_falsey
+        expect(address_record.user_id).to eq(user.id)
+        expect(address_record.kind).to eq("user")
+        expect(address_record.country_id).to eq(country.id)
+      end
+    end
+
+    context "when user has an existing address_record" do
+      let(:user) { FactoryBot.create(:user, :with_address_record) }
+
+      it "returns the existing address_record" do
+        expect(user.reload.address_record_id).to be_present
+        expect(user.find_or_build_address_record.id).to eq user.address_record_id
+      end
+    end
+
+    context "when user has an orphaned address_record" do
+      let(:user) { FactoryBot.create(:user) }
+      let!(:address_record) { FactoryBot.create(:address_record, user_id: user.id, kind: :user) }
+
+      it "finds the existing orphaned address_record" do
+        expect(user.reload.address_record_id).to be_blank
+        expect(user.find_or_build_address_record.id).to eq address_record.id
+        expect(user.reload.address_record_id).to eq address_record.id
+      end
+    end
+
+    context "when user has an address_record not for themselves" do
+      let(:user) { FactoryBot.create(:user) }
+      let!(:address_record) { FactoryBot.create(:address_record, user_id: user.id, kind: :stolen_record) }
+
+      it "finds the existing orphaned address_record" do
+        expect(user.reload.address_record_id).to be_blank
+
+        expect(user.find_or_build_address_record.id).to be_blank
+        expect(user.reload.address_record_id).to be_blank
       end
     end
   end
