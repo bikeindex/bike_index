@@ -1,3 +1,8 @@
+\restrict 0a42vag5T4BLcyjbliGuqbhgaCjgvCfMt3izwFtJxWRjyJPmHDa1lYgkUMZshFD
+
+-- Dumped from database version 17.6 (Homebrew)
+-- Dumped by pg_dump version 17.6 (Homebrew)
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -159,7 +164,8 @@ CREATE TABLE public.address_records (
     kind integer,
     publicly_visible_attribute integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    bike_id bigint
 );
 
 
@@ -666,7 +672,8 @@ CREATE TABLE public.bikes (
     serial_segments_migrated_at timestamp without time zone,
     model_audit_id bigint,
     neighborhood character varying,
-    primary_activity_id bigint
+    primary_activity_id bigint,
+    address_record_id bigint
 );
 
 
@@ -2830,7 +2837,8 @@ CREATE TABLE public.ownerships (
     registration_info jsonb DEFAULT '{}'::jsonb,
     pos_kind integer,
     is_new boolean DEFAULT false,
-    skip_email boolean DEFAULT false
+    skip_email boolean DEFAULT false,
+    address_record_id bigint
 );
 
 
@@ -5494,6 +5502,13 @@ CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.ac
 
 
 --
+-- Name: index_address_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id);
+
+
+--
 -- Name: index_address_records_on_country_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5722,6 +5737,13 @@ CREATE INDEX index_bike_versions_on_secondary_frame_color_id ON public.bike_vers
 --
 
 CREATE INDEX index_bike_versions_on_tertiary_frame_color_id ON public.bike_versions USING btree (tertiary_frame_color_id);
+
+
+--
+-- Name: index_bikes_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_address_record_id ON public.bikes USING btree (address_record_id);
 
 
 --
@@ -6509,6 +6531,13 @@ CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING bt
 
 
 --
+-- Name: index_ownerships_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_address_record_id ON public.ownerships USING btree (address_record_id);
+
+
+--
 -- Name: index_ownerships_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7046,9 +7075,12 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 -- PostgreSQL database dump complete
 --
 
+\unrestrict 0a42vag5T4BLcyjbliGuqbhgaCjgvCfMt3izwFtJxWRjyJPmHDa1lYgkUMZshFD
+
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250917185540'),
 ('20250910182759'),
 ('20250528154403'),
 ('20250519154506'),

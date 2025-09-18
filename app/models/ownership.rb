@@ -40,6 +40,7 @@
 #
 class Ownership < ApplicationRecord
   include RegistrationInfoable
+  include AddressRecorded
 
   ORIGIN_ENUM = {
     web: 0,
@@ -89,6 +90,7 @@ class Ownership < ApplicationRecord
   scope :transferred_pre_registration, -> { left_joins(:previous_ownership).where(previous_ownerships: {organization_pre_registration: true}) }
   scope :self_made, -> { where("user_id = creator_id") }
   scope :not_self_made, -> { where("user_id != creator_id").or(where(user_id: nil)) }
+  scope :with_reg_info_location, -> { where("(registration_info -> 'city') IS NOT NULL") }
 
   before_validation :set_calculated_attributes
   after_commit :send_notification_and_update_other_ownerships, on: :create
@@ -256,6 +258,7 @@ class Ownership < ApplicationRecord
       # Update owner name always! Keep it in track
       self.owner_name = user.name if user.present?
     end
+    self.address_record ||= address_record_from_registration_info
   end
 
   def prior_ownerships
@@ -352,8 +355,20 @@ class Ownership < ApplicationRecord
     return registration_info["user_name"] if registration_info["user_name"].present?
 
     # If it's made by PSU and not from a member of PSU, use the creator name
-    if new_registration? && organization_id == 553 && !creator.member_of?(organization)
+    if new_registration? && organization_id == 553 && creator.present? && !creator.member_of?(organization)
       creator.name
     end
+  end
+
+  def address_record_from_registration_info
+    reg_info_location = registration_info.slice(*LOCATION_KEYS).reject { |_k, v| v.blank? }
+    return unless reg_info_location.present?
+
+    reg_info_location["postal_code"] = reg_info_location.delete("zipcode")
+    reg_info_location["region_string"] = reg_info_location.delete("state")
+    reg_info_location["country"] ||= "US"
+
+    AddressRecord.new(bike_id: bike_id, kind: :ownership, user_id:,
+      skip_geocoding: reg_info_location["latitude"].present?, **reg_info_location)
   end
 end

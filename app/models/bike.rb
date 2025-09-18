@@ -54,6 +54,7 @@
 #  zipcode                     :string(255)
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
+#  address_record_id           :bigint
 #  country_id                  :integer
 #  creation_organization_id    :integer
 #  creator_id                  :integer
@@ -76,6 +77,7 @@
 #
 # Indexes
 #
+#  index_bikes_on_address_record_id          (address_record_id)
 #  index_bikes_on_current_impound_record_id  (current_impound_record_id)
 #  index_bikes_on_current_ownership_id       (current_ownership_id)
 #  index_bikes_on_current_stolen_record_id   (current_stolen_record_id)
@@ -841,7 +843,7 @@ class Bike < ApplicationRecord
     when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
     when "user" then user&.address_hash_legacy
     when "bike_update" then address_hash
-    when "initial_creation" then current_ownership.address_hash
+    when "initial_creation" then current_ownership.address_hash_legacy
     else
       {}
     end.with_indifferent_access

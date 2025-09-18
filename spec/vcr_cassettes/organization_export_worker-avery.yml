@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://maps.googleapis.com/maps/api/geocode/json?address=102%20Washington%20Pl,%20State%20College,%20PA&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=State%20College,%20PA%2016801&key=<GOOGLE_GEOCODER>&language=en&sensor=false
     body:
       encoding: US-ASCII
       string: ''
@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Fri, 17 Dec 2021 20:18:02 GMT
+      - Wed, 17 Sep 2025 23:36:59 GMT
       Pragma:
       - no-cache
       Expires:
@@ -30,105 +30,59 @@ http_interactions:
       - no-cache, must-revalidate
       Access-Control-Allow-Origin:
       - "*"
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:214:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=msaifdggmnwc:214:0
+      Report-To:
+      - '{"group":"msaifdggmnwc:214:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:214:0"}],}'
       Server:
       - mafe
+      Content-Length:
+      - '2185'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=362
+      - gfet4t7; dur=77
       Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443";
-        ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
-      Transfer-Encoding:
-      - chunked
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
-      encoding: ASCII-8BIT
-      string: |
-        {
-           "results" : [
-              {
-                 "address_components" : [
-                    {
-                       "long_name" : "102",
-                       "short_name" : "102",
-                       "types" : [ "street_number" ]
-                    },
-                    {
-                       "long_name" : "Washington Place",
-                       "short_name" : "Washington Pl",
-                       "types" : [ "route" ]
-                    },
-                    {
-                       "long_name" : "State College",
-                       "short_name" : "State College",
-                       "types" : [ "locality", "political" ]
-                    },
-                    {
-                       "long_name" : "Ferguson Township",
-                       "short_name" : "Ferguson Township",
-                       "types" : [ "administrative_area_level_3", "political" ]
-                    },
-                    {
-                       "long_name" : "Centre County",
-                       "short_name" : "Centre County",
-                       "types" : [ "administrative_area_level_2", "political" ]
-                    },
-                    {
-                       "long_name" : "Pennsylvania",
-                       "short_name" : "PA",
-                       "types" : [ "administrative_area_level_1", "political" ]
-                    },
-                    {
-                       "long_name" : "United States",
-                       "short_name" : "US",
-                       "types" : [ "country", "political" ]
-                    },
-                    {
-                       "long_name" : "16801",
-                       "short_name" : "16801",
-                       "types" : [ "postal_code" ]
-                    },
-                    {
-                       "long_name" : "3201",
-                       "short_name" : "3201",
-                       "types" : [ "postal_code_suffix" ]
-                    }
-                 ],
-                 "formatted_address" : "102 Washington Pl, State College, PA 16801, USA",
-                 "geometry" : {
-                    "location" : {
-                       "lat" : 40.7712808,
-                       "lng" : -77.87389659999999
-                    },
-                    "location_type" : "ROOFTOP",
-                    "viewport" : {
-                       "northeast" : {
-                          "lat" : 40.7726297802915,
-                          "lng" : -77.8725476197085
-                       },
-                       "southwest" : {
-                          "lat" : 40.7699318197085,
-                          "lng" : -77.87524558029151
-                       }
-                    }
-                 },
-                 "place_id" : "ChIJH5WGh_CozokR1ltk1zyhUnE",
-                 "plus_code" : {
-                    "compound_code" : "Q4CG+GC State College, PA, USA",
-                    "global_code" : "87G4Q4CG+GC"
-                 },
-                 "types" : [ "street_address" ]
-              }
-           ],
-           "status" : "OK"
-        }
-    http_version: 
-  recorded_at: Fri, 17 Dec 2021 20:18:02 GMT
+      encoding: UTF-8
+      string: "{\n   \"results\" : \n   [\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"State College\",\n
+        \              \"short_name\" : \"State College\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Centre County\",\n               \"short_name\" : \"Centre County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Pennsylvania\",\n               \"short_name\"
+        : \"PA\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"State College, PA, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.8075721,\n                  \"lng\"
+        : -77.8189271\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 40.7684269,\n                  \"lng\" : -77.886301\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 40.7933949,\n               \"lng\" : -77.8600012\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 40.8075721,\n                  \"lng\" : -77.8189271\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.7684269,\n                  \"lng\" : -77.886301\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJc9s7wZmozokRkYA8g8LG4Zw\",\n
+        \        \"types\" : \n         [\n            \"locality\",\n            \"political\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+  recorded_at: Wed, 17 Sep 2025 23:36:59 GMT
 - request:
     method: get
-    uri: https://maps.googleapis.com/maps/api/geocode/json?address=102%20Washington%20Pl,%20State%20College,%20PA%2016801&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=State%20College,%20PA%2016801&key=<GOOGLE_GEOCODER>&language=en&sensor=false
     body:
       encoding: US-ASCII
       string: ''
@@ -147,7 +101,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Fri, 17 Dec 2021 20:22:16 GMT
+      - Wed, 17 Sep 2025 23:38:31 GMT
       Pragma:
       - no-cache
       Expires:
@@ -156,100 +110,54 @@ http_interactions:
       - no-cache, must-revalidate
       Access-Control-Allow-Origin:
       - "*"
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:214:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=msaifdggmnwc:214:0
+      Report-To:
+      - '{"group":"msaifdggmnwc:214:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:214:0"}],}'
       Server:
       - mafe
+      Content-Length:
+      - '2185'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=410
+      - gfet4t7; dur=66
       Alt-Svc:
-      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443";
-        ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
-      Transfer-Encoding:
-      - chunked
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
-      encoding: ASCII-8BIT
-      string: |
-        {
-           "results" : [
-              {
-                 "address_components" : [
-                    {
-                       "long_name" : "102",
-                       "short_name" : "102",
-                       "types" : [ "street_number" ]
-                    },
-                    {
-                       "long_name" : "Washington Place",
-                       "short_name" : "Washington Pl",
-                       "types" : [ "route" ]
-                    },
-                    {
-                       "long_name" : "State College",
-                       "short_name" : "State College",
-                       "types" : [ "locality", "political" ]
-                    },
-                    {
-                       "long_name" : "Ferguson Township",
-                       "short_name" : "Ferguson Township",
-                       "types" : [ "administrative_area_level_3", "political" ]
-                    },
-                    {
-                       "long_name" : "Centre County",
-                       "short_name" : "Centre County",
-                       "types" : [ "administrative_area_level_2", "political" ]
-                    },
-                    {
-                       "long_name" : "Pennsylvania",
-                       "short_name" : "PA",
-                       "types" : [ "administrative_area_level_1", "political" ]
-                    },
-                    {
-                       "long_name" : "United States",
-                       "short_name" : "US",
-                       "types" : [ "country", "political" ]
-                    },
-                    {
-                       "long_name" : "16801",
-                       "short_name" : "16801",
-                       "types" : [ "postal_code" ]
-                    },
-                    {
-                       "long_name" : "3201",
-                       "short_name" : "3201",
-                       "types" : [ "postal_code_suffix" ]
-                    }
-                 ],
-                 "formatted_address" : "102 Washington Pl, State College, PA 16801, USA",
-                 "geometry" : {
-                    "location" : {
-                       "lat" : 40.7712808,
-                       "lng" : -77.87389659999999
-                    },
-                    "location_type" : "ROOFTOP",
-                    "viewport" : {
-                       "northeast" : {
-                          "lat" : 40.7726297802915,
-                          "lng" : -77.8725476197085
-                       },
-                       "southwest" : {
-                          "lat" : 40.7699318197085,
-                          "lng" : -77.87524558029151
-                       }
-                    }
-                 },
-                 "place_id" : "ChIJH5WGh_CozokR1ltk1zyhUnE",
-                 "plus_code" : {
-                    "compound_code" : "Q4CG+GC State College, PA, USA",
-                    "global_code" : "87G4Q4CG+GC"
-                 },
-                 "types" : [ "street_address" ]
-              }
-           ],
-           "status" : "OK"
-        }
-    http_version: 
-  recorded_at: Fri, 17 Dec 2021 20:22:16 GMT
-recorded_with: VCR 5.0.0
+      encoding: UTF-8
+      string: "{\n   \"results\" : \n   [\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"State College\",\n
+        \              \"short_name\" : \"State College\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Centre County\",\n               \"short_name\" : \"Centre County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Pennsylvania\",\n               \"short_name\"
+        : \"PA\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"State College, PA, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.8075721,\n                  \"lng\"
+        : -77.8189271\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 40.7684269,\n                  \"lng\" : -77.886301\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 40.7933949,\n               \"lng\" : -77.8600012\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 40.8075721,\n                  \"lng\" : -77.8189271\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.7684269,\n                  \"lng\" : -77.886301\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJc9s7wZmozokRkYA8g8LG4Zw\",\n
+        \        \"types\" : \n         [\n            \"locality\",\n            \"political\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+  recorded_at: Wed, 17 Sep 2025 23:38:31 GMT
+recorded_with: VCR 6.3.1

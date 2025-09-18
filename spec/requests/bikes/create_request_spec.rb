@@ -346,7 +346,7 @@ RSpec.describe "BikesController#create", type: :request do
           .merge("organization_affiliation_#{organization.id}" => "community_member")
         expect(ownership.registration_info).to match_hash_indifferently reg_hash
 
-        expect(new_bike.registration_address).to match_hash_indifferently reg_hash.except("organization_affiliation_#{organization.id}")
+        expect(new_bike.registration_address.except("country", "latitude", "longitude")).to match_hash_indifferently reg_hash.except("organization_affiliation_#{organization.id}")
         expect(new_bike.address).to eq "1400 32nd St, Oakland, CA 94608, US"
         expect(new_bike.street).to eq "1400 32nd St"
         expect(new_bike.latitude.to_i).to eq 37
@@ -515,8 +515,9 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.manufacturer).to eq manufacturer
       expect(new_bike.current_ownership.origin).to eq "embed_partial"
       expect(new_bike.current_ownership.creator).to eq new_bike.creator
-      expect(new_bike.registration_address).to eq({"street" => default_location[:formatted_address_no_country]})
-      expect(new_bike.address).to eq default_location[:formatted_address_no_country]
+      expect(new_bike.registration_address.reject { |_k, v| v.blank? })
+        .to match_hash_indifferently({street: default_location[:formatted_address_no_country], country: "United States"})
+      expect(new_bike.address).to eq default_location[:formatted_address_no_country] + ", US" # update caused by ownership address_record, who cares
       expect(new_bike.latitude).to eq target_address[:latitude]
       expect(new_bike.longitude).to eq target_address[:longitude]
       expect(new_bike.extra_registration_number).to eq "XXXZZZ"
@@ -554,7 +555,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.current_ownership.origin).to eq "embed_partial"
         expect(new_bike.current_ownership.creator).to eq new_bike.creator
-        expect(new_bike.registration_address).to eq target_address.as_json
+        expect(new_bike.registration_address.except("country", "latitude", "longitude")).to eq target_address.as_json
         expect(new_bike.state.name).to eq "Illinois"
         expect(new_bike.extra_registration_number).to be_blank
         expect(new_bike.organization_affiliation).to eq "student"
@@ -590,7 +591,7 @@ RSpec.describe "BikesController#create", type: :request do
           expect(new_bike.manufacturer).to eq manufacturer
           expect(new_bike.current_ownership.origin).to eq "embed_partial"
           expect(new_bike.current_ownership.creator).to eq new_bike.creator
-          expect(new_bike.registration_address).to eq target_address.as_json
+          expect(new_bike.registration_address.except("country", "latitude", "longitude")).to eq target_address.as_json
           expect(new_bike.state.abbreviation).to eq "IL"
           expect(new_bike.extra_registration_number).to be_blank
           expect(new_bike.organization_affiliation).to eq "student"

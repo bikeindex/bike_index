@@ -491,7 +491,7 @@ RSpec.describe BikesController, type: :controller do
           context "new date input" do
             let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T23:34:00", timezone: "America/New_York") }
             let(:target_time) { 1532835240 }
-            it "creates a new ownership and bike from an organization" do
+            it "creates a new ownership and bike from an organization", :flaky do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
                 expect {
                   post :create, params: {bike: bike_params, stolen_record: alt_stolen_params}

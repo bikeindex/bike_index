@@ -3,6 +3,8 @@
 module RegistrationInfoable
   extend ActiveSupport::Concern
 
+  LOCATION_KEYS = %w[city country state street zipcode latitude longitude].freeze
+
   # Currently not used, keeping it around for reference
   # REGISTRATION_INFO_KEYS = %w[
   #   organization_affiliation
@@ -86,11 +88,6 @@ module RegistrationInfoable
 
   def student_id=(val, org = nil)
     update_registration_information(student_id_key(org), val)
-  end
-
-  def address_hash
-    reg_info.slice("street", "city", "state", "zipcode", "state", "country")
-      .with_indifferent_access
   end
 
   private
