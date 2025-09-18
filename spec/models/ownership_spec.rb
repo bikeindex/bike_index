@@ -675,7 +675,8 @@ RSpec.describe Ownership, type: :model do
   describe "address_record" do
     let!(:state) { FactoryBot.create(:state, name: "Pennsylvania", abbreviation: "PA") }
     let(:ownership) { FactoryBot.build(:ownership, registration_info:) }
-    let(:registration_info) { {city: "State College", state: "PA", street: "100 W College Ave", zipcode: "16801", organization_affiliation: "student"} }
+    let(:pa_info) { {city: "State College", state: "PA", street: "100 W College Ave", zipcode: "16801", organization_affiliation: "student"} }
+    let(:registration_info) { pa_info }
     let(:target_attrs) do
       {city: "State College", region_string: nil, street: "100 W College Ave", postal_code: "16801",
        region_record_id: state.id, country_id: Country.united_states_id, bike_id: ownership.bike_id}
@@ -692,6 +693,25 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.address_record_id).to be_present
         expect(ownership.address_record).to have_attributes target_attrs
         expect(ownership.address_record.to_coordinates.map(&:round)).to eq([41, -78])
+        expect(ownership.bike.valid_mailing_address?).to be_truthy
+      end
+    end
+
+    context "without street" do
+      let(:registration_info) { pa_info.except(:street) }
+
+      it "creates an address_record, without street" do
+        VCR.use_cassette("Ownership-address_record_from_registration_info-streetless") do
+          expect do
+            ownership.save!
+            ownership.reload.update(updated_at: Time.current)
+          end.to change(AddressRecord, :count).by 1
+
+          expect(ownership.address_record_id).to be_present
+          expect(ownership.address_record).to have_attributes target_attrs.merge(street: nil)
+          expect(ownership.address_record.to_coordinates.map(&:round)).to eq([41, -78])
+          expect(ownership.bike.valid_mailing_address?).to be_falsey
+        end
       end
     end
 

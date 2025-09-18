@@ -74,8 +74,8 @@ RSpec.describe OrganizationExportJob, type: :job do
             })
         end
         # Force unmemoize - TODO: might not be necessary
-        let!(:bike_for_avery) { Bike.find(bike_for_avery_og.id) }
-        let!(:bike_not_avery) do
+        let(:bike_for_avery) { Bike.find(bike_for_avery_og.id) }
+        let(:bike_not_avery) do
           FactoryBot.create(:bike_organized,
             manufacturer: trek,
             primary_frame_color: black,
@@ -99,14 +99,17 @@ RSpec.describe OrganizationExportJob, type: :job do
         let!(:state) { FactoryBot.create(:state, :find_or_create, name: "Pennsylvania", abbreviation: "PA", country: Country.united_states) }
         include_context :geocoder_real
         it "exports only bike with name, email and address" do
-          bike.reload
-          expect(bike_sticker.claimed?).to be_falsey
-          export.update(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
-          expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
-          expect(Export.with_bike_sticker_code(bike_sticker).pluck(:id)).to eq([])
-          expect(export.avery_export?).to be_truthy
-          expect(export.headers).to eq Export::AVERY_HEADERS
           VCR.use_cassette("organization_export_worker-avery") do
+            expect(bike_not_avery.reload.current_ownership.address_record.street).to be_blank
+            expect(bike_for_avery_og.reload.current_ownership.address_record.street).to be_present
+            bike.reload
+            expect(bike_sticker.claimed?).to be_falsey
+            export.update(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
+            expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
+            expect(Export.with_bike_sticker_code(bike_sticker).pluck(:id)).to eq([])
+            expect(export.avery_export?).to be_truthy
+            expect(export.headers).to eq Export::AVERY_HEADERS
+
             expect(bike_for_avery.registration_address_source).to eq "initial_creation"
             bike_for_avery.update(updated_at: Time.current)
             expect(bike_for_avery.reload.avery_exportable?).to be_truthy
@@ -117,12 +120,13 @@ RSpec.describe OrganizationExportJob, type: :job do
             bike_for_avery
             instance.perform(export.id)
             # Check this in here so the vcr geocoder records at the correct place
-            expect(bike_not_avery.registration_address["street"].present?).to be_falsey
+            expect(bike_not_avery.reload.registration_address["street"].present?).to be_falsey
+            expect(bike_not_avery.avery_exportable?).to be_falsey
           end
+
           export.reload
           expect(export.progress).to eq "finished"
-          # pp export.rows
-          # expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
+          expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
           # NOTE: This header needs to stay exactly the same or the avery export will break
           expect(export.written_headers).to eq(%w[owner_name address city state zipcode assigned_sticker])
