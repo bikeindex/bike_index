@@ -830,7 +830,7 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
-    elsif current_ownership&.address_hash.present?
+    elsif current_ownership&.address_record.present?
       "initial_creation"
     end
   end
