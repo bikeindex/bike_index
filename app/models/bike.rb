@@ -397,6 +397,14 @@ class Bike < ApplicationRecord
     Backfills::AddressRecordsForBikesJob.build_or_create_for(self, country_id:)
   end
 
+  def latitude_public
+    latitude.blank? ? nil : latitude.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
+  def longitude_public
+    longitude.blank? ? nil : longitude.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
   # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
   def cleaned_error_messages
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
