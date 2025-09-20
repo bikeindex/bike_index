@@ -12,13 +12,10 @@ FileUtils.mkdir_p(assets_path)
 css_files = Dir.glob(File.join(assets_path, "*.css"))
 
 if css_files.empty?
-  puts "Compiling CSS assets before tests..."
+  puts "Compiling assets before tests..."
 
-  # Compile dartsass quietly
-  system("bundle exec rails dartsass:build 2>/dev/null")
-
-  # Compile tailwind CSS quietly
-  system("bundle exec rails tailwindcss:build 2>/dev/null")
+  # Use Rails asset precompilation which handles all CSS builds
+  system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
 
   puts "Assets compiled successfully"
 end
