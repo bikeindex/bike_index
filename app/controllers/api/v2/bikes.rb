@@ -110,7 +110,7 @@ module API
             if %w[abandoned impounded unregistered_parking_notification].include?(state)
               "impounded"
             elsif StolenRecord.recovered.where(bike_id: bike.id)
-                .where("recovered_at > ?", Time.current - 1.year).limit(1).present?
+                .where("recovered_at > ?", 1.year.ago).limit(1).present?
               "recovered"
             else
               # NOTE: I believe this doesn't fully cover phone number registrations,

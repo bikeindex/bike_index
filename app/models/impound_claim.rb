@@ -49,7 +49,7 @@ class ImpoundClaim < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :notifications, as: :notifiable
 
-  validates_presence_of :impound_record_id, :user_id
+  validates :impound_record_id, :user_id, presence: true
 
   before_validation :set_calculated_attributes
   after_commit :send_triggered_notifications

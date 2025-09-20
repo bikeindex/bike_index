@@ -137,7 +137,7 @@ RSpec.describe BikeVersionCreatorJob, type: :job do
     end
   end
   context "with public_images" do
-    let(:large_image) { File.open(Rails.root.join("spec", "fixtures", "hugeimg.png")) }
+    let(:large_image) { File.open(Rails.root.join("spec/fixtures/hugeimg.png")) }
     let!(:public_image) { FactoryBot.create(:public_image, image: large_image, imageable: bike) }
     it "copies them" do
       bike.reload

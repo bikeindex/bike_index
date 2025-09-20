@@ -88,7 +88,7 @@ class TheftAlert < ApplicationRecord
     end
 
     def update_end_buffer
-      Time.current - 2.days
+      2.days.ago
     end
 
     def flatten_city(counted)
@@ -170,7 +170,7 @@ class TheftAlert < ApplicationRecord
     return false unless facebook_updateable?
     return false if end_at < self.class.update_end_buffer
 
-    facebook_updated_at.blank? || facebook_updated_at < Time.current - 3.hours
+    facebook_updated_at.blank? || facebook_updated_at < 3.hours.ago
   end
 
   # literally CAN NOT activate
@@ -294,7 +294,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def start_at_with_fallback
-    start_at.present? ? start_at : Time.current
+    start_at.presence || Time.current
   end
 
   # Default to 3 days, because something

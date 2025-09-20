@@ -103,7 +103,7 @@ RSpec.describe AdminHelper, type: :helper do
     end
     context "member" do
       let(:membership) { FactoryBot.create(:membership, start_at: 1.year.ago, end_at:) }
-      let(:end_at) { Time.current + 1.day }
+      let(:end_at) { 1.day.from_now }
       let(:user) { membership.user }
       let(:target) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Member\">M</span></span>" }
       let(:target_full_text) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Member\">M</span><span class=\"less-strong\">ember</span></span>" }
@@ -115,7 +115,7 @@ RSpec.describe AdminHelper, type: :helper do
         expect(user_icon(user, full_text: true)).to eq target_full_text
       end
       context "membership ended" do
-        let(:end_at) { Time.current - 1.hour }
+        let(:end_at) { 1.hour.ago }
         it "doesn't return member" do
           expect(membership.reload.status).to eq "ended"
           expect(user_icon_hash(user)).to eq({tags: []})

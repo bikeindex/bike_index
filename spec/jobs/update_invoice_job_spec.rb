@@ -11,9 +11,9 @@ RSpec.describe UpdateInvoiceJob, type: :job do
 
   describe "perform" do
     let(:invoice_active) { FactoryBot.create(:invoice_paid) }
-    let(:invoice_active_updated_at) { Time.current - 1.day }
+    let(:invoice_active_updated_at) { 1.day.ago }
     let(:organization1) { invoice_active.organization }
-    let(:invoice_expired) { FactoryBot.create(:invoice_paid, start_at: Time.current - 2.weeks) }
+    let(:invoice_expired) { FactoryBot.create(:invoice_paid, start_at: 2.weeks.ago) }
     let(:organization2) { invoice_expired.organization }
     let(:invoice_to_activate) { FactoryBot.create(:invoice_paid, start_at: Time.current + 0.2) }
     let(:organization3) { invoice_to_activate.organization }
@@ -29,7 +29,7 @@ RSpec.describe UpdateInvoiceJob, type: :job do
       expect(organization1.paid?).to be_truthy
       expect(organization1.current_invoices.first.paid_in_full?).to be_truthy
       # Manually make invoice expired
-      invoice_expired.update_column :subscription_end_at, Time.current - 1.day
+      invoice_expired.update_column :subscription_end_at, 1.day.ago
       invoice_expired.reload
       expect(invoice_expired.should_expire?).to be_truthy
       expect(invoice_expired.active?).to be_truthy

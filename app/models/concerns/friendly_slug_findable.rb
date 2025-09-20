@@ -19,8 +19,8 @@ module FriendlySlugFindable
   end
 
   included do
-    validates_presence_of :name
-    validates_uniqueness_of :name, :slug
+    validates :name, presence: true
+    validates :name, :slug, uniqueness: true
 
     before_create :set_slug
   end

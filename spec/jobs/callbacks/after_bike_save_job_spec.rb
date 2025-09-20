@@ -44,8 +44,8 @@ RSpec.describe Callbacks::AfterBikeSaveJob, type: :job do
       let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
 
       it "updates the marketplace_listing updated_at" do
-        marketplace_listing.update_column :updated_at, Time.current - 1.hour
-        expect(marketplace_listing.reload.updated_at).to be < Time.current - 50.minutes
+        marketplace_listing.update_column :updated_at, 1.hour.ago
+        expect(marketplace_listing.reload.updated_at).to be < 50.minutes.ago
         instance.perform(bike.id)
         expect(marketplace_listing.reload.updated_at).to be_within(1).of Time.current
       end

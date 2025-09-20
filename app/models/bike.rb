@@ -162,13 +162,13 @@ class Bike < ApplicationRecord
   accepts_nested_attributes_for :components, allow_destroy: true
   accepts_nested_attributes_for :current_marketplace_listing
 
-  validates_presence_of :serial_number
-  validates_presence_of :propulsion_type
-  validates_presence_of :cycle_type
-  validates_presence_of :creator, on: :create
-  validates_presence_of :manufacturer_id
+  validates :serial_number, presence: true
+  validates :propulsion_type, presence: true
+  validates :cycle_type, presence: true
+  validates :creator, presence: {on: :create}
+  validates :manufacturer_id, presence: true
 
-  validates_presence_of :primary_frame_color_id
+  validates :primary_frame_color_id, presence: true
 
   attr_accessor :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
     :image, :image_cache, :b_param_id, :embeded, :embeded_extended, :paint_name,
@@ -660,7 +660,7 @@ class Bike < ApplicationRecord
     new_stolen_record = stolen_records
       .build({country_id: new_country_id, phone: phone, current: true}.merge(new_attrs))
     new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
-    if created_at.blank? || created_at > Time.current - 1.day
+    if created_at.blank? || created_at > 1.day.ago
       new_stolen_record.creation_organization_id = creation_organization_id
     end
     self.status ||= "status_stolen"
@@ -709,7 +709,7 @@ class Bike < ApplicationRecord
     organization = Organization.friendly_find(organization_id)
     return organization.id if organization.present?
 
-    not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike])
+    not_found = I18n.t("activerecord.errors.models.bike.not_found")
     errors.add(:organizations, "#{organization_id} #{not_found}")
     nil
   end

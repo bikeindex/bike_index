@@ -103,7 +103,7 @@ class Membership < ApplicationRecord
   private
 
   def calculated_status
-    if start_at.blank? || start_at > Time.current + 1.minute
+    if start_at.blank? || start_at > 1.minute.from_now
       "pending"
     elsif period_active?
       "active"

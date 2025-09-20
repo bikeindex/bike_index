@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe LogSearcher::Reader do
-  let(:log_path) { Rails.root.join("spec", "fixtures", "example_log.log") }
+  let(:log_path) { Rails.root.join("spec/fixtures/example_log.log") }
   let(:redis) { Redis.new }
 
   describe "SEARCHES_MATCHES" do

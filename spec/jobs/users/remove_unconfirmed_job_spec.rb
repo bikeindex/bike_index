@@ -12,8 +12,8 @@ RSpec.describe Users::RemoveUnconfirmedJob, type: :job do
 
   describe "perform" do
     context "with unconfirmed users" do
-      let!(:confirmed_old) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week) }
-      let!(:unconfirmed_old) { FactoryBot.create(:user, created_at: Time.current - 1.week) }
+      let!(:confirmed_old) { FactoryBot.create(:user_confirmed, created_at: 1.week.ago) }
+      let!(:unconfirmed_old) { FactoryBot.create(:user, created_at: 1.week.ago) }
       let!(:unconfirmed) { FactoryBot.create(:user) }
       it "removes old unconfirmed" do
         expect(instance.unconfirmed_users_to_remove.pluck(:id)).to eq([unconfirmed_old.id])
@@ -26,9 +26,9 @@ RSpec.describe Users::RemoveUnconfirmedJob, type: :job do
     end
 
     context "with banned_email_domain_users" do
-      let!(:user) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "something@zzz.example.com") }
-      let!(:user_not_domain) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "other@example.org") }
-      let!(:user_pending_domain) { FactoryBot.create(:user_confirmed, created_at: Time.current - 1.week, email: "other@stuff.stuff.com") }
+      let!(:user) { FactoryBot.create(:user_confirmed, created_at: 1.week.ago, email: "something@zzz.example.com") }
+      let!(:user_not_domain) { FactoryBot.create(:user_confirmed, created_at: 1.week.ago, email: "other@example.org") }
+      let!(:user_pending_domain) { FactoryBot.create(:user_confirmed, created_at: 1.week.ago, email: "other@stuff.stuff.com") }
       let(:creator) { FactoryBot.create(:superuser) }
       let!(:email_domain_banned) { FactoryBot.create(:email_domain, status: "banned", domain: "example.com", creator:) }
       let!(:email_domain_pending) { FactoryBot.create(:email_domain, status: "provisional_ban", domain: "stuff.com", creator:) }

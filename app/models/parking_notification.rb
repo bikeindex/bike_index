@@ -68,7 +68,7 @@ class ParkingNotification < ActiveRecord::Base
 
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
 
-  validates_presence_of :bike_id, :user_id
+  validates :bike_id, :user_id, presence: true
   validate :location_present, on: :create
 
   before_validation :set_calculated_attributes

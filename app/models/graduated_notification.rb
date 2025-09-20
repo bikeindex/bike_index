@@ -46,7 +46,7 @@ class GraduatedNotification < ApplicationRecord
 
   has_many :secondary_notifications, class_name: "GraduatedNotification", foreign_key: :primary_notification_id
 
-  validates_presence_of :bike_id, :organization_id, :bike_organization_id
+  validates :bike_id, :organization_id, :bike_organization_id, presence: true
 
   before_validation :set_calculated_attributes
   after_commit :update_associated_notifications, if: :persisted?

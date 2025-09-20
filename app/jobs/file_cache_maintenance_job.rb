@@ -29,7 +29,7 @@ class FileCacheMaintenanceJob < ScheduledJob
   end
 
   def tmp_path
-    File.join(Rails.root, filename)
+    Rails.root.join(filename).to_s
   end
 
   def write_stolen
@@ -43,7 +43,7 @@ class FileCacheMaintenanceJob < ScheduledJob
   end
 
   def expired_file_hashes
-    expiration = (Time.current - 2.days).to_i
+    expiration = 2.days.ago.to_i
     FileCacheMaintainer.files.select do |file|
       file["updated_at"].to_i < expiration
     end

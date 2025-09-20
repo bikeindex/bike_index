@@ -39,7 +39,7 @@ class ModelAudit < ApplicationRecord
   has_many :model_attestations
   has_many :organization_model_audits, dependent: :destroy
 
-  validates_uniqueness_of :frame_model, scope: %i[manufacturer_id manufacturer_other], allow_nil: false, case_sensitive: false
+  validates :frame_model, uniqueness: {scope: %i[manufacturer_id manufacturer_other], allow_nil: false, case_sensitive: false}
 
   before_validation :set_calculated_attributes
 

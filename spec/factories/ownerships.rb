@@ -11,7 +11,7 @@ FactoryBot.define do
       claimed { true }
       user { creator } # Reduce the number of things added to the database
       owner_email { user.email }
-      claimed_at { Time.current - 1.hour }
+      claimed_at { 1.hour.ago }
     end
     factory :ownership_claimed, traits: [:claimed]
   end

@@ -121,7 +121,7 @@ RSpec.describe TheftAlert, type: :model do
     let(:theft_alert) do
       FactoryBot.create(:theft_alert, status: "pending", facebook_data: {activating_at:})
     end
-    let(:activating_at) { (Time.current - 6.minutes).to_i }
+    let(:activating_at) { 6.minutes.ago.to_i }
     let(:start_at) { nil }
     it "is falsey" do
       expect(theft_alert.reload.start_at).to be_nil
@@ -129,14 +129,14 @@ RSpec.describe TheftAlert, type: :model do
       expect(TheftAlert.activating.pluck(:id)).to eq([theft_alert.id])
       expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([theft_alert.id])
 
-      theft_alert.update(start_at: Time.current, end_at: Time.current + 1.day, status: "active")
+      theft_alert.update(start_at: Time.current, end_at: 1.day.from_now, status: "active")
       expect(theft_alert.reload.start_at).to be_present
       expect(theft_alert.failed_to_activate?).to be_falsey
       expect(TheftAlert.activating.pluck(:id)).to eq([])
       expect(TheftAlert.failed_to_activate.pluck(:id)).to eq([])
     end
     context "start_at more recently" do
-      let(:activating_at) { (Time.current - 2.minutes).to_i }
+      let(:activating_at) { 2.minutes.ago.to_i }
 
       it "is falsey" do
         expect(theft_alert.reload.failed_to_activate?).to be_falsey
@@ -170,19 +170,19 @@ RSpec.describe TheftAlert, type: :model do
       expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([])
     end
     context "campaign_id" do
-      let(:end_at) { Time.current - 1.hour }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {campaign_id: "cxcxc"}, start_at: Time.current - 1.week, end_at: end_at) }
+      let(:end_at) { 1.hour.ago }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, facebook_data: {campaign_id: "cxcxc"}, start_at: 1.week.ago, end_at: end_at) }
       it "is truthy" do
         expect(theft_alert.reload.facebook_updateable?).to be_truthy
         expect(theft_alert.live?).to be_falsey
         expect(theft_alert.should_update_facebook?).to be_truthy
         expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([theft_alert.id])
-        theft_alert.update(facebook_updated_at: Time.current - 1.hour)
+        theft_alert.update(facebook_updated_at: 1.hour.ago)
         expect(theft_alert.reload.should_update_facebook?).to be_falsey
         expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([theft_alert.id])
       end
       context "really ended" do
-        let(:end_at) { Time.current - 3.days }
+        let(:end_at) { 3.days.ago }
         it "is falsey" do
           expect(theft_alert.live?).to be_falsey
           expect(theft_alert.should_update_facebook?).to be_falsey

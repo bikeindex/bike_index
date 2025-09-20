@@ -17,7 +17,7 @@ Rails.application.configure do
 
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
-  if Rails.root.join("tmp", "caching-dev.txt").exist?
+  if Rails.root.join("tmp/caching-dev.txt").exist?
     config.action_controller.perform_caching = true
     config.cache_store = :redis_cache_store, {url: config.redis_cache_url}
 
@@ -41,7 +41,7 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default_url_options = {host: "localhost", port: 3042}
   routes.default_url_options = config.action_mailer.default_url_options
-  if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
+  if Rails.root.join("tmp/skip-letter_opener.txt").exist?
     config.action_mailer.perform_deliveries = false
     config.action_mailer.delivery_method = :smtp
   else
@@ -85,7 +85,7 @@ Rails.application.configure do
   # Lograge is what we use in production, it makes requests create one log line, rather than the multitude created by default
   # Useful to turn off primarily to monitor caching
   # Run rails dev:lograge to toggle lograge. It's enabled by default
-  unless Rails.root.join("tmp", "non-lograge-dev.txt").exist?
+  unless Rails.root.join("tmp/non-lograge-dev.txt").exist?
     config.lograge.enabled = true
     config.log_level = :debug
     config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format

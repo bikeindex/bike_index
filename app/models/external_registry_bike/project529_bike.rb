@@ -50,8 +50,8 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
   class << self
     def updated_since_date
       [
-        maximum(:external_updated_at) || Time.current - 3.years,
-        Time.current - 1.day
+        maximum(:external_updated_at) || 3.years.ago,
+        1.day.ago
       ].min
     end
 

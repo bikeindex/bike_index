@@ -49,8 +49,8 @@ class BParam < ApplicationRecord
   scope :top_level_motorized, -> { bike_params.where("(params -> 'propulsion_type_motorized') IS NOT NULL") }
 
   after_initialize :ensure_valid_params
-  before_create :generate_id_token
   before_save :clean_params
+  before_create :generate_id_token
 
   class << self
     def motorized
@@ -110,7 +110,7 @@ class BParam < ApplicationRecord
 
     # Because organization embed bikes might not match the creator
     def with_organization_or_no_creator(toke)
-      without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
+      without_bike.where("created_at >= ?", 1.month.ago).where(id_token: toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
     end
 

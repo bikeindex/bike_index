@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe UserPhone, type: :model do
   describe "find_confirmation_code" do
     let!(:user_phone1) { FactoryBot.create(:user_phone, confirmation_code: "2929292") }
-    let!(:user_phone2) { FactoryBot.create(:user_phone, phone: "1112223333", confirmation_code: "2929292", updated_at: Time.current - 3.hours) }
+    let!(:user_phone2) { FactoryBot.create(:user_phone, phone: "1112223333", confirmation_code: "2929292", updated_at: 3.hours.ago) }
     let!(:user_phone3) { FactoryBot.create(:user_phone, phone: "1112223333", confirmation_code: "2929291") }
     it "finds only confirmation codes in past 30 minutes" do
       expect(user_phone1).to be_valid # Ensure working factory
@@ -89,7 +89,7 @@ RSpec.describe UserPhone, type: :model do
       expect(notification.twilio_sid).to be_present
 
       # But, if updated more than 2 minutes ago, send another
-      user_phone.update_column :updated_at, Time.current - 5.minutes
+      user_phone.update_column :updated_at, 5.minutes.ago
       expect(user_phone.resend_confirmation?).to be_truthy
       VCR.use_cassette("user_phone-add_phone_for_user_id_again", match_requests_on: [:path]) do
         Sidekiq::Testing.inline! { UserPhone.add_phone_for_user_id(user.id, phone) }

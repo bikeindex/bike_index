@@ -105,7 +105,7 @@ class StolenRecord < ApplicationRecord
   has_one_attached :image_square, dependent: false
   has_one_attached :image_opengraph, dependent: false
 
-  validates_presence_of :date_stolen
+  validates :date_stolen, presence: true
 
   enum :recovery_display_status, RECOVERY_DISPLAY_STATUS_ENUM
 
@@ -117,7 +117,7 @@ class StolenRecord < ApplicationRecord
   scope :unapproved, -> { where(approved: false).joins(:bike).where.not(bikes: {id: nil}) } # Make sure bike isn't deleted
   scope :approveds, -> { where(approved: true) }
   scope :current_and_not, -> { unscoped } # might exclude certain things in the future. Also feels better than calling unscoped everywhere
-  scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
+  scope :approveds_with_reports, -> { approveds.where.not(police_report_number: nil).where.not(police_report_department: nil) }
   scope :not_tsved, -> { where("tsved_at IS NULL") }
   scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'") }
   scope :not_spam, -> { left_joins(:bike).where.not(bikes: {likely_spam: true}) }
@@ -128,7 +128,7 @@ class StolenRecord < ApplicationRecord
   scope :with_theft_alerts_paid_or_admin, -> { joins(:theft_alerts).merge(TheftAlert.paid_or_admin).distinct(true) }
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
-  scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
+  scope :without_recovery_display, -> { where.missing(:recovery_display) }
   scope :without_location, -> { without_street } # References geocodeable without_street, we need to reconcile this
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
@@ -182,12 +182,12 @@ class StolenRecord < ApplicationRecord
     def corrected_date_stolen(date = nil)
       date = TimeParser.parse(date) || Time.current
       year = date.year
-      if year < (Time.current - 100.years).year
+      if year < 100.years.ago.year
         decade = year.to_s[-2..].chars.join("")
         corrected = date.change(year: "20#{decade}".to_i)
         date = corrected
       end
-      if date > Time.current + 2.days
+      if date > 2.days.from_now
         corrected = date.change(year: Time.current.year - 1)
         date = corrected
       end

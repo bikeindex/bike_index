@@ -11,8 +11,8 @@ RSpec.describe CleanBulkImportJob, type: :job do
 
   describe "perform" do
     let!(:bulk_import1) { FactoryBot.create(:bulk_import_ascend) }
-    let!(:bulk_import2) { FactoryBot.create(:bulk_import, created_at: Time.current - 3.days) }
-    let!(:bulk_import3) { FactoryBot.create(:bulk_import_ascend, created_at: Time.current - 3.days) }
+    let!(:bulk_import2) { FactoryBot.create(:bulk_import, created_at: 3.days.ago) }
+    let!(:bulk_import3) { FactoryBot.create(:bulk_import_ascend, created_at: 3.days.ago) }
     it "schedules all the workers" do
       Sidekiq::Job.clear_all
       expect {

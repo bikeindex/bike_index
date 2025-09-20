@@ -144,7 +144,7 @@ RSpec.describe StolenRecord, type: :model do
     end
     it "scopes approveds_with_reports" do
       expect(StolenRecord.approveds_with_reports.to_sql).to eq(StolenRecord.unscoped.where(current: true).where(approved: true)
-                                                              .where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL").to_sql)
+                                                              .where.not(police_report_number: nil).where.not(police_report_department: nil).to_sql)
     end
 
     it "scopes not_tsved" do
@@ -299,36 +299,36 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
     context "date next year" do
-      let(:date) { Time.current + 2.months }
+      let(:date) { 2.months.from_now }
       it "it sets the year to last year" do
         expect(result.to_date).to eq((date - 1.year).to_date)
       end
     end
     context "timestamp" do
-      let(:date) { (Time.current - 1.hour).to_i }
+      let(:date) { 1.hour.ago.to_i }
       it "it sets the year to last year" do
-        expect(result).to be_within(1).of(Time.current - 1.hour)
+        expect(result).to be_within(1).of(1.hour.ago)
       end
     end
   end
 
   describe "update_tsved_at" do
     it "does not reset on save" do
-      t = Time.current - 1.minute
+      t = 1.minute.ago
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update(theft_description: "Something new description wise")
       stolen_record.reload
       expect(stolen_record.tsved_at.to_i).to eq(t.to_i)
     end
     it "resets from an update to police report" do
-      t = Time.current - 1.minute
+      t = 1.minute.ago
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update(police_report_number: "89dasf89dasf")
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
     end
     it "resets from an update to police report department" do
-      t = Time.current - 1.minute
+      t = 1.minute.ago
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update(police_report_department: "CPD")
       stolen_record.reload

@@ -14,8 +14,8 @@
 class RearGearType < ApplicationRecord
   include FriendlySlugFindable
 
-  validates_presence_of :name, :count
-  validates_uniqueness_of :name
+  validates :name, :count, presence: true
+  validates :name, uniqueness: true
   has_many :bikes
 
   scope :standard, -> { where(standard: true) }

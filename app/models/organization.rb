@@ -124,11 +124,11 @@ class Organization < ApplicationRecord
   enum :pos_kind, POS_KIND_ENUM
   enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
 
-  validates_presence_of :name
-  validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
+  validates :name, presence: true
+  validates :short_name, uniqueness: {case_sensitive: false, message: I18n.t("activerecord.errors.organization.duplicate_short_name")}
   validates_with OrganizationNameValidator
-  validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
-  validates_uniqueness_of :manufacturer_id, allow_blank: true
+  validates :slug, uniqueness: {message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"}
+  validates :manufacturer_id, uniqueness: {allow_blank: true}
 
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
@@ -361,7 +361,7 @@ class Organization < ApplicationRecord
   end
 
   def fetch_impound_configuration
-    impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
+    impound_configuration.presence || ImpoundConfiguration.create(organization_id: id)
   end
 
   def hot_sheet_on?
@@ -542,7 +542,7 @@ class Organization < ApplicationRecord
     new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
-      orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
+      orgs = id.present? ? Organization.unscoped.where.not(id: id) : Organization.unscoped.all
       # Force update the deleted short_names and slugs
       orgs.deleted.where.not("short_name ILIKE ?", "%-deleted")
         .each { |o| o.update_columns(short_name: "#{o.short_name}-deleted", slug: "#{o.slug}-deleted") }

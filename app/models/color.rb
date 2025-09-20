@@ -24,8 +24,8 @@ class Color < ApplicationRecord
   default_scope { order(:name) }
   scope :commonness, -> { order("priority ASC, name ASC") }
 
-  validates_presence_of :name, :priority
-  validates_uniqueness_of :name
+  validates :name, :priority, presence: true
+  validates :name, uniqueness: true
 
   def self.black
     where(name: "Black", priority: 1, display: "#000").first_or_create

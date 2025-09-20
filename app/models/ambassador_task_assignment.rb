@@ -33,8 +33,8 @@ class AmbassadorTaskAssignment < ApplicationRecord
 
   scope :completed, -> { where.not(completed_at: nil) }
   scope :incomplete, -> { where(completed_at: nil) }
-  scope :pending_completion, -> { incomplete.or(where("completed_at > ?", Time.current - 2.hours)) }
-  scope :locked_completed, -> { completed.where("completed_at < ?", Time.current - 2.hours) }
+  scope :pending_completion, -> { incomplete.or(where("completed_at > ?", 2.hours.ago)) }
+  scope :locked_completed, -> { completed.where("completed_at < ?", 2.hours.ago) }
   scope :task_ordered, -> { order(ambassador_task_id: :asc) }
 
   after_commit :update_associated_user

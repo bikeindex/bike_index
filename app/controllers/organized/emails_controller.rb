@@ -78,7 +78,7 @@ module Organized
       bike = current_organization.bikes.status_stolen.last
       if bike.blank?
         bike = default_bike
-        bike.current_stolen_record = StolenRecord.new(date_stolen: Time.current - 1.day)
+        bike.current_stolen_record = StolenRecord.new(date_stolen: 1.day.ago)
       end
       if OrganizationStolenMessage.for(current_organization).is_enabled
         bike.current_stolen_record.organization_stolen_message = OrganizationStolenMessage.for(current_organization)
@@ -176,7 +176,7 @@ module Organized
         @parking_notification = parking_notifications.build(bike: default_bike,
           kind: @kind,
           user: current_user,
-          created_at: Time.current - 1.hour)
+          created_at: 1.hour.ago)
         @parking_notification.set_location_from_organization
       end
       @bike = @parking_notification.bike || default_bike

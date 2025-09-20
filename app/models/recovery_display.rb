@@ -17,7 +17,7 @@
 #  index_recovery_displays_on_stolen_record_id  (stolen_record_id)
 #
 class RecoveryDisplay < ActiveRecord::Base
-  validates_presence_of :quote, :recovered_at
+  validates :quote, :recovered_at, presence: true
   mount_uploader :image, CircularImageUploader
   process_in_background :image, CarrierWaveProcessJob
   attr_writer :image_cache
@@ -62,7 +62,7 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def image_processing?
-    return false unless image.present? && updated_at > Time.current - 1.minute
+    return false unless image.present? && updated_at > 1.minute.ago
 
     !image_exists?
   end

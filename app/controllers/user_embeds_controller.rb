@@ -8,7 +8,7 @@ class UserEmbedsController < ApplicationController
     bikes = user.bikes if user.present?
     unless user&.show_bikes? && bikes.present?
       @text = "Most Recent Indexed Bikes"
-      bikes = Bike.where("thumb_path IS NOT NULL").limit(5)
+      bikes = Bike.where.not(thumb_path: nil).limit(5)
     end
     @bikes = bikes
   end

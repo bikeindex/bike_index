@@ -74,8 +74,8 @@ class LoggedSearch < AnalyticsRecord
   enum :endpoint, ENDPOINT_ENUM
   enum :stolenness, STOLENNESS_ENUM, prefix: :stolenness
 
-  validates_presence_of :log_line, :request_at
-  validates_uniqueness_of :request_id, allow_nil: false
+  validates :log_line, :request_at, presence: true
+  validates :request_id, uniqueness: {allow_nil: false}
 
   scope :organized, -> { where(endpoint: organized_endpoints) }
   scope :serial, -> { where.not(serial_normalized: nil) }

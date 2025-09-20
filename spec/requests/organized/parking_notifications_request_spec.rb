@@ -5,7 +5,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   include_context :request_spec_logged_in_as_organization_user
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-  let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 3.hours) }
+  let(:bike) { FactoryBot.create(:bike, created_at: 3.hours.ago) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
 
   describe "index" do
@@ -29,7 +29,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           FactoryBot.create(:parking_notification_organized,
             organization: current_organization,
             bike: bike,
-            created_at: Time.current - 1.hour,
+            created_at: 1.hour.ago,
             impound_record: impound_record)
         end
         let(:target) do
@@ -211,8 +211,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
       context "with photo" do
         # Bike claimed for this
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
-        let(:file) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: 3.hours.ago) }
+        let(:file) { File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s) }
         let(:parking_notification_and_photo_params) { parking_notification_params.merge(image: Rack::Test::UploadedFile.new(file)) }
         let(:organization_user) { FactoryBot.create(:organization_user, organization: current_organization) }
         it "creates and adds photo" do
@@ -255,7 +255,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
       context "manual address and repeat" do
         let(:state) { FactoryBot.create(:state_california) }
-        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly_notification") }
+        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: 1.year.ago, state: state, kind: "parked_incorrectly_notification") }
         let(:parking_notification_params) do
           {
             kind: "impound_notification",

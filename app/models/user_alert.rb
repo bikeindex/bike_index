@@ -57,7 +57,7 @@ class UserAlert < ApplicationRecord
   scope :with_notification, -> { joins(:notification).where.not(notifications: {id: nil}) }
   scope :create_notification, -> {
     where(kind: notification_kinds, updated_at: notify_period)
-      .left_joins(:notification).where(notifications: {id: nil})
+      .where.missing(:notification)
   }
 
   def self.kinds
@@ -95,7 +95,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.notify_period
-    (Time.current - 2.weeks)..(Time.current - 1.hour)
+    (2.weeks.ago)..(1.hour.ago)
   end
 
   def self.placement(kind)

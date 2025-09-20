@@ -75,7 +75,7 @@ FactoryBot.define do
       with_ownership
       transient do
         user { FactoryBot.create(:user) }
-        claimed_at { Time.current - 1.day }
+        claimed_at { 1.day.ago }
         claimed { true }
       end
       creator { user }

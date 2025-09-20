@@ -5,11 +5,11 @@ RSpec.describe Users::CreateOrUpdateMembershipFromPaymentJob, type: :job do
 
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:amount_cents) { 999 }
-  let(:payment) { FactoryBot.create(:payment, amount_cents:, user:, paid_at: Time.current - 1.day) }
+  let(:payment) { FactoryBot.create(:payment, amount_cents:, user:, paid_at: 1.day.ago) }
   let(:creator_id) { FactoryBot.create(:superuser).id }
 
   let(:new_attrs) do
-    {user_id: user.id, start_at: Time.current, end_at: Time.current + 3.month,
+    {user_id: user.id, start_at: Time.current, end_at: 3.month.from_now,
      creator_id:, level: "basic", status: "active"}
   end
   it "creates a membership" do
@@ -46,14 +46,14 @@ RSpec.describe Users::CreateOrUpdateMembershipFromPaymentJob, type: :job do
       expect(payment.reload.membership_id).to be_present
       expect(payment.kind).to eq "donation" # Doesn't update payment kind
 
-      expect(payment.membership).to match_hash_indifferently new_attrs.merge(level: "patron", end_at: Time.current + 1.year)
+      expect(payment.membership).to match_hash_indifferently new_attrs.merge(level: "patron", end_at: 1.year.from_now)
     end
   end
 
   context "when user already has a membership" do
     let!(:membership) { FactoryBot.create(:membership, start_at:, end_at:, level: "plus", user_id: user.id) }
-    let(:start_at) { Time.current - 1.month }
-    let(:end_at) { Time.current + 2.months }
+    let(:start_at) { 1.month.ago }
+    let(:end_at) { 2.months.from_now }
     let(:new_end_at) { end_at + 3.months }
     let(:updated_attrs) do
       {user_id: user.id, start_at:, end_at: end_at + 3.months,
@@ -74,7 +74,7 @@ RSpec.describe Users::CreateOrUpdateMembershipFromPaymentJob, type: :job do
     end
 
     context "when the membership ended" do
-      let(:end_at) { Time.current - 1.day }
+      let(:end_at) { 1.day.ago }
       it "creates a new membership from today" do
         expect(membership.reload.creator_id).to_not eq creator_id
         expect(membership.status).to eq "ended"

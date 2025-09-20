@@ -59,13 +59,13 @@ RSpec.describe UserAlert, type: :model do
     end
     context "stolen bike without location" do
       let(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location) }
-      let(:bike_updated_at) { Time.current - 2.hours }
+      let(:bike_updated_at) { 2.hours.ago }
       before do
-        user_alert.update_column :updated_at, Time.current - 2.hours
+        user_alert.update_column :updated_at, 2.hours.ago
         user_alert&.bike&.update_column :updated_at, bike_updated_at
       end
       it "is truthy if not updated" do
-        expect(user_alert.reload.updated_at).to be < Time.current - 119.minutes
+        expect(user_alert.reload.updated_at).to be < 119.minutes.ago
         expect(user_alert.create_notification?).to be_truthy
         expect(UserAlert.create_notification.pluck(:id)).to eq([user_alert.id])
         user_alert.update(updated_at: Time.current)
@@ -73,13 +73,13 @@ RSpec.describe UserAlert, type: :model do
         expect(UserAlert.create_notification.pluck(:id)).to eq([])
       end
       context "bike updated after" do
-        let(:bike_updated_at) { Time.current - 50.minutes }
+        let(:bike_updated_at) { 50.minutes.ago }
         it "is false" do
           expect(user_alert.reload.create_notification?).to be_falsey
         end
       end
       context "bike updated before" do
-        let(:bike_updated_at) { Time.current - 1.month }
+        let(:bike_updated_at) { 1.month.ago }
         it "is false" do
           expect(user_alert.reload.create_notification?).to be_falsey
         end

@@ -1,4 +1,4 @@
-if Rails.env != "test"
+if !Rails.env.test?
   require "rack-mini-profiler"
   require "flamegraph"
 

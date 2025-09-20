@@ -131,7 +131,7 @@ class CredibilityScorer
     badges += [:user_has_bike_recovered] if user.recovered_records.limit(1).present?
     badges += [:user_sent_in_bike_tip] if Feedback.where(user_id: user.id).stolen_tip.any?
     badges += [:user_supporter] if user.payments.any?
-    badges += [:long_time_user] if user.created_at < Time.current - 2.years
+    badges += [:long_time_user] if user.created_at < 2.years.ago
     badges += [:user_connected_to_strava] if user.integrations.strava.any?
     badges += [:user_verified_phone] if user.phone_confirmed?
     # Don't mark suspicious if we trust them
@@ -162,9 +162,9 @@ class CredibilityScorer
   #
 
   def self.creation_age_badge(obj)
-    return :long_time_registration if obj.created_at < Time.current - 1.year
+    return :long_time_registration if obj.created_at < 1.year.ago
 
-    (obj.created_at > Time.current - 1.month) ? :created_this_month : nil
+    (obj.created_at > 1.month.ago) ? :created_this_month : nil
   end
 
   def self.suspiscious_handle?(str)

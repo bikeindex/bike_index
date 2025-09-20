@@ -21,7 +21,7 @@ class UserPhone < ApplicationRecord
   belongs_to :user
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  validates_presence_of :user_id
+  validates :user_id, presence: true
   validates :phone, presence: true, uniqueness: {scope: :user_id}
 
   before_validation :set_calculated_attributes
@@ -32,7 +32,7 @@ class UserPhone < ApplicationRecord
   scope :waiting_confirmation, -> { unconfirmed.where("updated_at > ?", confirmation_timeout).where.not(confirmation_code: "legacy_migration") }
 
   def self.confirmation_timeout
-    Time.current - 1.hour
+    1.hour.ago
   end
 
   def self.code_display(str)
@@ -75,7 +75,7 @@ class UserPhone < ApplicationRecord
   def resend_confirmation?
     return true if legacy?
 
-    unconfirmed? && updated_at < Time.current - 2.minutes
+    unconfirmed? && updated_at < 2.minutes.ago
   end
 
   def resend_confirmation_if_reasonable!

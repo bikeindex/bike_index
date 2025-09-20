@@ -152,7 +152,7 @@ RSpec.describe TimeParser, type: :service do
     end
 
     context "time" do
-      let(:time) { Time.current - 55.minutes }
+      let(:time) { 55.minutes.ago }
 
       it "returns the time" do
         expect(subject.parse(time)).to be_within(1).of time
@@ -202,7 +202,7 @@ RSpec.describe TimeParser, type: :service do
 
     context "with time_zone" do
       let(:time_zone) { "Central Time (US & Canada)" }
-      let(:time) { (Time.current - 5.minutes).in_time_zone(time_zone) }
+      let(:time) { 5.minutes.ago.in_time_zone(time_zone) }
       it "returns with time_zone" do
         expect(subject.parse(time)).to eq time
         parsed_time = subject.parse(time)

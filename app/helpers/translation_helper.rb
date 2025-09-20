@@ -2,7 +2,7 @@ module TranslationHelper
   def theft_alert_plan_title(plan)
     duration = [
       plan.duration_days,
-      t(:days, scope: [:theft_alert_plans, :theft_alert_plan]).downcase
+      t("theft_alert_plans.theft_alert_plan.days").downcase
     ].join(" ")
 
     "#{plan.name} (#{duration})"

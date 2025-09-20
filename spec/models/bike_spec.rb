@@ -189,19 +189,19 @@ RSpec.describe Bike, type: :model do
         stolen_record = bike.build_new_stolen_record
         expect(stolen_record.country_id).to eq us_id
         expect(stolen_record.phone).to be_blank
-        expect(stolen_record.date_stolen).to be > Time.current - 1.second
+        expect(stolen_record.date_stolen).to be > 1.second.ago
         expect(stolen_record.creation_organization_id).to eq organization.id
       end
       context "older record" do
         let(:country) { FactoryBot.create(:country) }
         it "builds new record without creation_organization" do
-          bike.update(created_at: Time.current - 2.days)
+          bike.update(created_at: 2.days.ago)
           allow(bike).to receive(:phone) { "1112223333" }
           # Accepts properties
           stolen_record = bike.build_new_stolen_record(country_id: country.id)
           expect(stolen_record.country_id).to eq country.id
           expect(stolen_record.phone).to eq "1112223333"
-          expect(stolen_record.date_stolen).to be > Time.current - 1.second
+          expect(stolen_record.date_stolen).to be > 1.second.ago
           expect(stolen_record.creation_organization_id).to be_blank
         end
       end
@@ -213,7 +213,7 @@ RSpec.describe Bike, type: :model do
       it "builds a new record" do
         impound_record = bike.build_new_impound_record
         expect(impound_record.country_id).to eq us_id
-        expect(impound_record.impounded_at).to be > Time.current - 1.second
+        expect(impound_record.impounded_at).to be > 1.second.ago
         expect(impound_record.organization_id).to be_blank
       end
       context "organized record" do
@@ -221,11 +221,11 @@ RSpec.describe Bike, type: :model do
         let(:organization) { bike.creation_organization }
         let(:country) { FactoryBot.create(:country) }
         it "builds new record without organization" do
-          bike.update(created_at: Time.current - 2.days)
+          bike.update(created_at: 2.days.ago)
           # Accepts properties
           impound_record = bike.build_new_impound_record(country_id: country.id)
           expect(impound_record.country_id).to eq country.id
-          expect(impound_record.impounded_at).to be > Time.current - 1.second
+          expect(impound_record.impounded_at).to be > 1.second.ago
           expect(impound_record.organization_id).to be_blank
         end
       end
@@ -1602,17 +1602,17 @@ RSpec.describe Bike, type: :model do
     it "is the current stolen record date stolen * 1000" do
       allow(bike).to receive(:status).and_return("status_stolen")
       stolen_record = StolenRecord.new
-      yesterday = Time.current - 1.days
+      yesterday = 1.days.ago
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
       allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      expect(bike.calculated_listing_order).to be_within(1).of((Time.current - 1.day).to_i)
+      expect(bike.calculated_listing_order).to be_within(1).of(1.day.ago.to_i)
     end
 
     it "is the updated_at" do
-      last_week = Time.current - 7.days
+      last_week = 7.days.ago
       bike.updated_at = last_week
       allow(bike).to receive(:stock_photo_url).and_return("https://some_photo.cum")
-      expect(bike.calculated_listing_order).to eq((Time.current - 1.week).to_i / 10000)
+      expect(bike.calculated_listing_order).to eq(1.week.ago.to_i / 10000)
     end
 
     context "stolen_record date" do

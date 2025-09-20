@@ -41,7 +41,7 @@ RSpec.describe Organized::BaseController, type: :request do
 
   describe "/dashboard" do
     include_context :request_spec_logged_in_as_organization_user
-    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: current_organization, created_at: Time.current - 2.days) }
+    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: current_organization, created_at: 2.days.ago) }
     # Test the different organizations that have overview_dashboard? truthy
     context "organization with regional_bike_counts" do
       let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["regional_bike_counts"]) }
@@ -70,12 +70,12 @@ RSpec.describe Organized::BaseController, type: :request do
       end
     end
     context "organization with claimed_ownerships" do
-      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["claimed_ownerships"], created_at: Time.current - 2.years) }
-      let(:claimed_at) { Time.current - 13.months }
-      let!(:bike_claimed) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: current_organization, claimed_at: claimed_at, created_at: Time.current - 16.months) }
+      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["claimed_ownerships"], created_at: 2.years.ago) }
+      let(:claimed_at) { 13.months.ago }
+      let!(:bike_claimed) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: current_organization, claimed_at: claimed_at, created_at: 16.months.ago) }
       it "renders" do
         bike_claimed.reload
-        expect(bike_claimed.created_at).to be_within(5).of Time.current - 16.months
+        expect(bike_claimed.created_at).to be_within(5).of 16.months.ago
         expect(bike_claimed.current_ownership.claimed_at).to be_within(5).of claimed_at
         current_organization.reload
         expect(current_organization.overview_dashboard?).to be_truthy
@@ -85,14 +85,14 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(assigns(:bikes_in_organizations).pluck(:id)).to eq([bike.id])
         expect(assigns(:claimed_ownerships).pluck(:id)).to eq([])
 
-        get "/o/#{current_organization.to_param}/dashboard?period=custom&start_time=#{Time.current - 2.years}&end_time=#{Time.current - 1.year}"
+        get "/o/#{current_organization.to_param}/dashboard?period=custom&start_time=#{2.years.ago}&end_time=#{1.year.ago}"
         expect(response).to render_template(:child_and_regional)
         expect(assigns(:period)).to eq "custom"
         expect(assigns(:bikes_in_organizations).pluck(:id)).to eq([bike_claimed.id])
         expect(assigns(:claimed_ownerships).pluck(:id)).to eq([bike_claimed.current_ownership.id])
 
         # 14months - current
-        get "/o/#{current_organization.to_param}/dashboard?period=custom&start_time=#{Time.current - 14.months}"
+        get "/o/#{current_organization.to_param}/dashboard?period=custom&start_time=#{14.months.ago}"
         expect(response).to render_template(:child_and_regional)
         expect(assigns(:period)).to eq "custom"
         expect(assigns(:bikes_in_organizations).pluck(:id)).to eq([bike.id])

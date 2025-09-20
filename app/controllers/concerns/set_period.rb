@@ -44,7 +44,7 @@ module SetPeriod
 
     case @period
     when "hour"
-      @start_time = Time.current - 1.hour
+      @start_time = 1.hour.ago
     when "day"
       @start_time = Time.current.beginning_of_day - 1.day
     when "month"
@@ -80,7 +80,7 @@ module SetPeriod
     return nil if current_organization.blank?
 
     start_time = current_organization.created_at - 6.months
-    start_time = Time.current - 1.year if start_time > (Time.current - 1.year)
+    start_time = 1.year.ago if start_time > 1.year.ago
     start_time
   end
 

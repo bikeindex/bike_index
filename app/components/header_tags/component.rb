@@ -84,7 +84,7 @@ module HeaderTags
         "image" => page_image,
         "url" => @page_url,
         "headline" => @page_title,
-        "alternativeHeadline" => (@secondary_title.present? ? @secondary_title : @page_description)
+        "alternativeHeadline" => @secondary_title.presence || @page_description
       }.merge(@published_at.present? ? {"datePublished" => @published_at} : {})
         .merge(@updated_at.present? ? {"dateModified" => @updated_at} : {})
     end

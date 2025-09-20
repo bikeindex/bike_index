@@ -63,7 +63,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
 
   context "with an email with periods in different places" do
     let!(:user_prior) { FactoryBot.create(:user, email: "someth.i.ng@g.mail.com", created_at:) }
-    let(:created_at) { Time.current - 12.hours }
+    let(:created_at) { 12.hours.ago }
     let!(:user) { FactoryBot.create(:user, email: "something@g.mail.com") }
 
     it "creates a ban and doesn't notify" do
@@ -82,7 +82,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
     end
 
     context "before period" do
-      let(:created_at) { Time.current - 14.days }
+      let(:created_at) { 14.days.ago }
       it "creates the user and sends the email" do
         expect(User.unscoped.count).to eq 2
         expect do
@@ -121,7 +121,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
   end
 
   context "with an email with +" do
-    let(:created_at) { Time.current - 12.hours }
+    let(:created_at) { 12.hours.ago }
     let!(:user_prior) { FactoryBot.create(:user, email: "some@g.mail.com", created_at:) }
     let!(:user) { FactoryBot.create(:user, email: "some+thing@g.mail.com") }
 
@@ -141,7 +141,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
     end
     context "with bikeindex.org domain" do
       let!(:user_prior) { FactoryBot.create(:user, email: "some+thing@bikeindex.org", created_at:) }
-      let(:created_at) { Time.current - 12.hours }
+      let(:created_at) { 12.hours.ago }
       let!(:user) { FactoryBot.create(:user, email: "some@bikeindex.org") }
       it "creates" do
         expect(User.unscoped.count).to eq 2
@@ -156,7 +156,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
     end
 
     context "before period" do
-      let(:created_at) { Time.current - 14.days }
+      let(:created_at) { 14.days.ago }
       it "creates the user and sends the email" do
         expect(User.unscoped.count).to eq 2
         expect do
@@ -225,7 +225,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
       let(:user) { FactoryBot.create(:user) }
       let!(:notification) { FactoryBot.create(:notification, kind: "confirmation_email", user: user, created_at: created_at, delivery_status: delivery_status) }
       let(:delivery_status) { "delivery_success" }
-      let(:created_at) { Time.current - 30.seconds }
+      let(:created_at) { 30.seconds.ago }
       it "doesn't resend" do
         ActionMailer::Base.deliveries = []
         expect {
@@ -234,7 +234,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       end
       context "sent 1:10 seconds ago" do
-        let(:created_at) { Time.current - 70.seconds }
+        let(:created_at) { 70.seconds.ago }
         it "resends" do
           ActionMailer::Base.deliveries = []
           expect {

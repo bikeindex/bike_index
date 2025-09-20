@@ -11,12 +11,12 @@ RSpec.describe EmailBan, type: :model do
       expect(user.reload.email_banned?).to be_truthy
       expect(email_ban.reason_humanized).to eq "domain"
       # It doesn't let the same thing be created for the same user
-      expect(FactoryBot.build(:email_ban, user:, reason: :email_domain, start_at: Time.current - 1.hour))
+      expect(FactoryBot.build(:email_ban, user:, reason: :email_domain, start_at: 1.hour.ago))
         .to_not be_valid
       expect(FactoryBot.build(:email_ban, user:, reason: :email_duplicate)).to be_valid
     end
     context "end_at before now" do
-      let(:end_at) { Time.current - 1.hour }
+      let(:end_at) { 1.hour.ago }
       it "is not email_banned" do
         expect(email_ban).to be_valid
         expect(user.reload.email_banned?).to be_falsey

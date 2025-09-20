@@ -14,7 +14,7 @@ class Cgroup < ApplicationRecord
   # Note: Cgroup is short for component_group
   include FriendlySlugFindable
 
-  validates_presence_of :name, :priority
+  validates :name, :priority, presence: true
 
   has_many :ctypes
 

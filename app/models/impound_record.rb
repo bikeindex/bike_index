@@ -49,8 +49,8 @@ class ImpoundRecord < ApplicationRecord
   has_many :impound_record_updates
   has_many :impound_claims
 
-  validates_presence_of :user_id
-  validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
+  validates :user_id, presence: true
+  validates :bike_id, uniqueness: {if: :current?, conditions: -> { current }}
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
@@ -311,7 +311,7 @@ class ImpoundRecord < ApplicationRecord
     if impound_record_updates.where.not(user_id: nil).any?
       impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
     else
-      user_id.present? ? user_id : organization.auto_user&.id
+      user_id.presence || organization.auto_user&.id
     end
   end
 
@@ -322,7 +322,7 @@ class ImpoundRecord < ApplicationRecord
 
     if id.blank?
       return true if bike.present? && bike.created_at.blank?
-      return true if b_created_at > Time.current - 1.hour
+      return true if b_created_at > 1.hour.ago
     end
     bike&.current_ownership&.status == "status_impounded" &&
       (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)

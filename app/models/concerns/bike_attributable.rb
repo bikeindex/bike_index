@@ -201,7 +201,7 @@ module BikeAttributable
 
   def image_url(size = nil)
     if thumb_path.blank?
-      return stock_photo_url.present? ? stock_photo_url : nil
+      return stock_photo_url.presence
     end
 
     image_col = public_images.limit(1).first&.image

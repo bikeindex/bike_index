@@ -62,7 +62,7 @@ class ApplicationController < ActionController::Base
   end
 
   def permitted_org_bike_search_params
-    @stolenness ||= params["stolenness"].present? ? params["stolenness"] : "all"
+    @stolenness ||= params["stolenness"].presence || "all"
     params.permit(*Bike.permitted_search_params).merge(stolenness: @stolenness)
       .to_h # Use to_h here to prevent unpermitted params logs over and over
   end

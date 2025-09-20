@@ -20,7 +20,7 @@ class HotSheet < ApplicationRecord
 
   has_one :hot_sheet_configuration, through: :organization
 
-  validates_presence_of :organization_id, :sheet_date
+  validates :organization_id, :sheet_date, presence: true
 
   scope :email_success, -> { where(delivery_status: "email_success") }
 

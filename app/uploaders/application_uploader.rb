@@ -34,6 +34,6 @@ class ApplicationUploader < CarrierWave::Uploader::Base
   end
 
   def cache_dir
-    Rails.root.join("tmp", "cache")
+    Rails.root.join("tmp/cache")
   end
 end

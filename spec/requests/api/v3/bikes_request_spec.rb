@@ -169,7 +169,7 @@ RSpec.describe "Bikes API V3", type: :request do
             state: "stolen"
           }
         end
-        let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, date_stolen: Time.current - 1.year) }
+        let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, date_stolen: 1.year.ago) }
         before { bike.update(updated_at: Time.current) }
         it "returns target" do
           expect(bike.reload.status).to eq "status_stolen"
@@ -180,12 +180,12 @@ RSpec.describe "Bikes API V3", type: :request do
         context "recovered" do
           let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "recovered", authorized_bike_id: nil} }
           it "returns target" do
-            stolen_record.add_recovery_information(recovered_at: Time.current - 1.week)
+            stolen_record.add_recovery_information(recovered_at: 1.week.ago)
             post check_if_registered_url, params: search_params.to_json, headers: json_headers
             expect(response.code).to eq("201")
             expect(json_result).to match_hash_indifferently target_result
             # if recovery is more than a year ago, it goes back to being `with_user`
-            stolen_record.update(recovered_at: Time.current - 2.years)
+            stolen_record.update(recovered_at: 2.years.ago)
             post check_if_registered_url, params: search_params.to_json, headers: json_headers
             expect(response.code).to eq("201")
             expect(json_result).to match_hash_indifferently target_result.merge(state: "with_user")
@@ -1475,7 +1475,7 @@ RSpec.describe "Bikes API V3", type: :request do
     let!(:token) { create_doorkeeper_token(scopes: "read_user write_bikes") }
     it "doesn't post an image to a bike if the bike isn't owned by the user" do
       bike = FactoryBot.create(:ownership).bike
-      file = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
+      file = File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
       post url, params: {file: Rack::Test::UploadedFile.new(file)}
@@ -1486,7 +1486,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
     it "errors on non permitted file extensions" do
       bike = FactoryBot.create(:ownership, creator_id: user.id).bike
-      file = File.open(File.join(Rails.root, "spec", "spec_helper.rb"))
+      file = File.open(Rails.root.join("spec/spec_helper.rb").to_s)
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
       post url, params: {file: Rack::Test::UploadedFile.new(file)}
@@ -1497,7 +1497,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
     it "posts an image" do
       bike = FactoryBot.create(:ownership, creator_id: user.id).bike
-      file = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
+      file = File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
       post url, params: {file: Rack::Test::UploadedFile.new(file)}

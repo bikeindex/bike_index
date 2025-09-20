@@ -24,7 +24,7 @@ class HotSheetConfiguration < ApplicationRecord
 
   has_many :hot_sheets, through: :organization
 
-  validates_presence_of :organization_id, :send_seconds_past_midnight, :search_radius_miles
+  validates :organization_id, :send_seconds_past_midnight, :search_radius_miles, presence: true
   validate :ensure_location_if_on
 
   before_validation :set_calculated_attributes

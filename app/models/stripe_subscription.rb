@@ -30,7 +30,7 @@ class StripeSubscription < ApplicationRecord
   has_many :payments
   has_many :stripe_events, foreign_key: "stripe_subscription_stripe_id", primary_key: "stripe_id"
 
-  validates_uniqueness_of :stripe_id, allow_nil: true
+  validates :stripe_id, uniqueness: {allow_nil: true}
 
   before_validation :set_calculated_attributes
 

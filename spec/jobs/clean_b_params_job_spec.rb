@@ -16,7 +16,7 @@ RSpec.describe CleanBParamsJob, type: :job do
     let(:bike2) { FactoryBot.create(:bike) }
     let!(:b_param3) { FactoryBot.create(:b_param, created_bike_id: bike2.id) }
     it "schedules all the workers" do
-      b_param3.update_column :updated_at, Time.current - 1.week
+      b_param3.update_column :updated_at, 1.week.ago
       Sidekiq::Job.clear_all
       expect(BParam.count).to eq 3
       described_class.new.perform

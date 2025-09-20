@@ -53,7 +53,7 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
       end
     end
     context "with a photo" do
-      let(:file) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
+      let(:file) { File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s) }
       let(:valid_attrs) do
         {
           quote: "I recovered my bike!",

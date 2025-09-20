@@ -18,8 +18,8 @@ class IntegrationAssociationError < StandardError
 end
 
 class Integration < ApplicationRecord
-  validates_presence_of :access_token
-  validates_presence_of :information
+  validates :access_token, presence: true
+  validates :information, presence: true
 
   serialize :information, coder: JSON
 

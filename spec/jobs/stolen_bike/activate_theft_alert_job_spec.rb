@@ -50,7 +50,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
       # end
 
       describe "failed to activate" do
-        let(:timestamp) { (Time.current - 10.minutes).to_i }
+        let(:timestamp) { 10.minutes.ago.to_i }
 
         it "doesn't update the activating_at time" do
           stolen_record.reload

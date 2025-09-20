@@ -113,7 +113,7 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
         end
       end
       context "uploading a document" do
-        let(:test_file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))) }
+        let(:test_file) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)) }
         it "creates a model_attestation" do
           expect(organization_model_audit.model_attestations.count).to eq 0
           expect(organization_model_audit.certification_status).to be_nil

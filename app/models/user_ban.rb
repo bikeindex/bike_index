@@ -31,7 +31,7 @@ class UserBan < ApplicationRecord
   belongs_to :user
   belongs_to :creator, class_name: "User"
 
-  validates_presence_of :reason, :user_id
+  validates :reason, :user_id, presence: true
 
   def self.reasons
     REASON_ENUM.keys.map(&:to_s)

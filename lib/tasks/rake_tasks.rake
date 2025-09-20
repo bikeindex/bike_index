@@ -10,7 +10,7 @@ end
 
 task read_logged_searches: :environment do
   LogSearcher::Reader.write_log_lines(Time.current)
-  LogSearcher::Reader.write_log_lines(Time.current - 1.hour)
+  LogSearcher::Reader.write_log_lines(1.hour.ago)
 end
 
 desc "Reset Autocomplete"

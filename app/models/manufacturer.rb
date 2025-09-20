@@ -34,10 +34,10 @@ class Manufacturer < ApplicationRecord
 
   mount_uploader :logo, ManufacturerLogoUploader
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
-  validates_uniqueness_of :slug
-  validates_uniqueness_of :secondary_slug, allow_nil: true
+  validates :name, presence: true
+  validates :name, uniqueness: true
+  validates :slug, uniqueness: true
+  validates :secondary_slug, uniqueness: {allow_nil: true}
   validate :ensure_non_blocking_name
 
   before_validation :set_calculated_attributes

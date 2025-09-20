@@ -39,9 +39,9 @@ class ModelAttestation < ApplicationRecord
   belongs_to :user
   belongs_to :organization
 
-  validates_presence_of :model_audit_id
-  validates_presence_of :kind
-  validates_presence_of :user_id
+  validates :model_audit_id, presence: true
+  validates :kind, presence: true
+  validates :user_id, presence: true
 
   mount_uploader :file, PdfUploader
 

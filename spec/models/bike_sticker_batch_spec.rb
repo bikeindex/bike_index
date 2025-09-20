@@ -15,8 +15,8 @@ RSpec.describe BikeStickerBatch, type: :model do
     let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch, prefix: "XD", code_number_length: nil, organization: organization) }
     let(:target_codes) { %w[XD9999 XD10000 XD10001] }
     it "create_codes works and derives last code" do
-      bike_sticker_batch.update_column :updated_at, Time.current - 1.hour
-      expect(bike_sticker_batch.updated_at).to be < Time.current - 50.minutes
+      bike_sticker_batch.update_column :updated_at, 1.hour.ago
+      expect(bike_sticker_batch.updated_at).to be < 50.minutes.ago
       expect(bike_sticker_batch.calculated_code_number_length).to eq 4
       expect(bike_sticker_batch.bike_stickers.count).to eq 0
       expect {

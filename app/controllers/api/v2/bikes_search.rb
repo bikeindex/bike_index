@@ -35,7 +35,7 @@ module API
           params[:proximity_radius] ||= 100
           return nil unless params[:proximity] == "ip"
 
-          if Rails.env == "production"
+          if Rails.env.production?
             params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(",")[0]
           end
         end

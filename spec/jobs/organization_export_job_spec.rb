@@ -25,7 +25,7 @@ RSpec.describe OrganizationExportJob, type: :job do
 
   def csv_line_to_hash(line_str, headers:)
     line = line_str.gsub(/\A"/, "").gsub(/"\z/, "").split('","')
-      .map { |v| v.blank? ? nil : v }
+      .map { |v| v.presence }
     headers.map(&:to_sym).zip(line).to_h
   end
 
@@ -159,7 +159,7 @@ RSpec.describe OrganizationExportJob, type: :job do
     end
     context "no bikes" do
       let(:csv_lines) { [export.headers] }
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, end_at: Time.current - 1.week) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, end_at: 1.week.ago) }
       it "finishes export" do
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         instance.perform(export.id)

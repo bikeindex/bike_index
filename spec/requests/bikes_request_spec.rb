@@ -224,7 +224,7 @@ RSpec.describe BikesController, type: :request do
       end
     end
     context "parking_notification" do
-      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: Time.current - 2.hours) }
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike, created_at: 2.hours.ago) }
       let(:creator) { parking_notification.user }
       it "retrieves the bike" do
         parking_notification.reload
@@ -299,7 +299,7 @@ RSpec.describe BikesController, type: :request do
         end
       end
       context "already retrieved" do
-        let(:retrieval_time) { Time.current - 2.minutes }
+        let(:retrieval_time) { 2.minutes.ago }
         it "has a flash saying so" do
           parking_notification.mark_retrieved!(retrieved_by_id: nil, retrieved_kind: "link_token_recovery", resolved_at: retrieval_time)
           parking_notification.reload

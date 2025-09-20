@@ -42,8 +42,8 @@ class EmailDomain < ApplicationRecord
 
   belongs_to :creator, class_name: "User"
 
-  validates_presence_of :domain
-  validates_uniqueness_of :domain
+  validates :domain, presence: true
+  validates :domain, uniqueness: true
   validate :domain_is_expected_format
   validate :domain_does_not_match_existing, on: :create
 

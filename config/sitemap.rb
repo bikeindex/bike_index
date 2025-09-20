@@ -2,7 +2,7 @@
 SitemapGenerator::Sitemap.default_host = "https://bikeindex.org"
 # Cloudflare also has a redirect for bikeindex.org/sitemaps/* -> files.bikeindex.org/sitemaps/$1
 SitemapGenerator::Sitemap.sitemaps_host = "https://files.bikeindex.org"
-SitemapGenerator::Sitemap.public_path = "#{Rails.root}/tmp/uploads"
+SitemapGenerator::Sitemap.public_path = "#{Rails.root.join("tmp/uploads")}"
 SitemapGenerator::Sitemap.sitemaps_path = "sitemaps/"
 SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
 

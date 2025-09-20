@@ -90,7 +90,7 @@ RSpec.describe GraduatedNotification, type: :model do
       end
     end
     context "marked_remaining" do
-      let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization, bike_created_at: Time.current - 1.year) }
+      let(:graduated_notification) { FactoryBot.create(:graduated_notification, :marked_remaining, organization: organization, bike_created_at: 1.year.ago) }
       it "is not bike_graduated" do
         graduated_notification.reload
         expect(graduated_notification.bike_graduated?).to be_falsey
@@ -134,9 +134,9 @@ RSpec.describe GraduatedNotification, type: :model do
 
   describe "bikes_to_notify" do
     let(:graduated_notification_interval) { 2.years }
-    let(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: Time.current - 5.years) }
-    let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization, created_at: Time.current - 3.years) }
-    let!(:bike3) { FactoryBot.create(:bike_organized, :with_stolen_record, created_at: Time.current - 5.years) }
+    let(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: 5.years.ago) }
+    let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization, created_at: 3.years.ago) }
+    let!(:bike3) { FactoryBot.create(:bike_organized, :with_stolen_record, created_at: 5.years.ago) }
     let!(:bike_organization1) { bike1.bike_organizations.where(organization_id: organization.id).first }
     let!(:bike_organization2) { bike2.bike_organizations.where(organization_id: organization.id).first }
     let!(:graduated_notification1) { FactoryBot.create(:graduated_notification, :marked_remaining, bike: bike1, organization: organization) }
@@ -163,8 +163,8 @@ RSpec.describe GraduatedNotification, type: :model do
 
   describe "calculated_primary_bike" do
     before do
-      bike2.current_ownership.update(created_at: Time.current - 6.months)
-      bike1.current_ownership.update(created_at: Time.current - 1.year)
+      bike2.current_ownership.update(created_at: 6.months.ago)
+      bike1.current_ownership.update(created_at: 1.year.ago)
     end
     context "user" do
       let(:user) { FactoryBot.create(:user) }
@@ -177,7 +177,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike1.id, bike2.id])
         expect(GraduatedNotification.count).to eq 0
         graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
-        graduated_notification2.update(created_at: Time.current - 1.day)
+        graduated_notification2.update(created_at: 1.day.ago)
         expect(GraduatedNotification.count).to eq 1
         expect(graduated_notification2.primary_notification?).to be_falsey
         expect(graduated_notification2.user_id).to eq user.id
@@ -188,7 +188,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.processable?).to be_falsey
         expect(graduated_notification2.in_pending_period?).to be_falsey
         graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-        graduated_notification1.update(created_at: Time.current - 1.day)
+        graduated_notification1.update(created_at: 1.day.ago)
         expect(GraduatedNotification.count).to eq 2
         graduated_notification1.reload
         expect(graduated_notification1.primary_notification?).to be_truthy
@@ -242,8 +242,8 @@ RSpec.describe GraduatedNotification, type: :model do
         let(:bike3) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "test@example.edu") }
         let(:bike4) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "test@example.edu") }
         before do
-          bike4.current_ownership.update(created_at: Time.current - 13.months)
-          bike3.current_ownership.update(created_at: Time.current - 14.months)
+          bike4.current_ownership.update(created_at: 13.months.ago)
+          bike3.current_ownership.update(created_at: 14.months.ago)
         end
         it "does not associate them" do
           expect(GraduatedNotification.bikes_to_notify_without_notifications(organization).pluck(:id)).to eq([bike3.id, bike4.id, bike1.id, bike2.id])
@@ -273,16 +273,16 @@ RSpec.describe GraduatedNotification, type: :model do
     end
     context "not user" do
       let(:email) { "stuff@example.com" }
-      let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: email, created_at: Time.current - 52.weeks) }
-      let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: email, created_at: Time.current - 50.weeks) }
+      let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: email, created_at: 52.weeks.ago) }
+      let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: email, created_at: 50.weeks.ago) }
       let(:marked_remaining_at) { bike2.created_at - 3.weeks }
       it "finds the primary bike, outside of the interval" do
         bike1.reload
-        expect(bike1.current_ownership.created_at).to be < Time.current - 51.weeks # Ensure factory sets ownership created_at
+        expect(bike1.current_ownership.created_at).to be < 51.weeks.ago # Ensure factory sets ownership created_at
         Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-        graduated_notification1.update(created_at: Time.current - 25.hours)
+        graduated_notification1.update(created_at: 25.hours.ago)
         expect(graduated_notification1.in_pending_period?).to be_falsey
         expect(graduated_notification1.processable?).to be_falsey
         expect(graduated_notification1.process_notification).to be_falsey
@@ -331,14 +331,14 @@ RSpec.describe GraduatedNotification, type: :model do
 
   # This overlaps with some of the above tests, but it's separate to ensure coverage
   describe "bike assigned after creation" do
-    let(:period_start) { Time.current - 8.days }
+    let(:period_start) { 8.days.ago }
     let(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, created_at: period_start, user: user, creation_organization: organization) }
     let(:user) { FactoryBot.create(:user) }
     let(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, created_at: period_start + 4.days, user: user, creation_organization: organization) }
     it "it is still primary notification" do
       expect(bike1.user&.id).to eq user.id
       graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-      graduated_notification1.update(created_at: Time.current - 1.day)
+      graduated_notification1.update(created_at: 1.day.ago)
       expect(graduated_notification1.primary_notification?).to be_truthy
       expect(graduated_notification1.processable?).to be_truthy
       graduated_notification1.process_notification
@@ -395,12 +395,12 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification1.bike_organization.id).to eq @bike_organization1_id
         expect(BikeOrganization.unscoped.find(@bike_organization1_id).deleted?).to be_truthy
         expect(bike.organizations.pluck(:id)).to eq([])
-        bike_organization_again = FactoryBot.create(:bike_organization, bike: bike, organization: organization, created_at: Time.current - 3.days)
+        bike_organization_again = FactoryBot.create(:bike_organization, bike: bike, organization: organization, created_at: 3.days.ago)
         expect(bike_organization_again.valid?).to be_truthy
         graduated_notification1.reload
         expect(graduated_notification1.bike_organization.id).to eq @bike_organization1_id
 
-        graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike, created_at: Time.current - 2.days)
+        graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike, created_at: 2.days.ago)
         expect(graduated_notification2.errors.full_messages).to eq([])
         graduated_notification2.process_notification
         expect(graduated_notification2.bike_organization.id).to eq bike_organization_again.id
@@ -529,7 +529,7 @@ RSpec.describe GraduatedNotification, type: :model do
       end
     end
     context "bike created inside of notification interval" do
-      let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, created_at: Time.current - 1.hour) }
+      let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, created_at: 1.hour.ago) }
       let(:interval_start) { Time.current - graduated_notification_interval }
       it "enqueues additional graduated_notification creation if they aren't there" do
         expect(bike1.created_at).to be < interval_start
@@ -538,7 +538,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(bike2.user&.id).to eq user.id
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike1.id])
         # Actually store the graduated notification in the database, ensure it's out of the pending period
-        graduated_notification1.update(created_at: Time.current - 2.days)
+        graduated_notification1.update(created_at: 2.days.ago)
         expect(graduated_notification1.in_pending_period?).to be_falsey
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([])
         Sidekiq::Job.clear_all
@@ -605,7 +605,7 @@ RSpec.describe GraduatedNotification, type: :model do
       expect(graduated_notification.reload.most_recent?).to be_falsey
     end
     context "non-primary" do
-      let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: bike.owner_email, created_at: Time.current - 2.years) }
+      let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: bike.owner_email, created_at: 2.years.ago) }
       let(:graduated_notification2) { FactoryBot.create(:graduated_notification, organization: organization, bike: bike2, created_at: graduated_notification.created_at + 1.day) }
       it "updates it too" do
         expect(graduated_notification.reload.most_recent?).to be_truthy
@@ -636,7 +636,7 @@ RSpec.describe GraduatedNotification, type: :model do
     end
     context "different org" do
       let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["graduated_notifications"], graduated_notification_interval: graduated_notification_interval) }
-      let!(:bike_organization2) { FactoryBot.create(:bike_organization, organization: organization2, bike: bike, created_at: Time.current - 1.year) }
+      let!(:bike_organization2) { FactoryBot.create(:bike_organization, organization: organization2, bike: bike, created_at: 1.year.ago) }
       it "doesn't match" do
         expect(graduated_notification.reload.most_recent?).to be_truthy
         expect(graduated_notification.status).to eq "marked_remaining"
@@ -671,7 +671,7 @@ RSpec.describe GraduatedNotification, type: :model do
 
         graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization)
         expect(graduated_notification2).to be_valid
-        graduated_notification2.update_attribute :created_at, Time.current - 25.hours # Pending period
+        graduated_notification2.update_attribute :created_at, 25.hours.ago # Pending period
         expect(graduated_notification2).to be_valid
         expect(graduated_notification2.user_id).to eq user2.id
         expect(graduated_notification2.email).to eq user2.email

@@ -27,7 +27,7 @@ module Messages::ThreadShow
         marketplace_listing: marketplace_listing,
         receiver: current_user,
         sender: other_user,
-        created_at: Time.current - 2.hours - 6.months
+        created_at: 2.hours.ago - 6.months
       }
     end
 

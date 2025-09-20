@@ -6,7 +6,7 @@ RSpec.describe UserEmail, type: :model do
       expect(UserEmail.confirmed.to_sql).to eq(UserEmail.where("confirmation_token IS NULL").to_sql)
     end
     it "unconfirmed scopes to only unconfirmed UserEmails" do
-      expect(UserEmail.unconfirmed.to_sql).to eq(UserEmail.where("confirmation_token IS NOT NULL").to_sql)
+      expect(UserEmail.unconfirmed.to_sql).to eq(UserEmail.where.not(confirmation_token: nil).to_sql)
     end
   end
 

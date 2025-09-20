@@ -6,13 +6,13 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
   before { ActionMailer::Base.deliveries = [] }
 
   describe "perform" do
-    let(:initial) { FactoryBot.create(:parking_notification_organized, created_at: Time.current - 4.days, kind: "appears_abandoned_notification") }
+    let(:initial) { FactoryBot.create(:parking_notification_organized, created_at: 4.days.ago, kind: "appears_abandoned_notification") }
     let(:bike) { initial.bike }
     let(:user) { initial.user }
     let(:organization) { initial.organization }
     let(:initial_record_id) { initial.id }
     let(:kind2) { "appears_abandoned_notification" }
-    let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, created_at: Time.current - 2.days, kind: kind2, initial_record_id: initial_record_id, delivery_status: "email_success") }
+    let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, created_at: 2.days.ago, kind: kind2, initial_record_id: initial_record_id, delivery_status: "email_success") }
     context "impound record" do
       let(:parking_notification3) { FactoryBot.build(:parking_notification, user: user, bike: bike, organization: organization, kind: "impound_notification", initial_record: initial) }
       it "updates the other parking_notifications, creates the impound record" do
@@ -122,7 +122,7 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
         expect(initial.internal_notes).to eq "something"
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
-          parking_notification2.mark_retrieved!(retrieved_kind: "link_token_recovery", resolved_at: Time.current - 5.minutes)
+          parking_notification2.mark_retrieved!(retrieved_kind: "link_token_recovery", resolved_at: 5.minutes.ago)
         end
         initial.reload
         parking_notification2.reload

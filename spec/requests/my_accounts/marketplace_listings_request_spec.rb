@@ -202,7 +202,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           expect(current_user.reload.can_create_listing?).to be_truthy
           expect(current_user.address_record_id).to be_present
           og_user_address_record_id = current_user.address_record_id
-          bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
+          bike.update(updated_at: Time.current, created_at: 1.day.ago)
 
           expect(bike.reload.primary_activity_id).to be_nil
           expect(bike.updated_by_user_at).to be_within(1).of bike.created_at

@@ -31,11 +31,11 @@ class PrimaryActivity < ApplicationRecord
   has_many :bikes
   has_many :bike_versions
 
-  validates_presence_of :name
+  validates :name, presence: true
   # NOTE: This class has something very similar to FriendlySlugFindable
   # But scopes the validation of uniqueness
-  validates_uniqueness_of :name, scope: [:primary_activity_family_id], allow_nil: false
-  validates_uniqueness_of :slug, scope: [:primary_activity_family_id], allow_nil: false
+  validates :name, uniqueness: {scope: [:primary_activity_family_id], allow_nil: false}
+  validates :slug, uniqueness: {scope: [:primary_activity_family_id], allow_nil: false}
 
   before_validation :set_calculated_attributes
   after_create :assign_family_id_if_self

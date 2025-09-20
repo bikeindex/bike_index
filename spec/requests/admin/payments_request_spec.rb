@@ -7,7 +7,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
   let(:organization) { FactoryBot.create(:organization) }
   let(:invoice) { FactoryBot.create(:invoice, organization: organization) }
   let(:user2) { FactoryBot.create(:user) }
-  let(:create_time) { Time.current - 2.weeks }
+  let(:create_time) { 2.weeks.ago }
   let(:params) do
     {
       organization_id: organization.id,
@@ -45,7 +45,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
 
   describe "update" do
     context "stripe payment" do
-      let(:og_time) { Time.current - 3.hours }
+      let(:og_time) { 3.hours.ago }
       let(:invoice) { FactoryBot.create(:invoice, organization: organization, updated_at: og_time) }
       it "updates available attributes" do
         expect(subject.invoice).to be_nil

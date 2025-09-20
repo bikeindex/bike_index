@@ -80,7 +80,7 @@ RSpec.describe Admin::GraphsController, type: :request do
         get "#{base_url}/variable", params: {search_kind: "recoveries", timezone: "America/Los_Angeles"}
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
-        expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
+        expect(assigns(:start_time)).to be_within(1.day).of(1.year.ago)
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
       end
       context "passed date and time" do
@@ -101,7 +101,7 @@ RSpec.describe Admin::GraphsController, type: :request do
         get "#{base_url}/variable", params: {search_kind: "bikes", timezone: "America/Los_Angeles"}
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
-        expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
+        expect(assigns(:start_time)).to be_within(1.day).of(1.year.ago)
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
         # And it gets the other kinds too
         get "#{base_url}/variable", params: {search_kind: "bikes", timezone: "America/Los_Angeles", bike_graph_kind: "origin"}

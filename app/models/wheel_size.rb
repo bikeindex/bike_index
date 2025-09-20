@@ -11,8 +11,8 @@
 #  updated_at  :datetime         not null
 #
 class WheelSize < ApplicationRecord
-  validates_presence_of :name, :priority, :description, :iso_bsd
-  validates_uniqueness_of :description, :iso_bsd
+  validates :name, :priority, :description, :iso_bsd, presence: true
+  validates :description, :iso_bsd, uniqueness: true
   has_many :bikes
 
   default_scope { order(:iso_bsd) }

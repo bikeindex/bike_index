@@ -39,9 +39,9 @@ class Blog < ApplicationRecord
   accepts_nested_attributes_for :listicles, allow_destroy: true
   accepts_nested_attributes_for :blog_content_tags, allow_destroy: true
 
-  validates_presence_of :title, :body, :user_id
-  validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
-  validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
+  validates :title, :body, :user_id, presence: true
+  validates :title, uniqueness: {message: "has already been taken. If you believe that this message is an error, contact us!"}
+  validates :title_slug, uniqueness: {message: "somehow that overlaps with another title! Sorrys."}
 
   before_save :set_calculated_attributes
   before_create :set_title_slug

@@ -33,7 +33,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       expect(response).to render_template(:new)
     end
     context "passed end_at" do
-      let(:end_at) { Time.current + 10.years }
+      let(:end_at) { 10.years.from_now }
       it "renders, includes end_at" do
         get "#{base_url}/new?end_at=#{end_at.to_i}"
         expect(response.status).to eq(200)
@@ -67,7 +67,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       expect(invoice.notes).to eq params[:notes]
     end
     context "with amount_do 0" do
-      let(:time) { (Time.current - 1.month).utc.to_s }
+      let(:time) { 1.month.ago.utc.to_s }
       it "makes the invoice active" do
         Sidekiq::Testing.inline! do
           invoice_params = params.merge(
@@ -137,7 +137,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       end
     end
     context "create_following_invoice" do
-      let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: Time.current - 2.years, force_active: true) }
+      let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: 2.years.ago, force_active: true) }
       it "creates following invoice" do
         invoice.organization_feature_ids = [organization_feature1.id, organization_feature2.id]
         invoice.update(child_enabled_feature_slugs: ["passwordless_users"])

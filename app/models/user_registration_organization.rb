@@ -25,7 +25,7 @@ class UserRegistrationOrganization < ApplicationRecord
   belongs_to :user
   belongs_to :organization
 
-  validates_presence_of :user_id, :organization_id
+  validates :user_id, :organization_id, presence: true
 
   before_validation :set_calculated_attributes
   after_commit :update_associations, if: :persisted?

@@ -70,7 +70,7 @@ RSpec.describe Admin::EmailDomainsController, type: :request do
     it "updates" do
       VCR.use_cassette("Email-Domain-Controller_mails") do
         email_domain.update(status_changed_at: 1.week.ago)
-        expect(email_domain.reload.status_changed_at).to be < Time.current - 1.day
+        expect(email_domain.reload.status_changed_at).to be < 1.day.ago
         expect(email_domain.status_changed_after_create?).to be_falsey
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{email_domain.id}", params: {

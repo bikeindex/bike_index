@@ -67,7 +67,7 @@ RSpec.describe UpdateModelAuditJob, type: :job do
     let!(:bike1) { FactoryBot.create(:bike, propulsion_type: "pedal-assist-and-throttle", frame_model: frame_model1, manufacturer: manufacturer) }
     let(:frame_model1) { "Party model" }
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
-    let(:bike2) { FactoryBot.create(:bike, manufacturer: manufacturer, frame_model: frame_model2, cycle_type: :cargo, model_audit_id: model_audit&.id, updated_at: Time.current - 10.minutes) }
+    let(:bike2) { FactoryBot.create(:bike, manufacturer: manufacturer, frame_model: frame_model2, cycle_type: :cargo, model_audit_id: model_audit&.id, updated_at: 10.minutes.ago) }
     let(:frame_model2) { "Party MODEL " }
     let!(:model_audit) { FactoryBot.create(:model_audit, frame_model: bike1.frame_model, manufacturer: manufacturer) }
     context "skipped env" do
@@ -96,7 +96,7 @@ RSpec.describe UpdateModelAuditJob, type: :job do
           instance.perform(model_audit.id)
         }.to change(ModelAudit, :count).by 0
         expect(described_class.jobs.count).to eq 0
-        expect(bike2.reload.updated_at).to be < (Time.current - 9.minutes)
+        expect(bike2.reload.updated_at).to be < 9.minutes.ago
       end
     end
     context "should_be_unknown_model?" do
@@ -122,7 +122,7 @@ RSpec.describe UpdateModelAuditJob, type: :job do
     end
     context "bike_organized organization" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:time) { Time.current - 1.day }
+      let(:time) { 1.day.ago }
       let!(:bike3) { FactoryBot.create(:bike_organized, created_at: time, creation_organization: organization, frame_model: "PARTY  model", manufacturer: manufacturer, propulsion_type: "throttle") }
       before { expect(bike2).to be_present }
       # factory organization_with_organization_features enqueues inline sidekiq processing, which runs this job. So handle it manually
@@ -139,7 +139,7 @@ RSpec.describe UpdateModelAuditJob, type: :job do
         }.to change(ModelAudit, :count).by 0
         expect(Bike.unscoped.where(model_audit_id: model_audit.id).count).to eq 3
         # bike2 shouldn't have been updated
-        expect(bike2.reload.updated_at).to be < (Time.current - 9.minutes)
+        expect(bike2.reload.updated_at).to be < 9.minutes.ago
         expect(bike1.reload.model_audit_id).to eq model_audit.id
         expect(model_audit.organization_model_audits.count).to eq 1
         organization_model_audit = model_audit.organization_model_audits.first

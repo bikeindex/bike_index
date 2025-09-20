@@ -98,7 +98,7 @@ RSpec.describe BikeServices::Updator do
       end
       it "does not pass organization" do
         expect(bike.reload.current_ownership.organization).to be_present
-        expect(bike.created_at).to be < Time.current - 1.hour
+        expect(bike.created_at).to be < 1.hour.ago
         expect(bike.not_updated_by_user?).to be_truthy
         expect(bike.updator_id).to be_blank
         expect(user.member_of?(organization)).to be_falsey
@@ -122,7 +122,7 @@ RSpec.describe BikeServices::Updator do
         it "creates a new ownership with status_with_owner" do
           ProcessImpoundUpdatesJob.new.perform(impound_record.id)
           expect(bike.reload.current_ownership.organization).to be_present
-          expect(bike.created_at).to be < Time.current - 1.hour
+          expect(bike.created_at).to be < 1.hour.ago
           expect(bike.not_updated_by_user?).to be_truthy
           expect(bike.updator_id).to be_blank
           expect(bike.status).to eq "status_impounded"

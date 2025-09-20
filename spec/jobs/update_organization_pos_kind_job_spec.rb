@@ -12,8 +12,8 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
   end
 
   describe "perform" do
-    let(:og_updated_at) { Time.current - 3.weeks }
-    let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", created_at: Time.current - 1.month, updated_at: og_updated_at) }
+    let(:og_updated_at) { 3.weeks.ago }
+    let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", created_at: 1.month.ago, updated_at: og_updated_at) }
     let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization) }
     it "schedules all the workers" do
       organization.reload
@@ -28,7 +28,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
       expect(organization.pos_kind).to eq "ascend_pos"
     end
     context "broken ascend" do
-      let(:time) { Time.current - 3.weeks }
+      let(:time) { 3.weeks.ago }
       before do
         pos_bike.bulk_import.update(created_at: time)
         organization.update_column :pos_kind, :ascend_pos
@@ -55,7 +55,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
           FactoryBot.create(:bulk_import_ascend,
             organization: organization,
             import_errors: {file: ["Invalid file extension, must be .csv or .tsv"]},
-            created_at: Time.current - 3.days)
+            created_at: 3.days.ago)
         end
         it "updates to broken" do
           expect(organization.reload.updated_at).to be_within(5).of og_updated_at
@@ -69,7 +69,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
         end
       end
       context "bike" do
-        let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization, created_at: Time.current - 1.month) }
+        let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization, created_at: 1.month.ago) }
         it "updates to broken" do
           expect(organization.reload.updated_at).to be_within(5).of og_updated_at
           pos_bike.reload
@@ -117,7 +117,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
       end
     end
     context "broken lightspeed" do
-      let!(:pos_bike) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: organization, created_at: Time.current - 1.month) }
+      let!(:pos_bike) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: organization, created_at: 1.month.ago) }
       it "updates to broken" do
         organization.reload
         pos_bike.reload
@@ -144,7 +144,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
         organization.reload
         expect(organization.pos_kind).to eq "lightspeed_pos"
         # And if bike is created before cut-of for pos kind, it returns broken
-        bike_pos.update_attribute :created_at, Time.current - 2.weeks
+        bike_pos.update_attribute :created_at, 2.weeks.ago
         expect(described_class.calculated_pos_kind(organization)).to eq "broken_lightspeed_pos"
       end
     end
@@ -205,7 +205,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
         organization_status1 = OrganizationStatus.order(:id).first
         expect(organization_status1.current?).to be_truthy
 
-        organization.update_attribute :created_at, Time.current - 2.weeks
+        organization.update_attribute :created_at, 2.weeks.ago
         organization.reload
         expect(described_class.calculated_pos_kind(organization)).to eq "does_not_need_pos"
 

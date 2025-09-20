@@ -10,7 +10,7 @@ RSpec.describe UserPhonesController, type: :request do
 
   it "redirects if user not present" do
     user_phone = FactoryBot.create(:user_phone)
-    user_phone.update_column :updated_at, Time.current - 5.minutes
+    user_phone.update_column :updated_at, 5.minutes.ago
     expect(user_phone.resend_confirmation?).to be_truthy
     expect {
       Sidekiq::Testing.inline! {
@@ -28,7 +28,7 @@ RSpec.describe UserPhonesController, type: :request do
     it "resends if reasonable and verifies" do
       Flipper.enable(:phone_verification)
       expect(current_user).to be_present
-      user_phone.update_column :updated_at, Time.current - 5.minutes
+      user_phone.update_column :updated_at, 5.minutes.ago
       user_phone.reload
       expect(user_phone.confirmed?).to be_falsey
       expect(user_phone.confirmation_code).to eq "6666666"
@@ -114,7 +114,7 @@ RSpec.describe UserPhonesController, type: :request do
       end
       context "outside of confirmation time" do
         it "does not confirm" do
-          user_phone.update_column :updated_at, Time.current - 5.hours
+          user_phone.update_column :updated_at, 5.hours.ago
           user_phone.reload
           expect(user_phone.confirmed?).to be_falsey
           Sidekiq::Job.clear_all
@@ -199,7 +199,7 @@ RSpec.describe UserPhonesController, type: :request do
         let(:user_phone) { FactoryBot.create(:user_phone_confirmed, user: current_user, phone: phone) }
         it "does not resend" do
           # Shouldn't actually effect #resend_confirmation?, but still...
-          user_phone.update_column :updated_at, Time.current - 5.minutes
+          user_phone.update_column :updated_at, 5.minutes.ago
           user_phone.reload
           expect(user_phone.confirmed?).to be_truthy
           Sidekiq::Job.clear_all
@@ -222,7 +222,7 @@ RSpec.describe UserPhonesController, type: :request do
       context "different users phone" do
         let(:user_phone) { FactoryBot.create(:user_phone, phone: phone) }
         it "does not resend" do
-          user_phone.update_column :updated_at, Time.current - 5.minutes
+          user_phone.update_column :updated_at, 5.minutes.ago
           user_phone.reload
           expect(user_phone.resend_confirmation?).to be_truthy
           Sidekiq::Job.clear_all

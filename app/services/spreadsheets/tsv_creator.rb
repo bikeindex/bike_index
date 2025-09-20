@@ -52,7 +52,7 @@ class Spreadsheets::TsvCreator
   def create_org_count(organization, start_date = nil)
     start_date ||= Time.current.beginning_of_year
     obikes = organization.bikes.where("bikes.created_at >= ?", start_date)
-    out_file = File.join(Rails.root, "#{@file_prefix}org_count_bikes.tsv")
+    out_file = Rails.root.join("#{@file_prefix}org_count_bikes.tsv").to_s
     output = File.open(out_file, "w")
     output.puts org_counts_header
     obikes.find_each { |b| output.puts org_count_row(b) }
@@ -71,7 +71,7 @@ class Spreadsheets::TsvCreator
   # end
 
   def create_manufacturer
-    out_file = File.join(Rails.root, "#{@file_prefix}manufacturers.tsv")
+    out_file = Rails.root.join("#{@file_prefix}manufacturers.tsv").to_s
     output = File.open(out_file, "w")
     output.puts manufacturers_header
     Manufacturer.all.find_each { |m| output.puts manufacturer_row(m) }

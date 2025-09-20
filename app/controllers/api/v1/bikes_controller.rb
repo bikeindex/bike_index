@@ -21,7 +21,7 @@ module API
 
       def index
         if params[:proximity] == "ip"
-          params[:proximity] = if Rails.env == "production"
+          params[:proximity] = if Rails.env.production?
             request.env["HTTP_X_FORWARDED_FOR"].split(",")[0]
           else
             request.remote_ip

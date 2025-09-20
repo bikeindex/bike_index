@@ -56,10 +56,10 @@ RSpec.describe Blog, type: :model do
   end
 
   describe "info published_at" do
-    let(:blog) { FactoryBot.create(:blog, published_at: Time.current - 2.days) }
+    let(:blog) { FactoryBot.create(:blog, published_at: 2.days.ago) }
     it "updates the published_at" do
       blog.update(updated_at: Time.current)
-      expect(blog.published_at).to be < Time.current - 1.day
+      expect(blog.published_at).to be < 1.day.ago
       blog.update(info_kind: true)
       expect(blog.published_at).to be_within(2).of Time.current
     end

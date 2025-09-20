@@ -251,7 +251,7 @@ RSpec.describe UsersController, type: :request do
       end
       context "older token" do
         it "updates token and sends" do
-          user.update_auth_token("token_for_password_reset", Time.current - 5.minutes)
+          user.update_auth_token("token_for_password_reset", 5.minutes.ago)
           og_token = user.token_for_password_reset
           expect(og_token).to be_present
           expect {
@@ -296,7 +296,7 @@ RSpec.describe UsersController, type: :request do
     end
     context "auth token expired" do
       it "redirects" do
-        user.update_auth_token("token_for_password_reset", Time.current - 121.minutes)
+        user.update_auth_token("token_for_password_reset", 121.minutes.ago)
         og_token = user.token_for_password_reset
         get "#{base_url}/update_password_form_with_reset_token", params: {token: user.token_for_password_reset}
         expect(response).to redirect_to request_password_reset_form_users_path
@@ -421,7 +421,7 @@ RSpec.describe UsersController, type: :request do
     end
     context "auth token expired" do
       it "redirects" do
-        user.update_auth_token("token_for_password_reset", Time.current - 3.hours)
+        user.update_auth_token("token_for_password_reset", 3.hours.ago)
         user.reload
         og_token = user.token_for_password_reset
         post "#{base_url}/update_password_with_reset_token", params: valid_params

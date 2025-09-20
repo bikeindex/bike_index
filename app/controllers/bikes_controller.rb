@@ -44,7 +44,7 @@ class BikesController < Bikes::BaseController
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
       pdf = render_to_string pdf: filename, template: "bikes/pdf"
-      save_path = "#{Rails.root}/tmp/#{filename}.pdf"
+      save_path = "#{Rails.root.join("tmp/#{filename}.pdf")}"
       File.open(save_path, "wb") do |file|
         file << pdf
       end
