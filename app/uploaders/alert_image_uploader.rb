@@ -29,17 +29,19 @@ class AlertImageUploader < ApplicationUploader
 
   def generate_landscape(variant)
     manipulate! do |img|
-      AlertImageGenerator
-        .new(stolen_record: stolen_record, bike_image: img)
-        .build_landscape(variant)
+      img =
+        AlertImageGenerator
+          .new(stolen_record: stolen_record, bike_image: img)
+          .build_landscape(variant)
     end
   end
 
   def generate_square
     manipulate! do |img|
-      AlertImageGenerator
-        .new(stolen_record: stolen_record, bike_image: img)
-        .build_square
+      img =
+        AlertImageGenerator
+          .new(stolen_record: stolen_record, bike_image: img)
+          .build_square
     end
   end
 end

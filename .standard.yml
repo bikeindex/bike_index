@@ -1,9 +1,11 @@
 parallel: true
-format: progress
+# format: progress
 
 ignore:
+  - "public/**/*"
   - "node_modules/**/*"
-  - app/models/single_sign_on.rb # Keep it the way it was originally
-
-# Layout/ParameterAlignment:
-#   EnforcedStyle: with_first_parameter
+  - "spec/vcr_cassettes/*"
+  - app/models/single_sign_on.rb
+  - app/uploaders/alert_image_uploader.rb
+  - app/uploaders/avatar_uploader.rb
+  - app/uploaders/manufacturer_logo_uploader.rb

@@ -13,7 +13,7 @@ class ManufacturerLogoUploader < ApplicationUploader
 
   def auto_orient
     manipulate! do |img|
-      img.auto_orient
+      img = img.auto_orient
     end
   end
 
