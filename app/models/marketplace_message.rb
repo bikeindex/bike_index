@@ -35,7 +35,7 @@ class MarketplaceMessage < ApplicationRecord
 
   has_many :notifications, as: :notifiable
 
-  validates :marketplace_listing_id, :sender_id, :receiver_id, :subject, :body, presence: true
+  validates_presence_of :marketplace_listing_id, :sender_id, :receiver_id, :subject, :body
   validate :users_match_initial_record, if: -> { buyer_seller_message? }
 
   before_validation :set_calculated_attributes
@@ -174,7 +174,7 @@ class MarketplaceMessage < ApplicationRecord
     raise "not passed a sender or receiver: #{user_or_id}" unless o_id.present?
 
     o_name = o_user&.marketplace_message_name ||
-      I18n.t("activerecord.errors.messages.user_removed")
+      I18n.t("user_removed", scope: %i[activerecord errors messages])
     [o_name, o_id]
   end
 
@@ -223,13 +223,14 @@ class MarketplaceMessage < ApplicationRecord
     return if initial_message? || sender_id.blank? || receiver_id.blank?
     return if initial_record.user_ids.sort == user_ids.sort
 
-    errors.add(:base, I18n.t("activerecord.errors.messages.user_not_in_initial_record"))
+    errors.add(:base, I18n.t("user_not_in_initial_record", scope: %i[activerecord errors messages]))
   end
 
   def set_calculated_attributes
     self.kind ||= (sender_id == seller_id) ? "sender_seller" : "sender_buyer"
     if reply_message?
-      self.subject = I18n.t("activerecord.errors.messages.re", original_subject: initial_record.subject)
+      self.subject = I18n.t("re", original_subject: initial_record.subject,
+        scope: %i[activerecord errors messages])
     end
     self.initial_record ||= self
     self.messages_prior_count ||= messages_prior.count

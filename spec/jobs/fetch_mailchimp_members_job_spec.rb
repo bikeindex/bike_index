@@ -40,7 +40,7 @@ RSpec.describe FetchMailchimpMembersJob, type: :job do
         }
       end
       let(:user) { FactoryBot.create(:user, email: "seth@bikeindex.org") }
-      let!(:mailchimp_datum) { MailchimpDatum.create(user: user, mailchimp_updated_at: 1.year.ago, data: {lists: ["organization"]}) }
+      let!(:mailchimp_datum) { MailchimpDatum.create(user: user, mailchimp_updated_at: Time.current - 1.year, data: {lists: ["organization"]}) }
       let(:mailchimp_updated_at) { TimeParser.parse("2021-06-11T20:11:41+00:00") }
       it "does not duplicate user" do
         expect(MailchimpDatum.count).to eq 1

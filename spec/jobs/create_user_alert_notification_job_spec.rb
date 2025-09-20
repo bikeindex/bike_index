@@ -7,8 +7,8 @@ RSpec.describe CreateUserAlertNotificationJob, type: :job do
 
   describe "perform" do
     before do
-      user_alert.update_column :updated_at, 2.hours.ago
-      bike&.update_column :updated_at, 2.hours.ago
+      user_alert.update_column :updated_at, Time.current - 2.hours
+      bike&.update_column :updated_at, Time.current - 2.hours
       user_alert.reload
     end
 

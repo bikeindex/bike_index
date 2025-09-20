@@ -45,7 +45,7 @@ RSpec.describe "BikesController#update", type: :request do
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
-      bike.update(updated_at: Time.current, created_at: 1.day.ago)
+      bike.update(updated_at: Time.current, created_at: Time.current - 1.day)
       bike.reload
       expect(bike.updated_by_user_at).to eq bike.created_at
       expect(bike.not_updated_by_user?).to be_truthy
@@ -157,7 +157,7 @@ RSpec.describe "BikesController#update", type: :request do
     end
     context "bike has location" do
       let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
-      let(:time) { 10.minutes.ago }
+      let(:time) { Time.current - 10.minutes }
       let(:phone) { "2221114444" }
       let(:current_user) { FactoryBot.create(:user_confirmed, phone: phone) }
       let(:ownership) { FactoryBot.create(:ownership, owner_email: current_user.email) }
@@ -358,7 +358,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone_for_police).to be_truthy
         ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
-        current_user.update_column :updated_at, 5.minutes.ago
+        current_user.update_column :updated_at, Time.current - 5.minutes
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           patch base_url, params: {

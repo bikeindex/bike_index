@@ -22,7 +22,7 @@ RSpec.describe HotSheet, type: :model do
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
     context "with two records" do
-      let!(:stolen_record2) { FactoryBot.create(:stolen_record, :in_nyc, date_stolen: 2.days.ago) }
+      let!(:stolen_record2) { FactoryBot.create(:stolen_record, :in_nyc, date_stolen: Time.current - 2.days) }
       before { expect(hot_sheet_configuration).to be_present }
       it "finds the stolen records, assigns" do
         hot_sheet.reload
@@ -31,7 +31,7 @@ RSpec.describe HotSheet, type: :model do
         expect(hot_sheet.stolen_record_ids).to eq([stolen_record.id, stolen_record2.id])
       end
       context "with stolen record recovered" do
-        let!(:stolen_record2) { FactoryBot.create(:stolen_record_recovered, date_stolen: 2.days.ago) }
+        let!(:stolen_record2) { FactoryBot.create(:stolen_record_recovered, date_stolen: Time.current - 2.days) }
         it "only returns if already stored" do
           expect(hot_sheet.fetch_stolen_records.pluck(:id)).to eq([stolen_record.id])
           hot_sheet.stolen_record_ids = [stolen_record.id, stolen_record2.id]
@@ -77,13 +77,13 @@ RSpec.describe HotSheet, type: :model do
   end
 
   describe "for" do
-    let!(:hot_sheet1) { FactoryBot.create(:hot_sheet, sheet_date: 2.days.ago) }
+    let!(:hot_sheet1) { FactoryBot.create(:hot_sheet, sheet_date: Time.current - 2.days) }
     let(:organization) { hot_sheet1.organization }
-    let!(:hot_sheet2) { FactoryBot.create(:hot_sheet, sheet_date: 1.day.ago, organization: organization) }
+    let!(:hot_sheet2) { FactoryBot.create(:hot_sheet, sheet_date: Time.current - 1.day, organization: organization) }
     let!(:hot_sheet3) { FactoryBot.create(:hot_sheet, sheet_date: Time.current.to_date, organization: organization) }
     it "finds for the day" do
-      expect(HotSheet.for(organization, 2.days.ago.to_date)).to eq hot_sheet1
-      expect(HotSheet.for(organization, 1.days.ago.to_date)).to eq hot_sheet2
+      expect(HotSheet.for(organization, (Time.current - 2.days).to_date)).to eq hot_sheet1
+      expect(HotSheet.for(organization, (Time.current - 1.days).to_date)).to eq hot_sheet2
       expect(HotSheet.for(organization, Time.current.to_date)).to eq hot_sheet3
       current_hot_sheet = HotSheet.for(organization)
       expect(current_hot_sheet.current?).to be_truthy

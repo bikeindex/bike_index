@@ -30,7 +30,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
         let!(:marketplace_listing_sold) { FactoryBot.create(:marketplace_listing, :sold, seller:) }
         let!(:marketplace_listing_removed) do
           FactoryBot.create(:marketplace_listing, status: :removed, seller:, item:,
-            created_at: 1.year.ago, published_at: 2.months.ago, end_at: 1.month.ago)
+            created_at: Time.current - 1.year, published_at: Time.current - 2.months, end_at: Time.current - 1.month)
         end
 
         it "renders with bikes" do

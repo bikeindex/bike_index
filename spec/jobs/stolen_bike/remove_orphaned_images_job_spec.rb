@@ -11,7 +11,7 @@ RSpec.describe StolenBike::RemoveOrphanedImagesJob, type: :lib do
 
   describe "perform" do
     let(:instance) { described_class.new }
-    let(:time) { 2.days.ago }
+    let(:time) { Time.current - 2.days }
     let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images) }
     let(:bike) { stolen_record.bike }
     let!(:image_attachment) { stolen_record.reload.image_four_by_five.attachment }

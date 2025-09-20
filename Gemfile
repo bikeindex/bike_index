@@ -154,7 +154,6 @@ group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem "standard" # Ruby linter
-  gem "standard-rails" # Rails linter
   gem "erb-formatter" # html linter
   # I18n - localization/translation
   gem "i18n-tasks"

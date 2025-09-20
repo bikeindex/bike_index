@@ -11,7 +11,7 @@ RSpec.describe PublicImagesController, type: :request do
       let!(:current_user) { bike.current_ownership.creator }
       context "valid owner" do
         it "creates an image" do
-          bike.update_column :updated_at, 1.hour.ago
+          bike.update_column :updated_at, Time.current - 1.hour
           Sidekiq::Job.clear_all
           post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
           expect(::Callbacks::AfterBikeSaveJob.jobs.count).to eq 1
@@ -22,7 +22,7 @@ RSpec.describe PublicImagesController, type: :request do
         context "user hidden" do
           it "creates an image" do
             bike.update(marked_user_hidden: true)
-            bike.update_column :updated_at, 1.hour.ago
+            bike.update_column :updated_at, Time.current - 1.hour
             expect(bike.reload.user_hidden).to be_truthy
             expect(bike.thumb_path).to be_blank
             Sidekiq::Job.clear_all
@@ -38,7 +38,7 @@ RSpec.describe PublicImagesController, type: :request do
           it "creates an image, runs StolenProcessor" do
             expect(bike.reload.current_stolen_record_id).to be_present
             expect(Images::StolenProcessor).to receive(:update_alert_images)
-            bike.update_column :updated_at, 1.hour.ago
+            bike.update_column :updated_at, Time.current - 1.hour
             Sidekiq::Testing.inline! do
               post base_url, params: {bike_id: bike.id, public_image: {name: "cool name"}, format: :js}
             end
@@ -78,7 +78,7 @@ RSpec.describe PublicImagesController, type: :request do
       let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user) }
       context "valid owner" do
         it "creates an image" do
-          bike_version.update_column :updated_at, 1.hour.ago
+          bike_version.update_column :updated_at, Time.current - 1.hour
           Sidekiq::Job.clear_all
           post base_url, params: {bike_id: bike_version.id, imageable_type: "BikeVersion",
                                   public_image: {name: "cool name"}, format: :js}
@@ -103,7 +103,7 @@ RSpec.describe PublicImagesController, type: :request do
     end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
-      let(:file) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
         it "creates an image" do
           post base_url, params: {blog_id: blog.id, public_image: {name: "cool name", image: file}, format: :js}
@@ -162,7 +162,7 @@ RSpec.describe PublicImagesController, type: :request do
     end
     context "mail_snippet" do
       let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
-      let(:file) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
         it "creates an image" do
           post base_url, params: {mail_snippet_id: mail_snippet.to_param, public_image: {name: "cool name", image: file}, format: :js}

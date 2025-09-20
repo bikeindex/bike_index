@@ -27,7 +27,7 @@ RSpec.describe Invoice, type: :model do
       end
     end
     context "future" do
-      let(:invoice) { Invoice.new(subscription_start_at: 1.hour.from_now, amount_due: 0) }
+      let(:invoice) { Invoice.new(subscription_start_at: Time.current + 1.hour, amount_due: 0) }
       it "is not active" do
         invoice.set_calculated_attributes
         expect(invoice.expired?).to be_falsey
@@ -52,7 +52,7 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "previous_invoice" do
-    let(:invoice) { FactoryBot.create(:invoice, start_at: 4.years.ago, force_active: true) }
+    let(:invoice) { FactoryBot.create(:invoice, start_at: Time.current - 4.years, force_active: true) }
     let(:invoice2) { invoice.create_following_invoice }
     let(:invoice3) { invoice2.create_following_invoice }
     it "returns correct invoices" do
@@ -63,10 +63,10 @@ RSpec.describe Invoice, type: :model do
       expect(invoice2.active?).to be_falsey
       expect(invoice2.was_active?).to be_truthy
       expect(invoice3.subscription_first_invoice).to eq invoice
-      expect(invoice2.subscription_start_at).to be_within(1.minute).of 3.years.ago
+      expect(invoice2.subscription_start_at).to be_within(1.minute).of Time.current - 3.years
       expect(invoice2.renewal_invoice?).to be_truthy
       expect(invoice2.previous_invoice).to eq invoice
-      expect(invoice3.subscription_start_at).to be_within(1.minute).of 2.years.ago
+      expect(invoice3.subscription_start_at).to be_within(1.minute).of Time.current - 2.years
       expect(invoice3.previous_invoice).to eq invoice2
     end
   end
@@ -81,7 +81,7 @@ RSpec.describe Invoice, type: :model do
       end
     end
     context "with active invoice" do
-      let(:invoice) { FactoryBot.create(:invoice, subscription_start_at: 4.years.ago, force_active: true) }
+      let(:invoice) { FactoryBot.create(:invoice, subscription_start_at: Time.current - 4.years, force_active: true) }
       let(:organization_feature) { FactoryBot.create(:organization_feature, kind: "standard") }
       let(:organization_feature_one_time) { FactoryBot.create(:organization_feature_one_time) }
       it "returns invoice" do
@@ -158,7 +158,7 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "organization_feature_ids" do
-    let(:invoice) { FactoryBot.create(:invoice, amount_due_cents: nil, subscription_start_at: 1.week.ago) }
+    let(:invoice) { FactoryBot.create(:invoice, amount_due_cents: nil, subscription_start_at: Time.current - 1.week) }
     let(:organization_feature) { FactoryBot.create(:organization_feature, amount_cents: 100_000) }
     let(:organization_feature2) { FactoryBot.create(:organization_feature) }
     let(:organization_feature_one_time) { FactoryBot.create(:organization_feature_one_time, name: "one Time Feature") }
@@ -184,9 +184,9 @@ RSpec.describe Invoice, type: :model do
   describe "two invoices" do
     let(:organization_feature1) { FactoryBot.create(:organization_feature, feature_slugs: ["bike_search"]) }
     let(:organization_feature2) { FactoryBot.create(:organization_feature, feature_slugs: ["extra_registration_number"]) }
-    let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: 1.week.ago) }
+    let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.week) }
     let(:organization) { invoice1.organization }
-    let(:invoice2) { FactoryBot.create(:invoice_with_payment, amount_due_cents: 10000, subscription_start_at: 1.day.ago, organization: organization) }
+    let(:invoice2) { FactoryBot.create(:invoice_with_payment, amount_due_cents: 10000, subscription_start_at: Time.current - 1.day, organization: organization) }
     it "adds the organization features" do
       invoice1.update(organization_feature_ids: [organization_feature1.id])
       expect(invoice1.paid_in_full?).to be_truthy

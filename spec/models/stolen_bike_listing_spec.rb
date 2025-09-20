@@ -21,8 +21,8 @@ RSpec.describe StolenBikeListing, type: :model do
     let(:interpreted_params) { BikeSearchable.searchable_interpreted_params(query_params) }
     context "color_ids of primary, secondary and tertiary" do
       let(:color2) { FactoryBot.create(:color) }
-      let(:stolen_bike_listing1) { FactoryBot.create(:stolen_bike_listing, primary_frame_color: color, listed_at: 3.months.ago) }
-      let(:stolen_bike_listing2) { FactoryBot.create(:stolen_bike_listing, secondary_frame_color: color, tertiary_frame_color: color2, listed_at: 2.weeks.ago) }
+      let(:stolen_bike_listing1) { FactoryBot.create(:stolen_bike_listing, primary_frame_color: color, listed_at: Time.current - 3.months) }
+      let(:stolen_bike_listing2) { FactoryBot.create(:stolen_bike_listing, secondary_frame_color: color, tertiary_frame_color: color2, listed_at: Time.current - 2.weeks) }
       let(:stolen_bike_listing3) { FactoryBot.create(:stolen_bike_listing, tertiary_frame_color: color, manufacturer: manufacturer) }
       let(:all_color_ids) do
         [

@@ -18,10 +18,10 @@
 class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
   belongs_to :old_user, class_name: "User", touch: true
-  validates :user_id, :email, presence: true
+  validates_presence_of :user_id, :email
 
   scope :confirmed, -> { where("confirmation_token IS NULL") }
-  scope :unconfirmed, -> { where.not(confirmation_token: nil) }
+  scope :unconfirmed, -> { where("confirmation_token IS NOT NULL") }
   scope :last_email_errored, -> { where(last_email_errored: true) }
 
   before_validation :normalize_email
@@ -85,7 +85,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def expired?
-    created_at > 2.hours.ago
+    created_at > Time.current - 2.hours
   end
 
   def make_primary

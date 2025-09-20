@@ -41,7 +41,7 @@ RSpec.describe UserAlertsController, type: :request do
             expect(response).to redirect_to "/my_account"
             expect(flash).to be_blank
             expect(user_alert.reload.dismissed?).to be_truthy
-            dismissed_time = 1.day.ago
+            dismissed_time = Time.current - 1.day
             user_alert.update(dismissed_at: dismissed_time)
             # And dismiss without failing again
             patch "#{base_url}/#{user_alert.id}", params: {alert_action: "dismiss"},

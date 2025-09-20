@@ -139,7 +139,7 @@ RSpec.describe CreateGraduatedNotificationJob, type: :lib do
           marked_remaining_at: Time.current - (2 * graduated_notification_interval))
       end
 
-      let(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: 5.years.ago) }
+      let(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: Time.current - 5.years) }
       let!(:graduated_notification2_remaining_expired) do
         FactoryBot.create(:graduated_notification,
           :marked_remaining,
@@ -150,7 +150,7 @@ RSpec.describe CreateGraduatedNotificationJob, type: :lib do
       let!(:graduated_notification2) do
         FactoryBot.create(:graduated_notification,
           bike: bike2,
-          created_at: 3.weeks.ago,
+          created_at: Time.current - 3.weeks,
           organization: organization)
       end
 
@@ -161,7 +161,7 @@ RSpec.describe CreateGraduatedNotificationJob, type: :lib do
 
         expect(graduated_notification2_remaining_expired.reload.most_recent?).to be_falsey
         graduated_notification2.mark_remaining!
-        graduated_notification2.update_column :marked_remaining_at, 2.weeks.ago
+        graduated_notification2.update_column :marked_remaining_at, Time.current - 2.weeks
         graduated_notification2.reload
         bike2.reload
         expect(bike2.organizations.pluck(:id)).to eq([organization.id])

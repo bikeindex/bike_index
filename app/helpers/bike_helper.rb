@@ -16,10 +16,11 @@ module BikeHelper
     serial_html << " "
     serial_html << content_tag(:em, class: "small less-less-strong") do
       if bike.authorized?(user)
-        I18n.t("helpers.bike_helper.hidden_for_unauthorized_users")
+        I18n.t("hidden_for_unauthorized_users", scope: %i[helpers bike_helper])
       else
-        I18n.t("helpers.bike_helper.hidden_because_status",
-          bike_type: bike.type, status: bike.status_humanized_translated)
+        I18n.t("hidden_because_status",
+          bike_type: bike.type, status: bike.status_humanized_translated,
+          scope: %i[helpers bike_helper])
       end
     end
   end

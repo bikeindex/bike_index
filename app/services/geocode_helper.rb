@@ -11,7 +11,7 @@ class GeocodeHelper
     # Always returns latitude and longitude
     def coordinates_for(lookup_string)
       coords = assignable_address_hash_for(lookup_string).slice(:latitude, :longitude)
-      coords.presence || {latitude: nil, longitude: nil}
+      coords.present? ? coords : {latitude: nil, longitude: nil}
     end
 
     def address_string_for(lookup_string)
@@ -92,7 +92,7 @@ class GeocodeHelper
       end
       return {} if ignored_coordinates?(address_hash[:latitude], address_hash[:longitude])
 
-      address_hash.transform_values { |v| v.presence }
+      address_hash.transform_values { |v| v.blank? ? nil : v }
     end
 
     def hash_for_geocoder_response(result, new_attrs:)

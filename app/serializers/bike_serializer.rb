@@ -67,7 +67,7 @@ class BikeSerializer < ApplicationSerializer
   end
 
   def stolen_record
-    object.current_stolen_record.presence
+    object.current_stolen_record if object.current_stolen_record.present?
   end
 
   def photo

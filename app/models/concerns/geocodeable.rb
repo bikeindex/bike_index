@@ -167,7 +167,7 @@ module Geocodeable
     address_attrs = Geocodeable.location_attrs - %w[country_id country state_id state neighborhood]
     attributes.slice(*address_attrs)
       .merge(state: state_abbr, country: country_abbr)
-      .to_a.map { |k, v| [k, v.presence] }.to_h # Return blank attrs as nil
+      .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
       .with_indifferent_access
   end
 

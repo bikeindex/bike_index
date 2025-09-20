@@ -42,8 +42,8 @@ class BikeSticker < ApplicationRecord
 
   enum :kind, KIND_ENUM
 
-  validates :code, presence: true
-  validates :code, uniqueness: {scope: [:organization_id], allow_nil: false}
+  validates_presence_of :code
+  validates_uniqueness_of :code, scope: [:organization_id], allow_nil: false
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
@@ -267,7 +267,7 @@ class BikeSticker < ApplicationRecord
       organization: claiming_organization, bike: claiming_bike,
       export_id: args[:export_id], safe_assign_creator_kind: args[:creator_kind])
     if claiming_bike.blank? && args[:bike].is_a?(String) && args[:bike].length > 0
-      not_found = I18n.t("activerecord.errors.models.bike_sticker.not_found")
+      not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_sticker])
       errors.add(:bike, "\"#{args[:bike]}\" #{not_found}")
       bike_sticker_update.add_failed_claim_error("unable to find bike: #{args[:bike]}")
     end

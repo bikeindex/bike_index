@@ -1,8 +1,5 @@
 parallel: true
-format: progress
-
-plugins:
-  - standard-rails
+# format: progress
 
 ignore:
   - "public/**/*"

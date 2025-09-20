@@ -33,13 +33,13 @@ class StolenNotification < ApplicationRecord
   }.freeze
 
   belongs_to :bike
-  belongs_to :sender, class_name: "User"
-  belongs_to :receiver, class_name: "User"
+  belongs_to :sender, class_name: "User", foreign_key: :sender_id
+  belongs_to :receiver, class_name: "User", foreign_key: :receiver_id
   belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application"
 
   has_many :notifications, as: :notifiable
 
-  validates :sender, :bike, :message, presence: true
+  validates_presence_of :sender, :bike, :message
 
   before_validation :set_calculated_attributes
   after_create :notify_receiver

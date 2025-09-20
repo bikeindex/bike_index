@@ -223,7 +223,7 @@ RSpec.describe "BikesController#create", type: :request do
     let(:bike_params) { basic_bike_params }
     context "impound_record" do
       include_context :geocoder_real
-      let(:impound_params) { chicago_stolen_params.merge(impounded_at_with_timezone: 1.day.ago.utc, timezone: "UTC", impounded_description: "Cool description") }
+      let(:impound_params) { chicago_stolen_params.merge(impounded_at_with_timezone: (Time.current - 1.day).utc, timezone: "UTC", impounded_description: "Cool description") }
       it "creates a new ownership and impound_record" do
         VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:method]) do
           expect {

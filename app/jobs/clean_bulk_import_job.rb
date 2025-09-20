@@ -6,7 +6,7 @@ class CleanBulkImportJob < ScheduledJob
   end
 
   def self.clean_before
-    48.hours.ago
+    Time.current - 48.hours
   end
 
   def perform(import_id = nil)

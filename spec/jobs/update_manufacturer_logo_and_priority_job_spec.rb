@@ -38,7 +38,7 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
 
   context "manufacturer has logo" do
     it "no-ops" do
-      local_image = File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)
+      local_image = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
       manufacturer = FactoryBot.create(:manufacturer, logo: local_image, website: "http://example.com")
       expect(manufacturer.logo).to be_present
       Sidekiq::Job.clear_all

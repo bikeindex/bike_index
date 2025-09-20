@@ -20,7 +20,7 @@ RSpec.describe "API V3 Authorization specs", type: :request do
       end
       context "revoked_token" do
         it "responds with 403" do
-          token.update(revoked_at: 30.seconds.ago)
+          token.update(revoked_at: Time.current - 30.seconds)
           expect(token.reload.acceptable?([])).to be_falsey
           get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
           expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
@@ -30,7 +30,7 @@ RSpec.describe "API V3 Authorization specs", type: :request do
       end
       context "expired_token" do
         it "responds with 403" do
-          token.update(created_at: 2.days.ago, expires_in: 3600)
+          token.update(created_at: Time.current - 2.days, expires_in: 3600)
           expect(token.reload.acceptable?([])).to be_falsey
           get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
           expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")

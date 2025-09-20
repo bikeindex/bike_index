@@ -481,7 +481,7 @@ RSpec.describe "Bikes API V2", type: :request do
     let!(:token) { create_doorkeeper_token(scopes: "read_user write_bikes") }
     it "doesn't post an image to a bike if the bike isn't owned by the user" do
       bike = FactoryBot.create(:ownership).bike
-      file = File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)
+      file = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
       url = "/api/v2/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
       post url, params: {file: Rack::Test::UploadedFile.new(file)}
@@ -492,7 +492,7 @@ RSpec.describe "Bikes API V2", type: :request do
 
     it "errors on non permitted file extensions" do
       bike = FactoryBot.create(:ownership, creator_id: user.id).bike
-      file = File.open(Rails.root.join("spec/spec_helper.rb").to_s)
+      file = File.open(File.join(Rails.root, "spec", "spec_helper.rb"))
       url = "/api/v2/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
       post url, params: {file: Rack::Test::UploadedFile.new(file)}
@@ -503,7 +503,7 @@ RSpec.describe "Bikes API V2", type: :request do
 
     it "posts an image" do
       bike = FactoryBot.create(:ownership, creator_id: user.id).bike
-      file = File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)
+      file = File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))
       url = "/api/v2/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
       post url, params: {file: Rack::Test::UploadedFile.new(file)}

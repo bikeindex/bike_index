@@ -34,7 +34,7 @@ end
 
 # Additional carrierwave configurations
 CarrierWave.configure do |config|
-  config.cache_dir = Rails.root.join("tmp/uploads")
+  config.cache_dir = Rails.root.join("tmp", "uploads")
   config.storage = :file
   config.asset_host = ENV["BASE_URL"]
 

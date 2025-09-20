@@ -2,7 +2,7 @@ class SecurityTokenizer
   EARLIEST_TOKEN_TIME = 1427848192 # 2015-03-31T17:29:52
 
   def self.new_token(time = nil)
-    t = (time.presence || Time.current).to_i
+    t = (time.blank? ? Time.current : time).to_i
     "#{t}-" + SecureRandom.hex + Digest::MD5.hexdigest("#{SecureRandom.hex}-#{t}")
   end
 

@@ -26,8 +26,8 @@ class MailchimpValue < ApplicationRecord
     merge_field: 3
   }.freeze
 
-  validates :slug, :list, :kind, :mailchimp_id, presence: true
-  validates :mailchimp_id, uniqueness: {scope: %i[list kind]}
+  validates_presence_of :slug, :list, :kind, :mailchimp_id
+  validates_uniqueness_of :mailchimp_id, scope: %i[list kind]
 
   before_validation :set_calculated_attributes
 

@@ -25,7 +25,7 @@ class Counts
     end
 
     def beginning_of_week
-      7.days.ago.end_of_day + 1.minute
+      (Time.current - 7.days).end_of_day + 1.minute
     end
 
     def total_bikes

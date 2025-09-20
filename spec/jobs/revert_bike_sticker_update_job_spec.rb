@@ -15,7 +15,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
     end
 
     context "kind: initial_claim" do
-      let(:sticker_update_at) { 1.day.ago }
+      let(:sticker_update_at) { Time.current - 1.day }
       let(:bike_sticker_update) do
         bike_sticker.claim(bike:, organization: new_organization, user:)
         bike_sticker.update_columns(claimed_at: sticker_update_at, updated_at: sticker_update_at)
@@ -56,7 +56,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
       end
 
       context "kind: re_claim" do
-        let(:initial_claimed_at) { 1.week.ago }
+        let(:initial_claimed_at) { Time.current - 1.week }
         let(:bike2) { FactoryBot.create(:bike) }
         let(:user2) { FactoryBot.create(:user) }
         let!(:bike_sticker_update_initial) do
@@ -112,7 +112,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
         context "with a following successful claim" do
           let(:user3) { FactoryBot.create(:user) }
           let(:bike3) { FactoryBot.create(:bike) }
-          let(:update_time) { 3.hours.ago }
+          let(:update_time) { Time.current - 3.hours }
           let(:bike_sticker_update_following) do
             bike_sticker.claim(user: user3, bike: bike3)
             bike_sticker.update(claimed_at: update_time)
@@ -150,7 +150,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
           let(:bike_sticker_update_following) do
             bike_sticker.claim_if_permitted(user: user3, bike: bike3)
             bs_update = bike_sticker.bike_sticker_updates.last
-            bs_update.update_column(:created_at, 3.hours.ago)
+            bs_update.update_column(:created_at, Time.current - 3.hours)
             bs_update
           end
           let(:target_reclaimed) do

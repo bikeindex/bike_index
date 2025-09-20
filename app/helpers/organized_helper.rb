@@ -176,7 +176,7 @@ module OrganizedHelper
     return nil unless organization&.additional_registration_fields&.include?("reg_address")
 
     content_tag(:span,
-      I18n.t("helpers.organization_helper.your_full_address_is_required", org_name: organization.short_name),
+      I18n.t(:your_full_address_is_required, scope: %i[helpers organization_helper], org_name: organization.short_name),
       class: "below-input-help text-warning")
   end
 end

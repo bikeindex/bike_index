@@ -37,7 +37,7 @@ class Feedback < ApplicationRecord
     lead_for_law_enforcement: 12
   }.freeze
 
-  validates :body, :email, :title, presence: true
+  validates_presence_of :body, :email, :title
 
   belongs_to :user
   belongs_to :mailchimp_datum

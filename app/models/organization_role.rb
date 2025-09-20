@@ -36,7 +36,7 @@ class OrganizationRole < ApplicationRecord
   enum :role, ROLE_TYPES
   enum :hot_sheet_notification, HOT_SHEET_NOTIFICATION_ENUM
 
-  validates :role, :organization_id, :invited_email, presence: true
+  validates_presence_of :role, :organization_id, :invited_email
 
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker

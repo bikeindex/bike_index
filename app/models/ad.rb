@@ -14,8 +14,8 @@
 #
 class Ad < ApplicationRecord
   belongs_to :organization
-  validates :title, presence: true
-  validates :title, uniqueness: true
+  validates_presence_of :title
+  validates_uniqueness_of :title
 
   mount_uploader :image, PartnerUploader
 

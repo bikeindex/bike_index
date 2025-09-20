@@ -1,6 +1,6 @@
 # A sample organization to seed
 hogwarts = Organization.find_by_name("Hogwarts") || Organization.create!(name: "Hogwarts")
-invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: 1.hour.ago)
+invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: Time.current - 1.hour)
 # This list was created with:
 #   OrganizationFeature.has_feature_slugs.map { |of| of.slice(:name, :feature_slugs) }
 feature_name_and_slugs = [

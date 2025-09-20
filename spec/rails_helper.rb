@@ -45,7 +45,7 @@ ActiveRecord::Migration.maintain_test_schema!
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
+Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
 
 # If on GitHub actions, enable knapsack pro to optimize test splitting
 if ENV["GITHUB_ACTIONS"] == "true"

@@ -47,9 +47,9 @@ class MarketplaceListing < ApplicationRecord
 
   has_many :marketplace_messages
 
-  validates :item_id, presence: true
-  validates :seller_id, presence: true
-  validates :status, presence: true
+  validates_presence_of :item_id
+  validates_presence_of :seller_id
+  validates_presence_of :status
 
   before_validation :set_calculated_attributes
   after_commit :update_bike_for_sale

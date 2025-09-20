@@ -43,8 +43,8 @@ class Location < ApplicationRecord
   # scope :international, where("country_id IS NOT #{Country.united_states_id}")
 
   before_validation :set_calculated_attributes
-  before_destroy :ensure_destroy_permitted!
   after_commit :update_associations
+  before_destroy :ensure_destroy_permitted!
 
   attr_accessor :skip_update
 

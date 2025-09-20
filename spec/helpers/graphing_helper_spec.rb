@@ -28,27 +28,27 @@ RSpec.describe GraphingHelper, type: :helper do
   describe "group_by_method" do
     context "hourly" do
       it "returns group_by_minute" do
-        expect(group_by_method((1.hour.ago)..Time.current)).to eq :group_by_minute
+        expect(group_by_method((Time.current - 1.hour)..Time.current)).to eq :group_by_minute
       end
     end
     context "daily" do
       it "returns group_by_hour" do
-        expect(group_by_method((1.day.ago)..Time.current)).to eq :group_by_hour
+        expect(group_by_method((Time.current - 1.day)..Time.current)).to eq :group_by_hour
       end
     end
     context "weekly" do
       it "returns group_by_day" do
-        expect(group_by_method((6.days.ago)..Time.current)).to eq :group_by_day
+        expect(group_by_method((Time.current - 6.days)..Time.current)).to eq :group_by_day
       end
     end
     context "6 months" do
       it "returns group_by_week" do
-        expect(group_by_method((6.months.ago)..Time.current)).to eq :group_by_week
+        expect(group_by_method((Time.current - 6.months)..Time.current)).to eq :group_by_week
       end
     end
     context "2 years" do
       it "returns group_by_month" do
-        expect(group_by_method((2.years.ago)..Time.current)).to eq :group_by_month
+        expect(group_by_method((Time.current - 2.years)..Time.current)).to eq :group_by_month
       end
     end
   end
@@ -125,24 +125,24 @@ RSpec.describe GraphingHelper, type: :helper do
     context "standard time range" do
       it "returns period" do
         @period = "week"
-        expect(humanized_time_range((1.week.ago)..Time.current)).to eq "in the past week"
+        expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the past week"
       end
       context "all" do
         it "returns period" do
           @period = "all"
-          expect(humanized_time_range((1.week.ago)..Time.current)).to be_blank
+          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to be_blank
         end
       end
       context "next_week" do
         it "returns period" do
           @period = "next_week"
-          expect(humanized_time_range((1.week.ago)..Time.current)).to eq "in the next week"
+          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next week"
         end
       end
       context "next_month" do
         it "returns period" do
           @period = "next_month"
-          expect(humanized_time_range((1.week.ago)..Time.current)).to eq "in the next month"
+          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next month"
         end
       end
     end
@@ -181,7 +181,7 @@ RSpec.describe GraphingHelper, type: :helper do
           expect(humanized_time_range(time_range)).to eq "<span>" + target_html.join + "</span>"
         end
         context "ending now" do
-          let(:end_time) { 1.minute.ago } # Because we send time by minute
+          let(:end_time) { Time.current - 1.minute } # Because we send time by minute
           let(:current_target_html) { target_html.slice(0, 2) + ["</em> to <em>now</em>"] }
           it "returns time in precise time" do
             expect(humanized_time_range(time_range)).to eq "<span>" + current_target_html.join + "</span>"

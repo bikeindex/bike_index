@@ -17,7 +17,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
   end
 
   def earliest_period_date
-    OrganizationStatus.minimum(:start_at) || 1.day.ago
+    OrganizationStatus.minimum(:start_at) || Time.current - 1.day
   end
 
   def grouped_pos_kinds

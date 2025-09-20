@@ -12,11 +12,11 @@ FactoryBot.define do
     end
 
     trait :completed_an_hour_ago do
-      completed_at { 1.hour.ago }
+      completed_at { Time.current - 1.hour }
     end
 
     trait :completed_a_day_ago do
-      completed_at { 1.day.ago }
+      completed_at { Time.current - 1.day }
     end
   end
 end

@@ -61,9 +61,9 @@ class Ownership < ApplicationRecord
     sticker: 13
   }.freeze
 
-  validates :owner_email, presence: true
-  validates :creator_id, presence: true
-  validates :bike_id, presence: true
+  validates_presence_of :owner_email
+  validates_presence_of :creator_id
+  validates_presence_of :bike_id
   validates :owner_email,
     format: {with: /\A.+@.+\..+\z/, message: "invalid format"},
     unless: :phone_registration?

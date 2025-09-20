@@ -86,7 +86,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
   end
 
   context "unregistered_parking_notification" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: 2.hours.ago, status: "unregistered_parking_notification") }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: Time.current - 2.hours, status: "unregistered_parking_notification") }
 
     it "renders without serial" do
       expect(bike.reload.status).to eq "unregistered_parking_notification"

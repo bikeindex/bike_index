@@ -8,7 +8,7 @@ RSpec.describe BikeServices::Geojsoner do
       expect(described_class.feature(bike)).to be_blank
     end
     context "stolen" do
-      let(:date_stolen) { 6.hours.ago }
+      let(:date_stolen) { Time.current - 6.hours }
       let(:bike) { FactoryBot.create(:bike, :with_stolen_record, date_stolen: date_stolen) }
       let(:target) do
         {

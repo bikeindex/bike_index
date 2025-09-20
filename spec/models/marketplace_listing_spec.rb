@@ -144,7 +144,7 @@ RSpec.describe MarketplaceListing, type: :model do
     end
 
     context "with a sold listing" do
-      let!(:marketplace_listing_previous) { FactoryBot.create(:marketplace_listing, :sold, item: marketplace_listing_low.item, end_at: 3.days.ago) }
+      let!(:marketplace_listing_previous) { FactoryBot.create(:marketplace_listing, :sold, item: marketplace_listing_low.item, end_at: Time.current - 3.days) }
       let!(:marketplace_listing_sold) { FactoryBot.create(:marketplace_listing, :sold) }
       let(:item_sold_id) { marketplace_listing_sold.item_id }
       let(:item_ids) { [item_low_id, item_mid_id, item_high_id, item_sold_id] }

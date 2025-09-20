@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe ProcessImpoundUpdatesJob, type: :job do
   let(:instance) { described_class.new }
 
-  let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: 2.hours.ago) }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: Time.current - 2.hours) }
   let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
   let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, processed: false, kind: kind) }
   let(:kind) { "note" }
@@ -29,7 +29,7 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
   end
 
   context "unregistered_parking_notification" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: 2.hours.ago, status: "unregistered_parking_notification") }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: Time.current - 2.hours, status: "unregistered_parking_notification") }
     let!(:parking_notification) { FactoryBot.create(:parking_notification_unregistered, kind: "impound_notification", bike: bike) }
     it "marks the bike not hidden" do
       impound_record.update(parking_notification: parking_notification)

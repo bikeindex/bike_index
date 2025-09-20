@@ -89,7 +89,7 @@ class Users::MergeAdditionalEmailJob < ApplicationJob
     user = User.fuzzy_unconfirmed_primary_email_find(email)
     return user if user.present?
 
-    user_email = UserEmail.where.not(user_id: user_id).where(email: email).first
+    user_email = UserEmail.where("user_id != ?", user_id).where(email: email).first
     user_email&.user
   end
 end

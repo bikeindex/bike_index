@@ -89,7 +89,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
       expect(organization.manual_pos_kind).to eq "lightspeed_pos"
     end
     context "no change" do
-      let(:updated_at) { 5.minutes.ago }
+      let(:updated_at) { Time.current - 5.minutes }
       it "does not bump organization" do
         organization.update(manual_pos_kind: "lightspeed_pos")
         organization.update_column :updated_at, updated_at

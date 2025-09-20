@@ -485,7 +485,7 @@ RSpec.describe User, type: :model do
       expect(user.username).to be_present
       expect(user.confirmation_token).to be_present
       time = Time.at(SecurityTokenizer.token_time(user.auth_token))
-      expect(time).to be > 1.minutes.ago
+      expect(time).to be > Time.current - 1.minutes
     end
     it "haves before create callback" do
       expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:generate_username_confirmation_and_auth)).to eq(true)
@@ -527,13 +527,13 @@ RSpec.describe User, type: :model do
         user.update_auth_token("token_for_password_reset")
         user.reload
         expect(user.token_for_password_reset).to be_present
-        expect(user.auth_token_time("token_for_password_reset")).to be > 2.seconds.ago
+        expect(user.auth_token_time("token_for_password_reset")).to be > Time.current - 2.seconds
         expect(user.auth_token_expired?("token_for_password_reset")).to be_falsey
       end
       it "input time" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("token_for_password_reset", 121.minutes.ago.to_i)
-        expect(user.reload.auth_token_time("token_for_password_reset")).to be < 1.hours.ago
+        user.update_auth_token("token_for_password_reset", (Time.current - 121.minutes).to_i)
+        expect(user.reload.auth_token_time("token_for_password_reset")).to be < (Time.current - 1.hours)
         expect(user.auth_token_expired?("token_for_password_reset")).to be_truthy
       end
     end
@@ -546,14 +546,14 @@ RSpec.describe User, type: :model do
       it "gets the time" do
         user = User.new
         user.generate_auth_token("magic_link_token")
-        expect(user.auth_token_time("magic_link_token")).to be > 2.seconds.ago
+        expect(user.auth_token_time("magic_link_token")).to be > Time.current - 2.seconds
         expect(user.auth_token_expired?("magic_link_token")).to be_falsey
       end
       it "uses input time, it returns the token" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("magic_link_token", 1.hour.ago.to_i)
+        user.update_auth_token("magic_link_token", (Time.current - 1.hour).to_i)
         user.reload
-        expect(user.auth_token_time("magic_link_token")).to be < 1.hours.ago
+        expect(user.auth_token_time("magic_link_token")).to be < (Time.current - 1.hours)
         expect(user.auth_token_expired?("magic_link_token")).to be_falsey
       end
     end
@@ -607,7 +607,7 @@ RSpec.describe User, type: :model do
 
   describe "update_last_login" do
     let(:user) { FactoryBot.create(:user) }
-    let(:update_time) { 3.hours.ago }
+    let(:update_time) { Time.current - 3.hours }
     it "updates the last sign in for the user, regardless of whether there are errors" do
       user.update_column :updated_at, update_time
       user.reload

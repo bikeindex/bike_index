@@ -205,7 +205,7 @@ RSpec.describe Organized::BikesController, type: :request do
           longitude: default_location[:longitude]
         }
       end
-      let(:test_photo) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s)) }
+      let(:test_photo) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))) }
       it "creates along with parking_notification and photo" do
         current_organization.reload
         expect(current_organization.auto_user).to eq current_user

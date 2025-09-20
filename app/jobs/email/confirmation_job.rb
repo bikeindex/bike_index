@@ -12,7 +12,7 @@ class Email::ConfirmationJob < ApplicationJob
     # Clean up situations where there are two users created
     return user.really_destroy! if duplicate_user?(user)
 
-    notifications = user.notifications.confirmation_email.where("created_at > ?", 1.minute.ago)
+    notifications = user.notifications.confirmation_email.where("created_at > ?", Time.current - 1.minute)
     # If we just sent it, don't send again
     return false if notifications.delivery_success.any?
 

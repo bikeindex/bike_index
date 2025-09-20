@@ -70,7 +70,7 @@ RSpec.describe Email::DonationJob, type: :job do
       expect(payment.notifications.first.bike_id).to eq bike1.id
     end
     context "older stolen record" do
-      let(:stolen_record2) { FactoryBot.create(:stolen_record, bike: bike2, date_stolen: 2.weeks.ago) }
+      let(:stolen_record2) { FactoryBot.create(:stolen_record, bike: bike2, date_stolen: Time.current - 2.weeks) }
       it "is the more recent stolen_record" do
         user.reload
         expect(user.theft_alerts.count).to eq 1
@@ -113,7 +113,7 @@ RSpec.describe Email::DonationJob, type: :job do
   end
 
   context "donation_recovered" do
-    let!(:recovery) { FactoryBot.create(:stolen_record_recovered, bike: bike2, recovered_at: 1.year.ago) }
+    let!(:recovery) { FactoryBot.create(:stolen_record_recovered, bike: bike2, recovered_at: Time.current - 1.year) }
     it "sends a donation_stolen message if recovery is old" do
       expect(stolen_record1).to be_present
       payment.reload
@@ -131,7 +131,7 @@ RSpec.describe Email::DonationJob, type: :job do
     end
     context "with active theft alert" do
       let!(:theft_alert) { FactoryBot.create(:theft_alert_begun, user: user) }
-      let!(:recovery2) { FactoryBot.create(:stolen_record_recovered, bike: bike2, recovered_at: 1.week.ago) }
+      let!(:recovery2) { FactoryBot.create(:stolen_record_recovered, bike: bike2, recovered_at: Time.current - 1.week) }
       it "sends a donation_recovered message" do
         expect(stolen_record1).to be_present
         user.reload

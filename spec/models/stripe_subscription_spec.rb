@@ -74,7 +74,7 @@ RSpec.describe StripeSubscription, type: :model do
 
   describe "update_membership!" do
     let(:stripe_subscription) { FactoryBot.create(:stripe_subscription, membership_id:, start_at:, end_at:, user:, stripe_status:) }
-    let(:start_at) { 1.minute.ago }
+    let(:start_at) { Time.current - 1.minute }
     let(:end_at) { nil }
     let(:membership_id) { nil }
     let(:user) { FactoryBot.create(:user_confirmed) }
@@ -85,7 +85,7 @@ RSpec.describe StripeSubscription, type: :model do
         FactoryBot.create(:membership, user:, start_at: start_at_existing, end_at: end_at_existing,
           creator: FactoryBot.create(:superuser))
       end
-      let(:start_at_existing) { 1.year.ago }
+      let(:start_at_existing) { Time.current - 1.year }
       let(:end_at_existing) { nil }
       let(:target_attrs) do
         {start_at:, end_at:, user_id: user.id, level: "basic", stripe_managed?: true}
@@ -107,8 +107,8 @@ RSpec.describe StripeSubscription, type: :model do
 
       context "with stripe_subscription ended" do
         let(:stripe_status) { "ended" }
-        let(:start_at) { 1.year.ago }
-        let(:end_at) { 1.week.ago }
+        let(:start_at) { Time.current - 1.year }
+        let(:end_at) { Time.current - 1.week }
         it "does not end the membership" do
           expect(membership_existing.reload.active?).to be_truthy
           expect(stripe_subscription.reload.active?).to be_falsey
@@ -123,8 +123,8 @@ RSpec.describe StripeSubscription, type: :model do
     end
 
     context "ended" do
-      let(:start_at) { 1.year.ago }
-      let(:end_at) { 1.minute.ago }
+      let(:start_at) { Time.current - 1.year }
+      let(:end_at) { Time.current - 1.minute }
       let(:stripe_status) { "canceled" }
       let(:target_attrs) { {start_at:, end_at:, level: "basic", status: "ended"} }
 

@@ -18,7 +18,7 @@ class OrganizationDisplayer
       return false if organization&.invoices.blank? || organization.paid_money?
 
       organization.invoices.expired.any? do |invoice|
-        invoice.was_active? && invoice.end_at > 3.months.ago
+        invoice.was_active? && invoice.end_at > (Time.current - 3.months)
       end
     end
 

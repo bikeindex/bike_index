@@ -6,7 +6,7 @@ class CleanBParamsJob < ScheduledJob
   end
 
   def self.clean_before
-    24.hours.ago
+    Time.current - 24.hours
   end
 
   def perform

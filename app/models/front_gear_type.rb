@@ -14,8 +14,8 @@
 class FrontGearType < ApplicationRecord
   include FriendlySlugFindable
 
-  validates :name, :count, presence: true
-  validates :name, uniqueness: true
+  validates_presence_of :name, :count
+  validates_uniqueness_of :name
   has_many :bikes
 
   scope :standard, -> { where(standard: true) }

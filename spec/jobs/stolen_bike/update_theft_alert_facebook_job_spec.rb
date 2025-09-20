@@ -19,7 +19,7 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
     let(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
     let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, :in_vancouver, bike: bike, approved: true) }
     let(:facebook_data) { {campaign_id: "222", adset_id: "333", ad_id: "444", activating_at: Time.current.to_i} }
-    let(:start_at) { 1.minute.ago }
+    let(:start_at) { Time.current - 1.minute }
     let(:end_at) { Time.current + theft_alert_plan.duration_days_facebook }
     let(:theft_alert) do
       FactoryBot.create(:theft_alert, :paid,
@@ -74,7 +74,7 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
     end
     context "with facebook_update_at set" do
       it "also enqueues" do
-        theft_alert.update(facebook_updated_at: 6.hours.ago)
+        theft_alert.update(facebook_updated_at: Time.current - 6.hours)
         expect(TheftAlert.facebook_updateable.pluck(:id)).to eq([theft_alert.id])
         expect(TheftAlert.should_update_facebook.pluck(:id)).to eq([theft_alert.id])
         expect(theft_alert.reload.should_update_facebook?).to be_truthy
@@ -134,7 +134,7 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
       context "failed_to_activate" do
         let(:start_at) { nil }
         let(:end_at) { nil }
-        let(:facebook_data) { {activating_at: 6.minutes.ago.to_i} }
+        let(:facebook_data) { {activating_at: (Time.current - 6.minutes).to_i} }
         it "enqueues activate theft worker and exits" do
           theft_alert.reload
           expect(theft_alert.failed_to_activate?).to be_truthy
@@ -151,7 +151,7 @@ RSpec.describe StolenBike::UpdateTheftAlertFacebookJob, type: :job do
           }.to change(StolenBike::ActivateTheftAlertJob.jobs, :count).by 1
         end
         context "manual_override_inactive?" do
-          let(:facebook_data) { {activating_at: 1.month.ago.to_i} }
+          let(:facebook_data) { {activating_at: (Time.current - 1.month).to_i} }
           it "does not enqueue" do
             theft_alert.update(status: :inactive)
             theft_alert.reload

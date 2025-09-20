@@ -5,7 +5,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
   include_context :request_spec_logged_in_as_organization_user
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-  let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com", created_at: 4.hours.ago) }
+  let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com", created_at: Time.current - 4.hours) }
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
   let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id_integer: 1111) }
 
@@ -21,7 +21,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     context "multiple impound_records" do
       let!(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike2) }
       let(:bike2) { FactoryBot.create(:bike, serial_number: "yaris") }
-      let!(:impound_record_retrieved) { FactoryBot.create(:impound_record_resolved, :with_organization, organization: current_organization, user: current_user, bike: bike, resolved_at: 1.week.ago, created_at: 1.hour.ago) }
+      let!(:impound_record_retrieved) { FactoryBot.create(:impound_record_resolved, :with_organization, organization: current_organization, user: current_user, bike: bike, resolved_at: Time.current - 1.week, created_at: Time.current - 1.hour) }
       let!(:impound_record_unorganized) { FactoryBot.create(:impound_record) }
       it "finds by bike searches and also by impound scoping" do
         current_organization.fetch_impound_configuration
@@ -269,7 +269,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     context "unregistered_parking_notification" do
       let(:parking_notification) do
         pn = FactoryBot.create(:parking_notification_unregistered,
-          created_at: 1.hour.ago,
+          created_at: Time.current - 1.hour,
           organization: current_organization,
           user: current_user,
           kind: "impound_notification")
@@ -357,7 +357,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           let(:impound_claim) do
             FactoryBot.create(:impound_claim_with_stolen_record,
               organization: current_organization,
-              created_at: 1.hour.ago,
+              created_at: Time.current - 1.hour,
               impound_record: impound_record)
           end
           let!(:impound_record_update_approved) { impound_record.impound_record_updates.create(user: current_user, kind: "claim_approved", impound_claim: impound_claim) }
@@ -403,7 +403,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     end
 
     describe "update - multi_update" do
-      let(:bike2) { FactoryBot.create(:bike, created_at: 3.weeks.ago) }
+      let(:bike2) { FactoryBot.create(:bike, created_at: Time.current - 3.weeks) }
       let(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, bike: bike2) }
       it "updates two records" do
         expect(impound_record.reload.status).to eq "current"

@@ -20,7 +20,7 @@ module Organized
 
     # This is exactly the same as BikeStickersController#update - except the redirect is different
     def update
-      bike_id = params[:bike_id].presence || params.dig(:bike_sticker, :bike_id)
+      bike_id = params[:bike_id].present? ? params[:bike_id] : params.dig(:bike_sticker, :bike_id)
       @bike_sticker.claim_if_permitted(user: current_user, bike: bike_id, organization: current_organization)
       if @bike_sticker.errors.any?
         flash[:error] = @bike_sticker.errors.full_messages.to_sentence

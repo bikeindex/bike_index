@@ -12,12 +12,12 @@ RSpec.describe ImpoundExpirationJob, type: :job do
   describe "perform" do
     let(:impound_configuration) { FactoryBot.create(:impound_configuration, expiration_period_days: 45) }
     let(:organization) { impound_configuration.organization }
-    let!(:impound_record1) { FactoryBot.create(:impound_record, :with_organization, organization: organization, created_at: 46.days.ago) }
-    let!(:impound_record2) { FactoryBot.create(:impound_record, :with_organization, organization: organization, created_at: 44.days.ago) }
-    let!(:impound_record3) { FactoryBot.create(:impound_record, :with_organization, organization: organization, created_at: 100.days.ago) }
+    let!(:impound_record1) { FactoryBot.create(:impound_record, :with_organization, organization: organization, created_at: Time.current - 46.days) }
+    let!(:impound_record2) { FactoryBot.create(:impound_record, :with_organization, organization: organization, created_at: Time.current - 44.days) }
+    let!(:impound_record3) { FactoryBot.create(:impound_record, :with_organization, organization: organization, created_at: Time.current - 100.days) }
     let(:user) { impound_record1.user }
     it "schedules all the workers" do
-      expect(impound_record1.reload.bike.created_at).to be < 45.days.ago
+      expect(impound_record1.reload.bike.created_at).to be < Time.current - 45.days
       Sidekiq::Testing.inline! do
         impound_record3.impound_record_updates.create(kind: "transferred_to_new_owner",
           transfer_email: "something@stuff.com",

@@ -11,13 +11,13 @@ RSpec.shared_examples "active_periodable" do
       expect(instance.period_active?).to be_falsey
     end
     context "start_at in the future" do
-      let(:start_at) { 1.minute.from_now }
+      let(:start_at) { Time.current + 1.minute }
       it "is inactive" do
         expect(instance.period_active?).to be_falsey
       end
     end
     context "start_at in past" do
-      let(:start_at) { 1.year.ago }
+      let(:start_at) { Time.current - 1.year }
       it "is active" do
         expect(instance.period_active?).to be_truthy
         instance.save!
@@ -26,14 +26,14 @@ RSpec.shared_examples "active_periodable" do
         expect(subject.class.period_inactive.pluck(:id)).to eq([])
       end
       context "with end_at in the future" do
-        let(:end_at) { 1.week.from_now }
+        let(:end_at) { Time.current + 1.week }
 
         it "is active" do
           expect(instance.period_active?).to be_truthy
         end
       end
       context "with end_at in the past" do
-        let(:end_at) { 1.minute.ago }
+        let(:end_at) { Time.current - 1.minute }
 
         it "is active" do
           expect(instance.period_active?).to be_falsey

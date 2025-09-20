@@ -462,7 +462,7 @@ RSpec.describe BikesController, type: :controller do
             city: "Chicago",
             zipcode: "60622",
             state_id: state.id,
-            date_stolen: 1.day.ago.utc,
+            date_stolen: (Time.current - 1.day).utc,
             timezone: "UTC"
           }
         end
@@ -558,7 +558,7 @@ RSpec.describe BikesController, type: :controller do
       context "with an image" do
         it "registers a bike and uploads an image" do
           Sidekiq::Testing.inline! do
-            test_photo = Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s))
+            test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
             post :create, params: {persist_email: "", bike: bike_params.merge(image: test_photo)}
             expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))

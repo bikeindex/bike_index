@@ -26,7 +26,7 @@ class EmailBan < ApplicationRecord
 
   enum :reason, REASON_ENUM
 
-  validates :reason, presence: true
+  validates_presence_of :reason
   validate :is_not_duplicate_ban
 
   before_validation :set_calculated_attributes

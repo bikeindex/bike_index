@@ -25,9 +25,9 @@ class Lock < ApplicationRecord
   belongs_to :lock_type
   belongs_to :user
 
-  validates :user, presence: {on: :create}
-  validates :manufacturer, presence: true
-  validates :lock_type, presence: true
+  validates_presence_of :user, on: :create
+  validates_presence_of :manufacturer
+  validates_presence_of :lock_type
 
   def mnfg_name
     Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other) ||

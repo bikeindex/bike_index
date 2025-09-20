@@ -40,10 +40,10 @@ class ImpoundRecordUpdate < ApplicationRecord
   belongs_to :user
   belongs_to :location
 
-  validates :impound_record_id, presence: true
-  validates :user_id, presence: {if: :user_required?}
-  validates :transfer_email, presence: {if: :transferred_to_new_owner?}
-  validates :location_id, presence: {if: :move_location?}
+  validates_presence_of :impound_record_id
+  validates_presence_of :user_id, if: :user_required?
+  validates_presence_of :transfer_email, if: :transferred_to_new_owner?
+  validates_presence_of :location_id, if: :move_location?
 
   after_commit :update_associations
 

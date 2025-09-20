@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Integration, type: :model do
-  let(:facebook_file) { File.read(Rails.root.join("spec/fixtures/integration_data_facebook.json")) }
-  let(:strava_file) { File.read(Rails.root.join("spec/fixtures/integration_data_strava.json")) }
+  let(:facebook_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_facebook.json")) }
+  let(:strava_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_strava.json")) }
 
   describe "associate_with_user" do
     context "facebook integration" do

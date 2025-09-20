@@ -4,11 +4,11 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
   let(:instance) { described_class.new }
 
   context "multiple organizations" do
-    let!(:organization1) { FactoryBot.create(:organization, updated_at: 1.hour.ago) }
-    let!(:organization2) { FactoryBot.create(:organization, updated_at: 2.hours.ago) }
+    let!(:organization1) { FactoryBot.create(:organization, updated_at: Time.current - 1.hour) }
+    let!(:organization2) { FactoryBot.create(:organization, updated_at: Time.current - 2.hours) }
     it "updates the passed organizations" do
-      expect(organization1.reload.updated_at).to be < 30.minutes.ago
-      expect(organization2.reload.updated_at).to be < 30.minutes.ago
+      expect(organization1.reload.updated_at).to be < Time.current - 30.minutes
+      expect(organization2.reload.updated_at).to be < Time.current - 30.minutes
       Sidekiq::Job.clear_all
       instance.perform([organization1.id, organization2.id])
       # Make sure we don't reenqueue
@@ -21,12 +21,12 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
 
   context "regional organization" do
     let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
-    let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, updated_at: 1.hour.ago) }
+    let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, updated_at: Time.current - 1.hour) }
     it "updates the regional parent too" do
-      regional_child.update_column :updated_at, 1.hour.ago
-      regional_parent.update_column :updated_at, 1.hour.ago
-      expect(regional_child.reload.updated_at).to be < 30.minutes.ago
-      expect(regional_parent.reload.updated_at).to be < 30.minutes.ago
+      regional_child.update_column :updated_at, Time.current - 1.hour
+      regional_parent.update_column :updated_at, Time.current - 1.hour
+      expect(regional_child.reload.updated_at).to be < Time.current - 30.minutes
+      expect(regional_parent.reload.updated_at).to be < Time.current - 30.minutes
       Sidekiq::Job.clear_all
 
       # Test that the associated_organizations are returning correctly
@@ -45,8 +45,8 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
     let!(:organization) { FactoryBot.create(:organization, :in_nyc) }
     it "updates the regional parent too" do
       expect(organization.locations.count).to eq 1
-      organization.update_columns(updated_at: 1.hour.ago, location_longitude: nil, location_latitude: nil)
-      expect(organization.reload.updated_at).to be < 30.minutes.ago
+      organization.update_columns(updated_at: Time.current - 1.hour, location_longitude: nil, location_latitude: nil)
+      expect(organization.reload.updated_at).to be < Time.current - 30.minutes
       expect(organization.search_coordinates_set?).to be_falsey
       Sidekiq::Job.clear_all
 
@@ -66,7 +66,7 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
     let(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
     it "creates the mailchimp_datum" do
       expect(organization.reload.admins.pluck(:id)).to eq([user.id])
-      mailchimp_datum.update(updated_at: 1.hour.ago)
+      mailchimp_datum.update(updated_at: Time.current - 1.hour)
       user.reload
       expect(UpdateMailchimpDatumJob::UPDATE_MAILCHIMP).to be_falsey
       Sidekiq::Job.clear_all
@@ -76,7 +76,7 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
       user.reload
       expect(user.mailchimp_datum).to be_present
       expect(user.mailchimp_datum.lists).to eq(["organization"])
-      expect(user.mailchimp_datum.updated_at).to be > 1.minute.ago
+      expect(user.mailchimp_datum.updated_at).to be > Time.current - 1.minute
     end
   end
 
@@ -125,7 +125,7 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
     let(:organization) { FactoryBot.create(:organization, :in_nyc) }
     # Have to do this whole dance because factories inline sidekiq processing of this job
     let(:organization_feature) { FactoryBot.create(:organization_feature, feature_slugs: ["organization_stolen_message"]) }
-    let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization, subscription_start_at: 6.months.ago) }
+    let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization, subscription_start_at: Time.current - 6.months) }
     it "adds it and disables it" do
       expect(organization.reload.organization_stolen_message).to be_blank
       invoice.update(organization_feature_ids: [organization_feature.id])
@@ -137,7 +137,7 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
       expect(organization_stolen_message.kind).to eq "association"
       organization_stolen_message.update(body: "stuff", is_enabled: true)
       expect(organization_stolen_message.reload.is_enabled).to be_truthy
-      invoice.update(subscription_end_at: 1.day.ago)
+      invoice.update(subscription_end_at: Time.current - 1.day)
       instance.perform(organization.id)
       expect(organization.reload.enabled_feature_slugs).to eq([])
       expect(organization_stolen_message.reload.is_enabled).to be_falsey

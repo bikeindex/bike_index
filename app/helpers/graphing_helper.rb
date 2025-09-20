@@ -94,7 +94,7 @@ module GraphingHelper
       concat "from "
       concat content_tag(:em, l(time_range.first, format: :convert_time), class: "convertTime #{precision_class}")
       concat " to "
-      if time_range.last > 5.minutes.ago
+      if time_range.last > Time.current - 5.minutes
         concat content_tag(:em, "now")
       else
         concat content_tag(:em, l(time_range.last, format: :convert_time), class: "convertTime #{precision_class}")

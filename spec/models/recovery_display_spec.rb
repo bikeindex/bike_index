@@ -22,7 +22,7 @@ RSpec.describe RecoveryDisplay, type: :model do
         allow(recovery_display).to receive(:image) { OpenStruct.new(file: OpenStruct.new("exists?" => false)) }
         expect(recovery_display.image_exists?).to be_falsey
         expect(recovery_display.image_processing?).to be_truthy
-        recovery_display.updated_at = 2.minutes.ago
+        recovery_display.updated_at = Time.current - 2.minutes
         expect(recovery_display.image_processing?).to be_falsey
       end
     end
@@ -37,7 +37,7 @@ RSpec.describe RecoveryDisplay, type: :model do
     it "sets time if no time" do
       recovery_display = RecoveryDisplay.new
       recovery_display.set_time
-      expect(recovery_display.recovered_at).to be > 5.seconds.ago
+      expect(recovery_display.recovered_at).to be > Time.current - 5.seconds
     end
     it "has before_validation_callback_method defined" do
       expect(RecoveryDisplay._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:set_time)).to eq(true)
@@ -67,7 +67,7 @@ RSpec.describe RecoveryDisplay, type: :model do
       it "sets attrs from stolen record" do
         recovery_display.from_stolen_record(stolen_record.id)
         expect(recovery_display.quote).to eq("stuff")
-        expect(recovery_display.recovered_at).to be > 5.seconds.ago
+        expect(recovery_display.recovered_at).to be > Time.current - 5.seconds
         expect(recovery_display.calculated_owner_name).to be_nil
         expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
         expect(recovery_display.quote_by).to be_nil
@@ -79,7 +79,7 @@ RSpec.describe RecoveryDisplay, type: :model do
           expect(bike.reload.user_hidden).to be_truthy
           recovery_display.from_stolen_record(stolen_record.id)
           expect(recovery_display.quote).to eq("stuff")
-          expect(recovery_display.recovered_at).to be > 5.seconds.ago
+          expect(recovery_display.recovered_at).to be > Time.current - 5.seconds
           expect(recovery_display.calculated_owner_name).to eq bike.current_ownership.user.display_name
           expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
           expect(recovery_display.quote_by).to eq "User"

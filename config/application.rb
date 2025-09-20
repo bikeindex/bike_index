@@ -52,8 +52,8 @@ module Bikeindex
     config.active_record.belongs_to_required_by_default = false
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    config.i18n.load_path += Dir[Rails.root.join("config/locales/**/*.{rb,yml}").to_s]
-    config.i18n.load_path += Dir[Rails.root.join("app/components/**/*.{yml}").to_s]
+    config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
+    config.i18n.load_path += Dir[Rails.root.join("app", "components", "**", "*.{yml}").to_s]
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
     config.i18n.available_locales = %i[en es it nl nb]
@@ -79,7 +79,7 @@ module Bikeindex
     config.view_component.use_deprecated_instrumentation_name = false # Stop annoying deprecation message
     # ^ remove after upgrading to ViewComponent 4
     config.default_preview_layout = "component_preview"
-    config.view_component.preview_paths << "#{Rails.root.join("app/components/")}"
+    config.view_component.preview_paths << "#{Rails.root}/app/components/"
     # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
     initializer "app_assets", after: "importmap.assets" do
       Rails.application.config.assets.paths << Rails.root.join("app")

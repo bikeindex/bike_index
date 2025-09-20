@@ -164,7 +164,7 @@ RSpec.describe Notification, type: :model do
         expect(user.reload.email).to eq user_email.email
         expect(notification.reload.message_channel_target).to eq user.email
         expect(notification.user_email&.id).to eq user_email.id
-        user.update_column :updated_at, 1.hour.ago
+        user.update_column :updated_at, Time.current - 1.hour
         expect(notification.reload.delivery_status).to eq "delivery_pending"
         notification.track_email_delivery do
           CustomerMailer.confirmation_email(notification.user).deliver_now

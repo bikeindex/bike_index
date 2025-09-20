@@ -20,8 +20,8 @@ RSpec.describe MailchimpDatum, type: :model do
         expect(UpdateMailchimpDatumJob.jobs.count).to eq 0
       end
       context "member" do
-        let!(:member) { FactoryBot.create(:membership, user:, level: "plus", start_at: 1.year.ago, end_at:) }
-        let(:end_at) { 2.weeks.from_now }
+        let!(:member) { FactoryBot.create(:membership, user:, level: "plus", start_at: Time.current - 1.year, end_at:) }
+        let(:end_at) { Time.current + 2.weeks }
         it "creates and then finds for the user" do
           expect(user.reload.member?).to be_truthy
           mailchimp_datum = MailchimpDatum.find_or_create_for(user)
@@ -49,7 +49,7 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.user_id).to be_present
         end
         context "membership ended" do
-          let(:end_at) { 1.week.ago }
+          let(:end_at) { Time.current - 1.week }
           it "does not create if not otherwise required" do
             expect(user.reload.member?).to be_falsey
             mailchimp_datum = MailchimpDatum.find_or_create_for(user)
@@ -314,7 +314,7 @@ RSpec.describe MailchimpDatum, type: :model do
         end
       end
       context "previously paid" do
-        let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization, start_at: 2.years.ago) }
+        let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization, start_at: Time.current - 2.years) }
         it "returns paid_previously" do
           organization.reload
           expect(organization.paid?).to be_falsey

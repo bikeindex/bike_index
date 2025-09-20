@@ -76,7 +76,7 @@ class OrganizationFeature < ApplicationRecord
   has_many :invoice_organization_features
   has_many :invoices, through: :invoice_organization_features
 
-  validates :name, uniqueness: true
+  validates_uniqueness_of :name
 
   enum :kind, KIND_ENUM
 

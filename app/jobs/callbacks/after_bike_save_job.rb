@@ -52,12 +52,12 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
     {
       auth_token: AUTH_TOKEN,
       bike: BikeV2ShowSerializer.new(bike, root: false).as_json,
-      update: bike.created_at > 30.seconds.ago
+      update: bike.created_at > Time.current - 30.seconds
     }
   end
 
   def update_matching_partial_registrations(bike)
-    return true unless bike.created_at > 5.minutes.ago # skip unless new bike
+    return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
 
     matches = BParam.partial_registrations.without_bike.where("email ilike ?", "%#{bike.owner_email}%")
       .reorder(:created_at)

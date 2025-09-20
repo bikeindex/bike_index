@@ -165,7 +165,7 @@ RSpec.describe HeaderTags::Component, type: :component do
     end
     describe "show" do
       let(:action_name) { "show" }
-      let(:target_time) { 1.hour.ago.utc }
+      let(:target_time) { (Time.current - 1.hour).utc }
       # Have to create user so it creates a path for the user
       let(:user) { FactoryBot.create(:user, name: "John", twitter: "stolenbikereg") }
       let(:title) { "Cool blog" }
@@ -253,7 +253,7 @@ RSpec.describe HeaderTags::Component, type: :component do
   describe "bikes_header_tags" do
     let(:controller_name) { "bikes" }
     let(:bike) { Bike.new(status: "status_stolen") }
-    let(:target_time) { 2.days.ago }
+    let(:target_time) { Time.current - 2.days }
     let(:page_obj) { bike }
     let(:mnfg_name) { bike.manufacturer.short_name.to_s }
 

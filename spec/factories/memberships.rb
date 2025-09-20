@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :membership do
     user { FactoryBot.create(:user_confirmed) }
     level { "basic" }
-    start_at { 1.hour.ago }
+    start_at { Time.current - 1.hour }
     creator { FactoryBot.create(:superuser) }
 
     trait :with_payment do

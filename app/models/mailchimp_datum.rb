@@ -32,7 +32,7 @@ class MailchimpDatum < ApplicationRecord
   belongs_to :user
   has_many :feedbacks
 
-  validates :email, presence: true
+  validates_presence_of :email
   validates :user_id, uniqueness: true, allow_blank: true
   validate :ensure_subscription_required, on: :create
 
@@ -105,7 +105,7 @@ class MailchimpDatum < ApplicationRecord
 
   def should_update?(prev_status = nil)
     return false if id.blank? || mailchimp_archived_at.present?
-    return true unless mailchimp_updated_at.present? && mailchimp_updated_at > 2.minutes.ago
+    return true unless mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
 
     prev_status ||= status # Enable passing previous_status in after_commit
     prev_status != calculated_status # If status doesn't match, we should update!

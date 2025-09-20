@@ -45,9 +45,9 @@ RSpec.describe Membership, type: :model do
 
   describe "validations" do
     let(:creator) { FactoryBot.create(:superuser) }
-    let!(:membership_existing) { FactoryBot.create(:membership, start_at: 2.months.ago, end_at: end_at_existing, creator:) }
+    let!(:membership_existing) { FactoryBot.create(:membership, start_at: Time.current - 2.months, end_at: end_at_existing, creator:) }
     let(:user) { membership_existing.user.reload }
-    let(:membership_new) { FactoryBot.build(:membership, start_at: 1.week.ago, user:, creator:) }
+    let(:membership_new) { FactoryBot.build(:membership, start_at: Time.current - 1.week, user:, creator:) }
     let(:end_at_existing) { nil }
 
     it "blocks creating when there is an existing membership" do
@@ -58,7 +58,7 @@ RSpec.describe Membership, type: :model do
     end
 
     context "when updating existing to overlap" do
-      let(:end_at_existing) { 8.days.ago }
+      let(:end_at_existing) { Time.current - 8.days }
       it "blocks updating" do
         expect(membership_existing.reload.period_active?).to be_falsey
         expect(membership_new.save).to be_truthy
@@ -76,8 +76,8 @@ RSpec.describe Membership, type: :model do
           expect(membership_new.id).to be > membership_existing.id
           membership_existing.reload.save
           expect(membership_existing.reload.save).to be_truthy
-          membership_existing.update(end_at: 1.minute.from_now)
-          expect(membership_existing.reload.end_at).to be_within(1).of 1.minute.from_now
+          membership_existing.update(end_at: Time.current + 1.minute)
+          expect(membership_existing.reload.end_at).to be_within(1).of Time.current + 1.minute
 
           # Nothing has happened here
           expect(membership_new.reload.end_at).to be_nil
@@ -111,7 +111,7 @@ RSpec.describe Membership, type: :model do
       expect(User.member.pluck(:id)).to eq([user.id])
     end
     context "membership pending" do
-      let(:membership) { FactoryBot.create(:membership, start_at: 1.week.from_now) }
+      let(:membership) { FactoryBot.create(:membership, start_at: Time.current + 1.week) }
       it "is not member" do
         expect(membership.reload.status).to eq "pending"
         expect(user.reload.member?).to be_falsey

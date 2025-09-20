@@ -97,11 +97,11 @@ class BulkImportJob < ApplicationJob
       bike: {
         is_bulk: true,
         # Set default manufacturer, since sometimes manufacturer is blank
-        manufacturer_id: row[:manufacturer].presence || "Unknown",
+        manufacturer_id: row[:manufacturer].present? ? row[:manufacturer] : "Unknown",
         owner_email: row[:owner_email],
         # Set a default color of black, since sometimes there aren't colors in imports
         # NOTE: This runs through paint
-        color: row[:color].presence || "Black",
+        color: row[:color].present? ? row[:color] : "Black",
         serial_number: rescue_blank_serial(row[:serial_number]),
         year: row[:year],
         frame_model: row[:model],

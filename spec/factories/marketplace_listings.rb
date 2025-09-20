@@ -14,13 +14,13 @@ FactoryBot.define do
 
     trait :for_sale do
       with_address_record
-      published_at { 1.minute.ago }
+      published_at { Time.current - 1.minute }
       status { :for_sale }
     end
 
     trait :sold do
-      end_at { 1.minute.ago }
-      published_at { 1.week.ago }
+      end_at { Time.current - 1.minute }
+      published_at { Time.current - 1.week }
       buyer { FactoryBot.create(:user_confirmed) }
       status { :sold }
     end

@@ -4,7 +4,7 @@ RSpec.describe ImpoundRecord, type: :model do
   it_behaves_like "geocodeable"
   it_behaves_like "default_currencyable"
 
-  let!(:bike) { FactoryBot.create(:bike, created_at: 1.day.ago) }
+  let!(:bike) { FactoryBot.create(:bike, created_at: Time.current - 1.day) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:impound_configuration) { organization.fetch_impound_configuration }
   let(:user) { FactoryBot.create(:organization_user, organization: organization) }
@@ -80,7 +80,7 @@ RSpec.describe ImpoundRecord, type: :model do
       context "unregistered_parking_notification" do
         let(:parking_notification) do
           pn = FactoryBot.create(:parking_notification_unregistered,
-            created_at: 1.hour.ago,
+            created_at: Time.current - 1.hour,
             organization: organization,
             user: user2,
             kind: "impound_notification")
@@ -139,7 +139,7 @@ RSpec.describe ImpoundRecord, type: :model do
             FactoryBot.create(:impound_claim_with_stolen_record,
               status: "submitting",
               organization: organization,
-              created_at: 1.hour.ago,
+              created_at: Time.current - 1.hour,
               impound_record: impound_record)
           end
           let(:stolen_record) { impound_claim.stolen_record }
@@ -262,7 +262,7 @@ RSpec.describe ImpoundRecord, type: :model do
   end
 
   describe "authorized?" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: 3.hours.ago) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
     let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
     it "is not authorized by user" do
       bike.reload
@@ -287,7 +287,7 @@ RSpec.describe ImpoundRecord, type: :model do
     context "note and message" do
       let(:parking_notification1) do
         FactoryBot.create(:parking_notification, bike: bike, organization: organization, kind: "parked_incorrectly_notification",
-          internal_notes: "Internal note 1", created_at: 1.month.ago)
+          internal_notes: "Internal note 1", created_at: Time.current - 1.month)
       end
       let!(:parking_notification2) do
         FactoryBot.create(:parking_notification, is_repeat: true, organization: organization, kind: "impound_notification", impound_record: impound_record,
@@ -405,7 +405,7 @@ RSpec.describe ImpoundRecord, type: :model do
     let(:bike) { FactoryBot.create(:bike, created_at: time, status: "status_impounded") }
     let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
     let(:impound_record) { FactoryBot.create(:impound_record, created_at: impounded_time, bike: bike) }
-    let(:time) { 1.week.ago }
+    let(:time) { Time.current - 1.week }
     let(:impounded_time) { time + 1.hour }
     before { bike.reload }
     it "is falsey" do

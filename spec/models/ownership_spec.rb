@@ -20,7 +20,7 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.creator).to eq bike.creator
       end
       context "bike_organized" do
-        let(:time) { 5.weeks.ago }
+        let(:time) { Time.current - 5.weeks }
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, created_at: time) }
         it "creates" do
           expect(bike.reload.created_at).to be_within(1).of time
@@ -267,7 +267,7 @@ RSpec.describe Ownership, type: :model do
       expect(ownership.claimed_at).to be_present
     end
     context "factory ownership_claimed" do
-      let(:claimed_at) { 2.weeks.ago }
+      let(:claimed_at) { Time.current - 2.weeks }
       let!(:ownership) { FactoryBot.create(:ownership_claimed, claimed_at: claimed_at) }
       it "is claimed" do
         expect(ownership.claimed?).to be_truthy

@@ -5,7 +5,7 @@ RSpec.describe Email::ScheduledSurveyJob, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
 
-  let(:stolen_at) { 2.weeks.ago } # time in stolen_survey_period
+  let(:stolen_at) { Time.current - 2.weeks } # time in stolen_survey_period
   let(:organization) { FactoryBot.create(:organization, opted_into_theft_survey_2023: true) }
   let(:user) { FactoryBot.create(:user) }
   let(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creation_organization: organization) }

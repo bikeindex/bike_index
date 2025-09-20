@@ -3,7 +3,7 @@ FactoryBot.define do
     factory :project529_credential,
       class: "ExternalRegistryCredential::Project529Credential" do
       access_token { "test" }
-      access_token_expires_at { 2.days.from_now }
+      access_token_expires_at { Time.current + 2.days }
       app_id { "test" }
       refresh_token { "test" }
       type { "ExternalRegistryCredential::Project529Credential" }

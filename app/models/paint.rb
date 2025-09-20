@@ -15,8 +15,8 @@
 class Paint < ApplicationRecord
   include FriendlyNameFindable
 
-  validates :name, presence: true
-  validates :name, uniqueness: true
+  validates_presence_of :name
+  validates_uniqueness_of :name
   belongs_to :color
   belongs_to :manufacturer
   has_many :bikes
@@ -24,8 +24,8 @@ class Paint < ApplicationRecord
   belongs_to :secondary_color, class_name: "Color"
   belongs_to :tertiary_color, class_name: "Color"
 
-  scope :official, -> { where.not(manufacturer_id: nil) }
-  scope :linked, -> { where.not(color_id: nil) }
+  scope :official, -> { where("manufacturer_id IS NOT NULL") }
+  scope :linked, -> { where("color_id IS NOT NULL") }
   scope :unlinked, -> { where("color_id IS NULL") }
 
   before_save :set_calculated_attributes

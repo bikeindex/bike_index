@@ -154,7 +154,7 @@ class Export < ApplicationRecord
   end
 
   def partial_registrations
-    options["partial_registrations"].presence || false
+    options["partial_registrations"].blank? ? false : options["partial_registrations"]
   end
 
   # NOTE: Only does the first 100 bikes, in case there is a huge export
@@ -305,7 +305,7 @@ class Export < ApplicationRecord
   def calculated_progress
     return progress unless pending? || ongoing?
 
-    ((created_at || Time.current) < 10.minutes.ago) ? "errored" : progress
+    ((created_at || Time.current) < Time.current - 10.minutes) ? "errored" : progress
   end
 
   def validated_options(opts)

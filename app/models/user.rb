@@ -119,25 +119,25 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :user_ban
 
-  validates :username, uniqueness: {case_sensitive: false}
+  validates_uniqueness_of :username, case_sensitive: false
 
   validates :password,
     presence: true,
     length: {within: 12..100},
     on: :create
-  validates :password, format: {with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create}
+  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
 
   validates :password,
     confirmation: true,
     length: {within: 12..100},
     allow_blank: true,
     on: :update
-  validates :password, format: {with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true}
+  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
 
   validate :preferred_language_is_an_available_locale
 
-  validates :email, presence: true
-  validates :email, uniqueness: {case_sensitive: false}
+  validates_presence_of :email
+  validates_uniqueness_of :email, case_sensitive: false
 
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
@@ -297,11 +297,11 @@ class User < ApplicationRecord
   end
 
   def marketplace_message_name
-    InputNormalizer.sanitize(name.presence || short_username)
+    InputNormalizer.sanitize(name.present? ? name : short_username)
   end
 
   def display_name
-    name.presence || email
+    name.present? ? name : email
   end
 
   def first_display_name
@@ -363,7 +363,7 @@ class User < ApplicationRecord
   end
 
   def auth_token_expired?(auth_token_type)
-    auth_token_time(auth_token_type) < 2.hours.ago
+    auth_token_time(auth_token_type) < (Time.current - 2.hours)
   end
 
   def accepted_vendor_terms_of_service?
@@ -389,7 +389,7 @@ class User < ApplicationRecord
 
   def send_magic_link_email
     # If the auth token was just created, don't create a new one, it's too error prone
-    return true if auth_token_time("magic_link_token") > 1.minutes.ago
+    return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
 
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
@@ -587,7 +587,7 @@ class User < ApplicationRecord
   end
 
   def password_reset_just_sent?
-    auth_token_time("token_for_password_reset").to_i > 2.minutes.ago.to_i
+    auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
   end
 
   def claimed_organization_roles_for(organization_id)

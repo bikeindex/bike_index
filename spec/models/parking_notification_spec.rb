@@ -18,7 +18,7 @@ RSpec.describe ParkingNotification, type: :model do
     end
     context "organized record" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:bike) { FactoryBot.create(:bike, created_at: 2.weeks.ago) }
+      let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 2.weeks) }
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, bike: bike) }
       let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: parking_notification.user) }
       let!(:parking_notification3) { FactoryBot.create(:parking_notification_organized) }
@@ -107,7 +107,7 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.status).to eq "status_abandoned"
     end
     context "existing" do
-      let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: 1.year.ago) }
+      let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.year) }
       let(:initial_organization) { FactoryBot.create(:organization) }
       it "repeat_record is false - and test that bike status isn't changed" do
         bike.reload
@@ -147,7 +147,7 @@ RSpec.describe ParkingNotification, type: :model do
           expect(parking_notification.associated_notifications_including_self.pluck(:id)).to match_array([parking_notification_initial.id, parking_notification.id])
         end
         context "additional parking_notification" do
-          let!(:parking_notification2) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: 1.week.ago, initial_record: parking_notification_initial) }
+          let!(:parking_notification2) { FactoryBot.create(:parking_notification, bike: bike, organization: initial_organization, created_at: Time.current - 1.week, initial_record: parking_notification_initial) }
           it "can be assigned" do
             parking_notification2.reload
             expect(ParkingNotification.where(initial_record_id: parking_notification_initial.id).count).to eq 1
@@ -315,7 +315,7 @@ RSpec.describe ParkingNotification, type: :model do
     it "marks retrieved and enqueues processing, but only once" do
       expect(parking_notification.active?).to be_truthy
       # test setting the attrs and the overrides (because local keyword args)
-      parking_notification.resolved_at = 2.hours.ago
+      parking_notification.resolved_at = Time.current - 2.hours
       parking_notification.retrieved_by_id = 12121212
       expect {
         parking_notification.mark_retrieved!(retrieved_by_id: user.id, retrieved_kind: "organization_recovery")
@@ -350,7 +350,7 @@ RSpec.describe ParkingNotification, type: :model do
           bike: parking_notification.bike,
           organization: parking_notification.organization,
           user: parking_notification.user,
-          created_at: 1.week.ago,
+          created_at: Time.current - 1.week,
           initial_record: parking_notification,
           delivery_status: "email_success")
       end
@@ -437,7 +437,7 @@ RSpec.describe ParkingNotification, type: :model do
         expect(new_parking_notification.current?).to be_truthy
       end
       context "already retrieved" do
-        let(:resolved_at) { 26.hours.ago }
+        let(:resolved_at) { Time.current - 26.hours }
         let(:parking_notification) { FactoryBot.create(:parking_notification, :retrieved, resolved_at: resolved_at) }
         it "does not create" do
           expect(parking_notification.status).to eq "retrieved"

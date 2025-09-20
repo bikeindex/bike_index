@@ -615,7 +615,7 @@ RSpec.describe BikeServices::Creator do
       it "creates public images for the attached image" do
         bike = FactoryBot.create(:bike)
         b_param = FactoryBot.create(:b_param)
-        test_photo = Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg").to_s))
+        test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
         b_param.image = test_photo
         b_param.save
         expect(b_param.image).to be_present
@@ -696,7 +696,7 @@ RSpec.describe BikeServices::Creator do
         expect(bike.status_humanized).to eq "found"
       end
       context "with impound attrs" do
-        let(:time) { 12.hours.ago }
+        let(:time) { Time.current - 12.hours }
         let(:b_param_params) { {bike: {status: "status_with_owner"}, impound_record: {impounded_at: time}} }
         it "is abandoned" do
           expect(b_param.status).to eq "status_impounded"

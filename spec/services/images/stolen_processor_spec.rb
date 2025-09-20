@@ -34,7 +34,7 @@ RSpec.describe Images::StolenProcessor do
     let(:image) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
 
     it "assigns the public_image" do
-      stolen_record.bike.update_column :updated_at, 1.hour.ago
+      stolen_record.bike.update_column :updated_at, Time.current - 1.hour
       Sidekiq::Job.clear_all
       expect(stolen_record.reload.bike_main_image.id).to eq public_image.id
       expect do
@@ -49,7 +49,7 @@ RSpec.describe Images::StolenProcessor do
       # No new jobs are enqueued
       expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
 
-      stolen_record.bike.update_column :updated_at, 1.hour.ago
+      stolen_record.bike.update_column :updated_at, Time.current - 1.hour
       # It doesn't create again
       expect do
         described_class.update_alert_images(stolen_record)
@@ -57,7 +57,7 @@ RSpec.describe Images::StolenProcessor do
       expect(ActiveStorage::Attachment.count).to eq 3
       expect(stolen_record.reload.images_attached?).to be_truthy
       # It doesn't update the updated_at
-      expect(stolen_record.reload.bike.updated_at).to be_within(1).of(1.hour.ago)
+      expect(stolen_record.reload.bike.updated_at).to be_within(1).of(Time.current - 1.hour)
       # No new jobs are enqueued
       expect(StolenBike::AfterStolenRecordSaveJob.jobs.count).to eq 0
     end
@@ -74,7 +74,7 @@ RSpec.describe Images::StolenProcessor do
         expect(stolen_record.image_opengraph.attached?).to be_truthy
 
         public_image.destroy
-        stolen_record.bike.update_column :updated_at, 1.hour.ago
+        stolen_record.bike.update_column :updated_at, Time.current - 1.hour
         # Calling it after public_image is deleted, soft deletes the attachments
         expect do
           described_class.update_alert_images(stolen_record)

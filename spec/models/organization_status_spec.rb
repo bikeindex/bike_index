@@ -10,7 +10,7 @@ RSpec.describe OrganizationStatus, type: :model do
   end
 
   describe "at_time" do
-    let(:time) { 23.hours.ago }
+    let(:time) { Time.current - 23.hours }
     let!(:organization_status1) { FactoryBot.create(:organization_status, start_at: time - 2.hours, end_at: time - 1.hour) }
     let(:organization) { organization_status1.organization }
     let!(:organization_status2) { FactoryBot.create(:organization_status, organization: organization, start_at: time - 30.minutes) }

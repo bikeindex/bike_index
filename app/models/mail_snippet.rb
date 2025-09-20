@@ -60,11 +60,12 @@ class MailSnippet < ApplicationRecord
 
   enum :kind, KIND_ENUM
 
-  before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  validates :organization_id, uniqueness: {scope: [:kind], allow_nil: true}
-  validates :doorkeeper_app_id, uniqueness: {scope: [:kind], allow_nil: true}
+  before_validation :set_calculated_attributes
+
+  validates_uniqueness_of :organization_id, scope: [:kind], allow_nil: true
+  validates_uniqueness_of :doorkeeper_app_id, scope: [:kind], allow_nil: true
 
   scope :enabled, -> { where(is_enabled: true) }
   scope :with_organizations, -> { where.not(organization_id: nil) }

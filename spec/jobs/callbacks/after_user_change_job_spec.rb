@@ -372,7 +372,7 @@ RSpec.describe Callbacks::AfterUserChangeJob, type: :job do
       expect(bike2.user&.id).to eq user.id
       expect(bike2.current_ownership_id).to eq ownership2.id
       expect(bike3.reload.current_ownership_id).to be_present
-      bike3.update_column :updated_at, 1.hour.ago
+      bike3.update_column :updated_at, Time.current - 1.hour
 
       Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do

@@ -61,7 +61,7 @@ class Email::ScheduledSurveyJob < ScheduledJob
   end
 
   def stolen_survey_period
-    (10.years.ago)..(1.week.ago)
+    (Time.current - 10.years)..(Time.current - 1.week)
   end
 
   # Split out to make it easier to individually send messages
