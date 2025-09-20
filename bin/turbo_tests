@@ -4,21 +4,11 @@
 require "bundler/setup"
 require "fileutils"
 
-# Compile assets before running tests to avoid compilation warnings
-assets_path = File.expand_path("../app/assets/builds", __dir__)
-FileUtils.mkdir_p(assets_path)
+puts "Compiling assets before tests..."
+system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
 
-# Check if CSS files exist
-css_files = Dir.glob(File.join(assets_path, "*.css"))
-
-if css_files.empty?
-  puts "Compiling assets before tests..."
-
-  # Use Rails asset precompilation which handles all CSS builds
-  system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
-
-  puts "Assets compiled successfully"
-end
+# Make sure precompilation is off, because it already happened
+ENV['RAILS_ASSETS_PRECOMPILE'] = 'false'
 
 # Pass all arguments to turbo_tests
 exec "bundle", "exec", "turbo_tests", *ARGV
