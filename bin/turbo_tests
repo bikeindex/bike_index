@@ -3,10 +3,14 @@
 
 require "bundler/setup"
 
-# Use Rails' assets:clobber task to check if assets need compilation
-# If assets are already compiled and up-to-date, this will be fast
-puts "Ensuring assets are compiled..."
-system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
+# Simple check: if CSS files exist, assume they're compiled
+builds_dir = File.expand_path("../app/assets/builds", __dir__)
+css_files = Dir.glob(File.join(builds_dir, "*.css"))
+
+if css_files.empty?
+  puts "Compiling assets before tests..."
+  system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
+end
 
 # Pass all arguments to turbo_tests
 exec "bundle", "exec", "turbo_tests", *ARGV
