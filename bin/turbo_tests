@@ -2,12 +2,33 @@
 # frozen_string_literal: true
 
 require "bundler/setup"
+require "digest"
 
-# Simple check: if CSS files exist, assume they're compiled
-builds_dir = File.expand_path("../app/assets/builds", __dir__)
-css_files = Dir.glob(File.join(builds_dir, "*.css"))
+def assets_need_compilation?
+  builds_dir = File.expand_path("../app/assets/builds", __dir__)
 
-if css_files.empty?
+  # If builds directory doesn't exist or is empty, we need compilation
+  return true unless Dir.exist?(builds_dir)
+  css_files = Dir.glob(File.join(builds_dir, "*.css"))
+  return true if css_files.empty?
+
+  # Get the oldest compiled asset timestamp
+  oldest_asset_time = css_files.map { |f| File.mtime(f) }.min
+
+  # Check if any source files are newer than the oldest compiled asset
+  source_patterns = [
+    "app/assets/stylesheets/**/*.scss",
+    "app/assets/stylesheets/**/*.css",
+    "config/tailwind.config.js",
+    "config/initializers/dartsass.rb"
+  ]
+
+  source_patterns.any? do |pattern|
+    Dir.glob(pattern).any? { |f| File.mtime(f) > oldest_asset_time }
+  end
+end
+
+if assets_need_compilation?
   puts "Compiling assets before tests..."
   system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
 end
