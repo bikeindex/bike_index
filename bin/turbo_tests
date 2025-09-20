@@ -4,6 +4,8 @@
 require "bundler/setup"
 require "digest"
 
+# For some reason (I believe because of dartsass) assets get recompiled every time tests run
+# So handle asset compilation ourselves
 def assets_need_compilation?
   builds_dir = File.expand_path("../app/assets/builds", __dir__)
 
@@ -16,22 +18,24 @@ def assets_need_compilation?
   oldest_asset_time = css_files.map { |f| File.mtime(f) }.min
 
   # Check if any source files are newer than the oldest compiled asset
-  source_patterns = [
+  [
     "app/assets/stylesheets/**/*.scss",
     "app/assets/stylesheets/**/*.css",
     "config/tailwind.config.js",
     "config/initializers/dartsass.rb"
-  ]
-
-  source_patterns.any? do |pattern|
+  ].any? do |pattern|
     Dir.glob(pattern).any? { |f| File.mtime(f) > oldest_asset_time }
   end
 end
 
 if assets_need_compilation?
   puts "Compiling assets before tests..."
+  # Hide the output, dartsass vomits a bunch of warnings
   system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
 end
+
+# Make sure precompilation is off, because it's just been handled
+ENV['RAILS_ASSETS_PRECOMPILE'] = 'false'
 
 # Pass all arguments to turbo_tests
 exec "bundle", "exec", "turbo_tests", *ARGV
