@@ -43,34 +43,6 @@ require "view_component/system_test_helpers"
 
 ActiveRecord::Migration.maintain_test_schema!
 
-# Compile CSS assets once before tests to avoid multiple compilation warnings
-# Use a lock file to ensure only one process compiles
-assets_path = Rails.root.join("app/assets/builds")
-lock_file = Rails.root.join("tmp", "assets_compile.lock")
-
-FileUtils.mkdir_p(assets_path) unless File.directory?(assets_path)
-FileUtils.mkdir_p(Rails.root.join("tmp")) unless File.directory?(Rails.root.join("tmp"))
-
-# Check if CSS files exist
-css_files = Dir.glob(assets_path.join("*.css"))
-if css_files.empty?
-  # Use file locking to ensure only one process compiles
-  File.open(lock_file, File::CREAT) do |f|
-    if f.flock(File::LOCK_EX | File::LOCK_NB)
-      # We got the lock, so we compile
-      puts "Compiling CSS assets once before tests..."
-      system("bundle exec rails dartsass:build 2>/dev/null")
-      system("bundle exec rails tailwindcss:build 2>/dev/null")
-      f.flock(File::LOCK_UN)
-    else
-      # Another process has the lock, wait for it to finish
-      puts "Waiting for another process to compile assets..."
-      f.flock(File::LOCK_EX)
-      f.flock(File::LOCK_UN)
-    end
-  end
-end
-
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
