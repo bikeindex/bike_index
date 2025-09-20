@@ -36,9 +36,9 @@ This project uses Rspec for tests. All business logic should be tested.
 Run tests with turbo_tests:
 
 ```bash
-bundle exec turbo_tests
+bin/turbo_tests
 # Or, to run just specific tests
-bundle exec turbo_tests {FILE OR FOLDER}
+bin/turbo_tests {FILE OR FOLDER}
 ```
 
 ## Frontend Development
