@@ -192,6 +192,13 @@ RSpec.describe GeocodeHelper do
         expect(described_class.bounding_box([42.8490197, -106.3015341], 10)).to eq target
       end
     end
+    context "unknown location" do
+      it "returns empty" do
+        VCR.use_cassette("geohelper-boundingbox-unknown", vcr_config) do
+          expect(described_class.bounding_box("adsf9asdsf09 adsfasdf", 10)).to eq([])
+        end
+      end
+    end
   end
 
   describe "permitted_distance" do

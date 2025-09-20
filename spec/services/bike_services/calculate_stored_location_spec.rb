@@ -118,5 +118,30 @@ RSpec.describe BikeServices::CalculateStoredLocation do
         end
       end
     end
+
+    context "with address_record" do
+      let(:address_record) { FactoryBot.create(:address_record, :edmonton, kind: :bike) }
+      let(:bike) { FactoryBot.create(:bike, address_record:, address_set_manually:) }
+      let(:address_set_manually) { false }
+      let(:coords) { address_record.reload.to_coordinates }
+
+      it "doesn't assign from address_record" do
+        expect(address_record.to_coordinates).to eq coords
+
+        expect(bike.reload.registration_address_source).to be_blank
+        expect(bike.to_coordinates).to eq([nil, nil])
+      end
+
+      context "with address_set_manually" do
+        let(:address_set_manually) { true }
+
+        it "assigns from address_record" do
+          expect(address_record.to_coordinates).to eq coords
+
+          expect(bike.reload.registration_address_source).to eq "bike_update"
+          expect(bike.to_coordinates).to eq coords
+        end
+      end
+    end
   end
 end

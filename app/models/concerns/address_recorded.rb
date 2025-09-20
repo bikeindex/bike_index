@@ -10,8 +10,15 @@ module AddressRecorded
     delegate :address_present?, :address_hash, :formatted_address_string,
       to: :address_record, allow_nil: true
 
-    scope :with_location, -> { where.not(address_record_id: nil) }
+    # This duplicates the functionality of Geocoder::Store::ActiveRecord.within_bounding_box
+    scope :within_bounding_box, lambda { |*bounds|
+      sw_lat, sw_lng, ne_lat, ne_lng = bounds.flatten if bounds
+      return none unless sw_lat && sw_lng && ne_lat && ne_lng
 
+      where(table_name => {latitude: sw_lat..ne_lat, longitude: sw_lng..ne_lng})
+    }
+
+    scope :with_location, -> { where.not(address_record_id: nil) }
     # TODO: uncomment when bike AddressRecords have finished migration
     # scope :with_street, -> { includes(:address_record).where.not(address_records: {street: nil}) }
   end

@@ -12,12 +12,11 @@ class BikeServices::CalculateStoredLocation
         bike.current_stolen_record.attributes.slice("latitude", "longitude")
       else
         attrs = {}
-        if bike.address_set_manually # If it's not stolen, use the manual set address for the coordinates
-          return {} unless bike.user&.address_set_manually # If it's set by the user, address_set_manually is no longer correct!
-
+        # If address is comes from the user record, address_set_manually is no longer correct!
+        if bike.address_set_manually && bike.user&.address_set_manually
           attrs[:address_set_manually] = false
         end
-        attrs.merge(location_record_address_hash(bike))
+        attrs.merge(location_record_coordinates(bike))
       end
     end
 
@@ -30,7 +29,7 @@ class BikeServices::CalculateStoredLocation
     # 2. #registration_address (which prioritizes user address)
     # 3. The creation organization address (so we have a general area for the bike)
     # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
-    def location_record_address_hash(bike)
+    def location_record_coordinates(bike)
       l_hashes = [
         bike.current_impound_record&.address_hash,
         bike.current_parking_notification&.address_hash,

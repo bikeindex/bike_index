@@ -16,8 +16,11 @@ RSpec.describe Bike, type: :model do
     it "is valid" do
       expect(address_record).to have_attributes target_attrs
       expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
+      expect(bike.reload.address_set_manually).to be_truthy # Required to get the address_record coordinates
+      expect(bike.to_coordinates.map(&:round)).to eq([52, 5])
       expect(AddressRecord.pluck(:id)).to eq([address_record.id])
-      expect(Bike.with_street.pluck(:id)).to eq([bike.id])
+      # TODO: when bike AddressRecords have finished migration, uncomment
+      # expect(Bike.with_street.pluck(:id)).to eq([bike.id])
     end
   end
 
@@ -1321,15 +1324,19 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "address set on bike" do
+      let(:address_record) { FactoryBot.create(:address_record, :chicago, street: "1313 N Milwaukee Ave ", postal_code: "66666 ", kind: :bike) }
       it "returns bike_update" do
+        expect(address_record.reload.to_coordinates.map(&:round)).to eq([42, -88])
         expect(bike.reload.registration_address_source).to eq "initial_creation"
-        bike.update(street: "1313 N Milwaukee Ave ", city: " Chicago", zipcode: " 66666", latitude: 43.9, longitude: -88.7, address_set_manually: true)
+        bike.update(address_record:, address_set_manually: true)
+        expect(bike.reload.registration_address(true)["latitude"]).to eq address_record["latitude"]
+        expect(bike.reload.address_record.city).to eq "Chicago"
+        expect(bike.address_record.street).to eq "1313 N Milwaukee Ave"
+        expect(bike.address_record.city).to eq "Chicago"
+        expect(bike.address_record.postal_code).to eq "66666"
+
         expect(bike.registration_address_source).to eq "bike_update"
-        expect(bike.latitude).to eq 43.9
-        expect(bike.latitude_public).to eq 43.9
-        expect(bike.street).to eq "1313 N Milwaukee Ave"
-        expect(bike.city).to eq "Chicago"
-        expect(bike.zipcode).to eq "66666"
+        expect(bike.reload.to_coordinates.map(&:round)).to eq([42, -88])
       end
     end
     context "b_param" do
@@ -1341,12 +1348,12 @@ RSpec.describe Bike, type: :model do
       end
       context "user with address address_set_manually" do
         let(:user) { FactoryBot.create(:user, :address_in_vancouver, address_set_manually: true) }
-        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, city: "Lancaster", zipcode: 17601) }
+        let(:bike) { FactoryBot.create(:bike, :address_in_chicago, :with_ownership_claimed, user:) }
         it "returns user address" do
           bike.reload
           expect(bike.registration_address_source).to eq "user"
-          expect(bike.address_hash["city"]).to eq "Lancaster" # Because it's set on the bike
           expect(bike.registration_address(true)).to eq user.address_hash_legacy
+          expect(bike.address_record.city).to eq "Chicago"
           expect(bike.registration_address["city"]).to eq "Vancouver"
         end
       end

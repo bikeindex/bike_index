@@ -25,6 +25,8 @@ FactoryBot.define do
     trait :with_address_record do
       transient { address_record_kind { :bike } }
 
+      address_set_manually { true } # Required to set the address_record coordinates
+
       address_record { FactoryBot.build(:address_record, kind: address_record_kind) }
 
       after(:create) do |bike, _evaluator|
