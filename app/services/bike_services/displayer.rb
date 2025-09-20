@@ -65,23 +65,6 @@ class BikeServices::Displayer
       %w[status_impounded unregistered_parking_notification status_stolen].exclude?(bike.status)
     end
 
-    # Intended as an internal method, splitting out for testing purposes
-    def user_edit_bike_address?(bike, user = nil)
-      return false if user.blank?
-
-      if bike.user.present?
-        # If the user has set their address, that's the only way to update bike addresses
-        return false if bike.user.address_set_manually
-        if bike.user == user
-          # If user is bike owner, check for user_registration_organizations with reg_address -
-          # because then they need to edit address via their account page
-          return user.uro_organizations.with_enabled_feature_slugs("reg_address").none?
-        end
-      end
-      # otherwise if bike is new, for superusers or users authorized by organization
-      bike.id.blank? || user.superuser? || bike.authorized_by_organization?(u: user)
-    end
-
     def edit_street_address?(bike, user = nil)
       return false if bike.user&.no_address? || bike.creation_organization&.enabled?("no_address")
 
@@ -126,6 +109,22 @@ class BikeServices::Displayer
     end
 
     private
+
+    def user_edit_bike_address?(bike, user = nil)
+      return false if user.blank?
+
+      if bike.user.present?
+        # If the user has set their address, that's the only way to update bike addresses
+        return false if bike.user.address_set_manually
+        if bike.user == user
+          # If user is bike owner, check for user_registration_organizations with reg_address -
+          # because then they need to edit address via their account page
+          return user.uro_organizations.with_enabled_feature_slugs("reg_address").none?
+        end
+      end
+      # otherwise if bike is new, for superusers or users authorized by organization
+      bike.id.blank? || user.superuser? || bike.authorized_by_organization?(u: user)
+    end
 
     def single_image_hash(image_url)
       {square: image_url, twitter: image_url, facebook: image_url}
