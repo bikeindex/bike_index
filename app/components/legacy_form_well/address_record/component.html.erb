@@ -76,15 +76,20 @@
         data-legacy-form-well--address-record-with-default-target="staticFields"
       >
         <%= @builder.object.city %>
+        <br>
+        <%= @builder.object.region %>
+        <br>
+        <%= @builder.object.postal_code %>
       </p>
     <% end %>
   </div>
-  <div class="form-group row">
+  <%# NOTE: The below rows are hidden when static (and rendered above), to fix a spacing issue %>
+  <div
+    class="form-group row <%= non_static_field_class %>"
+    data-legacy-form-well--address-record-with-default-target="nonStaticFields"
+  >
     <label class="form-well-label"></label>
-    <div
-      class="form-well-input <%= non_static_field_class %>"
-      data-legacy-form-well--address-record-with-default-target="nonStaticFields"
-    >
+    <div class="form-well-input">
       <%= @builder.collection_select(
         :region_record_id,
         State.united_states,
@@ -103,16 +108,11 @@
         "data-legacy-form-well--address-record-target" => "region",
       ) %>
     </div>
-    <% if @static_fields %>
-      <p
-        class="form-well-input-static tw:py-0!"
-        data-legacy-form-well--address-record-with-default-target="staticFields"
-      >
-        <%= @builder.object.region %>
-      </p>
-    <% end %>
   </div>
-  <div class="form-group row mb-4">
+  <div
+    class="form-group row mb-4 <%= non_static_field_class %>"
+    data-legacy-form-well--address-record-with-default-target="nonStaticFields"
+  >
     <label class="form-well-label"></label>
     <div
       class="form-well-input <%= non_static_field_class %>"
@@ -122,13 +122,5 @@
                           placeholder: translation(".postal_code"),
                           class: "form-control" %>
     </div>
-    <% if @static_fields %>
-      <p
-        class="form-well-input-static tw:py-0!"
-        data-legacy-form-well--address-record-with-default-target="staticFields"
-      >
-        <%= @builder.object.postal_code %>
-      </p>
-    <% end %>
   </div>
 </div>

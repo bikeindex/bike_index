@@ -4088,7 +4088,7 @@ en:
       daily_hot_sheet_notifications_html: Receive daily <em>%{org_name}</em> %{hot_sheets_link}
       give_us_permission_html: >-
         Give us permission to contact you if we believe your bike has been stolen,
-        <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
+        <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>.
       have_multiple_emails: Have multiple emails? Consolidate them into one account
         here
       make_primary_email: Make primary email
@@ -4109,7 +4109,7 @@ en:
       unconfirmed: unconfirmed!
       unconfirmed_emails: Unconfirmed emails
       verified: verified
-      why_you_should_text: Read why you should
+      why_you_should_text: read why you should
     sharing:
       choose_file: Choose file...
       create_page: Create page
