@@ -9,11 +9,7 @@ class BikeServices::CalculateStoredLocation
       if bike.current_stolen_record.present?
         # If there is a current stolen - even if it has a blank location - use it
         # It's used for searching and displaying stolen bikes, we don't want other information leaking
-        if bike.address_set_manually # Only set coordinates if the address is set manually
-          bike.current_stolen_record.attributes.slice("latitude", "longitude")
-        else # Set the whole address from the stolen record
-          bike.current_stolen_record.address_hash
-        end
+        bike.current_stolen_record.attributes.slice("latitude", "longitude")
       else
         attrs = {}
         if bike.address_set_manually # If it's not stolen, use the manual set address for the coordinates
@@ -45,8 +41,8 @@ class BikeServices::CalculateStoredLocation
         l_hashes.find { |rec| rec&.dig("latitude").present? }
       return {} unless l_hash.present?
 
-      # If the location record has coordinates, skip geocoding
-      l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
+      # Only ever respond with the coordinates
+      l_hash.slice("latitude", "longitude")
     end
   end
 end

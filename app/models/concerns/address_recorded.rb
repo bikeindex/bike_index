@@ -9,6 +9,11 @@ module AddressRecorded
 
     delegate :address_present?, :address_hash, :formatted_address_string,
       to: :address_record, allow_nil: true
+
+    scope :with_location, -> { where.not(address_record_id: nil) }
+
+    # TODO: uncomment when bike AddressRecords have finished migration
+    # scope :with_street, -> { includes(:address_record).where.not(address_records: {street: nil}) }
   end
 
   def to_coordinates

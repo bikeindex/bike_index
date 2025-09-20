@@ -2,8 +2,24 @@ require "rails_helper"
 
 RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
-  it_behaves_like "geocodeable"
+  it_behaves_like "address_recorded"
   it_behaves_like "bike_attributable"
+
+  describe "address factories" do
+    let(:bike) { FactoryBot.create(:bike, :address_in_amsterdam) }
+    let(:address_record) { bike.reload.address_record }
+    let(:target_attrs) do
+      {city: "Amsterdam", region_string: "North Holland", country_id: Country.netherlands.id,
+       bike_id: bike.id, kind: "bike"}
+    end
+
+    it "is valid" do
+      expect(address_record).to have_attributes target_attrs
+      expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
+      expect(AddressRecord.pluck(:id)).to eq([address_record.id])
+      expect(Bike.with_street.pluck(:id)).to eq([bike.id])
+    end
+  end
 
   describe "scopes and searching" do
     describe "scopes" do
