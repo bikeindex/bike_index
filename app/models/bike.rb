@@ -822,6 +822,12 @@ class Bike < ApplicationRecord
     self.paint_id = paint.id
   end
 
+  # THIS IS FUCKING OBNOXIOUS.
+  # Somehow we need to get rid of needing to have this method. country should default to optional
+  def address(country: [:optional])
+    Geocodeable.address(registration_address, country:)
+  end
+
   def valid_mailing_address?
     addy = registration_address
     return false if addy.blank? || addy.values.all?(&:blank?)
