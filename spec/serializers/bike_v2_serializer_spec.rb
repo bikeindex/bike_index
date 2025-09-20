@@ -52,7 +52,8 @@ RSpec.describe BikeV2Serializer do
       end
       it "returns the expected thing" do
         expect(bike.reload.status).to eq "status_stolen"
-        expect(bike.address).to eq "278 Broadway, New York, NY 10007, US"
+        expect(bike.registration_address_source).to eq "stolen_record"
+        expect(bike.registration_address(true)["latitude"]).to eq 40.7143528
         expect(serializer.as_json(root: false)).to eq target_stolen
       end
     end
