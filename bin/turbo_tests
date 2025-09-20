@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "fileutils"
+
+puts "Compiling assets before tests..."
+system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
+
+# Make sure precompilation is off, because it already happened
+ENV['RAILS_ASSETS_PRECOMPILE'] = 'false'
+
+# Pass all arguments to turbo_tests
+exec "bundle", "exec", "turbo_tests", *ARGV

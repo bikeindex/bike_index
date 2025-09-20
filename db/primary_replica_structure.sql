@@ -1,4 +1,3 @@
-\restrict 0a42vag5T4BLcyjbliGuqbhgaCjgvCfMt3izwFtJxWRjyJPmHDa1lYgkUMZshFD
 
 -- Dumped from database version 17.6 (Homebrew)
 -- Dumped by pg_dump version 17.6 (Homebrew)
@@ -7075,7 +7074,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 0a42vag5T4BLcyjbliGuqbhgaCjgvCfMt3izwFtJxWRjyJPmHDa1lYgkUMZshFD
 
 SET search_path TO "$user", public;
 

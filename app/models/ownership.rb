@@ -21,6 +21,7 @@
 #  user_hidden                   :boolean          default(FALSE), not null
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
+#  address_record_id             :bigint
 #  bike_id                       :integer
 #  bulk_import_id                :bigint
 #  creator_id                    :integer
@@ -31,6 +32,7 @@
 #
 # Indexes
 #
+#  index_ownerships_on_address_record_id  (address_record_id)
 #  index_ownerships_on_bike_id            (bike_id)
 #  index_ownerships_on_bulk_import_id     (bulk_import_id)
 #  index_ownerships_on_creator_id         (creator_id)
