@@ -2,13 +2,11 @@
 # frozen_string_literal: true
 
 require "bundler/setup"
-require "fileutils"
 
-puts "Compiling assets before tests..."
+# Use Rails' assets:clobber task to check if assets need compilation
+# If assets are already compiled and up-to-date, this will be fast
+puts "Ensuring assets are compiled..."
 system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
-
-# Make sure precompilation is off, because it already happened
-ENV['RAILS_ASSETS_PRECOMPILE'] = 'false'
 
 # Pass all arguments to turbo_tests
 exec "bundle", "exec", "turbo_tests", *ARGV
