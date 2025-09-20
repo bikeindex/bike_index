@@ -14,7 +14,7 @@ class AvatarUploader < ApplicationUploader
 
   def auto_orient
     manipulate! do |img|
-      img = img.auto_orient
+      img.auto_orient
     end
   end
 
