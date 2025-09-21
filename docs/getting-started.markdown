@@ -12,7 +12,7 @@ If you're working on a Mac and want to develop using an Ubuntu virtual machine f
 
 1. Download UTM from https://mac.getutm.app or the App Store
 2. Follow UTM's [Ubuntu guide for a customized Ubuntu installation](https://docs.getutm.app/guides/ubuntu/)
-    - You will need to download ubuntu-23.10-live-server-arm64.iso from https://ubuntu.com/download/server
+    - Recommend installing an LTS version 24 or newer from https://ubuntu.com/download/server/arm (unless your mac is pre-2020)
     - After installing the OS and creating an account, you will need to run `sudo apt update && sudo apt install ubuntu-desktop && sudo reboot`
     - Alternatively you could try UTM's [pre-built Ubuntu 20.04 VM from their download/open links](https://mac.getutm.app/gallery/ubuntu-20-04)
 3. Login with the account you made
@@ -24,7 +24,7 @@ If you're working on a Mac and want to develop using an Ubuntu virtual machine f
 # 1. System Dependencies
 #   Postgresql 15 is the current version
 sudo apt-get update
-sudo apt-get install g++ make python3 python3-pip imagemagick redis-server postgresql postgresql-contrib libpq-dev
+sudo apt-get install g++ make python3 python3-pip imagemagick redis-server postgresql postgresql-contrib libpq-dev libffi-dev libyaml-dev libvips libvips-dev
 
 # 2.1 Set up Postgresql
 #   create a password for your postgres user
@@ -61,7 +61,17 @@ bin/setup
 # 6. Start the development server
 bin/dev
 
+# TODO: Sort out the tailwinds issues as described in https://chatgpt.com/c/68d041af-1250-832f-b503-a693c705aa5e
+
 # Open the app!
 # You will have to use another Terminal or open Firefox directly
 open 'http://localhost:3042'
+
+# TODO: Sort out logged 500 server-side error 20:34:00 css.1         | Done in 13ms
+20:34:00 log.1         |   
+20:34:00 log.1         | ActiveRecord::ConnectionNotEstablished (connection to server at "127.0.0.1", port 5432 failed: fe_sendauth: no password supplied
+20:34:00 log.1         | )
+20:34:00 log.1         | Caused by: PG::ConnectionBad (connection to server at "127.0.0.1", port 5432 failed: fe_sendauth: no password supplied
+20:34:00 log.1         | )
+
 ```
