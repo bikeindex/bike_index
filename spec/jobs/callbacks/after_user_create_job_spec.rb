@@ -115,15 +115,16 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
         bike.reload.update(updated_at: Time.current)
         expect(bike.reload.registration_address_source).to eq "initial_creation"
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
+        expect(bike.phone).to eq "1112223333"
         expect(BikeServices::CalculateStoredLocation.location_attrs(bike).except("country", "skip_geocoding"))
-          .to match_hash_indifferently target_address_hash.except("latitude", "longitude")
+          .to match_hash_indifferently target_address_hash.slice(:latitude, :longitude)
 
         Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
         user.reload
 
         expect(user.phone).to eq "1112223333"
         expect(user.address_hash_legacy).to eq target_address_hash.merge(country: "United States").as_json
-        expect(user.to_coordinates).to eq([37.8016649, -122.397348])
+        expect(user.to_coordinates).to eq bike.to_coordinates
       end
     end
     context "existing attributes" do

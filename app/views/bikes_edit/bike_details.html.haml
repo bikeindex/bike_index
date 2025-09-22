@@ -169,6 +169,7 @@
 
           - if BikeServices::Displayer.display_edit_address_fields?(@bike, current_user)
             -# It's sus to make queries in a page - but I think it's more important to call this at the correct place
+            -# Added when switching Bike to address record PR#2911
             - @bike.find_or_build_address_record(country_id: current_country_id)
             = f.fields_for :address_record do |address_form|
               = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, no_street: !BikeServices::Displayer.edit_street_address?(@bike, current_user)))

@@ -104,10 +104,11 @@ class AddressRecord < ApplicationRecord
     }
   end
 
-  def address_hash_legacy
+  def address_hash_legacy(address_record_id: false)
     l_hash = address_hash(visible_attribute: :street, render_country: true).dup
     l_hash[:zipcode] = l_hash.delete(:postal_code)
     l_hash[:state] = l_hash.delete(:region)
+    l_hash[:address_record_id] = id if address_record_id
     l_hash.with_indifferent_access
   end
 

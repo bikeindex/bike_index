@@ -19,7 +19,7 @@ module AddressRecorded
     }
 
     scope :with_location, -> { where.not(address_record_id: nil) }
-    # TODO: uncomment when bike AddressRecords have finished migration
+    # TODO: uncomment when Bike AddressRecords have finished migration - #2922
     # scope :with_street, -> { includes(:address_record).where.not(address_records: {street: nil}) }
   end
 
@@ -27,8 +27,8 @@ module AddressRecorded
     [latitude, longitude]
   end
 
-  def address_hash_legacy
-    return address_record.address_hash_legacy if address_record.present?
+  def address_hash_legacy(address_record_id: false)
+    return address_record.address_hash_legacy(address_record_id:) if address_record.present?
     # To ease migration, use the existing attrs. Handle if they've been dropped
     return {} unless defined?(street)
 

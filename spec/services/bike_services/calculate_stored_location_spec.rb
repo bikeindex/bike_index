@@ -94,9 +94,12 @@ RSpec.describe BikeServices::CalculateStoredLocation do
         expect(user.to_coordinates.compact.length).to eq 2 # User still has coordinates, even though no street
         expect(bike.reload.current_ownership_id).to eq ownership.id
 
-        expect(bike.current_ownership.address_hash_legacy[:latitude]).to be_present
+        ownership_address_record = bike.current_ownership.address_record
+        expect(ownership_address_record[:latitude]).to be_present
+        expect(ownership_address_record).to match_hash_indifferently(kind: "ownership", postal_code: "99999", street: "main main street")
         expect(bike.registration_address_source).to eq "initial_creation"
-        expect(bike.to_coordinates).to eq bike.current_ownership.address_record.to_coordinates
+        expect(bike.to_coordinates).to eq ownership_address_record.to_coordinates
+        expect(bike.address_record_id).to eq ownership_address_record.id
       end
       context "user street is present" do
         let(:user) { FactoryBot.create(:user_confirmed, :address_in_nyc, address_set_manually: true) }
@@ -115,6 +118,7 @@ RSpec.describe BikeServices::CalculateStoredLocation do
 
           expect(bike.reload.address_set_manually).to be_falsey # Because it's set by the user
           expect(bike.to_coordinates).to eq user.to_coordinates
+          expect(bike.address_record_id).to eq user.address_record_id
         end
       end
     end
@@ -130,6 +134,7 @@ RSpec.describe BikeServices::CalculateStoredLocation do
 
         expect(bike.reload.registration_address_source).to be_blank
         expect(bike.to_coordinates).to eq([nil, nil])
+        expect(bike.address_record_id).to eq address_record.id
       end
 
       context "with address_set_manually" do

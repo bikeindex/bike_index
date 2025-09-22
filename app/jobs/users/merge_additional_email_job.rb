@@ -58,7 +58,7 @@ class Users::MergeAdditionalEmailJob < ApplicationJob
   private
 
   def update_address_records(user_id, old_user_id)
-    # If the new user has an
+    # If the new user has no address record, assign the old records over, otherwise orphan them
     if AddressRecord.user.where(user_id:).none?
       AddressRecord.user.where(user_id: old_user_id).each { |i| i.update(user_id:) }
     end

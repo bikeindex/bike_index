@@ -33,7 +33,7 @@ class BikeServices::CalculateStoredLocation
       l_hashes = [
         bike.current_impound_record&.address_hash,
         bike.current_parking_notification&.address_hash,
-        bike.registration_address(true),
+        bike.registration_address(true, address_record_id: true), # temporary cludge?
         bike.creation_organization&.default_location&.address_hash
       ].compact
       l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
@@ -41,7 +41,7 @@ class BikeServices::CalculateStoredLocation
       return {} unless l_hash.present?
 
       # Only ever respond with the coordinates
-      l_hash.slice("latitude", "longitude")
+      l_hash.slice("latitude", "longitude", "address_record_id")
     end
   end
 end

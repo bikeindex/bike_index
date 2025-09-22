@@ -845,15 +845,15 @@ class Bike < ApplicationRecord
     end
   end
 
-  def registration_address(unmemoize = false)
+  def registration_address(unmemoize = false, address_record_id: false)
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
 
     @registration_address = case registration_address_source
-    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
-    when "user" then user&.address_hash_legacy
-    when "bike_update" then address_record&.address_hash_legacy
-    when "initial_creation" then current_ownership.address_hash_legacy
+    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy(address_record_id:)
+    when "user" then user&.address_hash_legacy(address_record_id:)
+    when "bike_update" then address_record&.address_hash_legacy(address_record_id:)
+    when "initial_creation" then current_ownership.address_hash_legacy(address_record_id:)
     else
       {}
     end.with_indifferent_access

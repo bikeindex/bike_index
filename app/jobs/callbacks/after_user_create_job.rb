@@ -87,6 +87,7 @@ class Callbacks::AfterUserCreateJob < ApplicationJob
   def import_user_attributes(user)
     if user.phone.blank?
       user.phone = user_bikes_for_attrs(user.id).map { |b| b.phone }.reject(&:blank?).last
+      user.save if user.phone.present?
     end
     # Only do address import if the user doesn't have an address present
     unless user.address_present?
