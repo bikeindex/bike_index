@@ -11,5 +11,8 @@
       "/app/assets/",
       "/public/"
     ]
+  },
+  "dependencies": {
+    "@herb-tools/dev-tools": "^0.7.2"
   }
 }

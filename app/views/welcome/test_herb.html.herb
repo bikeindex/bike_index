@@ -1,0 +1,4 @@
+<div class="test">
+  <h1>ReActionView Test</h1>
+  <p>Current time: <%= Time.current %></p>
+</div>

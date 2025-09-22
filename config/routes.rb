@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   end
 
   root to: "welcome#index"
+  get "/test_herb", to: "welcome#test_herb"
 
   get "/user_root_url_redirect", to: "welcome#user_root_url_redirect", as: :user_root_url_redirect
 
