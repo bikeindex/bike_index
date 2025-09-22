@@ -822,11 +822,6 @@ class Bike < ApplicationRecord
     self.paint_id = paint.id
   end
 
-  # # TODO: once all the sources are AddressRecord, this should be updatable
-  # def current_address(country: [:optional])
-  #   Geocodeable.address(registration_address, country:)
-  # end
-
   def valid_mailing_address?
     addy = registration_address
     return false if addy.blank? || addy.values.all?(&:blank?)
@@ -839,9 +834,7 @@ class Bike < ApplicationRecord
   def registration_address_source
     # NOTE: Marketplace Listing and User address are the preferred addresses!
     # If either is set, address fields don't show on bike!
-    if current_stolen_record.present?
-      "stolen_record"
-    elsif is_for_sale && current_marketplace_listing.present?
+    if is_for_sale && current_marketplace_listing.present?
       "marketplace_listing"
     elsif user&.address_set_manually
       "user"
@@ -857,7 +850,6 @@ class Bike < ApplicationRecord
     return @registration_address if !unmemoize && defined?(@registration_address)
 
     @registration_address = case registration_address_source
-    when "stolen_record" then current_stolen_record.address_hash
     when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
     when "user" then user&.address_hash_legacy
     when "bike_update" then address_record&.address_hash_legacy
