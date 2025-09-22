@@ -357,6 +357,9 @@ GEM
       thor
       tilt
     hashdiff (1.1.2)
+    herb (0.7.2)
+    herb (0.7.2-arm64-darwin)
+    herb (0.7.2-x86_64-linux-gnu)
     highline (3.1.2)
       reline
     honeybadger (5.27.0)
@@ -638,6 +641,9 @@ GEM
     rdoc (6.14.2)
       erb
       psych (>= 4.0.0)
+    reactionview (0.1.2)
+      actionview (>= 7.0)
+      herb (>= 0.7.0, < 1.0.0)
     redcarpet (3.6.1)
     redis (5.3.0)
       redis-client (>= 0.22.0)
@@ -901,6 +907,7 @@ DEPENDENCIES
   guard
   guard-rspec
   haml
+  herb
   honeybadger
   hotwire-livereload (~> 1.4.1)
   httparty
@@ -940,6 +947,7 @@ DEPENDENCIES
   rails
   rails-controller-testing
   rails-i18n
+  reactionview
   redis
   redlock
   rerun
