@@ -11,4 +11,4 @@
 //= link_tree ../../components/ .js
 //= link_tree ../builds
 
-//= link_tree ../../vendor/javascript/
+//= link_tree ../../../vendor/javascript/
