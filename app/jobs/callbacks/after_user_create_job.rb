@@ -91,8 +91,7 @@ class Callbacks::AfterUserCreateJob < ApplicationJob
     end
     # Only do address import if the user doesn't have an address present
     unless user.address_present?
-      ::Callbacks::AfterUserChangeJob.assign_user_address_from_bikes(user, bikes: user_bikes_for_attrs(user.id),
-        save_user: true)
+      UserServices::Updator.assign_address_from_bikes(user, bikes: user_bikes_for_attrs(user.id), save_user: true)
     end
   end
 

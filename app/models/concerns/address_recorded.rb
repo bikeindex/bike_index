@@ -19,8 +19,8 @@ module AddressRecorded
     }
 
     scope :with_location, -> { where.not(address_record_id: nil) }
-    # TODO: uncomment when Bike AddressRecords have finished migration - #2922
-    # scope :with_street, -> { includes(:address_record).where.not(address_records: {street: nil}) }
+    # TODO: rename to :with_street when Bike AddressRecords have finished migration - #2922
+    scope :with_street_address_record, -> { includes(:address_record).where.not(address_records: {street: nil}) }
   end
 
   def to_coordinates

@@ -114,17 +114,27 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
         expect(user).to be_present
         bike.reload.update(updated_at: Time.current)
         expect(bike.reload.registration_address_source).to eq "initial_creation"
+        expect(bike.address_set_manually).to be_falsey
+        bike_address_record = bike.address_record
+        expect(bike_address_record.user_id).to eq user.id
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
         expect(bike.phone).to eq "1112223333"
         expect(BikeServices::CalculateStoredLocation.location_attrs(bike).except("country", "skip_geocoding"))
-          .to match_hash_indifferently target_address_hash.slice(:latitude, :longitude)
+          .to match_hash_indifferently target_address_hash.slice(:latitude, :longitude).merge(address_record_id: bike_address_record.id)
 
-        Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
-        user.reload
+        expect(user.reload.address_record).to be_blank
+        expect(user.phone).to be_blank
+        expect do
+          Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
+        end.to change(AddressRecord, :count).by 1
 
-        expect(user.phone).to eq "1112223333"
-        expect(user.address_hash_legacy).to eq target_address_hash.merge(country: "United States").as_json
+        expect(user.reload.phone).to eq "1112223333"
+        expect(user.address_record).to be_present
+        expect(user.address_record.internal_address_attrs).to eq bike_address_record.internal_address_attrs
+        expect(user.address_record.kind).to eq "user"
+        expect(user.address_set_manually).to be_falsey
         expect(user.to_coordinates).to eq bike.to_coordinates
+        expect(bike.reload.registration_address_source).to eq "initial_creation"
       end
     end
     context "existing attributes" do

@@ -852,7 +852,7 @@ class Bike < ApplicationRecord
     @registration_address = case registration_address_source
     when "marketplace_listing" then current_marketplace_listing.address_hash_legacy(address_record_id:)
     when "user" then user&.address_hash_legacy(address_record_id:)
-    when "bike_update" then address_record&.address_hash_legacy(address_record_id:)
+    when "bike_update" then address_hash_legacy(address_record_id:)
     when "initial_creation" then current_ownership.address_hash_legacy(address_record_id:)
     else
       {}
