@@ -15,12 +15,12 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def variable
-    if @kind == "users"
-      chart_data = helpers.time_range_counts(collection: User.where(created_at: @time_range))
+    chart_data = if @kind == "users"
+      helpers.time_range_counts(collection: User.where(created_at: @time_range))
     elsif @kind == "bikes"
-      chart_data = bike_chart_data
+      bike_chart_data
     elsif @kind == "recoveries"
-      chart_data = helpers.time_range_counts(collection: matching_recoveries)
+      helpers.time_range_counts(collection: matching_recoveries)
     end
     if chart_data.present?
       render json: chart_data.chart_json
@@ -38,7 +38,8 @@ class Admin::GraphsController < Admin::BaseController
   protected
 
   def set_variable_graph_kind
-    @graph_kinds = %w[general users bikes recoveries]
+    # NOTE: pos_integrations redirects you to the OrganizationStatusesController
+    @graph_kinds = %w[general users bikes recoveries pos_integrations]
     @kind = @graph_kinds.include?(params[:search_kind]) ? params[:search_kind] : @graph_kinds.first
   end
 
