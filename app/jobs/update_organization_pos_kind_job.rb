@@ -34,8 +34,8 @@ class UpdateOrganizationPosKindJob < ScheduledJob
     organization = Organization.unscoped.find(org_id)
     pos_kind = self.class.calculated_pos_kind(organization)
 
-    OrganizationStatus.find_or_create_current(organization, pos_kind:)
     organization.update(pos_kind: pos_kind) if organization.pos_kind != pos_kind
+    OrganizationStatus.find_or_create_current(organization.reload)
   end
 
   private

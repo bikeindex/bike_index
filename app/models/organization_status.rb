@@ -38,11 +38,22 @@ class OrganizationStatus < AnalyticsRecord
         .or(current.where("start_at < ?", time))
     end
 
-    def find_or_create_current(organization, pos_kind: nil)
+    def find_or_create_current(organization)
       organization_status = current.where(organization_id: organization.id).first
-      pos_kind ||= organization.pos_kind
 
-      return organization_status if unchanged?(organization_status:, organization:, pos_kind:)
+      return organization_status if unchanged?(organization_status:, organization:)
+
+      if organization.deleted?
+        # Don't create a new status for a deleted org. NOTE: this is the only time this method returns nil
+        return unless organization_status.present?
+
+        unless organization_status.deleted? && organization_status.end_at.present?
+          organization_status.organization_deleted_at ||= organization.deleted_at
+          organization_status.end_at ||= organization.deleted_at
+          organization_status.save
+        end
+        return organization_status
+      end
 
       new_organization_status = OrganizationStatus.create!(organization_id: organization.id,
         kind: organization.kind,
@@ -56,13 +67,12 @@ class OrganizationStatus < AnalyticsRecord
 
     private
 
-    def unchanged?(organization:, pos_kind:, organization_status: nil)
+    def unchanged?(organization:, organization_status: nil)
       return false if organization_status.blank?
 
       organization_status.deleted? == organization.deleted? &&
-        organization_status.pos_kind == pos_kind &&
-        organization_status.pos_kind == organization.pos_kind
-      organization_status.kind == organization.kind
+        organization_status.pos_kind == organization.pos_kind &&
+        organization_status.kind == organization.kind
     end
 
     def status_change_at(organization)

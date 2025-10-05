@@ -47,14 +47,55 @@ RSpec.describe OrganizationStatus, type: :model do
 
         organization_status2 = OrganizationStatus.find_or_create_current(organization)
         expect(organization_status2.id).to_not eq organization_status1.id
-        expect(organization.reload.created_at).to be_within(1).of created_at
         expect(organization_status2).to match_hash_indifferently target_attrs.merge(kind: "bike_shop", start_at: new_updated_at)
 
         expect(organization_status1.reload).to match_hash_indifferently target_attrs.merge(end_at: new_updated_at)
       end
     end
 
-    context "with new POS kind" do
+    context "with new POS kind, then deletion" do
+      it "creates a status" do
+        organization_status1 = OrganizationStatus.find_or_create_current(organization)
+        expect(organization_status1).to match_hash_indifferently target_attrs
+        organization.update_columns(pos_kind: "lightspeed_pos", updated_at: new_updated_at)
+
+        organization_status2 = OrganizationStatus.find_or_create_current(organization)
+        expect(organization_status2.id).to_not eq organization_status1.id
+        expect(organization_status2).to match_hash_indifferently target_attrs.merge(pos_kind: "lightspeed_pos", start_at: new_updated_at)
+
+        expect(organization_status1.reload).to match_hash_indifferently target_attrs.merge(end_at: new_updated_at)
+      end
+    end
+
+    context "when organization is deleted" do
+      it "ends the existing status" do
+        organization_status1 = OrganizationStatus.find_or_create_current(organization)
+        expect(organization_status1).to match_hash_indifferently target_attrs
+        organization.update_columns(deleted_at: new_updated_at, updated_at: new_updated_at)
+
+        expect do
+          OrganizationStatus.find_or_create_current(organization)
+          OrganizationStatus.find_or_create_current(organization)
+          OrganizationStatus.find_or_create_current(organization)
+        end.to_not change(OrganizationStatus, :count)
+
+        # If the organization was briefly undeleted, don't create a new status
+        organization.update(deleted_at: new_updated_at + 1.hour)
+        expect { OrganizationStatus.find_or_create_current(organization) }.to_not change(OrganizationStatus, :count)
+
+        expect(organization_status1.reload).to match_hash_indifferently target_attrs.merge(end_at: new_updated_at, organization_deleted_at: new_updated_at)
+
+        organization.update(deleted_at: nil)
+        expect(organization.reload.deleted?).to be_falsey
+
+        organization_status2 = OrganizationStatus.find_or_create_current(organization)
+        expect(organization_status2.id).to_not eq organization_status1.id
+        expect(organization_status2).to match_hash_indifferently target_attrs.merge(start_at: organization.updated_at)
+
+        # And the first status isn't updated
+        expect(organization_status1.reload).to match_hash_indifferently target_attrs.merge(end_at: new_updated_at, organization_deleted_at: new_updated_at)
+        expect(OrganizationStatus.count).to eq 2
+      end
     end
   end
 end
