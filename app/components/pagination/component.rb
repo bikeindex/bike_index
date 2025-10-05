@@ -80,7 +80,7 @@ module Pagination
     def next_html
       if (p_next = @pagy.next)
         link_to(pagy_t("pagy.next").html_safe, @params.merge(page: p_next), class: active_classes + " tw:rounded-e-md",
-          "aria-label": pagy_t("pagy.aria_label.next"), data: @data)
+          "aria-label": pagy_t("pagy.aria_label.next"), rel: "next", data: @data)
       else
         content_tag(:a, pagy_t("pagy.next").html_safe, role: "link", class: disabled_classes + " tw:rounded-e-md",
           disabled: true, "aria-disabled": "true", "aria-label": pagy_t("pagy.aria_label.next"))

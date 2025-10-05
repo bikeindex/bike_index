@@ -10,6 +10,7 @@ class Search::MarketplaceController < ApplicationController
   def index
     @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
     @is_marketplace = true
+    @is_pagination = params[:page].present? && params[:page].to_i > 1
 
     if @render_results
       @pagy, @bikes = pagy(searched_bikes.reorder("marketplace_listings.published_at DESC"),

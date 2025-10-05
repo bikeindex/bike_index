@@ -1,0 +1,11 @@
+<div class="tw:px-4 tw:max-w-7xl tw:mx-auto tw:mt-8 tw:lg:mt-12 tw:mb-6">
+  <% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
+
+  <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t(".no_matched_marketplace"))) do %>
+    <% @bikes.each do |bike| %>
+      <% cache(["search_results", @search_kind, @result_view, bike]) do %>
+        <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

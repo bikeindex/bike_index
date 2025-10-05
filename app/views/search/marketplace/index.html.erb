@@ -6,13 +6,24 @@
     price_max_amount: @price_max_amount, result_view: @result_view) %>
 </div>
 
-<%= turbo_frame_tag :marketplace_results_frame do %>
-  <% if @render_results %>
-    <%= render partial: "/search/registrations/results" %>
-  <% else %>
-    <span id="loadedWithoutResults" class="tw:hidden"></span>
+<div data-controller="infinite-scroll">
+  <%= turbo_frame_tag :marketplace_results_frame do %>
+    <% if @render_results %>
+      <div id="marketplace_results_list">
+        <%= render partial: "results_content" %>
+      </div>
+
+      <% if @bikes.present? && @pagy.present? %>
+        <div id="pagination" data-infinite-scroll-target="pagination">
+          <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
+            size: :lg, data: {turbo_action: "advance", turbo_frame: "marketplace_results_frame"})) %>
+        </div>
+      <% end %>
+    <% else %>
+      <span id="loadedWithoutResults" class="tw:hidden"></span>
+    <% end %>
   <% end %>
-<% end %>
+</div>
 
 <div id="hiddenLoadingSpinner" class="tw:hidden">
   <%= render LoadingSpinner::Component.new(text: t(".loading_results")) %>

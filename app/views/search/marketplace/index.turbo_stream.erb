@@ -1,4 +1,27 @@
-<%# This doesn't seem to normally actually be rendered? Definitely rendered in tests though... %>
-<%= turbo_stream.replace :search_marketplace_results_frame do %>
-  <%= render partial: "/search/registrations/results" %>
+<% if @is_pagination %>
+  <%= turbo_stream.append "marketplace_results_list" do %>
+    <%= render partial: "results_content" %>
+  <% end %>
+
+  <%= turbo_stream.replace "pagination" do %>
+    <% if @bikes.present? && @pagy.present? %>
+      <div data-infinite-scroll-target="pagination">
+        <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
+          size: :lg, data: {turbo_action: "advance", turbo_frame: "marketplace_results_frame"})) %>
+      </div>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.replace :marketplace_results_frame do %>
+    <div id="marketplace_results_list">
+      <%= render partial: "results_content" %>
+    </div>
+
+    <% if @bikes.present? && @pagy.present? %>
+      <div id="pagination" data-infinite-scroll-target="pagination">
+        <%= render(Pagination::Component.new(pagy: @pagy, page_params: params,
+          size: :lg, data: {turbo_action: "advance", turbo_frame: "marketplace_results_frame"})) %>
+      </div>
+    <% end %>
+  <% end %>
 <% end %>
