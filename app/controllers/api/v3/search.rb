@@ -12,7 +12,7 @@ module API
           optional :colors, desc: "Color slugs or ids, comma delineated (see **Selections: colors**)"
           optional :location, type: String, desc: "Location for proximity search (must set stolenness to `proximity`)", default: "IP"
           optional :distance, type: String, desc: "Distance in miles from `location` for proximity search (must set stolenness to `proximity`)", default: 10
-          optional :stolenness, type: String, desc: "Bikes matching Stolen status", values: %w[non stolen proximity all] + [""], default: "stolen"
+          optional :stolenness, type: String, desc: "Bikes matching Stolen status", values: %w[non stolen proximity for_sale all] + [""], default: "stolen"
           optional :query_items, type: Array, desc: "Our Fancy select query items, DO NOT USE, may change without notice", documentation: {hidden: true}
         end
         params :search do
@@ -21,7 +21,7 @@ module API
         end
 
         def interpreted_params
-          Bike.searchable_interpreted_params(params, ip: forwarded_ip_address)
+          BikeSearchable.searchable_interpreted_params(params, ip: forwarded_ip_address)
         end
 
         def serialized_bikes_results(paginated_bikes)
@@ -82,18 +82,20 @@ module API
           max_limit = 11_000
           ActiveRecord::Base.connected_to(role: :reading) do
             # Doing extra stuff to make this query more efficient, since this is called all the time
-            interpreted_params = Bike.searchable_interpreted_params(params.merge(stolenness: "proximity"), ip: forwarded_ip_address)
+            interpreted_params = BikeSearchable.searchable_interpreted_params(params.merge(stolenness: "proximity"), ip: forwarded_ip_address)
             # Un-scope to remove the unnecessary eager loading
             bikes = Bike.unscoped.current.search(interpreted_params.merge(stolenness: "all"))
             # And then execute the specific BikeSearchable#search_matching_stolenness query for each
+            proximity = if interpreted_params[:bounding_box].present?
+              bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).limit(max_limit).count
+            else # we're probably in testing, but regardless, just skip
+              0
+            end
             {
               non: bikes.status_with_owner.limit(max_limit).count,
               stolen: bikes.stolen_or_impounded.limit(max_limit).count,
-              proximity: if interpreted_params[:bounding_box].present?
-                           bikes.stolen_or_impounded.within_bounding_box(interpreted_params[:bounding_box]).limit(max_limit).count
-                         else # we're probably in testing, but regardless, just skip
-                           0
-                         end
+              proximity:,
+              for_sale: bikes.for_sale.limit(max_limit).count
             }
           end
         end

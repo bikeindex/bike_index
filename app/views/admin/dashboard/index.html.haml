@@ -41,10 +41,10 @@
 .row.justify-content-end
   .col-auto
     %p
-      = number_with_delimiter(User.count)
+      = number_with_delimiter(User.valid_only.count)
       users total
-      - today = User.where("created_at >= ?", Time.current.beginning_of_day).count
-      - yesterday = (User.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
+      - today = User.valid_only.where("users.created_at >= ?", Time.current.beginning_of_day).count
+      - yesterday = (User.valid_only.where("users.created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
       %em
         (#{number_with_delimiter(yesterday)} yesterday, #{number_with_delimiter(today)} today)
 

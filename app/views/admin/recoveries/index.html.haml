@@ -42,19 +42,19 @@
         %tbody
           %tr.small
             %td With user entered value
-            %td= admin_number_display(valued_recoveries.count)
+            %td= number_display(valued_recoveries.count)
           %tr.small
             %td Total user entered value
             %td
-              $#{admin_number_display(valued_recoveries.sum)}
+              $#{number_display(valued_recoveries.sum)}
           %tr.small
             %td Average stolen value
             %td
-              $#{admin_number_display(Counts.recovery_average_value)}
+              $#{number_display(Counts.recovery_average_value)}
           %tr
             %td Total estimated value
             %td
-              $#{admin_number_display(recovery_amount)}
+              $#{number_display(recovery_amount)}
 
 
 .mt-2.mb-4
@@ -62,7 +62,7 @@
 
 .row.mb-4.mt-4
   .col-md-5
-    = admin_number_display(available_recoveries.count)
+    = number_display(available_recoveries.count)
     = "matching recovery".pluralize(available_recoveries.count)
     %em
       = humanized_time_range_column(@time_range_column)
@@ -82,6 +82,6 @@
         = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render partial: "/shared/pagination", locals: {collection: @recoveries}
+= render partial: "/shared/admin/pagination", locals: {collection: @recoveries}
 = render partial: "table", locals: { recoveries: @recoveries, render_sortable: true }
-= render partial: "/shared/pagination", locals: {collection: @recoveries, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @recoveries, skip_total: true}

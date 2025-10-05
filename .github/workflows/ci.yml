@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  lint_and_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Lint code for consistent style
+        run: bin/lint --no-fix
+      - name: Scan for common Rails security vulnerabilities using static analysis
+        run: bin/brakeman --no-pager
+      # Unfortunately, erb-formatter doesn't support an exit code -
+      # and bin/lint doesn't seem to be running it :/
+      # so run it here and check for changes
+      - name: Run erb-formatter
+        run: bundle exec erb-formatter app/components/**/*.html.erb --write
+      - name: Run erb-formatter
+        run: bundle exec erb-formatter app/components/**/*.html.erb
+      - name: Check for changes from erb-formatter
+        run: git diff HEAD --exit-code app/
+
+      # Eventually this should be added:
+      # - name: Scan for security vulnerabilities in JavaScript dependencies
+      #   run: bin/importmap audit
+  test:
+    name: "Run tests"
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: rails
+          POSTGRES_PASSWORD: password
+        # needed because the postgres container does not provide a healthcheck
+        # tmpfs makes DB faster by using RAM
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+    strategy:
+      fail-fast: false
+      matrix:
+        ci_node_total: [3]
+        ci_node_index: [0, 1, 2]
+    env:
+      RAILS_ENV: test
+      TZ: "America/Chicago"
+      COVERAGE: false # additional configuration is needed for parallelized tests
+      CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
+      TRANSLATION_BRANCH: main
+      RETRY_FLAKY: true
+      SKIP_PARALLEL_MIGRATIONS: true
+      KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
+      KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
+      KNAPSACK_PRO_CI_NODE_INDEX: ${{ matrix.ci_node_index }}
+      KNAPSACK_PRO_LOG_LEVEL: warn
+    steps:
+      - name: Get CPU cores
+        id: cpu-info
+        run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
+      # install system dependencies
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          version: 1.0
+      - name: Checkout code
+        uses: actions/checkout@v5
+      # Install Ruby dependencies
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: bundle install
+      - name: Set up database
+        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
+      - name: Sync translations (only on main by default)
+        run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
+      # Install JS dependencies
+      - name: build assets
+        run: bin/rails assets:precompile --trace
+      # Run tests
+      - name: Run tests
+        run: bin/knapsack_pro_tests
+      # Until parallel reporting is set up, skip sending code coverage reports
+      # - name: publish code coverage
+      #   uses: paambaati/codeclimate-action@v9.0.0

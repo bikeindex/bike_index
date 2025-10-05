@@ -3,18 +3,31 @@ default: &default
   # manually set db_pool, separate from threads, because sidekiq
   pool: <%= ENV.fetch("DB_POOL") { 20 } %>
 
+default_local: &default_local
+  <<: *default
+  port: <%= ENV.fetch("PGPORT", 5432) %>
+  <% if ENV["CI"] %>
+  host: 127.0.0.1
+  username: rails
+  password: password
+  <% else %>
+  host: <%= ENV.fetch("PGHOST", "localhost") %>
+  username: <%= ENV["PGUSER"] %>
+  password: <%= ENV["PGPASSWORD"] %>
+  <% end %>
+
 development:
   primary:
-    <<: *default
+    <<: *default_local
     database: bikeindex_development
   primary_replica:
-    <<: *default
+    <<: *default_local
     # Using primary database, replica not actually replicating
     database: bikeindex_development
     # database: bikeindex_development_replica
     # replica: true
   analytics:
-    <<: *default
+    <<: *default_local
     database: bikeindex_analytics_development
     migrations_paths: db/analytics_migrate
 
@@ -24,38 +37,37 @@ development:
 # Do not set this db to the same as development or production.
 test:
   primary:
-    <<: *default
+    <<: *default_local
     database: bikeindex_test<%= ENV["TEST_ENV_NUMBER"] %>
   primary_replica:
-    <<: *default
+    <<: *default_local
     database: bikeindex_test_replica<%= ENV["TEST_ENV_NUMBER"] %>
     replica: true
   analytics:
-    <<: *default
+    <<: *default_local
     database: bikeindex_analytics_test<%= ENV["TEST_ENV_NUMBER"] %>
     migrations_paths: db/analytics_migrate
 
 production:
   primary:
     <<: *default
+    database: bike_index_production
     host: "<%= ENV['POSTGRESQL_ADDRESS'] %>"
-    database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
     username: "<%= ENV['POSTGRESQL_USERNAME'] %>"
     password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
 
   primary_replica:
     <<: *default
     replica: true
-    host: "<%= ENV['POSTGRESQL_SLAVE_ADDRESSES'] %>"
+    host: "<%= ENV['POSTGRESQL_PRIMARY_REPLICA_ADDRESS'] %>"
     database: "<%= ENV['POSTGRESQL_DATABASE'] %>"
     username: "<%= ENV['POSTGRESQL_USERNAME'] %>"
     password: "<%= ENV['POSTGRESQL_PASSWORD'] %>"
 
   analytics:
     <<: *default
-    database: bikeindex_analytics
     migrations_paths: db/analytics_migrate
-    host: "<%= ENV['ANALYTICS_DB_ADDRESSES'] %>"
+    host: "<%= ENV['POSTGRESQL_ANALYTICS_ADDRESS'] %>"
     database: "<%= ENV['ANALYTICS_DB_DATABASE'] %>"
     username: "<%= ENV['ANALYTICS_DB_USERNAME'] %>"
     password: "<%= ENV['ANALYTICS_DB_PASSWORD'] %>"

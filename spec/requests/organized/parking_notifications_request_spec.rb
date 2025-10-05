@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::ParkingNotificationsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/parking_notifications" }
-  include_context :request_spec_logged_in_as_organization_member
+  include_context :request_spec_logged_in_as_organization_user
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 3.hours) }
@@ -93,7 +93,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
-        expect(response.header["Per-Page"]).to eq "200" # Because it's over the max permitted
+        expect(response.header["Per-Page"]).to eq "250" # Because it's over the max permitted
 
         # Pagination tests
         get "#{base_url}?per_page=1&page=2", headers: json_headers
@@ -137,7 +137,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
 
     context "geolocated" do
-      context "user without organization membership" do
+      context "user without organization organization_role" do
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "does not create" do
           expect(current_organization.enabled?("parking_notifications")).to be_truthy
@@ -198,12 +198,12 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         }.to change(ParkingNotification, :count).by(1)
         parking_notification = ParkingNotification.last
 
-        expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
+        expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address)
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
         expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
         expect(parking_notification.location_from_address).to be_falsey
-        expect(ProcessParkingNotificationWorker.jobs.count).to eq 1
+        expect(ProcessParkingNotificationJob.jobs.count).to eq 1
 
         bike.reload
         expect(bike.status).to eq "status_abandoned"
@@ -214,13 +214,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
         let(:file) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
         let(:parking_notification_and_photo_params) { parking_notification_params.merge(image: Rack::Test::UploadedFile.new(file)) }
-        let(:organization_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+        let(:organization_user) { FactoryBot.create(:organization_user, organization: current_organization) }
         it "creates and adds photo" do
           FactoryBot.create(:state_new_york)
           expect(current_organization.enabled?("parking_notifications")).to be_truthy
           bike.reload
           expect(bike.status).to eq "status_with_owner"
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             expect {
@@ -239,7 +239,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.image).to be_present
           expect(parking_notification.image_processing).to be_falsey
 
-          expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address))
+          expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address)
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
@@ -254,7 +254,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
 
       context "manual address and repeat" do
-        let(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
+        let(:state) { FactoryBot.create(:state_california) }
         let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly_notification") }
         let(:parking_notification_params) do
           {
@@ -276,7 +276,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         end
         include_context :geocoder_real
         it "creates", vcr: true do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           bike.reload
           expect(bike.status).to eq "status_with_owner"
           ActionMailer::Base.deliveries = []
@@ -293,7 +293,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           parking_notification = ParkingNotification.last
 
-          expect_attrs_to_match_hash(parking_notification, parking_notification_params.except(:use_entered_address, :is_repeat, :latitude, :longitude))
+          expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address, :is_repeat, :latitude, :longitude)
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.initial_record).to eq parking_notification_initial
@@ -339,7 +339,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       expect(parking_notification_initial.current?).to be_truthy
       expect(parking_notification_initial.user).to_not eq current_user
       expect(ParkingNotification.count).to eq 1
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       ActionMailer::Base.deliveries = []
       Sidekiq::Testing.inline! do
         post base_url, params: {
@@ -380,7 +380,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification_initial.current?).to be_truthy
         expect(parking_notification_initial.user).to_not eq current_user
         expect(ParkingNotification.count).to eq 1
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
           post base_url, params: {
@@ -407,7 +407,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       context "multiple parking notifications" do
         let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization, delivery_status: "email_success") }
         it "marks both retrieved" do
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post base_url, params: {
@@ -461,7 +461,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           kind: "parked_incorrectly_notification")
       end
 
-      before { ProcessParkingNotificationWorker.new.perform(parking_notification2.id) }
+      before { ProcessParkingNotificationJob.new.perform(parking_notification2.id) }
 
       def expect_just_current_notification_sent(parking_notification_initial, parking_notification2)
         expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([])
@@ -497,7 +497,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         bike.reload
         expect(bike.status).to eq "status_with_owner"
         expect(ParkingNotification.count).to eq 2
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         Sidekiq::Testing.inline! do
           post base_url, params: {
@@ -516,7 +516,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           parking_notification2.reload
           parking_notification_initial.reload
           expect(parking_notification2.current?).to be_truthy
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             post base_url, params: {
@@ -542,7 +542,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification2.current?).to be_truthy
         expect(parking_notification2.user).to_not eq current_user
         expect(current_organization.parking_notifications.active.pluck(:id)).to match_array([parking_notification_initial.id, parking_notification2.id])
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect {
           post base_url, params: {
@@ -550,8 +550,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             kind: "impound_notification",
             ids: "#{parking_notification_initial.id}, #{parking_notification2.id}"
           }
-        }.to change(ProcessParkingNotificationWorker.jobs, :count).by 2
-        ProcessParkingNotificationWorker.drain
+        }.to change(ProcessParkingNotificationJob.jobs, :count).by 2
+        ProcessParkingNotificationJob.drain
         expect(ParkingNotification.count).to eq 4
         expect(ActionMailer::Base.deliveries.count).to eq 2
 

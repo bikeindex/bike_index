@@ -1,29 +1,57 @@
-- if @user.banned?
-  - user_ban = @user.user_ban
-  .row.mt-4.mb-4
-    .col-md-8.offset-md-2
-      %h4.text-danger
+- last_email_errored = @user.user_emails&.last_email_errored || UserEmail.none
+- if @user.banned? || @user.deleted? || last_email_errored.any? || @user.email_banned?
+  .row.mb-4
+    - if @user.deleted?
+      .col-sm-10.offset-sm-1.col-md-6.offset-md-3.mt-4
+        .alert.alert-danger.mb-4
+          %h4.text-danger User deleted
+          Deleted:
+          %span.convertTime.preciseTime
+            = l @user.deleted_at, format: :convert_time
+    - if @user.banned?
+      - user_ban = @user.user_ban
+      .col-md-8.offset-md-2.mt-4
+        %h4.text-danger
         %strong User banned
-      %table.table-list
-        %tbody
-          %tr
-            %td Banned at
-            %td.convertTime.preciseTime
-              - time = user_ban&.created_at || @user.updated_at
-              = l time, format: :convert_time
-          %tr
-            %td By
-            %td
-              - if user_ban&.creator.present?
-                = user_ban.creator.display_name
-              - elsif user_ban&.creator_id.present?
-                User ##{user_ban.creator_id} (unknown user)
-          %tr
-            %td Reason
-            %td= user_ban&.reason&.humanize
-          %tr
-            %td Notes
-            %td= user_ban&.description
+        %table.table-list
+          %tbody
+            %tr
+              %td Banned at
+              %td.convertTime.preciseTime
+                - time = user_ban&.created_at || @user.updated_at
+                = l time, format: :convert_time
+            %tr
+              %td By
+              %td
+                - if user_ban&.creator.present?
+                  = user_ban.creator.display_name
+                - elsif user_ban&.creator_id.present?
+                  User ##{user_ban.creator_id} (unknown user)
+            %tr
+              %td Reason
+              %td= user_ban&.reason&.humanize
+            %tr
+              %td Notes
+              %td= user_ban&.description
+    - if last_email_errored.any?
+      .col-sm-10.offset-sm-1.col-md-6.offset-md-3.mt-4
+        .alert.alert-danger.mb-4
+          %h4.text-danger Last email to user errored!
+          Check the notifications "Delivery Errors" (below)
+    - if @user.email_banned?
+      .col-sm-10.offset-sm-1.col-md-6.offset-md-3.mt-4
+        .alert.alert-danger.mb-4
+          %h4.text-danger User's email banned (not delivered)
+          Reasons:
+          - @user.email_bans_active.each do |email_ban|
+            = email_ban.reason_humanized
+            %small.less-strong
+              - if email_ban.reason == "email_domain"
+                \- the #{link_to "email domain", admin_email_domain_path(email_ban.email_domain)} was banned.
+              - elsif email_ban.reason == "email_duplicate"
+                \- the email looks like a duplicate of another email. In 2025, we were getting a lot of user sign up spam with emails that just had extra periods added in (which still deliver to gmail)
+              - elsif email_ban.reason == "delivery_failure"
+                \- a recent email to them failed to be delivered. Have them check their spam folder!
 .row
   .col-md-6
     %h1
@@ -162,7 +190,7 @@
         %td
           - display_phone = @user.phone.present?
           - if display_phone || @user.user_phones.any?
-            %ul
+            %ul.mb-0
               - @user.user_phones.each do |user_phone|
                 %li
                   = phone_display(user_phone.phone)
@@ -176,6 +204,8 @@
                 %li
                   = phone_display(@user.phone)
                   %small.less-strong.text-warning unconfirmed
+            - unless Flipper.enabled?(:phone_verification)
+              %em.small.less-strong Phone verification is currently disabled, users don't see the option to confirm their phones
       %tr
         %td Website
         %td
@@ -183,7 +213,7 @@
       %tr
         %td Address
         %td
-          %small= @user.address
+          %small= @user.formatted_address_string(visible_attribute: :street, current_country_id:)
       %tr
         %td Vendor terms?
         %td
@@ -218,54 +248,73 @@
 
 %h4.mt-4
   Bikes
-  %small= link_to admin_number_display(@bikescount), admin_bikes_path(user_id: @user.id)
+  %small= link_to number_display(@bikescount), admin_bikes_path(user_id: @user.id)
 
 - if @bikescount > 0
   = render partial: "admin/bikes/table", locals: {bikes: @bikes, skip_user: true}
 
+
+- object_limit = 10
+
+- memberships = Membership.where(user_id: @user.id).order(id: :desc)
+%h4.mt-4
+  Memberships
+  %small
+    = link_to number_display(memberships.count), admin_memberships_path(user_id: @user.id)
+    - if memberships.count > object_limit
+      %em (only #{object_limit} most recent shown)
+- if memberships.count > 0
+  = render partial: "/admin/memberships/table", locals: {memberships: memberships.limit(object_limit), skip_user: true}
+
 - user_alerts = @user.user_alerts.order(created_at: :desc)
 %h4.mt-4
   = "Active Alert".pluralize(user_alerts.active.count)
-  = admin_number_display(user_alerts.active.count)
+  = number_display(user_alerts.active.count)
   %em.small.ml-2= link_to "#{user_alerts.count} total", admin_user_alerts_path(user_id: @user.id)
 - if user_alerts.any?
   = render partial: "admin/user_alerts/table", locals: {user_alerts: user_alerts.active, skip_user: true}
 
 
-- payments = @user.payments.reorder(created_at: :desc)
+- payments = @user.payments.reorder(created_at: :desc).paid
 %h4.mt-4
   Donations/payments
   %small
-    = link_to admin_number_display(payments.count), admin_payments_path(user_id: @user.id, period: "all")
-    - if payments.count > 5
-      %em (only first 5 shown)
+    = link_to number_display(payments.count), admin_payments_path(user_id: @user.id, period: "all")
+    - if payments.count > object_limit
+      %em (only #{object_limit} most recent shown)
 - if payments.any?
-  = render partial: "/admin/payments/table", locals: {payments: payments.limit(5), skip_user: true}
+  = render partial: "/admin/payments/table", locals: {payments: payments.limit(object_limit), skip_user: true}
 
 %h4.mt-4
-  Memberships
-  %small.less-strong.mr-3= admin_number_display(@user.memberships.count)
+  OrganizationRoles
+  %small.less-strong.mr-3= number_display(@user.organization_roles.count)
   %small.d-inline-block.less-strong
     - reg_orgs_count = @user.user_registration_organizations.count
     = link_to admin_user_registration_organizations_path(user_id: @user.id) do
-      = admin_number_display(reg_orgs_count)
+      = number_display(reg_orgs_count)
     = "registration org".pluralize(reg_orgs_count)
-- if @user.memberships.count > 0
-  = render partial: "/admin/memberships/table", locals: {memberships: @user.memberships}
+- if @user.organization_roles.count > 0
+  = render partial: "/admin/organization_roles/table", locals: {organization_roles: @user.organization_roles}
 
-- notifications = Notification.notifications_sent_or_received_by(@user)
+- notifications = Notification.notifications_sent_or_received_by(@user).order(id: :desc)
 %h4.mt-4
   Notifications
-  %small= link_to admin_number_display(notifications.count), admin_notifications_path(user_id: @user.id)
+  %small
+    = link_to number_display(notifications.count), admin_notifications_path(user_id: @user.id)
+    - if notifications.count > object_limit
+      %em (only #{object_limit} most recent shown)
 - if notifications.count > 0
-  = render partial: "/admin/notifications/table", locals: {notifications: notifications, skip_user: true}
+  = render partial: "/admin/notifications/table", locals: {notifications: notifications.limit(object_limit), skip_user: true}
 
-- feedbacks = Feedback.where(user_id: @user.id)
+- feedbacks = Feedback.where(user_id: @user.id).order(id: :desc)
 %h4.mt-4
   Feedbacks
-  %small= link_to admin_number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id)
+  %small
+    = link_to number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id)
+    - if notifications.count > object_limit
+      %em (only #{object_limit} most recent shown)
 - if feedbacks.count > 0
-  = render partial: "/admin/feedbacks/table", locals: {feedbacks: feedbacks, skip_user: true}
+  = render partial: "/admin/feedbacks/table", locals: {feedbacks: feedbacks.limit(object_limit), skip_user: true}
 
 
 %h4.mt-4 User emails
@@ -345,9 +394,9 @@
 
 %hr.mt-4
 %h4 Edit
-= form_for [:admin, @user] do |f|
-  - if @user.errors.any?
-    = render partial: "/shared/errors", locals: { name: "User", obj: @user }
+= form_for @user, url: admin_user_path, method: :patch  do |f|
+  = render(AlertForErrors::Component.new(object: @user))
+
   .row.mt-4
     .col-md-6
       .form-group
@@ -418,30 +467,30 @@
                 = user_ban.label :description, "Description/notes"
                 = user_ban.text_area :description, class: "form-control"
 
-
-%hr{style: "margin-top: 60px;"}
-.mt-4.mb-4.row
-  .col-sm-6.mb-4
-    = link_to "Delete #{@user.email}!", admin_user_url(@user.to_param), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger less-strong"
-  .col-sm-6.mb-4
-    .text-right
-      %a.gray-link{ href: "#forceMergeEmail", data: { toggle: "collapse", target: "#forceMergeEmail" } }
-        Force merge with another email
-    #forceMergeEmail.collapse.mt-2
-      .card
-        .card-body
-          %p
-            Add another email to this user.
-          %p
-            %span.text-danger WARNING
-            this does not send a confirmation email or check that they have access to the email you merge with.
-          %p
-            %span.text-warning We can <strong>not</strong> undo this.
-          = form_for [:admin, @user] do |f|
-            .row.mt-2
-              .col-md-8
-                .form-group
-                  = email_field_tag :force_merge_email, "", placeholder: "Email to merge", class: "form-control"
-                  %small.less-strong Email must be another user account on Bike Index
-              .col-md-4
-                = f.submit "Merge", class: 'btn btn-outline-danger'
+- if @user.present?
+  %hr{style: "margin-top: 60px;"}
+  .mt-4.mb-4.row
+    .col-sm-6.mb-4
+      = link_to "Delete #{@user.email}!", admin_user_url(@user.id, method: :delete), data: { confirm: "Are you sure?" }, class: "btn btn-danger less-strong"
+    .col-sm-6.mb-4
+      .text-right
+        %a.gray-link{ href: "#forceMergeEmail", data: { toggle: "collapse", target: "#forceMergeEmail" } }
+          Force merge with another email
+      #forceMergeEmail.collapse.mt-2
+        .card
+          .card-body
+            %p
+              Add another email to this user.
+            %p
+              %span.text-danger WARNING
+              this does not send a confirmation email or check that they have access to the email you merge with.
+            %p
+              %span.text-warning We can <strong>not</strong> undo this.
+            = form_for @user, url: admin_user_path, method: :patch  do |f|
+              .row.mt-2
+                .col-md-8
+                  .form-group
+                    = email_field_tag :force_merge_email, "", placeholder: "Email to merge", class: "form-control"
+                    %small.less-strong Email must be another user account on Bike Index
+                .col-md-4
+                  = f.submit "Merge", class: 'btn btn-outline-danger'

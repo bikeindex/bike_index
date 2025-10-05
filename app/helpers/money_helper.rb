@@ -7,23 +7,15 @@ module MoneyHelper
 
   # Return the currency abbreviation (USD, EUR) for the current locale.
   def default_currency
-    t(I18n.locale, scope: [:money, :currencies])
+    I18n.t(I18n.locale, scope: [:money, :currencies])
+  # Don't error when unknown currency- return USD
+  rescue I18n::MissingTranslationData
+    "USD"
   end
 
   # Return a list of currency abbreviations (USD, EUR) for all available locales.
   def available_currencies
     ExchangeRate.required_targets
-  end
-
-  # Return a list of currency symbols and abbreviations for all available locales:
-  # ["$ (USD)", "€ (EUR)"]
-  def currency_symbols
-    I18n.available_locales.map do |locale|
-      [
-        I18n.with_locale(locale) { number_to_currency(1, format: "%u") },
-        "(#{t(locale, scope: [:money, :currencies])})"
-      ].join(" ")
-    end
   end
 
   def money_usd(dollars, exchange_to: default_currency)

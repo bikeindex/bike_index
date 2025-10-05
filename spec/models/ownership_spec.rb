@@ -57,11 +57,11 @@ RSpec.describe Ownership, type: :model do
     let!(:ownership2) { FactoryBot.create(:ownership, bike: bike) }
     it "marks existing ownerships as not current" do
       ownership2.reload
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         bike.ownerships.create(creator: ownership2.creator,
           owner_email: "s@s.com")
-      }.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
       expect(bike.ownerships.count).to eq 3
       expect(bike.reload.send(:calculated_current_ownership)&.id).to be > ownership2.id
       expect(ownership1.reload.current).to be_falsey
@@ -99,10 +99,10 @@ RSpec.describe Ownership, type: :model do
         expect(ownership1.current?).to be_falsey
         expect(ownership1.claim_message).to be_blank
         expect(ownership1.organization&.id).to eq bike.organizations.first.id
-        expect(ownership1.first?).to be_truthy
+        expect(ownership1.initial?).to be_truthy
         expect(ownership1.previous_ownership_id).to be_blank
         expect(ownership2.current?).to be_truthy
-        expect(ownership2.first?).to be_falsey
+        expect(ownership2.initial?).to be_falsey
         expect(ownership2.second?).to be_truthy
         expect(ownership2.organization&.id).to be_blank
         expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
@@ -135,23 +135,23 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.claimed?).to be_truthy
           expect(ownership.current?).to be_truthy
           expect(ownership.organization&.id).to eq organization.id
-          expect(ownership.first?).to be_truthy
+          expect(ownership.initial?).to be_truthy
           expect(ownership.previous_ownership_id).to be_blank
           expect(ownership.organization_pre_registration?).to be_truthy
           expect(ownership.send_email).to be_truthy # still defaults to true
           # Before save, still works
           expect(ownership2.current).to be_truthy
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
-          expect(ownership2.first?).to be_falsey
+          expect(ownership2.initial?).to be_falsey
           expect(ownership2.second?).to be_truthy
           ownership2.save
           ownership2.reload
           ownership.reload
           expect(ownership.current?).to be_falsey
-          expect(ownership.first?).to be_truthy
+          expect(ownership.initial?).to be_truthy
           expect(ownership2.current?).to be_truthy
           expect(ownership2.self_made?).to be_falsey
-          expect(ownership2.first?).to be_falsey
+          expect(ownership2.initial?).to be_falsey
           expect(ownership2.second?).to be_truthy
           expect(ownership2.organization_pre_registration?).to be_falsey
           expect(ownership2.previous_ownership_id).to eq ownership.id
@@ -169,7 +169,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership3.organization_pre_registration?).to be_falsey
           expect(ownership3.previous_ownership.organization_pre_registration?).to be_falsey
           expect(ownership3.prior_ownerships.pluck(:id)).to match_array([ownership.id, ownership2.id])
-          expect(ownership3.first?).to be_falsey
+          expect(ownership3.initial?).to be_falsey
           expect(ownership3.second?).to be_falsey
           expect(ownership3.new_registration?).to be_falsey
           expect(ownership3.self_made?).to be_falsey
@@ -210,10 +210,10 @@ RSpec.describe Ownership, type: :model do
         expect(ownership2.origin).to eq "transferred_ownership"
         expect(ownership2.claim_message).to eq "transferred_registration"
 
-        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
         expect(bike.reload.status).to eq "status_impounded"
         FactoryBot.create(:impound_record_update, impound_record: impound_record, kind: "transferred_to_new_owner", transfer_email: new_email)
-        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
         ownership3 = impound_record.reload.ownership
         expect(ownership3.previous_ownership_id).to eq ownership2.id
         expect(ownership3.origin).to eq "impound_process"
@@ -356,7 +356,7 @@ RSpec.describe Ownership, type: :model do
         # There was some trouble with CI on this, so now we're just updating a bunch
         ownership.update(updated_at: Time.current)
         expect(organization.enabled?("skip_ownership_email")).to be_truthy
-        expect(ownership.first?).to be_truthy
+        expect(ownership.initial?).to be_truthy
         expect(ownership.calculated_send_email).to be_falsey
         ownership2 = FactoryBot.create(:ownership, bike: bike, created_at: Time.current)
         ownership2.update(updated_at: Time.current)
@@ -446,7 +446,7 @@ RSpec.describe Ownership, type: :model do
     end
     context "organization registration" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
-      let(:creator) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:creator) { FactoryBot.create(:organization_user, organization: organization) }
       let(:owner_email) { creator.email }
       let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creator: creator, owner_email: owner_email) }
       let(:ownership) { bike.ownerships.first }
@@ -472,7 +472,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.send(:calculated_organization_pre_registration?)).to be_truthy
         end
         context "not self made" do
-          let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:member) { FactoryBot.create(:organization_user, organization: organization) }
           let(:owner_email) { member.email }
           it "is falsey" do
             ownership.reload
@@ -668,6 +668,70 @@ RSpec.describe Ownership, type: :model do
         expect(organization.reload.id).to eq 553
         expect(bike.current_ownership.user_id).to be_blank
         expect(bike.current_ownership.owner_name).to eq "Jill Example"
+      end
+    end
+  end
+
+  describe "address_record" do
+    let!(:state) { FactoryBot.create(:state, name: "Pennsylvania", abbreviation: "PA") }
+    let(:ownership) { FactoryBot.build(:ownership, registration_info:) }
+    let(:pa_info) { {city: "State College", state: "PA", street: "100 W College Ave", zipcode: "16801", organization_affiliation: "student"} }
+    let(:registration_info) { pa_info }
+    let(:target_attrs) do
+      {city: "State College", region_string: nil, street: "100 W College Ave", postal_code: "16801",
+       region_record_id: state.id, country_id: Country.united_states_id, bike_id: ownership.bike_id}
+    end
+    include_context :geocoder_real
+
+    it "creates an address_record" do
+      VCR.use_cassette("Ownership-address_record_from_registration_info") do
+        expect do
+          ownership.save!
+          ownership.reload.update(updated_at: Time.current)
+        end.to change(AddressRecord, :count).by 1
+
+        expect(ownership.address_record_id).to be_present
+        expect(ownership.address_record).to have_attributes target_attrs
+        expect(ownership.address_record.to_coordinates.map(&:round)).to eq([41, -78])
+        expect(ownership.bike.valid_mailing_address?).to be_truthy
+      end
+    end
+
+    context "without street" do
+      let(:registration_info) { pa_info.except(:street) }
+
+      it "creates an address_record, without street" do
+        VCR.use_cassette("Ownership-address_record_from_registration_info-streetless") do
+          expect do
+            ownership.save!
+            ownership.reload.update(updated_at: Time.current)
+          end.to change(AddressRecord, :count).by 1
+
+          expect(ownership.address_record_id).to be_present
+          expect(ownership.address_record).to have_attributes target_attrs.merge(street: nil)
+          expect(ownership.address_record.to_coordinates.map(&:round)).to eq([41, -78])
+          expect(ownership.bike.valid_mailing_address?).to be_falsey
+        end
+      end
+    end
+
+    context "edmonton" do
+      let(:registration_info) { {city: "Edmonton", state: "AB", street: "2 Sir Winston Churchill Sq", zipcode: "T5J 2C1", organization_affiliation: "student", country: "canada"} }
+      let(:target_attrs) do
+        {city: "Edmonton", region_string: "AB", street: "2 Sir Winston Churchill Sq", postal_code: "T5J 2C1",
+         region_record_id: nil, country_id: Country.canada_id}
+      end
+      it "creates an address_record" do
+        VCR.use_cassette("Ownership-address_record_from_registration_info-edmonton") do
+          expect do
+            ownership.save!
+            ownership.reload.update(updated_at: Time.current)
+          end.to change(AddressRecord, :count).by 1
+
+          expect(ownership.address_record_id).to be_present
+          expect(ownership.address_record).to have_attributes target_attrs
+          expect(ownership.address_record.to_coordinates.map(&:round)).to eq([54, -113])
+        end
       end
     end
   end

@@ -1,7 +1,6 @@
-Rails.application.configure do
-  # Verifies that versions and hashed value of the package contents in the project's package.json
-  config.webpacker.check_yarn_integrity = false
+require "active_support/core_ext/integer/time"
 
+Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   # Use lograge for logging to production
   config.lograge.enabled = true
@@ -19,7 +18,7 @@ Rails.application.configure do
   config.action_controller.action_on_unpermitted_parameters :log
 
   # Code is not reloaded between requests.
-  config.cache_classes = true
+  config.enable_reloading = false
 
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
@@ -43,7 +42,6 @@ Rails.application.configure do
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
 
   # Compress JavaScripts and CSS.
-  config.assets.js_compressor = Uglifier.new(harmony: true)
   # config.assets.css_compressor = :sass
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
@@ -55,20 +53,22 @@ Rails.application.configure do
   # yet still be able to expire them through the digest params.
   config.assets.digest = true
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  # config.action_controller.asset_host = 'http://assets.example.com'
+  # config.asset_host = "http://assets.example.com"
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Store uploaded files on the local file system (see config/storage.yml for options)
-  config.active_storage.service = :local
+  config.active_storage.service = :cloudflare_production
 
   # Mount Action Cable outside main process or domain
   # config.action_cable.mount_path = nil
   # config.action_cable.url = 'wss://example.com/cable'
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
+  # Assume all access to the app is happening through a SSL-terminating reverse proxy.
+  config.assume_ssl = true
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = true
 
@@ -108,9 +108,26 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   config.action_mailer.default_url_options = {protocol: "https", host: "bikeindex.org"}
+  routes.default_url_options = config.action_mailer.default_url_options
 
-  config.action_mailer.delivery_method = :postmark
-  config.action_mailer.postmark_settings = {
-    api_token: ENV["POSTMARK_API_TOKEN"]
-  }
+  if ENV["SENDGRID_ENABLED"] == "true"
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: "smtp.sendgrid.net",
+      port: 587,
+      domain: "bikeindex.org",
+      user_name: ENV["SENDGRID_USERNAME"],
+      password: ENV["SENDGRID_API_KEY"],
+      authentication: "plain",
+      enable_starttls_auto: true
+    }
+  else
+    config.action_mailer.delivery_method = :postmark
+    config.action_mailer.postmark_settings = {
+      api_token: ENV["POSTMARK_API_TOKEN"]
+    }
+  end
+
+  # Only use :id for inspections in production.
+  config.active_record.attributes_for_inspect = [:id]
 end

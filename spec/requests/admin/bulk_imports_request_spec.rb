@@ -66,7 +66,7 @@ RSpec.describe Admin::BulkImportsController, type: :request do
         expect(bulk_import.send_email).to be_falsey
         expect(bulk_import.no_duplicate).to be_falsey
         expect(bulk_import.kind).to eq "organization_import"
-        expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+        expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
       end
       context "no_duplicate" do
         it "creates" do
@@ -82,21 +82,22 @@ RSpec.describe Admin::BulkImportsController, type: :request do
           expect(bulk_import.send_email).to be_truthy
           expect(bulk_import.no_duplicate).to be_truthy
           expect(bulk_import.kind).to eq "organization_import"
-          expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+          expect(BulkImportJob).to have_enqueued_sidekiq_job(bulk_import.id)
         end
       end
     end
   end
 
   describe "update" do
-    let(:bulk_import) { FactoryBot.create(:bulk_import) }
+    let!(:bulk_import) { FactoryBot.create(:bulk_import) }
+
     it "reenqueues" do
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         patch "#{base_url}/#{bulk_import.id}", params: {reprocess: true}
-      }.to change(BulkImportWorker.jobs, :count).by 1
+      }.to change(BulkImportJob.jobs, :count).by 1
       expect(flash[:success]).to be_present
-      expect(BulkImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
+      expect(BulkImportJob.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
     end
   end
 end

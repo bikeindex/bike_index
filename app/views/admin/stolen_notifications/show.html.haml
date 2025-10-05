@@ -17,7 +17,7 @@
         = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)
         %small
           %em total messages sent to bike:
-          = admin_number_display(@bike.messages_count)
+          = number_display(@bike.messages_count)
     %tr
       %td
         Receiver Name

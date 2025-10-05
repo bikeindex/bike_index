@@ -5,13 +5,12 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization) }
 
   it "redirects" do
-    expect {
-      get "/some-unknown-organization/impounded_bikes"
-    }.to raise_error(ActiveRecord::RecordNotFound)
+    get "/some-unknown-organization/impounded_bikes"
+    expect(response.status).to eq 404
   end
 
   context "Logged in as organization (not enabled)" do
-    include_context :request_spec_logged_in_as_organization_member
+    include_context :request_spec_logged_in_as_organization_user
     it "redirects" do
       expect(current_organization.enabled?("impound_bikes")).to be_falsey
       expect(current_organization.public_impound_bikes?).to be_falsey
@@ -27,10 +26,11 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
         expect(current_organization.public_impound_bikes?).to be_falsey
         expect(current_user.authorized?(current_organization)).to be_truthy
         expect(current_organization.enabled?("impound_bikes"))
-        get base_url
+        get "#{base_url}?per_page=%27&page=%27"
         expect(flash[:success]).to be_present
         expect(response.status).to eq(200)
         expect(response).to render_template :index
+        expect(assigns(:per_page)).to eq 25
       end
     end
   end
@@ -50,9 +50,12 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
     let(:current_organization) { impound_configuration.organization }
     let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered, organization: current_organization) }
     let!(:bike) { parking_notification.bike }
+    # This is required by show, if it isn't present it raises ReadOnlyError
+    before { RearGearType.fixed }
+
     it "renders, shows impounded bike" do
       expect(current_organization.public_impound_bikes?).to be_truthy
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
         i = parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification")
         expect(i).to be_valid

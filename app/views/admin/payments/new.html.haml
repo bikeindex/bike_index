@@ -2,8 +2,7 @@
   New Payment
 
 = form_for [:admin, @payment] do |f|
-  - if @payment.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Payment", obj: @payment }
+  = render(AlertForErrors::Component.new(object: @payment))
 
   .row
     .col-md-6
@@ -20,7 +19,7 @@
       .input-group
         .input-group-prepend
           %span.input-group-text
-            = f.select :currency, options_for_select(currency_symbols.zip(available_currencies))
+            = f.select :currency_enum, options_for_select(Currency.select_options)
         = f.number_field :amount, step: 1, min: 0, class: "form-control"
     .col-md-6
       .form-group

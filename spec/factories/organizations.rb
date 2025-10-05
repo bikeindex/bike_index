@@ -42,6 +42,22 @@ FactoryBot.define do
       end
     end
 
+    trait :paid do
+      transient do
+        enabled_feature_slugs { nil }
+        organization_feature { nil }
+      end
+
+      after(:create) do |organization, evaluator|
+        Sidekiq::Testing.inline! do
+          invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
+          invoice.update(organization_feature_ids: [evaluator.organization_feature&.id])
+          organization.reload
+        end
+      end
+    end
+
+    # TODO: Figure out how to use the :paid trait rather than duplicating the logic
     trait :organization_features do
       transient do
         enabled_feature_slugs { ["csv_export"] }
@@ -51,7 +67,7 @@ FactoryBot.define do
       after(:create) do |organization, evaluator|
         Sidekiq::Testing.inline! do
           invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
-          invoice.update(organization_feature_ids: [evaluator.organization_feature.id])
+          invoice.update(organization_feature_ids: [evaluator.organization_feature&.id])
           organization.reload
         end
       end
@@ -68,7 +84,7 @@ FactoryBot.define do
       transient { user { FactoryBot.create(:user_confirmed) } }
 
       after(:create) do |organization, evaluator|
-        FactoryBot.create(:membership_claimed, user: evaluator.user, organization: organization)
+        FactoryBot.create(:organization_role_claimed, user: evaluator.user, organization: organization)
         organization.update(auto_user: evaluator.user)
       end
     end

@@ -86,7 +86,7 @@
     - label_address_class = registration_field_label(@organization, "reg_address").present? ? "strong" : ""
     / Set all the bike address attrs
     - @bike.attributes = { street: @b_param.address("street"), city: @b_param.address("city"), zipcode: @b_param.address("zipcode"), state: @b_param.address("state"), country: @b_param.address("country") }
-    - @bike.country_id ||= @organization.country_id || Country.united_states.id
+    - @bike.country_id ||= @organization.country_id || Country.united_states_id
     .input-group.with-optional-blocks
       #address-fields
         = f.label :street, label_address, class: label_address_class
@@ -97,9 +97,9 @@
         .control-group
           = f.text_field :zipcode, required: true, placeholder: t(".zipcode")
         .full-width-wrap
-          #state-select.control-group.fancy-select.unfancy.hidden-other{ class: (@bike.country_id == Country.united_states.id ? "unhidden initially-unhidden" : "") }
-            = f.collection_select(:state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: t(".state") )
-          .control-group.special-select-single#us_id_data{ data: { usid: Country.united_states.id } }
+          #state-select.control-group.fancy-select.unfancy.hidden-other{ class: (@bike.country_id == Country.united_states_id ? "unhidden initially-unhidden" : "") }
+            = f.collection_select(:state, State.united_states, :abbreviation, :name, include_blank: true, required: true, prompt: t(".state") )
+          .control-group.special-select-single#us_id_data{ data: { usid: Country.united_states_id } }
             = f.select(:country_id, Country.select_options, { class: 'country-select-input form-control' })
   - if include_field_reg_phone?(@organization)
     - label_phone = registration_field_label(@organization, "reg_phone") || t(".owners_phone")
@@ -151,7 +151,7 @@
     .control-group.special-select-single
       = f.label :handlebar_type, class: "control-label"
       .controls
-        = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, required: true, prompt: t(".choose_handlebar") })
+        = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, prompt: t(".choose_handlebar") })
   .input-group
     .control-group
       = f.label :description, t(".other_defining_features"), class: "control-label"

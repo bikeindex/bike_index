@@ -9,17 +9,16 @@ class Admin::DashboardController < Admin::BaseController
       .includes(:creation_organization, :paint, :recovered_records)
     bikes = bikes.not_spam unless current_user.su_option?(:no_hide_spam)
     @bikes = bikes.order(id: :desc).limit(10)
-    @users = User.includes(memberships: [:organization]).limit(5).order(id: :desc)
+    @users = User.valid_only.includes(organization_roles: [:organization]).limit(5).order(id: :desc)
   end
 
   def maintenance
     # @bikes here because this is the only one we're using the standard admin bikes table
     @bikes = Bike.unscoped.order("created_at desc").where(example: true).limit(10)
     mnfg_other_id = Manufacturer.other.id
-    @component_mnfgs = Component.where(manufacturer_id: mnfg_other_id)
-    @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other_id)
-    @component_types = Component.where(ctype_id: Ctype.other.id)
-    @handlebar_types = Bike.where(handlebar_type: Bike.handlebar_types[:other])
+    @component_mnfgs = Component.where(manufacturer_id: mnfg_other_id).reorder(id: :desc).includes(:bike, :ctype).limit(50)
+    @component_types = Component.where(ctype_id: Ctype.other.id).reorder(id: :desc).includes(:bike, :ctype).limit(50)
+    @bikes_other_handlebar_type = Bike.where(handlebar_type: Bike.handlebar_types[:other]).reorder(id: :desc).limit(50)
     @paint = Paint.where("color_id IS NULL")
   end
 
@@ -58,5 +57,11 @@ class Admin::DashboardController < Admin::BaseController
     new_blocklist = params[:blocklist].split(/\n|\r/).reject { |t| t.blank? }
     FileCacheMaintainer.reset_blocklist_ids(new_blocklist)
     redirect_to admin_tsvs_path
+  end
+
+  def ip_location
+    @cloudflare_hash = IpAddressParser.location_hash(request)
+    @geocoder_hash = IpAddressParser.location_hash_geocoder(forwarded_ip_address, new_attrs: true)
+    @headers = request.headers.to_h.select { |k, _v| k.start_with?("HTTP_") }.to_h
   end
 end

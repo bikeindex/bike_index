@@ -1,0 +1,88 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=Edmonton,%20AB%20T5J%202C1&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 17 Sep 2025 21:17:26 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Goog-Maps-Metro-Area:
+      - Edmonton
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:214:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=msaifdggmnwc:214:0
+      Report-To:
+      - '{"group":"msaifdggmnwc:214:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:214:0"}],}'
+      Server:
+      - mafe
+      Content-Length:
+      - '2389'
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=107
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "{\n   \"results\" : \n   [\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"T5J 2C1\",\n
+        \              \"short_name\" : \"T5J 2C1\",\n               \"types\" : \n
+        \              [\n                  \"postal_code\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"North Central Edmonton\",\n
+        \              \"short_name\" : \"North Central Edmonton\",\n               \"types\"
+        : \n               [\n                  \"neighborhood\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Edmonton\",\n               \"short_name\" : \"Edmonton\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Alberta\",\n               \"short_name\" : \"AB\",\n               \"types\"
+        : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Canada\",\n               \"short_name\"
+        : \"CA\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"Edmonton, AB T5J 2C1, Canada\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 53.5455869,\n                  \"lng\"
+        : -113.486604\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 53.54392290000001,\n                  \"lng\"
+        : -113.4892655\n               }\n            },\n            \"location\"
+        : \n            {\n               \"lat\" : 53.5452039,\n               \"lng\"
+        : -113.4885298\n            },\n            \"location_type\" : \"APPROXIMATE\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 53.5461038802915,\n                  \"lng\"
+        : -113.4865857697085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 53.5434059197085,\n                  \"lng\"
+        : -113.4892837302915\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJ243Y808ioFMR7h6uUuyyX2c\",\n         \"types\" : \n         [\n            \"postal_code\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+  recorded_at: Wed, 17 Sep 2025 21:17:26 GMT
+recorded_with: VCR 6.3.1

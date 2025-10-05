@@ -32,10 +32,11 @@
           %td Claimant
           %td
             = @impound_claim.user.display_name
-        %tr
-          %td Verified phone?
-          %td
-            = check_mark if @impound_claim.user.phone_confirmed?
+        - if Flipper.enabled?(:phone_verification)
+          %tr
+            %td Verified phone?
+            %td
+              = check_mark if @impound_claim.user.phone_confirmed?
         - if @bike_submitting.present?
           %tr
             %td Bike

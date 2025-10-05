@@ -7,7 +7,7 @@
 = render partial: "/shared/period_select"
 
 .mt-4.mb-4
-  = pluralize(number_with_delimiter(@organization_model_audits.total_count), "matching models")
+  = pluralize(number_with_delimiter(@pagy.count), "matching models")
   %em
     = humanized_time_range(@time_range)
   - if params[:search_mnfg_name].present?
@@ -58,7 +58,7 @@
               %span.less-strong= l(organization_model_audit.updated_at, format: :convert_time)
         %td
           %strong
-            = admin_number_display(organization_model_audit.bikes_count)
+            = number_display(organization_model_audit.bikes_count)
         %td
           - if organization_model_audit.certification_status.present?
             %span{class: status_display_class(organization_model_audit.certification_status)}
@@ -69,7 +69,7 @@
           %a.btn.btn-sm.btn-secondary.float-right.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal", modelauditid: model_audit.id, mnfgname: model_audit.mnfg_name, framemodel: model_audit.frame_model}}
             update
 
-.paginate-container.paginate-container-bottom
-  = paginate @organization_model_audits
+.pt-4.pb-4
+  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
 
 = render partial: "/organized/model_audits/submit_model_attestation"

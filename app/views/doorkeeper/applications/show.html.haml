@@ -3,6 +3,10 @@
     Application:
     %em.header-font-uncap
       = @application.name
+  - if @application.can_send_stolen_notifications?
+    %p.pb-4
+      %strong.text-warning
+        Application has permission to send stolen notifications!
 .row
   .col-md-8
     %h4

@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: tweets
+#
+#  id                 :integer          not null, primary key
+#  alignment          :string
+#  body               :text
+#  body_html          :text
+#  image              :string
+#  kind               :integer
+#  twitter_response   :json
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  original_tweet_id  :integer
+#  stolen_record_id   :integer
+#  twitter_account_id :integer
+#  twitter_id         :string
+#
+# Indexes
+#
+#  index_tweets_on_original_tweet_id   (original_tweet_id)
+#  index_tweets_on_stolen_record_id    (stolen_record_id)
+#  index_tweets_on_twitter_account_id  (twitter_account_id)
+#
 class Tweet < ApplicationRecord
   KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
@@ -17,7 +41,7 @@ class Tweet < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :retweet, -> { where.not(original_tweet: nil) }
   scope :not_retweet, -> { where(original_tweet: nil) }
@@ -29,8 +53,9 @@ class Tweet < ApplicationRecord
 
   def self.friendly_find(id)
     return nil if id.blank?
+
     id = id.to_s
-    query = id.length > 15 ? {twitter_id: id} : {id: id}
+    query = (id.length > 15) ? {twitter_id: id} : {id: id}
     order(created_at: :desc).find_by(query)
   end
 
@@ -46,6 +71,7 @@ class Tweet < ApplicationRecord
 
   def self.admin_search(str)
     return none unless str.present?
+
     text = str.strip
     # If passed a number, assume it is a bike ID and search for that bike_id
     if text.is_a?(Integer) || text.match(/\A\d+\z/).present?
@@ -61,6 +87,7 @@ class Tweet < ApplicationRecord
   # TODO: Add actual testing of this. It isn't tested right now, sorry :/
   def send_tweet
     return true unless app_tweet? && twitter_response.blank?
+
     if image.present?
       Tempfile.open("foto.jpg") do |foto|
         foto.binmode
@@ -79,6 +106,7 @@ class Tweet < ApplicationRecord
   # TODO: Add actual testing of this. It isn't tested right now, sorry :/
   def retweet_to_account(retweet_account)
     return nil if retweet_account.id.to_i == twitter_account_id.to_i
+
     posted_retweet = retweet_account.retweet(twitter_id)
     return nil if posted_retweet.blank?
 
@@ -98,6 +126,7 @@ class Tweet < ApplicationRecord
   # Because of recoveries
   def stolen_record
     return nil unless stolen_record_id.present?
+
     # Using super because maybe it will benefit from includes?
     super || StolenRecord.current_and_not.find(stolen_record_id)
   end
@@ -120,12 +149,12 @@ class Tweet < ApplicationRecord
       self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
       self.alignment ||= VALID_ALIGNMENTS.first
       unless VALID_ALIGNMENTS.include?(alignment)
-        errors[:base] << "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
+        errors.add "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
       end
     else
       if kind == "app_tweet" && twitter_id.blank?
-        errors[:base] << "You need to choose an account" unless twitter_account.present?
-        errors[:base] << "You need to include tweet text" unless body.present?
+        errors.add "You need to choose an account" unless twitter_account.present?
+        errors.add "You need to include tweet text" unless body.present?
       end
       self.twitter_id ||= trh[:id]
       self.body ||= tweeted_text
@@ -142,6 +171,7 @@ class Tweet < ApplicationRecord
 
   def tweeted_image
     return nil unless trh.dig(:entities, :media).present?
+
     trh.dig(:entities, :media).first&.dig(:media_url_https)
   end
 
@@ -151,6 +181,7 @@ class Tweet < ApplicationRecord
 
   def tweetor
     return twitter_account.screen_name if twitter_account&.screen_name.present?
+
     trh.dig(:user, :screen_name)
   end
 
@@ -203,6 +234,7 @@ class Tweet < ApplicationRecord
   def calculated_kind
     return "stolen_tweet" if stolen_record_id.present?
     return "imported_tweet" if twitter_id.present?
+
     "app_tweet"
   end
 end

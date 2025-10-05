@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: organization_stolen_messages
+#
+#  id                  :bigint           not null, primary key
+#  body                :text
+#  content_added_at    :datetime
+#  is_enabled          :boolean          default(FALSE)
+#  kind                :integer
+#  latitude            :float
+#  longitude           :float
+#  report_url          :string
+#  search_radius_miles :float
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  organization_id     :bigint
+#  updator_id          :bigint
+#
+# Indexes
+#
+#  index_organization_stolen_messages_on_organization_id  (organization_id)
+#  index_organization_stolen_messages_on_updator_id       (updator_id)
+#
 class OrganizationStolenMessage < ApplicationRecord
   MAX_BODY_LENGTH = 400
   KIND_ENUM = {area: 0, association: 1}
@@ -16,7 +39,7 @@ class OrganizationStolenMessage < ApplicationRecord
 
   delegate :search_coordinates, :metric_units?, to: :organization, allow_nil: true
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :present, -> { where.not(body: nil) }
   scope :enabled, -> { where(is_enabled: true) }
@@ -38,10 +61,13 @@ class OrganizationStolenMessage < ApplicationRecord
 
   def self.for_stolen_record(stolen_record)
     return stolen_record.organization_stolen_message if stolen_record.organization_stolen_message.present?
+
     area_result = for_coordinates(stolen_record.to_coordinates)
     return area_result if area_result.present?
+
     bike = Bike.unscoped.find_by_id(stolen_record.bike_id)
     return nil if bike.blank?
+
     bike.bike_organizations.includes(:organization).order(:id)
       .detect { |bo| bo.organization&.organization_stolen_message&.is_enabled? }
       &.organization&.organization_stolen_message
@@ -52,6 +78,7 @@ class OrganizationStolenMessage < ApplicationRecord
     enabled.area.near(coordinates, MAX_SEARCH_RADIUS).detect do |org_stolen_message|
       # Ignore stolen_messages with have a search radius smaller than nearer ones
       next if searched_radius > org_stolen_message.search_radius_miles
+
       searched_radius = org_stolen_message.search_radius_miles
       org_stolen_message.distance_to(coordinates) < org_stolen_message.search_radius_miles
     end
@@ -59,8 +86,8 @@ class OrganizationStolenMessage < ApplicationRecord
 
   def self.clean_body(str)
     return nil if str.blank?
-    ActionController::Base.helpers.strip_tags(str).gsub("&amp;", "&")
-      .strip.gsub(/\s+/, " ").truncate(MAX_BODY_LENGTH, omission: "")
+
+    InputNormalizer.sanitize(str).truncate(MAX_BODY_LENGTH, omission: "")
   end
 
   def self.default_kind_for_organization_kind(org_kind)
@@ -97,6 +124,7 @@ class OrganizationStolenMessage < ApplicationRecord
   def shown_to?(stolen_record)
     return false if disabled?
     return true if body.present?
+
     report_url.present? && stolen_record.police_report_number.blank?
   end
 
@@ -114,6 +142,7 @@ class OrganizationStolenMessage < ApplicationRecord
   def can_enable?
     return false if body.blank? && report_url.blank?
     return true if association?
+
     latitude.present? && longitude.present? && search_radius_miles.present?
   end
 end

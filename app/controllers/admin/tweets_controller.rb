@@ -1,16 +1,13 @@
 class Admin::TweetsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_tweet, except: [:new, :create, :index]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 50
-    @tweets = matching_tweets
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @tweets = pagy(matching_tweets
       .includes(:twitter_account, :public_images, :stolen_record, :retweets, :original_tweet)
-      .reorder(sort_column + " " + sort_direction)
-      .page(page)
-      .per(@per_page)
+      .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def show
@@ -95,7 +92,7 @@ class Admin::TweetsController < Admin::BaseController
     tweets = Tweet
     tweets = tweets.not_retweet unless InputNormalizer.boolean(params[:search_retweet])
     @search_kind = permitted_search_kinds.include?(params[:search_kind]) ? params[:search_kind] : "all"
-    tweets = tweets.send(@search_kind) unless @search_kind == "all"
+    tweets = tweets.public_send(@search_kind) unless @search_kind == "all"
 
     if params[:search_twitter_account_id].present?
       @twitter_account = TwitterAccount.friendly_find(params[:search_twitter_account_id])
@@ -113,6 +110,7 @@ class Admin::TweetsController < Admin::BaseController
   def find_tweet
     @tweet ||= Tweet.friendly_find(params[:id])
     return @tweet if @tweet.present?
+
     raise ActiveRecord::RecordNotFound
   end
 

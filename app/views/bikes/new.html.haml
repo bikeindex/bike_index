@@ -53,38 +53,28 @@
                 = t(".missing_serial")
 
           .related-fields
-            .form-group.row.unnested-field
+            .form-group.row
               = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
               .form-well-input
                 - if @bike.cycle_type == "bike"
                   %label.collapse.in.pt-1.pl-1.cursor-pointer
                     = check_box_tag :traditional_bike_checkbox, true, true
                     = t(".traditional_bike")
-                    %span.below-input-help{style: "font-size: 100%; padding: 0 0 0 1.1em"}
-                      %em= t(".traditional_bike_definition")
+                    %em= t(".traditional_bike_definition")
+
                 .cycle-type-select.fancy-select.unfancy{class: @bike.cycle_type == "bike" ? "collapse" : ""}
                   = select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'})
-                  %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
-                    = check_box_tag :propulsion_type_motorized, true
-                    %strong ⚡️
-                    = t(".electric")
-                    (motorized)
-                  #propulsionTypeFields.collapse.pl-1
-                    %label.checkbox-inline.mr-2
-                      = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?
-                      Throttle
-                    %label.checkbox-inline
-                      = check_box_tag :propulsion_type_pedal_assist, true, @bike.propulsion_type_pedal_assist?
-                      Pedal assist
-            .form-group.row.hidden-other#propulsionTypeFields
-              = f.label :propulsion_type, "Motor type", class: "form-well-label"
-              .form-well-input
-                %label.checkbox-inline.mr-2
-                  = check_box_tag :propulsion_type, "pedal-assist"
-                  Pedal assist
-                %label.checkbox-inline.mr-2
-                  = check_box_tag :propulsion_type, "throttle"
-                  Throttle
+                %label#motorizedWrapper.cursor-pointer.mt-1.mb-0.pl-1
+                  = check_box_tag :propulsion_type_motorized, true, @bike.motorized?
+                  %strong ⚡️
+                  = t(".electric_motorized")
+                #propulsionTypeFields.collapse.pl-1
+                  %label.checkbox-inline.mr-2
+                    = check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle?
+                    Throttle
+                  %label.checkbox-inline
+                    = check_box_tag :propulsion_type_pedal_assist, true, @bike.propulsion_type_pedal_assist?
+                    Pedal assist
 
           .related-fields
             .form-group.row
@@ -136,7 +126,7 @@
             = fields_for @bike.impound_records.last do |irecord|
               = render partial: '/bikes_edit/bike_fields/stolen_location', locals: {srecord: irecord}
 
-          - if include_field_reg_address?(@organization, current_user) && BikeDisplayer.display_edit_address_fields?(@bike, current_user)
+          - if include_field_reg_address?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user)
             .related-fields
               .form-group.row
                 -# Set all the bike address attrs
@@ -176,7 +166,7 @@
               .form-group.row.fancy-select-placeholder.unfancy
                 %label.form-well-label
                 .form-well-input
-                  = f.collection_select(:state, State.all, :abbreviation, :name,
+                  = f.collection_select(:state, State.united_states, :abbreviation, :name,
                     {include_blank: true, required: true, prompt: t(".state")},
                     {class: "form-control"})
 

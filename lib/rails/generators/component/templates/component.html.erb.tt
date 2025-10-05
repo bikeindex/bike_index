@@ -1,0 +1,3 @@
+<div>
+  <%= component_class %> component
+</div>

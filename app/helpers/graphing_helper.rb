@@ -20,13 +20,14 @@ module GraphingHelper
   end
 
   def group_by_method(time_range)
-    if time_range.last - time_range.first < 3601 # 1.hour + 1 second
+    period_s = time_period_s(time_range)
+    if period_s < 3601 # 1.hour + 1 second
       :group_by_minute
-    elsif time_range.last - time_range.first < 500_000 # around 6 days
+    elsif period_s < 5.days
       :group_by_hour
-    elsif time_range.last - time_range.first < 5_000_000 # around 60 days
+    elsif period_s < 5_000_000 # around 60 days
       :group_by_day
-    elsif time_range.last - time_range.first < 31449600 # 364 days (52 weeks)
+    elsif period_s < 31449600 # 364 days (52 weeks)
       :group_by_week
     else
       :group_by_month
@@ -39,29 +40,31 @@ module GraphingHelper
       "%l:%M %p"
     elsif group_period == :group_by_hour
       "%a%l %p"
-    elsif group_period == :group_by_week
-      "%Y-%-m-%-d"
-    elsif %i[group_by_day group_by_week].include?(group_period) || time_range.present? && time_range.last - time_range.first < 2.weeks.to_i
-      "%a %Y-%-m-%-d"
     elsif group_period == :group_by_month
       "%Y-%-m"
+    elsif group_period == :group_by_day && (time_period_s(time_range) < 10.days)
+      "%a %-m-%-d"
+    else # Default handling
+      "%Y-%-m-%-d"
     end
-    # If no match, it falls back to the default handling
   end
 
   def humanized_time_range_column(time_range_column, return_value_for_all: false)
     return_value_for_all = true if @render_chart # Because otherwise it's confusing
     return nil unless return_value_for_all || !(@period == "all")
+
     humanized_text = time_range_column.to_s.gsub("_at", "").humanize.downcase
     return humanized_text.gsub("request", "requested") if time_range_column&.match?("request_at")
     return humanized_text.gsub("start", "starts") if time_range_column&.match?("start_at")
     return humanized_text.gsub("end", "ends") if time_range_column&.match?("end_at")
     return humanized_text.gsub("needs", "need") if time_range_column&.match?("needs_renewal_at")
+
     humanized_text
   end
 
   def humanized_time_range(time_range)
     return nil if @period == "all"
+
     unless @period == "custom"
       period_display = @period.match?("next_") ? @period.tr("_", " ") : "past #{@period}"
       return "in the #{period_display}"
@@ -89,6 +92,7 @@ module GraphingHelper
   # Initially just used by scheduled jobs display, but could be used by other things!
   def period_in_words(seconds)
     return "" if seconds.blank?
+
     seconds = seconds.to_i.abs
     if seconds >= 365.days
       pluralize((seconds / 31556952.0).round(1), "year")
@@ -111,6 +115,7 @@ module GraphingHelper
       data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at")
     }
     return [org_registrations] unless current_organization.regional?
+
     [
       org_registrations,
       {
@@ -131,5 +136,9 @@ module GraphingHelper
       range: time_range,
       format: group_by_format(time_range)
     )
+  end
+
+  def time_period_s(time_range)
+    time_range.last - time_range.first
   end
 end

@@ -2,9 +2,27 @@ require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
   it_behaves_like "geocodeable"
+  it_behaves_like "default_currencyable"
+
+  describe "factories" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    it "is valid" do
+      expect(stolen_record).to be_valid
+      expect(stolen_record.reload.images_attached?).to be_falsey
+    end
+    context "with images attached" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images) }
+      it "is valid" do
+        expect(stolen_record).to be_valid
+        expect(stolen_record.reload.images_attached?).to be_truthy
+      end
+    end
+  end
 
   describe "after_save hooks" do
     let(:bike) { FactoryBot.create(:bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+
     context "if bike no longer exists" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
       it "removes alert_image" do
@@ -16,7 +34,28 @@ RSpec.describe StolenRecord, type: :model do
 
         stolen_record.reload
         expect(stolen_record.bike).to be_blank
-        expect(stolen_record.alert_image).to be_blank
+        expect(stolen_record.images_attached?).to be_falsey
+      end
+    end
+
+    context "if phone changes" do
+      it "enqueues update without location_changed" do
+        # ensure not memoizing anything
+        stolen_record_instance = StolenRecord.find(stolen_record.id)
+        Sidekiq::Job.clear_all
+        stolen_record_instance.update(phone: "1112223333")
+        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+          .to eq([stolen_record_instance.id, false])
+      end
+    end
+
+    context "location changes" do
+      it "enqueues update with location_changed" do
+        stolen_record_instance = StolenRecord.find(stolen_record.id)
+        Sidekiq::Job.clear_all
+        stolen_record_instance.update(city: "New city")
+        expect(StolenBike::AfterStolenRecordSaveJob.jobs.map { |j| j["args"] }.last.flatten)
+          .to eq([stolen_record_instance.id, true])
       end
     end
 
@@ -42,7 +81,6 @@ RSpec.describe StolenRecord, type: :model do
 
         expect(stolen_record.recovered?).to be_truthy
         expect(stolen_record.bike.status_stolen?).to be_falsey
-        expect(stolen_record.alert_image).to be_blank
       end
     end
 
@@ -70,85 +108,6 @@ RSpec.describe StolenRecord, type: :model do
           expect(stolen_record2.reload.current).to be_truthy
           expect(bike.reload.current_stolen_record_id).to eq stolen_record2.id
         end
-      end
-    end
-  end
-
-  describe "#generate_alert_image" do
-    context "given no bike image" do
-      it "returns falsey with no changes" do
-        stolen_record = FactoryBot.create(:stolen_record)
-
-        result = stolen_record.generate_alert_image
-
-        expect(result).to be_nil
-        expect(stolen_record.alert_image).to be_blank
-        expect(AlertImage.count).to be_zero
-      end
-    end
-
-    context "given a bike image" do
-      it "returns truthy, persists the alert image, but destroys it if it is destroyed" do
-        stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
-        image = stolen_record.bike.public_images.first
-
-        result = stolen_record.generate_alert_image
-
-        expect(result).to be_an_instance_of(AlertImage)
-        expect(stolen_record.alert_image).to eq(result)
-        stolen_record.skip_update = false # Make sure we aren't blocking
-        expect(AlertImage.count).to eq(1)
-        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
-        FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
-        expect(stolen_record.theft_alert_missing_photo?).to be_falsey
-
-        image.destroy
-        expect(stolen_record.bike.public_images.count).to eq 0
-        result = stolen_record.generate_alert_image
-        expect(result).to be_nil
-        stolen_record.reload
-        expect(stolen_record.alert_image).to be_blank
-      end
-    end
-
-    context "given alert image creation fails" do
-      it "returns falsey with no changes" do
-        stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
-
-        bad_image = double(:image, image: 0)
-        result = stolen_record.generate_alert_image(bike_image: bad_image)
-
-        expect(result).to be_nil
-        expect(stolen_record.reload.alert_image).to be_nil
-        expect(AlertImage.count).to eq(0)
-      end
-      it "doesn't update again" do
-        # ensure no looping of updates in the case of a failed image
-        bike = FactoryBot.create(:bike, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg")
-        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
-        expect(stolen_record.alert_image).to be_blank
-        expect(bike).to_not receive(:save)
-        expect(stolen_record.generate_alert_image).to be_blank
-      end
-    end
-
-    context "given multiple bike images" do
-      it "uses the first bike image for the alert image" do
-        bike = FactoryBot.create(:bike)
-        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
-
-        image1 = FactoryBot.create(:public_image, imageable: bike)
-        FactoryBot.create(:public_image, imageable: bike)
-        stolen_record.reload
-        expect(stolen_record.alert_image).to be_blank
-
-        stolen_record.generate_alert_image
-        expect(stolen_record.alert_image).to be_present
-
-        alert_image = stolen_record.alert_image
-        alert_image_name = File.basename(alert_image.image.path, ".*")
-        image1_name = File.basename(image1.image.path, ".*")
-        expect(alert_image_name).to eq(image1_name)
       end
     end
   end
@@ -297,57 +256,59 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  describe "set_phone" do
-    let(:stolen_record) { StolenRecord.new(phone: "000/000/0000", secondary_phone: "+220000000000 extension: 000") }
-    it "it should set_phone" do
-      stolen_record.set_calculated_attributes
-      expect(stolen_record.phone).to eq("0000000000")
-      expect(stolen_record.secondary_phone).to eq("+22 0000000000 x000")
-    end
-  end
-
-  describe "titleize_city" do
-    it "it should titleize_city" do
-      stolen_record = StolenRecord.new(city: "INDIANAPOLIS, IN USA")
-      stolen_record.set_calculated_attributes
-      expect(stolen_record.city).to eq("Indianapolis")
-    end
-
-    it "it shouldn't remove other things" do
-      stolen_record = StolenRecord.new(city: "Georgian la")
-      stolen_record.set_calculated_attributes
-      expect(stolen_record.city).to eq("Georgian La")
-    end
-  end
-
   describe "set_calculated_attributes" do
-    let(:stolen_record) { FactoryBot.create(:stolen_record) }
-    it "has before_save_callback_method defined as before_save callback" do
-      expect(stolen_record._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:set_calculated_attributes)).to eq(true)
+    describe "set_phone" do
+      let(:stolen_record) { StolenRecord.new(phone: "000/000/0000", secondary_phone: "+220000000000 extension: 000") }
+      it "it should set_phone" do
+        stolen_record.set_calculated_attributes
+        expect(stolen_record.phone).to eq("0000000000")
+        expect(stolen_record.secondary_phone).to eq("+22 0000000000 x000")
+      end
+    end
+
+    describe "titleize_city" do
+      it "it should titleize_city" do
+        stolen_record = StolenRecord.new(city: "INDIANAPOLIS, IN USA")
+        stolen_record.set_calculated_attributes
+        expect(stolen_record.city).to eq("Indianapolis")
+      end
+
+      it "it shouldn't remove other things" do
+        stolen_record = StolenRecord.new(city: "Georgian la")
+        stolen_record.set_calculated_attributes
+        expect(stolen_record.city).to eq("Georgian La")
+      end
+    end
+
+    describe "set_date" do
+      let(:date) { Date.strptime("07-22-0014", "%m-%d-%Y") }
+      let(:stolen_record) { StolenRecord.new(date_stolen: date) }
+      it "it should set the year to something not stupid" do
+        stolen_record.set_calculated_attributes
+        expect(stolen_record.date_stolen.to_date.to_s).to eq("2014-07-22")
+      end
     end
   end
 
-  describe "fix_date" do
-    it "it should set the year to something not stupid" do
-      stolen_record = StolenRecord.new
-      stupid_year = Date.strptime("07-22-0014", "%m-%d-%Y")
-      stolen_record.date_stolen = stupid_year
-      stolen_record.send(:fix_date)
-      expect(stolen_record.date_stolen.year).to eq(2014)
+  describe "corrected_date_stolen" do
+    let(:result) { StolenRecord.corrected_date_stolen(date) }
+    context "year last century" do
+      let(:date) { Date.strptime("07-22-1913", "%m-%d-%Y") }
+      it "it sets the year to not last century" do
+        expect(result.to_date.to_s).to eq("2013-07-22")
+      end
     end
-    it "it should set the year to not last century" do
-      stolen_record = StolenRecord.new
-      wrong_century = Date.strptime("07-22-1913", "%m-%d-%Y")
-      stolen_record.date_stolen = wrong_century
-      stolen_record.send(:fix_date)
-      expect(stolen_record.date_stolen.year).to eq(2013)
+    context "date next year" do
+      let(:date) { Time.current + 2.months }
+      it "it sets the year to last year" do
+        expect(result.to_date).to eq((date - 1.year).to_date)
+      end
     end
-    it "it should set the year to the past year if the date hasn't happened yet" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      next_year = (Time.current + 2.months)
-      stolen_record.date_stolen = next_year
-      stolen_record.send(:fix_date)
-      expect(stolen_record.date_stolen.year).to eq(Time.current.year - 1)
+    context "timestamp" do
+      let(:date) { (Time.current - 1.hour).to_i }
+      it "it sets the year to last year" do
+        expect(result).to be_within(1).of(Time.current - 1.hour)
+      end
     end
   end
 
@@ -538,7 +499,7 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record.street = ""
         expect(stolen_record.without_location?).to be_truthy
 
-        ca = FactoryBot.create(:state, name: "California", abbreviation: "CA")
+        ca = FactoryBot.create(:state_california)
         stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ca, country: Country.united_states)
         expect(stolen_record.address).to eq("CA, US")
         expect(stolen_record.address(country: [:skip_default])).to eq("CA")
@@ -549,21 +510,6 @@ RSpec.describe StolenRecord, type: :model do
       it "returns nil" do
         stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: nil)
         expect(stolen_record.address).to eq("New Paltz")
-      end
-    end
-
-    context "given an address change" do
-      it "returns false unless there has been an address change" do
-        stolen_record = FactoryBot.create(
-          :stolen_record,
-          :in_los_angeles,
-          skip_geocoding: false
-        )
-        expect(stolen_record.should_be_geocoded?).to eq(false)
-
-        stolen_record.city = "New York"
-        stolen_record.valid? # triggers an update to address
-        expect(stolen_record.should_be_geocoded?).to eq(true)
       end
     end
   end
@@ -584,6 +530,52 @@ RSpec.describe StolenRecord, type: :model do
     it "is rounded" do
       expect(stolen_record.latitude_public).to eq(-122.28)
       expect(stolen_record.longitude_public).to eq longitude.round(2)
+    end
+  end
+
+  describe "bike_index_geocode with reverse geocoding" do
+    let(:latitude) { -122.2824933 }
+    let(:longitude) { 37.837112 }
+    let(:stolen_record) do
+      FactoryBot.build(:stolen_record, skip_geocoding: false, city: " ",
+        latitude: latitude, longitude: longitude, street: "Special Broadway location")
+    end
+    let(:country) { Country.united_states }
+    let!(:state) { State.find_or_create_by(FactoryBot.attributes_for(:state_new_york)) }
+    let(:target_attributes) do
+      {
+        street: "Special Broadway location",
+        city: "New York",
+        zipcode: "10007",
+        neighborhood: "Tribeca",
+        state_id: state.id,
+        latitude: latitude,
+        longitude: longitude
+      }
+    end
+    # Block the initial Geocoding lookup
+    before { allow(stolen_record).to receive(:address_changed?) { false } }
+    it "geocodes" do
+      expect(Geocoder).to receive(:search).and_call_original
+      stolen_record.save!
+      expect(stolen_record.reload).to have_attributes target_attributes
+    end
+    context "with location attributes set" do
+      let(:location_attributes) { {country_id: country.id, state_id: FactoryBot.create(:state).id, zipcode: "99999", city: "A City"} }
+      before { stolen_record.attributes = location_attributes }
+      it "does not call geocoder" do
+        expect(Geocoder).to_not receive(:search)
+        stolen_record.save!
+        expect(stolen_record.reload).to have_attributes location_attributes
+      end
+      context "with canada (no state_id)" do
+        let(:location_attributes) { {country_id: Country.canada.id, state_id: nil, zipcode: "99999", city: "A City"} }
+        it "does not call geocoder" do
+          expect(Geocoder).to_not receive(:search)
+          stolen_record.save!
+          expect(stolen_record.reload).to have_attributes location_attributes
+        end
+      end
     end
   end
 

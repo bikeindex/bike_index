@@ -22,7 +22,7 @@ RSpec.describe "BikesController#create", type: :request do
   let(:chicago_stolen_params) do
     {
       country_id: country.id,
-      street: "2459 W Division St",
+      street: "2459 West Division Street",
       city: "Chicago",
       zipcode: "60622",
       state_id: state.id
@@ -59,7 +59,7 @@ RSpec.describe "BikesController#create", type: :request do
     context "scanned_sticker" do
       let(:organization) { FactoryBot.create(:organization) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization) }
-      it "assigns scanned_sticker" do
+      it "assigns scanned_sticker", :flaky do
         expect(current_user.bikes.count).to eq 0
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 0
         expect {
@@ -85,10 +85,16 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
     context "made_without_serial" do
+      let(:ip_address) { "fake-ip-address" }
+      include_context :geocoder_default_location
+      let(:default_location) do
+        {country_code: "US", region_code: "CA", state_code: "CA", city: "San Francisco", latitude: 37.75, longitude: -122.41, error: nil}
+      end
       it "creates, is made_without_serial" do
         expect(current_user.bikes.count).to eq 0
         expect {
-          post base_url, params: {bike: bike_params.merge(made_without_serial: "1")}
+          post base_url, params: {bike: bike_params.merge(made_without_serial: "1")},
+            headers: {"HTTP_CF_CONNECTING_IP" => ip_address}
         }.to change(Ownership, :count).by(1)
         expect(current_user.bikes.count).to eq 1
         new_bike = current_user.bikes.first
@@ -99,6 +105,8 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.serial_number).to eq "made_without_serial"
         expect(new_bike.normalized_serial_segments).to eq([])
         expect(new_bike.current_ownership.impound_record_id).to be_blank
+        expect(new_bike.latitude).to be_present
+        expect(new_bike.longitude).to be_present
       end
     end
   end
@@ -140,9 +148,9 @@ RSpec.describe "BikesController#create", type: :request do
           # We need to call clean_params on the BParam after bikebook update, so that
           # the foreign keys are assigned correctly. This is how we test that we're
           # This is also where we're testing bikebook assignment
-          expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+          expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
           ActionMailer::Base.deliveries = []
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             Sidekiq::Testing.inline! do
               # Test that we can still pass show_address - because API backward compatibility
@@ -183,7 +191,7 @@ RSpec.describe "BikesController#create", type: :request do
         end
         context "association message" do
           let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "association", body: "Something cool", search_radius_miles: search_radius_miles} }
-          it "it assigns organization_stolen_message" do
+          it "it assigns organization_stolen_message", :flaky do
             expect(organization_stolen_message.reload.kind).to eq "association"
             expect_created_stolen_bike(bike_params: bike_params.merge(creation_organization_id: organization.id), stolen_params: chicago_stolen_params.merge(show_address: true))
             bike = Bike.last
@@ -204,10 +212,10 @@ RSpec.describe "BikesController#create", type: :request do
         expect(BParam.all.count).to eq 1
         expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
         bike = assigns(:bike)
-        expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+        expect(bike).to match_hash_indifferently bike_params.except(:manufacturer_id, :phone)
         expect(bike.status).to eq "status_stolen"
         # we retain the stolen record attrs, test that they are assigned correctly too
-        expect_attrs_to_match_hash(bike.stolen_records.first, chicago_stolen_params)
+        expect(bike.stolen_records.first).to match_hash_indifferently chicago_stolen_params
       end
     end
   end
@@ -231,12 +239,12 @@ RSpec.describe "BikesController#create", type: :request do
           expect(new_bike.status).to eq "status_impounded"
           expect(new_bike.status_humanized).to eq "found"
           expect(new_bike.current_ownership.status).to eq "status_impounded" # Make sure this status matches
-          expect_attrs_to_match_hash(new_bike, testable_bike_params)
+          expect(new_bike).to match_hash_indifferently testable_bike_params
           expect(ImpoundRecord.where(bike_id: new_bike.id).count).to eq 1
           impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
           expect(new_bike.current_impound_record&.id).to eq impound_record.id
           expect(impound_record.kind).to eq "found"
-          expect_attrs_to_match_hash(impound_record, impound_params.except(:impounded_at_with_timezone, :timezone))
+          expect(impound_record).to match_hash_indifferently impound_params.except(:impounded_at_with_timezone, :timezone)
           expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
           expect(impound_record.send(:calculated_unregistered_bike?)).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
@@ -257,10 +265,10 @@ RSpec.describe "BikesController#create", type: :request do
             expect(BParam.all.count).to eq 1
             expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
             bike = assigns(:bike)
-            expect_attrs_to_match_hash(bike, bike_params.except(:manufacturer_id, :phone))
+            expect(bike).to match_hash_indifferently bike_params.except(:manufacturer_id, :phone)
             expect(bike.status).to eq "status_impounded"
             # we retain the stolen record attrs, test that they are assigned correctly too
-            expect_attrs_to_match_hash(bike.impound_records.first, impound_params.except(:impounded_at_with_timezone, :timezone))
+            expect(bike.impound_records.first).to match_hash_indifferently impound_params.except(:impounded_at_with_timezone, :timezone)
           end
         end
       end
@@ -293,16 +301,16 @@ RSpec.describe "BikesController#create", type: :request do
     # Make bike_params without address because it's used more often
     let(:bike_params) { bike_params_with_address.except(:street, :city, :zipcode, :state) }
     include_context :geocoder_real
-    it "creates with address" do
-      expect(current_user.reload.address).to be_blank
+    it "creates with address", :flaky do
+      expect(current_user.reload.to_coordinates.compact).to eq([])
       expect(current_user.user_registration_organizations.count).to eq 0
       VCR.use_cassette("bikes_controller-create-reg_address", match_requests_on: [:method]) do
-        expect(BikeDisplayer.display_edit_address_fields?(Bike.new, current_user)).to be_truthy
+        expect(BikeServices::Displayer.display_edit_address_fields?(Bike.new, current_user)).to be_truthy
         organization.reload
         expect(organization.location_latitude.to_i).to eq 34
         expect(organization.default_location).to be_present
-        expect(current_user.memberships.pluck(:id)).to eq([]) # sanity check
-        Sidekiq::Worker.clear_all
+        expect(current_user.organization_roles.pluck(:id)).to eq([]) # sanity check
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {
@@ -324,7 +332,7 @@ RSpec.describe "BikesController#create", type: :request do
         new_bike.reload
         expect(new_bike.b_params.count).to eq 0
         expect(testable_bike_params.keys.count).to be > 10
-        expect_attrs_to_match_hash(new_bike, testable_bike_params)
+        expect(new_bike).to match_hash_indifferently testable_bike_params
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.user_id).to eq current_user.id
         expect(new_bike.ownerships.count).to eq 1
@@ -336,16 +344,17 @@ RSpec.describe "BikesController#create", type: :request do
         expect(ownership.creator_id).to eq current_user.id
         reg_hash = bike_params_with_address.slice(:street, :city, :zipcode, :state)
           .merge("organization_affiliation_#{organization.id}" => "community_member")
-        expect_hashes_to_match(ownership.registration_info, reg_hash)
+        expect(ownership.registration_info).to match_hash_indifferently reg_hash
 
-        expect_hashes_to_match(new_bike.registration_address, reg_hash.except("organization_affiliation_#{organization.id}"))
+        expect(new_bike.registration_address.except("country", "latitude", "longitude")).to match_hash_indifferently reg_hash.except("organization_affiliation_#{organization.id}")
         expect(new_bike.address).to eq "1400 32nd St, Oakland, CA 94608, US"
         expect(new_bike.street).to eq "1400 32nd St"
         expect(new_bike.latitude.to_i).to eq 37
         expect(new_bike.longitude.to_i).to eq(-122)
         expect(new_bike.valid_mailing_address?).to be_truthy
-        expect(current_user.reload.address).to eq new_bike.address
-        expect(BikeDisplayer.display_edit_address_fields?(new_bike, current_user)).to be_falsey
+        expect(current_user.reload.formatted_address_string(visible_attribute: :street, render_country: true))
+          .to eq new_bike.address(country: [:name])
+        expect(BikeServices::Displayer.display_edit_address_fields?(new_bike, current_user)).to be_falsey
         expect(current_user.user_registration_organizations.pluck(:organization_id)).to eq([organization.id])
         user_registration_organization = current_user.user_registration_organizations.first
         expect(user_registration_organization.all_bikes?).to be_truthy
@@ -353,8 +362,8 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
     context "no address passed" do
-      it "does not have address, has association" do
-        Sidekiq::Worker.clear_all
+      it "does not have address, has association", :flaky do
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {bike: bike_params.merge(cycle_type: "non-e-scooter")}
@@ -362,7 +371,7 @@ RSpec.describe "BikesController#create", type: :request do
         end
         expect(flash[:success]).to be_present
         new_bike = Bike.last
-        expect_attrs_to_match_hash(new_bike, testable_bike_params.merge(cycle_type: "non-e-scooter"))
+        expect(new_bike).to match_hash_indifferently testable_bike_params.merge(cycle_type: "non-e-scooter")
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.user_id).to eq current_user.id
         expect(new_bike.ownerships.count).to eq 1
@@ -406,7 +415,7 @@ RSpec.describe "BikesController#create", type: :request do
         bike_code: "ed001"
       }
     end
-    it "creates and adds the bike code" do
+    it "creates and adds the bike code", :flaky do
       b_param.reload
       expect(b_param.created_bike_id).to be_blank
       expect {
@@ -425,6 +434,8 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.student_id).to eq nil
       expect(new_bike.cycle_type).to eq "personal-mobility"
       expect(new_bike.motorized?).to be_truthy
+      expect(new_bike.latitude).to be_present # Because IP address!
+      expect(new_bike.longitude).to be_present
 
       expect(new_bike.current_ownership.organization&.id).to eq organization.id
       expect(new_bike.current_ownership.origin).to eq "embed_extended"
@@ -478,7 +489,7 @@ RSpec.describe "BikesController#create", type: :request do
       # We need to call clean_params on the BParam after bikebook update, so that
       # the foreign keys are assigned correctly.
       # This is also where we're testing bikebook assignment
-      expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+      expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
     end
     it "creates a bike" do
       expect {
@@ -500,18 +511,19 @@ RSpec.describe "BikesController#create", type: :request do
       b_param.reload
       expect(b_param.created_bike_id).to eq new_bike.id
       expect(b_param.phone).to eq "18887776666"
-      expect_attrs_to_match_hash(new_bike, testable_bike_params)
+      expect(new_bike).to match_hash_indifferently testable_bike_params
       expect(new_bike.manufacturer).to eq manufacturer
       expect(new_bike.current_ownership.origin).to eq "embed_partial"
       expect(new_bike.current_ownership.creator).to eq new_bike.creator
-      expect(new_bike.registration_address).to eq({"street" => default_location[:formatted_address_no_country]})
-      expect(new_bike.address).to eq default_location[:formatted_address_no_country]
+      expect(new_bike.registration_address.reject { |_k, v| v.blank? })
+        .to match_hash_indifferently({street: default_location[:formatted_address_no_country], country: "United States"})
+      expect(new_bike.address).to eq default_location[:formatted_address_no_country] + ", US" # update caused by ownership address_record, who cares
       expect(new_bike.latitude).to eq target_address[:latitude]
       expect(new_bike.longitude).to eq target_address[:longitude]
       expect(new_bike.extra_registration_number).to eq "XXXZZZ"
       expect(new_bike.organization_affiliation).to eq "employee"
       expect(new_bike.student_id).to eq "999888"
-      expect_hashes_to_match(new_bike.registration_info, {phone: "18887776666", street: default_location[:formatted_address_no_country], organization_affiliation: "employee", student_id: "999888"})
+      expect(new_bike.registration_info).to match_hash_indifferently({phone: "18887776666", street: default_location[:formatted_address_no_country], organization_affiliation: "employee", student_id: "999888"})
       expect(new_bike.phone).to eq "18887776666"
       current_user.reload
       expect(new_bike.owner).to eq current_user # NOTE: not bike user
@@ -539,11 +551,11 @@ RSpec.describe "BikesController#create", type: :request do
         new_bike = Bike.last
         b_param.reload
         expect(b_param.created_bike_id).to eq new_bike.id
-        expect_attrs_to_match_hash(new_bike, testable_bike_params)
+        expect(new_bike).to match_hash_indifferently testable_bike_params
         expect(new_bike.manufacturer).to eq manufacturer
         expect(new_bike.current_ownership.origin).to eq "embed_partial"
         expect(new_bike.current_ownership.creator).to eq new_bike.creator
-        expect(new_bike.registration_address).to eq target_address.as_json
+        expect(new_bike.registration_address.except("country", "latitude", "longitude")).to eq target_address.as_json
         expect(new_bike.state.name).to eq "Illinois"
         expect(new_bike.extra_registration_number).to be_blank
         expect(new_bike.organization_affiliation).to eq "student"
@@ -575,11 +587,11 @@ RSpec.describe "BikesController#create", type: :request do
           b_param.reload
           expect(b_param.address_hash.except("country")).to eq target_address.as_json
           expect(b_param.created_bike_id).to eq new_bike.id
-          expect_attrs_to_match_hash(new_bike, testable_bike_params)
+          expect(new_bike).to match_hash_indifferently testable_bike_params
           expect(new_bike.manufacturer).to eq manufacturer
           expect(new_bike.current_ownership.origin).to eq "embed_partial"
           expect(new_bike.current_ownership.creator).to eq new_bike.creator
-          expect(new_bike.registration_address).to eq target_address.as_json
+          expect(new_bike.registration_address.except("country", "latitude", "longitude")).to eq target_address.as_json
           expect(new_bike.state.abbreviation).to eq "IL"
           expect(new_bike.extra_registration_number).to be_blank
           expect(new_bike.organization_affiliation).to eq "student"

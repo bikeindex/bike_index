@@ -44,13 +44,35 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
     context "valid create" do
       let(:valid_attrs) { {quote: "something that is nice and short and stuff"} }
       it "creates the recovery_display" do
-        post base_url, params: {recovery_display: valid_attrs}
+        expect do
+          post base_url, params: {recovery_display: valid_attrs}
+        end.to change(RecoveryDisplay, :count).by 1
 
         recovery_display = RecoveryDisplay.last
         expect(recovery_display.quote).to eq valid_attrs[:quote]
       end
     end
-    context "valid create" do
+    context "with a photo" do
+      let(:file) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
+      let(:valid_attrs) do
+        {
+          quote: "I recovered my bike!",
+          image: Rack::Test::UploadedFile.new(file)
+        }
+      end
+      it "creates with a photo and processes it in the background" do
+        expect do
+          post base_url, params: {recovery_display: valid_attrs}
+        end.to change(RecoveryDisplay, :count).by 1
+        Sidekiq::Job.drain_all # Process the backgrounded image upload
+
+        recovery_display = RecoveryDisplay.last
+        expect(recovery_display.quote).to eq valid_attrs[:quote]
+        expect(recovery_display.image).to be_present
+        expect(recovery_display.image_processing?).to be_falsey
+      end
+    end
+    context "invalid create" do
       let(:invalid_attrs) do
         {
           quote: "La croix scenester pug glossier, yuccie salvia humblebrag chia. Meditation health goth readymade flannel hot chicken austin tofu salvia cornhole tumeric hashtag plaid. Umami vegan hell of before they sold out copper mug chillwave authentic poke mumblecore godard la croix 8-bit. Venmo raw denim synth wolf. Food truck hot chicken waistcoat activated charcoal"

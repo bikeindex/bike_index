@@ -30,9 +30,8 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
     context "unknown organization" do
       it "raises" do
-        expect {
-          get "#{base_url}/d89safdf"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/d89safdf"
+        expect(response.status).to eq 404
       end
     end
   end
@@ -68,7 +67,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           organization = Organization.last
           expect(organization.kind).to eq(kind)
           unless organization.ambassador? # Ambassadors have special attrs set
-            expect_attrs_to_match_hash(organization, create_attributes.except(:kind))
+            expect(organization).to match_hash_indifferently create_attributes.except(:kind)
           end
           expect(current_user.organizations.count).to eq 0 # it doesn't assign the user
         end
@@ -136,12 +135,12 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
     it "updates the organization" do
       expect(location1).to be_present
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       expect {
         put "#{base_url}/#{organization.to_param}", params: {organization_id: organization.to_param, organization: update}
       }.to change(Location, :count).by 1
-      expect(UpdateOrganizationPosKindWorker.jobs.count).to eq 1
-      UpdateOrganizationPosKindWorker.drain # Run the jobs in the queue
+      expect(UpdateOrganizationPosKindJob.jobs.count).to eq 1
+      UpdateOrganizationPosKindJob.drain # Run the jobs in the queue
       organization.reload
       expect(organization.parent_organization).to eq parent_organization
       expect(organization.name).to eq update[:name]
@@ -157,19 +156,19 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       location1.reload
       expect(location1.organization).to eq organization
       location1_update = update[:locations_attributes]["0"]
-      expect_attrs_to_match_hash(location1, location1_update.except(:latitude, :longitude, :organization_id, :created_at, :_destroy))
+      expect(location1).to match_hash_indifferently location1_update.except(:latitude, :longitude, :organization_id, :created_at, :_destroy)
 
       # still existing location
       location2 = organization.locations.last
       location2_update = update[:locations_attributes][update[:locations_attributes].keys.last]
-      expect_attrs_to_match_hash(location2, location2_update.except(:latitude, :longitude, :organization_id, :created_at))
+      expect(location2).to match_hash_indifferently location2_update.except(:latitude, :longitude, :organization_id, :created_at)
     end
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }
       it "updates the organization" do
         expect {
           put "#{base_url}/#{organization.to_param}", params: {organization: {manual_pos_kind: "not_set", lightspeed_register_with_phone: "0"}}
-        }.to change(UpdateOrganizationPosKindWorker.jobs, :count).by 1
+        }.to change(UpdateOrganizationPosKindJob.jobs, :count).by 1
         organization.reload
         expect(organization.manual_pos_kind).to be_blank
         expect(organization.lightspeed_register_with_phone).to be_falsey
@@ -263,7 +262,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           organization_stolen_message_search_radius_miles: 44,
           organization_stolen_message_kind: "association"
         }
-        expect_attrs_to_match_hash(organization.reload, update_params)
+        expect(organization.reload).to match_hash_indifferently update_params
         expect(organization_stolen_message.reload.kind).to eq "association"
         expect(organization_stolen_message.search_radius_miles).to eq 44
         # And it works with kilometers too
@@ -282,7 +281,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       it "updates and doesn't enqueue worker" do
         expect {
           put "#{base_url}/#{organization.to_param}", params: {organization: {name: "new name", short_name: "something else"}}
-        }.to_not change(UpdateOrganizationPosKindWorker.jobs, :count)
+        }.to_not change(UpdateOrganizationPosKindJob.jobs, :count)
         organization.reload
         expect(organization.name).to eq "new name"
         expect(organization.short_name).to eq "something else"

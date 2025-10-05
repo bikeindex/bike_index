@@ -1,3 +1,22 @@
+# == Schema Information
+#
+# Table name: impound_configurations
+#
+#  id                      :bigint           not null, primary key
+#  bulk_import_view        :boolean          default(FALSE)
+#  display_id_next_integer :integer
+#  display_id_prefix       :string
+#  email                   :string
+#  expiration_period_days  :integer
+#  public_view             :boolean          default(FALSE)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  organization_id         :bigint
+#
+# Indexes
+#
+#  index_impound_configurations_on_organization_id  (organization_id)
+#
 class ImpoundConfiguration < ApplicationRecord
   belongs_to :organization
   has_many :impound_records, through: :organization
@@ -25,8 +44,9 @@ class ImpoundConfiguration < ApplicationRecord
 
   def calculated_display_id_next_integer
     # TODO: display_id_next_integer input needs to be validated
-    # currently, in ProcessImpoundUpdatesWorker it's removed if it's been used
+    # currently, in ProcessImpoundUpdatesJob it's removed if it's been used
     return display_id_next_integer if display_id_next_integer.present?
+
     last_display_id_integer + 1
   end
 
@@ -50,6 +70,7 @@ class ImpoundConfiguration < ApplicationRecord
 
   def impound_records_to_expire
     return ImpoundRecord.none unless expiration?
+
     impound_records.active.where("impound_records.created_at < ?", expired_before)
   end
 

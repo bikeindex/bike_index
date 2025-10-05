@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: customer_contacts
+#
+#  id            :integer          not null, primary key
+#  body          :text
+#  creator_email :string(255)
+#  info_hash     :jsonb
+#  kind          :integer          default("stolen_contact"), not null
+#  title         :string(255)
+#  user_email    :string(255)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  bike_id       :integer
+#  creator_id    :integer
+#  user_id       :integer
+#
 class CustomerContact < ApplicationRecord
   belongs_to :bike
   belongs_to :user
@@ -10,7 +27,7 @@ class CustomerContact < ApplicationRecord
     bike_possibly_found: 2
   }.freeze
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   validates \
     :bike,
@@ -96,6 +113,6 @@ class CustomerContact < ApplicationRecord
   end
 
   def create_notification
-    CustomerContactNotificationCreateWorker.perform_async(id)
+    CustomerContactNotificationCreateJob.perform_async(id)
   end
 end

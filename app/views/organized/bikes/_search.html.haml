@@ -1,7 +1,7 @@
 :ruby
   # NOTE: In addition to bikes_search, this renders for model_audit show
   skip_view_just_stolen ||= @bike_sticker.present?
-  cycle_type = BikeDisplayer.vehicle_search?(params.merge(@interpreted_params)) ? t(".vehicle") : t(".bike")
+  cycle_type = BikeServices::Displayer.vehicle_search?(params.merge(@interpreted_params)) ? t(".vehicle") : t(".bike")
   only_show_bikes ||= false
 
   search_params = (sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: current_organization.to_param))
@@ -105,29 +105,32 @@
       %p.search-sort-btns.text-right
         = link_to t(".create_export_of_vehicles", cycle_type: cycle_type), organization_bikes_path(search_params.merge(create_export: true)), class: "gray-link"
 
-  - if only_show_bikes
-    %a.float-right.less-strong{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb"}
+  - settings_button = capture_haml do
+    %a.float-right.btn.btn-sm.btn-outline-primary.uncap{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin-top: 0.1em;"}
       = t(".settings")
+      = inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", alt: "settings icon"
+
+  - if only_show_bikes
+    = settings_button
   - else
     %p.mt-4
       - if @search_query_present || params[:search_stickers].present? || params[:search_address].present? || @model_audit.present?
-        = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type))
+        = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type))
       - else
         = t(".registered_bikes_html",
-        bikes: pluralize(number_with_delimiter(@bikes.total_count), cycle_type),
+        bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type),
         org_name: current_organization.short_name)
       %em
         = humanized_time_range(@time_range)
+      = settings_button
       - unless skip_view_just_stolen
         - if @stolenness == 'all'
-          %a.float-right.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "stolen")), data: {stolenness: "stolen"}}
+          %a.float-right.organized-bikes-stolenness-toggle.gray-link.tw:mx-2{href: organization_bikes_path(search_params.merge(stolenness: "stolen")), data: {stolenness: "stolen"}}
             = t(".view_just_stolen_vehicles", cycle_type: cycle_type.pluralize(10))
         - else
           = t(".stolen_vehicles_html", cycle_type: cycle_type)
-          %a.organized-bikes-stolenness-toggle{href: organization_bikes_path(search_params.merge(stolenness: "all")), data: {stolenness: "all"}}
+          %a.organized-bikes-stolenness-toggle.gray-link.tw:mx-2{href: organization_bikes_path(search_params.merge(stolenness: "all")), data: {stolenness: "all"}}
             = t(".view_all_vehicles", cycle_type: cycle_type)
-      %a.float-right.less-strong{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb"}
-        = t(".settings")
     - if @model_audit.present?
       %p.mt-0
         E-Vehicles for audit:
@@ -136,7 +139,7 @@
         &nbsp;
         = link_to "view matching any audit", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "gray-link small"
 
-.full-screen-table.pl-lg-1.pr-lg-1
+.full-screen-table.pl-lg-1
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header.sortable
       %tr
@@ -154,7 +157,7 @@
         %th.hiddenColumn.hidden-xs-down.cycle_type_cell
           = sortable "cycle_type", t(".vehicle_type")
         %th.hiddenColumn.hidden-xs-down.manufacturer_cell
-          = sortable "manufacturer_id", t(".manufacturer")
+          = sortable "mnfg_name", t(".manufacturer")
         %th.hiddenColumn.hidden-xs-down.model_cell
           = sortable "frame_model", t(".model")
         %th.hiddenColumn.hidden-xs-down.color_cell
@@ -235,8 +238,7 @@
                 %em
                   = bike.owner_name
             %td.hiddenColumn.status_cell.small
-              - unless bike.status_with_owner?
-                = status_display(bike.status_humanized)
+              = status_display(bike.status_humanized_no_with_owner)
             - additional_registration_fields.each do |reg_field|
               - next if reg_field == "extra_registration_number" # All organizations can see additional serial#
               %td.hiddenColumn.hidden-xs-down{class: "#{reg_field}_cell"}
@@ -279,9 +281,9 @@
             %td.hiddenColumn.hidden-xs-down{class: "avery_cell"}
               = check_mark if bike.avery_exportable?
 
-- if !only_show_bikes && @bikes.total_count > @bikes.count
+- if !only_show_bikes && @pagy.count > @bikes.count
   .paginate-container.paginate-container-bottom.row
-    .col-sm-6.mb-2
-      = paginate @bikes
-    .col-sm-6.text-right
-      = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} #{cycle_type.pluralize(10)} per page", i] }, selected: @per_page), {class: "form-control d-inline-block", style: "width: 15rem; margin-top:15px;"}
+    .col-md-8.mb-2.mt-4
+      = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+    .col-md-4.text-right
+      = select_tag :per_page_select, options_for_select([10, 25, 50, 100].map { |i| ["#{i} #{cycle_type.pluralize(10)} per page", i] }, selected: @per_page), {class: "form-control d-inline-block", style: "width: 100%; max-width: 15rem; margin-top:15px;"}

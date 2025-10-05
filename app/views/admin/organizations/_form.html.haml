@@ -1,6 +1,4 @@
-- if @organization.errors.any?
-  = render partial: "/shared/errors", locals: {name: "Organization", obj: @organization}
-
+= render(AlertForErrors::Component.new(object: @organization))
 
 .row
   .form-group.col-md-6
@@ -131,7 +129,7 @@
           %small.less-strong embed registration email
         = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
         %small.less-strong
-          - if @organization.memberships.count == 0
+          - if @organization.organization_roles.count == 0
             You can use #{ENV['AUTO_ORG_MEMBER']} if
             there are no members of the organization
     - if @organization.bike_shop?

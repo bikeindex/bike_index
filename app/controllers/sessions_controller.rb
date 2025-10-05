@@ -1,5 +1,6 @@
 class SessionsController < ApplicationController
   include Sessionable
+
   before_action :skip_if_signed_in, only: [:new, :magic_link]
 
   def new
@@ -28,10 +29,10 @@ class SessionsController < ApplicationController
     if user.blank?
       matching_organization = Organization.passwordless_email_matching(params[:email])
       if matching_organization.present?
-        membership = Membership.create_passwordless(invited_email: params[:email],
+        organization_role = OrganizationRole.create_passwordless(invited_email: params[:email],
           created_by_magic_link: true,
           organization_id: matching_organization.id)
-        user = membership.user
+        user = organization_role.user
       end
     end
     if user.present?
@@ -64,12 +65,13 @@ class SessionsController < ApplicationController
   def destroy
     remove_session
     if params[:partner] == "bikehub"
-      redirect_to(bikehub_website_url) && return
+      redirect_to(bikehub_website_url, allow_other_host: true) && return
     elsif params[:redirect_location].present?
       if params[:redirect_location].match?("new_user")
         redirect_to(new_user_path, notice: "Logged out!") && return
       end
     end
+
     redirect_to goodbye_url, notice: "Logged out!"
   end
 

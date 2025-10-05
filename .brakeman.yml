@@ -1,0 +1,3 @@
+min_confidence: 2 # 0 is the least confident, 3 is the most confident
+output_formats: [ 'tabs' ]
+output_files: [ 'brakeman-output.tabs' ]

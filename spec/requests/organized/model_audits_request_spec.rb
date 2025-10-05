@@ -19,7 +19,7 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
     end
 
     context "logged in as super admin" do
-      let(:current_user) { FactoryBot.create(:admin) }
+      let(:current_user) { FactoryBot.create(:superuser) }
       describe "index" do
         it "renders" do
           expect(current_user.member_of?(current_organization, no_superuser_override: true)).to be_falsey
@@ -33,11 +33,11 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
 
   context "organization with model_audits" do
     let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["model_audits"]) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
 
     describe "index" do
       it "renders" do
-        expect(current_user.memberships.first.role).to eq "member"
+        expect(current_user.organization_roles.first.role).to eq "member"
         current_organization.reload
         get base_url
         expect(response.code).to eq("200")

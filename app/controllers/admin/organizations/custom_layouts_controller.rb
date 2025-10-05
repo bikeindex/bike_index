@@ -35,6 +35,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def layout_kind
     return "landing_page" if params[:id] == "landing_page"
+
     "mail_snippet"
   end
 

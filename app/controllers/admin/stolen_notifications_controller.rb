@@ -1,19 +1,18 @@
 class Admin::StolenNotificationsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_notification, only: [:show, :resend]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 100
-    @stolen_notifications = searched_stolen_notifications
+    @per_page = permitted_per_page(default: 100)
+    @pagy, @stolen_notifications = pagy(searched_stolen_notifications
       .reorder("#{sort_column} #{sort_direction}")
-      .includes(:bike).page(page).per(@per_page)
+      .includes(:bike), limit: @per_page, page: permitted_page)
   end
 
   def resend
     if (@stolen_notification.send_dates_parsed.count == 0) || params[:pretty_please]
-      EmailStolenNotificationWorker.perform_async(@stolen_notification.id, true)
+      Email::StolenNotificationJob.perform_async(@stolen_notification.id, true)
       flash[:success] = "Notification resent!"
       redirect_to admin_stolen_notifications_url
     else

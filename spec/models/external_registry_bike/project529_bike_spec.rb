@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe ExternalRegistryBike::Project529Bike, type: :model do
   before do
-    FactoryBot.create(:country, name: "Canada", iso: "CA")
-    FactoryBot.create(:country, name: "United States", iso: "US")
+    Country.united_states
+    Country.canada
   end
 
   describe "updated_since_date" do

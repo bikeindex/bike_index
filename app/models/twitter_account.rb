@@ -1,3 +1,40 @@
+# == Schema Information
+#
+# Table name: twitter_accounts
+#
+#  id                   :integer          not null, primary key
+#  active               :boolean          default(FALSE), not null
+#  address_string       :string
+#  append_block         :string
+#  city                 :string
+#  consumer_key         :string           not null
+#  consumer_secret      :string           not null
+#  default              :boolean          default(FALSE), not null
+#  language             :string
+#  last_error           :string
+#  last_error_at        :datetime
+#  latitude             :float
+#  longitude            :float
+#  national             :boolean          default(FALSE), not null
+#  neighborhood         :string
+#  screen_name          :string           not null
+#  street               :string
+#  twitter_account_info :jsonb
+#  user_secret          :string           not null
+#  user_token           :string           not null
+#  zipcode              :string
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  country_id           :bigint
+#  state_id             :bigint
+#
+# Indexes
+#
+#  index_twitter_accounts_on_country_id              (country_id)
+#  index_twitter_accounts_on_latitude_and_longitude  (latitude,longitude)
+#  index_twitter_accounts_on_screen_name             (screen_name)
+#  index_twitter_accounts_on_state_id                (state_id)
+#
 class TwitterAccount < ApplicationRecord
   include Geocodeable
 
@@ -33,12 +70,14 @@ class TwitterAccount < ApplicationRecord
 
   def self.fuzzy_screen_name_find(name)
     return if name.blank?
+
     where("lower(screen_name) = ?", name.downcase.strip).first
   end
 
   def self.friendly_find(str)
     return nil if str.blank?
     return where(id: str).first if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
+
     fuzzy_screen_name_find(str)
   end
 
@@ -75,6 +114,7 @@ class TwitterAccount < ApplicationRecord
 
   def self.in_proximity(obj = nil)
     return [] unless obj&.to_coordinates&.compact.present?
+
     [
       active.near(obj.to_coordinates, 50),
       default_account_for_country(obj&.country)
@@ -87,6 +127,7 @@ class TwitterAccount < ApplicationRecord
 
   def fetch_account_info
     return twitter_account_url if twitter_account_info.present?
+
     self.twitter_account_info = twitter_user
     self.created_at = TimeParser.parse(twitter_account_info["created_at"])
     twitter_account_info
@@ -98,11 +139,13 @@ class TwitterAccount < ApplicationRecord
 
   def account_info_name
     return if twitter_account_info.blank?
+
     twitter_account_info["name"]
   end
 
   def account_info_image
     return if twitter_account_info.blank?
+
     twitter_account_info["profile_image_url_https"]
   end
 
@@ -130,13 +173,15 @@ class TwitterAccount < ApplicationRecord
   end
 
   def tweet(text, photo = nil, **opts)
-    return unless text.present?
+    nil unless text.present?
 
-    if photo.present?
-      twitter_client.update_with_media(text, photo, opts)
-    else
-      twitter_client.update(text, opts)
-    end
+    # Commented out in #2618 - twitter is disabled
+    #
+    # if photo.present?
+    #   twitter_client.update_with_media(text, photo, opts)
+    # else
+    #   twitter_client.update(text, opts)
+    # end
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
     nil

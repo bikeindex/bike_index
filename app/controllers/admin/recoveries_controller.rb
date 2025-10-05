@@ -1,16 +1,12 @@
 class Admin::RecoveriesController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
-
   helper_method :available_recoveries
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 50
-    @recoveries = available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
-      .includes(:bike)
-      .page(page).per(@per_page)
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @recoveries = pagy(available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
+      .includes(:bike), limit: @per_page, page: permitted_page)
   end
 
   def show
@@ -70,10 +66,9 @@ class Admin::RecoveriesController < Admin::BaseController
     end
 
     # We always render distance
-    distance = params[:search_distance].to_i
-    @distance = distance.present? && distance > 0 ? distance : 50
+    @distance = GeocodeHelper.permitted_distance(params[:search_distance], default_distance: 50)
     if params[:search_location].present?
-      bounding_box = Geocoder::Calculations.bounding_box(params[:search_location], @distance)
+      bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
       recoveries = recoveries.within_bounding_box(bounding_box)
     end
 
@@ -91,6 +86,6 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:stolen_record).permit(StolenRecordUpdator.old_attr_accessible)
+    params.require(:stolen_record).permit(BikeServices::StolenRecordUpdator.old_attr_accessible)
   end
 end

@@ -9,7 +9,11 @@ class DiscourseAuthenticationController < ApplicationController
     sso.admin = current_user.superuser? if current_user.superuser?
     sso.moderator = current_user.ambassador? if current_user.ambassador?
     session[:discourse_redirect] = nil
-    redirect_to(sso.to_url(discourse_redirect_url)) && return
+    url = sso.to_url(discourse_redirect_url)
+
+    if url.include?("session/sso_login?")
+      redirect_to(url, allow_other_host: true) && return
+    end
   end
 
   private

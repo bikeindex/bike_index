@@ -1,7 +1,26 @@
+# == Schema Information
+#
+# Table name: bulk_imports
+#
+#  id              :integer          not null, primary key
+#  data            :jsonb
+#  file            :text
+#  file_cleaned    :boolean          default(FALSE)
+#  import_errors   :json
+#  is_ascend       :boolean          default(FALSE)
+#  kind            :integer
+#  no_notify       :boolean          default(FALSE)
+#  progress        :integer          default("pending")
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  organization_id :integer
+#  user_id         :integer
+#
 class BulkImport < ApplicationRecord
   PROGRESS_ENUM = {pending: 0, ongoing: 1, finished: 2}.freeze
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
   VALID_FILE_EXTENSIONS = %(csv tsv).freeze
+  TIMEOUT_FAILURE_DELAY = 20.minutes.freeze
   mount_uploader :file, BulkImportUploader
 
   belongs_to :organization
@@ -11,19 +30,22 @@ class BulkImport < ApplicationRecord
   has_many :ownerships
   has_many :bikes, through: :ownerships
 
-  enum progress: PROGRESS_ENUM
-  enum kind: KIND_ENUM
+  enum :progress, PROGRESS_ENUM
+  enum :kind, KIND_ENUM
 
   scope :file_errors, -> { where("(import_errors -> 'file') IS NOT NULL") }
   scope :line_errors, -> { where("(import_errors -> 'line') IS NOT NULL") }
   scope :ascend_errors, -> { where("(import_errors -> 'ascend') IS NOT NULL") }
-  scope :import_errors, -> { file_errors.or(line_errors) }
+  # NOTE: the timeout_failure? method is slightly different - it has a shorter timeout for pending status
+  scope :timeout_failure, -> { not_finished.where("created_at < ?", Time.current - TIMEOUT_FAILURE_DELAY) }
+  scope :import_errors, -> { file_errors.or(line_errors).or(timeout_failure) }
   scope :no_import_errors, -> { where("(import_errors -> 'line') IS NULL").where("(import_errors -> 'file') IS NULL") }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') IS NOT NULL") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') IS NOT NULL") }
   scope :not_ascend, -> { where.not(kind: "ascend") }
 
   before_save :set_calculated_attributes
+  after_commit :enqueue_job, on: :create
 
   def self.ascend_api_token
     ENV["ASCEND_API_TOKEN"]
@@ -38,7 +60,7 @@ class BulkImport < ApplicationRecord
   end
 
   def self.kind_humanized(str)
-    str == "organization_import" ? "standard" : str&.gsub("_", " ")
+    (str == "organization_import") ? "standard" : str&.tr("_", " ")
   end
 
   # NOTE: Headers were added in PR#1914 - 2021-3-11 - many bulk imports don't have them stored
@@ -60,6 +82,7 @@ class BulkImport < ApplicationRecord
 
   def file_errors_with_lines
     return nil unless file_errors.present?
+
     [file_errors].flatten.zip(file_import_error_lines)
   end
 
@@ -72,9 +95,17 @@ class BulkImport < ApplicationRecord
     line_errors.present? || file_errors.present? || ascend_errors.present?
   end
 
+  def timeout_failure?
+    return false if finished? || created_at.blank?
+
+    # If pending, fail if older than 5 minutes (it should have started processing by then!)
+    # Doesn't match the scope exactly, which just uses TIMEOUT_FAILURE_DELAY
+    timeout = pending? ? 5.minutes : TIMEOUT_FAILURE_DELAY
+    created_at < Time.current - timeout
+  end
+
   def blocking_error?
-    ascend_errors.present? || file_errors.present? ||
-      pending? && created_at && created_at < Time.current - 5.minutes
+    ascend_errors.present? || file_errors.present? || timeout_failure?
   end
 
   def no_bikes?
@@ -88,16 +119,18 @@ class BulkImport < ApplicationRecord
   def add_file_error(error_msg, line_error = "", skip_save: false)
     self.progress = "finished"
     return if file_errors.present? && file_errors.include?(error_msg)
+
     updated_file_error_data = {
       "file" => [file_errors, error_msg.to_s].compact.flatten,
       "file_lines" => [file_import_error_lines, line_error].flatten
     }
     return true if skip_save # Don't get stuck in a loop during creation
+
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
     update_attribute :import_errors, (import_errors || {}).merge(updated_file_error_data)
   end
 
-  # If the bulk import failed on a line, start after that line, otherwise it's 1. See BulkImportWorker
+  # If the bulk import failed on a line, start after that line, otherwise it's 1. See BulkImportJob
   def starting_line
     error_line = file_import_error_lines&.compact&.last
     error_line.present? ? error_line + 1 : 1
@@ -136,6 +169,13 @@ class BulkImport < ApplicationRecord
     file_filename.split("_-_").last.gsub(/\.\w{3,5}\z/, "")
   end
 
+  def unlink_tempfile
+    return if @tempfile.blank?
+
+    @tempfile.close && @tempfile.unlink && @tempfile = nil
+    true
+  end
+
   def check_ascend_import_processable!
     self.import_errors = (import_errors || {}).except("ascend")
     if organization_id.blank?
@@ -143,17 +183,19 @@ class BulkImport < ApplicationRecord
       save if organization_id.present?
     end
     if organization_id.present? && invalid_extension?
-      InvalidExtensionForAscendImportWorker.perform_async(id)
+      InvalidExtensionForAscendImportJob.perform_async(id)
     end
     return true if organization_id.present?
+
     add_ascend_import_error!
-    UnknownOrganizationForAscendImportWorker.perform_async(id)
-    false # must return false, otherwise BulkImportWorker enqueues processing
+    UnknownOrganizationForAscendImportJob.perform_async(id)
+    false # must return false, otherwise BulkImportJob enqueues processing
   end
 
   def organization_for_ascend_name
     org = Organization.where(ascend_name: ascend_name).first
     return org if org.present?
+
     regex_matcher = ascend_name.gsub(/-|_|\s/, "")
     Organization.ascend_pos.find { |org|
       org.ascend_name.present? && org.ascend_name.gsub(/-|_|\s/, "").match(/#{regex_matcher}/i)
@@ -162,6 +204,7 @@ class BulkImport < ApplicationRecord
 
   def stolen_record_attrs
     return {} unless stolen? && data&.dig("stolen_record").present?
+
     data["stolen_record"].merge(proof_of_ownership: true, receive_notifications: true)
   end
 
@@ -170,6 +213,7 @@ class BulkImport < ApplicationRecord
     self.no_notify = true if kind == "stolen"
     # we're managing ascend errors separately because we need to lookup organization
     return true if ascend_unprocessable?
+
     unless creator.present?
       add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end
@@ -188,16 +232,25 @@ class BulkImport < ApplicationRecord
   # To enable stream processing, so that we aren't loading the whole file into memory all at once
   # also so we can separately deal with the header line
   def open_file
-    @open_file ||= local_file? ? File.open(file.path, "r") : URI.parse(file.url).open
+    @open_file ||= local_file? ? File.open(file.path, "r") : fetch_tempfile
   rescue => e
     add_file_error(e.message)
     raise e
   end
 
+  def enqueue_job
+    BulkImportJob.perform_async(id) if persisted?
+  end
+
   private
+
+  def fetch_tempfile
+    @tempfile ||= Down.download(file.url)
+  end
 
   def calculated_kind
     return "unorganized" if organization_id.blank?
+
     "organization_import" # Default
   end
 

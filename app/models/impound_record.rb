@@ -1,5 +1,43 @@
+# == Schema Information
+#
+# Table name: impound_records
+#
+#  id                    :integer          not null, primary key
+#  city                  :text
+#  display_id_integer    :bigint
+#  display_id_prefix     :string
+#  impounded_at          :datetime
+#  impounded_description :text
+#  latitude              :float
+#  longitude             :float
+#  neighborhood          :text
+#  resolved_at           :datetime
+#  status                :integer          default("current")
+#  street                :text
+#  unregistered_bike     :boolean          default(FALSE)
+#  zipcode               :text
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  bike_id               :integer
+#  country_id            :bigint
+#  display_id            :string
+#  location_id           :bigint
+#  organization_id       :integer
+#  state_id              :bigint
+#  user_id               :integer
+#
+# Indexes
+#
+#  index_impound_records_on_bike_id          (bike_id)
+#  index_impound_records_on_country_id       (country_id)
+#  index_impound_records_on_location_id      (location_id)
+#  index_impound_records_on_organization_id  (organization_id)
+#  index_impound_records_on_state_id         (state_id)
+#  index_impound_records_on_user_id          (user_id)
+#
 class ImpoundRecord < ApplicationRecord
   include Geocodeable
+  include DefaultCurrencyable
 
   belongs_to :bike, touch: true
   belongs_to :user
@@ -17,7 +55,7 @@ class ImpoundRecord < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  enum status: ImpoundRecordUpdate::KIND_ENUM
+  enum :status, ImpoundRecordUpdate::KIND_ENUM
 
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
@@ -91,6 +129,7 @@ class ImpoundRecord < ApplicationRecord
   def authorized?(u = nil)
     return false if u.blank?
     return true if u.superuser?
+
     organized? ? u.authorized?(organization) : u.id == user_id
   end
 
@@ -108,7 +147,7 @@ class ImpoundRecord < ApplicationRecord
   def address(force_show_address: false, country: [:iso, :optional, :skip_default])
     Geocodeable.address(
       self,
-      street: (force_show_address || show_address),
+      street: force_show_address || show_address,
       country: country
     ).presence
   end
@@ -134,6 +173,7 @@ class ImpoundRecord < ApplicationRecord
 
   def notification_notes_and_messages
     return nil unless parking_notification.present?
+
     msgs = parking_notification.associated_notifications_including_self
       .map { |pn| [pn.internal_notes, pn.message] }.flatten.reject(&:blank?)
     msgs.any? ? msgs : nil
@@ -170,6 +210,7 @@ class ImpoundRecord < ApplicationRecord
 
   def update_kinds
     return ["note"] if resolved?
+
     u_kinds = ImpoundRecordUpdate.kinds - ["expired"]
     u_kinds -= %w[move_location] unless organization&.enabled?("impound_bikes_locations")
     if impound_claims.approved.any? || impound_claims.active.none?
@@ -185,6 +226,7 @@ class ImpoundRecord < ApplicationRecord
   def update_multi_kinds
     u_kinds = update_kinds - %w[current expired]
     return u_kinds if resolved? || impound_claims.submitted.active.none?
+
     # If there are approved claims, you can have the bike retrieved_by_owner, but can't approve other claims
     u_kinds - if impound_claims.approved.any?
       %w[removed_from_bike_index transferred_to_new_owner claim_approved]
@@ -195,9 +237,10 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def update_associations
-    # We call this job inline in ProcessParkingNotificationWorker
+    # We call this job inline in ProcessParkingNotificationJob
     return true if skip_update || !persisted?
-    ProcessImpoundUpdatesWorker.perform_async(id)
+
+    ProcessImpoundUpdatesJob.perform_async(id)
   end
 
   def set_calculated_attributes
@@ -211,16 +254,18 @@ class ImpoundRecord < ApplicationRecord
     self.unregistered_bike ||= calculated_unregistered_bike?
     # Don't geocode if location is present and address hasn't changed
     return if !address_changed? && with_location?
+
     self.attributes = if parking_notification.present?
       parking_notification.attributes.slice(*Geocodeable.location_attrs)
     else
-      Geohelper.assignable_address_hash(address(force_show_address: true))
+      GeocodeHelper.assignable_address_hash_for(address(force_show_address: true))
     end
   end
 
   def reply_to_email
     # Delegate to parking notification, since that's the original email
     return parking_notification.reply_to_email if parking_notification.present?
+
     organization&.fetch_impound_configuration&.email ||
       organization&.auto_user&.email ||
       user&.email
@@ -233,6 +278,7 @@ class ImpoundRecord < ApplicationRecord
       # Force nil display_id for non-organized records
       return self.attributes = {display_id: nil, display_id_prefix: nil, display_id_integer: nil}
     end
+
     if @display_id_from_calculation
       # Blank the integer if calculated, so it can be reassigned
       self.display_id_integer = nil
@@ -249,12 +295,14 @@ class ImpoundRecord < ApplicationRecord
 
   def calculated_status
     return resolving_update.kind if resolving_update.present?
+
     "current"
   end
 
   def calculated_location_id
     # Return the existing location_id if the organization doesn't have locations enabled - just to be safe and not lose data
     return location_id unless organization&.enabled?("impound_bikes_locations")
+
     # If any impound records have a set location, use that, otherwise, use the existing. Fall back to the default location
     impound_record_updates.with_location.order(:id).last&.location_id || location_id.presence || organization.default_impound_location&.id
   end
@@ -269,12 +317,14 @@ class ImpoundRecord < ApplicationRecord
 
   def calculated_unregistered_bike?
     return true if parking_notification&.unregistered_bike?
+
     b_created_at = bike&.created_at || Time.current
-    if id.blank? & bike.present?
-      return true if bike.created_at.blank? || bike.created_at > Time.current - 1.hour
+
+    if id.blank?
+      return true if bike.present? && bike.created_at.blank?
+      return true if b_created_at > Time.current - 1.hour
     end
-    return true if id.blank? && b_created_at > Time.current - 1.hour
-    return false unless (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
-    bike&.current_ownership&.status == "status_impounded" || false
+    bike&.current_ownership&.status == "status_impounded" &&
+      (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
   end
 end

@@ -4,6 +4,8 @@ touch log/development.log
 > log/test.log # Clear out test log too
 touch log/bullet.log
 > log/test.log # Clear out bullet log
+# Clear out temp - mainly used by tests
+rm -rf tmp/*
 
 # Start Redis in the background, if it isn't started already
 touch log/redis.log
@@ -12,7 +14,7 @@ redis-server > log/redis.log &
 
 # If there is a development specific environment file
 if test -f .env.development; then
-  bundle exec foreman start -f Procfile_development --env .env.development
+  bundle exec foreman start -f Procfile.dev --env .env.development
 else
-  bundle exec foreman start -f Procfile_development
+  bundle exec foreman start -f Procfile.dev
 fi

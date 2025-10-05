@@ -37,7 +37,7 @@
       .form-group.row
         %label.form-well-label
         %label.form-well-input.form-well-input-checks{style: "line-height: 1.5em;"}
-          = check_box_tag "hot_sheet_notifications[#{organization.id}]", true, @user.memberships.where(organization_id: organization.id).first&.notification_daily?
+          = check_box_tag "hot_sheet_notifications[#{organization.id}]", true, @user.organization_roles.where(organization_id: organization.id).first&.notification_daily?
           - hot_sheets_link = link_to(t(".stolen_hot_sheets"),  organization_hot_sheet_path(organization_id: organization.to_param))
           = t(".daily_hot_sheet_notifications_html", org_name: organization.short_name, hot_sheets_link: hot_sheets_link)
 
@@ -46,7 +46,7 @@
     .form-well-input
       -# if the user was just updated, they might not have the user_phone assigned
       -# in which case, show the phone number to reduce confusion
-      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : @user.phone
+      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : phone_display(@user.phone)
       = f.text_field :phone, value: phone_value, placeholder: t(".add_new_phone_number"), class: "form-control"
     - if @user.user_phones.any?
       .form-well-input-static-full-width.ml-auto
@@ -55,49 +55,20 @@
             %li.row
               .col-sm-8
                 = phone_display(user_phone.phone)
-                - if user_phone.confirmed?
-                  %small.less-strong= t(".verified")
-                - else
-                  %small.text-danger= t(".unconfirmed")
-              .col-sm-4.text-right
-                - if user_phone.resend_confirmation?
-                  = link_to t(".resend_confirmation"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "patch", action: "update", class: "small"
-                - else
-                  = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
+                - if Flipper.enabled?(:phone_verification)
+                  - if user_phone.confirmed?
+                    %small.less-strong= t(".verified")
+                  - else
+                    %small.text-danger= t(".unconfirmed")
+              - if Flipper.enabled?(:phone_verification)
+                .col-sm-4.text-right
+                  - if user_phone.resend_confirmation?
+                    = link_to t(".resend_confirmation"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "patch", action: "update", class: "small"
+                  - else
+                    = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
+  = f.fields_for :address_record do |address_form|
+    = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @user.uro_organization_reg_address, no_street: @user.no_address?, current_country_id:))
 
-  .related-fields
-    - address_org = @user.uro_organization_reg_address
-    - address_label = registration_field_label(address_org, "reg_address") || t(".address")
-
-    - unless @user.no_address?
-      .form-group.row
-        = f.label :street, address_label, class: "form-well-label"
-        .form-well-input
-          = f.text_field :street, placeholder: registration_field_address_placeholder(address_org), class: "form-control"
-          = registration_address_required_below_helper(address_org)
-
-    .form-group.row
-      - if @user.no_address?
-        = f.label :city, address_label, class: "form-well-label"
-      - else
-        %label.form-well-label
-      .form-well-input
-        = f.text_field :city, placeholder: t(".city"), class: "form-control"
-
-    .form-group.row.fancy-select.no-restore-on-backspace.unfancy
-      %label.form-well-label
-      .form-well-input#us_id_data{data: {usid: Country.united_states.id}}
-        = f.select(:country_id, Country.select_options, {prompt: t(".choose_country")}, {class: "country-select-input form-control"})
-
-    - state_class = (@user.country_id == Country.united_states.id) ? "unhidden" : ""
-    .form-group.row.fancy-select-placeholder.unfancy.hidden-other{class: state_class}
-      %label.form-well-label
-      .form-well-input
-        = f.collection_select(:state_id, State.all, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
-    .form-group.row.mb-4
-      %label.form-well-label
-      .form-well-input
-        = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
 
   .related-fields.my-account-checks
     .form-group.row.fancy-select.unfancy
@@ -136,7 +107,7 @@
               - unless labeled
                 = t(".confirmed_emails")
                 - labeled = true
-            %p.form-well-input-static
+            %p.form-well-input-static{style: "overflow-x: scroll"}
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post, class: "d-block"

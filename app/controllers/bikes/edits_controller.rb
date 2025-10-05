@@ -7,13 +7,15 @@ class Bikes::EditsController < Bikes::BaseController
     @page_errors = @bike.errors
     return unless setup_edit_template(params[:edit_template]) # Returns nil if redirecting
 
+    @page_title = page_title_for(@edit_template, @bike)
+
     if @edit_template == "photos"
       @private_images = PublicImage
         .unscoped
         .where(imageable_type: "Bike")
         .where(imageable_id: @bike.id)
         .where(is_private: true)
-    elsif @edit_template == "ownership"
+    elsif @edit_template == "remove"
       @new_email_assigned = params[:owner_email].present? && @bike.owner_email != params[:owner_email]
       if @new_email_assigned
         @og_email = @bike.owner_email # so that edit_bike_skeleton doesn't show the wrong value
@@ -21,7 +23,7 @@ class Bikes::EditsController < Bikes::BaseController
       end
     end
 
-    render "/bikes_edit/#{@edit_template}".to_sym
+    render :"/bikes_edit/#{@edit_template}"
   end
 
   private

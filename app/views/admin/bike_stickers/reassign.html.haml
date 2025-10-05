@@ -5,7 +5,7 @@
 
   .col-12.mt-4
     %h5
-      = admin_number_display(@bike_sticker_batches.count)
+      = number_display(@bike_sticker_batches.count)
       - if @bike_sticker_batch.present?
         Selected batch
       - else
@@ -14,7 +14,7 @@
     = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false}
 
 
-  = render partial: "/shared/admin_current_header", locals: { viewing: "Stickers" }
+  = render partial: "/shared/admin/current_header", locals: { viewing: "Stickers" }
 .row
   .col-md-8.offset-md-2.mt-2
     = form_tag reassign_admin_bike_stickers_path, method: :get, id: "reassign_form" do
@@ -77,15 +77,15 @@
 .row.mt-4
   .col-md-6
     %p
-      = admin_number_display(@bike_stickers.total_count)
+      = number_display(selected_bike_stickers.size)
       matching
-      = "sticker".pluralize(@bike_stickers.total_count)
+      = "sticker".pluralize(selected_bike_stickers.size)
       %span.less-strong
         = number_with_delimiter(matching_bike_stickers.claimed.count)
         claimed
 
-= render partial: "/shared/pagination", locals: {collection: @bike_stickers, viewing: "Sticker"}
+= render partial: "/shared/admin/pagination", locals: {collection: @bike_stickers, viewing: "Sticker"}
 
 = render partial: "table", locals: { bike_stickers: @bike_stickers, render_sortable: true }
 
-= render partial: "/shared/pagination", locals: {collection: @bike_stickers, viewing: "Sticker", skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @bike_stickers, viewing: "Sticker", skip_total: true}

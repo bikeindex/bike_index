@@ -17,16 +17,16 @@
 .row.mt-4
   .col-sm-7
     %p
-      = admin_number_display(matching_paints.count)
+      = number_display(matching_paints.count)
       matching paints
       %em
         = humanized_time_range(@time_range)
       %em
-        (#{admin_number_display(matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count)} today)
+        (#{number_display(matching_paints.where("created_at >= ?", Time.current.beginning_of_day).count)} today)
 
       - unless sortable_search_params?
         %strong
-          = admin_number_display(Paint.unlinked.count)
+          = number_display(Paint.unlinked.count)
 
           are unlinked
 
@@ -38,7 +38,7 @@
     = submit_tag "Search", name: "search", class: "btn btn-success"
 
 - if @paints.present?
-  = paginate @paints, views_prefix: "admin"
+  = render partial: "/shared/admin/pagination", locals: {collection: @paints}
 
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
@@ -86,7 +86,7 @@
                   %li
                     = paint.tertiary_color.name
 
-  = paginate @paints, views_prefix: "admin"
+  = render partial: "/shared/admin/pagination", locals: {collection: @paints, skip_total: true}
 
 
 - else

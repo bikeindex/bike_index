@@ -1,16 +1,12 @@
 class Admin::ModelAuditsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 50
-    @model_audits =
-      matching_model_audits
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @model_audits =
+      pagy(matching_model_audits
         .includes(:organization_model_audits, :model_attestations)
-        .reorder(sort_ordered)
-        .page(page)
-        .per(@per_page)
+        .reorder(sort_ordered), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_model_audits

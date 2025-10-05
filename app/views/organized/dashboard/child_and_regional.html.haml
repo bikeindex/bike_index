@@ -37,6 +37,16 @@
         %tr
           %td Registrations claimed by their owners
           %td= number_with_delimiter(@claimed_ownerships.count)
+      %tr
+        %td
+          Ever registered
+          %span.less-strong
+            (including deleted
+            - if current_organization.enabled?("graduated_notifications")
+              and graduated
+            registrations)
+            %em.small not shown in the chart or above totals
+        %td= number_with_delimiter(@bikes_ever_registered_count)
       - if current_organization.parent?
         %tr
           %td Registered by related organizations
@@ -58,6 +68,7 @@
             %strong
               - total_bikes = @bikes_in_organizations.count(:all) + @bikes_not_in_organizations.count(:all)
               = number_with_delimiter(total_bikes)
+
   - if current_organization.regional?
     %small.less-strong.d-md-block{ style: "display: none; padding: 0.25rem 0.5rem; margin: -1rem 0 0 0;" }
       %em

@@ -1,0 +1,22 @@
+{
+   "applinks": {
+      "details": [
+         {
+            "appIDs": [
+               "8ZM5ZL6ABT.org.bikeindex.app"
+            ],
+            "components": [
+               {
+                  "/": "/bikes/scanned/*",
+                  "comment": "Example: bikeindex.org/bikes/scanned/A40340, open directly in-app for QR code scanning"
+               }
+            ]
+         }
+      ]
+   },
+   "webcredentials": {
+      "apps": [
+         "8ZM5ZL6ABT.org.bikeindex.app"
+      ]
+   }
+}

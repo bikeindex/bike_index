@@ -10,7 +10,7 @@ class OrganizationsController < ApplicationController
 
   def lightspeed_interface
     if current_user&.organizations&.any?
-      redirect_to("https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}") && return
+      redirect_to("https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}", allow_other_host: true) && return
     end
 
     session[:return_to] = lightspeed_interface_path
@@ -26,7 +26,7 @@ class OrganizationsController < ApplicationController
   def create
     @organization = Organization.new(permitted_create_params)
     if @organization.save
-      Membership.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
+      OrganizationRole.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
       notify_admins("organization_created")
       flash[:success] = translation(:organization_created)
       if current_user.present?
@@ -37,18 +37,19 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  # previously accepted stolen_first=true as a parameter.
-  # Stopped accepting in PR#1875, because consistency, use stolen=true instead
+  # Additional parameter included in shop printouts: shop_display=true
+  # currently not used, but may use it someday!
   def embed
-    @bike = BikeCreator.new.build_bike(@b_param)
+    @bike = BikeServices::Creator.new.build_bike(@b_param)
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
     @stolen = @bike.status_stolen?
+    @non_stolen = InputNormalizer.boolean(params[:non_stolen]) if !@stolen
     render layout: "embed_layout"
   end
 
   def embed_extended
-    @bike = BikeCreator.new.build_bike(@b_param)
+    @bike = BikeServices::Creator.new.build_bike(@b_param)
     if params[:email].present?
       @bike.owner_email = params[:email]
       @persist_email = true unless defined?(@persist_email)
@@ -66,6 +67,7 @@ class OrganizationsController < ApplicationController
 
   def set_bparam
     return true unless find_organization.present?
+
     unless find_organization.auto_user.present?
       flash[:error] = translation(:no_user)
       redirect_to(root_url) && return
@@ -106,6 +108,7 @@ class OrganizationsController < ApplicationController
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
+
     flash[:error] = translation(:not_found)
     redirect_to(root_url) && return
   end

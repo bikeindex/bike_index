@@ -4,18 +4,17 @@ module Organized
     before_action :find_export, except: %i[index new create]
 
     def index
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
-      @exports = exports.order(created_at: :desc).page(@page).per(@per_page)
+      @per_page = permitted_per_page
+      @pagy, @exports = pagy(exports.order(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def show
       @avery_export_redirect = params[:avery_redirect].present?
-      redirect_to @export.avery_export_url if @avery_export_redirect && @export.avery_export_url.present?
+      redirect_to(@export.avery_export_url, allow_other_host: true) if @avery_export_redirect && @export.avery_export_url.present?
     end
 
     def new
-      @export ||= Export.new
+      @export ||= Export.new(permitted_new_parameters)
     end
 
     def create
@@ -26,7 +25,7 @@ module Organized
         @export.options[:partial_registrations] = partial_registration_params
       end
       if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
-        OrganizationExportWorker.perform_async(@export.id)
+        OrganizationExportJob.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
           flash[:success] = translation(:with_avery_redirect)
           redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id, avery_redirect: true)
@@ -72,6 +71,11 @@ module Organized
       end
     end
 
+    def permitted_new_parameters
+      # For new, params aren't in export (to save encoding space)
+      params.permit(*params_with_assigned_codes)
+    end
+
     def permitted_parameters
       params.require(:export).permit(*params_with_assigned_codes)
     end
@@ -98,15 +102,18 @@ module Organized
 
     def partial_registration_params
       return false unless current_organization.enabled?("show_partial_registrations")
+
       include_full = InputNormalizer.boolean(params[:include_full_registrations])
       include_partial = InputNormalizer.boolean(params[:include_partial_registrations])
       return false unless include_full || include_partial
       return "only" if !include_full && include_partial
+
       include_partial ? true : false
     end
 
     def ensure_access_to_exports!
       return true if current_organization.enabled?("csv_exports") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

@@ -47,7 +47,7 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
       expect(response).to redirect_to(edit_admin_mail_snippet_path(mail_snippet.to_param))
       expect(flash[:errors]).to be_blank
       mail_snippet.reload
-      expect_attrs_to_match_hash(mail_snippet, valid_params)
+      expect(mail_snippet).to match_hash_indifferently valid_params
     end
   end
 end

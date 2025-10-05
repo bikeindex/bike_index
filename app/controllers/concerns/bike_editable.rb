@@ -9,6 +9,7 @@ module BikeEditable
 
   def edit_templates
     return @edit_templates if @edit_templates.present?
+
     @theft_templates = @bike.status_stolen? ? theft_templates : {}
     @bike_templates = bike_templates
     @edit_templates = @theft_templates.merge(@bike_templates)
@@ -28,8 +29,12 @@ module BikeEditable
 
   protected
 
+  def page_title_for(edit_template, bike)
+    "#{edit_templates[edit_template]}: #{bike.title_string}"
+  end
+
   def t_scope
-    [:controllers, :bikes, :edit]
+    %i[controllers bikes edit]
   end
 
   # NB: Hash insertion order here determines how nav links are displayed in the
@@ -54,14 +59,26 @@ module BikeEditable
       h[:photos] = translation(:photos, scope: t_scope)
       h[:drivetrain] = translation(:drivetrain, scope: t_scope)
       h[:accessories] = translation(:accessories, scope: t_scope)
+
       unless @bike.version?
-        h[:ownership] = translation(:ownership, scope: t_scope)
         h[:groups] = translation(:groups, scope: t_scope)
+
+        if show_listing_link?(@bike, @current_user)
+          h[:marketplace] = if @bike.is_for_sale?
+            translation(:marketplace_on_sale, scope: t_scope)
+          else
+            translation(:marketplace_list, scope: t_scope)
+          end
+        end
       end
-      h[:remove] = translation(:remove, scope: t_scope)
-      if Flipper.enabled?(:bike_versions, @current_user) # Inexplicably, specs require "@"
-        h[:versions] = translation(:versions, scope: t_scope)
+
+      h[:remove] = if @bike.version?
+        translation(:remove, scope: t_scope)
+      else
+        translation(:remove_or_transfer, scope: t_scope)
       end
+
+      h[:versions] = translation(:versions, scope: t_scope)
       unless @bike.status_stolen_or_impounded? || @bike.version?
         h[:report_stolen] = translation(:report_stolen, scope: t_scope)
       end
@@ -77,8 +94,14 @@ module BikeEditable
     @edit_template = requested_page || @bike.default_edit_template
     valid_requested_page = (edit_templates.keys.map(&:to_s) + ["alert_purchase_confirmation"]).include?(@edit_template)
     unless valid_requested_page && controller_name == edits_controller_name_for(@edit_template)
-      redirect_template = valid_requested_page ? @edit_template : @bike.default_edit_template
-      redirect_to(edit_bike_template_path_for(@bike, redirect_template))
+      edit_redirect_url = if @edit_template == "ownership" && params[:owner_email].present? # Preserve older functionality
+        edit_bike_url(@bike.id, edit_template: "remove", owner_email: params[:owner_email])
+      else
+        redirect_template = valid_requested_page ? @edit_template : @bike.default_edit_template
+        edit_bike_template_path_for(@bike, redirect_template)
+      end
+
+      redirect_to(edit_redirect_url)
       return false
     end
 
@@ -86,11 +109,18 @@ module BikeEditable
     true
   end
 
+  def show_listing_link?(bike, user)
+    return false unless bike.status_with_owner?
+    return true if bike.current_marketplace_listing&.current?
+
+    user&.can_create_listing?
+  end
+
   def assign_versions
-    return true unless Flipper.enabled?(:bike_versions, @current_user) && @bike.present?
+    return true unless @bike.present?
+
     @bike_og ||= @bike # Already assigned by bike_versions controller
-    @bike_versions = @bike_og.bike_versions
-      .where(owner_id: @current_user.id)
+    @bike_versions = @bike_og.bike_versions.where(owner_id: @current_user&.id)
   end
 
   def edits_controller_name_for(requested_page)

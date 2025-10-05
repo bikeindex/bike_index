@@ -71,7 +71,7 @@ class Autocomplete::Loader
 
     def frame_mnfg_count
       RedisPool.conn do |r|
-        r.scan_each({match: "#{Autocomplete.category_key("frame_mnfg")}*"})
+        r.scan_each(match: "#{Autocomplete.category_key("frame_mnfg")}*")
       end.count
     end
 
@@ -83,6 +83,7 @@ class Autocomplete::Loader
       combinatored_category_array.each do |category_combo|
         items.each do |item|
           next unless category_combo.match?(item[:category]) || category_combo == "all"
+
           # Only add item data once (when in the exact matching category)
           store_item(item, Autocomplete.category_key(category_combo), category_combo != item[:category])
           i += 1
@@ -128,6 +129,7 @@ class Autocomplete::Loader
     # Assume this is memoized, during load_all - so use it instead of #category_combos
     def combinatored_category_array
       return @combinatored_category_array if defined?(@combinatored_category_array)
+
       array = 1.upto(Autocomplete.sorted_category_array.size).flat_map do |n|
         Autocomplete.sorted_category_array.combination(n)
           .map { |el| el.join("") }
@@ -151,10 +153,12 @@ class Autocomplete::Loader
       if item[:text].blank?
         raise ArgumentError, "Items must have text. Missing from: #{item}"
       end
+
       i_hash = items_hash(item[:text], item[:category])
       unless Autocomplete.sorted_category_array.include?(i_hash[:category])
         raise ArgumentError, "Items must have one of the accepted categories, not included in: #{item}"
       end
+
       i_hash[:data] = i_hash[:data].merge(item[:data]) if item[:data].present?
       i_hash[:priority] = item[:priority].to_f if item[:priority].present?
       i_hash[:data][:id] = item[:id] if item[:id].present?
@@ -195,11 +199,11 @@ class Autocomplete::Loader
     end
 
     def fetch_category_keys(redis_block)
-      redis_block.scan_each({match: Autocomplete.category_key.gsub(/all:\z/, "*")})
+      redis_block.scan_each(match: Autocomplete.category_key.gsub(/all:\z/, "*"))
     end
 
     def fetch_cache_keys(redis_block)
-      redis_block.scan_each({match: Autocomplete.cache_key.gsub(/all:\z/, "*")})
+      redis_block.scan_each(match: Autocomplete.cache_key.gsub(/all:\z/, "*"))
     end
 
     def delete_data(id = nil)

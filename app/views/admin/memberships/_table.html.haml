@@ -1,5 +1,5 @@
 - memberships ||= @memberships
-- skip_organization ||= false
+- skip_user ||= false
 - render_sortable ||= false
 - render_deleted ||= false
 
@@ -8,23 +8,17 @@
     %thead.thead-light
       %th
         = sortable "created_at", render_sortable: render_sortable
-      %th
-        = sortable "invited_email", "recipient", render_sortable: render_sortable
-      - unless skip_organization
+      - unless skip_user
         %th
-          = sortable "organization_id", render_sortable: render_sortable
+          = sortable "user_id", render_sortable: render_sortable
       %th
-        = sortable "claimed_at", render_sortable: render_sortable
+        = sortable "start_at", render_sortable: render_sortable
       %th
-        %small
-          = sortable "sender_id", "Sender", render_sortable: render_sortable
+        = sortable "end_at", render_sortable: render_sortable
       %th
-        %small
-          = sortable "role", "Admin?", render_sortable: render_sortable
-      - if render_deleted
-        %th
-          %small
-            = sortable "deleted_at", render_sortable: render_sortable
+        = sortable "level", render_sortable: render_sortable
+      %th
+        = sortable "creator", render_sortable: render_sortable
 
     %tbody
       - memberships.each do |membership|
@@ -35,27 +29,21 @@
                 = l membership.created_at, format: :convert_time
               %span.less-strong-right.d-none.d-md-block
                 = membership.id
-          %td
-            - if membership.user.present?
-              = render partial: "/shared/admin_user_cell", locals: {user: membership.user, render_search: false, cache: true}
-            - else
-              = membership.invited_email
-          - unless skip_organization
+          - unless skip_user
             %td
-              = link_to membership.organization&.name, admin_organization_path(membership.organization_id)
+              = render partial: "/shared/admin/user_cell", locals: {user: membership.user, user_id: membership.user_id, render_search: false, cache: true}
           %td
-            - if membership.claimed_at.present?
+            %span.convertTime
+              = l membership.start_at, format: :convert_time
+          %td
+            - if membership.end_at.present?
               %span.convertTime
-                = l membership.claimed_at, format: :convert_time
+                = l membership.end_at, format: :convert_time
           %td
-            - if membership.sender.present?
-              = render partial: "/shared/admin_user_cell", locals: {user: membership.sender, render_search: false, cache: true}
+            = membership.level_humanized
+          %td
+            - if membership.stripe_managed?
+              = link_to "Stripe", membership.stripe_admin_url
             - else
-              = membership.sender_id
-          %td
-            = check_mark if membership.admin?
-          - if render_deleted
-            %td
-              - if membership.deleted_at.present?
-                %small.convertTime
-                  = l membership.deleted_at, format: :convert_time
+              .less-strong
+                = render partial: "/shared/admin/user_cell", locals: {user: membership.creator, user_id: membership.creator_id, render_search: false, cache: true}

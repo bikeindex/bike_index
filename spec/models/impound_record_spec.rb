@@ -2,11 +2,13 @@ require "rails_helper"
 
 RSpec.describe ImpoundRecord, type: :model do
   it_behaves_like "geocodeable"
+  it_behaves_like "default_currencyable"
+
   let!(:bike) { FactoryBot.create(:bike, created_at: Time.current - 1.day) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:impound_configuration) { organization.fetch_impound_configuration }
-  let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-  let(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+  let(:user) { FactoryBot.create(:organization_user, organization: organization) }
+  let(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
 
   describe "validations" do
     it "marks the bike impounded only once" do
@@ -53,11 +55,11 @@ RSpec.describe ImpoundRecord, type: :model do
     context "impound_record_update" do
       let!(:location) { FactoryBot.create(:location, organization: organization) }
       let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization, display_id: "v8xcv833") }
-      let!(:user2) { FactoryBot.create(:organization_member, organization: organization) }
+      let!(:user2) { FactoryBot.create(:organization_user, organization: organization) }
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
       let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied expired] }
       it "updates the record and the user" do
-        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
         bike.reload
         expect(bike.impounded?).to be_truthy
         expect(bike.status_impounded?).to be_truthy
@@ -83,7 +85,7 @@ RSpec.describe ImpoundRecord, type: :model do
             user: user2,
             kind: "impound_notification")
           # Process parking_notification in the actual code path that creates the impound record
-          ProcessParkingNotificationWorker.new.perform(pn.id)
+          ProcessParkingNotificationJob.new.perform(pn.id)
           pn.reload
           pn
         end
@@ -106,15 +108,15 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.status).to eq "current"
           expect(impound_record.to_coordinates).to eq parking_notification.to_coordinates
           expect(impound_record.authorized?(user)).to be_truthy
-          expect(impound_record.authorized?(organization_member)).to be_truthy
+          expect(impound_record.authorized?(organization_user)).to be_truthy
           # Doesn't include move update kind, because there is no location
           expect(impound_record.update_kinds).to eq(valid_update_kinds - ["retrieved_by_owner"])
           expect(impound_record.update_multi_kinds).to eq(impound_record.update_kinds - %w[current expired])
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             impound_record_update.save
-          }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
-          ProcessImpoundUpdatesWorker.drain
+          }.to change(ProcessImpoundUpdatesJob.jobs, :count).by 1
+          ProcessImpoundUpdatesJob.drain
           expect(impound_record_update).to be_valid
           expect(impound_record.update_multi_kinds).to eq(["note"])
 
@@ -180,11 +182,11 @@ RSpec.describe ImpoundRecord, type: :model do
             impound_record_update.save
             expect(impound_record_update).to be_valid
             expect(impound_record_update.impound_claim_id).to be_blank
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             expect {
               impound_record_update.save
-            }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
-            ProcessImpoundUpdatesWorker.drain
+            }.to change(ProcessImpoundUpdatesJob.jobs, :count).by 1
+            ProcessImpoundUpdatesJob.drain
             expect(impound_record_update.reload.resolved?).to be_truthy
             expect(impound_record_update.impound_claim_id).to eq impound_claim.id
             impound_claim.reload
@@ -249,13 +251,13 @@ RSpec.describe ImpoundRecord, type: :model do
     it "enqueues for create and update, not destroy" do
       expect {
         impound_record.save
-      }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
+      }.to change(ProcessImpoundUpdatesJob.jobs, :count).by 1
       expect {
         impound_record.update(updated_at: Time.current)
-      }.to change(ProcessImpoundUpdatesWorker.jobs, :count).by 1
+      }.to change(ProcessImpoundUpdatesJob.jobs, :count).by 1
       expect {
         impound_record.destroy
-      }.to_not change(ProcessImpoundUpdatesWorker.jobs, :count)
+      }.to_not change(ProcessImpoundUpdatesJob.jobs, :count)
     end
   end
 
@@ -293,8 +295,8 @@ RSpec.describe ImpoundRecord, type: :model do
       end
       let(:impound_record_update) { FactoryBot.create(:impound_record_update, impound_record: impound_record, kind: "retrieved_by_owner") }
       it "returns note and message" do
-        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
-        ProcessParkingNotificationWorker.new.perform(parking_notification2.id)
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
+        ProcessParkingNotificationJob.new.perform(parking_notification2.id)
         impound_record.reload
         organization.reload
         expect(impound_record.parking_notification&.id).to eq parking_notification2.id
@@ -310,7 +312,7 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(parking_notification1.reload.status).to eq "replaced"
         expect(parking_notification1.resolved_at).to be_within(5).of resolved_at
         # Trigger worker for impound_record_update, also associated pprocessing of parking notifications
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! { impound_record_update.reload }
         expect(bike.reload.status).to eq "status_with_owner"
         expect(parking_notification1.reload.status).to eq "replaced"
@@ -338,10 +340,10 @@ RSpec.describe ImpoundRecord, type: :model do
         VCR.use_cassette("impound_record-address_lookup") do
           impound_record.save
           impound_record.reload
-          expect(impound_record.street).to eq "3554 W Shakespeare Ave"
+          expect(impound_record.street).to eq "3554 West Shakespeare Avenue"
           expect(impound_record.address).to eq "Chicago, IL 60647"
-          expect(impound_record.address(force_show_address: true)).to eq "3554 W Shakespeare Ave, Chicago, IL 60647"
-          expect(impound_record.address(force_show_address: true, country: [:skip_default])).to eq "3554 W Shakespeare Ave, Chicago, IL 60647"
+          expect(impound_record.address(force_show_address: true)).to eq "3554 West Shakespeare Avenue, Chicago, IL 60647"
+          expect(impound_record.address(force_show_address: true, country: [:skip_default])).to eq "3554 West Shakespeare Avenue, Chicago, IL 60647"
           expect(impound_record.latitude).to eq latitude
           expect(impound_record.longitude).to eq longitude
           expect(impound_record.valid?).to be_truthy
@@ -349,13 +351,13 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.state_id).to eq state.id
           expect(impound_record.country_id).to eq Country.united_states.id
           # It changes, so regeocodes
-          impound_record.update(street: "2554 W Shakespeare ave")
+          impound_record.update(street: "2554 West Shakespeare ave")
           impound_record.reload
-          expect(impound_record.address(force_show_address: true)).to eq "2554 W Shakespeare Ave, Chicago, IL 60647"
+          expect(impound_record.address(force_show_address: true)).to eq "2554 West Shakespeare Avenue, Chicago, IL 60647"
           expect(impound_record.latitude).to_not eq latitude
           expect(impound_record.longitude).to_not eq longitude
           # It does not change, no re-geocoding
-          expect(Geohelper).to_not receive(:assignable_address_hash)
+          expect(GeocodeHelper).to_not receive(:assignable_address_hash_for)
           impound_record.update(status: "retrieved_by_owner")
         end
       end

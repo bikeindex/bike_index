@@ -6,18 +6,33 @@ FactoryBot.define do
     password_confirmation { "testthisthing7$" }
     terms_of_service { true }
 
+    # Set latitude and longitude from address_record if it's present
+    latitude { address_record&.latitude }
+    longitude { address_record&.longitude }
+
     trait :confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }
+    end
+
+    trait :with_address_record do
+      transient do
+        address_record_kind { :user }
+      end
+      address_record { FactoryBot.build(:address_record, kind: address_record_kind) }
+
+      after(:create) do |user, _evaluator|
+        user.address_record.update(user_id: user.id)
+      end
     end
 
     factory :user_confirmed, traits: [:confirmed] do
       factory :user_bikehub_signup do
         partner_data { {sign_up: "bikehub"} }
       end
-      factory :admin do
+      factory :superuser do
         accepted_vendor_terms_of_service { true }
         superuser { true }
-        factory :admin_developer do
+        factory :superuser_developer do
           developer { true }
         end
       end
@@ -37,13 +52,13 @@ FactoryBot.define do
       accepted_vendor_terms_of_service { true } # Necessary so everyone doesn't redirect back accept_vendor_terms
 
       after(:create) do |user, evaluator|
-        FactoryBot.create(:membership_claimed, user: user,
+        FactoryBot.create(:organization_role_claimed, user: user,
           organization: evaluator.organization,
           role: evaluator.role)
       end
     end
 
-    factory :organization_member, traits: [:with_organization]
+    factory :organization_user, traits: [:with_organization]
 
     factory :organization_auto_user, traits: [:with_organization] do
       after(:create) do |user, evaluator|

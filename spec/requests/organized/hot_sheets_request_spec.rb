@@ -13,7 +13,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
   end
 
   context "organization not enabled" do
-    include_context :request_spec_logged_in_as_organization_member
+    include_context :request_spec_logged_in_as_organization_user
     let(:current_organization) { FactoryBot.create(:organization) }
     it "redirects" do
       get base_url
@@ -22,8 +22,8 @@ RSpec.describe Organized::HotSheetsController, type: :request do
     end
   end
 
-  context "logged_in_as_organization_member" do
-    include_context :request_spec_logged_in_as_organization_member
+  context "logged_in_as_organization_user" do
+    include_context :request_spec_logged_in_as_organization_user
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
 
     describe "show" do
@@ -46,6 +46,15 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           expect(assigns(:day)).to eq Time.current.to_date
         end
       end
+      context "organization doesn't have location" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
+        it "redirects with error" do
+          get base_url
+          expect(flash[:error]).to match(/location/i)
+          expect(response).to redirect_to organization_root_path(current_organization)
+          expect(current_organization.reload.hot_sheet_configuration).to be_valid
+        end
+      end
     end
 
     describe "edit" do
@@ -66,6 +75,15 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
+      end
+      context "organization doesn't have location" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
+        it "redirects with error" do
+          get base_url
+          expect(flash[:error]).to match(/location/i)
+          expect(response).to redirect_to edit_organization_hot_sheet_path(current_organization)
+          expect(current_organization.reload.hot_sheet_configuration).to be_valid
+        end
       end
     end
 
@@ -100,7 +118,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         end
         it "creates and enables the features we expect" do
           expect(current_organization.hot_sheet_configuration).to be_blank
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             put base_url, params: enabled_params
           }.to change(HotSheetConfiguration, :count).by 1
@@ -113,8 +131,8 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           expect(hot_sheet_configuration.timezone_str).to eq "America/Guatemala"
           expect(hot_sheet_configuration.search_radius_miles).to eq 1000.1
 
-          expect(ProcessHotSheetWorker.jobs.count).to eq 1
-          expect(ProcessHotSheetWorker.jobs.map { |j| j["args"] }.flatten).to eq([current_organization.id])
+          expect(ProcessHotSheetJob.jobs.count).to eq 1
+          expect(ProcessHotSheetJob.jobs.map { |j| j["args"] }.flatten).to eq([current_organization.id])
         end
         context "already sent today" do
           let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: current_organization, is_on: false, timezone_str: "America/Los_Angeles") }
@@ -123,7 +141,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           let!(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: current_organization, delivery_status: "email_success", sheet_date: sheet_date) }
           it "does not send again" do
             expect(current_organization.hot_sheet_configuration).to eq hot_sheet_configuration
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             expect {
               put base_url, params: enabled_params
             }.to_not change(HotSheetConfiguration, :count)
@@ -141,7 +159,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
             # Additional test, because we need to be sure that the timezone str is still parseable
             expect(hot_sheet_configuration.timezone).to eq ActiveSupport::TimeZone["America/Guatemala"]
 
-            expect(ProcessHotSheetWorker.jobs.count).to eq 0
+            expect(ProcessHotSheetJob.jobs.count).to eq 0
           end
         end
       end
@@ -149,7 +167,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
         let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: current_organization, is_on: true, timezone_str: "America/Los_Angeles") }
         it "turns off if set off" do
           current_organization.update(search_radius_miles: 101)
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             put base_url, params: {
               hot_sheet_configuration: {
@@ -173,7 +191,7 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           expect(hot_sheet_configuration.search_radius_miles).to be_within(0.1).of(249.5)
           expect(hot_sheet_configuration.timezone_str).to be_blank
 
-          expect(ProcessHotSheetWorker.jobs.count).to eq 0
+          expect(ProcessHotSheetJob.jobs.count).to eq 0
         end
       end
     end

@@ -9,6 +9,7 @@ class Admin::BaseController < ApplicationController
   def current_organization
     return @current_organization if defined?(@current_organization)
     return @current_organization = nil if params[:organization_id] == "none" # manual nil organization setting
+
     @current_organization = Organization.unscoped.friendly_find(params[:organization_id])
     set_passive_organization(@current_organization)
   end
@@ -45,11 +46,17 @@ class Admin::BaseController < ApplicationController
       bikes = bikes.where(deleted_at: nil)
     end
 
-    bike_statuses = (%w[stolen with_owner abandoned impounded] & @searched_statuses)
-      .map { |k| "status_#{k}" }
-    if @searched_statuses.include?("unregistered_parking_notification")
-      bike_statuses << "unregistered_parking_notification"
-    end
+    bike_statuses = bike_search_statuses(@searched_statuses)
     bikes.where(status: bike_statuses)
+  end
+
+  # Match the statuses with bike statuses
+  def bike_search_statuses(searched_statuses)
+    bike_statuses = searched_statuses.map do |k|
+      (k == "unregistered_parking_notification") ? k : "status_#{k}"
+    end
+    statuses = bike_statuses & Bike.statuses
+    # Return all bike statuses if there are no matches (e.g. searching for "deleted_only")
+    statuses.any? ? statuses : Bike.statuses
   end
 end

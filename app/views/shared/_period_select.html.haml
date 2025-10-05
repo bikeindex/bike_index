@@ -1,6 +1,7 @@
 - skip_submission ||= false
 - include_future ||= false
 - prepend_text ||= nil
+- raise "Must include :set_period for this action" unless @start_time.present?
 
 -# This is duplicated with different values in stolen_bike_listings#index
 

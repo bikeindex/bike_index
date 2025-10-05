@@ -7,7 +7,7 @@ RSpec.describe MyAccountsController, type: :request do
     context "user not logged in" do
       it "redirects" do
         get base_url
-        expect(response).to redirect_to(/users\/new/) # weird subdomain issue matching url directly otherwise
+        expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
       end
     end
 
@@ -44,14 +44,14 @@ RSpec.describe MyAccountsController, type: :request do
             # Test some header tag properties
             html_response = response.body
             # This is from header tag helpers
-            expect(html_response).to match(/<title>Alexandra on Bike Index</)
+            expect(html_response).to match(/<title>You on Bike Index</)
             # This is pulled from the translations file
             expect(html_response).to match(/<meta.*Your bikes on Bike Index/)
           end
         end
         context "with organization" do
           let(:organization) { FactoryBot.create(:organization) }
-          let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
           it "sets passive_organization_id" do
             expect(current_user.authorized?(organization)).to be_truthy
             get base_url
@@ -88,15 +88,27 @@ RSpec.describe MyAccountsController, type: :request do
         context "with user_phone" do
           before { current_user.update_column :alert_slugs, ["phone_waiting_confirmation"] }
           it "renders with show_general_alert" do
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             expect {
               get base_url
               expect(response).to be_ok
-              expect(assigns(:show_general_alert)).to be_truthy
+              expect(assigns(:show_general_alert)).to be_falsey
               expect(response).to render_template("show")
-            }.to change(AfterUserChangeWorker.jobs, :count).by 1
-            AfterUserChangeWorker.drain
-            expect(current_user.reload.alert_slugs).to eq([])
+            }.to change(::Callbacks::AfterUserChangeJob.jobs, :count).by 0
+          end
+          context "with phone_verification enabled" do
+            before { Flipper.enable(:phone_verification) }
+            it "renders with show_general_alert" do
+              Sidekiq::Job.clear_all
+              expect {
+                get base_url
+                expect(response).to be_ok
+                expect(assigns(:show_general_alert)).to be_truthy
+                expect(response).to render_template("show")
+              }.to change(::Callbacks::AfterUserChangeJob.jobs, :count).by 1
+              ::Callbacks::AfterUserChangeJob.drain
+              expect(current_user.reload.alert_slugs).to eq([])
+            end
           end
         end
       end
@@ -105,7 +117,15 @@ RSpec.describe MyAccountsController, type: :request do
 
   describe "/edit" do
     include_context :request_spec_logged_in_as_user
-    let(:default_edit_templates) { {root: "User Settings", password: "Password", sharing: "Sharing + Personal Page"} }
+    let(:default_edit_templates) do
+      {
+        delete_account: "Delete account",
+        root: "User Settings",
+        password: "Password",
+        sharing: "Sharing + Personal Page",
+        membership: "Membership"
+      }
+    end
     context "no page given" do
       it "renders root" do
         get "#{base_url}/edit"
@@ -163,7 +183,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(current_user.username).to eq "something"
         expect {
           patch base_url, params: {id: current_user.username, user: {username: " ", name: "tim"}, edit_template: "sharing"}
-        }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+        }.to change(::Callbacks::AfterUserChangeJob.jobs, :size).by(1)
         expect(assigns(:edit_template)).to eq("sharing")
         current_user.reload
         expect(current_user.username).to eq("something")
@@ -174,7 +194,7 @@ RSpec.describe MyAccountsController, type: :request do
       expect(current_user.notification_unstolen).to be_truthy # Because it's set to true by default
       expect {
         patch base_url, params: {id: current_user.username, user: {notification_newsletters: "1", notification_unstolen: "0"}}
-      }.to change(AfterUserChangeWorker.jobs, :size).by(1)
+      }.to change(::Callbacks::AfterUserChangeJob.jobs, :size).by(1)
       expect(response).to redirect_to edit_my_account_url(edit_template: "root")
       current_user.reload
       expect(current_user.notification_newsletters).to be_truthy
@@ -208,37 +228,114 @@ RSpec.describe MyAccountsController, type: :request do
 
     context "setting address" do
       let(:country) { Country.united_states }
-      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
-      it "sets address, geocodes" do
-        current_user.reload
-        expect(current_user.address_set_manually).to be_falsey
-        expect(current_user.notification_newsletters).to be_falsey
-        put base_url, params: {
+      let!(:state) { FactoryBot.create(:state_new_york) }
+      let(:user_address_params) do
+        {
           id: current_user.username,
           user: {
             name: "Mr. Slick",
-            country_id: country.id,
-            state_id: state.id,
-            city: "New York",
-            street: "278 Broadway",
-            zipcode: "10007",
+            address_record_attributes:,
             notification_newsletters: "1",
             phone: "3223232"
           }
         }
+      end
+      let(:address_record_attributes) do
+        {
+          country_id: country.id,
+          region_record_id: state.id,
+          region_string: "something",
+          city: "New York",
+          street: "278 Broadway",
+          postal_code: "10007"
+        }
+      end
+      let(:target_address_record_attrs) do
+        {
+          user_id: current_user.id,
+          country_id: country.id,
+          region_record_id: state.id,
+          street: "278 Broadway",
+          postal_code: "10007",
+          latitude: default_location[:latitude],
+          longitude: default_location[:longitude]
+        }
+      end
+      def expect_updated_user_and_address(user, address_record)
+        user.reload
+        expect(user.name).to eq("Mr. Slick")
+        expect(user.notification_newsletters).to be_truthy
+        expect(user.phone).to eq "3223232"
+        expect(user.address_set_manually).to be_truthy
+
+        expect(address_record).to match_hash_indifferently target_address_record_attrs
+
+        expect(user.address_record_id).to eq address_record.id
+        expect(user.latitude).to eq default_location[:latitude]
+        expect(user.longitude).to eq default_location[:longitude]
+      end
+      it "sets address, geocodes" do
+        current_user.reload
+        expect(current_user.address_set_manually).to be_falsey
+        expect(current_user.notification_newsletters).to be_falsey
+        put base_url, params: user_address_params
         expect(response).to redirect_to "/my_account/edit/root"
         expect(flash[:error]).to_not be_present
-        current_user.reload
-        expect(current_user.name).to eq("Mr. Slick")
-        expect(current_user.country).to eq country
-        expect(current_user.state).to eq state
-        expect(current_user.street).to eq "278 Broadway"
-        expect(current_user.zipcode).to eq "10007"
-        expect(current_user.notification_newsletters).to be_truthy
-        expect(current_user.latitude).to eq default_location[:latitude]
-        expect(current_user.longitude).to eq default_location[:longitude]
-        expect(current_user.phone).to eq "3223232"
-        expect(current_user.address_set_manually).to be_truthy
+        Callbacks::AddressRecordUpdateAssociationsJob.drain
+
+        expect_updated_user_and_address(current_user, AddressRecord.last)
+
+        expect(AddressRecord.count).to eq 1
+      end
+      context "existing address_record" do
+        let!(:address_record) { FactoryBot.create(:address_record, user: current_user, kind: :user) }
+        let(:address_record_attributes) do
+          {
+            country_id: country.id,
+            region_record_id: "",
+            region_string: "",
+            city: " ",
+            street: " ",
+            postal_code: "10007",
+            id: address_record.id.to_s
+          }
+        end
+
+        it "does not create a new address record" do
+          current_user.reload
+          expect(current_user.address_set_manually).to be_falsey
+          expect(current_user.notification_newsletters).to be_falsey
+          expect(AddressRecord.count).to eq 1
+          Sidekiq::Job.clear_all
+          Sidekiq::Testing.inline! do
+            put base_url, params: user_address_params
+            expect(response).to redirect_to "/my_account/edit/root"
+          end
+          expect(flash[:error]).to_not be_present
+          expect(AddressRecord.count).to eq 1
+          expect_updated_user_and_address(current_user, address_record.reload)
+        end
+        context "passed ID that isn't user's address_record_id" do
+          let!(:address_record) { FactoryBot.create(:address_record, user: FactoryBot.create(:user)) }
+
+          it "creates a new address_record" do
+            current_user.reload
+            expect(current_user.address_set_manually).to be_falsey
+            expect(current_user.notification_newsletters).to be_falsey
+            expect(AddressRecord.count).to eq 1
+            Sidekiq::Job.clear_all
+            Sidekiq::Testing.inline! do
+              put base_url, params: user_address_params
+              expect(response).to redirect_to "/my_account/edit/root"
+            end
+            expect(flash[:error]).to_not be_present
+            expect_updated_user_and_address(current_user, AddressRecord.last)
+
+            expect(AddressRecord.count).to eq 2
+            # Verify that the original address_record is unchanged
+            expect(address_record.reload.street).to eq "1 Shields Ave"
+          end
+        end
       end
     end
 
@@ -274,7 +371,7 @@ RSpec.describe MyAccountsController, type: :request do
         current_user.reload
         expect(current_user.phone).to be_blank
         expect(current_user.user_phones.count).to eq 0
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
           Sidekiq::Testing.inline! {
             put base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
@@ -291,7 +388,33 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_phone.phone).to eq "15005550006"
         expect(user_phone.confirmed?).to be_falsey
         expect(user_phone.confirmation_code).to be_present
-        expect(user_phone.notifications.count).to eq 1
+        expect(user_phone.notifications.count).to eq 0
+      end
+      context "with phone_verification" do
+        before { Flipper.enable(:phone_verification) }
+        it "updates and adds the phone" do
+          current_user.reload
+          expect(current_user.phone).to be_blank
+          expect(current_user.user_phones.count).to eq 0
+          Sidekiq::Job.clear_all
+          VCR.use_cassette("users_controller-update_phone", match_requests_on: [:path]) do
+            Sidekiq::Testing.inline! {
+              put base_url, params: {id: current_user.id, user: {phone: "15005550006"}}
+            }
+          end
+          expect(flash[:success]).to be_present
+          current_user.reload
+          expect(current_user.phone).to eq "15005550006"
+          expect(current_user.user_phones.count).to eq 1
+          expect(current_user.phone_waiting_confirmation?).to be_truthy
+          expect(current_user.alert_slugs).to eq(["phone_waiting_confirmation"])
+
+          user_phone = current_user.user_phones.reorder(:created_at).last
+          expect(user_phone.phone).to eq "15005550006"
+          expect(user_phone.confirmed?).to be_falsey
+          expect(user_phone.confirmation_code).to be_present
+          expect(user_phone.notifications.count).to eq 1
+        end
       end
       context "without background" do
         it "still shows general alert" do
@@ -331,10 +454,10 @@ RSpec.describe MyAccountsController, type: :request do
     context "organization with hotsheet" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
       let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
-      let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:membership) { current_user.memberships.first }
+      let(:current_user) { FactoryBot.create(:organization_user, organization: organization) }
+      let(:organization_role) { current_user.organization_roles.first }
       it "updates hotsheet" do
-        expect(membership.notification_never?).to be_truthy
+        expect(organization_role.notification_never?).to be_truthy
         # Doesn't include the parameter because when false, it doesn't include
         patch base_url, params: {
           id: current_user.username,
@@ -343,16 +466,16 @@ RSpec.describe MyAccountsController, type: :request do
         }, headers: {"HTTP_REFERER" => organization_hot_sheet_path(organization_id: organization.to_param)}
         expect(flash[:success]).to be_present
         expect(response).to redirect_to organization_hot_sheet_path(organization_id: organization.to_param)
-        membership.reload
-        expect(membership.notification_daily?).to be_truthy
+        organization_role.reload
+        expect(organization_role.notification_daily?).to be_truthy
       end
       context "with other parameters too" do
         let(:hot_sheet_configuration2) { FactoryBot.create(:hot_sheet_configuration, is_on: true) }
         let(:organization2) { hot_sheet_configuration2.organization }
-        let!(:membership2) { FactoryBot.create(:membership_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
+        let!(:organization_role2) { FactoryBot.create(:organization_role_claimed, organization: organization2, user: current_user, hot_sheet_notification: "notification_daily") }
         it "updates all the parameters" do
-          expect(membership.notification_never?).to be_truthy
-          expect(membership2.notification_daily?).to be_truthy
+          expect(organization_role.notification_never?).to be_truthy
+          expect(organization_role2.notification_daily?).to be_truthy
           put base_url, params: {
             id: current_user.username,
             hot_sheet_organization_ids: "#{organization.id},#{organization2.id}",
@@ -364,10 +487,10 @@ RSpec.describe MyAccountsController, type: :request do
           }
           expect(flash[:success]).to be_present
           expect(response).to redirect_to edit_my_account_url(edit_template: "root")
-          membership.reload
-          membership2.reload
-          expect(membership.notification_daily?).to be_truthy
-          expect(membership2.notification_daily?).to be_falsey
+          organization_role.reload
+          organization_role2.reload
+          expect(organization_role.notification_daily?).to be_truthy
+          expect(organization_role2.notification_daily?).to be_falsey
 
           current_user.reload
           expect(current_user.notification_newsletters).to be_truthy
@@ -408,10 +531,10 @@ RSpec.describe MyAccountsController, type: :request do
       it "updates" do
         expect_bike1_initiated
 
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         put base_url, params: update_params
-        expect(AfterUserChangeWorker.jobs.count).to eq 1
-        expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+        expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
+        expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
         expect(flash[:success]).to be_present
         expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
         expect(user_registration_organization1.reload.all_bikes?).to be_truthy
@@ -419,7 +542,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user_registration_organization1.registration_info).to eq target_info
 
         Sidekiq::Testing.inline! {
-          AfterUserChangeWorker.drain
+          ::Callbacks::AfterUserChangeJob.drain
         }
         expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
         expect(bike1.registration_info).to eq target_info
@@ -435,7 +558,7 @@ RSpec.describe MyAccountsController, type: :request do
           expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([])
           expect(bike2.registration_info).to be_blank
 
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           put base_url, params: {
             :edit_template => "registration_organizations",
             :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
@@ -443,8 +566,8 @@ RSpec.describe MyAccountsController, type: :request do
             "reg_field-organization_affiliation_#{organization1.id}" => "student",
             "reg_field-student_id_#{organization1.id}" => "XXX777YYY"
           }
-          expect(AfterUserChangeWorker.jobs.count).to eq 1
-          expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+          expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
+          expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
           expect(flash[:success]).to be_present
           expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
           expect(user_registration_organization1.reload.all_bikes?).to be_truthy
@@ -452,7 +575,7 @@ RSpec.describe MyAccountsController, type: :request do
           expect(user_registration_organization1.registration_info).to eq target_info
 
           Sidekiq::Testing.inline! {
-            AfterUserChangeWorker.drain
+            ::Callbacks::AfterUserChangeJob.drain
           }
           expect(bike1.reload.bike_organizations.pluck(:organization_id)).to eq([organization1.id])
           expect(bike1.registration_info).to eq target_info
@@ -492,7 +615,7 @@ RSpec.describe MyAccountsController, type: :request do
             expect(bike3.reload.registration_info).to eq(bike3_information)
             expect(bike3.address_hash).to eq default_location_registration_address.as_json
 
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             put base_url, params: {
               :edit_template => "registration_organizations",
               :user_registration_organization_all_bikes => [user_registration_organization1.id.to_s, ""],
@@ -501,8 +624,8 @@ RSpec.describe MyAccountsController, type: :request do
               "reg_field-student_id_#{organization1.id}" => "XXX777YYY",
               "reg_field-organization_affiliation_#{organization2.id}" => "employee"
             }
-            expect(AfterUserChangeWorker.jobs.count).to eq 1
-            expect(Sidekiq::Worker.jobs.count).to eq 1 # And it's the only job to have been enqueued!
+            expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
+            expect(Sidekiq::Job.jobs.count).to eq 1 # And it's the only job to have been enqueued!
             expect(flash[:success]).to be_present
             expect(response).to redirect_to edit_my_account_url(edit_template: "registration_organizations")
             expect(user_registration_organization1.reload.all_bikes?).to be_truthy
@@ -514,7 +637,7 @@ RSpec.describe MyAccountsController, type: :request do
             expect(user_registration_organization2.registration_info).to eq target_extra_info
 
             Sidekiq::Testing.inline! {
-              AfterUserChangeWorker.drain
+              ::Callbacks::AfterUserChangeJob.drain
             }
             deleted_bike_organization = BikeOrganization.unscoped.where(id: bike1_organization2.id).first
             expect(deleted_bike_organization.deleted?).to be_truthy
@@ -533,7 +656,12 @@ RSpec.describe MyAccountsController, type: :request do
             target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
             expect(bike3.registration_info).to eq target_bike3_info
 
-            expect(current_user.reload.address_hash).to eq default_location_registration_address.as_json
+            expect(current_user.reload.address_record).to be_present
+            expect(current_user.address_hash(visible_attribute: :street, render_country: true))
+              .to eq default_location_registration_address_new
+
+            expect(current_user.address_hash_legacy)
+              .to eq default_location_registration_address.merge("country" => "United States")
           end
         end
       end
@@ -563,6 +691,35 @@ RSpec.describe MyAccountsController, type: :request do
         expect(flash[:success]).to be_blank
         expect(response).to render_template(:edit)
         expect(current_user.reload.preferred_language).to eq(nil)
+      end
+    end
+  end
+
+  describe "delete" do
+    let!(:current_user) { let!(:user) { FactoryBot.create(:user_confirmed, :with_organization, role: "member") } }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: current_user) }
+    include_context :request_spec_logged_in_as_user
+
+    it "deletes" do
+      expect(current_user.reload.deletable?).to be_truthy
+      expect do
+        delete base_url
+      end.to change(User, :count).by(-1)
+      expect(Bike.count).to eq 0
+      expect(response).to redirect_to(goodbye_url)
+      expect(flash[:notice]).to be_present
+    end
+
+    context "organization admin" do
+      let!(:current_user) { FactoryBot.create(:user, :with_organization, role: "admin") }
+
+      it "does not delete" do
+        expect(current_user.reload.deletable?).to be_falsey
+        expect do
+          delete base_url
+        end.to change(User, :count).by(0)
+        expect(Bike.count).to eq 1
+        expect(flash[:error]).to eq "Organization admins cannot delete their accounts. Email support@bikeindex.org for help"
       end
     end
   end

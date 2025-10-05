@@ -1,6 +1,7 @@
 # Every email in here has the potential to be owned by an organization -
 # but they aren't necessarily
 class OrganizedMailer < ApplicationMailer
+  helper TranslationHelper
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
@@ -31,11 +32,11 @@ class OrganizedMailer < ApplicationMailer
       new_bike: @ownership.new_registration?,
       email: @ownership.owner_email,
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
-      registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id)
+      registered_by_owner: @ownership.user.present? && @bike.creator_id == @ownership.user_id
     }
     @organization = @ownership.organization
     @vars[:donation_message] = @bike.status_stolen? && !(@organization && !@organization.paid?)
-    subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
+    subject = I18n.t("organized_mailer.finished#{finished_registration_type}_registration.subject", **default_subject_vars)
     tag = __callee__
     tag = "#{tag}_pos" if @ownership.pos? && @ownership.new_registration?
     I18n.with_locale(@user&.preferred_language) do
@@ -46,11 +47,11 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
-  def organization_invitation(membership)
-    @membership = membership
-    @organization = @membership.organization
-    @sender = @membership.sender
-    @vars = {email: @membership.invited_email}
+  def organization_invitation(organization_role)
+    @organization_role = organization_role
+    @organization = @organization_role.organization
+    @sender = @organization_role.sender
+    @vars = {email: @organization_role.invited_email}
     @new_user = User.fuzzy_email_find(@vars[:email]).present?
 
     I18n.with_locale(@sender&.preferred_language) do
@@ -134,6 +135,7 @@ class OrganizedMailer < ApplicationMailer
 
   def finished_registration_type
     return "_stolen" if @bike.status_stolen?
+
     @ownership.claimed ? "_owned" : ""
   end
 
@@ -152,6 +154,6 @@ class OrganizedMailer < ApplicationMailer
   end
 
   def reply_to
-    @organization && @organization.auto_user.present? ? @organization.auto_user.email : "contact@bikeindex.org"
+    (@organization && @organization.auto_user.present?) ? @organization.auto_user.email : "contact@bikeindex.org"
   end
 end

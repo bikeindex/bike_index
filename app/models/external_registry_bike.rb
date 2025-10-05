@@ -1,3 +1,35 @@
+# == Schema Information
+#
+# Table name: external_registry_bikes
+#
+#  id                        :integer          not null, primary key
+#  category                  :string
+#  cycle_type                :string
+#  date_stolen               :datetime
+#  description               :string
+#  external_updated_at       :datetime
+#  extra_registration_number :string
+#  frame_colors              :string
+#  frame_model               :string
+#  info_hash                 :jsonb
+#  location_found            :string
+#  mnfg_name                 :string
+#  serial_normalized         :string           not null
+#  serial_number             :string           not null
+#  status                    :integer
+#  type                      :string           not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  country_id                :integer          not null
+#  external_id               :string           not null
+#
+# Indexes
+#
+#  index_external_registry_bikes_on_country_id         (country_id)
+#  index_external_registry_bikes_on_external_id        (external_id)
+#  index_external_registry_bikes_on_serial_normalized  (serial_normalized)
+#  index_external_registry_bikes_on_type               (type)
+#
 class ExternalRegistryBike < ApplicationRecord
   belongs_to :country, class_name: "Country"
 
@@ -12,14 +44,16 @@ class ExternalRegistryBike < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  enum status: Bike::STATUS_ENUM
+  enum :status, Bike::STATUS_ENUM
 
   class << self
     def registry_name(str)
       return nil unless str.present?
+
       reg = str.to_s.split("::").last.gsub("Bike", "")
       return "StopHeling.nl" if reg == "StopHeling"
       return "VerlorenOfGevonden.nl" if reg == "VerlorenOfGevonden"
+
       reg.titleize
     end
 
@@ -56,11 +90,13 @@ class ExternalRegistryBike < ApplicationRecord
 
     def brand(brand_name)
       return "unknown_brand" if absent?(brand_name)
+
       brand_name
     end
 
     def colors(frame_color)
       return "unknown" if absent?(frame_color)
+
       frame_color
     end
 
@@ -71,14 +107,16 @@ class ExternalRegistryBike < ApplicationRecord
 
   def short_address
     return nil unless location_found.present?
+
     addy = location_found.split(",")
-    shorter_length = addy.length > 3 ? 3 : addy.length
+    shorter_length = (addy.length > 3) ? 3 : addy.length
     addy[-shorter_length..].reject(&:blank?).map(&:strip).join(", ")
   end
 
   def status_humanized
     shuman = Bike.status_humanized(status)
     return self.class.impounded_kind if shuman == "impounded"
+
     shuman
   end
 

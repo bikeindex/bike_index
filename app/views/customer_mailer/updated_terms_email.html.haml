@@ -26,7 +26,7 @@
           %ul
             %li= link_to t(".html.bike_index_privacy_policy"), privacy_url
             %li= link_to t(".html.bike_index_terms_of_service"), terms_url
-            - if @user.has_membership?
+            - if @user.has_organization_role?
               %li= link_to t(".html.bike_index_vendor_terms_of_service"), vendor_terms_url
 
         %p

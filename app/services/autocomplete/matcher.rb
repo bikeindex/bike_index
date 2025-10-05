@@ -35,7 +35,7 @@ class Autocomplete::Matcher
         cache_key: cache_key_from_opts(categories, opts[:q_array]),
         interkeys: interkeys_from_opts(opts[:category_cache_key], opts[:q_array]),
         offset: offset,
-        limit: limit < 0 ? 0 : limit
+        limit: (limit < 0) ? 0 : limit
       )
     end
 
@@ -56,10 +56,12 @@ class Autocomplete::Matcher
 
     def categories_array(categories = [])
       return [] if categories.blank?
+
       categories = categories.split(/,|\+/) if !categories.is_a?(Array)
       permitted_categories = Autocomplete.sorted_category_array
       categories = permitted_categories & categories.map { |s| Autocomplete.normalize(s) }
       return [] if categories.length == permitted_categories.length
+
       categories
     end
 
@@ -101,6 +103,7 @@ class Autocomplete::Matcher
 
     def matching_hashes(terms)
       return [] unless terms.size > 0
+
       RedisPool.conn { |r| r.hmget(Autocomplete.items_data_key, *terms) }
         .reject(&:blank?).map { |r| JSON.parse(r) }
     end

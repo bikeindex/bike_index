@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: model_attestations
+#
+#  id                 :bigint           not null, primary key
+#  certification_type :string
+#  file               :string
+#  info               :text
+#  kind               :integer
+#  replaced           :boolean          default(FALSE)
+#  url                :text
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  model_audit_id     :bigint
+#  organization_id    :bigint
+#  user_id            :bigint
+#
+# Indexes
+#
+#  index_model_attestations_on_model_audit_id   (model_audit_id)
+#  index_model_attestations_on_organization_id  (organization_id)
+#  index_model_attestations_on_user_id          (user_id)
+#
 class ModelAttestation < ApplicationRecord
   # NOTE: This hash is ordered by the importance of the kind
   CERTIFICATION_KIND_ENUM = {
@@ -10,7 +33,7 @@ class ModelAttestation < ApplicationRecord
     uncertified_by_your_org: 11
   }.freeze
 
-  enum kind: CERTIFICATION_KIND_ENUM
+  enum :kind, CERTIFICATION_KIND_ENUM
 
   belongs_to :model_audit
   belongs_to :user
@@ -30,6 +53,7 @@ class ModelAttestation < ApplicationRecord
 
   def self.kind_humanized(str)
     return nil if str.blank?
+
     str.to_s.gsub("_org", " organization").tr("_", " ")
   end
 
@@ -43,7 +67,7 @@ class ModelAttestation < ApplicationRecord
   end
 
   def update_model_audit
-    UpdateModelAuditWorker.perform_async(model_audit_id)
+    UpdateModelAuditJob.perform_async(model_audit_id)
     # Also lazy set the replaced attribute
     previous_attesations.update_all(replaced: true)
   end

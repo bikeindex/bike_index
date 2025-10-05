@@ -4,10 +4,24 @@
     - email_placeholder ||= t(".owner_email", owner: current_organization&.school? ? current_organization.short_name : t(".your"))
     = f.email_field :owner_email, required: true, value: @owner_email, placeholder: email_placeholder, class: "form-control"
 
+  - if @vehicle_select
+    :javascript
+      window.cycleTypesPedals = #{CycleType::PEDAL.to_json};
+      window.cycleTypesAlwaysMotorized = #{CycleType::ALWAYS_MOTORIZED.to_json};
+      window.cycleTypesNeverMotorized = #{CycleType::NEVER_MOTORIZED.to_json};
+    .form-group.fancy-select.unfancy.short-fancy-select{style: 'margin-bottom: 0.5rem;'}
+      - @b_param.cycle_type ||= CycleType.default_slug
+      = f.select(:cycle_type, CycleType.select_options(traditional_bike: true), {}, {required: true, class: 'form-control'})
+      %label#motorizedWrapper.cusor-pointer{style: 'margin: 0; padding-left: 0.25rem; cursor: pointer;'}
+        = check_box_tag :propulsion_type_motorized, true, @b_param.motorized?
+        %strong ⚡️
+        = t(".electric_motorized")
+
   .form-group
     - initial_mnfg = @b_param.manufacturer && { id: @b_param.manufacturer.id, text: @b_param.manufacturer.name }.to_json
-    = f.text_field :manufacturer_id, value: @b_param.manufacturer&.name, class: "form-control unfancy", placeholder: t(".bike_manufacturer"), data: { initial: initial_mnfg }
-
+    = f.text_field :manufacturer_id, value: @b_param.manufacturer&.name, class: "form-control unfancy",
+      placeholder: @vehicle_select ? t(".vehicle_manufacturer") : t(".bike_manufacturer"),
+      data: { initial: initial_mnfg }
     %span.below-input-help
       = t(".select_other_if_manufacturer_doesnt_show")
 
@@ -23,7 +37,9 @@
   .form-group
     %label
       = f.check_box :status, {}, "status_stolen", "status_with_owner"
-      = t(".this_bike_is_either_missing_or_stolen")
+      = @vehicle_select ? t(".this_vehicle_is_either_missing_or_stolen") : t(".this_bike_is_either_missing_or_stolen")
 
   .submit-wrapper
-    = submit_tag t(".register"), class: "btn btn-lg btn-primary"
+    - button_color = @button_and_header || @button
+    - button_style = button_color.blank? ? '' : "background: #{button_color}"
+    = submit_tag t(".register"), class: "btn btn-lg btn-primary", style: button_style

@@ -3,6 +3,23 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   it_behaves_like "search_radius_metricable"
 
+  describe "factory" do
+    let(:organization) { FactoryBot.create(:organization, :paid) }
+    it "is paid and valid" do
+      expect(organization.reload.is_paid).to be_truthy
+      expect(organization.enabled_feature_slugs).to eq([])
+      expect(organization.invoices.last.invoice_organization_features.pluck(:id)).to eq([])
+    end
+    context "organization_features" do
+      let(:organization) { FactoryBot.create(:organization, :organization_features) }
+      it "is valid" do
+        expect(organization.reload.is_paid).to be_truthy
+        expect(organization.enabled_feature_slugs).to eq(["csv_export"])
+        expect(organization.invoices.last.invoice_organization_features.pluck(:id).count).to eq 1
+      end
+    end
+  end
+
   describe "#nearby_bikes" do
     it "returns bikes within the search radius" do
       FactoryBot.create(:bike, :in_los_angeles)
@@ -61,7 +78,7 @@ RSpec.describe Organization, type: :model do
 
   describe "bikes member and not_member" do
     let(:organization) { FactoryBot.create(:organization) }
-    let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:member) { FactoryBot.create(:organization_user, organization: organization) }
     let(:user) { FactoryBot.create(:user) }
     let!(:bike_not_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, creator: member) }
     let!(:bike_member) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, creator: member, user: member) }
@@ -105,7 +122,7 @@ RSpec.describe Organization, type: :model do
       VCR.use_cassette("organizations-nearby_organizations", match_requests_on: [:path]) do
         invoice.update(organization_feature_ids: [organization_feature.id], child_enabled_feature_slugs_string: "regional_bike_counts, child_organizations")
         expect([location_parent, location_child1, location_child2, location_child3, location_shop].size).to eq 5
-        UpdateOrganizationAssociationsWorker.new.perform(organization_ids)
+        UpdateOrganizationAssociationsJob.new.perform(organization_ids)
         organization_parent.reload && organization_child1.reload && organization_child2.reload && organization_child3.reload && organization_shop.reload
 
         expect(organization_child1.enabled_feature_slugs).to match_array(%w[child_organizations regional_bike_counts])
@@ -355,7 +372,7 @@ RSpec.describe Organization, type: :model do
       invoice.update(child_enabled_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(%w[child_organizations csv_exports])
 
-      expect { organization.save }.to change { UpdateOrganizationAssociationsWorker.jobs.count }.by(1)
+      expect { organization.save }.to change { UpdateOrganizationAssociationsJob.jobs.count }.by(1)
 
       expect(organization.is_paid).to be_truthy
       expect(organization.enabled_feature_slugs).to eq(["child_organizations", "csv_exports"])
@@ -380,7 +397,7 @@ RSpec.describe Organization, type: :model do
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update(updated_at: Time.current)
-        expect(regional_parent.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
+        expect(regional_parent.reload.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
@@ -444,18 +461,27 @@ RSpec.describe Organization, type: :model do
         can_share_recovery: true
       }
     end
+    let(:bike2) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
+    let(:stolen_record2) { bike2.fetch_current_stolen_record }
+    let!(:bike_organization2) { FactoryBot.create(:bike_organization, bike: bike2, organization: organization) }
     it "returns recovered bikes" do
+      stolen_record2.add_recovery_information(recovery_information)
+      bike_organization2.destroy
+      expect(BikeOrganization.unscoped.pluck(:id)).to match_array([bike_organization.id, bike_organization2.id])
       organization.reload
-      expect(organization.bikes).to eq([bike])
-      expect(organization.bikes.status_stolen).to eq([bike])
+      expect(organization.bikes.pluck(:id)).to eq([bike.id])
+      expect(organization.bikes.status_stolen.pluck(:id)).to eq([bike.id])
+      # Now for the deleted stuff!
+      expect(organization.bike_organizations_ever_registered.pluck(:id)).to match_array([bike_organization.id, bike_organization2.id])
+      expect(organization.bikes_ever_registered.pluck(:id)).to eq([bike.id, bike2.id])
       # Check the inverse lookup
-      expect(Bike.organization(organization)).to eq([bike])
-      expect(Bike.organization(organization.id)).to eq([bike])
+      expect(Bike.organization(organization).pluck(:id)).to eq([bike.id])
+      expect(Bike.organization(organization.id).pluck(:id)).to eq([bike.id])
       # Check recovered
       stolen_record.add_recovery_information(recovery_information)
       bike.reload
       expect(bike.stolen_recovery?).to be_truthy
-      expect(organization.recovered_records).to eq([stolen_record])
+      expect(organization.recovered_records.pluck(:id)).to match_array([stolen_record.id, stolen_record2.id])
     end
   end
 
@@ -500,7 +526,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.name).to eq "Bikes (& Trikes)"
         expect(organization.short_name).to eq "Bikes (& Trikes)"
         # only ampersands surrounded by spaces are kept
-        expect(organization.slug).to eq "bikes--trikes"
+        expect(organization.slug).to eq "bikes"
       end
     end
 
@@ -542,7 +568,6 @@ RSpec.describe Organization, type: :model do
       it "protects from naming collisions from deleted things, by renaming deleted things" do
         org1 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
         org1.reload
-        org1.id = org1.id
         expect(org1.short_name).to eq "buckshot"
         org1.delete
         expect(org1.reload.deleted_at).to be_present
@@ -588,7 +613,7 @@ RSpec.describe Organization, type: :model do
       it "sets the embedable user" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed, email: "embed@org.com")
-        FactoryBot.create(:membership_claimed, organization: organization, user: user)
+        FactoryBot.create(:organization_role_claimed, organization: organization, user: user)
         organization.embedable_user_email = "embed@org.com"
         organization.save
         expect(organization.reload.auto_user_id).to eq(user.id)
@@ -600,7 +625,7 @@ RSpec.describe Organization, type: :model do
         organization.save
         expect(organization.reload.auto_user_id).to be_nil
       end
-      it "Makes a membership if the user is auto user" do
+      it "Makes a organization_role if the user is auto user" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed, email: ENV["AUTO_ORG_MEMBER"])
         organization.embedable_user_email = ENV["AUTO_ORG_MEMBER"]
@@ -610,7 +635,7 @@ RSpec.describe Organization, type: :model do
       it "sets the embedable user if it isn't set and the org has members" do
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user_confirmed)
-        FactoryBot.create(:membership_claimed, user: user, organization: organization)
+        FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
         organization.save
         expect(organization.reload.auto_user_id).not_to be_nil
       end
@@ -620,7 +645,7 @@ RSpec.describe Organization, type: :model do
   describe "ensure_auto_user" do
     let(:organization) { FactoryBot.create(:organization) }
     context "existing members" do
-      let(:member) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:member) { FactoryBot.create(:organization_user, organization: organization) }
       before do
         expect(member).to be_present
       end

@@ -1,3 +1,35 @@
+# == Schema Information
+#
+# Table name: external_registry_bikes
+#
+#  id                        :integer          not null, primary key
+#  category                  :string
+#  cycle_type                :string
+#  date_stolen               :datetime
+#  description               :string
+#  external_updated_at       :datetime
+#  extra_registration_number :string
+#  frame_colors              :string
+#  frame_model               :string
+#  info_hash                 :jsonb
+#  location_found            :string
+#  mnfg_name                 :string
+#  serial_normalized         :string           not null
+#  serial_number             :string           not null
+#  status                    :integer
+#  type                      :string           not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  country_id                :integer          not null
+#  external_id               :string           not null
+#
+# Indexes
+#
+#  index_external_registry_bikes_on_country_id         (country_id)
+#  index_external_registry_bikes_on_external_id        (external_id)
+#  index_external_registry_bikes_on_serial_normalized  (serial_normalized)
+#  index_external_registry_bikes_on_type               (type)
+#
 class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
   def registry_url
     "https://verlorenofgevonden.nl"
@@ -9,6 +41,7 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
 
   def image_url
     return if info_hash["object_id"].blank?
+
     [registry_url, "assets", "image", info_hash["object_id"]].join("/")
   end
 
@@ -83,6 +116,7 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
     def parse_serial_number(description)
       match_data = SERIAL_NUMBER_REGEX.match(description)
       return "absent" if match_data.blank? || absent?(match_data[1])
+
       match_data[1]
     end
   end

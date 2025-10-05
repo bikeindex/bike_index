@@ -1,14 +1,17 @@
 # Ignore local config files
 /.bundle
+# Ignore vendored gems
+/vendor/bundle
+vendor/bundle
 
 # Ignore all logfiles and tempfiles.
-/log/*.log
+/log/*.log*
+/storage/*
 /tmp
 .DS_Store
 coverage/*
 public/uploads/*
 public/caches
-.sass-cache
 public/partner
 .vagrant
 ubuntu-xenial-16.04-cloudimg-console.log
@@ -41,14 +44,16 @@ manufacturer.tsv
 
 # Ignore special configuration env file
 .env.*
+
+# Ignore asset stuff
 /public/packs
 /public/packs-test
 /node_modules
-yarn-debug.log*
-yarn-error.log
-.yarn-integrity
 .nvmrc
-package-lock.json
+!/public/assets/.keep
+/public/assets/
+/app/assets/builds/*
+!/app/assets/builds/.keep
 
 # Ignore jest coverage files
 coverage
@@ -62,3 +67,6 @@ spec/vcr_cassettes/facebook/*
 
 # Ignore editor temp files
 .idea
+
+# Ignore .claude settings
+.claude/

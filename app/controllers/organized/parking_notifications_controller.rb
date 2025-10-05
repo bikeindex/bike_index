@@ -2,15 +2,15 @@ module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
     include SortableTable
+
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
-    before_action :set_period, only: [:index]
+
     before_action :set_failed_and_repeated_ivars
 
     def index
       @search_bounding_box = search_bounding_box
-      @per_page = params[:per_page]
-      @per_page = DEFAULT_PER_PAGE if @per_page.blank? || @per_page.to_i > ParkingNotification::MAX_PER_PAGE
+      @per_page = permitted_per_page(default: DEFAULT_PER_PAGE, max: ParkingNotification::MAX_PER_PAGE)
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         per_page: @per_page,
@@ -19,8 +19,8 @@ module Organized
         map_center_lng: map_center(@search_bounding_box).last
       }
 
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       # These are set here because we render them in HTML
       @search_kind = if ParkingNotification.kinds.include?(params[:search_kind]).present?
@@ -29,7 +29,7 @@ module Organized
         "all"
       end
       # If we're searching impound_notifications, you can't search current or replaced
-      @unpermitted_statuses = @search_kind == "impound_notification" ? %w[current replaced] : []
+      @unpermitted_statuses = (@search_kind == "impound_notification") ? %w[current replaced] : []
       permitted_statuses = ParkingNotification.statuses + %w[all resolved]
       @search_status = permitted_statuses.include?(params[:search_status]) ? params[:search_status] : "current"
       @search_status = "all" if @unpermitted_statuses.include?(@search_status)
@@ -40,12 +40,10 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          @page = params[:page] || 1
-          records = matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-            .includes(:user, :bike, :impound_record)
-            .page(@page).per(@per_page)
-          set_pagination_headers(records, @page, @per_page) # Can't use api-pagination, because it blocks overriding max_per_page
-
+          pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+            .includes(:user, :bike, :impound_record), limit: @per_page, page: permitted_page)
+          # This was already set up, so I left it when upgrading to pagy
+          set_pagination_headers(pagy, @per_page)
           render json: records,
             root: "parking_notifications",
             each_serializer: ParkingNotificationSerializer
@@ -90,6 +88,7 @@ module Organized
 
     def matching_parking_notifications
       return @matching_parking_notifications if defined?(@matching_parking_notifications)
+
       notifications = parking_notifications
       if params[:search_bike_id].present?
         notifications = notifications.where(bike_id: params[:search_bike_id])
@@ -159,6 +158,7 @@ module Organized
         target_notification = parking_notification.current_associated_notification
         # Don't repeat notifications already sent, or previous to ones already targeted
         next if (ids_repeated + success_ids).include?(target_notification.id)
+
         ids_repeated << target_notification.id
         new_notification = target_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
         success_ids << new_notification.id
@@ -180,6 +180,7 @@ module Organized
 
     def set_failed_and_repeated_ivars
       return true unless session[:repeated_kind].present?
+
       @repeated_kind = session.delete(:repeated_kind)
       notifications_failed_resolved_ids = session.delete(:notifications_failed_resolved_ids)
       notifications_repeated_ids = session.delete(:notifications_repeated_ids)
@@ -195,6 +196,7 @@ module Organized
 
     def ensure_access_to_parking_notifications!
       return true if current_organization.enabled?("parking_notifications") || current_user.superuser?
+
       raise_do_not_have_access!
     end
 
@@ -211,20 +213,22 @@ module Organized
 
     def search_bounding_box
       return nil unless params[:search_southwest_coords].present? && params[:search_northeast_coords].present?
+
       [params[:search_southwest_coords].split(","), params[:search_northeast_coords].split(",")].flatten.map(&:to_f)
     end
 
     def map_center(bounding_box)
       return current_organization.map_focus_coordinates.values unless bounding_box.present?
+
       lat_dif = bounding_box[0] - bounding_box[2]
       lng_dif = bounding_box[1] - bounding_box[3]
       [bounding_box[0] + lat_dif, bounding_box[1] + lng_dif]
     end
 
     # Pulling this out of api-pagination gem because the gem doesn't allow overriding the max per
-    def set_pagination_headers(collection, page, per_page)
+    def set_pagination_headers(pagy, per_page)
       url = request.base_url + request.path_info
-      pages = ApiPagination.pages_from(collection)
+      pages = ApiPagination.pages_from(pagy)
       links = []
 
       pages.each do |k, v|
@@ -232,10 +236,10 @@ module Organized
         links << %(<#{url}?#{new_params.to_param}>; rel="#{k}")
       end
 
-      headers["Page"] = page
+      headers["Page"] = pagy.page
       headers["Link"] = links.join(", ") unless links.empty?
       headers["Per-Page"] = per_page.to_s
-      headers["Total"] = collection.total_count.to_s
+      headers["Total"] = pagy.count.to_s
     end
   end
 end

@@ -1,43 +1,52 @@
 module Organized
   class BikesController < Organized::BaseController
     include SortableTable
+
+    SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
+
     skip_before_action :set_x_frame_options_header, only: [:new_iframe, :create]
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
-      @page = params[:page] || 1
       set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.enabled?("bike_search")
 
-        @per_page = params[:per_page] || 10
+        @per_page = permitted_per_page(default: 10)
         search_organization_bikes
         if current_organization.enabled?("csv_exports") && InputNormalizer.boolean(params[:create_export])
-          if @bikes.count > 10_000 # Don't want everything to explode...
+          if @available_bikes.count > 10_000 # Don't want everything to explode...
             flash[:error] = "Too many bikes selected to export"
-          else
+          elsif directly_create_export?
+            # There is probably a better way to handle this, via storing in session or building the export but not starting
+            # ... but, this works
+            flash[:info] = "Directly creating export - can't configure with over 1,000 bikes"
             export = Export.create(create_export_params)
-            OrganizationExportWorker.perform_async(export.id)
-            flash[:success] = "Export created"
+            OrganizationExportJob.perform_async(export.id)
             redirect_to organization_export_path(export, organization_id: current_organization.id)
+          else
+            if @available_bikes.count > 300
+              flash[:info] = "Warning: Exporting from search with this many matching bikes may not work correctly"
+            end
+            redirect_to new_organization_export_path(build_export_params)
           end
         end
       else
-        @per_page = params[:per_page] || 50
+        @per_page = permitted_per_page(default: 50)
         @available_bikes = if current_organization.enabled?("claimed_ownerships")
           claimed_ownerships_search
         else
           organization_bikes.where(created_at: @time_range)
         end
-        @bikes = @available_bikes.order("bikes.created_at desc").page(@page).per(@per_page)
+        @pagy, @bikes = pagy(@available_bikes.order("bikes.created_at desc"), limit: @per_page, page: permitted_page)
       end
     end
 
     def recoveries
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_recoveries")
+
       set_period
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
+      @per_page = permitted_per_page
       # Default to showing regional recoveries
       @search_only_organization = InputNormalizer.boolean(params[:search_only_organization])
       # ... but if organization isn't regional, we can't show regional
@@ -45,27 +54,29 @@ module Organized
       recovered_records = @search_only_organization ? current_organization.recovered_records : current_organization.nearby_recovered_records
 
       @matching_recoveries = recovered_records.where(recovered_at: @time_range)
-      @recoveries = @matching_recoveries.reorder(recovered_at: :desc).page(@page).per(@per_page)
+      @pagy, @recoveries = pagy(@matching_recoveries.reorder(recovered_at: :desc), limit: @per_page, page: permitted_page)
       # When selecting through the organization bikes, it fails. Lazy solution: Don't permit doing that ;)
       @render_chart = !@search_only_organization && InputNormalizer.boolean(params[:render_chart])
     end
 
     def incompletes
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
+
       set_period
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
+      @per_page = permitted_per_page
       b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
-      @b_params_total = b_params.where(created_at: @time_range)
-      @b_params = @b_params_total.order(created_at: :desc).page(@page).per(@per_page)
+
+      @b_params_total = incompletes_sorted(b_params.where(created_at: @time_range))
+      @pagy, @b_params = pagy(@b_params_total, limit: @per_page, page: permitted_page)
     end
 
     def resend_incomplete_email
       redirect_to(current_root_path) && return unless current_organization.enabled?("show_partial_registrations")
+
       @b_param = current_organization.incomplete_b_params.find_by_id(params[:id])
       if @b_param.present?
-        EmailPartialRegistrationWorker.perform_async(@b_param.id)
+        Email::PartialRegistrationJob.perform_async(@b_param.id)
         flash[:success] = "Incomplete registration re-sent!"
       else
         flash[:error] = "Unable to find that incomplete bike"
@@ -83,7 +94,7 @@ module Organized
     def new_iframe
       @organization = current_organization
       @b_param = find_or_new_b_param
-      @bike = BikeCreator.new.build_bike(@b_param)
+      @bike = BikeServices::Creator.new.build_bike(@b_param)
       render layout: "embed_layout"
     end
 
@@ -101,7 +112,7 @@ module Organized
         end
         # we handle filtering & coercion in BParam, just create it with whatever here
         @b_param.update(permitted_create_params)
-        @bike = BikeCreator.new.create_bike(@b_param)
+        @bike = BikeServices::Creator.new.create_bike(@b_param)
         if @bike.errors.any?
           flash[:error] = @b_param.bike_errors.to_sentence
           iframe_redirect_params[:b_param_id_token] = @b_param.id_token
@@ -134,7 +145,24 @@ module Organized
     end
 
     def sortable_columns
-      %w[id updated_by_user_at owner_email manufacturer_id frame_model cycle_type]
+      SORTABLE_COLUMNS + %w[email motorized] # incompletes/b_param specific
+    end
+
+    def incompletes_sorted(b_params)
+      if sort_column == "cycle_type"
+        if sort_direction == "desc"
+          b_params.cycle_type_not_bike_ordered
+        else
+          b_params.cycle_type_bike
+        end
+      elsif sort_column == "motorized"
+        # NOTE: don't have a 'not_motorized' scope - it would be complicated and I don't think it's desired
+        b_params.motorized
+      else
+        @sort_column = "id" unless %w[id email].include?(sort_column)
+
+        b_params.order("b_params.#{sort_column} #{sort_direction}")
+      end
     end
 
     def organization_bikes
@@ -171,7 +199,7 @@ module Organized
     def search_organization_bikes
       @permitted_org_bike_search_params = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?)
       @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)
@@ -180,8 +208,8 @@ module Organized
         bikes = Bike.search(@interpreted_params)
       end
       if params[:search_stickers].present?
-        @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
-        bikes = @search_stickers == "none" ? bikes.no_bike_sticker : bikes.bike_sticker
+        @search_stickers = (params[:search_stickers] == "none") ? "none" : "with"
+        bikes = (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
       else
         @search_stickers = false
       end
@@ -209,29 +237,37 @@ module Organized
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
-      @bikes = @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
+      @pagy, @bikes = pagy(@available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
     end
 
     def search_status
       return @search_status if defined?(@search_status)
+
       valid_statuses = %w[with_owner stolen all]
       valid_statuses += %w[impounded not_impounded] if current_organization.enabled?("impound_bikes")
       @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : valid_statuses.last
     end
 
-    def create_export_params
+    def directly_create_export?
+      InputNormalizer.boolean(params[:directly_create_export]) || @available_bikes.count > 999
+    end
+
+    def build_export_params
       {
-        kind: "organization",
         organization_id: current_organization.id,
-        custom_bike_ids: @available_bikes.pluck(:id),
         only_custom_bike_ids: true,
-        headers: Export.permitted_headers(current_organization),
-        user_id: current_user.id
+        custom_bike_ids: @available_bikes.pluck(:id).join("_") # Use _ because it doesn't get encoded
       }
+    end
+
+    def create_export_params
+      build_export_params.merge(kind: "organization",
+        headers: Export.permitted_headers(current_organization),
+        user_id: current_user.id)
     end
   end
 end

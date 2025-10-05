@@ -83,6 +83,7 @@ RSpec.describe PropulsionType, type: :model do
         expect(PropulsionType.for_vehicle(:stroller, :"pedal-assist")).to eq :throttle
         expect(PropulsionType.for_vehicle(:"personal-mobility", :"pedal-assist")).to eq :throttle
         expect(PropulsionType.for_vehicle(:"e-scooter", :"pedal-assist-and-throttle")).to eq :throttle
+        expect(PropulsionType.for_vehicle(:"e-motorcycle", :"hand-pedal")).to eq :throttle
         (CycleType.slugs_sym - CycleType::PEDAL - CycleType::NEVER_MOTORIZED).each do |cycle_type|
           expect(PropulsionType.for_vehicle(cycle_type, :motorized)).to eq :throttle
         end
@@ -168,9 +169,21 @@ RSpec.describe PropulsionType, type: :model do
     end
     describe "autocomplete_hash" do
       it "is the target" do
-        expect_hashes_to_match(PropulsionType.send(:motorized_autocomplete_hash), motorized_hash)
+        expect(PropulsionType.send(:motorized_autocomplete_hash)).to match_hash_indifferently motorized_hash
         expect(PropulsionType.autocomplete_hashes.count).to eq 1
       end
+    end
+  end
+
+  describe "names and translations" do
+    let(:en_yaml) { YAML.safe_load_file(Rails.root.join("config", "locales", "en.yml"), permitted_classes: [Symbol]) }
+    let(:enum_translations) do
+      # For dumb historical reasons, slugs have dashes rather than underscores
+      en_yaml.dig("en", "activerecord", "enums", "propulsion_type")
+        .map { |k, v| [k.tr("_", "-"), v] }.to_h
+    end
+    it "has the same names as english translations" do
+      expect(enum_translations).to match_hash_indifferently PropulsionType::NAMES
     end
   end
 end

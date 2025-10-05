@@ -1,32 +1,33 @@
 .card
   .card-body
-    - if @membership.id.present?
-      %h4.text-danger.mb-4
-        DANGER! Don't edit
-        %em
-          %br
-          It would be better to delete and re-add
     = form_for [:admin, @membership] do |f|
       - if @membership.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Membership", obj: @membership }
-      .form-group.fancy-select.unfancy
-        = f.label :organization
-        = collection_select :membership, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
+        = render(AlertForErrors::Component.new(object: @membership, dismissable: true))
+
+      - if @membership.id.blank?
+        .form-group
+          = f.label :user_email
+          = f.email_field :user_email, required: true, class: "form-control"
 
       .form-group
-        = f.label :invited_email
-        = f.text_field :invited_email, required: true, class: "form-control"
+        = f.label :start_at
+        = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+        = f.datetime_local_field :start_at, step: 60, required: true, class: "form-control"
+
+      .form-group
+        = f.label :end_at
+        = f.datetime_local_field :end_at, step: 60, class: "form-control"
+        %small.below-input-help
+          %em leave blank if you want to give a membership for forever. In general, set an end at
 
       .form-group
         %label
-          Role
-        .form-check
-          %label
-            = f.radio_button :role, "admin", class: "form-check-input"
-            Admin of organization
-        .form-check
-          %label
-            = f.radio_button :role, "member", class: "form-check-input"
-            Member of organization
+          Membership Level
+        - Membership.levels.keys.each do |level|
+          .form-check
+            %label
+              = f.radio_button :level, level, class: "form-check-input"
+              = Membership.level_humanized(level)
 
-      = f.submit 'Save', class: 'btn btn-success'
+      .form-group.mt-4
+        = f.submit 'Save', class: 'btn btn-success'

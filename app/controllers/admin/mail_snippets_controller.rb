@@ -1,15 +1,12 @@
 class Admin::MailSnippetsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   before_action :find_snippet, except: [:index, :new, :create]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 25
-    @mail_snippets = matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
-      .page(page).per(@per_page)
-      .includes(:organization)
+    @per_page = permitted_per_page
+    @pagy, @mail_snippets = pagy(matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
+      .includes(:organization), limit: @per_page, page: permitted_page)
   end
 
   def show
@@ -54,6 +51,7 @@ class Admin::MailSnippetsController < Admin::BaseController
 
   def matching_mail_snippets
     return @matching_mail_snippets if defined?(@matching_mail_snippets)
+
     matching_mail_snippets = MailSnippet
     if MailSnippet.kinds.include?(params[:search_kind])
       @search_kind = params[:search_kind]
@@ -76,6 +74,7 @@ class Admin::MailSnippetsController < Admin::BaseController
       :latitude,
       :longitude,
       :proximity_radius,
+      :doorkeeper_app_id,
       :is_location_triggered)
   end
 

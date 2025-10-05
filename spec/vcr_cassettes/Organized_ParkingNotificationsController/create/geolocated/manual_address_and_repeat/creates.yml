@@ -1,254 +1,709 @@
 ---
 http_interactions:
-  - request:
-      method: get
-      uri: https://maps.googleapis.com/maps/api/geocode/json?address=300%20Lakeside%20Dr,%20Oakland,%20CA%2094612&language=en&sensor=false
-      body:
-        encoding: US-ASCII
-        string: ""
-      headers:
-        Accept-Encoding:
-          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-        Accept:
-          - "*/*"
-        User-Agent:
-          - Ruby
-    response:
-      status:
-        code: 200
-        message: OK
-      headers:
-        Content-Type:
-          - application/json; charset=UTF-8
-        Date:
-          - Wed, 12 Feb 2020 21:16:36 GMT
-        Pragma:
-          - no-cache
-        Expires:
-          - Fri, 01 Jan 1990 00:00:00 GMT
-        Cache-Control:
-          - no-cache, must-revalidate
-        Access-Control-Allow-Origin:
-          - "*"
-        Server:
-          - mafe
-        X-Xss-Protection:
-          - "0"
-        X-Frame-Options:
-          - SAMEORIGIN
-        Server-Timing:
-          - gfet4t7; dur=31
-        Alt-Svc:
-          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
-            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
-            ma=2592000
-        Transfer-Encoding:
-          - chunked
-      body:
-        encoding: ASCII-8BIT
-        string: |
-          {
-             "results" : [
-                {
-                   "address_components" : [
-                      {
-                         "long_name" : "Kaiser Center",
-                         "short_name" : "Kaiser Center",
-                         "types" : [ "premise" ]
-                      },
-                      {
-                         "long_name" : "300",
-                         "short_name" : "300",
-                         "types" : [ "street_number" ]
-                      },
-                      {
-                         "long_name" : "Lakeside Drive",
-                         "short_name" : "Lakeside Dr",
-                         "types" : [ "route" ]
-                      },
-                      {
-                         "long_name" : "Downtown Oakland",
-                         "short_name" : "Downtown Oakland",
-                         "types" : [ "neighborhood", "political" ]
-                      },
-                      {
-                         "long_name" : "Oakland",
-                         "short_name" : "Oakland",
-                         "types" : [ "locality", "political" ]
-                      },
-                      {
-                         "long_name" : "Alameda County",
-                         "short_name" : "Alameda County",
-                         "types" : [ "administrative_area_level_2", "political" ]
-                      },
-                      {
-                         "long_name" : "California",
-                         "short_name" : "CA",
-                         "types" : [ "administrative_area_level_1", "political" ]
-                      },
-                      {
-                         "long_name" : "United States",
-                         "short_name" : "US",
-                         "types" : [ "country", "political" ]
-                      },
-                      {
-                         "long_name" : "94612",
-                         "short_name" : "94612",
-                         "types" : [ "postal_code" ]
-                      }
-                   ],
-                   "formatted_address" : "Kaiser Center, 300 Lakeside Dr, Oakland, CA 94612, USA",
-                   "geometry" : {
-                      "bounds" : {
-                         "northeast" : {
-                            "lat" : 37.8092277,
-                            "lng" : -122.2633498
-                         },
-                         "southwest" : {
-                            "lat" : 37.8083219,
-                            "lng" : -122.2647484
-                         }
-                      },
-                      "location" : {
-                         "lat" : 37.8087498,
-                         "lng" : -122.263705
-                      },
-                      "location_type" : "ROOFTOP",
-                      "viewport" : {
-                         "northeast" : {
-                            "lat" : 37.8101237802915,
-                            "lng" : -122.2627001197085
-                         },
-                         "southwest" : {
-                            "lat" : 37.8074258197085,
-                            "lng" : -122.2653980802915
-                         }
-                      }
-                   },
-                   "place_id" : "ChIJLX4TPk2Hj4AR3dwhAELTiz4",
-                   "types" : [ "premise" ]
-                }
-             ],
-             "status" : "OK"
-          }
-      http_version:
-    recorded_at: Wed, 12 Feb 2020 21:16:34 GMT
-  - request:
-      method: get
-      uri: https://maps.googleapis.com/maps/api/geocode/json?address=New%20York%2010007%20United%20States&language=en&sensor=false
-      body:
-        encoding: US-ASCII
-        string: ""
-      headers:
-        Accept-Encoding:
-          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-        Accept:
-          - "*/*"
-        User-Agent:
-          - Ruby
-    response:
-      status:
-        code: 200
-        message: OK
-      headers:
-        Content-Type:
-          - application/json; charset=UTF-8
-        Date:
-          - Wed, 12 Feb 2020 21:16:36 GMT
-        Pragma:
-          - no-cache
-        Expires:
-          - Fri, 01 Jan 1990 00:00:00 GMT
-        Cache-Control:
-          - no-cache, must-revalidate
-        Access-Control-Allow-Origin:
-          - "*"
-        Server:
-          - mafe
-        X-Xss-Protection:
-          - "0"
-        X-Frame-Options:
-          - SAMEORIGIN
-        Server-Timing:
-          - gfet4t7; dur=17
-        Alt-Svc:
-          - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
-            ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
-            ma=2592000
-        Transfer-Encoding:
-          - chunked
-      body:
-        encoding: ASCII-8BIT
-        string: |
-          {
-             "results" : [
-                {
-                   "address_components" : [
-                      {
-                         "long_name" : "10007",
-                         "short_name" : "10007",
-                         "types" : [ "postal_code" ]
-                      },
-                      {
-                         "long_name" : "Manhattan",
-                         "short_name" : "Manhattan",
-                         "types" : [ "political", "sublocality", "sublocality_level_1" ]
-                      },
-                      {
-                         "long_name" : "New York",
-                         "short_name" : "New York",
-                         "types" : [ "locality", "political" ]
-                      },
-                      {
-                         "long_name" : "New York County",
-                         "short_name" : "New York County",
-                         "types" : [ "administrative_area_level_2", "political" ]
-                      },
-                      {
-                         "long_name" : "New York",
-                         "short_name" : "NY",
-                         "types" : [ "administrative_area_level_1", "political" ]
-                      },
-                      {
-                         "long_name" : "United States",
-                         "short_name" : "US",
-                         "types" : [ "country", "political" ]
-                      }
-                   ],
-                   "formatted_address" : "New York, NY 10007, USA",
-                   "geometry" : {
-                      "bounds" : {
-                         "northeast" : {
-                            "lat" : 40.717076,
-                            "lng" : -74.0001781
-                         },
-                         "southwest" : {
-                            "lat" : 40.709806,
-                            "lng" : -74.01375399999999
-                         }
-                      },
-                      "location" : {
-                         "lat" : 40.7136487,
-                         "lng" : -74.0087126
-                      },
-                      "location_type" : "APPROXIMATE",
-                      "viewport" : {
-                         "northeast" : {
-                            "lat" : 40.717076,
-                            "lng" : -74.0001781
-                         },
-                         "southwest" : {
-                            "lat" : 40.709806,
-                            "lng" : -74.01375399999999
-                         }
-                      }
-                   },
-                   "place_id" : "ChIJwbJsUhhawokRuCRdc8piF8c",
-                   "types" : [ "postal_code" ]
-                }
-             ],
-             "status" : "OK"
-          }
-      http_version:
-    recorded_at: Wed, 12 Feb 2020 21:16:34 GMT
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=300%20Lakeside%20Dr,%20Oakland,%20CA%2094612&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 12 Feb 2020 21:16:36 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - mafe
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=31
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
+        ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+        ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Kaiser Center",
+                       "short_name" : "Kaiser Center",
+                       "types" : [ "premise" ]
+                    },
+                    {
+                       "long_name" : "300",
+                       "short_name" : "300",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "Lakeside Drive",
+                       "short_name" : "Lakeside Dr",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "Downtown Oakland",
+                       "short_name" : "Downtown Oakland",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Oakland",
+                       "short_name" : "Oakland",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Alameda County",
+                       "short_name" : "Alameda County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "California",
+                       "short_name" : "CA",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "94612",
+                       "short_name" : "94612",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "Kaiser Center, 300 Lakeside Dr, Oakland, CA 94612, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 37.8092277,
+                          "lng" : -122.2633498
+                       },
+                       "southwest" : {
+                          "lat" : 37.8083219,
+                          "lng" : -122.2647484
+                       }
+                    },
+                    "location" : {
+                       "lat" : 37.8087498,
+                       "lng" : -122.263705
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 37.8101237802915,
+                          "lng" : -122.2627001197085
+                       },
+                       "southwest" : {
+                          "lat" : 37.8074258197085,
+                          "lng" : -122.2653980802915
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJLX4TPk2Hj4AR3dwhAELTiz4",
+                 "types" : [ "premise" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version:
+  recorded_at: Wed, 12 Feb 2020 21:16:34 GMT
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=New%20York%2010007%20United%20States&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 12 Feb 2020 21:16:36 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - mafe
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=17
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="46,43",h3-Q050=":443"; ma=2592000,h3-Q049=":443";
+        ma=2592000,h3-Q048=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443";
+        ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "10007",
+                       "short_name" : "10007",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "Manhattan",
+                       "short_name" : "Manhattan",
+                       "types" : [ "political", "sublocality", "sublocality_level_1" ]
+                    },
+                    {
+                       "long_name" : "New York",
+                       "short_name" : "New York",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "New York County",
+                       "short_name" : "New York County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "New York",
+                       "short_name" : "NY",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "New York, NY 10007, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 40.717076,
+                          "lng" : -74.0001781
+                       },
+                       "southwest" : {
+                          "lat" : 40.709806,
+                          "lng" : -74.01375399999999
+                       }
+                    },
+                    "location" : {
+                       "lat" : 40.7136487,
+                       "lng" : -74.0087126
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 40.717076,
+                          "lng" : -74.0001781
+                       },
+                       "southwest" : {
+                          "lat" : 40.709806,
+                          "lng" : -74.01375399999999
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJwbJsUhhawokRuCRdc8piF8c",
+                 "types" : [ "postal_code" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version:
+  recorded_at: Wed, 12 Feb 2020 21:16:34 GMT
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?key=<GOOGLE_GEOCODER>&language=en&latlng=40.7143528,-74.0059731&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Sun, 14 Jul 2024 19:59:19 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Goog-Maps-Metro-Area:
+      - New York, NY
+      Server:
+      - mafe
+      Content-Length:
+      - '31617'
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=103
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "{\n   \"plus_code\" : \n   {\n      \"compound_code\" : \"PX7V+PJR
+        New York, NY, USA\",\n      \"global_code\" : \"87G7PX7V+PJR\"\n   },\n   \"results\"
+        : \n   [\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"278\",\n               \"short_name\" : \"278\",\n
+        \              \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"West Broadway\",\n               \"short_name\" : \"W Broadway\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Manhattan\",\n               \"short_name\"
+        : \"Manhattan\",\n               \"types\" : \n               [\n                  \"political\",\n
+        \                 \"sublocality\",\n                  \"sublocality_level_1\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"New York\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York County\",\n               \"short_name\" : \"New York County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"10006\",\n               \"short_name\" :
+        \"10006\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"278 W Broadway, New York, NY 10006, USA\",\n         \"geometry\" : \n
+        \        {\n            \"location\" : \n            {\n               \"lat\"
+        : 40.714352,\n               \"lng\" : -74.00597359999999\n            },\n
+        \           \"location_type\" : \"ROOFTOP\",\n            \"viewport\" : \n
+        \           {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 40.7157009802915,\n                  \"lng\" : -74.00462461970849\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.7130030197085,\n                  \"lng\" : -74.0073225802915\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJ47g8SLNbwokRu6jVeZTNEJg\",\n
+        \        \"plus_code\" : \n         {\n            \"compound_code\" : \"PX7V+PJ
+        New York, NY, USA\",\n            \"global_code\" : \"87G7PX7V+PJ\"\n         },\n
+        \        \"types\" : \n         [\n            \"street_address\"\n         ]\n
+        \     },\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"280\",\n               \"short_name\" : \"280\",\n
+        \              \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Broadway\",\n               \"short_name\" : \"Broadway\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Manhattan\",\n               \"short_name\"
+        : \"Manhattan\",\n               \"types\" : \n               [\n                  \"political\",\n
+        \                 \"sublocality\",\n                  \"sublocality_level_1\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"New York\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York County\",\n               \"short_name\" : \"New York County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"10007\",\n               \"short_name\" :
+        \"10007\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"280 Broadway, New York, NY 10007, USA\",\n         \"geometry\" : \n         {\n
+        \           \"location\" : \n            {\n               \"lat\" : 40.714299,\n
+        \              \"lng\" : -74.0058154\n            },\n            \"location_type\"
+        : \"ROOFTOP\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.71564798029149,\n                  \"lng\"
+        : -74.00446641970851\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 40.71295001970849,\n                  \"lng\"
+        : -74.00716438029151\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJy6U3LuJbwokR21pv6WB5-hQ\",\n         \"plus_code\" : \n         {\n
+        \           \"compound_code\" : \"PX7V+PM New York, NY, USA\",\n            \"global_code\"
+        : \"87G7PX7V+PM\"\n         },\n         \"types\" : \n         [\n            \"establishment\",\n
+        \           \"gym\",\n            \"health\",\n            \"point_of_interest\"\n
+        \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
+        \           {\n               \"long_name\" : \"280\",\n               \"short_name\"
+        : \"280\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Broadway\",\n               \"short_name\" : \"Broadway\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Manhattan\",\n               \"short_name\"
+        : \"Manhattan\",\n               \"types\" : \n               [\n                  \"political\",\n
+        \                 \"sublocality\",\n                  \"sublocality_level_1\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"New York\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York County\",\n               \"short_name\" : \"New York County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"10007\",\n               \"short_name\" :
+        \"10007\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"1868\",\n               \"short_name\" : \"1868\",\n               \"types\"
+        : \n               [\n                  \"postal_code_suffix\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"280 Broadway,
+        New York, NY 10007, USA\",\n         \"geometry\" : \n         {\n            \"location\"
+        : \n            {\n               \"lat\" : 40.7145277,\n               \"lng\"
+        : -74.00581029999999\n            },\n            \"location_type\" : \"ROOFTOP\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 40.71587668029149,\n                  \"lng\"
+        : -74.00446131970848\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 40.71317871970849,\n                  \"lng\"
+        : -74.0071592802915\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJ-eij8CFawokRX6B-QHHA62I\",\n         \"types\" : \n         [\n            \"premise\"\n
+        \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
+        \           {\n               \"long_name\" : \"280\",\n               \"short_name\"
+        : \"280\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Broadway\",\n               \"short_name\" : \"Broadway\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Manhattan\",\n               \"short_name\"
+        : \"Manhattan\",\n               \"types\" : \n               [\n                  \"political\",\n
+        \                 \"sublocality\",\n                  \"sublocality_level_1\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"New York\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York County\",\n               \"short_name\" : \"New York County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"10007\",\n               \"short_name\" :
+        \"10007\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"280 Broadway, New York, NY 10007, USA\",\n         \"geometry\" : \n         {\n
+        \           \"location\" : \n            {\n               \"lat\" : 40.7144336,\n
+        \              \"lng\" : -74.00610159999999\n            },\n            \"location_type\"
+        : \"RANGE_INTERPOLATED\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.7157825802915,\n                  \"lng\"
+        : -74.00475261970848\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 40.7130846197085,\n                  \"lng\"
+        : -74.0074505802915\n               }\n            }\n         },\n         \"place_id\"
+        : \"EiUyODAgQnJvYWR3YXksIE5ldyBZb3JrLCBOWSAxMDAwNywgVVNBIhsSGQoUChIJIVdd-yFawokRyRLyIYALj4oQmAI\",\n
+        \        \"types\" : \n         [\n            \"street_address\"\n         ]\n
+        \     },\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"PX7V+PJ\",\n               \"short_name\"
+        : \"PX7V+PJ\",\n               \"types\" : \n               [\n                  \"plus_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"New York\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"NY\",\n               \"types\"
+        : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"PX7V+PJ New York, NY, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.714375,\n                  \"lng\"
+        : -74.005875\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 40.71425,\n                  \"lng\" : -74.006\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 40.7143528,\n               \"lng\" : -74.00597309999999\n
+        \           },\n            \"location_type\" : \"GEOMETRIC_CENTER\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 40.71566148029149,\n                  \"lng\" : -74.00458851970851\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.7129635197085,\n                  \"lng\" : -74.00728648029151\n               }\n
+        \           }\n         },\n         \"place_id\" : \"GhIJLOec6W9bREAR90n_3GGAUsA\",\n
+        \        \"plus_code\" : \n         {\n            \"compound_code\" : \"PX7V+PJ
+        New York, NY, USA\",\n            \"global_code\" : \"87G7PX7V+PJ\"\n         },\n
+        \        \"types\" : \n         [\n            \"plus_code\"\n         ]\n
+        \     },\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"289-273\",\n               \"short_name\"
+        : \"289-273\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Broadway\",\n               \"short_name\" : \"Broadway\",\n               \"types\"
+        : \n               [\n                  \"route\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Manhattan\",\n               \"short_name\"
+        : \"Manhattan\",\n               \"types\" : \n               [\n                  \"political\",\n
+        \                 \"sublocality\",\n                  \"sublocality_level_1\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"New York\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York County\",\n               \"short_name\" : \"New York County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"10007\",\n               \"short_name\" :
+        \"10007\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"289-273 Broadway, New York, NY 10007, USA\",\n         \"geometry\" :
+        \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.714693,\n                  \"lng\"
+        : -74.00588929999999\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 40.7141829,\n                  \"lng\"
+        : -74.0063069\n               }\n            },\n            \"location\"
+        : \n            {\n               \"lat\" : 40.7144379,\n               \"lng\"
+        : -74.0060981\n            },\n            \"location_type\" : \"GEOMETRIC_CENTER\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 40.7157869302915,\n                  \"lng\"
+        : -74.00474911970848\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 40.7130889697085,\n                  \"lng\"
+        : -74.0074470802915\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJIVdd-yFawokRyBLyIYALj4o\",\n         \"types\" : \n         [\n            \"route\"\n
+        \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
+        \           {\n               \"long_name\" : \"Civic Center\",\n               \"short_name\"
+        : \"Civic Center\",\n               \"types\" : \n               [\n                  \"neighborhood\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Manhattan\",\n               \"short_name\"
+        : \"Manhattan\",\n               \"types\" : \n               [\n                  \"political\",\n
+        \                 \"sublocality\",\n                  \"sublocality_level_1\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"New York\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York County\",\n               \"short_name\" : \"New York County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"Civic Center, New York, NY, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.71776149999999,\n                  \"lng\"
+        : -73.9982199\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 40.7097756,\n                  \"lng\" : -74.00873419999999\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 40.7140519,\n               \"lng\" : -74.00283639999999\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 40.71776149999999,\n                  \"lng\" : -73.9982199\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.7097756,\n                  \"lng\" : -74.00873419999999\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJEZaa1SNawokRXvMbRrc0HC8\",\n
+        \        \"types\" : \n         [\n            \"neighborhood\",\n            \"political\"\n
+        \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
+        \           {\n               \"long_name\" : \"10007\",\n               \"short_name\"
+        : \"10007\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Manhattan\",\n               \"short_name\" : \"Manhattan\",\n               \"types\"
+        : \n               [\n                  \"political\",\n                  \"sublocality\",\n
+        \                 \"sublocality_level_1\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"New York\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York County\",\n               \"short_name\"
+        : \"New York County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"New York, NY 10007, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.717076,\n                  \"lng\"
+        : -74.0001781\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 40.709806,\n                  \"lng\" : -74.01375399999999\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 40.7136487,\n               \"lng\" : -74.0087126\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 40.717076,\n                  \"lng\" : -74.0001781\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.709806,\n                  \"lng\" : -74.01375399999999\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJwbJsUhhawokRuCRdc8piF8c\",\n
+        \        \"types\" : \n         [\n            \"postal_code\"\n         ]\n
+        \     },\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"Manhattan\",\n               \"short_name\"
+        : \"Manhattan\",\n               \"types\" : \n               [\n                  \"political\",\n
+        \                 \"sublocality\",\n                  \"sublocality_level_1\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"New York\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York County\",\n               \"short_name\" : \"New York County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"Manhattan, New York, NY, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.882214,\n                  \"lng\"
+        : -73.907\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 40.6803955,\n                  \"lng\" : -74.04723679999999\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 40.7830603,\n               \"lng\" : -73.9712488\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 40.882214,\n                  \"lng\" : -73.907\n               },\n               \"southwest\"
+        : \n               {\n                  \"lat\" : 40.6803955,\n                  \"lng\"
+        : -74.04723679999999\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJYeZuBI9YwokRjMDs_IEyCwo\",\n         \"types\" : \n         [\n            \"political\",\n
+        \           \"sublocality\",\n            \"sublocality_level_1\"\n         ]\n
+        \     },\n      {\n         \"address_components\" : \n         [\n            {\n
+        \              \"long_name\" : \"New York County\",\n               \"short_name\"
+        : \"New York County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"New York\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"New York\",\n               \"short_name\"
+        : \"NY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"New York County, New York, NY, USA\",\n
+        \        \"geometry\" : \n         {\n            \"bounds\" : \n            {\n
+        \              \"northeast\" : \n               {\n                  \"lat\"
+        : 40.882214,\n                  \"lng\" : -73.907\n               },\n               \"southwest\"
+        : \n               {\n                  \"lat\" : 40.6795479,\n                  \"lng\"
+        : -74.0477173\n               }\n            },\n            \"location\"
+        : \n            {\n               \"lat\" : 40.7830603,\n               \"lng\"
+        : -73.9712488\n            },\n            \"location_type\" : \"APPROXIMATE\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 40.882214,\n                  \"lng\"
+        : -73.907\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 40.6795479,\n                  \"lng\" : -74.0477173\n
+        \              }\n            }\n         },\n         \"place_id\" : \"ChIJOwE7_GTtwokRFq0uOwLSE9g\",\n
+        \        \"types\" : \n         [\n            \"administrative_area_level_2\",\n
+        \           \"political\"\n         ]\n      },\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"New York\",\n
+        \              \"short_name\" : \"New York\",\n               \"types\" :
+        \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"New York\",\n               \"short_name\" : \"NY\",\n               \"types\"
+        : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"New York, NY, USA\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 40.9175771,\n                  \"lng\"
+        : -73.70027209999999\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 40.4773991,\n                  \"lng\"
+        : -74.25908989999999\n               }\n            },\n            \"location\"
+        : \n            {\n               \"lat\" : 40.7127753,\n               \"lng\"
+        : -74.0059728\n            },\n            \"location_type\" : \"APPROXIMATE\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 40.9175771,\n                  \"lng\"
+        : -73.70027209999999\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 40.4773991,\n                  \"lng\"
+        : -74.25908989999999\n               }\n            }\n         },\n         \"place_id\"
+        : \"ChIJOwg_06VPwokRYv534QaPC8g\",\n         \"types\" : \n         [\n            \"locality\",\n
+        \           \"political\"\n         ]\n      },\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"New York\",\n
+        \              \"short_name\" : \"NY\",\n               \"types\" : \n               [\n
+        \                 \"administrative_area_level_1\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"United States\",\n               \"short_name\" : \"US\",\n               \"types\"
+        : \n               [\n                  \"country\",\n                  \"political\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"New York, USA\",\n         \"geometry\" : \n         {\n            \"bounds\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 45.015861,\n                  \"lng\" : -71.777491\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.476578,\n                  \"lng\" : -79.7625901\n               }\n
+        \           },\n            \"location\" : \n            {\n               \"lat\"
+        : 43.2994285,\n               \"lng\" : -74.21793260000001\n            },\n
+        \           \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 45.015861,\n                  \"lng\" : -71.777491\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 40.476578,\n                  \"lng\" : -79.7625901\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJqaUj8fBLzEwRZ5UY3sHGz90\",\n
+        \        \"types\" : \n         [\n            \"administrative_area_level_1\",\n
+        \           \"political\"\n         ]\n      },\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"United States\",\n
+        \              \"short_name\" : \"US\",\n               \"types\" : \n               [\n
+        \                 \"country\",\n                  \"political\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"United States\",\n
+        \        \"geometry\" : \n         {\n            \"bounds\" : \n            {\n
+        \              \"northeast\" : \n               {\n                  \"lat\"
+        : 74.071038,\n                  \"lng\" : -66.885417\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 18.7763,\n                  \"lng\" : 166.9999999\n               }\n            },\n
+        \           \"location\" : \n            {\n               \"lat\" : 37.09024,\n
+        \              \"lng\" : -95.712891\n            },\n            \"location_type\"
+        : \"APPROXIMATE\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 74.071038,\n                  \"lng\"
+        : -66.885417\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 18.7763,\n                  \"lng\" : 166.9999999\n
+        \              }\n            }\n         },\n         \"place_id\" : \"ChIJCzYy5IS16lQRQrfeQ5K5Oxw\",\n
+        \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+    http_version:
+  recorded_at: Sun, 14 Jul 2024 19:59:19 GMT
 recorded_with: VCR 5.0.0

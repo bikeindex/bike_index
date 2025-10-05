@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe UsersController, type: :controller do
   let(:user) { FactoryBot.create(:user_confirmed) }
   describe "new" do
@@ -108,10 +112,10 @@ RSpec.describe UsersController, type: :controller do
       context "with locale passed" do
         it "creates a user with a preferred_language" do
           request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             post :create, params: {locale: "nl", user: user_attributes}
-          }.to change(EmailConfirmationWorker.jobs, :count).by 1
+          }.to change(Email::ConfirmationJob.jobs, :count).by 1
 
           user = User.order(:created_at).last
           expect(User.from_auth(cookies.signed[:auth])).to eq user
@@ -125,7 +129,7 @@ RSpec.describe UsersController, type: :controller do
 
           ActionMailer::Base.deliveries = []
           expect {
-            EmailConfirmationWorker.drain
+            Email::ConfirmationJob.drain
           }.to change(ActionMailer::Base.deliveries, :count).by 1
 
           mail = ActionMailer::Base.deliveries.last
@@ -134,10 +138,10 @@ RSpec.describe UsersController, type: :controller do
           expect(mail.from).to eq(["contact@bikeindex.org"])
         end
       end
-      context "with membership and an example bike" do
+      context "with organization_role and an example bike" do
         let(:email) { "test@stuff.com" }
-        let(:membership) { FactoryBot.create(:membership, invited_email: " #{email.upcase}", role: "member") }
-        let!(:organization) { membership.organization }
+        let(:organization_role) { FactoryBot.create(:organization_role, invited_email: " #{email.upcase}", role: "member") }
+        let!(:organization) { organization_role.organization }
         let(:bike) { FactoryBot.create(:bike, example: true, owner_email: email) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
         let(:user_attributes) { {email: email, name: "SAMPLE", password: "pleaseplease12", terms_of_service: "1", notification_newsletters: "0"} }
@@ -146,7 +150,7 @@ RSpec.describe UsersController, type: :controller do
           expect(session[:passive_organization_id]).to be_blank
           bike.reload
           expect(bike.user).to be_blank
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
             post :create, params: {user: user_attributes}
@@ -164,32 +168,32 @@ RSpec.describe UsersController, type: :controller do
             expect(user.user_emails.first.email).to eq email
             expect(User.fuzzy_email_find(email)).to eq user
             # bike association is processed async, so we have to drain the queue
-            expect(AfterUserCreateWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
-            AfterUserCreateWorker.drain
+            expect(::Callbacks::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+            ::Callbacks::AfterUserCreateJob.drain
             bike.reload
             expect(bike.user).to eq user
-          }.to change(EmailWelcomeWorker.jobs, :count)
+          }.to change(Email::WelcomeJob.jobs, :count)
         end
       end
-      context "with membership, partner param" do
-        let!(:membership) { FactoryBot.create(:membership, invited_email: "poo@pile.com") }
+      context "with organization_role, partner param" do
+        let!(:organization_role) { FactoryBot.create(:organization_role, invited_email: "poo@pile.com") }
         it "creates a confirmed user, log in, and send welcome, language header" do
           session[:passive_organization_id] = "0"
           request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
-          allow(EmailWelcomeWorker).to receive(:perform_async)
+          allow(Email::WelcomeJob).to receive(:perform_async)
 
           post :create, params: {user: user_attributes, partner: "bikehub"}
 
           expect(response).to redirect_to("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
           user = User.find_by_email("poo@pile.com")
-          expect(EmailWelcomeWorker).to have_received(:perform_async).with(user.id)
+          expect(Email::WelcomeJob).to have_received(:perform_async).with(user.id)
           expect(user.partner_sign_up).to eq "bikehub"
           expect(user.email).to eq "poo@pile.com"
 
           expect(User.from_auth(cookies.signed[:auth])).to eq user
           expect(user.last_login_at).to be_within(2.seconds).of Time.current
           expect(user.preferred_language).to eq "nl"
-          expect(session[:passive_organization_id]).to eq membership.organization_id
+          expect(session[:passive_organization_id]).to eq organization_role.organization_id
         end
       end
       context "with partner session" do
@@ -213,10 +217,10 @@ RSpec.describe UsersController, type: :controller do
       context "with auto passwordless users" do
         let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
         let(:email) { "example@ladot.online" }
-        it "Does not create a membership or automatically confirm the user" do
+        it "Does not create a organization_role or automatically confirm the user" do
           expect(session[:passive_organization_id]).to be_blank
           ActionMailer::Base.deliveries = []
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             request.env["HTTP_CF_CONNECTING_IP"] = "169.99.69.2"
             expect {
@@ -255,7 +259,7 @@ RSpec.describe UsersController, type: :controller do
         expect {
           expect {
             post :create, params: {user: user_attributes}
-          }.to_not change(EmailWelcomeWorker.jobs, :count)
+          }.to_not change(Email::WelcomeJob.jobs, :count)
         }.to_not change(User, :count)
       end
       context "partner param" do
@@ -362,7 +366,7 @@ RSpec.describe UsersController, type: :controller do
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           expect_confirmed_and_set_ip(user)
-          expect(user.memberships.count).to eq 0
+          expect(user.organization_roles.count).to eq 0
           expect(session[:passive_organization_id]).to eq "0"
         end
         context "domain matching" do
@@ -375,7 +379,7 @@ RSpec.describe UsersController, type: :controller do
             expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
             expect(session[:passive_organization_id]).to eq organization.id
             expect_confirmed_and_set_ip(user)
-            expect(user.memberships.count).to eq 1
+            expect(user.organization_roles.count).to eq 1
           end
         end
       end
@@ -385,7 +389,7 @@ RSpec.describe UsersController, type: :controller do
       include_context :logged_in_as_user
       it "redirects" do
         expect(user.confirmed?).to be_truthy
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         get :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
         expect(User.from_auth(cookies.signed[:auth])).to eq(user)
         expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"

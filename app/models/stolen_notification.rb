@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: stolen_notifications
+#
+#  id                   :integer          not null, primary key
+#  kind                 :integer
+#  message              :text
+#  receiver_email       :string(255)
+#  reference_url        :text
+#  send_dates           :json
+#  subject              :string(255)
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  bike_id              :integer
+#  doorkeeper_app_id    :bigint
+#  oauth_application_id :integer
+#  receiver_id          :integer
+#  sender_id            :integer
+#
+# Indexes
+#
+#  index_stolen_notifications_on_doorkeeper_app_id     (doorkeeper_app_id)
+#  index_stolen_notifications_on_oauth_application_id  (oauth_application_id)
+#
 class StolenNotification < ApplicationRecord
   KIND_ENUM = {
     stolen_permitted: 0,
@@ -11,6 +35,7 @@ class StolenNotification < ApplicationRecord
   belongs_to :bike
   belongs_to :sender, class_name: "User", foreign_key: :sender_id
   belongs_to :receiver, class_name: "User", foreign_key: :receiver_id
+  belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application"
 
   has_many :notifications, as: :notifiable
 
@@ -21,21 +46,23 @@ class StolenNotification < ApplicationRecord
 
   # Kind enum was added to track how often various types of messages were sent
   # in #2275 - it isn't currently used for logic, just data analysis
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   def notify_receiver
-    EmailStolenNotificationWorker.perform_async(id)
+    Email::StolenNotificationJob.perform_async(id)
   end
 
   def permitted_send?
     return false unless bike&.contact_owner?(sender)
-    return true if sender.enabled?("unstolen_notifications")
+    return true if sender.enabled?("unstolen_notifications") || doorkeeper_app_id.present?
+
     (sender.sent_stolen_notifications.count < 2) || sender.can_send_many_stolen_notifications
   end
 
   # NOTE: This is legacy. Should be updated to check notifications rather than this
   def send_dates_parsed
     return [] unless send_dates
+
     send_dates.is_a?(String) ? JSON.parse(send_dates) : send_dates
   end
 
@@ -53,6 +80,12 @@ class StolenNotification < ApplicationRecord
     STR
   end
 
+  def mail_snippet
+    return nil if doorkeeper_app_id.blank?
+
+    MailSnippet.enabled.stolen_notification_oauth.find_by(doorkeeper_app_id:)
+  end
+
   private
 
   def calculated_unstolen_blocked?
@@ -64,6 +97,7 @@ class StolenNotification < ApplicationRecord
       permitted_send? ? "stolen_permitted" : "stolen_blocked"
     else
       return "unstolen_blocked" unless permitted_send?
+
       if bike&.claimed?
         "unstolen_claimed_permitted"
       elsif bike&.current_ownership&.organization_direct_unclaimed_notifications?

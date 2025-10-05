@@ -10,7 +10,7 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
     allow_nil: true
 
   def status
-    object.status.gsub(/status_/, "").tr("_", " ")
+    object.status.gsub("status_", "").tr("_", " ")
   end
 
   def serial

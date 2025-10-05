@@ -1,5 +1,11 @@
+task enqueue_newsletter: :environment do
+  if Sidekiq.redis { |conn| conn.llen("queue:low_priority") < 3_000 }
+    Email::NewsletterJob.enqueue_for(94, limit: 5_000)
+  end
+end
+
 task run_scheduler: :environment do
-  ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
+  ScheduledJobRunner.perform_async if ScheduledJobRunner.should_enqueue?
 end
 
 task read_logged_searches: :environment do
@@ -9,12 +15,40 @@ end
 
 desc "Reset Autocomplete"
 task reset_autocomplete: :environment do
-  AutocompleteLoaderWorker.new.perform(nil, true)
+  AutocompleteLoaderJob.new.perform(nil, true)
+end
+
+desc "import manufacturers from GitHub"
+task import_manufacturers_csv: :environment do
+  url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/manufacturers.csv"
+  file_path = Rails.root.join("tmp/manufacturers.csv")
+  system("wget -q #{url} -O #{file_path}", exception: true)
+  Spreadsheets::Manufacturers.import(file_path)
+end
+
+desc "import primary activities from GitHub"
+# NOTE: This doesn't actually do a good job updating existing primary activities.
+# If that is required, probably do it manually via console
+task import_primary_activities_csv: :environment do
+  url = "https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/primary_activities.csv"
+  file_path = Rails.root.join("tmp/primary_activities.csv")
+  system("wget -q #{url} -O #{file_path}", exception: true)
+  Spreadsheets::PrimaryActivities.import(file_path)
+end
+
+# TODO: Remove :processed attribute when processing finishes
+desc "Enqueue Logged Search Processing"
+task process_logged_searches: :environment do
+  enqueue_limit = ENV["LOGGED_SEARCHES_BACKFILL_COUNT"]
+  enqueue_limit = enqueue_limit.present? ? enqueue_limit.to_i : 1000
+
+  LoggedSearch.unprocessed.limit(enqueue_limit).pluck(:id)
+    .each { |i| ProcessLoggedSearchJob.perform_async(i) }
 end
 
 desc "Load counts" # This is a rake task so it can be loaded from bin/update
 task load_counts: :environment do
-  UpdateCountsWorker.new.perform
+  UpdateCountsJob.new.perform
 end
 
 desc "Prepare translations for committing to main"

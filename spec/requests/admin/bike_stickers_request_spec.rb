@@ -46,7 +46,7 @@ RSpec.describe Admin::BikeStickersController, type: :request do
         organization_id: organization.id
       }
     end
-    before { Sidekiq::Worker.clear_all }
+    before { Sidekiq::Job.clear_all }
     def expect_success(base_url, passed_params)
       expect do
         post base_url, params: {bike_sticker_batch: passed_params}
@@ -63,12 +63,12 @@ RSpec.describe Admin::BikeStickersController, type: :request do
       end
       expect(response).to redirect_to(admin_bike_stickers_path(search_bike_sticker_batch_id: bike_sticker_batch.id))
 
-      expect(CreateBikeStickerCodesWorker.jobs.count).to eq 1
+      expect(CreateBikeStickerCodesJob.jobs.count).to eq 1
       target_args = [bike_sticker_batch.id,
         passed_params[:stickers_to_create_count]&.to_s,
         passed_params[:initial_code_integer]&.to_i]
 
-      expect(CreateBikeStickerCodesWorker.jobs.map { |j| j["args"] }.last.flatten).to eq target_args
+      expect(CreateBikeStickerCodesJob.jobs.map { |j| j["args"] }.last.flatten).to eq target_args
 
       bike_sticker_batch
     end
@@ -135,13 +135,13 @@ RSpec.describe Admin::BikeStickersController, type: :request do
       expect(response).to render_template(:reassign)
       expect(assigns(:bike_stickers).pluck(:id)).to match_array([bike_sticker1.id])
       expect(assigns(:valid_selection)).to be_falsey
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       get "#{base_url}/reassign", params: {search_first_sticker: bike_sticker1.code,
                                            search_last_sticker: bike_sticker1.code,
                                            search_bike_sticker_batch_id: bike_sticker_batch.id,
                                            organization_id: organization.id,
                                            reassign_now: true}
-      expect(AdminReassignBikeStickerCodesWorker.jobs.count).to eq 0
+      expect(AdminReassignBikeStickerCodesJob.jobs.count).to eq 0
     end
     context "valid update" do
       let!(:bike_stickers) { bike_sticker_batch.create_codes(4, initial_code_integer: 22122) }
@@ -160,12 +160,12 @@ RSpec.describe Admin::BikeStickersController, type: :request do
         expect(response).to render_template(:reassign)
         expect(assigns(:bike_stickers).count).to eq 3
         expect(assigns(:valid_selection)).to be_truthy
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         get "#{base_url}/reassign", params: selection_params.merge(reassign_now: true)
-        expect(AdminReassignBikeStickerCodesWorker.jobs.count).to eq 1
+        expect(AdminReassignBikeStickerCodesJob.jobs.count).to eq 1
         expect(BikeStickerUpdate.count).to eq 0
         expect(flash[:success]).to be_present
-        AdminReassignBikeStickerCodesWorker.drain
+        AdminReassignBikeStickerCodesJob.drain
         expect(BikeStickerUpdate.count).to eq 3
         target_update_attrs = {
           organization_id: organization.id,

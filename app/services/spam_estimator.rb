@@ -5,9 +5,11 @@ class SpamEstimator
     def estimate_bike(bike, stolen_record = nil)
       estimate = 0
       return estimate if bike.blank?
+
       estimate += 35 if bike.creation_organization&.spam_registrations
       estimate += 0.2 * string_spaminess(bike.frame_model)
       estimate += 0.4 * string_spaminess(bike.manufacturer_other)
+      estimate += domain_estimate(bike.owner_email)
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
 
       within_bounds(estimate)
@@ -17,8 +19,10 @@ class SpamEstimator
     # Currently, doing a weird vowel count thing
     def string_spaminess(str)
       return 0 if str.blank?
+
       str_length ||= str.length.to_f
       return 10 if str_length == 1
+
       str_downlate ||= downcase_transliterate(str)
 
       total = vowel_frequency_suspiciousness(str, str_length, str_downlate) +
@@ -31,9 +35,21 @@ class SpamEstimator
 
     private
 
+    def domain_estimate(email)
+      return 0 unless EmailDomain::VERIFICATION_ENABLED
+
+      email_domain = EmailDomain.find_or_create_for(email)
+
+      return 0 if email_domain.blank? || email_domain.permitted?
+
+      # If it's banned, it's spam - otherwise increase spam likelihood (pending_ban)
+      email_domain.banned? ? 100 : 40
+    end
+
     def estimate_stolen_record(stolen_record)
       estimate = 0
       return 0 if stolen_record.blank?
+
       estimate += string_spaminess(stolen_record.theft_description)
       if stolen_record.street.present?
         street_letters = stolen_record.street.gsub(/[^a-z|\s]/, "") # Ignore non letter things from street
@@ -52,9 +68,9 @@ class SpamEstimator
       susness = if str_length < 6
         [0, 100].include?(vowel_percent) ? 40 : 0
       elsif vowel_percent < 5
-        str_length < 11 ? 80 : 100
+        (str_length < 11) ? 80 : 100
       elsif vowel_percent < 20
-        offset = vowel_percent > 12 ? 90 : 120
+        offset = (vowel_percent > 12) ? 90 : 120
         if str_length < 9
           offset -= 50
         elsif str_length < 14
@@ -126,21 +142,20 @@ class SpamEstimator
 
       spaces_count = str.count(" -")
       if str_length < 20
-        return spaces_count < 1 ? 10 : 0
+        return (spaces_count < 1) ? 10 : 0
       end
 
       target_space_count = (str_length / 12).floor
       return 0 if spaces_count >= target_space_count
 
-      multiplier = str_length < 31 ? 40 : 60
+      multiplier = (str_length < 31) ? 40 : 60
       susness = (target_space_count - spaces_count) * multiplier
 
       within_bounds(susness)
     end
 
     def within_bounds(num)
-      return 0 if num < 0
-      num < 100 ? num : 100
+      num.clamp(0, 100)
     end
 
     def downcase_transliterate(str)

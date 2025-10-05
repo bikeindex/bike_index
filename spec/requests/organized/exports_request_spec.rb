@@ -28,7 +28,7 @@ RSpec.describe Organized::ExportsController, type: :request do
     end
 
     context "logged in as super admin" do
-      let(:current_user) { FactoryBot.create(:admin) }
+      let(:current_user) { FactoryBot.create(:superuser) }
       describe "index" do
         it "renders" do
           expect(current_user.member_of?(current_organization, no_superuser_override: true)).to be_falsey
@@ -43,11 +43,11 @@ RSpec.describe Organized::ExportsController, type: :request do
   context "organization with csv_exports" do
     let(:enabled_feature_slugs) { ["csv_exports"] }
     let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization) }
 
     describe "index" do
       it "renders" do
-        expect(current_user.memberships.first.role).to eq "member"
+        expect(current_user.organization_roles.first.role).to eq "member"
         expect(export).to be_present # So that we're actually rendering an export
         current_organization.reload
         expect(current_organization.enabled?("csv_exports")).to be_truthy
@@ -70,9 +70,8 @@ RSpec.describe Organized::ExportsController, type: :request do
         let(:export) { FactoryBot.create(:export_organization) }
         it "404s" do
           expect(export.organization.id).to_not eq current_organization.id
-          expect {
-            get "#{base_url}/#{export.id}"
-          }.to raise_error(ActiveRecord::RecordNotFound)
+          get "#{base_url}/#{export.id}"
+          expect(response.status).to eq 404
         end
       end
       context "avery_export" do
@@ -101,6 +100,28 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
+        end
+      end
+      context "passed properties" do
+        let(:export_properties) do
+          {
+            kind: "organization",
+            organization_id: current_organization.id,
+            custom_bike_ids: "123_12_44444",
+            only_custom_bike_ids: true,
+            headers: %w[link registered_at manufacturer model color serial is_stolen],
+            user_id: current_user.id
+          }
+        end
+        it "renders with those options" do
+          get "#{base_url}/new?#{export_properties.to_query}"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:new)
+          expect(flash).to_not be_present
+          export = assigns(:export)
+          expect(export.headers).to eq(%w[link registered_at manufacturer model color serial is_stolen])
+          expect(export.only_custom_bike_ids).to be_truthy
+          expect(export.custom_bike_ids).to eq([123, 12, 44444])
         end
       end
     end
@@ -171,7 +192,7 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(export.start_at.to_i).to be_within(1).of start_at
         expect(export.end_at).to_not be_present
         expect(export.options["partial_registrations"]).to be_falsey
-        expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+        expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
       end
       context "with partial export" do
         let(:enabled_feature_slugs) { %w[csv_exports show_partial_registrations] }
@@ -193,7 +214,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(export.options["partial_registrations"]).to eq "only"
           expect(export.partial_registrations).to eq "only"
           expect(export.assign_bike_codes).to be_falsey
-          expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+          expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
         end
         context "with include_full_registrations" do
           it "creates with both" do
@@ -213,7 +234,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.start_at.to_i).to be_within(1).of start_at
             expect(export.end_at).to_not be_present
             expect(export.options["partial_registrations"]).to be_truthy
-            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+            expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end
         end
         context "with assign_bike_codes" do
@@ -235,7 +256,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.end_at).to_not be_present
             expect(export.partial_registrations).to be_falsey
             expect(export.assign_bike_codes?).to be_truthy
-            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+            expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end
         end
       end
@@ -269,7 +290,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(export.end_at.to_i).to be_within(1).of start_at + 2.days.to_i
           expect(export.bike_code_start).to be_nil
           expect(export.options["partial_registrations"]).to be_falsey # Both were false, so it defaults to just full
-          expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+          expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           expect(export.avery_export?).to be_falsey
           expect(export.custom_bike_ids).to eq([1222, 999])
         end
@@ -298,7 +319,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.start_at.to_i).to be_within(1).of 1535173200
             expect(export.end_at.to_i).to be_within(1).of 1538283600 # Explicitly testing this in TimeParser
             expect(export.assign_bike_codes?).to be_falsey
-            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+            expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end
         end
         context "avery export" do
@@ -322,7 +343,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.end_at.to_i).to be_within(1).of end_at
             expect(export.options["partial_registrations"]).to be_falsey # Avery exports can't include partials
             expect(export.bike_code_start).to eq "A221"
-            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+            expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end
           context "avery export with already assigned bike_sticker" do
             let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, code: "a0221") }

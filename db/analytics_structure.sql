@@ -1,3 +1,7 @@
+
+-- Dumped from database version 17.6 (Homebrew)
+-- Dumped by pg_dump version 17.6 (Homebrew)
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -47,7 +51,14 @@ CREATE TABLE public.logged_searches (
     user_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    serial_normalized character varying
+    serial_normalized character varying,
+    street character varying,
+    neighborhood character varying,
+    city character varying,
+    zipcode character varying,
+    country_id bigint,
+    state_id bigint,
+    processed boolean DEFAULT false
 );
 
 
@@ -162,6 +173,13 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: index_logged_searches_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_logged_searches_on_country_id ON public.logged_searches USING btree (country_id);
+
+
+--
 -- Name: index_logged_searches_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -173,6 +191,13 @@ CREATE INDEX index_logged_searches_on_organization_id ON public.logged_searches 
 --
 
 CREATE INDEX index_logged_searches_on_request_id ON public.logged_searches USING btree (request_id);
+
+
+--
+-- Name: index_logged_searches_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_logged_searches_on_state_id ON public.logged_searches USING btree (state_id);
 
 
 --
@@ -193,12 +218,13 @@ CREATE INDEX index_organization_statuses_on_organization_id ON public.organizati
 -- PostgreSQL database dump complete
 --
 
+
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20231025160704'),
-('20231027162602'),
+('20240702144929'),
+('20231209193453'),
 ('20231027173606'),
-('20231209193453');
-
+('20231027162602'),
+('20231025160704');
 

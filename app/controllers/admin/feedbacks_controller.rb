@@ -1,12 +1,11 @@
 class Admin::FeedbacksController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 50
-    @feedbacks = available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
-      .page(page).per(@per_page)
+    params[:page] || 1
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @feedbacks = pagy(available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}"),
+      limit: @per_page, page: permitted_page)
     @render_kind_counts = InputNormalizer.boolean(params[:search_kind_counts])
   end
 
@@ -33,7 +32,7 @@ class Admin::FeedbacksController < Admin::BaseController
     feedbacks = Feedback
     if params[:search_kind].present? && permitted_kinds.include?(params[:search_kind])
       @search_kind = params[:search_kind]
-      feedbacks = feedbacks.send(@search_kind) unless @search_kind == "all"
+      feedbacks = feedbacks.public_send(@search_kind) unless @search_kind == "all"
     else
       @search_kind = "all"
     end

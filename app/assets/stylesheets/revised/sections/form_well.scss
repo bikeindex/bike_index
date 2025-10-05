@@ -109,6 +109,7 @@
   // *Matched by the padding on the new bike electric checks*
   .form-well-input-checks {
     padding-left: 19px;
+    line-height: 1.5;
   }
 
   .related-fields {
@@ -158,12 +159,12 @@
   }
 
   .full-width-button {
-    padding: (2 * $vertical-height) 0;
+    padding: (2 * $vertical-height) $grid-gutter-width;
 
     .btn {
       display: block;
       margin: 0 auto;
-      max-width: 450px;
+      max-width: 100%;
     }
   }
 
@@ -185,7 +186,8 @@
 // XS screens
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .form-well {
-    .form-well-input {
+    .form-well-input,
+    .form-well-input-static {
       @include make-col(8);
     }
 

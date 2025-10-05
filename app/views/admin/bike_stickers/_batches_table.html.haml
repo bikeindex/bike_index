@@ -42,16 +42,16 @@
               = link_to bike_sticker_batch.organization.name, admin_bike_stickers_path(organization_id: bike_sticker_batch.organization_id)
           - if matching_count
             %td
-              = admin_number_display(@bike_stickers.where(bike_sticker_batch_id: bike_sticker_batch.id).count)
+              = number_display(@bike_stickers.where(bike_sticker_batch_id: bike_sticker_batch.id).count)
           %td
-            %small= admin_number_display(bike_sticker_batch.bike_stickers.count)
+            %small= number_display(bike_sticker_batch.bike_stickers.count)
           %td
-            %small= admin_number_display(bike_sticker_batch.bike_stickers.claimed.count)
+            %small= number_display(bike_sticker_batch.bike_stickers.claimed.count)
           %td
             %small= bike_sticker_batch.prefix
           %td
-            %small= admin_number_display(bike_sticker_batch.min_code_integer)
+            %small= number_display(bike_sticker_batch.min_code_integer)
           %td
-            %small= admin_number_display(bike_sticker_batch.max_code_integer)
+            %small= number_display(bike_sticker_batch.max_code_integer)
           %td
             %small= bike_sticker_batch.notes

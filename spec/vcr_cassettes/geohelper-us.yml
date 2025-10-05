@@ -1,0 +1,73 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=United%20States&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Thu, 03 Jul 2025 16:54:21 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:228:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=msaifdggmnwc:228:0
+      Report-To:
+      - '{"group":"msaifdggmnwc:228:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:228:0"}],}'
+      Server:
+      - mafe
+      Content-Length:
+      - '1429'
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=49
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "{\n   \"results\" : \n   [\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"United States\",\n
+        \              \"short_name\" : \"US\",\n               \"types\" : \n               [\n
+        \                 \"country\",\n                  \"political\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"United States\",\n
+        \        \"geometry\" : \n         {\n            \"bounds\" : \n            {\n
+        \              \"northeast\" : \n               {\n                  \"lat\"
+        : 74.071038,\n                  \"lng\" : -66.885417\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 18.7763,\n                  \"lng\" : 166.9999999\n               }\n            },\n
+        \           \"location\" : \n            {\n               \"lat\" : 38.7945952,\n
+        \              \"lng\" : -106.5348379\n            },\n            \"location_type\"
+        : \"APPROXIMATE\",\n            \"viewport\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 72.70871579999999,\n                  \"lng\"
+        : -66.3193754\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 15.7760139,\n                  \"lng\" : -173.2992296\n
+        \              }\n            }\n         },\n         \"place_id\" : \"ChIJCzYy5IS16lQRQrfeQ5K5Oxw\",\n
+        \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+  recorded_at: Thu, 03 Jul 2025 16:54:21 GMT
+recorded_with: VCR 6.3.1

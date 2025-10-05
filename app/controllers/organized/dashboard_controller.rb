@@ -2,6 +2,9 @@ module Organized
   class DashboardController < Organized::BaseController
     before_action :set_fallback_period
     before_action :set_period, only: [:index]
+
+    skip_before_action :ensure_not_ambassador_organization!, only: [:root]
+
     helper_method :bikes_for_graph
 
     def root
@@ -43,6 +46,7 @@ module Organized
       @child_organizations = current_organization.child_organizations
       @bikes_in_organizations = Bike.unscoped.current.organization(current_organization.nearby_and_partner_organization_ids).where(created_at: @time_range)
       @bikes_in_organization_count = current_organization.bikes.where(created_at: @time_range).count
+      @bikes_ever_registered_count = current_organization.bikes_ever_registered.where(created_at: @time_range).count
 
       if current_organization.regional?
         @bikes_not_in_organizations = current_organization.nearby_bikes.where.not(id: @bikes_in_organizations.pluck(:id)).where(created_at: @time_range)

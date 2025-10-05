@@ -24,11 +24,13 @@
       %li.nav-item
         = link_to "serial", url_for(sortable_search_params.merge(search_serial: !@serial)), class: "nav-link #{@serial ? 'active' : ''}"
       %li.nav-item
+        = link_to "location", url_for(sortable_search_params.merge(search_with_location: !@with_location)), class: "nav-link #{@with_location ? 'active' : ''}"
+      %li.nav-item
         = link_to "include query", url_for(sortable_search_params.merge(search_includes_query: !@includes_query)), class: "nav-link #{@includes_query ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Logged Searches"}
+  = render partial: "/shared/admin/current_header", locals: {viewing: "Logged Searches"}
 
 - if @render_chart
   - if @endpoint.present?
@@ -60,7 +62,7 @@
     %code= params[:search_ip_address]
     = link_to "view from any ip address", url_for(sortable_search_params.merge(search_ip_address: nil)), class: "gray-link small"
 
-= render partial: "/shared/pagination", locals: {collection: @logged_searches}
+= render partial: "/shared/admin/pagination", locals: {collection: @logged_searches, count: matching_logged_searches.size}
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -74,6 +76,8 @@
         = sortable "endpoint"
       %th
         = sortable "ip_address"
+      %th
+        %small= sortable "city", "IP Location"
       %th
         Query
       %th
@@ -106,6 +110,8 @@
           %td
             %code.small= logged_search.ip_address
             = link_to search_emoji, url_for(sortable_search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link small"
+          %td
+            %small= logged_search.address(country: [:name, :skip_default])
           %td.data-cell.only-data.small
             .wrapper{style: "position: relative"}
               - if logged_search.query_items.present?
@@ -119,19 +125,17 @@
                   = logged_search.log_line
           %td
             - if logged_search.organization_id.present?
-              = link_to logged_search.organization&.short_name, admin_organization_path(logged_search.organization_id), class: "text-link"
+              = link_to logged_search.organization&.short_name || "##{logged_search.organization_id}", admin_organization_path(logged_search.organization_id), class: "text-link"
               = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id)), class: "display-sortable-link small"
           %td
             - if logged_search.user_id.present?
-              %a{href: admin_user_path(logged_search.user_id)}
-                = logged_search.user_id
-              = link_to search_emoji, url_for(sortable_search_params.merge(user_id: logged_search.user_id)), class: "display-sortable-link small"
-              -# = render partial: "/shared/admin_user_cell", locals: {user: logged_search.user, render_search: true, cache: true}
+              = render partial: "/shared/admin/user_cell", locals: {user: logged_search.user, render_search: true, cache: true, user_id: logged_search.user_id}
+
           %td
             - unless logged_search.stolenness_all?
               %small= logged_search.stolenness
           %td.small
-            = admin_number_display(logged_search.page)
+            = number_display(logged_search.page)
           - if sort_column == "serial_normalized"
             %td.small
               - if logged_search.serial_normalized.present?
@@ -139,7 +143,7 @@
           %td
             - if logged_search.duration_ms.present?
               %span{title: "#{logged_search.duration_ms} ms"}
-                = admin_number_display((logged_search.duration_ms * 0.001).round(2))
+                = number_display((logged_search.duration_ms * 0.001).round(2))
 
 
-= render partial: "/shared/pagination", locals: {collection: @logged_searches, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @logged_searches, skip_total: true}

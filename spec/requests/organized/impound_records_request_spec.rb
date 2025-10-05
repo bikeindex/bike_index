@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::ImpoundRecordsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/impound_records" }
-  include_context :request_spec_logged_in_as_organization_member
+  include_context :request_spec_logged_in_as_organization_user
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:bike) { FactoryBot.create(:bike, owner_email: "someemail@things.com", created_at: Time.current - 4.hours) }
@@ -27,13 +27,13 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         current_organization.fetch_impound_configuration
         current_organization.reload.impound_configuration.update(expiration_period_days: 55)
         [impound_record2, impound_record_retrieved, impound_record_unorganized].each do |ir|
-          ProcessImpoundUpdatesWorker.new.perform(ir.id)
+          ProcessImpoundUpdatesJob.new.perform(ir.id)
         end
         # Test that impound_record.active.bikes scopes correctly
         expect(current_organization.impound_records.active.pluck(:id)).to eq([impound_record2.id])
         expect(current_organization.impound_records.active.bikes.pluck(:id)).to eq([bike2.id])
         expect(impound_record).to be_present
-        ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
         expect(current_organization.impound_records.bikes.count).to eq 2
         get base_url
         expect(response.status).to eq(200)
@@ -94,9 +94,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     end
     context "not found" do
       it "raises" do
-        expect {
-          get "#{base_url}/2812912"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/2812912"
+        expect(response.status).to eq 404
       end
     end
   end
@@ -107,9 +106,9 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
     let!(:ownership_original) { FactoryBot.create(:ownership, bike: bike) }
     before do
       expect(impound_record).to be_present
-      ProcessImpoundUpdatesWorker.new.perform(impound_record.id)
+      ProcessImpoundUpdatesJob.new.perform(impound_record.id)
       ActionMailer::Base.deliveries = []
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline!
     end
     after { Sidekiq::Testing.fake! }
@@ -211,7 +210,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(bike.current_ownership.impound_record).to eq impound_record
         expect(bike.current_ownership.organization).to eq current_organization
         expect(bike.current_ownership.owner_email).to eq "a@b.c"
-        expect(bike.current_ownership.first?).to be_falsey
+        expect(bike.current_ownership.initial?).to be_falsey
         expect(bike.current_ownership.new_registration?).to be_truthy
       end
       context "without a transfer_email" do
@@ -275,7 +274,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           user: current_user,
           kind: "impound_notification")
         # Process parking_notification in the actual code path that creates the impound record
-        ProcessParkingNotificationWorker.new.perform(pn.id)
+        ProcessParkingNotificationJob.new.perform(pn.id)
         pn.reload
         pn
       end
@@ -363,6 +362,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
           end
           let!(:impound_record_update_approved) { impound_record.impound_record_updates.create(user: current_user, kind: "claim_approved", impound_claim: impound_claim) }
           it "marks retrieved by owner" do
+            expect(EmailDomain::VERIFICATION_ENABLED).to be_falsey
             expect(impound_record_update_approved).to be_valid
             expect(MailchimpDatum.count).to eq 0
             impound_claim.reload

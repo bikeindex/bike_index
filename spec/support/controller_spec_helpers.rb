@@ -3,6 +3,7 @@
 module ControllerSpecHelpers
   def set_current_user(user)
     return unless user.present?
+
     cookies.signed[:auth] =
       {secure: true, httponly: true, value: [user.id, user.auth_token]}
   end
@@ -13,7 +14,7 @@ module ControllerSpecHelpers
   end
 
   RSpec.shared_context :logged_in_as_superuser do
-    let(:user) { FactoryBot.create(:admin) }
+    let(:user) { FactoryBot.create(:superuser) }
     before { set_current_user(user) }
   end
 
@@ -25,8 +26,8 @@ module ControllerSpecHelpers
     end
   end
 
-  RSpec.shared_context :logged_in_as_organization_member do
-    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+  RSpec.shared_context :logged_in_as_organization_user do
+    let(:user) { FactoryBot.create(:organization_user, organization: organization) }
     let(:organization) { FactoryBot.create(:organization) }
     before :each do
       set_current_user(user)

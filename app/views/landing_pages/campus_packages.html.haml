@@ -3,28 +3,26 @@
 :ruby
   plans = {
     free: { cost: 0 },
-    supporting: { cost: 299 },
     bronze: { cost: 1999 },
     silver: { cost: 5999, popular: true },
     gold: { cost: 8999 },
   }
   plan_sizes = plans.keys
   plan_features = [
-    { free: true, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.create_organization_account") },
-    { free: true, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.embed_registration_form") },
-    { free: false, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.search_bikes_organization") },
-    { free: false, supporting: true, bronze: true, silver: true, gold: true, title: t("plan_features.import_registrations_from_previous") },
-    { free: false, supporting: false, bronze: true, silver: true, gold: true, title: t("plan_features.campus_bike_management_suite") },
-    { free: false, supporting: false, bronze: true, silver: true, gold: true, title: t("plan_features.qr_sticker_scanning_and_messaging") },
-    { free: "3", supporting: "3", bronze: "10", silver: "20", gold: "unlimited", title: t("plan_features.staff_accounts") },
-    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.school_landing_page") },
-    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.priority_programming_support") },
-    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.contact_unfinished_registrants") },
-    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.graduated_bikes") },
-    { free: false, supporting: false, bronze: false, silver: true, gold: true, title: t("plan_features.customize_emails") },
-    { free: false, supporting: false, bronze: false, silver: false, gold: true, title: t("plan_features.custom_form_fields") },
-    { free: false, supporting: false, bronze: false, silver: false, gold: true, title: t("plan_features.export_custom_data") },
-    { free: false, supporting: false, bronze: false, silver: false, gold: true, title: t("plan_features.mailing_stickers") },
+    { free: true, bronze: true, silver: true, gold: true, title: t("plan_features.create_organization_account") },
+    { free: true, bronze: true, silver: true, gold: true, title: t("plan_features.embed_registration_form") },
+    { free: false, bronze: true, silver: true, gold: true, title: t("plan_features.search_bikes_organization") },
+    { free: false, bronze: true, silver: true, gold: true, title: t("plan_features.import_registrations_from_previous") },
+    { free: false, bronze: true, silver: true, gold: true, title: t("plan_features.campus_bike_management_suite") },
+    { free: false, bronze: true, silver: true, gold: true, title: t("plan_features.qr_sticker_scanning_and_messaging") },
+    { free: "3", bronze: "10", silver: "20", gold: "unlimited", title: t("plan_features.staff_accounts") },
+    { free: false, bronze: false, silver: true, gold: true, title: t("plan_features.school_landing_page") },
+    { free: false, bronze: false, silver: true, gold: true, title: t("plan_features.priority_programming_support") },
+    { free: false, bronze: false, silver: true, gold: true, title: t("plan_features.contact_unfinished_registrants") },
+    { free: false, bronze: false, silver: true, gold: true, title: t("plan_features.graduated_bikes") },
+    { free: false, bronze: false, silver: true, gold: true, title: t("plan_features.customize_emails") },
+    { free: false, bronze: false, silver: false, gold: true, title: t("plan_features.custom_form_fields") },
+    { free: false, bronze: false, silver: false, gold: true, title: t("plan_features.export_custom_data") },
   ]
 
 .signup-landing-page.signup-landing-page-packages.signup-landing-page-campus-packages

@@ -1,0 +1,107 @@
+%h1
+  Editing Membership
+  %small.less-strong
+    - if @membership.admin_managed?
+      admin managed
+    - else
+      stripe managed
+  - if @membership.stripe_managed?
+    = link_to "Update from Stripe", admin_membership_path(id: @membership.id, update_from_stripe: true), method: :patch, action: :update, class: "btn btn-sm btn-success float-right"
+
+.row.mt-4
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            User
+          %td
+            = render partial: "/shared/admin/user_cell", locals: {user: @membership.user, user_id: @membership.user_id}
+        %tr.small
+          %td
+            Created
+          %td
+            %span.convertTime.preciseTime
+              = l @membership.created_at, format: :convert_time
+        %tr.small
+          %td
+            Updated
+          %td
+            %span.convertTime.preciseTime
+              = l @membership.updated_at, format: :convert_time
+        %tr
+          %td
+            level
+          %td
+            = @membership.level_humanized
+        %tr
+          %td Referral source
+          %td
+            - if @membership.referral_source.present?
+              %code.small= @membership.referral_source
+              - if display_dev_info?
+                -# There shouldn't be multiple different sources! Show them if there are.
+                - referral_sources = (@membership.stripe_subscriptions.distinct.pluck(:referral_source) + @membership.payments.distinct.pluck(:referral_source)).compact.uniq
+                - if referral_sources.count > 1
+                  %span.only-dev-visible multiple different sources!
+                  %small= referral_sources.join(",")
+
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Status
+          %td
+            = @membership.status_humanized
+        %tr
+          %td
+            Start
+          %td
+            - if @membership.start_at.present?
+              %span.convertTime.preciseTime
+                = l @membership.start_at, format: :convert_time
+        %tr
+          %td
+            End
+          %td
+            - if @membership.end_at.present?
+              %span.convertTime.preciseTime
+                = l @membership.end_at, format: :convert_time
+        %tr
+          - if @membership.admin_managed?
+            %td Creator
+            %td
+              - if @membership.creator_id.present?
+                %em Admin:
+                = render partial: "/shared/admin/user_cell", locals: {user: @membership.creator, user_id: @membership.creator_id}
+          - else
+            %td Stripe
+            %td
+              - if @membership.stripe_id.present?
+                = link_to @membership.stripe_id.truncate(20), @membership.stripe_admin_url, title: @membership.stripe_id
+              - else
+                %span.text-danger MISSING STRIPE ID!
+                %small.less-strong This is a problem, tell Seth!
+
+- if @membership.admin_managed? && @membership.active?
+  .row.mt-5
+    .col-md-4
+      = render partial: "form"
+
+.container
+  %h4.pt-4.pb-2
+    Payments
+    %small
+      = link_to number_display(@payments.count), admin_payments_path(user_id: @membership.user_id, period: "all")
+      - if @payments.count > 25
+        %em (only first 25 shown)
+- if @payments.any?
+  = render partial: "/admin/payments/table", locals: {payments: @payments.limit(25), skip_user: true, render_method: true}
+
+
+- if display_dev_info?
+  .container
+    %h4.pt-4.pb-2
+      %span.only-dev-visible Stripe Subscriptions
+  = render(partial: "/admin/stripe_subscriptions/table", locals: {collection: @stripe_subscriptions, render_sortable: false})

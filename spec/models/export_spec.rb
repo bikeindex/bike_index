@@ -112,10 +112,15 @@ RSpec.describe Export, type: :model do
     it "assigns the bike ids" do
       bike1.reload
       expect(bike1.created_at).to be < export.end_at
-      export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}?organization_id=#{organization.slug}  "
+      export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}?organization_id=#{organization.slug}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}?organization_id=#{organization.slug}  "
       export.assign_exported_bike_ids
       expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(export.exported_bike_ids).to match_array([bike1.id, bike2.id])
+      # Using _ separator: bikes search > export separator
+      export.custom_bike_ids = "#{bike1.id}_#{bike3.id}_#{bike2.id}"
+      expect(export.custom_bike_ids).to eq([bike1.id, bike3.id, bike2.id])
+      export.assign_exported_bike_ids
       expect(export.exported_bike_ids).to match_array([bike1.id, bike2.id])
       # only_custom_bike_ids
       export.only_custom_bike_ids = true
@@ -186,7 +191,7 @@ RSpec.describe Export, type: :model do
   end
 
   describe "bikes_scoped" do
-    # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
+    # Pending - we're getting the organization scopes up and running before migrating existing Spreadsheets::TsvCreator tasks
     # But we eventually want to add stolen tsv's into here
     # context "stolen" do
     #   it "matches existing tsv scopes"
@@ -213,7 +218,7 @@ RSpec.describe Export, type: :model do
     let(:additional_headers) { %w[address bike_sticker organization_affiliation phone student_id] }
     let(:all_headers) { permitted_headers + additional_headers }
     it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 13
+      expect(permitted_headers.count).to eq 15
       expect(Export.permitted_headers).to eq permitted_headers
       expect(Export.permitted_headers("include_paid")).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
@@ -221,6 +226,15 @@ RSpec.describe Export, type: :model do
       expect(Export.permitted_headers(organization_reg_phone)).to eq(permitted_headers + ["phone"])
       expect(organization_full.additional_registration_fields.map { |s| s.gsub("reg_", "") }).to eq additional_headers
       expect(Export.permitted_headers(organization_full)).to eq all_headers
+    end
+    context "with impounded and partial" do
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes show_partial_registrations]) }
+      it "returns the array we expect" do
+        expect(permitted_headers.count).to eq 15
+        expect(Export.permitted_headers).to eq permitted_headers
+        expect(Export.permitted_headers("include_paid")).to match_array all_headers
+        expect(Export.permitted_headers(organization)).to match_array(permitted_headers + %w[is_impounded partial_registration])
+      end
     end
     context "with bike_stickers from regional organization" do
       let!(:organization_in_region) { FactoryBot.create(:organization, :in_nyc) }

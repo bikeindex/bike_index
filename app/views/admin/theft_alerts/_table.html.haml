@@ -22,6 +22,7 @@
           = sortable "end_at", render_sortable: render_sortable
         - if display_dev_info?
           %th.only-dev-visible.small FB updated
+          %th.only-dev-visible.small FB objective
         %th
           = sortable "reach", render_sortable: render_sortable
         %th.small Clicks
@@ -60,12 +61,9 @@
 
           - unless skip_bike
             %td
-              - if theft_alert.bike.present?
-                = link_to theft_alert.bike.title_string, edit_admin_bike_path(theft_alert.bike)
+              = render partial: "/shared/admin/bike_cell", locals: {bike: theft_alert.bike, bike_id: theft_alert.bike_id, bike_link_path: edit_admin_bike_path(theft_alert.bike_id)}
           %td
-            - if theft_alert.admin
-              %small.text-info admin:
-            = link_to theft_alert.user.display_name, edit_admin_user_path(theft_alert.user.to_param)
+            = render partial: "/shared/admin/user_cell", locals: {user: theft_alert.user, render_search: true, cache: true, user_id: theft_alert.user_id}
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
             %small
@@ -84,10 +82,14 @@
             %td
               - if theft_alert.facebook_updated_at.present?
                 %small.convertTime= l theft_alert.facebook_updated_at, format: :convert_time
+            %td
+              - if theft_alert.objective_adset.present?
+                %small{title: "Campaign: #{theft_alert.objective_campaign}\nAdset: #{theft_alert.objective_adset}\n"}
+                  = theft_alert.objective_campaign.humanize.downcase.gsub("outcome", "").strip
           %td
-            = admin_number_display(theft_alert.reach)
+            = number_display(theft_alert.reach)
           %td
-            %small= admin_number_display(theft_alert.engagement&.dig("unique_clicks"))
+            %small= number_display(theft_alert.engagement&.dig("unique_clicks"))
           %td
             = theft_alert.city
             - if theft_alert.state.present?

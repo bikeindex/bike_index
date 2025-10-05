@@ -1,9 +1,13 @@
+- show_error_column = InputNormalizer.boolean(params[:search_show_error])
+
 .admin-subnav
   .col-md-5
     %h1
       Notifications
   .col-md-7
     %ul
+      %li.nav-item
+        = link_to "show errors", url_for(sortable_search_params.merge(search_show_error: !show_error_column)), class: "nav-link #{show_error_column ? 'active' : ''}"
       %li.nav-item.dropdown
         %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@kind != "all" ? "active" : "")}
           #{@kind.titleize} #{(special_kind_scopes + ["all"]).include?(@kind) ? "kinds" : ""}
@@ -23,7 +27,7 @@
         = link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Notifications"}
+  = render partial: "/shared/admin/current_header", locals: {viewing: "Notifications"}
 
 
 -# Only render stacked kinds if rendering type counts
@@ -65,14 +69,14 @@
                     %div{style: "width: 1em; height: 1em; background: #{color}; float: right; margin-left: 0.4rem;"}
                     = link_to Notification.kind_humanized(kind).titleize, url_for(sortable_search_params.merge(search_kind: kind))
                   %td
-                    = admin_number_display(count)
+                    = number_display(count)
               - nil_count = matching_notifications.where(kind: nil).count
               - if nil_count > 0
                 %tr
                   %td
                     Nil
                   %td
-                    = admin_number_display(nil_count)
+                    = number_display(nil_count)
 
 = render partial: "/shared/period_select"
 
@@ -86,8 +90,8 @@
         = text_field_tag :query, params[:query], placeholder: "Search email/phone", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render partial: "/shared/pagination", locals: {collection: @notifications, count: matching_notifications.count}
+= render partial: "/shared/admin/pagination", locals: {collection: @notifications, count: matching_notifications.count}
 
-= render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true}
+= render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true, skip_error: !show_error_column}
 
-= render partial: "/shared/pagination", locals: {collection: @notifications, count: matching_notifications.count, skip_total: true}
+= render partial: "/shared/admin/pagination", locals: {collection: @notifications, count: matching_notifications.count, skip_total: true}

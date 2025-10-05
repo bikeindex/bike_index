@@ -23,17 +23,27 @@ Bundler.require(*Rails.groups)
 module Bikeindex
   class Application < Rails::Application
     config.redis_default_url = ENV["REDIS_URL"]
-    config.redis_cache_url = ENV["REDIS_CACHE_URL"]
+    # If in test, add the TEST_ENV_NUMBER to the redis
+    if config.redis_default_url.blank? && Rails.env.test? && ENV["TEST_ENV_NUMBER"].present?
+      config.redis_default_url = "redis://localhost:6379/#{ENV["TEST_ENV_NUMBER"]&.to_i || 0}"
+    end
+    config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
 
-    config.load_defaults 6.1
+    config.load_defaults 8.0
+
+    # directly using Sidekiq is preferred, but some things (e.g. active_storage) use active job
+    config.active_job.queue_adapter = :sidekiq
+    config.active_job.default_queue_name = :low_priority
 
     # Use our custom error pages
     config.exceptions_app = routes
 
-    # Configure sensitive parameters which will be filtered from the log file.
-    Rails.application.config.filter_parameters += [:password, :file]
-
     config.time_zone = "Central Time (US & Canada)"
+
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w[assets tasks rails])
 
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql
@@ -43,11 +53,13 @@ module Bikeindex
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
+    config.i18n.load_path += Dir[Rails.root.join("app", "components", "**", "*.{yml}").to_s]
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
-    config.i18n.available_locales = %i[en nl nb es]
+    config.i18n.available_locales = %i[en es it nl nb]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
+    config.middleware.insert 0, Rack::UTF8Sanitizer
     config.middleware.use Rack::Throttle::Minute,
       max: ENV["MIN_MAX_RATE"].to_i,
       cache: Redis.new(url: config.redis_cache_url),
@@ -62,8 +74,20 @@ module Bikeindex
       Doorkeeper::AuthorizedApplicationsController.layout "doorkeeper"
     end
 
+    # Enable instrumentation for ViewComponents (used by rack-mini-profiler)
+    config.view_component.instrumentation_enabled = true
+    config.view_component.use_deprecated_instrumentation_name = false # Stop annoying deprecation message
+    # ^ remove after upgrading to ViewComponent 4
+    config.default_preview_layout = "component_preview"
+    config.view_component.preview_paths << "#{Rails.root}/app/components/"
+    # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
+    initializer "app_assets", after: "importmap.assets" do
+      Rails.application.config.assets.paths << Rails.root.join("app")
+    end
+    config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
+    config.lookbook.preview_display_options = {theme: ["light", "dark"]} # Add dynamic 'theme' display option
+
     config.generators do |g|
-      g.factory_bot "true"
       g.helper nil
       g.javascripts nil
       g.stylesheets nil

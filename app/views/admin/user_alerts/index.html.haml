@@ -31,7 +31,7 @@
         = link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: { viewing: "User Alerts" }
+  = render partial: "/shared/admin/current_header", locals: { viewing: "User Alerts" }
 
 -# Only render stacked kinds if rendering type counts
 - colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]
@@ -59,17 +59,17 @@
                     %div{style: "width: 1em; height: 1em; background: #{color}; float: right; margin-left: 0.4rem;"}
                     = link_to UserAlert.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind))
                   %td
-                    = admin_number_display(count)
+                    = number_display(count)
               - nil_count = matching_user_alerts.where(kind: nil).count
               - if nil_count > 0
                 %tr
                   %td
                     Nil
                   %td
-                    = admin_number_display(nil_count)
+                    = number_display(nil_count)
 
 = render partial: "/shared/period_select"
 
-= render partial: "/shared/pagination", locals: {collection: @user_alerts}
+= render partial: "/shared/admin/pagination", locals: {collection: @user_alerts, count: matching_user_alerts.size}
 
 = render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @user_alerts, skip_user: @user.present?}

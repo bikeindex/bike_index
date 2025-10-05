@@ -47,7 +47,7 @@
           = link_to "view not ignored bikes", url_for(sortable_params.merge(search_ignored: false)), class: "gray-link small"
       - if @total_count.present?
         %p.mt-4
-          #{admin_number_display(@total_count)} matching #{@kind}
+          #{number_display(@total_count)} matching #{@kind}
           %em
             = humanized_time_range(@time_range)
 
@@ -94,7 +94,7 @@
                     %td.text-left
                       = pos_kind.humanize
                       = link_to search_emoji, admin_bikes_path(sortable_params.merge(search_pos: pos_kind))
-                    %td.text-right= admin_number_display(matching_bikes.send(pos_kind).count)
+                    %td.text-right= number_display(matching_bikes.send(pos_kind).count)
       - elsif graph_kind == "origin"
         .col-sm-6.offset-sm-3.mt-4
           .full-screen-table
@@ -108,17 +108,17 @@
                     %td.text-left
                       = origin.humanize
                       = link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin))
-                    %td.text-right= admin_number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
+                    %td.text-right= number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
                 -# TODO: make this actually work
                 -# %tr
                 -#   %td.text-left Transferred pre-registration
-                -#   %td.text-right= admin_number_display(Ownership.transferred_pre_registration.joins(:bike).merge(matching_bikes).count)
+                -#   %td.text-right= number_display(Ownership.transferred_pre_registration.joins(:bike).merge(matching_bikes).count)
                 %tr
                   %td.text-left Stolen records
-                  %td.text-right= admin_number_display(StolenRecord.unscoped.where(created_at: @time_range).joins(:bike).merge(matching_bikes).count)
+                  %td.text-right= number_display(StolenRecord.unscoped.where(created_at: @time_range).joins(:bike).merge(matching_bikes).count)
                 %tr
                   %td.text-left Recoveries
-                  %td.text-right= admin_number_display(StolenRecord.unscoped.where(recovered_at: @time_range).joins(:bike).merge(matching_bikes).count)
+                  %td.text-right= number_display(StolenRecord.unscoped.where(recovered_at: @time_range).joins(:bike).merge(matching_bikes).count)
 
       .mt-4
       = column_chart variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: graph_kind)), stacked: true, thousands: ","
@@ -153,12 +153,4 @@
                   - if organization.present?
                     = organization.pos_kind.humanize
                 %td.text-right
-                  = admin_number_display(bike_count)
-- else
-  - if @total_count.present?
-    %p.mt-4
-      #{admin_number_display(@total_count)} matching #{@kind}
-      %em
-        = humanized_time_range(@time_range)
-  .mt-4
-  = column_chart variable_admin_graphs_path(sortable_params), thousands: ","
+                  = number_display(bike_count)

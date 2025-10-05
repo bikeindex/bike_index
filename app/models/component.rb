@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: components
+#
+#  id                 :integer          not null, primary key
+#  component_model    :string(255)
+#  ctype_other        :string(255)
+#  description        :text
+#  front              :boolean
+#  is_stock           :boolean          default(FALSE), not null
+#  manufacturer_other :string(255)
+#  mnfg_name          :string
+#  rear               :boolean
+#  serial_number      :string(255)
+#  year               :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  bike_id            :integer
+#  bike_version_id    :bigint
+#  ctype_id           :integer
+#  manufacturer_id    :integer
+#
+# Indexes
+#
+#  index_components_on_bike_id          (bike_id)
+#  index_components_on_bike_version_id  (bike_version_id)
+#  index_components_on_manufacturer_id  (manufacturer_id)
+#
 class Component < ApplicationRecord
   include ActiveModel::Dirty
 
@@ -35,6 +63,7 @@ class Component < ApplicationRecord
 
   def set_front_or_rear
     return true unless front_or_rear.present?
+
     position = front_or_rear.downcase.strip
     self.front_or_rear = ""
     if position == "both"
@@ -51,7 +80,8 @@ class Component < ApplicationRecord
 
   def component_type
     return nil unless ctype.present?
-    if ctype.name && ctype.name == "Other" && ctype_other.present?
+
+    if ctype_id == Ctype.other.id && ctype_other.present?
       ctype_other
     else
       ctype.name
@@ -64,11 +94,13 @@ class Component < ApplicationRecord
 
   def component_group
     return "Additional parts" unless ctype.present?
+
     ctype.cgroup.name
   end
 
   def set_is_stock
     return true if setting_is_stock
+
     if id.present? && is_stock && description_changed? || component_model_changed?
       self.is_stock = false
     end
@@ -77,6 +109,9 @@ class Component < ApplicationRecord
   def set_calculated_attributes
     set_front_or_rear
     set_is_stock
+    self.manufacturer_other = InputNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
+    self.ctype_other = InputNormalizer.string(ctype_other)
+    self.ctype_other = nil if ctype_other&.downcase == "other"
   end
 end

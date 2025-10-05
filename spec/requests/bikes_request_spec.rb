@@ -5,7 +5,6 @@ require "rails_helper"
 #  - bikes/show_request_spec.rb
 #  - bikes/update_request_spec.rb
 #  - bikes/edit_request_spec.rb
-#  - bikes/index_request_spec.rb
 
 RSpec.describe BikesController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
@@ -24,8 +23,10 @@ RSpec.describe BikesController, type: :request do
       expect(bike.status).to eq "status_with_owner"
       expect(bike.stolen_records.last).to be_blank
       expect(response).to render_template(:new)
+      expect(response.body).to match("<title>Register a bike!</title>")
+      expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
       # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
-      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+      expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
     context "with bike_sticker" do
       let(:organization) { FactoryBot.create(:organization) }
@@ -54,21 +55,26 @@ RSpec.describe BikesController, type: :request do
         bike = assigns(:bike)
         expect(bike.status).to eq "status_stolen"
         expect(bike.stolen_records.last).to be_present
-        expect(bike.stolen_records.last.country_id).to eq Country.united_states.id
+        expect(bike.stolen_records.last.country_id).to eq Country.united_states_id
         expect(response).to render_template(:new)
+        expect(response.body).to match("<title>Register a stolen bike</title>")
+        expect(response.body).to match('<meta name="description" content="Register a stolen bike on Bike Index quickly')
         # Make sure it renders without address fields for a stolen bikes
-        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
+        expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       end
-      it "renders a new stolen bike from status" do
-        country = FactoryBot.create(:country_canada)
-        current_user.update(country_id: country.id)
-        get "#{base_url}/new?status=stolen"
-        expect(response.code).to eq("200")
-        bike = assigns(:bike)
-        expect(bike.status_humanized).to eq "stolen"
-        expect(bike.stolen_records.last).to be_present
-        expect(bike.stolen_records.last.country_id).to eq country.id
-        expect(response).to render_template(:new)
+      context "with address in different country" do
+        let(:ownership) { FactoryBot.create(:ownership, creator: current_user) }
+        let(:current_user) { FactoryBot.create(:user, :address_in_edmonton) }
+
+        it "renders a new stolen bike from status" do
+          get "#{base_url}/new?status=stolen"
+          expect(response.code).to eq("200")
+          bike = assigns(:bike)
+          expect(bike.status_humanized).to eq "stolen"
+          expect(bike.stolen_records.last).to be_present
+          expect(bike.stolen_records.last.country_id).to eq Country.canada_id
+          expect(response).to render_template(:new)
+        end
       end
     end
     context "impounded from params" do
@@ -313,13 +319,13 @@ RSpec.describe BikesController, type: :request do
       context "abandoned as well" do
         let!(:parking_notification_abandoned) { parking_notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: creator) }
         it "recovers both" do
-          ProcessParkingNotificationWorker.new.perform(parking_notification_abandoned.id)
+          ProcessParkingNotificationJob.new.perform(parking_notification_abandoned.id)
           expect(parking_notification_abandoned.reload.status).to eq "current"
           parking_notification.reload
           expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.active?).to be_truthy
           expect(parking_notification.resolved?).to be_falsey
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
             expect(response).to redirect_to(bike_path(bike.id))
@@ -343,12 +349,12 @@ RSpec.describe BikesController, type: :request do
       context "impound notification" do
         let!(:parking_notification_impounded) { parking_notification.retrieve_or_repeat_notification!(kind: "impound_notification", user: creator) }
         it "refuses" do
-          ProcessParkingNotificationWorker.new.perform(parking_notification_impounded.id)
+          ProcessParkingNotificationJob.new.perform(parking_notification_impounded.id)
           parking_notification.reload
           expect(parking_notification.status).to eq "replaced"
           expect(parking_notification.active?).to be_falsey
           expect(bike.reload.status).to eq "status_impounded"
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
             expect(response).to redirect_to(bike_path(bike.id))
@@ -409,9 +415,8 @@ RSpec.describe BikesController, type: :request do
         get "/bikes/scanned/U01101"
         expect(response).to render_template("scanned")
         expect(assigns(:bike_sticker)&.id).to eq bike_sticker3.id
-        expect {
-          get "/bikes/scannedU01101"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "/bikes/scannedU01101"
+        expect(response.status).to eq 404
       end
     end
   end

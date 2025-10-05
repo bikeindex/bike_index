@@ -1,12 +1,13 @@
-Rails.application.configure do
-  # Verifies that versions and hashed value of the package contents in the
-  # project's package.json
-  config.webpacker.check_yarn_integrity = true
+require "active_support/core_ext/integer/time"
 
-  # In the development environment your application's code is reloaded on
-  # every request. This slows down response time but is perfect for development
+Rails.application.configure do
+  # In the development environment your application's code is reloaded any time
+  # it changes. This slows down response time but is perfect for development
   # since you don't have to restart the web server when you make code changes.
-  config.cache_classes = false
+  config.enable_reloading = true
+
+  # Enable server timing
+  config.server_timing = true
 
   # Do not eager load code on boot.
   config.eager_load = false
@@ -31,10 +32,15 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
   # Store uploaded files on the local file system (see config/storage.yml for options)
-  config.active_storage.service = :local
+  config.active_storage.service = if ENV["CLOUDFLARE_DEV"] == "true"
+    :cloudflare_dev
+  else
+    :local
+  end
 
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default_url_options = {host: "localhost", port: 3042}
+  routes.default_url_options = config.action_mailer.default_url_options
   if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
     config.action_mailer.perform_deliveries = false
     config.action_mailer.delivery_method = :smtp
@@ -45,12 +51,19 @@ Rails.application.configure do
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
+  # Raise exceptions for disallowed deprecations.
+  config.active_support.disallowed_deprecation = :raise
 
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
+  # Append comments with runtime information tags to SQL queries in logs.
+  config.active_record.query_log_tags_enabled = true
+
+  # Annotate rendered view with file names.
+  config.action_view.annotate_rendered_view_with_filenames = true
 
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large
@@ -80,7 +93,7 @@ Rails.application.configure do
       {
         remote_ip: event.payload[:ip],
         u_id: event.payload[:u_id],
-        params: event.payload[:params].except("controller", "action", "format", "id")
+        params: event.payload[:params]&.except("controller", "action", "format", "id")
       }
     end
   end
@@ -96,30 +109,10 @@ Rails.application.configure do
   # Raises error for missing translations
   config.i18n.raise_on_missing_translations = true
 
+  # Raise error when a before_action's only/except options reference missing actions.
+  config.action_controller.raise_on_missing_callback_actions = true
+
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
-
-  # Make sure we reload the API after every request!
-  @last_api_change = Time.current
-  api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/**/**/*.rb"]) { |reloader|
-    times = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| File.mtime(f) }
-    files = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| f }
-
-    Rails.logger.debug "! Change detected: reloading following files:"
-    files.each_with_index do |s, i|
-      if times[i] > @last_api_change
-        Rails.logger.debug " - #{s}"
-        load s
-      end
-    end
-
-    Rails.application.reload_routes!
-    Rails.application.routes_reloader.reload!
-    Rails.application.eager_load!
-  }
-
-  ActiveSupport::Reloader.to_prepare do
-    api_reloader.execute_if_updated
-  end
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 end

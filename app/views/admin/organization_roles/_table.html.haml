@@ -1,0 +1,61 @@
+- organization_roles ||= @organization_roles
+- skip_organization ||= false
+- render_sortable ||= false
+- render_deleted ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      %th
+        = sortable "invited_email", "recipient", render_sortable: render_sortable
+      - unless skip_organization
+        %th
+          = sortable "organization_id", render_sortable: render_sortable
+      %th
+        = sortable "claimed_at", render_sortable: render_sortable
+      %th
+        %small
+          = sortable "sender_id", "Sender", render_sortable: render_sortable
+      %th
+        %small
+          = sortable "role", "Admin?", render_sortable: render_sortable
+      - if render_deleted
+        %th
+          %small
+            = sortable "deleted_at", render_sortable: render_sortable
+
+    %tbody
+      - organization_roles.each do |organization_role|
+        %tr
+          %td
+            .less-strong-hold
+              %a.convertTime{ href: admin_organization_role_url(organization_role) }
+                = l organization_role.created_at, format: :convert_time
+              %span.less-strong-right.d-none.d-md-block
+                = organization_role.id
+          %td
+            - if organization_role.user.present?
+              = render partial: "/shared/admin/user_cell", locals: {user: organization_role.user, render_search: false, cache: true}
+            - else
+              = organization_role.invited_email
+          - unless skip_organization
+            %td
+              = render partial: "/shared/admin/organization_cell", locals: {organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?}
+          %td
+            - if organization_role.claimed_at.present?
+              %span.convertTime
+                = l organization_role.claimed_at, format: :convert_time
+          %td
+            - if organization_role.sender.present?
+              = render partial: "/shared/admin/user_cell", locals: {user: organization_role.sender, render_search: false, cache: true}
+            - else
+              = organization_role.sender_id
+          %td
+            = check_mark if organization_role.admin?
+          - if render_deleted
+            %td
+              - if organization_role.deleted_at.present?
+                %small.convertTime
+                  = l organization_role.deleted_at, format: :convert_time

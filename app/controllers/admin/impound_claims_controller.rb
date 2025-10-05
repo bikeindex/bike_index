@@ -1,14 +1,16 @@
 class Admin::ImpoundClaimsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_impound_claim, except: [:index]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 50
-    @impound_claims = matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
-      .order(sort_column + " " + sort_direction)
-      .page(page).per(@per_page)
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @impound_claims = pagy(
+      matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
+        .order(sort_column + " " + sort_direction),
+      limit: @per_page,
+      page: permitted_page
+    )
   end
 
   def show
@@ -40,7 +42,7 @@ class Admin::ImpoundClaimsController < Admin::BaseController
       impound_claims = if ImpoundClaim.statuses.include?(@search_status)
         impound_claims.where(status: @search_status)
       else
-        impound_claims.send(@search_status)
+        impound_claims.public_send(@search_status)
       end
     end
 

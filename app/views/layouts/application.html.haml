@@ -1,12 +1,15 @@
 !!!
 %html{ lang: I18n.locale }
   %head
-    = header_tags
-    = stylesheet_link_tag 'revised', media: 'all'
+    = render(HeaderTags::Component.new(**header_tags_component_options))
+    -# TODO: Cache this ^
+    = csrf_meta_tags
+    = stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload"
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    <script src="https://kit.fontawesome.com/82eb17360c.js"></script>
     = javascript_include_tag 'application_revised'
+    = javascript_importmap_tags
+    = hotwire_livereload_tags if Rails.env.development?
     :javascript
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
@@ -22,10 +25,10 @@
   %body{id: page_id, class:  body_class}
 
     -# Cache navbar to speed stuff up, on per-user, per-page
-    - cache(["main_navbar", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["main_navbar4", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       %nav.primary-header-nav
         .container
-          %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
+          %a.primary-logo{ href: user_root_url, class: "" }
             = image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home"
           = link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do
             = t(".the_nonprofit_bike_registry")
@@ -34,20 +37,23 @@
             %span.current-organization-nav-item
               %a#passive_organization_submenu{ href: "#", "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
                 = passive_organization.short_name
-                %i.fas.fa-chevron-down.caret-down
+                = inline_svg_tag "icons/chevron-right.svg", class: "tw:rotate-90 tw:inline-block tw:w-3 tw:h-3 tw:ml-1"
               %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
                 = render partial: "/shared/organized_menu_items", locals: { passed_organization: passive_organization, is_dropdown: true }
 
           - elsif current_user.blank?
             .center-navbar-signup-link-container
               = link_to t(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase"
-          - bike_search_active = controller_namespace.blank? && controller_name == "bikes" && action_name == "index"
+          - bike_search_active = controller_namespace == "search" && controller_name == "registrations" && action_name == "index"
+          - marketplace_search_active = controller_namespace == "search" && controller_name == "marketplace" && action_name == "index"
           %a#menu-opened-backdrop{ "aria-hidden" => "true" }
           .hamburgler{ "aria-hidden" => "true" }
             %a#primary_nav_hamburgler
           %ul.primary-main-menu
             %li.primary-nav-item.d-lg-none
-              = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", id: "search_bikes_header_link"
+              = link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}"
+            %li.primary-nav-item.d-lg-none
+              = link_to t(".marketplace"), search_marketplace_path, class: "nav-link #{marketplace_search_active ? 'active' : ''}"
             %li.divider-nav-item.d-lg-none{ "aria-hidden" => "true" }
             - if current_user_or_unconfirmed_user.present?
               %li.primary-nav-item
@@ -55,19 +61,23 @@
                   :plain
                     <svg id="settings-icon" data-name="Layer 13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.16 30"><defs><style>.cls-1{fill:none;stroke:#a4a4a4;stroke-miterlimit:10;}</style></defs><title>settings</title><circle class="cls-1" cx="10.68" cy="19.41" r="3.78"/><circle class="cls-1" cx="23.92" cy="6.17" r="1.89"/><path class="cls-1" d="M4900.95,1506.07a8.21,8.21,0,0,0-.18-1.71l2-1.15-2.52-4.37-1.95,1.15a6.91,6.91,0,0,0-2.92-1.72v-2.14h-5v2.14a7.28,7.28,0,0,0-3,1.72l-2-1.15-2.53,4.37,2,1.15a8.15,8.15,0,0,0,0,3.43l-2,1.14,2.52,4.37,2-1.15a7.26,7.26,0,0,0,3,1.72v2.29h5v-2.29a6.93,6.93,0,0,0,2.92-1.72l2,1.15,2.51-4.37-2-1.14A8.28,8.28,0,0,0,4900.95,1506.07Z" transform="translate(-4882.07 -1486.66)"/><path class="cls-1" d="M4910.4,1492.83a4.42,4.42,0,0,0-.12-1l1.25-.72-1.26-2.18-1.21.73a4.53,4.53,0,0,0-1.72-1v-1.45h-2.52v1.45a4.86,4.86,0,0,0-1.81,1l-1.28-.73-1.27,2.18,1.25,0.72a4.27,4.27,0,0,0,0,2l-1.26.72,1.26,2.19,1.3-.73a4.84,4.84,0,0,0,1.81,1v1.45h2.52v-1.45a4.51,4.51,0,0,0,1.72-1l1.23,0.73,1.25-2.19-1.26-.72A4.42,4.42,0,0,0,4910.4,1492.83Z" transform="translate(-4882.07 -1486.66)"/></svg>
                 %ul.primary-submenu{ 'aria-labelledby' => '#setting_submenu' }
-                  - memberships = current_user_or_unconfirmed_user.memberships.includes(:organization)
-                  - if memberships.any?
-                    - memberships.each do |membership|
-                      - organization = membership.organization
+                  - organization_roles = current_user_or_unconfirmed_user.organization_roles.includes(:organization)
+                  - if organization_roles.any?
+                    - organization_roles.each do |organization_role|
+                      - organization = organization_role.organization
                       - next unless organization.present?
                       %li
                         %a.nav-link{ href: organization_root_path(organization_id: organization.to_param) }
                           = t(".view_org", org_name: organization.name)
                     %li.divider-nav-item
                   %li
-                    = active_link t(".register_a_new_bike"), choose_registration_path, class: 'nav-link'
+                    = active_link t(".your_registrations"), my_account_path, class: 'nav-link'
+                  -# .any_for_user? caches
+                  - if MarketplaceMessage.any_for_user?(current_user)
+                    %li
+                      = active_link t(".marketplace_messages"), my_account_messages_path, class: 'nav-link'
                   %li
-                    = active_link t(".your_bikes"), my_account_path, class: 'nav-link'
+                    = active_link t(".register_a_new_bike"), choose_registration_path, class: 'nav-link'
                   %li
                     = active_link t(".user_settings", user_email: current_user_or_unconfirmed_user.email), edit_my_account_path, class: 'nav-link', id: "navUserSettingLink", "data-email" => current_user_or_unconfirmed_user.email
                   %li.divider-nav-item
@@ -88,8 +98,10 @@
               = active_link t(".donate"), why_donate_path, class: 'nav-link'
             %li.primary-nav-item
               = active_link t(".blog"), news_index_path, class: 'nav-link', match_controller: true
+            %li.primary-nav-item.d-lg-block
+              = link_to t(".marketplace"), search_marketplace_path, class: "nav-link #{marketplace_search_active ? 'active' : ''}"
             %li.primary-nav-item.d-none.d-lg-block
-              = link_to t(".search_bikes"), default_bike_search_path, class: "nav-link defaultBikeSearchLink #{bike_search_active ? 'active' : ''}", match_controller: true
+              = link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}", match_controller: true
     = render partial: "/layouts/revised_messages"
 
     - if current_page_skeleton.present?
@@ -105,7 +117,7 @@
       = render partial: "/shared/user_general_alert"
 
 
-    - cache(["footer", page_id, current_user_or_unconfirmed_user, passive_organization]) do
+    - cache(["footer_2", page_id, current_user_or_unconfirmed_user, passive_organization]) do
       = render partial: "/shared/footer_revised"
 
 :javascript

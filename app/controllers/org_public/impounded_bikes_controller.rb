@@ -1,18 +1,16 @@
 module OrgPublic
   class ImpoundedBikesController < OrgPublic::BaseController
     include SortableTable
+
     before_action :ensure_public_impound_bikes!
-    before_action :set_period, only: [:index]
 
     def index
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @per_page = permitted_per_page
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
-      @impound_records = available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-        .page(@page).per(@per_page)
-        .includes(:bike, :location)
+      @pagy, @impound_records = pagy(available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
+        .includes(:bike, :location), limit: @per_page, page: permitted_page)
     end
 
     private
@@ -20,8 +18,10 @@ module OrgPublic
     def ensure_public_impound_bikes!
       # It will 404 if there isn't an current_organization because of OrgPublic before action
       return ensure_current_organization! unless current_organization.present?
+
       if current_organization.enabled?("impound_bikes")
         return true if current_organization.public_impound_bikes?
+
         if current_user&.authorized?(current_organization)
           flash[:success] = "This page is not publicly visible (it's only visible to organization members)"
           return true
@@ -41,6 +41,7 @@ module OrgPublic
 
     def available_impound_records
       return @available_impound_records if defined?(@available_impound_records)
+
       a_impound_records = current_organization.impound_records.active
 
       if bike_search_params_present?

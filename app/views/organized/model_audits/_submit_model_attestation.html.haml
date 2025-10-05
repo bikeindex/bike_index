@@ -8,7 +8,7 @@
           %strong#updateModalMnfg Manufacturer
           %em#updateModalFrameModel Model
         - opts = [["Mark Certified", "certified_by_trusted_org"], ["Mark NOT certified", "uncertified_by_trusted_org"], ["Record other update", "certification_update"]]
-        = f.select(:kind, opts, {include_blank: false, required: true}, {class: 'form-control'})
+        = f.select(:kind, opts, {include_blank: true, required: true}, {class: 'form-control'})
       .form-group.collapse.in.hidden-not-certification-updating
         = f.label :certification_type
         = f.text_field :certification_type, placeholder: "optional", required: false, class: "form-control"

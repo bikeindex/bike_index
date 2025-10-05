@@ -21,7 +21,7 @@
 
 .row.mt-4.mb-4
   .col-sm-6
-    = pluralize(number_with_delimiter(@graduated_notifications.total_count), "matching graduated notifications")
+    = pluralize(number_with_delimiter(@pagy.count), "matching graduated notifications")
     %em
       = humanized_time_range(@time_range)
     - if user_search_params_present?
@@ -58,5 +58,5 @@
 
 = render partial: "/organized/graduated_notifications/table", locals: {graduated_notifications: @graduated_notifications, render_sortable: true, render_remaining_at: !skip_remaining, separate_secondary_notifications: separate_secondary_notifications?}
 
-.paginate-container.paginate-container-bottom
-  = paginate @graduated_notifications
+.pt-4.pb-4
+  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

@@ -1,5 +1,5 @@
 module Autocomplete
-  BASE_KEY = "autc#{Rails.env.test? ? ":test" : ""}:".freeze
+  BASE_KEY = "autc#{":test" if Rails.env.test?}:".freeze
   SORTED_CATEGORY_ARRAY = %w[cmp_mnfg colors cycle_type frame_mnfg propulsion].freeze
   STOP_WORDS = [].freeze # I think we might want to include 'the'
 
@@ -12,6 +12,7 @@ module Autocomplete
 
     def normalize(str)
       return "" if str.blank?
+
       I18n.transliterate(str.downcase).gsub(/[^\p{Word}\ ]/i, "")
         .strip.gsub(/\s+/, " ")
     end

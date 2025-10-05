@@ -2,6 +2,8 @@ class NewsController < ApplicationController
   def index
     @blogs = matching_blogs
     @blogs_count ||= @blogs.count
+    @page_updated_at = matching_blogs.maximum(:updated_at)
+    @show_discuss = InputNormalizer.boolean(ENV["SHOW_DISCOURSE"])
     redirect_to news_index_url(format: "atom") if request.format == "xml"
   end
 

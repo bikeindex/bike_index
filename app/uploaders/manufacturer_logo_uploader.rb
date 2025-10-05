@@ -2,9 +2,11 @@
 class ManufacturerLogoUploader < ApplicationUploader
   include CarrierWave::MiniMagick
 
+  FALLBACK_IMAGE = "https://files.bikeindex.org/blank.png".freeze
+
   # Fallback so the page doesn't break if the image isn't there
-  def default_url
-    "https://files.bikeindex.org/blank.png"
+  def default_url(*args)
+    FALLBACK_IMAGE
   end
 
   process :validate_dimensions

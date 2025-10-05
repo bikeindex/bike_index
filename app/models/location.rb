@@ -1,3 +1,28 @@
+# == Schema Information
+#
+# Table name: locations
+#
+#  id                       :integer          not null, primary key
+#  city                     :string(255)
+#  default_impound_location :boolean          default(FALSE)
+#  deleted_at               :datetime
+#  email                    :string(255)
+#  impound_location         :boolean          default(FALSE)
+#  latitude                 :float
+#  longitude                :float
+#  name                     :string(255)
+#  neighborhood             :string
+#  not_publicly_visible     :boolean          default(FALSE)
+#  phone                    :string(255)
+#  shown                    :boolean          default(FALSE)
+#  street                   :string(255)
+#  zipcode                  :string(255)
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  country_id               :integer
+#  organization_id          :integer
+#  state_id                 :integer
+#
 class Location < ApplicationRecord
   include Geocodeable
 
@@ -15,7 +40,7 @@ class Location < ApplicationRecord
   scope :publicly_visible, -> { shown.where(not_publicly_visible: false) }
   scope :impound_locations, -> { where(impound_location: true) }
   scope :default_impound_locations, -> { impound_locations.where(default_impound_location: true) }
-  # scope :international, where("country_id IS NOT #{Country.united_states.id}")
+  # scope :international, where("country_id IS NOT #{Country.united_states_id}")
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
@@ -63,6 +88,7 @@ class Location < ApplicationRecord
 
   def update_associations
     return true if skip_update
+
     # If this wasn't set by the organization callback (which uses skip_update: true)
     # And this location was updated with default_impound_location, ensure there aren't any others
     if default_impound_location
@@ -76,12 +102,14 @@ class Location < ApplicationRecord
 
   def display_name
     return "" if organization.blank?
-    name == organization.name ? name : "#{organization.name} - #{name}"
+
+    (name == organization.name) ? name : "#{organization.name} - #{name}"
   end
 
   # Quick and dirty hack to ensure it's blocked - frontend should prevent doing this normally
   def ensure_destroy_permitted!
     return true unless destroy_forbidden?
+
     raise StandardError, "Can't destroy a location with impounded bikes"
   end
 
@@ -89,6 +117,7 @@ class Location < ApplicationRecord
 
   def calculated_shown
     return false if not_publicly_visible
+
     organization.present? && organization.allowed_show?
   end
 end

@@ -1,3 +1,63 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                                 :integer          not null, primary key
+#  address_set_manually               :boolean          default(FALSE)
+#  admin_options                      :jsonb
+#  alert_slugs                        :jsonb
+#  auth_token                         :string(255)
+#  avatar                             :string(255)
+#  banned                             :boolean          default(FALSE), not null
+#  can_send_many_stolen_notifications :boolean          default(FALSE), not null
+#  confirmation_token                 :string(255)
+#  confirmed                          :boolean          default(FALSE), not null
+#  deleted_at                         :datetime
+#  description                        :text
+#  developer                          :boolean          default(FALSE), not null
+#  email                              :string(255)
+#  instagram                          :string
+#  last_login_at                      :datetime
+#  last_login_ip                      :string
+#  latitude                           :float
+#  longitude                          :float
+#  magic_link_token                   :text
+#  my_bikes_hash                      :jsonb
+#  name                               :string(255)
+#  no_address                         :boolean          default(FALSE)
+#  no_non_theft_notification          :boolean          default(FALSE)
+#  notification_newsletters           :boolean          default(FALSE), not null
+#  notification_unstolen              :boolean          default(TRUE)
+#  partner_data                       :jsonb
+#  password                           :text
+#  password_digest                    :string(255)
+#  phone                              :string(255)
+#  preferred_language                 :string
+#  show_bikes                         :boolean          default(FALSE), not null
+#  show_instagram                     :boolean          default(FALSE)
+#  show_phone                         :boolean          default(TRUE)
+#  show_twitter                       :boolean          default(FALSE), not null
+#  show_website                       :boolean          default(FALSE), not null
+#  superuser                          :boolean          default(FALSE), not null
+#  terms_of_service                   :boolean          default(FALSE), not null
+#  time_single_format                 :boolean          default(FALSE)
+#  title                              :text
+#  token_for_password_reset           :text
+#  twitter                            :string(255)
+#  username                           :string(255)
+#  vendor_terms_of_service            :boolean
+#  when_vendor_terms_of_service       :datetime
+#  created_at                         :datetime         not null
+#  updated_at                         :datetime         not null
+#  address_record_id                  :bigint
+#  stripe_id                          :string(255)
+#
+# Indexes
+#
+#  index_users_on_address_record_id         (address_record_id)
+#  index_users_on_auth_token                (auth_token)
+#  index_users_on_token_for_password_reset  (token_for_password_reset)
+#
 class Ambassador < User
   default_scope -> { ambassadors }
 
@@ -21,6 +81,7 @@ class Ambassador < User
 
   def percent_complete
     return 0.0 if ambassador_task_assignments.empty?
+
     (completed_tasks_count / tasks_count.to_f).round(2)
   end
 
@@ -41,15 +102,15 @@ class Ambassador < User
   end
 
   def current_ambassador_organization
-    most_recent_ambassador_membership =
-      memberships
+    most_recent_ambassador_organization_role =
+      organization_roles
         .ambassador_organizations
         .reorder(created_at: :desc)
         .limit(1)
 
     organizations
       .ambassador
-      .where(id: most_recent_ambassador_membership.select(:organization_id))
+      .where(id: most_recent_ambassador_organization_role.select(:organization_id))
       .first
   end
 end

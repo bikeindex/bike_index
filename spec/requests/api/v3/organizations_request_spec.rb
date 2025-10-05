@@ -5,7 +5,7 @@ RSpec.describe "Organization API V3", type: :request do
 
   describe "create" do
     let(:country) { Country.united_states }
-    let(:state) { FactoryBot.create(:state, name: "Oregon", abbreviation: "OR", country: country) }
+    let(:state) { FactoryBot.create(:state, :find_or_create, name: "Oregon", abbreviation: "OR", country: country) }
     let(:token) { create_doorkeeper_token(scopes: :write_organizations) }
     let(:url) { "/api/v3/organizations?access_token=#{token.token}" }
     let(:location_1) {
@@ -120,8 +120,7 @@ RSpec.describe "Organization API V3", type: :request do
           }.to change(Organization, :count).by 1
           expect(response).to be_created
           expect(response.code).to eq("201")
-          expect(json_result["organization"]).to be_present
-          expect_hashes_to_match(json_result["organization"], target_response)
+          expect(json_result["organization"]).to match_hash_indifferently target_response
         end
         describe "with no ALLOWED_WRITE_ORGANIZATIONS" do
           it "creates an organization" do

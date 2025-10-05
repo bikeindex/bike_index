@@ -68,6 +68,7 @@ module API
 
       def recover_bike(bike, feedback)
         return true unless bike.current_stolen_record.present?
+
         feedback.feedback_hash.merge!(index_helped_recovery: params[:index_helped_recovery],
           can_share_recovery: params[:can_share_recovery])
 

@@ -1,18 +1,66 @@
+# == Schema Information
+#
+# Table name: exports
+#
+#  id              :integer          not null, primary key
+#  file            :text
+#  file_format     :integer          default("csv")
+#  kind            :integer          default("organization")
+#  options         :jsonb
+#  progress        :integer          default("pending")
+#  rows            :integer
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  organization_id :integer
+#  user_id         :integer
+#
+# Indexes
+#
+#  index_exports_on_organization_id  (organization_id)
+#  index_exports_on_user_id          (user_id)
+#
 class Export < ApplicationRecord
-  PROGRESS_ENUM = %i[pending ongoing finished errored].freeze
-  VALID_KINDS = %i[organization stolen manufacturer].freeze
+  PROGRESS_ENUM = {
+    pending: 0,
+    ongoing: 1,
+    finished: 2,
+    errored: 3
+  }.freeze
+  VALID_KINDS = {
+    organization: 0,
+    stolen: 1,
+    manufacturer: 2
+  }.freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
-  DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  AVERY_HEADERS = %w[owner_name address].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[vehicle_type thumbnail extra_registration_number registered_by owner_email owner_name]).freeze
+  DEFAULT_HEADERS = %w[
+    color
+    is_stolen
+    link
+    manufacturer
+    model
+    registered_at
+    serial
+  ].freeze
+  EXTRA_HEADERS = %w[
+    extra_registration_number
+    motorized
+    owner_email
+    owner_name
+    registered_by
+    status
+    thumbnail
+    vehicle_type
+  ].freeze
+  AVERY_HEADERS = %w[address owner_name].freeze
+  PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
 
   mount_uploader :file, ExportUploader
 
   belongs_to :organization
   belongs_to :user # Creator of export
-  enum progress: PROGRESS_ENUM
-  enum kind: VALID_KINDS
-  enum file_format: VALID_FILE_FORMATS
+  enum :progress, PROGRESS_ENUM
+  enum :kind, VALID_KINDS
+  enum :file_format, VALID_FILE_FORMATS
 
   before_validation :set_calculated_attributes
 
@@ -48,11 +96,13 @@ class Export < ApplicationRecord
 
   def self.permitted_headers(organization_or_overide = nil)
     return PERMITTED_HEADERS unless organization_or_overide.present?
+
     if organization_or_overide == "include_paid" # passing include_paid overrides
       additional_headers = OrganizationFeature::REG_FIELDS
     elsif organization_or_overide.is_a?(Organization)
       additional_headers = organization_or_overide.additional_registration_fields
       additional_headers += ["partial_registration"] if organization_or_overide.enabled?("show_partial_registrations")
+      additional_headers += ["is_impounded"] if organization_or_overide.enabled?("impound_bikes")
     end
     additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
     # We always give the option to export extra_registration_number, don't double up if org can add too
@@ -119,6 +169,7 @@ class Export < ApplicationRecord
 
   def remove_bike_stickers_and_record!(passed_user = nil)
     return true unless assign_bike_codes? && !bike_codes_removed?
+
     remove_bike_stickers(passed_user)
     update_attribute :options, options.merge(bike_codes_removed: true)
   end
@@ -154,12 +205,17 @@ class Export < ApplicationRecord
 
   def bike_code_start=(val)
     return unless val.present?
+
     self.options = options.merge(bike_code_start: BikeSticker.normalize_code(val, leading_zeros: true))
   end
 
   def custom_bike_ids=(val)
-    custom_ids = (val.is_a?(Array) ? val : val.split(/\s+|,/))
-      .map { |cid| bike_id_from_url(cid) }.compact.uniq
+    custom_ids = if val.is_a?(Array)
+      val
+    else
+      # Organized Bikes controller uses _ as delimiter to shorten encoded URL length
+      val.match?(/\A\w*\z/) ? val.split("_") : val.split(/\s+|,/)
+    end.map { |cid| bike_id_from_url(cid) }.compact.uniq
     custom_ids = nil if custom_ids.none?
     self.options = options.merge(custom_bike_ids: custom_ids)
   end
@@ -172,6 +228,7 @@ class Export < ApplicationRecord
 
   def avery_export_url
     return nil unless avery_export? && finished?
+
     (ENV["AVERY_EXPORT_URL"] || "") + CGI.escape(file_url)
   end
 
@@ -196,7 +253,7 @@ class Export < ApplicationRecord
   end
 
   def tmp_file
-    @tmp_file ||= Tempfile.new(["#{kind == "organization" ? organization.slug : kind}_#{id}", ".#{file_format}"])
+    @tmp_file ||= Tempfile.new(["#{(kind == "organization") ? organization.slug : kind}_#{id}", ".#{file_format}"])
   end
 
   def tmp_file_rows
@@ -221,13 +278,16 @@ class Export < ApplicationRecord
     return Bike.none if partial_registrations == "only"
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
     return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
+
     bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
   end
 
   def incompletes_scoped
     return BParam.none unless partial_registrations.present?
+
     incompletes = organization.incomplete_b_params
     return incompletes unless option?("start_at") || option?("end_at")
+
     if option?("start_at")
       option?("end_at") ? incompletes.where(created_at: start_at..end_at) : incompletes.where("b_params.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
@@ -244,7 +304,8 @@ class Export < ApplicationRecord
   # Generally, use calculated_progress rather than progress directly for display
   def calculated_progress
     return progress unless pending? || ongoing?
-    (created_at || Time.current) < Time.current - 10.minutes ? "errored" : progress
+
+    ((created_at || Time.current) < Time.current - 10.minutes) ? "errored" : progress
   end
 
   def validated_options(opts)
@@ -259,6 +320,7 @@ class Export < ApplicationRecord
 
   def bikes_within_time(bikes)
     return bikes unless option?("start_at") || option?("end_at")
+
     if option?("start_at")
       option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
@@ -269,6 +331,7 @@ class Export < ApplicationRecord
   def bike_id_from_url(bike_url)
     return nil unless bike_url.present?
     return bike_url if bike_url.is_a?(Integer) # integers passed directly in organized bikes_controller
+
     id_str = bike_url.strip
     if id_str.match?(/\A\d+\z/)
       id_str.to_i

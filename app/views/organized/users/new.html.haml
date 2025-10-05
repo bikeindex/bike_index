@@ -18,10 +18,9 @@
         %br
         = t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.passwordless_user_domain}", org_name: current_organization.short_name)
 
-= form_for @membership, { as: :membership, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
+= form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 
-  - if @membership.errors.any?
-    = render partial: "shared/errors", locals: { name: t(".membership"), obj: @membership }
+  = render(AlertForErrors::Component.new(object: @organization_role, name: t(".organization_role")))
 
   - display_multi_invite = params[:multiple_emails_invited].present?
   .form-group.row#singleEmailInvite{ class: display_multi_invite ? "currently-hidden" : "" }
@@ -45,7 +44,7 @@
         rows: 4,
         class: "form-control"
 
-  = render partial: "membership_role_fields", locals: {f: f}
+  = render partial: "organization_role_fields", locals: {f: f}
 
   .form-group.row
     .form-submit-button

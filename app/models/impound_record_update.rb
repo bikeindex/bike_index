@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: impound_record_updates
+#
+#  id                :bigint           not null, primary key
+#  kind              :integer
+#  notes             :text
+#  processed         :boolean          default(FALSE)
+#  transfer_email    :string
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  impound_claim_id  :bigint
+#  impound_record_id :bigint
+#  location_id       :bigint
+#  user_id           :bigint
+#
+# Indexes
+#
+#  index_impound_record_updates_on_impound_claim_id   (impound_claim_id)
+#  index_impound_record_updates_on_impound_record_id  (impound_record_id)
+#  index_impound_record_updates_on_location_id        (location_id)
+#  index_impound_record_updates_on_user_id            (user_id)
+#
 class ImpoundRecordUpdate < ApplicationRecord
   # These statuses are used by impound_records!
   KIND_ENUM = {
@@ -24,7 +47,7 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   after_commit :update_associations
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   scope :active, -> { where(kind: active_kinds) }
   scope :resolved, -> { where(kind: resolved_kinds) }
@@ -60,7 +83,7 @@ class ImpoundRecordUpdate < ApplicationRecord
       move_location: "Update location",
       retrieved_by_owner: "Owner retrieved bike",
       removed_from_bike_index: "Removed from Bike Index",
-      transferred_to_new_owner: "Transferred to new owner",
+      transferred_to_new_owner: "Transferred to owner",
       claim_approved: "Claim approved",
       claim_denied: "Claim denied",
       expired: "Removed after expiration period"
@@ -103,6 +126,7 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def update_associations
     return true if skip_update
+
     impound_record&.update(updated_at: Time.current)
     impound_claim&.update(updated_at: Time.current)
   end

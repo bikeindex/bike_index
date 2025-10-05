@@ -1,16 +1,19 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  # The test environment is used exclusively to run your application's
-  # test suite. You never need to work with it otherwise. Remember that
-  # your test database is "scratch space" for the test suite and is wiped
-  # and recreated between test runs. Don't rely on the data there!
-  config.cache_classes = true
+  # While tests run files are not watched, reloading is not necessary.
+  config.enable_reloading = false
 
-  # Do not eager load code on boot. This avoids loading your whole application
-  # just for the purpose of running a single test. If you are using a tool that
-  # preloads Rails for running tests, you may have to set it to true.
-  config.eager_load = false
+  # Don't log things in test
+  config.active_record.verbose_query_logs = false
+  config.active_record.query_log_tags_enabled = false
+  config.log_level = :fatal
+
+  # Eager loading loads your entire application. When running a single test locally,
+  # this is usually not necessary, and can slow down your test suite. However, it's
+  # recommended that you enable it in continuous integration systems to ensure eager
+  # loading is working properly before deploying your code.
+  config.eager_load = ENV["CI"].present?
 
   # Configure public file server for tests with Cache-Control for performance.
   config.public_file_server.enabled = true
@@ -25,8 +28,8 @@ Rails.application.configure do
   # Don't check for precompiled assets
   config.assets.check_precompiled_asset = false
 
-  # Raise exceptions instead of rendering exception templates.
-  config.action_dispatch.show_exceptions = false
+  # Render exception templates for rescuable exceptions and raise for other exceptions.
+  config.action_dispatch.show_exceptions = :rescuable
 
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false
@@ -44,10 +47,27 @@ Rails.application.configure do
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
+  # Raise exceptions for disallowed deprecations.
+  config.active_support.disallowed_deprecation = :raise
+
+  # Tell Active Support which deprecation messages to disallow.
+  config.active_support.disallowed_deprecation_warnings = []
+  # Raise error when a before_action's only/except options reference missing actions.
+  config.action_controller.raise_on_missing_callback_actions = true
+
   # Raises error for missing translations
   config.i18n.raise_on_missing_translations = true
   config.i18n.exception_handler = proc { |exception| raise exception.to_exception }
+
   config.action_mailer.default_url_options = {host: ENV["BASE_URL"]}
+  routes.default_url_options = config.action_mailer.default_url_options
 
   config.cache_store = :file_store, Rails.root.join("tmp", "cache", "test#{ENV["TEST_ENV_NUMBER"]}")
+
+  # Configure Sidekiq to suppress INFO logs in test environment
+  if defined?(Sidekiq)
+    Sidekiq.configure_client { |config| config.logger.level = Logger::WARN }
+
+    Sidekiq.configure_server { |config| config.logger.level = Logger::WARN }
+  end
 end

@@ -1,8 +1,47 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: stolen_bike_listings
+#
+#  id                       :bigint           not null, primary key
+#  amount_cents             :integer
+#  currency_enum            :integer
+#  data                     :jsonb
+#  frame_model              :text
+#  frame_size               :string
+#  frame_size_number        :float
+#  frame_size_unit          :string
+#  group                    :integer
+#  line                     :integer
+#  listed_at                :datetime
+#  listing_order            :integer
+#  listing_text             :text
+#  manufacturer_other       :string
+#  mnfg_name                :string
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  bike_id                  :bigint
+#  initial_listing_id       :bigint
+#  manufacturer_id          :bigint
+#  primary_frame_color_id   :bigint
+#  secondary_frame_color_id :bigint
+#  tertiary_frame_color_id  :bigint
+#
+# Indexes
+#
+#  index_stolen_bike_listings_on_bike_id                   (bike_id)
+#  index_stolen_bike_listings_on_initial_listing_id        (initial_listing_id)
+#  index_stolen_bike_listings_on_manufacturer_id           (manufacturer_id)
+#  index_stolen_bike_listings_on_primary_frame_color_id    (primary_frame_color_id)
+#  index_stolen_bike_listings_on_secondary_frame_color_id  (secondary_frame_color_id)
+#  index_stolen_bike_listings_on_tertiary_frame_color_id   (tertiary_frame_color_id)
+#
+
 # Initially created for mexican stolen bike ring
 class StolenBikeListing < ActiveRecord::Base
   include PgSearch::Model
+  include Currencyable
   include Amountable
   include BikeSearchable
 
@@ -19,7 +58,7 @@ class StolenBikeListing < ActiveRecord::Base
 
   before_save :set_calculated_attributes
 
-  enum group: GROUP_ENUM
+  enum :group, GROUP_ENUM
 
   scope :listing_ordered, -> { reorder(listing_order: :desc) }
   scope :initial, -> { where(initial_listing_id: nil) }
@@ -54,16 +93,18 @@ class StolenBikeListing < ActiveRecord::Base
 
   def amount_usd_formatted
     cents_usd = data["amount_cents_usd"] || calculated_amount_cents_usd
-    MoneyFormater.money_format_without_cents(cents_usd, :USD)
+    MoneyFormatter.money_format_without_cents(cents_usd, :USD)
   end
 
   def calculated_amount_cents_usd
     return 0 unless amount_cents.present?
-    Money.new(amount_cents, currency).exchange_to(:USD).cents
+
+    Money.new(amount_cents, currency_name).exchange_to(:USD).cents
   end
 
   def updated_photo_folder
     return nil if photo_folder.blank?
+
     suffix = photo_folder[/_\d+\z/].to_s
     if suffix.blank? # Sometimes there folders like 2021_OMFG
       suffix = photo_folder[/20\d\d_.*\z/].to_s
@@ -85,6 +126,7 @@ class StolenBikeListing < ActiveRecord::Base
   # TODO: Refactor - this duplicates bike#clean_frame_size, they should both be better
   def clean_frame_size
     return true unless frame_size.present? || frame_size_number.present?
+
     if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
       # Don't overwrite frame_size_number if frame_size_number was passed
       if frame_size_number.blank? || !frame_size_number_changed?
@@ -130,7 +172,7 @@ class StolenBikeListing < ActiveRecord::Base
   def set_calculated_attributes
     self.data ||= {}
     self.mnfg_name = if manufacturer.present?
-      manufacturer.other? ? manufacturer_other : manufacturer.simple_name
+      manufacturer.other? ? manufacturer_other : manufacturer.short_name
     end
     self.listed_at ||= Time.current
     self.listing_order = listed_at.to_i

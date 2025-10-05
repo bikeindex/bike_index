@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+# To test linting, rather than automatically fix it, set LINT_TEST. Used for CI
+cli_args = ARGV
+lint_test = ENV["LINT_TEST"] == "true" || cli_args.include?('--no-fix')
+
 require "fileutils"
 include FileUtils
 
@@ -11,5 +15,17 @@ def system!(*args)
 end
 
 chdir APP_ROOT do
-  system!("bundle exec standardrb --fix")
+  if lint_test
+    puts "Testing lint (will not autofix)"
+    system!("bundle exec standardrb --no-fix")
+    # TEMPORARILY commented out, js not installed on CI
+    # system!("npm run lint")
+  else
+    system!("bundle exec standardrb --fix")
+    system!("npm run lint")
+  end
+  # Unfortuanately, erb-formatter doesn't support returning a status code
+  # So always lint the files, and in the CI action, check if the files changed
+  # See github.com/nebulab/erb-formatter/issues/79
+  `bundle exec erb-formatter app/components/**/*.html.erb --write`
 end

@@ -1,0 +1,32 @@
+.card
+  .card-body
+    - if @organization_role.id.present?
+      %h4.text-danger.mb-4
+        DANGER! Don't edit
+        %em
+          %br
+          It would be better to delete and re-add
+    = form_for [:admin, @organization_role] do |f|
+      = render(AlertForErrors::Component.new(object: @organization_role))
+
+      .form-group.fancy-select.unfancy
+        = f.label :organization
+        = collection_select :organization_role, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
+
+      .form-group
+        = f.label :invited_email
+        = f.text_field :invited_email, required: true, class: "form-control"
+
+      .form-group
+        %label
+          Role
+        .form-check
+          %label
+            = f.radio_button :role, "admin", class: "form-check-input"
+            Admin of organization
+        .form-check
+          %label
+            = f.radio_button :role, "member", class: "form-check-input"
+            Member of organization
+
+      = f.submit 'Save', class: 'btn btn-success'

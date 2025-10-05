@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Organized::ImpoundClaimsController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/impound_claims" }
-  include_context :request_spec_logged_in_as_organization_member
+  include_context :request_spec_logged_in_as_organization_user
 
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
   let(:user_email) { "someemail@things.com" }
@@ -81,7 +81,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           submit: "Retrieved",
           impound_claim: {response_message: ""}
         }
-      }.to_not change(EmailImpoundClaimWorker.jobs, :count)
+      }.to_not change(Email::ImpoundClaimJob.jobs, :count)
       expect(flash[:error]).to be_present
       expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
       impound_record.reload
@@ -102,7 +102,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
             submit: "Approve",
             impound_claim: {response_message: " "}
           }
-        }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
+        }.to change(Email::ImpoundClaimJob.jobs, :count).by(1)
         expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
@@ -124,7 +124,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         let(:response_message) { "RESponse=MESSAGE<alert>" }
         it "sends a message" do
           FactoryBot.create(:organization_mail_snippet, kind: "impound_claim_approved", organization: current_organization, body: snippet_body)
-          EmailImpoundClaimWorker.new.perform(impound_claim.id)
+          Email::ImpoundClaimJob.new.perform(impound_claim.id)
           # ensure that the message includes the response_message
           expect(impound_claim.reload.status).to eq "submitting"
           # Verify we sent created a notification already (or else it gets created when sidekiq inlined)
@@ -134,7 +134,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           expect(impound_record.status).to eq "current"
           expect(impound_record.impound_claims.pluck(:id)).to eq([impound_claim.id])
           expect(impound_record.update_kinds).to eq(ImpoundRecordUpdate.kinds - %w[move_location expired])
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           Sidekiq::Testing.inline! do
             patch "#{base_url}/#{impound_claim.to_param}", params: {
@@ -181,7 +181,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
             submit: "Deny",
             impound_claim: {response_message: "I recommend talking with us about all the things"}
           }
-        }.to change(EmailImpoundClaimWorker.jobs, :count).by(1)
+        }.to change(Email::ImpoundClaimJob.jobs, :count).by(1)
         expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload

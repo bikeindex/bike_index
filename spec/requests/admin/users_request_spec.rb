@@ -16,16 +16,15 @@ RSpec.describe Admin::UsersController, type: :request do
   describe "show" do
     it "links to edit" do
       get "#{base_url}/#{user_subject.username}"
-      expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+      expect(response).to redirect_to(edit_admin_user_path(user_subject.username))
     end
   end
 
   describe "edit" do
     context "user doesn't exist" do
       it "404s" do
-        expect {
-          get "#{base_url}/STUFFFFFF/edit"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/STUFFFFFF/edit"
+        expect(response.status).to eq 404
       end
     end
     context "username" do
@@ -48,11 +47,11 @@ RSpec.describe Admin::UsersController, type: :request do
         og_auth_token = user_subject.auth_token
         expect(user_subject.banned?).to be_falsey
         current_user.reload
-        Sidekiq::Worker.clear_all
-        put "#{base_url}/#{user_subject.id}", params: {
+        Sidekiq::Job.clear_all
+        patch "#{base_url}/#{user_subject.id}", params: {
           user: {
             name: "New Name",
-            email: "newemailexample.com",
+            email: "newemail@example.com",
             confirmed: true,
             superuser: true,
             developer: "1",
@@ -65,7 +64,7 @@ RSpec.describe Admin::UsersController, type: :request do
           }
         }
         expect(user_subject.reload.name).to eq("New Name")
-        expect(user_subject.email).to eq("newemailexample.com")
+        expect(user_subject.email).to eq("newemail@example.com")
         expect(user_subject.confirmed).to be_truthy
         expect(user_subject.superuser).to be_truthy
         expect(user_subject.developer).to be_falsey
@@ -79,14 +78,14 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_ban.description).to eq "something here"
         # Bump the auth token, because we want to sign out the user
         expect(user_subject.auth_token).to_not eq og_auth_token
-        expect(AfterUserChangeWorker.jobs.count).to be > 0
-        AfterUserChangeWorker.new.perform(user_subject.id)
+        expect(::Callbacks::AfterUserChangeJob.jobs.count).to be > 0
+        ::Callbacks::AfterUserChangeJob.new.perform(user_subject.id)
         expect(user_subject.superuser_abilities.count).to eq 1
         expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
       end
     end
     context "developer" do
-      let(:current_user) { FactoryBot.create(:admin_developer) }
+      let(:current_user) { FactoryBot.create(:superuser_developer) }
       it "updates developer" do
         user_subject.reload
         og_auth_token = user_subject.auth_token

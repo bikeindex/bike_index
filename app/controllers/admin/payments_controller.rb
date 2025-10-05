@@ -1,15 +1,12 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
   before_action :find_payment, only: %i[edit update]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 50
-    @payments = matching_payments.includes(:user, :organization, :invoice)
-      .order(sort_column + " " + sort_direction)
-      .page(page).per(@per_page)
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @payments = pagy(matching_payments.includes(:user, :organization, :invoice)
+      .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def new
@@ -24,7 +21,15 @@ class Admin::PaymentsController < Admin::BaseController
   end
 
   def update
-    if valid_invoice_parameters?
+    if assign_to_membership_param?
+      if @payment.can_assign_to_membership?
+        Users::CreateOrUpdateMembershipFromPaymentJob.new.perform(@payment.id, current_user.id)
+        flash[:success] = "Payment updated"
+      else
+        flash[:error] = "This payment can't be assigned to a membership - maybe it already has been?"
+      end
+      redirect_back(fallback_location: edit_admin_payment_url(@payment))
+    elsif valid_invoice_parameters?
       @payment.update(invoice_parameters) # invoice params are the only params permitted for update ;)
       flash[:success] = "Payment updated"
       redirect_to admin_payments_path
@@ -35,7 +40,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def create
     @payment = Payment.new(permitted_create_parameters)
-    @payment.first_payment_date = @payment.created_at
+    @payment.paid_at = @payment.created_at
     valid_method = Payment.admin_creatable_payment_methods.include?(permitted_create_parameters[:payment_method])
 
     if valid_method && valid_invoice_parameters? && @payment.save
@@ -69,6 +74,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def matching_payments
     return @matching_payments if defined?(@matching_payments)
+
     matching_payments = Payment
     if sort_column == "invoice_id"
       matching_payments = matching_payments.where.not(invoice_id: nil)
@@ -102,6 +108,9 @@ class Admin::PaymentsController < Admin::BaseController
     else
       @payment_method = "all"
     end
+    if params[:search_membership_id].present?
+      matching_payments = matching_payments.where(membership_id: params[:search_membership_id])
+    end
     matching_payments = matching_payments.admin_search(params[:query]) if params[:query].present?
     if params[:search_email].present?
       matching_payments = matching_payments.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%")
@@ -122,10 +131,15 @@ class Admin::PaymentsController < Admin::BaseController
     "year"
   end
 
+  def assign_to_membership_param?
+    InputNormalizer.boolean(params[:assign_to_membership])
+  end
+
   def valid_invoice_parameters?
     invoice_parameters # To parse the invoice params
     return true unless @params_invoice.present?
     return true if @params_invoice.organization_id&.to_s == invoice_parameters[:organization_id]&.to_s
+
     organization_name = Organization.friendly_find(invoice_parameters[:organization_id])&.short_name
     flash[:error] = "Invoice #{invoice_parameters[:invoice_id]} is not owned by #{organization_name}"
     false
@@ -133,6 +147,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def invoice_parameters
     return @invoice_parameters if defined?(@invoice_parameters)
+
     iparams = params.require(:payment).permit(:organization_id, :invoice_id, :referral_source)
     @params_invoice = Invoice.friendly_find(iparams[:invoice_id])
     if @params_invoice.present?
@@ -144,7 +159,7 @@ class Admin::PaymentsController < Admin::BaseController
   def permitted_create_parameters
     params
       .require(:payment)
-      .permit(:payment_method, :amount, :email, :currency, :created_at, :referral_source)
+      .permit(:payment_method, :amount, :email, :currency_enum, :created_at, :referral_source)
       .merge(invoice_parameters)
   end
 

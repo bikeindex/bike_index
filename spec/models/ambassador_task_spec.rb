@@ -7,7 +7,7 @@ RSpec.describe AmbassadorTask, type: :model do
       expect(AmbassadorTaskAssignment.count).to eq(0)
 
       task = AmbassadorTask.create(title: "New Task")
-      Sidekiq::Worker.drain_all
+      Sidekiq::Job.drain_all
 
       expect(AmbassadorTaskAssignment.count).to eq(1)
       expect(ambassador.ambassador_tasks.pluck(:id)).to match_array([task.id])

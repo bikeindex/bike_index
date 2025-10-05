@@ -1,12 +1,10 @@
 class Bikes::TheftAlertsController < Bikes::BaseController
   include BikeEditable
+
   before_action :get_existing_theft_alerts, except: [:create]
 
   def new
     return unless setup_edit_template("alert")
-
-    bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-    @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
 
     @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
     @selected_theft_alert_plan =
@@ -22,7 +20,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     redirect_to new_bike_theft_alert_path(bike_id: @bike.id) unless @payment.present?
     return unless setup_edit_template("alert_purchase_confirmation")
 
-    @payment&.update_from_stripe_session
+    @payment&.update_from_stripe!
   end
 
   def create
@@ -33,19 +31,15 @@ class Bikes::TheftAlertsController < Bikes::BaseController
       user: current_user
     )
     @payment = Payment.new(create_parameters(theft_alert))
+    @payment.stripe_checkout_session(item_name: product_description(theft_alert))
 
-    stripe_session = Stripe::Checkout::Session.create(
-      @payment.stripe_session_hash(item_name: product_description(theft_alert))
-    )
-
-    @payment.update!(stripe_id: stripe_session.id)
     theft_alert.update(payment: @payment)
 
-    redirect_to stripe_session.url
-    image_id = params[:selected_bike_image_id]
-    if image_id.present? && image_id != @bike.public_images&.first&.id
-      @bike.current_stolen_record&.generate_alert_image(bike_image: PublicImage.find_by_id(image_id))
-    end
+    # Enqueue creation of the image with the specified image
+    StolenBike::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, false,
+      params[:selected_bike_image_id])
+
+    redirect_to @payment.stripe_checkout_session.url, allow_other_host: true
   end
 
   private
@@ -54,22 +48,23 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     {
       kind: "theft_alert",
       payment_method: "stripe",
-      stripe_kind: "stripe_session",
       theft_alert: theft_alert,
       amount_cents: theft_alert.amount_cents,
       user_id: current_user.id,
       email: current_user.email,
-      currency: params[:currency] || MoneyFormater.default_currency # TODO: handle this better
+      currency: params[:currency] || Currency.default.name # TODO: handle this better
     }
   end
 
   def current_customer_data
     return {customer_email: current_user.email} if current_user.stripe_id.blank?
+
     {customer: current_user.stripe_id}
   end
 
   def product_description(theft_alert)
     return params[:description] if params[:description].present?
+
     theft_alert.theft_alert_plan&.name
   end
 
@@ -83,6 +78,7 @@ class Bikes::TheftAlertsController < Bikes::BaseController
       .references(:theft_alert_plan)
     # Only show non-user theft_alerts to superuser
     return @theft_alerts if current_user.superuser?
+
     @theft_alerts = @theft_alerts.where(user: current_user)
   end
 end

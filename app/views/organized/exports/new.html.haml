@@ -33,11 +33,15 @@
           Included columns:
       .col-lg-8
         .row
-          - Export.permitted_headers(current_organization).each do |header|
+          - checked_headers = @export.headers.present? ? @export.headers : Export.default_headers
+          - Export.permitted_headers(current_organization).sort.each do |header|
             .form-group.col-xs-6.col-md-4
               %label.checkbox
-                = f.check_box :headers, {multiple: true, checked: Export.default_headers.include?(header)}, header, 1
-                = header.titleize(keep_id_suffix: true)
+                = f.check_box :headers, {multiple: true, checked: checked_headers.include?(header)}, header, 1
+                - if header == "motorized"
+                  Motorized / e-vehicle
+                - else
+                  = header.titleize(keep_id_suffix: true)
     .form-group.row.mt-4.hiddenOnOnlyCustom
       = f.label :start_at, "Registered after", class: "org-form-label"
       .col-sm-4
@@ -59,7 +63,7 @@
     .form-group.row
       = f.label :custom_bike_ids, "Bikes to export", class: "org-form-label"
       .col-sm-8
-        .row
+        .row.hiddenOnOnlyCustom
           - if current_organization.enabled?("show_partial_registrations")
             - include_full = @export.partial_registrations != "only"
             - include_partial = @export.partial_registrations != false
@@ -67,17 +71,19 @@
               %label.checkbox
                 = check_box_tag :include_full_registrations, true, include_full
                 Registered bikes
-            .col-xs-4.mb-0.hiddenOnAveryExport.hiddenOnOnlyCustom{style: "line-height: 1.25;"}
+            .col-xs-4.mb-0.hiddenOnAveryExport{style: "line-height: 1.25;"}
               %label.checkbox
                 = check_box_tag :include_partial_registrations, true, include_partial
                 Incomplete registrations
           .col-xs-4.mb-0
-            %a.field-expander{href: "#expandCustomBikeIds"}
+            %a#addSpecificBikes.field-expander{href: "#"}
               Add specific bikes to export
-        .collapsed-fields
-          = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1"
+        .collapsed-fields#expandCustomBikeIds
+          = f.text_area :custom_bike_ids, value: @export.custom_bike_ids&.join(", "), placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1"
           %span.below-input-help
             For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
+            %br
+            %span.less-strong (can also be just the IDs - e.g. for the above: <code>123, 4567</code>)
           %label.checkbox.mt-0
             = f.check_box :only_custom_bike_ids
             <em>Only</em> include specific bikes

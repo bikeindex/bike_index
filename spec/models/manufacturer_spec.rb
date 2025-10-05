@@ -2,12 +2,7 @@ require "rails_helper"
 
 RSpec.describe Manufacturer, type: :model do
   it_behaves_like "autocomplete_hashable"
-
-  describe "scopes" do
-    it "default_scope is alphabetized" do
-      expect(Manufacturer.all.to_sql).to eq(Manufacturer.unscoped.order(:name).to_sql)
-    end
-  end
+  it_behaves_like "short_nameable"
 
   describe "ensure_non_blocking_name" do
     before { FactoryBot.create(:color, name: "Purple") }
@@ -23,6 +18,19 @@ RSpec.describe Manufacturer, type: :model do
         manufacturer = FactoryBot.build(:manufacturer, name: "Purple bikes")
         manufacturer.valid?
         expect(manufacturer.errors.count).to eq 0
+      end
+    end
+    context "name with single quote" do
+      let(:manufacturer) { FactoryBot.build(:manufacturer, name: "stuff'") }
+      it "is valid" do
+        expect(manufacturer.valid?).to be_truthy
+      end
+    end
+    context "name with double quote" do
+      let(:manufacturer) { FactoryBot.build(:manufacturer, name: 'stuff"') }
+      it "adds an error" do
+        expect(manufacturer.valid?).to be_falsey
+        expect(manufacturer.errors.full_messages.to_s).to match "quote"
       end
     end
   end
@@ -99,35 +107,6 @@ RSpec.describe Manufacturer, type: :model do
     end
   end
 
-  describe "import csv" do
-    it "adds manufacturers to the list" do
-      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
-      expect {
-        Manufacturer.import(import_file)
-      }.to change(Manufacturer, :count).by(2)
-    end
-
-    it "adds in all the attributes that are listed" do
-      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
-      Manufacturer.import(import_file)
-      manufacturer = Manufacturer.find_by_slug("surly")
-      expect(manufacturer.website).to eq("http://surlybikes.com")
-      expect(manufacturer.frame_maker).to be_truthy
-      expect(manufacturer.open_year).to eq(1900)
-      expect(manufacturer.close_year).to eq(3000)
-      manufacturer2 = Manufacturer.find_by_slug("wethepeople")
-      expect(manufacturer2.website).to eq("http://wethepeople.com")
-    end
-
-    it "updates attributes on a second upload" do
-      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
-      Manufacturer.import(import_file)
-      second_import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import-second.csv")
-      Manufacturer.import(second_import_file)
-      expect(Manufacturer.find_by_slug("surly")).to be_present
-    end
-  end
-
   describe "friendly_find_id" do
     it "gets id from name" do
       manufacturer = FactoryBot.create(:manufacturer)
@@ -146,6 +125,8 @@ RSpec.describe Manufacturer, type: :model do
     it "returns the value of manufacturer_other if manufacturer is other" do
       expect(Manufacturer.calculated_mnfg_name(manufacturer, "Other manufacturer name")).to eq "Mnfg name"
       expect(Manufacturer.calculated_mnfg_name(manufacturer_other, "Other manufacturer name")).to eq("Other manufacturer name")
+      expect(manufacturer.short_name).to eq "Mnfg name"
+      expect(manufacturer.secondary_name).to be_nil
     end
 
     it "returns the name of the manufacturer if it isn't other" do
@@ -161,14 +142,7 @@ RSpec.describe Manufacturer, type: :model do
 
     context "weird stuff" do
       let(:malicious_str) { "Sweet manufacturer <><>><\\" }
-      let(:target) do
-        # NOTE: this is different on the mac version of nokogiri, see PR#2366
-        if ENV["CI"]
-          "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\"
-        else
-          "Sweet manufacturer &gt;"
-        end
-      end
+      let(:target) { "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;\\" }
       it "encodes" do
         expect(Manufacturer.calculated_mnfg_name(manufacturer_other, malicious_str)).to eq target
       end
@@ -178,6 +152,9 @@ RSpec.describe Manufacturer, type: :model do
       let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Racing (S E Bikes)") }
       it "returns Just SE Bikes (and does it on save)" do
         expect(Manufacturer.calculated_mnfg_name(manufacturer, nil)).to eq "SE Racing"
+        expect(manufacturer.reload.name).to eq "SE Racing (S E Bikes)"
+        expect(manufacturer.short_name).to eq "SE Racing"
+        expect(manufacturer.secondary_name).to eq "S E Bikes"
       end
     end
   end
@@ -207,6 +184,33 @@ RSpec.describe Manufacturer, type: :model do
       manufacturer.set_calculated_attributes
       expect(manufacturer.logo_source).to be_nil
       expect(manufacturer.description).to be_nil
+    end
+  end
+
+  describe "run_callback_job" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
+    it "happens on create" do
+      expect { manufacturer }.to change(::Callbacks::AfterManufacturerChangeJob.jobs, :count).by 1
+    end
+
+    it "happens when name is changed" do
+      expect(manufacturer).to be_valid
+
+      expect do
+        manufacturer.update(frame_maker: true, description: "something", close_year: Time.current.year)
+      end.to change(::Callbacks::AfterManufacturerChangeJob.jobs, :count).by 0
+
+      expect do
+        manufacturer.update(name: "new special special name")
+      end.to change(::Callbacks::AfterManufacturerChangeJob.jobs, :count).by 1
+    end
+
+    it "does not happen when deleted" do
+      expect(manufacturer).to be_valid
+
+      expect do
+        manufacturer.destroy
+      end.to change(::Callbacks::AfterManufacturerChangeJob.jobs, :count).by 0
     end
   end
 end

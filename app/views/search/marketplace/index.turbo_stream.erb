@@ -1,0 +1,4 @@
+<%# This doesn't seem to normally actually be rendered? Definitely rendered in tests though... %>
+<%= turbo_stream.replace :search_marketplace_results_frame do %>
+  <%= render partial: "/search/registrations/results" %>
+<% end %>

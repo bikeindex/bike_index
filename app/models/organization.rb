@@ -1,3 +1,53 @@
+# == Schema Information
+#
+# Table name: organizations
+#
+#  id                              :integer          not null, primary key
+#  access_token                    :string(255)
+#  api_access_approved             :boolean          default(FALSE), not null
+#  approved                        :boolean          default(TRUE)
+#  ascend_name                     :string
+#  available_invitation_count      :integer          default(10)
+#  avatar                          :string(255)
+#  child_ids                       :jsonb
+#  deleted_at                      :datetime
+#  direct_unclaimed_notifications  :boolean          default(FALSE)
+#  enabled_feature_slugs           :jsonb
+#  graduated_notification_interval :bigint
+#  is_paid                         :boolean          default(FALSE), not null
+#  kind                            :integer
+#  landing_html                    :text
+#  lightspeed_register_with_phone  :boolean          default(FALSE)
+#  location_latitude               :float
+#  location_longitude              :float
+#  lock_show_on_map                :boolean          default(FALSE), not null
+#  manual_pos_kind                 :integer
+#  name                            :string(255)
+#  opted_into_theft_survey_2023    :boolean          default(FALSE)
+#  passwordless_user_domain        :string
+#  pos_kind                        :integer          default("no_pos")
+#  previous_slug                   :string
+#  regional_ids                    :jsonb
+#  registration_field_labels       :jsonb
+#  search_radius_miles             :float            default(50.0), not null
+#  short_name                      :string(255)
+#  show_on_map                     :boolean
+#  slug                            :string(255)      not null
+#  spam_registrations              :boolean          default(FALSE)
+#  website                         :string(255)
+#  created_at                      :datetime         not null
+#  updated_at                      :datetime         not null
+#  auto_user_id                    :integer
+#  manufacturer_id                 :bigint
+#  parent_organization_id          :integer
+#
+# Indexes
+#
+#  index_organizations_on_location_latitude_and_location_longitude  (location_latitude,location_longitude)
+#  index_organizations_on_manufacturer_id                           (manufacturer_id)
+#  index_organizations_on_parent_organization_id                    (parent_organization_id)
+#  index_organizations_on_slug                                      (slug) UNIQUE
+#
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
   include SearchRadiusMetricable
@@ -35,13 +85,15 @@ class Organization < ApplicationRecord
 
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
-  has_many :recovered_records, through: :bikes
+  has_many :bike_organizations_ever_registered, -> { with_deleted }, class_name: "BikeOrganization"
+  has_many :bikes_ever_registered, through: :bike_organizations_ever_registered, source: :bike
+  has_many :recovered_records, through: :bikes_ever_registered
 
-  has_many :memberships, dependent: :destroy
-  has_many :users, through: :memberships
+  has_many :organization_roles, dependent: :destroy
+  has_many :users, through: :organization_roles
 
-  has_many :admin_memberships, -> { admin }, class_name: "Membership"
-  has_many :admins, through: :admin_memberships, source: :user
+  has_many :admin_organization_roles, -> { admin }, class_name: "OrganizationRole"
+  has_many :admins, through: :admin_organization_roles, source: :user
 
   has_many :ownerships
   has_many :created_bikes, through: :ownerships, source: :bike
@@ -68,9 +120,9 @@ class Organization < ApplicationRecord
   accepts_nested_attributes_for :organization_stolen_message
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  enum kind: KIND_ENUM
-  enum pos_kind: POS_KIND_ENUM
-  enum manual_pos_kind: POS_KIND_ENUM, _prefix: :manual
+  enum :kind, KIND_ENUM
+  enum :pos_kind, POS_KIND_ENUM
+  enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
 
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
@@ -163,6 +215,7 @@ class Organization < ApplicationRecord
     return nil unless n.present?
     return n if n.is_a?(Organization)
     return find_by_id(n) if integer_slug?(n)
+
     slug = Slugifyer.slugify(n)
     # First try slug, then previous slug, and finally, just give finding by name a shot
     find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
@@ -178,6 +231,7 @@ class Organization < ApplicationRecord
 
   def self.admin_text_search(n)
     return nil unless n.present?
+
     str = "%#{n.strip}%"
     match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
@@ -188,12 +242,14 @@ class Organization < ApplicationRecord
   def self.with_enabled_feature_slugs(slugs)
     matching_slugs = OrganizationFeature.matching_slugs(slugs)
     return none unless matching_slugs.present?
+
     where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
   def self.with_any_enabled_feature_slugs(slugs)
     matching_slugs = OrganizationFeature.matching_slugs(slugs)
     return none unless matching_slugs.present?
+
     where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
   end
 
@@ -204,6 +260,7 @@ class Organization < ApplicationRecord
   def self.passwordless_email_matching(str)
     str = EmailNormalizer.normalize(str)
     return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
+
     domain = str.split("@").last
     permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
   end
@@ -230,7 +287,7 @@ class Organization < ApplicationRecord
   end
 
   def sent_invitation_count
-    memberships.count
+    organization_roles.count
   end
 
   def remaining_invitation_count
@@ -377,12 +434,14 @@ class Organization < ApplicationRecord
 
   def organization_view_counts
     return Organization.none unless manufacturer_id.present?
+
     Organization.left_joins(:organization_manufacturers)
       .where(organization_manufacturers: {can_view_counts: true, manufacturer_id: manufacturer_id})
   end
 
   def mail_snippet_body(snippet_kind)
     return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
+
     snippet = mail_snippets.enabled.where(kind: snippet_kind).first
     snippet&.body
   end
@@ -426,12 +485,14 @@ class Organization < ApplicationRecord
   # Bikes geolocated within `search_radius` miles.
   def nearby_bikes
     return Bike.none unless regional? && search_coordinates_set?
+
     # Need to unscope it so that we can call group-by on it
     Bike.unscoped.current.within_bounding_box(bounding_box)
   end
 
   def nearby_recovered_records
     return StolenRecord.none unless regional? && search_coordinates_set?
+
     # Don't use recovered scope because it orders them
     StolenRecord.recovered.within_bounding_box(bounding_box)
   end
@@ -442,6 +503,7 @@ class Organization < ApplicationRecord
 
   def graduated_notification_interval_days
     return nil unless graduated_notification_interval.present?
+
     graduated_notification_interval / ActiveSupport::Duration::SECONDS_PER_DAY
   end
 
@@ -454,6 +516,7 @@ class Organization < ApplicationRecord
   def enabled?(feature_name)
     features = OrganizationFeature.matching_slugs(feature_name)
     return false unless features.present? && enabled_feature_slugs.is_a?(Array)
+
     features.all? { |feature| enabled_feature_slugs.include?(feature) }
   end
 
@@ -464,6 +527,7 @@ class Organization < ApplicationRecord
 
   def set_calculated_attributes
     return true unless name.present?
+
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
@@ -500,6 +564,7 @@ class Organization < ApplicationRecord
 
   def ensure_auto_user
     return true if auto_user.present?
+
     self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
     save
   end
@@ -521,30 +586,33 @@ class Organization < ApplicationRecord
       u = User.fuzzy_email_find(embedable_user_email)
       self.auto_user_id = u.id if u&.member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
-        Membership.create(user_id: u.id, organization_id: id, role: "member")
+        OrganizationRole.create(user_id: u.id, organization_id: id, role: "member")
         self.auto_user_id = u.id
       end
     elsif auto_user_id.blank?
       return nil unless users.any?
+
       self.auto_user_id = users.first.id
     end
   end
 
   def update_associations
     return true if skip_update
-    UpdateOrganizationAssociationsWorker.perform_async(id)
+
+    UpdateOrganizationAssociationsJob.perform_async(id)
   end
 
   private
 
   def nearby_organizations_including_siblings
     return self.class.none unless regional? && search_coordinates_set?
+
     self.class.within_bounding_box(bounding_box).where.not(id: child_ids + [id, parent_organization_id])
       .reorder(id: :asc)
   end
 
   def strip_name_tags(str)
-    strip_tags(name&.strip).gsub("&amp;", "&")
+    InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
   end
 
   def name_shortener(str)
@@ -554,6 +622,7 @@ class Organization < ApplicationRecord
     end
     str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
     return str unless deleted_at.present?
+
     str.match?("-deleted") ? str : "#{str}-deleted"
   end
 

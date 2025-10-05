@@ -4,8 +4,8 @@ RSpec.describe UserPhonesController, type: :request do
   let(:base_url) { "/user_phones" }
   let(:phone) { "7733234433" } # ensure it's a valid phone number to not get twilio error
   before do
-    UserPhoneConfirmationWorker.new # Instantiate for stubbing
-    stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+    UserPhoneConfirmationJob.new # Instantiate for stubbing
+    stub_const("UserPhoneConfirmationJob::UPDATE_TWILIO", true)
   end
 
   it "redirects if user not present" do
@@ -26,6 +26,7 @@ RSpec.describe UserPhonesController, type: :request do
     let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone) }
     let!(:ownership) { FactoryBot.create(:ownership, is_phone: true, owner_email: phone, bike: bike) }
     it "resends if reasonable and verifies" do
+      Flipper.enable(:phone_verification)
       expect(current_user).to be_present
       user_phone.update_column :updated_at, Time.current - 5.minutes
       user_phone.reload
@@ -34,7 +35,7 @@ RSpec.describe UserPhonesController, type: :request do
       expect(user_phone.resend_confirmation?).to be_truthy
       bike.reload
       expect(bike.ownerships.count).to eq 1
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! {
         VCR.use_cassette("user_phones_controller-resend", match_requests_on: [:path]) do
           expect {
@@ -75,6 +76,7 @@ RSpec.describe UserPhonesController, type: :request do
     end
 
     describe "confirm" do
+      before { Flipper.enable(:phone_verification) }
       it "confirms" do
         expect(current_user).to be_present
         expect(user_phone.confirmed?).to be_falsey
@@ -115,7 +117,7 @@ RSpec.describe UserPhonesController, type: :request do
           user_phone.update_column :updated_at, Time.current - 5.hours
           user_phone.reload
           expect(user_phone.confirmed?).to be_falsey
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             expect {
               VCR.use_cassette("user_phones_controller-resend", match_requests_on: [:path]) do
@@ -139,12 +141,13 @@ RSpec.describe UserPhonesController, type: :request do
     end
 
     describe "resend_confirmation" do
+      before { Flipper.enable(:phone_verification) }
       context "not reasonable to resend" do
         it "does not resend" do
           user_phone.reload
           expect(user_phone.confirmed?).to be_falsey
           expect(user_phone.resend_confirmation?).to be_falsey
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             expect {
               patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
@@ -171,7 +174,7 @@ RSpec.describe UserPhonesController, type: :request do
           expect(user_phone.resend_confirmation?).to be_truthy
           current_user.reload
           expect(current_user.phone_waiting_confirmation?).to be_falsey
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             VCR.use_cassette("user_phones_controller-resend", match_requests_on: [:path]) do
               expect {
@@ -199,7 +202,7 @@ RSpec.describe UserPhonesController, type: :request do
           user_phone.update_column :updated_at, Time.current - 5.minutes
           user_phone.reload
           expect(user_phone.confirmed?).to be_truthy
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             expect {
               patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
@@ -222,11 +225,10 @@ RSpec.describe UserPhonesController, type: :request do
           user_phone.update_column :updated_at, Time.current - 5.minutes
           user_phone.reload
           expect(user_phone.resend_confirmation?).to be_truthy
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
-            expect {
-              patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
-            }.to raise_error(ActiveRecord::RecordNotFound)
+            patch "#{base_url}/#{user_phone.to_param}", params: {resend_confirmation: true}
+            expect(response.status).to eq 404
           end
           current_user.reload
           expect(current_user.user_phones.count).to eq 0
@@ -272,9 +274,8 @@ RSpec.describe UserPhonesController, type: :request do
           user_phone.reload
           current_user.reload
           expect(current_user.user_phones.count).to eq 1
-          expect {
-            delete "#{base_url}/#{user_phone2.to_param}"
-          }.to raise_error(ActiveRecord::RecordNotFound)
+          delete "#{base_url}/#{user_phone2.to_param}"
+          expect(response.status).to eq 404
 
           current_user.reload
           expect(current_user.user_phones.count).to eq 1

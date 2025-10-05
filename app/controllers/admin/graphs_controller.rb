@@ -52,6 +52,7 @@ class Admin::GraphsController < Admin::BaseController
 
   def matching_bikes
     return @matching_bikes if defined?(@matching_bikes)
+
     bikes = Bike.unscoped.where(created_at: @time_range)
     if params[:search_manufacturer].present?
       @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer])

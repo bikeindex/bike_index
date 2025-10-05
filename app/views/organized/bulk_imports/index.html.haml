@@ -17,7 +17,7 @@
 
 .row.pt-4.mt-4.mb-4
   .col-sm-6
-    = pluralize(number_with_delimiter(@bulk_imports.total_count), "matching import")
+    = pluralize(number_with_delimiter(@pagy.count), "matching import")
     %em
       = humanized_time_range(@time_range)
   .col-sm-6.text-right
@@ -37,14 +37,14 @@
   %thead.small-header
     %th
       = sortable "created_at", t(".added")
-    %th= t(".progress")
     - if @show_kind
       %th
         = sortable "kind", t(".kind")
+    %th= t(".progress")
     %th= t(".errors")
     %th
       = sortable "user_id", t(".creator")
-    %th= t(".bikes")
+    %th= t(".registrations")
   %tbody
     - @bulk_imports.each do |bulk_import|
       %tr
@@ -55,17 +55,13 @@
           %td
             = bulk_import.kind_humanized
         %td
-          - if bulk_import.blocking_error?
-            %span.text-danger
-              = t(".unable_to_process")
-          - else
-            = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
+          = render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import: bulk_import}
         %td
           = render partial: "/organized/bulk_imports/error_type", locals: {bulk_import: bulk_import}
         %td
           = bulk_import.user.display_name if bulk_import.user_id.present?
         %td
-          = bulk_import.ownerships.count # Don't need to do bikes through ownerships
+          = number_display(bulk_import.ownerships.count) # Don't need to do bikes through ownerships
 
-.paginate-container.paginate-container-bottom
-  = paginate @bulk_imports
+.pb-4.pt-4
+  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

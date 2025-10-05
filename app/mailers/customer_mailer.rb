@@ -1,4 +1,6 @@
 class CustomerMailer < ApplicationMailer
+  helper TranslationHelper
+
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
 
@@ -23,7 +25,7 @@ class CustomerMailer < ApplicationMailer
 
   def password_reset_email(user)
     @user = user
-    @url = update_password_form_with_reset_token_users_url(token: @user.password_reset_token)
+    @url = update_password_form_with_reset_token_users_url(token: @user.token_for_password_reset)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email, tag: __callee__)
@@ -57,17 +59,27 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def newsletter(user:, mail_snippet:)
+    @user = user
+    @_action_has_layout = false # layout is manually included here
+    @mail_snippet_body = mail_snippet.body
+    @title = mail_snippet.subject
+
+    mail(to: @user.email, subject: @title, tag: __callee__)
+  end
+
   def theft_survey(notification)
     mail_snippet = MailSnippet.theft_survey_2023.first
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
-    mail_body = mail_snippet.body.gsub(/SURVEY_LINK_ID/, notification.survey_id.to_s)
+
+    mail_body = mail_snippet.body.gsub("SURVEY_LINK_ID", notification.survey_id.to_s)
     if notification.user.present?
       mail_body = mail_body.gsub(/Bike Index Registrant/i, notification.user.name)
     end
 
     # Also replace organization if it's present
     organization = notification.bike.creation_organization
-    mail_body = mail_body.gsub(/a Bike Shop/, organization.name) if organization.present?
+    mail_body = mail_body.gsub("a Bike Shop", organization.name) if organization.present?
 
     mail(to: notification.calculated_message_channel_target, from: "gavin@bikeindex.org",
       subject: mail_snippet.subject, body: mail_body + "\n\n\n\n", tag: notification.kind)
@@ -77,7 +89,7 @@ class CustomerMailer < ApplicationMailer
     @customer_contact = customer_contact
     @info = customer_contact.info_hash
     @bike = customer_contact.bike
-    @bike_type = @bike.cycle_type_name&.downcase
+    @bike_type = @bike.type
     @user = @customer_contact.user
 
     @location = @info["location"]
@@ -130,6 +142,7 @@ class CustomerMailer < ApplicationMailer
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
     @user = stolen_notification.receiver
+    @mail_snippet = stolen_notification.mail_snippet
 
     I18n.with_locale(@user&.preferred_language) do
       mail(
@@ -196,6 +209,25 @@ class CustomerMailer < ApplicationMailer
       mail(to: @user.email,
         from: '"Gavin Hoover" <gavin@bikeindex.org>',
         tag: __callee__)
+    end
+  end
+
+  def marketplace_message_notification(marketplace_message)
+    @marketplace_message = marketplace_message
+    @user = @marketplace_message.receiver
+    @marketplace_listing = @marketplace_message.marketplace_listing
+    # TODO: Specific layout for these, rather than just skipping header
+    @skip_header = true
+
+    @message_url = my_account_message_url(id: @marketplace_message.id, anchor: "message-#{@marketplace_message.id}")
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @user.email,
+        subject: @marketplace_message.subject,
+        references: @marketplace_message.email_references_id,
+        tag: __callee__
+      )
     end
   end
 end

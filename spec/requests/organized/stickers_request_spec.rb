@@ -38,7 +38,7 @@ RSpec.describe Organized::StickersController, type: :request do
   end
 
   context "organization with bike_stickers" do
-    include_context :request_spec_logged_in_as_organization_member
+    include_context :request_spec_logged_in_as_organization_user
     let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_stickers"]) }
 
     context "logged in as organization member" do

@@ -1,19 +1,18 @@
 module Organized
   class GraduatedNotificationsController < Organized::BaseController
     include SortableTable
+
     before_action :ensure_access_to_graduated_notifications!
-    before_action :set_period, only: [:index]
+
     before_action :find_graduated_notification, except: [:index]
 
     def index
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @per_page = permitted_per_page
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
-      @graduated_notifications = available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
-        .page(@page).per(@per_page)
-        .includes(:user, :bike, :secondary_notifications)
+      @pagy, @graduated_notifications = pagy(available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
+        .includes(:user, :bike, :secondary_notifications), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -46,12 +45,13 @@ module Organized
 
     def available_graduated_notifications
       return @available_graduated_notifications if defined?(@available_graduated_notifications)
+
       if params[:search_status] == "all"
         @search_status = "all"
         a_graduated_notifications = graduated_notifications
       else
         @search_status = GraduatedNotification.statuses.include?(params[:search_status]) ? params[:search_status] : "current"
-        a_graduated_notifications = graduated_notifications.send(@search_status)
+        a_graduated_notifications = graduated_notifications.public_send(@search_status)
       end
 
       # Doesn't make sense to include unprocessed if sorting by processed_at
@@ -85,6 +85,7 @@ module Organized
 
     def ensure_access_to_graduated_notifications!
       return true if current_organization.enabled?("graduated_notifications") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

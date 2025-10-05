@@ -6,7 +6,7 @@ RSpec.describe MailchimpDatum, type: :model do
   let(:empty_data) { {lists: [], tags: [], interests: [], merge_fields: {"bikes" => 0, "number_of_donations" => 0}} }
 
   describe "find_or_create_for" do
-    before { Sidekiq::Worker.clear_all }
+    before { Sidekiq::Job.clear_all }
 
     context "user" do
       let(:user) { FactoryBot.create(:user, email: "test@stuff.com") }
@@ -17,10 +17,53 @@ RSpec.describe MailchimpDatum, type: :model do
         expect(mailchimp_datum.id).to be_blank
         expect(mailchimp_datum.data.except("merge_fields")).to eq empty_data.except(:merge_fields).merge(tags: ["in_bike_index"]).as_json
         expect(mailchimp_datum.subscriber_hash).to eq "4108acb6069e48c2eec39cb7ecc002fe"
-        expect(UpdateMailchimpDatumWorker.jobs.count).to eq 0
+        expect(UpdateMailchimpDatumJob.jobs.count).to eq 0
+      end
+      context "member" do
+        let!(:member) { FactoryBot.create(:membership, user:, level: "plus", start_at: Time.current - 1.year, end_at:) }
+        let(:end_at) { Time.current + 2.weeks }
+        it "creates and then finds for the user" do
+          expect(user.reload.member?).to be_truthy
+          mailchimp_datum = MailchimpDatum.find_or_create_for(user)
+          expect(mailchimp_datum.lists).to eq(["individual"])
+          expect(mailchimp_datum.subscribed?).to be_truthy
+          expect(mailchimp_datum.on_mailchimp?).to be_falsey
+          expect(mailchimp_datum.id).to be_present
+          expect(mailchimp_datum.user_id).to eq user.id
+          expect(user.reload.mailchimp_datum&.id).to eq mailchimp_datum.id
+          expect(UpdateMailchimpDatumJob.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
+          expect {
+            mailchimp_datum.update(updated_at: Time.current)
+          }.to_not change(UpdateMailchimpDatumJob.jobs, :count)
+          expect(mailchimp_datum.should_update?).to be_truthy
+
+          # Destroying the user updates mailchimp
+          user.destroy
+          expect {
+            mailchimp_datum.reload
+            mailchimp_datum.update(updated_at: Time.current)
+          }.to change(UpdateMailchimpDatumJob.jobs, :count).by 1
+          mailchimp_datum.reload
+          expect(mailchimp_datum.user_deleted?).to be_truthy
+          expect(mailchimp_datum.status).to eq "archived"
+          expect(mailchimp_datum.user_id).to be_present
+        end
+        context "membership ended" do
+          let(:end_at) { Time.current - 1.week }
+          it "does not create if not otherwise required" do
+            expect(user.reload.member?).to be_falsey
+            mailchimp_datum = MailchimpDatum.find_or_create_for(user)
+            expect(mailchimp_datum.lists).to eq([])
+            expect(mailchimp_datum.no_subscription_required?).to be_truthy
+            expect(mailchimp_datum.id).to be_blank
+            expect(mailchimp_datum.data.except("merge_fields")).to eq empty_data.except(:merge_fields).merge(tags: ["in_bike_index"]).as_json
+            expect(mailchimp_datum.subscriber_hash).to eq "4108acb6069e48c2eec39cb7ecc002fe"
+            expect(UpdateMailchimpDatumJob.jobs.count).to eq 0
+          end
+        end
       end
       context "organization admin" do
-        let!(:membership) { FactoryBot.create(:membership_claimed, role: "admin", user: user, organization: organization) }
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, role: "admin", user: user, organization: organization) }
         it "creates and then finds for the user" do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
           mailchimp_datum = MailchimpDatum.find_or_create_for(user)
@@ -30,10 +73,10 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.id).to be_present
           expect(mailchimp_datum.user_id).to eq user.id
           expect(user.reload.mailchimp_datum&.id).to eq mailchimp_datum.id
-          expect(UpdateMailchimpDatumWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
+          expect(UpdateMailchimpDatumJob.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
           expect {
             mailchimp_datum.update(updated_at: Time.current)
-          }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
+          }.to_not change(UpdateMailchimpDatumJob.jobs, :count)
           expect(mailchimp_datum.should_update?).to be_truthy
 
           # Destroying the user updates mailchimp
@@ -41,21 +84,21 @@ RSpec.describe MailchimpDatum, type: :model do
           expect {
             mailchimp_datum.reload
             mailchimp_datum.update(updated_at: Time.current)
-          }.to change(UpdateMailchimpDatumWorker.jobs, :count).by 1
+          }.to change(UpdateMailchimpDatumJob.jobs, :count).by 1
           mailchimp_datum.reload
           expect(mailchimp_datum.user_deleted?).to be_truthy
           expect(mailchimp_datum.status).to eq "archived"
           expect(mailchimp_datum.user_id).to be_present
         end
-        context "membership removed" do
+        context "organization_role removed" do
           it "is archived" do
             mailchimp_datum = MailchimpDatum.find_or_create_for(user)
             expect(mailchimp_datum.lists).to eq(["organization"])
             expect(mailchimp_datum.subscribed?).to be_truthy
             expect(mailchimp_datum.on_mailchimp?).to be_falsey
-            Sidekiq::Worker.clear_all
-            membership.destroy
-            expect(AfterUserChangeWorker.jobs.count).to eq 1
+            Sidekiq::Job.clear_all
+            organization_role.destroy
+            expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
             id = mailchimp_datum.id
             mailchimp_datum = MailchimpDatum.find(id) # Unmemoize
             expect(mailchimp_datum.mailchimp_organization&.id).to be_blank
@@ -65,15 +108,15 @@ RSpec.describe MailchimpDatum, type: :model do
           end
         end
       end
-      context "organization member" do
-        let!(:membership) { FactoryBot.create(:membership_claimed, role: "member", user: user, organization: organization) }
+      context "organization role" do
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, role: "member", user: user, organization: organization) }
         it "does not create" do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
           mailchimp_datum = MailchimpDatum.find_or_create_for(user)
           expect(mailchimp_datum.lists).to eq([])
           expect(mailchimp_datum.status).to eq "no_subscription_required"
           expect(mailchimp_datum.id).to be_blank
-          expect(UpdateMailchimpDatumWorker.jobs.count).to eq 0
+          expect(UpdateMailchimpDatumJob.jobs.count).to eq 0
         end
       end
       context "with feedback" do
@@ -88,17 +131,17 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.user_id).to eq user.id
           expect(mailchimp_datum.feedbacks.pluck(:id)).to eq([feedback.id])
           expect(feedback.reload.mailchimp_datum_id).to eq mailchimp_datum.id
-          expect(UpdateMailchimpDatumWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
+          expect(UpdateMailchimpDatumJob.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
 
           expect {
             mailchimp_datum.update(updated_at: Time.current)
-          }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
+          }.to_not change(UpdateMailchimpDatumJob.jobs, :count)
 
-          # And test that creating a membership doesn't result in update mailchimp datum
-          FactoryBot.create(:membership_claimed, user: user, organization: organization)
+          # And test that creating a organization_role doesn't result in update mailchimp datum
+          FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
           expect {
             mailchimp_datum.update(updated_at: Time.current)
-          }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
+          }.to_not change(UpdateMailchimpDatumJob.jobs, :count)
         end
         it "also creates if passed the feedback" do
           expect(feedback.reload.mailchimp_datum_id).to be_blank
@@ -110,11 +153,11 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.user_id).to eq user.id
           expect(mailchimp_datum.feedbacks.pluck(:id)).to eq([feedback.id])
           expect(feedback.reload.mailchimp_datum_id).to eq mailchimp_datum.id
-          expect(UpdateMailchimpDatumWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
+          expect(UpdateMailchimpDatumJob.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
 
           expect {
             mailchimp_datum.update(updated_at: Time.current)
-          }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
+          }.to_not change(UpdateMailchimpDatumJob.jobs, :count)
           # Thow this test in here too
           expect(MailchimpDatum.list("organization").pluck(:id)).to eq([mailchimp_datum.id])
           expect(MailchimpDatum.list("individual").pluck(:id)).to eq([])
@@ -129,7 +172,7 @@ RSpec.describe MailchimpDatum, type: :model do
         expect(mailchimp_datum.lists).to eq([])
         expect(mailchimp_datum.no_subscription_required?).to be_truthy
         expect(mailchimp_datum.id).to be_blank
-        expect(UpdateMailchimpDatumWorker.jobs.count).to eq 0
+        expect(UpdateMailchimpDatumJob.jobs.count).to eq 0
       end
       context "lead_for_school" do
         let!(:feedback) { FactoryBot.create(:feedback, kind: "lead_for_school") }
@@ -144,11 +187,11 @@ RSpec.describe MailchimpDatum, type: :model do
           expect(mailchimp_datum.feedbacks.pluck(:id)).to eq([feedback.id])
           expect(feedback.reload.mailchimp_datum_id).to eq mailchimp_datum.id
           expect(mailchimp_datum.data).to eq target.as_json
-          expect(UpdateMailchimpDatumWorker.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
+          expect(UpdateMailchimpDatumJob.jobs.map { |j| j["args"] }.last.flatten).to eq([mailchimp_datum.id])
 
           expect {
             mailchimp_datum.update(updated_at: Time.current)
-          }.to_not change(UpdateMailchimpDatumWorker.jobs, :count)
+          }.to_not change(UpdateMailchimpDatumJob.jobs, :count)
         end
       end
     end
@@ -185,7 +228,7 @@ RSpec.describe MailchimpDatum, type: :model do
         }
       end
       it "is as expected" do
-        expect(user.reload.memberships.first.organization_creator?).to be_truthy
+        expect(user.reload.organization_roles.first.organization_creator?).to be_truthy
         expect(mailchimp_datum.calculated_data.as_json).to eq target.as_json
         expect(mailchimp_datum.managed_merge_fields.as_json).to eq target_merge_fields.as_json
         expect(mailchimp_datum.lists).to eq(["organization"])
@@ -205,14 +248,14 @@ RSpec.describe MailchimpDatum, type: :model do
         let(:organization_kind) { "ambassador" }
         it "is no_subscription_required" do
           expect(user).to be_present
-          expect(mailchimp_datum.mailchimp_organization_membership&.id).to be_blank
+          expect(mailchimp_datum.mailchimp_organization_role&.id).to be_blank
           # Doesn't include does_not_need_pos tag
           expect(mailchimp_datum.status).to eq "no_subscription_required"
           expect(mailchimp_datum.id).to be_blank
           expect(mailchimp_datum).to_not be_valid
           # And because I initially added some ambassador orgs, make sure we don't just load from the name
           mailchimp_datum.data["merge_fields"] = {organization_name: organization.name}
-          expect(mailchimp_datum.mailchimp_organization_membership&.id).to be_blank
+          expect(mailchimp_datum.mailchimp_organization_role&.id).to be_blank
         end
       end
       context "lightspeed" do
@@ -245,8 +288,8 @@ RSpec.describe MailchimpDatum, type: :model do
       context "not creator of organization" do
         let!(:organization_creator) { FactoryBot.create(:organization_admin, organization: organization) }
         it "is as expected" do
-          expect(organization_creator.reload.memberships.first.organization_creator?).to be_truthy
-          expect(user.reload.memberships.first.organization_creator?).to be_falsey
+          expect(organization_creator.reload.organization_roles.first.organization_creator?).to be_truthy
+          expect(user.reload.organization_roles.first.organization_creator?).to be_falsey
           expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in_bike_index not_org_creator]).as_json
         end
       end
@@ -287,7 +330,7 @@ RSpec.describe MailchimpDatum, type: :model do
         let(:combined_merge_fields) { target_merge_fields.merge(most_recent_donation_at: payment_time.to_date.to_s, number_of_donations: 1) }
         it "is only organization list but includes the other interests" do
           payment.reload
-          expect(user.reload.memberships.first.organization_creator?).to be_truthy
+          expect(user.reload.organization_roles.first.organization_creator?).to be_truthy
           expect(mailchimp_datum.managed_merge_fields.as_json).to eq combined_merge_fields.as_json
           expect(mailchimp_datum.lists).to eq(["organization"])
           target_combined = target.merge(interests: %w[bike_shop donors],
@@ -361,18 +404,18 @@ RSpec.describe MailchimpDatum, type: :model do
     end
   end
 
-  describe "mailchimp_organization_membership" do
+  describe "mailchimp_organization_role" do
     let(:user) { FactoryBot.create(:organization_admin) }
     let(:organization1) { user.organizations.first }
-    let(:membership2) { FactoryBot.create(:membership_claimed, user: user, role: "admin") }
-    let(:organization2) { membership2.organization }
+    let(:organization_role2) { FactoryBot.create(:organization_role_claimed, user: user, role: "admin") }
+    let(:organization2) { organization_role2.organization }
     let!(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
     it "uses the existing organization" do
       expect(mailchimp_datum).to be_valid
       expect(mailchimp_datum.mailchimp_organization&.id).to eq organization1.id
       mailchimp_datum.data["merge_fields"] = mailchimp_datum.managed_merge_fields
       mailchimp_datum.update(updated_at: Time.current)
-      expect(membership2).to be_valid
+      expect(organization_role2).to be_valid
       user.reload
       id = mailchimp_datum.id
       mailchimp_datum = MailchimpDatum.find(id) # Unmemoize

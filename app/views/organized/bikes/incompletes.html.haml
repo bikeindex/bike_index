@@ -10,10 +10,10 @@
 
 %p.mt-4
   %strong
-    = @b_params.total_count
+    = @pagy.count
     = t(".matching") if params[:query].present?
   = t(".incomplete")
-  = t(".registration").pluralize(@b_params.total_count)
+  = t(".registration").pluralize(@pagy.count)
   %em
     = humanized_time_range(@time_range)
 
@@ -30,21 +30,35 @@
 - include_child_org = current_organization.child_ids.present?
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
   %thead.small-header
+  %thead.sortable
     %th
-      = t(".sent")
-      %small.convertTimezone
+      = sortable "id" do
+        = t(".sent")
+        %small.convertTimezone
     %th= t(".bike")
-    %th= t(".email")
+    %th= sortable "cycle_type", t(".vehicle_type")
+    %th= sortable "motorized", t(".motorized")
+    %th= sortable "email", t(".email")
   %tbody
     - @b_params.each do |b_param|
       %tr
         %td
           %span.convertTime
             = l b_param.created_at, format: :convert_time
+          - if display_dev_info?
+            %small.only-dev-visible= b_param.id
         %td
           %strong
             = b_param.primary_frame_color
           = b_param.mnfg_name
+        %td
+          - cycle_type = b_param.cycle_type
+          - if cycle_type.present? && cycle_type != 'bike'
+            = CycleType.slug_translation(cycle_type)
+          - else
+            %span.less-strong bike
+        %td
+          = check_mark if b_param.motorized?
         %td
           = b_param.owner_email
           - if include_child_org && b_param.organization != current_organization
@@ -63,5 +77,5 @@
               %span.less-strong-right
                 = link_to t(".re_send"), resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param), method: :post, data: {confirm: t(".only_resend_with_permission")}, class: "gray-link"
 
-.paginate-container.paginate-container-bottom
-  = paginate @b_params
+.pt-4.pb-4
+  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

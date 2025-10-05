@@ -1,16 +1,11 @@
 class Admin::OrganizationStatusesController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
-
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 10
-    @organization_statuses =
-      matching_organization_statuses
-        .reorder("organization_statuses.#{sort_column} #{sort_direction}")
-        .page(page)
-        .per(@per_page)
+    @per_page = permitted_per_page(default: 10)
+    @pagy, @organization_statuses =
+      pagy(matching_organization_statuses
+        .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_organization_statuses, :grouped_pos_kinds
@@ -61,14 +56,14 @@ class Admin::OrganizationStatusesController < Admin::BaseController
 
     if permitted_pos_kinds.include?(params[:search_pos_kind])
       @pos_kind = params[:search_pos_kind]
-      organization_statuses = organization_statuses.send(@pos_kind)
+      organization_statuses = organization_statuses.public_send(@pos_kind)
     else
       @pos_kind = "all"
     end
 
     if permitted_kinds.include?(params[:search_kind])
       @kind = params[:search_kind]
-      organization_statuses = organization_statuses.send(@kind)
+      organization_statuses = organization_statuses.public_send(@kind)
     else
       @kind = "all"
     end

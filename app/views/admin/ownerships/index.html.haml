@@ -1,32 +1,30 @@
-.admin-subnav
-  .col-md-5
-    %h1
-      Ownerships
-  .col-md-7
-    %ul
-      %li.nav-item.dropdown.dropleft
-        %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_origin != "all" ? "active" : "")}
-          - if @search_origin == "all"
-            All origins
-          - elsif @search_origin == "only_initial"
-            Only initial
-          - else
-            = Ownership.origin_humanized(@search_origin).titleize
-        .dropdown-menu
-          = link_to "All origins", url_for(sortable_search_params.merge(search_origin: nil)), class: "dropdown-item #{@search_origin == 'all' ? 'active' : ''}"
-          = link_to "Only initial", url_for(sortable_search_params.merge(search_origin: "only_initial")), class: "dropdown-item #{@search_origin == 'only_initial' ? 'active' : ''}"
-          .dropdown-divider
-          - Ownership.origins.each do |origin|
-            = link_to Ownership.origin_humanized(origin).titleize, url_for(sortable_search_params.merge(search_origin: origin)), class: "dropdown-item #{@search_origin == origin ? 'active' : ''}"
-      %li.nav-item
-        = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin_current_header", locals: {viewing: "Ownerships"}
+- nav_header_list_items = capture_haml do
+  %li.nav-item.dropdown.dropleft
+    %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_organization_kind.present? ? "active" : "")}
+      - if @search_organization_kind.blank?
+        with and without organization
+      - else
+        = @search_organization_kind.humanize
+    .dropdown-menu
+      = link_to "with and without organizations", url_for(sortable_search_params.merge(search_organization_kind: nil)), class: "dropdown-item #{@search_organization_kind.blank? ? 'active' : ''}"
+      - organization_kind_options.each do |search_organization_kind|
+        = link_to search_organization_kind.humanize, url_for(sortable_search_params.merge(search_organization_kind:)), class: "dropdown-item #{@search_organization_kind == search_organization_kind ? 'active' : ''}"
 
-- if @render_chart
-  = column_chart time_range_counts(collection: matching_ownerships, column: @time_range_column), stacked: true, thousands: ","
+  %li.nav-item.dropdown.dropleft
+    %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_origin != "all" ? "active" : "")}
+      - if @search_origin == "all"
+        All origins
+      - elsif @search_origin == "only_initial"
+        Only initial
+      - else
+        = Ownership.origin_humanized(@search_origin).titleize
+    .dropdown-menu
+      = link_to "All origins", url_for(sortable_search_params.merge(search_origin: nil)), class: "dropdown-item #{@search_origin == 'all' ? 'active' : ''}"
+      = link_to "Only initial", url_for(sortable_search_params.merge(search_origin: "only_initial")), class: "dropdown-item #{@search_origin == 'only_initial' ? 'active' : ''}"
+      .dropdown-divider
+      - Ownership.origins.each do |origin|
+        = link_to Ownership.origin_humanized(origin).titleize, url_for(sortable_search_params.merge(search_origin: origin)), class: "dropdown-item #{@search_origin == origin ? 'active' : ''}"
 
-= render partial: "/shared/period_select"
+- table_view = render partial: "/admin/ownerships/table", locals: {ownerships: @ownerships, render_sortable: true}
 
-= render partial: "/shared/pagination", locals: {collection: @ownerships}
-
-= render partial: "/admin/ownerships/table", locals: {ownerships: @ownerships, render_sortable: true}
+= render partial: "/shared/admin/index_skeleton", locals: {collection: @ownerships, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_ownerships}

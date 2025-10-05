@@ -95,7 +95,7 @@ module API
 
         def owner_duplicate_bike(bikes: nil)
           @manufacturer_id ||= Manufacturer.friendly_find_id(params[:manufacturer])
-          OwnerDuplicateBikeFinder.matching(serial: params[:serial],
+          BikeServices::OwnerDuplicateFinder.matching(serial: params[:serial],
             owner_email: params[:owner_email_is_phone_number] ? nil : params[:owner_email],
             phone: params[:owner_email_is_phone_number] ? params[:owner_email] : nil,
             manufacturer_id: @manufacturer_id,
@@ -106,6 +106,7 @@ module API
           state = bike&.status&.gsub("status_", "")
           if state.present?
             return state if state == "stolen"
+
             if %w[abandoned impounded unregistered_parking_notification].include?(state)
               "impounded"
             elsif StolenRecord.recovered.where(bike_id: bike.id)
@@ -136,6 +137,7 @@ module API
 
         def authorize_bike_for_user(addendum = "")
           return true if @bike.authorize_and_claim_for_user(current_user)
+
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
 
@@ -273,9 +275,9 @@ module API
             end
             begin
               # Don't update the email (or is_phone), because maybe they have different user emails
-              bike_update_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :no_duplicate))
-              BikeUpdator
-                .new(user: current_user, bike: @bike, b_params: bike_update_params)
+              permitted_params = b_param.params.merge("bike" => b_param.bike.except(:owner_email, :is_phone, :no_duplicate))
+              BikeServices::Updator
+                .new(user: current_user, bike: @bike, permitted_params:)
                 .update_available_attributes
             rescue => e
               error!("Unable to update bike: #{e}", 401)
@@ -287,7 +289,7 @@ module API
           b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
             params: declared_p.merge(creation_state_params).as_json)
           b_param.save
-          bike = BikeCreator.new.create_bike(b_param)
+          bike = BikeServices::Creator.new.create_bike(b_param)
 
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
             created_bike_serialized(bike, true)
@@ -322,10 +324,9 @@ module API
           authorize_bike_for_user
           b_param = BParam.new(params: declared_p.as_json, origin: origin_api_version)
           b_param.clean_params
-          hash = b_param.params
-          @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
+          @bike.load_external_images(b_param.params["bike"]["external_image_urls"]) if b_param.params.dig("bike", "external_image_urls").present?
           begin
-            BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
+            BikeServices::Updator.new(user: current_user, bike: @bike, permitted_params: b_param.params).update_available_attributes
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end
@@ -431,12 +432,15 @@ module API
         end
         post ":id/send_stolen_notification" do
           find_bike
-          error!("Bike is not stolen", 400) unless @bike.present? && @bike.status_stolen?
-          # Unless application is authorized....
-          authorize_bike_for_user(" (this application is not approved to send notifications)")
+          error!("Unable to find matching stolen bike", 400) unless @bike.present? && @bike.status_stolen?
+          unless doorkeeper_application.can_send_stolen_notifications
+            # if the application isn't authorized, only send notifications to the user's bikes
+            authorize_bike_for_user(" (this application is not approved to send notifications)")
+          end
           stolen_notification = StolenNotification.create(bike_id: params[:id],
             message: params[:message],
-            sender: current_user)
+            sender: current_user,
+            doorkeeper_app_id: doorkeeper_application.id)
           StolenNotificationSerializer.new(stolen_notification).as_json
         end
       end

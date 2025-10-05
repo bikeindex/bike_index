@@ -32,8 +32,8 @@
 
 
 = form_for [:admin, @paint] do |f|
-  - if @paint.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Paint", obj: @paint }
+  = render(AlertForErrors::Component.new(object: @paint))
+
   .row
     .col-lg-3.col-md-6.col-sm-12
       .form-group
@@ -62,9 +62,10 @@
 
 - if @bikes.present?
   %p
-    = number_with_delimiter(@bikes.total_count)
+    = number_with_delimiter(@bikes_count)
     Bikes with this paint
-  = paginate @bikes, views_prefix: "admin"
+
+  = render partial: "/shared/admin/pagination", locals: {collection: @bikes}
 
   = render partial: "/admin/bikes/table"
 

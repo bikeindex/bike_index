@@ -2,11 +2,13 @@ module SortableTable
   extend ActiveSupport::Concern
 
   included do
+    before_action :set_period, only: %i[index]
+
     helper_method :sort_column, :sort_direction
   end
 
   def sort_column
-    sortable_columns.include?(params[:sort]) ? params[:sort] : default_column
+    @sort_column ||= sortable_columns.include?(params[:sort]) ? params[:sort] : default_column
   end
 
   def sort_direction

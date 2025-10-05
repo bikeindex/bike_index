@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: duplicate_bike_groups
+#
+#  id            :integer          not null, primary key
+#  added_bike_at :datetime
+#  ignore        :boolean          default(FALSE), not null
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
 class DuplicateBikeGroup < ApplicationRecord
   has_many :normalized_serial_segments
   has_many :bikes, through: :normalized_serial_segments
@@ -16,7 +26,6 @@ class DuplicateBikeGroup < ApplicationRecord
   end
 
   def segment
-    normalized_serial_segments&.first &&
-      normalized_serial_segments.first.segment || ""
+    normalized_serial_segments&.first&.segment || ""
   end
 end

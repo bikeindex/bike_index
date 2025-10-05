@@ -1,9 +1,9 @@
 require "rails_helper"
 
-RSpec.describe BikeVersions::EditsController, type: :request do
+RSpec.describe BikeVersionsController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/bike_versions" }
-  let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user) }
+  let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user, description: "cool bike, boo") }
 
   describe "index" do
     it "renders" do
@@ -12,6 +12,17 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       expect(response.code).to eq("200")
       expect(response).to render_template(:index)
       expect(assigns(:bike_versions).pluck(:id)).to eq([bike_version.id])
+
+      get "#{base_url}?query_items%5B%5D=boo"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:index)
+      expect(assigns(:interpreted_params)).to eq({query: "boo", stolenness: "non"})
+      expect(assigns(:bike_versions).pluck(:id)).to eq([bike_version.id])
+
+      get "#{base_url}?query_items%5B%5D=booboo"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:index)
+      expect(assigns(:bike_versions).pluck(:id)).to eq([])
     end
   end
 
@@ -26,7 +37,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       expect(response).to render_template(:show)
     end
     context "superadmin" do
-      let(:current_user) { FactoryBot.create(:admin) }
+      let(:current_user) { FactoryBot.create(:superuser) }
       it "renders" do
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
@@ -45,9 +56,8 @@ RSpec.describe BikeVersions::EditsController, type: :request do
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
         bike_version.update(visibility: "user_hidden")
-        expect {
-          get "#{base_url}/#{bike_version.to_param}"
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        get "#{base_url}/#{bike_version.to_param}"
+        expect(response.status).to eq 404
       end
     end
   end
@@ -103,7 +113,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
           end_at: nil)
       }
       expect(flash[:success]).to be_present
-      expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
+      expect(bike_version.reload).to match_hash_indifferently valid_update_params
       expect(bike_version.owner_id).to eq current_user.id
       expect(bike_version.bike_id).to eq og_bike_id
       expect(bike_version.start_at).to be_blank
@@ -123,7 +133,7 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       }
       expect(flash[:success]).to be_present
       expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/accessories")
-      expect_attrs_to_match_hash(bike_version.reload, valid_update_params)
+      expect(bike_version.reload).to match_hash_indifferently valid_update_params
       expect(bike_version.start_at.to_i).to be_within(1).of 1524938400
       expect(bike_version.end_at.to_i).to be_within(1).of 1632852000
     end

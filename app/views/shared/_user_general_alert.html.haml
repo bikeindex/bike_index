@@ -3,7 +3,7 @@
 -# We're manually rendering only the general alerts here
 
 
-- if current_user.alert_slugs.include?("phone_waiting_confirmation")
+- if Flipper.enabled?(:phone_verification) && current_user.alert_slugs.include?("phone_waiting_confirmation")
   -# TODO: use existing user_alert to select correct phone
   - if current_user.phone_waiting_confirmation?
     - phone_number = current_user.user_phones.waiting_confirmation.reorder(:updated_at).last

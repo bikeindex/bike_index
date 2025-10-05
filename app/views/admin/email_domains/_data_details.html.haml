@@ -1,0 +1,10 @@
+- email_domain ||= nil
+- subdomain_count = email_domain&.data&.dig("subdomain_count")&.to_i
+- if subdomain_count.present? && subdomain_count > 0
+  %a.small.text-info.text-underline.mr-1{href: admin_email_domains_path(query: email_domain.tld) }
+    = number_display(subdomain_count)
+    %em subs
+- if email_domain&.broader_domain_exists?
+  %a.small.text-danger.text-underline.mr-1{href: admin_email_domains_path(query: email_domain.tld) }
+    broader exists
+-#   %small.float-right= link_to "remove block", admin_email_domain_path(email_domain), method: :delete

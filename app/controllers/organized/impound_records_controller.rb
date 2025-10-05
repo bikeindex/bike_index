@@ -1,18 +1,16 @@
 module Organized
   class ImpoundRecordsController < Organized::BaseController
     include SortableTable
-    before_action :set_period, only: [:index]
+
     before_action :find_impound_record, except: [:index]
 
     def index
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @per_page = permitted_per_page
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
-      @impound_records = available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-        .page(@page).per(@per_page)
-        .includes(:user, :bike, :location)
+      @pagy, @impound_records = pagy(available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
+        .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -21,6 +19,7 @@ module Organized
 
     def update
       return multi_update_response(params[:ids].as_json) if params[:id] == "multi_update"
+
       @impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
       is_valid_kind = @impound_record.update_kinds.include?(@impound_record_update.kind)
       if @impound_record.update_kinds.include?(@impound_record_update.kind) && @impound_record_update.save
@@ -51,6 +50,7 @@ module Organized
     def available_statuses
       # current ordered the way we want to display
       return @available_statuses if defined?(@available_statuses)
+
       available_statuses = %w[current resolved all] + (ImpoundRecord.statuses - ["current"])
       available_statuses -= ["expired"] unless current_organization.fetch_impound_configuration.expiration?
       @available_statuses = available_statuses
@@ -62,6 +62,7 @@ module Organized
 
     def available_impound_records
       return @available_impound_records if defined?(@available_impound_records)
+
       if params[:search_status] == "all"
         @search_status = "all"
         a_impound_records = impound_records
@@ -70,7 +71,7 @@ module Organized
         a_impound_records = if ImpoundRecord.statuses.include?(@search_status)
           impound_records.where(status: @search_status)
         else
-          impound_records.send(@search_status)
+          impound_records.public_send(@search_status)
         end
       end
 
@@ -97,6 +98,7 @@ module Organized
 
     def find_impound_record
       return if params[:id] == "multi_update" # Can't find a single impound_record!
+
       # NOTE: Uses display_id, not normal id, unless id starts with pkey-
       @impound_record = impound_records.friendly_find!(params[:id])
     end
@@ -120,6 +122,7 @@ module Organized
       else
         successful = selected_records.select { |impound_record|
           next unless impound_record.update_multi_kinds.include?(permitted_parameters[:kind])
+
           impound_record.impound_record_updates.create(permitted_parameters)
         }
         flash[:success] = "Updated #{successful.count} impound record"

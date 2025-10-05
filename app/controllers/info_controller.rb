@@ -1,9 +1,15 @@
+# frozen_string_literal: true
+
 class InfoController < ApplicationController
+  DONT_BUY_STOLEN_URL = "https://files.bikeindex.org/stored/dont_buy_stolen.pdf"
+
   def show
     @blog = Blog.friendly_find(params[:id])
     if @blog.blank?
       flash[:error] = "unable to find that page"
       redirect_to(news_path) && return
+    elsif @blog.title_slug == Blog.membership_slug
+      redirect_to("/membership") && return
     elsif @blog.id == Blog.theft_rings_id
       redirect_to("/theft-rings") && return
     elsif @blog.blog?
@@ -48,6 +54,12 @@ class InfoController < ApplicationController
   def image_resources
   end
 
+  def membership
+    @blog = Blog.friendly_find(Blog.membership_slug)
+    @page_id = "news_show" # Override to make styles same as news
+    render "show"
+  end
+
   def why_donate
     @blog = Blog.friendly_find(Blog.why_donate_slug)
     render "/news/show"
@@ -74,7 +86,13 @@ class InfoController < ApplicationController
   end
 
   def how_not_to_buy_stolen
-    redirect_to "https://files.bikeindex.org/stored/dont_buy_stolen.pdf"
+    redirect_to(DONT_BUY_STOLEN_URL, allow_other_host: true)
+  end
+
+  def primary_activities
+    respond_to do |format|
+      format.csv { render plain: Spreadsheets::PrimaryActivities.to_csv }
+    end
   end
 
   private

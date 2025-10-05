@@ -7,8 +7,10 @@ module Sessionable
     if unconfirmed_current_user.present? || current_user&.unconfirmed?
       redirect_to(please_confirm_email_users_path) && return
     end
+
     if current_user.present?
       return if return_to_if_present # If this returns true, we're returning already
+
       flash[:success] = translation(:already_signed_in, scope: [:controllers, :concerns, :sessionable, __method__])
       redirect_to(user_root_url) && return
     end
@@ -32,7 +34,7 @@ module Sessionable
     if sign_in_partner.present?
       session.delete(:partner) # Only removing once signed in, PR#1435
       session.delete(:company)
-      redirect_to(bikehub_url("account?reauthenticate_bike_index=true")) && return # Only partner rn is bikehub, hardcode it
+      redirect_to(bikehub_url("account?reauthenticate_bike_index=true"), allow_other_host: true) && return # Only partner rn is bikehub, hardcode it
     elsif user.unconfirmed?
       render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) && return
     elsif !return_to_if_present
@@ -45,7 +47,11 @@ module Sessionable
     cookies.signed[:auth] = cookie_options(user)
   end
 
-  protected
+  def authenticate_user_for_my_accounts_controller
+    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :info)
+  end
+
+  private
 
   def cookie_options(user)
     c = {
@@ -58,7 +64,7 @@ module Sessionable
 
   def update_user_authentication_for_new_password
     @user.generate_auth_token("auth_token") # Doesn't save user
-    @user.update_auth_token("password_reset_token") # saves users
+    @user.update_auth_token("token_for_password_reset") # saves users
     @user.reload
   end
 end

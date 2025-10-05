@@ -7,6 +7,7 @@ module CarrierWave
         if img.dimensions.any? { |i| i > 8000 }
           raise CarrierWave::ProcessingError, "dimensions too large"
         end
+
         img
       end
     end

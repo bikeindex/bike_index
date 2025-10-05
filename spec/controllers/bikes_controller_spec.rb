@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe BikesController, type: :controller do
   let!(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
   let!(:country) { state.country }
@@ -11,6 +15,9 @@ RSpec.describe BikesController, type: :controller do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:user) { bike.creator }
     let(:organization) { FactoryBot.create(:organization) }
+    # This is required by show, if it isn't present it raises ReadOnlyError
+    before { RearGearType.fixed }
+
     it "shows the bike" do
       get :show, params: {id: bike.id}
       expect(response.status).to eq(200)
@@ -45,7 +52,7 @@ RSpec.describe BikesController, type: :controller do
     context "sign_in_if_not" do
       it "redirects to sign in" do
         get :show, params: {id: bike.id, sign_in_if_not: 1}
-        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}"
+        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}?sign_in_if_not=1"
         expect(flash[:notice]).to be_present
         expect(response).to redirect_to(new_session_path)
       end
@@ -53,7 +60,7 @@ RSpec.describe BikesController, type: :controller do
         let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
         it "redirects to magic link, because organization sign in" do
           get :show, params: {id: bike.id, sign_in_if_not: 1, organization_id: organization.to_param}
-          expect(session[:return_to]).to eq bike_path(bike.to_param)
+          expect(session[:return_to]).to eq bike_path(bike.to_param, sign_in_if_not: 1, organization_id: organization.to_param)
           expect(flash[:notice]).to be_present
           expect(response).to redirect_to(magic_link_session_path)
         end
@@ -61,7 +68,7 @@ RSpec.describe BikesController, type: :controller do
     end
     context "Admin with manually set current_organization" do
       include_context :logged_in_as_superuser
-      let(:user) { FactoryBot.create(:organization_member, superuser: true) }
+      let(:user) { FactoryBot.create(:organization_user, superuser: true) }
       it "renders, sets passive_organization_id to be passed organization" do
         expect(user.default_organization).to be_present
         expect(user.default_organization).to_not eq organization
@@ -106,7 +113,7 @@ RSpec.describe BikesController, type: :controller do
     end
     # Because we're doing some special stuff with organization bike viewing
     context "organized user viewing bike" do
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       before { set_current_user(user) }
       it "renders" do
         expect(bike.editable_organizations.pluck(:id)).to eq([])
@@ -115,8 +122,6 @@ RSpec.describe BikesController, type: :controller do
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
         expect(session[:passive_organization_id]).to eq organization.id
-        expect(assigns(:passive_organization_authorized)).to be_falsey
-        expect(assigns(:passive_organization_registered)).to be_falsey
       end
       # This is mostly legacy - really we don't care about creation organization
       # Leaving this in just for better test coverage
@@ -129,8 +134,6 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
           expect(session[:passive_organization_id]).to eq organization.id
-          expect(assigns(:passive_organization_authorized)).to be_truthy
-          expect(assigns(:passive_organization_registered)).to be_truthy
         end
       end
       context "bike owned by organization" do
@@ -142,8 +145,6 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
           expect(session[:passive_organization_id]).to eq organization.id
-          expect(assigns(:passive_organization_authorized)).to be_truthy
-          expect(assigns(:passive_organization_registered)).to be_truthy
         end
       end
       context "bike owned by organization, without can_edit_claimed" do
@@ -155,8 +156,6 @@ RSpec.describe BikesController, type: :controller do
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
           expect(session[:passive_organization_id]).to eq organization.id
-          expect(assigns(:passive_organization_authorized)).to be_falsey
-          expect(assigns(:passive_organization_registered)).to be_truthy
         end
       end
     end
@@ -189,6 +188,17 @@ RSpec.describe BikesController, type: :controller do
         end
       end
     end
+    context "with recovery token present" do
+      let(:bike) { FactoryBot.create(:stolen_bike) }
+      let(:stolen_record) { bike.current_stolen_record }
+      let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
+      it "renders a mark recovered modal, and deletes the session recovery_link_token" do
+        session[:recovery_link_token] = recovery_link_token
+        get :show, params: {id: bike.id}
+        expect(response.body).to match(recovery_link_token)
+        expect(session[:recovery_link_token]).to be_nil
+      end
+    end
   end
 
   describe "scanned" do
@@ -208,7 +218,7 @@ RSpec.describe BikesController, type: :controller do
         expect(session[:passive_organization_id]).to eq "0"
       end
       context "user part of organization" do
-        let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let!(:user) { FactoryBot.create(:organization_user, organization: organization) }
         it "makes current_organization the organization" do
           get :scanned, params: {id: "D0900", organization_id: organization.to_param}
           expect(assigns(:bike_sticker)).to eq bike_sticker2
@@ -218,7 +228,7 @@ RSpec.describe BikesController, type: :controller do
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
           it "makes current_organization the organization" do
-            expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
+            expect(user.organization_roles&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_sticker2.organization).to eq organization
             get :scanned, params: {id: "D900", organization_id: "BikeIndex"}
             expect(assigns(:bike_sticker)).to eq bike_sticker2
@@ -288,7 +298,7 @@ RSpec.describe BikesController, type: :controller do
         end
       end
       context "with organization member" do
-        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
         it "renders and assigns creation_organization" do
           get :new
           expect(response.code).to eq("200")
@@ -383,13 +393,13 @@ RSpec.describe BikesController, type: :controller do
       let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
       context "unverified authenticity token" do
         include_context :test_csrf_token
-        it "permits" do
+        it "permits", :flaky do
           expect(user).to be_present
-          Sidekiq::Worker.clear_all
+          Sidekiq::Job.clear_all
           expect {
             post :create, params: {bike: bike_params}
           }.to change(Ownership, :count).by 1
-          Sidekiq::Worker.drain_all
+          Sidekiq::Job.drain_all
           expect(ActionMailer::Base.deliveries.count).to eq 1
           bike = Bike.reorder(:created_at).last
           expect(bike.country.name).to eq("United States")
@@ -401,7 +411,7 @@ RSpec.describe BikesController, type: :controller do
       end
       context "non-stolen" do
         let(:user) { FactoryBot.create(:user_confirmed) }
-        it "creates a new ownership and bike from an organization" do
+        it "creates a new ownership and bike from an organization", :flaky do
           expect(user).to be_present
           expect {
             post :create, params: {bike: bike_params}
@@ -432,7 +442,7 @@ RSpec.describe BikesController, type: :controller do
             street: "whatever"
           }
         end
-        it "registers, doesn't create a parking_notification" do
+        it "registers, doesn't create a parking_notification", :flaky do
           expect {
             post :create, params: {bike: bike_params, parking_notification: parking_notification}
           }.to change(Ownership, :count).by 1
@@ -459,7 +469,7 @@ RSpec.describe BikesController, type: :controller do
         context "valid" do
           include_context :geocoder_real
           context "with old style date input" do
-            it "creates a new ownership and bike from an organization" do
+            it "creates a new ownership and bike from an organization", :flaky do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
                 expect {
                   post :create, params: {bike: bike_params, stolen_record: stolen_params}
@@ -481,7 +491,7 @@ RSpec.describe BikesController, type: :controller do
           context "new date input" do
             let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T23:34:00", timezone: "America/New_York") }
             let(:target_time) { 1532835240 }
-            it "creates a new ownership and bike from an organization" do
+            it "creates a new ownership and bike from an organization", :flaky do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
                 expect {
                   post :create, params: {bike: bike_params, stolen_record: alt_stolen_params}
@@ -553,7 +563,7 @@ RSpec.describe BikesController, type: :controller do
             expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
-            ImageAssociatorWorker.new.perform
+            Images::AssociatorJob.new.perform
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
             expect(bike.current_ownership.origin).to eq "embed_extended"
@@ -587,10 +597,10 @@ RSpec.describe BikesController, type: :controller do
         end
       end
       context "with organization bike code and signed in member" do
-        let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let!(:user) { FactoryBot.create(:organization_user, organization: organization) }
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "aaa", kind: "sticker") }
         let!(:wrong_bike_sticker) { FactoryBot.create(:bike_sticker, code: "aaa", kind: "sticker") }
-        it "registers a bike under signed in user and redirects with persist_email" do
+        it "registers a bike under signed in user and redirects with persist_email", :flaky do
           set_current_user(user)
           post :create, params: {bike: bike_params.merge(bike_sticker: "AAA")}
           expect(response).to redirect_to(embed_extended_organization_url(organization))
@@ -838,7 +848,7 @@ RSpec.describe BikesController, type: :controller do
           before do
             bike.reload
             ActionMailer::Base.deliveries = []
-            Sidekiq::Worker.clear_all
+            Sidekiq::Job.clear_all
             Sidekiq::Testing.inline!
           end
           after { Sidekiq::Testing.fake! }
@@ -988,7 +998,7 @@ RSpec.describe BikesController, type: :controller do
             end
           end
           context "canadian stolen record" do
-            let!(:canada) { FactoryBot.create(:country, name: "Canada", iso: "CA") }
+            let!(:canada) { Country.canada }
             let(:stolen_attrs) do
               {
                 date_stolen: "2016-02-08 04:00:00",
@@ -1044,9 +1054,6 @@ RSpec.describe BikesController, type: :controller do
                 end
               end
             end
-          end
-          context "recovered bike" do
-            it "marks the bike recovered"
           end
         end
       end
@@ -1137,7 +1144,7 @@ RSpec.describe BikesController, type: :controller do
       let(:can_edit_claimed) { false }
       let(:claimed) { false }
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       before { set_current_user(user) }
       it "updates the bike" do
         bike.reload
@@ -1191,18 +1198,6 @@ RSpec.describe BikesController, type: :controller do
           end
         end
       end
-    end
-  end
-
-  describe "show with recovery token present" do
-    let(:bike) { FactoryBot.create(:stolen_bike) }
-    let(:stolen_record) { bike.current_stolen_record }
-    let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
-    it "renders a mark recovered modal, and deletes the session recovery_link_token" do
-      session[:recovery_link_token] = recovery_link_token
-      get :show, params: {id: bike.id}
-      expect(response.body).to match(recovery_link_token)
-      expect(session[:recovery_link_token]).to be_nil
     end
   end
 end

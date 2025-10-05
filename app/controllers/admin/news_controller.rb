@@ -1,6 +1,6 @@
 class Admin::NewsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_blog, only: [:show, :edit, :update, :destroy]
   before_action :set_dignified_name
 
@@ -31,7 +31,7 @@ class Admin::NewsController < Admin::BaseController
       @blog.reload
 
       if @blog.listicles.present?
-        @blog.listicles.pluck(:id).each { |id| ListicleImageSizeWorker.perform_in(1.minutes, id) }
+        @blog.listicles.pluck(:id).each { |id| ListicleImageSizeJob.perform_in(1.minutes, id) }
       end
 
       flash[:success] = "#{@blog.info? ? "Info post" : "Blog"} saved!"
@@ -109,7 +109,7 @@ class Admin::NewsController < Admin::BaseController
       blogs = blogs.with_tag_ids(@tags.pluck(:id))
     end
     blogs = blogs.published if sort_column == "published_at"
-    @time_range_column = sort_column == "updated_at" ? "updated_at" : "created_at"
+    @time_range_column = (sort_column == "updated_at") ? "updated_at" : "created_at"
     blogs.where(@time_range_column => @time_range)
   end
 

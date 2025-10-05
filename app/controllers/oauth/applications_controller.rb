@@ -1,7 +1,8 @@
 module Oauth
   class ApplicationsController < Doorkeeper::ApplicationsController
     include ControllerHelpers
-    before_action :authenticate_user
+
+    before_action :store_return_and_authenticate_user
     before_action :ensure_app_owner!, except: [:index, :new, :create]
 
     def index
@@ -30,6 +31,7 @@ module Oauth
 
     def ensure_app_owner!
       return true if @current_user&.superuser? || @current_user&.id == @application&.owner_id
+
       flash[:error] = translation(:not_your_application)
       redirect_to(oauth_applications_url) && return
     end

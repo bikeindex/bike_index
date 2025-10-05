@@ -3,7 +3,7 @@ class PdfUploader < ApplicationUploader
     IMAGE_EXT_WHITE_LIST + ["pdf"]
   end
 
-  def extension_white_list
+  def extension_allowlist
     self.class.extensions
   end
 end

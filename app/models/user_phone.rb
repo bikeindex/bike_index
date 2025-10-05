@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: user_phones
+#
+#  id                :bigint           not null, primary key
+#  confirmation_code :string
+#  confirmed_at      :datetime
+#  deleted_at        :datetime
+#  phone             :string
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  user_id           :bigint
+#
+# Indexes
+#
+#  index_user_phones_on_user_id  (user_id)
+#
 class UserPhone < ApplicationRecord
   acts_as_paranoid
 
@@ -20,6 +37,7 @@ class UserPhone < ApplicationRecord
 
   def self.code_display(str)
     return nil unless str.present?
+
     str[0..2] + " " + str[3..]
   end
 
@@ -56,11 +74,13 @@ class UserPhone < ApplicationRecord
   # Protect against overenthusiastic clicking
   def resend_confirmation?
     return true if legacy?
+
     unconfirmed? && updated_at < Time.current - 2.minutes
   end
 
   def resend_confirmation_if_reasonable!
     return false unless resend_confirmation?
+
     generate_confirmation
     send_confirmation_text
   end
@@ -75,8 +95,9 @@ class UserPhone < ApplicationRecord
 
   def confirm!
     return true if confirmed?
+
     result = update(confirmed_at: Time.current)
-    AfterPhoneConfirmedWorker.perform_async(id)
+    ::Callbacks::AfterPhoneConfirmedJob.perform_async(id)
     result
   end
 
@@ -98,7 +119,7 @@ class UserPhone < ApplicationRecord
   end
 
   def send_confirmation_text
-    UserPhoneConfirmationWorker.perform_async(id) unless confirmed?
+    UserPhoneConfirmationJob.perform_async(id) unless confirmed?
   end
 
   def generate_confirmation

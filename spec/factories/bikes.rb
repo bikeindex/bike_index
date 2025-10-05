@@ -1,4 +1,4 @@
-# Warning: BikeCreator forces every bike to have an ownership
+# Warning: BikeServices::Creator forces every bike to have an ownership
 # ... But this factory allows creating bikes without ownerships
 FactoryBot.define do
   factory :bike do
@@ -10,6 +10,10 @@ FactoryBot.define do
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }
     skip_geocoding { true }
+
+    trait :with_primary_activity do
+      primary_activity { FactoryBot.create(:primary_activity) }
+    end
 
     trait :with_image do
       after(:create) do |bike|
@@ -26,12 +30,14 @@ FactoryBot.define do
         claimed_at { nil }
         can_edit_claimed { true }
         creation_pos_kind { "" }
+        marked_user_hidden { false }
         # Previous Creation State attributes
         # TODO: part of #2110 - remove prefix
         creation_state_origin { "" }
         creation_state_bulk_import { nil }
         creation_registration_info { nil }
       end
+      user_hidden { marked_user_hidden }
 
       after(:create) do |bike, evaluator|
         # Sometimes multiple things include with_ownership, this can get called multiple times
@@ -45,6 +51,7 @@ FactoryBot.define do
           end
 
           FactoryBot.create(:ownership,
+            user_hidden: bike.user_hidden,
             bike: bike,
             creator: bike.creator,
             owner_email: bike.owner_email,

@@ -20,7 +20,7 @@ $landing-page-targets: "bike_shops", "school", "community_groups",
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
     .banner-header {
-      background-image: image-url("landing_pages/header_bg_#{$target}.jpg");
+      background-image: url("landing_pages/header_bg_#{$target}.jpg");
     }
   }
 }

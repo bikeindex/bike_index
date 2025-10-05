@@ -43,7 +43,7 @@
 
 .full-screen-table.mt-4
   %p{ style: "margin-bottom: 0;" }
-    %strong= pluralize(number_with_delimiter(@bike_stickers.total_count), t(".sticker"))
+    %strong= pluralize(number_with_delimiter(@pagy.count), t(".sticker"))
 
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.sortable
@@ -75,5 +75,5 @@
           %td
             %strong= bike_sticker.pretty_code
 
-.paginate-container.paginate-container-bottom
-  = paginate @bike_stickers
+.pt-4.pb-4
+  = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

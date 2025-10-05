@@ -5,7 +5,7 @@
       %small.less-strong
         %small simple:
 
-        = @manufacturer.simple_name
+        = @manufacturer.short_name
 
 .row
   .col-6
@@ -51,7 +51,7 @@
           %td
             Bikes
           %td
-            = admin_number_display(@manufacturer.bikes.count)
+            = number_display(@manufacturer.bikes.count)
             %a{ href: admin_bikes_path(search_manufacturer: @manufacturer.slug) }
               view
         %tr

@@ -21,15 +21,15 @@ http_interactions:
       Content-Type:
       - text/plain; charset=utf-8
       Content-Length:
-      - '1'
+      - '10'
       Connection:
       - keep-alive
       Date:
-      - Sun, 10 Dec 2023 19:59:36 GMT
+      - Sat, 20 Sep 2025 16:40:04 GMT
       X-Envoy-Response-Flags:
       - "-"
       Server:
-      - envoy
+      - Clearbit
       Strict-Transport-Security:
       - max-age=63072000; includeSubDomains; preload
       X-Content-Type-Options:
@@ -37,14 +37,15 @@ http_interactions:
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 0a60df055acf18164b14661cb4d16952.cloudfront.net (CloudFront)
+      - 1.1 5e9f822a188dc082efd0a9d3918e7402.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
       - SFO53-P5
       X-Amz-Cf-Id:
-      - 3kNhOas8RtLkWg6PE45HeGRynL_kjwctD0VsIvv0F3QmULH-7117Ow==
+      - k2zVzQJGPgvE7Td0QjftFIBP1Sioj74OO_aB5-WYsLe4deWWR9KbYw==
     body:
       encoding: UTF-8
-      string: "\n"
-    http_version:
-  recorded_at: Sun, 10 Dec 2023 19:59:36 GMT
-recorded_with: VCR 5.0.0
+      string: 'Not Found
+
+        '
+  recorded_at: Sat, 20 Sep 2025 16:40:04 GMT
+recorded_with: VCR 6.3.1

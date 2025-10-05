@@ -1,13 +1,12 @@
 class Admin::ContentTagsController < Admin::BaseController
   include SortableTable
+
   before_action :find_content_tag, only: %i[edit update]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 100
-    @content_tags = matching_content_tags
-      .order(sort_column + " " + sort_direction)
-      .page(page).per(@per_page)
+    @per_page = permitted_per_page(default: 100)
+    @pagy, @content_tags = pagy(matching_content_tags
+      .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def new

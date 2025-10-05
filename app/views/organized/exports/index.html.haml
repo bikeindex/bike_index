@@ -10,7 +10,7 @@
   .full-screen-table.mt-4
     %p{ style: "margin-bottom: 0;" }
       %strong
-        = pluralize(number_with_delimiter(@exports.total_count), t(".export"))
+        = pluralize(number_with_delimiter(@pagy.count), t(".export"))
 
     - show_assigned_bike_codes = current_organization.enabled?("avery_export") || @exports.any? { |e| e.assign_bike_codes? }
 
@@ -45,7 +45,7 @@
               %td.text-center
                 = check_mark if (export.avery_export? || export.assign_bike_codes?)
             %td
-              = admin_number_display(export.rows) if export.finished?
+              = number_display(export.rows) if export.finished?
             %td
               = link_to(t(".download"), export.file.url) if export.file.url.present?
             %td
@@ -54,5 +54,5 @@
                 organization_export_path(export, organization_id: current_organization.to_param),
                 method: :delete
 
-  .paginate-container.paginate-container-bottom
-    = paginate @exports
+  .pb-4.pt-4
+    = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

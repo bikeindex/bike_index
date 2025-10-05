@@ -18,7 +18,7 @@ class FeedbacksController < ApplicationController
         translation(:thanks_for_your_message)
       end
       if request.env["HTTP_REFERER"].present? && (request.env["HTTP_REFERER"] != request.env["REQUEST_URI"])
-        redirect_back(fallback_location: help_path)
+        redirect_back(fallback_location: help_path, allow_other_host: true)
       else
         redirect_to help_path
       end
@@ -45,6 +45,7 @@ class FeedbacksController < ApplicationController
     # Previously, we were authenticating users in a before_action
     # But to make it possible for non-signed in users to generate leads, we're trying this out
     return false unless feedback.looks_like_spam?
+
     flash[:error] = translation(:please_sign_in)
     redirect_back(fallback_location: root_url) && (return true)
   end

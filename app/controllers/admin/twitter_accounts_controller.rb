@@ -1,7 +1,7 @@
 class Admin::TwitterAccountsController < Admin::BaseController
   include SortableTable
+
   before_action :find_twitter_account, only: %i[show edit update destroy check_credentials]
-  skip_before_action :require_index_admin!, only: %(create)
 
   def index
     @twitter_accounts = matching_twitter_accounts
@@ -24,20 +24,6 @@ class Admin::TwitterAccountsController < Admin::BaseController
       redirect_to admin_twitter_account_url(@twitter_account)
     else
       render action: :edit
-    end
-  end
-
-  def create
-    twitter_account =
-      TwitterAccount.find_or_create_from_twitter_oauth(request.env["omniauth.auth"])
-
-    if twitter_account.persisted?
-      twitter_account.check_credentials
-      flash[:notice] = "Twitter account #{twitter_account.screen_name} is persisted."
-      redirect_to admin_twitter_account_url(twitter_account)
-    else
-      flash[:error] = twitter_account.errors.full_messages.to_sentence
-      redirect_to admin_twitter_accounts_url
     end
   end
 
@@ -86,7 +72,7 @@ class Admin::TwitterAccountsController < Admin::BaseController
 
   def matching_twitter_accounts
     if sort_column == "last_error_at" # If sorting by last_error_at, show the error
-      sort_direction == "desc" ? TwitterAccount.errored : TwitterAccount.where(last_error_at: nil)
+      (sort_direction == "desc") ? TwitterAccount.errored : TwitterAccount.where(last_error_at: nil)
     elsif sort_column == "national" # If national, show only national one direction, only non the other
       TwitterAccount.where(national: sort_direction == "asc")
     else

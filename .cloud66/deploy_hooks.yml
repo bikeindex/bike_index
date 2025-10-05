@@ -1,7 +1,7 @@
 production:
-  # Install postgres 13 client, to be enable db:structure:load
+  # Install postgres (to enable db:structure:load) and ripgrep
   first_thing:
-    - command: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && sudo apt-get update && sudo apt-get -y install postgresql-13
+    - command: sudo apt-get -y install postgresql-client-common ripgrep libvips
       target: rails
       sudo: true
       apply_during: build_only
@@ -19,11 +19,6 @@ production:
       sudo: true
 
   after_rails:
-    # Add ripgrep
-    - command: sudo apt-get install ripgrep
-      target: rails
-      run_on: all_servers
-      sudo: true
     # Make papertrail connected
     - source: /.cloud66/log_files.yml
       destination: /etc/log_files.yml

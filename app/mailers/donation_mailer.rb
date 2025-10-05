@@ -1,5 +1,6 @@
 # Does not inheriting from normal base class
 class DonationMailer < ActionMailer::Base
+  helper TranslationHelper
   layout false
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]

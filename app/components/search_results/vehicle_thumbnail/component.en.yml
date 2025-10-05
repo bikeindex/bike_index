@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    search_results:
+      vehicle_thumbnail:
+        registered_not_stolen: registered, not stolen

@@ -3,6 +3,7 @@ class BikeIndex.BikesNew extends BikeIndex
     new window.ManufacturersSelect('#bike_manufacturer_id')
     new BikeIndex.FormWell
     new window.CheckEmail('#bike_owner_email')
+    new window.UpdatePropulsionType('bike')
     @initializeEventListeners()
     @updateSerial($('#has_no_serial').prop('checked'))
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())
@@ -27,13 +28,6 @@ class BikeIndex.BikesNew extends BikeIndex
       @updateSerial(true)
     $('#traditional_bike_checkbox').change (e) =>
       @updateCycleTypeCheck()
-    $('#bike_cycle_type').change (e) =>
-      @updatePropulsionAndCycleType()
-    $('#propulsion_type_motorized').change (e) =>
-      @updatePropulsionAndCycleType()
-    $('.modal').on 'show.bs.modal', =>
-      # Need to trigger correct text on modal
-      @updatePropulsionAndCycleType()
 
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
@@ -122,6 +116,7 @@ class BikeIndex.BikesNew extends BikeIndex
 
   # Set motorized if it should be motorized.
   # Only show propulsion type options if there can be options
+  # embed_script.js.coffee has a simpler version of this method
   updatePropulsionAndCycleType: ->
     cycleTypeValue = $('#bike_cycle_type').val()
     if window.cycleTypesAlwaysMotorized.includes(cycleTypeValue)

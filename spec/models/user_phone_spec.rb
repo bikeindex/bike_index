@@ -49,13 +49,14 @@ RSpec.describe UserPhone, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:phone) { "2342342345" }
     before do
-      UserPhoneConfirmationWorker.new # Instantiate for stubbing
-      stub_const("UserPhoneConfirmationWorker::UPDATE_TWILIO", true)
+      Flipper.enable(:phone_verification)
+      UserPhoneConfirmationJob.new # Instantiate for stubbing
+      stub_const("UserPhoneConfirmationJob::UPDATE_TWILIO", true)
     end
 
     it "adds a user_phone" do
       expect(user.phone).to be_blank
-      Sidekiq::Worker.clear_all
+      Sidekiq::Job.clear_all
       VCR.use_cassette("user_phone-add_phone_for_user_id", match_requests_on: [:path]) do
         Sidekiq::Testing.inline! {
           expect {

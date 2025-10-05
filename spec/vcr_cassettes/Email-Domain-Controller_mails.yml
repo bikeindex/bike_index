@@ -1,0 +1,197 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://mails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Moved Temporarily
+    headers:
+      Server:
+      - openresty
+      Date:
+      - Wed, 19 Mar 2025 02:32:57 GMT
+      Content-Type:
+      - text/html
+      Content-Length:
+      - '142'
+      Connection:
+      - keep-alive
+      Location:
+      - https://domains.atom.com/lpd/name/mails.com
+      Svr-Id:
+      - squadhelp-auto-ssl-9
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:32:57 GMT
+- request:
+    method: head
+    uri: https://domains.atom.com/lpd/name/mails.com
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Mar 2025 02:32:58 GMT
+      Content-Type:
+      - text/html; charset=UTF-8
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept-Encoding
+      - Accept-Encoding
+      - Accept-Encoding
+      Expires:
+      - Thu, 19 Nov 1981 08:52:00 GMT
+      Cache-Control:
+      - max-age=86400, must-revalidate
+      Pragma:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Last-Modified:
+      - Mon, 17 Mar 2025 01:53:03 GMT
+      Cf-Cache-Status:
+      - HIT
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Speculation-Rules:
+      - '"/cdn-cgi/speculation"'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 92298ff1fd8feb36-SJC
+      Content-Encoding:
+      - gzip
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:32:57 GMT
+- request:
+    method: head
+    uri: http://mails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Moved Temporarily
+    headers:
+      Server:
+      - openresty
+      Date:
+      - Wed, 19 Mar 2025 02:32:58 GMT
+      Content-Type:
+      - text/html
+      Content-Length:
+      - '142'
+      Connection:
+      - keep-alive
+      Location:
+      - https://domains.atom.com/lpd/name/mails.com
+      Svr-Id:
+      - squadhelp-auto-ssl-1
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:32:58 GMT
+- request:
+    method: head
+    uri: https://domains.atom.com/lpd/name/mails.com
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Mar 2025 02:32:58 GMT
+      Content-Type:
+      - text/html; charset=UTF-8
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept-Encoding
+      - Accept-Encoding
+      - Accept-Encoding
+      Expires:
+      - Thu, 19 Nov 1981 08:52:00 GMT
+      Cache-Control:
+      - max-age=86400, must-revalidate
+      Pragma:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Last-Modified:
+      - Mon, 17 Mar 2025 01:53:03 GMT
+      Cf-Cache-Status:
+      - HIT
+      Age:
+      - '1'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Speculation-Rules:
+      - '"/cdn-cgi/speculation"'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 92298ff3ee53cf05-SJC
+      Content-Encoding:
+      - gzip
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:32:58 GMT
+recorded_with: VCR 6.3.1

@@ -4,12 +4,16 @@ class LogSearcher::Parser
     "API::V1::BikesController#index" => :api_v1_bikes,
     "API::V1::BikesController#stolen_ids" => :api_v1_stolen_ids,
     "API::V1::BikesController#close_serials" => :api_v1_close_serials,
-    "BikesController#index" => :web_bikes,
     "Organized::BikesController#index" => :org_bikes,
     "Admin::BikesController#index" => :admin_bikes,
     "OrgPublic::ImpoundedBikesController#index" => :org_public_impounded,
     "Organized::ImpoundRecordsController#index" => :org_impounded,
-    "Organized::ParkingNotificationsController#index" => :org_parking_notifications
+    "Organized::ParkingNotificationsController#index" => :org_parking_notifications,
+    "Search::RegistrationsController#index" => :web_bikes,
+    "Search::RegistrationsController#serials_containing" => :web_serials_containing,
+    "Search::RegistrationsController#similar_serials" => :web_close_serials,
+    "Search::MarketplaceController#index" => :web_marketplace,
+    "Search::MarketplaceController#counts" => :web_marketplace_count
   }.freeze
 
   ROUTE_ENDPOINTS = {
@@ -24,13 +28,16 @@ class LogSearcher::Parser
     "/api/v3/bikes/check_if_registered" => :api_v3_check_if_registered
   }.freeze
 
-  FILTERED_PARAMS = %w[access_token organization_id organization_slug page].freeze
-  NON_QUERY_ITEMS = (FILTERED_PARAMS +
-    %w[stolenness location distance locale sort sort_direction render_chart utf8]).freeze
+  FILTERED_PARAMS = %w[access_token page].freeze
+  NON_QUERY_ITEMS = (
+    FILTERED_PARAMS +
+    %w[stolenness location distance locale organization_id organization_slug sort sort_direction render_chart utf8]
+  ).freeze
 
   class << self
     def parse_log_line(log_line)
       raise "Multiple line_data matches for log line #{log_line}" if log_line.match?(/\] \{.*\] \{/)
+
       line_data, opts = log_line.split("] {")
       opts = JSON.parse("{#{opts}")
       endpoint = parse_endpoint(opts)
@@ -79,6 +86,7 @@ class LogSearcher::Parser
 
     def organization_from_params(params)
       return nil if params.blank?
+
       Organization.friendly_find_id(params["organization_id"] || params["organization_slug"])
     end
 
@@ -98,6 +106,8 @@ class LogSearcher::Parser
         :impounded
       elsif endpoint == :api_v1_stolen_ids
         :stolen
+      elsif endpoint.match?(/marketplace/)
+        :for_sale
       else
         case opts.dig("params", "stolenness")
         when "stolen", "proximity" then :stolen

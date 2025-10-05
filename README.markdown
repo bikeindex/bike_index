@@ -1,8 +1,6 @@
-# [![BIKE INDEX][bike-index-logo]][bike-index] [![CircleCI][circleci-badge]][circleci] [![View performance data on Skylight][skylight-badge]][skylight]
+# [![BIKE INDEX][bike-index-logo]][bike-index] [![View performance data on Skylight][skylight-badge]][skylight]
 
-[bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/bike_index.png?raw=true
-[circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/main
-[circleci-badge]: https://circleci.com/gh/bikeindex/bike_index/tree/main.svg?style=svg
+[bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/public/icon-dark.svg?raw=true
 [skylight]: https://oss.skylight.io/app/applications/j93iQ4K2pxCP
 [skylight-badge]: https://badges.skylight.io/status/j93iQ4K2pxCP.svg
 [bike-index]: https://www.bikeindex.org
@@ -15,21 +13,21 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 ### Dependencies
 
-_We recommend [asdf-vm](https://asdf-vm.com/#/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of the following dependencies that Bike Index uses._
+_We recommend [mise](https://mise.jdx.dev/) for managing versions of Ruby and Node. Check the [.tool-versions](.tool-versions) file to see the versions of required versions of:_
 
-- [Ruby 2.7](http://www.ruby-lang.org/en/)
+- [Ruby](http://www.ruby-lang.org/en/)
 
-- [Rails 5.2](http://rubyonrails.org/)
+- [Node](https://nodejs.org/en/)
 
-- [Node 12.18](https://nodejs.org/en/) & [yarn](https://yarnpkg.com/en/)
+_Bike Index also requires some additional libraries. We recommend installing them via your system package manager / homebrew_
 
-- PostgreSQL >= 9.6
+- PostgreSQL
 
-- Imagemagick ([railscast](http://railscasts.com/episodes/374-image-manipulation?view=asciicast))
+- Redis
 
-- [Sidekiq](https://github.com/mperham/sidekiq), which requires [Redis](http://redis.io/).
+- `libvips` and `imagemagick` for image manipulation
+  - Eventually, `imagemagick` will only be required for testing (via [chunky_png](https://github.com/wvanbergen/chunky_png)), but we're not there yet
 
-- Requires 1gb of ram (or at least more than 512mb)
 
 ## Running Bike Index locally
 
@@ -39,7 +37,7 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
   - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
   - Gives user@example.com 50 bikes
 
-- `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile_development](Procfile_development) and [.env](.env)
+- `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile.dev). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile.dev](Procfile.dev) and [.env](.env)
 
 - Go to [localhost:3042](http://localhost:3042)
 
@@ -51,9 +49,9 @@ Follow [the Getting Started guide](docs/getting-started.markdown) for a complete
 
 [letter_opener]: https://github.com/ryanb/letter_opener
 
-## Internationalization
+## Localization
 
-See the [internationalization docs](docs/internationalization.markdown) for details (we use [translation.io](https://translation.io/) for localization).
+See the [localization docs](docs/localization.markdown) for details (we use [translation.io](https://translation.io/) for localization).
 
 ## Testing
 
@@ -71,13 +69,13 @@ We use [RSpec](https://github.com/rspec/rspec) and
   CREATE EXTENSION fuzzystrmatch;
   ```
 
-We use [`parallel_tests`](https://github.com/grosser/parallel_tests/) to run the test suite in parallel. By default, this will spawn one process per CPU in your computer.
+We use [`turbo_tests`](https://github.com/serpapi/turbo_tests) to run the test suite in parallel. By default, this will spawn one process per CPU in your computer.
 
-- Run all the tests in parallel with `bin/rake parallel:spec`
+- Run all the tests in parallel with `bin/turbo_tests`
 
 - Run `bin/rake parallel:prepare` to synchronize the test db schema after migrations (rather than `db:test:prepare`).
 
-- Run specific files or test directories with `bin/parallel_rspec <FILES_OR_FOLDERS>`
+- Run specific files or test directories with `bin/turbo_tests <FILES_OR_FOLDERS>`
 
 - Run Guard with parallelism `bin/guard -G Guardfile_parallel`
 
@@ -107,9 +105,13 @@ See the [how do I run standard in my editor](standardrb-plugin) section of the S
 
 [standardrb-plugin]: https://github.com/testdouble/standard#how-do-i-run-standard-in-my-editor
 
-### ESLint
+### StandardJS
 
-ESlint is configured to run on project JavaScript. To run it, issue `yarn lint`.
+standard is configured to run on project JavaScript.
+
+Install it with `npm install`
+
+Run it with `npm run lint`.
 
 ## Bug tracker
 

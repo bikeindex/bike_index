@@ -1,4 +1,34 @@
+# == Schema Information
+#
+# Table name: impound_claims
+#
+#  id                 :bigint           not null, primary key
+#  message            :text
+#  resolved_at        :datetime
+#  response_message   :text
+#  status             :integer
+#  submitted_at       :datetime
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  bike_claimed_id    :bigint
+#  bike_submitting_id :bigint
+#  impound_record_id  :bigint
+#  organization_id    :bigint
+#  stolen_record_id   :bigint
+#  user_id            :bigint
+#
+# Indexes
+#
+#  index_impound_claims_on_bike_claimed_id     (bike_claimed_id)
+#  index_impound_claims_on_bike_submitting_id  (bike_submitting_id)
+#  index_impound_claims_on_impound_record_id   (impound_record_id)
+#  index_impound_claims_on_organization_id     (organization_id)
+#  index_impound_claims_on_stolen_record_id    (stolen_record_id)
+#  index_impound_claims_on_user_id             (user_id)
+#
 class ImpoundClaim < ApplicationRecord
+  include StatusHumanizable
+
   STATUS_ENUM = {
     pending: 0,
     submitting: 1, # TOD: change this to submitted
@@ -24,7 +54,7 @@ class ImpoundClaim < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :send_triggered_notifications
 
-  enum status: STATUS_ENUM
+  enum :status, STATUS_ENUM
 
   scope :unsubmitted, -> { where(submitted_at: nil) }
   scope :submitted, -> { where.not(submitted_at: nil) }
@@ -56,7 +86,7 @@ class ImpoundClaim < ApplicationRecord
 
   def self.status_humanized(str)
     # It doesn't make sense to display "submitting"
-    str == "submitting" ? "submitted" : str&.to_s&.tr("_", " ")
+    (str == "submitting") ? "submitted" : str&.to_s&.tr("_", " ")
   end
 
   def self.involving_bike_id(bike_id)
@@ -111,13 +141,10 @@ class ImpoundClaim < ApplicationRecord
     @bike_claimed ||= bike_claimed_id.present? ? Bike.unscoped.find_by_id(bike_claimed_id) : nil
   end
 
-  def status_humanized
-    self.class.status_humanized(status)
-  end
-
   # return private images too
   def bike_submitting_images
     return [] unless bike_submitting.present?
+
     PublicImage.unscoped.where(imageable_id: bike_submitting.id).bike.order(:listing_order)
   end
 
@@ -147,13 +174,15 @@ class ImpoundClaim < ApplicationRecord
 
   def send_triggered_notifications
     return true if skip_update
-    EmailImpoundClaimWorker.perform_async(id)
+
+    Email::ImpoundClaimJob.perform_async(id)
   end
 
   private
 
   def calculated_status
     return status if impound_record_updates.none?
+
     last_update = impound_record_updates.reorder(:id).last
     if last_update.claim_approved?
       "approved"

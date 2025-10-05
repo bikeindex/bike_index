@@ -27,18 +27,27 @@ RSpec.describe "Locale detection", type: :request do
       it "renders the homepage in the requested language" do
         get "/"
         expect(response.body).to match(/bike registration/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="en"/>')
 
         current_user.update(preferred_language: :nl)
         get "/"
         expect(response.body).to match(/fietsregistratie/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="nl"/>')
 
         current_user.update(preferred_language: :nb)
         get "/"
         expect(response.body).to match(/sykkelregistrering/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="nb"/>')
 
-        # current_user.update(preferred_language: :es)
+        current_user.update(preferred_language: :es)
+        get "/"
+        expect(response.body).to match(/registro de bicicletas/i)
+        expect(response.body).to match('<meta http-equiv="Content-Language" content="es"/>')
+
+        # current_user.update(preferred_language: :it)
         # get "/"
-        # expect(response.body).to match(/registro de bicicletas/i)
+        # expect(response.body).to match(/Registrazione della bicicletta/i)
+        # expect(response.body).to match('<meta http-equiv="Content-Language" content="it" />')
       end
     end
 
@@ -50,7 +59,9 @@ RSpec.describe "Locale detection", type: :request do
         expect(response.body).to match(/fietsregistratie/i)
         get "/", params: {locale: :nb}
         expect(response.body).to match(/sykkelregistrering/i)
-        # get "/", params: {locale: :nb}
+        get "/", params: {locale: :es}
+        expect(response.body).to match(/registro de bicicletas/i)
+        # get "/", params: {locale: :it}
         # expect(response.body).to match(/registro de bicicletas/i)
       end
     end
@@ -76,8 +87,8 @@ RSpec.describe "Locale detection", type: :request do
         get "/", params: {}, headers: {"HTTP_ACCEPT_LANGUAGE" => "nb,en;q=0.9"}
         expect(response.body).to match(/sykkelregistrering/i)
 
-        # get "/", params: {}, headers: {"HTTP_ACCEPT_LANGUAGE" => "nb,en;q=0.9"}
-        # expect(response.body).to match(/registro de bicicletas/i)
+        get "/", params: {}, headers: {"HTTP_ACCEPT_LANGUAGE" => "es,en;q=0.9"}
+        expect(response.body).to match(/registro de bicicletas/i)
       end
     end
 
@@ -93,13 +104,13 @@ RSpec.describe "Locale detection", type: :request do
     context "given multiple detected locales" do
       include_context :request_spec_logged_in_as_user
 
-      # it "gives highest precedence to query param" do
-      #   current_user.update_attribute :preferred_language, :es
-      #   get "/", params: {locale: :nl}, headers: {"HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9"}
-      #   expect(response.body).to match(/fietsregistratie/i)
-      #   # It doesn't reset users preferences based on request
-      #   expect(current_user.reload.preferred_language).to eq "es"
-      # end
+      it "gives highest precedence to query param" do
+        current_user.update_attribute :preferred_language, :es
+        get "/", params: {locale: :nl}, headers: {"HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9"}
+        expect(response.body).to match(/fietsregistratie/i)
+        # It doesn't reset users preferences based on request
+        expect(current_user.reload.preferred_language).to eq "es"
+      end
 
       it "gives secondary precedence to user preference" do
         current_user.update_attribute :preferred_language, :nl

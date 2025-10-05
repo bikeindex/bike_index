@@ -3,7 +3,7 @@
 TranslationIO.configure do |config|
   config.api_key = ENV["TRANSLATION_IO_API_KEY"]
   config.source_locale = "en"
-  config.target_locales = %w[nl nb es]
+  config.target_locales = %w[es it nl nb]
 
   # Uncomment this if you don't want to use gettext
   config.disable_gettext = true

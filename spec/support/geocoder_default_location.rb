@@ -6,14 +6,14 @@ RSpec.shared_context :geocoder_default_location do
       address: "New York, NY, USA",
       formatted_address: "278 Broadway, New York, NY 10007, USA",
       formatted_address_no_country: "278 Broadway, New York, NY 10007",
-      street: "278 Broadway",
+      street_address: "278 Broadway",
       city: "New York",
       state: "New York",
       state_code: "NY",
       neighborhood: "Tribeca",
       country: "United States",
       country_code: "US",
-      zipcode: "10007"
+      postal_code: "10007"
     }
   end
 
@@ -30,15 +30,18 @@ RSpec.shared_context :geocoder_default_location do
     }.as_json
   end
 
+  let(:default_location_registration_address_new) do
+    Geocodeable.new_address_hash(default_location_registration_address)
+  end
+
+  let(:default_location_coordinates) { default_location.slice(:latitude, :longitude).values }
+
   let(:geo_hash) do
     {
       data: ["US", "NY", "New York", default_location[:latitude].to_s, default_location[:longitude].to_s],
       cache_hit: true
     }
   end
-  let(:legacy_production_ip_search_result) { [geo_hash] }
-
-  let(:production_ip_search_result) { [OpenStruct.new(geo_hash)] }
 
   let(:bounding_box) do
     [
@@ -63,7 +66,10 @@ end
 
 RSpec.shared_context :geocoder_real do
   before do
-    Geocoder.configure(lookup: :google, use_https: true, api_key: ENV["GOOGLE_GEOCODER"])
+    Geocoder.configure(
+      lookup: :google, use_https: true, api_key: ENV["GOOGLE_GEOCODER"],
+      ip_lookup: :maxmind, maxmind: {service: :city, api_key: ENV["MAXMIND_KEY"]}
+    )
   end
 
   after do

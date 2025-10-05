@@ -1,8 +1,26 @@
+# == Schema Information
+#
+# Table name: organization_statuses
+#
+#  id                      :bigint           not null, primary key
+#  end_at                  :datetime
+#  kind                    :integer
+#  organization_deleted_at :datetime
+#  pos_kind                :integer
+#  start_at                :datetime
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  organization_id         :bigint
+#
+# Indexes
+#
+#  index_organization_statuses_on_organization_id  (organization_id)
+#
 class OrganizationStatus < AnalyticsRecord
   belongs_to :organization
 
-  enum pos_kind: Organization::POS_KIND_ENUM
-  enum kind: Organization::KIND_ENUM
+  enum :pos_kind, Organization::POS_KIND_ENUM
+  enum :kind, Organization::KIND_ENUM
 
   has_one :notification, as: :notifiable
 

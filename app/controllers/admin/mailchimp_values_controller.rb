@@ -6,7 +6,7 @@ class Admin::MailchimpValuesController < Admin::BaseController
   end
 
   def create
-    UpdateMailchimpValuesWorker.perform_async
+    UpdateMailchimpValuesJob.perform_async
     flash[:success] = "Updating the Mailchimp Values"
     redirect_back(fallback_location: admin_mailchimp_values_path)
   end

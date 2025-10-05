@@ -37,13 +37,13 @@ RSpec.describe CustomerMailer, type: :mailer do
 
   describe "password_reset_email" do
     it "renders email" do
-      user.update_auth_token("password_reset_token")
+      user.update_auth_token("token_for_password_reset")
       mail = CustomerMailer.password_reset_email(user)
       expect(mail.subject).to eq("Instructions to reset your password")
       expect(mail.from).to eq(["contact@bikeindex.org"])
-      expect(mail.body.encoded).to match(user.password_reset_token)
+      expect(mail.body.encoded).to match(user.token_for_password_reset)
       # And just to be sure, test the route a little more
-      expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.password_reset_token}/)
+      expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.token_for_password_reset}/)
       expect(mail.tag).to eq "password_reset_email"
     end
   end
@@ -128,7 +128,7 @@ RSpec.describe CustomerMailer, type: :mailer do
     it "renders email" do
       mail = CustomerMailer.recovered_from_link(stolen_record)
       expect(mail.to).to eq([bike.owner_email])
-      expect(mail.subject).to eq "Your tall bike has been marked recovered!"
+      expect(mail.subject).to eq "Your tall bike (multiple frames fused together) has been marked recovered!"
       expect(mail.from).to eq(["bryan@bikeindex.org"])
       expect(mail.body.encoded).to match recovered_description
     end
@@ -137,7 +137,7 @@ RSpec.describe CustomerMailer, type: :mailer do
   describe "admin_contact_stolen_email" do
     let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
     let(:bike) { FactoryBot.create(:stolen_bike) }
-    let(:user) { FactoryBot.create(:admin, email: "something@stuff.com") }
+    let(:user) { FactoryBot.create(:superuser, email: "something@stuff.com") }
     let(:customer_contact) do
       CustomerContact.create(user_email: bike.owner_email,
         creator_email: user.email,
@@ -233,6 +233,32 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.body.encoded.strip).to eq "Dear #{user.name}, a bike from Wheelageddon, view survey: https://example.com?respid=2"
         expect(mail.message_stream).to eq "outbound"
       end
+    end
+  end
+
+  describe "newsletter" do
+    let(:mail_snippet) { FactoryBot.build(:mail_snippet, kind: :newsletter) }
+    let(:user) { FactoryBot.create(:user) }
+
+    it "renders, includes unsubscribe" do
+      mail = CustomerMailer.newsletter(user:, mail_snippet:)
+
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.to).to eq([user.email])
+      expect(mail.tag).to eq "newsletter"
+      expect(mail.body.encoded).to match "unsubscribe"
+    end
+  end
+
+  # TODO: Move to its own mailer?
+  describe "marketplace_message_notification" do
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
+    it "delivers" do
+      mail = CustomerMailer.marketplace_message_notification(marketplace_message)
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.to).to eq([marketplace_message.receiver.email])
+      expect(mail.body.encoded.strip).to match marketplace_message.body
+      expect(mail.message_stream).to eq "outbound"
     end
   end
 end

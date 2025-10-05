@@ -67,6 +67,13 @@ es:
       default: "%A, %-d de %B de %Y %H:%M:%S %z"
       long: "%-d de %B de %Y %H:%M"
       short: "%-d de %b %H:%M"
+      blog: "%m_%d_%Y"
+      convert_time: "%FT%T%z"
+      dotted: "%Y.%-m.%-d"
+      no_day_with_year: "%B %d %Y"
+      short_with_hour: "%l%P - %m.%d.%y"
+      short_with_year: "%a, %B %d %Y"
+      standard_display: "%a, %B %d"
   i18n:
     transliterate:
       rule:
@@ -83,6 +90,6 @@ es:
         Ó: O
         Ú: U
         Ü: U
-        Ñ: N
+        Ñ: "N"
   spree:
     say_no: false

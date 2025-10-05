@@ -1,3 +1,28 @@
+# == Schema Information
+#
+# Table name: user_alerts
+#
+#  id              :bigint           not null, primary key
+#  dismissed_at    :datetime
+#  kind            :integer
+#  message         :text
+#  resolved_at     :datetime
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  bike_id         :bigint
+#  organization_id :bigint
+#  theft_alert_id  :bigint
+#  user_id         :bigint
+#  user_phone_id   :bigint
+#
+# Indexes
+#
+#  index_user_alerts_on_bike_id          (bike_id)
+#  index_user_alerts_on_organization_id  (organization_id)
+#  index_user_alerts_on_theft_alert_id   (theft_alert_id)
+#  index_user_alerts_on_user_id          (user_id)
+#  index_user_alerts_on_user_phone_id    (user_phone_id)
+#
 class UserAlert < ApplicationRecord
   KIND_ENUM = {
     phone_waiting_confirmation: 0,
@@ -14,9 +39,9 @@ class UserAlert < ApplicationRecord
 
   has_one :notification, as: :notifiable
 
-  validates :user_phone_id, uniqueness: {scope: [:kind, :user_id]}, allow_blank: true
+  validates :user_phone_id, uniqueness: {scope: %i[kind user_id]}, allow_blank: true
 
-  enum kind: KIND_ENUM
+  enum :kind, KIND_ENUM
 
   before_validation :set_calculated_attributes
 
@@ -41,6 +66,7 @@ class UserAlert < ApplicationRecord
 
   def self.kind_humanized(str)
     return "" unless str.present?
+
     str.tr("_", " ")
   end
 
@@ -88,7 +114,7 @@ class UserAlert < ApplicationRecord
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
     else # Don't create just to resolve
-      user_alert.id.blank? ? true : user_alert.resolve!
+      user_alert.id.blank? || user_alert.resolve!
     end
   end
 
@@ -98,7 +124,7 @@ class UserAlert < ApplicationRecord
     if bike.current_stolen_record&.without_location?
       user_alert.save
     else # Don't create just to resolve
-      user_alert.id.blank? ? true : user_alert.resolve!
+      user_alert.id.blank? || user_alert.resolve!
     end
   end
 
@@ -109,7 +135,7 @@ class UserAlert < ApplicationRecord
       user_alert.save
     else
       # Don't create if theft alert already has a photo
-      user_alert.id.blank? ? true : user_alert.resolve!
+      user_alert.id.blank? || user_alert.resolve!
     end
   end
 
@@ -118,7 +144,7 @@ class UserAlert < ApplicationRecord
       user_id: user.id, user_phone_id: user_phone.id)
     if user_phone.confirmed?
       # Don't create if phone is already confirmed
-      user_alert.id.blank? ? true : user_alert.resolve!
+      user_alert.id.blank? || user_alert.resolve!
     else
       user_alert.save unless user_phone.legacy?
     end
@@ -162,11 +188,13 @@ class UserAlert < ApplicationRecord
 
   def dismiss!
     return true if dismissed?
+
     update(dismissed_at: Time.current)
   end
 
   def resolve!
     return true if resolved?
+
     update(resolved_at: Time.current)
   end
 
@@ -174,6 +202,7 @@ class UserAlert < ApplicationRecord
     return false if inactive? || notification.present? ||
       !self.class.notify_period.cover?(updated_at) ||
       self.class.notification_kinds.exclude?(kind)
+
     # Check if the relevant object is updated since
     if theft_alert_without_photo? || stolen_bike_without_location?
       return false if bike.blank? || !self.class.notify_period.cover?(bike.updated_at) ||

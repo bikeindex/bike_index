@@ -1,0 +1,70 @@
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        = sortable "created_at", render_sortable: render_sortable
+      %th
+        = sortable "stripe_price_stripe_id", "Stripe Price", render_sortable: render_sortable
+      %th
+        = sortable "start_at", render_sortable: render_sortable
+      %th
+        = sortable "end_at", render_sortable: render_sortable
+      %th
+        = sortable "user_id", render_sortable: render_sortable
+      %th
+        = sortable "stripe_status", render_sortable: render_sortable
+      %th
+        Referral Source
+      %th
+        Stripe
+      %th
+        Payments
+    %tbody
+      - collection.each do |stripe_subscription|
+        %tr
+          %td
+            .less-strong-hold
+              - if stripe_subscription.membership_id.present?
+                %a.convertTime{href: admin_membership_path(stripe_subscription.membership_id)}
+                  = l stripe_subscription.created_at, format: :convert_time
+              - else
+                %span.convertTime
+                  = l stripe_subscription.created_at, format: :convert_time
+              %span.less-strong-right.d-none.d-md-block
+                = stripe_subscription.id
+          %td
+            - if stripe_subscription.stripe_price.present?
+              - stripe_price = stripe_subscription.stripe_price
+              #{stripe_price.membership_level}
+              %span.less-strong= stripe_price.interval
+              - unless stripe_price.currency_enum == "usd"
+                %small= stripe_price.currency_name
+          %td
+            - if stripe_subscription.start_at.present?
+              %span.convertTime
+                = l stripe_subscription.start_at, format: :convert_time
+          %td
+            - if stripe_subscription.end_at.present?
+              %span.convertTime
+                = l stripe_subscription.end_at, format: :convert_time
+          %td
+            - if stripe_subscription.user_id.present?
+              = render partial: "/shared/admin/user_cell", locals: {user: stripe_subscription.user, render_search: true, cache: true}
+            - else
+              = stripe_subscription.email
+          %td
+            = stripe_subscription.stripe_status
+          %td
+            = stripe_subscription.referral_source
+          %td
+            - if stripe_subscription.stripe_id.present?
+              = link_to stripe_subscription.stripe_id.truncate(20), stripe_subscription.stripe_admin_url, title: stripe_subscription.stripe_id
+          %td
+            - payment_count = stripe_subscription.payments.count
+            %small= number_display(payment_count)
+            - stripe_subscription.payments.order(id: :desc).limit(1).pluck(:id, :stripe_status).each do |id, stripe_status|
+              = link_to admin_payment_path(id), class: "small" do
+                - if stripe_status.blank? || payment_count > 1
+                  last
+                - if stripe_status.present?
+                  %code #{stripe_status}

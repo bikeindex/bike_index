@@ -1,5 +1,9 @@
 class ApplicationController < ActionController::Base
   include ControllerHelpers
+  include SetPeriod
+  include Turbo::Redirection
+  include Pagy::Backend
+
   protect_from_forgery
 
   around_action :set_locale
@@ -45,6 +49,18 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def permitted_per_page(default: 25, max: 100)
+    per_page = params[:per_page]&.to_i
+    per_page = (per_page.present? && per_page > 0) ? per_page : default
+    per_page.clamp(1, max)
+  end
+
+  def permitted_page(max: nil)
+    page = params[:page]&.to_i || 1
+    page = 1 if page < 1
+    max.present? ? page.clamp(1, max) : page
+  end
+
   def permitted_org_bike_search_params
     @stolenness ||= params["stolenness"].present? ? params["stolenness"] : "all"
     params.permit(*Bike.permitted_search_params).merge(stolenness: @stolenness)
@@ -84,28 +100,29 @@ class ApplicationController < ActionController::Base
   def set_locale(&action)
     # Parse the timezone params if they are passed (tested in admin#dashboard#index)
     if params[:timezone].present?
-      timezone = TimeParser.parse_timezone(params[:timezone])
+      timezone = TimeZoneParser.parse(params[:timezone])
       # If it's a valid timezone, save to session
       session[:timezone] = timezone&.name
     end
     # Set the timezone on a per request basis if we have a timezone saved
     if session[:timezone].present?
-      Time.zone = timezone || TimeParser.parse_timezone(session[:timezone])
+      Time.zone = timezone || TimeZoneParser.parse(session[:timezone])
     end
 
     # We aren't translating the superadmin section
     if controller_namespace == "admin"
       return I18n.with_locale(I18n.default_locale, &action)
     end
+
     I18n.with_locale(requested_locale, &action)
   ensure # Make sure we reset default timezone
-    Time.zone = TimeParser::DEFAULT_TIMEZONE
+    Time.zone = TimeParser::DEFAULT_TIME_ZONE
   end
 
   # Handle localization / currency conversion exceptions by redirecting to the
   # root url with the default locale and a flash message.
   def localization_failure
-    locale = t(requested_locale, scope: [:locales])
+    locale = translation(requested_locale, scope: [:locales])
     flash[:error] = "#{locale} localization is unavailable. Please try again later."
     params.delete(:locale)
     redirect_to root_url

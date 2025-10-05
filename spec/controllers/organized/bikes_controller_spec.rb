@@ -1,5 +1,9 @@
 require "rails_helper"
 
+# Need controller specs to test setting session
+#
+# PUT ALL TESTS IN Request spec !
+#
 RSpec.describe Organized::BikesController, type: :controller do
   context "given an authenticated ambassador" do
     include_context :logged_in_as_ambassador
@@ -35,7 +39,7 @@ RSpec.describe Organized::BikesController, type: :controller do
       expect(session[:passive_organization_id]).to eq "0" # sets it to zero so we don't look it up again
     end
     context "admin user" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "renders, doesn't reassign passive_organization_id" do
         session[:passive_organization_id] = organization.to_param # Admin, so user has access
         get :index, params: {organization_id: organization.to_param}
@@ -95,11 +99,11 @@ RSpec.describe Organized::BikesController, type: :controller do
         }
       end
       it "creates" do
-        Sidekiq::Worker.clear_all
+        Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect(organization.auto_user_id).to_not eq user.id
-        expect(UpdateMailchimpDatumWorker).to be_present
-        stub_const("UpdateMailchimpDatumWorker::UPDATE_MAILCHIMP", false)
+        expect(UpdateMailchimpDatumJob).to be_present
+        stub_const("UpdateMailchimpDatumJob::UPDATE_MAILCHIMP", false)
         Sidekiq::Testing.inline! do
           expect {
             post :create, params: {bike: attrs, organization_id: organization.to_param}
@@ -131,147 +135,6 @@ RSpec.describe Organized::BikesController, type: :controller do
         message = ActionMailer::Base.deliveries.last
         expect(message.to).to eq([attrs[:owner_email]])
         expect(message.subject).to match(/confirm.*registration/i)
-      end
-    end
-  end
-
-  context "logged_in_as_organization_member" do
-    include_context :logged_in_as_organization_member
-    context "paid organization" do
-      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
-      before { organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) } # Stub organization having organization feature
-      describe "index" do
-        context "with search_stickers" do
-          let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-          let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
-          it "searches for bikes with stickers" do
-            expect(bike_with_sticker.bike_sticker?).to be_truthy
-            get :index, params: {organization_id: organization.to_param, search_stickers: "none"}
-            expect(response.status).to eq(200)
-            expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:search_stickers)).to eq "none"
-            expect(assigns(:bikes).pluck(:id)).to eq([])
-            expect(session[:passive_organization_id]).to eq organization.id
-          end
-        end
-        context "without params" do
-          it "renders, assigns search_query_present and stolenness all" do
-            get :index, params: {organization_id: organization.to_param}
-            expect(response.status).to eq(200)
-            expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-            expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:search_query_present)).to be_falsey
-            expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
-          end
-        end
-      end
-      describe "recoveries" do
-        let(:bike) { FactoryBot.create(:stolen_bike) }
-        let(:bike2) { FactoryBot.create(:stolen_bike) }
-        let(:recovered_record) { bike.fetch_current_stolen_record }
-        let(:recovered_record2) { bike2.fetch_current_stolen_record }
-        let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization) }
-        let!(:bike_organization2) { FactoryBot.create(:bike_organization, bike: bike2, organization: organization) }
-        let(:date) { "2016-01-10 13:59:59" }
-        let(:recovery_information) do
-          {
-            recovered_description: "recovered it on a special corner",
-            index_helped_recovery: true,
-            can_share_recovery: true,
-            recovered_at: "2016-01-10 13:59:59"
-          }
-        end
-        before do
-          recovered_record.add_recovery_information
-          recovered_record2.add_recovery_information(recovery_information)
-        end
-        it "renders, assigns search_query_present and stolenness all" do
-          expect(recovered_record2.recovered_at.to_date).to eq Date.parse("2016-01-10")
-          get :recoveries, params: {
-            organization_id: organization.to_param,
-            period: "custom",
-            start_time: Time.parse("2016-01-01").to_i
-          }
-          expect(response.status).to eq(200)
-          expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
-          expect(response).to render_template :recoveries
-        end
-      end
-      describe "incompletes" do
-        let(:partial_reg_attrs) do
-          {
-            manufacturer_id: Manufacturer.other.id,
-            primary_frame_color_id: Color.black.id,
-            owner_email: "something@stuff.com",
-            creation_organization_id: organization.id
-          }
-        end
-        let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs}, origin: "embed_partial") }
-        it "renders" do
-          expect(partial_registration.organization).to eq organization
-          get :incompletes, params: {organization_id: organization.to_param}
-          expect(response.status).to eq(200)
-          expect(response).to render_template :incompletes
-          expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
-        end
-        context "suborganization incomplete" do
-          let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: organization) }
-          let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id)}, origin: "embed_partial") }
-          it "renders" do
-            organization.save
-            organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs) # Continue organization feature stubbing
-            expect(partial_registration.organization).to eq organization_child
-
-            get :incompletes, params: {organization_id: organization.to_param}
-
-            expect(response.status).to eq(200)
-            expect(response).to render_template :incompletes
-            expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
-          end
-        end
-      end
-      describe "multi_serial_search" do
-        it "renders" do
-          get :multi_serial_search, params: {organization_id: organization.to_param}
-          expect(response.status).to eq(200)
-          expect(response).to render_template :multi_serial_search
-        end
-      end
-    end
-    context "unpaid organization" do
-      before do
-        expect(organization.is_paid).to be_falsey
-      end
-      describe "index" do
-        it "renders without search" do
-          expect(Bike).to_not receive(:search)
-          get :index, params: {organization_id: organization.to_param}
-          expect(response.status).to eq(200)
-          expect(response).to render_template :index
-          expect(assigns(:current_organization)).to eq organization
-          expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
-        end
-      end
-      describe "recoveries" do
-        it "redirects recoveries" do
-          get :recoveries, params: {organization_id: organization.to_param}
-          expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
-        end
-      end
-      describe "incompletes" do
-        it "redirects incompletes" do
-          get :incompletes, params: {organization_id: organization.to_param}
-          expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
-        end
-      end
-    end
-
-    describe "new" do
-      it "renders" do
-        get :new, params: {organization_id: organization.to_param}
-        expect(response.status).to eq(200)
-        expect(response).to render_template :new
-        expect(assigns(:current_organization)).to eq organization
       end
     end
   end

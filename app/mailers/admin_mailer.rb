@@ -1,5 +1,5 @@
 class AdminMailer < ApplicationMailer
-  helper LocalizationHelper
+  helper TranslationHelper
 
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"],
@@ -31,8 +31,7 @@ class AdminMailer < ApplicationMailer
 
   def blocked_stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
-    mail(to: "bryan@bikeindex.org",
-      bcc: "contact@bikeindex.org",
+    mail(to: "contact@bikeindex.org",
       subject: "Stolen notification blocked!")
   end
 

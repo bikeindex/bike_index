@@ -57,9 +57,7 @@
         .col-lg-5.col-9.mt-auto.mb-2.pr-lg-0
           %p.strong.mb-0
             = link_to edit_admin_bike_path(bike.to_param) do
-              - if bike.status_stolen?
-                %span.text-danger
-                  Stolen
+              = bike_status_span(@bike)
               = bike.title_string
             = link_to "non-admin view", bike_path(bike.to_param, organization_id: bike.creation_organization.to_param), class: "text-muted float-right"
           %table.table-list.mb-0
@@ -104,7 +102,7 @@
                       - if bike.creator.blank?
                         %small.text-danger Creator missing
                       - else
-                        = render partial: "/shared/admin_user_cell", locals: {user: bike.creator, search_url: admin_bikes_path(user_id: bike.creator_id)}
+                        = render partial: "/shared/admin/user_cell", locals: {user: bike.creator, search_url: admin_bikes_path(user_id: bike.creator_id)}
                     - else
                       %small.less-strong self reg
                   - if bike.creation_description.present?
@@ -163,7 +161,7 @@
                 Owner
               %td
                 - if bike.user.present?
-                  = render partial: "/shared/admin_user_cell", locals: {user: bike.user}
+                  = render partial: "/shared/admin/user_cell", locals: {user: bike.user}
                 - else
                   Unclaimed
             %tr
@@ -350,7 +348,7 @@
   - if bike.present?
     #bike-tab-wrapper{"data-activetab" => active_tab}
       .nav.nav-tabs
-        - cache(["admin_bike_tabs", bike, stolen_record]) do
+        - cache(["admin_bike_tabs-1", bike, stolen_record]) do
           - impound_count = bike.impound_records.count + ImpoundClaim.involving_bike_id(bike.id).count
 
           .nav-item
@@ -359,22 +357,27 @@
             = link_to admin_bike_path(bike, active_tab: "duplicates"), class: "nav-link bikes-duplicates" do
               D<span class="d-none d-md-inline">uplicates</span>
               %small
-                (#{admin_number_display(bike.duplicate_bike_groups.count)})
+                (#{number_display(bike.duplicate_bike_groups.count)})
           .nav-item
             = link_to admin_bike_path(bike, active_tab: "messages"), class: "nav-link bikes-messages" do
               M<span class="d-none d-md-inline">essages</span>
               %small
-                (#{admin_number_display(bike.messages_count)})
+                (#{number_display(bike.messages_count)})
+          .nav-item
+            = link_to admin_marketplace_listings_path(search_bike_id: bike.id), class: "nav-link marketplace_listings-index" do
+              L<span class="d-none d-md-inline">istings</span>
+              %small
+                (#{number_display(bike.marketplace_listings.count)})
           .nav-item
             = link_to admin_bike_path(bike.id, active_tab: "ownerships"), class: "nav-link bikes-ownerships" do
               O<span class="d-none d-md-inline">wnerships</span>
               %small
-                (#{admin_number_display(bike.ownerships.count)})
+                (#{number_display(bike.ownerships.count)})
           .nav-item
             = link_to admin_bike_path(bike, active_tab: "stickers"), class: "nav-link bikes-stickers" do
               S<span class="d-none d-md-inline">tickers</span>
               %small
-                (#{admin_number_display(bike.bike_stickers.count)})
+                (#{number_display(bike.bike_stickers.count)})
           - if stolen_record.present?
             .nav-item
               = link_to edit_admin_stolen_bike_url(stolen_record.id, stolen_record_id: true), class: "nav-link stolen_bikes-edit" do
@@ -385,18 +388,18 @@
             = link_to admin_theft_alerts_path(search_bike_id: bike.id), class: "nav-link theft_alerts" do
               P<span class="d-none d-md-inline">romoted alerts</span>
               %small
-                (#{admin_number_display(bike.theft_alerts.count)})
+                (#{number_display(bike.theft_alerts.count)})
           .nav-item
             = link_to admin_bike_path(bike, active_tab: "recoveries"), class: "nav-link bikes-recoveries" do
               R<span class="d-none d-md-inline">ecoveries</span>
               %small
-                (#{admin_number_display(bike.recovered_records.count)})
+                (#{number_display(bike.recovered_records.count)})
           - if impound_count > 0
             .nav-item
               = link_to admin_bike_path(bike, active_tab: "impound"), class: "nav-link bikes-impound" do
                 I<span class="d-none d-md-inline">mpoundings</span>
                 %small
-                  (#{admin_number_display(impound_count)})
+                  (#{number_display(impound_count)})
 
         -# NOTE: not cached, only renders when looking at recoveries
         - if display_recovery

@@ -62,7 +62,7 @@
               = l bike_sticker.updated_at, format: :convert_time
           - unless skip_updates
             %td
-              = link_to admin_number_display(bike_sticker.bike_sticker_updates.count), admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id)
+              = link_to number_display(bike_sticker.bike_sticker_updates.count), admin_bike_sticker_updates_path(search_bike_sticker_id: bike_sticker.id)
           %td
             - if bike_sticker.organization.present?
               = link_to bike_sticker.organization.name, admin_bike_stickers_path(sortable_search_params.merge(organization_id: bike_sticker.organization_id))

@@ -8,7 +8,7 @@ class CircularImageUploader < ApplicationUploader
 
   process :fix_exif_rotation
   process :strip # Remove EXIF data, because we don't need it
-  process convert: "jpg"
+  process convert: "png"
 
   version :large do
     process :round_image
@@ -22,7 +22,7 @@ class CircularImageUploader < ApplicationUploader
     process resize_to_fill: [100, 100]
   end
 
-  def extension_white_list
+  def extension_allowlist
     self.class.extensions
   end
 
@@ -31,7 +31,7 @@ class CircularImageUploader < ApplicationUploader
       path = img.path
       new_tmp_path = File.join(cache_dir, "round_#{File.basename(path)}")
       width, height = img[:dimensions]
-      radius_point = (width > height ? [width / 2, height] : [width, height / 2]).join(",")
+      radius_point = ((width > height) ? [width / 2, height] : [width, height / 2]).join(",")
       imagemagick_command = ["convert",
         "-size #{width}x#{height}",
         "xc:transparent",

@@ -1,24 +1,26 @@
 class Admin::OrganizationsController < Admin::BaseController
   include SortableTable
-  before_action :set_period, only: [:index]
+
   before_action :find_organization, only: [:show, :edit, :update, :destroy]
 
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 25
-    @organizations = if sort_column == "bikes"
+    @per_page = permitted_per_page
+    organizations = if sort_column == "bikes"
       matching_organizations.left_joins(:bikes).group(:id)
         .order("COUNT(bikes.id) #{sort_direction}")
     else
       matching_organizations
         .reorder("organizations.#{sort_column} #{sort_direction}")
-    end.page(page).per(@per_page)
+    end
+    @pagy, @organizations = pagy(organizations, limit: @per_page, page: permitted_page)
   end
 
   def show
     @locations = @organization.locations
-    @deleted_memberships = @organization.deleted? || InputNormalizer.boolean(params[:deleted_memberships])
-    @bikes = @organization.bikes.reorder("created_at desc").page(1).per(10)
+    @deleted_organization_roles = @organization.deleted? || InputNormalizer.boolean(params[:deleted_organization_roles])
+    bikes = @organization.bikes.reorder("created_at desc")
+    @bikes_count = bikes.size
+    @pagy, @bikes = pagy(bikes, limit: 10, page: permitted_page)
   end
 
   def show_deleted
@@ -57,7 +59,7 @@ class Admin::OrganizationsController < Admin::BaseController
     if @organization.update(permitted_parameters)
       update_organization_stolen_message
       flash[:success] = "Organization Saved!"
-      UpdateOrganizationPosKindWorker.perform_async(@organization.id) if run_update_pos_kind
+      UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
       redirect_to admin_organization_url(@organization)
     else
       render action: :edit
@@ -123,6 +125,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def matching_organizations
     return @matching_organizations if defined?(@matching_organizations)
+
     @search_paid = InputNormalizer.boolean(params[:search_paid])
     matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
     matching_organizations = matching_organizations.paid if @search_paid
@@ -196,12 +199,14 @@ class Admin::OrganizationsController < Admin::BaseController
                       kind: params[:organization_stolen_message_kind],
                       search_radius_kilometers: params[:organization_stolen_message_search_radius_kilometers]}
     return unless message_params.values.reject(&:blank?).any?
+
     OrganizationStolenMessage.for(@organization).update(message_params)
   end
 
   def find_organization
     @organization = Organization.unscoped.friendly_find(params[:id])
     return true if @organization.present?
+
     raise ActiveRecord::RecordNotFound # Because this should have been raised
   end
 end

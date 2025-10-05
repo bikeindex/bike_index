@@ -1,17 +1,12 @@
 class Admin::BikeStickerUpdatesController < Admin::BaseController
   include SortableTable
 
-  before_action :set_period, only: [:index]
-
   def index
-    page = params[:page] || 1
-    @per_page = params[:per_page] || 25
-    @bike_sticker_updates =
-      matching_bike_sticker_updates
+    @per_page = permitted_per_page
+    @pagy, @bike_sticker_updates =
+      pagy(matching_bike_sticker_updates
         .reorder("bike_sticker_updates.#{sort_column} #{sort_direction}")
-        .includes(:organization, :user, :bike)
-        .page(page)
-        .per(@per_page)
+        .includes(:organization, :user, :bike), limit: @per_page, page: permitted_page)
   end
 
   helper_method :matching_bike_sticker_updates

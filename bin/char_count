@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Count the number of non-whitespace characters
+
+require "shellwords"
+
+# If passed an argument, it counts the files and folders at that path
+# Given no argument, it counts files in app, bin, config, lib
+paths = ARGV.empty? ? %w[app bin config lib] : ARGV
+
+def remove_comments(content, file_path)
+  case File.extname(file_path)
+  when ".rb", ".yml", ".yaml"
+    # Ruby/YAML files: remove # comments
+    content.gsub(/#.*$/, "")
+  when ".erb", ".haml", ".html"
+    # Template/HTML files: remove HTML comments and # comments (for ERB)
+    content.gsub(/#.*$/, "").gsub(/<!--.*?-->/m, "")
+  when ".js", ".css", ".scss"
+    # JS/CSS files: remove // and /* */ comments
+    content.gsub(%r{//.*$}, "").gsub(%r{/\*.*?\*/}m, "")
+  when ".md"
+    # Markdown files: remove HTML comments only
+    content.gsub(/<!--.*?-->/m, "")
+  else
+    # don't remove comments - e.g. JSON files (JSON doesn't support comments)
+    content
+  end
+end
+
+# Change to the script's parent directory
+Dir.chdir(File.expand_path("..", __dir__))
+
+# Get all tracked files in the specified paths
+file_extensions = %w[.rb .erb .haml .html .js .css .scss .yml .yaml .json .md]
+files = `git ls-files #{paths.shelljoin}`.split("\n")
+                                         .select { |file| file_extensions.include?(File.extname(file)) }
+
+# Process all files and count non-whitespace characters
+total_chars = files.sum do |file|
+  next 0 unless File.exist?(file)
+
+  content = File.read(file)
+  content_without_comments = remove_comments(content, file)
+  content_without_comments.gsub(/\s/, "").length
+end
+
+puts total_chars
