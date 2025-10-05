@@ -1,9 +1,7 @@
 class Admin::GraphsController < Admin::BaseController
   before_action :set_period
   before_action :set_variable_graph_kind
-  # analytics DB doesn't have reading role and OrganizationStatus is analytics - so it can't be reading
-  around_action :set_reading_role, unless: -> { params[:search_kind] == "pos_integrations" }
-
+  around_action :set_reading_role
 
   def index
     @total_count = if @kind == "users"
@@ -22,9 +20,7 @@ class Admin::GraphsController < Admin::BaseController
     elsif @kind == "bikes"
       bike_chart_data
     elsif @kind == "recoveries"
-       helpers.time_range_counts(collection: matching_recoveries)
-    elsif @kind == "pos_integrations"
-      pos_integrations_chart_data
+      helpers.time_range_counts(collection: matching_recoveries)
     end
     if chart_data.present?
       render json: chart_data.chart_json
@@ -42,6 +38,7 @@ class Admin::GraphsController < Admin::BaseController
   protected
 
   def set_variable_graph_kind
+    # NOTE: pos_integrations redirects you to the OrganizationStatusesController
     @graph_kinds = %w[general users bikes recoveries pos_integrations]
     @kind = @graph_kinds.include?(params[:search_kind]) ? params[:search_kind] : @graph_kinds.first
   end
@@ -128,21 +125,6 @@ class Admin::GraphsController < Admin::BaseController
           data: helpers.time_range_counts(collection: bikes.example)
         }
       ]
-    end
-  end
-
-  def pos_integration_chart_kinds
-    Organization::POS_KIND_ENUM.keys - %i[no_pos]
-  end
-
-  def pos_integrations_chart_data
-    organization_statuses = OrganizationStatus.where(start_at: @time_range)
-    # Graphing just the started
-    pos_integration_chart_kinds.map do |pos_kind|
-      {
-        name: pos_kind.to_s.humanize,
-        data: helpers.time_range_counts(collection: organization_statuses.send(pos_kind))
-      }
     end
   end
 end

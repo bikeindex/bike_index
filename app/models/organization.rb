@@ -70,8 +70,8 @@ class Organization < ApplicationRecord
     other_pos: 1,
     lightspeed_pos: 2,
     ascend_pos: 3,
-    broken_lightspeed_pos: 4,
     does_not_need_pos: 5,
+    broken_lightspeed_pos: 4,
     broken_ascend_pos: 6
   }.freeze
 

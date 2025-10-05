@@ -1,3 +1,14 @@
+:ruby
+  def humanize_pos_kind(kind)
+    if kind == "all"
+      "All POS kinds"
+    elsif kind == "not_no_pos"
+      "Any POS kind (all but no_pos)"
+    else
+      kind&.humanize
+    end
+  end
+
 .admin-subnav
   .col-md-5
     %h1 Organization Statuses
@@ -20,15 +31,12 @@
             = link_to Organization.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
       %li.nav-item
         %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@pos_kind != "all" ? "active" : "")}
-          - if @pos_kind == "all"
-            Any POS kind
-          - else
-            = @pos_kind.humanize
+          = humanize_pos_kind(@pos_kind)
         .dropdown-menu
-          = link_to "Any POS kind", url_for(sortable_search_params.merge(search_pos_kind: nil)), class: "dropdown-item #{@pos_kind == "all" ? 'active' : ''}"
+          = link_to humanize_pos_kind("all"), url_for(sortable_search_params.merge(search_pos_kind: nil)), class: "dropdown-item #{@pos_kind == "all" ? 'active' : ''}"
           - grouped_pos_kinds.each do |pos_kind|
             - pos_kind_active = @pos_kind == pos_kind
-            = link_to pos_kind.humanize, url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), class: "dropdown-item #{pos_kind_active ? 'active' : ''}"
+            = link_to humanize_pos_kind(pos_kind), url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), class: "dropdown-item #{pos_kind_active ? 'active' : ''}"
           .dropdown-divider
           - Organization.pos_kinds.each do |pos_kind|
             - pos_kind_active = @pos_kind == pos_kind
@@ -44,32 +52,7 @@
 
   = render partial: "/shared/admin/current_header", locals: {viewing: "Organization Statuses"}
 
-- if @render_chart
-  :ruby
-    # Only render stacked kinds if rendering type counts
-    colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]
-
-    # GROSS, sorry
-    pos_kinds_start_counts = []
-    start_colors = []
-    pos_kinds_end_counts = []
-    end_colors = []
-    Organization.pos_kinds.each_with_index do |k, i|
-      if matching_organization_statuses.where(pos_kind: k).where(start_at: @time_range).limit(1).present?
-        pos_kinds_start_counts << {name: k.humanize, data: time_range_counts(collection: matching_organization_statuses.where(pos_kind: k), column: :start_at)}
-        start_colors << colors[i]
-      end
-      if matching_organization_statuses.where(pos_kind: k).where(end_at: @time_range).limit(1).present?
-        pos_kinds_end_counts << {name: k.humanize, data: time_range_counts(collection: matching_organization_statuses.where(pos_kind: k), column: :end_at)}
-        end_colors << colors[i]
-      end
-    end
-  - unless @ended
-    %h4.mt-4 POS kinds <code>start_at</code>
-    = column_chart pos_kinds_start_counts, stacked: true, thousands: ",", colors: start_colors
-  - unless @current
-    %h4.mt-4 POS kinds <code>end_at</code>
-    = column_chart pos_kinds_end_counts, stacked: true, thousands: ",", colors: end_colors
+= render partial: "graphs" if @render_chart
 
 .mt-2
   = render partial: "/shared/period_select"

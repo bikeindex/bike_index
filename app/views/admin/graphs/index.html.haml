@@ -19,10 +19,6 @@
 - elsif @kind == "bikes"
   = render partial: "bikes_graphs", locals: {sortable_params:}
 
-- elsif @kind == "pos_integrations"
-  - colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]
-  = column_chart variable_admin_graphs_path(sortable_params), thousands: ",", colors:
-
 - else
   - if @total_count.present?
     %p.mt-4
