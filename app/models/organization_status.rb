@@ -32,18 +32,55 @@ class OrganizationStatus < AnalyticsRecord
   scope :with_pos, -> { where(pos_kind: Organization.with_pos_kinds) }
   scope :without_pos, -> { where(pos_kind: Organization.without_pos_kinds) }
 
-  def self.at_time(time)
-    where("start_at < ?", time).where("end_at > ?", time)
-      .or(current.where("start_at < ?", time))
+  class << self
+    def at_time(time)
+      where("start_at < ?", time).where("end_at > ?", time)
+        .or(current.where("start_at < ?", time))
+    end
+
+    def find_or_create_current(organization, pos_kind: nil)
+      organization_status = current.where(organization_id: organization.id).first
+      pos_kind ||= organization.pos_kind
+
+      return organization_status if unchanged?(organization_status:, organization:, pos_kind:)
+
+      new_organization_status = OrganizationStatus.create!(organization_id: organization.id,
+        kind: organization.kind,
+        organization_deleted_at: organization.deleted_at,
+        pos_kind: organization.pos_kind,
+        start_at: status_change_at(organization))
+
+      organization_status&.update(end_at: new_organization_status.start_at)
+      new_organization_status
+    end
+
+    private
+
+    def unchanged?(organization:, pos_kind:, organization_status: nil)
+      return false if organization_status.blank?
+
+      organization_status.deleted? == organization.deleted? &&
+        organization_status.pos_kind == pos_kind &&
+        organization_status.pos_kind == organization.pos_kind
+      organization_status.kind == organization.kind
+    end
+
+    def status_change_at(organization)
+      if %w[ascend_pos broken_ascend_pos].include?(organization.pos_kind)
+        bulk_imports = BulkImport.where(organization_id: organization.id).ascend.order(:id)
+        time = bulk_imports.no_import_errors.last&.created_at
+        time ||= bulk_imports.file_errors.last&.created_at
+        return time if time.present?
+      end
+      organization.updated_at || Time.current
+    end
   end
 
   def bulk_imports
-    if Organization.ascend_or_broken_ascend_kinds.include?(pos_kind)
-      b_imports = BulkImport.where("created_at > ?", start_at)
-      ended? ? b_imports.where("created_at < ?", end_at) : b_imports
-    else
-      BulkImport.none
-    end
+    return BulkImport.none unless Organization.ascend_or_broken_ascend_kinds.include?(pos_kind)
+
+    b_imports = BulkImport.where("created_at > ?", start_at)
+    ended? ? b_imports.where("created_at < ?", end_at) : b_imports
   end
 
   def ended?

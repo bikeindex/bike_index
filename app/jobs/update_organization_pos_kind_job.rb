@@ -33,38 +33,12 @@ class UpdateOrganizationPosKindJob < ScheduledJob
 
     organization = Organization.unscoped.find(org_id)
     pos_kind = self.class.calculated_pos_kind(organization)
-    organization_status = current_organization_status(organization)
-    return true if organization.pos_kind == pos_kind
 
-    status_change_at = status_change_at(organization)
-    organization_status.update(end_at: status_change_at)
-    organization.update(pos_kind: pos_kind)
-    current_organization_status(organization, start_at: status_change_at)
+    OrganizationStatus.find_or_create_current(organization, pos_kind:)
+    organization.update(pos_kind: pos_kind) if organization.pos_kind != pos_kind
   end
 
   private
-
-  def current_organization_status(organization, start_at: nil)
-    organization_status = OrganizationStatus.current.where(organization_id: organization.id).first
-    if organization_status.present?
-      return organization_status if organization_status.deleted? == organization.deleted?
-    end
-    OrganizationStatus.create!(organization_id: organization.id,
-      kind: organization.kind,
-      organization_deleted_at: organization.deleted_at,
-      pos_kind: organization.pos_kind,
-      start_at: start_at || Time.current)
-  end
-
-  def status_change_at(organization)
-    if %w[ascend_pos broken_ascend_pos].include?(organization.pos_kind)
-      bulk_imports = BulkImport.where(organization_id: organization.id).ascend.order(:id)
-      time = bulk_imports.no_import_errors.last&.created_at
-      time ||= bulk_imports.file_errors.last&.created_at
-      return time if time.present?
-    end
-    organization.updated_at
-  end
 
   def enqueue_workers
     Organization.unscoped.pluck(:id).each do |id|
