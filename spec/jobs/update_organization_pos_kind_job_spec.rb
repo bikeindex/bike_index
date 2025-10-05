@@ -200,7 +200,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
       it "no_pos, does_not_need_pos if older organization" do
         organization.reload
         expect(described_class.calculated_pos_kind(organization)).to eq "no_pos"
-        3.times { FactoryBot.create(:bike_organized, creation_organization: organization) }
+        10.times { FactoryBot.create(:bike_organized, creation_organization: organization) }
         organization.reload
         expect(described_class.calculated_pos_kind(organization)).to eq "no_pos"
         expect {
@@ -209,7 +209,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
         organization_status1 = OrganizationStatus.order(:id).first
         expect(organization_status1.current?).to be_truthy
 
-        organization.update_attribute :created_at, Time.current - 2.weeks
+        organization.update_attribute :created_at, Time.current - 3.weeks
         organization.reload
         expect(described_class.calculated_pos_kind(organization)).to eq "does_not_need_pos"
 
