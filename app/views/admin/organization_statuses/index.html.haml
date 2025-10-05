@@ -52,7 +52,14 @@
 
   = render partial: "/shared/admin/current_header", locals: {viewing: "Organization Statuses"}
 
-= render partial: "graphs" if @render_chart
+- if @render_chart
+
+  - if sort_column != "created_at"
+    = render partial: "graphs"
+  - else
+    -# ALMOST ALWAYS we want to see fancy graphs for the start/end.
+    -# But, in case you want to see created_at (probably for bug hunting), graph that
+    = column_chart time_range_counts(collection: matching_organization_statuses, column: @time_range_column), stacked: true, thousands: ","
 
 .mt-2
   = render partial: "/shared/period_select"
@@ -63,12 +70,14 @@
 
 - org_ids = @organization_statuses.distinct.map(&:organization_id)
 - org_names_hash = Organization.unscoped.where(id: org_ids).pluck(:id, :short_name).to_h
+- show_created_at = sort_column == "created_at" || InputNormalizer.boolean(params[:search_show_created_at])
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header
       %th
         = sortable "start_at"
-      - if sort_column == "created_at"
+      - if show_created_at
         %th.small
           = sortable "created_at"
       %th
@@ -91,7 +100,7 @@
               = l organization_status.start_at, format: :convert_time
             - if display_dev_info?
               %code.small.only-dev-visible= organization_status.id
-          - if sort_column == "created_at"
+          - if show_created_at
             %td.small
               %span.convertTime= l organization_status.created_at, format: :convert_time
 
@@ -103,9 +112,8 @@
             - if organization_status.end_at.present?
               = period_in_words(organization_status.end_at - organization_status.start_at)
           %td
-            - if organization_status.organization_id.present?
-              = link_to org_names_hash[organization_status.organization_id], admin_organization_path(organization_status.organization_id), class: "text-link"
-              = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: organization_status.organization_id)), class: "display-sortable-link small"
+            = render partial: "/shared/admin/organization_cell", locals: {organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?}
+
 
           %td
             - status_class = organization_status.pos_kind.match?(/broken/) ? "text-danger" : ""
