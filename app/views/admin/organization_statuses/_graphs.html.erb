@@ -18,27 +18,29 @@
     end
   end
 
-  show_with_pos_counts = %w[not_no_pos all with_pos].include?(@pos_kind)
+  show_with_pos_counts = %w[not_no_pos with_pos].include?(@pos_kind)
 %>
 
 <table class="table table-striped table-bordered table-sm without-exterior-border tw:mb-8">
   <thead class="small-header">
     <tr>
-      <th>Active at start</th>
-      <% if show_with_pos_counts %><th>With POS at start</th><% end %>
-      <th>Active at end</th>
-      <% if show_with_pos_counts %><th>With POS at end</th><% end %>
+      <% if show_with_pos_counts %>
+        <th>Active POS at start</th>
+        <th>Active POS at end</th>
+      <% else %>
+        <th>Matching statuses at start</th>
+        <th>Matching statuses at end</th>
+      <% end %>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><%= number_display(matching_organization_statuses_untimed.at_time(@time_range.first).count) %></td>
       <% if show_with_pos_counts %>
         <td><%= number_display(matching_organization_statuses_untimed.with_pos.at_time(@time_range.first).count) %></td>
-      <% end %>
-      <td><%= number_display(matching_organization_statuses_untimed.at_time(@time_range.last).count) %></td>
-      <% if show_with_pos_counts %>
         <td><%= number_display(matching_organization_statuses_untimed.with_pos.at_time(@time_range.last).count) %></td>
+      <% else %>
+        <td><%= number_display(matching_organization_statuses_untimed.at_time(@time_range.first).count) %></td>
+        <td><%= number_display(matching_organization_statuses_untimed.at_time(@time_range.last).count) %></td>
       <% end %>
     </tr>
   </tbody>
