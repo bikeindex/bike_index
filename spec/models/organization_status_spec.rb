@@ -18,6 +18,10 @@ RSpec.describe OrganizationStatus, type: :model do
     it "returns matching statuses" do
       expect(OrganizationStatus.current.pluck(:id)).to eq([organization_status2.id])
       expect(OrganizationStatus.at_time(time).pluck(:id)).to match_array([organization_status2.id, organization_status3.id])
+      # It matches if start_at is the same:
+      expect(OrganizationStatus.at_time(organization_status2.start_at).pluck(:id)).to match_array([organization_status2.id])
+      # It DOES NOT match if end_at is the same
+      expect(OrganizationStatus.at_time(organization_status3.end_at).pluck(:id)).to match_array([organization_status2.id])
     end
   end
 

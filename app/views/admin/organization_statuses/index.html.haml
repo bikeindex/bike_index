@@ -113,8 +113,6 @@
               = period_in_words(organization_status.end_at - organization_status.start_at)
           %td
             = render partial: "/shared/admin/organization_cell", locals: {organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?}
-
-
           %td
             - status_class = organization_status.pos_kind.match?(/broken/) ? "text-danger" : ""
             - status_class = "less-strong" if organization_status.pos_kind == "no_pos"
