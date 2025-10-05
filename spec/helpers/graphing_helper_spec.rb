@@ -14,7 +14,6 @@ RSpec.describe GraphingHelper, type: :helper do
     describe "time_range_counts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 1, " 1:18 PM" => 0, " 1:19 PM" => 0} }
       it "returns the thing with want" do
-        pp send(:time_range_counts, collection: Payment.all)
         expect(time_range_counts(collection: Payment.all)).to eq target_counts
       end
     end
