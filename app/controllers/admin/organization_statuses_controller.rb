@@ -12,21 +12,6 @@ class Admin::OrganizationStatusesController < Admin::BaseController
         .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
-  # def pos_integration_chart_kinds
-  #   Organization::POS_KIND_ENUM.keys - %i[no_pos]
-  # end
-
-  # def pos_integrations_chart_data
-  #   organization_statuses = OrganizationStatus.where(start_at: @time_range)
-  #   # Graphing just the started
-  #   pos_integration_chart_kinds.map do |pos_kind|
-  #     {
-  #       name: pos_kind.to_s.humanize,
-  #       data: helpers.time_range_counts(collection: organization_statuses.send(pos_kind))
-  #     }
-  #   end
-  # end
-
   helper_method :matching_organization_statuses_untimed, :matching_organization_statuses, :grouped_pos_kinds
 
   private

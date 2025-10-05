@@ -110,28 +110,5 @@ RSpec.describe Admin::GraphsController, type: :request do
         expect(json_result.is_a?(Array)).to be_truthy
       end
     end
-    context "pos_integrations" do
-      let!(:organization_status) { FactoryBot.create(:organization_status, pos_kind: :lightspeed_pos, start_at:) }
-      let(:start_at) { Time.current - 5.days }
-      it "returns json" do
-        get "#{base_url}/variable", params: {search_kind: "pos_integrations", timezone: "America/Los_Angeles"}
-        expect(response.status).to eq(200)
-        expect(json_result.is_a?(Array)).to be_truthy
-        expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
-        expect(assigns(:end_time)).to be_within(1.minute).of Time.current
-      end
-      context "passed date and time" do
-        let(:end_time) { "2019-01-22T13:48" }
-        let(:start_time) { "2019-01-15T14:48" }
-        it "returns json" do
-          get "#{base_url}/variable", params: {search_kind: "pos_integrations", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
-          expect(response.status).to eq(200)
-          expect(json_result.is_a?(Array)).to be_truthy
-          Time.zone = TimeZoneParser.parse("America/Los_Angeles")
-          expect(assigns(:start_time).strftime("%Y-%m-%dT%H:%M")).to eq start_time
-          expect(assigns(:end_time).strftime("%Y-%m-%dT%H:%M")).to eq end_time
-        end
-      end
-    end
   end
 end
