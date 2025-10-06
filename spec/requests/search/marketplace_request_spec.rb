@@ -75,7 +75,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(response.content_type).to include("text/vnd.turbo-stream.html")
           expect(response).to have_http_status(:success)
 
-          expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_marketplace_results_frame\">")
+          expect(response.body).to include("<turbo-stream action=\"replace\" target=\"marketplace_results_frame\">")
           expect(response).to render_template(:index)
           expect(assigns(:interpreted_params)).to eq(stolenness: "all")
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
@@ -84,14 +84,31 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
           expect(marketplace_listing_nyc).to be_present
           get "#{base_url}?price_max_amount=500", as: :turbo_stream
-          expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_marketplace_results_frame\">")
+          expect(response.body).to include("<turbo-stream action=\"replace\" target=\"marketplace_results_frame\">")
           expect(response).to render_template(:index)
           expect(assigns(:bikes).pluck(:id)).to eq([marketplace_listing_nyc.item_id])
 
           get "#{base_url}?price_max_amount=5000&price_min_amount=600", as: :turbo_stream
-          expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_marketplace_results_frame\">")
+          expect(response.body).to include("<turbo-stream action=\"replace\" target=\"marketplace_results_frame\">")
           expect(response).to render_template(:index)
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
+        end
+
+        context "pagination" do
+          it "appends results for page 2 and beyond" do
+            get "#{base_url}?page=2", as: :turbo_stream
+            expect(response).to have_http_status(:success)
+            expect(response.body).to include("<turbo-stream action=\"append\" target=\"marketplace_results_list\">")
+            expect(response.body).to include("<turbo-stream action=\"replace\" target=\"pagination\">")
+            expect(assigns(:is_pagination)).to be true
+          end
+
+          it "replaces results for page 1" do
+            get "#{base_url}?page=1", as: :turbo_stream
+            expect(response).to have_http_status(:success)
+            expect(response.body).to include("<turbo-stream action=\"replace\" target=\"marketplace_results_frame\">")
+            expect(assigns(:is_pagination)).to be false
+          end
         end
 
         context "geocoder_stubbed_bounding_box" do
