@@ -202,10 +202,7 @@ class BikeVersion < ApplicationRecord
     return false if deleted?
     return true unless user_hidden?
 
-    if passed_user.present?
-      return true if user_hidden? && authorized?(passed_user)
-    end
-    false
+    passed_user.present? && authorized?(passed_user)
   end
 
   def calculated_listing_order
