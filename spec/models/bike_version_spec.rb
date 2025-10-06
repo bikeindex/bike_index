@@ -60,4 +60,26 @@ RSpec.describe BikeVersion, type: :model do
       expect(bike_version.reload.cached_data).to be_present
     end
   end
+
+  describe "listing_order" do
+    let!(:bike_version_1) { FactoryBot.create(:bike_version, :with_image, created_at: Time.current - 1.day) }
+    let!(:bike_version_3) { FactoryBot.create(:bike_version, created_at: Time.current - 1.month) }
+    let!(:bike_version_2) { FactoryBot.create(:bike_version, created_at: Time.current) }
+
+    before do
+      # Ensure the updated_at is set and listing_order is recalculated
+      bike_version_1.update(name: "Version 1")
+      bike_version_2.update(name: "Version 2")
+      bike_version_3.update(name: "Version 3")
+    end
+    it "orders them as expected" do
+      # Sanity check that the versions are created when expected
+      expect(BikeVersion.reorder(:created_at).pluck(:id)).to eq([bike_version_3.id, bike_version_1.id, bike_version_2.id])
+
+      expect(bike_version_1.calculated_listing_order).to be > bike_version_2.calculated_listing_order
+      expect(bike_version_2.calculated_listing_order).to be > bike_version_3.calculated_listing_order
+
+      expect(BikeVersion.pluck(:id)).to eq([bike_version_1.id, bike_version_2.id, bike_version_3.id])
+    end
+  end
 end
