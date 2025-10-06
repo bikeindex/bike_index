@@ -1,4 +1,3 @@
-<%# This doesn't seem to normally actually be rendered? Definitely rendered in tests though... %>
-<%= turbo_stream.replace :search_marketplace_results_frame do %>
-  <%= render partial: "/search/registrations/results" %>
+<%= turbo_frame_tag "page_#{@pagy.page}" do %>
+  <%= render partial: "marketplace_results", formats: [:html] %>
 <% end %>
