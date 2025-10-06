@@ -87,8 +87,9 @@ class BikeVersion < ApplicationRecord
   attr_writer :end_at_shown, :start_at_shown
 
   scope :user_hidden, -> { unscoped.user_hidden }
+  scope :visible, -> { where.not(visibility: "user_hidden").where(deleted_at: nil) }
 
-  default_scope { where.not(visibility: "user_hidden").where(deleted_at: nil).order(listing_order: :desc) }
+  default_scope { visible.order(listing_order: :desc) }
 
   validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
 
@@ -191,23 +192,24 @@ class BikeVersion < ApplicationRecord
   def authorized?(passed_user, no_superuser_override: false)
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?
+    return false if deleted?
 
     passed_user == owner
   end
 
   def visible_by?(passed_user = nil)
+    return true if passed_user&.superuser?
+    return false if deleted?
     return true unless user_hidden?
 
-    if passed_user.present?
-      return true if passed_user.superuser?
-      return true if user_hidden? && authorized?(passed_user)
-    end
-    false
+    passed_user.present? && authorized?(passed_user)
   end
 
   def calculated_listing_order
-    t = (updated_at || Time.current).to_i / 10000
-    public_images.present? ? t : t / 100
+    t = Time.current.to_i / 10000
+
+    # Use ID so that more recent versions have a little bit of precedence
+    id_with_fallback + (public_images.present? ? t : (t / 100))
   end
 
   def set_calculated_attributes
@@ -231,5 +233,11 @@ class BikeVersion < ApplicationRecord
   def bike_overridden_attributes
     self.class.bike_override_attributes.map { |k| [k, bike.send(k)] }
       .reject { |_k, v| v.blank? }.to_h
+  end
+
+  def id_with_fallback
+    return id if id.present?
+
+    (BikeVersion.maximum(:id) || 0) + 1
   end
 end

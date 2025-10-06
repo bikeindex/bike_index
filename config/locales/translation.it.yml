@@ -1934,13 +1934,11 @@ it:
       contact_the_owner:
       created_to_record_parking_notification:
       from:
-      hidden_by_owner:
       in:
       is_this_linked_to_incorrect_bike:
       know_something_about_this_bike_type:
       link_url:
       looking_for_correct_owner:
-      no_one_but_the_user_and_bike_index_admins:
       not_registered_by_user:
       or_call:
       owners_phone_number:
@@ -2012,6 +2010,10 @@ it:
         plan:
         start:
         status:
+    header_row:
+      hidden_by_owner:
+      no_one_but_the_user_and_bike_index_admins:
+      test_registration:
   bikes_edit:
     accessories:
       add_a_component:

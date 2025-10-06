@@ -140,7 +140,7 @@
                 = t(".add_a_picture_of_it")
               - else
                 = t(".add_a_picture_so_people_know_what_to_look")
-        - else
+        - elsif !@bike.version?
           -# The bike has been sent to someone other than the current_user
           = t(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)
         - bike_or_version_link = @bike.version? ? edit_bike_version_path(@bike, edit_template: @bike.default_edit_template) : edit_bike_path(@bike, edit_template: @bike.default_edit_template)

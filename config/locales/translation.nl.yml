@@ -1946,11 +1946,8 @@ nl:
       register_a_new_bike_html: Registreer %{new_bike_link} met deze sticker
     show:
       contact_the_owner: Neem contact op met de eigenaar
-      hidden_by_owner: VERBORGEN door eigenaar
       know_something_about_this_bike_type: Weet u hier iets over %{bike_type}?
       link_url: Link url
-      no_one_but_the_user_and_bike_index_admins: niemand anders dan de gebruiker (en
-        Bike Index-beheerders) kunnen het zien
       or_call: Of bel
       owners_phone_number: 'Telefoonnummer van de eigenaar:'
       send_message: Verstuur bericht
@@ -2097,6 +2094,11 @@ nl:
       report_the_theft_to_the_organization_html: <span class="text-warning">Meld de
         diefstal</span> bij %{organization} <strong>%{report_link}</strong> om een
         politierapportnummer te krijgen
+    header_row:
+      hidden_by_owner: VERBORGEN door eigenaar
+      no_one_but_the_user_and_bike_index_admins: niemand anders dan de gebruiker (en
+        Bike Index-beheerders) kunnen het zien
+      test_registration: proefregistratie
   controllers:
     bikes:
       edit:

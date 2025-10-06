@@ -1069,6 +1069,11 @@ en:
         You sent this %{bike_type} to <em>%{owner_email}</em> and it hasn't been claimed
         yet. You can update it.
       your_bike: Your %{bike_type}
+    header_row:
+      hidden_by_owner: HIDDEN by owner
+      no_one_but_the_user_and_bike_index_admins: No one but the user (and Bike Index
+        admins) can see it
+      test_registration: test registration
     main_show_block:
       abandoned_title: This is an abandoned %{bike_type} that was %{impound_kind}
       bike_photo: "%{bike_type} photo"
@@ -1235,14 +1240,11 @@ en:
       created_to_record_parking_notification: created by %{organization} to record
         a Parking Notification
       from: from
-      hidden_by_owner: HIDDEN by owner
       in: in
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
-      no_one_but_the_user_and_bike_index_admins: No one but the user (and Bike Index
-        admins) can see it
       not_registered_by_user: Not registered to a user
       or_call: Or call
       owners_phone_number: 'Owner''s phone number:'
