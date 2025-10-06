@@ -1,6 +1,9 @@
 = render partial: "/bikes/bike_show_overlays"
 
 .container
+  - if current_user.present? # Header row is super admin stuff and credibility badges
+    = render partial: "/bikes/header_row"
+
   .row
     .col-md-8
       %h1.bike-title

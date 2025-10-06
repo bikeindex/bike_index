@@ -197,10 +197,11 @@ class BikeVersion < ApplicationRecord
   end
 
   def visible_by?(passed_user = nil)
-    return true unless user_hidden?
+    return true unless user_hidden? || deleted?
 
     if passed_user.present?
       return true if passed_user.superuser?
+      return false if deleted?
       return true if user_hidden? && authorized?(passed_user)
     end
     false
