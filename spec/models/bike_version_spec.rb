@@ -52,6 +52,23 @@ RSpec.describe BikeVersion, type: :model do
         expect(bike_version.visible_by?(superuser)).to be_truthy
       end
     end
+    context "deleted" do
+      before { bike_version.delete }
+      it "is as expected" do
+        expect(bike_version.deleted_at).to be_present
+        expect(bike_version.authorized?(nil)).to be_falsey
+        expect(bike_version.authorized?(user)).to be_falsey
+        expect(bike_version.authorized?(owner)).to be_falsey
+        expect(bike_version.authorized?(owner, no_superuser_override: true)).to be_falsey
+        expect(bike_version.authorized?(superuser)).to be_truthy
+        expect(bike_version.authorized?(superuser, no_superuser_override: true)).to be_falsey
+        # visible
+        expect(bike_version.visible_by?).to be_falsey
+        expect(bike_version.visible_by?(user)).to be_falsey
+        expect(bike_version.visible_by?(owner)).to be_falsey
+        expect(bike_version.visible_by?(superuser)).to be_truthy
+      end
+    end
   end
 
   describe "cached_data" do

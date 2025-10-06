@@ -31,6 +31,7 @@ RSpec.describe BikeVersionsController, type: :request do
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"
       expect(response).to render_template(:show)
+      expect(response.body).to_not match(/is hidden/i)
 
       # Hidden
       bike_version.update(visibility: "user_hidden")
@@ -38,7 +39,7 @@ RSpec.describe BikeVersionsController, type: :request do
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"
       expect(response).to render_template(:show)
-      expect(response.body).to match(/hidden/i)
+      expect(response.body).to match(/is hidden/i)
 
       # And deleted
       bike_version.update(visibility: "visible_not_related", deleted_at: Time.current)
@@ -53,7 +54,7 @@ RSpec.describe BikeVersionsController, type: :request do
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
         expect(response.body).to_not match(/deleted/i)
-        expect(response.body).to_not match(/hidden/i)
+        expect(response.body).to_not match(/HIDDEN by owner/i)
 
         # User hidden
         bike_version.update(visibility: "user_hidden")
@@ -61,7 +62,7 @@ RSpec.describe BikeVersionsController, type: :request do
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
-        expect(response.body).to match(/hidden/i)
+        expect(response.body).to match(/HIDDEN by owner/i)
 
         # Deleted
         bike_version.update(visibility: "visible_not_related", deleted_at: Time.current)

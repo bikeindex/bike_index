@@ -1071,9 +1071,9 @@ en:
       your_bike: Your %{bike_type}
     header_row:
       hidden_by_owner: HIDDEN by owner
-      test_registration: test registration
       no_one_but_the_user_and_bike_index_admins: No one but the user (and Bike Index
         admins) can see it
+      test_registration: test registration
     main_show_block:
       abandoned_title: This is an abandoned %{bike_type} that was %{impound_kind}
       bike_photo: "%{bike_type} photo"
@@ -1240,7 +1240,6 @@ en:
       created_to_record_parking_notification: created by %{organization} to record
         a Parking Notification
       from: from
-      
       in: in
       is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       know_something_about_this_bike_type: Know something about this %{bike_type}?
@@ -1253,6 +1252,7 @@ en:
       share_it: Share it!
       spread_the_word: Spread the word!
       switch_to_new_bike_id: Switch to a new bike ID
+      test_registration: test registration
       update: Update
       view_public_non_listing: View public registration
       view_users_other_registrations: View user's other registrations
