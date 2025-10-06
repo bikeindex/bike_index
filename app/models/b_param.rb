@@ -25,8 +25,56 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
+  # Also uses address_record_attributes to get legacy address attributes
+  REGISTRATION_INFO_ATTRS = %w[
+    accuracy
+    bike_code
+    bike_sticker
+    city
+    country_id
+    organization_affiliation
+    phone
+    postal_code
+    region_string
+    street
+    student_id
+    user_name
+  ].freeze
+  # attrs that need to be skipped on bike assignment, mostly legacy reasons
+  SKIPPED_BIKE_ATTRS = %w[
+    abandoned
+    accuracy
+    address
+    address_city
+    address_country
+    address_state
+    address_zipcode
+    bike_code
+    bike_sticker
+    city
+    country
+    country_id
+    cycle_type_name
+    cycle_type_slug
+    front_gear_type_slug
+    handlebar_type_slug
+    is_bulk
+    is_new
+    is_pos
+    no_duplicate
+    propulsion_type
+    propulsion_type_slug
+    rear_gear_type_slug
+    revised_new
+    state
+    state_id
+    stolen
+    street
+    zipcode
+  ].freeze
   mount_uploader :image, ImageUploader
   process_in_background :image, CarrierWaveStoreJob
+
   attr_writer :image_cache
 
   serialize :bike_errors, coder: YAML
@@ -112,21 +160,6 @@ class BParam < ApplicationRecord
     def with_organization_or_no_creator(toke)
       without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
-    end
-
-    # Attrs that need to be skipped on bike assignment
-    def skipped_bike_attrs
-      # Previously, assigned stolen & abandoned booleans - now that we don't, we need to drop them - in preexisting bparams
-      %w[abandoned accuracy address address_city address_country address_state address_state
-        address_zipcode bike_code bike_sticker cycle_type_name cycle_type_slug
-        front_gear_type_slug handlebar_type_slug is_bulk is_new is_pos propulsion_type propulsion_type_slug
-        no_duplicate rear_gear_type_slug revised_new stolen]
-    end
-
-    def registration_info_attrs
-      # Also uses address_hash to get legacy address attributes
-      %w[accuracy bike_code bike_sticker city country organization_affiliation phone state
-        street student_id user_name zipcode]
     end
 
     def email_search(str)
@@ -258,9 +291,9 @@ class BParam < ApplicationRecord
   end
 
   def registration_info_attrs
-    ria = params["bike"]&.slice(*self.class.registration_info_attrs) || {}
+    ria = params["bike"]&.slice(*REGISTRATION_INFO_ATTRS) || {}
     # Include legacy address attributes
-    (ria.key?("street") ? ria : ria.merge(address_hash)).reject { |_k, v| v.blank? }.to_h
+    (ria.key?("street") ? ria : ria.merge(address_record_attributes)).reject { |_k, v| v.blank? }.to_h
   end
 
   def status
@@ -392,18 +425,10 @@ class BParam < ApplicationRecord
     bike["external_image_urls"] || []
   end
 
-  # Deal with the legacy address concerns
-  def address(field)
-    key = field.gsub(/address_?/, "") # remove 'address' from the key if it's present
-    if key.blank? || key == "street" # If looking for street or address, try both street and address
-      bike["street"] || bike["address"]
-    else
-      bike[key] || bike["address_#{key}"]
-    end
-  end
+  def address_record_attributes
+    ara = AddressRecord.permitted_params.map { |k| [k, address_field_value(k)] }.to_h
 
-  def address_hash
-    %w[street city zipcode state country].map { |k| [k, address(k)] }.to_h
+    ara.values.any? ? ara : {}
   end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show
@@ -581,7 +606,7 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     attrs_merged = bike.merge("status" => status).merge(new_attrs.as_json)
-    attrs_merged.except(*BParam.skipped_bike_attrs)
+    attrs_merged.except(*SKIPPED_BIKE_ATTRS)
       .map { |k, v| clean_key_value(k, v) }.compact.to_h
       .merge("b_param_id" => id,
         "b_param_id_token" => id_token,
@@ -589,7 +614,7 @@ class BParam < ApplicationRecord
         "updator_id" => creator_id,
         # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
         "propulsion_type_slug" => self.class.propulsion_type(params.merge("bike" => attrs_merged)))
-      .merge(address_hash)
+      .merge(address_record_attributes:)
   end
 
   private
@@ -640,5 +665,20 @@ class BParam < ApplicationRecord
     color = params.dig("bike", key).presence && Color.friendly_find(params.dig("bike", key))
     params["bike"]["#{key}_id"] = color.id if color.present?
     params["bike"].delete(key)
+  end
+
+  # Deal with the legacy address concerns
+  def address_field_value(field)
+    if field == :street # If looking for street or address, try both street and address
+      bike["street"] || bike["address"] || bike["address_street"]
+    elsif field == :postal_code
+      bike[field.to_s] || bike["zipcode"] || bike["address_zipcode"]
+    elsif field == :region_string
+      bike[field.to_s] || bike["state"] || bike["address_state"]
+    elsif field == :country_id
+      bike[field.to_s] || bike["country"] || bike["address_country"]
+    else
+      bike[field.to_s] || bike["address_#{field}"]
+    end
   end
 end
