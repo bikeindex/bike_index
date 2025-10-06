@@ -51,33 +51,36 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
         expect(organization_status2.end_at).to be_blank
       end
       context "bulk_import_ascend broken" do
-        let!(:bulk_import) do
+        let(:bulk_import) do
           FactoryBot.create(:bulk_import_ascend,
             organization: organization,
             import_errors: {file: ["Invalid file extension, must be .csv or .tsv"]},
             created_at: Time.current - 3.days)
         end
         it "updates to broken" do
+          expect(OrganizationStatus.find_or_create_current(organization).start_at).to be_within(1).of og_updated_at
+          expect(bulk_import).to be_present
           expect(organization.reload.updated_at).to be_within(5).of og_updated_at
           expect(bulk_import.reload.blocking_error?).to be_truthy
-          expect(instance.send(:status_change_at, organization)).to be_within(5).of time
           expect {
             instance.perform(organization.id)
-          }.to change(OrganizationStatus, :count).by 2
+          }.to change(OrganizationStatus, :count).by 1
 
           expect_broken_ascend(organization, start_at: time)
         end
       end
       context "bike" do
-        let!(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization, created_at: Time.current - 1.month) }
+        let(:pos_bike) { FactoryBot.create(:bike_ascend_pos, creation_organization: organization, created_at: Time.current - 1.month) }
         it "updates to broken" do
+          expect(OrganizationStatus.find_or_create_current(organization).start_at).to be_within(1).of og_updated_at
+          expect(pos_bike).to be_present
           expect(organization.reload.updated_at).to be_within(5).of og_updated_at
           pos_bike.reload
           expect(organization.bikes).to eq([pos_bike])
           expect(organization.pos_kind).to eq "ascend_pos"
           expect {
             instance.perform(organization.id)
-          }.to change(OrganizationStatus, :count).by 2
+          }.to change(OrganizationStatus, :count).by 1
 
           expect_broken_ascend(organization, start_at: og_updated_at)
         end
@@ -85,18 +88,18 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
     end
     context "deleted" do
       let(:pos_bike) { nil }
-      it "creates status" do
+      it "updates status" do
+        organization_status1 = OrganizationStatus.find_or_create_current(organization)
+        expect(organization_status1.deleted?).to be_falsey
         organization.destroy
         expect {
           instance.perform(organization.id)
-          instance.perform(organization.id)
-        }.to change(OrganizationStatus, :count).by 1
+        }.to_not change(OrganizationStatus, :count)
 
-        organization_status1 = OrganizationStatus.order(:id).first
-        expect(organization_status1.organization_id).to eq organization.id
+        expect(organization_status1.reload.organization_id).to eq organization.id
         expect(organization_status1.pos_kind).to eq "no_pos"
-        expect(organization_status1.start_at).to be_within(5).of Time.current
-        expect(organization_status1.end_at).to be_blank
+        expect(organization_status1.start_at).to be_within(5).of og_updated_at
+        expect(organization_status1.end_at).to be_within(5).of Time.current
         expect(organization_status1.deleted?).to be_truthy
 
         organization.restore
@@ -105,7 +108,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
         }.to change(OrganizationStatus, :count).by 1
 
         expect(organization_status1.reload.current?).to be_falsey
-        expect(organization_status1.end_at).to be_blank
+        expect(organization_status1.end_at).to be_present
         expect(organization_status1.deleted?).to be_truthy
 
         organization_status2 = OrganizationStatus.order(:id).last
@@ -152,17 +155,18 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
       let(:organization) { FactoryBot.create(:organization, ascend_name: "SOMESHOP") }
       it "returns ascend_pos" do
         expect(organization.reload.pos_kind).to eq "no_pos"
+        organization_status1 = OrganizationStatus.find_or_create_current(organization)
+        expect(organization_status1.current?).to be_truthy
         expect(described_class.calculated_pos_kind(organization)).to eq "ascend_pos"
         expect {
           UpdateOrganizationPosKindJob.new.perform(organization.id)
-        }.to change(OrganizationStatus, :count).by 2
+        }.to change(OrganizationStatus, :count).by 1
         organization.reload
         expect(organization.manual_pos_kind?).to be_blank
         expect(organization.pos_kind).to eq "ascend_pos"
         expect(organization.show_bulk_import?).to be_truthy
 
-        organization_status1 = OrganizationStatus.order(:id).first
-        expect(organization_status1.organization_id).to eq organization.id
+        expect(organization_status1.reload.organization_id).to eq organization.id
         expect(organization_status1.pos_kind).to eq "no_pos"
         expect(organization_status1.start_at).to be_within(5).of Time.current
         expect(organization_status1.end_at).to be_within(1).of Time.current
@@ -196,7 +200,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
       it "no_pos, does_not_need_pos if older organization" do
         organization.reload
         expect(described_class.calculated_pos_kind(organization)).to eq "no_pos"
-        3.times { FactoryBot.create(:bike_organized, creation_organization: organization) }
+        10.times { FactoryBot.create(:bike_organized, creation_organization: organization) }
         organization.reload
         expect(described_class.calculated_pos_kind(organization)).to eq "no_pos"
         expect {
@@ -205,7 +209,7 @@ RSpec.describe UpdateOrganizationPosKindJob, type: :lib do
         organization_status1 = OrganizationStatus.order(:id).first
         expect(organization_status1.current?).to be_truthy
 
-        organization.update_attribute :created_at, Time.current - 2.weeks
+        organization.update_attribute :created_at, Time.current - 3.weeks
         organization.reload
         expect(described_class.calculated_pos_kind(organization)).to eq "does_not_need_pos"
 

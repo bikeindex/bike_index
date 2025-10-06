@@ -117,8 +117,8 @@ RSpec.describe GeocodeHelper do
       context "another IP address" do
         let(:address) { "50.211.197.209" }
         let(:target_address_hash) do
-          target_assignable_hash.merge(latitude: 37.7308, longitude: -122.3838,
-            formatted_address: "San Francisco, CA, US")
+          target_assignable_hash.merge(latitude: 37.6196, longitude: -122.4816, city: "Pacifica",
+            formatted_address: "Pacifica, CA, US")
         end
         it "finds the address" do
           VCR.use_cassette("geohelper-ip_address2", vcr_config) do

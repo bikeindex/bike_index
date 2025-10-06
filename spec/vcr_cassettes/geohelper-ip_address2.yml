@@ -19,13 +19,15 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sat, 28 Jun 2025 22:12:22 GMT
+      - Sun, 05 Oct 2025 17:25:26 GMT
       Content-Type:
       - text/plain; charset=ISO-8859-1
       Content-Length:
-      - '41'
+      - '36'
       Connection:
       - keep-alive
+      Cf-Ray:
+      - 989e9e4a19d6cf13-SJC
       Access-Control-Allow-Origin:
       - "*"
       Cache-Control:
@@ -38,12 +40,10 @@ http_interactions:
       - max-age=31536000; includeSubDomains; preload
       Server:
       - cloudflare
-      Cf-Ray:
-      - 957086756d02cf17-SJC
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
       encoding: UTF-8
-      string: US,CA,San Francisco,37.730800,-122.383800
-  recorded_at: Sat, 28 Jun 2025 22:12:22 GMT
+      string: US,CA,Pacifica,37.619600,-122.481600
+  recorded_at: Sun, 05 Oct 2025 17:25:26 GMT
 recorded_with: VCR 6.3.1

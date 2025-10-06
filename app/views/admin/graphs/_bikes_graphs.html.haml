@@ -1,0 +1,137 @@
+- show_search_statuses = !@ignored_only && @kind == "bikes"
+%ul.nav.justify-content-end.small
+  - unless @ignored_only
+    %li.nav-item
+      = link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "nav-link"
+  - if show_search_statuses
+    %li.nav-item
+      %a.nav-link#showStatusesSearch{href: "#", class: (@not_default_statuses ? "active" : "")}
+        Search statuses
+.row.mt-4.mb-4
+  .col-md-6.order-2.order-md-1
+    - if params[:search_manufacturer].present?
+      Bikes
+      - if @manufacturer.present?
+        made by
+        = link_to @manufacturer.name, admin_manufacturer_path(@manufacturer)
+      - else
+        No manufacturer found for
+        %code
+          = params[:search_manufacturer]
+      = link_to "view all manufacturer bikes", url_for(sortable_params.merge(search_manufacturer: nil)), class: "gray-link small"
+    - if @ignored_only
+      %p
+        Viewing only
+        %strong ignored
+        bikes
+        %em (deleted, test, spam)
+        = link_to "view not ignored bikes", url_for(sortable_params.merge(search_ignored: false)), class: "gray-link small"
+    - if @total_count.present?
+      %p.mt-4
+        #{number_display(@total_count)} matching #{@kind}
+        %em
+          = humanized_time_range(@time_range)
+
+  .col-md-6.order-1.order-md-2
+    - if show_search_statuses
+      = form_tag admin_graphs_path(search_kind: "bikes"), method: :get do
+        = render partial: "/shared/hidden_search_fields"
+
+        = render partial: "/admin/bikes/search_statuses"
+
+        .form-inline.mt-2
+          .mr-auto
+          = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+
+
+  - if @ignored_only
+    = column_chart variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "ignored")), stacked: true, thousands: ","
+
+.mt-4
+= column_chart variable_admin_graphs_path(sortable_params), thousands: ","
+.text-center.mb-4
+  %small.less-strong
+    %strong Note:
+    Columns are separate because they are independent counts: total registrations & stolen records created for those registrations
+    %em.d-block This is different from other graphs showing counts of nonstolen & stolen (which add up to the total registrations). This is done here so that this graph includes recovered bikes.
+
+-# Don't render all the extra stuff if looking at a period that is longer than 1 year
+- render_other_bike_graphs = time_range_length(@time_range) < 367.days.to_i
+
+- if render_other_bike_graphs
+  - shown_bike_graph_kinds.each do |graph_kind|
+    - if graph_kind == "stolen"
+      - next # because that's already rendered above
+    - elsif graph_kind == "pos"
+      .col-sm-6.offset-sm-3.mt-4
+        .full-screen-table
+          %table.table.table-striped.table-bordered.table-sm.text-center
+            %thead
+              %th.text-left Kind
+              %th.text-right Bikes
+            %tbody
+              - pos_search_kinds.each do |pos_kind|
+                %tr
+                  %td.text-left
+                    = pos_kind.humanize
+                    = link_to search_emoji, admin_bikes_path(sortable_params.merge(search_pos: pos_kind))
+                  %td.text-right= number_display(matching_bikes.send(pos_kind).count)
+    - elsif graph_kind == "origin"
+      .col-sm-6.offset-sm-3.mt-4
+        .full-screen-table
+          %table.table.table-striped.table-bordered.table-sm.text-center
+            %thead
+              %th.text-left Origin
+              %th.text-right Bikes
+            %tbody
+              - Ownership.origins.each do |origin|
+                %tr
+                  %td.text-left
+                    = origin.humanize
+                    = link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin))
+                  %td.text-right= number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
+              -# TODO: make this actually work
+              -# %tr
+              -#   %td.text-left Transferred pre-registration
+              -#   %td.text-right= number_display(Ownership.transferred_pre_registration.joins(:bike).merge(matching_bikes).count)
+              %tr
+                %td.text-left Stolen records
+                %td.text-right= number_display(StolenRecord.unscoped.where(created_at: @time_range).joins(:bike).merge(matching_bikes).count)
+              %tr
+                %td.text-left Recoveries
+                %td.text-right= number_display(StolenRecord.unscoped.where(recovered_at: @time_range).joins(:bike).merge(matching_bikes).count)
+
+    .mt-4
+    = column_chart variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: graph_kind)), stacked: true, thousands: ","
+
+  .col-sm-8.offset-sm-2.mt-4
+    .full-screen-table
+      %table.table.table-striped.table-bordered.table-sm
+        %thead
+          %th Organization
+          %th Kind
+          %th.small Integration
+          %th Bikes
+        %tbody
+          - organization_ids = matching_bikes.distinct.pluck(:creation_organization_id)
+          - organization_bikes = organization_ids.map {|org_id| [org_id, matching_bikes.where(creation_organization_id: org_id).count]}
+          - total_orgs = 0
+          - total_bikes = 0
+          - organization_bikes.sort { |a, b| b[1] <=> a[1] }.each do |org_id, bike_count|
+            - organization = Organization.unscoped.find_by_id(org_id)
+            %tr
+              %td
+                - if organization.present?
+                  = link_to organization.name, admin_bikes_path(sortable_params.merge(organization_id: org_id, render_chart: true))
+                  = link_to search_emoji, admin_bikes_path(sortable_params.merge(organization_id: org_id))
+                - else
+                  %a.gray-link{href: admin_bikes_path(sortable_params.merge(organization_id: "false", render_chart: true)), title: "(id: #{org_id})"}
+                    no organization
+              %td
+                - if organization.present?
+                  = organization.kind.humanize
+              %td.small-less-strong
+                - if organization.present?
+                  = organization.pos_kind.humanize
+              %td.text-right
+                = number_display(bike_count)
