@@ -839,50 +839,6 @@
       "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
     },
     {
-      "warning_type": "Dynamic Render Path",
-      "warning_code": 15,
-      "fingerprint": "62588dbd2d0e05e8562365fe1f683b1cbe52d82d129a9d2d6674cb9872a2dfad",
-      "check_name": "Render",
-      "message": "Render path contains parameter value",
-      "file": "app/views/search/registrations/_results.html.erb",
-      "line": 38,
-      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(action => SearchResults::Container::Component.component_class_for_result_view(SearchResults::Container::Component.permitted_result_view(params[:search_result_view], :default => :thumbnail)).new(:bike => bike, :search_kind => :marketplace), { :locals => ({ :\"searchresults::container::component\" => SearchResults::Container::Component.component_class_for_result_view(SearchResults::Container::Component.permitted_result_view(params[:search_result_view], :default => :thumbnail)).new(:bike => bike, :search_kind => :marketplace) }) })",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Search::MarketplaceController",
-          "method": "index",
-          "line": 20,
-          "file": "app/controllers/search/marketplace_controller.rb",
-          "rendered": {
-            "name": "search/marketplace/index",
-            "file": "app/views/search/marketplace/index.html.erb"
-          }
-        },
-        {
-          "type": "template",
-          "name": "search/marketplace/index",
-          "line": 11,
-          "file": "app/views/search/marketplace/index.html.erb",
-          "rendered": {
-            "name": "search/registrations/_results",
-            "file": "app/views/search/registrations/_results.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "search/registrations/_results"
-      },
-      "user_input": "params[:search_result_view]",
-      "confidence": "Weak",
-      "cwe_id": [
-        22
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
       "fingerprint": "651809dafcd743c22afeb1dd2c7cca62a326b3211f77053f8b4994a2e341f1e9",
@@ -1026,6 +982,50 @@
       "confidence": "Medium",
       "cwe_id": [
         915
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "908a8763f062375234f963bca706ae035cf8818668364baca1d876a93131f7fe",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/views/search/marketplace/_marketplace_results.html.erb",
+      "line": 7,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(action => SearchResults::Container::Component.component_class_for_result_view(SearchResults::Container::Component.permitted_result_view(params[:search_result_view], :default => :thumbnail)).new(:bike => bike, :search_kind => :marketplace), { :locals => ({ :\"searchresults::container::component\" => SearchResults::Container::Component.component_class_for_result_view(SearchResults::Container::Component.permitted_result_view(params[:search_result_view], :default => :thumbnail)).new(:bike => bike, :search_kind => :marketplace) }) })",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Search::MarketplaceController",
+          "method": "index",
+          "line": 20,
+          "file": "app/controllers/search/marketplace_controller.rb",
+          "rendered": {
+            "name": "search/marketplace/index",
+            "file": "app/views/search/marketplace/index.html.erb"
+          }
+        },
+        {
+          "type": "template",
+          "name": "search/marketplace/index",
+          "line": 12,
+          "file": "app/views/search/marketplace/index.html.erb",
+          "rendered": {
+            "name": "search/marketplace/_marketplace_results",
+            "file": "app/views/search/marketplace/_marketplace_results.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "search/marketplace/_marketplace_results"
+      },
+      "user_input": "params[:search_result_view]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
       ],
       "note": ""
     },

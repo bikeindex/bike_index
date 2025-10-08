@@ -8,7 +8,9 @@
 
 <%= turbo_frame_tag :marketplace_results_frame do %>
   <% if @render_results %>
-    <%= render partial: "/search/registrations/results" %>
+    <%= turbo_frame_tag "page_#{@pagy.page}" do %>
+      <%= render partial: "marketplace_results" %>
+    <% end %>
   <% else %>
     <span id="loadedWithoutResults" class="tw:hidden"></span>
   <% end %>

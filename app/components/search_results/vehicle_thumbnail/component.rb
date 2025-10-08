@@ -44,9 +44,10 @@ module SearchResults::VehicleThumbnail
     def vehicle_image_tag
       thumb_image_url = BikeServices::Displayer.thumb_image_url(@bike)
       if thumb_image_url.present?
-        image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:rounded tw:w-full")
+        image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:rounded tw:w-full tw:h-full tw:object-cover")
       else
-        image_tag(bike_placeholder_image_path, alt: @bike.title_string, title: "No image", class: "tw-block tw:w-full tw:bg-gray-300 tw:dark:bg-gray-800 tw:rounded tw:p-8")
+        image_tag(bike_placeholder_image_path, alt: @bike.title_string, title: "No image",
+          class: "tw-block tw:w-full tw:rounded tw:p-8")
       end
     end
 
