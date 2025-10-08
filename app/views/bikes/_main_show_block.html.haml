@@ -67,12 +67,15 @@
         - same_width = @bike.front_tire_narrow.nil? || @bike.front_tire_narrow == @bike.rear_tire_narrow
         - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id && same_width
           = render(DefinitionList::Row::Component.new(label: t(".wheel_diameter"), value: @bike.front_wheel_size&.name))
-          = render(DefinitionList::Row::Component.new(label: t(".tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
+          - unless @bike.front_tire_narrow.nil? # required because the translation counts as a value :/
+            = render(DefinitionList::Row::Component.new(label: t(".tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
         - else
           = render(DefinitionList::Row::Component.new(label: t(".front_wheel_diameter"), value: @bike.front_wheel_size&.name))
-          = render(DefinitionList::Row::Component.new(label: t(".front_tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
+          - unless @bike.front_tire_narrow.nil? # required because the translation counts as a value :/
+            = render(DefinitionList::Row::Component.new(label: t(".front_tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
           = render(DefinitionList::Row::Component.new(label: t(".rear_wheel_diameter"), value: @bike.rear_wheel_size&.name))
-          = render(DefinitionList::Row::Component.new(label: t(".rear_tire_width"), value: t(".tire_width_narrow_#{@bike.rear_tire_narrow}")))
+          - unless @bike.rear_tire_narrow.nil? # required because the translation counts as a value :/
+            = render(DefinitionList::Row::Component.new(label: t(".rear_tire_width"), value: t(".tire_width_narrow_#{@bike.rear_tire_narrow}")))
       -# Drivetrain
       - if @bike.fixed_gear?
         = render(DefinitionList::Row::Component.new(label: t(".drivetrain"), value: t(".drivetrain_fixed")))
