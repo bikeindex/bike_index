@@ -835,7 +835,7 @@ GEM
     unicode-emoji (4.1.0)
     unicode_utils (1.4.0)
     uniform_notifier (1.16.0)
-    uri (1.0.3)
+    uri (1.0.4)
     user_agent_parser (2.7.0)
     useragent (0.16.11)
     vcr (6.3.1)
