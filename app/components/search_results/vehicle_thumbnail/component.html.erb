@@ -1,11 +1,13 @@
 <%# The width of these is mostly handled by the container component %>
 <li
   class="
-    tw:max-w-xs tw:min-w-[150px] tw:cursor-pointer tw:hover:underline tw:relative
+    tw:w-full tw:max-w-xs tw:min-w-[150px] tw:cursor-pointer tw:hover:underline tw:relative
     tw:isolate
   "
 >
-  <%= vehicle_image_tag %>
+  <div class="tw:aspect-square tw:w-full tw:rounded tw:bg-gray-300 tw:dark:bg-gray-800">
+    <%= vehicle_image_tag %>
+  </div>
   <h4 class="tw:text-lg">
     <% if render_status? %><%= bike_status_span(@bike) %>:<% end %>
     <% if render_for_sale_info? %>
