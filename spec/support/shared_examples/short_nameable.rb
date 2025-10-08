@@ -18,5 +18,13 @@ RSpec.shared_examples "short_nameable" do
         expect(instance.secondary_name).to eq "Extra name"
       end
     end
+
+    context "with something after the parens" do
+      let(:name) { "ATB (All Terrain Biking) — Gravel, Cyclocross, etc." }
+      it "finds by the name" do
+        expect(instance.short_name).to eq "ATB"
+        expect(instance.secondary_name).to eq "All Terrain Biking"
+      end
+    end
   end
 end

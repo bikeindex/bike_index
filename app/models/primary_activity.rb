@@ -36,6 +36,9 @@ class PrimaryActivity < ApplicationRecord
   # But scopes the validation of uniqueness
   validates_uniqueness_of :name, scope: [:primary_activity_family_id], allow_nil: false
   validates_uniqueness_of :slug, scope: [:primary_activity_family_id], allow_nil: false
+  # require uniqueness for family categories
+  validates_uniqueness_of :name, if: -> { primary_activity_family_id.nil? }
+  validates_uniqueness_of :slug, if: -> { primary_activity_family_id.nil? }
 
   before_validation :set_calculated_attributes
   after_create :assign_family_id_if_self
