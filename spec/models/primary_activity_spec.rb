@@ -33,7 +33,8 @@ RSpec.describe PrimaryActivity, type: :model do
       expect(primary_activity.top_level?).to be_truthy
     end
     context "with family" do
-      let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)") }
+      let(:atb_name) { "ATB (All Terrain Biking) — Gravel, Cyclocross, etc." }
+      let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: atb_name) }
       let(:primary_activity) { FactoryBot.create(:primary_activity, name:, primary_activity_family:) }
       let(:name) { "All Road" }
       it "is the name with the family" do
@@ -55,22 +56,27 @@ RSpec.describe PrimaryActivity, type: :model do
           expect(primary_activity_2.display_name_search).to eq "Road: ONLY All Road"
           expect(primary_activity_family_2.display_name_search).to eq "Road Biking"
           expect(PrimaryActivity.friendly_find_id("Road")).to eq primary_activity_family_2.id
+          # but it doesn't allow there to be multiple family
+          primary_activity_invalid = FactoryBot.build(:primary_activity_family, name: "Road Biking")
+          expect(primary_activity_invalid).to_not be_valid
+          expect(primary_activity_invalid.errors.full_messages.sort)
+            .to eq(["Name has already been taken", "Slug has already been taken"])
         end
       end
       context "cyclocross" do
         let(:name) { "Cyclocross" }
         it "does not include family in name" do
           expect(primary_activity.reload.name).to eq "Cyclocross"
-          expect(primary_activity.display_name).to eq "Cyclocross"
+          expect(primary_activity.display_name).to eq "ATB: Cyclocross"
           expect(primary_activity.display_name_search).to eq "ATB: ONLY Cyclocross"
-          expect(primary_activity_family.display_name_search).to eq "ATB (All Terrain Biking)"
+          expect(primary_activity_family.display_name_search).to eq atb_name
         end
       end
       context "Gravel" do
         let(:name) { "Gravel" }
         it "does not include family in name" do
           expect(primary_activity.reload.name).to eq "Gravel"
-          expect(primary_activity.display_name).to eq "Gravel"
+          expect(primary_activity.display_name).to eq "ATB: Gravel"
           expect(primary_activity.display_name_search).to eq "ATB: ONLY Gravel"
         end
       end
