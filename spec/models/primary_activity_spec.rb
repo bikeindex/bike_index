@@ -67,7 +67,7 @@ RSpec.describe PrimaryActivity, type: :model do
         let(:name) { "Cyclocross" }
         it "does not include family in name" do
           expect(primary_activity.reload.name).to eq "Cyclocross"
-          expect(primary_activity.display_name).to eq "Cyclocross"
+          expect(primary_activity.display_name).to eq "ATB: Cyclocross"
           expect(primary_activity.display_name_search).to eq "ATB: ONLY Cyclocross"
           expect(primary_activity_family.display_name_search).to eq atb_name
         end
@@ -76,7 +76,7 @@ RSpec.describe PrimaryActivity, type: :model do
         let(:name) { "Gravel" }
         it "does not include family in name" do
           expect(primary_activity.reload.name).to eq "Gravel"
-          expect(primary_activity.display_name).to eq "Gravel"
+          expect(primary_activity.display_name).to eq "ATB: Gravel"
           expect(primary_activity.display_name_search).to eq "ATB: ONLY Gravel"
         end
       end

@@ -120,7 +120,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def display_name_search
-    [family_display_name(include_skipped_family_name: true), name].compact.join(": ONLY ")
+    [family_display_name, name].compact.join(": ONLY ")
   end
 
   def family_name
@@ -140,13 +140,8 @@ class PrimaryActivity < ApplicationRecord
 
   private
 
-  def skip_family_display_name?
-    %w[cyclocross gravel].include?(name.downcase)
-  end
-
-  def family_display_name(include_skipped_family_name: false)
+  def family_display_name
     return nil if primary_activity_family.blank? || top_level?
-    return nil if skip_family_display_name? && !include_skipped_family_name
 
     family_short_name
   end
