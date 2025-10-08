@@ -723,6 +723,27 @@ RSpec.describe BParam, type: :model do
           }
         }
       end
+      context "with address_record" do
+        let(:bike_params) do
+          {
+            phone: "1112223333",
+            student_id: "99999999",
+            email: "stuff@example.com",
+            embeded: "true",
+            address_record_attributes: {
+              city: "Golden",
+              region_string: "CO",
+              street: "1812 Miners Spur, Building 2015 Unit 99999-69",
+              postal_code: "80401",
+              country_id: Country.united_states_id
+            }
+          }
+        end
+        it "returns target attributes" do
+          expect(b_param.address_record_attributes).to match_hash_indifferently target[:address_record_attributes]
+          expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
+        end
+      end
       context "with legacy attributes" do
         let(:bike_params) do
           {

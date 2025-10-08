@@ -18,7 +18,8 @@ class BikeServices::Creator
       [
         stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
         impound_records_attributes: permitted_impound_attrs,
-        components_attributes: Component.permitted_attributes
+        components_attributes: Component.permitted_attributes,
+        address_record_attributes: AddressRecord.permitted_params
       ]
     ).freeze
   end

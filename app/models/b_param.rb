@@ -426,8 +426,10 @@ class BParam < ApplicationRecord
   end
 
   def address_record_attributes
-    ara = AddressRecord.permitted_params.map { |k| [k, address_field_value(k)] }.to_h
+    # If nested address_record_attributes hash is present, no legacy handling required!
+    return bike["address_record_attributes"] if bike["address_record_attributes"].present?
 
+    ara = AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(k)] }.to_h
     ara.values.any? ? ara : {}
   end
 
@@ -668,7 +670,7 @@ class BParam < ApplicationRecord
   end
 
   # Deal with the legacy address concerns
-  def address_field_value(field)
+  def legacy_address_field_value(field)
     if field == :street # If looking for street or address, try both street and address
       bike["street"] || bike["address"] || bike["address_street"]
     elsif field == :postal_code
