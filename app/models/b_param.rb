@@ -430,7 +430,7 @@ class BParam < ApplicationRecord
     return bike["address_record_attributes"] if bike["address_record_attributes"].present?
 
     ara = AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(k)] }.to_h
-    ara.values.any? ? ara : {}
+    ara.values.any? ? ara.compact : {}
   end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show

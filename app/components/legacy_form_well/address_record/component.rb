@@ -6,7 +6,6 @@ module LegacyFormWell::AddressRecord
 
     def initialize(form_builder:, organization: nil, no_street: false, not_related_fields: false,
       static_fields: false, current_country_id: nil)
-      # Sorry for all the params ^
       @builder = form_builder
       @no_street = no_street
       @organization = organization

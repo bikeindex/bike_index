@@ -266,8 +266,7 @@ RSpec.describe BParam, type: :model do
     let(:params_hash) { {bike: bike_params}.as_json }
     let(:b_param) { BParam.new(params: params_hash) }
     let(:target_address) do
-      {street: "123 Main St", city: "Nevernever Land", postal_code: "11111", region_string: "CA",
-       country_id: nil, region_record_id: nil}
+      {street: "123 Main St", city: "Nevernever Land", postal_code: "11111", region_string: "CA"}
     end
     let(:bike) { Bike.new }
     let(:bike_params) do
@@ -716,7 +715,6 @@ RSpec.describe BParam, type: :model do
           address_record_attributes: {
             city: "Golden",
             country_id: Country.united_states_id,
-            region_record_id: nil,
             region_string: "CO",
             street: "1812 Miners Spur, Building 2015 Unit 99999-69",
             postal_code: "80401"
@@ -740,7 +738,8 @@ RSpec.describe BParam, type: :model do
           }
         end
         it "returns target attributes" do
-          expect(b_param.address_record_attributes).to match_hash_indifferently target[:address_record_attributes]
+          expect(b_param.address_record_attributes.except(:region_record_id))
+            .to match_hash_indifferently target[:address_record_attributes].except(:region_record_id)
           expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
         end
       end
