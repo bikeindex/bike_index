@@ -9,19 +9,14 @@ class BikeServices::CalculateStoredLocation
       if bike.current_stolen_record.present?
         # If there is a current stolen - even if it has a blank location - use it
         # It's used for searching and displaying stolen bikes, we don't want other information leaking
-        if bike.address_set_manually # Only set coordinates if the address is set manually
-          bike.current_stolen_record.attributes.slice("latitude", "longitude")
-        else # Set the whole address from the stolen record
-          bike.current_stolen_record.address_hash
-        end
+        bike.current_stolen_record.attributes.slice("latitude", "longitude")
       else
         attrs = {}
-        if bike.address_set_manually # If it's not stolen, use the manual set address for the coordinates
-          return {} unless bike.user&.address_set_manually # If it's set by the user, address_set_manually is no longer correct!
-
+        # If address is comes from the user record, address_set_manually is no longer correct!
+        if bike.address_set_manually && bike.user&.address_set_manually
           attrs[:address_set_manually] = false
         end
-        attrs.merge(location_record_address_hash(bike))
+        attrs.merge(location_record_coordinates(bike))
       end
     end
 
@@ -34,19 +29,19 @@ class BikeServices::CalculateStoredLocation
     # 2. #registration_address (which prioritizes user address)
     # 3. The creation organization address (so we have a general area for the bike)
     # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
-    def location_record_address_hash(bike)
+    def location_record_coordinates(bike)
       l_hashes = [
         bike.current_impound_record&.address_hash,
         bike.current_parking_notification&.address_hash,
-        bike.registration_address(true),
+        bike.registration_address(true, address_record_id: true), # temporary cludge?
         bike.creation_organization&.default_location&.address_hash
       ].compact
       l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
         l_hashes.find { |rec| rec&.dig("latitude").present? }
       return {} unless l_hash.present?
 
-      # If the location record has coordinates, skip geocoding
-      l_hash.merge(skip_geocoding: l_hash["latitude"].present?)
+      # Only ever respond with the coordinates
+      l_hash.slice("latitude", "longitude", "address_record_id")
     end
   end
 end
