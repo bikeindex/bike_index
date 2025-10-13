@@ -62,7 +62,7 @@ gem "sitemap_generator", "~> 6"
 gem "image_processing" # what it says
 gem "mini_magick" # Required for image processing
 gem "ruby-vips" # Faster image processing, should eventually replace mini_magick
-gem "carrierwave", "~> 2.2.6" # File uploader
+gem "carrierwave", "~> 3.1.2" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
