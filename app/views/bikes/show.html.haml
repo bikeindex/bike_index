@@ -1,42 +1,8 @@
 = render partial: "bike_show_overlays"
 
 .container
-  -# If there's a passive organization, display bike title at the top too, otherwise you can't tell what bike you're looking at without scrolling down
-  -# TODO: move these queries into the controller
-  - if current_user.present?
-    - show_credibility_badges = current_user.su_option?(:always_show_credibility) || passive_organization.present? && current_user.authorized?(passive_organization) && passive_organization&.enabled?("credibility_badges")
-    - superadmin_link = current_user.superuser?(controller_name: "bikes", action_name: "show")
-    - if show_credibility_badges || superadmin_link
-      .row
-        - col_classes = show_credibility_badges ? "col-md-7" : "col-xs-12"
-        .clearfix{class: col_classes}
-          - if superadmin_link
-            = link_to "superadmin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info less-strong superuser-bike-button"
-          - if passive_organization.present?
-            %h3.secondary-bike-title.mb-2
-              = bike_title_html(@bike)
-              - if @bike.likely_spam?
-                %small.text-danger likely spam
-              - if @bike.example
-                %small.text-danger= t(".test_registration")
-        - if show_credibility_badges
-          .col-md-5.text-right
-            = render partial: "/bikes/credibility_score", locals: {bike: @bike}
-
-
-
-  - if current_user&.superuser?(controller_name: "bikes", action_name: "show")
-    - if !@bike.unregistered_parking_notification? && @bike.user_hidden
-      %h2.text-warning.mb-4.mt-2
-        = t(".hidden_by_owner")
-        %small.less-strong.uncap.d-block
-          = t(".no_one_but_the_user_and_bike_index_admins")
-    - if @bike.deleted?
-      %h2.text-danger.uncap.mb-4.mt-2
-        Deleted
-        - if @bike.deleted_at.present?
-          %small.convertTime.preciseTime.withPreposition
-            = l @bike.deleted_at, format: :convert_time
+  - if current_user.present? # Header row is super admin stuff and credibility badges
+    = render partial: "/bikes/header_row"
 
   - if @bike_sticker.present?
     .alert.alert-success

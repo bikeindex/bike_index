@@ -1985,14 +1985,11 @@ nb:
       created_to_record_parking_notification: opprettet av %{organization} for å registrere
         et parkeringsvarsel
       from: fra
-      hidden_by_owner: SKJULT av eier
       in: i
       is_this_linked_to_incorrect_bike: Er dette klistremerket knyttet til feil sykkel?
       know_something_about_this_bike_type: Vet du noe om dette %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Ser etter riktig eier av denne %{bike_type}!
-      no_one_but_the_user_and_bike_index_admins: Ingen andre enn brukeren (og Bike
-        Index-administratorer) kan se den
       not_registered_by_user: Ikke registrert på en bruker
       or_call: Eller ring
       owners_phone_number: 'Eierens telefonnummer:'
@@ -2077,6 +2074,11 @@ nb:
         plan: Plan
         start: Start
         status: Status
+    header_row:
+      hidden_by_owner: SKJULT av eier
+      no_one_but_the_user_and_bike_index_admins: Ingen andre enn brukeren (og Bike
+        Index-administratorer) kan se den
+      test_registration: prøveregistrering
   bikes_edit:
     accessories:
       add_a_component: Legg til en komponent
@@ -5372,7 +5374,6 @@ nb:
       design_and_developer_resources: Design og utviklerressurser
       donate: Donere
       donate_today: Doner i dag
-      forum: Forum
       help: Hjelp
       how_to_get_your_stolen_bike_back: Hvordan få tilbake den stjålne sykkelen
       make_a_difference: Gjør en forskjell i sykkeltyveri

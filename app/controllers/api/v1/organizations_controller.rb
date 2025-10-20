@@ -17,7 +17,7 @@ module API
             m_kind = (params[:manual_pos_kind] == "no_pos") ? nil : params[:manual_pos_kind]
             # We really only want to update orgs when there is a change, otherwise it breaks where
             unless @organization.manual_pos_kind == m_kind
-              @organization.update(manual_pos_kind: m_kind)
+              @organization.update!(manual_pos_kind: m_kind)
               UpdateOrganizationPosKindJob.perform_async(@organization.id)
             end
             render json: organization_serialized(@organization)

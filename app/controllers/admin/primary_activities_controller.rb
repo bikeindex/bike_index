@@ -35,7 +35,7 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[priority created_at name family]
+    %w[priority created_at name family primary_activity_family_id]
   end
 
   def searchable_scopes

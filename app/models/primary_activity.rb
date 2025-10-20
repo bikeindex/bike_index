@@ -36,6 +36,9 @@ class PrimaryActivity < ApplicationRecord
   # But scopes the validation of uniqueness
   validates_uniqueness_of :name, scope: [:primary_activity_family_id], allow_nil: false
   validates_uniqueness_of :slug, scope: [:primary_activity_family_id], allow_nil: false
+  # require uniqueness for family categories
+  validates_uniqueness_of :name, if: -> { primary_activity_family_id.nil? }
+  validates_uniqueness_of :slug, if: -> { primary_activity_family_id.nil? }
 
   before_validation :set_calculated_attributes
   after_create :assign_family_id_if_self
@@ -117,7 +120,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def display_name_search
-    [family_display_name(include_skipped_family_name: true), name].compact.join(": ONLY ")
+    [family_display_name, name].compact.join(": ONLY ")
   end
 
   def family_name
@@ -137,13 +140,8 @@ class PrimaryActivity < ApplicationRecord
 
   private
 
-  def skip_family_display_name?
-    %w[cyclocross gravel].include?(name.downcase)
-  end
-
-  def family_display_name(include_skipped_family_name: false)
+  def family_display_name
     return nil if primary_activity_family.blank? || top_level?
-    return nil if skip_family_display_name? && !include_skipped_family_name
 
     family_short_name
   end

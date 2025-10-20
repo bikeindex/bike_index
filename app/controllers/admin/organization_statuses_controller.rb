@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 class Admin::OrganizationStatusesController < Admin::BaseController
   include SortableTable
+
+  WITH_POS_GRAPH_PARAMS = {search_pos_kind: "not_no_pos", render_chart: true}.freeze
 
   def index
     @per_page = permitted_per_page(default: 10)
@@ -8,7 +12,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
         .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
-  helper_method :matching_organization_statuses, :grouped_pos_kinds
+  helper_method :matching_organization_statuses_untimed, :matching_organization_statuses, :grouped_pos_kinds
 
   private
 
@@ -21,7 +25,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
   end
 
   def grouped_pos_kinds
-    %w[broken_pos without_pos with_pos].freeze
+    %w[not_no_pos broken_pos without_pos with_pos].freeze
   end
 
   def permitted_pos_kinds
@@ -32,7 +36,8 @@ class Admin::OrganizationStatusesController < Admin::BaseController
     Organization.kinds + ["not_bike_shop"]
   end
 
-  def matching_organization_statuses
+  # Needs to be a separate method so :at_time can be called on it
+  def matching_organization_statuses_untimed
     organization_statuses = OrganizationStatus.all
 
     if current_organization.present?
@@ -67,9 +72,12 @@ class Admin::OrganizationStatusesController < Admin::BaseController
     else
       @kind = "all"
     end
+    organization_statuses
+  end
 
+  def matching_organization_statuses
     @time_range_column = sort_column if %w[end_at created_at deleted_at].include?(sort_column)
     @time_range_column ||= "start_at"
-    organization_statuses.where(@time_range_column => @time_range)
+    matching_organization_statuses_untimed.where(@time_range_column => @time_range)
   end
 end

@@ -31,31 +31,65 @@ RSpec.describe BikeVersionsController, type: :request do
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"
       expect(response).to render_template(:show)
+      expect(response.body).to_not match(/is hidden/i)
+
+      # Hidden
       bike_version.update(visibility: "user_hidden")
+      expect(bike_version.authorized?(current_user)).to be_truthy
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"
       expect(response).to render_template(:show)
+      expect(response.body).to match(/is hidden/i)
+
+      # And deleted
+      bike_version.update(visibility: "visible_not_related", deleted_at: Time.current)
+      expect(bike_version.authorized?(current_user)).to be_falsey
+      get "#{base_url}/#{bike_version.to_param}"
+      expect(response.status).to eq 404
     end
     context "superadmin" do
       let(:current_user) { FactoryBot.create(:superuser) }
-      it "renders" do
+      it "renders, when hidden or deleted" do
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
+        expect(response.body).to_not match(/deleted/i)
+        expect(response.body).to_not match(/HIDDEN by owner/i)
+
+        # User hidden
         bike_version.update(visibility: "user_hidden")
+        expect(bike_version.authorized?(current_user)).to be_truthy
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
+        expect(response.body).to match(/HIDDEN by owner/i)
+
+        # Deleted
+        bike_version.update(visibility: "visible_not_related", deleted_at: Time.current)
+        expect(bike_version.authorized?(current_user)).to be_truthy
+        get "#{base_url}/#{bike_version.to_param}"
+        expect(response).to render_template(:show)
+        expect(response.body).to match(/deleted/i)
       end
     end
     context "no current_user" do
       let(:current_user) { nil }
       let(:bike_version) { FactoryBot.create(:bike_version) }
       it "renders" do
+        expect(bike_version.reload.visibility).to eq "visible_not_related"
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
+
+        # User hidden
         bike_version.update(visibility: "user_hidden")
+        expect(bike_version.authorized?(current_user)).to be_falsey
+        get "#{base_url}/#{bike_version.to_param}"
+        expect(response.status).to eq 404
+
+        # And deleted
+        bike_version.update(visibility: "visible_not_related", deleted_at: Time.current)
+        expect(bike_version.authorized?(current_user)).to be_falsey
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.status).to eq 404
       end
