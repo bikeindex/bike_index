@@ -33,7 +33,7 @@ RSpec.describe LandingPagesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(controller_action)
         expect(response.body).to match("<title>#{page_title}</title>")
-        expect(response.body).to match("<html lang='en'>") # Accessibility
+        expect(response.body).to match('<html lang="en">') # Accessibility
       end
     end
   end
