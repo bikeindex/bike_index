@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title><%= content_for?(:title) ? yield(:title) : t(".bike_index") %></title>
+    <%= stylesheet_link_tag "email" %>
+
+    <%# Remove the top and bottom margin on email preview, because they look funky %>
+    <% if @email_preview %>
+      <style>
+        .binx-wrapper { margin: 0; }
+        html { background: #e6e6e6; }
+      </style>
+    <% end %>
+  </head>
+
+  <body>
+    <div class="binx-wrapper">
+      <% unless @skip_header %>
+        <table class="binx-header">
+          <tbody>
+            <tr>
+              <td class="<%= @partner.present? ? "partner-header" : "" %>">
+                <% if @partner %>
+                  <span class="partner-logo-wrapper">
+                    <%= image_tag "https://files.bikeindex.org/email_assets/bikehub_logo_plus.png",
+                      height: "50",
+                      class: "partner-header-logo" %>
+                  </span>
+                <% end %>
+
+                <%# Not including an alt tag because it renders in the text version %>
+                <img class="bike-index-logo" src="https://files.bikeindex.org/email_assets/logo.png" height="70">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      <% end %>
+
+      <div class="binx-body">
+        <%# We only render snippets for organized messages - or if we're doing a preview %>
+        <% render_organization_snippets = @organization.present? && (controller_path == "organized_mailer" || @email_preview) %>
+        <% if render_organization_snippets && @organization.mail_snippet_body("header").present? %>
+          <%= @organization.mail_snippet_body("header").html_safe %>
+        <% end %>
+
+        <%= yield %>
+
+        <% if render_organization_snippets && @organization.mail_snippet_body("footer").present? %>
+          <%= @organization.mail_snippet_body("footer").html_safe %>
+        <% end %>
+      </div>
+
+      <div class="binx-pstscpt">
+        <div class="hearts">
+          <span>&#9829;</span>
+          <span>&#9829;</span>
+          <span>&#9829;</span>
+          <span>&#9829;</span>
+          <span>&#9829;</span>
+        </div>
+        <h4><%= t(".the_bike_index_team") %></h4>
+      </div>
+
+      <div class="binx-footer">
+        <h5>
+          <%= Time.current.year %> &copy; <%= t(".bike_index") %>.
+
+          <% if render_donation?(@organization) %>
+            <%= t(".help_prevent_theft") %>
+            <%= link_to(t(".make_a_donation"), support_the_index_url) %>
+          <% end %>
+        </h5>
+
+        <% if render_supporters?(@organization) %>
+          <p>
+            Bike Index is also supported by <%= link_to "Ottalaus", "https://ottalausinc.ca/" %> and <%= link_to "The Pro's Closet", "https://www.theproscloset.com/" %>.
+          </p>
+        <% end %>
+      </div>
+    </div>
+  </body>
+</html>

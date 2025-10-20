@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" style="background: none;">
+  <head>
+    <%= render(HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag 'registrations', media: 'all' %>
+    <%= javascript_include_tag 'registrations' %>
+  </head>
+
+  <body style="background: none; width: 100%; max-width: 500px; margin: 0 auto;">
+    <div class="registration-widget <%= current_organization&.slug %>" id="binx_registration_widget">
+      <% if action_name == 'create' %>
+        <header class="reg-header">
+          <%= image_tag 'revised/logo.svg', class: 'reg-header-logo' %>
+        </header>
+      <% elsif @simple_header %>
+        <% header_style = @button_and_header.blank? ? '' : "background: #{@button_and_header}" %>
+        <header style="<%= header_style %>">
+          <h3><%= @vehicle_select ? t(".register_your_vehicle") : t(".register_your_bike") %></h3>
+        </header>
+      <% else %>
+        <header class="reg-header">
+          <%= image_tag 'revised/logo.svg', class: 'reg-header-logo' %>
+          <h2><%= t(".protect_your_bike_today") %></h2>
+          <p>
+            <%= t(".register_on_bike_index") %>
+            <em><%= t(".its_free") %></em>
+          </p>
+        </header>
+      <% end %>
+      <div class="registration-widget-body">
+        <%= yield %>
+      </div>
+    </div>
+
+    <%= render "/shared/analytics" %>
+  </body>
+</html>
