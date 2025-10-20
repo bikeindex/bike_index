@@ -9,7 +9,7 @@ class WelcomeController < ApplicationController
   end
 
   def test_herb
-    render layout: false
+    render layout: "herb"
   end
 
   def bike_creation_graph

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <%= render(HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%# TODO: Cache this ^ %>
+    <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <%= javascript_importmap_tags %>
+    <%= hotwire_livereload_tags if Rails.env.development? %>
+
+    <% if current_user&.time_single_format %>
+      <script>window.timeParserSingleFormat = true</script>
+    <% end %>
+    <%= render partial: "/shared/analytics" %>
+    <%# Use with content_for(:header) -- see news/show for an example of content yielded to a named `yield`. %>
+    <%# https://guides.rubyonrails.org/layouts_and_rendering.html#using-the-content-for-method %>
+    <%= yield :header %>
+    <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
+  </head>
+  <body>
+    <%= yield %>
+  </body>
+</html>
