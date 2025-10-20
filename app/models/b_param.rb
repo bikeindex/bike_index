@@ -608,6 +608,8 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     attrs_merged = bike.merge("status" => status).merge(new_attrs.as_json)
+    address_record_hash = attrs_merged["address_record_attributes"] || address_record_attributes
+
     attrs_merged.except(*SKIPPED_BIKE_ATTRS)
       .map { |k, v| clean_key_value(k, v) }.compact.to_h
       .merge("b_param_id" => id,
@@ -616,7 +618,7 @@ class BParam < ApplicationRecord
         "updator_id" => creator_id,
         # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
         "propulsion_type_slug" => self.class.propulsion_type(params.merge("bike" => attrs_merged)))
-      .merge(address_record_attributes:)
+      .merge(address_record_hash.present? ? {"address_record_attributes" => address_record_hash} : {})
   end
 
   private

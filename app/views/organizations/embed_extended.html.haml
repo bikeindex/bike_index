@@ -81,7 +81,7 @@
       .controls
         = f.email_field :owner_email, required: true
   -# Note: Don't check display_edit_address_fields? because current_user is probably not owner
-  - if include_field_reg_address?(@organization)
+  - if BikeServices::Builder.include_address_record?(@organization)
     - label_address = registration_field_label(@organization, "reg_address") || t(".owners_mailing_address")
     - label_address_class = registration_field_label(@organization, "reg_address").present? ? "strong" : ""
     / Set all the bike address attrs

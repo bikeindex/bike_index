@@ -682,7 +682,6 @@ RSpec.describe BParam, type: :model do
         owner_email: "stuff@something.com",
         b_param_id: nil,
         b_param_id_token: nil,
-        address_record_attributes: {},
         creator_id: nil,
         updator_id: nil,
         status: "status_with_owner",
@@ -691,6 +690,7 @@ RSpec.describe BParam, type: :model do
     end
     it "responds with bike_attrs" do
       expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
+      expect(b_param.safe_bike_attrs({})).to_not have_key(:address_record_attributes)
     end
     context "with new_attrs" do
       it "uses the new_attrs" do

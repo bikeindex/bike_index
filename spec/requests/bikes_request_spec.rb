@@ -25,7 +25,7 @@ RSpec.describe BikesController, type: :request do
       expect(response).to render_template(:new)
       expect(response.body).to match("<title>Register a bike!</title>")
       expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
-      # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
+      # This still wouldn't show address, because it doesn't have an organization with BikeServices::Builder.include_address_record?
       expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
     context "with bike_sticker" do
