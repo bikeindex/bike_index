@@ -1,0 +1,34 @@
+<%# Note: %>
+<%# ----- %>
+<%# We primarily use 3 flash types - success, error, and notice %>
+<%# success - No actionable info. Basically, Bike Index did what you asked. Auto faded %>
+<%# error   - Messages because you did something wrong. Not faded %>
+<%# notice  - Messages that don't fit in the above categories. Not faded, may have actionable info %>
+
+<div class="bootstrapstyle primary-alert-block">
+  <% flash.each do |name, msg| %>
+    <%= render partial: "/shared/alert", locals: { body: msg, type: name } %>
+  <% end %>
+
+  <% if @page_errors.present? %><%# Primarily used for form object errors %>
+    <% title = t(".please_fix_the_following", errors: pluralize(@page_errors.count, t(".error"))) %>
+    <% error_body = capture do %>
+      <ul>
+        <% @page_errors = @page_errors.full_messages if @page_errors.is_a?(ActiveModel::Errors) %>
+        <% @page_errors.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    <% end %>
+    <%= render partial: '/shared/alert', locals: { body: error_body, title: title } %>
+  <% end %>
+</div>
+
+<script id="alert-template" type="x-tmpl-mustache">
+  <div class="alert alert-{{alert_type}} in" data-seconds="{{seconds}}">
+    <button aria-label="Close" class="close" data-dismiss="alert" type="button">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{alert_body}}
+  </div>
+</script>

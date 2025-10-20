@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%= render(HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= csrf_meta_tags %>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href="/vendored_assets/admin.css" rel='stylesheet' type='text/css'>
+    <script src="/vendored_assets/application_standalone.js"></script>
+    <%= stylesheet_link_tag 'tailwind', "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <%#= hotwire_livereload_tags if Rails.env.development? %>
+    <%# assets are vendored, lazy solution %>
+    <style>.for-sale-color {color: #2ecc71;} .stolen-color, impounded-color {color: #e74c3c;} .found-color {color: oklch(59.1% 0.293 322.896);} .unregistered-color { color: #f0ad4e};</style>
+    <styles></styles>
+  </head>
+
+  <%# manually override body_class in a few situations :/ %>
+  <% admin_body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome" %>
+  <% admin_body_class = "vendor-signup-page" if current_page?(:vendor_signup) %>
+  <% admin_body_class = "news-page" if controller_name == "news" %>
+
+  <body id="<%= page_id %>" class="<%= admin_body_class || body_class %>">
+    <nav class="navbar navbar-expand-md navbar-light bg-light admin-navbar more">
+      <span class="navbar-brand">
+        <%= link_to (image_tag("logo.svg")), user_root_url %>
+      </span>
+      <% if current_user.superuser? %>
+        <ul class="navbar-nav d-none d-lg-flex">
+          <li class="nav-item">
+            <%= active_link "Users", admin_users_path, role: "button", class: "nav-link users", match_controller: true %>
+          </li>
+          <li class="nav-item">
+            <%= active_link "Bikes", admin_bikes_path, role: "button", class:"nav-link bikes", match_controller: true %>
+          </li>
+          <li class="nav-item">
+            <%= active_link "Organizations", admin_organizations_path, role: "button", class: "nav-link", match_controller: true %>
+          </li>
+          <li class="nav-item">
+            <%= active_link "News", admin_news_index_path, role: "button", class: "nav-link", match_controller: true %>
+          </li>
+          <li class="nav-item">
+            <%= active_link "Stolen", admin_stolen_bikes_path, role: "button", class: "nav-link", match_controller: true %>
+          </li>
+          <% if Rails.env.development? %>
+            <li class="dropdown nav-item">
+              <a class="dropdown-toggle nav-link" data-toggle="dropdown">
+                Mailers
+              </a>
+              <div class="dropdown-menu admin-nav-dropdown">
+                <%= link_to "Organized", '/rails/mailers/organized_mailer' , role: "button", class: "btn btn-light dropdown-item" %>
+                <%= link_to "Admin", '/rails/mailers/admin_mailer' , role: "button", class: "btn btn-light dropdown-item" %>
+                <%= link_to "Donation", '/rails/mailers/donation_mailer' , role: "button", class: "btn btn-light dropdown-item" %>
+                <%= link_to "Customer", '/rails/mailers/customer_mailer' , role: "button", class: "btn btn-light dropdown-item" %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+
+        <% if admin_nav_display_view_all %>
+          <%= link_to admin_nav_select_link_active[:path], class: "nav-link text-muted em" do %>
+            All
+            <div class="d-none d-sm-inline-block d-lg-none d-xl-inline-block">
+              <%# Remove "Config:" and "Dev:" from the all link title %>
+              <%= admin_nav_select_link_active[:title]&.split(":").last %>
+            </div>
+          <% end %>
+        <% end %>
+        <div class="fancy-select unfancy no-restore-on-backspace">
+          <%= select(:admin, :other_navigation, options_for_select(admin_nav_select_links.map { |l| [l[:title], l[:path]] }), { prompt: admin_nav_select_prompt }, { class: "form-control" }) %>
+        </div>
+      <% end %>
+
+      <%= link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block" %>
+    </nav>
+    <%= render "/layouts/revised_messages" %>
+
+    <section id="admin-content" class="pb-4 mb-4">
+      <div class="container-fluid mt-4 pb-4">
+        <%= yield %>
+      </div>
+    </section>
+  </body>
+</html>

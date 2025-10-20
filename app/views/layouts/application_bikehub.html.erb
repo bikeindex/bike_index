@@ -1,0 +1,113 @@
+<%# copies application_revised assets but dramatically different %>
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" style="background: #fff; padding-bottom: 40px;">
+  <head>
+    <%= render(HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag 'revised', media: 'all' %>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <%= javascript_include_tag 'application_revised' %>
+    <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
+    <script>
+      window.BikeIndex.translator = (keyspace) => {
+        return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
+      }
+    </script>
+  </head>
+
+  <body id="<%= page_id %>" class="<%= body_class %>" style="padding-top: 0;">
+    <%# This is either the signup or signin page %>
+    <% signup_page = controller_name != "sessions" %>
+    <div class="bikehub">
+      <nav class="navbar nav bikehub-nav navbar-expand-md">
+        <div class="container-fluid">
+          <a href="https://bikehub.com" class="bikehub-logo">
+            <%= image_tag "bikehub/bikehub_logo.png", alt: "BikeHub home" %>
+          </a>
+          <span class="powered-by-text">
+            Powered
+            <br>
+            by
+          </span>
+          <a href="<%= user_root_url %>" class="powered-by-logo">
+            <%= image_tag "logo.svg", alt: "Bike Index home" %>
+          </a>
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbarContent" aria-controls="mainNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="mainNavbarContent">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a href="https://bikehub.com/" class="nav-link">
+                  <%= t(".home") %>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="https://bikehub.com/contact/" class="nav-link">
+                  <%= t(".contact") %>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<%= new_user_path(partner: sign_in_partner) %>" class="nav-link <%= signup_page ? "active" : "" %>">
+                  <%= t(".register") %>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="<%= new_session_path(partner: sign_in_partner) %>" class="nav-link <%= signup_page ? "" : "active" %>">
+                  <%= t(".login") %>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div class="landing-page">
+        <header class="bikehub-banner-header">
+          <div class="teamed-up-with-bike-index">
+            <%= image_tag "bikehub/high-five.svg", alt: "Bikehub and Bike Index together", class: "bikehub-high-five" %>
+            <h1><%= t(".teamed_up") %></h1>
+            <p>
+              <%= t(".accounts_powered_by_bike_index") %>
+            </p>
+          </div>
+        </header>
+      </div>
+
+
+      <%= render "layouts/revised_messages" %>
+      <div class="mt-4"></div>
+      <%= yield %>
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-xl-8 offset-xl-2 col-md-10 offset-md-1 bikehub-bottom-info">
+            <p>
+              <em>
+                <%= t(".non_profit") %>
+              </em>
+            </p>
+            <p>
+              <em>
+                <%= t(".partnership") %>
+              </em>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <%= render "/shared/analytics" %>
+
+  <script>
+    var trackOutboundLink = function(url) {
+      ga('send', 'event', 'outbound', 'click', url, {
+        'transport': 'beacon',
+        'hitCallback': function(){document.location = url;}
+      });
+    }
+  </script>
+</html>
