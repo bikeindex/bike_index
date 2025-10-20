@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe GeocodeHelper do
   include_context :geocoder_real
-  let(:vcr_config) { {match_requests_on: [:path], re_record_interval: 3.months} }
+  let(:vcr_config) { {match_requests_on: [:path], re_record_interval: 4.months} }
 
   describe "assignable_address_hash_for" do
     let!(:country) { Country.united_states }
