@@ -7,13 +7,6 @@ import { lazyLoadControllersFrom } from '@hotwired/stimulus-loading'
 
 import TimeLocalizer from 'utils/time_localizer'
 
-import { Herb } from "@herb-tools/browser"
-
-await Herb.load()
-
-
-console.log(Herb.parse("content"))
-
 /* global Turbo */
 // Disable Turbo by default, only enable on case-by-case
 // You must include data-turbo="true" on the elements you want to enable turbo on

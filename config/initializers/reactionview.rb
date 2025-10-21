@@ -5,5 +5,5 @@ ReActionView.configure do |config|
   config.intercept_erb = true
 
   # Enable debug mode in development (adds debug attributes to HTML)
-  config.debug_mode = true
+  config.debug_mode = Rails.env.development?
 end
