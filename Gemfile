@@ -52,6 +52,8 @@ gem "redlock" # Locking
 gem "faraday_middleware" # Manage faraday request flow
 gem "geocoder" # Geolocation using external APIs
 gem "haml" # Template language
+gem "herb" # herb
+gem "reactionview" # fancy view component stuff
 gem "httparty" # http connection client
 gem "pagy" # pagination
 gem "kramdown" # Markdown
