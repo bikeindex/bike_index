@@ -216,7 +216,7 @@ class User < ApplicationRecord
   end
 
   def find_or_build_address_record(country_id: nil)
-    return address_record if address_record.present?
+    return address_record if address_record?
 
     orphaned_address_record = AddressRecord.user.where(user_id: id).first
     if orphaned_address_record.present?

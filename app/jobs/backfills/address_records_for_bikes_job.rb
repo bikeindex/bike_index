@@ -12,7 +12,7 @@ class Backfills::AddressRecordsForBikesJob < ApplicationJob
     end
 
     def build_or_create_for(bike, country_id: nil)
-      return bike.address_record if bike.address_record.present?
+      return bike.address_record if bike.address_record?
 
       existing_address_record = AddressRecord.where(kind: :bike, bike_id: bike.id).order(:id).last
       if existing_address_record.present?

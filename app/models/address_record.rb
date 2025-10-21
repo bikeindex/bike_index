@@ -71,7 +71,11 @@ class AddressRecord < ApplicationRecord
     end
 
     def attrs_from_legacy(obj)
-      user_attrs = obj.is_a?(User) ? {} : {user_id: obj.user_id}
+      user_attrs = if !obj.is_a?(User) && obj.respond_to?(:user_id)
+        {user_id: obj.user_id}
+      else
+        {}
+      end
 
       {
         skip_geocoding: obj.latitude.present?, # Skip geocoding if already geocoded

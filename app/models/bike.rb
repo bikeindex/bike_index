@@ -186,7 +186,6 @@ class Bike < ApplicationRecord
     :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
     to: :current_ownership, allow_nil: true
 
-  scope :without_location, -> { where(latitude: nil) }
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
@@ -840,7 +839,7 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
-    elsif current_ownership&.address_record.present?
+    elsif current_ownership&.address_record?
       "initial_creation"
     end
   end

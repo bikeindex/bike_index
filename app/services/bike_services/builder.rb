@@ -1,9 +1,10 @@
+# frozen_string_literal: true
 
 class BikeServices::Builder
-  # Not sure if I like everything being class methods, but doing that for now anyway because functional-ish
   class << self
     def include_address_record?(organization = nil, user = nil)
       return false if organization.blank?
+      return false if user&.address_set_manually?
 
       organization.additional_registration_fields.include?("reg_address")
     end
@@ -28,7 +29,7 @@ class BikeServices::Builder
       if b_param.unregistered_parking_notification?
         bike.attributes = default_parking_notification_attrs(b_param, bike)
       elsif include_address_record?(bike.creation_organization)
-        bike.address_record ||= org_address_record(b_param)
+        bike.address_record ||= org_address_record(bike)
       end
       bike.bike_sticker = b_param.bike_sticker_code
       if bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
@@ -101,6 +102,12 @@ class BikeServices::Builder
       end
       attrs[:serial_number] = "unknown" unless bike.serial_number.present?
       attrs
+    end
+
+    def org_address_record(bike)
+      AddressRecord.new(AddressRecord.attrs_from_legacy(bike.creation_organization)
+        .slice(:city, :region_record_id, :country_id)
+        .merge(kind: :bike, bike:))
     end
   end
 end
