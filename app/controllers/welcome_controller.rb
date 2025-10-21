@@ -8,10 +8,6 @@ class WelcomeController < ApplicationController
     @recovery_displays = RecoveryDisplay.limit(5)
   end
 
-  def test_herb
-    render layout: "herb"
-  end
-
   def bike_creation_graph
     @height = (params[:height] || 300).to_i
     render layout: false

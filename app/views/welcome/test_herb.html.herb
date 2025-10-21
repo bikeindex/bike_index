@@ -1,6 +1,0 @@
-<div class="test">
-  <h1>ReActionView Test</h1>
-  <p>Current time: <%= Time.current %></p>
-
-  <%= render(Alert::Component.new(text: "Something something something", kind: :success)) %>
-</div>
