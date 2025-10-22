@@ -23,7 +23,7 @@ RSpec.describe OrganizationsController, type: :request do
 
   describe "create" do
     include_context :request_spec_logged_in_as_user
-    let(:location_attrs) { {street: "", city: "San Francisco", zipcode: "94119", country_id: Country.united_states.id} }
+    let(:location_attrs) { {street: "somewhere", city: "San Francisco", zipcode: "94119", country_id: Country.united_states.id} }
     let(:org_attrs) do
       {
         name: "a new org",
