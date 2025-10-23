@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BikeServices::Creator
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator
@@ -32,33 +34,9 @@ class BikeServices::Creator
     @ip_address = ip_address
   end
 
-  def build_bike(b_param, new_attrs = {})
-    # Default attributes
-    bike = Bike.new(cycle_type: "bike")
-    bike.attributes = b_param.safe_bike_attrs(new_attrs)
-    # If manufacturer_other is an existing manufacturer, reassign it
-    if bike.manufacturer_id == Manufacturer.other.id
-      manufacturer = Manufacturer.friendly_find(bike.manufacturer_other)
-      if manufacturer.present?
-        bike.attributes = {manufacturer_id: manufacturer.id, manufacturer_other: nil}
-      end
-    end
-    # Use bike status because it takes into account new_attrs
-    bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
-    bike.build_new_impound_record(b_param.impound_attrs) if bike.status_impounded?
-    bike = check_organization(b_param, bike)
-    bike = check_example(b_param, bike)
-    bike.attributes = default_parking_notification_attrs(b_param, bike) if b_param.unregistered_parking_notification?
-    bike.bike_sticker = b_param.bike_sticker_code
-    if bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
-      bike.attributes = {front_wheel_size_id: bike.rear_wheel_size_id, front_tire_narrow: bike.rear_tire_narrow}
-    end
-    bike
-  end
-
   def create_bike(b_param)
     add_bike_book_data(b_param)
-    bike = find_or_build_bike(b_param)
+    bike = BikeServices::Builder.find_or_build(b_param)
     # Skip processing if this bike is already created
     return bike if bike.id.present? && bike.id == b_param.created_bike_id
 
@@ -119,7 +97,7 @@ class BikeServices::Creator
   end
 
   def clear_bike(b_param, bike)
-    built_bike = find_or_build_bike(b_param)
+    built_bike = BikeServices::Builder.find_or_build(b_param)
     bike.errors.messages.each do |message|
       built_bike.errors.add(message[0], message[1][0])
     end
@@ -163,75 +141,13 @@ class BikeServices::Creator
         organization: bike.creation_organization, creator_kind: "creator_bike_creation")
     end
     if b_param.unregistered_parking_notification?
-      # We skipped setting address, with default_parking_notification_attrs, notification will update it
+      # We skipped setting address, with Builder.default_parking_notification_attrs,
+      # notification will update it
       ParkingNotification.create!(b_param.parking_notification_params)
     end
     # Check if the bike has a location, update with passed location if no
     bike.reload
     bike.update(GeocodeHelper.assignable_address_hash_for(@ip_address)) unless bike.latitude.present?
-    bike
-  end
-
-  def find_or_build_bike(b_param)
-    return b_param.created_bike if b_param&.created_bike&.present?
-
-    bike = build_bike(b_param)
-    bike.set_calculated_unassociated_attributes
-
-    if b_param.no_duplicate?
-      # If a dupe is found, return that rather than the just built bike
-      dupe = BikeServices::OwnerDuplicateFinder.matching(serial: bike.serial_number,
-        owner_email: bike.owner_email, manufacturer_id: bike.manufacturer_id).first
-
-      if dupe.present?
-        b_param.update(created_bike_id: dupe.id)
-        return dupe
-      end
-    end
-    bike
-  end
-
-  def default_parking_notification_attrs(b_param, bike)
-    attrs = {
-      skip_status_update: true,
-      skip_geocoding: true,
-      status: "unregistered_parking_notification",
-      marked_user_hidden: true
-    }
-    # We want to force not sending email
-    if b_param.params.dig("bike", "send_email").blank?
-      b_param.update_attribute :params, b_param.params.merge("bike" => b_param.params["bike"].merge("send_email" => "false"))
-    end
-    if bike.owner_email.blank?
-      attrs[:owner_email] = b_param.creation_organization&.auto_user&.email.presence || b_param.creator.email
-    end
-    attrs[:serial_number] = "unknown" unless bike.serial_number.present?
-    attrs
-  end
-
-  # previously BikeServices::CreatorOrganizer
-  def check_organization(b_param, bike)
-    organization_id = b_param.params.dig("creation_organization_id").presence ||
-      b_param.params.dig("bike", "creation_organization_id")
-    organization = Organization.friendly_find(organization_id)
-    if organization.present?
-      bike.creation_organization_id = organization.id
-      bike.creator_id ||= organization.auto_user_id
-    else
-      # Since there wasn't a valid organization, blank the organization
-      bike.creation_organization_id = nil
-    end
-    bike
-  end
-
-  def check_example(b_param, bike)
-    example_org = Organization.example
-    bike.creation_organization_id = example_org.id if b_param.params && b_param.params["test"]
-    if bike.creation_organization_id.present? && example_org.present?
-      bike.example = true if bike.creation_organization_id == example_org.id
-    else
-      bike.example = false
-    end
     bike
   end
 

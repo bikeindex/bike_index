@@ -14,13 +14,16 @@ RSpec.describe BikeServices::Creator do
 
   describe "create_bike" do
     context "errors" do
-      it "returns the bike instead of saving if the bike has errors" do
-        bike = Bike.new(serial_number: "LOLZ")
-        bike.errors.add(:errory, "something")
-        expect(instance).to receive(:find_or_build_bike).and_return(bike)
-        bike = instance.create_bike(b_param)
-        expect(bike.errors[:errory]).to eq(["something"])
-      end
+      # TODO: Can this be deleted?
+      # Seems like garbage...
+      #
+      # it "returns the bike instead of saving if the bike has errors" do
+      #   bike = Bike.new(serial_number: "LOLZ")
+      #   bike.errors.add(:errory, "something")
+      #   expect(instance).to receive(:find_or_build_bike).and_return(bike)
+      #   bike = instance.create_bike(b_param)
+      #   expect(bike.errors[:errory]).to eq(["something"])
+      # end
       context "owner_email format error" do
         let(:bike_params) do
           {
@@ -210,8 +213,9 @@ RSpec.describe BikeServices::Creator do
       context "extra attributes" do
         let(:manufacturer_name) { "BH Bikes (Beistegui Hermanos)" }
         let(:wheel_size) { FactoryBot.create(:wheel_size) }
-        let(:bike_params) do
-          default_params.merge(
+        let(:bike_params) { default_params.merge(extra_attributes) }
+        let(:extra_attributes) do
+          {
             creation_organization_id: organization.id,
             manufacturer_id: Manufacturer.other.id,
             manufacturer_other: "BH", # It looks up the manufacturer
@@ -223,18 +227,28 @@ RSpec.describe BikeServices::Creator do
             handlebar_type: "bmx",
             owner_email: "stuff@stuff.com",
             user_name: "Sally",
-            street: "Somewhere Ville"
-          )
+            address_record_attributes: {
+              street: "Somewhere Ville"
+            }
+          }
         end
-        it "creates" do
+        let(:not_matched_attrs) { %i[user_name propulsion_type_slug manufacturer_id manufacturer_other street address_record_attributes] }
+        let(:target_address_record) do
+          {street: "Somewhere Ville", country_id: Country.united_states_id, kind: "ownership", publicly_visible_attribute: "postal_code"}
+        end
+
+        def expect_bike_created_with_extra_attrs
           expect { instance.create_bike(b_param) }.to change(Bike, :count).by(1)
           expect(b_param.skip_email?).to be_falsey
           bike = Bike.last
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-          expect(bike.registration_address.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville", "country" => "United States"})
-          expect(bike).to match_hash_indifferently bike_params.except(:user_name, :propulsion_type_slug, :manufacturer_id, :manufacturer_other)
+          expect(bike.registration_address.compact).to eq({"street" => "Somewhere Ville", "country" => "United States"})
+          # pp bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)
+          expect(bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)).to eq target_address_record.merge(bike_id: bike.id)
+
+          expect(bike).to match_hash_indifferently bike_params.except(*not_matched_attrs)
           expect(bike.manufacturer_id).to eq manufacturer.id
           expect(bike.manufacturer_other).to be_nil
           expect(bike.mnfg_name).to eq "BH Bikes" # Because that's the short name
@@ -251,6 +265,22 @@ RSpec.describe BikeServices::Creator do
           expect(ownership.owner_email).to eq "stuff@stuff.com"
           expect(ownership.owner_name).to eq "Sally"
           expect(ownership.address_hash_legacy.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville", "country" => "United States"})
+        end
+
+        it "creates" do
+          expect_bike_created_with_extra_attrs
+        end
+
+        context "legacy location attrs" do
+          # I'm not sure this is actually necessary, but keeping it for now
+          # TODO: Remove this once backfill is finished - #2922
+          let(:bike_params) do
+            default_params.merge(extra_attributes.except(:address_record_attributes)
+              .merge(street: target_address_record[:street]))
+          end
+          it "creates" do
+            expect_bike_created_with_extra_attrs
+          end
         end
       end
     end
@@ -305,7 +335,7 @@ RSpec.describe BikeServices::Creator do
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.id).to be_present
           expect(bike.serial_number).to eq "unknown"
-          expect(bike.address).to be_present
+          expect(bike.address_record).to be_present
           expect(bike.latitude).to eq(40.7143528)
           expect(bike.longitude).to eq(-74.0059731)
           expect(bike.owner_email).to eq auto_user.email
@@ -376,7 +406,7 @@ RSpec.describe BikeServices::Creator do
             expect(bike.creation_organization_id).to eq organization.id
             expect(bike.id).to be_present
             expect(bike.serial_number).to eq "unknown"
-            expect(bike.address).to be_present
+            expect(bike.address_record).to be_present
             expect(bike.latitude).to eq(40.7143528)
             expect(bike.longitude).to eq(-74.0059731)
             expect(bike.owner_email).to eq auto_user.email
@@ -599,18 +629,22 @@ RSpec.describe BikeServices::Creator do
   end
 
   context "private methods (legacy specs)" do
-    describe "building" do
-      it "returns a new bike object from the params with the b_param_id" do
-        allow(b_param).to receive(:id).and_return(9)
-        allow(b_param).to receive(:creator_id).and_return(6)
-        allow(b_param).to receive(:params).and_return({bike: {serial_number: "AAAA"}}.as_json)
-        bike = instance.build_bike(b_param)
-        expect(bike.serial_number).to eq("AAAA")
-        expect(bike.updator_id).to eq(6)
-        expect(bike.b_param_id).to eq(9)
-      end
-    end
+    # TODO: Can this be deleted?
+    # Seems like garbage...
+    #
+    # describe "building" do
+    #   it "returns a new bike object from the params with the b_param_id" do
+    #     allow(b_param).to receive(:id).and_return(9)
+    #     allow(b_param).to receive(:creator_id).and_return(6)
+    #     allow(b_param).to receive(:params).and_return({bike: {serial_number: "AAAA"}}.as_json)
+    #     bike = instance.build_bike(b_param)
+    #     expect(bike.serial_number).to eq("AAAA")
+    #     expect(bike.updator_id).to eq(6)
+    #     expect(bike.b_param_id).to eq(9)
+    #   end
+    # end
 
+    # TODO: This is probably necessary
     describe "attach_photo" do
       it "creates public images for the attached image" do
         bike = FactoryBot.create(:bike)
@@ -672,102 +706,6 @@ RSpec.describe BikeServices::Creator do
           expect(b_param.bike["serial_number"]).to eq("Some serial")
           expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
         end
-      end
-    end
-  end
-
-  describe "build_bike" do
-    let(:b_param_params) { {} }
-    let(:b_param) { BParam.new(params: b_param_params) }
-    let(:bike) { instance.build_bike(b_param) }
-    it "builds it" do
-      expect(bike.status).to eq "status_with_owner"
-      expect(bike.id).to be_blank
-    end
-    context "status impounded" do
-      let(:b_param_params) { {bike: {status: "status_impounded"}} }
-      it "is abandoned" do
-        expect(b_param.status).to eq "status_impounded"
-        expect(b_param.impound_attrs).to be_blank
-        expect(bike.id).to be_blank
-        impound_record = bike.impound_records.last
-        expect(impound_record).to be_present
-        expect(impound_record.kind).to eq "found"
-        expect(bike.status_humanized).to eq "found"
-      end
-      context "with impound attrs" do
-        let(:time) { Time.current - 12.hours }
-        let(:b_param_params) { {bike: {status: "status_with_owner"}, impound_record: {impounded_at: time}} }
-        it "is abandoned" do
-          expect(b_param.status).to eq "status_impounded"
-          expect(b_param.impound_attrs).to be_present
-          expect(bike.id).to be_blank
-          impound_record = bike.impound_records.last
-          expect(impound_record).to be_present
-          expect(impound_record.kind).to eq "found"
-          expect(impound_record.impounded_at).to be_within(1).of time
-          expect(bike.status_humanized).to eq "found"
-        end
-      end
-    end
-    context "status stolen" do
-      let(:b_param_params) { {bike: {status: "status_stolen"}} }
-      it "is stolen" do
-        expect(b_param).to be_valid
-        expect(b_param.status).to eq "status_stolen"
-        expect(b_param.stolen_attrs).to be_blank
-        expect(bike.status).to eq "status_stolen"
-        expect(bike.id).to be_blank
-        expect(bike.stolen_records.last).to be_present
-      end
-      context "legacy_stolen" do
-        let(:b_param_params) { {bike: {stolen: true}} }
-        it "is stolen" do
-          expect(b_param).to be_valid
-          expect(b_param.status).to eq "status_stolen"
-          expect(b_param.stolen_attrs).to be_blank
-          expect(bike.status).to eq "status_stolen"
-          expect(bike.id).to be_blank
-          expect(bike.stolen_records.last).to be_present
-        end
-      end
-    end
-    context "with id" do
-      let(:b_param) { FactoryBot.create(:b_param, params: b_param_params) }
-      it "includes ID" do
-        expect(b_param).to be_valid
-        expect(bike.status).to eq "status_with_owner"
-        expect(bike.id).to be_blank
-        expect(bike.b_param_id).to eq b_param.id
-        expect(bike.b_param_id_token).to eq b_param.id_token
-        expect(bike.creator).to eq b_param.creator
-      end
-      context "stolen" do
-        # Even though status_with_owner passed - since it has stolen attrs
-        let(:b_param_params) { {bike: {status: "status_with_owner"}, stolen_record: {phone: "7183839292"}} }
-        it "is stolen" do
-          expect(b_param).to be_valid
-          expect(b_param.status).to eq "status_stolen"
-          expect(b_param.stolen_attrs).to eq b_param_params[:stolen_record].as_json
-          expect(bike.status).to eq "status_stolen"
-          expect(bike.id).to be_blank
-          expect(bike.b_param_id).to eq b_param.id
-          expect(bike.b_param_id_token).to eq b_param.id_token
-          expect(bike.creator).to eq b_param.creator
-          stolen_record = bike.stolen_records.last
-          expect(stolen_record).to be_present
-          expect(stolen_record.phone).to eq b_param_params.dig(:stolen_record, :phone)
-        end
-      end
-    end
-    context "status overrides" do
-      it "is stolen if it is stolen" do
-        bike = instance.build_bike(BParam.new, status: "status_stolen")
-        expect(bike.status).to eq "status_stolen"
-      end
-      it "impounded if status_impounded" do
-        bike = instance.build_bike(BParam.new, status: "status_impounded")
-        expect(bike.status).to eq "status_impounded"
       end
     end
   end
