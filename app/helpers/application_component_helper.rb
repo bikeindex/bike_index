@@ -33,6 +33,7 @@ module ApplicationComponentHelper
     return "" if phone.blank?
 
     phone_d = phone_display(phone)
+    return "" if phone_d.blank?
     # Switch extension to be pause in link
     link_to(phone_d, "tel:#{phone_d.tr("x", ";")}", html_options)
   end

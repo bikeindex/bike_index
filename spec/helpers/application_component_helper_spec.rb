@@ -63,5 +63,11 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
         expect(phone_link("777 777 7777 ext. 2929222", class: "phone-number-link")).to eq target
       end
     end
+    context "error version" do
+      let(:target) { "" }
+      it "doesn't error" do
+        expect(phone_link("+1", class: "phone-number-link")).to eq target
+      end
+    end
   end
 end
