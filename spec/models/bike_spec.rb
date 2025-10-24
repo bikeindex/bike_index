@@ -19,7 +19,7 @@ RSpec.describe Bike, type: :model do
       expect(bike.reload.address_set_manually).to be_truthy # Required to get the address_record coordinates
       expect(bike.to_coordinates.map(&:round)).to eq([52, 5])
       expect(AddressRecord.pluck(:id)).to eq([address_record.id])
-      # TODO: when bike AddressRecords have finished migration, uncomment
+      # TODO: when bike AddressRecords have finished migration, uncomment - #2922
       # expect(Bike.with_street.pluck(:id)).to eq([bike.id])
     end
   end

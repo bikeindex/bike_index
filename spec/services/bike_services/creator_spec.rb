@@ -14,16 +14,6 @@ RSpec.describe BikeServices::Creator do
 
   describe "create_bike" do
     context "errors" do
-      # TODO: Can this be deleted?
-      # Seems like garbage...
-      #
-      # it "returns the bike instead of saving if the bike has errors" do
-      #   bike = Bike.new(serial_number: "LOLZ")
-      #   bike.errors.add(:errory, "something")
-      #   expect(instance).to receive(:find_or_build_bike).and_return(bike)
-      #   bike = instance.create_bike(b_param)
-      #   expect(bike.errors[:errory]).to eq(["something"])
-      # end
       context "owner_email format error" do
         let(:bike_params) do
           {
@@ -245,7 +235,6 @@ RSpec.describe BikeServices::Creator do
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect(bike.registration_address.compact).to eq({"street" => "Somewhere Ville", "country" => "United States"})
-          # pp bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)
           expect(bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)).to eq target_address_record.merge(bike_id: bike.id)
 
           expect(bike).to match_hash_indifferently bike_params.except(*not_matched_attrs)
@@ -283,6 +272,37 @@ RSpec.describe BikeServices::Creator do
           end
         end
       end
+      # describe "attach_photo" do
+      #   it "creates public images for the attached image" do
+      #     bike = FactoryBot.create(:bike)
+      #     b_param = FactoryBot.create(:b_param)
+      #     test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
+      #     b_param.image = test_photo
+      #     b_param.save
+      #     expect(b_param.image).to be_present
+      #     b_param.params = {}
+      #     instance.attach_photo(b_param, bike)
+      #     expect(bike.public_images.count).to eq(1)
+      #   end
+      # end
+
+      # describe "updated_phone" do
+      #   let(:bike) { Bike.new(phone: "699.999.9999") }
+      #   before { allow(bike).to receive(:user) { user } }
+      #   it "sets the owner's phone if one is passed in" do
+      #     instance.send(:assign_user_attributes, bike)
+      #     user.reload
+      #     expect(user.phone).to eq("6999999999")
+      #   end
+      #   context "user already has a phone" do
+      #     let(:user) { FactoryBot.create(:user, phone: "0000000000") }
+      #     it "does not set the phone if the user already has a phone" do
+      #       instance.send(:assign_user_attributes, bike)
+      #       user.reload
+      #       expect(user.phone).to eq("0000000000")
+      #     end
+      #   end
+      # end
     end
 
     describe "creating parking_notification bike" do
@@ -625,56 +645,6 @@ RSpec.describe BikeServices::Creator do
       allow(bike).to receive(:errors).and_return(nil)
       expect(b_param).to receive(:update).with(created_bike_id: 69, bike_errors: nil)
       instance.send(:validate_record, b_param, bike)
-    end
-  end
-
-  context "private methods (legacy specs)" do
-    # TODO: Can this be deleted?
-    # Seems like garbage...
-    #
-    # describe "building" do
-    #   it "returns a new bike object from the params with the b_param_id" do
-    #     allow(b_param).to receive(:id).and_return(9)
-    #     allow(b_param).to receive(:creator_id).and_return(6)
-    #     allow(b_param).to receive(:params).and_return({bike: {serial_number: "AAAA"}}.as_json)
-    #     bike = instance.build_bike(b_param)
-    #     expect(bike.serial_number).to eq("AAAA")
-    #     expect(bike.updator_id).to eq(6)
-    #     expect(bike.b_param_id).to eq(9)
-    #   end
-    # end
-
-    # TODO: This is probably necessary
-    describe "attach_photo" do
-      it "creates public images for the attached image" do
-        bike = FactoryBot.create(:bike)
-        b_param = FactoryBot.create(:b_param)
-        test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
-        b_param.image = test_photo
-        b_param.save
-        expect(b_param.image).to be_present
-        b_param.params = {}
-        instance.attach_photo(b_param, bike)
-        expect(bike.public_images.count).to eq(1)
-      end
-    end
-
-    describe "updated_phone" do
-      let(:bike) { Bike.new(phone: "699.999.9999") }
-      before { allow(bike).to receive(:user) { user } }
-      it "sets the owner's phone if one is passed in" do
-        instance.send(:assign_user_attributes, bike)
-        user.reload
-        expect(user.phone).to eq("6999999999")
-      end
-      context "user already has a phone" do
-        let(:user) { FactoryBot.create(:user, phone: "0000000000") }
-        it "does not set the phone if the user already has a phone" do
-          instance.send(:assign_user_attributes, bike)
-          user.reload
-          expect(user.phone).to eq("0000000000")
-        end
-      end
     end
   end
 
