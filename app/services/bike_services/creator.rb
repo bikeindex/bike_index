@@ -123,6 +123,7 @@ class BikeServices::Creator
 
   def save_bike(b_param, bike)
     # TODO: Figure out why this needs to be called separately, before save. See PR #2848
+    # Maybe can be removed in #2922
     bike.attributes = BikeServices::CalculateStoredLocation.location_attrs(bike)
     bike.save
     ownership = create_ownership(b_param, bike)
@@ -140,19 +141,27 @@ class BikeServices::Creator
       bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
         organization: bike.creation_organization, creator_kind: "creator_bike_creation")
     end
+    # TODO: #2911 -
+    # Why was this here? Can it be removed?? it's created in association
+    #
     if b_param.unregistered_parking_notification?
+      pp "unreged", b_param.parking_notification_params
       # We skipped setting address, with Builder.default_parking_notification_attrs,
       # notification will update it
       ParkingNotification.create!(b_param.parking_notification_params)
     end
-    # Check if the bike has a location, update with passed location if no
+
+    # Check if the bike has a location, update with passed IP location if no
     bike.reload
-    bike.update(GeocodeHelper.assignable_address_hash_for(@ip_address)) unless bike.latitude.present?
+    if bike.latitude.blank?
+      # TODO: #2911 - generate an address_record
+      bike.update(GeocodeHelper.assignable_address_hash_for(@ip_address))
+    end
     bike
   end
 
   def associate(b_param, bike, ownership)
-    create_parking_notification(b_param, bike) if b_param&.status_abandoned?
+    create_parking_notification_if_present(b_param, bike)
     create_bike_organizations(ownership)
     ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
     bike.create_normalized_serial_segments
@@ -198,8 +207,12 @@ class BikeServices::Creator
     end
   end
 
-  def create_parking_notification(b_param, bike)
-    parking_notification_attrs = b_param.bike.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "accuracy")
+  def create_parking_notification_if_present(b_param, bike)
+    pp bike.status, b_param.status
+    # pp bike.address_record, bike.address_hash_legacy, b_param.bike
+    return unless bike.status_abandoned? # %w[unregistered_parking_notification status_abandoned].include?(bike.status)
+
+    parking_notification_attrs = bike.address_hash_legacy #b_param.bike.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "accuracy")
     parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
       bike_id: bike.id,
       user_id: bike.creator.id,
