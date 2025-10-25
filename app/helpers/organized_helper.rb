@@ -131,13 +131,6 @@ module OrganizedHelper
     user.user_registration_organizations.with_organization_affiliation(organization.id).none?
   end
 
-  def include_field_reg_address?(organization = nil, user = nil)
-    return false unless organization.present? &&
-      organization.additional_registration_fields.include?("reg_address")
-
-    !user&.address_set_manually?
-  end
-
   def include_field_reg_phone?(organization = nil, user = nil)
     return false unless organization.present? &&
       organization.additional_registration_fields.include?("reg_phone")

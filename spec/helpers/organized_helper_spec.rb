@@ -189,8 +189,6 @@ RSpec.describe OrganizedHelper, type: :helper do
     it "does not include" do
       expect(include_field_reg_phone?(organization)).to be_falsey
       expect(include_field_reg_phone?(organization, user)).to be_falsey
-      expect(include_field_reg_address?(organization)).to be_falsey
-      expect(include_field_reg_address?(organization, user)).to be_falsey
       expect(include_field_reg_extra_registration_number?(organization)).to be_falsey
       expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
       # the labels work with or without an organization
@@ -209,8 +207,6 @@ RSpec.describe OrganizedHelper, type: :helper do
       it "includes" do
         expect(include_field_reg_phone?(organization)).to be_truthy
         expect(include_field_reg_phone?(organization, user)).to be_truthy
-        expect(include_field_reg_address?(organization)).to be_truthy
-        expect(include_field_reg_address?(organization, user)).to be_truthy
         expect(include_field_reg_extra_registration_number?(organization)).to be_truthy
         expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
         # And test the labels
@@ -228,8 +224,6 @@ RSpec.describe OrganizedHelper, type: :helper do
           expect(user.phone).to be_present
           expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
           expect(include_field_reg_phone?(organization, user)).to be_falsey
-          expect(include_field_reg_address?(organization, user)).to be_truthy
-          expect(include_field_reg_address?(nil, user)).to be_falsey
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
         end
@@ -241,8 +235,6 @@ RSpec.describe OrganizedHelper, type: :helper do
           it "is falsey with user" do
             expect(include_field_reg_phone?(organization)).to be_truthy
             expect(include_field_reg_phone?(organization, user)).to be_truthy # Purely based on whether user has phone
-            expect(include_field_reg_address?(organization)).to be_truthy
-            expect(include_field_reg_address?(organization, user)).to be_truthy
             expect(include_field_reg_organization_affiliation?(organization)).to be_truthy
             expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
             expect(include_field_reg_student_id?(organization)).to be_truthy
@@ -254,7 +246,6 @@ RSpec.describe OrganizedHelper, type: :helper do
             it "is falsey" do
               expect(user.reload.address_record.street).to be_present
               expect(include_field_reg_phone?(organization, user)).to be_falsey # Purely based on whether user has phone
-              expect(include_field_reg_address?(organization, user)).to be_falsey
               expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
               expect(include_field_reg_student_id?(organization, user)).to be_falsey
               # Each bike needs to have these fields - regardless of user_registration_organization

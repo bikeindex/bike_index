@@ -168,34 +168,12 @@
               = f.text_field :extra_registration_number, class: "form-control"
 
           - if BikeServices::Displayer.display_edit_address_fields?(@bike, current_user)
-            .related-fields.no-divider-row
-              - if BikeServices::Displayer.edit_street_address?(@bike, current_user)
-                .form-group.row
-                  = f.label :street, class: "form-well-label"
-                  .form-well-input
-                    = f.text_field :street, class: "form-control", required: true, placeholder: t(".street")
-              .form-group.row
-                = f.label :city, class: "form-well-label"
-                .form-well-input
-                  = f.text_field :city, class: "form-control", required: true, placeholder: t(".city")
+            -# It's sus to make queries in a page - but I think it's more important to call this at the correct place
+            -# Added when switching Bike to address record PR#2911
+            - @bike.find_or_build_address_record(country_id: current_country_id)
+            = f.fields_for :address_record do |address_form|
+              = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, no_street: !BikeServices::Displayer.edit_street_address?(@bike, current_user)))
 
-              .form-group.row
-                = f.label :zipcode, class: "form-well-label"
-                .form-well-input
-                  = f.text_field :zipcode, class: "form-control", required: true, placeholder: t(".zipcode")
-
-              .form-group.row.fancy-select-placeholder.unfancy#us_id_data{data: {usid: Country.united_states_id}}
-                = f.label :country_id, class: "form-well-label"
-                .form-well-input
-                  = f.select :country_id, Country.select_options,
-                    {required: true, prompt: t(".choose_country")},
-                    {class: "country-select-input form-control"}
-
-              - if @bike.state.present?
-                .form-group.row.fancy-select-placeholder.unfancy.hidden-other.unhidden
-                  = f.label :state_id, class: "form-well-label"
-                  .form-well-input
-                    = f.collection_select(:state_id, State.united_states, :id, :name, {include_blank: true, prompt: t(".state")}, {class: "form-control"})
 
           -# need to check if any stickers, because maybe it has some that aren't user editable
           - if @bike.bike_stickers.none? && !BikeServices::Displayer.display_sticker_edit?(@bike, current_user)

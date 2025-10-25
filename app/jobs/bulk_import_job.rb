@@ -91,7 +91,7 @@ class BulkImportJob < ApplicationJob
         organization_id: @bulk_import.organization_id
       }
     end
-
+    pp row[:address]
     {
       bulk_import_id: @bulk_import.id,
       bike: {

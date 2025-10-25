@@ -50,10 +50,9 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def location_found
-    return object.location_found if defined?(object.location)
     return nil unless object.status_impounded?
 
-    object.address
+    object.current_impound_record&.address(force_show_address: true, country: [:iso])
   end
 
   def date_stolen
