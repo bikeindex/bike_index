@@ -3,7 +3,8 @@
   data-controller="legacy-form-well--address-record"
   data-legacy-form-well--address-record-us-id-value="<%= Country.united_states_id %>"
 >
-  <div class="form-group row fancy-select unfancy">
+  <%# TODO: make fancy select - requires updating the stimulus controller to trigger on Selectize change %>
+  <div class="form-group row">
     <label class="form-well-label"></label>
     <div
       class="form-well-input <%= non_static_field_class %>"
