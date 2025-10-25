@@ -61,6 +61,7 @@
 class User < ApplicationRecord
   include FeatureFlaggable
   include AddressRecorded
+  include AddressRecordedWithinBoundingBox
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
 
@@ -216,7 +217,7 @@ class User < ApplicationRecord
   end
 
   def find_or_build_address_record(country_id: nil)
-    return address_record if address_record.present?
+    return address_record if address_record?
 
     orphaned_address_record = AddressRecord.user.where(user_id: id).first
     if orphaned_address_record.present?

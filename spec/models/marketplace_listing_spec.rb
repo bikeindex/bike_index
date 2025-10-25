@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe MarketplaceListing, type: :model do
   it_behaves_like "address_recorded"
+  it_behaves_like "address_recorded_within_bounding_box"
   it_behaves_like "amountable"
 
   describe "factory" do

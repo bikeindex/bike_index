@@ -34,6 +34,7 @@ class MarketplaceListing < ApplicationRecord
   CURRENT_STATUSES = %i[draft for_sale]
 
   include AddressRecorded
+  include AddressRecordedWithinBoundingBox
   include Amountable
   include Currencyable
 
