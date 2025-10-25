@@ -5,12 +5,13 @@ RSpec.describe BikeServices::Creator do
   let(:user) { FactoryBot.create(:user) }
   let(:bike_params) { {} }
   let(:b_param) { BParam.create(creator: user, params: {bike: bike_params}) }
-  let(:instance) { subject.new }
+  let(:instance) { subject.new(ip_address:) }
   # Frequently used associations
   let(:organization) { FactoryBot.create(:organization) }
   let(:color) { FactoryBot.create(:color) }
   let(:manufacturer_name) { "Trek" }
   let(:manufacturer) { FactoryBot.create(:manufacturer, name: manufacturer_name) }
+  let(:ip_address) { '127.0.0.1' }
 
   describe "create_bike" do
     context "errors" do
@@ -581,6 +582,22 @@ RSpec.describe BikeServices::Creator do
           expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id, bike.id])
           expect(Ownership.count).to eq 2
         end
+      end
+    end
+
+    describe 'with ip_address' do
+      before { allow(GeocodeHelper).to receive(:assignable_address_hash_for).and_return(address_hash) }
+      let(:address_hash) do
+        {city: "Casper", latitude: 42.8489653, longitude: -106.3014667, postal_code: "82601",
+         region_string: "WY", country_id: Country.united_states_id, street: "1740 East 2nd Street"}
+      end
+      let(:bike_params) { {primary_frame_color_id: color.id, manufacturer_id: manufacturer.id, owner_email: "something@stuff.com"}}
+
+      it "adds an address_record" do
+        bike = instance.create_bike(b_param)
+        expect(bike).to be_valid
+        expect(bike.address_record).to be_present
+        expect(bike.address_record).to have_attributes address_hash
       end
     end
   end

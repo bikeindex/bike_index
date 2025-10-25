@@ -150,11 +150,17 @@ class BikeServices::Creator
 
     # Check if the bike has a location, update with passed IP location if no
     bike.reload
-    if bike.latitude.blank?
-      # TODO: #2911 - generate an address_record
-      bike.update(GeocodeHelper.assignable_address_hash_for(@ip_address))
-    end
+    create_address_record_from_ip(bike, @ip_address) if bike.latitude.blank? && bike.address_record.blank?
     bike
+  end
+
+  def create_address_record_from_ip(bike, ip_address)
+    return if ip_address.blank?
+    # address_record_attributes =
+    bike.update(address_record_attributes:
+      GeocodeHelper.assignable_address_hash_for(@ip_address, new_attrs: true)
+      .merge(kind: :bike, bike_id: bike.id)
+    )
   end
 
   def associate(b_param, bike, ownership)
