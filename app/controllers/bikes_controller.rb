@@ -223,7 +223,7 @@ class BikesController < Bikes::BaseController
   def new_bike_attrs
     # Fallback to active (i.e. passed organization_id), then passive_organization
     # NOTE: organization passed here is overridden by existing BParam params
-    BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h)
+    BParam.status_hash_from_params(params)
       .merge(organization: current_organization || passive_organization)
   end
 
