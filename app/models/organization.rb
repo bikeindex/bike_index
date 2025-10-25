@@ -50,6 +50,7 @@
 #
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
+  include FriendlyNameFindable
   include SearchRadiusMetricable
 
   KIND_ENUM = {
@@ -167,108 +168,101 @@ class Organization < ApplicationRecord
 
   attr_accessor :embedable_user_email, :skip_update
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
+  class << self
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
+
+    def pos_kinds
+      POS_KIND_ENUM.keys.map(&:to_s)
+    end
+
+    def broken_pos_kinds
+      %w[broken_ascend_pos broken_lightspeed_pos].freeze
+    end
+
+    def without_pos_kinds
+      %w[no_pos does_not_need_pos].freeze
+    end
+
+    def ascend_or_broken_ascend_kinds
+      %w[ascend_pos broken_ascend_pos].freeze
+    end
+
+    def lightspeed_or_broken_lightspeed_kinds
+      %w[lightspeed_pos broken_lightspeed_pos].freeze
+    end
+
+    def with_pos_kinds
+      pos_kinds - broken_pos_kinds - without_pos_kinds
+    end
+
+    def pos?(kind = nil)
+      kind.present? && !without_pos_kinds.include?(kind)
+    end
+
+    def admin_required_kinds
+      %w[ambassador bike_depot].freeze
+    end
+
+    def user_creatable_kinds
+      kinds - admin_required_kinds
+    end
+
+    def kind_humanized(str)
+      str.blank? ? nil : str.to_s.titleize
+    end
+
+    def friendly_find(n)
+      return nil unless n.present?
+      return n if n.is_a?(Organization)
+      return find_by_id(n) if integer_string?(n)
+
+      slug = Slugifyer.slugify(n)
+      # First try slug, then previous slug, and finally, just give finding by name a shot
+      find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
+    end
+
+    def admin_text_search(n)
+      return nil unless n.present?
+
+      str = "%#{n.strip}%"
+      match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
+      joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
+        .distinct
+        .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), {str: str})
+    end
+
+    def with_enabled_feature_slugs(slugs)
+      matching_slugs = OrganizationFeature.matching_slugs(slugs)
+      return none unless matching_slugs.present?
+
+      where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
+    end
+
+    def with_any_enabled_feature_slugs(slugs)
+      matching_slugs = OrganizationFeature.matching_slugs(slugs)
+      return none unless matching_slugs.present?
+
+      where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
+    end
+
+    def permitted_domain_passwordless_signin
+      where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
+    end
+
+    def passwordless_email_matching(str)
+      str = EmailNormalizer.normalize(str)
+      return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
+
+      domain = str.split("@").last
+      permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
+    end
+
+    def example
+      Organization.find_by_id(92) || Organization.create(name: "Example organization")
+    end
   end
-
-  def self.pos_kinds
-    POS_KIND_ENUM.keys.map(&:to_s)
-  end
-
-  def self.broken_pos_kinds
-    %w[broken_ascend_pos broken_lightspeed_pos].freeze
-  end
-
-  def self.without_pos_kinds
-    %w[no_pos does_not_need_pos].freeze
-  end
-
-  def self.ascend_or_broken_ascend_kinds
-    %w[ascend_pos broken_ascend_pos].freeze
-  end
-
-  def self.lightspeed_or_broken_lightspeed_kinds
-    %w[lightspeed_pos broken_lightspeed_pos].freeze
-  end
-
-  def self.with_pos_kinds
-    pos_kinds - broken_pos_kinds - without_pos_kinds
-  end
-
-  def self.pos?(kind = nil)
-    kind.present? && !without_pos_kinds.include?(kind)
-  end
-
-  def self.admin_required_kinds
-    %w[ambassador bike_depot].freeze
-  end
-
-  def self.user_creatable_kinds
-    kinds - admin_required_kinds
-  end
-
-  def self.kind_humanized(str)
-    str.blank? ? nil : str.to_s.titleize
-  end
-
-  def self.friendly_find(n)
-    return nil unless n.present?
-    return n if n.is_a?(Organization)
-    return find_by_id(n) if integer_slug?(n)
-
-    slug = Slugifyer.slugify(n)
-    # First try slug, then previous slug, and finally, just give finding by name a shot
-    find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
-  end
-
-  def self.friendly_find_id(n)
-    friendly_find(n)&.id
-  end
-
-  def self.integer_slug?(n)
-    n.is_a?(Integer) || n.match(/\A\d+\z/).present?
-  end
-
-  def self.admin_text_search(n)
-    return nil unless n.present?
-
-    str = "%#{n.strip}%"
-    match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
-    joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
-      .distinct
-      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), {str: str})
-  end
-
-  def self.with_enabled_feature_slugs(slugs)
-    matching_slugs = OrganizationFeature.matching_slugs(slugs)
-    return none unless matching_slugs.present?
-
-    where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
-  end
-
-  def self.with_any_enabled_feature_slugs(slugs)
-    matching_slugs = OrganizationFeature.matching_slugs(slugs)
-    return none unless matching_slugs.present?
-
-    where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
-  end
-
-  def self.permitted_domain_passwordless_signin
-    where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
-  end
-
-  def self.passwordless_email_matching(str)
-    str = EmailNormalizer.normalize(str)
-    return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
-
-    domain = str.split("@").last
-    permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
-  end
-
-  def self.example
-    Organization.find_by_id(92) || Organization.create(name: "Example organization")
-  end
-
   # never geocode, use default_location lat/long
   def should_be_geocoded?
     false
