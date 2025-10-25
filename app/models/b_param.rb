@@ -137,7 +137,7 @@ class BParam < ApplicationRecord
 
     # There are URLs out there with stolen=true, and will be forever - so lean in
     # Keywords are - :status, :stolen
-    def bike_attrs_from_url_params(url_params = {})
+    def bike_status_from_url_params(url_params = {})
       status = url_params[:status]
       if status.present?
         status = "status_#{status}" unless status.start_with?("status_")
