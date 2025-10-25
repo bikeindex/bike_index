@@ -4,8 +4,10 @@ module LegacyFormWell::AddressRecord
   class ComponentPreview < ApplicationComponentPreview
     layout "component_preview_form_wrap"
 
-    def default
-      {template: "legacy_form_well/address_record/component_preview/default"}
+    # @param organization_id text "Organization ID to render the fields for"
+    def default(organization_id: nil)
+      {template: "legacy_form_well/address_record/component_preview/default",
+        locals: {organization: Organization.friendly_find(organization_id)} }
     end
 
     # TODO: Figure out how to use slots to actually pass user to these different options

@@ -1,9 +1,10 @@
 <div
-  class="<%= @wrapper_class %> mb-4"
+  class="<%= @wrapper_class %>"
   data-controller="legacy-form-well--address-record"
   data-legacy-form-well--address-record-us-id-value="<%= Country.united_states_id %>"
 >
-  <div class="form-group row unfancy">
+  <%# TODO: make fancy select - requires updating the stimulus controller to trigger on Selectize change %>
+  <div class="form-group row">
     <label class="form-well-label"></label>
     <div
       class="form-well-input <%= non_static_field_class %>"
@@ -30,7 +31,7 @@
       </p>
     <% end %>
   </div>
-  <% if !no_street? %>
+  <% if !@no_street %>
     <div class="form-group row">
       <%= @builder.label :street, address_label, class: "form-well-label" %>
       <div
@@ -57,7 +58,7 @@
     </div>
   <% end %>
   <div class="form-group row">
-    <% if no_street? %>
+    <% if @no_street %>
       <%= @builder.label :city, address_label, class: "form-well-label" %>
     <% else %>
       <label class="form-well-label"></label>
@@ -75,11 +76,7 @@
         class="form-well-input-static tw:py-0!"
         data-legacy-form-well--address-record-with-default-target="staticFields"
       >
-        <%= @builder.object.city %>
-        <br>
-        <%= @builder.object.region %>
-        <br>
-        <%= @builder.object.postal_code %>
+        <%= @builder.object.city %>, <%= @builder.object.region %>, <%= @builder.object.postal_code %>
       </p>
     <% end %>
   </div>

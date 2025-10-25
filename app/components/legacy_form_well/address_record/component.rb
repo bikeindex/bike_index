@@ -4,18 +4,33 @@ module LegacyFormWell::AddressRecord
   class Component < ApplicationComponent
     STATIC_FIELDS_OPTIONS = %i[shown hidden]
 
-    def initialize(form_builder:, organization: nil, no_street: false, not_related_fields: false,
-      static_fields: false, current_country_id: nil)
+    # NOTE: This renders for the embed and embed_extended views - which don't have tailwind styles
+    def initialize(form_builder:, organization: nil, not_related_fields: false,
+      static_fields: false, current_country_id: nil, embed_layout: false, no_street: nil)
       @builder = form_builder
-      @no_street = no_street
+      @no_street = no_street?(no_street, @builder.object, @organization)
       @organization = organization
       @builder.object.country_id ||= current_country_id
       @initial_country_id = @builder.object.country_id
-      @wrapper_class = not_related_fields ? "" : "related-fields"
       @static_fields = STATIC_FIELDS_OPTIONS.include?(static_fields) ? static_fields : false
+      @embed_layout = InputNormalizer.boolean(embed_layout)
+
+      @wrapper_class = if @embed_layout
+        "input-group"
+      else
+        not_related_fields ? "" : "related-fields"
+      end
     end
 
     private
+
+    def no_street?(no_street, object, organization)
+      # If it's not nil, it was passed deliberately
+      return no_street if [true, false].include?(no_street)
+
+      object.is_a?(User) && object.no_address ||
+        organization.present? && organization&.enabled?("no_address")
+    end
 
     def country_required?
       @builder.object.address_present?
@@ -33,10 +48,6 @@ module LegacyFormWell::AddressRecord
       (@static_fields == :hidden) ? "tw:hidden!" : ""
     end
 
-    def no_street?
-      @no_street
-    end
-
     def initial_state_class
       (@initial_country_id == Country.united_states_id) ? "" : "tw:hidden!" # Should check if address_object.country_id == Country.united_states_id
     end
@@ -49,7 +60,7 @@ module LegacyFormWell::AddressRecord
       txt = @organization&.registration_field_labels&.dig("reg_address")
       return txt.html_safe if txt.present?
 
-      no_street? ? translation(:address_no_street) : translation(:address)
+      @no_street ? translation(:address_no_street) : translation(:address)
     end
 
     def street_placeholder
