@@ -47,6 +47,13 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template(:new)
       end
     end
+    context "with organization" do
+      it "renders with organization"
+
+      context "existing b_param with creation_organization_id" do
+        it "uses the existing organization"
+      end
+    end
     context "stolen from params" do
       it "renders a new stolen bike" do
         get "#{base_url}/new?stolen=true"

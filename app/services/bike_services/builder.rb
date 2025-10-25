@@ -9,9 +9,12 @@ class BikeServices::Builder
       organization.additional_registration_fields.include?("reg_address")
     end
 
-    def build(b_param, new_attrs = {})
+    def build(b_param, new_attrs = nil)
+      new_attrs ||= {}
       # Default attributes
       bike = Bike.new(cycle_type: "bike")
+      # passed_organization is assigned unless b_param has an organization
+      passed_organization = new_attrs.delete(:organization)
       bike.attributes = b_param.safe_bike_attrs(new_attrs)
 
       # If manufacturer_other is an existing manufacturer, reassign it
@@ -25,6 +28,7 @@ class BikeServices::Builder
       bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
       bike.build_new_impound_record(b_param.impound_attrs) if bike.status_impounded?
       bike = check_organization(b_param, bike)
+      bike.creation_organization ||= passed_organization
       bike = check_example(b_param, bike)
       if b_param.unregistered_parking_notification?
         bike.attributes = default_parking_notification_attrs(b_param, bike)

@@ -6,10 +6,15 @@ RSpec.describe BikeServices::Builder do
   let(:organization) { FactoryBot.create(:organization) }
 
   describe "build" do
-    let(:bike) { described_class.build(b_param) }
+    let(:bike) { described_class.build(b_param, new_attrs) }
+    let(:new_attrs) { nil }
     it "builds it" do
       expect(bike.status).to eq "status_with_owner"
       expect(bike.id).to be_blank
+      # No address_record
+      expect(bike.creation_organization_id).to be_blank
+      expect(b_param.address_record_attributes).to be_blank
+      expect(bike.address_record).to be_blank
     end
     context "status impounded" do
       let(:b_param_params) { {bike: {status: "status_impounded"}} }
@@ -87,6 +92,7 @@ RSpec.describe BikeServices::Builder do
         end
       end
     end
+
     context "status overrides" do
       it "is stolen if it is stolen" do
         bike = described_class.build(BParam.new, status: "status_stolen")
@@ -95,13 +101,32 @@ RSpec.describe BikeServices::Builder do
       it "impounded if status_impounded" do
         bike = described_class.build(BParam.new, status: "status_impounded")
         expect(bike.status).to eq "status_impounded"
+        expect(bike.address_record).to be_blank
       end
     end
 
-    context "with address_record" do
-      it "doesn't add an address_record by default" do
+    context "with organization" do
+      let(:new_attrs) { {organization:} }
+
+      it "assigns from organization keywarg" do
+        expect(bike.creation_organization_id).to eq organization.id
+      end
+      context "with organization in b_param_params" do
+        let(:organization2) { FactoryBot.create(:organization) }
+        let(:b_param_params) { {bike: {creation_organization_id: organization2.id}} }
+        it "assigns from b_param_params" do
+          expect(bike.creation_organization_id).to eq organization2.id
+        end
+      end
+    end
+
+    describe "address_record" do
+      let(:new_attrs) { {organization:} }
+
+      it "doesn't create an address_record" do
         expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
         expect(b_param.address_record_attributes).to be_blank
+        expect(bike.creation_organization_id).to eq organization.id
         expect(bike.address_record).to be_blank
       end
 
@@ -112,7 +137,6 @@ RSpec.describe BikeServices::Builder do
           {id: nil, kind: "bike", city: "Chicago", region_record_id: state_id,
            country_id: Country.united_states_id, street: nil, postal_code: nil}
         end
-        let(:b_param_params) { {bike: {creation_organization_id: organization.id}} }
         it "returns address with organization's country, region_string and city" do
           expect(organization.reload.city).to eq "Chicago"
           expect(organization.street).to be_present
@@ -122,6 +146,7 @@ RSpec.describe BikeServices::Builder do
           expect(bike.address_record).to match_hash_indifferently target_attributes
         end
         context "with b_param with address_record_attributes" do
+          let(:b_param_organization) { Organization.new } # this is ignored, because it's in b_param
           let(:b_param_params) do
             {
               bike: {

@@ -89,9 +89,7 @@ class BikesController < Bikes::BaseController
 
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= BikeServices::Builder.build(@b_param, BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h))
-    # Fallback to active (i.e. passed organization_id), then passive_organization
-    @bike.creation_organization ||= current_organization || passive_organization
+    @bike ||= BikeServices::Builder.build(@b_param, new_bike_attrs)
     @organization = @bike.creation_organization
     @page_errors = @b_param.bike_errors
   end
@@ -220,6 +218,13 @@ class BikesController < Bikes::BaseController
     return false unless marketplace_listing.visible_by?(current_user)
 
     @marketplace_preview = true
+  end
+
+  def new_bike_attrs
+    # Fallback to active (i.e. passed organization_id), then passive_organization
+    # NOTE: organization passed here is overridden by existing BParam params
+    BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h)
+      .merge(organization: current_organization || passive_organization)
   end
 
   def render_ad
