@@ -1,5 +1,5 @@
 <div
-  class="<%= @wrapper_class %> mb-4"
+  class="<%= @wrapper_class %>"
   data-controller="legacy-form-well--address-record"
   data-legacy-form-well--address-record-us-id-value="<%= Country.united_states_id %>"
 >
@@ -76,11 +76,7 @@
         class="form-well-input-static tw:py-0!"
         data-legacy-form-well--address-record-with-default-target="staticFields"
       >
-        <%= @builder.object.city %>
-        <br>
-        <%= @builder.object.region %>
-        <br>
-        <%= @builder.object.postal_code %>
+        <%= @builder.object.city %>, <%= @builder.object.region %>, <%= @builder.object.postal_code %>
       </p>
     <% end %>
   </div>

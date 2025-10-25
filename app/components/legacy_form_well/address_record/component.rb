@@ -4,15 +4,22 @@ module LegacyFormWell::AddressRecord
   class Component < ApplicationComponent
     STATIC_FIELDS_OPTIONS = %i[shown hidden]
 
+    # NOTE: This renders for the embed and embed_extended views - which don't have tailwind styles
     def initialize(form_builder:, organization: nil, no_street: false, not_related_fields: false,
-      static_fields: false, current_country_id: nil)
+      static_fields: false, current_country_id: nil, embed_layout: false)
       @builder = form_builder
       @no_street = no_street
       @organization = organization
       @builder.object.country_id ||= current_country_id
       @initial_country_id = @builder.object.country_id
-      @wrapper_class = not_related_fields ? "" : "related-fields"
       @static_fields = STATIC_FIELDS_OPTIONS.include?(static_fields) ? static_fields : false
+      @embed_layout = InputNormalizer.boolean(embed_layout)
+
+      @wrapper_class = if @embed_layout
+        "input-group"
+      else
+        not_related_fields ? "" : "related-fields"
+      end
     end
 
     private

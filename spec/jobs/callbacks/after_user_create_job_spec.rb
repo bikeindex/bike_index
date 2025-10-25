@@ -126,7 +126,7 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
         expect(user.phone).to be_blank
         expect do
           Sidekiq::Testing.inline! { instance.perform(user.id, "new") }
-        end.to change(AddressRecord, :count).by 1
+        end.to change(AddressRecord, :count).by(1)
 
         expect(user.reload.phone).to eq "1112223333"
         expect(user.address_record).to be_present
