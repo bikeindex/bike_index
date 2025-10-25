@@ -279,26 +279,4 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
     end
   end
-
-  describe "registration_field_address_placeholder and registration_address_required_below_helper" do
-    it "is complete address" do
-      expect(registration_field_address_placeholder).to eq "Street address"
-      expect(registration_address_required_below_helper).to be_nil
-    end
-    context "school" do
-      let(:organization) { Organization.new(kind: :school) }
-      it "is Campus address" do
-        expect(registration_field_address_placeholder(organization)).to eq "Campus mailing address"
-        expect(registration_address_required_below_helper(organization)).to be_nil
-      end
-    end
-    describe "reg_address organization" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: :law_enforcement, enabled_feature_slugs: ["reg_address"]) }
-      let(:target) { "<span class=\"below-input-help text-warning\">Your full address is required by #{organization.short_name}</span>" }
-      it "returns" do
-        expect(registration_address_required_below_helper(organization)).to eq target
-        expect(registration_field_address_placeholder(organization)).to eq "Street address"
-      end
-    end
-  end
 end

@@ -128,7 +128,7 @@
 
           - if BikeServices::Builder.include_address_record?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user)
             = f.fields_for :address_record do |address_form|
-              = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, no_street: !BikeServices::Displayer.edit_street_address?(@bike, current_user)))
+              = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @bike.creation_organization))
 
 
           - if include_field_reg_extra_registration_number?(@organization, current_user)

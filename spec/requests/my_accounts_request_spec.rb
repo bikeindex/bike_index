@@ -591,7 +591,7 @@ RSpec.describe MyAccountsController, type: :request do
           let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_organization_affiliation"]) }
           let(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, all_bikes: true, user: current_user, organization: organization2) }
           let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_address).as_json }
-          let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, :in_nyc, user: current_user, creation_registration_info: bike3_information) }
+          let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, :address_in_nyc, user: current_user, creation_registration_info: bike3_information) }
           let(:target_extra_info) do
             target_info.merge("organization_affiliation_#{organization2.id}" => "employee")
               .merge(default_location_registration_address).as_json
@@ -613,7 +613,7 @@ RSpec.describe MyAccountsController, type: :request do
             bike1_organization2.destroy
 
             expect(bike3.reload.registration_info).to eq(bike3_information)
-            expect(bike3.address_hash).to eq default_location_registration_address.as_json
+            expect(bike3.address_hash_legacy).to eq default_location_registration_address.merge(country: "United States").as_json
 
             Sidekiq::Job.clear_all
             put base_url, params: {

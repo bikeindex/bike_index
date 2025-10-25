@@ -7,8 +7,8 @@ FactoryBot.define do
     terms_of_service { true }
 
     # Set latitude and longitude from address_record if it's present
-    # latitude { address_record&.latitude }
-    # longitude { address_record&.longitude }
+    latitude { address_record&.latitude }
+    longitude { address_record&.longitude }
 
     trait :confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }

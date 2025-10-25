@@ -160,16 +160,4 @@ module OrganizedHelper
 
     strip_tags ? InputNormalizer.sanitize(txt) : txt.html_safe
   end
-
-  def registration_field_address_placeholder(organization = nil)
-    I18n.t(organization&.school? ? :address_school : :address, scope: %i[helpers organization_helper])
-  end
-
-  def registration_address_required_below_helper(organization = nil)
-    return nil unless organization&.additional_registration_fields&.include?("reg_address")
-
-    content_tag(:span,
-      I18n.t(:your_full_address_is_required, scope: %i[helpers organization_helper], org_name: organization.short_name),
-      class: "below-input-help text-warning")
-  end
 end
