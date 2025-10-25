@@ -535,64 +535,51 @@ RSpec.describe BParam, type: :model do
     end
   end
 
-  describe "bike_attrs_from_url_params" do
+  describe "status_hash_from_params" do
+    let(:params) { ActionController::Parameters.new(params_hash) }
+    def acparams(hash)
+      ActionController::Parameters.new(hash)
+    end
     it "returns empty" do
-      expect(BParam.bike_attrs_from_url_params).to eq({})
-      expect(BParam.bike_attrs_from_url_params(status: "asdfasdfasdfasdf")).to eq({})
-      expect(BParam.bike_attrs_from_url_params(status: "status_party")).to eq({})
+      expect(BParam.status_hash_from_params).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: "asdfasdfasdfasdf"))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: "status_party"))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: nil))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(stolen: nil))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: nil, stolen: nil))).to eq({})
     end
-    context "url_params" do
-      let(:url_params) { ActionController::Parameters.new({status: nil}) }
-      it "returns status_stolen" do
-        expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({})
-        expect(BParam.bike_attrs_from_url_params(url_params.permit(:stolen).to_h)).to eq({})
-      end
-    end
-    context "stolen falsey" do
+    context "with stolen value" do
       it "returns empty" do
-        expect(BParam.bike_attrs_from_url_params(stolen: nil)).to eq({})
-        expect(BParam.bike_attrs_from_url_params(stolen: "false")).to eq({})
-        expect(BParam.bike_attrs_from_url_params(stolen: 0)).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: nil))).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: "false"))).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: 0))).to eq({})
       end
     end
     context "stolen truthy" do
       it "returns stolen" do
-        expect(BParam.bike_attrs_from_url_params(stolen: true)).to eq({status: "status_stolen"})
-        expect(BParam.bike_attrs_from_url_params(stolen: "true")).to eq({status: "status_stolen"})
-        expect(BParam.bike_attrs_from_url_params(stolen: 1)).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: true))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: "true"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: 1))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: 1, status: nil))).to eq({status: "status_stolen"})
       end
     end
     context "status_stolen" do
       it "returns stolen" do
-        expect(BParam.bike_attrs_from_url_params(status: "status_stolen")).to eq({status: "status_stolen"})
-        expect(BParam.bike_attrs_from_url_params(status: "stolen")).to eq({status: "status_stolen"})
-        expect(BParam.bike_attrs_from_url_params(status: "stolen", stolen: nil)).to eq({status: "status_stolen"})
-      end
-      context "url_params" do
-        let(:url_params) { ActionController::Parameters.new({status: nil, stolen: true}) }
-        it "returns status_stolen" do
-          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_stolen"})
-        end
+        expect(BParam.status_hash_from_params(acparams(status: "status_stolen"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(status: "stolen"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(status: "stolen", stolen: nil))).to eq({status: "status_stolen"})
       end
     end
     context "status_impounded" do
       it "returns impounded" do
-        expect(BParam.bike_attrs_from_url_params(status: "status_impounded")).to eq({status: "status_impounded"})
-        expect(BParam.bike_attrs_from_url_params(status: "impounded")).to eq({status: "status_impounded"})
-        expect(BParam.bike_attrs_from_url_params(status: "impounded", stolen: "1")).to eq({status: "status_impounded"})
-      end
-      context "url_params" do
-        let(:url_params) { ActionController::Parameters.new({status: "impounded", stolen: "1"}) }
-        it "returns impounded" do
-          # Make sure slice works
-          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
-        end
+        expect(BParam.status_hash_from_params(acparams(status: "status_impounded"))).to eq({status: "status_impounded"})
+        expect(BParam.status_hash_from_params(acparams(status: "impounded"))).to eq({status: "status_impounded"})
+        expect(BParam.status_hash_from_params(acparams(status: "impounded", stolen: "1"))).to eq({status: "status_impounded"})
       end
       context "found" do
-        let(:url_params) { ActionController::Parameters.new({status: "found"}) }
         it "returns impounded" do
-          expect(BParam.bike_attrs_from_url_params(status: "found")).to eq({status: "status_impounded"})
-          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
+          expect(BParam.status_hash_from_params(acparams(status: "found"))).to eq({status: "status_impounded"})
+          expect(BParam.status_hash_from_params(acparams(status: "found", stolen: true))).to eq({status: "status_impounded"})
         end
       end
     end
