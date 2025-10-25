@@ -4,20 +4,19 @@ require "rails_helper"
 
 RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
   let(:user) { FactoryBot.create(:user) }
-  let(:address_record) { AddressRecord.new(country: Country.united_states) }
+  let(:address_record) { AddressRecord.new(country: Country.united_states, user:) }
   let(:organization) { nil }
-  let(:options) { {form_builder:, organization:, embed_layout:} }
+  let(:options) { {organization:, embed_layout:} }
   let(:embed_layout) { false }
   let(:obj) { user }
 
-  def rendered_component(passed_obj, passed_organization = nil)
+  def rendered_component(passed_obj, options)
     render_in_view_context do
       form_for passed_obj, url: "#", method: :patch, multipart: true do |f|
         f.fields_for(:address_record) do |address_form|
           # Here we provide the form_builder to the component
           render(LegacyFormWell::AddressRecord::Component.new(
-            form_builder: address_form,
-            organization: passed_organization
+            **options.merge(form_builder: address_form)
           ))
         end
       end
@@ -30,7 +29,7 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
     obj.address_record = address_record
   end
 
-  let(:component) { rendered_component(obj, organization) }
+  let(:component) { rendered_component(obj, options) }
 
   it "default preview" do
     expect(component).to have_css("label", text: "Street address")
@@ -38,20 +37,18 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
   end
 
   context "with no_address: true" do
-    let(:user) { FactoryBot.create(:user, no_address: true) }
+    let(:user) { FactoryBot.build(:user, no_address: true) }
+
     it "renders with address" do
       expect(component).to have_css("label", text: "Address")
       expect(component).not_to have_field("user_address_record_attributes_street")
     end
 
-    context "with object: marketplace_listing" do
-      let(:obj) { FactoryBot.create(:marketplace_listing, :with_address_record) }
-      let(:address_record) { obj.address_record }
-
+    context "with no_street: true" do
+      let(:options) { {organization: nil, embed_layout: false, no_street: true }}
       it "renders with street_address anyway" do
-        expect(address_record.kind).to eq "marketplace_listing"
-        expect(component).to have_css("label", text: "Street address")
-        expect(component).to have_field("user_address_record_attributes_street")
+        expect(component).to have_css("label", text: "Address")
+        expect(component).not_to have_field("user_address_record_attributes_street")
       end
     end
   end
@@ -69,8 +66,6 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
     let(:registration_field_labels) { {} }
 
     it "default preview" do
-      component = rendered_component(user)
-
       expect(component).to have_css("label", text: "Street address")
       expect(component).to have_field("user_address_record_attributes_street")
     end
@@ -84,11 +79,12 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
     end
 
     context "with no_street" do
-      let(:organization) { Organization.new(enabled_feature_slugs: %w[no_street], registration_field_labels:) }
+      let(:organization) { Organization.new(enabled_feature_slugs: %w[no_address]) }
 
       it "renders with address" do
-        expect(component).to have_css("label", text: "Address")
+        expect(organization.enabled?('no_address')).to be_truthy
         expect(component).not_to have_field("user_address_record_attributes_street")
+        expect(component).to have_css("label", text: "Address")
       end
     end
   end

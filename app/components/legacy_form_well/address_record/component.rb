@@ -8,8 +8,10 @@ module LegacyFormWell::AddressRecord
     def initialize(form_builder:, organization: nil, not_related_fields: false,
       static_fields: false, current_country_id: nil, embed_layout: false, no_street: nil)
       @builder = form_builder
-      @no_street = no_street?(no_street, @builder.object, @organization)
       @organization = organization
+
+      @no_street = no_street?(no_street, @builder.object, @organization)
+
       @builder.object.country_id ||= current_country_id
       @initial_country_id = @builder.object.country_id
       @static_fields = STATIC_FIELDS_OPTIONS.include?(static_fields) ? static_fields : false
@@ -25,10 +27,10 @@ module LegacyFormWell::AddressRecord
     private
 
     def no_street?(no_street, object, organization)
-      # If it's not nil, it was passed deliberately
+      # If it's not nil, assume it was passed deliberately
       return no_street if [true, false].include?(no_street)
 
-      object.is_a?(User) && object.no_address ||
+      object.user.present? && object.user.no_address ||
         organization.present? && organization&.enabled?("no_address")
     end
 

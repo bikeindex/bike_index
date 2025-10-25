@@ -6,11 +6,14 @@ module LegacyFormWell::AddressRecord
 
     # @param organization_id text "Organization ID to render the fields for"
     def default(organization_id: nil)
+      # organization = Organization.friendly_find(organization_id)
+      organization = Organization.friendly_find('PSU')
+
       {template: "legacy_form_well/address_record/component_preview/default",
-        locals: {organization: Organization.friendly_find(organization_id)} }
+        locals: {organization:} }
     end
 
-    # TODO: Figure out how to use slots to actually pass user to these different options
+    # TODO: WTF, why isn't the @param working :/
     # def with_organization
     # end
 
