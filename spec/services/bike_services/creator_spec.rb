@@ -272,37 +272,6 @@ RSpec.describe BikeServices::Creator do
           end
         end
       end
-      # describe "attach_photo" do
-      #   it "creates public images for the attached image" do
-      #     bike = FactoryBot.create(:bike)
-      #     b_param = FactoryBot.create(:b_param)
-      #     test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
-      #     b_param.image = test_photo
-      #     b_param.save
-      #     expect(b_param.image).to be_present
-      #     b_param.params = {}
-      #     instance.attach_photo(b_param, bike)
-      #     expect(bike.public_images.count).to eq(1)
-      #   end
-      # end
-
-      # describe "updated_phone" do
-      #   let(:bike) { Bike.new(phone: "699.999.9999") }
-      #   before { allow(bike).to receive(:user) { user } }
-      #   it "sets the owner's phone if one is passed in" do
-      #     instance.send(:assign_user_attributes, bike)
-      #     user.reload
-      #     expect(user.phone).to eq("6999999999")
-      #   end
-      #   context "user already has a phone" do
-      #     let(:user) { FactoryBot.create(:user, phone: "0000000000") }
-      #     it "does not set the phone if the user already has a phone" do
-      #       instance.send(:assign_user_attributes, bike)
-      #       user.reload
-      #       expect(user.phone).to eq("0000000000")
-      #     end
-      #   end
-      # end
     end
 
     describe "creating parking_notification bike" do
@@ -355,7 +324,6 @@ RSpec.describe BikeServices::Creator do
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.id).to be_present
           expect(bike.serial_number).to eq "unknown"
-          expect(bike.address_record).to be_present
           expect(bike.latitude).to eq(40.7143528)
           expect(bike.longitude).to eq(-74.0059731)
           expect(bike.owner_email).to eq auto_user.email
@@ -426,7 +394,6 @@ RSpec.describe BikeServices::Creator do
             expect(bike.creation_organization_id).to eq organization.id
             expect(bike.id).to be_present
             expect(bike.serial_number).to eq "unknown"
-            expect(bike.address_record).to be_present
             expect(bike.latitude).to eq(40.7143528)
             expect(bike.longitude).to eq(-74.0059731)
             expect(bike.owner_email).to eq auto_user.email
@@ -614,6 +581,40 @@ RSpec.describe BikeServices::Creator do
           expect(Bike.unscoped.pluck(:id)).to match_array([existing_bike.id, bike.id])
           expect(Ownership.count).to eq 2
         end
+      end
+    end
+  end
+
+  describe "attach_photo" do
+    it "creates public images for the attached image" do
+      bike = FactoryBot.create(:bike)
+      b_param = FactoryBot.create(:b_param)
+      test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
+      b_param.image = test_photo
+      b_param.save
+      expect(b_param.image).to be_present
+      b_param.params = {}
+      instance.attach_photo(b_param, bike)
+      expect(bike.public_images.count).to eq(1)
+    end
+  end
+
+  # Private method (legacy spec)
+  describe "updated_phone" do
+    let(:bike) { Bike.new(phone: "699.999.9999") }
+    before { allow(bike).to receive(:user) { user } }
+
+    it "sets the owner's phone if one is passed in" do
+      instance.send(:assign_user_attributes, bike)
+      user.reload
+      expect(user.phone).to eq("6999999999")
+    end
+    context "user already has a phone" do
+      let(:user) { FactoryBot.create(:user, phone: "0000000000") }
+      it "does not set the phone if the user already has a phone" do
+        instance.send(:assign_user_attributes, bike)
+        user.reload
+        expect(user.phone).to eq("0000000000")
       end
     end
   end

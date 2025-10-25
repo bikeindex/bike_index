@@ -141,11 +141,8 @@ class BikeServices::Creator
       bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
         organization: bike.creation_organization, creator_kind: "creator_bike_creation")
     end
-    # TODO: #2911 -
-    # Why was this here? Can it be removed?? it's created in association
-    #
+    # TODO: consolidate into create_parking_notification in #2922
     if b_param.unregistered_parking_notification?
-      pp "unreged", b_param.parking_notification_params
       # We skipped setting address, with Builder.default_parking_notification_attrs,
       # notification will update it
       ParkingNotification.create!(b_param.parking_notification_params)
@@ -161,7 +158,7 @@ class BikeServices::Creator
   end
 
   def associate(b_param, bike, ownership)
-    create_parking_notification_if_present(b_param, bike)
+    create_parking_notification(b_param, bike) if b_param&.status_abandoned?
     create_bike_organizations(ownership)
     ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
     bike.create_normalized_serial_segments
@@ -207,12 +204,8 @@ class BikeServices::Creator
     end
   end
 
-  def create_parking_notification_if_present(b_param, bike)
-    pp bike.status, b_param.status
-    # pp bike.address_record, bike.address_hash_legacy, b_param.bike
-    return unless bike.status_abandoned? # %w[unregistered_parking_notification status_abandoned].include?(bike.status)
-
-    parking_notification_attrs = bike.address_hash_legacy #b_param.bike.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "accuracy")
+  def create_parking_notification(b_param, bike)
+    parking_notification_attrs = bike.address_hash_legacy
     parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
       bike_id: bike.id,
       user_id: bike.creator.id,
