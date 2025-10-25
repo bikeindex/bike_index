@@ -49,12 +49,11 @@ RSpec.describe AddressRecord, type: :model do
     end
 
     it "returns target attrs" do
-      pp obj.reload.latitude
       expect(described_class.attrs_to_duplicate(obj)).to match_hash_indifferently target_attrs
     end
 
     context "with address_record" do
-      let!(:obj) { FactoryBot.create(:bike, :address_in_edmonton) }
+      let!(:obj) { FactoryBot.create(:user, :address_in_edmonton) }
       let(:target_attrs) do
         {
           latitude: 53.5069377,
