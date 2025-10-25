@@ -9,14 +9,14 @@ module AddressRecorded
 
     delegate :address_present?, :address_hash, :formatted_address_string,
       to: :address_record, allow_nil: true
+
+    scope :address_record, -> { where.not(address_record_id: nil) }
+    # TODO: rename to :with_street when Bike AddressRecords have finished migration - #2922
+    scope :with_street_address_record, -> { includes(:address_record).where.not(address_records: {street: nil}) }
   end
 
-  def to_coordinates
-    [latitude, longitude]
-  end
-
-  def address_hash_legacy
-    return address_record.address_hash_legacy if address_record.present?
+  def address_hash_legacy(address_record_id: false)
+    return address_record.address_hash_legacy(address_record_id:) if address_record?
     # To ease migration, use the existing attrs. Handle if they've been dropped
     return {} unless defined?(street)
 
@@ -26,6 +26,10 @@ module AddressRecorded
       .merge(state: legacy_state_abbr, country: legacy_country_iso)
       .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
       .with_indifferent_access
+  end
+
+  def address_record?
+    address_record.present?
   end
 
   private

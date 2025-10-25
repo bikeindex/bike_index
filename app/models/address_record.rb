@@ -30,6 +30,7 @@ class AddressRecord < ApplicationRecord
   KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
+  ADDRESS_ATTRS = %i[street city region_record_id postal_code country_id latitude longitude]
 
   enum :kind, KIND_ENUM
   enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
@@ -57,11 +58,27 @@ class AddressRecord < ApplicationRecord
       %i[city postal_code region_string street country_id region_record_id].freeze
     end
 
+    def attrs_to_duplicate(obj)
+      if obj.is_a?(AddressRecord)
+        obj.internal_address_attrs.merge(skip_geocoding: obj.latitude.present?, skip_callback_job: true)
+      elsif defined?(obj.address_record) && obj.address_record.present?
+        attrs_to_duplicate(obj.address_record)
+      elsif defined?(obj.street)
+        attrs_from_legacy(obj)
+      else
+        {}
+      end
+    end
+
     def attrs_from_legacy(obj)
-      user_attrs = obj.is_a?(User) ? {} : {user_id: obj.user_id}
+      user_attrs = if !obj.is_a?(User) && obj.respond_to?(:user_id)
+        {user_id: obj.user_id}
+      else
+        {}
+      end
 
       {
-        skip_geocoding: true, # Skip geocoding, this is a direct copy
+        skip_geocoding: obj.latitude.present?, # Skip geocoding if already geocoded
         skip_callback_job: true, # they're already in sync
         street: obj.street,
         city: obj.city,
@@ -91,23 +108,28 @@ class AddressRecord < ApplicationRecord
     end
   end
 
+  def internal_address_attrs
+    slice(*ADDRESS_ATTRS)
+  end
+
   def address_hash(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     include_country = include_country?(render_country:, current_country_id:, current_country_iso:)
+    country_hash = (include_country && country&.name.present?) ? {country: country.name} : {}
     visible_attr = permitted_visible_attribute(visible_attribute)
     {
       street: %i[street].include?(visible_attr) ? street : nil,
       city:,
       region:,
       postal_code: %i[street postal_code].include?(visible_attr) ? postal_code : nil,
-      country: include_country ? country&.name : nil,
       latitude:, longitude:
-    }
+    }.merge(country_hash)
   end
 
-  def address_hash_legacy
+  def address_hash_legacy(address_record_id: false)
     l_hash = address_hash(visible_attribute: :street, render_country: true).dup
     l_hash[:zipcode] = l_hash.delete(:postal_code)
     l_hash[:state] = l_hash.delete(:region)
+    l_hash[:address_record_id] = id if address_record_id
     l_hash.with_indifferent_access
   end
 
