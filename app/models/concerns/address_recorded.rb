@@ -13,26 +13,6 @@ module AddressRecorded
     scope :address_record, -> { where.not(address_record_id: nil) }
     # TODO: rename to :with_street when Bike AddressRecords have finished migration - #2922
     scope :with_street_address_record, -> { includes(:address_record).where.not(address_records: {street: nil}) }
-
-    # Ownership does not have coordinates, but does include AddressRecorded
-
-    # if column_names.include?("latitude")
-    #   # This duplicates the functionality of Geocoder::Store::ActiveRecord.within_bounding_box
-    #   scope :within_bounding_box, lambda { |*bounds|
-    #     sw_lat, sw_lng, ne_lat, ne_lng = bounds.flatten if bounds
-    #     return none unless sw_lat && sw_lng && ne_lat && ne_lng
-
-    #     where(table_name => {latitude: sw_lat..ne_lat, longitude: sw_lng..ne_lng})
-    #   }
-
-    #   scope :with_location, -> { where.not(latitude: nil) }
-    #   scope :without_location, -> { where(latitude: nil) }
-    # end
-  end
-
-  # Ownership does not have coordinates, but does include AddressRecorded. This will raise there, :shrug:
-  def to_coordinates
-    [latitude, longitude]
   end
 
   def address_hash_legacy(address_record_id: false)

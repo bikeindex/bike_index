@@ -61,6 +61,7 @@
 class User < ApplicationRecord
   include FeatureFlaggable
   include AddressRecorded
+  include AddressRecordedWithinBoundingBox
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
 

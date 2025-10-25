@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
   it_behaves_like "address_recorded"
+  it_behaves_like "address_recorded_within_bounding_box"
   it_behaves_like "bike_attributable"
 
   describe "address factories" do

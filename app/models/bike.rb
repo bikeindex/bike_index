@@ -102,6 +102,7 @@ class Bike < ApplicationRecord
   include BikeSearchable
   include BikeAttributable
   include AddressRecorded
+  include AddressRecordedWithinBoundingBox
   include PgSearch::Model
 
   PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
