@@ -78,7 +78,7 @@ class OrganizationsController < ApplicationController
       BParam.create(creator_id: @organization.auto_user.id, params: {
         creation_organization_id: @organization.id,
         embeded: true,
-        bike: BParam.bike_status_from_params(params)
+        bike: BParam.status_hash_from_params(params)
       })
     end
   end

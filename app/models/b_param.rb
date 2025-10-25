@@ -137,7 +137,7 @@ class BParam < ApplicationRecord
 
     # There are URLs out there with stolen=true, and will be forever - so lean in
     # Keywords are - :status, :stolen
-    def bike_status_from_params(action_controller_params = nil)
+    def status_hash_from_params(action_controller_params = nil)
       url_params = action_controller_params&.permit(:status, :stolen).to_h
       status = url_params[:status]
       if status.present?

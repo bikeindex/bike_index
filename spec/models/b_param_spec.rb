@@ -539,51 +539,51 @@ RSpec.describe BParam, type: :model do
     end
   end
 
-  describe "bike_status_from_params" do
+  describe "status_hash_from_params" do
     let(:params) { ActionController::Parameters.new(params_hash) }
     def acparams(hash)
       ActionController::Parameters.new(hash)
     end
     it "returns empty" do
-      expect(BParam.bike_status_from_params).to eq({})
-      expect(BParam.bike_status_from_params(acparams(status: "asdfasdfasdfasdf"))).to eq({})
-      expect(BParam.bike_status_from_params(acparams(status: "status_party"))).to eq({})
-      expect(BParam.bike_status_from_params(acparams(status: nil))).to eq({})
-      expect(BParam.bike_status_from_params(acparams(stolen: nil))).to eq({})
-      expect(BParam.bike_status_from_params(acparams(status: nil, stolen: nil))).to eq({})
+      expect(BParam.status_hash_from_params).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: "asdfasdfasdfasdf"))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: "status_party"))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: nil))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(stolen: nil))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: nil, stolen: nil))).to eq({})
     end
     context "with stolen value" do
       it "returns empty" do
-        expect(BParam.bike_status_from_params(acparams(stolen: nil))).to eq({})
-        expect(BParam.bike_status_from_params(acparams(stolen: "false"))).to eq({})
-        expect(BParam.bike_status_from_params(acparams(stolen: 0))).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: nil))).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: "false"))).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: 0))).to eq({})
       end
     end
     context "stolen truthy" do
       it "returns stolen" do
-        expect(BParam.bike_status_from_params(acparams(stolen: true))).to eq({status: "status_stolen"})
-        expect(BParam.bike_status_from_params(acparams(stolen: "true"))).to eq({status: "status_stolen"})
-        expect(BParam.bike_status_from_params(acparams(stolen: 1))).to eq({status: "status_stolen"})
-        expect(BParam.bike_status_from_params(acparams(stolen: 1, status: nil))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: true))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: "true"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: 1))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: 1, status: nil))).to eq({status: "status_stolen"})
       end
     end
     context "status_stolen" do
       it "returns stolen" do
-        expect(BParam.bike_status_from_params(acparams(status: "status_stolen"))).to eq({status: "status_stolen"})
-        expect(BParam.bike_status_from_params(acparams(status: "stolen"))).to eq({status: "status_stolen"})
-        expect(BParam.bike_status_from_params(acparams(status: "stolen", stolen: nil))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(status: "status_stolen"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(status: "stolen"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(status: "stolen", stolen: nil))).to eq({status: "status_stolen"})
       end
     end
     context "status_impounded" do
       it "returns impounded" do
-        expect(BParam.bike_status_from_params(acparams(status: "status_impounded"))).to eq({status: "status_impounded"})
-        expect(BParam.bike_status_from_params(acparams(status: "impounded"))).to eq({status: "status_impounded"})
-        expect(BParam.bike_status_from_params(acparams(status: "impounded", stolen: "1"))).to eq({status: "status_impounded"})
+        expect(BParam.status_hash_from_params(acparams(status: "status_impounded"))).to eq({status: "status_impounded"})
+        expect(BParam.status_hash_from_params(acparams(status: "impounded"))).to eq({status: "status_impounded"})
+        expect(BParam.status_hash_from_params(acparams(status: "impounded", stolen: "1"))).to eq({status: "status_impounded"})
       end
       context "found" do
         it "returns impounded" do
-          expect(BParam.bike_status_from_params(acparams(status: "found"))).to eq({status: "status_impounded"})
-          expect(BParam.bike_status_from_params(acparams(status: "found", stolen: true))).to eq({status: "status_impounded"})
+          expect(BParam.status_hash_from_params(acparams(status: "found"))).to eq({status: "status_impounded"})
+          expect(BParam.status_hash_from_params(acparams(status: "found", stolen: true))).to eq({status: "status_impounded"})
         end
       end
     end
