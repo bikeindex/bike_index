@@ -22,7 +22,7 @@ class RegistrationsController < ApplicationController
     end
     if @b_param.blank?
       bike_params = {creation_organization_id: creation_organization_id, owner_email: @owner_email}
-        .merge(BParam.bike_status_from_url_params(params.permit(:status, :stolen).to_h))
+        .merge(BParam.bike_status_from_params(params))
       @b_param = BParam.new(params: {bike: bike_params.as_json})
     end
     @stolen = @b_param.status_stolen?
