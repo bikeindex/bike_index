@@ -31,7 +31,7 @@
       </p>
     <% end %>
   </div>
-  <% if !no_street? %>
+  <% unless @no_street %>
     <div class="form-group row">
       <%= @builder.label :street, address_label, class: "form-well-label" %>
       <div
@@ -58,7 +58,7 @@
     </div>
   <% end %>
   <div class="form-group row">
-    <% if no_street? %>
+    <% if @no_street %>
       <%= @builder.label :city, address_label, class: "form-well-label" %>
     <% else %>
       <label class="form-well-label"></label>
