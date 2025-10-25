@@ -402,7 +402,7 @@ RSpec.describe BikesController, type: :controller do
           Sidekiq::Job.drain_all
           expect(ActionMailer::Base.deliveries.count).to eq 1
           bike = Bike.reorder(:created_at).last
-          expect(bike.country.name).to eq("United States")
+          expect(bike.address_record.country.name).to eq("United States")
           expect(bike.current_ownership.origin).to eq "embed"
           expect(bike.current_ownership.organization).to eq organization
           expect(bike.current_ownership.creator).to eq organization.auto_user
@@ -417,7 +417,7 @@ RSpec.describe BikesController, type: :controller do
             post :create, params: {bike: bike_params}
           }.to change(Ownership, :count).by 1
           bike = Bike.last
-          expect(bike.country.name).to eq("United States")
+          expect(bike.address_record.country.name).to eq("United States")
           expect(bike.current_ownership.origin).to eq "embed"
           expect(bike.current_ownership.organization).to eq organization
           expect(bike.creator_id).to eq organization.auto_user_id
@@ -447,7 +447,7 @@ RSpec.describe BikesController, type: :controller do
             post :create, params: {bike: bike_params, parking_notification: parking_notification}
           }.to change(Ownership, :count).by 1
           bike = Bike.last
-          expect(bike.country.name).to eq("United States")
+          expect(bike.address_record.country.name).to eq("United States")
           expect(bike.current_ownership.origin).to eq "embed"
           expect(bike.current_ownership.organization).to eq organization
           expect(ParkingNotification.count).to eq 0
@@ -706,57 +706,70 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.bike_organization_ids).to eq([organization.id])
         end
 
-        it "updates the bike and components" do
-          component1 = FactoryBot.create(:component, bike: bike)
-          other_handlebar_type = "other"
-          ctype_id = component1.ctype_id
-          bike.update(country: Country.united_states)
-          bike.reload
-          component2_attrs = {
-            _destroy: "0",
-            ctype_id: ctype_id,
-            description: "sdfsdfsdf",
-            manufacturer_id: bike.manufacturer_id.to_s,
-            manufacturer_other: "stuffffffff",
-            component_model: "asdfasdf",
-            year: "1995",
-            serial_number: "simple_serial"
-          }
-          bike_attrs = {
-            description: "69",
-            handlebar_type: other_handlebar_type,
-            owner_email: "  #{bike.owner_email.upcase}",
-            city: "Rotterdam",
-            zipcode: "3035",
-            country_id: Country.netherlands.id,
-            organization_affiliation: "something weird",
-            components_attributes: {
-              "0" => {
-                "_destroy" => "1",
-                :id => component1.id.to_s
-              },
-              Time.current.to_i.to_s => component2_attrs
+        context "bike with address_record" do
+          let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_address_record, creator: user) }
+          let(:user) { FactoryBot.create(:user_confirmed) }
+          it "updates the bike and components" do
+            component1 = FactoryBot.create(:component, bike:)
+            other_handlebar_type = "other"
+            ctype_id = component1.ctype_id
+            address_record = bike.address_record
+            bike.reload
+            component2_attrs = {
+              _destroy: "0",
+              ctype_id: ctype_id,
+              description: "sdfsdfsdf",
+              manufacturer_id: bike.manufacturer_id.to_s,
+              manufacturer_other: "stuffffffff",
+              component_model: "asdfasdf",
+              year: "1995",
+              serial_number: "simple_serial"
             }
-          }
-          expect {
-            put :update, params: {id: bike.id, bike: bike_attrs}
-          }.to_not change(Ownership, :count)
-          bike.reload
-          expect(bike.description).to eq("69")
-          expect(response).to redirect_to edit_bike_url(bike)
-          expect(bike.handlebar_type).to eq other_handlebar_type
-          expect(assigns(:bike)).to be_present
-          expect(bike.user_hidden).to be_falsey
-          expect(bike.country&.name).to eq(Country.netherlands.name)
-          expect(bike.zipcode).to eq "3035"
-          expect(bike.city).to eq "Rotterdam"
-          expect(bike.organization_affiliation).to eq "something weird"
+            bike_attrs = {
+              description: "69",
+              handlebar_type: other_handlebar_type,
+              owner_email: "  #{bike.owner_email.upcase}",
+              organization_affiliation: "something weird",
+              address_record_attributes: {
+                city: "Rotterdam",
+                postal_code: "3035",
+                country_id: Country.netherlands.id,
+                id: address_record.id
+              },
+              components_attributes: {
+                "0" => {
+                  "_destroy" => "1",
+                  :id => component1.id.to_s
+                },
+                Time.current.to_i.to_s => component2_attrs
+              }
+            }
+            expect {
+              put :update, params: {id: bike.id, bike: bike_attrs}
+            }.to change(Ownership, :count).by(0)
+              .and change(AddressRecord, :count).by(0)
 
-          expect(bike.components.count).to eq 1
-          expect(bike.components.where(id: component1.id).any?).to be_falsey
-          component2 = bike.components.first
-          component2_attrs.except(:_destroy).each do |key, value|
-            expect(component2.send(key).to_s).to eq value.to_s
+            expect(flash.to_h).to have_key("success")
+            bike.reload
+            expect(bike.description).to eq("69")
+            expect(response).to redirect_to edit_bike_url(bike)
+            expect(bike.handlebar_type).to eq other_handlebar_type
+            expect(assigns(:bike)).to be_present
+            expect(bike.user_hidden).to be_falsey
+            expect(bike.address_record_id).to eq address_record.id
+
+            expect(address_record.reload.country&.name).to eq(Country.netherlands.name)
+            expect(address_record.postal_code).to eq "3035"
+            expect(address_record.city).to eq "Rotterdam"
+
+            expect(bike.organization_affiliation).to eq "something weird"
+
+            expect(bike.components.count).to eq 1
+            expect(bike.components.where(id: component1.id).any?).to be_falsey
+            component2 = bike.components.first
+            component2_attrs.except(:_destroy).each do |key, value|
+              expect(component2.send(key).to_s).to eq value.to_s
+            end
           end
         end
 

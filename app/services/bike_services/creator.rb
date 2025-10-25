@@ -156,11 +156,10 @@ class BikeServices::Creator
 
   def create_address_record_from_ip(bike, ip_address)
     return if ip_address.blank?
-    # address_record_attributes =
+
     bike.update(address_record_attributes:
       GeocodeHelper.assignable_address_hash_for(@ip_address, new_attrs: true)
-      .merge(kind: :bike, bike_id: bike.id)
-    )
+      .merge(kind: :bike, bike_id: bike.id))
   end
 
   def associate(b_param, bike, ownership)

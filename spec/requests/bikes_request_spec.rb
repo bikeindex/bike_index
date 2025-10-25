@@ -48,10 +48,32 @@ RSpec.describe BikesController, type: :request do
       end
     end
     context "with organization" do
-      it "renders with organization"
+      let!(:organization) { FactoryBot.create(:organization) }
+
+      it "renders with organization" do
+        get "#{base_url}/new?organization_id=#{organization.slug}"
+        expect(response.code).to eq("200")
+        expect(response).to render_template(:new)
+        expect(assigns(:bike).creation_organization_id).to eq organization.id
+        expect(assigns(:bike).primary_frame_color_id).to be_nil
+      end
 
       context "existing b_param with creation_organization_id" do
-        it "uses the existing organization"
+        let(:organization2) { FactoryBot.create(:organization) }
+        let(:b_param) { FactoryBot.create(:b_param, params: {bike: bike_params}) }
+        let(:manufacturer_id) { FactoryBot.create(:manufacturer).id }
+        let(:bike_params) do
+          {owner_email: current_user.email, manufacturer_id:, creation_organization_id: organization2.id}
+        end
+        it "uses the existing organization" do
+          expect(b_param.reload.id_token).to be_present
+          get "#{base_url}/new?organization_id=#{organization.slug}&b_param_token=#{b_param.id_token}"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:new)
+          expect(assigns(:bike).creation_organization_id).to eq organization2.id
+          expect(assigns(:bike).manufacturer_id).to eq manufacturer_id
+          expect(assigns(:bike).primary_frame_color_id).to be_nil
+        end
       end
     end
     context "stolen from params" do
