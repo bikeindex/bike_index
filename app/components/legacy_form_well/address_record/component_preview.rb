@@ -6,11 +6,10 @@ module LegacyFormWell::AddressRecord
 
     # @param organization_id text "Organization ID to render the fields for"
     def default(organization_id: nil)
-      # organization = Organization.friendly_find(organization_id)
-      organization = Organization.friendly_find('PSU')
+      organization = Organization.friendly_find(organization_id)
 
       {template: "legacy_form_well/address_record/component_preview/default",
-        locals: {organization:} }
+       locals: {organization:}}
     end
 
     # TODO: WTF, why isn't the @param working :/

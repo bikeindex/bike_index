@@ -1,5 +1,6 @@
-<% @user = User.new(no_address: true) %>
-<% @user.address_record = AddressRecord.new(country: organization&.country || Country.united_states, user:) %>
+<% organization ||= nil %>
+<% @user = User.new %>
+<% @user.address_record = AddressRecord.new(country: organization&.country || Country.united_states, user: @user) %>
 <%= form_for @user, url: my_account_path, method: :patch, multipart: true do |f| %>
   <%= f.fields_for :address_record do |address_form| %>
     <%= render(
@@ -8,8 +9,3 @@
   <% end %>
 <% end %>
 
-<p class="small">
-  Organization: <strong><%= organization&.short_name || "no org" %></strong>
-  <br>
-  No Street: <strong><%= @user.no_address %></strong>
-</p>

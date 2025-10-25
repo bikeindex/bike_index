@@ -45,7 +45,7 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
     end
 
     context "with no_street: true" do
-      let(:options) { {organization: nil, embed_layout: false, no_street: true }}
+      let(:options) { {organization: nil, embed_layout: false, no_street: true} }
       it "renders with street_address anyway" do
         expect(component).to have_css("label", text: "Address")
         expect(component).not_to have_field("user_address_record_attributes_street")
@@ -82,7 +82,7 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
       let(:organization) { Organization.new(enabled_feature_slugs: %w[no_address]) }
 
       it "renders with address" do
-        expect(organization.enabled?('no_address')).to be_truthy
+        expect(organization.enabled?("no_address")).to be_truthy
         expect(component).not_to have_field("user_address_record_attributes_street")
         expect(component).to have_css("label", text: "Address")
       end
