@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe Ownership, type: :model do
   it_behaves_like "registration_infoable"
+  # TODO: update so that this works! Probably
+  # it_behaves_like "address_recorded"
 
   describe "factories" do
     let(:ownership) { FactoryBot.create(:ownership) }
