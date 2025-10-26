@@ -27,7 +27,7 @@
 #  index_address_records_on_user_id           (user_id)
 #
 class AddressRecord < ApplicationRecord
-  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3}.freeze
+  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
   ADDRESS_ATTRS = %i[street city region_record_id postal_code country_id latitude longitude]
