@@ -98,7 +98,6 @@ jobs:
         run: bin/rails assets:precompile --trace
       # Run tests
       - name: Run tests
-        continue-on-error: true
         run: bin/knapsack_pro_tests
       # Until parallel reporting is set up, skip sending code coverage reports
       # - name: publish code coverage
@@ -127,3 +126,6 @@ jobs:
         with:
           files: test-results/**/*.xml
           json_thousands_separator: ","
+
+      - name: Conclusion
+        run: echo "Conclusion is ${{ fromJSON( steps.test-results.outputs.json ).conclusion }}"
