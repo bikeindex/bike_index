@@ -127,5 +127,4 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: test-results/**/*.xml
-          json_thousands_separator: ","
-          comment_mode: changes in failures
+          # json_thousands_separator: ","
