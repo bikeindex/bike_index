@@ -100,7 +100,6 @@ jobs:
       - name: Run tests
         continue-on-error: true
         run: bin/knapsack_pro_tests
-        # run: bundle exec rake "knapsack_pro:queue:rspec[--format documentation --format RSpec::Github::Formatter --format RspecJunitFormatter --out tmp/rspec-${CI_NODE_INDEX}.xml]"
       # Until parallel reporting is set up, skip sending code coverage reports
       # - name: publish code coverage
       #   uses: paambaati/codeclimate-action@v9.0.0
@@ -127,4 +126,4 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: test-results/**/*.xml
-          # json_thousands_separator: ","
+          json_thousands_separator: ","

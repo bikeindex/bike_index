@@ -8,4 +8,9 @@ if [ "$KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC" = "" ]; then
   export KNAPSACK_PRO_CI_NODE_RETRY_COUNT=0
 fi
 
-bundle exec rake "knapsack_pro:queue:rspec[--format documentation --format RSpec::Github::Formatter --format RspecJunitFormatter --out tmp/rspec-${KNAPSACK_PRO_CI_NODE_INDEX}.xml]"
+bundle exec rake "knapsack_pro:queue:rspec[\
+  --format documentation \
+  --format RSpec::Github::Formatter \
+  --format RspecJunitFormatter \
+  --out tmp/rspec-${KNAPSACK_PRO_CI_NODE_INDEX}.xml\
+]"
