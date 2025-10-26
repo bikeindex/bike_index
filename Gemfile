@@ -168,7 +168,7 @@ group :test do
   gem "simplecov", require: false
   gem "simplecov_json_formatter", require: false # Fix json error
   gem "rspec-github", require: false # Rspec GitHub formatter (adds annotations to files)
-  gem 'rspec_junit_formatter', require: false # Rspec JUnit formatter (for test aggregation on GitHub)
+  gem "rspec_junit_formatter", require: false # Rspec JUnit formatter (for test aggregation on GitHub)
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
   gem "rspec-retry", require: false # Retry flaky test failures on CI
