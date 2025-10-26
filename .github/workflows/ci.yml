@@ -98,7 +98,31 @@ jobs:
         run: bin/rails assets:precompile --trace
       # Run tests
       - name: Run tests
-        run: bin/knapsack_pro_tests
+        run: bundle exec rake "knapsack_pro:queue:rspec[--format documentation --format RSpec::Github::Formatter --format RspecJunitFormatter --out tmp/rspec-${{ matrix.ci_node_index }}.xml]"
+        # run: bin/knapsack_pro_tests
       # Until parallel reporting is set up, skip sending code coverage reports
       # - name: publish code coverage
       #   uses: paambaati/codeclimate-action@v9.0.0
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.ci_node_index }}
+          path: tmp/rspec-${{ matrix.ci_node_index }}.xml
+
+  aggregate_test_results:
+    name: "Test Report"
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+    steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: test-results
+
+      - name: Publish combined test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: test-results/**/*.xml
