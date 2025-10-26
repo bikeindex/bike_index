@@ -429,7 +429,7 @@ class BParam < ApplicationRecord
 
   def address_record_attributes
     # If nested address_record_attributes hash is present, no legacy handling required!
-    ar_attrs = bike["address_record_attributes"]&.slice(AddressRecord.permitted_params.map(&:to_s))
+    ar_attrs = bike["address_record_attributes"]&.slice(*AddressRecord.permitted_params.map(&:to_s))
     ar_attrs ||= AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(k)] }.to_h
 
     ar_attrs.values.any? ? ar_attrs.compact.merge(kind: "bike") : {}

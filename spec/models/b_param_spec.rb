@@ -727,7 +727,7 @@ RSpec.describe BParam, type: :model do
         end
         it "returns target attributes" do
           expect(b_param.address_record_attributes.except(:region_record_id))
-            .to match_hash_indifferently target[:address_record_attributes].except(:region_record_id, :kind)
+            .to match_hash_indifferently target[:address_record_attributes].except(:region_record_id)
           expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
         end
       end

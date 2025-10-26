@@ -15,7 +15,6 @@ class BikeServices::Builder
       bike = Bike.new(cycle_type: "bike")
       # passed_organization is assigned unless b_param has an organization
       passed_organization = new_attrs.delete(:organization)
-      pp b_param.safe_bike_attrs(new_attrs)
       bike.attributes = b_param.safe_bike_attrs(new_attrs)
 
       # If manufacturer_other is an existing manufacturer, reassign it

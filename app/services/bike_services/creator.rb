@@ -97,7 +97,6 @@ class BikeServices::Creator
 
   def create_bike(b_param)
     add_bike_book_data(b_param)
-    pp b_param.params
     bike = BikeServices::Builder.find_or_build(b_param)
     # Skip processing if this bike is already created
     return bike if bike.id.present? && bike.id == b_param.created_bike_id
