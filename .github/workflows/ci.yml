@@ -107,8 +107,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.ci_node_index }}
-          path: tmp/rspec-${{ matrix.ci_node_index }}.xml
+          name: test-results-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}
+          path: tmp/rspec-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}.xml
 
   aggregate_test_results:
     name: "Test Report"
