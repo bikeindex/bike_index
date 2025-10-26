@@ -291,6 +291,7 @@ class BParam < ApplicationRecord
     s_attrs
   end
 
+  # registration_info_attrs is assigned to ownership. Update to use address_record_attributes in #2922
   def registration_info_attrs
     ria = params["bike"]&.slice(*REGISTRATION_INFO_ATTRS) || {}
     # Include legacy address attributes
@@ -431,7 +432,7 @@ class BParam < ApplicationRecord
     return bike["address_record_attributes"] if bike["address_record_attributes"].present?
 
     ara = AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(k)] }.to_h
-    ara.values.any? ? ara.compact : {}
+    ara.values.any? ? ara.compact.merge(kind: "bike") : {}
   end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show
@@ -609,7 +610,12 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     attrs_merged = bike.merge("status" => status).merge(new_attrs.as_json)
-    address_record_hash = attrs_merged["address_record_attributes"] || address_record_attributes
+    addy_hash = attrs_merged["address_record_attributes"] || address_record_attributes
+    addy_attributes = if addy_hash.present?
+      {"address_record_attributes" => addy_hash.merge(kind: "bike")}
+    else
+      {}
+    end
 
     attrs_merged.except(*SKIPPED_BIKE_ATTRS)
       .map { |k, v| clean_key_value(k, v) }.compact.to_h
@@ -619,7 +625,7 @@ class BParam < ApplicationRecord
         "updator_id" => creator_id,
         # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
         "propulsion_type_slug" => self.class.propulsion_type(params.merge("bike" => attrs_merged)))
-      .merge(address_record_hash.present? ? {"address_record_attributes" => address_record_hash} : {})
+      .merge(addy_attributes)
   end
 
   private

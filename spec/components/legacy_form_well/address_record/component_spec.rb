@@ -62,19 +62,22 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
   end
 
   context "with organization" do
-    let(:organization) { Organization.new(enabled_feature_slugs: %w[reg_address], registration_field_labels:) }
+    let(:organization) { Organization.new(kind:, enabled_feature_slugs: %w[reg_address], registration_field_labels:) }
+    let(:kind) { :bike_shop }
     let(:registration_field_labels) { {} }
 
     it "default preview" do
       expect(component).to have_css("label", text: "Street address")
-      expect(component).to have_field("user_address_record_attributes_street")
+      expect(component).to have_field("user_address_record_attributes_street", placeholder: "Street address")
     end
 
-    context "with reg_address" do
+    context "school with reg_address" do
       let(:reg_address) { "Special address label" }
+      let(:kind) { :school }
       let(:registration_field_labels) { {reg_address:}.as_json }
       it "renders" do
         expect(component).to have_css("label", text: reg_address)
+        expect(component).to have_field("user_address_record_attributes_street", placeholder: "Campus mailing address")
       end
     end
 
