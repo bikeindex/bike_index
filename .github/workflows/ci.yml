@@ -128,6 +128,3 @@ jobs:
           files: test-results/**/*.xml
           json_thousands_separator: "," # Can't get this to work :/
           comment_mode: off
-
-      - name: Conclusion
-        run: echo "Conclusion is ${{ fromJSON( steps.test-results.outputs.json ).conclusion }}"
