@@ -122,8 +122,9 @@ jobs:
           path: test-results
 
       - name: Publish combined test results
+        id: test-results
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: test-results/**/*.xml
-          json_thousands_separator: .
+          json_thousands_separator: "," # Can't get this to work :/
           comment_mode: off
