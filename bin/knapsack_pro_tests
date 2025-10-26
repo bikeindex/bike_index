@@ -2,11 +2,15 @@
 
 # Skip running knapsack if on a fork (which doesn't have the secret)
 if [ "$KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC" = "" ]; then
-  KNAPSACK_PRO_ENDPOINT=https://api-disabled-for-fork.knapsackpro.com \
-  KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC=disabled-for-fork \
-  KNAPSACK_PRO_MAX_REQUEST_RETRIES=0 \
-  KNAPSACK_PRO_CI_NODE_RETRY_COUNT=0 \
-  bundle exec rake "knapsack_pro:queue:rspec[--format documentation --format RSpec::Github::Formatter]"
-else
-  bundle exec rake "knapsack_pro:queue:rspec[--format documentation --format RSpec::Github::Formatter]"
+  export KNAPSACK_PRO_ENDPOINT=https://api-disabled-for-fork.knapsackpro.com
+  export KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC=disabled-for-fork
+  export KNAPSACK_PRO_MAX_REQUEST_RETRIES=0
+  export KNAPSACK_PRO_CI_NODE_RETRY_COUNT=0
 fi
+
+bundle exec rake "knapsack_pro:queue:rspec[\
+  --format documentation \
+  --format RSpec::Github::Formatter \
+  --format RspecJunitFormatter \
+  --out tmp/rspec-${KNAPSACK_PRO_CI_NODE_INDEX}.xml\
+]"
