@@ -1,33 +1,94 @@
 # frozen_string_literal: true
 
 class BikeServices::Creator
+  PERMITTED_ATTRS = %i[
+    abandoned
+    approved_stolen
+    b_param_id
+    b_param_id_token
+    belt_drive
+    bike_organization_ids
+    coaster_brake
+    components_attributes
+    creation_organization_id
+    creator
+    creator_id
+    current_stolen_record_id
+    cycle_type
+    date_stolen
+    description
+    embeded
+    embeded_extended
+    example
+    extra_registration_number
+    frame_material
+    frame_model
+    frame_size
+    frame_size_number
+    frame_size_unit
+    front_gear_type_id
+    front_gear_type_slug
+    front_tire_narrow
+    front_wheel_size_id
+    handlebar_type
+    image
+    is_for_sale
+    listing_order
+    made_without_serial
+    manufacturer
+    manufacturer_id
+    manufacturer_other
+    marked_user_hidden
+    marked_user_unhidden
+    name
+    number_of_seats
+    organization_affiliation
+    owner_email
+    paint_id
+    paint_name
+    pdf
+    phone
+    primary_activity_id
+    primary_frame_color_id
+    propulsion_type
+    rear_gear_type_id
+    rear_gear_type_slug
+    rear_tire_narrow
+    rear_wheel_size_id
+    receive_notifications
+    secondary_frame_color_id
+    send_email
+    serial_normalized
+    serial_number
+    skip_email
+    stock_photo_url
+    student_id
+    tertiary_frame_color_id
+    thumb_path
+    timezone
+    year
+  ].freeze
+  PERMITTED_IMPOUND_ATTRS = %i[
+    city
+    country
+    display_id
+    impounded_at_with_timezone
+    impounded_description
+    state
+    street
+    timezone
+    zipcode
+  ].freeze
+
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator
   def self.old_attr_accessible
-    (%i[manufacturer_id manufacturer_other serial_number
-      serial_normalized made_without_serial extra_registration_number
-      creation_organization_id manufacturer year thumb_path name
-      current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
-      handlebar_type frame_size frame_size_number frame_size_unit
-      rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
-      primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-      propulsion_type street zipcode country_id state_id city belt_drive
-      coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
-      timezone date_stolen receive_notifications phone creator creator_id image
-      components_attributes b_param_id embeded embeded_extended example organization_affiliation student_id
-      stock_photo_url pdf send_email skip_email listing_order approved_stolen primary_activity_id
-      marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
-      [
-        stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
-        impound_records_attributes: permitted_impound_attrs,
-        components_attributes: Component.permitted_attributes,
-        address_record_attributes: (AddressRecord.permitted_params + [:id])
-      ]
-    ).freeze
-  end
-
-  def self.permitted_impound_attrs
-    %w[street city state zipcode country timezone impounded_at_with_timezone display_id impounded_description].freeze
+    (PERMITTED_ATTRS + [
+      stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
+      impound_records_attributes: PERMITTED_IMPOUND_ATTRS,
+      components_attributes: Component.permitted_attributes,
+      address_record_attributes: (AddressRecord.permitted_params + [:id])
+    ]).freeze
   end
 
   def initialize(ip_address: nil)
@@ -36,6 +97,7 @@ class BikeServices::Creator
 
   def create_bike(b_param)
     add_bike_book_data(b_param)
+    pp b_param.params
     bike = BikeServices::Builder.find_or_build(b_param)
     # Skip processing if this bike is already created
     return bike if bike.id.present? && bike.id == b_param.created_bike_id

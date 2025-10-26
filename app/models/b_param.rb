@@ -429,10 +429,10 @@ class BParam < ApplicationRecord
 
   def address_record_attributes
     # If nested address_record_attributes hash is present, no legacy handling required!
-    return bike["address_record_attributes"] if bike["address_record_attributes"].present?
+    ar_attrs = bike["address_record_attributes"]&.slice(AddressRecord.permitted_params.map(&:to_s))
+    ar_attrs ||= AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(k)] }.to_h
 
-    ara = AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(k)] }.to_h
-    ara.values.any? ? ara.compact.merge(kind: "bike") : {}
+    ar_attrs.values.any? ? ar_attrs.compact.merge(kind: "bike") : {}
   end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show
