@@ -225,17 +225,20 @@ RSpec.describe BikeServices::Creator do
         end
         let(:not_matched_attrs) { %i[user_name propulsion_type_slug manufacturer_id manufacturer_other street address_record_attributes] }
         let(:target_address_record) do
-          {street: "Somewhere Ville", country_id: Country.united_states_id, kind: "ownership", publicly_visible_attribute: "postal_code"}
+          {street: "Somewhere Ville", kind: "ownership", publicly_visible_attribute: "postal_code"}
         end
 
         def expect_bike_created_with_extra_attrs
           expect { instance.create_bike(b_param) }.to change(Bike, :count).by(1)
+            .and change(AddressRecord, :count).by(1)
+
           expect(b_param.skip_email?).to be_falsey
           bike = Bike.last
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-          expect(bike.registration_address.compact).to eq({"street" => "Somewhere Ville", "country" => "United States"})
+          expect(bike.registration_address.compact).to eq({"street" => "Somewhere Ville"})
+          expect(bike.registration_address_source).to eq "initial_creation"
           expect(bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)).to eq target_address_record.merge(bike_id: bike.id)
 
           expect(bike).to match_hash_indifferently bike_params.except(*not_matched_attrs)
@@ -254,7 +257,7 @@ RSpec.describe BikeServices::Creator do
           expect(ownership.organization_id).to eq organization.id
           expect(ownership.owner_email).to eq "stuff@stuff.com"
           expect(ownership.owner_name).to eq "Sally"
-          expect(ownership.address_hash_legacy.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville", "country" => "United States"})
+          expect(ownership.address_hash_legacy.reject { |_k, v| v.blank? }).to eq({"street" => "Somewhere Ville"})
         end
 
         it "creates" do
@@ -588,14 +591,17 @@ RSpec.describe BikeServices::Creator do
     describe "with ip_address" do
       before { allow(GeocodeHelper).to receive(:assignable_address_hash_for).and_return(address_hash) }
       let(:address_hash) do
-        {city: "Casper", latitude: 42.8489653, longitude: -106.3014667, postal_code: "82601",
+        {kind: "ownership", city: "Casper", latitude: 42.8489653, longitude: -106.3014667, postal_code: "82601",
          region_string: "WY", country_id: Country.united_states_id, street: "1740 East 2nd Street"}
       end
       let(:bike_params) { {primary_frame_color_id: color.id, manufacturer_id: manufacturer.id, owner_email: "something@stuff.com"} }
 
       it "adds an address_record" do
+        expect(AddressRecord.count).to eq 0
         bike = instance.create_bike(b_param)
+        expect(AddressRecord.count).to eq 1
         expect(bike).to be_valid
+        expect(bike.current_ownership.registration_info).to match_hash_indifferently({ip_address:})
         expect(bike.address_record).to be_present
         expect(bike.address_record).to have_attributes address_hash
       end

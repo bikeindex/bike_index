@@ -245,7 +245,8 @@ class BikeServices::Creator
       bulk_import_id: b_param.params["bulk_import_id"],
       creator_id: b_param.creator_id,
       can_edit_claimed: bike.creation_organization_id.present?,
-      organization_id: bike.creation_organization_id
+      organization_id: bike.creation_organization_id,
+      address_record_id: bike.address_record_id
     }.merge(registration_info: b_param.registration_info_attrs)
   end
 
