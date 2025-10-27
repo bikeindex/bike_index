@@ -363,14 +363,23 @@ class Ownership < ApplicationRecord
   end
 
   def address_record_from_registration_info
+    address_attrs = reg_info_location_hash
+    if address_attrs.blank? && registration_info["ip_address"].present?
+      address_attrs = GeocodeHelper.assignable_address_hash_for(registration_info["ip_address"], new_attrs: true)
+    end
+    return if address_attrs.blank?
+
+    AddressRecord.new(bike_id: bike_id, kind: :ownership, user_id:,
+      skip_geocoding: address_attrs[:latitude].present?, **address_attrs)
+  end
+
+  def reg_info_location_hash
     reg_info_location = registration_info.slice(*LOCATION_KEYS).reject { |_k, v| v.blank? }
     return unless reg_info_location.present?
 
     reg_info_location["postal_code"] = reg_info_location.delete("zipcode")
     reg_info_location["region_string"] = reg_info_location.delete("state")
     reg_info_location["country"] ||= "US"
-
-    AddressRecord.new(bike_id: bike_id, kind: :ownership, user_id:,
-      skip_geocoding: reg_info_location["latitude"].present?, **reg_info_location)
+    reg_info_location.with_indifferent_access
   end
 end
