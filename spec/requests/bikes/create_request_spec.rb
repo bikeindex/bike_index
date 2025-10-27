@@ -346,7 +346,8 @@ RSpec.describe "BikesController#create", type: :request do
           .merge("organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1")
         expect(ownership.registration_info).to match_hash_indifferently reg_hash
 
-        expect(new_bike.registration_address.except("country", "latitude", "longitude")).to match_hash_indifferently reg_hash.except("organization_affiliation_#{organization.id}")
+        expect(new_bike.registration_address.except("country", "latitude", "longitude"))
+          .to match_hash_indifferently reg_hash.except("organization_affiliation_#{organization.id}", "ip_address")
         expect(new_bike.address).to eq "1400 32nd St, Oakland, CA 94608, US"
         expect(new_bike.street).to eq "1400 32nd St"
         expect(new_bike.latitude.to_i).to eq 37
