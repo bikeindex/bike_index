@@ -343,10 +343,11 @@ RSpec.describe "BikesController#create", type: :request do
         expect(ownership.origin).to eq "web"
         expect(ownership.creator_id).to eq current_user.id
         reg_hash = bike_params_with_address.slice(:street, :city, :zipcode, :state)
-          .merge("organization_affiliation_#{organization.id}" => "community_member")
+          .merge("organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1")
         expect(ownership.registration_info).to match_hash_indifferently reg_hash
 
-        expect(new_bike.registration_address.except("country", "latitude", "longitude")).to match_hash_indifferently reg_hash.except("organization_affiliation_#{organization.id}")
+        expect(new_bike.registration_address.except("country", "latitude", "longitude"))
+          .to match_hash_indifferently reg_hash.except("organization_affiliation_#{organization.id}", "ip_address")
         expect(new_bike.address).to eq "1400 32nd St, Oakland, CA 94608, US"
         expect(new_bike.street).to eq "1400 32nd St"
         expect(new_bike.latitude.to_i).to eq 37
@@ -380,7 +381,7 @@ RSpec.describe "BikesController#create", type: :request do
         ownership = new_bike.current_ownership
         expect(ownership.origin).to eq "web"
         expect(ownership.creator_id).to eq current_user.id
-        expect(ownership.registration_info).to eq({"organization_affiliation_#{organization.id}" => "community_member"})
+        expect(ownership.registration_info).to eq({"organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1"})
         # It doesn't have a registration address! But it does have an address - which is just the organization
         expect(new_bike.registration_address).to be_blank
         expect(new_bike.address).to be_present
@@ -523,7 +524,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(new_bike.extra_registration_number).to eq "XXXZZZ"
       expect(new_bike.organization_affiliation).to eq "employee"
       expect(new_bike.student_id).to eq "999888"
-      expect(new_bike.registration_info).to match_hash_indifferently({phone: "18887776666", street: default_location[:formatted_address_no_country], organization_affiliation: "employee", student_id: "999888"})
+      expect(new_bike.registration_info).to match_hash_indifferently({phone: "18887776666", street: default_location[:formatted_address_no_country], organization_affiliation: "employee", student_id: "999888", ip_address: "127.0.0.1"})
       expect(new_bike.phone).to eq "18887776666"
       current_user.reload
       expect(new_bike.owner).to eq current_user # NOTE: not bike user
