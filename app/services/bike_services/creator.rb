@@ -236,7 +236,7 @@ class BikeServices::Creator
       can_edit_claimed: bike.creation_organization_id.present?,
       organization_id: bike.creation_organization_id,
       address_record_id: bike.address_record_id
-    }.merge(registration_info: b_param.registration_info_attrs)
+    }.merge(registration_info: b_param.registration_info_attrs.merge(ip_address: @ip_address))
   end
 
   def create_ownership(b_param, bike)
