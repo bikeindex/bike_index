@@ -343,7 +343,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(ownership.origin).to eq "web"
         expect(ownership.creator_id).to eq current_user.id
         reg_hash = bike_params_with_address.slice(:street, :city, :zipcode, :state)
-          .merge("organization_affiliation_#{organization.id}" => "community_member", :ip_address => "127.0.0.1")
+          .merge("organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1")
         expect(ownership.registration_info).to match_hash_indifferently reg_hash
 
         expect(new_bike.registration_address.except("country", "latitude", "longitude")).to match_hash_indifferently reg_hash.except("organization_affiliation_#{organization.id}")
@@ -380,7 +380,7 @@ RSpec.describe "BikesController#create", type: :request do
         ownership = new_bike.current_ownership
         expect(ownership.origin).to eq "web"
         expect(ownership.creator_id).to eq current_user.id
-        expect(ownership.registration_info).to eq({"organization_affiliation_#{organization.id}" => "community_member", :ip_address => "127.0.0.1"})
+        expect(ownership.registration_info).to eq({"organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1"})
         # It doesn't have a registration address! But it does have an address - which is just the organization
         expect(new_bike.registration_address).to be_blank
         expect(new_bike.address).to be_present
