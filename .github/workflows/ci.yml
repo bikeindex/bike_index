@@ -116,7 +116,7 @@ jobs:
     if: always()
     steps:
       - name: Download all test results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           pattern: test-results-*
           path: test-results
