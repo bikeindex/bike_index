@@ -205,6 +205,32 @@ class BParam < ApplicationRecord
     def matching_domain(str)
       where("(params -> 'bike' ->> 'owner_email') ILIKE ?", "%#{str.to_s.strip}")
     end
+
+    # NOTE:
+    def address_record_attributes(bike_params)
+      # If nested address_record_attributes hash is present, no legacy handling required!
+      ar_attrs = bike_params["address_record_attributes"]&.slice(*AddressRecord.permitted_params.map(&:to_s))
+      ar_attrs ||= AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(bike_params, k)] }.to_h
+
+      ar_attrs.values.any? ? ar_attrs.compact.merge(kind: "ownership") : {}
+    end
+
+    private
+
+    # Deal with the legacy address concerns
+    def legacy_address_field_value(bike_params, field)
+      if field == :street # If looking for street or address, try both street and address
+        bike_params["street"] || bike_params["address"] || bike_params["address_street"]
+      elsif field == :postal_code
+        bike_params[field.to_s] || bike_params["zipcode"] || bike_params["address_zipcode"]
+      elsif field == :region_string
+        bike_params[field.to_s] || bike_params["state"] || bike_params["address_state"]
+      elsif field == :country_id
+        bike_params[field.to_s] || bike_params["country"] || bike_params["address_country"]
+      else
+        bike_params[field.to_s] || bike_params["address_#{field}"]
+      end
+    end
   end
 
   # Crazy new shit
@@ -295,7 +321,7 @@ class BParam < ApplicationRecord
   def registration_info_attrs
     ria = params["bike"]&.slice(*REGISTRATION_INFO_ATTRS) || {}
     # Include legacy address attributes
-    (ria.key?("street") ? ria : ria.merge(address_record_attributes)).reject { |_k, v| v.blank? }.to_h
+    (ria.key?("street") ? ria : ria.merge(self.class.address_record_attributes(bike))).reject { |_k, v| v.blank? }.to_h
   end
 
   def status
@@ -425,14 +451,6 @@ class BParam < ApplicationRecord
 
   def external_image_urls
     bike["external_image_urls"] || []
-  end
-
-  def address_record_attributes
-    # If nested address_record_attributes hash is present, no legacy handling required!
-    ar_attrs = bike["address_record_attributes"]&.slice(*AddressRecord.permitted_params.map(&:to_s))
-    ar_attrs ||= AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(k)] }.to_h
-
-    ar_attrs.values.any? ? ar_attrs.compact.merge(kind: "bike") : {}
   end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show
@@ -610,12 +628,7 @@ class BParam < ApplicationRecord
   def safe_bike_attrs(new_attrs)
     # existing bike attrs, overridden with passed attributes
     attrs_merged = bike.merge("status" => status).merge(new_attrs.as_json)
-    addy_hash = attrs_merged["address_record_attributes"] || address_record_attributes
-    addy_attributes = if addy_hash.present?
-      {"address_record_attributes" => addy_hash.merge(kind: "bike")}
-    else
-      {}
-    end
+    addy_hash = self.class.address_record_attributes(attrs_merged)
 
     attrs_merged.except(*SKIPPED_BIKE_ATTRS)
       .map { |k, v| clean_key_value(k, v) }.compact.to_h
@@ -625,7 +638,7 @@ class BParam < ApplicationRecord
         "updator_id" => creator_id,
         # propulsion_type_slug safe assigns, verifying against cycle_type (in BikeAttributable)
         "propulsion_type_slug" => self.class.propulsion_type(params.merge("bike" => attrs_merged)))
-      .merge(addy_attributes)
+      .merge(addy_hash.blank? ? {} : {"address_record_attributes" => addy_hash})
   end
 
   private
@@ -676,20 +689,5 @@ class BParam < ApplicationRecord
     color = params.dig("bike", key).presence && Color.friendly_find(params.dig("bike", key))
     params["bike"]["#{key}_id"] = color.id if color.present?
     params["bike"].delete(key)
-  end
-
-  # Deal with the legacy address concerns
-  def legacy_address_field_value(field)
-    if field == :street # If looking for street or address, try both street and address
-      bike["street"] || bike["address"] || bike["address_street"]
-    elsif field == :postal_code
-      bike[field.to_s] || bike["zipcode"] || bike["address_zipcode"]
-    elsif field == :region_string
-      bike[field.to_s] || bike["state"] || bike["address_state"]
-    elsif field == :country_id
-      bike[field.to_s] || bike["country"] || bike["address_country"]
-    else
-      bike[field.to_s] || bike["address_#{field}"]
-    end
   end
 end

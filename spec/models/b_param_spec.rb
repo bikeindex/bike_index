@@ -266,7 +266,7 @@ RSpec.describe BParam, type: :model do
     let(:params_hash) { {bike: bike_params}.as_json }
     let(:b_param) { BParam.new(params: params_hash) }
     let(:target_address) do
-      {street: "123 Main St", city: "Nevernever Land", postal_code: "11111", region_string: "CA", kind: "bike"}
+      {street: "123 Main St", city: "Nevernever Land", postal_code: "11111", region_string: "CA", kind: "ownership"}
     end
     let(:bike) { Bike.new }
     let(:bike_params) do
@@ -284,7 +284,7 @@ RSpec.describe BParam, type: :model do
     end
     before { allow(bike).to receive(:b_params) { [b_param] } }
     it "has the expected fields" do
-      expect(b_param.address_record_attributes).to eq target_address
+      expect(described_class.address_record_attributes(b_param.bike)).to eq target_address
       expect(b_param.bike_sticker_code).to eq "xxxx"
       expect(b_param.organization_affiliation).to eq "employee"
       expect(b_param.phone).to eq "919929333"
@@ -705,7 +705,7 @@ RSpec.describe BParam, type: :model do
             region_string: "CO",
             street: "1812 Miners Spur, Building 2015 Unit 99999-69",
             postal_code: "80401",
-            kind: "bike"
+            kind: "ownership"
           }
         }
       end
@@ -726,7 +726,7 @@ RSpec.describe BParam, type: :model do
           }
         end
         it "returns target attributes" do
-          expect(b_param.address_record_attributes.except(:region_record_id))
+          expect(described_class.address_record_attributes(b_param.bike).except(:region_record_id))
             .to match_hash_indifferently target[:address_record_attributes].except(:region_record_id)
           expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
         end
@@ -746,7 +746,8 @@ RSpec.describe BParam, type: :model do
           }
         end
         it "returns target attributes" do
-          expect(b_param.address_record_attributes).to match_hash_indifferently target[:address_record_attributes]
+          expect(described_class.address_record_attributes(b_param.bike))
+            .to match_hash_indifferently target[:address_record_attributes]
           expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
         end
       end
