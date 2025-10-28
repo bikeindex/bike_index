@@ -292,7 +292,7 @@ class Ownership < ApplicationRecord
     if overridden_by_user_registration?
       UserRegistrationOrganization.universal_registration_info_for(user, registration_info)
     else
-      # Only assign info with organization_uniq if
+      # Only assign info with organization_uniq if org_id is present
       r_info = info_with_organization_uniq(registration_info, organization_id)
       clean_registration_info(r_info)
     end
@@ -324,7 +324,7 @@ class Ownership < ApplicationRecord
     if r_info["bike_code"].present?
       r_info["bike_sticker"] = r_info.delete("bike_code")
     end
-    r_info.reject { |_k, v| v.blank? }
+    r_info.reject { |_k, v| v.blank? }.except("kind") # ignore 'kind' from the address_record
   end
 
   def spam_risky_email?
