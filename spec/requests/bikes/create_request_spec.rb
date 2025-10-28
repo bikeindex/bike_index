@@ -76,7 +76,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.normalized_serial_segments).to eq([])
         expect(new_bike.creation_organization_id).to eq organization.id
         expect(new_bike.creator_id).to eq current_user.id
-        expect(new_bike.address_record).to be_blank
+        expect(new_bike.address_record).to match_hash_indifferently default_location_address_record_attrs.merge(kind: "ownership")
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
         bike_sticker_update = bike_sticker.bike_sticker_updates.last
         expect(bike_sticker_update.kind).to eq "initial_claim"

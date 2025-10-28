@@ -656,9 +656,7 @@ RSpec.describe MyAccountsController, type: :request do
             target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
             expect(bike3.registration_info).to eq target_bike3_info
 
-            expect(current_user.reload.address_record).to be_present
-            expect(current_user.address_hash(visible_attribute: :street, render_country: true))
-              .to eq default_location_registration_address_new
+            expect(current_user.reload.address_record).to match_hash_indifferently default_location_address_record_attrs.merge(kind: "user")
 
             expect(current_user.address_hash_legacy)
               .to eq default_location_registration_address.merge("country" => "United States")
