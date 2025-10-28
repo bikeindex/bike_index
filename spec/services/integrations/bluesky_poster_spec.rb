@@ -10,7 +10,7 @@ RSpec.describe Integrations::BlueskyPoster do
 
   describe "#build_bike_status" do
     context "stolen bike" do
-      let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national) }
+      let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national, platform: :bluesky) }
       let(:bike) { FactoryBot.create(:stolen_bike, :blue_trek_930) }
       let(:bpi) { Integrations::BlueskyPoster.new(bike) }
       before do
@@ -71,7 +71,7 @@ RSpec.describe Integrations::BlueskyPoster do
     end
 
     context "bike with image" do
-      let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national) }
+      let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national, platform: :bluesky) }
       let(:bike) { FactoryBot.create(:stolen_bike, :blue_trek_930, :with_image) }
 
       it "creates correct string with media" do
@@ -87,7 +87,7 @@ RSpec.describe Integrations::BlueskyPoster do
   end
 
   describe "#initialize" do
-    let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national) }
+    let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national, platform: :bluesky) }
     let(:bike) { FactoryBot.create(:stolen_bike, :blue_trek_930) }
     let(:bpi) { Integrations::BlueskyPoster.new(bike) }
 
@@ -99,7 +99,7 @@ RSpec.describe Integrations::BlueskyPoster do
   end
 
   describe "#stolen_slug" do
-    let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national) }
+    let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national, platform: :bluesky) }
 
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike) }
@@ -121,7 +121,7 @@ RSpec.describe Integrations::BlueskyPoster do
   end
 
   describe "#compute_max_char" do
-    let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national) }
+    let!(:national_account) { FactoryBot.create(:twitter_account_1, :active, :national, platform: :bluesky) }
     let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:bpi) { Integrations::BlueskyPoster.new(bike) }
 

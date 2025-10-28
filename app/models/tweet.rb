@@ -8,6 +8,7 @@
 #  body_html          :text
 #  image              :string
 #  kind               :integer
+#  platform           :integer          default("twitter"), not null
 #  twitter_response   :json
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
@@ -19,11 +20,13 @@
 # Indexes
 #
 #  index_tweets_on_original_tweet_id   (original_tweet_id)
+#  index_tweets_on_platform            (platform)
 #  index_tweets_on_stolen_record_id    (stolen_record_id)
 #  index_tweets_on_twitter_account_id  (twitter_account_id)
 #
 class Tweet < ApplicationRecord
   KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
+  PLATFORM_ENUM = {twitter: 0, bluesky: 1}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
   validates :twitter_id, uniqueness: true, allow_blank: true
   has_many :public_images, as: :imageable, dependent: :destroy
@@ -42,10 +45,14 @@ class Tweet < ApplicationRecord
   before_validation :set_calculated_attributes
 
   enum :kind, KIND_ENUM
+  enum :platform, PLATFORM_ENUM
 
   scope :retweet, -> { where.not(original_tweet: nil) }
   scope :not_retweet, -> { where(original_tweet: nil) }
   scope :not_stolen, -> { where.not(kind: "stolen_tweet") }
+  scope :for_platform, ->(platform) { where(platform:) }
+  scope :twitter_posts, -> { where(platform: :twitter) }
+  scope :bluesky_posts, -> { where(platform: :bluesky) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -59,13 +66,23 @@ class Tweet < ApplicationRecord
     order(created_at: :desc).find_by(query)
   end
 
-  def self.auto_link_text(text)
-    text.gsub(/@([^\s])*/) {
-      username = Regexp.last_match[0]
-      "<a href=\"https://twitter.com/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
-    }.gsub(/#([^\s])*/) do
-      hashtag = Regexp.last_match[0]
-      "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
+  def self.auto_link_text(text, platform = :twitter)
+    if platform == :bluesky
+      text.gsub(/@([^\s])*/) {
+        username = Regexp.last_match[0]
+        "<a href=\"https://bsky.app/profile/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
+      }.gsub(/#([^\s])*/) do
+        hashtag = Regexp.last_match[0]
+        "<a href=\"https://bsky.app/search?q=#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
+      end
+    else
+      text.gsub(/@([^\s])*/) {
+        username = Regexp.last_match[0]
+        "<a href=\"https://twitter.com/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
+      }.gsub(/#([^\s])*/) do
+        hashtag = Regexp.last_match[0]
+        "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
+      end
     end
   end
 
@@ -145,8 +162,13 @@ class Tweet < ApplicationRecord
 
   def set_calculated_attributes
     self.kind ||= calculated_kind
+    # Set platform from twitter_account if not explicitly set
+    if twitter_account.present? && (platform.nil? || platform == "twitter")
+      self.platform = twitter_account.platform
+    end
+    self.platform ||= :twitter
     if imported_tweet?
-      self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
+      self.body_html ||= self.class.auto_link_text(trh[:text], platform) if trh.dig(:text).present?
       self.alignment ||= VALID_ALIGNMENTS.first
       unless VALID_ALIGNMENTS.include?(alignment)
         errors.add "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
@@ -194,14 +216,33 @@ class Tweet < ApplicationRecord
   end
 
   def tweetor_link
-    twitter_account&.twitter_account_url || "https://twitter.com/#{tweetor}"
+    twitter_account&.platform_account_url || default_platform_url
   end
 
   def tweet_link
     if twitter_account.present?
-      [twitter_account.twitter_account_url, "status", twitter_id].join("/")
+      if bluesky?
+        # Bluesky post URLs use the format: https://bsky.app/profile/{handle}/post/{post-id}
+        # Extract the post ID from the URI (format: at://did:plc:.../app.bsky.feed.post/...)
+        post_id = if twitter_id.start_with?("at://")
+          twitter_id.split("/").last
+        else
+          twitter_id
+        end
+        "#{twitter_account.platform_account_url}/post/#{post_id}"
+      else
+        [twitter_account.platform_account_url, "status", twitter_id].join("/")
+      end
     else
-      "https://twitter.com/#{tweetor}/status/#{twitter_id}"
+      "#{default_platform_url}/status/#{twitter_id}"
+    end
+  end
+
+  def default_platform_url
+    if bluesky?
+      "https://bsky.app/profile/#{tweetor}"
+    else
+      "https://twitter.com/#{tweetor}"
     end
   end
 

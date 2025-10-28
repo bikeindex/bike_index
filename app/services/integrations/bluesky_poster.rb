@@ -24,7 +24,7 @@ class Integrations::BlueskyPoster
     if bike.image_url.present?
       self.bike_photo_url = bike.image_url(:large)
     end
-    self.national_twitter_account = TwitterAccount.national.first
+    self.national_twitter_account = TwitterAccount.national.bluesky_accounts.first
     self.city = stolen_record&.city
     self.state = stolen_record&.state&.abbreviation
     self.neighborhood = stolen_record&.neighborhood
