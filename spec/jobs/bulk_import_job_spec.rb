@@ -191,7 +191,9 @@ RSpec.describe BulkImportJob, type: :job do
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XXX123") }
+      let(:target_address) { {city: "NY", region_string: "New York", country_id: Country.united_states_id, kind: "ownership"} }
       it "creates the bikes, doesn't have any errors", :flaky do
+        expect(Country.united_states).to be_present
         expect(bike_sticker.reload.claimed?).to be_falsey
         expect(bike_sticker.bike_sticker_updates.count).to eq 0
         # In production, we actually use remote files rather than local files.
@@ -225,7 +227,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike1.public_images.count).to eq 0
           expect(bike1.phone).to eq("8887776666")
           # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
-          expect(bike1.registration_address.reject { |_k, v| v.blank? }).to match_hash_indifferently({street: default_location[:address], country: "United States"})
+          expect(bike1.address_record.attributes.except(:id, :latitude, :longitude).compact).to match_hash_indifferently target_address
           expect(bike1.registration_address_source).to eq "initial_creation"
           # IDK why this is failing, post address_record for ownerships - PR #2912
           # expect(bike1.current_ownership.address_record.to_coordinates.compact.count).to eq 2
@@ -306,130 +308,132 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike_sticker.bike_sticker_updates.count).to eq 2
         end
       end
-      # context "valid file, kind: impounded" do
-      #   let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
-      #   let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
-      #   let(:organization) { impound_configuration.organization }
-      #   let!(:state) { FactoryBot.create(:state_california) }
-      #   let(:user) { FactoryBot.create(:organization_user, organization: organization) }
-      #   # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
-      #   let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
-      #   include_context :geocoder_real
-      #   let(:bike1_target) do
-      #     {
-      #       primary_frame_color: color_green,
-      #       serial_number: "xyz_test",
-      #       owner_email: "test@bikeindex.org",
-      #       manufacturer: trek,
-      #       creator: organization.auto_user,
-      #       creation_organization_id: organization.id,
-      #       year: 2019,
-      #       description: "I love this, it's my favorite",
-      #       frame_size: "29in",
-      #       frame_size_unit: "in",
-      #       registration_address: {},
-      #       public_images: [],
-      #       phone: "8887776666",
-      #       extra_registration_number: nil,
-      #       owner_name: nil,
-      #       status: "status_impounded"
-      #     }
-      #   end
-      #   let(:bike2_target) do
-      #     {
-      #       primary_frame_color: color_white,
-      #       serial_number: "example",
-      #       owner_email: "test2@bikeindex.org",
-      #       manufacturer: surly,
-      #       creator: organization.auto_user,
-      #       creation_organization_id: organization.id,
-      #       year: nil,
-      #       frame_size: "m",
-      #       frame_size_unit: "ordinal",
-      #       registration_address: {},
-      #       phone: nil,
-      #       extra_registration_number: "extra serial number",
-      #       owner_name: "Sally",
-      #       status: "status_impounded"
-      #     }
-      #   end
-      #   let(:impound_record1_target) do
-      #     {
-      #       impounded_description: "It was locked to a handicap railing",
-      #       display_id: "2020-33333",
-      #       unregistered_bike: true,
-      #       street: "1409 Martin Luther King Junior Way",
-      #       city: "Berkeley",
-      #       zipcode: "94709", # NOTE: the zipcode that is entered is 94710
-      #       state_id: state.id
-      #     }
-      #   end
-      #   let(:impound_record2_target) do
-      #     {
-      #       impounded_description: "Appears to be abandoned",
-      #       display_id: "1",
-      #       unregistered_bike: true,
-      #       street: "327 17th Street",
-      #       city: "Oakland",
-      #       zipcode: "94612",
-      #       state_id: state.id
-      #     }
-      #   end
-      #   it "creates the bikes and impound records", :flaky do
-      #     expect(bike_sticker.reload.claimed?).to be_falsey
-      #     expect(bike_sticker.bike_sticker_updates.count).to eq 0
-      #     VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:method]) do
-      #       allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
-      #       expect {
-      #         instance.perform(bulk_import.id)
-      #         # This test is being flaky! Add debug printout #2101
-      #         pp "Error valid file impounded", bulk_import.import_errors if bulk_import.reload.blocking_error?
-      #       }.to change(Bike, :count).by 2
-      #       bulk_import.reload
-      #       expect(bulk_import.progress).to eq "finished"
-      #       expect(bulk_import.bikes.count).to eq 2
-      #       expect(bulk_import.file_errors).to_not be_present
-      #       expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size bike_sticker photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
+      context "valid file, kind: impounded" do
+        let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_impounded_all_optional_fields.csv" }
+        let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
+        let(:organization) { impound_configuration.organization }
+        let!(:state) { FactoryBot.create(:state_california) }
+        let(:user) { FactoryBot.create(:organization_user, organization: organization) }
+        # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
+        let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: user.id, kind: "impounded", organization_id: organization.id) }
+        include_context :geocoder_real
+        let(:bike1_target) do
+          {
+            primary_frame_color: color_green,
+            serial_number: "xyz_test",
+            owner_email: "test@bikeindex.org",
+            manufacturer: trek,
+            creator: organization.auto_user,
+            creation_organization_id: organization.id,
+            year: 2019,
+            description: "I love this, it's my favorite",
+            frame_size: "29in",
+            frame_size_unit: "in",
+            registration_address: {},
+            public_images: [],
+            phone: "8887776666",
+            extra_registration_number: nil,
+            owner_name: nil,
+            status: "status_impounded"
+          }
+        end
+        let(:bike2_target) do
+          {
+            primary_frame_color: color_white,
+            serial_number: "example",
+            owner_email: "test2@bikeindex.org",
+            manufacturer: surly,
+            creator: organization.auto_user,
+            creation_organization_id: organization.id,
+            year: nil,
+            frame_size: "m",
+            frame_size_unit: "ordinal",
+            registration_address: {},
+            phone: nil,
+            extra_registration_number: "extra serial number",
+            owner_name: "Sally",
+            status: "status_impounded"
+          }
+        end
+        let(:impound_record1_target) do
+          {
+            impounded_description: "It was locked to a handicap railing",
+            display_id: "2020-33333",
+            unregistered_bike: true,
+            street: "1409 Martin Luther King Junior Way",
+            city: "Berkeley",
+            zipcode: "94709", # NOTE: the zipcode that is entered is 94710
+            state_id: state.id
+          }
+        end
+        let(:impound_record2_target) do
+          {
+            impounded_description: "Appears to be abandoned",
+            display_id: "1",
+            unregistered_bike: true,
+            street: "327 17th Street",
+            city: "Oakland",
+            zipcode: "94612",
+            state_id: state.id
+          }
+        end
+        it "creates the bikes and impound records", :flaky do
+          expect(bike_sticker.reload.claimed?).to be_falsey
+          expect(bike_sticker.bike_sticker_updates.count).to eq 0
+          VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:method]) do
+            allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
+            expect {
+              instance.perform(bulk_import.id)
+              # This test is being flaky! Add debug printout #2101
+              pp "Error valid file impounded", bulk_import.import_errors if bulk_import.reload.blocking_error?
+            }.to change(Bike, :count).by 2
+            bulk_import.reload
+            expect(bulk_import.progress).to eq "finished"
+            expect(bulk_import.bikes.count).to eq 2
+            expect(bulk_import.file_errors).to_not be_present
+            expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size bike_sticker photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
 
-      #       bike1 = bulk_import.bikes.reorder(:created_at).first
-      #       expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
-      #       expect(bike1.current_ownership.status).to eq "status_impounded"
-      #       expect(bike1).to match_hash_indifferently bike1_target
-      #       expect(bike1.created_by_notification_or_impounding?).to be_truthy
-      #       bike1_impound_record = bike1.current_impound_record
-      #       expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
-      #       expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
-      #       expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
+            bike1 = bulk_import.bikes.reorder(:created_at).first
+            expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
+            expect(bike1.current_ownership.status).to eq "status_impounded"
+            expect(bike1).to match_hash_indifferently bike1_target
+            expect(bike1.created_by_notification_or_impounding?).to be_truthy
+            bike1_impound_record = bike1.current_impound_record
+            expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
+            expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
+            expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
 
-      #       expect(bike1.address_hash).to eq bike1_impound_record.address_hash
-      #       expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
-      #       expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
-      #       bike_sticker.reload
-      #       expect(bike_sticker.claimed?).to be_truthy
-      #       expect(bike_sticker.bike_id).to eq bike1.id
-      #       expect(bike_sticker.organization_id).to be_blank
-      #       expect(bike_sticker.secondary_organization_id).to eq organization.id
-      #       expect(bike_sticker.bike_sticker_updates.count).to eq 1
-      #       bike_sticker_update = bike_sticker.bike_sticker_updates.first
-      #       expect(bike_sticker_update.organization_id).to eq organization.id
-      #       expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
-      #       expect(bike_sticker_update.creator_kind).to eq "creator_import"
+            expect(bike1.to_coordinates).to eq bike1_impound_record.to_coordinates
+            expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+            expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_truthy
+            expect(bike_sticker.bike_id).to eq bike1.id
+            expect(bike_sticker.organization_id).to be_blank
+            expect(bike_sticker.secondary_organization_id).to eq organization.id
+            expect(bike_sticker.bike_sticker_updates.count).to eq 1
+            bike_sticker_update = bike_sticker.bike_sticker_updates.first
+            expect(bike_sticker_update.organization_id).to eq organization.id
+            expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
+            expect(bike_sticker_update.creator_kind).to eq "creator_import"
 
-      #       bike2 = bulk_import.bikes.reorder(:created_at).last
-      #       expect(bike2.id).to_not eq bike1.id
-      #       expect(bike2).to match_hash_indifferently bike2_target
-      #       expect(bike2.public_images.count).to eq 1
-      #       expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
-      #       expect(bike1.current_ownership.status).to eq "status_impounded"
-      #       expect(bike2.created_by_notification_or_impounding?).to be_truthy
-      #       bike2_impound_record = bike2.current_impound_record
-      #       expect(bike2_impound_record).to match_hash_indifferently impound_record2_target
-      #       expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
-      #       expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
-      #       expect(bike2.address_hash).to eq bike2_impound_record.address_hash
-      #     end
-      #   end
-      # end
+            bike2 = bulk_import.bikes.reorder(:created_at).last
+            expect(bike2.id).to_not eq bike1.id
+            expect(bike2).to match_hash_indifferently bike2_target
+            expect(bike2.public_images.count).to eq 1
+            expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
+            expect(bike1.current_ownership.status).to eq "status_impounded"
+            expect(bike2.created_by_notification_or_impounding?).to be_truthy
+            bike2_impound_record = bike2.current_impound_record
+            # pp ImpoundRecord.count
+            # pp bike1_impound_record, bike2_impound_record, impound_record2_target
+            expect(bike2_impound_record).to match_hash_indifferently impound_record2_target
+            expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
+            expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
+            expect(bike2.to_coordinates).to eq bike2_impound_record.to_coordinates
+          end
+        end
+      end
     end
   end
 
@@ -441,7 +445,7 @@ RSpec.describe BulkImportJob, type: :job do
         let(:csv_lines) { sample_csv_lines.slice(1, 2).map { |l| l.join(",") } }
         it "adds a file error" do
           expect(instance).to_not receive(:register_bike)
-          instance.process_csv(File.open(tempfile.path, "r"))
+          instance.send(:process_csv, File.open(tempfile.path, "r"))
           bulk_import.reload
           expect(bulk_import.file_errors.to_s).to match(/invalid csv headers/i)
           expect(bulk_import.progress).to eq "finished"
@@ -451,7 +455,7 @@ RSpec.describe BulkImportJob, type: :job do
         let(:csv_lines) { ([%w[manufacturer email name color]] + sample_csv_lines.slice(1, 2)).map { |l| l.join(",") } }
         it "adds a file error" do
           expect(instance).to_not receive(:register_bike)
-          instance.process_csv(File.open(tempfile.path, "r"))
+          instance.send(:process_csv, File.open(tempfile.path, "r"))
           bulk_import.reload
           expect(bulk_import.file_errors.to_s).to match(/invalid csv headers/i)
           expect(bulk_import.progress).to eq "finished"
@@ -462,7 +466,7 @@ RSpec.describe BulkImportJob, type: :job do
         let(:csv_lines) { [[sample_csv_lines[0]], [error_line]].map { |l| l.join(",") } }
         let(:target_line_error) { [2, ["Owner email can't be blank"]] }
         it "registers a bike and adds a row error" do
-          instance.process_csv(File.open(tempfile.path, "r"))
+          instance.send(:process_csv, File.open(tempfile.path, "r"))
           expect(instance.line_errors.count).to eq 1
           expect(instance.line_errors.first).to eq target_line_error
           expect(bulk_import.progress).to eq "ongoing"
@@ -470,12 +474,12 @@ RSpec.describe BulkImportJob, type: :job do
       end
       context "with two valid bikes" do
         let(:csv_lines) { sample_csv_lines.map { |l| l.join(",") } }
-        let(:bparam_line1) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(sample_csv_lines[1]).to_h) }
-        let(:bparam_line2) { instance.row_to_b_param_hash(sample_csv_lines[0].map(&:to_sym).zip(sample_csv_lines[2]).to_h) }
+        let(:bparam_line1) { instance.send(:row_to_b_param_hash, sample_csv_lines[0].map(&:to_sym).zip(sample_csv_lines[1]).to_h) }
+        let(:bparam_line2) { instance.send(:row_to_b_param_hash, sample_csv_lines[0].map(&:to_sym).zip(sample_csv_lines[2]).to_h) }
         it "calls register bike with the valid bikes" do
           expect(instance).to receive(:register_bike).with(bparam_line1) { Bike.new(id: 1) }
           expect(instance).to receive(:register_bike).with(bparam_line2) { Bike.new(id: 1) }
-          instance.process_csv(File.open(tempfile.path, "r"))
+          instance.send(:process_csv, File.open(tempfile.path, "r"))
           bulk_import.reload
           expect(bulk_import.import_errors).to_not be_present
           expect(bulk_import.progress).to eq "ongoing"
@@ -497,7 +501,6 @@ RSpec.describe BulkImportJob, type: :job do
           description: nil,
           frame_size: nil,
           phone: nil,
-          address: nil,
           extra_registration_number: nil,
           user_name: nil,
           send_email: true,
@@ -510,7 +513,7 @@ RSpec.describe BulkImportJob, type: :job do
         context "some extra bits" do
           it "returns the hash we want" do
             row_hash = row.merge(hidden: true, another_thing: "912913")
-            result = instance.row_to_b_param_hash(row_hash)
+            result = instance.send(:row_to_b_param_hash, row_hash)
             expect(result.select { |_k, v| v.present? }.keys).to eq([:bulk_import_id, :bike])
             expect(result[:bike]).to eq target
           end
@@ -519,7 +522,7 @@ RSpec.describe BulkImportJob, type: :job do
           let(:organization) { FactoryBot.create(:organization) }
           let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization, no_notify: true) }
           it "registers with organization" do
-            expect(instance.row_to_b_param_hash(row)[:bike]).to eq target.merge(send_email: false, creation_organization_id: organization.id)
+            expect(instance.send(:row_to_b_param_hash, row)[:bike]).to eq target.merge(send_email: false, creation_organization_id: organization.id)
           end
         end
       end
@@ -538,7 +541,6 @@ RSpec.describe BulkImportJob, type: :job do
             description: nil,
             frame_size: nil,
             phone: nil,
-            address: nil,
             extra_registration_number: nil,
             user_name: nil,
             send_email: true,
@@ -561,7 +563,7 @@ RSpec.describe BulkImportJob, type: :job do
           }
         end
         it "returns impounded kind" do
-          result = instance.row_to_b_param_hash(row)
+          result = instance.send(:row_to_b_param_hash, row)
           expect(result.select { |_k, v| v.present? }.keys).to eq([:bulk_import_id, :bike, :impound_record])
           expect(result[:bike]).to eq target
           expect(result[:impound_record]).to eq target_impound
@@ -578,7 +580,7 @@ RSpec.describe BulkImportJob, type: :job do
         def expect_registered_bike(passed_row)
           expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0
-          new_bike = instance.register_bike(instance.row_to_b_param_hash(passed_row))
+          new_bike = instance.send(:register_bike, instance.send(:row_to_b_param_hash, passed_row))
           # This test is being flaky! Add debug printout #2101
           pp "Error expect_registered_bike", new_bike.errors if new_bike.errors.any?
           expect(Bike.count).to eq 1
@@ -642,7 +644,7 @@ RSpec.describe BulkImportJob, type: :job do
         let(:target_errors) { ["Owner email can't be blank"] }
         it "returns the invalid bike with errors" do
           expect {
-            bike = instance.register_bike(instance.row_to_b_param_hash(row))
+            bike = instance.send(:register_bike, instance.send(:row_to_b_param_hash, row))
             expect(bike.id).to_not be_present
             expect(bike.cleaned_error_messages).to eq(target_errors)
           }.to change(Bike, :count).by 0
@@ -654,7 +656,7 @@ RSpec.describe BulkImportJob, type: :job do
         it "returns the invalid bike with errors" do
           bulk_import.kind = "impounded"
           expect {
-            expect(instance.register_bike(instance.row_to_b_param_hash(row))).to be_blank
+            expect(instance.send(:register_bike, instance.send(:row_to_b_param_hash, row))).to be_blank
           }.to change(Bike, :count).by 0
         end
       end
@@ -665,10 +667,10 @@ RSpec.describe BulkImportJob, type: :job do
       let(:non_blank_examples) { %w[somethingna none8xc9x] }
       it "rescues blank serials, doesn't rescue non blank serials" do
         blank_examples.each do |blank|
-          expect(instance.rescue_blank_serial(blank)).to eq("unknown"), "Failure: '#{blank}'"
+          expect(instance.send(:rescue_blank_serial, blank)).to eq("unknown"), "Failure: '#{blank}'"
         end
         non_blank_examples.each do |non_blank|
-          expect(instance.rescue_blank_serial(non_blank)).to_not eq("unknown"), "Failure: #{non_blank}"
+          expect(instance.send(:rescue_blank_serial, non_blank)).to_not eq("unknown"), "Failure: #{non_blank}"
         end
       end
     end
@@ -678,7 +680,7 @@ RSpec.describe BulkImportJob, type: :job do
         let(:header_string) { "ManufaCTURER,MODEL, YEAR, owner_email, serial Number, Stuff\n" }
         let(:target) { %i[manufacturer model year owner_email serial_number stuff] }
         it "leaves things alone" do
-          expect(instance.convert_headers(header_string)).to eq target
+          expect(instance.send(:convert_headers, header_string)).to eq target
           expect(instance.bulk_import.import_errors?).to be_falsey
         end
       end
@@ -687,7 +689,7 @@ RSpec.describe BulkImportJob, type: :job do
         let(:header_string) { "BRAnd, vendor,MODEL,frame_model, frame YEAR,impounded_at, serial, impounded street, impounded-city, Stuff\n" }
         let(:target) { %i[manufacturer vendor model frame_model year impounded_at serial_number impounded_street impounded_city stuff] }
         it "returns the symbol if the symbol exists, without overwriting better terms" do
-          expect(instance.convert_headers(header_string)).to eq target
+          expect(instance.send(:convert_headers, header_string)).to eq target
           expect(instance.bulk_import.import_errors?).to be_falsey
         end
         context "crazy characters" do
@@ -696,7 +698,7 @@ RSpec.describe BulkImportJob, type: :job do
           let(:header_string) { "#{shitty_character}impounded_id, BRAnd, vendor,MODEL,frame_model, frame YEAR,impounded_at, serial, impounded street, impounded-city, Stuff\n" }
           it "returns the target" do
             expect(header_string.first.ord).to eq 65279
-            expect(instance.convert_headers(header_string)).to eq([:impounded_id] + target)
+            expect(instance.send(:convert_headers, header_string)).to eq([:impounded_id] + target)
             expect(instance.bulk_import.import_errors?).to be_falsey
           end
         end
@@ -705,17 +707,82 @@ RSpec.describe BulkImportJob, type: :job do
         let(:header_string) { "BRAnd, vendor,MODEL,frame_model, frame YEAR,email, serial, Stuff\n" }
         let(:target) { %i[manufacturer vendor model frame_model year owner_email serial_number stuff] }
         it "returns the symbol if the symbol exists, without overwriting better terms" do
-          expect(instance.convert_headers(header_string)).to eq target
+          expect(instance.send(:convert_headers, header_string)).to eq target
           expect(instance.bulk_import.import_errors?).to be_falsey
         end
         context "quote wrapped" do
           let(:header_string) { '"Product Description","Brand","Color","Size","Serial Number","Customer Last Name","Customer First Name","Customer Email"' }
           let(:target) { %i[description manufacturer color frame_size serial_number customer_last_name customer_first_name owner_email] }
           it "leaves things alone" do
-            expect(instance.convert_headers(header_string)).to eq target
+            expect(instance.send(:convert_headers, header_string)).to eq target
             expect(instance.bulk_import.import_errors?).to be_falsey
           end
         end
+      end
+    end
+  end
+
+  describe "address_record_attributes" do
+    let(:target) { {address_record_attributes:} }
+
+    it "returns empty for empty" do
+      expect(described_class.address_record_attributes(nil)).to eq({})
+      expect(described_class.address_record_attributes("\t ")).to eq({})
+    end
+
+    context "San Francisco" do
+      let(:address_string) { "San Francisco, CA" }
+      let(:country) { Country.united_states_id }
+      let(:address_record_attributes) { {city: "San Francisco", region_string: "CA", country:, street: nil} }
+
+      it "returns San Francisco" do
+        expect(described_class.send(:region_and_postal, "CA")).to eq({region_string: "CA"})
+        expect(described_class.address_record_attributes("San Francisco, CA", country)).to eq target
+        expect(described_class.address_record_attributes("San Francisco, CA, USA", country)).to eq target
+        expect(described_class.address_record_attributes("San Francisco, CA, USA")).to eq target
+        # Handle single address part
+        expect(described_class.address_record_attributes("San Francisco", country))
+          .to eq({address_record_attributes: {city: "San Francisco", country:, street: nil}})
+      end
+
+      context "city, region and postal code" do
+        let(:address_string) { "San Francisco, CA 94110" }
+        let(:address_record_attributes) { {city: "San Francisco", region_string: "CA", postal_code: "94110", country:, street: nil} }
+        it "returns target" do
+          expect(described_class.send(:region_and_postal, "CA 94110")).to eq({region_string: "CA", postal_code: "94110"})
+
+          expect(described_class.address_record_attributes(address_string, country)).to eq target
+          expect(described_class.address_record_attributes("#{address_string}, USA", country)).to eq target
+          expect(described_class.address_record_attributes("#{address_string}, USA")).to eq target
+        end
+      end
+
+      context "street, city, region and postal code" do
+        let(:address_string) { "Suite 2, 494 14th St, San Francisco, CA 94103" }
+        let(:address_record_attributes) { {street: "Suite 2, 494 14th St", city: "San Francisco", region_string: "CA", postal_code: "94103", country:} }
+
+        it "returns target" do
+          expect(described_class.address_record_attributes(address_string, country)).to eq target
+          expect(described_class.address_record_attributes("#{address_string}, USA", country)).to eq target
+          expect(described_class.address_record_attributes("#{address_string}, USA")).to eq target
+        end
+      end
+    end
+
+    context "with street, city, region and postal_code" do
+      let(:address_string) { "15007 Stony Plain Rd, Edmonton, AB T5P 4W1" }
+      let(:address_record_attributes) { {city: "Edmonton", region_string: "AB", postal_code: "T5P 4W1", country:, street: "15007 Stony Plain Rd"} }
+      let(:country) { Country.canada_id }
+
+      it "returns target" do
+        expect(described_class.send(:region_and_postal, "AB T5P 4W1")).to eq({region_string: "AB", postal_code: "T5P 4W1"})
+        expect(described_class.address_record_attributes(address_string, country)).to eq target
+        expect(described_class.address_record_attributes("#{address_string}, CA", country)[:address_record_attributes])
+          .to eq address_record_attributes.merge(country: "CA")
+        expect(described_class.address_record_attributes("#{address_string}, CA")[:address_record_attributes])
+          .to eq address_record_attributes.merge(country: "CA")
+        expect(described_class.address_record_attributes("#{address_string}, Canada")[:address_record_attributes])
+          .to eq address_record_attributes.merge(country: "Canada")
       end
     end
   end
