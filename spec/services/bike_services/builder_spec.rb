@@ -13,7 +13,7 @@ RSpec.describe BikeServices::Builder do
       expect(bike.id).to be_blank
       # No address_record
       expect(bike.creation_organization_id).to be_blank
-      expect(b_param.address_record_attributes).to be_blank
+      expect(BParam.address_record_attributes(b_param.bike)).to be_blank
       expect(bike.address_record).to be_blank
     end
     context "status impounded" do
@@ -125,23 +125,27 @@ RSpec.describe BikeServices::Builder do
 
       it "doesn't create an address_record" do
         expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
-        expect(b_param.address_record_attributes).to be_blank
+        expect(BParam.address_record_attributes(b_param.bike)).to be_blank
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.address_record).to be_blank
+      end
+
+      context "with address_record_attributes: street" do
+        it "creates"
       end
 
       context "with organization with reg_address" do
         let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
         let(:state_id) { organization.state_id }
         let(:target_attributes) do
-          {id: nil, kind: "bike", city: "Chicago", region_record_id: state_id,
+          {id: nil, kind: "ownership", city: "Chicago", region_record_id: state_id,
            country_id: Country.united_states_id, street: nil, postal_code: nil}
         end
         it "returns address with organization's country, region_string and city" do
           expect(organization.reload.city).to eq "Chicago"
           expect(organization.street).to be_present
           expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
-          expect(b_param.address_record_attributes).to be_blank
+          expect(BParam.address_record_attributes(b_param.bike)).to be_blank
           expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
           expect(bike.address_record).to match_hash_indifferently target_attributes
         end
@@ -165,7 +169,7 @@ RSpec.describe BikeServices::Builder do
             expect(organization.reload.city).to eq "Chicago"
             expect(organization.street).to be_present
             expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
-            expect(b_param.address_record_attributes).to be_present
+            expect(BParam.address_record_attributes(b_param.bike)).to be_present
             expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
             expect(bike.address_record).to match_hash_indifferently b_param_params[:bike][:address_record_attributes]
           end
@@ -178,7 +182,7 @@ RSpec.describe BikeServices::Builder do
             expect(organization.reload.city).to be_blank
             expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
             expect(bike.address_record).to be_present
-            expect(bike.address_record.attributes.compact).to match_hash_indifferently(kind: "bike")
+            expect(bike.address_record.attributes.compact).to match_hash_indifferently(kind: "ownership")
           end
         end
       end

@@ -16,6 +16,7 @@ class BikeServices::Builder
       # passed_organization is assigned unless b_param has an organization
       passed_organization = new_attrs.delete(:organization)
       bike.attributes = b_param.safe_bike_attrs(new_attrs)
+
       bike.address_record&.bike = bike # Kinda gross, but gotta get it both ways!
 
       # If manufacturer_other is an existing manufacturer, reassign it
