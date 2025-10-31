@@ -206,7 +206,6 @@ class BParam < ApplicationRecord
       where("(params -> 'bike' ->> 'owner_email') ILIKE ?", "%#{str.to_s.strip}")
     end
 
-    # NOTE:
     def address_record_attributes(bike_params)
       # If nested address_record_attributes hash is present, no legacy handling required!
       ar_attrs = bike_params["address_record_attributes"]&.slice(*AddressRecord.permitted_params.map(&:to_s))

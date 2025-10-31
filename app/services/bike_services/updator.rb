@@ -77,10 +77,9 @@ class BikeServices::Updator
     @skip_ownership_bike_save = true # Don't save bike an extra time in update ownership
     update_ownership
     update_api_components if @bike_params["components"].present?
-    update_attrs = @bike_params["bike"].except("stolen_records_attributes", "impound_records_attributes")
-    if update_attrs.slice("street", "city", "zipcode").values.reject(&:blank?).any?
-      @bike.address_set_manually = true
-    end
+    update_attrs = @bike_params["bike"].except("stolen_records_attributes", "impound_records_attributes", "address_record_attributes")
+
+    update_attrs.merge!(address_record_attributes(update_attrs, @bike_params["bike"]["address_record_attributes"]))
 
     propulsion_updates = update_attrs.keys & %w[cycle_type cycle_type_name propulsion_type propulsion_type_slug]
     if propulsion_updates.any?
@@ -128,5 +127,20 @@ class BikeServices::Updator
 
   def updator_attrs
     {updated_by_user_at: Time.current}.merge(@user.present? ? {updator_id: @user.id} : {})
+  end
+
+  # TODO: Remove :update_attrs - only need address_record_attributes - once backfill is finished - #2922
+  def address_record_attributes(update_attrs, address_record_attributes)
+    if address_record_attributes.blank?
+      address_record_attributes = update_attrs.slice("city", "country_id", "street")
+        .merge(region_record_id: update_attrs["state_id"], postal_code: update_attrs["zipcode"])
+    end
+    return {} if address_record_attributes.values.reject(&:blank?).none?
+
+    address_record_attributes["kind"] = "bike"
+    address_record_attributes["id"] = (@bike.address_record&.kind == "bike") ? @bike.address_record_id : nil
+    address_set_manually = address_record_attributes.slice("street", "city", "postal_code").values.reject(&:blank?).any?
+
+    {address_record_attributes:}.merge(address_set_manually ? {address_set_manually: true} : {})
   end
 end
