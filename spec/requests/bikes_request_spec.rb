@@ -68,7 +68,7 @@ RSpec.describe BikesController, type: :request do
           {owner_email: current_user.email, manufacturer_id:, creation_organization_id: organization2.id,
            address: "212 Main St", address_city: "Chicago", address_state: "IL", address_zipcode: "60647"}
         end
-        let(:target_address_attrs) { {street: "212 Main St", city: "Chicago", region_string: "IL", postal_code: "60647", kind: "bike"} }
+        let(:target_address_attrs) { {street: "212 Main St", city: "Chicago", region_string: "IL", postal_code: "60647", kind: "ownership"} }
 
         it "uses the existing organization" do
           expect(b_param.reload.id_token).to be_present
