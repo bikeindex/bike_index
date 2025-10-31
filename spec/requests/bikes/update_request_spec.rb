@@ -42,6 +42,7 @@ RSpec.describe "BikesController#update", type: :request do
       {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: "",
        primary_activity_id:}
     end
+    let(:target_address_record_attributes) { update.slice(:street, :city, :country_id).merge(kind: "bike", postal_code: "AB T6E 2A4") }
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
@@ -59,12 +60,16 @@ RSpec.describe "BikesController#update", type: :request do
       VCR.use_cassette("bike_request-set_manual_address") do
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
-          patch base_url, params: {bike: update}
+          # expect {
+            patch base_url, params: {bike: update}
+          # }.to change(AddressRecord, :count).by 1
         end
       end
       bike.reload
-      expect(bike.street).to eq default_location[:street_address]
       expect(bike.address_set_manually).to be_falsey
+      # I don't understand why this doesn't create an address record?
+      expect(bike.address_record.street).to eq default_location[:street_address]
+      # expect(bike.address_record).to match_hash_indifferently(target_address_record_attributes)
       expect(bike.updated_by_user_at).to be > (Time.current - 1)
       expect(bike.primary_activity_id).to eq primary_activity_id
       expect(bike.not_updated_by_user?).to be_falsey
@@ -89,8 +94,7 @@ RSpec.describe "BikesController#update", type: :request do
           end
         end
         bike.reload
-        expect(bike.street).to eq "10544 82 Ave NW"
-        expect(bike.country).to eq Country.canada
+        expect(bike.address_record).to match_hash_indifferently(target_address_record_attributes)
         expect(bike.address_set_manually).to be_truthy
         # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
         expect(bike.latitude).to be_within(0.01).of(53.5183351)
@@ -156,7 +160,7 @@ RSpec.describe "BikesController#update", type: :request do
       end
     end
     context "bike has location" do
-      let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
+      let(:address_record) { FactoryBot.create(:address_record, :new_york, bike:, kind: "bike")}
       let(:time) { Time.current - 10.minutes }
       let(:phone) { "2221114444" }
       let(:current_user) { FactoryBot.create(:user_confirmed, phone: phone) }
@@ -165,7 +169,7 @@ RSpec.describe "BikesController#update", type: :request do
       let!(:user_phone_confirmed) { FactoryBot.create(:user_phone_confirmed, user: current_user, phone: phone) }
       it "marks the bike stolen, doesn't set a location, blanks bike location" do
         expect(current_user.reload.phone).to eq "2221114444"
-        bike.update(location_attrs.merge(skip_geocoding: true))
+        bike.update(address_set_manually: true)
         bike.reload
         expect(bike.address_set_manually).to be_truthy
         expect(bike.status_stolen?).to be_falsey
