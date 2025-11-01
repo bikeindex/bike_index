@@ -1841,13 +1841,11 @@ nl:
       additional_serial_sticker_number: Extra framenummer / stickernummer
       affiliation: "%{org_name} aansluiting"
       are_you_certain: Weet je het zeker?
-      city: City
       how_to_find_serial: hoe je het framenummer kan vinden
       i_just_dont_know_the_serial: Ik ken de serie gewoon niet
       im_100_sure: Ik ben 100% zeker
       is_a_handmade_frame: Is een handgemaakt frame
       it_probably_has_a_serial_number: Het heeft waarschijnlijk een framenummer.
-      mailing_address: Postadres
       missing_serial: Serie ontbreekt
       model_year: Modeljaar
       nevermind: Laat maar
@@ -1864,12 +1862,10 @@ nl:
       serial_help_content_html: Elke fiets heeft een uniek framenummer, zo worden
         ze geïdentificeerd. Voor meer informatie of enkele voorbeelden, ga naar %{serial_page_link}
         <small>(opent in een apart venster)</small> .
-      state: Staat
       this_is_a: Dit is een
       unknown_year: Onbekend jaar
       unsure_or_unknown: Onzeker of onbekend
       was_made_before_1970: Werd vóór 1970 gemaakt
-      zipcode: Postcode
       manufacturer: Fabrikant
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
@@ -5328,7 +5324,6 @@ nl:
       zipcode: Postcode
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
-      owners_mailing_address: Het postadres van de eigenaar
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} is bij u geregistreerd via <strong>%{org_name}</strong>
         ."
@@ -5343,7 +5338,6 @@ nl:
       choose_handlebar: Kies stuur
       choose_material: Kies materiaal
       choose_photo: Kies foto
-      city: City
       frame_color: Framekleur
       image_has_been_uploaded: Afbeelding is geüpload
       manufacturer_name: Naam van de fabrikant
@@ -5360,15 +5354,12 @@ nl:
       secondary_color: Secundaire Kleur
       select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
         niet wordt vermeld
-      state: Staat
       third_color: Derde kleur
       unknown_serial: Onbekende serie
       unknown_year: Onbekend jaar
       unsure_or_unknown: Onzeker of onbekend
-      zipcode: Postcode
       sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
-      owners_mailing_address: Het postadres van de eigenaar
     new:
       bike_index_for_organizations: Bike Index voor organisaties
     new_form:
@@ -5738,9 +5729,7 @@ nl:
       a_qr_sticker: een QR-sticker
       add_a_sticker_label_html: Voeg %{sticker_information_link} toe
       bike_name: Fietsnaam
-      choose_country: Kies land
       choose_material: Kies materiaal
-      city: City
       existing_stickers: Bestaande stickers
       frame_size: Kadergrootte
       general_description: Algemene beschrijving
@@ -5753,8 +5742,6 @@ nl:
       please_fill_in_both_fields: Gelieve beide velden in te vullen
       reason_for_update: Reden voor update
       seat_tube_length: Lengte zitbuis
-      state: Staat
-      street: Straat
       submit_manufacturer_correction: Correctie door fabrikant indienen
       submit_serial_correction: Seriële correctie indienen
       submit_update: Update verzenden
@@ -5763,7 +5750,6 @@ nl:
       unsure_or_unknown: Onzeker of onbekend
       update_serial_number: Framenummer bijwerken
       updated_serial: Framenummer bijgewerkt
-      zipcode: Postcode
       add_end: Einddatum versie toevoegen
       add_start: Startdatum versie toevoegen
       bike_registration: Bewerk hier de %{bike_type}-registratie
