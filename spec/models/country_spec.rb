@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Country, type: :model do
+  it_behaves_like "friendly_name_findable"
+
   describe "factory" do
     let(:country) { FactoryBot.create(:country_australia) }
     it "is valid and only creates once" do

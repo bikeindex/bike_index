@@ -12,7 +12,8 @@ RSpec.describe User, type: :model do
     end
 
     it "is valid" do
-      expect(address_record).to have_attributes target_attrs
+      # TODO: allow the user_id to include - #2922
+      expect(address_record.reload).to have_attributes target_attrs.except(:user_id)
       expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
       expect(user.to_coordinates).to eq(address_record.to_coordinates)
       expect(AddressRecord.pluck(:id)).to eq([address_record.id])

@@ -265,7 +265,9 @@ RSpec.describe BParam, type: :model do
   describe "additional_registration_fields" do
     let(:params_hash) { {bike: bike_params}.as_json }
     let(:b_param) { BParam.new(params: params_hash) }
-    let(:target_address) { {street: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA"}.as_json }
+    let(:target_address) do
+      {street: "123 Main St", city: "Nevernever Land", postal_code: "11111", region_string: "CA", kind: "ownership"}
+    end
     let(:bike) { Bike.new }
     let(:bike_params) do
       {
@@ -282,13 +284,7 @@ RSpec.describe BParam, type: :model do
     end
     before { allow(bike).to receive(:b_params) { [b_param] } }
     it "has the expected fields" do
-      expect(b_param.address("street")).to eq "123 Main St"
-      expect(b_param.address("address")).to eq "123 Main St"
-      expect(b_param.address("city")).to eq "Nevernever Land"
-      expect(b_param.address("address_zipcode")).to eq "11111"
-      expect(b_param.address("state")).to eq "CA"
-
-      expect(b_param.address_hash.except("country")).to eq target_address
+      expect(described_class.address_record_attributes(b_param.bike)).to eq target_address
       expect(b_param.bike_sticker_code).to eq "xxxx"
       expect(b_param.organization_affiliation).to eq "employee"
       expect(b_param.phone).to eq "919929333"
@@ -673,23 +669,87 @@ RSpec.describe BParam, type: :model do
         owner_email: "stuff@something.com",
         b_param_id: nil,
         b_param_id_token: nil,
-        city: nil,
-        country: nil,
         creator_id: nil,
-        state: nil,
-        street: nil,
         updator_id: nil,
-        zipcode: nil,
         status: "status_with_owner",
         propulsion_type_slug: "foot-pedal"
       }
     end
     it "responds with bike_attrs" do
       expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
+      expect(b_param.safe_bike_attrs({})).to_not have_key(:address_record_attributes)
     end
     context "with new_attrs" do
       it "uses the new_attrs" do
         expect(b_param.safe_bike_attrs({"owner_email" => "e@f.g"})).to match_hash_indifferently target.merge(owner_email: "e@f.g")
+      end
+    end
+    context "with location attrs" do
+      let!(:organization) { FactoryBot.create(:organization) }
+      let!(:state) { FactoryBot.create(:state, :find_or_create, abbreviation: "CO", name: "Colorado") }
+      let(:target) do
+        {
+          email: "stuff@example.com",
+          embeded: "true",
+          b_param_id: nil,
+          b_param_id_token: nil,
+          status: "status_with_owner",
+          propulsion_type_slug: nil,
+          creator_id: nil,
+          updator_id: nil,
+          phone: "1112223333",
+          student_id: "99999999",
+          address_record_attributes: {
+            city: "Golden",
+            country_id: Country.united_states_id,
+            region_string: "CO",
+            street: "1812 Miners Spur, Building 2015 Unit 99999-69",
+            postal_code: "80401",
+            kind: "ownership"
+          }
+        }
+      end
+      context "with address_record" do
+        let(:bike_params) do
+          {
+            phone: "1112223333",
+            student_id: "99999999",
+            email: "stuff@example.com",
+            embeded: "true",
+            address_record_attributes: {
+              city: "Golden",
+              region_string: "CO",
+              street: "1812 Miners Spur, Building 2015 Unit 99999-69",
+              postal_code: "80401",
+              country_id: Country.united_states_id
+            }
+          }
+        end
+        it "returns target attributes" do
+          expect(described_class.address_record_attributes(b_param.bike).except(:region_record_id))
+            .to match_hash_indifferently target[:address_record_attributes].except(:region_record_id)
+          expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
+        end
+      end
+      context "with legacy attributes" do
+        let(:bike_params) do
+          {
+            city: "Golden",
+            phone: "1112223333",
+            state: "CO",
+            street: "1812 Miners Spur, Building 2015 Unit 99999-69",
+            embeded: "true",
+            zipcode: "80401",
+            country_id: Country.united_states_id,
+            student_id: "99999999",
+            email: "stuff@example.com"
+          }
+        end
+        it "returns target attributes" do
+          expect(described_class.address_record_attributes(b_param.bike))
+            .to match_hash_indifferently target[:address_record_attributes]
+          expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
+        end
       end
     end
     context "top_level_propulsion_type" do

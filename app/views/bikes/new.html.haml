@@ -126,49 +126,10 @@
             = fields_for @bike.impound_records.last do |irecord|
               = render partial: '/bikes_edit/bike_fields/stolen_location', locals: {srecord: irecord}
 
-          - if include_field_reg_address?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user)
-            .related-fields
-              .form-group.row
-                -# Set all the bike address attrs
-                - @bike.attributes = {street: @b_param.address("address"),
-                  city: @b_param.address("city"),
-                  zipcode: @b_param.address("zipcode"),
-                  state: @b_param.address("state")}
+          - if BikeServices::Builder.include_address_record?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user)
+            = f.fields_for :address_record do |address_form|
+              = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @bike.creation_organization))
 
-                = f.label :street,
-                  registration_field_label(@organization, "reg_address") || t(".mailing_address"),
-                  class: 'form-well-label'
-
-                .form-well-input
-                  = f.text_field :street,
-                    required: true,
-                    placeholder: registration_field_address_placeholder(@organization),
-                    class: 'form-control'
-
-                  = registration_address_required_below_helper(@organization)
-
-              .form-group.row
-                %label.form-well-label
-                .form-well-input
-                  = f.text_field :city,
-                    required: true,
-                    placeholder: t(".city"),
-                    class: "form-control"
-
-              .form-group.row
-                %label.form-well-label
-                .form-well-input
-                  = f.text_field :zipcode,
-                    required: true,
-                    placeholder: t(".zipcode"),
-                    class: "form-control"
-
-              .form-group.row.fancy-select-placeholder.unfancy
-                %label.form-well-label
-                .form-well-input
-                  = f.collection_select(:state, State.united_states, :abbreviation, :name,
-                    {include_blank: true, required: true, prompt: t(".state")},
-                    {class: "form-control"})
 
           - if include_field_reg_extra_registration_number?(@organization, current_user)
             .form-group.row.unnested-field.no-divider-row

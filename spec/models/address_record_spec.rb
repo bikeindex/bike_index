@@ -73,6 +73,7 @@ RSpec.describe AddressRecord, type: :model do
       end
 
       context "passed address_record" do
+        let!(:obj) { FactoryBot.create(:bike, :address_in_edmonton) }
         it "returns target_attrs" do
           expect(described_class.attrs_to_duplicate(obj.address_record)).to match_hash_indifferently target_attrs
         end

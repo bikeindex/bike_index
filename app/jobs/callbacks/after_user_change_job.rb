@@ -1,24 +1,6 @@
 class Callbacks::AfterUserChangeJob < ApplicationJob
   sidekiq_options retry: false
 
-  def self.assign_user_address_from_bikes(user, bikes: nil, save_user: false)
-    bikes ||= user.bikes
-    address_bike = bikes.with_street.first || bikes.with_location.first
-    if address_bike.present?
-      address_record = user.address_record ||
-        AddressRecord.new(user_id: user.id, kind: :user, skip_geocoding: true, skip_callback_job: true)
-      address_record.update(AddressRecord.attrs_from_legacy(address_bike))
-      user.attributes = {
-        address_record_id: address_record.id,
-        latitude: address_record.latitude,
-        longitude: address_record.longitude,
-        address_set_manually: address_bike.address_set_manually
-      }
-      user.save if save_user
-    end
-    user
-  end
-
   def perform(user_id, user = nil, skip_bike_update = false)
     user ||= User.find_by_id(user_id)
     return false unless user.present?
@@ -36,7 +18,7 @@ class Callbacks::AfterUserChangeJob < ApplicationJob
 
     user.no_address = user.bike_organizations.with_enabled_feature_slugs("no_address").any?
     if !user.no_address && !user.address_set_manually # If user.address_set_manually bikes pick it up on save
-      self.class.assign_user_address_from_bikes(user)
+      UserServices::Updator.assign_address_from_bikes(user)
     end
     user.update(skip_update: true) if user.changed?
 

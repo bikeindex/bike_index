@@ -102,7 +102,7 @@ class AddressRecord < ApplicationRecord
 
   # Enable assigning string countries
   def country=(val)
-    self.country_id = if val.is_a?(String)
+    self.country_id = if val.is_a?(String) || val.is_a?(Numeric)
       Country.friendly_find_id(val)
     elsif val.respond_to?(:id)
       val.id
