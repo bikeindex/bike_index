@@ -264,9 +264,8 @@ RSpec.describe BikeServices::Creator do
           expect_bike_created_with_extra_attrs
         end
 
+        # TODO: Remove this once backfill is finished - #2922
         context "legacy location attrs" do
-          # I'm not sure this is actually necessary, but keeping it for now
-          # TODO: Remove this once backfill is finished - #2922
           let(:bike_params) do
             default_params.merge(extra_attributes.except(:address_record_attributes)
               .merge(street: target_address_record[:street]))

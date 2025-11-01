@@ -399,11 +399,11 @@ class Bike < ApplicationRecord
   end
 
   def latitude_public
-    latitude.blank? ? nil : latitude.round(Bike::PUBLIC_COORD_LENGTH)
+    latitude.blank? ? nil : latitude.round(PUBLIC_COORD_LENGTH)
   end
 
   def longitude_public
-    longitude.blank? ? nil : longitude.round(Bike::PUBLIC_COORD_LENGTH)
+    longitude.blank? ? nil : longitude.round(PUBLIC_COORD_LENGTH)
   end
 
   # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
@@ -843,6 +843,12 @@ class Bike < ApplicationRecord
     elsif current_ownership&.address_record?
       "initial_creation"
     end
+  end
+
+  # NOTE! This will return different hashes - legacy hashes for stolen & impound
+  def address_hash
+    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
+      address_record&.address_hash
   end
 
   def registration_address(unmemoize = false, address_record_id: false)
