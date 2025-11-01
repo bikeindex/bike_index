@@ -113,10 +113,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(bike_for_avery.registration_address_source).to eq "initial_creation"
             bike_for_avery.update(updated_at: Time.current)
             expect(bike_for_avery.reload.avery_exportable?).to be_truthy
-            expect(bike_for_avery.address_hash.except("country")).to eq bike_for_avery.registration_address.except("country")
-            # We need to be exporting via registration_address - NOT address_hash - so manually blank it, just to make sure
-            bike_for_avery.update_column :street, nil
-            expect(bike_for_avery.address_hash.except("country")).to eq bike_for_avery.registration_address.merge(street: nil).except("country")
+            expect(bike_for_avery.address_hash_legacy.except("country")).to eq bike_for_avery.registration_address.except("country", "address_record_id")
             bike_for_avery
             instance.perform(export.id)
             # Check this in here so the vcr geocoder records at the correct place

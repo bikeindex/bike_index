@@ -101,7 +101,8 @@ class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
   include BikeAttributable
-  include Geocodeable
+  include AddressRecorded
+  include AddressRecordedWithinBoundingBox
   include PgSearch::Model
 
   PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
@@ -186,7 +187,6 @@ class Bike < ApplicationRecord
     :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
     to: :current_ownership, allow_nil: true
 
-  scope :without_location, -> { where(latitude: nil) }
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
@@ -215,6 +215,10 @@ class Bike < ApplicationRecord
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
   scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
+
+  # TODO: remove when bike AddressRecords have finished migration, use AddressRecorded.with_street
+  # Also uncomment the bike spec
+  scope :with_street, -> { where.not(street: nil) }
 
   default_scope -> { default_includes.current.order(listing_order: :desc) }
 
@@ -388,6 +392,18 @@ class Bike < ApplicationRecord
     def matching_domain(str)
       where("bikes.owner_email ILIKE ?", "%#{str.to_s.strip}")
     end
+  end
+
+  def find_or_build_address_record(country_id: nil)
+    Backfills::AddressRecordsForBikesJob.build_or_create_for(self, country_id:)
+  end
+
+  def latitude_public
+    latitude.blank? ? nil : latitude.round(PUBLIC_COORD_LENGTH)
+  end
+
+  def longitude_public
+    longitude.blank? ? nil : longitude.round(PUBLIC_COORD_LENGTH)
   end
 
   # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
@@ -806,12 +822,6 @@ class Bike < ApplicationRecord
     self.paint_id = paint.id
   end
 
-  # THIS IS FUCKING OBNOXIOUS.
-  # Somehow we need to get rid of needing to have this method. country should default to optional
-  def address(country: [:optional])
-    Geocodeable.address(self, country:)
-  end
-
   def valid_mailing_address?
     addy = registration_address
     return false if addy.blank? || addy.values.all?(&:blank?)
@@ -830,20 +840,26 @@ class Bike < ApplicationRecord
       "user"
     elsif address_set_manually
       "bike_update"
-    elsif current_ownership&.address_record.present?
+    elsif current_ownership&.address_record?
       "initial_creation"
     end
   end
 
-  def registration_address(unmemoize = false)
+  # NOTE! This will return different hashes - legacy hashes for stolen & impound
+  def address_hash
+    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
+      address_record&.address_hash
+  end
+
+  def registration_address(unmemoize = false, address_record_id: false)
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
 
     @registration_address = case registration_address_source
-    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
-    when "user" then user&.address_hash_legacy
-    when "bike_update" then address_hash
-    when "initial_creation" then current_ownership.address_hash_legacy
+    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy(address_record_id:)
+    when "user" then user&.address_hash_legacy(address_record_id:)
+    when "bike_update" then address_hash_legacy(address_record_id:)
+    when "initial_creation" then current_ownership.address_hash_legacy(address_record_id:)
     else
       {}
     end.with_indifferent_access
@@ -896,13 +912,6 @@ class Bike < ApplicationRecord
     self.all_description = cached_description_and_stolen_description
     self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
-  end
-
-  # Only geocode if address is set manually (and not skipping geocoding)
-  def should_be_geocoded?
-    return false if skip_geocoding?
-
-    address_changed?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
