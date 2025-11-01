@@ -88,7 +88,7 @@ class BikeServices::Creator
       stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
       impound_records_attributes: PERMITTED_IMPOUND_ATTRS,
       components_attributes: Component.permitted_attributes,
-      address_record_attributes: (AddressRecord.permitted_params + [:id])
+      address_record_attributes: AddressRecord.permitted_params
     ]).freeze
   end
 
@@ -189,6 +189,7 @@ class BikeServices::Creator
     # Maybe can be removed in #2922
     bike.attributes = BikeServices::CalculateStoredLocation.location_attrs(bike)
     bike.save
+
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
     bike = validate_record(b_param, bike)

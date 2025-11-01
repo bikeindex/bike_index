@@ -162,7 +162,7 @@ RSpec.describe "BikesController#update", type: :request do
       end
     end
     context "bike has location" do
-      let(:address_record) { FactoryBot.create(:address_record, :new_york, bike:, kind: "bike")}
+      let(:address_record) { FactoryBot.create(:address_record, :new_york, bike:, kind: "bike") }
       let(:time) { Time.current - 10.minutes }
       let(:phone) { "2221114444" }
       let(:current_user) { FactoryBot.create(:user_confirmed, phone: phone) }

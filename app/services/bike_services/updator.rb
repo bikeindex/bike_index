@@ -7,8 +7,7 @@ class BikeServices::Updator
       # TODO: improve this entire thing. Maybe using BParam.safe_bike_attrs
       # IMPORTANT - needs to handle propulsion_type > propulsion_type_slug coercion
       {
-        bike: params.require(:bike).permit(BikeServices::Creator.old_attr_accessible,
-          address_record_attributes: (AddressRecord.permitted_params + [:id])) # include address_record id so we don't create new address records
+        bike: params.require(:bike).permit(BikeServices::Creator.old_attr_accessible)
       }.as_json
     end
   end
