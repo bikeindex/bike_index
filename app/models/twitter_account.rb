@@ -17,6 +17,7 @@
 #  longitude            :float
 #  national             :boolean          default(FALSE), not null
 #  neighborhood         :string
+#  platform             :integer          default("twitter"), not null
 #  screen_name          :string           not null
 #  street               :string
 #  twitter_account_info :jsonb
@@ -32,11 +33,14 @@
 #
 #  index_twitter_accounts_on_country_id              (country_id)
 #  index_twitter_accounts_on_latitude_and_longitude  (latitude,longitude)
+#  index_twitter_accounts_on_platform                (platform)
 #  index_twitter_accounts_on_screen_name             (screen_name)
 #  index_twitter_accounts_on_state_id                (state_id)
 #
 class TwitterAccount < ApplicationRecord
   include Geocodeable
+
+  PLATFORM_ENUM = {twitter: 0, bluesky: 1}.freeze
 
   has_many :tweets, dependent: :destroy
 
@@ -50,6 +54,8 @@ class TwitterAccount < ApplicationRecord
 
   validates :screen_name, uniqueness: true
 
+  enum :platform, PLATFORM_ENUM
+
   before_save :reverse_geocode, if: :should_be_reverse_geocoded?
   before_save :fetch_account_info
 
@@ -57,6 +63,9 @@ class TwitterAccount < ApplicationRecord
   scope :national, -> { active.where(national: true) }
   scope :not_national, -> { active.where(national: false) }
   scope :errored, -> { where.not(last_error_at: nil) }
+  scope :for_platform, ->(platform) { where(platform:) }
+  scope :twitter_accounts, -> { where(platform: :twitter) }
+  scope :bluesky_accounts, -> { where(platform: :bluesky) }
 
   reverse_geocoded_by :latitude, :longitude do |account, results|
     if (geo = results.first)
@@ -122,7 +131,15 @@ class TwitterAccount < ApplicationRecord
   end
 
   def twitter_account_url
-    "https://twitter.com/#{screen_name}"
+    platform_account_url
+  end
+
+  def platform_account_url
+    if bluesky?
+      "https://bsky.app/profile/#{screen_name}"
+    else
+      "https://twitter.com/#{screen_name}"
+    end
   end
 
   def fetch_account_info

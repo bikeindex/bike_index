@@ -112,4 +112,91 @@ RSpec.describe Tweet, type: :model do
       expect(tweet.twitter_response).to eq({"something" => "ffff"})
     end
   end
+
+  describe "platform support" do
+    let(:twitter_account) { FactoryBot.create(:twitter_account, platform: :twitter, twitter_account_info: {name: "Test"}) }
+    let(:bluesky_account) { FactoryBot.create(:twitter_account, platform: :bluesky, twitter_account_info: {name: "Test"}) }
+    let(:twitter_tweet) { FactoryBot.create(:tweet, twitter_account:, twitter_id: "1234567890") }
+    let(:bluesky_tweet) { FactoryBot.create(:tweet, twitter_account: bluesky_account, twitter_id: "at://did:plc:abc123/app.bsky.feed.post/xyz789") }
+
+    describe "enum" do
+      it "supports twitter platform" do
+        expect(twitter_tweet.platform).to eq("twitter")
+        expect(twitter_tweet.twitter?).to be true
+        expect(twitter_tweet.bluesky?).to be false
+      end
+
+      it "supports bluesky platform" do
+        expect(bluesky_tweet.platform).to eq("bluesky")
+        expect(bluesky_tweet.bluesky?).to be true
+        expect(bluesky_tweet.twitter?).to be false
+      end
+
+      it "sets platform from twitter_account" do
+        tweet = Tweet.create(body: "test", twitter_account:, kind: "app_tweet")
+        expect(tweet.platform).to eq("twitter")
+
+        tweet2 = Tweet.create(body: "test", twitter_account: bluesky_account, kind: "app_tweet")
+        expect(tweet2.platform).to eq("bluesky")
+      end
+    end
+
+    describe "scopes" do
+      before do
+        twitter_tweet
+        bluesky_tweet
+      end
+
+      it "filters by platform with for_platform" do
+        expect(Tweet.for_platform(:twitter).pluck(:id)).to eq([twitter_tweet.id])
+        expect(Tweet.for_platform(:bluesky).pluck(:id)).to eq([bluesky_tweet.id])
+      end
+
+      it "filters twitter posts" do
+        expect(Tweet.twitter_posts.pluck(:id)).to eq([twitter_tweet.id])
+      end
+
+      it "filters bluesky posts" do
+        expect(Tweet.bluesky_posts.pluck(:id)).to eq([bluesky_tweet.id])
+      end
+    end
+
+    describe "#tweet_link" do
+      it "returns twitter URL for twitter platform" do
+        expected = "https://twitter.com/#{twitter_account.screen_name}/status/1234567890"
+        expect(twitter_tweet.tweet_link).to eq(expected)
+      end
+
+      it "returns bluesky URL for bluesky platform" do
+        expected = "https://bsky.app/profile/#{bluesky_account.screen_name}/post/xyz789"
+        expect(bluesky_tweet.tweet_link).to eq(expected)
+      end
+    end
+
+    describe "#tweetor_link" do
+      it "returns twitter URL for twitter platform" do
+        expect(twitter_tweet.tweetor_link).to eq("https://twitter.com/#{twitter_account.screen_name}")
+      end
+
+      it "returns bluesky URL for bluesky platform" do
+        expect(bluesky_tweet.tweetor_link).to eq("https://bsky.app/profile/#{bluesky_account.screen_name}")
+      end
+    end
+
+    describe ".auto_link_text" do
+      let(:text) { "Check out @bikeindex and #biketheft" }
+
+      it "links to twitter for twitter platform" do
+        result = Tweet.auto_link_text(text, :twitter)
+        expect(result).to include('href="https://twitter.com/bikeindex"')
+        expect(result).to include('href="https://twitter.com/hashtag/biketheft"')
+      end
+
+      it "links to bluesky for bluesky platform" do
+        result = Tweet.auto_link_text(text, :bluesky)
+        expect(result).to include('href="https://bsky.app/profile/bikeindex"')
+        expect(result).to include('href="https://bsky.app/search?q=biketheft"')
+      end
+    end
+  end
 end
