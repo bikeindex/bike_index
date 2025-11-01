@@ -12,6 +12,7 @@
 #  publicly_visible_attribute :integer
 #  region_string              :string
 #  street                     :string
+#  street_2                   :string
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  bike_id                    :bigint
@@ -30,7 +31,7 @@ class AddressRecord < ApplicationRecord
   KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
-  ADDRESS_ATTRS = %i[street city region_record_id postal_code country_id latitude longitude]
+  ADDRESS_ATTRS = %i[street street_2 city region_record_id postal_code country_id latitude longitude]
 
   enum :kind, KIND_ENUM
   enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
@@ -55,7 +56,7 @@ class AddressRecord < ApplicationRecord
 
     def permitted_params
       # user_id and kind should be set manually!
-      %i[city postal_code region_string street country_id region_record_id].freeze
+      %i[city postal_code region_string street street_2 country_id region_record_id].freeze
     end
 
     def attrs_to_duplicate(obj)
