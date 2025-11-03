@@ -188,7 +188,7 @@ class StolenRecord < ApplicationRecord
         date = corrected
       end
       if date > Time.current + 2.days
-        updated_year = date.month < Time.current.month ? Time.current.year : Time.current.year - 1
+        updated_year = (date.month < Time.current.month) ? Time.current.year : Time.current.year - 1
         corrected = date.change(year: updated_year)
         date = corrected
       end
