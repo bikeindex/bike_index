@@ -4,7 +4,7 @@ RSpec.describe User, type: :model do
   it_behaves_like "address_recorded"
 
   describe "address factories" do
-    let(:user) { FactoryBot.create(:user, :address_in_amsterdam) }
+    let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :amsterdam) }
     let(:address_record) { user.reload.address_record }
     let(:target_attrs) do
       {city: "Amsterdam", region_string: "North Holland", country_id: Country.netherlands.id,
@@ -12,8 +12,11 @@ RSpec.describe User, type: :model do
     end
 
     it "is valid" do
-      # TODO: allow the user_id to include - #2922
-      expect(address_record.reload).to have_attributes target_attrs.except(:user_id)
+      expect(AddressRecord.count).to eq 0
+      expect(user.address_record_id).to be_present
+      expect(address_record.reload.user_id).to eq user.id
+      expect(address_record.kind).to eq "user"
+      expect(address_record.reload).to have_attributes target_attrs
       expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
       expect(user.to_coordinates).to eq(address_record.to_coordinates)
       expect(AddressRecord.pluck(:id)).to eq([address_record.id])
