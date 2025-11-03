@@ -5,8 +5,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
 
   describe "update" do
     let(:user) do
-      FactoryBot.create(:user_confirmed, :with_address_record, address_set_manually: true,
-        address_record: FactoryBot.build(:address_record, :new_york, kind: :user))
+      FactoryBot.create(:user_confirmed, :with_address_record, address_set_manually: true)
     end
     let(:address_record) { nil }
     let(:current_user) { user }

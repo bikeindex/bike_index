@@ -8,7 +8,8 @@ class Backfills::AddressRecordsForBikesJob < ApplicationJob
 
   class << self
     def iterable_scope
-      Bike.where(address_record_id: nil).where.not(city: nil, street: nil)
+      Bike.where(address_record_id: nil).where.not(city: nil)
+        .or(Bike.where(address_record_id: nil).where.not(street: nil))
     end
 
     def build_or_create_for(bike, country_id: nil)
