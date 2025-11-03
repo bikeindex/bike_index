@@ -67,7 +67,7 @@
                   - else
                     = link_to t(".remove_number"), user_phone_path(user_phone.to_param, resend_confirmation: true), method: "delete", action: "destroy", class: "small less-strong"
   = f.fields_for :address_record do |address_form|
-    = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @user.uro_organization_reg_address, current_country_id:))
+    = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @user.uro_organization_reg_address, current_country_id:, street_2: true))
 
 
   .related-fields.my-account-checks
