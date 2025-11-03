@@ -11,12 +11,11 @@ RSpec.describe Search::MarketplaceController, type: :request do
   end
 
   context "with listings" do
-    let(:seller) { FactoryBot.create(:user, :with_address_record) }
+    let(:seller) { FactoryBot.create(:user, :with_address_record, address_in: :davis) }
     let(:item) { FactoryBot.create(:bike, :with_primary_activity, cycle_type: "personal-mobility", propulsion_type: "throttle") }
     let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, address_record: seller.address_record, seller:, item:, amount_cents: 1000_00) }
     let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, :with_address_record, status: :draft, seller:) }
-    let(:address_record) { FactoryBot.create(:address_record, :new_york, kind: :marketplace_listing, user: seller) }
-    let(:marketplace_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, address_record:, amount_cents: 500_00) }
+    let(:marketplace_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, amount_cents: 500_00) }
     describe "index" do
       it "renders" do
         get base_url
@@ -96,6 +95,13 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
         context "infinite scroll" do
           it "includes lazy-loading turbo frame for next page" do
+            # Request page 1 with turbo_stream - should only show 1 item total
+            get base_url, as: :turbo_stream
+            expect(response).to have_http_status(:success)
+            expect(response.body).to include("<turbo-frame id=\"page_1\">")
+            # Should NOT include a lazy-loading frame for page 2 (only 1 result, fits on page 1)
+            expect(response.body).not_to include("id=\"page_2\"")
+
             # Create enough listings to have multiple pages (12 per page)
             13.times do
               listing = FactoryBot.create(:marketplace_listing, :for_sale, seller:)
@@ -109,15 +115,6 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(response.body).to include("loading=\"lazy\"")
             expect(response.body).to include("id=\"page_2\"")
             expect(response.body).to match(/src="[^"]*page=2/)
-          end
-
-          it "does not include next page frame when on last page" do
-            # Request page 1 with turbo_stream - should only show 1 item total
-            get base_url, as: :turbo_stream
-            expect(response).to have_http_status(:success)
-            expect(response.body).to include("<turbo-frame id=\"page_1\">")
-            # Should NOT include a lazy-loading frame for page 2 (only 1 result, fits on page 1)
-            expect(response.body).not_to include("id=\"page_2\"")
           end
         end
 
@@ -161,19 +158,13 @@ RSpec.describe Search::MarketplaceController, type: :request do
     end
 
     describe "counts" do
-      it "renders empty" do
+      it "renders" do
         get "#{base_url}/counts"
         expect(response.status).to eq 200
         expect(json_result).to match_hash_indifferently({for_sale: 1, for_sale_proximity: 0})
       end
 
       context "with listings" do
-        let(:seller) { FactoryBot.create(:user, :with_address_record) }
-        let(:item) { FactoryBot.create(:bike, :with_primary_activity, cycle_type: "personal-mobility", propulsion_type: "throttle") }
-        let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, address_record: seller.address_record, seller:, item:) }
-        let!(:marketplace_listing_draft) { FactoryBot.create(:marketplace_listing, :with_address_record, status: :draft, seller:) }
-        let!(:address_record) { FactoryBot.create(:address_record, :new_york, kind: :marketplace_listing, user: seller) }
-        let!(:marketplace_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, address_record:) }
         let(:target_result) { {for_sale: 2, for_sale_proximity: 1} }
         include_context :geocoder_real
 

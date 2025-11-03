@@ -45,6 +45,19 @@ RSpec.describe MarketplaceListing, type: :model do
         expect(marketplace_listing.buyer).to be_present
       end
     end
+    context "with_address_record" do
+      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, address_in: :vancouver) }
+      let(:target_address_record_attrs) do
+        {kind: "marketplace_listing", user_id: marketplace_listing.seller_id, city: "Vancouver",
+         postal_code: "V5Y 1P5", bike_id: marketplace_listing.item_id}
+      end
+      it "is valid" do
+        expect(marketplace_listing.address_record_id).to be_present
+        expect(marketplace_listing.address_record).to match_hash_indifferently target_address_record_attrs
+        expect(marketplace_listing.address_record.to_coordinates.map(&:round)).to eq([49, -123])
+        expect(marketplace_listing.to_coordinates.map(&:round)).to eq([49, -123])
+      end
+    end
   end
 
   describe "find_or_build_current_for" do
