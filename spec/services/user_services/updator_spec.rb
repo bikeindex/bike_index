@@ -48,7 +48,7 @@ RSpec.describe UserServices::Updator do
 
     context "with address record" do
       let(:bike) do
-        FactoryBot.create(:bike, :with_ownership, :address_in_los_angeles,
+        FactoryBot.create(:bike, :with_ownership, :with_address_record, address_in: :los_angeles,
           owner_email: "aftercreate@bikeindex.org", address_set_manually: true)
       end
       let(:target_coordinates) { [34.05223, -118.24368] }

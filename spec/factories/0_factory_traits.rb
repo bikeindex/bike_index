@@ -80,41 +80,4 @@ FactoryBot.define do
     state_id { nil }
     country_id { Country.canada.id }
   end
-
-  # address record location traits
-  trait :address_in_amsterdam do
-    with_address_record
-
-    address_record { FactoryBot.create(:address_record, :amsterdam, kind: address_record_kind) }
-  end
-
-  trait :address_in_chicago do
-    with_address_record
-
-    address_record { FactoryBot.create(:address_record, :chicago, kind: address_record_kind) }
-  end
-
-  trait :address_in_los_angeles do
-    with_address_record
-
-    address_record { FactoryBot.create(:address_record, :los_angeles, kind: address_record_kind) }
-  end
-
-  trait :address_in_nyc do
-    with_address_record
-
-    address_record { FactoryBot.create(:address_record, :new_york, kind: address_record_kind) }
-  end
-
-  trait :address_in_vancouver do
-    with_address_record
-
-    address_record { FactoryBot.create(:address_record, :vancouver, kind: address_record_kind) }
-  end
-
-  trait :address_in_edmonton do
-    with_address_record
-
-    address_record { FactoryBot.create(:address_record, :edmonton, kind: address_record_kind) }
-  end
 end

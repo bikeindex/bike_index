@@ -102,7 +102,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "with address in different country" do
         let(:ownership) { FactoryBot.create(:ownership, creator: current_user) }
-        let(:current_user) { FactoryBot.create(:user, :address_in_edmonton) }
+        let(:current_user) { FactoryBot.create(:user, :with_address_record, address_in: :edmonton) }
 
         it "renders a new stolen bike from status" do
           get "#{base_url}/new?status=stolen"

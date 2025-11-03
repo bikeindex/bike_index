@@ -292,7 +292,7 @@ RSpec.describe BikeServices::Displayer do
         expect(BikeServices::Displayer.display_edit_address_fields?(bike, admin)).to be_truthy
       end
       context "user address set" do
-        let(:user) { FactoryBot.create(:user, :address_in_amsterdam, address_set_manually: true) }
+        let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :amsterdam, address_set_manually: true) }
         it "is falsey" do
           expect(user.reload.address_set_manually).to be_truthy
           expect(user.uro_organization_reg_address&.id).to be_nil
@@ -411,7 +411,7 @@ RSpec.describe BikeServices::Displayer do
         end
       end
       context "user address set" do
-        let(:user) { FactoryBot.create(:user, :address_in_amsterdam, address_set_manually: true) }
+        let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :amsterdam, address_set_manually: true) }
         it "is falsey" do
           expect(BikeServices::Displayer.display_edit_address_fields?(bike, user)).to be_falsey
           expect(BikeServices::Displayer.send(:user_edit_bike_address?, bike, user)).to be_falsey

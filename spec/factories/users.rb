@@ -16,17 +16,13 @@ FactoryBot.define do
 
     trait :with_address_record do
       transient do
-        address_in { :nyc }
+        address_in { :new_york }
         address_record_kind { :user }
       end
 
       address_record do
         FactoryBot.build(:address_record, address_in, kind: address_record_kind, user: instance)
       end
-
-      # after(:create) do |user, _evaluator|
-      #   user.address_record.update(user_id: user.id)
-      # end
     end
 
     factory :user_confirmed, traits: [:confirmed] do

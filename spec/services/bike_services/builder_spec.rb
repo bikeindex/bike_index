@@ -205,8 +205,8 @@ RSpec.describe BikeServices::Builder do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
       let(:user) { FactoryBot.create(:user_confirmed) }
       let(:user_with_registration_organization) { FactoryBot.create(:user_registration_organization, organization:).user }
-      let(:user_with_address) { FactoryBot.create(:user_confirmed, :address_in_edmonton, address_set_manually: false) }
-      let(:user_with_address_manually) { FactoryBot.create(:user_confirmed, :address_in_edmonton, address_set_manually: true) }
+      let(:user_with_address) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, address_set_manually: false) }
+      let(:user_with_address_manually) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, address_set_manually: true) }
       it "includes" do
         expect(described_class.include_address_record?(organization)).to be_truthy
         expect(described_class.include_address_record?(organization, User.new)).to be_truthy
