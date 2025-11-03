@@ -4,7 +4,6 @@ en:
     legacy_form_well:
       address_record:
         address: Street address
-        street_2: Street address line 2 (optional)
         address_no_street: Address
         address_school: Campus mailing address
         choose_country: Choose country
@@ -12,4 +11,5 @@ en:
         postal_code: Postal Code
         region: Region / Province
         state: State
+        street_2: Street address line 2 (optional)
         your_full_address_is_required: Your full address is required by %{org_name}
