@@ -7,7 +7,7 @@ RSpec.describe Bike, type: :model do
   it_behaves_like "bike_attributable"
 
   describe "address factories" do
-    let(:bike) { FactoryBot.create(:bike, :address_in_amsterdam) }
+    let(:bike) { FactoryBot.create(:bike, :with_address_record, address_in: :amsterdam) }
     let(:address_record) { bike.reload.address_record }
     let(:target_attrs) do
       {city: "Amsterdam", region_string: "North Holland", country_id: Country.netherlands.id,
@@ -22,6 +22,15 @@ RSpec.describe Bike, type: :model do
       expect(AddressRecord.pluck(:id)).to eq([address_record.id])
       # TODO: when bike AddressRecords have finished migration, uncomment - #2922
       # expect(Bike.with_street.pluck(:id)).to eq([bike.id])
+    end
+
+    context "with user" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_address_record, address_in: :amsterdam) }
+
+      it "is valid" do
+        expect(bike.reload.user).to be_present
+        expect(address_record).to have_attributes target_attrs.merge(user_id: bike.user_id)
+      end
     end
   end
 
@@ -1348,8 +1357,8 @@ RSpec.describe Bike, type: :model do
         expect(bike.registration_info).to eq registration_info.as_json
       end
       context "user with address address_set_manually" do
-        let(:user) { FactoryBot.create(:user, :address_in_vancouver, address_set_manually: true) }
-        let(:bike) { FactoryBot.create(:bike, :address_in_chicago, :with_ownership_claimed, user:) }
+        let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :vancouver, address_set_manually: true) }
+        let(:bike) { FactoryBot.create(:bike, :with_address_record, :with_ownership_claimed, address_in: :chicago, user:) }
         it "returns user address" do
           bike.reload
           expect(bike.registration_address_source).to eq "user"

@@ -23,14 +23,15 @@ FactoryBot.define do
     end
 
     trait :with_address_record do
-      transient { address_record_kind { :bike } }
+      transient do
+        address_in { :new_york }
+        address_record_kind { :bike }
+      end
 
       address_set_manually { true } # Required to set the address_record coordinates
 
-      address_record { FactoryBot.build(:address_record, kind: address_record_kind) }
-
-      after(:create) do |bike, _evaluator|
-        bike.address_record.update(bike_id: bike.id)
+      address_record do
+        FactoryBot.build(:address_record, address_in, kind: address_record_kind, bike: instance, user:)
       end
     end
 
@@ -90,7 +91,7 @@ FactoryBot.define do
         claimed { true }
       end
       creator { user }
-      owner_email { user.email }
+      owner_email { user&.email }
       created_at { claimed_at }
     end
 

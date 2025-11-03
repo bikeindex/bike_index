@@ -6054,6 +6054,7 @@ nl:
         state: Staat
         your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
         address_no_street: Adres
+        street_2: Straatadres regel 2 (optioneel)
       address_record_with_default:
         edit_my_account_path: bewerken op mijn account
         use_account_address: Gebruik accountadres

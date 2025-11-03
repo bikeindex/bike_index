@@ -15,12 +15,13 @@ FactoryBot.define do
     end
 
     trait :with_address_record do
-      transient { address_record_kind { :user } }
+      transient do
+        address_in { :new_york }
+        address_record_kind { :user }
+      end
 
-      address_record { FactoryBot.build(:address_record, kind: address_record_kind) }
-
-      after(:create) do |user, _evaluator|
-        user.address_record.update(user_id: user.id)
+      address_record do
+        FactoryBot.build(:address_record, address_in, kind: address_record_kind, user: instance)
       end
     end
 

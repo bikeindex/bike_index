@@ -280,7 +280,7 @@ RSpec.describe Callbacks::AfterUserChangeJob, type: :job do
         expect(user.reload.address_hash(render_country: true, visible_attribute: :street)).to eq target_address
       end
       context "user not backfilled" do
-        let(:user) { FactoryBot.create(:user, :address_in_los_angeles, address_set_manually: true) }
+        let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :los_angeles, address_set_manually: true) }
         it "updates bike to be users address" do
           expect(Geocodeable.new_address_hash(bike.reload.registration_address(true))).to eq target_address
           # Inline so it processes the bikes

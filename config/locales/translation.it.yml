@@ -4711,6 +4711,7 @@ it:
         state: Stato
         your_full_address_is_required:
         address_no_street: Indirizzo
+        street_2:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:
