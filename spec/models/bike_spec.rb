@@ -1657,9 +1657,8 @@ RSpec.describe Bike, type: :model do
         end
       end
       context "with future stolen bike" do
-        let(:date_stolen) { Time.current + 1.week }
+        let(:date_stolen) { Time.current + 2.days }
 
-        # NOTE: because date_stolen.to_i is negative
         it "is the created_at" do
           expect(bike.reload.occurred_at).to be_within(1).of date_stolen
 
