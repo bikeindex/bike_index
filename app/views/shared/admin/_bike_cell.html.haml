@@ -8,7 +8,7 @@
 - if bike.blank? && bike_id.present?
   %small.text-danger{title: bike_id} Missing bike
   - if bike.blank? && bike_id.present? # If email is present, the email will be shown
-    %code.small= bike_id
+    %code= link_to bike_id, bike_link_path
 
 - if bike.present?
   - bike_content = capture_haml do

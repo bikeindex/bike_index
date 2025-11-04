@@ -35,9 +35,11 @@
       %p
         - if marketplace_listing.present?
           #{viewing.pluralize} for
-          = link_to "Listing: #{marketplace_listing.status} ##{marketplace_listing.id}", admin_marketplace_listing_path(marketplace_listing)
-          %small.less-strong
-            = render(partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id})
+          %em
+            Marketplace Listing
+            = render(Badge::Status::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing))
+            = "##{marketplace_listing.id}"
+          = render(partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id})
         - else
           %span.text-danger
             Marketplace ##{params[:search_marketplace_listing_id]}

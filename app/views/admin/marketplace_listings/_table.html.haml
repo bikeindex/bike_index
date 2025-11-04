@@ -46,10 +46,7 @@
               %small.convertTime
                 = l marketplace_listing.updated_at, format: :convert_time
             %td
-              - status_class = "text-info" if marketplace_listing.for_sale?
-              - status_class = "text-success" if marketplace_listing.sold?
-              %span{class: status_class}
-                = marketplace_listing.status_humanized
+              = render Badge::Status::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing)
             %td
               - if marketplace_listing.published_at.present?
                 %span.convertTime
