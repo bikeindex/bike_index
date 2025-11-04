@@ -53,9 +53,7 @@
     "url": "https://bikeindex.org"
   }
 </script>
-<script type="application/ld+json">
-  <%= raw page_json_ld.to_json %>
-</script>
+<%= tag.script(page_json_ld.to_json.html_safe, type: "application/ld+json") %>
 
 <link rel="canonical" href="<%= url_canonical %>">
 
