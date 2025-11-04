@@ -4,6 +4,12 @@
 module Alert
   class Component < ApplicationComponent
     KINDS = %i[notice error warning success]
+    TEXT_CLASSES = {
+      notice: "tw:text-blue-800 tw:dark:text-blue-400",
+      error: "tw:text-red-800 tw:dark:text-red-400",
+      warning: "tw:text-yellow-800 tw:dark:text-yellow-400",
+      success: "tw:text-green-800 tw:dark:text-green-400"
+    }.freeze
     # TODO: Should this convert danger>error, notice>warning? Do we need those anymore, from some bootstrap thing?
 
     # NOTE: you can pass arbitrary classes in via margin_classes, but that's not ideal (they might conflict, etc)
@@ -39,16 +45,7 @@ module Alert
     end
 
     def text_color_classes
-      case @kind
-      when :notice
-        "tw:text-blue-800 tw:dark:text-blue-400"
-      when :error
-        "tw:text-red-800 tw:dark:text-red-400"
-      when :warning
-        "tw:text-yellow-800 tw:dark:text-yellow-400"
-      when :success
-        "tw:text-green-800 tw:dark:text-green-400"
-      end
+      TEXT_CLASSES[@kind]
     end
 
     # Required because bootstrap alert color overrides

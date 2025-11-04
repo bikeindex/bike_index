@@ -61,7 +61,7 @@
 
           - unless skip_bike
             %td
-              = render partial: "/shared/admin/bike_cell", locals: {bike: theft_alert.bike, bike_id: theft_alert.bike_id, bike_link_path: edit_admin_bike_path(theft_alert.bike_id)}
+              = render partial: "/shared/admin/bike_cell", locals: {bike: theft_alert.bike, bike_id: theft_alert.bike_id}
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: theft_alert.user, render_search: true, cache: true, user_id: theft_alert.user_id}
           %td

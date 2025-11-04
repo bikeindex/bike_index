@@ -13,6 +13,7 @@ class Admin::MarketplaceMessagesController < Admin::BaseController
   def show
     @marketplace_message = MarketplaceMessage.find(params[:id])
     @marketplace_listing = @marketplace_message.marketplace_listing
+    @marketplace_messages_thread = @marketplace_message.messages_in_thread
   end
 
   helper_method :matching_marketplace_messages
@@ -34,10 +35,14 @@ class Admin::MarketplaceMessagesController < Admin::BaseController
   def matching_marketplace_messages
     marketplace_messages = MarketplaceMessage
 
-    if params[:bike_id].present?
-      @bike = Bike.unscoped.find_by(id: params[:bike_id])
+    if params[:search_bike_id].present?
+      @bike = Bike.unscoped.find_by(id: params[:search_bike_id])
       marketplace_messages = marketplace_messages.includes(:marketplace_listing)
-        .where(marketplace_listings: {item_type: "Bike", item_id: params[:bike_id]})
+        .where(marketplace_listings: {item_type: "Bike", item_id: params[:search_bike_id]})
+    end
+    if params[:search_marketplace_listing_id].present?
+      marketplace_messages = marketplace_messages.where(marketplace_listing_id: params[:search_marketplace_listing_id])
+      @marketplace_listing = MarketplaceListing.find_by(id: params[:search_marketplace_listing_id])
     end
 
     if params[:user_id].present?

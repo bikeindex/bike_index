@@ -117,6 +117,21 @@ RSpec.describe HeaderTags::Component, type: :component do
       expect(component.css("title")).to have_text "🧰 Dashboard"
       expect(component.css('meta[name="description"]').first["content"]).to eq default_description
     end
+    context "bike" do
+      let(:controller_name) { "bikes" }
+      let(:bike) { FactoryBot.create(:bike, frame_model: "Something special", year: 1969, description: "Cool description") }
+      let(:title) { "1969 #{mnfg_name} Something special" }
+      let(:page_obj) { bike }
+      let(:mnfg_name) { bike.manufacturer.short_name.to_s }
+      let(:action_name) { "show" }
+
+      it "renders admin bike title" do
+        expect(bike.title_string).to eq title
+
+        expect(component).to be_present
+        expect(component.css("title")).to have_text "🧰 #{title}"
+      end
+    end
   end
 
   context "organized" do
