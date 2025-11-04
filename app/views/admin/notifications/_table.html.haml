@@ -26,15 +26,15 @@
         = sortable "created_at", render_sortable: render_sortable
       %th.small
         = sortable "updated_at", render_sortable: render_sortable
+      %th Object
+      %th.user-cell
+        = sortable "user_id", render_sortable: render_sortable
+      %th.bike-cell
+        = sortable "bike_id", render_sortable: render_sortable
       %th
         = sortable "kind", render_sortable: render_sortable
       %th.small Method
-      %th.user-cell
-        = sortable "user_id", render_sortable: render_sortable
       %th.small Delivered?
-      %th.bike-cell
-        = sortable "bike_id", render_sortable: render_sortable
-      %th Object
       %th.sender-cell Sender
       %th.error-cell
         Delivery Errors
@@ -49,23 +49,6 @@
             %td
               %small.convertTime
                 = l(notification.updated_at, format: :convert_time)
-            %td= notification.kind_humanized&.titleize
-            %td
-              %small.less-strong= notification.message_channel
-            %td.user-cell
-              - if notification.user_id.present?
-                = render partial: "/shared/admin/user_cell", locals: {user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, cache: false}
-              - else
-                = notification.message_channel_target
-                %small.less-strong no user
-            %td.text-center
-              = notification_delivery_display(notification.delivery_status)
-            %td.bike-cell
-              - if notification.bike_id.present?
-                %code= link_to "#{notification.bike_id}", admin_bike_path(notification.bike_id), class: "less-strong"
-                - if render_sortable && params[:search_bike_id].blank?
-                  %small
-                    = link_to search_emoji, admin_notifications_path(sortable_search_params.merge(search_bike_id: notification.bike_id)), class: "small"
             %td
               - if notification.notifiable.present?
                 = link_to admin_path_for_object(notification.notifiable) do
@@ -76,6 +59,21 @@
                   - notification_text = notification.notifiable.body
                   %small.message-preview.d-block{title: notification_text}
                     = notification_text.truncate(100)
+            %td.user-cell
+              - if notification.user_id.present?
+                = render partial: "/shared/admin/user_cell", locals: {user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, cache: false}
+              - else
+                = notification.message_channel_target
+                %small.less-strong no user
+            %td.bike-cell
+              - if notification.bike_id.present?
+                = render partial: "/shared/admin/bike_cell", locals: {bike: notification.bike, bike_link_path: admin_bike_path(notification.bike_id, active_tab: "messages"), render_search: true}
+
+            %td= notification.kind_humanized&.titleize
+            %td
+              %small.less-strong= notification.message_channel
+            %td.text-center
+              = notification_delivery_display(notification.delivery_status)
             %td.sender-cell
               - sender_display_name = notification.sender_display_name
               - if notification.sender.is_a?(User)

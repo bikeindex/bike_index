@@ -82,9 +82,10 @@ class Admin::BikesController < Admin::BaseController
 
   def show
     @active_tab = params[:active_tab]
-    unless @active_tab.present?
-      redirect_to edit_admin_bike_path
-      nil
+    if @active_tab.present?
+      @page_title = "#{@active_tab.titleize}: #{@bike.title_string}"
+    else
+      redirect_to edit_admin_bike_path and return
     end
   end
 

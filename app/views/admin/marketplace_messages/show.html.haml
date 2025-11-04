@@ -17,6 +17,7 @@
             Sender
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.sender, user_id: @marketplace_message.sender_id}
+
         %tr
           %td
             Receiver
@@ -36,9 +37,14 @@
               = l @marketplace_message.updated_at, format: :convert_time
         %tr
           %td
-            Status
+            From
           %td
             = @marketplace_message.kind_humanized
+        %tr
+          %td Count
+          %td
+            #{number_display(@marketplace_message.messages_prior_count)} prior / #{number_display(@marketplace_messages_thread.count)} in thread
+
 
   .col-md-6
     %table.table-list
@@ -46,7 +52,7 @@
 
         %tr
           %td Marketplace Listing
-          %td
+          %td.small
             %span.convertTime
               = l @marketplace_listing.created_at, format: :convert_time
             - if display_dev_info?
@@ -66,6 +72,7 @@
             - if @marketplace_listing.published_at.present?
               %span.convertTime
                 = l @marketplace_listing.published_at, format: :convert_time
+            %small.less-strong (#{number_display(@marketplace_listing.marketplace_messages.count)} #{link_to("messages about this listing", admin_marketplace_messages_path(marketplace_listing_id: @marketplace_message.marketplace_listing_id))})
         %tr
           %td Listing end
           %td

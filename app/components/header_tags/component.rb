@@ -23,10 +23,13 @@ module HeaderTags
         assign_user_attrs(page_obj)
       end
 
-      @page_title ||= translation_if_exists("meta_titles.#{@page_key}", organization_name) ||
-        auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
       @page_description ||= translation_if_exists("meta_descriptions.#{@page_key}", organization_name) ||
         default_description
+      @page_title ||= translation_if_exists("meta_titles.#{@page_key}", organization_name) ||
+        auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
+
+      # Always prefix admin with emoji, regardless of how title was assigned
+      @page_title = "🧰 #{@page_title}" if controller_namespace == "admin"
     end
 
     private
@@ -122,9 +125,7 @@ module HeaderTags
     end
 
     def auto_title_for(controller_name:, controller_namespace:, action_name:, organization_name:)
-      namespace_title = if controller_namespace == "admin"
-        "🧰"
-      elsif controller_namespace == "organized"
+      namespace_title = if controller_namespace == "organized"
         organization_name
       end
 
@@ -182,7 +183,7 @@ module HeaderTags
       @updated_at = time(bike&.updated_at)
       return unless action_name == "show"
 
-      status_prefix = bike.status_with_owner? ? "" : bike.status_humanized.titleize
+      status_prefix = bike.status_with_owner? ? nil : bike.status_humanized.titleize
       @page_title ||= [status_prefix, bike.title_string].compact.join(" ")
 
       @page_description = bike_page_description(bike, status_prefix)

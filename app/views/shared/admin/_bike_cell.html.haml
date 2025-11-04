@@ -1,8 +1,9 @@
-- bike_link_path ||= nil
 - search_url ||= nil
 - render_search ||= search_url.present?
 - bike ||= nil
 - bike_id ||= bike&.id
+-# pass bike_link_path: false to not link
+- bike_link_path ||= admin_bike_path(bike_id) unless bike_link_path == false
 
 - if bike.blank? && bike_id.present?
   %small.text-danger{title: bike_id} Missing bike
@@ -11,15 +12,15 @@
 
 - if bike.present?
   - bike_content = capture_haml do
-    = bike.title_string
     - if bike.thumb_path.present?
       %small 📷
+    = bike.title_string
   - if bike_link_path.present?
     = link_to bike_content, bike_link_path
   - else
     = bike_content
 
 - if render_search && bike_id.present?
-  - search_url ||= url_for(sortable_search_params.merge(bike_id: bike_id))
+  - search_url ||= url_for(sortable_search_params.merge(search_bike_id: bike_id))
 
-  = link_to search_emoji, search_url, class: "display-sortable-link small"
+  = link_to search_emoji, search_url, class: "display-sortable-link small ml-1"
