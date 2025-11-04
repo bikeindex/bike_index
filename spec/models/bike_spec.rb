@@ -30,6 +30,9 @@ RSpec.describe Bike, type: :model do
       it "is valid" do
         expect(bike.reload.user).to be_present
         expect(address_record).to have_attributes target_attrs.merge(user_id: bike.user_id)
+        # TODO: when bike AddressRecords have finished migration, uncomment - #2922
+        # expect(Bike.with_street.pluck(:id)).to eq([bike.id])
+        # expect(User.with_street.pluck(:id)).to eq([bike.id])
       end
     end
   end
@@ -1632,13 +1635,37 @@ RSpec.describe Bike, type: :model do
       expect(bike.calculated_listing_order).to eq(Time.current.to_i / 1000000)
     end
 
-    it "is the current stolen record date stolen * 1000" do
-      allow(bike).to receive(:status).and_return("status_stolen")
-      stolen_record = StolenRecord.new
-      yesterday = Time.current - 1.days
-      allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
-      allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      expect(bike.calculated_listing_order).to be_within(1).of((Time.current - 1.day).to_i)
+    context "stolen bike" do
+      let(:date_stolen) { Time.current - 1.week }
+      let(:created_at) { Time.current - 1.day }
+      let(:bike) { FactoryBot.create(:stolen_bike, date_stolen:, created_at:) }
+      it "is the current stolen record date stolen" do
+        expect(bike.reload.occurred_at).to be_within(1).of date_stolen
+
+        expect(bike.calculated_listing_order).to be_within(1).of(date_stolen.to_i)
+        expect(bike.listing_order).to be_within(1).of date_stolen.to_i
+      end
+
+      context "with erroneously old stolen bike" do
+        let(:date_stolen) { Time.current - 100.years }
+
+        # NOTE: because date_stolen.to_i is negative
+        it "is the created_at" do
+          expect(bike.reload.occurred_at).to be_within(1).of date_stolen
+
+          expect(bike.calculated_listing_order).to be_within(1).of(created_at.to_i)
+        end
+      end
+      context "with future stolen bike" do
+        let(:date_stolen) { Time.current + 1.week }
+
+        # NOTE: because date_stolen.to_i is negative
+        it "is the created_at" do
+          expect(bike.reload.occurred_at).to be_within(1).of date_stolen
+
+          expect(bike.calculated_listing_order).to be_within(1).of(created_at.to_i)
+        end
+      end
     end
 
     it "is the updated_at" do

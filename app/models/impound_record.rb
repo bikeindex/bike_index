@@ -250,6 +250,7 @@ class ImpoundRecord < ApplicationRecord
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
+    self.impounded_at = created_at if created_at.present? && created_at > impounded_at + 10.years
     # unregistered_bike means essentially that the bike was created for this impound record
     self.unregistered_bike ||= calculated_unregistered_bike?
     # Don't geocode if location is present and address hasn't changed
