@@ -94,6 +94,8 @@ RSpec.describe HeaderTags::Component, type: :component do
       expect(component.css("title")).to have_text "About Bike Index"
       expect(component.css('meta[name="description"]').first["content"]).to eq "Why we made Bike Index and who we are"
       expect(component.to_s).to match('<meta http-equiv="Content-Language" content="en">')
+      # Validate that JSON LD is rendering without escaping. Can't get this test to work right :/
+      # expect(component.to_html).not_to match("{\x22@context\x22")
     end
 
     context "locale: nl" do
