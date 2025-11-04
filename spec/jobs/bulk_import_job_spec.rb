@@ -230,7 +230,7 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike1.phone).to eq("8887776666")
           # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
           expect(bike1.address_record.attributes.except(:id, :latitude, :longitude).compact).to match_hash_indifferently target_address
-          expect(bike1.registration_address_source).to eq "initial_creation"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike1)).to eq "initial_creation"
           # IDK why this is failing, post address_record for ownerships - PR #2912
           # expect(bike1.current_ownership.address_record.to_coordinates.compact.count).to eq 2
           # expect(bike1.to_coordinates).to eq default_location.slice(:latitude, :longitude).values

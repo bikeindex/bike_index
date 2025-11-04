@@ -247,7 +247,7 @@
                   - if bike.valid_mailing_address?
                     -# Don't show organization address
                     %small{style: "line-height: 1.5;"}
-                      = bike.registration_address["street"]
+                      =# bike.registration_address["street"]
                 - elsif bike_attr == "organization_affiliation"
                   = bike.organization_affiliation(current_organization)&.humanize
                 - elsif bike_attr == "student_id"

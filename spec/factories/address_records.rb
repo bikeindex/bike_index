@@ -7,7 +7,8 @@ FactoryBot.define do
       city { "Davis" }
       region_record { FactoryBot.create(:state_california) }
       country { Country.united_states }
-      street { "1 Shields Ave" }
+      street { "One Shields Ave" }
+      street_2 { "C/O BicyclingPlus" }
       postal_code { "95616" }
       latitude { 38.5449065 }
       longitude { -121.7405167 }

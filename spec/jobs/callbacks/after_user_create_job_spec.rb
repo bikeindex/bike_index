@@ -113,13 +113,13 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
       VCR.use_cassette("after_user_create_worker-import_user_attributes") do
         expect(user).to be_present
         bike.reload.update(updated_at: Time.current)
-        expect(bike.reload.registration_address_source).to eq "initial_creation"
+        expect(BikeServices::CalculateLocation.registration_address_source(bike.reload)).to eq "initial_creation"
         expect(bike.address_set_manually).to be_falsey
         bike_address_record = bike.address_record
         expect(bike_address_record.user_id).to eq user.id
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
         expect(bike.phone).to eq "1112223333"
-        expect(BikeServices::CalculateStoredLocation.location_attrs(bike).except("country", "skip_geocoding"))
+        expect(BikeServices::CalculateLocation.stored_location_attrs(bike).except("country", "skip_geocoding"))
           .to match_hash_indifferently target_address_hash.slice(:latitude, :longitude).merge(address_record_id: bike_address_record.id)
 
         expect(user.reload.address_record).to be_blank
@@ -134,7 +134,7 @@ RSpec.describe Callbacks::AfterUserCreateJob, type: :job do
         expect(user.address_record.kind).to eq "user"
         expect(user.address_set_manually).to be_falsey
         expect(user.to_coordinates).to eq bike.to_coordinates
-        expect(bike.reload.registration_address_source).to eq "initial_creation"
+        expect(BikeServices::CalculateLocation.registration_address_source(bike.reload)).to eq "initial_creation"
       end
     end
     context "existing attributes" do

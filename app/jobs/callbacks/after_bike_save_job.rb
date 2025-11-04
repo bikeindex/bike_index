@@ -92,7 +92,7 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
   # If the bike address_record was geocoded after save, update the bike
   def update_coordinates(bike)
     return if bike.address_record.blank? ||
-      %w[bike_update initial_creation].exclude?(bike.registration_address_source) ||
+      %w[bike_update initial_creation].exclude?(BikeServices::CalculateLocation.registration_address_source(bike)) ||
       bike.address_record.latitude == bike.latitude && bike.address_record.longitude == bike.longitude
 
     bike.update_columns(latitude: bike.address_record.latitude, longitude: bike.address_record.longitude)

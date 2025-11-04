@@ -110,7 +110,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(export.avery_export?).to be_truthy
             expect(export.headers).to eq Export::AVERY_HEADERS
 
-            expect(bike_for_avery.registration_address_source).to eq "initial_creation"
+            expect(BikeServices::CalculateLocation.registration_address_source(bike_for_avery)).to eq "initial_creation"
             bike_for_avery.update(updated_at: Time.current)
             expect(bike_for_avery.reload.avery_exportable?).to be_truthy
             expect(bike_for_avery.address_hash_legacy.except("country")).to eq bike_for_avery.registration_address.except("country", "address_record_id")
@@ -372,7 +372,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"
             expect(bike.registration_address(true).except("country")).to eq target_address
-            expect(bike.registration_address_source).to eq "initial_creation"
+            expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
             instance.perform(export.id)
           end
           export.reload
@@ -481,7 +481,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           it "returns expected values" do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
               bike.reload.update(cycle_type: "personal-mobility")
-              expect(bike.registration_address_source).to eq "initial_creation"
+              expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
               expect(bike.registration_address(true).except("country")).to eq target_address
               expect(bike.registration_address.except("country")).to eq target_address
             end

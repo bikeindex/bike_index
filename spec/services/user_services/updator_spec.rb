@@ -22,7 +22,7 @@ RSpec.describe UserServices::Updator do
       bike.current_ownership.mark_claimed
       expect(bike.current_ownership.reload.user_id).to eq user.id
       bike.update(updated_at: Time.current)
-      expect(bike.reload.registration_address_source).to eq "initial_creation"
+      expect(BikeServices::CalculateLocation.registration_address_source(bike.reload)).to eq "initial_creation"
       expect(bike.current_ownership.address_record).to be_present
       expect(bike.current_ownership.address_record.country_id).to eq Country.united_states_id
       expect(bike.address_record.address_hash(visible_attribute: :street).except(:country))
@@ -42,7 +42,7 @@ RSpec.describe UserServices::Updator do
 
       expect(bike.reload.address_record.user_id).to eq user.id
       expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
-      expect(bike.registration_address_source).to eq "initial_creation"
+      expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
       expect(AddressRecord.count).to eq 2 # sanity check ;)
     end
 
@@ -61,7 +61,7 @@ RSpec.describe UserServices::Updator do
         bike.current_ownership.mark_claimed
         expect(bike.current_ownership.reload.user_id).to eq user.id
         bike.update(updated_at: Time.current)
-        expect(bike.reload.registration_address_source).to eq "bike_update"
+        expect(BikeServices::CalculateLocation.registration_address_source(bike.reload)).to eq "bike_update"
         expect(bike.to_coordinates).to eq target_coordinates
         expect(address_record.to_coordinates).to eq target_coordinates
         expect(address_record.user_id).to be_blank
@@ -76,7 +76,7 @@ RSpec.describe UserServices::Updator do
 
         expect(bike.reload.address_record.user_id).to eq user.id
         expect(bike.to_coordinates).to eq target_coordinates
-        expect(bike.registration_address_source).to eq "user"
+        expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
         expect(AddressRecord.count).to eq 2 # sanity check ;)
       end
 
@@ -91,7 +91,7 @@ RSpec.describe UserServices::Updator do
           bike.current_ownership.mark_claimed
           expect(bike.current_ownership.reload.user_id).to eq user.id
           bike.update(updated_at: Time.current)
-          expect(bike.reload.registration_address_source).to eq "bike_update"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike.reload)).to eq "bike_update"
           expect(bike.to_coordinates).to eq target_coordinates
           expect(address_record.to_coordinates).to eq target_coordinates
           expect(user.reload.address_record_id).to be_nil
@@ -105,7 +105,7 @@ RSpec.describe UserServices::Updator do
 
           expect(bike.reload.address_record.user_id).to eq other_user.id
           expect(bike.to_coordinates).to eq target_coordinates
-          expect(bike.registration_address_source).to eq "user"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
           expect(AddressRecord.count).to eq 2 # sanity check ;)
         end
       end
@@ -125,7 +125,7 @@ RSpec.describe UserServices::Updator do
         bike.current_ownership.mark_claimed
         expect(bike.current_ownership.reload.user_id).to eq user.id
         bike.update(updated_at: Time.current)
-        expect(bike.reload.registration_address_source).to eq "bike_update"
+        expect(BikeServices::CalculateLocation.registration_address_source(bike.reload)).to eq "bike_update"
         expect(bike.address_hash_legacy).to match_hash_indifferently legacy_hash
 
         described_class.assign_address_from_bikes(user, save_user: true)
@@ -138,7 +138,7 @@ RSpec.describe UserServices::Updator do
 
         expect(bike.reload.address_record.user_id).to eq user.id
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
-        expect(bike.registration_address_source).to eq "user"
+        expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
         expect(AddressRecord.count).to eq 1
       end
     end

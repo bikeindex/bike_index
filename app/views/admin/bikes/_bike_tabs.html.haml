@@ -197,7 +197,7 @@
                       %small.only-dev-visible.ml-2
                         %em
                           source:
-                        = bike.registration_address_source
+                        = BikeServices::CalculateLocation.registration_address_source(bike)
 
             -# Only show phone if no stolen record
             - if stolen_record.blank? && bike.phone.present?

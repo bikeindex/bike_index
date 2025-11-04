@@ -149,12 +149,13 @@
                               %br
                           %span.text-warning
                             %small invalid address
-                        - if @bike.registration_address_source.present?
+                        - address_source = BikeServices::CalculateLocation.registration_address_source(@bike)
+                        - if address_source.present?
                           %br
                           %small.less-strong
                             %em
                               Address source:
-                            = @bike.registration_address_source&.humanize
+                            = address_source.to_s&.humanize
                   - else
                     %tr
                       %td
