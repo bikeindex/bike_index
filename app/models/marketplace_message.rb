@@ -149,6 +149,12 @@ class MarketplaceMessage < ApplicationRecord
     BUYER_SELLER_MESSAGE_KINDS.include?(kind)
   end
 
+  def buyer_id
+    return unless buyer_seller_message?
+
+    sender_buyer? ? sender_id : buyer_id
+  end
+
   # TODO: do we need all these other_user methods?
   def other_user(user_or_id)
     user_id = user_or_id&.is_a?(User) ? user_or_id.id : user_or_id

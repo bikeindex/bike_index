@@ -57,7 +57,10 @@ RSpec.describe MarketplaceMessage, type: :model do
         expect(marketplace_message_reply.receiver_id).to eq marketplace_message.receiver_id
         expect(marketplace_message_reply.marketplace_listing_id).to eq marketplace_message.marketplace_listing_id
         expect(marketplace_message_reply.initial_message?).to be_falsey
+        expect(marketplace_message_reply.buyer_id).to eq marketplace_message.sender_id
+
         expect(marketplace_message.kind).to eq "sender_buyer"
+        expect(marketplace_message.buyer_id).to eq marketplace_message.sender_id
       end
     end
   end

@@ -2,15 +2,18 @@
 - render_search ||= search_url.present?
 - bike ||= nil
 - bike_id ||= bike&.id
+- bike ||= Bike.unscoped.find_by(id: bike_id) if bike_id.present?
 -# pass bike_link_path: false to not link
 - bike_link_path ||= admin_bike_path(bike_id) unless bike_link_path == false
 
-- if bike.blank? && bike_id.present?
-  %small.text-danger{title: bike_id} Missing bike
-  - if bike.blank? && bike_id.present? # If email is present, the email will be shown
-    %code= link_to bike_id, bike_link_path
+- if bike.blank?
+  %small.text-danger
+    Missing bike
+    - if bike_id.present?
+      %code= bike_id
 
-- if bike.present?
+- elsif bike.present?
+  = render Badge::BikeHiddenAdminExplanation::Component.new(bike:)
   - bike_content = capture_haml do
     - if bike.thumb_path.present?
       %small 📷

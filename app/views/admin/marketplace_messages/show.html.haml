@@ -1,3 +1,4 @@
+- message_thread_path = admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id, user_id: @marketplace_listing.buyer_id || @marketplace_message.receiver_id)
 .admin-subnav
   .col-md-12
     %h1
@@ -17,12 +18,20 @@
             Sender
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.sender, user_id: @marketplace_message.sender_id}
-
+            %small{class: "tw:ml-2"}
+              - sender_count = MarketplaceMessage.where(sender_id: @marketplace_message.sender_id).count
+              = link_to admin_marketplace_messages_path(user_id: @marketplace_message.sender_id) do
+                #{number_display(sender_count)} total #{"message".pluralize(sender_count)} sent
         %tr
           %td
             Receiver
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id}
+            %small{class: "tw:ml-2"}
+              - receiver_count = MarketplaceMessage.where(sender_id: @marketplace_message.receiver_id).count
+              = link_to admin_marketplace_messages_path(user_id: @marketplace_message.receiver_id) do
+                #{number_display(receiver_count)} total #{"message".pluralize(receiver_count)} sent
+
         %tr.small
           %td
             Created
@@ -43,13 +52,13 @@
         %tr
           %td Count
           %td
-            #{number_display(@marketplace_message.messages_prior_count)} prior / #{number_display(@marketplace_messages_thread.count)} in thread
+            #{number_display(@marketplace_message.messages_prior_count)} prior /
+            %small #{number_display(@marketplace_messages_thread.count)} total #{link_to "in thread", message_thread_path}
 
 
   .col-md-6
     %table.table-list
       %tbody
-
         %tr
           %td Marketplace Listing
           %td.small
@@ -97,3 +106,9 @@
       = @marketplace_message.subject
 
     = render(UserTextBlockDisplay::Component.new(text: @marketplace_message.body, max_height_class: ""))
+
+- if @marketplace_messages_thread.count > 1
+  %h2.mt-5
+    Message Thread
+    %small (#{link_to(number_display(@marketplace_messages_thread.count), message_thread_path)})
+  = render partial: "table", locals: {collection: @marketplace_messages_thread, render_sortable: false}
