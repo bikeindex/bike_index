@@ -417,11 +417,16 @@ class Bike < ApplicationRecord
   end
 
   def calculated_listing_order
-    return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
-    return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
+    if current_stolen_record.present? || current_impound_record.present?
+      c_at = created_at || Time.current
+      clo = occurred_at.to_i
+      # Make sure listing_order is a reasonable number, even if occurred_at isn't
+      clo = c_at.to_i unless (c_at - 10.years).to_i < clo && (c_at + 1.day).to_i > clo
+      return clo
+    end
 
-    t = (updated_by_user_fallback || Time.current).to_i / 10000
-    (stock_photo_url.present? || public_images.limit(1).present?) ? t : t / 100
+    clo = (updated_by_user_fallback || Time.current).to_i / 10000
+    (stock_photo_url.present? || public_images.limit(1).present?) ? clo : clo / 100
   end
 
   def credibility_scorer
@@ -959,7 +964,8 @@ class Bike < ApplicationRecord
   def calculated_occurred_at
     return nil if current_event_record.blank? || is_for_sale
 
-    current_impound_record&.impounded_at || current_stolen_record&.date_stolen
+    current_impound_record&.impounded_at || current_stolen_record&.date_stolen ||
+      created_at || Time.current # ensure there is always a time returned
   end
 
   def normalized_email

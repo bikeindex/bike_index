@@ -31,6 +31,8 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(organization.impound_records.bikes.pluck(:id)).to eq([bike.id])
       expect(impound_record.kind).to eq "impounded"
       expect(impound_record.impounded_at).to be_within(1).of impound_record.created_at
+      impound_record.update(impounded_at: Time.current - 11.years)
+      expect(impound_record.reload.impounded_at).to be_within(1).of impound_record.created_at
     end
     context "bike already impounded" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike, display_id: "fasdfasdf1", display_id_prefix: "fasdfasdf", display_id_integer: 1) }
