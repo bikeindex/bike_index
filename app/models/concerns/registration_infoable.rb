@@ -3,7 +3,7 @@
 module RegistrationInfoable
   extend ActiveSupport::Concern
 
-  LOCATION_KEYS = %w[city country state street zipcode latitude longitude].freeze
+  LOCATION_KEYS = %w[city country state street street_2 zipcode latitude longitude].freeze
 
   # Currently not used, keeping it around for reference
   # REGISTRATION_INFO_KEYS = %w[
