@@ -67,7 +67,7 @@
                 %small.less-strong no user
             %td.bike-cell
               - if notification.bike_id.present?
-                = render partial: "/shared/admin/bike_cell", locals: {bike: notification.bike, bike_link_path: admin_bike_path(notification.bike_id, active_tab: "messages"), render_search: true}
+                = render partial: "/shared/admin/bike_cell", locals: {bike: notification.bike, bike_id: notification.bike_id, bike_link_path: admin_bike_path(notification.bike_id, active_tab: "messages"), render_search: true}
 
             %td= notification.kind_humanized&.titleize
             %td
