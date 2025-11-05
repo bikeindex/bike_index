@@ -7,7 +7,7 @@ RSpec.describe UserServices::Updator do
     let!(:state) { FactoryBot.create(:state_california) }
     let!(:country) { Country.united_states }
     let(:reg_info_hash) { {street: "Pier 15, The Embarcadero", city: "San Francisco", state: "CA", zipcode: "94111", latitude: 37.8016649, longitude: -122.397348} }
-    let(:target_address_hash) { reg_info_hash.except(:state, :zipcode).merge(region: "CA", postal_code: "94111") }
+    let(:target_address_hash) { reg_info_hash.except(:state, :zipcode).merge(region: "CA", postal_code: "94111", street_2: nil) }
     let(:bike) do
       FactoryBot.create(:bike,
         :with_ownership,
@@ -117,7 +117,7 @@ RSpec.describe UserServices::Updator do
         FactoryBot.create(:bike, :with_ownership, :in_los_angeles, owner_email: "aftercreate@bikeindex.org", address_set_manually: true)
       end
       let(:legacy_hash) { {street: "100 W 1st St", city: "Los Angeles", state: "CA", zipcode: "90021", latitude: 34.05223, longitude: -118.24368, country: "US"} }
-      let(:target_address_hash) { legacy_hash.except(:state, :zipcode, :country).merge(region: "CA", postal_code: "90021") }
+      let(:target_address_hash) { legacy_hash.except(:state, :zipcode, :country).merge(region: "CA", postal_code: "90021", street_2: nil) }
 
       it "updates from the bike attrs" do
         expect(bike.reload.current_ownership.user_id).to be_blank

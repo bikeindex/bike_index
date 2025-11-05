@@ -241,8 +241,8 @@ RSpec.describe Callbacks::AfterUserChangeJob, type: :job do
 
   describe "user_address" do
     let(:user) { FactoryBot.create(:user) }
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :in_vancouver, user: user, address_set_manually: true) }
-    let(:target_address) { {street: "278 Broadway", postal_code: "10007", city: "Vancouver", country: "Canada", region: nil, latitude: 49.253992, longitude: -123.241084} }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_address_record, address_in: :vancouver, user:) }
+    let(:target_address) { {street: "278 W Broadway", postal_code: "V5Y 1P5", city: "Vancouver", country: "Canada", region: "BC", latitude: 49.253992, longitude: -123.241084, street_2: nil} }
     it "sets based on bikes" do
       expect(Geocodeable.new_address_hash(bike.reload.registration_address(true))).to eq target_address
       expect(bike.address_set_manually).to be_truthy
@@ -264,7 +264,7 @@ RSpec.describe Callbacks::AfterUserChangeJob, type: :job do
     context "address_set_manually" do
       let(:address_record) { FactoryBot.create(:address_record, :los_angeles, kind: :user) }
       let(:user) { FactoryBot.create(:user, address_record:, address_set_manually: true) }
-      let(:target_address) { {street: "100 W 1st St", city: "Los Angeles", region: "CA", postal_code: "90021", country: "United States", latitude: 34.05223, longitude: -118.24368} }
+      let(:target_address) { {street: "100 W 1st St", city: "Los Angeles", region: "CA", postal_code: "90021", country: "United States", latitude: 34.05223, longitude: -118.24368, street_2: nil} }
       it "updates bike to be users address" do
         expect(Geocodeable.new_address_hash(bike.reload.registration_address(true))).to eq target_address
         expect(user.reload.address_hash(render_country: true, visible_attribute: :street)).to eq target_address
