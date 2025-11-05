@@ -16,7 +16,7 @@ RSpec.describe AddressDisplay::Component, type: :component do
   end
 
   context "with address_record" do
-    let(:address_record) { FactoryBot.build(:address_record, publicly_visible_attribute: "postal_code") }
+    let(:address_record) { FactoryBot.build(:address_record, publicly_visible_attribute: "postal_code", street_2: "C/O BicyclingPlus") }
     it "renders" do
       expect(address_record.publicly_visible_attribute).to eq "postal_code"
       expect(component).to have_content "Davis, CA 95616"

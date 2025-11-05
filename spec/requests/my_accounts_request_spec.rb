@@ -613,7 +613,7 @@ RSpec.describe MyAccountsController, type: :request do
             bike1_organization2.destroy
 
             expect(bike3.reload.registration_info).to eq(bike3_information)
-            expect(bike3.address_hash_legacy).to eq default_location_registration_address.merge(country: "United States").as_json
+            expect(bike3.address_hash_legacy).to eq default_location_registration_address.merge(country: "United States", street_2: nil).as_json
 
             Sidekiq::Job.clear_all
             put base_url, params: {
@@ -659,7 +659,7 @@ RSpec.describe MyAccountsController, type: :request do
             expect(current_user.reload.address_record).to match_hash_indifferently default_location_address_record_attrs.merge(kind: "user")
 
             expect(current_user.address_hash_legacy)
-              .to eq default_location_registration_address.merge("country" => "United States")
+              .to eq default_location_registration_address.merge("country" => "United States", "street_2" => nil)
           end
         end
       end

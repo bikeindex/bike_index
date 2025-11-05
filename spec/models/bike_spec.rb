@@ -1340,7 +1340,7 @@ RSpec.describe Bike, type: :model do
           creation_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
       # let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
-      let(:target_address) { {city: "State College", country: "United States", latitude: 40.7933949, longitude: -77.8600012, state: "PA", street: "102 Washington Pl", zipcode: "16801"} }
+      let(:target_address) { {city: "State College", country: "United States", latitude: 40.7933949, longitude: -77.8600012, state: "PA", street: "102 Washington Pl", zipcode: "16801", street_2: nil} }
       include_context :geocoder_real
       it "is exportable" do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
@@ -1381,15 +1381,15 @@ RSpec.describe Bike, type: :model do
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do
-        expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States")
+        expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
         bike.reload
         expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
-        expect(bike.registration_address(true)).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States")
+        expect(bike.registration_address(true)).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
       end
       context "ownership creator" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: FactoryBot.create(:user_confirmed)) }
         it "returns nothing" do
-          expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States")
+          expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
           expect(bike.user).to_not eq user
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to be_blank
           expect(bike.registration_address.values.compact).to eq([])

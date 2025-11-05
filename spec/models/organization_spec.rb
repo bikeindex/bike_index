@@ -38,21 +38,21 @@ RSpec.describe Organization, type: :model do
     it "returns bikes associated with nearby organizations" do
       # an nyc-org bike in chicago
       nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-      chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, creation_organization: nyc_org1, address_set_manually: true)
+      chi_bike1 = FactoryBot.create(:bike_organized, :with_address_record, address_in: :chicago, creation_organization: nyc_org1)
 
       # a chicago-org bike in nyc
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
-      nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: chi_org, address_set_manually: true)
+      nyc_bike1 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: chi_org)
 
       nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-      nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: nyc_org2, address_set_manually: true)
+      nyc_bike2 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: nyc_org2)
 
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-      nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: nyc_org3, address_set_manually: true)
+      nyc_bike3 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: nyc_org3)
 
       nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
 
-      chi_bike1.reload
+      expect(chi_bike1.reload.address_set_manually).to be_truthy
       expect(chi_bike1.to_coordinates).to eq([41.8624488, -87.6591502])
 
       # stolen record doesn't automatically set latitude on bike,

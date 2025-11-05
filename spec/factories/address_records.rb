@@ -7,9 +7,8 @@ FactoryBot.define do
       city { "Davis" }
       region_record { FactoryBot.create(:state_california) }
       country { Country.united_states }
-      street { "One Shields Ave" }
-      street_2 { "C/O BicyclingPlus" }
       postal_code { "95616" }
+      street { "One Shields Ave" }
       latitude { 38.5449065 }
       longitude { -121.7405167 }
     end
@@ -23,7 +22,6 @@ FactoryBot.define do
       country { Country.netherlands }
       street { "Spuistraat 134afd.Gesch." }
       postal_code { "1012" }
-      street_2 { nil }
     end
 
     trait :chicago do
@@ -34,7 +32,6 @@ FactoryBot.define do
       country { Country.united_states }
       street { "1300 W 14th Pl" }
       postal_code { "60608" }
-      street_2 { nil }
     end
 
     trait :los_angeles do
@@ -44,7 +41,6 @@ FactoryBot.define do
       city { "Los Angeles" }
       region_record { FactoryBot.create(:state_california) }
       postal_code { "90021" }
-      street_2 { nil }
       country { Country.united_states }
     end
 
@@ -57,7 +53,6 @@ FactoryBot.define do
       country { Country.united_states }
       street { "278 Broadway" }
       postal_code { "10007" }
-      street_2 { nil }
     end
 
     trait :vancouver do
@@ -65,7 +60,6 @@ FactoryBot.define do
       longitude { -123.241084 }
       street { "278 W Broadway" }
       postal_code { "V5Y 1P5" }
-      street_2 { nil }
       city { "Vancouver" }
       region_record { FactoryBot.create(:state_british_columbia) }
       country { Country.canada }
@@ -76,7 +70,6 @@ FactoryBot.define do
       longitude { -113.5508765 }
       street { "9330 Groat Rd NW" }
       postal_code { "AB T6G 2B3" }
-      street_2 { nil }
       city { "Edmonton" }
       region_record { FactoryBot.create(:state_alberta) }
       country { Country.canada }
