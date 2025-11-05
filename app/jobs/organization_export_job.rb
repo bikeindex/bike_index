@@ -129,7 +129,7 @@ class OrganizationExportJob < ApplicationJob
     @export_headers = @export.headers
     if @export_headers.include?("address")
       # Remove address and re-add, because we want to keep them in line
-      @export_headers = (@export_headers - ["address"]) + %w[address city state zipcode]
+      @export_headers = (@export_headers - ["address"]) + %w[address address_2 city state zipcode]
     end
     @export_headers += ["partial_registration"] if @export.partial_registrations.present?
     if @export.assign_bike_codes?
@@ -158,6 +158,7 @@ class OrganizationExportJob < ApplicationJob
     when "is_stolen" then bike.status_stolen? ? "true" : nil
     when "is_impounded" then bike.status_impounded? ? "true" : nil
     when "address" then bike.registration_address["street"] # These are the expanded values for bike registration address
+    when "address_2" then bike.registration_address["street_2"]
     when "city" then bike.registration_address["city"]
     when "state" then bike.registration_address["state"]
     when "zipcode" then bike.registration_address["zipcode"]

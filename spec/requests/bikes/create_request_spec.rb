@@ -321,7 +321,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(ownership.creator_id).to eq current_user.id
       expect(ownership.registration_info).to eq({"organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1"})
       # It registers with the organization address
-      expect(new_bike.registration_address_source).to eq "initial_creation"
+      expect(BikeServices::CalculateLocation.registration_address_source(new_bike)).to eq "initial_creation"
       address_attrs = {city: "Los Angeles", country_id: Country.united_states_id, region_record_id: organization.state_id, kind: "ownership", latitude: nil, longitude: nil, postal_code: nil}
       expect(new_bike.address_record).to match_hash_indifferently(address_attrs)
       # Because the address is the same as the organization

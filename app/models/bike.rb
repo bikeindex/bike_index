@@ -836,20 +836,6 @@ class Bike < ApplicationRecord
     creation_organization.default_location.address_hash != addy
   end
 
-  def registration_address_source
-    # NOTE: Marketplace Listing and User address are the preferred addresses!
-    # If either is set, address fields don't show on bike!
-    if is_for_sale && current_marketplace_listing.present?
-      "marketplace_listing"
-    elsif user&.address_set_manually
-      "user"
-    elsif address_set_manually
-      "bike_update"
-    elsif current_ownership&.address_record?
-      "initial_creation"
-    end
-  end
-
   # NOTE! This will return different hashes - legacy hashes for stolen & impound
   def address_hash
     current_stolen_record&.address_hash || current_impound_record&.address_hash ||
@@ -860,14 +846,8 @@ class Bike < ApplicationRecord
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
 
-    @registration_address = case registration_address_source
-    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy(address_record_id:)
-    when "user" then user&.address_hash_legacy(address_record_id:)
-    when "bike_update" then address_hash_legacy(address_record_id:)
-    when "initial_creation" then current_ownership.address_hash_legacy(address_record_id:)
-    else
-      {}
-    end.with_indifferent_access
+    @registration_address =
+      BikeServices::CalculateLocation.registration_address_hash(self, address_record_id:)
   end
 
   def external_image_urls
@@ -908,7 +888,7 @@ class Bike < ApplicationRecord
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.occurred_at = calculated_occurred_at
     self.current_ownership = calculated_current_ownership
-    self.attributes = BikeServices::CalculateStoredLocation.location_attrs(self)
+    self.attributes = BikeServices::CalculateLocation.stored_location_attrs(self)
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at

@@ -238,7 +238,7 @@ RSpec.describe BikeServices::Creator do
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect(bike.registration_address.compact).to eq({"street" => "Somewhere Ville"})
-          expect(bike.registration_address_source).to eq "initial_creation"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
           expect(bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)).to eq target_address_record.merge(bike_id: bike.id)
 
           expect(bike).to match_hash_indifferently bike_params.except(*not_matched_attrs)

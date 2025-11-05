@@ -6,9 +6,10 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
   let(:user) { FactoryBot.create(:user) }
   let(:address_record) { AddressRecord.new(country: Country.united_states, user:) }
   let(:organization) { nil }
-  let(:options) { {organization:, embed_layout:} }
+  let(:options) { {organization:, embed_layout:, street_2:} }
   let(:embed_layout) { false }
   let(:obj) { user }
+  let(:street_2) { false }
 
   def rendered_component(passed_obj, options)
     render_in_view_context do
@@ -34,22 +35,34 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
   it "default preview" do
     expect(component).to have_css("label", text: "Street address")
     expect(component).to have_field("user_address_record_attributes_street")
+    expect(component).not_to have_field("user_address_record_attributes_street_2")
   end
 
   context "with no_address: true" do
     let(:user) { FactoryBot.build(:user, no_address: true) }
 
-    it "renders with address" do
+    it "renders with not street" do
       expect(component).to have_css("label", text: "Address")
       expect(component).not_to have_field("user_address_record_attributes_street")
+      expect(component).not_to have_field("user_address_record_attributes_street_2")
     end
 
     context "with no_street: true" do
-      let(:options) { {organization: nil, embed_layout: false, no_street: true} }
-      it "renders with street_address anyway" do
+      let(:options) { {organization: nil, embed_layout: false, no_street: true, street_2: true} }
+      it "renders with no street" do
         expect(component).to have_css("label", text: "Address")
         expect(component).not_to have_field("user_address_record_attributes_street")
+        expect(component).not_to have_field("user_address_record_attributes_street_2")
       end
+    end
+  end
+
+  context "with street_2" do
+    let(:street_2) { true }
+    it "renders with not street" do
+      expect(component).to have_css("label", text: "Street address")
+      expect(component).to have_field("user_address_record_attributes_street")
+      expect(component).to have_field("user_address_record_attributes_street_2")
     end
   end
 

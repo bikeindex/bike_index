@@ -38,7 +38,7 @@
           %em
             Marketplace Listing
             = render(Badge::Status::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing))
-            = "##{marketplace_listing.id}"
+            = "##{marketplace_listing.id},"
           = render(partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id})
         - else
           %span.text-danger

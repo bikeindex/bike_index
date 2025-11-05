@@ -94,6 +94,15 @@ class AddressRecord < ApplicationRecord
     def default_visibility_for(kind)
       (kind == "organization") ? :street : :postal_code
     end
+
+    def permitted_visible_attribute(string_or_sym, default: :postal_code)
+      if string_or_sym.present?
+        target_attr = string_or_sym&.to_sym
+        return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
+      end
+
+      default.to_sym
+    end
   end
 
   def to_coordinates
@@ -116,9 +125,10 @@ class AddressRecord < ApplicationRecord
   def address_hash(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     include_country = include_country?(render_country:, current_country_id:, current_country_iso:)
     country_hash = (include_country && country&.name.present?) ? {country: country.name} : {}
-    visible_attr = permitted_visible_attribute(visible_attribute)
+    visible_attr = self.class.permitted_visible_attribute(visible_attribute, default: publicly_visible_attribute)
     {
       street: %i[street].include?(visible_attr) ? street : nil,
+      street_2: %i[street].include?(visible_attr) ? street_2 : nil,
       city:,
       region:,
       postal_code: %i[street postal_code].include?(visible_attr) ? postal_code : nil,
@@ -203,22 +213,16 @@ class AddressRecord < ApplicationRecord
     address_changed?
   end
 
-  def permitted_visible_attribute(string_or_sym)
-    if string_or_sym.present?
-      target_attr = string_or_sym&.to_sym
-      return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
-    end
-    publicly_visible_attribute.to_sym
-  end
-
   def set_calculated_attributes
     self.publicly_visible_attribute ||= self.class.default_visibility_for(kind)
 
-    self.street = street.blank? ? nil : street.strip
-    self.postal_code = postal_code.blank? ? nil : postal_code.strip
-    self.city = city.blank? ? nil : city.strip
-    self.neighborhood = neighborhood.blank? ? nil : neighborhood.strip
+    self.street = InputNormalizer.string(street)
+    self.street_2 = InputNormalizer.string(street_2)
+    self.postal_code = InputNormalizer.string(postal_code)
+    self.city = InputNormalizer.string(city)
+    self.neighborhood = InputNormalizer.string(neighborhood)
     self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
+
     assign_region_record
   end
 

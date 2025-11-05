@@ -1328,57 +1328,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "address_source" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: registration_info) }
-    let(:registration_info) { {street: "2864 Milwaukee Ave"} }
-    context "no address" do
-      it "returns nil" do
-        expect(Bike.new.registration_address_source).to be_blank
-      end
-    end
-    context "address set on bike" do
-      let(:address_record) { FactoryBot.create(:address_record, :chicago, street: "1313 N Milwaukee Ave ", postal_code: "66666 ", kind: :bike) }
-      it "returns bike_update" do
-        expect(address_record.reload.to_coordinates.map(&:round)).to eq([42, -88])
-        expect(bike.reload.registration_address_source).to eq "initial_creation"
-        bike.update(address_record:, address_set_manually: true)
-        expect(bike.reload.registration_address(true)["latitude"]).to eq address_record["latitude"]
-        expect(bike.reload.address_record.city).to eq "Chicago"
-        expect(bike.address_record.street).to eq "1313 N Milwaukee Ave"
-        expect(bike.address_record.city).to eq "Chicago"
-        expect(bike.address_record.postal_code).to eq "66666"
-
-        expect(bike.registration_address_source).to eq "bike_update"
-        expect(bike.reload.to_coordinates.map(&:round)).to eq([42, -88])
-      end
-    end
-    context "b_param" do
-      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: {bike: registration_info}) }
-      it "returns creation_information" do
-        bike.reload
-        expect(bike.registration_address_source).to eq "initial_creation"
-        expect(bike.registration_info).to eq registration_info.as_json
-      end
-      context "user with address address_set_manually" do
-        let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :vancouver, address_set_manually: true) }
-        let(:bike) { FactoryBot.create(:bike, :with_address_record, :with_ownership_claimed, address_in: :chicago, user:) }
-        it "returns user address" do
-          bike.reload
-          expect(bike.registration_address_source).to eq "user"
-          expect(bike.registration_address(true)).to eq user.address_hash_legacy
-          expect(bike.address_record.city).to eq "Chicago"
-          expect(bike.registration_address["city"]).to eq "Vancouver"
-        end
-      end
-      context "with stolen record" do
-        let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, creation_registration_info: registration_info) }
-        it "returns initial_creation" do
-          expect(bike.reload.registration_address_source).to eq "initial_creation"
-        end
-      end
-    end
-  end
-
   describe "avery_exportable?" do
     context "unclaimed bike, with owner email" do
       let(:organization) { FactoryBot.create(:organization) }
@@ -1391,7 +1340,7 @@ RSpec.describe Bike, type: :model do
           creation_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
       # let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
-      let(:target_address) { {city: "State College", country: "United States", latitude: 40.7933949, longitude: -77.8600012, state: "PA", street: "102 Washington Pl", zipcode: "16801"} }
+      let(:target_address) { {city: "State College", country: "United States", latitude: 40.7933949, longitude: -77.8600012, state: "PA", street: "102 Washington Pl", zipcode: "16801", street_2: nil} }
       include_context :geocoder_real
       it "is exportable" do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
@@ -1399,7 +1348,7 @@ RSpec.describe Bike, type: :model do
           bike.reload.update(updated_at: Time.current)
           expect(bike.reload.user&.id).to eq user.id
           # We test that the bike has a location saved
-          expect(bike.registration_address_source).to eq "initial_creation"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
           expect(bike.registration_address(true).except("latitude", "longitude", "zipcode")).to eq(target_address.as_json.except("latitude", "longitude", "zipcode"))
           expect(bike.to_coordinates.map(&:round)).to eq([target_address[:latitude].round, target_address[:longitude].round])
           expect(bike.latitude).to be_present
@@ -1432,17 +1381,17 @@ RSpec.describe Bike, type: :model do
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do
-        expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States")
+        expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
         bike.reload
-        expect(bike.registration_address_source).to eq "user"
-        expect(bike.registration_address(true)).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States")
+        expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
+        expect(bike.registration_address(true)).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
       end
       context "ownership creator" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: FactoryBot.create(:user_confirmed)) }
         it "returns nothing" do
-          expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States")
+          expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
           expect(bike.user).to_not eq user
-          expect(bike.registration_address_source).to be_blank
+          expect(BikeServices::CalculateLocation.registration_address_source(bike)).to be_blank
           expect(bike.registration_address.values.compact).to eq([])
         end
       end

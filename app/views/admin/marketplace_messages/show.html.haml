@@ -111,4 +111,4 @@
   %h2.mt-5
     Message Thread
     %small (#{link_to(number_display(@marketplace_messages_thread.count), message_thread_path)})
-  = render partial: "table", locals: {collection: @marketplace_messages_thread, render_sortable: false}
+  = render partial: "table", locals: {collection: @marketplace_messages_thread.order(id: :desc), render_sortable: false, skip_marketplace_listing: true, truncate_length: 200}
