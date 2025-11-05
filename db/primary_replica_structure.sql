@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -1860,6 +1859,7 @@ CREATE TABLE public.item_sales (
     item_id bigint,
     seller_id bigint,
     sold_via integer,
+    sold_via_other character varying,
     sold_at timestamp(6) without time zone,
     ownership_id bigint,
     new_owner_string character varying,

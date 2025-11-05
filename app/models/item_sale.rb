@@ -9,6 +9,7 @@
 #  new_owner_string :string
 #  sold_at          :datetime
 #  sold_via         :integer
+#  sold_via_other   :string
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  item_id          :bigint
@@ -25,7 +26,21 @@ class ItemSale < ApplicationRecord
   include Amountable
   include Currencyable
 
+  SOLD_VIA_ENUM = {
+    bike_index_marketplace: 0,
+    facebook: 1,
+    craigslist: 2,
+    kijiji: 3,
+    ebay: 4,
+    pros_closet: 5,
+    friend: 6,
+    other: 7
+  }
+
   belongs_to :item, polymorphic: true
-  belongs_to :seller
+  belongs_to :seller, class_name: "User"
   belongs_to :ownership
+
+  validates_presence_of :item_id
+  validates_presence_of :seller_id
 end

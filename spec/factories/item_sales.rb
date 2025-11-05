@@ -1,11 +1,9 @@
 FactoryBot.define do
   factory :item_sale do
-    amount_cents { 1 }
-    currency_enum { 1 }
-    item { nil }
-    seller { nil }
-    sold_via { 1 }
-    sold_at { "2025-11-04 18:07:11" }
-    ownership { nil }
+    amount_cents { 100 }
+    item { FactoryBot.create(:bike, :with_ownership_claimed) }
+    seller { FactoryBot.create(:user_confirmed) }
+    sold_via { :facebook }
+    ownership { item.current_ownership }
   end
 end
