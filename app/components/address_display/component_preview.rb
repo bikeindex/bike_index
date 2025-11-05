@@ -5,11 +5,11 @@ module AddressDisplay
     # @group Address Variants
 
     def with_address_record
-      render(AddressDisplay::Component.new(address_record:, visible_attribute:))
+      render(AddressDisplay::Component.new(address_record:, visible_attribute: :street))
     end
 
     def with_address_hash
-      render(AddressDisplay::Component.new(address_hash:, visible_attribute:))
+      render(AddressDisplay::Component.new(address_hash:, visible_attribute: :street))
     end
 
     # @param visible_attribute text "Visible attribute"
@@ -24,7 +24,7 @@ module AddressDisplay
         city: "Davis",
         region_record: State.friendly_find("CA"),
         country: Country.united_states,
-        street: "One Shields Ave",
+        street: "1 Shields Ave",
         street_2: "C/O BicyclingPlus",
         postal_code: "95616",
         latitude: 38.5449065,
@@ -34,6 +34,8 @@ module AddressDisplay
 
     # Legacy address hash
     def address_hash
+      {street: "Some Ave", city: "Brooklyn", zipcode: "11222",
+        latitude: 40, longitude: -73, state: "NY", country: "US"}
     end
   end
 end

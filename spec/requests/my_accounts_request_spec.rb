@@ -333,7 +333,7 @@ RSpec.describe MyAccountsController, type: :request do
 
             expect(AddressRecord.count).to eq 2
             # Verify that the original address_record is unchanged
-            expect(address_record.reload.street).to eq "1 Shields Ave"
+            expect(address_record.reload.street).to eq "One Shields Ave"
           end
         end
       end

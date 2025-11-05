@@ -2,10 +2,8 @@ require "rails_helper"
 
 RSpec.describe BikeServices::CalculateLocation do
   describe "registration_address_hash and registration_address_record" do
-    let(:bike) { Bike.new }
-
     it "returns empty" do
-      expect(described_class.registration_address_hash).to eq({})
+      expect(described_class.registration_address_hash(Bike.new)).to eq({})
     end
     context "with user" do
       let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :vancouver, address_set_manually: true) }
@@ -25,7 +23,7 @@ RSpec.describe BikeServices::CalculateLocation do
 
     context "no address" do
       it "returns nil" do
-        expect(Bike.new.registration_address_source).to be_blank
+        expect(described_class.registration_address_source(Bike.new)).to be_blank
       end
     end
     context "address set on bike" do

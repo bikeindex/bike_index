@@ -14,17 +14,6 @@ class BikeServices::CalculateLocation
       end
     end
 
-    def registration_address_hash(bike, address_record_id: false)
-      case registration_address_source(bike)
-      when "marketplace_listing" then bike.current_marketplace_listing.address_hash_legacy(address_record_id:)
-      when "user" then bike.user&.address_hash_legacy(address_record_id:)
-      when "bike_update" then bike.address_hash_legacy(address_record_id:)
-      when "initial_creation" then bike.current_ownership.address_hash_legacy(address_record_id:)
-      else
-        {}
-      end.with_indifferent_access
-    end
-
     def registration_address_record(bike)
       case registration_address_source(bike)
       when "marketplace_listing" then bike.current_marketplace_listing.address_record
@@ -32,6 +21,11 @@ class BikeServices::CalculateLocation
       when "bike_update" then bike.address_record
       when "initial_creation" then bike.current_ownership.address_record
       end
+    end
+
+    def registration_address_hash(bike, address_record_id: false)
+      (registration_address_record(bike)&.address_hash_legacy(address_record_id:) || {})
+        .with_indifferent_access
     end
 
     # Set the bike's location data (lat/long, city, postal code, country, etc.)
