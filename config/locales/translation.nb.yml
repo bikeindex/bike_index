@@ -1876,13 +1876,11 @@ nb:
       additional_serial_sticker_number: Ekstra serie-/klistremerkenummer
       affiliation: "%{org_name} tilknytning"
       are_you_certain: Er du sikker?
-      city: By
       how_to_find_serial: hvordan du finner serienummeret ditt
       i_just_dont_know_the_serial: Jeg kjenner bare ikke serien
       im_100_sure: Jeg er 100% sikker
       is_a_handmade_frame: Er en håndlaget ramme
       it_probably_has_a_serial_number: Den har sannsynligvis et serienummer.
-      mailing_address: Postadresse
       manufacturer: Produsent
       missing_serial: Mangler serie
       model_year: Årsmodell
@@ -1901,7 +1899,6 @@ nb:
       serial_help_content_html: Hver sykkel har et unikt serienummer, det er hvordan
         de identifiseres. For å lære mer eller se noen eksempler, gå til %{serial_page_link}
         <small>(åpnes i et eget vindu)</small> .
-      state: Stat
       sticker_id_html: Klistremerke-ID <small class='less-strong'>valgfritt</small>
       student_id: Student ID
       this_is_a: Dette er en
@@ -1910,7 +1907,6 @@ nb:
       unknown_year: Ukjent årstall
       unsure_or_unknown: Usikker eller ukjent
       was_made_before_1970: Ble laget før 1970
-      zipcode: Postnummer
       enter_bike_type_details_html: Skriv inn %{type_html} detaljer
       enter_found_bike_type_details_html: Angi Fant %{type_html} detaljer
       enter_stolen_bike_type_details_html: Skriv inn stjålne %{type_html} detaljer
@@ -2089,9 +2085,7 @@ nb:
       add_start: Legg til versjonens startdato
       bike_name: Sykkelnavn
       bike_registration: Rediger %{bike_type}-registreringen her
-      choose_country: Velg land
       choose_material: Velg materiale
-      city: By
       existing_stickers: Eksisterende klistremerker
       frame_size: Rammestørrelse
       general_description: Generell beskrivelse
@@ -2106,8 +2100,6 @@ nb:
       remove_end: Fjern enden
       remove_start: Fjern start
       seat_tube_length: Seterørslengde
-      state: Stat
-      street: gate
       submit_manufacturer_correction: Send inn produsentkorrigering
       submit_serial_correction: Send inn serieretting
       submit_update: Send inn oppdatering
@@ -2120,7 +2112,6 @@ nb:
         versjoner og må oppdateres på den originale %{bike_type}-registreringen. %{bike_registration_link}.
       updated_serial: Oppdatert serie
       version_name: Versjonsnavn
-      zipcode: Postnummer
     bike_fields:
       revised_colors:
         add_a_color: Legg til en farge
@@ -4589,7 +4580,6 @@ nb:
       model_year: Årsmodell
       optional_upload_a_photo: Valgfritt - last opp et bilde
       other_manufacturer: Annen produsent
-      owners_mailing_address: Eierens postadresse
       police_report_number: Politiets rapportnummer
       receive_notifications_from_bike_index: Motta varsler fra indeksen om dette stjålne
         %{bike_type}
@@ -4627,7 +4617,6 @@ nb:
       choose_handlebar: Velg styre
       choose_material: Velg materiale
       choose_photo: Velg bilde
-      city: By
       frame_color: Rammefarge
       image_has_been_uploaded: Bildet er lastet opp
       manufacturer_name: Produsentens navn
@@ -4637,7 +4626,6 @@ nb:
       other_defining_features: Andre definerende funksjoner
       other_manufacturer: Annen produsent
       owners_email_address: Eierens e-postadresse
-      owners_mailing_address: Eierens postadresse
       owners_phone: Eierens telefon
       primary_frame_material: Primært rammemateriale
       register_this: Registrer dette
@@ -4645,14 +4633,12 @@ nb:
       secondary_color: Sekundær farge
       select_other_if_manufacturer_isnt_listed: Velg "Annet" hvis produsenten ikke
         er oppført
-      state: Stat
       sticker_id_html: Klistremerke-ID <small class='less-strong'>valgfritt</small>
       student_id: Student ID
       third_color: Tredje farge
       unknown_serial: Ukjent serie
       unknown_year: Ukjent årstall
       unsure_or_unknown: Usikker eller ukjent
-      zipcode: postnummer
     new:
       bike_index_for_organizations: Sykkelindeks for organisasjoner
     new_form:
@@ -5910,6 +5896,7 @@ nb:
         state: Stat
         your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
         address_no_street: Adresse
+        street_2: Gateadresse linje 2 (valgfritt)
       address_record_with_default:
         edit_my_account_path: redigering på kontoen min
         use_account_address: Bruk kontoadresse

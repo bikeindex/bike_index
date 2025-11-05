@@ -4,7 +4,14 @@
     <%= render(HeaderTags::Component.new(**header_tags_component_options)) %>
     <%= stylesheet_link_tag "embed_styles", media: "all" %>
     <%= javascript_include_tag "embed" %>
+    <%= javascript_importmap_tags %>
     <%= csrf_meta_tags %>
+
+    <style>
+      <%# Tailwind styles - added here for simplicity %>
+      .tw\:hidden { display: none; }
+      .tw\:hidden\! { display: none !important; }
+    </style>
   </head>
 
 

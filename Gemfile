@@ -24,6 +24,7 @@ gem "pg_search"
 gem "lograge" # Structure log data, put it in single lines to improve the functionality
 gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
+gem "openssl" # stuff breaks without this, 2025-10
 
 # Speed
 gem "fast_blank", "~> 1.0"

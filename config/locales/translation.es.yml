@@ -1819,13 +1819,11 @@ es:
       additional_serial_sticker_number:
       affiliation:
       are_you_certain:
-      city:
       how_to_find_serial:
       i_just_dont_know_the_serial:
       im_100_sure:
       is_a_handmade_frame:
       it_probably_has_a_serial_number:
-      mailing_address:
       manufacturer:
       missing_serial:
       model_year:
@@ -1842,7 +1840,6 @@ es:
       select_other:
       serial_help:
       serial_help_content_html:
-      state:
       sticker_id_html:
       student_id:
       this_is_a:
@@ -1851,7 +1848,6 @@ es:
       unknown_year:
       unsure_or_unknown:
       was_made_before_1970:
-      zipcode:
       enter_bike_type_details_html:
       enter_found_bike_type_details_html:
       enter_stolen_bike_type_details_html:
@@ -2007,9 +2003,7 @@ es:
       add_start:
       bike_name:
       bike_registration:
-      choose_country:
       choose_material:
-      city:
       existing_stickers:
       frame_size:
       general_description:
@@ -2024,8 +2018,6 @@ es:
       remove_end:
       remove_start:
       seat_tube_length:
-      state:
-      street:
       submit_manufacturer_correction:
       submit_serial_correction:
       submit_update:
@@ -2037,7 +2029,6 @@ es:
       update_these_attributes_on_bike_html:
       updated_serial:
       version_name:
-      zipcode:
     bike_fields:
       revised_colors:
         add_a_color:
@@ -3577,7 +3568,6 @@ es:
       model_year:
       optional_upload_a_photo:
       other_manufacturer:
-      owners_mailing_address:
       police_report_number:
       receive_notifications_from_bike_index:
       register:
@@ -3610,7 +3600,6 @@ es:
       choose_handlebar:
       choose_material:
       choose_photo:
-      city:
       frame_color:
       image_has_been_uploaded:
       manufacturer_name:
@@ -3620,21 +3609,18 @@ es:
       other_defining_features:
       other_manufacturer:
       owners_email_address:
-      owners_mailing_address:
       owners_phone:
       primary_frame_material:
       register_this:
       remove_color:
       secondary_color:
       select_other_if_manufacturer_isnt_listed:
-      state:
       sticker_id_html:
       student_id:
       third_color:
       unknown_serial:
       unknown_year:
       unsure_or_unknown:
-      zipcode:
     new:
       bike_index_for_organizations:
     new_form:
@@ -4663,6 +4649,7 @@ es:
         state:
         your_full_address_is_required:
         address_no_street:
+        street_2:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:

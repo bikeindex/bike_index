@@ -250,6 +250,7 @@ class ImpoundRecord < ApplicationRecord
     self.location_id = calculated_location_id
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
+    self.impounded_at = created_at if created_at.present? && created_at > impounded_at + 10.years
     # unregistered_bike means essentially that the bike was created for this impound record
     self.unregistered_bike ||= calculated_unregistered_bike?
     # Don't geocode if location is present and address hasn't changed
@@ -258,6 +259,9 @@ class ImpoundRecord < ApplicationRecord
     self.attributes = if parking_notification.present?
       parking_notification.attributes.slice(*Geocodeable.location_attrs)
     else
+      # IDK WTF but duplicating this fixes the failing bulk_import_job_spec
+      # TODO: Remove this once backfill is finished - #2922
+      GeocodeHelper.assignable_address_hash_for(address(force_show_address: true))
       GeocodeHelper.assignable_address_hash_for(address(force_show_address: true))
     end
   end

@@ -101,7 +101,8 @@ class Bike < ApplicationRecord
   include ActiveModel::Dirty
   include BikeSearchable
   include BikeAttributable
-  include Geocodeable
+  include AddressRecorded
+  include AddressRecordedWithinBoundingBox
   include PgSearch::Model
 
   PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
@@ -186,7 +187,6 @@ class Bike < ApplicationRecord
     :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
     to: :current_ownership, allow_nil: true
 
-  scope :without_location, -> { where(latitude: nil) }
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
@@ -215,6 +215,10 @@ class Bike < ApplicationRecord
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
   scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
+
+  # TODO: remove when bike AddressRecords have finished migration, use AddressRecorded.with_street
+  # Also uncomment the bike spec
+  scope :with_street, -> { where.not(street: nil) }
 
   default_scope -> { default_includes.current.order(listing_order: :desc) }
 
@@ -390,6 +394,18 @@ class Bike < ApplicationRecord
     end
   end
 
+  def find_or_build_address_record(country_id: nil)
+    Backfills::AddressRecordsForBikesJob.build_or_create_for(self, country_id:)
+  end
+
+  def latitude_public
+    latitude.blank? ? nil : latitude.round(PUBLIC_COORD_LENGTH)
+  end
+
+  def longitude_public
+    longitude.blank? ? nil : longitude.round(PUBLIC_COORD_LENGTH)
+  end
+
   # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
   def cleaned_error_messages
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
@@ -401,11 +417,16 @@ class Bike < ApplicationRecord
   end
 
   def calculated_listing_order
-    return current_stolen_record.date_stolen.to_i.abs if current_stolen_record.present?
-    return current_impound_record.impounded_at.to_i.abs if current_impound_record.present?
+    if current_stolen_record.present? || current_impound_record.present?
+      c_at = created_at || Time.current
+      clo = occurred_at.to_i
+      # Make sure listing_order is a reasonable number, even if occurred_at isn't
+      clo = c_at.to_i unless (c_at - 10.years).to_i < clo && (c_at + 1.day).to_i > clo
+      return clo
+    end
 
-    t = (updated_by_user_fallback || Time.current).to_i / 10000
-    (stock_photo_url.present? || public_images.limit(1).present?) ? t : t / 100
+    clo = (updated_by_user_fallback || Time.current).to_i / 10000
+    (stock_photo_url.present? || public_images.limit(1).present?) ? clo : clo / 100
   end
 
   def credibility_scorer
@@ -806,12 +827,6 @@ class Bike < ApplicationRecord
     self.paint_id = paint.id
   end
 
-  # THIS IS FUCKING OBNOXIOUS.
-  # Somehow we need to get rid of needing to have this method. country should default to optional
-  def address(country: [:optional])
-    Geocodeable.address(self, country:)
-  end
-
   def valid_mailing_address?
     addy = registration_address
     return false if addy.blank? || addy.values.all?(&:blank?)
@@ -821,32 +836,18 @@ class Bike < ApplicationRecord
     creation_organization.default_location.address_hash != addy
   end
 
-  def registration_address_source
-    # NOTE: Marketplace Listing and User address are the preferred addresses!
-    # If either is set, address fields don't show on bike!
-    if is_for_sale && current_marketplace_listing.present?
-      "marketplace_listing"
-    elsif user&.address_set_manually
-      "user"
-    elsif address_set_manually
-      "bike_update"
-    elsif current_ownership&.address_record.present?
-      "initial_creation"
-    end
+  # NOTE! This will return different hashes - legacy hashes for stolen & impound
+  def address_hash
+    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
+      address_record&.address_hash
   end
 
-  def registration_address(unmemoize = false)
+  def registration_address(unmemoize = false, address_record_id: false)
     # unmemoize is necessary during save, because things may have changed
     return @registration_address if !unmemoize && defined?(@registration_address)
 
-    @registration_address = case registration_address_source
-    when "marketplace_listing" then current_marketplace_listing.address_hash_legacy
-    when "user" then user&.address_hash_legacy
-    when "bike_update" then address_hash
-    when "initial_creation" then current_ownership.address_hash_legacy
-    else
-      {}
-    end.with_indifferent_access
+    @registration_address =
+      BikeServices::CalculateLocation.registration_address_hash(self, address_record_id:)
   end
 
   def external_image_urls
@@ -887,7 +888,7 @@ class Bike < ApplicationRecord
     fetch_current_impound_record # Used by a bunch of things, but this method is private
     self.occurred_at = calculated_occurred_at
     self.current_ownership = calculated_current_ownership
-    self.attributes = BikeServices::CalculateStoredLocation.location_attrs(self)
+    self.attributes = BikeServices::CalculateLocation.stored_location_attrs(self)
     self.listing_order = calculated_listing_order
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at
@@ -896,13 +897,6 @@ class Bike < ApplicationRecord
     self.all_description = cached_description_and_stolen_description
     self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
-  end
-
-  # Only geocode if address is set manually (and not skipping geocoding)
-  def should_be_geocoded?
-    return false if skip_geocoding?
-
-    address_changed?
   end
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
@@ -950,7 +944,8 @@ class Bike < ApplicationRecord
   def calculated_occurred_at
     return nil if current_event_record.blank? || is_for_sale
 
-    current_impound_record&.impounded_at || current_stolen_record&.date_stolen
+    current_impound_record&.impounded_at || current_stolen_record&.date_stolen ||
+      created_at || Time.current # ensure there is always a time returned
   end
 
   def normalized_email

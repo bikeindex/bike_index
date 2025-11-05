@@ -46,6 +46,11 @@
             <%= translation(:your_full_address_is_required, org_name: @organization.short_name) %>
           </span>
         <% end %>
+        <% if @street_2 %>
+          <%= @builder.text_field :street_2,
+                              placeholder: translation(:street_2),
+                              class: "form-control mb-2" %>
+        <% end %>
       </div>
       <% if @static_fields %>
         <p
@@ -54,6 +59,14 @@
         >
           <%= @builder.object.street %>
         </p>
+        <% if @street_2 %>
+          <p
+            class="form-well-input-static tw:py-0!"
+            data-legacy-form-well--address-record-with-default-target="staticFields"
+          >
+            <%= @builder.object.street_2 %>
+          </p>
+        <% end %>
       <% end %>
     </div>
   <% end %>

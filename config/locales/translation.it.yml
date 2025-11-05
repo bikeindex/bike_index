@@ -204,9 +204,10 @@ it:
           modalità di risposta.
         unsupported_response_type: Il server di autorizzazione non supporta questo
           response type.
-        user_removed:
-        re:
-        user_not_in_initial_record:
+        user_removed: "(utente rimosso)"
+        re: 'Re: %{original_subject}'
+        user_not_in_initial_record: l'utente non è uno degli utenti del messaggio
+          originale
       models:
         doorkeeper/application:
           attributes:
@@ -230,7 +231,7 @@ it:
           user_not_authorized: non ha il permesso di confiscare questa bicicletta
         manufacturer:
           cannot_match_a_color_name: non può essere uguale al nome del colore
-          cannot_include_quote:
+          cannot_include_quote: non può includere le doppie virgolette
         organization_message:
           latlon_required: latitudine e longitudine richieste
           required: richiesto
@@ -248,13 +249,17 @@ it:
           email_already_exists: L'e-mail è già registrata su Bike Index.
           not_an_available_language: non è una lingua disponibile
         marketplace_listing:
-          address_required:
-          condition_required:
-          item_not_visible:
-          price_required:
-          primary_activity_required:
-          bike_is_stolen:
-          not_with_owner:
+          address_required: 'L''ubicazione è obbligatoria: si prega di impostare almeno
+            una città'
+          condition_required: La condizione è necessaria
+          item_not_visible: "%{item_type} non è visibile - forse l'hai contrassegnato
+            come nascosto?"
+          price_required: Il prezzo è richiesto
+          primary_activity_required: È richiesta l'attività primaria
+          bike_is_stolen: "%{item_type} non può essere rubato (contrassegnarlo come
+            recuperato)"
+          not_with_owner: "%{item_type} contrassegnare la bicicletta recuperata per
+            elencarla"
       organization:
         duplicate_short_name: già in uso da un'altra organizzazione. Se pensate che
           non sia corretto, contattate support@bikeindex.org
@@ -337,7 +342,7 @@ it:
         when_vendor_terms_of_service: Quando i termini di servizio del venditore
         zipcode: Codice postale
         token_for_password_reset: Token per la reimpostazione della password
-        organization_roles:
+        organization_roles: Ruoli dell'organizzazione
         sent_organization_roles:
       ambassador_task:
         ambassador_task_assignments: Assegnazione dei compiti agli ambasciatori
@@ -757,7 +762,7 @@ it:
         name: Nome
         stolen_records: Record rubati
         theft_alerts: Avvisi di furto
-        views:
+        views: Visualizzazioni
       tweet:
         alignment: Allineamento
         body_html: Corpo HTML
@@ -769,7 +774,7 @@ it:
         ambassador_tasks:
         auth_token: Token di autorizzazione
         avatar: Avatar
-        banned:
+        banned: Vietato
         can_send_many_stolen_notifications: Può inviare molte notifiche di furto
         city: Città
         confirmation_token: Token di conferma
@@ -788,8 +793,8 @@ it:
         latitude: Latitudine
         locks: Lucchetti
         longitude: Longitudine
-        magic_link_token:
-        my_bikes_hash:
+        magic_link_token: Token magic link
+        my_bikes_hash: Hash delle mie biciclette
         name: Nome
         notification_newsletters:
         notification_unstolen:
@@ -805,7 +810,7 @@ it:
         phone: Telefono
         preferred_language: Lingua preferita
         received_stolen_notifications:
-        sent_stolen_notifications:
+        sent_stolen_notifications: Notifiche di furto inviate
         show_bikes: Mostra le biciclette
         show_phone: Mostra il telefono
         show_twitter: Mostra twitter
@@ -818,9 +823,9 @@ it:
         twitter: Twitter
         user_emails: Email dell'utente
         username: Nome utente
-        vendor_terms_of_service:
+        vendor_terms_of_service: Termini di servizio del venditore
         website: Sito web
-        when_vendor_terms_of_service:
+        when_vendor_terms_of_service: Quando i termini di servizio del venditore
         zipcode: Codice postale
         token_for_password_reset: Token per la reimpostazione della password
         organization_roles: Iscrizioni
@@ -831,7 +836,7 @@ it:
       wheel_size:
         bikes: Biciclette
         description: Descrizione
-        iso_bsd:
+        iso_bsd: Iso bsd
         name: Nome
         priority: Priorità
       organization_role:
@@ -844,7 +849,7 @@ it:
       cycle_type:
         bike: Bicicletta
         cargo: Cargo Bike (carico anteriore)
-        cargo_rear:
+        cargo_rear: Cargo Bike posteriore (ad es. longtail)
         cargo_trike: Triciclo Cargo (carico anteriore)
         cargo_trike_rear: Triciclo cargo (carico posteriore)
         e_motorcycle: Motociclo/Dirtbike elettrica (senza pedali)
@@ -857,7 +862,7 @@ it:
           personale, ecc.)
         recumbent: Reclinabile
         stroller: Passeggino
-        tall_bike: Bicicletta alta
+        tall_bike: Bicicletta alta (più telai saldati insieme)
         tandem: Tandem
         traditional_bike: Bicicletta tradizionale (2 ruote, 1 sella, pedali)
         trail_behind:
@@ -865,7 +870,7 @@ it:
         tricycle: Triciclo
         unicycle: Monociclo
         wheelchair: Sedia a rotelle
-        elliptical:
+        elliptical: Bicicletta ellittica
       frame_material:
         aluminum: Alluminio
         composite: Carbonio o composito
@@ -883,28 +888,28 @@ it:
       propulsion_type:
         foot_pedal: Pedale
         hand_pedal: Hand bike
-        human_not_pedal:
+        human_not_pedal: Alimentazione umana (non a pedali)
         pedal_assist: Pedalata assisita
         pedal_assist_and_throttle: Pedalata assistita e acceleratore
         throttle: Acceleratore elettrico
       currency:
-        cad:
+        cad: CAD
         eur: EUR
-        mxn:
+        mxn: MXN
         usd: USD
       marketplace_listing:
         condition:
-          excellent:
-          good:
-          new_in_box:
-          salvage:
-          poor:
+          excellent: eccellente
+          good: buono
+          new_in_box: nuovo
+          salvage: per ricambi
+          poor: cattivo
         condition_description:
-          excellent:
-          good:
-          new_in_box:
-          poor:
-          salvage:
+          excellent: leggermente usato
+          good: usato ma meccanicamente sano
+          new_in_box: non montato/con cartellino
+          poor: necessita riparazione
+          salvage: non funzionante/non utilizzabile
     models:
       ad: Annuncio
       ambassador: Ambasciatore
@@ -936,17 +941,17 @@ it:
       integration: Integrazione
       invoice: Fattura
       invoice_organization_feature:
-      listicle:
+      listicle: Elenco
       location: Luogo
       lock: Lucchetto
       lock_type: Tipo di lucchetto
-      mail_snippet:
+      mail_snippet: Frammento di posta elettronica
       manufacturer: Produttore
-      normalized_serial_segment:
+      normalized_serial_segment: Segmento seriale normalizzato
       organization: Organizzazione
-      organization_feature:
+      organization_feature: Caratteristica dell'organizzazione
       organization_message: Messaggio dell'organizzazione
-      other_listing:
+      other_listing: Altro annuncio
       ownership: Proprietà
       paint: Vernice
       payment: Pagamento
@@ -957,12 +962,12 @@ it:
       stolen_notification: Notifica di furto
       stolen_record: Record rubato
       theft_alert: Avvisi di furto
-      theft_alert_plan:
+      theft_alert_plan: Piano di allarme furto
       tweet: Tweet
       user: Utente
       user_email: Email dell'utente
       wheel_size: Dimensione della ruota
-      organization_role:
+      organization_role: Ruolo dell'organizzazione
     select_options:
       color:
         black: Nero
@@ -997,7 +1002,7 @@ it:
         computer: computer
         crankset: guarnitura
         derailleur: deragliatore
-        detangler:
+        detangler: districante
         fairing: carenatura
         fender: parafango
         fork: forcella
@@ -1022,7 +1027,7 @@ it:
         shift_cable: cavo del cambio
         shifter: cambio
         spokes: raggi
-        stem:
+        stem: stelo
         tire: pneumatico
         toe_clips: 'gabbia '
         training_wheels: ruote da allenamento
@@ -1063,7 +1068,7 @@ it:
       status_humanized:
         bike:
           abandoned: abbandonato
-          for_sale:
+          for_sale: in vendita
           found: trovato
           impounded: sequestrato
           stolen: rubato
@@ -1779,33 +1784,36 @@ it:
       when_did_you_recover_it: Quando l'hai recuperata?
       whoa_this_awesome_bike_type_is_yours: Wow, questa fantastica %{bike_type} è
         tua!
-      whoa_this_awesome_version_is_yours:
-      you_have_already_marked_remaining:
-      you_have_already_marked_resolved:
-      you_sent_this_bike_html:
-      your_bike:
+      whoa_this_awesome_version_is_yours: Wow, %{version_name} è tuo!
+      you_have_already_marked_remaining: Avete già contrassegnato questo %{bike_type}
+        rimanente
+      you_have_already_marked_resolved: Avete contrassegnato questa notifica come
+        risolta
+      you_sent_this_bike_html: Hai inviato questo %{bike_type} a <em>%{owner_email}</em>
+        e non è ancora stato reclamato. È possibile aggiornarlo.
+      your_bike: Il vostro %{bike_type}
     main_show_block:
-      bike_photo:
-      color_may_not_match:
-      componentyear:
-      department_city:
-      description_of_incident:
-      distinguishing_features:
-      found_at:
-      frame_material:
-      frame_size:
-      front:
-      front_rear:
-      front_wheel_diameter:
-      handlebar_type:
+      bike_photo: foto %{bike_type}
+      color_may_not_match: Il colore potrebbe non corrispondere!
+      componentyear: "%{componentyear}"
+      department_city: Dipartimento e città
+      description_of_incident: Descrizione dell'incidente
+      distinguishing_features: Caratteristiche distintive
+      found_at: Trovato presso
+      frame_material: Materiale del telaio
+      frame_size: Taglia del telaio
+      front: Anteriore
+      front_rear: Anteriore e posteriore
+      front_wheel_diameter: Diametro della ruota anteriore
+      handlebar_type: Tipo di manubrio
       impounded_at:
-      location:
+      location: Luogo
       locking_circumvented:
-      locking_description:
-      manufacturer:
-      model:
+      locking_description: Descrizione della chiusura
+      manufacturer: Produttore
+      model: Modello
       name: Nome
-      other:
+      other: Altro
       other_serial:
       paint_description:
       police_report:
@@ -1821,13 +1829,13 @@ it:
       wheel_diameter:
       year: Anno
       primary_activity:
-      abandoned_title:
-      component_no_info:
-      drivetrain:
-      drivetrain_fixed:
-      drivetrain_front:
-      drivetrain_rear:
-      front_tire_width:
+      abandoned_title: Questo è un %{bike_type} abbandonato che era %{impound_kind}
+      component_no_info: "-"
+      drivetrain: Trasmissione
+      drivetrain_fixed: Scatto fisso
+      drivetrain_front: Trasmissione anteriore
+      drivetrain_rear: Trasmissione posteriore
+      front_tire_width: Larghezza dello pneumatico anteriore
       rear_tire_width:
       tire_width:
       tire_width_narrow_false:
@@ -1836,7 +1844,6 @@ it:
       additional_serial_sticker_number:
       affiliation:
       are_you_certain:
-      city:
       electric_motorized:
       enter_bike_type_details_html:
       enter_found_bike_type_details_html:
@@ -1846,7 +1853,6 @@ it:
       im_100_sure:
       is_a_handmade_frame:
       it_probably_has_a_serial_number:
-      mailing_address:
       manufacturer:
       missing_serial:
       model_year:
@@ -1863,7 +1869,6 @@ it:
       select_other:
       serial_help:
       serial_help_content_html:
-      state:
       sticker_id_html:
       student_id:
       this_is_a:
@@ -1876,7 +1881,6 @@ it:
       was_made_before_1970:
       without_serial_html:
       without_serial_number_html:
-      zipcode:
     organization_stolen_message:
       report_link_text:
       report_the_theft_to_the_organization_html:
@@ -2011,8 +2015,9 @@ it:
         start:
         status:
     header_row:
-      hidden_by_owner:
-      no_one_but_the_user_and_bike_index_admins:
+      hidden_by_owner: Nascosto dal proprietario
+      no_one_but_the_user_and_bike_index_admins: Nessuno, a parte l'utente (e gli
+        amministratori di Bike Index), può vederlo
       test_registration:
   bikes_edit:
     accessories:
@@ -2024,9 +2029,7 @@ it:
       add_start:
       bike_name:
       bike_registration:
-      choose_country:
       choose_material:
-      city:
       existing_stickers:
       frame_size:
       general_description:
@@ -2041,8 +2044,6 @@ it:
       remove_end:
       remove_start:
       seat_tube_length:
-      state:
-      street:
       submit_manufacturer_correction:
       submit_serial_correction:
       submit_update:
@@ -2054,7 +2055,6 @@ it:
       update_these_attributes_on_bike_html:
       updated_serial:
       version_name:
-      zipcode:
     bike_fields:
       revised_colors:
         add_a_color:
@@ -3521,7 +3521,7 @@ it:
       bike_sticker:
       bikes:
       combination:
-      edit: Modifica
+      edit: modifica
       generally_connect_to_org:
       ignore:
       key_serial:
@@ -3593,7 +3593,6 @@ it:
       model_year:
       optional_upload_a_photo:
       other_manufacturer:
-      owners_mailing_address:
       police_report_number:
       receive_notifications_from_bike_index:
       register:
@@ -3626,7 +3625,6 @@ it:
       choose_handlebar:
       choose_material:
       choose_photo:
-      city:
       frame_color:
       image_has_been_uploaded:
       manufacturer_name:
@@ -3636,21 +3634,18 @@ it:
       other_defining_features:
       other_manufacturer:
       owners_email_address:
-      owners_mailing_address:
       owners_phone:
       primary_frame_material:
       register_this:
       remove_color:
       secondary_color:
       select_other_if_manufacturer_isnt_listed:
-      state:
       sticker_id_html:
       student_id:
       third_color:
       unknown_serial:
       unknown_year:
       unsure_or_unknown:
-      zipcode:
     new:
       bike_index_for_organizations:
     new_form:
@@ -4413,127 +4408,173 @@ it:
       org_locations:
       org_profile:
       parking_notification_unregistered:
-      parking_notifications:
-      recoveries:
-      registration_stickers:
-      resources:
+      parking_notifications: Notifiche di parcheggio
+      recoveries: Recuperi
+      registration_stickers: Adesivi di registrazione
+      resources: Risorse
       stolen_hot_sheet:
       stolen_hot_sheet_configuration:
-      stolen_message:
-      super_admin_view:
+      stolen_message: Messaggio di furto
+      super_admin_view: Super Amministratore per %{org_name}
     organized_skeleton:
-      additional_features_html:
-      admin_panel:
-      how_integration_works:
-      integrate_bike_index_with_ascend:
-      integrate_bike_index_with_lightspeed:
-      link_to_register_html:
-      other_point_of_sale_system:
-      read_a_full_explanation_html:
-      register_bikes_with_link_html:
-      streamlined_bike_shop_registration_page:
-      subscription_expired_html:
-      use_ascend:
-      use_lightspeed_retail_pos:
-      viewing_our_streamlined_page:
+      additional_features_html: Bike Index offre funzionalità aggiuntive per le forze
+        dell'ordine verificate. Contatta %{email_link} per abilitarle.
+      admin_panel: Pannello di amministrazione
+      how_integration_works: come funziona l'integrazione
+      integrate_bike_index_with_ascend: Integra Bike Index con Lightspeed
+      integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed
+      link_to_register_html: "<strong>%{link}</strong> per registrare automaticamente
+        le biciclette vendute ai clienti."
+      other_point_of_sale_system: Un altro sistema POS?
+      read_a_full_explanation_html: Leggi la spiegazione completa di %{link}.
+      register_bikes_with_link_html: Registra le biciclette con il nostro <strong>%{link}</strong>
+      streamlined_bike_shop_registration_page: pagina di registrazione del negozio
+        di biciclette semplificata
+      subscription_expired_html: Il tuo abbonamento a Bike Index è scaduto. Contatta
+        %{email_link} per riattivarlo.
+      use_ascend: Utilizzate Ascend?
+      use_lightspeed_retail_pos: Utilizzate Lightspeed Retail POS?
+      viewing_our_streamlined_page: Al momento stai visualizzando la nostra pagina
+        di registrazione semplificata per i negozi di biciclette, che è quella che
+        ti consigliamo di utilizzare
     period_select:
-      all:
-      custom:
-      day:
-      from:
-      hour:
-      next:
-      past:
-      seven_days:
-      thirty_days:
-      to:
-      update:
-      year:
+      all: Tutti
+      custom: personalizzato
+      day: giorno
+      from: Da
+      hour: ora
+      next: prossimo
+      past: passato
+      seven_days: 7 giorni
+      thirty_days: 30 giorni
+      to: A
+      update: Aggiorna
+      year: anno
     user_general_alert:
-      add_location_theft_bike_title_html:
-      add_photo_theft_bike_title_html:
-      confirm_your_phone_number:
-      location_critical_html:
-      missing_stolen_photo_title:
-      photo_critical_html:
-      stolen_missing_location_title:
-      verification_code:
-      verify_number:
-      without_location_all_is_lost:
-      without_photo_all_is_lost:
+      add_location_theft_bike_title_html: Aggiungere il luogo del furto del vostro
+        <strong>%{bike_title}</strong>
+      add_photo_theft_bike_title_html: Aggiungi una foto al tuo <strong>%{bike_title}</strong>
+      confirm_your_phone_number: Conferma il numero di telefono
+      location_critical_html: "<strong>È fondamentale per il recupero</strong> includere
+        l'indirizzo in cui la tua %{bike_type} è stata rubata."
+      missing_stolen_photo_title: Aggiungi una foto
+      photo_critical_html: Gli avvisi di successo <strong>devono avere un'immagine</strong>
+      stolen_missing_location_title: Aggiungi il luogo del furto
+      verification_code: Codice di verifica
+      verify_number: Verifica %{phone_number}
+      without_location_all_is_lost: Senza un luogo non possiamo diffondere la notizia
+        del furto e la gente non saprà dove cercare la tua %{bike_type}.
+      without_photo_all_is_lost: Se non hai foto della tua bicicletta, cerca un'immagine
+        stock su Internet e caricala. Senza un'immagine l'avviso non sarà efficace.
   stolen:
     index:
-      ambassador:
-      bike_index:
-      bike_index_will_broadcast:
-      check_out_your_local_flea_market:
-      donation:
-      error:
-      file_a_police_report:
-      if_you_are_here_your_bike_was_probably_stolen:
-      keep_an_eye_on_craigslist:
-      list_recent_stolen_bikes_html:
-      look_for_local_stolen_bike_groups_on_face:
-      make_sure_your_bike_is_registered_html:
-      other_recovery_tools:
-      please_fix_the_following:
-      please_login_to_make_report_html:
-      register_it:
+      ambassador: ambasciatore
+      bike_index: Bike Index
+      bike_index_will_broadcast: Bike Index trasmetterà la tua bicicletta rubata all'account
+        Twitter locale di Stolen Bike e diffonderà la notizia attraverso altri canali
+        sociali. I nostri dati sulle bici rubate sono collegati a LeadsOnline, quindi
+        se la tua bici finisce nel "sistema" verrà segnalata e verrai contattato.
+        La nostra comunità terrà d'occhio vari canali di rivendita.
+      check_out_your_local_flea_market: Cerca la tua bicicletta nel mercatino dell'usato
+        della zona.
+      donation: donazione
+      error: errore
+      file_a_police_report: Presenta una denuncia alla polizia. Se puoi, recati al
+        comando locale e fai in modo che un agente venga a fare rapporto. Coinvolgili
+        nella tua situazione!
+      if_you_are_here_your_bike_was_probably_stolen: 'Se sei qui, probabilmente la
+        tua bicicletta è stata rubata. È una brutta cosa, ma siamo qui per aiutarti.
+        Ecco cosa devi fare:'
+      keep_an_eye_on_craigslist: Tieni d'occhio Craigslist o simili. Imposta un avviso
+        specifico su ifttt.com per segnalare gli annunci che corrispondono alla tua
+        bicicletta. Tieni d'occhio app come OfferUp e LetGo, che sono spesso utilizzate
+        per la compravendita di biciclette.
+      list_recent_stolen_bikes_html: Elenca le biciclette rubate di recente sul tuo
+        sito con il nostro %{stolen_widget_link}
+      look_for_local_stolen_bike_groups_on_face: Cerca i gruppi locali per le biciclette
+        rubate su Facebook (cercate "bici rubate {nome della città}" Questi gruppi
+        di volontari esistono in tutto il mondo e possono aiutare i vostri sforzi
+        di recupero.
+      make_sure_your_bike_is_registered_html: Assicurati che la tua bicicletta sia
+        registrata su %{new_bike_link} e su qualsiasi registro locale esistente nella
+        tua comunità. Segnala la tua bicicletta come <strong>rubata</strong> su Bike
+        Index per attivare la nostra comunità.
+      other_recovery_tools: Altri strumenti di recupero
+      please_fix_the_following: Correggi i seguenti %{errors}
+      please_login_to_make_report_html: Si prega di %{login_link} per effettuare questa
+        segnalazione
+      register_it: registrala
       report_a_bicycle_chop_shop:
-      report_bike_theft_issues:
-      report_someone_selling_a_stolen_bike:
-      reporting_your_own_bike_stolen_html:
-      send_alert:
-      sign_in:
+      report_bike_theft_issues: 'Segnala i problemi di furto di biciclette:'
+      report_someone_selling_a_stolen_bike: Segnala la vendita di una bicicletta rubata
+      reporting_your_own_bike_stolen_html: Stai denunciando il furto della tua bicicletta?
+        Prima è necessario %{register_it_link}
+      send_alert: Invia l'allarme!
+      sign_in: accedi
       stolen_widget:
-      tell_everyone_you_know:
-      we_wish_you_the_best_of_luck_html:
-      what_happens_next:
-      what_to_do_if_your_bike_is_stolen:
-      where_is_this_happening:
-      your_email_address:
-      your_local_police_department_will_do_what:
+      tell_everyone_you_know: Fai sapere a tutti della tua bicicletta rubata. Utilizza
+        tutti i social network (Facebook, Instagram, Twitter, ecc.) e invia messaggi/email
+        a tutti quelli che conosci.
+      we_wish_you_the_best_of_luck_html: Ti auguriamo buona fortuna per il recupero
+        della tua bicicletta. Ci piacerebbe aggiungere la tua storia alle nostre %{recoveries_count}
+        biciclette recuperate. Se desideri sostenere la nostra causa, considera un
+        %{donations_link} o unisciti al nostro programma %{ambassadors_link}.
+      what_happens_next: Cosa succede dopo?
+      what_to_do_if_your_bike_is_stolen: Cosa fare in caso di furto della bicicletta
+      where_is_this_happening: Dove si svolge l'evento? URL, indirizzo - qualsiasi
+        informazione in vostro possesso
+      your_email_address: Il tuo indirizzo e-mail
+      your_local_police_department_will_do_what: La stazione di polizia locale farà
+        tutto il possibile per aiutarvi a recuperare la vostra bicicletta. Rimanete
+        in comunicazione con loro.
   theft_alert_plans:
     theft_alert_plan:
-      days:
+      days: Giorni
   user_embeds:
     show:
-      bike:
-      my_indexed_bikes:
-      no_photo:
+      bike: Bicicletta
+      my_indexed_bikes: Le mie %{bikes_count} indicizzate
+      no_photo: nessuna foto
   users:
     accept_terms:
-      i_agree_to_tos_html:
+      i_agree_to_tos_html: Accetto i <strong>Termini di servizio</strong> di Bike
+        Index.
       submit: Invia
     accept_vendor_terms:
-      i_agree_to_tos_html:
+      i_agree_to_tos_html: Accetto i <strong>Termini di servizio</strong> di Bike
+        Index <strong>per le organizzazioni</strong>.
       submit: Invia
     confirm_error_404:
-      we_couldnt_find_a_user_with_that_id:
-      woops:
+      we_couldnt_find_a_user_with_that_id: Non siamo riusciti a trovare un utente
+        con quell'ID. Sta succedendo qualcosa di strano.
+      woops: Ops
     confirm_error_bad_token:
-      could_not_find_matching_ticket:
-      woops:
+      could_not_find_matching_ticket: Il biglietto non corrisponde a nulla nei nostri
+        archivi. Spiacente.
+      woops: Ops
     new:
-      agree_bikeindex_bikehub_toc_html:
+      agree_bikeindex_bikehub_toc_html: Accetto il %{bikehub_toc_link} di BikeHub
+        e il %{bikeindex_toc_link} di Bike Index.
       agree_bikeindex_toc_html:
-      already_have_a_bike_index_account:
-      already_have_an_account:
-      better_password:
-      get_bike_indexs_newsletter:
+      already_have_a_bike_index_account: Hai già un account Bike Index?
+      already_have_an_account: hai già un account?
+      better_password: meglio
+      get_bike_indexs_newsletter: Ricevi la newsletter di Bike Index
       get_on_bike_index:
-      log_in:
-      password_helper_text_html:
-      sign_up:
-      sign_up_using_facebook:
-      sign_up_using_globalid:
-      sign_up_using_strava:
-      terms_and_conditions:
+      log_in: accedi
+      password_helper_text_html: La password deve essere composta da almeno 12 caratteri.
+        Più lunga è %{better_password_link}.
+      sign_up: Iscriviti
+      sign_up_using_facebook: Iscriviti con Facebook
+      sign_up_using_globalid: Iscriviti utilizzando globaliD
+      sign_up_using_strava: Iscriviti con Strava
+      terms_and_conditions: termini e condizioni
     please_confirm_email:
-      did_not_get_an_email:
-      please_verify_your_email:
-      resend_confirmation_email:
-      thanks_for_signing_up_for_bike_index:
+      did_not_get_an_email: Non avete ricevuto l'e-mail? Controllate la cartella spam.
+        Se non riuscite a trovarla, inviate nuovamente la notifica qui
+      please_verify_your_email: Verifica il tuo indirizzo e-mail
+      resend_confirmation_email: inviare nuovamente l'e-mail di conferma
+      thanks_for_signing_up_for_bike_index: Grazie per esserti iscritto a Bike Index!
       we_sent_an_email:
       we_sent_an_email_to_user_email_html:
     request_password_reset_form:
@@ -4670,6 +4711,7 @@ it:
         state: Stato
         your_full_address_is_required:
         address_no_street: Indirizzo
+        street_2:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:

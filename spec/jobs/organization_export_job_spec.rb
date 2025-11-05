@@ -67,6 +67,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             creation_organization: organization,
             creation_registration_info: {
               street: "102 Washington Pl",
+              street_2: "Apt Party",
               city: "State College",
               state: "PA",
               zipcode: "16801",
@@ -91,8 +92,8 @@ RSpec.describe OrganizationExportJob, type: :job do
         let(:csv_lines) do
           # We modify the headers during processing to separate the address into multiple fields
           [
-            %w[owner_name address city state zipcode assigned_sticker],
-            ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A 111 1"]
+            %w[owner_name address address_2 city state zipcode assigned_sticker],
+            ["Maya Skripal", "102 Washington Pl", "Apt Party", "State College", "PA", "16801", "A 111 1"]
           ]
         end
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "a1111") }
@@ -102,6 +103,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           VCR.use_cassette("organization_export_worker-avery") do
             expect(bike_not_avery.reload.current_ownership.address_record.street).to be_blank
             expect(bike_for_avery_og.reload.current_ownership.address_record.street).to be_present
+            expect(bike_for_avery_og.current_ownership.address_record.street_2).to eq "Apt Party"
             bike.reload
             expect(bike_sticker.claimed?).to be_falsey
             export.update(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
@@ -110,13 +112,10 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(export.avery_export?).to be_truthy
             expect(export.headers).to eq Export::AVERY_HEADERS
 
-            expect(bike_for_avery.registration_address_source).to eq "initial_creation"
+            expect(BikeServices::CalculateLocation.registration_address_source(bike_for_avery)).to eq "initial_creation"
             bike_for_avery.update(updated_at: Time.current)
             expect(bike_for_avery.reload.avery_exportable?).to be_truthy
-            expect(bike_for_avery.address_hash.except("country")).to eq bike_for_avery.registration_address.except("country")
-            # We need to be exporting via registration_address - NOT address_hash - so manually blank it, just to make sure
-            bike_for_avery.update_column :street, nil
-            expect(bike_for_avery.address_hash.except("country")).to eq bike_for_avery.registration_address.merge(street: nil).except("country")
+            expect(bike_for_avery.address_hash_legacy.except("country")).to eq bike_for_avery.registration_address.except("country", "address_record_id")
             bike_for_avery
             instance.perform(export.id)
             # Check this in here so the vcr geocoder records at the correct place
@@ -129,7 +128,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
           # NOTE: This header needs to stay exactly the same or the avery export will break
-          expect(export.written_headers).to eq(%w[owner_name address city state zipcode assigned_sticker])
+          expect(export.written_headers).to eq(%w[owner_name address address_2 city state zipcode assigned_sticker])
           expect(export.bike_stickers_assigned).to eq(["A1111"])
           expect(export.bike_codes_removed?).to be_falsey
           expect(Export.with_bike_sticker_code(bike_sticker.code).pluck(:id)).to eq([export.id])
@@ -252,13 +251,13 @@ RSpec.describe OrganizationExportJob, type: :job do
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, extra_registration_number: "cool extra serial", creation_registration_info: registration_info, cycle_type: "cargo", propulsion_type: "pedal-assist") }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state_california) }
-      let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).as_json }
+      let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).merge(street_2: nil).as_json }
       include_context :geocoder_real
 
       context "assigning stickers" do
         let(:export_options) { {headers: %w[link phone extra_registration_number address organization_affiliation student_id], bike_code_start: "ff333333"} }
-        let(:target_headers) { %w[link phone extra_registration_number organization_affiliation student_id address city state zipcode assigned_sticker] }
-        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "XX9999", "717 Market St", "San Francisco", "CA", "94103", "FF 333 333"] }
+        let(:target_headers) { %w[link phone extra_registration_number organization_affiliation student_id address address_2 city state zipcode assigned_sticker] }
+        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "XX9999", "717 Market St", "", "San Francisco", "CA", "94103", "FF 333 333"] }
         it "returns the expected values" do
           expect(export.reload.avery_export?).to be_falsey
           VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
@@ -355,6 +354,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             phone: "7177423423",
             student_id: "XX9999",
             address: "717 Market St",
+            address_2: nil,
             city: "San Francisco",
             state: "CA",
             zipcode: "94103"
@@ -375,7 +375,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(bike.extra_registration_number).to eq "cool extra serial"
             expect(bike.organization_affiliation).to eq "community_member"
             expect(bike.registration_address(true).except("country")).to eq target_address
-            expect(bike.registration_address_source).to eq "initial_creation"
+            expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
             instance.perform(export.id)
           end
           export.reload
@@ -425,6 +425,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             phone: nil,
             student_id: nil,
             address: nil,
+            address_2: nil,
             city: nil,
             state: nil,
             zipcode: nil,
@@ -475,6 +476,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               phone: "7177423423",
               student_id: "XX9999",
               address: "717 Market St",
+              address_2: nil,
               city: "San Francisco",
               state: "CA",
               zipcode: "94103",
@@ -484,7 +486,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           it "returns expected values" do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
               bike.reload.update(cycle_type: "personal-mobility")
-              expect(bike.registration_address_source).to eq "initial_creation"
+              expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
               expect(bike.registration_address(true).except("country")).to eq target_address
               expect(bike.registration_address.except("country")).to eq target_address
             end

@@ -7,8 +7,10 @@
   %thead.small-header.hidden-md-down
     %th
       = sortable "created_at", render_sortable: render_sortable
-    %th
+    %th.small
       = sortable "updated_at", render_sortable: render_sortable
+    %th
+      Impounded
     - unless skip_organization
       %th
         = sortable "organization_id", render_sortable: render_sortable
@@ -31,8 +33,12 @@
           %a.convertTime.preciseTime{href: admin_impound_record_path("pkey-#{impound_record.id}")}
             = l(impound_record.created_at, format: :convert_time)
         %td
-          %span.convertTime.preciseTime
+          %small.convertTime.preciseTime
             = l(impound_record.updated_at, format: :convert_time)
+        %td
+          - if impound_record.impounded_at.present?
+            %small.convertTime.preciseTime
+              = l(impound_record.impounded_at, format: :convert_time)
         - unless skip_organization
           %td
             - if impound_record.organization_id.present?

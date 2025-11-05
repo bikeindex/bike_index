@@ -9,7 +9,7 @@ RSpec.shared_examples "address_recorded" do
     let(:job) { Callbacks::AddressRecordUpdateAssociationsJob }
 
     it "is updated from the job" do
-      # bikes handling is via BikeServices::CalculateStoredLocation
+      # bikes handling is via BikeServices::CalculateLocation
       unless subject.instance_of?(Bike)
         expect(address_record).to be_valid
 

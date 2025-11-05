@@ -25,7 +25,7 @@ RSpec.describe BikesController, type: :request do
       expect(response).to render_template(:new)
       expect(response.body).to match("<title>Register a bike!</title>")
       expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
-      # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
+      # This still wouldn't show address, because it doesn't have an organization with BikeServices::Builder.include_address_record?
       expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
     context "with bike_sticker" do
@@ -47,6 +47,44 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template(:new)
       end
     end
+    context "with organization" do
+      let!(:organization) { FactoryBot.create(:organization) }
+
+      it "renders with organization" do
+        get "#{base_url}/new?organization_id=#{organization.slug}"
+        expect(response.code).to eq("200")
+        expect(response).to render_template(:new)
+        expect(assigns(:bike).creation_organization_id).to eq organization.id
+        expect(assigns(:bike).primary_frame_color_id).to be_nil
+        expect(assigns(:bike).address_record).to be_blank
+      end
+
+      context "existing b_param with creation_organization_id" do
+        let(:organization2) { FactoryBot.create(:organization_with_organization_features, kind: :school, enabled_feature_slugs: "reg_address") }
+        let(:b_param) { FactoryBot.create(:b_param, params: {bike: bike_params}) }
+        let(:manufacturer_id) { FactoryBot.create(:manufacturer).id }
+        let(:bike_params) do
+          # NOTE: This version of address is super old and probably won't be seen anymore #2922
+          {owner_email: current_user.email, manufacturer_id:, creation_organization_id: organization2.id,
+           address: "212 Main St", address_city: "Chicago", address_state: "IL", address_zipcode: "60647"}
+        end
+        let(:target_address_attrs) { {street: "212 Main St", city: "Chicago", region_string: "IL", postal_code: "60647", kind: "ownership"} }
+
+        it "uses the existing organization" do
+          expect(b_param.reload.id_token).to be_present
+          get "#{base_url}/new?organization_id=#{organization.slug}&b_param_token=#{b_param.id_token}"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:new)
+          expect(assigns(:bike).creation_organization_id).to eq organization2.id
+          expect(assigns(:bike).manufacturer_id).to eq manufacturer_id
+          expect(assigns(:bike).primary_frame_color_id).to be_nil
+
+          expect(response.body).to match("Campus mailing address")
+          address_record = assigns(:bike).address_record
+          expect(address_record).to have_attributes target_address_attrs
+        end
+      end
+    end
     context "stolen from params" do
       it "renders a new stolen bike" do
         get "#{base_url}/new?stolen=true"
@@ -64,7 +102,7 @@ RSpec.describe BikesController, type: :request do
       end
       context "with address in different country" do
         let(:ownership) { FactoryBot.create(:ownership, creator: current_user) }
-        let(:current_user) { FactoryBot.create(:user, :address_in_edmonton) }
+        let(:current_user) { FactoryBot.create(:user, :with_address_record, address_in: :edmonton) }
 
         it "renders a new stolen bike from status" do
           get "#{base_url}/new?status=stolen"

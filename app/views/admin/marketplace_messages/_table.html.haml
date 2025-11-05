@@ -1,3 +1,7 @@
+- render_sortable ||= false
+- skip_marketplace_listing ||= false
+- truncate_length ||= 100
+
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
@@ -5,8 +9,9 @@
         = sortable "created_at", render_sortable: render_sortable
       %th
         = sortable "amount_cents", "amount", render_sortable: render_sortable
-      %th
-        = sortable "marketplace_listing", render_sortable: render_sortable
+      - unless skip_marketplace_listing
+        %th
+          = sortable "marketplace_listing", render_sortable: render_sortable
       %th
         Body
       %th
@@ -28,13 +33,16 @@
                   = marketplace_message.id
           %td
             %small= "#{marketplace_message.marketplace_listing.currency_symbol}#{number_display(marketplace_message.marketplace_listing.amount)}"
-          %td
-            = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), render_search: true}
+          - unless skip_marketplace_listing
+            %td
+              = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages")}
+              = link_to search_emoji, url_for(sortable_search_params.merge(search_marketplace_listing_id: marketplace_message.marketplace_listing_id)), class: "display-sortable-link small ml-1"
           %td
             %span{title: marketplace_message.body}
-              = marketplace_message.body.truncate(100)
+              = marketplace_message.body.truncate(truncate_length)
           %td
-            = marketplace_message.kind_humanized
+            %span{class: (marketplace_message.sender_buyer? ? "less-strong" : "")}
+              = marketplace_message.kind_humanized
           %td
             = render partial: "/shared/admin/user_cell", locals: {user: marketplace_message.sender, render_search: true, cache: true}
           -# %td

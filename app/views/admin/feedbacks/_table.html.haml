@@ -34,9 +34,6 @@
           - unless skip_bike
             %td
               - if feedback.bike_id.present?
-                %code= link_to "#{feedback.bike_id}", admin_bike_path(feedback.bike_id), class: "less-strong"
-                - if render_sortable && params[:search_bike_id].blank?
-                  %small
-                    = link_to search_emoji, admin_feedbacks_path(sortable_search_params.merge(search_bike_id: feedback.bike_id)), class: "small"
+                = render partial: "/shared/admin/bike_cell", locals: {bike: feedback.bike, bike_id: feedback.bike_id, bike_link_path: admin_bike_path(feedback.bike_id, active_tab: "messages"), render_search: true}
           %td
             = feedback.body.truncate(100)

@@ -5,8 +5,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
 
   describe "update" do
     let(:user) do
-      FactoryBot.create(:user_confirmed, :with_address_record, address_set_manually: true,
-        address_record: FactoryBot.build(:address_record, :new_york, kind: :user))
+      FactoryBot.create(:user_confirmed, :with_address_record, address_set_manually: true)
     end
     let(:address_record) { nil }
     let(:current_user) { user }
@@ -64,14 +63,14 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
         expect(current_user.reload.can_create_listing?).to be_truthy
         expect(current_user.address_record_id).to be_present
         expect(bike.reload.current_marketplace_listing).to be_blank
-        expect(bike.registration_address_source).to eq "user"
+        expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
         expect(bike.authorized?(current_user)).to be_truthy
 
         make_update_bike_request(url: update_url, params:)
         expect(flash[:success]).to be_present
 
         expect(bike.reload.current_marketplace_listing).to be_present
-        expect(bike.registration_address_source).to eq "user"
+        expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
 
         marketplace_listing = bike.current_marketplace_listing
         expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs
@@ -209,7 +208,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           # expect(bike.not_updated_by_user?).to be_truthy
           expect(bike.current_ownership.claimed?).to be_truthy
           expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
-          expect(bike.registration_address_source).to eq "user"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
 
           VCR.use_cassette("marketplace_listing_request-update") do
             make_update_bike_request(url: update_url, params:)
@@ -225,7 +224,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
 
           expect(bike.reload.primary_activity_id).to eq primary_activity_id
           expect(bike.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
-          expect(bike.registration_address_source).to eq "user"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
           expect(AddressRecord.where(user_id: current_user.id).count).to eq 2
         end
       end
@@ -250,7 +249,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           expect(user.reload.can_create_listing?).to be_truthy
           expect(user.address_record_id).to be_present
           expect(bike.reload.current_marketplace_listing).to be_blank
-          expect(bike.registration_address_source).to eq "user"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
 
           make_update_bike_request(url: update_url, params:, address_record_change: 0)
 
@@ -260,7 +259,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           expect(marketplace_listing.valid_publishable?).to be_truthy
           expect(marketplace_listing).to match_hash_indifferently target_for_sale_attrs
 
-          expect(bike.registration_address_source).to eq "marketplace_listing"
+          expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "marketplace_listing"
           expect(bike.to_coordinates).to eq user.to_coordinates
         end
         context "bike is user_hidden" do

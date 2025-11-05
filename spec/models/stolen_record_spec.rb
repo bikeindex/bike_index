@@ -303,6 +303,13 @@ RSpec.describe StolenRecord, type: :model do
       it "it sets the year to last year" do
         expect(result.to_date).to eq((date - 1.year).to_date)
       end
+
+      context "next year previous month" do
+        let(:date) { Time.current - 1.week + 1.year }
+        it "sets the year to current year" do
+          expect(result.to_date).to eq((Time.current - 1.week).to_date)
+        end
+      end
     end
     context "timestamp" do
       let(:date) { (Time.current - 1.hour).to_i }

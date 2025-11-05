@@ -1,7 +1,3 @@
-
--- Dumped from database version 17.6 (Homebrew)
--- Dumped by pg_dump version 17.6 (Homebrew)
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -164,7 +160,8 @@ CREATE TABLE public.address_records (
     publicly_visible_attribute integer,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    bike_id bigint
+    bike_id bigint,
+    street_2 character varying
 );
 
 
@@ -7074,10 +7071,10 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 -- PostgreSQL database dump complete
 --
 
-
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251101041451'),
 ('20250917185540'),
 ('20250910182759'),
 ('20250528154403'),

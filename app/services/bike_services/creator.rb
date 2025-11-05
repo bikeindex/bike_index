@@ -1,63 +1,105 @@
+# frozen_string_literal: true
+
 class BikeServices::Creator
+  PERMITTED_ATTRS = %i[
+    abandoned
+    approved_stolen
+    b_param_id
+    b_param_id_token
+    belt_drive
+    bike_organization_ids
+    coaster_brake
+    components_attributes
+    creation_organization_id
+    creator
+    creator_id
+    current_stolen_record_id
+    cycle_type
+    date_stolen
+    description
+    embeded
+    embeded_extended
+    example
+    extra_registration_number
+    frame_material
+    frame_model
+    frame_size
+    frame_size_number
+    frame_size_unit
+    front_gear_type_id
+    front_gear_type_slug
+    front_tire_narrow
+    front_wheel_size_id
+    handlebar_type
+    image
+    is_for_sale
+    listing_order
+    made_without_serial
+    manufacturer
+    manufacturer_id
+    manufacturer_other
+    marked_user_hidden
+    marked_user_unhidden
+    name
+    number_of_seats
+    organization_affiliation
+    owner_email
+    paint_id
+    paint_name
+    pdf
+    phone
+    primary_activity_id
+    primary_frame_color_id
+    propulsion_type
+    rear_gear_type_id
+    rear_gear_type_slug
+    rear_tire_narrow
+    rear_wheel_size_id
+    receive_notifications
+    secondary_frame_color_id
+    send_email
+    serial_normalized
+    serial_number
+    skip_email
+    stock_photo_url
+    student_id
+    tertiary_frame_color_id
+    thumb_path
+    timezone
+    year
+  ].freeze
+  PERMITTED_IMPOUND_ATTRS = %i[
+    city
+    country
+    display_id
+    impounded_at_with_timezone
+    impounded_description
+    state
+    street
+    timezone
+    zipcode
+  ].freeze
+  # TODO: Remove this once backfill is finished - #2922
+  ADDRESS_ATTRS = %i[city country_id state_id street zipcode]
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator
   def self.old_attr_accessible
-    (%i[manufacturer_id manufacturer_other serial_number
-      serial_normalized made_without_serial extra_registration_number
-      creation_organization_id manufacturer year thumb_path name
-      current_stolen_record_id abandoned frame_material cycle_type frame_model number_of_seats
-      handlebar_type frame_size frame_size_number frame_size_unit
-      rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
-      primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-      propulsion_type street zipcode country_id state_id city belt_drive
-      coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
-      timezone date_stolen receive_notifications phone creator creator_id image
-      components_attributes b_param_id embeded embeded_extended example organization_affiliation student_id
-      stock_photo_url pdf send_email skip_email listing_order approved_stolen primary_activity_id
-      marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids] +
-      [
-        stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
-        impound_records_attributes: permitted_impound_attrs,
-        components_attributes: Component.permitted_attributes
-      ]
-    ).freeze
-  end
-
-  def self.permitted_impound_attrs
-    %w[street city state zipcode country timezone impounded_at_with_timezone display_id impounded_description].freeze
+    (PERMITTED_ATTRS + ADDRESS_ATTRS + [
+      stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
+      impound_records_attributes: PERMITTED_IMPOUND_ATTRS,
+      components_attributes: Component.permitted_attributes,
+      address_record_attributes: AddressRecord.permitted_params
+    ]).freeze
   end
 
   def initialize(ip_address: nil)
     @ip_address = ip_address
   end
 
-  def build_bike(b_param, new_attrs = {})
-    # Default attributes
-    bike = Bike.new(cycle_type: "bike")
-    bike.attributes = b_param.safe_bike_attrs(new_attrs)
-    # If manufacturer_other is an existing manufacturer, reassign it
-    if bike.manufacturer_id == Manufacturer.other.id
-      manufacturer = Manufacturer.friendly_find(bike.manufacturer_other)
-      if manufacturer.present?
-        bike.attributes = {manufacturer_id: manufacturer.id, manufacturer_other: nil}
-      end
-    end
-    # Use bike status because it takes into account new_attrs
-    bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
-    bike.build_new_impound_record(b_param.impound_attrs) if bike.status_impounded?
-    bike = check_organization(b_param, bike)
-    bike = check_example(b_param, bike)
-    bike.attributes = default_parking_notification_attrs(b_param, bike) if b_param.unregistered_parking_notification?
-    bike.bike_sticker = b_param.bike_sticker_code
-    if bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
-      bike.attributes = {front_wheel_size_id: bike.rear_wheel_size_id, front_tire_narrow: bike.rear_tire_narrow}
-    end
-    bike
-  end
-
   def create_bike(b_param)
     add_bike_book_data(b_param)
-    bike = find_or_build_bike(b_param)
+    bike = BikeServices::Builder.find_or_build(b_param)
+
     # Skip processing if this bike is already created
     return bike if bike.id.present? && bike.id == b_param.created_bike_id
 
@@ -118,7 +160,7 @@ class BikeServices::Creator
   end
 
   def clear_bike(b_param, bike)
-    built_bike = find_or_build_bike(b_param)
+    built_bike = BikeServices::Builder.find_or_build(b_param)
     bike.errors.messages.each do |message|
       built_bike.errors.add(message[0], message[1][0])
     end
@@ -144,8 +186,10 @@ class BikeServices::Creator
 
   def save_bike(b_param, bike)
     # TODO: Figure out why this needs to be called separately, before save. See PR #2848
-    bike.attributes = BikeServices::CalculateStoredLocation.location_attrs(bike)
+    # Maybe can be removed in #2922
+    bike.attributes = BikeServices::CalculateLocation.stored_location_attrs(bike)
     bike.save
+
     ownership = create_ownership(b_param, bike)
     bike = associate(b_param, bike, ownership) unless bike.errors.any?
     bike = validate_record(b_param, bike)
@@ -161,77 +205,14 @@ class BikeServices::Creator
       bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
         organization: bike.creation_organization, creator_kind: "creator_bike_creation")
     end
+    # TODO: consolidate into create_parking_notification in #2922
     if b_param.unregistered_parking_notification?
-      # We skipped setting address, with default_parking_notification_attrs, notification will update it
+      # We skipped setting address, with Builder.default_parking_notification_attrs,
+      # notification will update it
       ParkingNotification.create!(b_param.parking_notification_params)
     end
-    # Check if the bike has a location, update with passed location if no
+
     bike.reload
-    bike.update(GeocodeHelper.assignable_address_hash_for(@ip_address)) unless bike.latitude.present?
-    bike
-  end
-
-  def find_or_build_bike(b_param)
-    return b_param.created_bike if b_param&.created_bike&.present?
-
-    bike = build_bike(b_param)
-    bike.set_calculated_unassociated_attributes
-
-    if b_param.no_duplicate?
-      # If a dupe is found, return that rather than the just built bike
-      dupe = BikeServices::OwnerDuplicateFinder.matching(serial: bike.serial_number,
-        owner_email: bike.owner_email, manufacturer_id: bike.manufacturer_id).first
-
-      if dupe.present?
-        b_param.update(created_bike_id: dupe.id)
-        return dupe
-      end
-    end
-    bike
-  end
-
-  def default_parking_notification_attrs(b_param, bike)
-    attrs = {
-      skip_status_update: true,
-      skip_geocoding: true,
-      status: "unregistered_parking_notification",
-      marked_user_hidden: true
-    }
-    # We want to force not sending email
-    if b_param.params.dig("bike", "send_email").blank?
-      b_param.update_attribute :params, b_param.params.merge("bike" => b_param.params["bike"].merge("send_email" => "false"))
-    end
-    if bike.owner_email.blank?
-      attrs[:owner_email] = b_param.creation_organization&.auto_user&.email.presence || b_param.creator.email
-    end
-    attrs[:serial_number] = "unknown" unless bike.serial_number.present?
-    attrs
-  end
-
-  # previously BikeServices::CreatorOrganizer
-  def check_organization(b_param, bike)
-    organization_id = b_param.params.dig("creation_organization_id").presence ||
-      b_param.params.dig("bike", "creation_organization_id")
-    organization = Organization.friendly_find(organization_id)
-    if organization.present?
-      bike.creation_organization_id = organization.id
-      bike.creator_id ||= organization.auto_user_id
-    else
-      # Since there wasn't a valid organization, blank the organization
-      bike.creation_organization_id = nil
-    end
-    bike
-  end
-
-  def check_example(b_param, bike)
-    example_org = Organization.example
-    bike.creation_organization_id = example_org.id if b_param.params && b_param.params["test"]
-    if bike.creation_organization_id.present? && example_org.present?
-      bike.example = true if bike.creation_organization_id == example_org.id
-    else
-      bike.example = false
-    end
-    bike
   end
 
   def associate(b_param, bike, ownership)
@@ -256,8 +237,9 @@ class BikeServices::Creator
       bulk_import_id: b_param.params["bulk_import_id"],
       creator_id: b_param.creator_id,
       can_edit_claimed: bike.creation_organization_id.present?,
-      organization_id: bike.creation_organization_id
-    }.merge(registration_info: b_param.registration_info_attrs)
+      organization_id: bike.creation_organization_id,
+      address_record_id: bike.address_record_id
+    }.merge(registration_info: b_param.registration_info_attrs.merge(ip_address: @ip_address))
   end
 
   def create_ownership(b_param, bike)
@@ -282,7 +264,7 @@ class BikeServices::Creator
   end
 
   def create_parking_notification(b_param, bike)
-    parking_notification_attrs = b_param.bike.slice("latitude", "longitude", "street", "city", "state_id", "zipcode", "country_id", "accuracy")
+    parking_notification_attrs = bike.address_hash_legacy
     parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
       bike_id: bike.id,
       user_id: bike.creator.id,

@@ -56,5 +56,5 @@
 
           %td
             - if component.bike_id.present?
-              = render partial: "/shared/admin/bike_cell", locals: {bike: component.bike, bike_link_path: admin_bike_path(component.bike_id) }
+              = render partial: "/shared/admin/bike_cell", locals: {bike: component.bike, bike_id: component.bike_id}
 
