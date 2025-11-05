@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -1845,6 +1846,45 @@ CREATE SEQUENCE public.invoices_id_seq
 --
 
 ALTER SEQUENCE public.invoices_id_seq OWNED BY public.invoices.id;
+
+
+--
+-- Name: item_sales; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.item_sales (
+    id bigint NOT NULL,
+    amount_cents integer,
+    currency_enum integer,
+    item_type character varying,
+    item_id bigint,
+    seller_id bigint,
+    sold_via integer,
+    sold_at timestamp(6) without time zone,
+    ownership_id bigint,
+    new_owner_string character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: item_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.item_sales_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: item_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.item_sales_id_seq OWNED BY public.item_sales.id;
 
 
 --
@@ -4314,6 +4354,13 @@ ALTER TABLE ONLY public.invoices ALTER COLUMN id SET DEFAULT nextval('public.inv
 
 
 --
+-- Name: item_sales id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.item_sales ALTER COLUMN id SET DEFAULT nextval('public.item_sales_id_seq'::regclass);
+
+
+--
 -- Name: listicles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5051,6 +5098,14 @@ ALTER TABLE ONLY public.invoice_organization_features
 
 ALTER TABLE ONLY public.invoices
     ADD CONSTRAINT invoices_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: item_sales item_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.item_sales
+    ADD CONSTRAINT item_sales_pkey PRIMARY KEY (id);
 
 
 --
@@ -6219,6 +6274,27 @@ CREATE INDEX index_invoices_on_organization_id ON public.invoices USING btree (o
 
 
 --
+-- Name: index_item_sales_on_item; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_item_sales_on_item ON public.item_sales USING btree (item_type, item_id);
+
+
+--
+-- Name: index_item_sales_on_ownership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_item_sales_on_ownership_id ON public.item_sales USING btree (ownership_id);
+
+
+--
+-- Name: index_item_sales_on_seller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_item_sales_on_seller_id ON public.item_sales USING btree (seller_id);
+
+
+--
 -- Name: index_locks_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7074,6 +7150,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251105020711'),
 ('20251101041451'),
 ('20250917185540'),
 ('20250910182759'),
