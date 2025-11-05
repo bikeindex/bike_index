@@ -35,7 +35,7 @@ module AddressDisplay
     # Legacy address hash
     def address_hash
       {street: "Some Ave", city: "Brooklyn", zipcode: "11222",
-        latitude: 40, longitude: -73, state: "NY", country: "US"}
+       latitude: 40, longitude: -73, state: "NY", country: "US"}
     end
   end
 end

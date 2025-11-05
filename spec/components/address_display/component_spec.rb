@@ -60,7 +60,7 @@ RSpec.describe AddressDisplay::Component, type: :component do
     let(:address_record) { nil }
     let(:address_hash) do
       {street: "Some Ave", city: "Brooklyn", zipcode: "11222",
-        latitude: 40, longitude: -73, state: "NY", country: "US"}
+       latitude: 40, longitude: -73, state: "NY", country: "US"}
     end
     it "renders" do
       expect(component).to have_content "Brooklyn, NY 11222"
@@ -78,7 +78,7 @@ RSpec.describe AddressDisplay::Component, type: :component do
       context "with street with comma" do
         let(:address_hash) do
           {street: "One Shields Ave, C/O BicyclingPlus", city: "Davis", zipcode: "95616",
-            latitude: 40, longitude: -73, state: "CA", country: "US"}.as_json
+           latitude: 40, longitude: -73, state: "CA", country: "US"}.as_json
         end
         it "splits street" do
           expect(component).to have_content "Davis, CA 95616"

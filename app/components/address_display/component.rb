@@ -33,7 +33,7 @@ module AddressDisplay
       street_lines = if @address_record.present?
         [@address_record.street, @address_record.street_2]
       else
-        @address_hash[:street]&.split(",").map(&:strip)
+        @address_hash[:street]&.split(",")&.map(&:strip)
       end.compact
 
       street_lines.map { content_tag(:span, it + "\n", class: line_classes) }
