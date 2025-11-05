@@ -192,7 +192,7 @@
 
                     - if reg_address.present? # Make this a little easier to see, don't use ruby specific hashes
                       \{
-                      = reg_address.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
+                      = reg_address.compact.map { |k, v| "#{k}: " + (v.present? ? "\"#{v}\"" : "") }.join(", ")
                       \}
                       %small.only-dev-visible.ml-2
                         %em

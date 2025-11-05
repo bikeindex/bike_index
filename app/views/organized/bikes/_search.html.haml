@@ -244,11 +244,8 @@
               %td.hiddenColumn.hidden-xs-down{class: "#{reg_field}_cell"}
                 - bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
                 - if bike_attr == "address"
-                  - if bike.valid_mailing_address?
-                    -# Don't show organization address
-                    %small
-                      =# render AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street)
-                      = bike.registration_address["street"]
+                  - if bike.valid_mailing_address? # Don't show organization address
+                    %small= render AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street)
                 - elsif bike_attr == "organization_affiliation"
                   = bike.organization_affiliation(current_organization)&.humanize
                 - elsif bike_attr == "student_id"

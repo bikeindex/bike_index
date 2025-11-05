@@ -135,10 +135,7 @@
                       %td
                         - address = @bike.registration_address
                         - if @bike.valid_mailing_address?
-                          = address["street"]
-                          %br
-                          = [address["city"], address["state"]].reject(&:blank?).join(", ")
-                          = address['zipcode']
+                          %small= render AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(@bike), visible_attribute: :street)
                         - else
                           -# Don't show address if it's the organizations default address
                           - unless address == @organization.default_location&.address_hash
@@ -151,8 +148,7 @@
                             %small invalid address
                         - address_source = BikeServices::CalculateLocation.registration_address_source(@bike)
                         - if address_source.present?
-                          %br
-                          %small.less-strong
+                          %small{class: "less-strong tw:mt-2 tw:block"}
                             %em
                               Address source:
                             = address_source.to_s&.humanize
