@@ -22,7 +22,7 @@
 #  index_item_sales_on_ownership_id  (ownership_id)
 #  index_item_sales_on_seller_id     (seller_id)
 #
-class ItemSale < ApplicationRecord
+class Sale < ApplicationRecord
   include Amountable
   include Currencyable
 

@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :item_sale do
+  factory :sale do
     amount_cents { 100 }
     item { FactoryBot.create(:bike, :with_ownership_claimed) }
     seller { FactoryBot.create(:user_confirmed) }

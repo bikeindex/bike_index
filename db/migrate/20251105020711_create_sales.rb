@@ -1,6 +1,6 @@
-class CreateItemSales < ActiveRecord::Migration[8.0]
+class CreateSales < ActiveRecord::Migration[8.0]
   def change
-    create_table :item_sales do |t|
+    create_table :sales do |t|
       t.integer :amount_cents
       t.integer :currency_enum
       t.references :item, polymorphic: true
