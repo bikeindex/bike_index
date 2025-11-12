@@ -1,6 +1,7 @@
 # == Schema Information
 #
-# Table name: item_sales
+# Table name: sales
+# Database name: primary
 #
 #  id               :bigint           not null, primary key
 #  amount_cents     :integer
@@ -18,9 +19,9 @@
 #
 # Indexes
 #
-#  index_item_sales_on_item          (item_type,item_id)
-#  index_item_sales_on_ownership_id  (ownership_id)
-#  index_item_sales_on_seller_id     (seller_id)
+#  index_sales_on_item          (item_type,item_id)
+#  index_sales_on_ownership_id  (ownership_id)
+#  index_sales_on_seller_id     (seller_id)
 #
 class Sale < ApplicationRecord
   include Amountable

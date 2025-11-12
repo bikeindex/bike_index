@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3177,6 +3176,46 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 
 
 --
+-- Name: sales; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sales (
+    id bigint NOT NULL,
+    amount_cents integer,
+    currency_enum integer,
+    item_type character varying,
+    item_id bigint,
+    seller_id bigint,
+    sold_via integer,
+    sold_via_other character varying,
+    sold_at timestamp(6) without time zone,
+    ownership_id bigint,
+    new_owner_string character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: sales_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.sales_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.sales_id_seq OWNED BY public.sales.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4546,6 +4585,13 @@ ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
+-- Name: sales id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sales ALTER COLUMN id SET DEFAULT nextval('public.sales_id_seq'::regclass);
+
+
+--
 -- Name: states id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5316,6 +5362,14 @@ ALTER TABLE ONLY public.rear_gear_types
 
 ALTER TABLE ONLY public.recovery_displays
     ADD CONSTRAINT recovery_displays_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sales sales_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sales
+    ADD CONSTRAINT sales_pkey PRIMARY KEY (id);
 
 
 --
@@ -6682,6 +6736,27 @@ CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_disp
 
 
 --
+-- Name: index_sales_on_item; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sales_on_item ON public.sales USING btree (item_type, item_id);
+
+
+--
+-- Name: index_sales_on_ownership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sales_on_ownership_id ON public.sales USING btree (ownership_id);
+
+
+--
+-- Name: index_sales_on_seller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sales_on_seller_id ON public.sales USING btree (seller_id);
+
+
+--
 -- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7075,6 +7150,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251105020711'),
 ('20251101041451'),
 ('20250917185540'),
 ('20250910182759'),
