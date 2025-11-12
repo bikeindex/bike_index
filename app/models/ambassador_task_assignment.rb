@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: ambassador_task_assignments
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  completed_at       :datetime

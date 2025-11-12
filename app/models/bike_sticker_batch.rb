@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: bike_sticker_batches
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  code_number_length :integer

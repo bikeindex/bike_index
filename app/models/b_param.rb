@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: b_params
+# Database name: primary
 #
 #  id              :integer          not null, primary key
 #  bike_errors     :text

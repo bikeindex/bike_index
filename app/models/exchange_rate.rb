@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: exchange_rates
+# Database name: primary
 #
 #  id         :bigint           not null, primary key
 #  from       :string           not null

@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: notifications
+# Database name: primary
 #
 #  id                     :bigint           not null, primary key
 #  delivery_error         :string

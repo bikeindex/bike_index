@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: colors
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  display    :string(255)

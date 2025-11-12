@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: duplicate_bike_groups
+# Database name: primary
 #
 #  id            :integer          not null, primary key
 #  added_bike_at :datetime

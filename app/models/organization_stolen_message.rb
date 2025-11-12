@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: organization_stolen_messages
+# Database name: primary
 #
 #  id                  :bigint           not null, primary key
 #  body                :text

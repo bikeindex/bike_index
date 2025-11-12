@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: user_phones
+# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  confirmation_code :string

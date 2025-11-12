@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: bikes
+# Database name: primary
 #
 #  id                          :integer          not null, primary key
 #  address_set_manually        :boolean          default(FALSE)

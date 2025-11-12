@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: public_images
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  external_image_url :text

@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: user_bans
+# Database name: primary
 #
 #  id          :bigint           not null, primary key
 #  deleted_at  :datetime

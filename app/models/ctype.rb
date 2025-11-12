@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: ctypes
+# Database name: primary
 #
 #  id             :integer          not null, primary key
 #  has_multiple   :boolean          default(FALSE), not null

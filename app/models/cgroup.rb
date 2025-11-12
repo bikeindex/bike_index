@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: cgroups
+# Database name: primary
 #
 #  id          :integer          not null, primary key
 #  description :string(255)

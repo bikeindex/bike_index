@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: exports
+# Database name: primary
 #
 #  id              :integer          not null, primary key
 #  file            :text
