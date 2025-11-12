@@ -41,13 +41,11 @@ gem "rack-mini-profiler", require: ["prepend_net_http_patch"] # If you can't see
 gem "stackprof", require: false
 gem "pghero" # PG Info
 
-
 # I18n - localization/translation
 gem "i18n-country-translations"
 gem "i18n-js"
 gem "rails-i18n"
 gem "translation"
-
 
 # Redis and Redis dependents
 gem "redis"
@@ -55,7 +53,6 @@ gem "sidekiq" # Background job processing
 # Sidekiq failure tracking and viewing. Broken for sidekiq 8. see github.com/mhfs/sidekiq-failures/pull/159
 gem "sidekiq-failures", github: "navidemad/sidekiq-failures", branch: "feat-compatibility-sidekiq-8", ref: "63252253b1a17b7115fe086a910881467cd0e55d"
 gem "redlock" # Locking
-
 
 # Making other files
 gem "image_processing" # what it says
@@ -69,7 +66,6 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "0.10.1" # QR Code image generator
 
-
 # Functionality extensions
 gem "flipper" # Feature flagging
 gem "flipper-active_record" # Feature flagging
@@ -77,7 +73,6 @@ gem "flipper-ui" # Feature flagging
 gem "geocoder" # Geolocation using external APIs
 gem "money-rails", "~> 1.11" # Money formatting
 gem "sitemap_generator", "~> 6" # Make sitemaps
-
 
 # API wrappers, external requests
 gem "twitter" # Twitter. For rendering tweets
@@ -91,8 +86,6 @@ gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketi
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
 gem "down" # used to generate a local tempfile
 gem "faraday_middleware" # Manage faraday request flow
-# gem "resolv-replace" # Ruby DNS resolver. Fixes IPv6 request issues
-
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
@@ -100,7 +93,6 @@ gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
 gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
-
 
 # Frontend
 gem "chartkick" # Display charts
@@ -122,7 +114,6 @@ gem "tailwindcss-rails" # Use Tailwind CSS [https://github.com/rails/tailwindcss
 gem "view_component" # view components!
 gem "lookbook" # view_component preview
 gem "inline_svg" # render SVGs inline and give them classes
-
 
 group :production do
   gem "skylight" # Performance monitoring
