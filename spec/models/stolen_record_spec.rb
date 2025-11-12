@@ -304,10 +304,18 @@ RSpec.describe StolenRecord, type: :model do
         expect(result.to_date).to eq((date - 1.year).to_date)
       end
 
+      context "date tomorrow" do
+        let(:date) { Time.current + 1.day }
+        # Probably some timezone issue, permit it
+        it "returns passed date" do
+          expect(result.to_date).to eq((Time.current + 1.day).to_date)
+        end
+      end
+
       context "next year previous month" do
-        let(:date) { Time.current - 1.week + 1.year }
+        let(:date) { Time.current + 11.months }
         it "sets the year to current year" do
-          expect(result.to_date).to eq((Time.current - 1.week).to_date)
+          expect(result.to_date).to eq((Time.current - 1.month).to_date)
         end
       end
     end
