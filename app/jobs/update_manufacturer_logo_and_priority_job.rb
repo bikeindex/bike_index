@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 class UpdateManufacturerLogoAndPriorityJob < ScheduledJob
   prepend ScheduledJobRecorder
+
+  API_KEY = ENV["LOGO_API_TOKEN"]
 
   def self.frequency
     3.days
@@ -30,12 +34,12 @@ class UpdateManufacturerLogoAndPriorityJob < ScheduledJob
   def get_manufacturer_logo(manufacturer)
     return false if manufacturer.website.blank? || manufacturer.logo.present?
 
-    clearbit_url = "https://logo.clearbit.com/#{manufacturer.website.gsub(/\Ahttps?:\/\//i, "")}?size=400"
+    logo_url = "https://img.logo.dev/#{manufacturer.website.gsub(/\Ahttps?:\/\//i, "")}?size=400&fallback=404&token=#{API_KEY}"
 
-    status_response = Net::HTTP.get_response(URI(clearbit_url))
+    status_response = Net::HTTP.get_response(URI(logo_url))
 
     return false unless status_response.is_a?(Net::HTTPSuccess)
 
-    manufacturer.update!(remote_logo_url: clearbit_url, logo_source: "Clearbit")
+    manufacturer.update!(remote_logo_url: logo_url, logo_source: "Logo.dev")
   end
 end

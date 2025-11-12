@@ -15,7 +15,7 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
       described_class.new.perform(manufacturer.id)
       manufacturer.reload
       expect(manufacturer.logo).to be_present
-      expect(manufacturer.logo_source).to eq("Clearbit")
+      expect(manufacturer.logo_source).to eq("Logo.dev")
     end
   end
 
