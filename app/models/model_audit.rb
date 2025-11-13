@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: model_audits
+# Database name: primary
 #
 #  id                   :bigint           not null, primary key
 #  bikes_count          :integer

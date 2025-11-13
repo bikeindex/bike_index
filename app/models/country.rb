@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: countries
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  iso        :string(255)

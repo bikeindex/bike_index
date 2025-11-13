@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: locations
+# Database name: primary
 #
 #  id                       :integer          not null, primary key
 #  city                     :string(255)

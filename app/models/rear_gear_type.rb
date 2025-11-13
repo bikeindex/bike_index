@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: rear_gear_types
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  count      :integer

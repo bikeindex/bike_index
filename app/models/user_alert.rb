@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: user_alerts
+# Database name: primary
 #
 #  id              :bigint           not null, primary key
 #  dismissed_at    :datetime

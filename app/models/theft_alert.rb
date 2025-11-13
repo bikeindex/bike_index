@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: theft_alerts
+# Database name: primary
 #
 #  id                          :integer          not null, primary key
 #  ad_radius_miles             :integer

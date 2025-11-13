@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: integrations
+# Database name: primary
 #
 #  id            :integer          not null, primary key
 #  access_token  :text

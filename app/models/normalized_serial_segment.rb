@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: normalized_serial_segments
+# Database name: primary
 #
 #  id                      :integer          not null, primary key
 #  segment                 :string(255)

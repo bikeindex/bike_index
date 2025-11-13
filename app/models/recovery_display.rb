@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: recovery_displays
+# Database name: primary
 #
 #  id               :integer          not null, primary key
 #  image            :string(255)

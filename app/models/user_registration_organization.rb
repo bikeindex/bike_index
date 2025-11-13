@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: user_registration_organizations
+# Database name: primary
 #
 #  id                   :bigint           not null, primary key
 #  all_bikes            :boolean          default(FALSE)

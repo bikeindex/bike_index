@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: content_tags
+# Database name: primary
 #
 #  id          :bigint           not null, primary key
 #  description :text

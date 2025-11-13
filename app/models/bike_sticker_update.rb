@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: bike_sticker_updates
+# Database name: primary
 #
 #  id                  :bigint           not null, primary key
 #  creator_kind        :integer

@@ -11,10 +11,12 @@ ruby "3.4.7"
 gem "csv"
 gem "observer"
 gem "prime"
-# Maybe these can be removed after 3.4 upgrade? Added to silence deprecation warnings
+gem "openssl" # stuff breaks without this, 2025-10
+# Maybe ^ can be removed after 3.4 upgrade? Added to silence deprecation warnings
 
 gem "rails"
 
+# Things to improve/extend Rails
 gem "puma" # App server
 gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
@@ -24,18 +26,20 @@ gem "pg_search"
 gem "lograge" # Structure log data, put it in single lines to improve the functionality
 gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
-gem "openssl" # stuff breaks without this, 2025-10
+gem "responders" # Rails responders modules
+gem "rack-throttle" # Rate limiting
+gem "secure_headers", "~> 2.5.0"
 
-# Speed
+# Speed, performance, etc
 gem "fast_blank", "~> 1.0"
 gem "active_model_serializers", "~> 0.8.3" # NOTE: more recent versions are slower, see discourse Gemfile
 gem "oj" # optimized json
 gem "multi_json" # TODO: use this more
-
-# Feature flagging
-gem "flipper"
-gem "flipper-active_record"
-gem "flipper-ui"
+gem "flamegraph", require: false
+gem "memory_profiler", require: false
+gem "rack-mini-profiler", require: ["prepend_net_http_patch"] # If you can't see it you can't make it better
+gem "stackprof", require: false
+gem "pghero" # PG Info
 
 # I18n - localization/translation
 gem "i18n-country-translations"
@@ -43,23 +47,12 @@ gem "i18n-js"
 gem "rails-i18n"
 gem "translation"
 
-# Redis and redis dependents
+# Redis and Redis dependents
 gem "redis"
 gem "sidekiq" # Background job processing
 # Sidekiq failure tracking and viewing. Broken for sidekiq 8. see github.com/mhfs/sidekiq-failures/pull/159
 gem "sidekiq-failures", github: "navidemad/sidekiq-failures", branch: "feat-compatibility-sidekiq-8", ref: "63252253b1a17b7115fe086a910881467cd0e55d"
 gem "redlock" # Locking
-
-gem "faraday_middleware" # Manage faraday request flow
-gem "geocoder" # Geolocation using external APIs
-gem "haml" # Template language
-gem "herb" # herb
-gem "reactionview" # fancy view component stuff
-gem "httparty" # http connection client
-gem "pagy" # pagination
-gem "kramdown" # Markdown
-gem "money-rails", "~> 1.11"
-gem "sitemap_generator", "~> 6"
 
 # Making other files
 gem "image_processing" # what it says
@@ -71,11 +64,17 @@ gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # b
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
-gem "rqrcode", "0.10.1" # QR Codes
-gem "inline_svg" # render SVGs inline and give them classes
-gem "down" # used to generate a local tempfile
+gem "rqrcode", "0.10.1" # QR Code image generator
 
-# API wrappers
+# Functionality extensions
+gem "flipper" # Feature flagging
+gem "flipper-active_record" # Feature flagging
+gem "flipper-ui" # Feature flagging
+gem "geocoder" # Geolocation using external APIs
+gem "money-rails", "~> 1.11" # Money formatting
+gem "sitemap_generator", "~> 6" # Make sitemaps
+
+# API wrappers, external requests
 gem "twitter" # Twitter. For rendering tweets
 gem "twilio-ruby" # Twilio, for verifying phone numbers
 gem "stripe" # Payments
@@ -85,6 +84,8 @@ gem "aws-sdk-core", "3.211" # Required for S3 compatibility, see github.com/rail
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
+gem "down" # used to generate a local tempfile
+gem "faraday_middleware" # Manage faraday request flow
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
@@ -92,10 +93,6 @@ gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
 gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
-
-# Secure things
-gem "rack-throttle" # Rate limiting
-gem "secure_headers", "~> 2.5.0"
 
 # Frontend
 gem "chartkick" # Display charts
@@ -105,24 +102,18 @@ gem "groupdate" # Required for charts
 gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails
 gem "sprockets-rails"
 gem "dartsass-rails"
-
-# new frontend
+gem "haml" # Template language
+gem "herb" # New ERB parsing
+gem "reactionview" # fancy view component stuff with Herb
+gem "pagy" # pagination
+gem "kramdown" # Markdown template language
 gem "importmap-rails" # New JS setup
 gem "turbo-rails" # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "stimulus-rails" # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "tailwindcss-rails" # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
 gem "view_component" # view components!
 gem "lookbook" # view_component preview
-
-# Show performance metrics
-gem "flamegraph", require: false
-gem "memory_profiler", require: false
-gem "rack-mini-profiler", require: ["prepend_net_http_patch"] # If you can't see it you can't make it better
-gem "stackprof", require: false
-gem "pghero" # PG Info
-
-gem "responders"
-gem "thor"
+gem "inline_svg" # render SVGs inline and give them classes
 
 group :production do
   gem "skylight" # Performance monitoring
@@ -140,7 +131,7 @@ group :development do
   gem "rerun" # restart sidekiq processes in development on app change
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
-  gem "annotaterb"
+  gem "annotaterb" # Add comments with the attributes to Rails Model
 end
 
 group :development, :test do

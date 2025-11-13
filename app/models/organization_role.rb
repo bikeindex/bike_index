@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: organization_roles
+# Database name: primary
 #
 #  id                       :integer          not null, primary key
 #  claimed_at               :datetime

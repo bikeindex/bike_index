@@ -1672,6 +1672,7 @@ it:
           not_support_pkce:
           request_not_authorized: Request need to be authorized. Required parameter
             for authorizing request is missing or invalid.
+          invalid_code_challenge:
         invalid_redirect_uri: L'uri di redirect incluso non è valido.
         unauthorized_client: Il client non è autorizzato per effettuare questa richiesta
           utilizzando questo metodo.

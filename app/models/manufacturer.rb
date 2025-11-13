@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: manufacturers
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  close_year         :integer

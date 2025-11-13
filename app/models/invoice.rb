@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: invoices
+# Database name: primary
 #
 #  id                          :integer          not null, primary key
 #  amount_due_cents            :integer

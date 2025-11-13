@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: impound_claims
+# Database name: primary
 #
 #  id                 :bigint           not null, primary key
 #  message            :text

@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: organization_manufacturers
+# Database name: primary
 #
 #  id              :bigint           not null, primary key
 #  can_view_counts :boolean          default(FALSE)

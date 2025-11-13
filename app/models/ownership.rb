@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: ownerships
+# Database name: primary
 #
 #  id                            :integer          not null, primary key
 #  claimed                       :boolean          default(FALSE)

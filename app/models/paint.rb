@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: paints
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  bikes_count        :integer          default(0), not null

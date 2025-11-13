@@ -1746,6 +1746,7 @@ nl:
             pkce niet.
           request_not_authorized: Verzoek moet worden geautoriseerd. Vereiste parameter
             voor het autoriseren van de aanvraag ontbreekt of is ongeldig.
+          invalid_code_challenge: Er is een code-uitdaging vereist.
         invalid_code_challenge_method:
           zero: De autorisatieserver ondersteunt PKCE niet omdat er geen geaccepteerde
             code_challenge_method-waarden zijn.
