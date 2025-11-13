@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
-  let(:vcr_config) {{ re_record_interval: 1.month, match_requests_on: [:method, :path] }}
+  let(:vcr_config) { {re_record_interval: 1.month, match_requests_on: [:method, :path]} }
 
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
@@ -52,4 +52,3 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
     end
   end
 end
-
