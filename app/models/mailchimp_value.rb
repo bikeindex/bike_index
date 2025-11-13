@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: mailchimp_values
+# Database name: primary
 #
 #  id           :bigint           not null, primary key
 #  data         :jsonb

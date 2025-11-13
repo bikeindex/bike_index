@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: external_registry_credentials
+# Database name: primary
 #
 #  id                      :integer          not null, primary key
 #  access_token            :string

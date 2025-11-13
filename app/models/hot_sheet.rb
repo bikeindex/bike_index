@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: hot_sheets
+# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  delivery_status   :string

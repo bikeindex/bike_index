@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: stolen_records
+# Database name: primary
 #
 #  id                             :integer          not null, primary key
 #  approved                       :boolean          default(FALSE), not null

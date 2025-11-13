@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: address_records
+# Database name: primary
 #
 #  id                         :bigint           not null, primary key
 #  city                       :string

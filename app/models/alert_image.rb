@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: alert_images
+# Database name: primary
 #
 #  id               :integer          not null, primary key
 #  image            :string

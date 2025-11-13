@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: organization_statuses
+# Database name: analytics
 #
 #  id                      :bigint           not null, primary key
 #  end_at                  :datetime

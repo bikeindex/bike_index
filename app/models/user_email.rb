@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: user_emails
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  confirmation_token :text

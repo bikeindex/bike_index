@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: model_attestations
+# Database name: primary
 #
 #  id                 :bigint           not null, primary key
 #  certification_type :string

@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: payments
+# Database name: primary
 #
 #  id                     :integer          not null, primary key
 #  amount_cents           :integer

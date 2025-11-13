@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: stripe_prices
+# Database name: primary
 #
 #  id               :bigint           not null, primary key
 #  active           :boolean          default(FALSE)

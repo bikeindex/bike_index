@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: components
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  component_model    :string(255)

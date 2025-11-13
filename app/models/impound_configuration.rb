@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: impound_configurations
+# Database name: primary
 #
 #  id                      :bigint           not null, primary key
 #  bulk_import_view        :boolean          default(FALSE)

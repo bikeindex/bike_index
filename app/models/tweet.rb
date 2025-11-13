@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: tweets
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  alignment          :string

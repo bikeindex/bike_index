@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: stripe_subscriptions
+# Database name: primary
 #
 #  id                     :bigint           not null, primary key
 #  end_at                 :datetime

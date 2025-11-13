@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: email_domains
+# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  data              :jsonb

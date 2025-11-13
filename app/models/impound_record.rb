@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: impound_records
+# Database name: primary
 #
 #  id                    :integer          not null, primary key
 #  city                  :text
