@@ -385,8 +385,6 @@ GEM
     http-parser (1.2.3)
       ffi-compiler (>= 1.0, < 2.0)
     http_parser.rb (0.6.0)
-    httparty (0.16.2)
-      multi_xml (>= 0.5.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     i18n-country-translations (1.4.1)
@@ -496,8 +494,6 @@ GEM
       railties (>= 3.0)
     msgpack (1.8.0)
     multi_json (1.15.0)
-    multi_xml (0.7.1)
-      bigdecimal (~> 3.1)
     multipart-post (2.4.1)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
@@ -919,7 +915,6 @@ DEPENDENCIES
   herb
   honeybadger
   hotwire-livereload (~> 1.4.1)
-  httparty
   i18n-country-translations
   i18n-js
   i18n-tasks
@@ -986,7 +981,6 @@ DEPENDENCIES
   stripe
   tailwindcss-rails
   terminal-notifier
-  thor
   translation
   turbo-rails
   turbo_tests

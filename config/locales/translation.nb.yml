@@ -1702,6 +1702,7 @@ nb:
             pkce.
           request_not_authorized: Request need to be authorized. Required parameter
             for authorizing request is missing or invalid.
+          invalid_code_challenge: Kodeutfordring er påkrevd.
         invalid_redirect_uri: Videresendings uri-en inkludert er ikke gyldig.
         unauthorized_client: Klienten er ikke autorisert til å utføre denne forespørselen
           ved å bruke denne metoden.
