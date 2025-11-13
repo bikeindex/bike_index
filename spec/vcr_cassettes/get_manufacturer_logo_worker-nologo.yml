@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://logo.clearbit.com/bbbbbbbbbbbbbbsafasds.net?size=400
+    uri: https://img.logo.dev/bbbbbbbbbbbbbbsafasds.net?fallback=404&size=400&token=<LOGO_API_TOKEN>
     body:
       encoding: US-ASCII
       string: ''
@@ -19,33 +19,29 @@ http_interactions:
       message: Not Found
     headers:
       Content-Type:
-      - text/plain; charset=utf-8
+      - application/json; charset=utf-8
       Content-Length:
-      - '10'
+      - '19'
       Connection:
       - keep-alive
       Date:
-      - Sat, 20 Sep 2025 16:40:04 GMT
-      X-Envoy-Response-Flags:
-      - "-"
-      Server:
-      - Clearbit
-      Strict-Transport-Security:
-      - max-age=63072000; includeSubDomains; preload
-      X-Content-Type-Options:
-      - nosniff
+      - Thu, 13 Nov 2025 16:58:15 GMT
+      Cache-Control:
+      - max-age=86400, stale-while-revalidate=600
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 5e9f822a188dc082efd0a9d3918e7402.cloudfront.net (CloudFront)
+      - 1.1 332ef4544bd8b531e8f11abaa4197c08.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
-      - SFO53-P5
+      - SFO5-P2
       X-Amz-Cf-Id:
-      - k2zVzQJGPgvE7Td0QjftFIBP1Sioj74OO_aB5-WYsLe4deWWR9KbYw==
+      - 1P4MiLnhSyg-pOxXSC-BY5aStO-TFHtfs1UPl_mGe2fCF-H71f0U_w==
+      Age:
+      - '944'
+      Vary:
+      - Origin
     body:
       encoding: UTF-8
-      string: 'Not Found
-
-        '
-  recorded_at: Sat, 20 Sep 2025 16:40:04 GMT
+      string: '{"err":"not found"}'
+  recorded_at: Thu, 13 Nov 2025 17:13:59 GMT
 recorded_with: VCR 6.3.1

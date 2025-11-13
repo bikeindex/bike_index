@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
+  let(:vcr_config) { {re_record_interval: 1.month, match_requests_on: [:method, :path]} }
 
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
@@ -10,17 +11,17 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
   end
 
   it "Adds a logo, sets source" do
-    VCR.use_cassette("get_manufacturer_logo_worker", re_record_interval: 1.month) do
+    VCR.use_cassette("get_manufacturer_logo_worker", vcr_config) do
       manufacturer = FactoryBot.create(:manufacturer, website: "https://trekbikes.com")
       described_class.new.perform(manufacturer.id)
       manufacturer.reload
       expect(manufacturer.logo).to be_present
-      expect(manufacturer.logo_source).to eq("Clearbit")
+      expect(manufacturer.logo_source).to eq("Logo.dev")
     end
   end
 
   it "Doesn't break if no logo present" do
-    VCR.use_cassette("get_manufacturer_logo_worker-nologo", re_record_interval: 1.month) do
+    VCR.use_cassette("get_manufacturer_logo_worker-nologo", vcr_config) do
       manufacturer = FactoryBot.create(:manufacturer, website: "bbbbbbbbbbbbbbsafasds.net")
       described_class.new.perform(manufacturer.id)
       manufacturer.reload
