@@ -1,9 +1,9 @@
-- if TwitterAccount.errored.any?
+- if TwitterAccount.active.errored.any?
   .row.mt-4.mb-4
     .alert.alert-danger.col-md-6.ml-auto.mr-auto
       %h4
         %strong.text-danger
-          = pluralize(TwitterAccount.errored.count, "Twitter account")
+          = pluralize(TwitterAccount.active.errored.count, "Twitter account")
         with errors
         %em.text-success
           = link_to "review errors", admin_twitter_accounts_path(sort: "last_error_at")
@@ -11,6 +11,6 @@
         This will prevent posting tweets for areas served by:
         %br
         %em
-          = TwitterAccount.errored.pluck(:screen_name).sort.join(", ")
+          = TwitterAccount.active.errored.pluck(:screen_name).sort.join(", ")
 
       = link_to "Log in with any of these accounts to refresh their credentials", "/auth/twitter", class: "btn btn-success"
