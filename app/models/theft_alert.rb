@@ -181,9 +181,9 @@ class TheftAlert < ApplicationRecord
     admin ? true : paid?
   end
 
-  # Probably don't want to activate
+  # Previously, required stolen_record_approved?
   def activateable?
-    activateable_except_approval? && stolen_record_approved?
+    activateable_except_approval?
   end
 
   def activating?

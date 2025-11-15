@@ -21,6 +21,9 @@ class Bikes::TheftAlertsController < Bikes::BaseController
     return unless setup_edit_template("alert_purchase_confirmation")
 
     @payment&.update_from_stripe!
+    if @payment.theft_alert&.activateable?
+      StolenBike::ActivateTheftAlertJob.perform_async(@payment.theft_alert.id)
+    end
   end
 
   def create
