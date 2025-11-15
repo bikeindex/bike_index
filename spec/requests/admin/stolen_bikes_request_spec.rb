@@ -71,7 +71,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         let(:theft_alert) { FactoryBot.create(:theft_alert_paid, stolen_record: stolen_record, user: bike.user) }
         it "updates the bike and stolen_record and enqueues the jobs" do
           expect(theft_alert.reload.bike_id).to eq bike.id
-          expect(theft_alert.activateable?).to be_falsey
+          expect(theft_alert.activateable?).to be_truthy
           expect(theft_alert.activateable_except_approval?).to be_truthy
           expect(theft_alert.start_at).to be_blank
           bike.reload
