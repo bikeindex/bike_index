@@ -130,4 +130,24 @@ RSpec.describe Integrations::BlueskyPoster do
       expect(bpi.compute_max_char).to eq 267
     end
   end
+
+  describe "#create_post" do
+    let(:bike) { FactoryBot.create(:stolen_bike, :blue_trek_930) }
+
+    it "creates a post on bluesky", vcr: true do
+      national_account = FactoryBot.build(:twitter_account_1, :active, :national, platform: :bluesky, id: 99)
+      national_account.save
+
+      integration = Integrations::BlueskyPoster.new(bike)
+      tweet = integration.create_post
+
+      expect(tweet).to be_an_instance_of(Tweet)
+      expect(tweet.kind).to eq("stolen_tweet")
+      expect(tweet.twitter_response).to be_an_instance_of(Hash)
+      expect(tweet.twitter_id).to be_present
+      expect(tweet.twitter_id).to start_with("at://")
+      expect(tweet.twitter_account).to eq(national_account)
+      expect(tweet.stolen_record).to eq(bike.current_stolen_record)
+    end
+  end
 end
