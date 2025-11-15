@@ -360,9 +360,7 @@ GEM
       thor
       tilt
     hashdiff (1.1.2)
-    herb (0.7.5)
-    herb (0.7.5-arm64-darwin)
-    herb (0.7.5-x86_64-linux-gnu)
+    herb (0.8.0)
     highline (3.1.2)
       reline
     honeybadger (5.27.0)
