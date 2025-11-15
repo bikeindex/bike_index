@@ -53,12 +53,13 @@ RSpec.describe AddressRecord, type: :model do
     end
 
     context "with address_record" do
-      let!(:obj) { FactoryBot.create(:user, :address_in_edmonton) }
+      let!(:obj) { FactoryBot.create(:user, :with_address_record, address_in: :edmonton) }
       let(:target_attrs) do
         {
           latitude: 53.5069377,
           longitude: -113.5508765,
           street: "9330 Groat Rd NW",
+          street_2: nil,
           postal_code: "AB T6G 2B3",
           city: "Edmonton",
           region_record_id: obj.address_record.region_record_id,
@@ -73,6 +74,7 @@ RSpec.describe AddressRecord, type: :model do
       end
 
       context "passed address_record" do
+        let!(:obj) { FactoryBot.create(:bike, :with_address_record, address_in: :edmonton) }
         it "returns target_attrs" do
           expect(described_class.attrs_to_duplicate(obj.address_record)).to match_hash_indifferently target_attrs
         end

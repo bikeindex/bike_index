@@ -104,27 +104,32 @@ jobs:
       #   uses: paambaati/codeclimate-action@v9.0.0
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}
           path: tmp/rspec-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}.xml
 
-  aggregate_test_results:
-    name: "Test Report"
-    runs-on: ubuntu-latest
-    needs: test
-    if: always()
-    steps:
-      - name: Download all test results
-        uses: actions/download-artifact@v4
-        with:
-          pattern: test-results-*
-          path: test-results
+  # Commenting out for now - it doesn't work for forked pull requests,
+  # Which means forked PRs always fail
+  # Also - I want to fix the thousands separator
+  # github.com/EnricoMi/publish-unit-test-result-action/issues/698
+  #
+  # aggregate_test_results:
+  #   name: "Test Report"
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   if: always()
+  #   steps:
+  #     - name: Download all test results
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: test-results-*
+  #         path: test-results
 
-      - name: Publish combined test results
-        id: test-results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: test-results/**/*.xml
-          json_thousands_separator: "," # Can't get this to work :/
-          comment_mode: off
+  #     - name: Publish combined test results
+  #       id: test-results
+  #       uses: EnricoMi/publish-unit-test-result-action@v2
+  #       with:
+  #         files: test-results/**/*.xml
+  #         json_thousands_separator: "," # Can't get this to work :/
+  #         comment_mode: off

@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: bike_versions
+# Database name: primary
 #
 #  id                        :bigint           not null, primary key
 #  belt_drive                :boolean

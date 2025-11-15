@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: states
+# Database name: primary
 #
 #  id           :integer          not null, primary key
 #  abbreviation :string(255)

@@ -189,8 +189,6 @@ RSpec.describe OrganizedHelper, type: :helper do
     it "does not include" do
       expect(include_field_reg_phone?(organization)).to be_falsey
       expect(include_field_reg_phone?(organization, user)).to be_falsey
-      expect(include_field_reg_address?(organization)).to be_falsey
-      expect(include_field_reg_address?(organization, user)).to be_falsey
       expect(include_field_reg_extra_registration_number?(organization)).to be_falsey
       expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
       # the labels work with or without an organization
@@ -209,8 +207,6 @@ RSpec.describe OrganizedHelper, type: :helper do
       it "includes" do
         expect(include_field_reg_phone?(organization)).to be_truthy
         expect(include_field_reg_phone?(organization, user)).to be_truthy
-        expect(include_field_reg_address?(organization)).to be_truthy
-        expect(include_field_reg_address?(organization, user)).to be_truthy
         expect(include_field_reg_extra_registration_number?(organization)).to be_truthy
         expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
         # And test the labels
@@ -228,8 +224,6 @@ RSpec.describe OrganizedHelper, type: :helper do
           expect(user.phone).to be_present
           expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
           expect(include_field_reg_phone?(organization, user)).to be_falsey
-          expect(include_field_reg_address?(organization, user)).to be_truthy
-          expect(include_field_reg_address?(nil, user)).to be_falsey
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
           expect(include_field_reg_student_id?(organization, user)).to be_truthy
         end
@@ -241,20 +235,17 @@ RSpec.describe OrganizedHelper, type: :helper do
           it "is falsey with user" do
             expect(include_field_reg_phone?(organization)).to be_truthy
             expect(include_field_reg_phone?(organization, user)).to be_truthy # Purely based on whether user has phone
-            expect(include_field_reg_address?(organization)).to be_truthy
-            expect(include_field_reg_address?(organization, user)).to be_truthy
             expect(include_field_reg_organization_affiliation?(organization)).to be_truthy
             expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
             expect(include_field_reg_student_id?(organization)).to be_truthy
             expect(include_field_reg_student_id?(organization, user)).to be_truthy
           end
           context "with registration_info" do
-            let(:user) { FactoryBot.create(:user_confirmed, :address_in_edmonton, phone: "7773335555", address_set_manually: true) }
+            let(:user) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, phone: "7773335555", address_set_manually: true) }
             let(:registration_info) { {student_id: "12", organization_affiliation: "staff"} }
             it "is falsey" do
               expect(user.reload.address_record.street).to be_present
               expect(include_field_reg_phone?(organization, user)).to be_falsey # Purely based on whether user has phone
-              expect(include_field_reg_address?(organization, user)).to be_falsey
               expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
               expect(include_field_reg_student_id?(organization, user)).to be_falsey
               # Each bike needs to have these fields - regardless of user_registration_organization
@@ -285,28 +276,6 @@ RSpec.describe OrganizedHelper, type: :helper do
             expect(include_field_reg_bike_sticker?(organization, user, true)).to be_truthy
           end
         end
-      end
-    end
-  end
-
-  describe "registration_field_address_placeholder and registration_address_required_below_helper" do
-    it "is complete address" do
-      expect(registration_field_address_placeholder).to eq "Street address"
-      expect(registration_address_required_below_helper).to be_nil
-    end
-    context "school" do
-      let(:organization) { Organization.new(kind: :school) }
-      it "is Campus address" do
-        expect(registration_field_address_placeholder(organization)).to eq "Campus mailing address"
-        expect(registration_address_required_below_helper(organization)).to be_nil
-      end
-    end
-    describe "reg_address organization" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: :law_enforcement, enabled_feature_slugs: ["reg_address"]) }
-      let(:target) { "<span class=\"below-input-help text-warning\">Your full address is required by #{organization.short_name}</span>" }
-      it "returns" do
-        expect(registration_address_required_below_helper(organization)).to eq target
-        expect(registration_field_address_placeholder(organization)).to eq "Street address"
       end
     end
   end

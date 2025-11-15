@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: bike_organizations
+# Database name: primary
 #
 #  id                   :integer          not null, primary key
 #  can_not_edit_claimed :boolean          default(FALSE), not null

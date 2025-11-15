@@ -69,6 +69,8 @@ RSpec.describe OrganizationFeature, type: :model do
         bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field.to_sym)
         if bike_attr == "bike_sticker" # Because it accepts arguments, I guess? it fails
           expect(bike.bike_sticker).to be_blank
+        elsif bike_attr == "address"
+          expect(bike.address_record).to be_blank
         else
           expect(bike.send(bike_attr)).to be_blank
         end

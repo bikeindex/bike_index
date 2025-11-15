@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: parking_notifications
+# Database name: primary
 #
 #  id                    :integer          not null, primary key
 #  accuracy              :float

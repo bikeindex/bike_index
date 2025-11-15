@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: impound_record_updates
+# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  kind              :integer

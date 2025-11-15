@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: twitter_accounts
+# Database name: primary
 #
 #  id                   :integer          not null, primary key
 #  active               :boolean          default(FALSE), not null

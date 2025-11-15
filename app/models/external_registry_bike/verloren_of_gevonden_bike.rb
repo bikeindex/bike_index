@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: external_registry_bikes
+# Database name: primary
 #
 #  id                        :integer          not null, primary key
 #  category                  :string

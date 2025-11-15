@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: ambassador_tasks
+# Database name: primary
 #
 #  id          :integer          not null, primary key
 #  description :string           default(""), not null

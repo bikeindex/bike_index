@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: logged_searches
+# Database name: analytics
 #
 #  id                :bigint           not null, primary key
 #  city              :string

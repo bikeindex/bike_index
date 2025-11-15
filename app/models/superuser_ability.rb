@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: superuser_abilities
+# Database name: primary
 #
 #  id              :bigint           not null, primary key
 #  action_name     :string

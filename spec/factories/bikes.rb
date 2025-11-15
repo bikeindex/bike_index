@@ -9,7 +9,6 @@ FactoryBot.define do
     primary_frame_color { Color.black }
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }
-    skip_geocoding { true }
 
     trait :with_primary_activity do
       primary_activity { FactoryBot.create(:primary_activity) }
@@ -20,6 +19,19 @@ FactoryBot.define do
         FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike)
         bike.reload
         bike.save
+      end
+    end
+
+    trait :with_address_record do
+      transient do
+        address_in { :new_york }
+        address_record_kind { :bike }
+      end
+
+      address_set_manually { true } # Required to set the address_record coordinates
+
+      address_record do
+        FactoryBot.build(:address_record, address_in, kind: address_record_kind, bike: instance, user:)
       end
     end
 
@@ -79,7 +91,7 @@ FactoryBot.define do
         claimed { true }
       end
       creator { user }
-      owner_email { user.email }
+      owner_email { user&.email }
       created_at { claimed_at }
     end
 

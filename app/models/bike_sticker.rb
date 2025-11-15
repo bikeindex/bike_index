@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: bike_stickers
+# Database name: primary
 #
 #  id                        :integer          not null, primary key
 #  claimed_at                :datetime

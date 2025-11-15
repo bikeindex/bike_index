@@ -83,15 +83,7 @@
                 %small= link_to search_emoji, admin_bikes_path(search_manufacturer: bike.mnfg_name), class: "display-mnfg-link display-sortable-link"
               %td.d-none.d-lg-table-cell
                 .less-strong-hold
-                  - if bike.example
-                    %small.mr-1.text-danger{title: "example (aka test)"}
-                      test
-                  - if bike.likely_spam?
-                    %small.mr-1.text-danger{title: "Likely SPAM"}
-                      spam
-                  - if bike.deleted?
-                    %small.mr-1.text-danger
-                      Deleted&nbsp;<span class="convertTime">#{l bike.deleted_at, format: :convert_time}</span>
+                  = render Badge::BikeHiddenAdminExplanation::Component.new(bike:)
                   = [bike.year, bike.frame_model_truncated].join(' ')
                   = "(#{bike.type})" unless bike.type == 'bike'
                   - if bike.stolen_recovery?
@@ -105,8 +97,6 @@
                       = link_to bike.paint_description, edit_admin_paint_url(bike.paint)
                   - if bike.status_stolen?
                     %span.text-danger.less-strong-right stolen
-                  - if bike.user_hidden
-                    %span.small.text-warning.less-strong-right user hidden
               %td.admin-bike-table-serial-cell
                 %small.less-strong
                   = bike.serial_number

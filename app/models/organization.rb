@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: organizations
+# Database name: primary
 #
 #  id                              :integer          not null, primary key
 #  access_token                    :string(255)

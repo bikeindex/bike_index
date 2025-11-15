@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: primary_activities
+# Database name: primary
 #
 #  id                         :bigint           not null, primary key
 #  family                     :boolean

@@ -1126,7 +1126,6 @@ en:
       additional_serial_sticker_number: Additional serial/sticker number
       affiliation: "%{org_name} affiliation"
       are_you_certain: Are you certain?
-      city: City
       electric_motorized: Electric (motorized)
       enter_bike_type_details_html: Enter %{type_html} details
       enter_found_bike_type_details_html: Enter Found %{type_html} details
@@ -1136,7 +1135,6 @@ en:
       im_100_sure: I'm 100% sure
       is_a_handmade_frame: Is a handmade frame
       it_probably_has_a_serial_number: It probably has a serial number.
-      mailing_address: Mailing address
       manufacturer: Manufacturer
       missing_serial: Missing serial
       model_year: Model year
@@ -1157,7 +1155,6 @@ en:
         Every bike has a unique serial number, it's how they are identified. To learn
         more or see some examples, go to %{serial_page_link} <small>(opens in a separate
         window)</small>.
-      state: State
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       student_id: Student ID
       this_is_a: This is a
@@ -1173,7 +1170,6 @@ en:
       without_serial_html: This %{type_html} was made without a serial
       without_serial_number_html: This <span %{type_html} was made without a serial
         number
-      zipcode: Postal code
     organization_stolen_message:
       report_link_text: at this link
       report_the_theft_to_the_organization_html: >-
@@ -1347,9 +1343,7 @@ en:
       add_start: Add version start date
       bike_name: Bike Name
       bike_registration: Edit the %{bike_type} registration here
-      choose_country: Choose country
       choose_material: Choose material
-      city: City
       existing_stickers: Existing stickers
       frame_size: Frame size
       general_description: General description
@@ -1364,8 +1358,6 @@ en:
       remove_end: Remove end
       remove_start: Remove start
       seat_tube_length: Seat tube length
-      state: State
-      street: Street
       submit_manufacturer_correction: Submit Manufacturer Correction
       submit_serial_correction: Submit serial correction
       submit_update: Submit update
@@ -1379,7 +1371,6 @@ en:
         original %{bike_type} registration. %{bike_registration_link}.
       updated_serial: Updated serial
       version_name: Version Name
-      zipcode: Postal code
     bike_fields:
       primary_activity:
         choose_activity: Choose activity
@@ -4276,7 +4267,6 @@ en:
       model_year: Model year
       optional_upload_a_photo: Optional - upload a photo
       other_manufacturer: Other manufacturer
-      owners_mailing_address: Owner's mailing address
       police_report_number: Police report number
       receive_notifications_from_bike_index: Receive notifications from the Index
         about this stolen %{bike_type}
@@ -4315,7 +4305,6 @@ en:
       choose_handlebar: Choose handlebar
       choose_material: Choose material
       choose_photo: Choose photo
-      city: City
       frame_color: Frame color
       image_has_been_uploaded: Image has been uploaded
       manufacturer_name: Manufacturer name
@@ -4325,7 +4314,6 @@ en:
       other_defining_features: Other defining features
       other_manufacturer: Other manufacturer
       owners_email_address: Owner's email address
-      owners_mailing_address: Owner's mailing address
       owners_phone: Owner's phone
       primary_frame_material: Primary frame material
       register_this: Register this
@@ -4333,14 +4321,12 @@ en:
       secondary_color: Secondary color
       select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
         listed
-      state: State
       sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       student_id: Student ID
       third_color: Third color
       unknown_serial: Unknown serial
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
-      zipcode: Postal Code
     new:
       bike_index_for_organizations: Bike Index for organizations
     new_form:

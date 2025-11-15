@@ -4,6 +4,56 @@ class BulkImportJob < ApplicationJob
   MAX_LINES = 25_100
   sidekiq_options retry: false
 
+  class << self
+    # This is a little gross. It was added in PR #2911 when adding address records to bikes
+    def address_record_attributes(address_string, country_id = nil)
+      return {} if address_string.blank?
+
+      address_record_attributes = country_id.present? ? {country: country_id} : {}
+
+      address_parts = address_string.split(",").map(&:strip)
+      street, city, region_postal, country = if address_parts.count < 3
+        region_postal = (address_parts.count == 2) ? address_parts.last : nil
+        [nil, address_parts.first, region_postal, nil]
+      else
+        address_array_from_parts(address_parts)
+      end
+      address_record_attributes[:street] = street
+      address_record_attributes[:city] = city
+      address_record_attributes[:country] = country if country.present?
+      address_record_attributes.merge!(region_and_postal(region_postal)) if region_postal.present?
+
+      {address_record_attributes:}
+    end
+
+    private
+
+    def address_array_from_parts(address_parts)
+      country = if address_parts.last.downcase == "usa"
+        address_parts.pop # remove and ignore the country
+        Country.united_states_id
+      elsif !address_parts.last.match?(/\d/)
+        address_parts.pop
+      end
+
+      # Maybe don't need to check for number match here?
+      region_postal = address_parts.pop # if address_parts.last.match?(/\d/)
+      city = address_parts.pop # if address_parts.count > 1
+
+      [address_parts.any? ? address_parts.join(", ") : nil, city, region_postal, country]
+    end
+
+    def region_and_postal(region_postal)
+      return {region_string: region_postal} unless region_postal.match?(/\d/)
+
+      parts = region_postal.split(" ")
+      postal_code = parts.pop
+      postal_code = "#{parts.pop} #{postal_code}" if parts.last.match?(/\d/)
+
+      {region_string: parts.join(" "), postal_code:}
+    end
+  end
+
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
 
   def perform(bulk_import_id)
@@ -19,6 +69,8 @@ class BulkImportJob < ApplicationJob
       return @bulk_import.add_file_error("CSV is too big! Max allowed size is #{MAX_LINES - 100} lines")
     end
 
+    # Used in address_record_attributes
+    @country_id = @bulk_import.organization&.country_id
     process_csv(open_file)
 
     @bulk_import.unlink_tempfile
@@ -28,6 +80,8 @@ class BulkImportJob < ApplicationJob
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
     @bulk_import.update_attribute :import_errors, (@bulk_import.import_errors || {}).merge("line" => @line_errors.compact)
   end
+
+  private
 
   def process_csv(open_file)
     @line_errors = @bulk_import.line_errors || [] # We always need line_errors
@@ -108,14 +162,13 @@ class BulkImportJob < ApplicationJob
         description: row[:description],
         frame_size: row[:frame_size],
         phone: row[:phone],
-        address: row[:address],
         bike_sticker: row[:bike_sticker],
         user_name: row[:owner_name],
         extra_registration_number: row[:secondary_serial],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id,
         no_duplicate: @bulk_import.no_duplicate
-      },
+      }.merge(self.class.address_record_attributes(row[:address], @country_id)),
       impound_record: impound_attrs || {},
       stolen_record: @bulk_import.stolen_record_attrs,
       # Photo need to be an array - only include if photo has a value
@@ -149,8 +202,6 @@ class BulkImportJob < ApplicationJob
     validate_headers(headers)
     headers
   end
-
-  private
 
   def count_file_lines(file)
     line_count = 0

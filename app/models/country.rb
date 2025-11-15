@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: countries
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  iso        :string(255)
@@ -9,6 +10,8 @@
 #  updated_at :datetime         not null
 #
 class Country < ApplicationRecord
+  include FriendlyNameFindable
+
   UNITED_STATES_ID = Rails.env.test? ? nil : 230
   CANADA_ID = Rails.env.test? ? nil : 38
 
@@ -28,7 +31,9 @@ class Country < ApplicationRecord
     def friendly_find(name_or_iso)
       name_or_iso = name_or_iso&.to_s&.strip&.downcase
       return if name_or_iso.blank?
+      return where(id: name_or_iso).first if integer_string?(name_or_iso)
       return united_states if %w[us usa].include?(name_or_iso)
+      return canada if name_or_iso == "ca"
 
       find_by("lower(name) = ? or lower(iso) = ?", name_or_iso, name_or_iso)
     end

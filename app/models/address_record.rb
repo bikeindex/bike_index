@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: address_records
+# Database name: primary
 #
 #  id                         :bigint           not null, primary key
 #  city                       :string
@@ -12,6 +13,7 @@
 #  publicly_visible_attribute :integer
 #  region_string              :string
 #  street                     :string
+#  street_2                   :string
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  bike_id                    :bigint
@@ -30,7 +32,7 @@ class AddressRecord < ApplicationRecord
   KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
-  ADDRESS_ATTRS = %i[street city region_record_id postal_code country_id latitude longitude]
+  ADDRESS_ATTRS = %i[street street_2 city region_record_id postal_code country_id latitude longitude]
 
   enum :kind, KIND_ENUM
   enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
@@ -55,7 +57,7 @@ class AddressRecord < ApplicationRecord
 
     def permitted_params
       # user_id and kind should be set manually!
-      %i[city postal_code region_string street country_id region_record_id].freeze
+      %i[city postal_code region_string street street_2 country_id region_record_id].freeze
     end
 
     def attrs_to_duplicate(obj)
@@ -93,6 +95,15 @@ class AddressRecord < ApplicationRecord
     def default_visibility_for(kind)
       (kind == "organization") ? :street : :postal_code
     end
+
+    def permitted_visible_attribute(string_or_sym, default: :postal_code)
+      if string_or_sym.present?
+        target_attr = string_or_sym&.to_sym
+        return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
+      end
+
+      default.to_sym
+    end
   end
 
   def to_coordinates
@@ -101,7 +112,7 @@ class AddressRecord < ApplicationRecord
 
   # Enable assigning string countries
   def country=(val)
-    self.country_id = if val.is_a?(String)
+    self.country_id = if val.is_a?(String) || val.is_a?(Numeric)
       Country.friendly_find_id(val)
     elsif val.respond_to?(:id)
       val.id
@@ -115,9 +126,10 @@ class AddressRecord < ApplicationRecord
   def address_hash(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     include_country = include_country?(render_country:, current_country_id:, current_country_iso:)
     country_hash = (include_country && country&.name.present?) ? {country: country.name} : {}
-    visible_attr = permitted_visible_attribute(visible_attribute)
+    visible_attr = self.class.permitted_visible_attribute(visible_attribute, default: publicly_visible_attribute)
     {
       street: %i[street].include?(visible_attr) ? street : nil,
+      street_2: %i[street].include?(visible_attr) ? street_2 : nil,
       city:,
       region:,
       postal_code: %i[street postal_code].include?(visible_attr) ? postal_code : nil,
@@ -202,22 +214,16 @@ class AddressRecord < ApplicationRecord
     address_changed?
   end
 
-  def permitted_visible_attribute(string_or_sym)
-    if string_or_sym.present?
-      target_attr = string_or_sym&.to_sym
-      return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
-    end
-    publicly_visible_attribute.to_sym
-  end
-
   def set_calculated_attributes
     self.publicly_visible_attribute ||= self.class.default_visibility_for(kind)
 
-    self.street = street.blank? ? nil : street.strip
-    self.postal_code = postal_code.blank? ? nil : postal_code.strip
-    self.city = city.blank? ? nil : city.strip
-    self.neighborhood = neighborhood.blank? ? nil : neighborhood.strip
+    self.street = InputNormalizer.string(street)
+    self.street_2 = InputNormalizer.string(street_2)
+    self.postal_code = InputNormalizer.string(postal_code)
+    self.city = InputNormalizer.string(city)
+    self.neighborhood = InputNormalizer.string(neighborhood)
     self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
+
     assign_region_record
   end
 

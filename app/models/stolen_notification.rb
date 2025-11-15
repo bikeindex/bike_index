@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: stolen_notifications
+# Database name: primary
 #
 #  id                   :integer          not null, primary key
 #  kind                 :integer

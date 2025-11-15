@@ -1,14 +1,17 @@
 FactoryBot.define do
   factory :address_record do
-    city { "Davis" }
-    region_record { FactoryBot.create(:state_california) }
-    country { Country.united_states }
-    street { "1 Shields Ave" }
-    postal_code { "95616" }
-    latitude { 38.5449065 }
-    longitude { -121.7405167 }
-
+    davis
     skip_geocoding { true }
+
+    trait :davis do
+      city { "Davis" }
+      region_record { FactoryBot.create(:state_california) }
+      country { Country.united_states }
+      postal_code { "95616" }
+      street { "One Shields Ave" }
+      latitude { 38.5449065 }
+      longitude { -121.7405167 }
+    end
 
     trait :amsterdam do
       latitude { 52.37403 }

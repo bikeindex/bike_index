@@ -3,6 +3,7 @@
 # == Schema Information
 #
 # Table name: organization_features
+# Database name: primary
 #
 #  id            :integer          not null, primary key
 #  amount_cents  :integer

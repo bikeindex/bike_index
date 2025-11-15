@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: marketplace_messages
+# Database name: primary
 #
 #  id                     :bigint           not null, primary key
 #  body                   :text
@@ -147,6 +148,12 @@ class MarketplaceMessage < ApplicationRecord
 
   def buyer_seller_message?
     BUYER_SELLER_MESSAGE_KINDS.include?(kind)
+  end
+
+  def buyer_id
+    return unless buyer_seller_message?
+
+    sender_buyer? ? sender_id : buyer_id
   end
 
   # TODO: do we need all these other_user methods?

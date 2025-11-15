@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: hot_sheet_configurations
+# Database name: primary
 #
 #  id                         :bigint           not null, primary key
 #  is_on                      :boolean          default(FALSE)

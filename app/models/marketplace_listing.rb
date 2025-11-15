@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: marketplace_listings
+# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  amount_cents      :integer

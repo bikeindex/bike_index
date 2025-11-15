@@ -19,6 +19,7 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
     end
     create_user_registration_organizations(bike)
     update_ownership(bike)
+    update_coordinates(bike)
     unless skip_user_update
       # Update the user to update any user alerts relevant to bikes
       ::Callbacks::AfterUserChangeJob.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
@@ -86,6 +87,15 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
   # Bump registration_info attributes on ownerships
   def update_ownership(bike)
     bike.current_ownership&.update(updated_at: Time.current)
+  end
+
+  # If the bike address_record was geocoded after save, update the bike
+  def update_coordinates(bike)
+    return if bike.address_record.blank? ||
+      %w[bike_update initial_creation].exclude?(BikeServices::CalculateLocation.registration_address_source(bike)) ||
+      bike.address_record.latitude == bike.latitude && bike.address_record.longitude == bike.longitude
+
+    bike.update_columns(latitude: bike.address_record.latitude, longitude: bike.address_record.longitude)
   end
 
   def create_user_registration_organizations(bike)

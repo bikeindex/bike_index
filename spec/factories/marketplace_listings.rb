@@ -8,12 +8,22 @@ FactoryBot.define do
 
     status { "draft" }
 
+    latitude { address_record&.latitude }
+    longitude { address_record&.longitude }
+
     trait :with_address_record do
-      address_record { FactoryBot.build(:address_record, kind: :marketplace_listing, user: seller) }
+      transient do
+        address_in { :new_york }
+      end
+
+      address_record do
+        FactoryBot.build(:address_record, address_in, kind: :marketplace_listing, bike: item, user: seller)
+      end
     end
 
     trait :for_sale do
       with_address_record
+
       published_at { Time.current - 1.minute }
       status { :for_sale }
     end
