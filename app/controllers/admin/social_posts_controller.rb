@@ -1,31 +1,31 @@
-class Admin::TweetsController < Admin::BaseController
+class Admin::SocialPostsController < Admin::BaseController
   include SortableTable
 
   before_action :find_tweet, except: [:new, :create, :index]
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @tweets = pagy(matching_tweets
+    @pagy, @social_posts = pagy(matching_tweets
       .includes(:twitter_account, :public_images, :stolen_record, :retweets, :original_tweet)
       .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
   def show
-    if @tweet.imported_tweet?
+    if @social_post.imported_tweet?
       redirect_to edit_admin_tweet_path(params[:id])
       nil
     end
   end
 
   def edit
-    unless @tweet.imported_tweet?
+    unless @social_post.imported_tweet?
       redirect_to admin_tweet_path(params[:id])
       nil
     end
   end
 
   def update
-    if @tweet.update(permitted_parameters)
+    if @social_post.update(permitted_parameters)
       flash[:notice] = "Tweet saved!"
       redirect_to edit_admin_tweet_url
     else
@@ -34,28 +34,28 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def new
-    @tweet ||= Tweet.new(kind: "app_tweet")
+    @social_post ||= Tweet.new(kind: "app_tweet")
   end
 
   def create
-    @tweet = Tweet.new(permitted_parameters)
-    if @tweet.kind == "imported_tweet"
-      @tweet.twitter_account_id = nil
-      @tweet.body = nil # Blank the attributes that may have been accidentally passed
-      @tweet.twitter_response = fetch_twitter_response(@tweet.twitter_id)
-      @tweet.save
-    elsif @tweet.kind == "app_tweet"
-      @tweet.twitter_id = nil
-      @tweet.save
-      if @tweet.id.present?
-        @tweet.send_tweet
-        retweet_accounts.each { |twitter_account| @tweet.retweet_to_account(twitter_account) }
+    @social_post = Tweet.new(permitted_parameters)
+    if @social_post.kind == "imported_tweet"
+      @social_post.twitter_account_id = nil
+      @social_post.body = nil # Blank the attributes that may have been accidentally passed
+      @social_post.twitter_response = fetch_twitter_response(@social_post.twitter_id)
+      @social_post.save
+    elsif @social_post.kind == "app_tweet"
+      @social_post.twitter_id = nil
+      @social_post.save
+      if @social_post.id.present?
+        @social_post.send_tweet
+        retweet_accounts.each { |twitter_account| @social_post.retweet_to_account(twitter_account) }
       end
     else
-      raise StandardError, "Don't know how to create tweet with kind: '#{@tweet.kind}'"
+      raise StandardError, "Don't know how to create tweet with kind: '#{@social_post.kind}'"
     end
-    if @tweet.id.present?
-      redirect_to edit_admin_tweet_url(id: @tweet.id)
+    if @social_post.id.present?
+      redirect_to edit_admin_tweet_url(id: @social_post.id)
     else
       flash[:error] ||= "Unable to create tweet"
       render action: :new
@@ -63,12 +63,12 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def destroy
-    if @tweet.present? && @tweet.destroy
+    if @social_post.present? && @social_post.destroy
       flash[:info] = "Tweet deleted."
       redirect_to admin_tweets_url
     else
       flash[:error] = "Could not delete tweet."
-      redirect_to edit_admin_tweet_url(@tweet.id)
+      redirect_to edit_admin_tweet_url(@social_post.id)
     end
   end
 
@@ -95,7 +95,7 @@ class Admin::TweetsController < Admin::BaseController
     tweets = tweets.public_send(@search_kind) unless @search_kind == "all"
 
     if params[:search_twitter_account_id].present?
-      @twitter_account = TwitterAccount.friendly_find(params[:search_twitter_account_id])
+      @twitter_account = SocialAccount.friendly_find(params[:search_twitter_account_id])
       tweets = tweets.where(twitter_account_id: @twitter_account.id) if @twitter_account.present?
     end
     tweets = tweets.admin_search(params[:query]) if params[:query].present?
@@ -108,17 +108,17 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def find_tweet
-    @tweet ||= Tweet.friendly_find(params[:id])
-    return @tweet if @tweet.present?
+    @social_post ||= Tweet.friendly_find(params[:id])
+    return @social_post if @social_post.present?
 
     raise ActiveRecord::RecordNotFound
   end
 
   def fetch_twitter_response(tweet_id)
-    TwitterAccount.default_account.get_tweet(tweet_id).as_json
+    SocialAccount.default_account.get_tweet(tweet_id).as_json
   end
 
   def retweet_accounts
-    (params[:twitter_account_ids] || []).map { |id| TwitterAccount.friendly_find(id) }
+    (params[:twitter_account_ids] || []).map { |id| SocialAccount.friendly_find(id) }
   end
 end

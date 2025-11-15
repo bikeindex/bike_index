@@ -1,41 +1,41 @@
 # == Schema Information
 #
-# Table name: tweets
+# Table name: social_posts
 # Database name: primary
 #
-#  id                 :integer          not null, primary key
-#  alignment          :string
-#  body               :text
-#  body_html          :text
-#  image              :string
-#  kind               :integer
-#  twitter_response   :json
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  original_tweet_id  :integer
-#  stolen_record_id   :integer
-#  twitter_account_id :integer
-#  twitter_id         :string
+#  id                :integer          not null, primary key
+#  alignment         :string
+#  body              :text
+#  body_html         :text
+#  image             :string
+#  kind              :integer
+#  platform_response :json
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  original_post_id  :integer
+#  stolen_record_id  :integer
+#  social_account_id :integer
+#  platform_id       :string
 #
 # Indexes
 #
-#  index_tweets_on_original_tweet_id   (original_tweet_id)
-#  index_tweets_on_stolen_record_id    (stolen_record_id)
-#  index_tweets_on_twitter_account_id  (twitter_account_id)
+#  index_social_posts_on_original_post_id   (original_post_id)
+#  index_social_posts_on_stolen_record_id   (stolen_record_id)
+#  index_social_posts_on_social_account_id  (social_account_id)
 #
-class Tweet < ApplicationRecord
-  KIND_ENUM = {stolen_tweet: 0, imported_tweet: 1, app_tweet: 2}.freeze
+class SocialPost < ApplicationRecord
+  KIND_ENUM = {stolen_post: 0, imported_post: 1, app_post: 2}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
-  validates :twitter_id, uniqueness: true, allow_blank: true
+  validates :platform_id, uniqueness: true, allow_blank: true
   has_many :public_images, as: :imageable, dependent: :destroy
 
-  belongs_to :twitter_account
+  belongs_to :social_account
   belongs_to :stolen_record
 
-  belongs_to :original_tweet, class_name: "Tweet"
-  has_many :retweets,
-    foreign_key: :original_tweet_id,
-    class_name: "Tweet",
+  belongs_to :original_post, class_name: "SocialPost", foreign_key: :original_post_id
+  has_many :reposts,
+    foreign_key: :original_post_id,
+    class_name: "SocialPost",
     dependent: :destroy
 
   mount_uploader :image, ImageUploader
@@ -44,9 +44,9 @@ class Tweet < ApplicationRecord
 
   enum :kind, KIND_ENUM
 
-  scope :retweet, -> { where.not(original_tweet: nil) }
-  scope :not_retweet, -> { where(original_tweet: nil) }
-  scope :not_stolen, -> { where.not(kind: "stolen_tweet") }
+  scope :repost, -> { where.not(original_post: nil) }
+  scope :not_repost, -> { where(original_post: nil) }
+  scope :not_stolen, -> { where.not(kind: "stolen_post") }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -56,7 +56,7 @@ class Tweet < ApplicationRecord
     return nil if id.blank?
 
     id = id.to_s
-    query = (id.length > 15) ? {twitter_id: id} : {id: id}
+    query = (id.length > 15) ? {platform_id: id} : {id: id}
     order(created_at: :desc).find_by(query)
   end
 
@@ -76,8 +76,8 @@ class Tweet < ApplicationRecord
     text = str.strip
     # If passed a number, assume it is a bike ID and search for that bike_id
     if text.is_a?(Integer) || text.match(/\A\d+\z/).present?
-      if text.to_i > 2147483647 # max rails integer, assume it's a twitter_id instead
-        return where("twitter_id ILIKE ?", "%#{text}%")
+      if text.to_i > 2147483647 # max rails integer, assume it's a platform_id instead
+        return where("platform_id ILIKE ?", "%#{text}%")
       else
         return includes(:stolen_record).where(stolen_records: {bike_id: text})
       end
@@ -86,40 +86,40 @@ class Tweet < ApplicationRecord
   end
 
   # TODO: Add actual testing of this. It isn't tested right now, sorry :/
-  def send_tweet
-    return true unless app_tweet? && twitter_response.blank?
+  def send_post
+    return true unless app_post? && platform_response.blank?
 
     if image.present?
       Tempfile.open("foto.jpg") do |foto|
         foto.binmode
         foto.write open_image.read # TODO: Refactor this.
         foto.rewind
-        tweeted = twitter_account.tweet(body, foto)
-        update(twitter_response: tweeted.as_json)
+        tweeted = social_account.tweet(body, foto)
+        update(platform_response: tweeted.as_json)
       end
     else
-      tweeted = twitter_account.tweet(body)
-      update(twitter_response: tweeted.as_json)
+      tweeted = social_account.tweet(body)
+      update(platform_response: tweeted.as_json)
     end
     tweeted
   end
 
   # TODO: Add actual testing of this. It isn't tested right now, sorry :/
-  def retweet_to_account(retweet_account)
-    return nil if retweet_account.id.to_i == twitter_account_id.to_i
+  def repost_to_account(retweet_account)
+    return nil if retweet_account.id.to_i == social_account_id.to_i
 
-    posted_retweet = retweet_account.retweet(twitter_id)
-    return nil if posted_retweet.blank?
+    posted_repost = retweet_account.repost(platform_id)
+    return nil if posted_repost.blank?
 
-    retweet = Tweet.new(
-      twitter_id: posted_retweet.id,
-      twitter_account_id: retweet_account.id,
+    repost = SocialPost.new(
+      platform_id: posted_repost.id,
+      social_account_id: retweet_account.id,
       stolen_record_id: stolen_record_id,
-      original_tweet_id: id
+      original_post_id: id
     )
 
-    unless retweet.save
-      retweet_account.set_error(retweet.errors.full_messages.to_sentence)
+    unless repost.save
+      retweet_account.set_error(repost.errors.full_messages.to_sentence)
     end
     retweet
   end
@@ -136,73 +136,73 @@ class Tweet < ApplicationRecord
     stolen_record&.bike
   end
 
-  def retweet?
-    original_tweet.present?
+  def repost?
+    original_post.present?
   end
 
   def to_param
-    twitter_id
+    platform_id
   end
 
   def set_calculated_attributes
     self.kind ||= calculated_kind
-    if imported_tweet?
+    if imported_post?
       self.body_html ||= self.class.auto_link_text(trh[:text]) if trh.dig(:text).present?
       self.alignment ||= VALID_ALIGNMENTS.first
       unless VALID_ALIGNMENTS.include?(alignment)
         errors.add "#{alignment} is not one of valid alignments: #{VALID_ALIGNMENTS}"
       end
     else
-      if kind == "app_tweet" && twitter_id.blank?
-        errors.add "You need to choose an account" unless twitter_account.present?
+      if kind == "app_post" && platform_id.blank?
+        errors.add "You need to choose an account" unless social_account.present?
         errors.add "You need to include tweet text" unless body.present?
       end
-      self.twitter_id ||= trh[:id]
-      self.body ||= tweeted_text
+      self.platform_id ||= trh[:id]
+      self.body ||= posted_text
     end
   end
 
   def trh
-    (twitter_response || {}).with_indifferent_access
+    (platform_response || {}).with_indifferent_access
   end
 
-  def tweeted_at
+  def posted_at
     TimeParser.parse(trh[:created_at])
   end
 
-  def tweeted_image
+  def posted_image
     return nil unless trh.dig(:entities, :media).present?
 
     trh.dig(:entities, :media).first&.dig(:media_url_https)
   end
 
-  def tweeted_text
+  def posted_text
     trh[:text]
   end
 
-  def tweetor
-    return twitter_account.screen_name if twitter_account&.screen_name.present?
+  def poster
+    return social_account.screen_name if social_account&.screen_name.present?
 
     trh.dig(:user, :screen_name)
   end
 
-  def tweetor_avatar
+  def poster_avatar
     trh.dig(:user, :profile_image_url_https)
   end
 
-  def tweetor_name
+  def poster_name
     trh.dig(:user, :name)
   end
 
-  def tweetor_link
-    twitter_account&.twitter_account_url || "https://twitter.com/#{tweetor}"
+  def poster_link
+    social_account&.account_url || "https://twitter.com/#{poster}"
   end
 
-  def tweet_link
-    if twitter_account.present?
-      [twitter_account.twitter_account_url, "status", twitter_id].join("/")
+  def post_link
+    if social_account.present?
+      [social_account.account_url, "status", platform_id].join("/")
     else
-      "https://twitter.com/#{tweetor}/status/#{twitter_id}"
+      "https://twitter.com/#{poster}/status/#{platform_id}"
     end
   end
 
@@ -210,15 +210,15 @@ class Tweet < ApplicationRecord
     @details_hash ||= {}.tap do |details|
       details[:notification_type] = "stolen_twitter_alerter"
       details[:bike_id] = bike&.id
-      details[:tweet_id] = twitter_id
+      details[:tweet_id] = platform_id
       details[:tweet_string] = body_html
-      details[:tweet_account_screen_name] = tweetor
-      details[:tweet_account_name] = twitter_account&.account_info_name
-      details[:tweet_account_image] = twitter_account&.account_info_image
-      details[:retweet_screen_names] = retweets.map(&:tweetor)
+      details[:tweet_account_screen_name] = poster
+      details[:tweet_account_name] = social_account&.account_info_name
+      details[:tweet_account_image] = social_account&.account_info_image
+      details[:retweet_screen_names] = reposts.map(&:poster)
 
-      if !twitter_account&.national? && twitter_account&.address_string.present?
-        details[:location] = twitter_account.address_string.split(",").first.strip
+      if !social_account&.national? && social_account&.address_string.present?
+        details[:location] = social_account.address_string.split(",").first.strip
       end
     end
   end
@@ -233,9 +233,9 @@ class Tweet < ApplicationRecord
   private
 
   def calculated_kind
-    return "stolen_tweet" if stolen_record_id.present?
-    return "imported_tweet" if twitter_id.present?
+    return "stolen_post" if stolen_record_id.present?
+    return "imported_post" if platform_id.present?
 
-    "app_tweet"
+    "app_post"
   end
 end

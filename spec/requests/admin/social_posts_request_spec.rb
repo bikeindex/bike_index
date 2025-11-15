@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::TweetsController, type: :request do
-  let(:subject) { FactoryBot.create(:tweet, kind: "app_tweet", twitter_id: "fake-id-to-skip-validations") }
+  let(:subject) { FactoryBot.create(:social_post, kind: "app_tweet", platform_id: "fake-id-to-skip-validations") }
   let(:base_url) { "/admin/tweets/" }
   include_context :request_spec_logged_in_as_superuser
 
@@ -16,19 +16,19 @@ RSpec.describe Admin::TweetsController, type: :request do
 
   describe "show" do
     it "renders" do
-      get "#{base_url}/#{subject.twitter_id}"
+      get "#{base_url}/#{subject.platform_id}"
       expect(response).to be_ok
       expect(response).to render_template(:show)
       expect(flash).to be_blank
-      expect(assigns(:tweet)).to eq subject
+      expect(assigns(:social_post)).to eq subject
     end
     context "imported_tweet" do
-      let(:subject) { FactoryBot.create(:tweet, kind: "imported_tweet") }
+      let(:subject) { FactoryBot.create(:social_post, kind: "imported_tweet") }
       it "redirects to edit" do
         subject.reload
         expect(subject.kind).to eq "imported_tweet"
         get "#{base_url}/#{subject.id}"
-        expect(assigns(:tweet)).to eq subject
+        expect(assigns(:social_post)).to eq subject
         expect(response).to redirect_to edit_admin_tweet_path(subject.id)
       end
     end
@@ -42,7 +42,7 @@ RSpec.describe Admin::TweetsController, type: :request do
       expect(response).to redirect_to admin_tweet_path(subject.id)
     end
     context "imported_tweet" do
-      let(:subject) { FactoryBot.create(:tweet, kind: "imported_tweet") }
+      let(:subject) { FactoryBot.create(:social_post, kind: "imported_tweet") }
       it "renders" do
         get "#{base_url}/#{subject.id}/edit"
         expect(response).to be_ok
@@ -75,7 +75,7 @@ RSpec.describe Admin::TweetsController, type: :request do
   describe "#destroy" do
     context "given a successful deletion" do
       it "deletes the tweet, redirects to tweet index url with an appropriate flash" do
-        tweet = FactoryBot.create(:tweet)
+        tweet = FactoryBot.create(:social_post)
 
         delete "#{base_url}/#{tweet.id}"
 
@@ -87,7 +87,7 @@ RSpec.describe Admin::TweetsController, type: :request do
 
     context "given a failed deletion" do
       it "redirects to tweet edit url with an appropriate flash" do
-        tweet = FactoryBot.create(:tweet)
+        tweet = FactoryBot.create(:social_post)
         allow(tweet).to receive(:destroy).and_return(false)
         allow(Tweet).to receive(:friendly_find).with(tweet.id.to_s).and_return(tweet)
 
