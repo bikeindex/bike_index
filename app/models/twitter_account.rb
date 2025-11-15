@@ -64,9 +64,6 @@ class TwitterAccount < ApplicationRecord
   scope :national, -> { active.where(national: true) }
   scope :not_national, -> { active.where(national: false) }
   scope :errored, -> { where.not(last_error_at: nil) }
-  scope :for_platform, ->(platform) { where(platform:) }
-  scope :twitter_accounts, -> { where(platform: :twitter) }
-  scope :bluesky_accounts, -> { where(platform: :bluesky) }
 
   reverse_geocoded_by :latitude, :longitude do |account, results|
     if (geo = results.first)

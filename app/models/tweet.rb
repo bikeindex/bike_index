@@ -51,9 +51,6 @@ class Tweet < ApplicationRecord
   scope :retweet, -> { where.not(original_tweet: nil) }
   scope :not_retweet, -> { where(original_tweet: nil) }
   scope :not_stolen, -> { where.not(kind: "stolen_tweet") }
-  scope :for_platform, ->(platform) { where(platform:) }
-  scope :twitter_posts, -> { where(platform: :twitter) }
-  scope :bluesky_posts, -> { where(platform: :bluesky) }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
