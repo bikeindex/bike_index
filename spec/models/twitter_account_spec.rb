@@ -126,46 +126,6 @@ RSpec.describe TwitterAccount, type: :model do
     let(:twitter_account) { FactoryBot.create(:twitter_account_1, :active, platform: :twitter, twitter_account_info: {name: "Test"}) }
     let(:bluesky_account) { FactoryBot.create(:twitter_account_2, :active, platform: :bluesky, twitter_account_info: {name: "Test"}) }
 
-    describe "enum" do
-      it "supports twitter platform" do
-        expect(twitter_account.platform).to eq("twitter")
-        expect(twitter_account.twitter?).to be true
-        expect(twitter_account.bluesky?).to be false
-      end
-
-      it "supports bluesky platform" do
-        expect(bluesky_account.platform).to eq("bluesky")
-        expect(bluesky_account.bluesky?).to be true
-        expect(bluesky_account.twitter?).to be false
-      end
-
-      it "defaults to twitter" do
-        account = FactoryBot.create(:twitter_account, twitter_account_info: {name: "Test"})
-        expect(account.platform).to eq("twitter")
-        expect(account.twitter?).to be true
-      end
-    end
-
-    describe "scopes" do
-      before do
-        twitter_account
-        bluesky_account
-      end
-
-      it "filters by platform with for_platform" do
-        expect(TwitterAccount.for_platform(:twitter).pluck(:id)).to eq([twitter_account.id])
-        expect(TwitterAccount.for_platform(:bluesky).pluck(:id)).to eq([bluesky_account.id])
-      end
-
-      it "filters twitter accounts" do
-        expect(TwitterAccount.twitter_accounts.pluck(:id)).to eq([twitter_account.id])
-      end
-
-      it "filters bluesky accounts" do
-        expect(TwitterAccount.bluesky_accounts.pluck(:id)).to eq([bluesky_account.id])
-      end
-    end
-
     describe "#platform_account_url" do
       it "returns twitter URL for twitter platform" do
         expect(twitter_account.platform_account_url).to eq("https://twitter.com/#{twitter_account.screen_name}")

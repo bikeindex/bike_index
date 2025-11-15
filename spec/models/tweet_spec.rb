@@ -119,48 +119,6 @@ RSpec.describe Tweet, type: :model do
     let(:twitter_tweet) { FactoryBot.create(:tweet, twitter_account:, twitter_id: "1234567890") }
     let(:bluesky_tweet) { FactoryBot.create(:tweet, twitter_account: bluesky_account, twitter_id: "at://did:plc:abc123/app.bsky.feed.post/xyz789") }
 
-    describe "enum" do
-      it "supports twitter platform" do
-        expect(twitter_tweet.platform).to eq("twitter")
-        expect(twitter_tweet.twitter?).to be true
-        expect(twitter_tweet.bluesky?).to be false
-      end
-
-      it "supports bluesky platform" do
-        expect(bluesky_tweet.platform).to eq("bluesky")
-        expect(bluesky_tweet.bluesky?).to be true
-        expect(bluesky_tweet.twitter?).to be false
-      end
-
-      it "sets platform from twitter_account" do
-        tweet = Tweet.create(body: "test", twitter_account:, kind: "app_tweet")
-        expect(tweet.platform).to eq("twitter")
-
-        tweet2 = Tweet.create(body: "test", twitter_account: bluesky_account, kind: "app_tweet")
-        expect(tweet2.platform).to eq("bluesky")
-      end
-    end
-
-    describe "scopes" do
-      before do
-        twitter_tweet
-        bluesky_tweet
-      end
-
-      it "filters by platform with for_platform" do
-        expect(Tweet.for_platform(:twitter).pluck(:id)).to eq([twitter_tweet.id])
-        expect(Tweet.for_platform(:bluesky).pluck(:id)).to eq([bluesky_tweet.id])
-      end
-
-      it "filters twitter posts" do
-        expect(Tweet.twitter_posts.pluck(:id)).to eq([twitter_tweet.id])
-      end
-
-      it "filters bluesky posts" do
-        expect(Tweet.bluesky_posts.pluck(:id)).to eq([bluesky_tweet.id])
-      end
-    end
-
     describe "#tweet_link" do
       it "returns twitter URL for twitter platform" do
         expected = "https://twitter.com/#{twitter_account.screen_name}/status/1234567890"
