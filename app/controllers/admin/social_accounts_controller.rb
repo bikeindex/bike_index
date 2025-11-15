@@ -1,10 +1,10 @@
-class Admin::TwitterAccountsController < Admin::BaseController
+class Admin::SocialAccountsController < Admin::BaseController
   include SortableTable
 
   before_action :find_twitter_account, only: %i[show edit update destroy check_credentials]
 
   def index
-    @twitter_accounts = matching_twitter_accounts
+    @social_accounts = matching_twitter_accounts
       .reorder(sort_column + " " + sort_direction)
   end
 
@@ -15,31 +15,31 @@ class Admin::TwitterAccountsController < Admin::BaseController
   end
 
   def update
-    if @twitter_account.update(permitted_parameters)
+    if @social_account.update(permitted_parameters)
       if InputNormalizer.boolean(params[:check_credentials])
-        @twitter_account.reload
-        @twitter_account.check_credentials
+        @social_account.reload
+        @social_account.check_credentials
       end
       flash[:notice] = "Twitter account saved!"
-      redirect_to admin_twitter_account_url(@twitter_account)
+      redirect_to admin_twitter_account_url(@social_account)
     else
       render action: :edit
     end
   end
 
   def destroy
-    if @twitter_account.present? && @twitter_account.destroy
+    if @social_account.present? && @social_account.destroy
       flash[:info] = "Twitter account deleted."
       redirect_to admin_twitter_accounts_url
     else
       flash[:error] = "Could not delete Twitter account."
-      redirect_to edit_admin_twitter_account_url(@twitter_account)
+      redirect_to edit_admin_twitter_account_url(@social_account)
     end
   end
 
   def check_credentials
-    @twitter_account.check_credentials
-    redirect_to admin_twitter_account_url(@twitter_account)
+    @social_account.check_credentials
+    redirect_to admin_twitter_account_url(@social_account)
   end
 
   private
@@ -72,15 +72,15 @@ class Admin::TwitterAccountsController < Admin::BaseController
 
   def matching_twitter_accounts
     if sort_column == "last_error_at" # If sorting by last_error_at, show the error
-      (sort_direction == "desc") ? TwitterAccount.errored : TwitterAccount.where(last_error_at: nil)
+      (sort_direction == "desc") ? SocialAccount.errored : SocialAccount.where(last_error_at: nil)
     elsif sort_column == "national" # If national, show only national one direction, only non the other
-      TwitterAccount.where(national: sort_direction == "asc")
+      SocialAccount.where(national: sort_direction == "asc")
     else
-      TwitterAccount
+      SocialAccount
     end
   end
 
   def find_twitter_account
-    @twitter_account = TwitterAccount.find(params[:id])
+    @social_account = SocialAccount.find(params[:id])
   end
 end

@@ -11,12 +11,12 @@ RSpec.describe Integrations::TwitterTweeter do
   describe "#build_bike_status" do
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike, :blue_trek_930) }
-      let(:default_account) { FactoryBot.create(:twitter_account_2, :active, :default) }
-      let(:twitter_account) { FactoryBot.create(:twitter_account_1, :active) }
+      let(:default_account) { FactoryBot.create(:social_account_2, :active, :default) }
+      let(:social_account) { FactoryBot.create(:social_account_1, :active) }
       let(:tti) { Integrations::TwitterTweeter.new(bike) }
       before do
         expect(bike.current_stolen_record.neighborhood).to eq("Tribeca")
-        allow(TwitterAccount).to(receive(:in_proximity).and_return([twitter_account]))
+        allow(SocialAccount).to(receive(:in_proximity).and_return([social_account]))
       end
       let(:target) { "STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id}" }
       it "creates correct string without media" do
@@ -51,7 +51,7 @@ RSpec.describe Integrations::TwitterTweeter do
       end
 
       context "with append_block" do
-        before { twitter_account.append_block = "#bikeParty" }
+        before { social_account.append_block = "#bikeParty" }
         let(:target) { "STOLEN - Blue Trek 930 in Tribeca https://bikeindex.org/bikes/#{bike.id} #bikeParty" }
         it "creates correct string with append block" do
           expect(tti.build_bike_status).to eq target
@@ -74,12 +74,12 @@ RSpec.describe Integrations::TwitterTweeter do
 
     context "bike with image" do
       let(:bike) { FactoryBot.create(:stolen_bike, :blue_trek_930, :with_image) }
-      let(:twitter_account) { FactoryBot.create(:twitter_account_1, :active) }
+      let(:social_account) { FactoryBot.create(:social_account_1, :active) }
 
       it "creates correct string with media" do
         expect(bike.current_stolen_record.neighborhood).to eq("Tribeca")
 
-        allow(TwitterAccount).to(receive(:in_proximity).and_return([twitter_account]))
+        allow(SocialAccount).to(receive(:in_proximity).and_return([social_account]))
 
         tti = Integrations::TwitterTweeter.new(bike)
 
@@ -96,81 +96,81 @@ RSpec.describe Integrations::TwitterTweeter do
     # Commented out in #2618 - twitter is disabled
     #
     # it "posts a text only tweet properly", vcr: true do
-    #   twitter_account = FactoryBot.build(:twitter_account_1, :active, id: 99)
-    #   allow(TwitterAccount).to(receive(:in_proximity).and_return([twitter_account]))
+    #   social_account = FactoryBot.build(:social_account_1, :active, id: 99)
+    #   allow(SocialAccount).to(receive(:in_proximity).and_return([social_account]))
 
     #   integration = Integrations::TwitterTweeter.new(bike)
     #   tweet = integration.create_tweet
 
     #   expect(tweet).to be_an_instance_of(Tweet)
-    #   expect(integration.retweets&.first).to be_an_instance_of(Tweet)
-    #   expect(tweet.twitter_response).to be_an_instance_of(Hash)
-    #   expect(tweet.tweetor_avatar).to be_present
+    #   expect(integration.reposts&.first).to be_an_instance_of(Tweet)
+    #   expect(tweet.platform_response).to be_an_instance_of(Hash)
+    #   expect(tweet.postor_avatar).to be_present
     #   expect(tweet.body).to eq "STOLEN - Black Special_name10 in Tribeca https://t.co/6gqhQpUUsC"
-    #   expect(tweet.tweeted_image).to be_blank
+    #   expect(tweet.posted_image).to be_blank
     # end
 
-    # it "creates a media tweet with retweets", vcr: true do
+    # it "creates a media tweet with reposts", vcr: true do
     #   expect(bike.current_stolen_record.neighborhood).to eq("Tribeca")
 
-    #   twitter_account = FactoryBot.build(:twitter_account_1, :active, id: 99)
-    #   secondary_twitter_account = FactoryBot.build(:twitter_account_2, :active, id: 9)
+    #   social_account = FactoryBot.build(:social_account_1, :active, id: 99)
+    #   secondary_social_account = FactoryBot.build(:social_account_2, :active, id: 9)
 
-    #   allow(TwitterAccount).to(receive(:in_proximity).and_return([twitter_account, secondary_twitter_account]))
+    #   allow(SocialAccount).to(receive(:in_proximity).and_return([social_account, secondary_social_account]))
 
     #   integration = Integrations::TwitterTweeter.new(bike)
     #   expect { integration.create_tweet }.to change { Tweet.count }.by(2)
 
-    #   tweet = integration.tweet
+    #   tweet = integration.post
     #   expect(tweet).to be_an_instance_of(Tweet)
     #   expect(tweet.kind).to eq "stolen_tweet"
-    #   expect(integration.retweets.first).to be_an_instance_of(Tweet)
-    #   expect(tweet.tweeted_image).to be_blank # Because this BS is blank, legacy formatting presumably
+    #   expect(integration.reposts.first).to be_an_instance_of(Tweet)
+    #   expect(tweet.posted_image).to be_blank # Because this BS is blank, legacy formatting presumably
     # end
   end
 
-  describe "close_twitter_accounts" do
-    let!(:national) { FactoryBot.create(:twitter_account_1, :national, :active, :default, country: Country.united_states) }
+  describe "close_social_accounts" do
+    let!(:national) { FactoryBot.create(:social_account_1, :national, :active, :default, country: Country.united_states) }
     let(:stolen_bike_bay_area) do
       Bike.new(manual_csr: true,
         current_stolen_record: StolenRecord.new(latitude: 37.8390534, longitude: -122.3114197, country: Country.united_states))
     end
     let(:twitter_tweeter_integration) { Integrations::TwitterTweeter.new(stolen_bike_bay_area) }
     it "returns empty if no location" do
-      expect(TwitterAccount.in_proximity).to eq([])
-      expect(TwitterAccount.in_proximity(StolenRecord.new)).to eq([])
-      expect(twitter_tweeter_integration.close_twitter_accounts.map(&:id)).to eq([national.id])
-      expect(twitter_tweeter_integration.nearest_twitter_account&.id).to eq(national.id)
-      expect(twitter_tweeter_integration.retweetable_accounts.map(&:id)).to eq([])
+      expect(SocialAccount.in_proximity).to eq([])
+      expect(SocialAccount.in_proximity(StolenRecord.new)).to eq([])
+      expect(twitter_tweeter_integration.close_social_accounts.map(&:id)).to eq([national.id])
+      expect(twitter_tweeter_integration.nearest_social_account&.id).to eq(national.id)
+      expect(twitter_tweeter_integration.repostable_accounts.map(&:id)).to eq([])
     end
     context "bay area accounts" do
       include_context :geocoder_real
-      let(:twitter_brk) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikesbrk", latitude: 37.8715226, longitude: -122.273042, twitter_account_info: {info: true}) }
-      let(:twitter_oak) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikesoak", latitude: 37.8043514, longitude: -122.2711639, twitter_account_info: {info: true}) }
-      let(:twitter_sfo) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikessfo", latitude: 37.7749295, longitude: -122.4194155, twitter_account_info: {info: true}) }
-      let(:twitter_marin) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikemarin", latitude: 38.06170950000001, longitude: -122.6991484, twitter_account_info: {info: true}) }
-      let(:twitter_sj) { FactoryBot.create(:twitter_account, :active, screen_name: "stolenbikessj", latitude: 37.3382082, longitude: -121.8863286, twitter_account_info: {info: true}) }
+      let(:twitter_brk) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikesbrk", latitude: 37.8715226, longitude: -122.273042, social_account_info: {info: true}) }
+      let(:twitter_oak) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikesoak", latitude: 37.8043514, longitude: -122.2711639, social_account_info: {info: true}) }
+      let(:twitter_sfo) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikessfo", latitude: 37.7749295, longitude: -122.4194155, social_account_info: {info: true}) }
+      let(:twitter_marin) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikemarin", latitude: 38.06170950000001, longitude: -122.6991484, social_account_info: {info: true}) }
+      let(:twitter_sj) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikessj", latitude: 37.3382082, longitude: -121.8863286, social_account_info: {info: true}) }
       let(:all_account_ids) { [twitter_brk.id, twitter_oak.id, twitter_sfo.id, twitter_marin.id, twitter_sj.id, national.id] }
       it "matches area accounts" do
         stub_const("Integrations::TwitterTweeter::MAX_RETWEET_COUNT", 3)
         expect(all_account_ids.count).to eq 6
-        expect(TwitterAccount.active.pluck(:id)).to match_array all_account_ids
-        expect(TwitterAccount.in_proximity(stolen_bike_bay_area.current_stolen_record).map(&:id)).to eq all_account_ids
-        expect(twitter_tweeter_integration.close_twitter_accounts.map(&:id)).to eq all_account_ids
-        expect(twitter_tweeter_integration.nearest_twitter_account&.id).to eq(twitter_brk.id)
-        expect(twitter_tweeter_integration.retweetable_accounts.map(&:id)).to eq([twitter_oak.id, twitter_sfo.id, twitter_marin.id, twitter_sj.id])
+        expect(SocialAccount.active.pluck(:id)).to match_array all_account_ids
+        expect(SocialAccount.in_proximity(stolen_bike_bay_area.current_stolen_record).map(&:id)).to eq all_account_ids
+        expect(twitter_tweeter_integration.close_social_accounts.map(&:id)).to eq all_account_ids
+        expect(twitter_tweeter_integration.nearest_social_account&.id).to eq(twitter_brk.id)
+        expect(twitter_tweeter_integration.repostable_accounts.map(&:id)).to eq([twitter_oak.id, twitter_sfo.id, twitter_marin.id, twitter_sj.id])
 
         # With only one near
         stolen_record_sc = StolenRecord.new(latitude: 36.970772, longitude: -121.962723, country: Country.united_states)
-        expect(TwitterAccount.in_proximity(stolen_record_sc).map(&:id)).to eq([twitter_sj.id, national.id])
+        expect(SocialAccount.in_proximity(stolen_record_sc).map(&:id)).to eq([twitter_sj.id, national.id])
 
         # Sanity check on non-proximity
         stolen_record_la = StolenRecord.new(latitude: 33.992220, longitude: -118.386214, country: Country.united_states)
-        expect(TwitterAccount.in_proximity(stolen_record_la).map(&:id)).to eq([national.id])
+        expect(SocialAccount.in_proximity(stolen_record_la).map(&:id)).to eq([national.id])
 
-        # Verify that max retweet of 0 means 0
+        # Verify that max repost of 0 means 0
         stub_const("Integrations::TwitterTweeter::MAX_RETWEET_COUNT", 0)
-        expect(twitter_tweeter_integration.retweetable_accounts.map(&:id)).to eq([])
+        expect(twitter_tweeter_integration.repostable_accounts.map(&:id)).to eq([])
       end
     end
   end

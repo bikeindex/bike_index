@@ -10,9 +10,9 @@ class Integrations::TwitterTweeter
     :bike,
     :bike_photo_url,
     :city,
-    :close_twitter_accounts,
+    :close_social_accounts,
     :max_char,
-    :nearest_twitter_account,
+    :nearest_social_account,
     :neighborhood,
     :retweets,
     :state,
@@ -25,8 +25,8 @@ class Integrations::TwitterTweeter
     if bike.image_url.present?
       self.bike_photo_url = bike.image_url(:large)
     end
-    self.close_twitter_accounts = TwitterAccount.in_proximity(stolen_record)
-    self.nearest_twitter_account = close_twitter_accounts.find { |i| i.not_national? } || close_twitter_accounts.first
+    self.close_social_accounts = SocialAccount.in_proximity(stolen_record)
+    self.nearest_social_account = close_social_accounts.find { |i| i.not_national? } || close_social_accounts.first
     self.city = stolen_record&.city
     self.state = stolen_record&.state&.abbreviation
     self.neighborhood = stolen_record&.neighborhood
@@ -35,10 +35,10 @@ class Integrations::TwitterTweeter
   # To manually send a tweet (e.g. if authentication failed)
   # Integrations::TwitterTweeter.new(Bike.find(XXX)).create_tweet
   def create_tweet
-    return if stolen_record.blank? || nearest_twitter_account.blank?
+    return if stolen_record.blank? || nearest_social_account.blank?
 
     posted_tweet =
-      post_tweet_with_account(nearest_twitter_account,
+      post_tweet_with_account(nearest_social_account,
         build_bike_status,
         lat: stolen_record.latitude,
         long: stolen_record.longitude,
@@ -48,14 +48,14 @@ class Integrations::TwitterTweeter
 
     self.tweet = Tweet.new(
       twitter_id: posted_tweet.id,
-      twitter_account_id: nearest_twitter_account&.id,
+      social_account_id: nearest_social_account&.id,
       stolen_record_id: stolen_record&.id,
       twitter_response: posted_tweet,
       kind: "stolen_tweet"
     )
 
     unless tweet.save
-      nearest_twitter_account.set_error(tweet.errors.full_messages.to_sentence)
+      nearest_social_account.set_error(tweet.errors.full_messages.to_sentence)
     end
 
     retweet(posted_tweet)
@@ -65,14 +65,14 @@ class Integrations::TwitterTweeter
   def retweetable_accounts
     return [] if MAX_RETWEET_COUNT < 1
 
-    close_twitter_accounts.reject { |t| t.id == nearest_twitter_account.id }[0..MAX_RETWEET_COUNT]
+    close_social_accounts.reject { |t| t.id == nearest_social_account.id }[0..MAX_RETWEET_COUNT]
   end
 
   def retweet(posted_tweet)
-    self.retweets = [tweet]
+    self.reposts = [tweet]
 
-    retweetable_accounts.each do |twitter_account|
-      retweet = tweet.retweet_to_account(twitter_account)
+    retweetable_accounts.each do |social_account|
+      retweet = tweet.retweet_to_account(social_account)
       retweets << retweet if retweet.present?
     end
 
@@ -111,8 +111,8 @@ class Integrations::TwitterTweeter
   def tweet_string_with_options(stolen_slug, bike_slug, url)
     ts = tweet_string(stolen_slug, bike_slug, url)
 
-    if close_twitter_accounts&.first&.append_block.present?
-      block = nearest_twitter_account.append_block
+    if close_social_accounts&.first&.append_block.present?
+      block = nearest_social_account.append_block
       ts << " #{block}" if (ts.length + block.length) < max_char
     end
 
@@ -127,7 +127,7 @@ class Integrations::TwitterTweeter
     self.max_char = compute_max_char
 
     location = ""
-    if !close_twitter_accounts&.first&.default? && neighborhood.present?
+    if !close_social_accounts&.first&.default? && neighborhood.present?
       location = "in #{neighborhood}"
     elsif city.present? && state.present?
       location = "in #{city}, #{state}"
