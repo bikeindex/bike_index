@@ -3,8 +3,8 @@ require "tempfile"
 require "open-uri"
 
 class Integrations::TwitterTweeter
-  TWEET_LENGTH = 280
-  MAX_RETWEET_COUNT = (ENV["MAX_RETWEET_COUNT"] || 3).to_i
+  POST_LENGTH = 280
+  MAX_REPOST_COUNT = (ENV["MAX_REPOST_COUNT"] || 3).to_i
 
   attr_accessor \
     :bike,
@@ -14,7 +14,7 @@ class Integrations::TwitterTweeter
     :max_char,
     :nearest_social_account,
     :neighborhood,
-    :retweets,
+    :reposts,
     :state,
     :stolen_record,
     :social_post
@@ -50,33 +50,33 @@ class Integrations::TwitterTweeter
       platform_id: posted_social_post.id,
       social_account_id: nearest_social_account&.id,
       stolen_record_id: stolen_record&.id,
-      twitter_response: posted_social_post,
-      kind: "stolen_tweet"
+      platform_response: posted_social_post,
+      kind: "stolen_post"
     )
 
     unless social_post.save
       nearest_social_account.set_error(social_post.errors.full_messages.to_sentence)
     end
 
-    retweet(posted_social_post)
+    repost(posted_social_post)
     social_post
   end
 
-  def retweetable_accounts
-    return [] if MAX_RETWEET_COUNT < 1
+  def repostable_accounts
+    return [] if MAX_REPOST_COUNT < 1
 
-    close_social_accounts.reject { |t| t.id == nearest_social_account.id }[0..MAX_RETWEET_COUNT]
+    close_social_accounts.reject { |t| t.id == nearest_social_account.id }[0..MAX_REPOST_COUNT]
   end
 
-  def retweet(posted_social_post)
+  def repost(posted_social_post)
     self.reposts = [social_post]
 
-    retweetable_accounts.each do |social_account|
-      retweet = social_post.retweet_to_account(social_account)
-      retweets << retweet if retweet.present?
+    repostable_accounts.each do |social_account|
+      repost = social_post.repost_to_account(social_account)
+      reposts << repost if repost.present?
     end
 
-    retweets
+    reposts
   end
 
   def stolen_slug
@@ -92,13 +92,13 @@ class Integrations::TwitterTweeter
     # a REST client.configuration call
     #
     # spaces between slugs
-    # max_char = TWEET_LENGTH - https_length - at_screen_name.length - 3
+    # max_char = POST_LENGTH - https_length - at_screen_name.length - 3
 
     https_length = 23
     media_length = 23
 
     # spaces between slugs
-    max = TWEET_LENGTH - https_length - stolen_slug.size - 3
+    max = POST_LENGTH - https_length - stolen_slug.size - 3
     max -= bike_photo_url ? media_length : 0
 
     max

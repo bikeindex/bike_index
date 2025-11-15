@@ -90,7 +90,7 @@ RSpec.describe Integrations::TwitterTweeter do
     end
   end
 
-  describe "#create_tweet" do
+  describe "#create_post" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
 
     # Commented out in #2618 - twitter is disabled
@@ -145,14 +145,14 @@ RSpec.describe Integrations::TwitterTweeter do
     end
     context "bay area accounts" do
       include_context :geocoder_real
-      let(:twitter_brk) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikesbrk", latitude: 37.8715226, longitude: -122.273042, social_account_info: {info: true}) }
-      let(:twitter_oak) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikesoak", latitude: 37.8043514, longitude: -122.2711639, social_account_info: {info: true}) }
-      let(:twitter_sfo) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikessfo", latitude: 37.7749295, longitude: -122.4194155, social_account_info: {info: true}) }
-      let(:twitter_marin) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikemarin", latitude: 38.06170950000001, longitude: -122.6991484, social_account_info: {info: true}) }
-      let(:twitter_sj) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikessj", latitude: 37.3382082, longitude: -121.8863286, social_account_info: {info: true}) }
+      let(:twitter_brk) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikesbrk", latitude: 37.8715226, longitude: -122.273042, account_info: {info: true}) }
+      let(:twitter_oak) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikesoak", latitude: 37.8043514, longitude: -122.2711639, account_info: {info: true}) }
+      let(:twitter_sfo) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikessfo", latitude: 37.7749295, longitude: -122.4194155, account_info: {info: true}) }
+      let(:twitter_marin) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikemarin", latitude: 38.06170950000001, longitude: -122.6991484, account_info: {info: true}) }
+      let(:twitter_sj) { FactoryBot.create(:social_account, :active, screen_name: "stolenbikessj", latitude: 37.3382082, longitude: -121.8863286, account_info: {info: true}) }
       let(:all_account_ids) { [twitter_brk.id, twitter_oak.id, twitter_sfo.id, twitter_marin.id, twitter_sj.id, national.id] }
       it "matches area accounts" do
-        stub_const("Integrations::TwitterTweeter::MAX_RETWEET_COUNT", 3)
+        stub_const("Integrations::TwitterTweeter::MAX_REPOST_COUNT", 3)
         expect(all_account_ids.count).to eq 6
         expect(SocialAccount.active.pluck(:id)).to match_array all_account_ids
         expect(SocialAccount.in_proximity(stolen_bike_bay_area.current_stolen_record).map(&:id)).to eq all_account_ids
@@ -169,7 +169,7 @@ RSpec.describe Integrations::TwitterTweeter do
         expect(SocialAccount.in_proximity(stolen_record_la).map(&:id)).to eq([national.id])
 
         # Verify that max repost of 0 means 0
-        stub_const("Integrations::TwitterTweeter::MAX_RETWEET_COUNT", 0)
+        stub_const("Integrations::TwitterTweeter::MAX_REPOST_COUNT", 0)
         expect(twitter_tweeter_integration.repostable_accounts.map(&:id)).to eq([])
       end
     end
