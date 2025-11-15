@@ -137,18 +137,18 @@ RSpec.describe StolenRecord, type: :model do
 
   describe "scopes" do
     it "default scopes to current" do
-      expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true).to_sql)
+      expect(StolenRecord.all.to_sql).to eq(StolenRecord.unscoped.where(current: true, deleted_at: nil).to_sql)
     end
     it "scopes approveds" do
-      expect(StolenRecord.approveds.to_sql).to eq(StolenRecord.unscoped.where(current: true).where(approved: true).to_sql)
+      expect(StolenRecord.approveds.to_sql).to eq(StolenRecord.unscoped.where(current: true, deleted_at: nil, approved: true).to_sql)
     end
     it "scopes approveds_with_reports" do
-      expect(StolenRecord.approveds_with_reports.to_sql).to eq(StolenRecord.unscoped.where(current: true).where(approved: true)
+      expect(StolenRecord.approveds_with_reports.to_sql).to eq(StolenRecord.unscoped.where(current: true, deleted_at: nil, approved: true)
                                                               .where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL").to_sql)
     end
 
     it "scopes not_tsved" do
-      expect(StolenRecord.not_tsved.to_sql).to eq(StolenRecord.unscoped.where(current: true).where("tsved_at IS NULL").to_sql)
+      expect(StolenRecord.not_tsved.to_sql).to eq(StolenRecord.unscoped.where(current: true, deleted_at: nil).where("tsved_at IS NULL").to_sql)
     end
     it "scopes recovered" do
       expect(StolenRecord.recovered.to_sql).to eq(StolenRecord.unscoped.where(current: false).to_sql)

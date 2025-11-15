@@ -10,6 +10,7 @@
 #  create_open311                 :boolean          default(FALSE), not null
 #  current                        :boolean          default(TRUE)
 #  date_stolen                    :datetime
+#  deleted_at                     :datetime
 #  estimated_value                :integer
 #  index_helped_recovery          :boolean          default(FALSE), not null
 #  latitude                       :float
@@ -59,6 +60,8 @@ class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
   include Geocodeable
   include DefaultCurrencyable
+
+  acts_as_paranoid without_default_scope: true
 
   RECOVERY_DISPLAY_STATUS_ENUM = {
     not_eligible: 0,
@@ -114,7 +117,7 @@ class StolenRecord < ApplicationRecord
   after_commit :update_associations
 
   default_scope { current }
-  scope :current, -> { where(current: true) }
+  scope :current, -> { where(current: true, deleted_at: nil) }
   scope :unapproved, -> { where(approved: false).joins(:bike).where.not(bikes: {id: nil}) } # Make sure bike isn't deleted
   scope :approveds, -> { where(approved: true) }
   scope :current_and_not, -> { unscoped } # might exclude certain things in the future. Also feels better than calling unscoped everywhere
