@@ -104,7 +104,7 @@ jobs:
       #   uses: paambaati/codeclimate-action@v9.0.0
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}
           path: tmp/rspec-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}.xml
