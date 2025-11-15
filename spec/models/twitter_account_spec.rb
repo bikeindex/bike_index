@@ -121,4 +121,24 @@ RSpec.describe TwitterAccount, type: :model do
     expect(status).to be_an_instance_of(Twitter::Tweet)
     expect(status.id).to eq(tweet_id)
   end
+
+  describe "platform support" do
+    let(:twitter_account) { FactoryBot.create(:twitter_account_1, :active, platform: :twitter, twitter_account_info: {name: "Test"}) }
+    let(:bluesky_account) { FactoryBot.create(:twitter_account_2, :active, platform: :bluesky, twitter_account_info: {name: "Test"}) }
+
+    describe "#platform_account_url" do
+      it "returns twitter URL for twitter platform" do
+        expect(twitter_account.platform_account_url).to eq("https://twitter.com/#{twitter_account.screen_name}")
+      end
+
+      it "returns bluesky URL for bluesky platform" do
+        expect(bluesky_account.platform_account_url).to eq("https://bsky.app/profile/#{bluesky_account.screen_name}")
+      end
+
+      it "twitter_account_url delegates to platform_account_url" do
+        expect(twitter_account.twitter_account_url).to eq(twitter_account.platform_account_url)
+        expect(bluesky_account.twitter_account_url).to eq(bluesky_account.platform_account_url)
+      end
+    end
+  end
 end

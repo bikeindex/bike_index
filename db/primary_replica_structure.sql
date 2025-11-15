@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3626,7 +3627,8 @@ CREATE TABLE public.tweets (
     stolen_record_id integer,
     original_tweet_id integer,
     kind integer,
-    body text
+    body text,
+    platform integer DEFAULT 0 NOT NULL
 );
 
 
@@ -3678,7 +3680,8 @@ CREATE TABLE public.twitter_accounts (
     street character varying,
     zipcode character varying,
     state_id bigint,
-    country_id bigint
+    country_id bigint,
+    platform integer DEFAULT 0 NOT NULL
 );
 
 
@@ -6842,6 +6845,13 @@ CREATE INDEX index_tweets_on_original_tweet_id ON public.tweets USING btree (ori
 
 
 --
+-- Name: index_tweets_on_platform; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_platform ON public.tweets USING btree (platform);
+
+
+--
 -- Name: index_tweets_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6867,6 +6877,13 @@ CREATE INDEX index_twitter_accounts_on_country_id ON public.twitter_accounts USI
 --
 
 CREATE INDEX index_twitter_accounts_on_latitude_and_longitude ON public.twitter_accounts USING btree (latitude, longitude);
+
+
+--
+-- Name: index_twitter_accounts_on_platform; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_platform ON public.twitter_accounts USING btree (platform);
 
 
 --
@@ -7075,6 +7092,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20251101041451'),
+('20251028001158'),
 ('20250917185540'),
 ('20250910182759'),
 ('20250528154403'),

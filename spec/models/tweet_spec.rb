@@ -112,4 +112,49 @@ RSpec.describe Tweet, type: :model do
       expect(tweet.twitter_response).to eq({"something" => "ffff"})
     end
   end
+
+  describe "platform support" do
+    let(:twitter_account) { FactoryBot.create(:twitter_account, platform: :twitter, twitter_account_info: {name: "Test"}) }
+    let(:bluesky_account) { FactoryBot.create(:twitter_account, platform: :bluesky, twitter_account_info: {name: "Test"}) }
+    let(:twitter_tweet) { FactoryBot.create(:tweet, twitter_account:, twitter_id: "1234567890") }
+    let(:bluesky_tweet) { FactoryBot.create(:tweet, twitter_account: bluesky_account, twitter_id: "at://did:plc:abc123/app.bsky.feed.post/xyz789") }
+
+    describe "#tweet_link" do
+      it "returns twitter URL for twitter platform" do
+        expected = "https://twitter.com/#{twitter_account.screen_name}/status/1234567890"
+        expect(twitter_tweet.tweet_link).to eq(expected)
+      end
+
+      it "returns bluesky URL for bluesky platform" do
+        expected = "https://bsky.app/profile/#{bluesky_account.screen_name}/post/xyz789"
+        expect(bluesky_tweet.tweet_link).to eq(expected)
+      end
+    end
+
+    describe "#tweetor_link" do
+      it "returns twitter URL for twitter platform" do
+        expect(twitter_tweet.tweetor_link).to eq("https://twitter.com/#{twitter_account.screen_name}")
+      end
+
+      it "returns bluesky URL for bluesky platform" do
+        expect(bluesky_tweet.tweetor_link).to eq("https://bsky.app/profile/#{bluesky_account.screen_name}")
+      end
+    end
+
+    describe ".auto_link_text" do
+      let(:text) { "Check out @bikeindex and #biketheft" }
+
+      it "links to twitter for twitter platform" do
+        result = Tweet.auto_link_text(text, :twitter)
+        expect(result).to include('href="https://twitter.com/bikeindex"')
+        expect(result).to include('href="https://twitter.com/hashtag/biketheft"')
+      end
+
+      it "links to bluesky for bluesky platform" do
+        result = Tweet.auto_link_text(text, :bluesky)
+        expect(result).to include('href="https://bsky.app/profile/bikeindex"')
+        expect(result).to include('href="https://bsky.app/search?q=biketheft"')
+      end
+    end
+  end
 end
