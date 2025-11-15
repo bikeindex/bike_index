@@ -17,7 +17,7 @@ class Integrations::TwitterTweeter
     :retweets,
     :state,
     :stolen_record,
-    :tweet
+    :social_post
 
   def initialize(bike)
     self.bike = bike
@@ -32,34 +32,34 @@ class Integrations::TwitterTweeter
     self.neighborhood = stolen_record&.neighborhood
   end
 
-  # To manually send a tweet (e.g. if authentication failed)
-  # Integrations::TwitterTweeter.new(Bike.find(XXX)).create_tweet
-  def create_tweet
+  # To manually send a post (e.g. if authentication failed)
+  # Integrations::TwitterTweeter.new(Bike.find(XXX)).create_post
+  def create_post
     return if stolen_record.blank? || nearest_social_account.blank?
 
-    posted_tweet =
+    posted_social_post =
       post_tweet_with_account(nearest_social_account,
         build_bike_status,
         lat: stolen_record.latitude,
         long: stolen_record.longitude,
         display_coordinates: "true")
 
-    return if posted_tweet.blank?
+    return if posted_social_post.blank?
 
-    self.tweet = Tweet.new(
-      twitter_id: posted_tweet.id,
+    self.social_post = SocialPost.new(
+      platform_id: posted_social_post.id,
       social_account_id: nearest_social_account&.id,
       stolen_record_id: stolen_record&.id,
-      twitter_response: posted_tweet,
+      twitter_response: posted_social_post,
       kind: "stolen_tweet"
     )
 
-    unless tweet.save
-      nearest_social_account.set_error(tweet.errors.full_messages.to_sentence)
+    unless social_post.save
+      nearest_social_account.set_error(social_post.errors.full_messages.to_sentence)
     end
 
-    retweet(posted_tweet)
-    tweet
+    retweet(posted_social_post)
+    social_post
   end
 
   def retweetable_accounts
@@ -68,11 +68,11 @@ class Integrations::TwitterTweeter
     close_social_accounts.reject { |t| t.id == nearest_social_account.id }[0..MAX_RETWEET_COUNT]
   end
 
-  def retweet(posted_tweet)
-    self.reposts = [tweet]
+  def retweet(posted_social_post)
+    self.reposts = [social_post]
 
     retweetable_accounts.each do |social_account|
-      retweet = tweet.retweet_to_account(social_account)
+      retweet = social_post.retweet_to_account(social_account)
       retweets << retweet if retweet.present?
     end
 
@@ -196,6 +196,6 @@ class Integrations::TwitterTweeter
       tweet = account.tweet(text, opts)
     end
 
-    tweet
+    social_post
   end
 end
