@@ -66,6 +66,8 @@ RSpec.describe Organized::BikesController, type: :controller do
     end
 
     describe "new" do
+      let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
+
       it "renders" do
         get :new, params: {organization_id: organization.to_param}
         expect(response.status).to eq(200)
