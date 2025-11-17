@@ -26,7 +26,7 @@ RSpec.describe StolenBike::ApproveStolenListingJob, type: :job, vcr: true do
   # Commented out in #2618 - twitter is disabled
   #
   # context "given a bike with a current stolen record and a nearby twitter account" do
-  #   let!(:twitter_account) { FactoryBot.create(:twitter_account_1, :active, :in_nyc) }
+  #   let!(:social_account) { FactoryBot.create(:social_account_1, :active, :in_nyc) }
   #   let!(:bike) { FactoryBot.create(:stolen_bike) }
   #   it "creates twitter stolen bike alert" do
   #     expect {

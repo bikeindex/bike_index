@@ -271,8 +271,8 @@ Rails.application.routes.draw do
     resources :b_params, only: %i[index show]
     resources :feedbacks, only: %i[index show]
     resources :ownerships, only: %i[edit update index]
-    resources :tweets
-    resources :twitter_accounts, except: %i[new] do
+    resources :social_posts
+    resources :social_accounts, except: %i[new] do
       member { get :check_credentials }
     end
 

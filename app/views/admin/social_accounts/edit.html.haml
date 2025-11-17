@@ -1,23 +1,23 @@
 .admin-subnav
   .col-sm-6
     %h1
-      %small Update Twitter Account:
-      = @twitter_account.screen_name
+      %small Update Social Account:
+      = @social_account.screen_name
     %small.mr-4
-      = link_to "View account data", admin_twitter_account_path(@twitter_account)
+      = link_to "View account data", admin_social_account_path(@social_account)
     %small
       = link_to "Log in to refresh credentials", "/auth/twitter"
 
   .col-sm-6.text-right
     = link_to "Delete account",
-      admin_twitter_account_path(@twitter_account),
+      admin_social_account_path(@social_account),
       method: :delete,
       data: { confirm: "Are you sure you want to delete this? This can't be undone" },
       class: "btn btn-danger"
 
 .container-fluid
   = render "form",
-    twitter_account: @twitter_account,
-    action: admin_twitter_account_path(@twitter_account),
+    social_account: @social_account,
+    action: admin_social_account_path(@social_account),
     method: :patch,
     submit_label: "Save"

@@ -94,7 +94,7 @@ class StolenRecord < ApplicationRecord
   belongs_to :organization_stolen_message
 
   has_many :impound_claims
-  has_many :tweets
+  has_many :social_posts
   has_many :theft_alerts
   has_many :notifications, as: :notifiable
   has_many :theft_surveys, -> { theft_survey }, as: :notifiable, class_name: "Notification"

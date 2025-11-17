@@ -19,7 +19,7 @@
     .row.main-body-row
       .landing-why-col
         .embeded-tweet-break-top
-          = render partial: "landing_pages/tweet", locals: { tweet_id: 840324239425073152 }
+          = render partial: "landing_pages/social_post", locals: { post_id: 840324239425073152 }
 
         %h3= t(".register_bikes_for_your_customers")
         %p
@@ -39,7 +39,7 @@
           = t(".for_free_we_provide_you_with_t")
 
         %p
-          = render partial: "landing_pages/tweet", locals: { tweet_id: 1319724415840481280 }
+          = render partial: "landing_pages/social_post", locals: { post_id: 1319724415840481280 }
 
         %p
           - security_link = link_to t(".security_link_text"), "https://bikeindex.org/info/security-faq-pos-integrations"

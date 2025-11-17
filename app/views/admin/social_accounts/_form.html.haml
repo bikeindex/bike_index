@@ -1,4 +1,4 @@
-= form_for twitter_account,
+= form_for social_account,
   url: action,
   method: method,
   html: { class: "form" } do |f|
@@ -66,10 +66,10 @@
         = f.text_field :neighborhood, class: "form-control"
       .input-group.mt-2
         = f.label :state, class: "form-label mr-4"
-        = f.text_field :state, value: twitter_account.state&.abbreviation, class: "form-control"
+        = f.text_field :state, value: social_account.state&.abbreviation, class: "form-control"
       .input-group.mt-2
         = f.label :country, class: "form-label mr-4"
-        = f.text_field :country, value: twitter_account.country&.iso, class: "form-control"
+        = f.text_field :country, value: social_account.country&.iso, class: "form-control"
       .input-group.mt-2
         = f.label :language, class: "form-label mr-4"
         = f.text_field :language, class: "form-control"

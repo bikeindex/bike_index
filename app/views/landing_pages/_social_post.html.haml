@@ -1,0 +1,20 @@
+-# Only imported posts can be used for this. Making it work for non-imported posts is low priority
+- post_id ||= nil # ensure we don't explode when not passed key thing
+- social_post = SocialPost.friendly_find(post_id)
+
+- if social_post.present?
+  .embeded-tweet
+    - if social_post.image?
+      = image_tag social_post.image_url, alt: ""
+    .tweet-display{ class: "tweet-align-#{social_post.alignment}" }
+      %a.tweetor-header{ href: social_post.poster_link, target: '_blank' }
+        - if social_post.poster_avatar.present?
+          = image_tag social_post.poster_avatar, alt: ""
+        %span.tweetor-name
+          = social_post.poster_name
+        %span.tweetor-handle
+          %br
+          @#{social_post.poster}
+      .tweet-body
+        = social_post.body_html&.html_safe
+      %a.body-link{ href: social_post.post_link, target: '_blank' }
