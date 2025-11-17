@@ -1,0 +1,27 @@
+<%# requires local organization or organization_id %>
+<% render_search ||= false %>
+<% organization_id ||= organization&.id %>
+
+<% if organization_id.present? %>
+  <% organization ||= Organization.unscoped.find_by(id: organization_id) %>
+
+  <%= link_to admin_organization_path(organization_id) do %>
+    <% if organization.blank? %>
+      <small class="text-danger" title="<%= organization_id %>">Missing organization</small>
+      <code class="small"><%= organization_id %></code>
+    <% elsif organization.deleted? %>
+      <small>
+        <span class="less-strong"><%= organization.name %></span>
+        <% if organization.deleted? %>
+          <span class="text-danger">deleted!</span>
+        <% end %>
+      </small>
+    <% else %>
+      <%= organization.name %>
+    <% end %>
+  <% end %>
+
+  <% if render_search %>
+    <%= link_to search_emoji, url_for(sortable_search_params.merge(organization_id: organization_id)), class: "display-sortable-link small" %>
+  <% end %>
+<% end %>

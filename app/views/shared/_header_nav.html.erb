@@ -1,0 +1,67 @@
+<div class="top-header" id="total-top-header" data-domain="<%= Rails.env %>">
+  <%# <span class="background-extend"></span> %>
+  <div class="receptacle">
+    <div class="inner-recep">
+      <a class="follow-link logo" href="<%= root_url %>">
+        <%= image_tag "logo.svg", class: "standard-logo" %>
+        <%= image_tag "logo_cover.svg", class: "transparent-logo" %>
+        <span class="transparent-logo-bg"></span>
+        <span class="transparent-logo-bg"></span>
+
+        <span class="logo-background"></span>
+        <h2>Bike Index</h2>
+      </a>
+      <nav id="header-tabs" class="collapse in">
+        <ul class="global-tabs">
+          <span id="global-tabs-cover"></span>
+
+          <li class="expand_t yes_user hidden">
+            <a id="your_settings_n_stuff" href="#you">
+              <% if current_user.present? %>
+                <%= current_user.email %>
+              <% else %>
+                <%= t(".you") %>
+              <% end %>
+            </a>
+          </li>
+
+          <li class="super_user hidden">
+            <%= link_to t(".superuser_home"), admin_root_path, class: "follow-link" %>
+          </li>
+
+          <li class="expand_t no_user hidden">
+            <a class="expand-sign-in" href="#signup">
+              <%= t(".log_in") %>
+            </a>
+          </li>
+          <li class="no_user hidden">
+            <%= link_to t(".sign_up"), new_user_url, class: "follow-link" %>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <div id="you" class="tab-pane yes_user hidden">
+            <ul>
+              <li>
+                <%= link_to t(".your_bikes"), my_account_url, class: "follow-link" %>
+              </li>
+              <li>
+                <a title="<%= t(".your_preferences") %>" href="/edit_my_account">
+                  <%= t(".preferences") %>
+                </a>
+              </li>
+              <li>
+                <%= link_to t(".log_out"), session_path, method: :delete %>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div id="head-search-bikes">
+        <div class="search-fields">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

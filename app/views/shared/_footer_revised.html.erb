@@ -1,0 +1,152 @@
+<footer class="primary-footer">
+  <div class="primary-footer-nav">
+    <div class="container">
+      <div class="row">
+        <nav class="col-md-2 pull-right">
+          <h4><%= t(".bike_index") %></h4>
+          <ul>
+            <li><%= active_link t(".faq"), support_path %></li>
+            <li><%= active_link t(".blog"), news_index_path %></li>
+            <li><%= active_link t(".help"), help_path %></li>
+            <li><%= active_link t(".about"), about_path %></li>
+            <li><%= active_link t(".where_we_are"), where_path %></li>
+            <li><%= active_link t(".stolen_bike_recoveries"), recovery_stories_path %></li>
+            <li><%= active_link t(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path %></li>
+          </ul>
+        </nav>
+
+        <nav class="col-md-2 pull-right">
+          <h4><%= t(".support_us") %></h4>
+          <ul>
+            <li><%= active_link t(".donate"), why_donate_path %></li>
+            <li><%= active_link t(".store"), store_path %></li>
+            <li><%= active_link t(".ambassadors"), ambassadors_how_to_path %></li>
+          </ul>
+        </nav>
+
+        <nav class="col-md-2 pull-right">
+          <h4><%= t(".resources") %></h4>
+          <ul>
+            <li><%= active_link t(".api_documentation"), documentation_index_path %></li>
+            <li><%= active_link t(".dev_resources"), dev_and_design_path %></li>
+            <li><%= active_link t(".design_logos"), image_resources_path %></li>
+            <li><%= active_link t(".security"), security_path %></li>
+            <li><%= active_link t(".bike_manufacturer_list"), manufacturers_path %></li>
+            <li><%= active_link t(".protect_your_bike"), protect_your_bike_path %></li>
+            <li><%= active_link t(".stolen_bike_map"), "https://map.bikewise.org/" %></li>
+          </ul>
+        </nav>
+
+        <nav class="col-md-2 pull-right">
+          <h4><%= t(".who_we_serve") %></h4>
+          <ul>
+            <li><%= active_link t(".bike_shops"), for_bike_shops_path %></li>
+            <li><%= active_link t(".schools_and_universities"), for_schools_path %></li>
+            <li><%= active_link t(".cities"), for_cities_path %></li>
+            <li><%= active_link t(".law_enforcement"), for_law_enforcement_path %></li>
+            <li><%= active_link t(".community_groups"), for_community_groups_path %></li>
+            <li><%= link_to t(".press_inquiries"), "mailto:bryan@bikeindex.org,gavin@bikeindex.org" %></li>
+          </ul>
+        </nav>
+
+        <nav class="col-md-2 pull-right">
+        </nav>
+
+        <nav class="col-md-2 social-nav">
+          <ul>
+            <li>
+              <%#= link_to "https://twitter.com/BikeIndex" do %>
+              <%#  %span.sr-only Bike Index Twitter %>
+              <%#  = inline_svg_tag "icons/twitter.svg", class: "tw:block tw:w-6 tw:h-6" %>
+              <%# end %>
+              <%= link_to "https://bsky.app/profile/bikeindex.org" do %>
+                <span class="sr-only">Bike Index Blue SKy</span>
+                <%= inline_svg_tag "icons/bluesky.svg", class: "tw:block tw:w-6 tw:h-6" %>
+              <% end %>
+            </li>
+            <li>
+              <%= link_to "https://universeodon.com/@bikeindex", rel: 'me' do %>
+                <span class="sr-only">Bike Index Fediverse</span>
+                <%= inline_svg_tag "icons/mastodon.svg", class: "tw:block tw:w-6 tw:h-6" %>
+              <% end %>
+            </li>
+            <li>
+              <%= link_to "https://facebook.com/bikeindex" do %>
+                <span class="sr-only">Bike Index Facebook</span>
+                <%= inline_svg_tag "icons/facebook.svg", class: "tw:block tw:w-6 tw:h-6" %>
+              <% end %>
+            </li>
+            <li>
+              <%= link_to "https://instagram.com/bikeindex" do %>
+                <span class="sr-only">Bike Index Instagram</span>
+                <%= inline_svg_tag "icons/instagram.svg", class: "tw:block tw:w-6 tw:h-6" %>
+              <% end %>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <nav class="terms-and-stuff">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 text-left">
+          <%= form_tag nil, method: :get, class: "locale-form" do %>
+            <div class="row">
+              <div class="form-group">
+                <%= label_tag(:locale, t(".language")) %>
+                <%= select_tag(:locale,
+                  options_for_select(language_choices, selected: I18n.locale),
+                  class: "form-control-sm",
+                  onchange: "this.form.submit()") %>
+                <% if current_user.present? && current_user.preferred_language != I18n.locale %>
+                  <em class="below-input-help text-right">
+                    <%= link_to t(".change_preferred_language"), edit_my_account_path %>
+                  </em>
+                <% end %>
+                <%= submit_tag "update", name: "Update", class: "btn btn-primary btn-sm sr-only" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div class="col-md-6 text-right">
+          <p>
+            <%= [link_to(t(".privacy_policy"), privacy_url),
+              (current_user&.has_organization_role? ? link_to(t(".vendor_terms"), vendor_terms_url) : nil),
+            link_to(t(".terms_and_conditions"), terms_url)].compact.to_sentence.html_safe %>
+          </p>
+
+          <p>
+            <span data-license="https://github.com/bikeindex/bike_index/blob/main/LICENSE">
+              <%= t(".copyright_html", current_year: Time.current.year) %>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </nav>
+</footer>
+
+<%# Facebook pixel %>
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','//connect.facebook.net/en_US/fbevents.js');
+fbq('init', '199066297131941');
+fbq('track', "PageView");
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=199066297131941&ev=PageView&noscript=1"/></noscript>
+
+
+<script>
+  var trackOutboundLink = function(url) {
+    ga("send", "event", "outbound", "click", url, {transport: "beacon", hitCallback: function() {document.location = url;}});
+  };
+
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-K88RMWC');
+</script>
+
+<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K88RMWC" height="0" width="0" style="display:none;visibility:hidden" title="Google tag manager"></iframe>
