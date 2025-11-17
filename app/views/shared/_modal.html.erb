@@ -4,7 +4,7 @@
 <% data_hash ||= {} %>
 <% start_open ||= false %>
 
-<div class="bootstrapstyle modal fade" id="<%= id %>" data-<%= data_hash.map { |k, v| "#{k}=\"#{v}\"" }.join(' ') %>>
+<%= content_tag(:div, id:, class: "bootstrapstyle modal fade", data: data_hash) do %>
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <% if title %>
@@ -23,7 +23,7 @@
       <%= modal_body %>
     </div>
   </div>
-</div>
+<% end %>
 
 <% if start_open && id.present? %>
   <script>

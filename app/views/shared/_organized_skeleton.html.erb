@@ -1,5 +1,5 @@
 <% show_overview_dashboard = current_organization.overview_dashboard? %>
-<% show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link %>
+<% show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" %> <%# If viewing the dashboard, show the link %>
 <nav class="organized-left-menu bootstrapstyle">
   <div class="organized-menu-wrapper">
     <header class="<%= show_overview_dashboard ? "with-dashboard-link" : "with-divider-below" %>">
@@ -13,7 +13,6 @@
         </span>
       </h3>
     </header>
-
     <ul class="organized-mainmenu">
       <%# unless we're showing overview_dashboard, we want to start off with a divider - which is not true of the header menu %>
       <% unless show_overview_dashboard %>
@@ -23,8 +22,6 @@
     </ul>
   </div>
 </nav>
-
-
 <div class="organized-wrap">
   <div class="<%= organized_container %>">
     <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(current_organization) %>
@@ -52,8 +49,8 @@
         <button class="close" aria-label="Close" data-dismiss="alert" type="button">
           <span aria-hidden="true">&times;</span>
         </button>
-        <p>
-          <%= t(".use_lightspeed_retail_pos") %>
+        <div>
+          <p><%= t(".use_lightspeed_retail_pos") %></p>
           <ul>
             <li>
               <% link = link_to t(".integrate_bike_index_with_lightspeed"), lightspeed_interface_path %>
@@ -64,19 +61,18 @@
               <%= t(".read_a_full_explanation_html", link: link) %>
             </li>
           </ul>
-        </p>
-        <p class="mt-2">
-          <%= t(".use_ascend") %>
+        </div>
+        <div class="mt-2">
+          <p><%= t(".use_ascend") %></p>
           <ul>
             <li>
               <% link = link_to t(".integrate_bike_index_with_ascend"), ascend_path %>
               <%= t(".link_to_register_html", link: link) %>
             </li>
           </ul>
-        </p>
-
-        <p class="mt-2">
-          <%= t(".other_point_of_sale_system") %>
+        </div>
+        <div class="mt-2">
+          <p><%= t(".other_point_of_sale_system") %></p>
           <ul>
             <li>
               <% if controller_name == "bikes" && action_name == "new" %>
@@ -87,14 +83,12 @@
               <% end %>
             </li>
           </ul>
-        </p>
+        </div>
       </div>
     <% end %>
-
     <%= yield %>
   </div>
 </div>
-
 <% if organized_include_javascript_pack? %>
   <script>
     window.passiveOrganizationId = "<%= passive_organization&.slug %>";
