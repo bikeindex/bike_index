@@ -148,7 +148,7 @@
   <% if render_get_your_stolen_bike_back %>
     <div class="root-landing-recovery-stories mt-4">
       <div id="recovery-stories-container" class="extras-hidden">
-        <%= render RecoveryDisplay.limit(5) %>
+        <%= render partial: "shared/recovery_display", collection: RecoveryDisplay.limit(5) %>
         <div class="recovery-block recovery-see-more">
           <%= link_to "read more recovery stories",
             recovery_stories_path,

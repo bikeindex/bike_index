@@ -37,39 +37,6 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "0dc30a4e48b5fb1626c48072561812f8641dfa1d0ef609422b0d8ad805ed2b96",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/shared/_recovery_display.html.erb",
-      "line": 6,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "(Unresolved Model).new.quote",
-      "render_path": [
-        {
-          "type": "template",
-          "name": "welcome/index",
-          "line": 22,
-          "file": "app/views/welcome/index.html.erb",
-          "rendered": {
-            "name": "shared/_recovery_display",
-            "file": "app/views/shared/_recovery_display.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "shared/_recovery_display"
-      },
-      "user_input": null,
-      "confidence": "High",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
       "fingerprint": "0ffefb46fb11b12f2129c2b96c51cade952dc489a83a3a4886062071e2ad6410",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped model attribute",
@@ -271,6 +238,39 @@
         22
       ],
       "note": "edit_templates is already limits the potential values that @edit_template can have."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "256abbf7d9c0f9ab5f2d308097945c944bccc3c428f6e769bff43d767a43d057",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/shared/_recovery_display.html.erb",
+      "line": 29,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(safe_join([(RecoveryDisplay.new.bike.type_titleize or t(\".bike\")), content_tag(:span, t(\".recovered_date\", :date => l(RecoveryDisplay.new.recovered_at, :format => :dotted)), :class => \"recover-date\")], \" \"), RecoveryDisplay.new.link, :class => \"recover-date\")",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "shared/_content_skeleton",
+          "line": 151,
+          "file": "app/views/shared/_content_skeleton.html.erb",
+          "rendered": {
+            "name": "shared/_recovery_display",
+            "file": "app/views/shared/_recovery_display.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "shared/_recovery_display"
+      },
+      "user_input": "RecoveryDisplay.new.link",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": ""
     },
     {
       "warning_type": "Redirect",
@@ -628,7 +628,7 @@
           "type": "controller",
           "class": "Organized::BikesController",
           "method": "new_iframe",
-          "line": 98,
+          "line": 103,
           "file": "app/controllers/organized/bikes_controller.rb",
           "rendered": {
             "name": "organized/bikes/new_iframe",
@@ -1004,6 +1004,39 @@
       "confidence": "Medium",
       "cwe_id": [
         915
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "8ded63fd8b15c60463095cc709a843c6ac70f7b400a14c4d3f17052c383543f5",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/shared/_recovery_display.html.erb",
+      "line": 6,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "RecoveryDisplay.new.quote",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "shared/_content_skeleton",
+          "line": 151,
+          "file": "app/views/shared/_content_skeleton.html.erb",
+          "rendered": {
+            "name": "shared/_recovery_display",
+            "file": "app/views/shared/_recovery_display.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "shared/_recovery_display"
+      },
+      "user_input": null,
+      "confidence": "High",
+      "cwe_id": [
+        79
       ],
       "note": ""
     },
@@ -1585,39 +1618,6 @@
         "template": "review_impound_claims/_display"
       },
       "user_input": "(Unresolved Model).new.image_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "cc6d80072efab393542d4218a3034b11653b77310a9017a6c0b7fb8c20633528",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/shared/_recovery_display.html.erb",
-      "line": 29,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(safe_join([((Unresolved Model).new.bike.type_titleize or t(\".bike\")), content_tag(:span, t(\".recovered_date\", :date => l((Unresolved Model).new.recovered_at, :format => :dotted)), :class => \"recover-date\")], \" \"), (Unresolved Model).new.link, :class => \"recover-date\")",
-      "render_path": [
-        {
-          "type": "template",
-          "name": "welcome/index",
-          "line": 22,
-          "file": "app/views/welcome/index.html.erb",
-          "rendered": {
-            "name": "shared/_recovery_display",
-            "file": "app/views/shared/_recovery_display.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "shared/_recovery_display"
-      },
-      "user_input": "(Unresolved Model).new.link",
       "confidence": "Weak",
       "cwe_id": [
         79
