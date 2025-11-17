@@ -1,6 +1,7 @@
 {
   "name": "bike_index-webapp",
   "devDependencies": {
+    "@herb-tools/formatter": "^0.8.1",
     "standard": "*"
   },
   "scripts": {
