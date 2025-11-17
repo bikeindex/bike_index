@@ -4159,11 +4159,6 @@ it:
       edit: Modifica
       image_from:
       looks_like_this_is_your_image:
-  recovery_displays:
-    recovery_display:
-      bike:
-      recovered_date:
-      translated_from_english:
   registrations:
     create:
       follow_link_in_email:
@@ -4467,6 +4462,10 @@ it:
         del furto e la gente non saprà dove cercare la tua %{bike_type}.
       without_photo_all_is_lost: Se non hai foto della tua bicicletta, cerca un'immagine
         stock su Internet e caricala. Senza un'immagine l'avviso non sarà efficace.
+    recovery_display:
+      bike: Bicicletta
+      recovered_date:
+      translated_from_english:
   stolen:
     index:
       ambassador: ambasciatore

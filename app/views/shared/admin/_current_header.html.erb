@@ -1,0 +1,122 @@
+<% viewing ||= controller_name.humanize %>
+
+
+<% header_present = params.keys & %i[user_id organization_id search_bike_id primary_activity search_kind search_marketplace_listing_id search_membership_id] %>
+
+<% if header_present %>
+  <div class="col-12 mt-4">
+    <% if params[:user_id].present? %>
+      <% user_subject = @user || User.unscoped.find_by_id(params[:user_id]) %>
+      <p>
+        <% if user_subject.present? %>
+          <%= viewing.pluralize %> for
+          <%= link_to user_subject.display_name, admin_user_path(user_subject) %>
+        <% else %>
+          <span class="text-danger">
+            User #<%= params[:user_id] %>
+            <em>missing</em>
+          </span>
+        <% end %>
+        <%= link_to "view for all users", url_for(sortable_search_params.merge(user_id: nil)), class: "gray-link small" %>
+      </p>
+    <% end %>
+
+    <% if params[:search_bike_id].present? || @bike.present? %>
+      <% bike_subject = @bike || Bike.unscoped.find_by_id(params[:search_bike_id]) %>
+      <p>
+        <% if bike_subject.present? %>
+          <%= viewing.pluralize %> for
+          <%= link_to bike_subject.title_string, admin_bike_path(bike_subject) %>
+          <% if bike_subject.deleted? %>
+            <%= render partial: "/admin/bikes/deleted_alert", locals: { bike: bike_subject } %>
+          <% end %>
+        <% else %>
+          <span class="text-danger">
+            Bike #<%= params[:search_bike_id] %>
+            <em>missing</em>
+          </span>
+        <% end %>
+        <%= link_to "view for all bikes", url_for(sortable_search_params.merge(search_bike_id: nil)), class: "gray-link small" %>
+      </p>
+    <% end %>
+    <% if params[:search_marketplace_listing_id].present? || @marketplace_listing.present? %>
+      <% marketplace_listing = @marketplace_listing || MarketplaceListing.find_by_id(params[:search_marketplace_listing_id]) %>
+      <p>
+        <% if marketplace_listing.present? %>
+          <%= viewing.pluralize %> for
+          <em>
+            Marketplace Listing
+            <%= render(Badge::Status::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing)) %>
+            <%= "##{marketplace_listing.id}," %>
+          </em>
+          <%= render(partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id}) %>
+        <% else %>
+          <span class="text-danger">
+            Marketplace #<%= params[:search_marketplace_listing_id] %>
+            <em>missing</em>
+          </span>
+        <% end %>
+        <%= link_to "view for all marketplace listings", url_for(sortable_search_params.merge(search_marketplace_listing_id: nil)), class: "gray-link small" %>
+      </p>
+    <% end %>
+
+    <% if params[:organization_id].present? %>
+      <p>
+        <%= viewing.pluralize %> for
+        <% if current_organization.present? %>
+          <em>
+            <%= link_to current_organization.short_name, admin_organization_path(current_organization) %>
+          </em>
+        <% else %>
+          <strong>no organization</strong>
+        <% end %>
+
+        <%= link_to "view for all organizations", url_for(sortable_search_params.merge(organization_id: nil)), class: "gray-link small" %>
+        <% if current_organization&.deleted? %>
+          <em class="d-block mt-1 less-strong">
+            (<%= current_organization.short_name %> is <em class="text-danger">deleted</em>) - at
+            <span class="convertTime preciseTime">
+              <%= l current_organization.deleted_at, format: :convert_time %>
+            </span>
+          </em>
+        <% end %>
+      </p>
+    <% end %>
+
+    <% if params[:search_membership_id].present? %>
+      <% membership_id = params[:search_membership_id] %>
+      <p>
+        <%= viewing.pluralize %> for
+        <%= link_to "Membership #{params[:search_membership_id]}", admin_membership_path(membership_id) %>
+        <%= link_to "view for all memberships", url_for(sortable_search_params.merge(search_membership_id: nil)), class: "gray-link small" %>
+      </p>
+    <% end %>
+
+    <% if params[:search_kind].present? %>
+      <% kind_humanized ||= params[:search_kind].humanize %>
+      <p>
+        <%= viewing.pluralize %> for
+        <strong><%= kind_humanized %></strong>
+
+        <%= link_to "view for all kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "gray-link small" %>
+      </p>
+    <% end %>
+
+    <% if params[:primary_activity].present? %>
+      <% primary_activity = @primary_activity || PrimaryActivity.find_by_id(params[:primary_activity]) %>
+
+      <p>
+        <%= viewing.pluralize %> for
+        <strong>
+          <% if primary_activity.present? %>
+            <%= link_to primary_activity.name, admin_primary_activity_path(primary_activity) %>
+          <% else %>
+            <span class="text-danger">unknown primary activity "<%= params[:primary_activity] %>"</span>
+          <% end %>
+        </strong>
+
+        <%= link_to "view for all primary activities", url_for(sortable_search_params.merge(primary_activity: nil)), class: "gray-link small" %>
+      </p>
+    <% end %>
+  </div>
+<% end %>

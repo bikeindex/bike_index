@@ -1,0 +1,76 @@
+<% is_cached ||= false %>
+<% initial_amount ||= nil %>
+<% is_payment ||= false %>
+<% kind ||= "page" %>
+
+<% unless is_payment %>
+  <p>
+    <strong><%= t(".subheader_1") %></strong>
+    <br>
+    <%= t(".subheader_2") %>
+  </p>
+<% end %>
+<%= form_for Payment.new, html: {id: "new-payment-form"} do |f| %>
+  <%= hidden_field_tag :is_arbitrary, false %>
+  <%= f.hidden_field :amount_cents %>
+  <%= f.hidden_field :referral_source, value: params[:source] %>
+  <%= f.hidden_field :kind, value: (is_payment ? "payment" : "donation") %>
+  <%# If this is rendering from cache, don't include email because caching %>
+  <% email = is_cached ? nil : current_user&.email %>
+  <%= f.hidden_field :email, value: email %>
+
+
+  <ul class="row amount-list">
+    <% if is_payment # If payment, have one non-arbitrary button %>
+      <li class="col-xs-6 offset-sm-3">
+        <a class="btn btn-secondary active" data-amount="<%= initial_amount * 100 %>">
+          <%= initial_amount %>$
+        </a>
+      </li>
+    <% else %>
+      <% numbers = [5, 15, 25, 50, 100, 200, 500] %>
+      <% arbitrary_initial_value = numbers.include?(initial_amount) ? nil : initial_amount %>
+      <% numbers.each do |amount| %>
+        <li class="col-xs-4">
+          <a class="btn btn-secondary <%= amount == initial_amount ? "active" : "" %>" data-amount="<%= amount * 100 %>">
+            <%= number_to_currency(amount, precision: 0) %>
+          </a>
+        </li>
+      <% end %>
+      <li class="col-xs-8">
+        <div class="input-group">
+          <div class="input-group-addon">
+            <%= t("number.currency.format.unit") %>
+          </div>
+
+          <input id="arbitrary-amount" class="form-control <%= 'active' if arbitrary_initial_value.present? %>" type="number" min="0" placeholder="<%= t('.other_amount') %>" step="0.01" value="<%= arbitrary_initial_value %>">
+        </div>
+      </li>
+    <% end %>
+
+    <% if kind == "modal" %>
+      <li class="col-xs-6 text-left next-steps">
+        <a class="btn btn-secondary no-donate-btn" aria-label="Close" data-dismiss="modal">
+          <small><%= t(".skip") %></small>
+        </a>
+      </li>
+    <% end %>
+    <li class="next-steps <%= kind == "modal" ? "col-xs-6 text-right" : "col-xs-12 text-center" %>">
+      <%= submit_tag t(".next"), class: 'btn btn-primary d-inline-block' %>
+    </li>
+  </ul>
+<% end %>
+
+<div class="nfp-info mt-2">
+  <% unless is_payment %>
+    <%= link_to t(".what_does_your_donation_do"), why_donate_path, target: "_blank" %>
+    <span class="d-block mt-4"></span>
+  <% end %>
+  <small>
+    <% nonprofit_link = link_to t(".501c3_nonprofit"), news_url("bike-index--now-a-nonprofit"), target: "_blank" %>
+    <%= t(".bike_index_is_a_nonprofit_html", nonprofit_link: nonprofit_link) %>
+  </small>
+</div>
+
+<%# add a google event for tracking when this is loaded - useful for comparison with donation modal %>
+<script>ga("send", {hitType: "event", eventCategory: "donation-form", eventAction: "form-load", eventLabel: "donation_<%= kind %>"});</script>
