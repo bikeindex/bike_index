@@ -30,7 +30,7 @@
 
         %p= t(".with_over_registrations_and_almost", registrations:number_with_delimiter(Counts.total_bikes), stolen_recoveries: number_with_delimiter(Counts.recoveries))
 
-        %p= render partial: "landing_pages/tweet", locals: { tweet_id: 839247587521679360 }
+        %p= render partial: "landing_pages/social_post", locals: { post_id: 839247587521679360 }
 
         %h3= t(".put_a_lock_on_bike_theft")
 
@@ -41,7 +41,7 @@
         %p
           = t(".if_you_want_to_collaborate_html", link: link_to(t(".here"), for_cities_path))
 
-        %p= render partial: "landing_pages/tweet", locals: { tweet_id: 890211853942407168 }
+        %p= render partial: "landing_pages/social_post", locals: { post_id: 890211853942407168 }
 
         %h4= t(".related_articles")
         %ul
