@@ -94,11 +94,11 @@ class SocialPost < ApplicationRecord
         foto.binmode
         foto.write open_image.read # TODO: Refactor this.
         foto.rewind
-        tweeted = social_account.tweet(body, foto)
+        tweeted = social_account.post(body, foto)
         update(platform_response: tweeted.as_json)
       end
     else
-      tweeted = social_account.tweet(body)
+      tweeted = social_account.post(body)
       update(platform_response: tweeted.as_json)
     end
     tweeted
