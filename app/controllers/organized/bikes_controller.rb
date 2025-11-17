@@ -85,6 +85,11 @@ module Organized
     end
 
     def new
+      unless current_organization.auto_user.present?
+        flash[:error] = "You need to specify an email for your 'registration email' to be sent from"
+        redirect_to(organization_manage_path(organization_id: current_organization.to_param)) && return
+      end
+
       @unregistered_parking_notification = current_organization.enabled?("parking_notifications") && params[:parking_notification].present?
       if @unregistered_parking_notification
         @page_title = "#{current_organization.short_name} New parking notification"
