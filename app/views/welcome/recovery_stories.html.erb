@@ -1,0 +1,22 @@
+<div class="container">
+  <div class="row">
+    <h3>
+      <%= t(".recovery_stories") %>
+    </h3>
+  </div>
+
+  <div id="recovery-stories-listing">
+    <div class="container clearfix">
+      <div class="recovery-stories-container" data-stories-count="<%= @slice1.length %>">
+        <%= render partial: "shared/recovery_display", collection: @slice1 %>
+      </div>
+      <div class="recovery-stories-container" data-stories-count="<%= @slice2.length %>">
+        <%= render partial: "shared/recovery_display", collection: @slice2 %>
+      </div>
+    </div>
+
+    <div class="pt-4 pb-4">
+      <%= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+    </div>
+  </div>
+</div>

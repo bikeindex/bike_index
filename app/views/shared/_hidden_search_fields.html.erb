@@ -1,0 +1,34 @@
+<% kind ||= "admin" %>
+<% skip_organization ||= false %>
+<% include_primary_activity ||= false %>
+
+<%# Sortable %>
+<% if defined?(sort_column) %>
+  <%= hidden_field_tag :sort, sort_column %>
+  <%= hidden_field_tag :sort_direction, sort_direction %>
+<% end %>
+<% if include_primary_activity %>
+  <%= hidden_field_tag :primary_activity, params[:primary_activity] %>
+<% end %>
+<%# Period %>
+<%= hidden_field_tag :render_chart, @render_chart %>
+<%= hidden_field_tag :period, params[:period] %>
+<%= hidden_field_tag :end_time, params[:end_time] %>
+<%= hidden_field_tag :start_time, params[:start_time] %>
+<%= hidden_field_tag :user_id, params[:user_id] %>
+<%= hidden_field_tag :search_bike_id, params[:search_bike_id] %>
+<%= hidden_field_tag :search_marketplace_listing_id, params[:search_marketplace_listing_id] %>
+<%# common things that might be around %>
+<%= hidden_field_tag :search_status, params[:search_status] %>
+<%= hidden_field_tag :search_kind, params[:search_kind] %>
+<%# ignored bikes scope %>
+<%= hidden_field_tag :search_ignored, params[:search_ignored] %>
+
+<% unless skip_organization %>
+  <%= hidden_field_tag :organization_id, current_organization&.to_param %>
+<% end %>
+
+<%# Shared bike search fields %>
+<% if kind == "organized_bike_search" %>
+  <%= hidden_field_tag :stolenness, @stolenness %>
+<% end %>

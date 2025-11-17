@@ -5076,6 +5076,10 @@ nl:
       search_owner_email: Zoek eigenaar e-mail
       submit: Voorleggen
       within: binnen
+    recovery_display:
+      bike: Fiets
+      recovered_date: hersteld %{date}
+      translated_from_english: vertaald uit het Engels
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5419,11 +5423,6 @@ nl:
     show:
       by: Door
       also_published: 'Ook gepubliceerd op:'
-  recovery_displays:
-    recovery_display:
-      bike: Fiets
-      recovered_date: hersteld %{date}
-      translated_from_english: vertaald uit het Engels
   stolen:
     index:
       ambassador: Ambassadeur

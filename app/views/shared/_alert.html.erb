@@ -1,0 +1,28 @@
+<%# NOTE %>
+<%# ---- %>
+<%# There is a mustache alert template in revised_messages %>
+<%# that needs to be updated when this changes %>
+
+<%
+  class_names ||= ''
+  type ||= 'error'
+  class_names += " alert-#{type}"
+  seconds ||= 0
+
+  title ||= false
+  body ||= ''
+
+  unless body.include? '<' # Ensure we make it html
+    body = content_tag(:p, body)
+  end
+%>
+
+<div class="alert in <%= class_names %>" data-seconds="<%= seconds %>">
+  <button class="close" aria-label="Close" data-dismiss="alert" type="button">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <% if title %>
+    <h4><%= title %></h4>
+  <% end %>
+  <%= body %>
+</div>

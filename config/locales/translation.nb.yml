@@ -5271,11 +5271,6 @@ nb:
       edit: Endre
       image_from: Bilde fra %{image_title}
       looks_like_this_is_your_image: Ser ut som dette er bildet ditt.
-  recovery_displays:
-    recovery_display:
-      bike: Sykkel
-      recovered_date: gjenopprettet %{date}
-      translated_from_english: oversatt fra engelsk
   registrations:
     create:
       follow_link_in_email: Følg lenken i e-posten for å fullføre registreringen.
@@ -5642,6 +5637,10 @@ nb:
       without_photo_all_is_lost: Hvis du ikke har noen bilder av sykkelen din, finn
         et lagerbilde på internett og last det opp. Uten et bilde vil ikke det promoterte
         varselet være effektivt.
+    recovery_display:
+      bike: Sykkel
+      recovered_date: gjenopprettet %{date}
+      translated_from_english: oversatt fra engelsk
   stolen:
     index:
       ambassador: ambassadør

@@ -1,0 +1,166 @@
+<% if @blog.present? %>
+  <% render_why_donate = @blog.title_slug == Blog.why_donate_slug %>
+  <% render_get_your_stolen_bike_back = @blog.title_slug == Blog.get_your_stolen_bike_back_slug %>
+<% end %>
+
+<div class="container">
+  <div class="row">
+    <%# Unless one of the permitted pages, wrap it in .legacy-content-wrap %>
+    <% additional_class = %w().include?(content_page_type) ? "" : "legacy-content-wrap" %>
+    <div class="col-md-8 primary-content-block <%= additional_class %>">
+      <%= yield %>
+      <div class="d-md-none d-sm-block mb-2 mt-4">
+        <div class="ad-block ad-binx ad468x60"></div>
+      </div>
+    </div>
+    <div class="col-md-4 primary-content-menu">
+      <%# check if this is a donation info page %>
+      <% if render_why_donate %>
+        <% referral_source = params[:source].present? if params[:source].present? %>
+        <% referral_source ||= "why-donate" if @blog.title_slug == Blog.why_donate_slug %>
+        <% referral_source ||= @blog.title_slug %>
+        <div class="next-steps-wrap donation">
+          <header>
+            <%= t(".make_a_difference") %>
+            <%= link_to t(".donate_today"), donate_path(source: referral_source), class: "btn btn-primary" %>
+          </header>
+          <ul>
+            <li class="mt-3">
+              <%= link_to "Donate $5", donate_path(initial_amount: 5, source: referral_source), class: "btn btn-secondary donate-btn" %>
+            </li>
+            <li class="mt-2">
+              <%= link_to "Donate $50", donate_path(initial_amount: 50, source: referral_source), class: "btn btn-secondary donate-btn" %>
+            </li>
+            <li class="mt-2 mb-2">
+              <%= link_to "Donate $200", donate_path(initial_amount: 200, source: referral_source), class: "btn btn-secondary donate-btn" %>
+            </li>
+          </ul>
+        </div>
+        <style type="text/scss">
+          .next-steps-wrap .btn.donate-btn {
+            display: block;
+            width: auto;
+            margin-top: 0;
+          }
+          .next-steps-wrap.donation {
+            border-radius: 4px;
+          }
+        </style>
+      <% elsif render_get_your_stolen_bike_back %>
+        <div class="next-steps-wrap donation">
+          <header>
+            Bike Index recovery record
+          </header>
+          <ul>
+            <li class="mt-3">
+              <strong>
+                <%= number_with_delimiter(Counts.recoveries) %> -
+              </strong>
+              Stolen bikes recovered
+            </li>
+            <li class="mt-2">
+              <strong>
+                $<%= number_with_delimiter(Counts.recoveries_value) %> -
+              </strong>
+              Value of bikes recovered with Bike Index
+            </li>
+          </ul>
+        </div>
+      <% else %>
+        <nav class="content-nav-group">
+          <h3><%= t(".related") %></h3>
+          <ul>
+            <% if content_page_type == "news" %>
+              <li>
+                <% all_active = action_name == "index" && !sortable_search_params? %>
+                <%= link_to t(".bike_index_news"), news_index_path, class: (all_active ? "active" : "") %>
+              </li>
+            <% end %>
+            <% if @related_blogs.present? %>
+              <% @related_blogs.each do |blog| %>
+                <li class="mt-3">
+                  <%= link_to blog.title, news_url(blog) %>
+                </li>
+              <% end %>
+            <% else %>
+              <li>
+                <%= active_link t(".about"), about_path %>
+              </li>
+            <% end %>
+            <% unless content_page_type == 'news' %>
+              <li>
+                <%= active_link t(".help"), help_url %>
+              </li>
+              <li>
+                <%= active_link t(".where"), where_path %>
+              </li>
+              <% if %w(manufacturers where).include?(content_page_type) %>
+                <li>
+                  <%= active_link t(".sign_up_your_organization"), new_organization_path %>
+                </li>
+              <% end %>
+            <% end %>
+          </ul>
+        </nav>
+
+        <nav class="content-nav-group">
+          <h3><%= t(".other_pages") %></h3>
+          <ul>
+            <li>
+              <%= active_link t(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path %>
+            </li>
+            <% unless content_page_type == "news" %>
+              <li>
+                <%= active_link t(".bike_index_news"), news_index_path %>
+              </li>
+            <% end %>
+            <li>
+              <%= active_link t(".protect_your_bike"), protect_your_bike_path %>
+            </li>
+            <li>
+              <%= active_link t(".bicycle_serials"), serials_path %>
+            </li>
+            <% if %w(news about manufacturers).include?(content_page_type) %>
+              <li>
+                <%= active_link t(".donate"), why_donate_path %>
+              </li>
+            <% end %>
+            <% if %w(news serials manufacturers).include?(content_page_type) %>
+              <li>
+                <%= active_link t(".bike_index_store"), store_path %>
+              </li>
+            <% end %>
+            <li>
+              <%= active_link t(".design_and_developer_resources"), dev_and_design_path %>
+            </li>
+            <li>
+              <%= active_link t(".sign_up_your_organization"), new_organization_path %>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="ad-block ad-binx ad300x600 d-none d-md-block"></div>
+        <%= render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-3 d-none d-md-block"} %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if render_get_your_stolen_bike_back %>
+    <div class="root-landing-recovery-stories mt-4">
+      <div id="recovery-stories-container" class="extras-hidden">
+        <%= render RecoveryDisplay.limit(5) %>
+        <div class="recovery-block recovery-see-more">
+          <%= link_to "read more recovery stories",
+            recovery_stories_path,
+            class: "see-more-link" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @blog.present? && current_user&.superuser? %>
+    <div class="text-center mt-4 less-strong">
+      <%= link_to "edit post", edit_admin_news_path(@blog), class: "btn btn-outline-primary" %>
+    </div>
+  <% end %>
+</div>

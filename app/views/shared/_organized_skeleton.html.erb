@@ -1,0 +1,104 @@
+<% show_overview_dashboard = current_organization.overview_dashboard? %>
+<% show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link %>
+<nav class="organized-left-menu bootstrapstyle">
+  <div class="organized-menu-wrapper">
+    <header class="<%= show_overview_dashboard ? "with-dashboard-link" : "with-divider-below" %>">
+      <% if OrganizationDisplayer.avatar?(current_organization) %>
+        <%= image_tag current_organization.avatar.url(:medium) %>
+      <% end %>
+      <h3>
+        <%= t(".admin_panel") %>
+        <span>
+          <%= current_organization.name %>
+        </span>
+      </h3>
+    </header>
+
+    <ul class="organized-mainmenu">
+      <%# unless we're showing overview_dashboard, we want to start off with a divider - which is not true of the header menu %>
+      <% unless show_overview_dashboard %>
+        <li class="divider-nav-item"></li>
+      <% end %>
+      <%= render partial: "/shared/organized_menu_items", locals: {passed_organization: current_organization} %>
+    </ul>
+  </div>
+</nav>
+
+
+<div class="organized-wrap">
+  <div class="<%= organized_container %>">
+    <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(current_organization) %>
+      <div class="organization-wide-alert alert alert-info in">
+        <button class="close" aria-label="Close" data-dismiss="alert" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <p>
+          <%= t(".additional_features_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
+        </p>
+      </div>
+    <% end %>
+    <% if OrganizationDisplayer.subscription_expired_alert?(current_organization) %>
+      <div class="organization-wide-alert alert alert-info in">
+        <button class="close" aria-label="Close" data-dismiss="alert" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <p>
+          <%= t(".subscription_expired_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
+        </p>
+      </div>
+    <% end %>
+    <% if OrganizationDisplayer.bike_shop_display_integration_alert?(current_organization) %>
+      <div class="organization-wide-alert alert alert-info in">
+        <button class="close" aria-label="Close" data-dismiss="alert" type="button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <p>
+          <%= t(".use_lightspeed_retail_pos") %>
+          <ul>
+            <li>
+              <% link = link_to t(".integrate_bike_index_with_lightspeed"), lightspeed_interface_path %>
+              <%= t(".link_to_register_html", link: link) %>
+            </li>
+            <li>
+              <% link = link_to t( ".how_integration_works"), lightspeed_path %>
+              <%= t(".read_a_full_explanation_html", link: link) %>
+            </li>
+          </ul>
+        </p>
+        <p class="mt-2">
+          <%= t(".use_ascend") %>
+          <ul>
+            <li>
+              <% link = link_to t(".integrate_bike_index_with_ascend"), ascend_path %>
+              <%= t(".link_to_register_html", link: link) %>
+            </li>
+          </ul>
+        </p>
+
+        <p class="mt-2">
+          <%= t(".other_point_of_sale_system") %>
+          <ul>
+            <li>
+              <% if controller_name == "bikes" && action_name == "new" %>
+                <%= t(".viewing_our_streamlined_page") %>
+              <% else %>
+                <% link = link_to t(".streamlined_bike_shop_registration_page"), new_organization_bike_path(organization_id: current_organization.to_param) %>
+                <%= t(".register_bikes_with_link_html", link: link) %>
+              <% end %>
+            </li>
+          </ul>
+        </p>
+      </div>
+    <% end %>
+
+    <%= yield %>
+  </div>
+</div>
+
+<% if organized_include_javascript_pack? %>
+  <script>
+    window.passiveOrganizationId = "<%= passive_organization&.slug %>";
+  </script>
+  <%# Important that this is below yield, sometimes important page data is added to the dom in there %>
+  <script src="/vendored_assets/application.js"></script>
+<% end %>
