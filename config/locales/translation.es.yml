@@ -4134,11 +4134,6 @@ es:
       edit: Editar
       image_from:
       looks_like_this_is_your_image:
-  recovery_displays:
-    recovery_display:
-      bike:
-      recovered_date:
-      translated_from_english:
   registrations:
     create:
       follow_link_in_email:
@@ -4435,6 +4430,10 @@ es:
       verify_number:
       without_location_all_is_lost:
       without_photo_all_is_lost:
+    recovery_display:
+      bike:
+      recovered_date:
+      translated_from_english:
   stolen:
     index:
       ambassador:
