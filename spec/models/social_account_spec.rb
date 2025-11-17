@@ -39,29 +39,29 @@ RSpec.describe SocialAccount, type: :model do
 
       social_account.fetch_account_info
 
-      account_hash = social_account.social_account_info
+      account_hash = social_account.account_info
       expect(account_hash["name"]).to be_present
       expect(account_hash["profile_image_url_https"]).to be_present
     end
 
     it "sets the account info from fetch_account_info on save" do
-      social_account = FactoryBot.build(:social_account, social_account_info: {})
+      social_account = FactoryBot.build(:social_account, account_info: {})
       expect(social_account).to receive(:twitter_user).and_return({screen_name: "foo", created_at: "Sun Jun 22 20:46:35 +0000 2014"})
 
       social_account.save
       social_account.reload
-      expect(social_account.social_account_info).to be_present
+      expect(social_account.account_info).to be_present
       expect(social_account.created_at).to be_within(1.second).of Time.at(1403469995)
     end
 
     it "does nothing if account info is present" do
-      social_account = FactoryBot.build(:social_account, social_account_info: {screen_name: "BikeIndex"})
+      social_account = FactoryBot.build(:social_account, account_info: {screen_name: "BikeIndex"})
       allow(social_account).to receive(:twitter_user).and_return({screen_name: "foo"})
 
       social_account.fetch_account_info
 
       expect(social_account).to_not have_received(:twitter_user)
-      expect(social_account.social_account_info).to eq("screen_name" => "BikeIndex")
+      expect(social_account.account_info).to eq("screen_name" => "BikeIndex")
     end
   end
 
@@ -117,7 +117,7 @@ RSpec.describe SocialAccount, type: :model do
   it "delegates class methods to the client instance", vcr: true do
     FactoryBot.create(:social_account_1, :national, :active, :default)
     tweet_id = 1170061123191791622
-    status = SocialAccount.get_tweet(tweet_id)
+    status = SocialAccount.get_post(tweet_id)
     expect(status).to be_an_instance_of(Twitter::Tweet)
     expect(status.id).to eq(tweet_id)
   end
