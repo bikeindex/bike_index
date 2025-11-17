@@ -4,7 +4,7 @@
 <% data_hash ||= {} %>
 <% start_open ||= false %>
 
-<div class="bootstrapstyle modal fade" id="<%= id %>" data-<%= data_hash.map { |k, v| "#{k}=\"#{v}\"" }.join(' ') %>>
+<div class="bootstrapstyle modal fade" id="<%= id %>" <%= data_hash.map { |k, v| "data-#{k}=\"#{v}\"" }.join(' ').html_safe %>>
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <% if title %>

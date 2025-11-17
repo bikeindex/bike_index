@@ -1,5 +1,5 @@
 <% show_overview_dashboard = current_organization.overview_dashboard? %>
-<% show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" # If viewing the dashboard, show the link %>
+<% show_overview_dashboard = true if controller_name == "dashboard" && action_name == "index" %> <%# If viewing the dashboard, show the link %>
 <nav class="organized-left-menu bootstrapstyle">
   <div class="organized-menu-wrapper">
     <header class="<%= show_overview_dashboard ? "with-dashboard-link" : "with-divider-below" %>">
@@ -13,7 +13,6 @@
         </span>
       </h3>
     </header>
-
     <ul class="organized-mainmenu">
       <%# unless we're showing overview_dashboard, we want to start off with a divider - which is not true of the header menu %>
       <% unless show_overview_dashboard %>
@@ -23,8 +22,6 @@
     </ul>
   </div>
 </nav>
-
-
 <div class="organized-wrap">
   <div class="<%= organized_container %>">
     <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(current_organization) %>
@@ -74,7 +71,6 @@
             </li>
           </ul>
         </p>
-
         <p class="mt-2">
           <%= t(".other_point_of_sale_system") %>
           <ul>
@@ -90,11 +86,9 @@
         </p>
       </div>
     <% end %>
-
     <%= yield %>
   </div>
 </div>
-
 <% if organized_include_javascript_pack? %>
   <script>
     window.passiveOrganizationId = "<%= passive_organization&.slug %>";
