@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe Admin::TweetsController, type: :request do
-  let(:subject) { FactoryBot.create(:social_post, kind: "app_tweet", platform_id: "fake-id-to-skip-validations") }
-  let(:base_url) { "/admin/tweets/" }
+RSpec.describe Admin::SocialPostsController, type: :request do
+  let(:subject) { FactoryBot.create(:social_post, kind: "app_post", platform_id: "fake-id-to-skip-validations") }
+  let(:base_url) { "/admin/social_posts/" }
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
@@ -22,14 +22,14 @@ RSpec.describe Admin::TweetsController, type: :request do
       expect(flash).to be_blank
       expect(assigns(:social_post)).to eq subject
     end
-    context "imported_tweet" do
-      let(:subject) { FactoryBot.create(:social_post, kind: "imported_tweet") }
+    context "imported_post" do
+      let(:subject) { FactoryBot.create(:social_post, kind: "imported_post") }
       it "redirects to edit" do
         subject.reload
-        expect(subject.kind).to eq "imported_tweet"
+        expect(subject.kind).to eq "imported_post"
         get "#{base_url}/#{subject.id}"
         expect(assigns(:social_post)).to eq subject
-        expect(response).to redirect_to edit_admin_tweet_path(subject.id)
+        expect(response).to redirect_to edit_admin_social_post_path(subject.id)
       end
     end
   end
@@ -37,12 +37,12 @@ RSpec.describe Admin::TweetsController, type: :request do
   describe "edit" do
     it "redirects" do
       subject.reload
-      expect(subject.kind).to eq "app_tweet"
+      expect(subject.kind).to eq "app_post"
       get "#{base_url}/#{subject.id}/edit"
-      expect(response).to redirect_to admin_tweet_path(subject.id)
+      expect(response).to redirect_to admin_social_post_path(subject.id)
     end
-    context "imported_tweet" do
-      let(:subject) { FactoryBot.create(:social_post, kind: "imported_tweet") }
+    context "imported_post" do
+      let(:subject) { FactoryBot.create(:social_post, kind: "imported_post") }
       it "renders" do
         get "#{base_url}/#{subject.id}/edit"
         expect(response).to be_ok
@@ -65,7 +65,7 @@ RSpec.describe Admin::TweetsController, type: :request do
     # it "tweets" do
     #   # TODO: Actually test
     # end
-    # context "imported_tweet" do
+    # context "imported_post" do
     #   it "gets the tweet from twitter" do
     #     # TODO: Actually test
     #   end
@@ -75,25 +75,25 @@ RSpec.describe Admin::TweetsController, type: :request do
   describe "#destroy" do
     context "given a successful deletion" do
       it "deletes the tweet, redirects to tweet index url with an appropriate flash" do
-        tweet = FactoryBot.create(:social_post)
+        post = FactoryBot.create(:social_post)
 
-        delete "#{base_url}/#{tweet.id}"
+        delete "#{base_url}/#{post.id}"
 
-        expect(response).to redirect_to(admin_tweets_url)
+        expect(response).to redirect_to(admin_social_posts_url)
         expect(flash[:error]).to be_blank
         expect(flash[:info]).to match("deleted")
       end
     end
 
     context "given a failed deletion" do
-      it "redirects to tweet edit url with an appropriate flash" do
-        tweet = FactoryBot.create(:social_post)
-        allow(tweet).to receive(:destroy).and_return(false)
-        allow(Tweet).to receive(:friendly_find).with(tweet.id.to_s).and_return(tweet)
+      it "redirects to post edit url with an appropriate flash" do
+        post = FactoryBot.create(:social_post)
+        allow(post).to receive(:destroy).and_return(false)
+        allow(SocialPost).to receive(:friendly_find).with(post.id.to_s).and_return(post)
 
-        delete "#{base_url}/#{tweet.id}"
+        delete "#{base_url}/#{post.id}"
 
-        expect(response).to redirect_to(edit_admin_tweet_url)
+        expect(response).to redirect_to(edit_admin_social_post_url)
         expect(flash[:info]).to be_blank
         expect(flash[:error]).to match("Could not delete")
       end

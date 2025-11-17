@@ -1,21 +1,21 @@
 .admin-subnav
   .col-12.text-right
-    = link_to @tweet.tweet_link.gsub(/https?..\//, ''), @tweet.tweet_link, target: '_blank'
+    = link_to @social_post.post_link.gsub(/https?..\//, ''), @social_post.post_link, target: '_blank'
 
-= form_for [:admin, @tweet], url: { action: 'update', controller: 'tweets' } do |f|
-  = render(AlertForErrors::Component.new(object: @tweet))
+= form_for [:admin, @social_post], url: { action: 'update', controller: 'social_posts' } do |f|
+  = render(AlertForErrors::Component.new(object: @social_post))
 
   .row.mt-4
     .col-md-6
-      - if @tweet.stolen_tweet?
-        - if @tweet.tweeted_image.present?
-          = image_tag(@tweet.tweeted_image)
+      - if @social_post.stolen_post?
+        - if @social_post.posted_image.present?
+          = image_tag(@social_post.posted_image)
       - else
         .form-group.avatar-upload
           = f.label :image, 'Tweet photo', class: 'control-label'
           .avatar-img
-            - if @tweet.image?
-              = image_tag(@tweet.image_url(:small))
+            - if @social_post.image?
+              = image_tag(@social_post.image_url(:small))
             - else
               %p
                 No picture!
@@ -23,7 +23,7 @@
                 .custom-file
                 = f.label :image, "Tweet Image", class: "custom-file-label"
                 = f.file_field :image, class: "custom-file-input", accept: ImageUploader.permitted_extensions.join(",")
-          - if @tweet.image.present?
+          - if @social_post.image.present?
             .form-check
               = f.check_box :remove_image, class: "form-check-input"
               = f.label :remove_image, class: "form-check-label"
@@ -40,23 +40,23 @@
           Tweet alignment in image:
           .form-check-inline
             = f.radio_button :alignment,'top-left', class: "form-check-input"
-            = f.label :alignment, "Top left", {:for => "tweet_alignment_top-left", class: "form-check-label pl-0"}
+            = f.label :alignment, "Top left", {:for => "social_post_alignment_top-left", class: "form-check-label pl-0"}
           .form-check-inline.form-check
             = f.radio_button :alignment, 'top-right', class: "form-check-input"
-            = f.label :alignment, "Top right", {:for => "tweet_alignment_top-right", class: "form-check-label pl-0"}
+            = f.label :alignment, "Top right", {:for => "social_post_alignment_top-right", class: "form-check-label pl-0"}
           .form-check-inline.form-check
             = f.radio_button :alignment, 'bottom-left', class: "form-check-input"
-            = f.label :alignment, "Bottom-left", {:for => "tweet_alignment_bottom-left", class: "form-check-label pl-0"}
+            = f.label :alignment, "Bottom-left", {:for => "social_post_alignment_bottom-left", class: "form-check-label pl-0"}
           .form-check-inline.form-check
             = f.radio_button :alignment, 'bottom-right', class: "form-check-input"
-            = f.label :alignment, "Bottom-right", {:for => "tweet_alignment_bottom-right", class: "form-check-label pl-0"}
+            = f.label :alignment, "Bottom-right", {:for => "social_post_alignment_bottom-right", class: "form-check-label pl-0"}
 
   .row.justify-content-end
     .col-auto
       = f.submit "Save", class: "btn btn-success"
       = link_to "Delete",
-      { controller: "admin/tweets", id: @tweet.id, action: :destroy},
-      data: { confirm: "Are you sure you want to delete this tweet?" },
+      { controller: "admin/social_posts", id: @social_post.id, action: :destroy},
+      data: { confirm: "Are you sure you want to delete this post?" },
       method: :delete,
       class: "btn btn-danger"
 

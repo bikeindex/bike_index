@@ -1,10 +1,10 @@
 class Admin::SocialAccountsController < Admin::BaseController
   include SortableTable
 
-  before_action :find_twitter_account, only: %i[show edit update destroy check_credentials]
+  before_action :find_social_account, only: %i[show edit update destroy check_credentials]
 
   def index
-    @social_accounts = matching_twitter_accounts
+    @social_accounts = matching_social_accounts
       .reorder(sort_column + " " + sort_direction)
   end
 
@@ -20,8 +20,8 @@ class Admin::SocialAccountsController < Admin::BaseController
         @social_account.reload
         @social_account.check_credentials
       end
-      flash[:notice] = "Twitter account saved!"
-      redirect_to admin_twitter_account_url(@social_account)
+      flash[:notice] = "Social account saved!"
+      redirect_to admin_social_account_url(@social_account)
     else
       render action: :edit
     end
@@ -29,17 +29,17 @@ class Admin::SocialAccountsController < Admin::BaseController
 
   def destroy
     if @social_account.present? && @social_account.destroy
-      flash[:info] = "Twitter account deleted."
-      redirect_to admin_twitter_accounts_url
+      flash[:info] = "Social account deleted."
+      redirect_to admin_social_accounts_url
     else
-      flash[:error] = "Could not delete Twitter account."
-      redirect_to edit_admin_twitter_account_url(@social_account)
+      flash[:error] = "Could not delete Social account."
+      redirect_to edit_admin_social_account_url(@social_account)
     end
   end
 
   def check_credentials
     @social_account.check_credentials
-    redirect_to admin_twitter_account_url(@social_account)
+    redirect_to admin_social_account_url(@social_account)
   end
 
   private
@@ -49,7 +49,7 @@ class Admin::SocialAccountsController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:twitter_account).permit(
+    params.require(:social_account).permit(
       :active,
       :address_string,
       :append_block,
@@ -70,7 +70,7 @@ class Admin::SocialAccountsController < Admin::BaseController
     )
   end
 
-  def matching_twitter_accounts
+  def matching_social_accounts
     if sort_column == "last_error_at" # If sorting by last_error_at, show the error
       (sort_direction == "desc") ? SocialAccount.errored : SocialAccount.where(last_error_at: nil)
     elsif sort_column == "national" # If national, show only national one direction, only non the other
@@ -80,7 +80,7 @@ class Admin::SocialAccountsController < Admin::BaseController
     end
   end
 
-  def find_twitter_account
+  def find_social_account
     @social_account = SocialAccount.find(params[:id])
   end
 end

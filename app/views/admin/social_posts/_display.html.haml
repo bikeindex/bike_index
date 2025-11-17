@@ -5,56 +5,56 @@
         %td
           Account
         %td
-          = @tweet.tweetor
+          = @social_post.poster
       %tr
         %td
-          Tweet ID
+          Platform ID
         %td
-          %code= @tweet.twitter_id
+          %code= @social_post.platform_id
       %tr
         %td
           Created
         %td
           %span.convertTime
-            = l @tweet.created_at, format: :convert_time
-      - if @tweet.stolen_record_id.present?
+            = l @social_post.created_at, format: :convert_time
+      - if @social_post.stolen_record_id.present?
         %tr
           %td
             Bike
           %td
-            - link_text = @tweet.bike.title_string if @tweet.bike.present?
-            - link_text ||= @tweet.stolen_record.id
-            = link_to link_text, admin_stolen_bike_path(@tweet.stolen_record_id, stolen_record_id: true) if @tweet.stolen_record.present?
+            - link_text = @social_post.bike.title_string if @social_post.bike.present?
+            - link_text ||= @social_post.stolen_record.id
+            = link_to link_text, admin_stolen_bike_path(@social_post.stolen_record_id, stolen_record_id: true) if @social_post.stolen_record.present?
   .col-md-6
     %table.table-list
       %tr
         %td
           Text
         %td
-          = @tweet.tweeted_text
+          = @social_post.posted_text
       %tr
         %td
           Image
         %td
-          - if @tweet.tweeted_image.present?
-            = image_tag @tweet.tweeted_image, style: "display: block; max-height: 200px; width: auto;"
+          - if @social_post.posted_image.present?
+            = image_tag @social_post.posted_image, style: "display: block; max-height: 200px; width: auto;"
       %tr
         %td
           Kind
         %td
-          - if @tweet.kind.present?
-            = @tweet.kind.gsub(/_?tweet/, "").humanize
+          - if @social_post.kind.present?
+            = @social_post.kind.gsub(/_?post/, "").humanize
 
-- if @tweet.imported_tweet?
+- if @social_post.imported_post?
   %h3 Landing page rendering
   .landing-why-col.clearfix
-    = render partial: 'landing_pages/tweet', locals: { tweet_id: @tweet.id }
+    = render partial: 'landing_pages/social_post', locals: { post_id: @social_post.id }
 
-- if @tweet.retweets.any?
-  %h3.mt-4 Retweets
-  = render partial: "admin/tweets/table", locals: { tweets: @tweet.retweets, skip_retweets: true }
+- if @social_post.reposts.any?
+  %h3.mt-4 Reposts
+  = render partial: "admin/social_posts/table", locals: { social_posts: @social_post.reposts, skip_reposts: true }
 
 %hr.mt-4
 
-%h3 Twitter Response Data
-= pretty_print_json(@tweet.twitter_response)
+%h3 Platform Response Data
+= pretty_print_json(@social_post.platform_response)

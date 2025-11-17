@@ -1,14 +1,14 @@
 .admin-subnav
   .col-12.text-center
-    = link_to "Edit", edit_admin_twitter_account_url(@twitter_account), class: "btn btn-outline-success ml-2"
-    = link_to "Check Credentials", check_credentials_admin_twitter_account_url(@twitter_account), class: "btn btn-outline-success ml-2"
-- if @twitter_account.errored?
+    = link_to "Edit", edit_admin_social_account_url(@social_account), class: "btn btn-outline-success ml-2"
+    = link_to "Check Credentials", check_credentials_admin_social_account_url(@social_account), class: "btn btn-outline-success ml-2"
+- if @social_account.errored?
   .row.mt-4.mb-4
     .card.ml-auto.mr-auto.col-8
       .card-body
         %h4.text-danger
           %em
-            #{@twitter_account.screen_name} has an Error!
+            #{@social_account.screen_name} has an Error!
         %table.table-list.mt-4
           %tbody
             %tr
@@ -16,20 +16,20 @@
                 Error at:
               %td
                 %span.convertTime
-                  = l @twitter_account.last_error_at, format: :convert_time
+                  = l @social_account.last_error_at, format: :convert_time
             %tr
               %td
                 Error
               %td
-                = @twitter_account.last_error
+                = @social_account.last_error
         = link_to "Log in to refresh credentials", "/auth/twitter", class: "btn btn-success"
 .row
   .col-md-6
     %h1
       %small account:
-      = @twitter_account.screen_name
+      = @social_account.screen_name
     %small
-      = link_to "view on twitter", "https://twitter.com/#{@twitter_account.screen_name}", target: :_blank
+      = link_to "view on twitter", "https://twitter.com/#{@social_account.screen_name}", target: :_blank
 
     %table.table-list.mt-2
       %tbody
@@ -37,21 +37,21 @@
           %tr
             %td= attr.humanize
             %td
-              - if @twitter_account.send(attr).present?
+              - if @social_account.send(attr).present?
                 %span.convertTime
-                  = l @twitter_account.send(attr), format: :convert_time
-        - @twitter_account.attributes.except("twitter_account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
+                  = l @social_account.send(attr), format: :convert_time
+        - @social_account.attributes.except("account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
           %tr
             %td= attr
             %td= value
   .col-md-6
     %h3 Twitter Response Data
     %pre{ style: "max-height: 600px; overflow: scroll; background: #eeeeee; padding: 10px 2px;" }
-      = @twitter_account.twitter_account_info.to_yaml
+      = @social_account.account_info.to_yaml
 
 %h3.mt-4
-  = number_with_delimiter(@twitter_account.tweets.count)
+  = number_with_delimiter(@social_account.social_posts.count)
   Tweets
   %em.small
-    = link_to "view all", admin_tweets_path(search_twitter_account_id: @twitter_account.id)
-= render partial: "/admin/tweets/table", locals: { tweets: @twitter_account.tweets.reorder(created_at: :desc).limit(25), skip_twitter_account: true }
+    = link_to "view all", admin_social_posts_path(search_social_account_id: @social_account.id)
+= render partial: "/admin/social_posts/table", locals: { social_posts: @social_account.social_posts.reorder(created_at: :desc).limit(25), skip_social_account: true }
