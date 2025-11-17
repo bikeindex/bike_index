@@ -49,8 +49,8 @@
         <button class="close" aria-label="Close" data-dismiss="alert" type="button">
           <span aria-hidden="true">&times;</span>
         </button>
-        <p>
-          <%= t(".use_lightspeed_retail_pos") %>
+        <div>
+          <p><%= t(".use_lightspeed_retail_pos") %></p>
           <ul>
             <li>
               <% link = link_to t(".integrate_bike_index_with_lightspeed"), lightspeed_interface_path %>
@@ -61,18 +61,18 @@
               <%= t(".read_a_full_explanation_html", link: link) %>
             </li>
           </ul>
-        </p>
-        <p class="mt-2">
-          <%= t(".use_ascend") %>
+        </div>
+        <div class="mt-2">
+          <p><%= t(".use_ascend") %></p>
           <ul>
             <li>
               <% link = link_to t(".integrate_bike_index_with_ascend"), ascend_path %>
               <%= t(".link_to_register_html", link: link) %>
             </li>
           </ul>
-        </p>
-        <p class="mt-2">
-          <%= t(".other_point_of_sale_system") %>
+        </div>
+        <div class="mt-2">
+          <p><%= t(".other_point_of_sale_system") %></p>
           <ul>
             <li>
               <% if controller_name == "bikes" && action_name == "new" %>
@@ -83,7 +83,7 @@
               <% end %>
             </li>
           </ul>
-        </p>
+        </div>
       </div>
     <% end %>
     <%= yield %>
