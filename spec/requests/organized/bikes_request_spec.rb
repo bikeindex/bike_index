@@ -124,26 +124,34 @@ RSpec.describe Organized::BikesController, type: :request do
   end
 
   describe "new" do
-    it "renders" do
+    it "redirects" do
       get "#{base_url}/new"
-      expect(response.status).to eq(200)
-      expect(assigns(:unregistered_parking_notification)).to be_falsey
-      expect(response).to render_template(:new)
+      expect(response).to redirect_to organization_manage_path(current_organization)
+      expect(flash[:error]).to match(/email/i)
     end
-    context "parking_notification" do
-      it "renders with unregistered_parking_notification" do
-        get "#{base_url}/new", params: {parking_notification: 1}
+    context "with auto_user present" do
+      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: enabled_feature_slugs) }
+      it "renders" do
+        get "#{base_url}/new"
         expect(response.status).to eq(200)
         expect(assigns(:unregistered_parking_notification)).to be_falsey
         expect(response).to render_template(:new)
       end
-      context "with feature" do
-        let(:enabled_feature_slugs) { ["parking_notifications"] }
+      context "parking_notification" do
         it "renders with unregistered_parking_notification" do
           get "#{base_url}/new", params: {parking_notification: 1}
           expect(response.status).to eq(200)
-          expect(assigns(:unregistered_parking_notification)).to be_truthy
+          expect(assigns(:unregistered_parking_notification)).to be_falsey
           expect(response).to render_template(:new)
+        end
+        context "with feature" do
+          let(:enabled_feature_slugs) { ["parking_notifications"] }
+          it "renders with unregistered_parking_notification" do
+            get "#{base_url}/new", params: {parking_notification: 1}
+            expect(response.status).to eq(200)
+            expect(assigns(:unregistered_parking_notification)).to be_truthy
+            expect(response).to render_template(:new)
+          end
         end
       end
     end
