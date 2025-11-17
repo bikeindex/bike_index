@@ -19,7 +19,7 @@
       <div class="container">
         <h3><%= t(".recent_recovery_stories") %></h3>
         <div id="recovery-stories-container" class="extras-hidden">
-          <%= render @recovery_displays.limit(5) %>
+          <%= render partial: "shared/recovery_display", collection: @recovery_displays.limit(5) %>
           <div class="recovery-block recovery-see-more">
             <%= link_to t(".read_more_recovery_stories"),
               recovery_stories_path,

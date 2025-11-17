@@ -8,10 +8,10 @@
   <div id="recovery-stories-listing">
     <div class="container clearfix">
       <div class="recovery-stories-container" data-stories-count="<%= @slice1.length %>">
-        <%= render @slice1 %>
+        <%= render partial: "shared/recovery_display", collection: @slice1 %>
       </div>
       <div class="recovery-stories-container" data-stories-count="<%= @slice2.length %>">
-        <%= render @slice2 %>
+        <%= render partial: "shared/recovery_display", collection: @slice2 %>
       </div>
     </div>
 

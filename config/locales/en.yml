@@ -4982,11 +4982,6 @@ en:
       edit: Edit
       image_from: Image from %{image_title}
       looks_like_this_is_your_image: Looks like this is your image.
-  recovery_displays:
-    recovery_display:
-      bike: Bike
-      recovered_date: recovered %{date}
-      translated_from_english: translated from English
   registrations:
     create:
       follow_link_in_email: Follow the link in the email to complete your registration.
@@ -5373,6 +5368,10 @@ en:
       to: To
       update: Update
       year: year
+    recovery_display:
+      bike: Bike
+      recovered_date: recovered %{date}
+      translated_from_english: translated from English
     user_general_alert:
       add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Add a photo to your <strong>%{bike_title}</strong>
