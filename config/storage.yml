@@ -16,6 +16,8 @@ cloudflare_dev:
   bucket: bikeindex-dev
   region: auto
   public: true
+  request_checksum_calculation: "when_required"
+  response_checksum_validation: "when_required"
 
 cloudflare_production:
   service: S3
@@ -25,3 +27,5 @@ cloudflare_production:
   bucket: bikeindex
   region: auto
   public: true
+  request_checksum_calculation: "when_required"
+  response_checksum_validation: "when_required"
