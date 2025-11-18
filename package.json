@@ -1,11 +1,13 @@
 {
   "name": "bike_index-webapp",
   "devDependencies": {
-    "@herb-tools/formatter": "^0.8.1",
+    "@herb-tools/formatter": "^0.8.2",
     "standard": "*"
   },
   "scripts": {
-    "lint": "standard --fix"
+    "html:lint": "herb-format",
+    "js:lint": "standard --fix",
+    "lint": "npm run js:lint & npm run html:lint"
   },
   "standard": {
     "ignore": [
