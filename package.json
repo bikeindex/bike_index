@@ -6,8 +6,11 @@
   },
   "scripts": {
     "html:lint": "herb-format",
+    "html:lint_check": "herb-format --check",
     "js:lint": "standard --fix",
-    "lint": "npm run js:lint & npm run html:lint"
+    "js:lint_check": "standard --fix",
+    "lint": "npm run js:lint & npm run html:lint",
+    "lint_check": "npm run js:lint_check & npm run html:lint_check & wait"
   },
   "standard": {
     "ignore": [
