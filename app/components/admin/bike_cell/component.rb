@@ -13,11 +13,6 @@ module Admin::BikeCell
       @render_search = render_search.nil? ? @search_url.present? : render_search
     end
 
-    def bike = @bike
-    def bike_id = @bike_id
-    def search_url = @search_url
-    def render_search = @render_search
-
     def bike_link_path
       # bike_link_path can be false to not link
       return nil if @bike_link_path_arg == false

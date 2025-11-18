@@ -1,18 +1,18 @@
-<% if bike.blank? %>
+<% if @bike.blank? %>
   <small class="text-danger">
     Missing bike
-    <% if bike_id.present? %>
-      <code><%= bike_id %></code>
+    <% if @bike_id.present? %>
+      <code><%= @bike_id %></code>
     <% end %>
   </small>
 
-<% elsif bike.present? %>
-  <%= render Badge::BikeHiddenAdminExplanation::Component.new(bike:) %>
+<% elsif @bike.present? %>
+  <%= render Badge::BikeHiddenAdminExplanation::Component.new(bike: @bike) %>
   <% bike_content = capture do %>
-    <% if bike.thumb_path.present? %>
+    <% if @bike.thumb_path.present? %>
       <small>📷</small>
     <% end %>
-    <%= bike.title_string %>
+    <%= @bike.title_string %>
   <% end %>
   <% if bike_link_path.present? %>
     <%= link_to bike_content, bike_link_path %>
@@ -21,8 +21,8 @@
   <% end %>
 <% end %>
 
-<% if render_search && bike_id.present? %>
-  <% final_search_url = search_url || url_for(sortable_search_params.merge(search_bike_id: bike_id)) %>
+<% if @render_search && @bike_id.present? %>
+  <% final_search_url = @search_url || url_for(sortable_search_params.merge(search_bike_id: @bike_id)) %>
 
   <%= link_to search_emoji, final_search_url, class: "display-sortable-link small ml-1" %>
 <% end %>
