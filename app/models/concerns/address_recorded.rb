@@ -11,8 +11,8 @@ module AddressRecorded
       to: :address_record, allow_nil: true
 
     scope :address_record, -> { where.not(address_record_id: nil) }
-    # TODO: rename to :with_street when Bike AddressRecords have finished migration - #2922
-    scope :with_street_address_record, -> { includes(:address_record).where.not(address_records: {street: nil}) }
+    scope :with_street, -> { includes(:address_record).where.not(address_records: {street: nil}) }
+    scope :without_street, -> { includes(:address_record).where(address_records: {street: nil}) }
   end
 
   def address_hash_legacy(address_record_id: false)
