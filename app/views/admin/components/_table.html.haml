@@ -56,5 +56,5 @@
 
           %td
             - if component.bike_id.present?
-              = render partial: "/shared/admin/bike_cell", locals: {bike: component.bike, bike_id: component.bike_id}
+              = render Admin::BikeCell::Component.new(bike: component.bike, bike_id: component.bike_id)
 

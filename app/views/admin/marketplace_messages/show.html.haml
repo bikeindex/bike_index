@@ -98,7 +98,7 @@
         %tr
           %td Item
           %td
-            = render partial: "/shared/admin/bike_cell", locals: {bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, show_marketplace_preview: true) }
+            = render Admin::BikeCell::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, show_marketplace_preview: true))
 .mt-4
   = render(Card::Component.new(shadow: true)) do
     %p

@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    admin:
+      bike_cell:
+        bike: Bike
+        bike_id: Bike_id
+        bike_link_path: Bike_link_path
+        search_url: Search_url
+        render_search: Render_search

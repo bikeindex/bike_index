@@ -49,7 +49,7 @@
             <%= render(Badge::Status::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing)) %>
             <%= "##{marketplace_listing.id}," %>
           </em>
-          <%= render(partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id}) %>
+          <%= render Admin::BikeCell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id) %>
         <% else %>
           <span class="text-danger">
             Marketplace #<%= params[:search_marketplace_listing_id] %>

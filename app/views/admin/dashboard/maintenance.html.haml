@@ -30,7 +30,7 @@
               = l bike.created_at, format: :convert_time
 
           %td
-            = render partial: "/shared/admin/bike_cell", locals: {bike: bike}
+            = render Admin::BikeCell::Component.new(bike: bike)
 
 .full-screen-table
   %h2
