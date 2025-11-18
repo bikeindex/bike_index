@@ -3,58 +3,11 @@
   %h1.mt-5.mb-4 Recovery displays
 
 - else
-  .admin-subnav
-    .col-md-6
-      %h1
-        Recovery displays
-    .col-md-6
-      %ul
-        %li.nav-item
-          = link_to "New recovery display", new_admin_recovery_display_url, class: "nav-link btn btn-outline-success"
-        %li.nav-item
-          = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "nav-link less-strong"
-        %li.nav-item
-          = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+  - nav_header_list_items = capture_haml do
+    %li.nav-item
+      = link_to "New recovery display", new_admin_recovery_display_url, class: "nav-link btn btn-outline-success"
+    %li.nav-item
+      = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "nav-link less-strong"
 
-  - if @render_chart
-    .col-12.mt-2
-      = column_chart time_range_counts(collection: matching_recovery_displays, column: "recovery_displays.#{@time_range_column}"), stacked: true, thousands: ","
+  = render partial: "/shared/admin/index_skeleton", locals: {chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays}
 
-  = render partial: "/shared/period_select"
-
-  = render partial: "/shared/admin/pagination", locals: {collection: @recovery_displays}
-
-.full-screen-table
-  %table.table.table-striped.table-bordered.padded.table-sm
-    %thead.thead-light
-      %th= sortable "recovered_at"
-      %th.small.less-strong= sortable "created_at"
-      %th.small= sortable "updated_at"
-      %th Quote
-      %th Quoter
-      %th.small image?
-      %th.large-screens.small Association?
-    %tbody
-      - @recovery_displays.each do |recovery_display|
-        %tr
-          %td
-            .less-strong-hold
-              %a.convertTime.mr-2{href: edit_admin_recovery_display_url(recovery_display)}
-                = l recovery_display.recovered_at, format: :convert_time
-              %code.small.less-strong-right= recovery_display.id
-          %td
-            %small.convertTime
-              = l recovery_display.created_at, format: :convert_time
-          %td
-            %small.convertTime.less-strong
-              = l recovery_display.updated_at, format: :convert_time
-          %td
-            = truncate(recovery_display.quote, length: 140)
-          %td
-            = recovery_display.quote_by
-          %td.table-cell-check
-            = check_mark if recovery_display.image?
-          %td.large-screens.table-cell-check
-            = check_mark if recovery_display.stolen_record_id.present?
-
-= render partial: "/shared/admin/pagination", locals: {collection: @recovery_displays}
