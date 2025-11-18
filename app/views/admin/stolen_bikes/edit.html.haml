@@ -27,21 +27,21 @@
     .col-md-6
       %h4
         Stolen Record approval process
-      %ol
+      %ol{class: "tw:list-decimal tw:ml-4"}
         %li
           Delete anything that's egregiously wrong (like Motorcycles), or spam
         %li
           #{link_to "Edit Bike", admin_bike_path(@bike)} if there is a 40 word descriptions in the "Bike Model" field and move it to the description field
         %li
           #{link_to "Edit Bike", admin_bike_path(@bike)} & check "Unknown Serial" if:
-          %ul
+          %ul{class: "tw:list-disc tw:ml-4"}
             %li
               The serial is "idk" or other similar stupid shit (rather than <span class="less-strong">absent</span>)
             %li
               The serial is <em>only</em> a frame numbers like <code>EN14761</code> or <code>EN14****</code>
         %li
           #{link_to "Edit Bike", admin_bike_path(@bike, anchor: "edit-stolen-record")} and fix the stolen city name if:
-          %ul
+          %ul{class: "tw:list-disc tw:ml-4"}
             %li
               City is abbreviated: e.g. "SLC" and not "Salt Lake City"
             %li
@@ -49,7 +49,7 @@
 
         %li
           Determine if bike is <em>Special</em> - here are some reasons/actions taken
-          %ul
+          %ul{class: "tw:list-disc tw:ml-4"}
             %li
               Super distinct, in a city we are strong in? We tweet highlight it, even though its getting auto tweeted
             %li

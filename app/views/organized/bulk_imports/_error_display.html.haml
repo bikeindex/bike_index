@@ -3,7 +3,7 @@
     Bulk Import <span class="text-danger">failed to process</span> because no organization was found with the ascend name of <strong>#{@bulk_import.ascend_name}</strong>
   %p
     Fix this by:
-  %ol
+  %ol{class: "tw:list-decimal tw:ml-4"}
     %li Go to #{link_to "organizations", admin_organizations_path}
     %li Find the organization this bulk import should have been assigned to
     %li Edit the organization and add the ascend name <code>#{@bulk_import.ascend_name}</code>
@@ -12,7 +12,7 @@
 - if bulk_import.line_errors.present?
   %strong
     %span.text-danger Line errors:
-  %ul
+  %ul{class: "tw:list-disc tw:ml-4"}
     - bulk_import.line_errors.each do |le|
       %li
         - if le.is_a?(Array) && le.first.is_a?(Integer)
@@ -27,7 +27,7 @@
   %strong
     %span.text-danger
       File errors:
-  %ul
+  %ul{class: "tw:list-disc tw:ml-4"}
     - bulk_import.file_errors.each_with_index do |ie, ind|
       - file_line_error = bulk_import.file_import_error_lines[ind]
       %li
