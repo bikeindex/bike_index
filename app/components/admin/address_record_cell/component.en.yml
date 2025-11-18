@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    admin:
+      address_record_cell:
+        address_record: Address_record
