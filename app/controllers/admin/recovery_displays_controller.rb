@@ -14,7 +14,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def new
     @recovery_display = RecoveryDisplay.new
     if params[:stolen_record_id].present?
-      @recovery_display.from_stolen_record(params[:stolen_record_id])
+      @recovery_display = RecoveryDisplay.from_stolen_record_id(params[:stolen_record_id])
       @stolen_record = @recovery_display.stolen_record
       @bike = @recovery_display.bike
     end
@@ -67,7 +67,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def permitted_parameters
     params.require(:recovery_display)
       .permit(:stolen_record_id, :quote, :quote_by, :recovered_at, :link, :image,
-        :remote_image_url, :date_input, :remove_image)
+        :remote_image_url, :date_input, :remove_image, :location_string)
   end
 
   def find_recovery_displays

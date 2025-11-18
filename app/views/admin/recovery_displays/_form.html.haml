@@ -4,7 +4,7 @@
   .col-md-10.col-lg-8.ml-auto.mr-auto
     %h4
       Recovery display approval process
-    %ol
+    %ol{class: "tw:list-decimal"}
       %li
         Remove last name from "Quote by" field
       %li
@@ -13,7 +13,7 @@
           By default, if the bike has an image, it will use that image.  click "upload a different image" if you want to use a different.
       %li
         Edit the "Body" field and:
-        %ul
+        %ul{class: "tw:list-disc tw:ml-4"}
           %li
             Make sure the text is under the character count
             %small.less-strong
@@ -44,26 +44,30 @@
   - if @recovery_display.stolen_record_id.present?
     = f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id
   .row
-    .col-lg-6
+    .col-lg-4.col-md-6
       .form-group
         = f.label :quote_by do
           Quote By
           %small.less-strong
             (full name: <em>#{@recovery_display.calculated_owner_name}</em>)
         = f.text_field :quote_by, class: "form-control"
-    .col-lg-6
+    .col-lg-4.col-md-6
+      .form-group
+        = f.label :location_string, "Location"
+        = f.text_field :location_string, class: "form-control"
+    .col-lg-4.col-md-6
       .form-group
         = f.label :link
         = f.text_field :link, class: "form-control"
-  .row
-    .col-lg-6
+
+    .col-lg-4.col-md-6
       .form-group
         = f.label :recovered_at
         - f.object.recovered_at = TimeParser.round(f.object.recovered_at || Time.current)
         = f.datetime_local_field :recovered_at, max: TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.recovered_at, format: :convert_time)
 
     - if @bike.present?
-      .col-lg-6
+      .col-lg-4.col-md-6
         .form-group
           %label
             Bike url

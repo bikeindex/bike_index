@@ -42,7 +42,7 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
 
   describe "create" do
     context "valid create" do
-      let(:valid_attrs) { {quote: "something that is nice and short and stuff"} }
+      let(:valid_attrs) { {quote: "something that is nice and short and stuff", location_string: "Chicago"} }
       it "creates the recovery_display" do
         expect do
           post base_url, params: {recovery_display: valid_attrs}
@@ -50,6 +50,7 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
 
         recovery_display = RecoveryDisplay.last
         expect(recovery_display.quote).to eq valid_attrs[:quote]
+        expect(recovery_display.location_string).to eq "Chicago"
       end
     end
     context "with a photo" do

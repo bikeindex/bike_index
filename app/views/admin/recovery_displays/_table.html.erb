@@ -1,0 +1,55 @@
+<% collection ||= @recovery_displays %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered padded table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "recovered_at" %></th>
+      <th class="small less-strong"><%= sortable "created_at" %></th>
+      <th class="small"><%= sortable "updated_at" %></th>
+      <th>Quote</th>
+      <th>Quoter</th>
+      <th>Location</th>
+      <th class="small">image?</th>
+      <th class="large-screens small">Association?</th>
+    </thead>
+    <tbody>
+      <% collection.each do |recovery_display| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <a class="convertTime mr-2" href="<%= edit_admin_recovery_display_url(recovery_display) %>">
+                <%= l recovery_display.recovered_at, format: :convert_time %>
+              </a>
+              <code class="small less-strong-right"><%= recovery_display.id %></code>
+            </div>
+          </td>
+          <td>
+            <small class="convertTime">
+              <%= l recovery_display.created_at, format: :convert_time %>
+            </small>
+          </td>
+          <td>
+            <small class="convertTime less-strong">
+              <%= l recovery_display.updated_at, format: :convert_time %>
+            </small>
+          </td>
+          <td>
+            <%= truncate(recovery_display.quote, length: 140) %>
+          </td>
+          <td>
+            <%= recovery_display.quote_by %>
+          </td>
+          <td>
+            <%= recovery_display.location_string %>
+          </td>
+          <td class="table-cell-check">
+            <%= check_mark if recovery_display.image? %>
+          </td>
+          <td class="large-screens table-cell-check">
+            <%= check_mark if recovery_display.stolen_record_id.present? %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

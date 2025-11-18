@@ -3,7 +3,7 @@
 
   %p= t(".if_you_are_here_your_bike_was_probably_stolen")
 
-  %ol
+  %ol{class: "tw:list-decimal tw:ml-4"}
     %li= t(".file_a_police_report")
     %li= t(".make_sure_your_bike_is_registered_html", new_bike_link: link_to(t(".bike_index"), new_bike_url(status: "stolen")))
     %li= t(".look_for_local_stolen_bike_groups_on_face")
@@ -11,7 +11,7 @@
 
   %h2= t(".what_happens_next")
 
-  %ol
+  %ol{class: "tw:list-decimal tw:ml-4"}
     %li= t(".your_local_police_department_will_do_what")
     %li= t(".bike_index_will_broadcast")
     %li= t(".keep_an_eye_on_craigslist")
@@ -45,7 +45,7 @@
                   %a.close{"data-dismiss" => "alert"} ×
                   %h4
                     = t(".please_fix_the_following", errors: pluralize(@feedback.errors.count, t(".error")))
-                  %ul
+                  %ul{class: "tw:list-disc tw:ml-4"}
                     - @feedback.errors.full_messages.each do |msg|
                       %li
                         = msg
