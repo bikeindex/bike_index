@@ -217,10 +217,6 @@ class Bike < ApplicationRecord
 
   scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
 
-  # TODO: remove when bike AddressRecords have finished migration, use AddressRecorded.with_street
-  # Also uncomment the bike spec
-  scope :with_street, -> { where.not(street: nil) }
-
   default_scope -> { default_includes.current.order(listing_order: :desc) }
 
   before_validation :set_calculated_attributes

@@ -20,8 +20,7 @@ RSpec.describe Bike, type: :model do
       expect(bike.reload.address_set_manually).to be_truthy # Required to get the address_record coordinates
       expect(bike.to_coordinates.map(&:round)).to eq([52, 5])
       expect(AddressRecord.pluck(:id)).to eq([address_record.id])
-      # TODO: when bike AddressRecords have finished migration, uncomment - #2922
-      # expect(Bike.with_street.pluck(:id)).to eq([bike.id])
+      expect(Bike.with_street.pluck(:id)).to eq([bike.id])
     end
 
     context "with user" do
@@ -30,9 +29,9 @@ RSpec.describe Bike, type: :model do
       it "is valid" do
         expect(bike.reload.user).to be_present
         expect(address_record).to have_attributes target_attrs.merge(user_id: bike.user_id)
-        # TODO: when bike AddressRecords have finished migration, uncomment - #2922
-        # expect(Bike.with_street.pluck(:id)).to eq([bike.id])
-        # expect(User.with_street.pluck(:id)).to eq([bike.id])
+        expect(Bike.with_street.pluck(:id)).to eq([bike.id])
+        expect(Bike.without_street.pluck(:id)).to eq([])
+        expect(User.with_street.pluck(:id)).to eq([])
       end
     end
   end
