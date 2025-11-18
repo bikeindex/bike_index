@@ -51,7 +51,7 @@ RSpec.describe RecoveryDisplay, type: :model do
       user = FactoryBot.create(:user, name: "somebody Special")
       ownership = FactoryBot.create(:ownership, creator: user, user: user)
       stolen_record = FactoryBot.create(:stolen_record, bike: ownership.bike)
-      recovery_display = RecoveryDisplay.new
+      RecoveryDisplay.new
       recovery_display = RecoveryDisplay.from_stolen_record_id(stolen_record.id)
       expect(recovery_display.calculated_owner_name).to eq "somebody Special"
       expect(recovery_display.quote_by).to eq("somebody")
