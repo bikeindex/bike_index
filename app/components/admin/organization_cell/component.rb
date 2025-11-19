@@ -8,6 +8,8 @@ module Admin::OrganizationCell
       @render_search = render_search
     end
 
+    private
+
     def organization_present?
       @organization_id.present?
     end

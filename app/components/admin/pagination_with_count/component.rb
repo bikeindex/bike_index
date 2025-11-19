@@ -18,6 +18,8 @@ module Admin::PaginationWithCount
       @params = params
     end
 
+    private
+
     def count
       return @count if @count.present?
       return @pagy.count if @pagy.respond_to?(:count)
