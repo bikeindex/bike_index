@@ -84,8 +84,8 @@
         = number_with_delimiter(matching_bike_stickers.claimed.count)
         claimed
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bike_stickers, viewing: "Sticker"}
+= render Admin::PaginationWithCount::Component.new(collection: @bike_stickers, viewing: "Sticker", pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 = render partial: "table", locals: { bike_stickers: @bike_stickers, render_sortable: true }
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bike_stickers, viewing: "Sticker", skip_total: true}
+= render Admin::PaginationWithCount::Component.new(collection: @bike_stickers, viewing: "Sticker", skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)

@@ -32,7 +32,7 @@
 .mt-2.mb-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @graduated_notifications}
+= render Admin::PaginationWithCount::Component.new(collection: @graduated_notifications, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down

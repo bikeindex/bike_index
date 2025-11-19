@@ -38,7 +38,7 @@
     = submit_tag "Search", name: "search", class: "btn btn-success"
 
 - if @paints.present?
-  = render partial: "/shared/admin/pagination", locals: {collection: @paints}
+  = render Admin::PaginationWithCount::Component.new(collection: @paints, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
@@ -86,7 +86,7 @@
                   %li
                     = paint.tertiary_color.name
 
-  = render partial: "/shared/admin/pagination", locals: {collection: @paints, skip_total: true}
+  = render Admin::PaginationWithCount::Component.new(collection: @paints, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 
 - else

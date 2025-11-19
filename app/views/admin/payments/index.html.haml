@@ -116,8 +116,8 @@
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
 
-= render partial: "/shared/admin/pagination", locals: {collection: @payments}
+= render Admin::PaginationWithCount::Component.new(collection: @payments, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 = render partial: "table", locals: {payments: @payments, render_sortable: true, skip_paid_at: @incompleteness == "paid", render_method: @render_method}
 
-= render partial: "/shared/admin/pagination", locals: {collection: @payments, skip_total: true}
+= render Admin::PaginationWithCount::Component.new(collection: @payments, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)

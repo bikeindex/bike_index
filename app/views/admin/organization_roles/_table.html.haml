@@ -42,7 +42,7 @@
               = organization_role.invited_email
           - unless skip_organization
             %td
-              = render partial: "/shared/admin/organization_cell", locals: {organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?}
+              = render Admin::OrganizationCell::Component.new(organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?)
           %td
             - if organization_role.claimed_at.present?
               %span.convertTime

@@ -29,7 +29,7 @@
     .mt-2.mr-2
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @model_audits}
+= render Admin::PaginationWithCount::Component.new(collection: @model_audits, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 - unless display_dev_info?
   <style>.only-dev-visible {display: none !important;} </style>
@@ -86,4 +86,4 @@
 
 
 
-= render partial: "/shared/admin/pagination", locals: {collection: @model_audits, skip_total: true}
+= render Admin::PaginationWithCount::Component.new(collection: @model_audits, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)

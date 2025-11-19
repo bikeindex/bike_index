@@ -100,6 +100,6 @@
 %p.less-strong
   Go to individual organizations to create new invoices
 
-= render partial: "/shared/admin/pagination", locals: {collection: @invoices}
+= render Admin::PaginationWithCount::Component.new(collection: @invoices, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: true, display_organization: true }

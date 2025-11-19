@@ -166,8 +166,8 @@
                 %td.small= number_display(recovered_count_total)
 
 
-= render partial: "/shared/admin/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert"}
+= render Admin::PaginationWithCount::Component.new(collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert", pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 = render partial: "/admin/theft_alerts/table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: @bike.present?}
 
-= render partial: "/shared/admin/pagination", locals: {collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert", skip_total: true}
+= render Admin::PaginationWithCount::Component.new(collection: @theft_alerts, count: searched_theft_alerts.count, viewing: "Promoted Alert", skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)

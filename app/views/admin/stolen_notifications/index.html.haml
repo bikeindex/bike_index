@@ -14,7 +14,7 @@
 
 = render partial: "/shared/period_select"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @stolen_notifications, count: searched_stolen_notifications.count}
+= render Admin::PaginationWithCount::Component.new(collection: @stolen_notifications, count: searched_stolen_notifications.count, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 - skip_sortable = false
 
@@ -59,4 +59,4 @@
             - else
               = stolen_notification.send_dates_parsed.count
 
-= render partial: "/shared/admin/pagination", locals: {collection: @stolen_notifications, count: searched_stolen_notifications.count, skip_total: true}
+= render Admin::PaginationWithCount::Component.new(collection: @stolen_notifications, count: searched_stolen_notifications.count, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)

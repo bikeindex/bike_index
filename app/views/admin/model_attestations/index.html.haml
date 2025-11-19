@@ -22,7 +22,7 @@
     %em= model_audit_frame_model_display(@model_audit, truncate: false)
     = link_to "view for all model audits", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "gray-link small"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @model_attestations}
+= render Admin::PaginationWithCount::Component.new(collection: @model_attestations, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 - unless display_dev_info?
   <style>.only-dev-visible {display: none !important;} </style>
@@ -85,4 +85,4 @@
             = model_attestation.info
 
 
-= render partial: "/shared/admin/pagination", locals: {collection: @model_attestations, skip_total: true}
+= render Admin::PaginationWithCount::Component.new(collection: @model_attestations, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)

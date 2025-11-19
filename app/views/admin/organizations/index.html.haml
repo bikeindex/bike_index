@@ -64,8 +64,8 @@
     .mt-2.mr-2
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @organizations}
+= render Admin::PaginationWithCount::Component.new(collection: @organizations, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 = render partial: "/admin/organizations/table", locals: { render_sortable: true }
 
-= render partial: "/shared/admin/pagination", locals: {collection: @organizations, skip_total: true}
+= render Admin::PaginationWithCount::Component.new(collection: @organizations, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)

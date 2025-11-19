@@ -42,6 +42,6 @@
 .mt-4.mb-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @parking_notifications}
+= render Admin::PaginationWithCount::Component.new(collection: @parking_notifications, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 = render partial: "/admin/parking_notifications/table", locals: {parking_notifications: @parking_notifications, render_sortable: true}

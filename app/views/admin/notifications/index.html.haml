@@ -90,8 +90,8 @@
         = text_field_tag :query, params[:query], placeholder: "Search email/phone", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @notifications, count: matching_notifications.count}
+= render Admin::PaginationWithCount::Component.new(collection: @notifications, count: matching_notifications.count, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
 
 = render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true, skip_error: !show_error_column}
 
-= render partial: "/shared/admin/pagination", locals: {collection: @notifications, count: matching_notifications.count, skip_total: true}
+= render Admin::PaginationWithCount::Component.new(collection: @notifications, count: matching_notifications.count, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)

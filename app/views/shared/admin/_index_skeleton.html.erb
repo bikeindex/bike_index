@@ -44,9 +44,9 @@
   <%= admin_search_form %>
 <% end %>
 
-<%= render partial: "/shared/admin/pagination", locals: {collection:, viewing:} %>
+<%= render Admin::PaginationWithCount::Component.new(collection:, viewing:, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:) %>
 
 <%= table_view %>
 
 
-<%= render partial: "/shared/admin/pagination", locals: {collection:, skip_total: true} %>
+<%= render Admin::PaginationWithCount::Component.new(collection:, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:) %>
