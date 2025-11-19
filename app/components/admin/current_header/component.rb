@@ -4,6 +4,16 @@ module Admin::CurrentHeader
   class Component < ApplicationComponent
     include SortableHelper
 
+    HEADER_KEYS = %i[
+      organization_id
+      primary_activity
+      search_bike_id
+      search_kind
+      search_marketplace_listing_id
+      search_membership_id
+      user_id
+    ].freeze
+
     def initialize(params:, viewing: nil, kind_humanized: nil, user: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
       @params = params
       @viewing = viewing
@@ -15,30 +25,30 @@ module Admin::CurrentHeader
       @current_organization = current_organization
     end
 
+    def render?
+      (@params.keys.map(&:to_sym) & HEADER_KEYS).any?
+    end
+
     private
 
     def viewing
       @viewing || controller_name.humanize
     end
 
-    def header_present?
-      (@params.keys & %i[user_id organization_id search_bike_id primary_activity search_kind search_marketplace_listing_id search_membership_id]).any?
-    end
-
     def show_user?
-      @params[:user_id].present?
+      user_subject.present? || @params[:user_id].present?
     end
 
     def user_subject
-      @user || User.unscoped.find_by_id(@params[:user_id])
+      @user_subject ||= @user || User.unscoped.find_by_id(@params[:user_id])
     end
 
     def show_bike?
-      @params[:search_bike_id].present? || @bike.present?
+      bike_subject.present? || @params[:search_bike_id].present?
     end
 
     def bike_subject
-      @bike || Bike.unscoped.find_by_id(@params[:search_bike_id])
+      @bike_subject ||= @bike || Bike.unscoped.find_by_id(@params[:search_bike_id])
     end
 
     def show_marketplace_listing?

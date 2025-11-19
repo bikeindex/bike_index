@@ -4,113 +4,118 @@ require "rails_helper"
 
 RSpec.describe Admin::CurrentHeader::Component, type: :component do
   let(:instance) { described_class.new(**options) }
+  let(:component) { with_request_url("/admin") { render_inline(instance) } }
   let(:options) { {params:} }
   let(:params) { {} }
 
-  describe "header presence detection" do
+  describe "rendering" do
     context "without header params" do
-      it "does not render header" do
-        expect(instance.send(:header_present?)).to be false
+      it "renders nothing" do
+        expect(component.text).not_to include("view for all")
       end
     end
 
     context "with user_id param" do
-      let(:params) { {user_id: 123} }
+      context "when user exists" do
+        let(:user) { FactoryBot.create(:user, name: "Test User") }
+        let(:params) { {user_id: user.id} }
+        let(:options) { {params:, user:, viewing: "Activity"} }
 
-      it "detects header should be present" do
-        expect(instance.send(:header_present?)).to be true
+        it "renders user information with link" do
+          expect(component.text).to include("Activities for")
+          expect(component.text).to include(user.display_name)
+          expect(component).to have_css("a", text: "view for all users")
+        end
+      end
+
+      context "when user does not exist" do
+        let(:params) { {user_id: 99999} }
+
+        it "renders missing user message" do
+          expect(component.text).to include("User #99999")
+          expect(component).to have_css("span.text-danger em", text: "missing")
+          expect(component).to have_css("a", text: "view for all users")
+        end
       end
     end
 
     context "with organization_id param" do
-      let(:params) { {organization_id: 456} }
+      context "when organization exists" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let(:params) { {organization_id: organization.id} }
+        let(:options) { {params:, current_organization: organization, viewing: "Bike"} }
 
-      it "detects header should be present" do
-        expect(instance.send(:header_present?)).to be true
+        it "renders organization information" do
+          expect(component.text).to include("Bikes for")
+          expect(component.text).to include(organization.short_name)
+          expect(component).to have_css("a", text: "view for all organizations")
+        end
+      end
+
+      context "when no organization provided" do
+        let(:params) { {organization_id: 123} }
+        let(:options) { {params:, viewing: "Bike"} }
+
+        it "renders no organization message" do
+          expect(component.text).to include("Bikes for")
+          expect(component.text).to include("no organization")
+          expect(component).to have_css("a", text: "view for all organizations")
+        end
       end
     end
 
     context "with search_bike_id param" do
-      let(:params) { {search_bike_id: 789} }
+      context "when bike exists" do
+        let(:bike) { FactoryBot.create(:bike) }
+        let(:params) { {search_bike_id: bike.id} }
+        let(:options) { {params:, bike:, viewing: "Recovery"} }
 
-      it "detects header should be present" do
-        expect(instance.send(:header_present?)).to be true
+        it "renders bike information" do
+          expect(component.text).to include("Recoveries for")
+          expect(component.text).to include(bike.title_string)
+          expect(component).to have_css("a", text: "view for all bikes")
+        end
       end
-    end
-  end
 
-  describe "viewing text" do
-    context "with viewing parameter" do
-      let(:params) { {user_id: 123} }
-      let(:options) { {params:, viewing: "Test Item"} }
+      context "when bike does not exist" do
+        let(:params) { {search_bike_id: 88888} }
 
-      it "uses custom viewing text" do
-        expect(instance.send(:viewing)).to eq("Test Item")
-      end
-    end
-
-    context "without viewing parameter" do
-      it "would use controller name humanized when rendered" do
-        # The viewing method calls controller_name which is only available after rendering
-        # We can't test this without full controller context
-        expect(instance.instance_variable_get(:@viewing)).to be_nil
-      end
-    end
-  end
-
-  describe "kind_humanized" do
-    context "with kind_humanized parameter" do
-      let(:params) { {search_kind: "test"} }
-      let(:options) { {params:, kind_humanized: "Special Kind"} }
-
-      it "uses custom kind_humanized" do
-        expect(instance.send(:kind_humanized)).to eq("Special Kind")
+        it "renders missing bike message" do
+          expect(component.text).to include("Bike #88888")
+          expect(component).to have_css("span.text-danger em", text: "missing")
+          expect(component).to have_css("a", text: "view for all bikes")
+        end
       end
     end
 
-    context "without kind_humanized parameter" do
+    context "with search_kind param" do
       let(:params) { {search_kind: "bike_shop"} }
+      let(:options) { {params:, viewing: "Organization"} }
 
-      it "humanizes from search_kind param" do
-        expect(instance.send(:kind_humanized)).to eq("Bike shop")
-      end
-    end
-  end
-
-  describe "subject lookups" do
-    context "with user_id" do
-      let(:user) { FactoryBot.create(:user) }
-      let(:params) { {user_id: user.id} }
-      let(:options) { {params:, user:} }
-
-      it "identifies user should show" do
-        expect(instance.send(:show_user?)).to be true
+      it "renders humanized kind" do
+        expect(component.text).to include("Organizations for")
+        expect(component.text).to include("Bike shop")
+        expect(component).to have_css("a", text: "view for all kinds")
       end
 
-      it "uses provided user" do
-        expect(instance.send(:user_subject)).to eq(user)
+      context "with custom kind_humanized" do
+        let(:options) { {params:, kind_humanized: "Special Kind", viewing: "Thing"} }
+
+        it "renders custom kind humanized text" do
+          expect(component.text).to include("Special Kind")
+          expect(component).to have_css("a", text: "view for all kinds")
+        end
       end
     end
 
-    context "with missing user_id" do
-      let(:params) { {user_id: 99999} }
+    context "with search_membership_id param" do
+      let(:params) { {search_membership_id: 42} }
+      let(:options) { {params:, viewing: "Transaction"} }
 
-      it "identifies user should show" do
-        expect(instance.send(:show_user?)).to be true
-      end
-
-      it "attempts to find user by id" do
-        expect(instance.send(:user_subject)).to be_nil
-      end
-    end
-  end
-
-  describe "rendering without routes" do
-    context "empty state" do
-      let(:component) { render_inline(instance) }
-
-      it "renders blank when no params" do
-        expect(component.to_html.strip).to be_blank
+      it "renders membership information" do
+        expect(component.text).to include("Transactions for")
+        expect(component.text).to include("Membership 42")
+        expect(component).to have_css("a", text: "view for all memberships")
       end
     end
   end
