@@ -3,11 +3,12 @@
 require "rails_helper"
 
 RSpec.describe Admin::PaginationWithCount::Component, type: :component do
+  let(:instance) { described_class.new(**options) }
+  let(:component) { render_inline(instance) }
+  let(:options) { {collection:, params: {}} }
   let(:collection) { Bike.limit(10) }
 
   describe "count display" do
-    let(:component) { render_inline(described_class.new(**options)) }
-
     context "with explicit count and skip_pagination" do
       let(:options) { {collection:, count: 42, skip_pagination: true, params: {}} }
 
@@ -47,20 +48,15 @@ RSpec.describe Admin::PaginationWithCount::Component, type: :component do
   describe "pagination controls" do
     context "with skip_pagination true" do
       let(:options) { {collection:, skip_pagination: true, params: {}} }
-      let(:component) { render_inline(described_class.new(**options)) }
 
       it "does not render pagination controls" do
         expect(component.css("select")).to be_blank
-      end
-
-      it "renders count section" do
         expect(component.text).to include("Matching")
       end
     end
 
     context "with both skip_total and skip_pagination" do
       let(:options) { {collection:, skip_total: true, skip_pagination: true, params: {}} }
-      let(:component) { render_inline(described_class.new(**options)) }
 
       it "renders minimal output" do
         expect(component.css(".row")).to be_present
@@ -71,31 +67,24 @@ RSpec.describe Admin::PaginationWithCount::Component, type: :component do
 
   describe "component structure" do
     let(:options) { {collection:, skip_pagination: true, params: {}} }
-    let(:component) { render_inline(described_class.new(**options)) }
 
     it "renders within a row div" do
       expect(component.css("div.row")).to be_present
-    end
-
-    it "renders count in col-md-5 when not skipped" do
       expect(component.css("div.col-md-5 p.pagination-number")).to be_present
-    end
-
-    it "displays count with strong tag" do
       expect(component.css("strong")).to be_present
     end
   end
 
   describe "viewing text pluralization" do
-    let(:options) { {collection:, viewing: "Item", count: 1, skip_pagination: true, params: {}} }
-    let(:component) { render_inline(described_class.new(**options)) }
+    let(:options) { {collection:, viewing: "Item", count:, skip_pagination: true, params: {}} }
+    let(:count) { 1 }
 
     it "pluralizes viewing text based on count" do
       expect(component.text).to include("Matching Item")
     end
 
     context "with multiple items" do
-      let(:options) { {collection:, viewing: "Item", count: 5, skip_pagination: true, params: {}} }
+      let(:count) { 5 }
 
       it "uses plural form" do
         expect(component.text).to include("Matching Items")

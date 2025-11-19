@@ -15,26 +15,12 @@ RSpec.describe Admin::OrganizationCell::Component, type: :component do
     end
   end
 
-  context "with organization" do
-    let(:organization) { FactoryBot.create(:organization, name: "Test Organization") }
-
-    it "renders organization name as link" do
-      expect(component.text).to include("Test Organization")
-      expect(component.css("a[href*='/admin/organizations/']")).to be_present
-    end
-
-    it "does not show deleted indicator" do
-      expect(component.text).not_to include("deleted!")
-    end
-  end
-
   context "with organization_id only" do
-    let(:organization) { FactoryBot.create(:organization, name: "Org by ID") }
-    let(:organization_id) { organization.id }
+    let(:organization_id) { FactoryBot.create(:organization, name: "Org by ID").id }
 
     it "looks up and renders organization by id" do
       expect(component.text).to include("Org by ID")
-      expect(component.css("a[href='/admin/organizations/#{organization.id}']")).to be_present
+      expect(component.css("a[href='/admin/organizations/#{organization_id}']")).to be_present
     end
   end
 
@@ -44,36 +30,30 @@ RSpec.describe Admin::OrganizationCell::Component, type: :component do
     it "renders missing organization warning" do
       expect(component.text).to include("Missing organization")
       expect(component.css("small.text-danger")).to be_present
-    end
-
-    it "displays the organization_id" do
       expect(component.text).to include("99999999")
       expect(component.css("code.small")).to be_present
-    end
-
-    it "still renders link to organization path" do
       expect(component.css("a[href='/admin/organizations/99999999']")).to be_present
     end
   end
 
-  context "with deleted organization" do
-    let(:organization) { FactoryBot.create(:organization, name: "Deleted Org") }
+  context "with organization" do
+    let(:organization) { FactoryBot.create(:organization, name: "Test Organization") }
 
-    before do
-      organization.destroy
+    it "renders organization name as link" do
+      expect(component.text).to include("Test Organization")
+      expect(component.css("a[href*='/admin/organizations/']")).to be_present
+      expect(component.text).not_to include("deleted!")
     end
+  end
+
+  context "with deleted organization" do
+    let(:organization) { FactoryBot.create(:organization, name: "Deleted Org", deleted_at: Time.current - 1) }
 
     it "renders organization name with less emphasis" do
       expect(component.text).to include("Deleted Org")
       expect(component.css("span.less-strong")).to be_present
-    end
-
-    it "shows deleted indicator" do
       expect(component.text).to include("deleted!")
       expect(component.css("span.text-danger")).to be_present
-    end
-
-    it "wraps content in small tag" do
       expect(component.css("small")).to be_present
     end
   end
@@ -84,9 +64,6 @@ RSpec.describe Admin::OrganizationCell::Component, type: :component do
 
     it "renders organization name" do
       expect(component.text).to include("Search Test Org")
-    end
-
-    it "does not render search link" do
       expect(component.css("a.display-sortable-link")).to be_blank
     end
   end
