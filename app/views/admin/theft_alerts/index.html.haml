@@ -35,7 +35,7 @@
           = link_to "location counts", admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), class: "nav-link #{@location_counts ? 'active' : ''}"
         %li.nav-item
           = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-    = render Admin::CurrentHeader::Component.new(params:,  viewing: "Promoted Alerts" , user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
+    = render_admin_current_header(viewing: "Promoted Alerts")
 
   - theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| searched_theft_alerts.where(theft_alert_plan: plan).any? }
   - stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {id: searched_theft_alerts.pluck(:id)})

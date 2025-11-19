@@ -23,8 +23,8 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
     let(:options) { {params:, user:} }
 
     it "shows user is present" do
-      expect(instance.show_user?).to be true
-      expect(instance.user_subject).to eq(user)
+      expect(instance.send(:show_user?)).to be true
+      expect(instance.send(:user_subject)).to eq(user)
     end
   end
 
@@ -33,7 +33,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
     let(:viewing) { "Test Items" }
 
     it "uses custom viewing text" do
-      expect(instance.viewing).to eq("Test Items")
+      expect(instance.send(:viewing)).to eq("Test Items")
     end
   end
 
@@ -42,7 +42,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
     let(:kind_humanized) { "Special Kind" }
 
     it "uses custom kind_humanized" do
-      expect(instance.kind_humanized).to eq("Special Kind")
+      expect(instance.send(:kind_humanized)).to eq("Special Kind")
     end
   end
 end

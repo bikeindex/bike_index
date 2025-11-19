@@ -33,7 +33,7 @@
     = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false, matching_count: @matching_batches}
 
 
-  = render Admin::CurrentHeader::Component.new(params:,  viewing: "Stickers" , user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
+  = render_admin_current_header(viewing: "Stickers")
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_bike_stickers, column: @time_range_column), stacked: true, thousands: ","

@@ -240,6 +240,19 @@ module AdminHelper
     ))
   end
 
+  def render_admin_current_header(viewing: nil, kind_humanized: nil)
+    render(Admin::CurrentHeader::Component.new(
+      params:,
+      viewing:,
+      kind_humanized:,
+      user: @user,
+      bike: @bike,
+      marketplace_listing: @marketplace_listing,
+      primary_activity: @primary_activity,
+      current_organization:
+    ))
+  end
+
   private
 
   def org_icon_text(kind:, paid:)

@@ -2,7 +2,7 @@
   .col-5
     %h1
       Exports
-  = render Admin::CurrentHeader::Component.new(params:, viewing: "Users", user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
+  = render_admin_current_header(viewing: "Users")
 
 - if current_organization.present?
   %h4.mt-4
