@@ -40,7 +40,7 @@
           = link_to "Not Endless", admin_invoices_path(sortable_search_params.merge(search_endless: not_endless_active ? nil : "not_endless")), class: "dropdown-item #{not_endless_active ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", admin_invoices_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin/current_header", locals: {viewing: "Invoices"}
+  = render Admin::CurrentHeader::Component.new(params:, viewing: "Invoices", user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_invoices, column: @time_range_column), stacked: true, thousands: ","

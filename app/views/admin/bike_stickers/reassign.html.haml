@@ -14,7 +14,7 @@
     = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false}
 
 
-  = render partial: "/shared/admin/current_header", locals: { viewing: "Stickers" }
+  = render Admin::CurrentHeader::Component.new(params:,  viewing: "Stickers" , user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
 .row
   .col-md-8.offset-md-2.mt-2
     = form_tag reassign_admin_bike_stickers_path, method: :get, id: "reassign_form" do

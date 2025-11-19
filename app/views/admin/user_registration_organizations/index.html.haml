@@ -10,7 +10,7 @@
         = link_to "Render organization counts", url_for(sortable_search_params.merge(search_org_counts: !@render_org_counts)), class: "nav-link #{@render_org_counts ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin/current_header", locals: { viewing: "User Registration Organizations" }
+  = render Admin::CurrentHeader::Component.new(params:,  viewing: "User Registration Organizations" , user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
 
 - if @render_org_counts
   .row.mt-4.mb-4

@@ -31,7 +31,7 @@
         = link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render partial: "/shared/admin/current_header", locals: { viewing: "User Alerts" }
+  = render Admin::CurrentHeader::Component.new(params:, viewing: "User Alerts", user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
 
 -# Only render stacked kinds if rendering type counts
 - colors = ["#B60205", "#D93F0B", "#FBCA04", "#0E8A16", "#006B75", "#1D76DB", "#0052CC", "#5319E7", "#D4C5F9", "#2C3E50", "#F9D0C4", "#C2E0C6", "#C5DEF5", "#7DCABB"]

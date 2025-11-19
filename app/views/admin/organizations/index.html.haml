@@ -40,7 +40,7 @@
       %li.nav-item
         = link_to 'New Organization', new_admin_organization_url, class: "nav-link"
 
-  = render partial: "/shared/admin/current_header", locals: {viewing: "Organizations"}
+  = render Admin::CurrentHeader::Component.new(params:, viewing: "Organizations", user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_organizations, column: @time_range_column), stacked: true, thousands: ","

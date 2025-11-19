@@ -28,7 +28,7 @@
     </ul>
   </div>
 
-  <%= render partial: "/shared/admin/current_header", locals: {viewing:} %>
+  <%= render Admin::CurrentHeader::Component.new(params:, viewing:, user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:) %>
 </div>
 
 <% if !skip_charting && @render_chart %>
