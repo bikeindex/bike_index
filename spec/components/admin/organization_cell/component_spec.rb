@@ -3,11 +3,11 @@
 require "rails_helper"
 
 RSpec.describe Admin::OrganizationCell::Component, type: :component do
-  let(:component) { render_inline(described_class.new(**options)) }
+  let(:component) { with_request_url("/admin") { render_inline(described_class.new(**options)) } }
   let(:options) { {organization:, organization_id:, render_search:} }
   let(:organization) { nil }
   let(:organization_id) { nil }
-  let(:render_search) { false }
+  let(:render_search) { true }
 
   context "without organization" do
     it "renders nothing" do
@@ -20,7 +20,7 @@ RSpec.describe Admin::OrganizationCell::Component, type: :component do
 
     it "looks up and renders organization by id" do
       expect(component.text).to include("Org by ID")
-      expect(component.css("a[href='/admin/organizations/#{organization_id}']")).to be_present
+      expect(component).to have_css("a[href='/admin/organizations/#{organization_id}']")
     end
   end
 
@@ -29,10 +29,10 @@ RSpec.describe Admin::OrganizationCell::Component, type: :component do
 
     it "renders missing organization warning" do
       expect(component.text).to include("Missing organization")
-      expect(component.css("small.text-danger")).to be_present
+      expect(component).to have_css("small.tw:text-red-800")
       expect(component.text).to include("99999999")
-      expect(component.css("code.small")).to be_present
-      expect(component.css("a[href='/admin/organizations/99999999']")).to be_present
+      expect(component).to have_css("code.small")
+      expect(component).to have_css("a[href='/admin/organizations/99999999']")
     end
   end
 
@@ -41,7 +41,7 @@ RSpec.describe Admin::OrganizationCell::Component, type: :component do
 
     it "renders organization name as link" do
       expect(component.text).to include("Test Organization")
-      expect(component.css("a[href*='/admin/organizations/']")).to be_present
+      expect(component).to have_css("a[href*='/admin/organizations/']")
       expect(component.text).not_to include("deleted!")
     end
   end
@@ -51,10 +51,11 @@ RSpec.describe Admin::OrganizationCell::Component, type: :component do
 
     it "renders organization name with less emphasis" do
       expect(component.text).to include("Deleted Org")
-      expect(component.css("span.less-strong")).to be_present
+      expect(component).to have_css("span.less-strong")
       expect(component.text).to include("deleted!")
-      expect(component.css("span.text-danger")).to be_present
-      expect(component.css("small")).to be_present
+      expect(component).to have_css("span.tw:text-red-800")
+      expect(component).to have_css("small")
+      expect(component).to have_css("a.display-sortable-link")
     end
   end
 
@@ -64,7 +65,7 @@ RSpec.describe Admin::OrganizationCell::Component, type: :component do
 
     it "renders organization name" do
       expect(component.text).to include("Search Test Org")
-      expect(component.css("a.display-sortable-link")).to be_blank
+      expect(component).not_to have_css("a.display-sortable-link")
     end
   end
 end

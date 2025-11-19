@@ -25,7 +25,7 @@ RSpec.describe Admin::UserCell::Component, type: :component do
 
     it "renders missing user warning" do
       expect(component.text).to include("Missing user")
-      expect(component.css("small.text-danger")).to be_present
+      expect(component).to have_css("small.tw:text-red-800")
       # When email is present, shows email instead of user_id
       expect(component.text).to include("missing@example.com")
     end

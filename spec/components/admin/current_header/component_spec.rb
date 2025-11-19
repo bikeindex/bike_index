@@ -33,7 +33,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
 
         it "renders missing user message" do
           expect(component.text).to include("User #99999")
-          expect(component).to have_css("span.text-danger em", text: "missing")
+          expect(component).to have_css("span.tw:text-red-800 em", text: "missing")
           expect(component).to have_css("a", text: "view for all users")
         end
       end
@@ -82,7 +82,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
 
         it "renders missing bike message" do
           expect(component.text).to include("Bike #88888")
-          expect(component).to have_css("span.text-danger em", text: "missing")
+          expect(component).to have_css("span.tw:text-red-800 em", text: "missing")
           expect(component).to have_css("a", text: "view for all bikes")
         end
       end

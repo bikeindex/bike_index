@@ -1,5 +1,5 @@
 <% if show_missing_user? %>
-  <small class="text-danger" title="<%= @user_id %>">Missing user</small>
+  <small class="<%= Alert::Component::TEXT_CLASSES[:error] %>" title="<%= @user_id %>">Missing user</small>
   <% if show_email_for_missing_user? %>
     <code class="small"><%= @user_id %></code>
   <% end %>
