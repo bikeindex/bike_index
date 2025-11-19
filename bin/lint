@@ -17,8 +17,17 @@ end
 chdir APP_ROOT do
   if lint_test
     puts "Testing lint (will not autofix)"
-    system!("bundle exec standardrb --no-fix")
-    system!("npm run lint_check")
+    failed = false
+
+    # Run all lint checks, tracking failures
+    failed = true unless system("bundle exec standardrb --no-fix")
+    failed = true unless system("npm run js:lint_check")
+    failed = true unless system("npm run html:lint_check")
+    failed = true unless system("npm run html:format_check")
+
+    if failed
+      abort("\n== One or more lint checks failed ==")
+    end
   else
     system!("bundle exec standardrb --fix")
     system!("npm run lint")
