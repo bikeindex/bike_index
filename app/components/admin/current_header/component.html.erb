@@ -11,7 +11,7 @@
             <em>missing</em>
           </span>
         <% end %>
-        <%= link_to "view for all users", url_for(helpers.sortable_search_params.merge(user_id: nil)), class: "gray-link small" %>
+        <%= link_to "view for all users", url_for(sortable_search_params.merge(user_id: nil)), class: "gray-link small" %>
       </p>
     <% end %>
 
@@ -29,7 +29,7 @@
             <em>missing</em>
           </span>
         <% end %>
-        <%= link_to "view for all bikes", url_for(helpers.sortable_search_params.merge(search_bike_id: nil)), class: "gray-link small" %>
+        <%= link_to "view for all bikes", url_for(sortable_search_params.merge(search_bike_id: nil)), class: "gray-link small" %>
       </p>
     <% end %>
 
@@ -49,7 +49,7 @@
             <em>missing</em>
           </span>
         <% end %>
-        <%= link_to "view for all marketplace listings", url_for(helpers.sortable_search_params.merge(search_marketplace_listing_id: nil)), class: "gray-link small" %>
+        <%= link_to "view for all marketplace listings", url_for(sortable_search_params.merge(search_marketplace_listing_id: nil)), class: "gray-link small" %>
       </p>
     <% end %>
 
@@ -64,7 +64,7 @@
           <strong>no organization</strong>
         <% end %>
 
-        <%= link_to "view for all organizations", url_for(helpers.sortable_search_params.merge(organization_id: nil)), class: "gray-link small" %>
+        <%= link_to "view for all organizations", url_for(sortable_search_params.merge(organization_id: nil)), class: "gray-link small" %>
         <% if organization_subject&.deleted? %>
           <em class="d-block mt-1 less-strong">
             (<%= organization_subject.short_name %> is <em class="text-danger">deleted</em>) - at
@@ -80,7 +80,7 @@
       <p>
         <%= viewing.pluralize %> for
         <%= link_to "Membership #{membership_id}", admin_membership_path(membership_id) %>
-        <%= link_to "view for all memberships", url_for(helpers.sortable_search_params.merge(search_membership_id: nil)), class: "gray-link small" %>
+        <%= link_to "view for all memberships", url_for(sortable_search_params.merge(search_membership_id: nil)), class: "gray-link small" %>
       </p>
     <% end %>
 
@@ -89,7 +89,7 @@
         <%= viewing.pluralize %> for
         <strong><%= kind_humanized %></strong>
 
-        <%= link_to "view for all kinds", url_for(helpers.sortable_search_params.merge(search_kind: nil)), class: "gray-link small" %>
+        <%= link_to "view for all kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "gray-link small" %>
       </p>
     <% end %>
 
@@ -104,7 +104,7 @@
           <% end %>
         </strong>
 
-        <%= link_to "view for all primary activities", url_for(helpers.sortable_search_params.merge(primary_activity: nil)), class: "gray-link small" %>
+        <%= link_to "view for all primary activities", url_for(sortable_search_params.merge(primary_activity: nil)), class: "gray-link small" %>
       </p>
     <% end %>
   </div>

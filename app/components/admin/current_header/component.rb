@@ -2,6 +2,8 @@
 
 module Admin::CurrentHeader
   class Component < ApplicationComponent
+    include SortableHelper
+
     def initialize(params:, viewing: nil, kind_humanized: nil, user: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
       @params = params
       @viewing = viewing
