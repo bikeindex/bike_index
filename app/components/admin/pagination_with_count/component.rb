@@ -2,6 +2,8 @@
 
 module Admin::PaginationWithCount
   class Component < ApplicationComponent
+    include GraphingHelper # for humanized_time_range_column
+
     def initialize(collection:, count: nil, skip_total: false, skip_today: false, skip_pagination: false, humanized_time_range_column_override: nil, viewing: nil, pagy: nil, per_page: nil, time_range: nil, period: nil, time_range_column: nil, params: {})
       @collection = collection
       @count = count

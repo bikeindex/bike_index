@@ -12,7 +12,7 @@ module Admin::BikeCell
       # Store the raw bike_link_path value (can be false, nil, or a path)
       @bike_link_path_arg = bike_link_path
       @passed_search_url = search_url
-      @render_search = bike_id.present? && render_search.nil? ? @search_url.present? : render_search
+      @render_search = (bike_id.present? && render_search.nil?) ? @search_url.present? : render_search
     end
 
     private
