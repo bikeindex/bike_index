@@ -2,6 +2,8 @@
 
 module Admin::UserCell
   class Component < ApplicationComponent
+    include SortableHelper
+
     def initialize(user: nil, user_id: nil, email: nil, search_url: nil, render_search: nil)
       @user = user
       @user_id = user_id || user&.id
@@ -40,9 +42,9 @@ module Admin::UserCell
       return @search_url if @search_url.present?
 
       if @user_id.present?
-        helpers.url_for(helpers.sortable_search_params.merge(user_id: @user_id))
+        url_for(sortable_search_params.merge(user_id: @user_id))
       elsif @email.present?
-        helpers.url_for(helpers.sortable_search_params.merge(search_email: @email))
+        url_for(sortable_search_params.merge(search_email: @email))
       end
     end
   end
