@@ -13,15 +13,15 @@
 
 version: 0.8.2
 
-# files:
+files:
 #   # Additional patterns beyond the defaults (**.html, **.rhtml, **.html.erb, etc.)
 #   include:
 #     - '**/*.xml.erb'
 #     - 'custom/**/*.html'
 #
 #   # Patterns to exclude (can exclude defaults too)
-#   exclude:
-#     - 'public/**/*'
+  exclude:
+    - 'public/**/*'
 #     - 'tmp/**/*'
 
 linter:
