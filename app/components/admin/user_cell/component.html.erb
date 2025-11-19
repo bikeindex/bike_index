@@ -13,7 +13,8 @@
   </span>
 <% end %>
 
-<%= helpers.user_icon(@user) %>
+<%= user_icon(@user) %>
+
 <% if show_search? %>
   <%= link_to helpers.search_emoji, computed_search_url, class: "display-sortable-link small" %>
 <% end %>

@@ -44,7 +44,7 @@
             - if email_domain&.no_auto_assign_status?
               %small{class: "tw:ml-1 tw:text-sky-400"} no auto status
           %td
-            = render Admin::UserCell::Component.new(user: email_domain.creator, user_id: email_domain.creator_id, cache: false)
+            = render Admin::UserCell::Component.new(user: email_domain.creator, user_id: email_domain.creator_id)
           %td
             = link_to number_display(email_domain.user_count), admin_users_path(search_domain: email_domain.domain, render_chart: true), class: "text-link"
           %td
