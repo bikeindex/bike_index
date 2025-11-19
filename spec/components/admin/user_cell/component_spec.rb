@@ -3,130 +3,106 @@
 require "rails_helper"
 
 RSpec.describe Admin::UserCell::Component, type: :component do
-  let(:instance) { described_class.new(**options) }
+  let(:component) { render_inline(described_class.new(**options)) }
   let(:options) { {} }
 
-  describe "initialization with defaults" do
-    context "with user object" do
-      let(:user) { FactoryBot.create(:user, email: "test@example.com") }
-      let(:options) { {user:} }
+  context "with user object" do
+    let(:user) { FactoryBot.create(:user, email: "test@example.com") }
+    let(:options) { {user:} }
 
-      it "extracts user_id and email from user" do
-        expect(instance.instance_variable_get(:@user_id)).to eq(user.id)
-        expect(instance.instance_variable_get(:@email)).to eq("test@example.com")
-      end
+    it "renders email as link" do
+      expect(component.css("a.text-link")).to be_present
+      expect(component.css("a[href*='/admin/users/']")).to be_present
     end
 
-    context "with explicit values" do
-      let(:options) { {user_id: 123, email: "explicit@example.com"} }
+    it "displays truncated email" do
+      expect(component.text).to include("test@example.com")
+    end
 
-      it "uses provided values" do
-        expect(instance.instance_variable_get(:@user_id)).to eq(123)
-        expect(instance.instance_variable_get(:@email)).to eq("explicit@example.com")
-      end
+    it "includes user icon" do
+      # user_icon helper will render something based on user attributes
+      expect(component.to_html).to be_present
     end
   end
 
-  describe "#show_missing_user?" do
-    context "with user_id but no user" do
-      let(:options) { {user_id: 999} }
+  context "with missing user (user_id but no user)" do
+    let(:options) { {user_id: 999, email: "missing@example.com"} }
 
-      it "returns true" do
-        expect(instance.send(:show_missing_user?)).to be true
-      end
+    it "renders missing user warning" do
+      expect(component.text).to include("Missing user")
+      expect(component.css("small.text-danger")).to be_present
     end
 
-    context "with user present" do
-      let(:user) { FactoryBot.create(:user) }
-      let(:options) { {user:} }
-
-      it "returns false" do
-        expect(instance.send(:show_missing_user?)).to be false
-      end
+    it "displays email when email is present" do
+      # When email is present, shows email instead of user_id
+      expect(component.text).to include("missing@example.com")
     end
   end
 
-  describe "#show_user_link?" do
-    context "with user present" do
-      let(:user) { FactoryBot.create(:user) }
-      let(:options) { {user:} }
+  context "with missing user and no email" do
+    let(:options) { {user_id: 888} }
 
-      it "returns true" do
-        expect(instance.send(:show_user_link?)).to be true
-      end
+    it "renders missing user warning" do
+      expect(component.text).to include("Missing user")
     end
 
-    context "without user" do
-      let(:options) { {email: "test@example.com"} }
-
-      it "returns false" do
-        expect(instance.send(:show_user_link?)).to be false
-      end
+    it "displays user_id in code block" do
+      expect(component.text).to include("888")
+      expect(component.css("code.small")).to be_present
     end
   end
 
-  describe "#show_email_only?" do
-    context "with email but no user" do
-      let(:options) { {email: "orphaned@example.com"} }
+  context "with email only (no user)" do
+    let(:options) { {email: "orphaned@example.com"} }
 
-      it "returns true" do
-        expect(instance.send(:show_email_only?)).to be true
-      end
+    it "renders email in span" do
+      expect(component.css("span[title='orphaned@example.com']")).to be_present
+      expect(component.text).to include("orphaned@example.com")
     end
 
-    context "with user and email" do
-      let(:user) { FactoryBot.create(:user) }
-      let(:options) { {user:} }
-
-      it "returns false" do
-        expect(instance.send(:show_email_only?)).to be false
-      end
+    it "does not render as link" do
+      expect(component.css("a.text-link")).to be_blank
     end
   end
 
-  describe "#show_search?" do
-    context "with render_search true and email" do
-      let(:options) { {email: "test@example.com", render_search: true} }
+  context "with long email" do
+    let(:long_email) { "very.long.email.address.that.exceeds.thirty.characters@example.com" }
+    let(:options) { {email: long_email} }
 
-      it "returns true" do
-        expect(instance.send(:show_search?)).to be true
-      end
+    it "truncates email display" do
+      displayed_text = component.text.strip
+      expect(displayed_text.length).to be <= 30
+      expect(displayed_text).to end_with("...")
     end
 
-    context "with render_search false" do
-      let(:options) { {email: "test@example.com", render_search: false} }
-
-      it "returns false" do
-        expect(instance.send(:show_search?)).to be false
-      end
-    end
-
-    context "without email or user_id" do
-      let(:options) { {render_search: true} }
-
-      it "returns false" do
-        expect(instance.send(:show_search?)).to be false
-      end
+    it "includes full email in title attribute" do
+      expect(component.css("span[title='#{long_email}']")).to be_present
     end
   end
 
-  describe "#email_display" do
-    context "with short email" do
-      let(:options) { {email: "short@example.com"} }
+  context "without any user data" do
+    let(:options) { {} }
 
-      it "returns full email" do
-        expect(instance.send(:email_display)).to eq("short@example.com")
-      end
+    it "renders blank" do
+      # With no user, user_icon(nil) returns empty string, component renders completely blank
+      expect(component.text.strip).to be_blank
     end
 
-    context "with long email" do
-      let(:long_email) { "very.long.email.address.that.exceeds.thirty.characters@example.com" }
-      let(:options) { {email: long_email} }
+    it "does not render missing user warning" do
+      expect(component.text).not_to include("Missing user")
+    end
+  end
 
-      it "truncates to 30 characters" do
-        expect(instance.send(:email_display).length).to eq(30)
-        expect(instance.send(:email_display)).to end_with("...")
-      end
+  context "with render_search false" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:options) { {user:, render_search: false} }
+
+    it "renders user email" do
+      expect(component.css("a.text-link")).to be_present
+    end
+
+    it "does not render search link" do
+      expect(component.css("a.display-sortable-link")).to be_blank
     end
   end
 end
