@@ -2,15 +2,18 @@
   "name": "bike_index-webapp",
   "devDependencies": {
     "@herb-tools/formatter": "^0.8.2",
+    "@herb-tools/linter": "^0.8.2",
     "standard": "*"
   },
   "scripts": {
-    "html:lint": "herb-format",
-    "html:lint_check": "herb-format --check",
+    "html:format": "herb-format",
+    "html:format_check": "herb-format --check",
+    "html:lint": "herb-lint --fix",
+    "html:lint_check": "herb-lint",
     "js:lint": "standard --fix",
-    "js:lint_check": "standard --fix",
+    "js:lint_check": "standard",
     "lint": "npm run js:lint & npm run html:lint",
-    "lint_check": "npm run js:lint_check & npm run html:lint_check & wait"
+    "lint_check": "npm run js:lint_check & npm run html:lint_check & npm run html:format_check & wait"
   },
   "standard": {
     "ignore": [
