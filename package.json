@@ -9,10 +9,11 @@
     "html:format": "herb-format",
     "html:format_check": "herb-format --check",
     "html:lint": "herb-lint --fix",
-    "html:lint_check": "herb-lint",
+    "html:lint_check": "herb-lint --format=simple --github",
     "js:lint": "standard --fix",
     "js:lint_check": "standard",
-    "lint": "npm run js:lint & npm run html:lint"
+    "lint": "npm run js:lint & npm run html:lint & npm run html:format",
+    "lint_check": "npm run js:lint_check & npm run html:lint_check & npm run html:format_check & wait"
   },
   "standard": {
     "ignore": [

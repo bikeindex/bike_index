@@ -22,9 +22,20 @@ jobs:
           cache: 'npm'
       - run: npm install
 
-      - name: Lint code for consistent style
-        run: bin/lint --no-fix
+      - name: Lint Ruby code
+        run: bundle exec standardrb --no-fix
+      - name: Lint JavaScript code
+        if: success() || failure()
+        run: npm run js:lint_check
+      - name: Lint HTML code
+        if: success() || failure()
+        run: npm run html:lint_check
+      - name: Check HTML formatting
+        if: success() || failure()
+        run: npm run html:format_check
+
       - name: Scan for common Rails security vulnerabilities using static analysis
+        if: success() || failure()
         run: bin/brakeman --no-pager
 
       # Eventually this should be added:
