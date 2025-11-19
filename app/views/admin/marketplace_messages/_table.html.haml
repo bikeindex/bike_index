@@ -35,7 +35,7 @@
             %small= "#{marketplace_message.marketplace_listing.currency_symbol}#{number_display(marketplace_message.marketplace_listing.amount)}"
           - unless skip_marketplace_listing
             %td
-              = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages")}
+              = render Admin::BikeCell::Component.new(bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"))
               = link_to search_emoji, url_for(sortable_search_params.merge(search_marketplace_listing_id: marketplace_message.marketplace_listing_id)), class: "display-sortable-link small ml-1"
           %td
             %span{title: marketplace_message.body}
@@ -44,6 +44,8 @@
             %span{class: (marketplace_message.sender_buyer? ? "less-strong" : "")}
               = marketplace_message.kind_humanized
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: marketplace_message.sender, render_search: true, cache: true}
+            = cache do
+              = render Admin::UserCell::Component.new(user: marketplace_message.sender, render_search: true)
           -# %td
-          -#   = render partial: "/shared/admin/user_cell", locals: {user: marketplace_message.receiver, render_search: true, cache: true}
+          = cache do
+            -#   = render Admin::UserCell::Component.new(user: marketplace_message.receiver, render_search: true)

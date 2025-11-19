@@ -28,7 +28,7 @@
     </ul>
   </div>
 
-  <%= render partial: "/shared/admin/current_header", locals: {viewing:} %>
+  <%= render_admin_current_header %>
 </div>
 
 <% if !skip_charting && @render_chart %>
@@ -44,9 +44,9 @@
   <%= admin_search_form %>
 <% end %>
 
-<%= render partial: "/shared/admin/pagination", locals: {collection:, viewing:} %>
+<%= render_admin_pagination_with_count(collection:, viewing:) %>
 
 <%= table_view %>
 
 
-<%= render partial: "/shared/admin/pagination", locals: {collection:, skip_total: true} %>
+<%= render_admin_pagination_with_count(collection:, skip_total: true) %>

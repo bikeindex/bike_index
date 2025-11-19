@@ -37,7 +37,7 @@ class Admin::FeedbacksController < Admin::BaseController
       @search_kind = "all"
     end
     if params[:user_id].present?
-      @user = User.username_friendly_find(params[:user_id])
+      @user = User.friendly_find(params[:user_id])
       feedbacks = feedbacks.where(user_id: @user.id) if @user.present?
     end
     if params[:search_email].present?

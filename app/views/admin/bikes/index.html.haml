@@ -79,7 +79,7 @@
 .row.mt-4
   .col-md-6.order-2.order-md-1
     .row
-      = render partial: "/shared/admin/current_header", locals: {viewing: "Bikes"}
+      = render_admin_current_header(viewing: "Bikes")
     - if current_organization.present?
       %p
         - if params[:search_only_creation_organization].present?
@@ -163,8 +163,8 @@
             = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
         = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bikes, count: available_bikes.size}
+= render_admin_pagination_with_count(collection: @bikes, count: available_bikes.size)
 
 = render partial: "/admin/bikes/table", locals: {render_sortable: true, render_multi_check: @multi_delete}
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bikes, skip_total: true}
+= render_admin_pagination_with_count(collection: @bikes, skip_total: true)

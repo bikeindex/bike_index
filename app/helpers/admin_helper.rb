@@ -135,26 +135,6 @@ module AdminHelper
     end
   end
 
-  def user_icon_hash(user = nil)
-    icon_hash = {tags: []}
-    return icon_hash if user&.id.blank?
-
-    if user.superuser?
-      icon_hash[:tags] = [:superuser]
-      return icon_hash
-    end
-    icon_hash[:tags] += [:donor] if user.donor?
-    icon_hash[:tags] += [:member] if user.membership_active.present?
-    icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
-    icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
-    org = user.organization_prioritized
-    if org.present?
-      icon_hash[:tags] += [:organization_role]
-      icon_hash[:organization] = {kind: org.kind.to_sym, paid: org.paid?}
-    end
-    icon_hash
-  end
-
   # Add icon for unconfirmed, email banned
   def user_icon(user = nil, full_text: false)
     icon_hash = user_icon_hash(user)
@@ -222,7 +202,58 @@ module AdminHelper
     theft_alert.recovered? ? text_class + " small" : text_class
   end
 
+  def render_admin_pagination_with_count(collection:, count: nil, skip_total: false, skip_today: false, skip_pagination: false, humanized_time_range_column_override: nil, viewing: nil)
+    render(Admin::PaginationWithCount::Component.new(
+      collection:,
+      count:,
+      skip_total:,
+      skip_today:,
+      skip_pagination:,
+      humanized_time_range_column_override:,
+      viewing:,
+      pagy: @pagy,
+      per_page: @per_page,
+      time_range: @time_range,
+      period: @period,
+      time_range_column: @time_range_column,
+      params:
+    ))
+  end
+
+  def render_admin_current_header(viewing: nil, kind_humanized: nil)
+    render(Admin::CurrentHeader::Component.new(
+      params:,
+      viewing:,
+      kind_humanized:,
+      user: @user,
+      bike: @bike,
+      marketplace_listing: @marketplace_listing,
+      primary_activity: @primary_activity,
+      current_organization:
+    ))
+  end
+
   private
+
+  def user_icon_hash(user = nil)
+    icon_hash = {tags: []}
+    return icon_hash if user&.id.blank?
+
+    if user.superuser?
+      icon_hash[:tags] = [:superuser]
+      return icon_hash
+    end
+    icon_hash[:tags] += [:donor] if user.donor?
+    icon_hash[:tags] += [:member] if user.membership_active.present?
+    icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
+    icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
+    org = user.organization_prioritized
+    if org.present?
+      icon_hash[:tags] += [:organization_role]
+      icon_hash[:organization] = {kind: org.kind.to_sym, paid: org.paid?}
+    end
+    icon_hash
+  end
 
   def org_icon_text(kind:, paid:)
     kind_letter = {

@@ -61,13 +61,13 @@
                     = notification_text.truncate(100)
             %td.user-cell
               - if notification.user_id.present?
-                = render partial: "/shared/admin/user_cell", locals: {user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, cache: false}
+                = render Admin::UserCell::Component.new(user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable)
               - else
                 = notification.message_channel_target
                 %small.less-strong no user
             %td.bike-cell
               - if notification.bike_id.present?
-                = render partial: "/shared/admin/bike_cell", locals: {bike: notification.bike, bike_id: notification.bike_id, bike_link_path: admin_bike_path(notification.bike_id, active_tab: "messages"), render_search: true}
+                = render Admin::BikeCell::Component.new(bike: notification.bike, bike_id: notification.bike_id, bike_link_path: admin_bike_path(notification.bike_id, active_tab: "messages"), render_search: true)
 
             %td= notification.kind_humanized&.titleize
             %td

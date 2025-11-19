@@ -14,7 +14,7 @@
     = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false}
 
 
-  = render partial: "/shared/admin/current_header", locals: { viewing: "Stickers" }
+  = render_admin_current_header(viewing: "Stickers")
 .row
   .col-md-8.offset-md-2.mt-2
     = form_tag reassign_admin_bike_stickers_path, method: :get, id: "reassign_form" do
@@ -84,8 +84,8 @@
         = number_with_delimiter(matching_bike_stickers.claimed.count)
         claimed
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bike_stickers, viewing: "Sticker"}
+= render_admin_pagination_with_count(collection: @bike_stickers, viewing: "Sticker")
 
 = render partial: "table", locals: { bike_stickers: @bike_stickers, render_sortable: true }
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bike_stickers, viewing: "Sticker", skip_total: true}
+= render_admin_pagination_with_count(collection: @bike_stickers, viewing: "Sticker", skip_total: true)
