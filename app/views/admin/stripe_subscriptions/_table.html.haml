@@ -49,7 +49,7 @@
                 = l stripe_subscription.end_at, format: :convert_time
           %td
             - if stripe_subscription.user_id.present?
-              = render partial: "/shared/admin/user_cell", locals: {user: stripe_subscription.user, render_search: true, cache: true}
+              = render Admin::UserCell::Component.new(user: stripe_subscription.user, render_search: true, cache: true)
             - else
               = stripe_subscription.email
           %td

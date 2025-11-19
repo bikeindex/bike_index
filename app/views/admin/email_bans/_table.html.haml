@@ -33,4 +33,4 @@
                 = l email_ban.end_at, format: :convert_time
           %td
             - if email_ban.user_id.present?
-              = render partial: "/shared/admin/user_cell", locals: {user: email_ban.user, render_search: true, cache: true}
+              = render Admin::UserCell::Component.new(user: email_ban.user, render_search: true, cache: true)

@@ -167,7 +167,7 @@
               %small.only-dev-visible= bike_sticker_update.id
           %td
             - if bike_sticker_update.user_id.present?
-              = render partial: "/shared/admin/user_cell", locals: {user: bike_sticker_update.user, render_search: true, cache: true}
+              = render Admin::UserCell::Component.new(user: bike_sticker_update.user, render_search: true, cache: true)
           %td
             %strong
               = link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code))

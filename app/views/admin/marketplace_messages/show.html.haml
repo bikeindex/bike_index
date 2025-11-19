@@ -17,7 +17,7 @@
           %td
             Sender
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.sender, user_id: @marketplace_message.sender_id}
+            = render Admin::UserCell::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id)
             %small{class: "tw:ml-2"}
               - sender_count = MarketplaceMessage.where(sender_id: @marketplace_message.sender_id).count
               = link_to admin_marketplace_messages_path(user_id: @marketplace_message.sender_id) do
@@ -26,7 +26,7 @@
           %td
             Receiver
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id}
+            = render Admin::UserCell::Component.new(user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id)
             %small{class: "tw:ml-2"}
               - receiver_count = MarketplaceMessage.where(sender_id: @marketplace_message.receiver_id).count
               = link_to admin_marketplace_messages_path(user_id: @marketplace_message.receiver_id) do
