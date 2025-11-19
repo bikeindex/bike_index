@@ -167,7 +167,7 @@
               %small.only-dev-visible= bike_sticker_update.id
           %td
             - if bike_sticker_update.user_id.present?
-              = cache do
+              = cache(bike_sticker_update.user) do
                 = render Admin::UserCell::Component.new(user: bike_sticker_update.user, render_search: true)
           %td
             %strong

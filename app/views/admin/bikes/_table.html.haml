@@ -69,7 +69,7 @@
                   = l bike.updated_by_user_fallback, format: :convert_time
               %td.d-none.d-md-table-cell.user-cell
                 .less-strong-hold
-                  = cache do
+                  = cache(bike.user) do
                     = render Admin::UserCell::Component.new(email: bike.owner_email, user: bike.user, render_search: true)
                   -# Previously, was passing in search_url with search_email: owner_email - which is more inclusive and MUCH SLOWER
                   - if bike.claimed?
