@@ -65,9 +65,9 @@
               - if marketplace_listing.address_record
                 = render Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record)
             %td
-              = cache do
+              = cache(marketplace_listing.seller) do
                 = render Admin::UserCell::Component.new(user: marketplace_listing.seller, render_search: true)
             %td
               - if marketplace_listing.buyer_id.present?
-                = cache do
+                = cache(marketplace_listing.buyer_id) do
                   = render Admin::UserCell::Component.new(user: marketplace_listing.buyer_id, render_search: true)

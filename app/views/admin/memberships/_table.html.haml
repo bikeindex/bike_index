@@ -31,7 +31,7 @@
                 = membership.id
           - unless skip_user
             %td
-              = cache do
+              = cache(membership.user) do
                 = render Admin::UserCell::Component.new(user: membership.user, user_id: membership.user_id, render_search: false)
           %td
             %span.convertTime
@@ -47,5 +47,5 @@
               = link_to "Stripe", membership.stripe_admin_url
             - else
               .less-strong
-                = cache do
+                = cache(membership.creator) do
                   = render Admin::UserCell::Component.new(user: membership.creator, user_id: membership.creator_id, render_search: false)

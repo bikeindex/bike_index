@@ -129,7 +129,7 @@
               = link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id)), class: "display-sortable-link small"
           %td
             - if logged_search.user_id.present?
-              = cache do
+              = cache(logged_search.user) do
                 = render Admin::UserCell::Component.new(user: logged_search.user, render_search: true, user_id: logged_search.user_id)
 
           %td
