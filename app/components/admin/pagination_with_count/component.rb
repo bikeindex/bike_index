@@ -39,7 +39,7 @@ module Admin::PaginationWithCount
       end
     end
 
-    def humanized_time_range_column
+    def humanized_time_range_column_display
       if @humanized_time_range_column_override.present?
         @humanized_time_range_column_override
       else

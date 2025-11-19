@@ -8,7 +8,7 @@
         <% if show_time_range? %>
           <em>
             <% if @time_range_column.present? %>
-              <strong><%= humanized_time_range_column %></strong>
+              <strong><%= humanized_time_range_column_display %></strong>
             <% end %>
             <%= humanized_time_range(@time_range) %>
           </em>
