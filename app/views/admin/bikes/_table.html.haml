@@ -69,7 +69,8 @@
                   = l bike.updated_by_user_fallback, format: :convert_time
               %td.d-none.d-md-table-cell.user-cell
                 .less-strong-hold
-                  = render partial: "/shared/admin/user_cell", locals: {email: bike.owner_email, user: bike.user, render_search: true, cache: true}
+                  = cache do
+                    = render Admin::UserCell::Component.new(email: bike.owner_email, user: bike.user, render_search: true)
                   -# Previously, was passing in search_url with search_email: owner_email - which is more inclusive and MUCH SLOWER
                   - if bike.claimed?
                     %span.less-strong-right.text-info{title: "#{bike.type} is claimed", style: "cursor: default"}

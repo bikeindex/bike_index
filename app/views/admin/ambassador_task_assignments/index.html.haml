@@ -35,7 +35,7 @@
 
       = submit_tag "Filter", name: "search", class: "btn btn-primary ml-2"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @ambassador_task_assignments}
+= render_admin_pagination_with_count(collection: @ambassador_task_assignments)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border

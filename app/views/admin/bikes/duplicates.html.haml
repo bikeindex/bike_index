@@ -1,7 +1,7 @@
 %h1
   Possible duplicate bikes
 
-= render partial: "/shared/admin/pagination", locals: {collection: @duplicate_groups, count: @duplicate_groups_count}
+= render_admin_pagination_with_count(collection: @duplicate_groups, count: @duplicate_groups_count)
 
 - @duplicate_groups.each do |duplicate_group|
   .row
@@ -15,4 +15,4 @@
   = render partial: "/admin/bikes/table", locals: { bikes: duplicate_group.bikes, no_show_header: true, show_serial: true }
 
 
-= render partial: "/shared/admin/pagination", locals: {collection: @duplicate_groups, skip_total: true}
+= render_admin_pagination_with_count(collection: @duplicate_groups, skip_total: true)

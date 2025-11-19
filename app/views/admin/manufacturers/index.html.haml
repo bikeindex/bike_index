@@ -7,7 +7,7 @@
       %li.nav-item
         = link_to 'New Manufacturer', new_admin_manufacturer_url, class: "nav-link"
 
-  = render Admin::CurrentHeader::Component.new(params:, viewing: "Manufacturers", user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
+  = render_admin_current_header(viewing: "Manufacturers")
 
   .col-12.mt-4
     - if sortable_search_params?

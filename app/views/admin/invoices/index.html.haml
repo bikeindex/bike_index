@@ -40,7 +40,7 @@
           = link_to "Not Endless", admin_invoices_path(sortable_search_params.merge(search_endless: not_endless_active ? nil : "not_endless")), class: "dropdown-item #{not_endless_active ? 'active' : ''}"
       %li.nav-item
         = link_to "graph", admin_invoices_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
-  = render Admin::CurrentHeader::Component.new(params:, viewing: "Invoices", user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
+  = render_admin_current_header(viewing: "Invoices")
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_invoices, column: @time_range_column), stacked: true, thousands: ","
@@ -100,6 +100,6 @@
 %p.less-strong
   Go to individual organizations to create new invoices
 
-= render partial: "/shared/admin/pagination", locals: {collection: @invoices}
+= render_admin_pagination_with_count(collection: @invoices)
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: true, display_organization: true }

@@ -40,7 +40,7 @@
       %li.nav-item
         = link_to 'New Organization', new_admin_organization_url, class: "nav-link"
 
-  = render Admin::CurrentHeader::Component.new(params:, viewing: "Organizations", user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
+  = render_admin_current_header(viewing: "Organizations")
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_organizations, column: @time_range_column), stacked: true, thousands: ","
@@ -64,8 +64,8 @@
     .mt-2.mr-2
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @organizations}
+= render_admin_pagination_with_count(collection: @organizations)
 
 = render partial: "/admin/organizations/table", locals: { render_sortable: true }
 
-= render partial: "/shared/admin/pagination", locals: {collection: @organizations, skip_total: true}
+= render_admin_pagination_with_count(collection: @organizations, skip_total: true)

@@ -12,7 +12,7 @@
           %td
             Creator
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: @email_domain.creator, user_id: @email_domain.creator_id}
+            = render Admin::UserCell::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)
         %tr.small
           %td
             Created

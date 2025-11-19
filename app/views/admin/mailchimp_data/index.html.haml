@@ -54,7 +54,7 @@
         = text_field_tag :query, params[:query], placeholder: "Search email", class: "form-control ml-auto"
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
 
-= render partial: "/shared/admin/pagination", locals: {collection: @mailchimp_data}
+= render_admin_pagination_with_count(collection: @mailchimp_data)
 
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable

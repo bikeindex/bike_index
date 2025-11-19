@@ -44,6 +44,8 @@
             %span{class: (marketplace_message.sender_buyer? ? "less-strong" : "")}
               = marketplace_message.kind_humanized
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: marketplace_message.sender, render_search: true, cache: true}
+            = cache do
+              = render Admin::UserCell::Component.new(user: marketplace_message.sender, render_search: true)
           -# %td
-          -#   = render partial: "/shared/admin/user_cell", locals: {user: marketplace_message.receiver, render_search: true, cache: true}
+          = cache do
+            -#   = render Admin::UserCell::Component.new(user: marketplace_message.receiver, render_search: true)

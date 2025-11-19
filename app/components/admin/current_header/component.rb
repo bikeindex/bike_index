@@ -15,6 +15,8 @@ module Admin::CurrentHeader
       @current_organization = current_organization
     end
 
+    private
+
     def viewing
       @viewing || controller_name.humanize
     end

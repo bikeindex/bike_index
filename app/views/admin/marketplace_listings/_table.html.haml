@@ -65,7 +65,9 @@
               - if marketplace_listing.address_record
                 = render Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record)
             %td
-              = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.seller, render_search: true, cache: true}
+              = cache do
+                = render Admin::UserCell::Component.new(user: marketplace_listing.seller, render_search: true)
             %td
               - if marketplace_listing.buyer_id.present?
-                = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.buyer_id, render_search: true, cache: true}
+                = cache do
+                  = render Admin::UserCell::Component.new(user: marketplace_listing.buyer_id, render_search: true)

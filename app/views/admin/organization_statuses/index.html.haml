@@ -50,7 +50,7 @@
       %li.nav-item
         = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-  = render Admin::CurrentHeader::Component.new(params:, viewing: "Organization Statuses", user: @user, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:)
+  = render_admin_current_header(viewing: "Organization Statuses")
 
 - if @render_chart
 
@@ -66,7 +66,7 @@
 
 .mt-4
 
-= render partial: "/shared/admin/pagination", locals: {collection: @organization_statuses}
+= render_admin_pagination_with_count(collection: @organization_statuses)
 
 - org_ids = @organization_statuses.distinct.map(&:organization_id)
 - org_names_hash = Organization.unscoped.where(id: org_ids).pluck(:id, :short_name).to_h
@@ -112,7 +112,7 @@
             - if organization_status.end_at.present?
               = period_in_words(organization_status.end_at - organization_status.start_at)
           %td
-            = render partial: "/shared/admin/organization_cell", locals: {organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?}
+            = render Admin::OrganizationCell::Component.new(organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?)
           %td
             - status_class = organization_status.pos_kind.match?(/broken/) ? "text-danger" : ""
             - status_class = "less-strong" if organization_status.pos_kind == "no_pos"
@@ -127,4 +127,4 @@
 
 
 
-= render partial: "/shared/admin/pagination", locals: {collection: @organization_statuses, skip_total: true}
+= render_admin_pagination_with_count(collection: @organization_statuses, skip_total: true)

@@ -50,7 +50,8 @@
                   = l user.deleted_at, format: :convert_time
             %td
               .less-strong-hold
-                = render partial: "/shared/admin/user_cell", locals: {email: user.email, user: user, render_search: false, cache: true}
+                = cache do
+                  = render Admin::UserCell::Component.new(email: user.email, user: user, render_search: false)
                 %small.less-strong-right
                   &nbsp;#{user.id}
             %td
