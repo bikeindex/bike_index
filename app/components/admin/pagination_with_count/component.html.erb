@@ -8,13 +8,7 @@
         <% if show_time_range? %>
           <em>
             <% if @time_range_column.present? %>
-              <strong>
-                <% if @humanized_time_range_column_override.present? %>
-                  <%= @humanized_time_range_column_override %>
-                <% else %>
-                  <%= humanized_time_range_column(@time_range_column) %>
-                <% end %>
-              </strong>
+              <strong><%= humanized_time_range_column %></strong>
             <% end %>
             <%= humanized_time_range(@time_range) %>
           </em>

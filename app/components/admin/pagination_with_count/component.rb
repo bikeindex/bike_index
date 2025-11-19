@@ -39,6 +39,14 @@ module Admin::PaginationWithCount
       end
     end
 
+    def humanized_time_range_column
+      if @humanized_time_range_column_override.present?
+        @humanized_time_range_column_override
+      else
+        humanized_time_range_column(@time_range_column)
+      end
+    end
+
     def show_time_range?
       @time_range.present? && @period != "all"
     end
