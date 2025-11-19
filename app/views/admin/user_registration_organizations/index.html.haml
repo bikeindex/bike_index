@@ -35,7 +35,7 @@
   = column_chart time_range_counts(collection: matching_user_registration_organizations, column: @time_range_column), stacked: true, thousands: ","
 = render partial: "/shared/period_select"
 
-= render Admin::PaginationWithCount::Component.new(collection: @user_registration_organizations, count: matching_user_registration_organizations.size, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @user_registration_organizations, count: matching_user_registration_organizations.size)
 
 - render_sortable ||= true
 .full-screen-table

@@ -66,7 +66,7 @@
 
 .mt-4
 
-= render Admin::PaginationWithCount::Component.new(collection: @organization_statuses, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @organization_statuses)
 
 - org_ids = @organization_statuses.distinct.map(&:organization_id)
 - org_names_hash = Organization.unscoped.where(id: org_ids).pluck(:id, :short_name).to_h
@@ -127,4 +127,4 @@
 
 
 
-= render Admin::PaginationWithCount::Component.new(collection: @organization_statuses, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @organization_statuses, skip_total: true)

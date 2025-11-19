@@ -44,7 +44,7 @@ module Admin::PaginationWithCount
     end
 
     def today_count
-      @collection.where("#{@collection.table_name}.#{@time_range_column || 'created_at'} >= ?", Time.current.beginning_of_day).total_count
+      @collection.where("#{@collection.table_name}.#{@time_range_column || "created_at"} >= ?", Time.current.beginning_of_day).total_count
     end
 
     def per_pages
@@ -52,7 +52,7 @@ module Admin::PaginationWithCount
     end
 
     def per_page_select_id
-      "per_page_select#{@skip_total ? '-skiptotal' : ''}"
+      "per_page_select#{"-skiptotal" if @skip_total}"
     end
   end
 end

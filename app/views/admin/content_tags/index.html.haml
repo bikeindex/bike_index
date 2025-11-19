@@ -4,7 +4,7 @@
   .col-lg-2.col-sm-12
     = link_to "New tag", new_admin_content_tag_url, class: "btn btn-success float-right"
 
-= render Admin::PaginationWithCount::Component.new(collection: @content_tags, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @content_tags)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm

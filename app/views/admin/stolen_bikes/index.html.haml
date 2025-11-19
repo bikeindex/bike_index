@@ -60,7 +60,7 @@
           unapproved records
           = link_to "without location", url_for(sortable_search_params.merge(search_without_location: true))
 
-= render Admin::PaginationWithCount::Component.new(collection: @stolen_records, viewing: "Stolen Bike", count: available_stolen_records.size, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @stolen_records, viewing: "Stolen Bike", count: available_stolen_records.size)
 
 = form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post do
   .full-screen-table
@@ -144,4 +144,4 @@
                 = user_icon(bike&.user)
   .mb-3.text-center
     = submit_tag 'Approve selected', class: 'btn btn-outline-primary'
-= render Admin::PaginationWithCount::Component.new(collection: @stolen_records, count: available_stolen_records.count, viewing: "Stolen Bike", skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @stolen_records, count: available_stolen_records.count, viewing: "Stolen Bike", skip_total: true)

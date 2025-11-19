@@ -62,9 +62,9 @@
   %strong
     = number_with_delimiter(matching_users.unconfirmed.size)
   unconfirmed users
-= render Admin::PaginationWithCount::Component.new(collection: @users, viewing: "User", count: matching_users.size, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @users, viewing: "User", count: matching_users.size)
 = render partial: "/admin/users/table", locals: {render_sortable: true, render_deleted: @deleted}
-= render Admin::PaginationWithCount::Component.new(collection: @users, viewing: "User", skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @users, viewing: "User", skip_total: true)
 
 - unless @users.present?
   %h1.mt-4

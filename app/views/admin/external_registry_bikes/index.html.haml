@@ -61,8 +61,8 @@
 
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render Admin::PaginationWithCount::Component.new(collection: @bikes, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @bikes)
 
 = render partial: "table", locals: {render_sortable: true}
 
-= render Admin::PaginationWithCount::Component.new(collection: @bikes, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @bikes, skip_total: true)

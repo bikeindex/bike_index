@@ -54,6 +54,6 @@
         = text_field_tag :query, params[:query], placeholder: "Search tweets", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render Admin::PaginationWithCount::Component.new(collection: @tweets, count: matching_tweets.size, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @tweets, count: matching_tweets.size)
 
 = render partial: "/admin/tweets/table", locals: { tweets: @tweets, render_sortable: true, skip_total: true}

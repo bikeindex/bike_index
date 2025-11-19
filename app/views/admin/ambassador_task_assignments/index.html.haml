@@ -35,7 +35,7 @@
 
       = submit_tag "Filter", name: "search", class: "btn btn-primary ml-2"
 
-= render Admin::PaginationWithCount::Component.new(collection: @ambassador_task_assignments, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @ambassador_task_assignments)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border

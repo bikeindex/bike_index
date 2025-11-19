@@ -73,8 +73,8 @@
     .mt-2
       = submit_tag "Search", name: "search", class: "btn btn-primary"
 
-= render Admin::PaginationWithCount::Component.new(collection: @feedbacks, viewing: "Message", count: available_feedbacks.size, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @feedbacks, viewing: "Message", count: available_feedbacks.size)
 
 = render partial: "/admin/feedbacks/table", locals: {feedbacks: @feedbacks, render_sortable: true}
 
-= render Admin::PaginationWithCount::Component.new(collection: @feedbacks, viewing: "Message", skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @feedbacks, viewing: "Message", skip_total: true)

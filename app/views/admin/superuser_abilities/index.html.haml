@@ -17,8 +17,8 @@
 
 = render partial: "/shared/period_select"
 
-= render Admin::PaginationWithCount::Component.new(collection: @superuser_abilities, count: searched_superuser_abilities.count, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @superuser_abilities, count: searched_superuser_abilities.count)
 
 = render partial: "/admin/superuser_abilities/table", locals: {superuser_abilities: @superuser_abilities, render_sortable: true, render_deleted: @deleted}
 
-= render Admin::PaginationWithCount::Component.new(collection: @superuser_abilities, count: searched_superuser_abilities.count, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @superuser_abilities, count: searched_superuser_abilities.count)

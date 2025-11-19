@@ -43,7 +43,7 @@
         = text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render Admin::PaginationWithCount::Component.new(collection: @b_params, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @b_params)
 
 .full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm
@@ -101,5 +101,5 @@
             %div{ style: "max-width: 450px; overflow: scroll; white-space: nowrap;" }
               = pretty_print_json(b_param.params)
 
-= render Admin::PaginationWithCount::Component.new(collection: @b_params, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @b_params, skip_total: true)
 

@@ -62,6 +62,6 @@
 .mt-4.mb-4
   = render partial: "/shared/period_select"
 
-= render Admin::PaginationWithCount::Component.new(collection: @impound_claims, count: matching_impound_claims.size, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @impound_claims, count: matching_impound_claims.size)
 
 = render partial: "table", locals: {impound_claims: @impound_claims, render_sortable: true, skip_organization: current_organization.present?}

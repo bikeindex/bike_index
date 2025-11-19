@@ -70,6 +70,6 @@
 
 = render partial: "/shared/period_select"
 
-= render Admin::PaginationWithCount::Component.new(collection: @user_alerts, count: matching_user_alerts.size, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @user_alerts, count: matching_user_alerts.size)
 
 = render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @user_alerts, skip_user: @user.present?}

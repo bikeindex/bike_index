@@ -11,7 +11,7 @@
       = link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "less-strong"
 
 
-= render Admin::PaginationWithCount::Component.new(collection: @exports, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @exports)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.mt-4
@@ -49,4 +49,4 @@
             - if export.finished?
               = number_with_delimiter(export.rows)
 
-= render Admin::PaginationWithCount::Component.new(collection: @exports, skip_total: true, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, time_range_column: @time_range_column, params:)
+= render_admin_pagination_with_count(collection: @exports, skip_total: true)
