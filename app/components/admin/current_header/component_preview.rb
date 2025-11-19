@@ -5,12 +5,13 @@ module Admin::CurrentHeader
     # @group Header Variants
 
     def default
-      render(Admin::CurrentHeader::Component.new(params: {}))
+      render(Admin::CurrentHeader::Component.new(params: passed_params))
     end
 
-    def with_user
-      user = User.first
-      render(Admin::CurrentHeader::Component.new(params: passed_params(user_id: user.id), user:, viewing: "Notifications"))
+    def with_current_organization
+      current_organization = Organization.friendly_find "hogwarts"
+      primary_activity = PrimaryActivity.friendly_find "Gravel"
+      render(Admin::CurrentHeader::Component.new(current_organization:, params: passed_params, primary_activity:, viewing: "Notifications"))
     end
 
     def with_bike
@@ -20,7 +21,7 @@ module Admin::CurrentHeader
 
     private
 
-    def passed_params(hash)
+    def passed_params(hash = {})
       ActionController::Parameters.new(hash)
     end
   end

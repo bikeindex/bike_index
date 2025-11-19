@@ -26,7 +26,8 @@ module Admin::CurrentHeader
     end
 
     def render?
-      (@params.keys.map(&:to_sym) & HEADER_KEYS).any?
+      (@params.keys.map(&:to_sym) & HEADER_KEYS).any? || show_user? || show_marketplace_listing? ||
+        show_organization?
     end
 
     private
@@ -60,7 +61,7 @@ module Admin::CurrentHeader
     end
 
     def show_organization?
-      @params[:organization_id].present?
+      @params[:organization_id].present? || organization_subject.present?
     end
 
     def organization_subject
@@ -84,11 +85,15 @@ module Admin::CurrentHeader
     end
 
     def show_primary_activity?
-      @params[:primary_activity].present?
+      @params[:primary_activity].present? || primary_activity_subject.present?
     end
 
     def primary_activity_subject
-      @primary_activity || PrimaryActivity.find_by_id(@params[:primary_activity])
+      @primary_activity_subject ||= @primary_activity || PrimaryActivity.find_by_id(@params[:primary_activity])
+    end
+
+    def error_text_class
+      Alert::Component::TEXT_CLASSES[:error]
     end
   end
 end

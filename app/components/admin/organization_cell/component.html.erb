@@ -1,13 +1,13 @@
 <% if organization_present? %>
   <%= link_to admin_organization_path(@organization_id) do %>
     <% if organization_subject.blank? %>
-      <small class="text-danger" title="<%= @organization_id %>">Missing organization</small>
+      <small class="<%= error_text_class %>" title="<%= @organization_id %>">Missing organization</small>
       <code class="small"><%= @organization_id %></code>
     <% elsif organization_subject.deleted? %>
       <small>
         <span class="less-strong"><%= organization_subject.name %></span>
         <% if organization_subject.deleted? %>
-          <span class="text-danger">deleted!</span>
+          <span class="<%= error_text_class %>">deleted!</span>
         <% end %>
       </small>
     <% else %>
@@ -16,6 +16,6 @@
   <% end %>
 
   <% if @render_search %>
-    <%= link_to search_emoji, url_for(helpers.sortable_search_params.merge(organization_id: @organization_id)), class: "display-sortable-link small" %>
+    <%= link_to search_emoji, url_for(sortable_search_params.merge(organization_id: @organization_id)), class: "display-sortable-link small" %>
   <% end %>
 <% end %>
