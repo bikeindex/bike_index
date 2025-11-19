@@ -68,7 +68,7 @@ RSpec.describe AdminHelper, type: :helper do
 
   describe "user_icon" do
     it "returns empty" do
-      expect(user_icon_hash(User.new)).to eq({tags: []})
+      expect(helper.send(:user_icon_hash, User.new)).to eq({tags: []})
       expect(user_icon(User.new)).to be_blank
     end
     context "donor" do
@@ -78,7 +78,7 @@ RSpec.describe AdminHelper, type: :helper do
       let(:target_full_text) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Donor\">D</span><span class=\"less-strong\">onor</span></span>" }
       it "returns donor" do
         expect(user.donor?).to be_truthy
-        expect(user_icon_hash(user)).to eq({tags: %i[donor]})
+        expect(helper.send(:user_icon_hash, user)).to eq({tags: %i[donor]})
         expect(user_icon(user)).to eq target
         expect(user_icon(user, full_text: true)).to eq target_full_text
       end
@@ -93,11 +93,11 @@ RSpec.describe AdminHelper, type: :helper do
         it "returns donor and theft alert" do
           expect(user.donor?).to be_truthy
           expect(user.theft_alert_purchaser?).to be_truthy
-          expect(user_icon_hash(user)).to eq({tags: %i[donor theft_alert]})
+          expect(helper.send(:user_icon_hash, user)).to eq({tags: %i[donor theft_alert]})
           expect(user_icon(user)).to eq target
           expect(user_icon(user, full_text: true)).to eq target_full_text
           user.superuser = true
-          expect(user_icon_hash(user)).to eq({tags: %i[superuser]}) # It's just superuser
+          expect(helper.send(:user_icon_hash, user)).to eq({tags: %i[superuser]}) # It's just superuser
         end
       end
     end
@@ -110,7 +110,7 @@ RSpec.describe AdminHelper, type: :helper do
       it "returns member" do
         expect(membership.reload.status).to eq "active"
         expect(user.donor?).to be_falsey
-        expect(user_icon_hash(user)).to eq({tags: %i[member]})
+        expect(helper.send(:user_icon_hash, user)).to eq({tags: %i[member]})
         expect(user_icon(user)).to eq target
         expect(user_icon(user, full_text: true)).to eq target_full_text
       end
@@ -118,7 +118,7 @@ RSpec.describe AdminHelper, type: :helper do
         let(:end_at) { Time.current - 1.hour }
         it "doesn't return member" do
           expect(membership.reload.status).to eq "ended"
-          expect(user_icon_hash(user)).to eq({tags: []})
+          expect(helper.send(:user_icon_hash, user)).to eq({tags: []})
           expect(user_icon(user)).to be_blank
         end
       end
@@ -129,7 +129,7 @@ RSpec.describe AdminHelper, type: :helper do
       let(:user) { bike.user }
       it "returns recovery" do
         expect(user.reload).to be_present
-        expect(user_icon_hash(user)).to eq({tags: %i[recovery]})
+        expect(helper.send(:user_icon_hash, user)).to eq({tags: %i[recovery]})
       end
     end
     context "organization" do
@@ -137,7 +137,7 @@ RSpec.describe AdminHelper, type: :helper do
       let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       it "returns paid_org" do
         expect(user.paid_org?).to be_falsey
-        expect(user_icon_hash(user)).to eq({tags: %i[organization_role], organization: {kind: :bike_shop, paid: false}})
+        expect(helper.send(:user_icon_hash, user)).to eq({tags: %i[organization_role], organization: {kind: :bike_shop, paid: false}})
       end
       context "paid_org" do
         let(:organization) { FactoryBot.create(:organization, :organization_features, kind: "law_enforcement") }
@@ -145,7 +145,7 @@ RSpec.describe AdminHelper, type: :helper do
         let(:target_full_text) { "<span><span class=\"org-member-icon user-icon ml-1\" title=\"Paid organization member - Law Enforcement\">$O P</span><span class=\"ml-1 less-strong\">Paid organization member - Law Enforcement</span></span>" }
         it "returns paid_org" do
           expect(user.paid_org?).to be_truthy
-          expect(user_icon_hash(user)).to eq({tags: %i[organization_role], organization: {kind: :law_enforcement, paid: true}})
+          expect(helper.send(:user_icon_hash, user)).to eq({tags: %i[organization_role], organization: {kind: :law_enforcement, paid: true}})
           expect(user_icon(user)).to eq target
           expect(user_icon(user, full_text: true)).to eq target_full_text
         end

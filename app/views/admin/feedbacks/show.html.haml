@@ -50,7 +50,7 @@
             Bike
           %td
             - if @bike.present?
-              = render partial: "/shared/admin/bike_cell", locals: {bike: @bike, bike_id: @feedback.feedback_hash["bike_id"]}
+              = render Admin::BikeCell::Component.new(bike: @bike, bike_id: @feedback.feedback_hash["bike_id"])
             - elsif @feedback.bike_id.blank?
               %small.less-strong no bike
             - else

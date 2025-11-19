@@ -17,7 +17,7 @@
           %td
             Sender
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.sender, user_id: @marketplace_message.sender_id}
+            = render Admin::UserCell::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id)
             %small{class: "tw:ml-2"}
               - sender_count = MarketplaceMessage.where(sender_id: @marketplace_message.sender_id).count
               = link_to admin_marketplace_messages_path(user_id: @marketplace_message.sender_id) do
@@ -26,7 +26,7 @@
           %td
             Receiver
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id}
+            = render Admin::UserCell::Component.new(user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id)
             %small{class: "tw:ml-2"}
               - receiver_count = MarketplaceMessage.where(sender_id: @marketplace_message.receiver_id).count
               = link_to admin_marketplace_messages_path(user_id: @marketplace_message.receiver_id) do
@@ -98,7 +98,7 @@
         %tr
           %td Item
           %td
-            = render partial: "/shared/admin/bike_cell", locals: {bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, show_marketplace_preview: true) }
+            = render Admin::BikeCell::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, show_marketplace_preview: true))
 .mt-4
   = render(Card::Component.new(shadow: true)) do
     %p

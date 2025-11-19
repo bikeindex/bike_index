@@ -37,19 +37,21 @@
                 = organization_role.id
           %td
             - if organization_role.user.present?
-              = render partial: "/shared/admin/user_cell", locals: {user: organization_role.user, render_search: false, cache: true}
+              = cache do
+                = render Admin::UserCell::Component.new(user: organization_role.user, render_search: false)
             - else
               = organization_role.invited_email
           - unless skip_organization
             %td
-              = render partial: "/shared/admin/organization_cell", locals: {organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?}
+              = render Admin::OrganizationCell::Component.new(organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?)
           %td
             - if organization_role.claimed_at.present?
               %span.convertTime
                 = l organization_role.claimed_at, format: :convert_time
           %td
             - if organization_role.sender.present?
-              = render partial: "/shared/admin/user_cell", locals: {user: organization_role.sender, render_search: false, cache: true}
+              = cache do
+                = render Admin::UserCell::Component.new(user: organization_role.sender, render_search: false)
             - else
               = organization_role.sender_id
           %td

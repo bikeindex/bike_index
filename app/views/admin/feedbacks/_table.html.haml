@@ -24,7 +24,8 @@
               = l feedback.created_at, format: :convert_time
           - unless skip_user
             %td
-              = render partial: "/shared/admin/user_cell", locals: {email: feedback.email, user: feedback.user, render_search: render_sortable, cache: true}
+              = cache do
+                = render Admin::UserCell::Component.new(email: feedback.email, user: feedback.user, render_search: render_sortable)
             %td
               = feedback.name
           %td
@@ -34,6 +35,6 @@
           - unless skip_bike
             %td
               - if feedback.bike_id.present?
-                = render partial: "/shared/admin/bike_cell", locals: {bike: feedback.bike, bike_id: feedback.bike_id, bike_link_path: admin_bike_path(feedback.bike_id, active_tab: "messages"), render_search: true}
+                = render Admin::BikeCell::Component.new(bike: feedback.bike, bike_id: feedback.bike_id, bike_link_path: admin_bike_path(feedback.bike_id, active_tab: "messages"), render_search: true)
           %td
             = feedback.body.truncate(100)

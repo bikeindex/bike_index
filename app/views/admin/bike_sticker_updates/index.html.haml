@@ -40,7 +40,7 @@
       %li.nav-item
         = link_to "graph", admin_bike_sticker_updates_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-  = render partial: "/shared/admin/current_header", locals: {viewing: "Sticker updates"}
+  = render_admin_current_header(viewing: "Sticker updates")
 
 - if @render_chart
   - if @search_kind == "all"
@@ -131,7 +131,7 @@
       = render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @searched_bike_stickers.limit(100)}
 
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bike_sticker_updates, viewing: "Sticker Update", count: matching_bike_sticker_updates.size}
+= render_admin_pagination_with_count(collection: @bike_sticker_updates, viewing: "Sticker Update", count: matching_bike_sticker_updates.size)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
@@ -167,7 +167,8 @@
               %small.only-dev-visible= bike_sticker_update.id
           %td
             - if bike_sticker_update.user_id.present?
-              = render partial: "/shared/admin/user_cell", locals: {user: bike_sticker_update.user, render_search: true, cache: true}
+              = cache do
+                = render Admin::UserCell::Component.new(user: bike_sticker_update.user, render_search: true)
           %td
             %strong
               = link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code))

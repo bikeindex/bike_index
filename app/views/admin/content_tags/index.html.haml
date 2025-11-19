@@ -4,7 +4,7 @@
   .col-lg-2.col-sm-12
     = link_to "New tag", new_admin_content_tag_url, class: "btn btn-success float-right"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @content_tags}
+= render_admin_pagination_with_count(collection: @content_tags)
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm

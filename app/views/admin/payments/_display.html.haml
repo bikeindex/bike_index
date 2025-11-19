@@ -59,7 +59,7 @@
         %td User
         %td
           - search_url = payment.user_id.present? ? admin_payments_path(user_id: payment.user_id) : admin_payments_path(search_email: payment.email)
-          = render partial: "/shared/admin/user_cell", locals: {user: payment.user, email: payment.email, search_url: search_url}
+          = render Admin::UserCell::Component.new(user: payment.user, email: payment.email, search_url: search_url)
           - if payment.user_id.blank? && payment.email.present?
             %code= payment.email
       %tr
