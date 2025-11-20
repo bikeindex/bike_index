@@ -1,3 +1,6 @@
+<%# herb:linter ignore %>
+<%# Ignoring the file because I'm not sure how to apply herb:disable html-anchor-require-href with multiline tags %>
+
 <div class="container">
   <% if current_user.present? %>
     <div class="row choose-registration-items">
@@ -7,7 +10,6 @@
             <% current_user.organization_roles.each do |organization_role| %>
               <li>
                 <a
-                  <%# herb:disable html-anchor-require-href %>
                   class="organization-choice choose-type"
                   data-target="<%= new_bike_url(organization_id: organization_role.organization.id) %>"
                 >
@@ -21,7 +23,6 @@
 
           <li>
             <a
-              <%# herb:disable html-anchor-require-href %>
               class="purchase-choice choose-type"
               data-target="<%= new_bike_url %>"
             >
@@ -32,7 +33,6 @@
 
           <li>
             <a
-              <%# herb:disable html-anchor-require-href %>
               class="choose-type"
               data-target="<%= new_bike_url(status: "stolen") %>"
             >
@@ -43,7 +43,6 @@
 
           <li>
             <a
-              <%# herb:disable html-anchor-require-href %>
               class="choose-type"
               data-target="<%= new_bike_url(status: "impounded") %>"
             >

@@ -37,8 +37,6 @@ linter:
   rules:
     html-head-only-elements:
       enabled: false
-    html-body-only-elements:
-      enabled: false
   #   erb-no-extra-newline:
   #     enabled: false
   #

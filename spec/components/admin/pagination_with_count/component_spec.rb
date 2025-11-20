@@ -80,14 +80,15 @@ RSpec.describe Admin::PaginationWithCount::Component, type: :component do
     let(:count) { 1 }
 
     it "pluralizes viewing text based on count" do
-      expect(component.text).to include("Matching Item")
+      expect(component.text).to match(/Matching\s+Item/)
+      expect(component.text).to_not match(/Matching\s+Items/)
     end
 
     context "with multiple items" do
       let(:count) { 5 }
 
       it "uses plural form" do
-        expect(component.text).to include("Matching Items")
+        expect(component.text).to match(/Matching\s+Items/)
       end
     end
   end

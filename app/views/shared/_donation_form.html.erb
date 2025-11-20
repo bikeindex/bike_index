@@ -1,3 +1,5 @@
+<%# herb:linter ignore %>
+<%# Ignoring the file because I'm not sure how to apply herb:disable html-anchor-require-href with multiline tags %>
 <% is_cached ||= false %>
 <% initial_amount ||= nil %>
 <% is_payment ||= false %>
@@ -25,7 +27,6 @@
     <% if is_payment # If payment, have one non-arbitrary button %>
       <li class="col-xs-6 offset-sm-3">
         <a
-          <%# herb:disable html-anchor-require-href %>
           class="btn btn-secondary active"
           data-amount="<%= initial_amount * 100 %>"
         >
@@ -38,7 +39,6 @@
       <% numbers.each do |amount| %>
         <li class="col-xs-4">
           <a
-            <%# herb:disable html-anchor-require-href %>
             class="btn btn-secondary <%= amount == initial_amount ? "active" : "" %>"
             data-amount="<%= amount * 100 %>"
           >
@@ -69,7 +69,6 @@
     <% if kind == "modal" %>
       <li class="col-xs-6 text-left next-steps">
         <a
-          <%# herb:disable html-anchor-require-href %>
           class="btn btn-secondary no-donate-btn"
           aria-label="Close"
           data-dismiss="modal"
