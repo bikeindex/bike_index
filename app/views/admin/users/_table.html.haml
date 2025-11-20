@@ -50,7 +50,7 @@
                   = l user.deleted_at, format: :convert_time
             %td
               .less-strong-hold
-                = cache do
+                = cache(user) do
                   = render Admin::UserCell::Component.new(email: user.email, user: user, render_search: false)
                 %small.less-strong-right
                   &nbsp;#{user.id}

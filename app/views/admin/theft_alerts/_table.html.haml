@@ -63,7 +63,7 @@
             %td
               = render Admin::BikeCell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id)
           %td
-            = cache do
+            = cache(theft_alert.user) do
               = render Admin::UserCell::Component.new(user: theft_alert.user, render_search: true, user_id: theft_alert.user_id)
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan

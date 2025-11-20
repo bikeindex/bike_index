@@ -33,5 +33,5 @@
                 = l email_ban.end_at, format: :convert_time
           %td
             - if email_ban.user_id.present?
-              = cache do
+              = cache(email_ban.user) do
                 = render Admin::UserCell::Component.new(user: email_ban.user, render_search: true)

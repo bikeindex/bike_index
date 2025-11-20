@@ -49,7 +49,7 @@
                 = l stripe_subscription.end_at, format: :convert_time
           %td
             - if stripe_subscription.user_id.present?
-              = cache do
+              = cache(stripe_subscription.user) do
                 = render Admin::UserCell::Component.new(user: stripe_subscription.user, render_search: true)
             - else
               = stripe_subscription.email

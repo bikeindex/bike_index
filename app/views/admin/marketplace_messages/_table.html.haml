@@ -44,8 +44,8 @@
             %span{class: (marketplace_message.sender_buyer? ? "less-strong" : "")}
               = marketplace_message.kind_humanized
           %td
-            = cache do
+            = cache(marketplace_message.sender) do
               = render Admin::UserCell::Component.new(user: marketplace_message.sender, render_search: true)
           -# %td
-          = cache do
+          = cache(marketplace_message.receiver) do
             -#   = render Admin::UserCell::Component.new(user: marketplace_message.receiver, render_search: true)

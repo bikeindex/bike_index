@@ -37,7 +37,7 @@
           - unless skip_user
             %td
               - if superuser_ability.user_id.present?
-                = cache do
+                = cache(superuser_ability.user) do
                   = render Admin::UserCell::Component.new(user_id: superuser_ability.user_id, user: superuser_ability.user, render_search: render_sortable)
           %td= superuser_ability.kind.titleize
           %td

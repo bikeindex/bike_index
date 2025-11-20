@@ -41,7 +41,7 @@
                   = l payment.paid_at, format: :convert_time
           - unless skip_user
             %td
-              = cache do
+              = cache(payment.user) do
                 = render Admin::UserCell::Component.new(email: payment.email, user: payment.user, render_search: render_sortable)
           %td
             - if payment.referral_source.present?
