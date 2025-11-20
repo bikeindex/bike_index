@@ -7,6 +7,7 @@
             <% current_user.organization_roles.each do |organization_role| %>
               <li>
                 <a
+                  <%# herb:disable html-anchor-require-href %>
                   class="organization-choice choose-type"
                   data-target="<%= new_bike_url(organization_id: organization_role.organization.id) %>"
                 >
@@ -20,6 +21,7 @@
 
           <li>
             <a
+              <%# herb:disable html-anchor-require-href %>
               class="purchase-choice choose-type"
               data-target="<%= new_bike_url %>"
             >
@@ -30,6 +32,7 @@
 
           <li>
             <a
+              <%# herb:disable html-anchor-require-href %>
               class="choose-type"
               data-target="<%= new_bike_url(status: "stolen") %>"
             >
@@ -40,6 +43,7 @@
 
           <li>
             <a
+              <%# herb:disable html-anchor-require-href %>
               class="choose-type"
               data-target="<%= new_bike_url(status: "impounded") %>"
             >

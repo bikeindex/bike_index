@@ -85,10 +85,10 @@
           <% bike_search_active = controller_namespace == "search" && controller_name == "registrations" && action_name == "index" %>
           <% marketplace_search_active = controller_namespace == "search" && controller_name == "marketplace" && action_name == "index" %>
 
-          <a id="menu-opened-backdrop" aria-hidden="true"></a>
+          <a id="menu-opened-backdrop" aria-hidden="true"></a> <%# herb:disable html-anchor-require-href %>
 
           <div class="hamburgler" aria-hidden="true">
-            <a id="primary_nav_hamburgler"></a>
+            <a id="primary_nav_hamburgler"></a> <%# herb:disable html-anchor-require-href %>
           </div>
 
           <ul class="primary-main-menu">
@@ -230,7 +230,7 @@
             </li>
 
             <li class="primary-nav-item d-none d-lg-block">
-              <%= link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}", match_controller: true %>
+              <%= link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}" %>
             </li>
           </ul>
         </div>
