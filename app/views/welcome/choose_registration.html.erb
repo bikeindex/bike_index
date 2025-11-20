@@ -8,7 +8,6 @@
               <li>
                 <a
                   class="organization-choice choose-type"
-                  href="<%= new_bike_url(organization_id: organization_role.organization.id) %>"
                   data-target="<%= new_bike_url(organization_id: organization_role.organization.id) %>"
                 >
                   <span class="add-selected"> &#10004 </span>
@@ -22,7 +21,6 @@
           <li>
             <a
               class="purchase-choice choose-type"
-              href="<%= new_bike_url %>"
               data-target="<%= new_bike_url %>"
             >
               <span class="add-selected"> &#10004 </span>
@@ -33,7 +31,6 @@
           <li>
             <a
               class="choose-type"
-              href="<%= new_bike_url(status: "stolen") %>"
               data-target="<%= new_bike_url(status: "stolen") %>"
             >
               <span class="add-selected"> &#10004 </span>
@@ -44,7 +41,6 @@
           <li>
             <a
               class="choose-type"
-              href="<%= new_bike_url(status: "impounded") %>"
               data-target="<%= new_bike_url(status: "impounded") %>"
             >
               <span class="add-selected"> &#10004 </span>

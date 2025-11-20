@@ -27,6 +27,8 @@
     <%# = hotwire_livereload_tags if Rails.env.development? %>
     <%# assets are vendored, lazy solution %>
     <style>.for-sale-color {color: #2ecc71;} .stolen-color, impounded-color {color: #e74c3c;} .found-color {color: oklch(59.1% 0.293 322.896);} .unregistered-color { color: #f0ad4e};</style>
+
+    <styles></styles>
   </head>
 
   <%# manually override body_class in a few situations :/ %>
@@ -64,7 +66,7 @@
 
           <% if Rails.env.development? %>
             <li class="dropdown nav-item">
-              <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+              <a class="dropdown-toggle nav-link" data-toggle="dropdown">
                 Mailers
               </a>
 

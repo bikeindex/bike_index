@@ -19,25 +19,27 @@
     <div id="alert-block">
       <% flash.each do |name, msg| %>
         <div class="alert- <%= name %>">
-          <a href="#" class="close" data-dismiss="alert">×</a>
+          <a class="close" data-dismiss="alert">×</a>
           <%= content_tag :div, msg, id: "flash_#{name}" if msg.is_a?(String) %>
         </div>
       <% end %>
 
       <% if @b_param && @b_param.bike_errors.present? %>
-        <div class="alert alert-error">
-          <a href="#" class="close" data-dismiss="alert">×</a>
+        <div id="alert-block">
+          <div class="alert alert-error">
+            <a class="close" data-dismiss="alert">×</a>
 
-          <h4>
-            <%= t(".please_fix_the_following") %>
-            <%= pluralize(@b_param.bike_errors.count, t(".error")) %>
-          </h4>
+            <h4>
+              <%= t(".please_fix_the_following") %>
+              <%= pluralize(@b_param.bike_errors.count, t(".error")) %>
+            </h4>
 
-          <ul>
-            <% @b_param.bike_errors.each do |msg| %>
-              <li><%= msg %></li>
-            <% end %>
-          </ul>
+            <ul>
+              <% @b_param.bike_errors.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
         </div>
       <% end %>
     </div>
