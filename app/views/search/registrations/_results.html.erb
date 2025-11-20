@@ -5,11 +5,10 @@
         <ul class="bike-boxes">
           <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>
         </ul>
-        <%# hidden, no ads  %>
+        <%# hidden, no ads %>
         <div class="row d-none">
           <div class="col-md-4 mt-4 offset-md-2">
-            <div class="ad-block ad-binx ad468x60">
-            </div>
+            <div class="ad-block ad-binx ad468x60"></div>
           </div>
         </div>
         <div class="row d-none">
@@ -18,9 +17,7 @@
           </div>
         </div>
       <% else %>
-        <h3 class="text-center uncap">
-          <%= t(".no_matched")  %>
-        </h3>
+        <h3 class="text-center uncap"><%= t(".no_matched") %></h3>
       <% end %>
     </div>
   </div>
@@ -34,19 +31,14 @@
 
 <%# render near serials %>
 <% if @interpreted_params[:serial].present? %>
-  <%=
-    turbo_frame_tag :search_registrations_similar_serials_frame,
+  <%= turbo_frame_tag :search_registrations_similar_serials_frame,
     src: similar_serials_search_registrations_path(@interpreted_params),
-    loading: :lazy do
-  %>
+    loading: :lazy do %>
     <%= render LoadingSpinner::Component.new(text: t(".search_for_similar")) %>
   <% end %>
-
-  <%=
-    turbo_frame_tag :search_registrations_serials_containing_frame,
+  <%= turbo_frame_tag :search_registrations_serials_containing_frame,
     src: serials_containing_search_registrations_path(@interpreted_params),
-    loading: :lazy do
-  %>
+    loading: :lazy do %>
     <%= render LoadingSpinner::Component.new(text: t(".search_for_containing")) %>
   <% end %>
 <% end %>

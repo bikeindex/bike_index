@@ -6,9 +6,8 @@
   >
     <%= bike_thumb_image(@bike) %>
   </a>
-  <div
-    class="bike-information <%= 'multi-attr-lists' if render_second_column? %>"
-  >
+
+  <div class="bike-information <%= 'multi-attr-lists' if render_second_column? %>">
     <h5 class="title-link">
       <%= link_to bike_title_html(@bike),
       @bike.html_url,
@@ -17,12 +16,14 @@
       },
       class: "tw:cursor-pointer tw:hover:underline" %>
     </h5>
+
     <ul class="attr-list">
       <li>
         <strong class="attr-title"><%= translation(".serial") %>:</strong>
         <%# current_user is only present if not cached %>
         <%= render_serial_display(@bike, @current_user) %>
       </li>
+
       <%= attr_list_item(@bike.frame_colors.to_sentence, translation(".primary_colors")) %>
     </ul>
 
@@ -31,7 +32,8 @@
         <% if render_for_sale_info? %>
           <li>
             <%= bike_status_span(@bike) %>:
-            <%= @current_event_record.currency_symbol %><%= number_display(@current_event_record.amount) %>
+            <%= @current_event_record.currency_symbol %>
+            <%= number_display(@current_event_record.amount) %>
             <small><%= @current_event_record.currency_name %></small>
           </li>
           <%= attr_list_item(
@@ -39,7 +41,10 @@
             translation(".location"),
           ) %>
           <li>
-            <strong class="attr-title"><%= translation(".posted_at") %>:</strong>
+            <strong class="attr-title">
+              <%= translation(".posted_at") %>:
+            </strong>
+
             <span class="localizeTime">
               <%= l @current_event_record.published_at, format: :convert_time %>
             </span>
@@ -47,9 +52,7 @@
         <% else %>
           <li>
             <%= bike_status_span(@bike) %>:
-            <span class="localizeTime">
-              <%= l occurred_at_with_fallback, format: :convert_time %>
-            </span>
+            <span class="localizeTime"><%= l occurred_at_with_fallback, format: :convert_time %></span>
           </li>
           <%= attr_list_item(
             @current_event_record.address(country: [:iso]),

@@ -13,16 +13,17 @@
   <tbody>
     <tr>
       <td class="image-holder <%= thumbclass %>">
-        <a href="<%= bike_url_path %>" data-pm-no-track="<%= skip_link_tracking %>">
+        <a
+          href="<%= bike_url_path %>"
+          data-pm-no-track="<%= skip_link_tracking %>"
+        >
           <img src="<%= thumb_url %>">
         </a>
       </td>
+
       <td class="info-holder">
         <ul>
-          <li>
-            <strong><%= t(".make") %></strong>
-            <%= @bike.mnfg_name %>
-          </li>
+          <li><strong><%= t(".make") %></strong><%= @bike.mnfg_name %></li>
 
           <li>
             <strong><%= t(".serial") %></strong>
@@ -34,8 +35,11 @@
               <%= t(".color").pluralize(@bike.frame_colors.count) %>:
               <%= @bike.frame_colors.to_sentence %>
             </strong>
+
             <% if BikeServices::Displayer.paint_description?(@bike) %>
-              <small class="less-strong"> - <%= @bike.paint_description %></small>
+              <small class="less-strong">
+                - <%= @bike.paint_description %>
+              </small>
             <% end %>
           </li>
 
@@ -45,21 +49,18 @@
               <strong>
                 <%= @bike.status_impounded? ? t(".found") : t(".stolen_from") %>
               </strong>
+
               <%= stolen_record.address(country: [:skip_default]) %>
             </li>
             <li>
-              <strong>
-                <%= t(".stolen_at") %>
-              </strong>
+              <strong><%= t(".stolen_at") %></strong>
               <%= l stolen_record.date_stolen, format: :dotted %>
             </li>
           <% end %>
 
           <% if @bike.current_ownership&.new_registration? && @bike.pos? %>
             <li>
-              <em class="less-strong">
-                <%= t(".color_may_be_incorrect") %>
-              </em>
+              <em class="less-strong"><%= t(".color_may_be_incorrect") %></em>
             </li>
           <% end %>
         </ul>

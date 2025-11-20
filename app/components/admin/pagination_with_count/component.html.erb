@@ -3,13 +3,15 @@
     <div class="col-md-5">
       <p class="pagination-number mb-0">
         <strong><%= number_with_delimiter(count) %></strong>
-        Matching <%= viewing.pluralize(count) %>
+        Matching
+        <%= viewing.pluralize(count) %>
 
         <% if show_time_range? %>
           <em>
             <% if @time_range_column.present? %>
               <strong><%= humanized_time_range_column_display %></strong>
             <% end %>
+
             <%= humanized_time_range(@time_range) %>
           </em>
         <% elsif show_today_count? %>
@@ -20,8 +22,9 @@
       </p>
     </div>
   <% end %>
+
   <% unless @skip_pagination || @pagy.blank? %>
-    <div class="tw:md:text-right tw:flex tw:flex-wrap tw:md:flex-nowrap tw:gap-4 tw:justify-end <%= (@skip_total ? "col-12" : "col-md-7") %>">
+    <div class="tw:flex tw:flex-wrap tw:justify-end tw:gap-4 tw:md:flex-nowrap tw:md:text-right <%= (@skip_total ? "col-12" : "col-md-7") %>">
       <%= render(Pagination::Component.new(pagy: @pagy, page_params: @params)) %>
 
       <%= select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @per_page), {id: per_page_select_id, class: "form-control d-inline-block", style: "margin-top: -6px; max-width: 8rem;"} %>

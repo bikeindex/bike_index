@@ -1,7 +1,7 @@
 <%# requires marketplace_message local %>
 
 <div class="tw:px-4">
-  <h2 class="tw:text-xl tw:font-bold tw:mt-6">
+  <h2 class="tw:mt-6 tw:text-xl tw:font-bold">
     <%= marketplace_message.initial_message? ? t(".new_message") : t(".reply_to_message") %>
   </h2>
 
@@ -17,7 +17,6 @@
         <%= f.text_field :subject, maxlength: 180, required: true, class: "twinput" %>
       </div>
     <% end %>
-
 
     <div class="tw:mt-3">
       <%= f.label :body, class: "twlabel tw:sr-only" %>

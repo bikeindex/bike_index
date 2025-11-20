@@ -12,10 +12,9 @@
 
 <div class="admin-subnav">
   <div class="col-md-5">
-    <h1>
-      Manage <%= viewing %>
-    </h1>
+    <h1>Manage <%= viewing %></h1>
   </div>
+
   <div class="col-md-7">
     <ul>
       <%= nav_header_list_items %>
@@ -36,9 +35,7 @@
   <%= column_chart time_range_counts(collection: chart_collection, column: time_range_column), stacked: true, thousands: "," %>
 <% end %>
 
-<div class="mt-2 mb-4">
-  <%= render partial: "/shared/period_select" %>
-</div>
+<div class="mt-2 mb-4"><%= render partial: "/shared/period_select" %></div>
 
 <% if admin_search_form.present? %>
   <%= admin_search_form %>
@@ -47,6 +44,5 @@
 <%= render_admin_pagination_with_count(collection:, viewing:) %>
 
 <%= table_view %>
-
 
 <%= render_admin_pagination_with_count(collection:, skip_total: true) %>

@@ -6,6 +6,7 @@
   <% if OrganizationDisplayer.avatar?(ownership.organization) %>
     <%= image_tag ownership.organization.avatar.url(:medium), class: "claim-message-org-avatar" %>
   <% end %>
+
   <strong>
     <% if ownership.organization.present? %>
       <%= ownership.organization.name %>
@@ -15,17 +16,15 @@
       <%= EmailNormalizer.obfuscate(ownership&.creator&.email) %>
     <% end %>
   </strong>
+
   <%= t(".registered_your_bike_on_index", bike_type: bike.type) %>
 </p>
-
 
 <p>
   <%= t(".public_resource_reunited_value_html", value: as_currency(Counts.recoveries_value)) %>
 </p>
 
-<p>
-  <%= t(".supercharge_if_your_bike_stolen", bike_type: bike.type) %>
-</p>
+<p><%= t(".supercharge_if_your_bike_stolen", bike_type: bike.type) %></p>
 
 <% unless skip_to_see %>
   <p>

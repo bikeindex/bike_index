@@ -1,35 +1,42 @@
 <!DOCTYPE html>
+
 <html>
   <head>
     <title>Bike Index Component Preview</title>
+
     <link
       href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700"
       rel="stylesheet"
       type="text/css"
     >
+
     <link
       href="https://fonts.googleapis.com/css?family=Montserrat:400,700"
       rel="stylesheet"
       type="text/css"
     >
+
     <%= stylesheet_link_tag "tailwind" %>
     <%= javascript_importmap_tags %>
+
     <script>window.inComponentPreview = true</script>
 
-    <%# Use Lookbook's display options to include the legacy stylesheet
-        add '# @display legacy_stylesheet true' above your preview method to render it %>
+    <%#
+      Use Lookbook's display options to include the legacy stylesheet
+      add '# @display legacy_stylesheet true' above your preview method to render it
+    %>
+
     <% if InputNormalizer.boolean(params.dig(:lookbook, :display, :legacy_stylesheet)) %>
       <%= stylesheet_link_tag "revised" %>
     <% end %>
   </head>
+
   <%# NOTE: This sets the theme. Padding set to 0 because revised stylesheet in bike box %>
   <body
     class="<%= params.dig(:lookbook, :display, :theme) %>"
     style="padding: 0;"
   >
     <%# NOTE: at some point, make the padding optional %>
-    <div class="tw:p-4">
-      <%= yield %>
-    </div>
+    <div class="tw:p-4"><%= yield %></div>
   </body>
 </html>

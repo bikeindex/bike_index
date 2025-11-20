@@ -1,9 +1,11 @@
 <div id="error-page-wrap">
   <h1 class="error-text">422</h1>
+
   <p class="error-explanation">
-    <%- email_link = link_to t(".contact"), "mailto:#{t('.contact_email')}"  %>
+    <%- email_link = link_to t(".contact"), "mailto:#{t('.contact_email')}" %>
     <%= t(".explanation_html", email_link: email_link) %>
   </p>
+
   <h4 class="go-back">
     <a class="back-link" onClick="history.go(-1);return true;">
       <%= t(".send_me_back") %>
