@@ -204,7 +204,7 @@ $(document).ready ->
     updateSerial(e)
 
   $('#alert-block .close').click ->
-    $('#alert-block').fadeOut('fast')
+    $(this).closest('.alert').fadeOut('fast')
 
   $('a.optional-form-block').click (e) ->
     optionalFormUpdate(e)

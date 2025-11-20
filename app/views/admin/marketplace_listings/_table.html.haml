@@ -32,7 +32,7 @@
         = sortable "seller_id", render_sortable: render_sortable
       %th
         = sortable "buyer_id", render_sortable: render_sortable
-    %tbody
+    %tbody{"data-controller"=>"update-cached-sortable-links", "data-update-cached-sortable-links-base-url-value"=> url_for(sortable_search_params)}
       - collection.each do |marketplace_listing|
         - cache(["admin_marketplace_listing", marketplace_listing]) do
           %tr

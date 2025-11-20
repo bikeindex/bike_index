@@ -47,5 +47,5 @@
             = cache(marketplace_message.sender) do
               = render Admin::UserCell::Component.new(user: marketplace_message.sender, render_search: true)
           -# %td
-          = cache(marketplace_message.receiver) do
+          -#= cache(marketplace_message.receiver) do
             -#   = render Admin::UserCell::Component.new(user: marketplace_message.receiver, render_search: true)
