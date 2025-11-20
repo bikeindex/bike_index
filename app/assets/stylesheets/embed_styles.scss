@@ -357,10 +357,10 @@ a {
   z-index: 100;
   position: fixed;
   top: 100px;
-  left: 0;
 
-  // margin: 10px;
-  width: 100%;
+  left: 10%;
+  width: 80%;
+  max-width: 700px;
 
   // @include clearfix;
   margin: 0 auto;
@@ -370,12 +370,9 @@ a {
 
     // For IE 8
     -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#000000')";
-    z-index: 100;
-    position: absolute;
-    left: 10%;
-    width: 80%;
-    top: 20px;
+    width: 100%;
     opacity: 0.95;
+    max-width: 700px;
   }
 }
 

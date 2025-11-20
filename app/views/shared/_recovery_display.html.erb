@@ -1,5 +1,7 @@
 <% cache(recovery_display) do %>
-  <div class="recovery-block js-recovery-slide recovery- <%= recovery_display.id %>">
+  <% recovery_id_class = "recovery-#{recovery_display.id}" %>
+
+  <div class="recovery-block js-recovery-slide <%= recovery_id_class %>">
     <p class="recovery-quote">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.75 23.54">
         <path
