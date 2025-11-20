@@ -12,39 +12,45 @@
       <th class="small">image?</th>
       <th class="large-screens small">Association?</th>
     </thead>
+
     <tbody>
       <% collection.each do |recovery_display| %>
         <tr>
           <td>
             <div class="less-strong-hold">
-              <a class="convertTime mr-2" href="<%= edit_admin_recovery_display_url(recovery_display) %>">
+              <a
+                class="convertTime mr-2"
+                href="<%= edit_admin_recovery_display_url(recovery_display) %>"
+              >
                 <%= l recovery_display.recovered_at, format: :convert_time %>
               </a>
-              <code class="small less-strong-right"><%= recovery_display.id %></code>
+
+              <code class="small less-strong-right">
+                <%= recovery_display.id %>
+              </code>
             </div>
           </td>
+
           <td>
             <small class="convertTime">
               <%= l recovery_display.created_at, format: :convert_time %>
             </small>
           </td>
+
           <td>
             <small class="convertTime less-strong">
               <%= l recovery_display.updated_at, format: :convert_time %>
             </small>
           </td>
-          <td>
-            <%= truncate(recovery_display.quote, length: 140) %>
-          </td>
-          <td>
-            <%= recovery_display.quote_by %>
-          </td>
-          <td>
-            <%= recovery_display.location_string %>
-          </td>
+
+          <td><%= truncate(recovery_display.quote, length: 140) %></td>
+          <td><%= recovery_display.quote_by %></td>
+          <td><%= recovery_display.location_string %></td>
+
           <td class="table-cell-check">
             <%= check_mark if recovery_display.image? %>
           </td>
+
           <td class="large-screens table-cell-check">
             <%= check_mark if recovery_display.stolen_record_id.present? %>
           </td>

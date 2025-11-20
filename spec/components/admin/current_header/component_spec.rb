@@ -22,7 +22,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
         let(:options) { {params:, user:, viewing: "Activity"} }
 
         it "renders user information with link" do
-          expect(component.text).to include("Activities for")
+          expect(component.text).to match(/Activities\s+for/)
           expect(component.text).to include(user.display_name)
           expect(component).to have_css("a", text: "view for all users")
         end
@@ -46,7 +46,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
         let(:options) { {params:, current_organization: organization, viewing: "Bike"} }
 
         it "renders organization information" do
-          expect(component.text).to include("Bikes for")
+          expect(component.text).to match(/Bikes\s+for/)
           expect(component.text).to include(organization.short_name)
           expect(component).to have_css("a", text: "view for all organizations")
         end
@@ -57,7 +57,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
         let(:options) { {params:, viewing: "Bike"} }
 
         it "renders no organization message" do
-          expect(component.text).to include("Bikes for")
+          expect(component.text).to match(/Bikes\s+for/)
           expect(component.text).to include("no organization")
           expect(component).to have_css("a", text: "view for all organizations")
         end
@@ -71,7 +71,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
         let(:options) { {params:, bike:, viewing: "Recovery"} }
 
         it "renders bike information" do
-          expect(component.text).to include("Recoveries for")
+          expect(component.text).to match(/Recoveries\s+for/)
           expect(component.text).to include(bike.title_string)
           expect(component).to have_css("a", text: "view for all bikes")
         end
@@ -93,7 +93,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
       let(:options) { {params:, viewing: "Organization"} }
 
       it "renders humanized kind" do
-        expect(component.text).to include("Organizations for")
+        expect(component.text).to match(/Organizations\s+for/)
         expect(component.text).to include("Bike shop")
         expect(component).to have_css("a", text: "view for all kinds")
       end
@@ -113,7 +113,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
       let(:options) { {params:, viewing: "Transaction"} }
 
       it "renders membership information" do
-        expect(component.text).to include("Transactions for")
+        expect(component.text).to match(/Transactions\s+for/)
         expect(component.text).to include("Membership 42")
         expect(component).to have_css("a", text: "view for all memberships")
       end

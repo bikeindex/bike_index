@@ -5,7 +5,6 @@
       <code><%= @bike_id %></code>
     <% end %>
   </small>
-
 <% elsif @bike.present? %>
   <%= render Badge::BikeHiddenAdminExplanation::Component.new(bike: @bike) %>
   <% if bike_link_path.present? %>

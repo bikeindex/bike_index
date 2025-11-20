@@ -2,18 +2,20 @@
 <%# The alerts are in priority from highest to lowest %>
 <%# We're manually rendering only the general alerts here %>
 
-
 <% if Flipper.enabled?(:phone_verification) && current_user.alert_slugs.include?("phone_waiting_confirmation") %>
   <%# TODO: use existing user_alert to select correct phone %>
   <% if current_user.phone_waiting_confirmation? %>
     <% phone_number = current_user.user_phones.waiting_confirmation.reorder(:updated_at).last %>
-
     <div class="confirm-phone-number-popover">
-      <a class="less-strong" href="#" data-toggle="modal" data-target="#confirmPhoneNumber">
+      <a
+        class="less-strong"
+        href="#"
+        data-toggle="modal"
+        data-target="#confirmPhoneNumber"
+      >
         <%= t(".confirm_your_phone_number") %>
       </a>
     </div>
-
     <% modal_title = t(".verify_number", phone_number: phone_display(phone_number.phone)) %>
     <% modal_body = capture do %>
       <div class="modal-body">
@@ -22,6 +24,7 @@
             <%= label_tag :confirmation_code, t(".verification_code") %>
             <%= text_field_tag :confirmation_code, "", required: true, class: "form-control" %>
           </div>
+
           <div class="modal-btn-footer">
             <div class="form-submit-button">
               <%= submit_tag modal_title, class: "btn btn-success btn-lg" %>
@@ -30,29 +33,28 @@
         <% end %>
       </div>
     <% end %>
-
     <%= render partial: "shared/modal", locals: { title: modal_title, modal_body: modal_body, id: "confirmPhoneNumber" } %>
   <% else %>
     <%# enqueue job to update user (enqueuing doesn't write to DB, so can be performed by read replica) %>
     <% current_user.skip_update = false # required for testing %>
     <% current_user.perform_user_update_jobs %>
   <% end %>
-
 <% elsif current_user.alert_slugs.include?("stolen_bike_without_location") %>
   <%# TODO: use existing user_alert to select correct stolen bike %>
   <% without_location_bikes = current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.without_location? } %>
   <% if without_location_bikes.present? %>
-
     <% modal_body = capture do %>
       <div class="modal-body">
         <p>
           <%= t(".location_critical_html", bike_type: without_location_bikes.first.type) %>
         </p>
+
         <% without_location_bikes.each do |bike| %>
           <p>
             <%= link_to t(".add_location_theft_bike_title_html", bike_title: bike.title_string), edit_bike_path(bike.to_param, edit_template: "theft_details", anchor: "where-theft-happened") %>
           </p>
         <% end %>
+
         <p>
           <em class="less-strong">
             <%= t(".without_location_all_is_lost", bike_type: without_location_bikes.first.type) %>
@@ -60,25 +62,24 @@
         </p>
       </div>
     <% end %>
-
     <%= render partial: "shared/modal", locals: { title: t(".stolen_missing_location_title"), modal_body: modal_body, id: "stolenMissingLocationModal", start_open: true } %>
   <% end %>
-
 <% elsif current_user.alert_slugs.include?("theft_alert_without_photo") %>
   <%# TODO: use existing user_alert to select correct theft alert %>
   <% missing_photo_bikes = current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.theft_alert_missing_photo? } %>
   <% if missing_photo_bikes.present? %>
-
     <% modal_body = capture do %>
       <div class="modal-body">
         <p>
           <%= t(".photo_critical_html", bike_type: missing_photo_bikes.first.type) %>
         </p>
+
         <% missing_photo_bikes.each do |bike| %>
           <p>
             <%= link_to t(".add_photo_theft_bike_title_html", bike_title: bike.title_string), edit_bike_path(bike.to_param, edit_template: "photos") %>
           </p>
         <% end %>
+
         <p>
           <em class="less-strong">
             <%= t(".without_photo_all_is_lost", bike_type: missing_photo_bikes.first.type) %>
@@ -86,7 +87,6 @@
         </p>
       </div>
     <% end %>
-
     <%= render partial: "shared/modal", locals: { title: t(".missing_stolen_photo_title"), modal_body: modal_body, id: "stolenMissingLocationModal", start_open: true } %>
   <% end %>
 <% end %>

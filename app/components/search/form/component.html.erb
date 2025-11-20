@@ -5,12 +5,11 @@
       id: "Search_Form",
       data: { turbo_frame: @target_frame, turbo_action: "advance",
         turbo: true, "search--form-target" => "form"}) do |f| %>
-
     <%# search_no_js is removed in the search--form stimulus controller. If it's present, the results render synchronously (rather than as a turbo frame) %>
     <%= hidden_field_tag :search_no_js, true %>
 
     <div class="tw:flex tw:flex-nowrap tw:gap-4">
-      <div class="tw:flex-grow search-fields">
+      <div class="search-fields tw:flex-grow">
         <%= render(
           Search::EverythingCombobox::Component.new(
             selected_query_items_options: @selected_query_items_options,
@@ -27,10 +26,12 @@
           placeholder: translation(".search_for_serial_number"),
           class: "twinput tw:mt-2 fieldResetsCounts" %>
         <% end %>
+
         <% if render_activity_and_price_wrapper? %>
           <div
             class="
-              tw:mt-2 tw:flex tw:flex-wrap tw:md:flex-nowrap tw:justify-between tw:gap-3
+              tw:mt-2 tw:flex tw:flex-wrap tw:justify-between tw:gap-3
+              tw:md:flex-nowrap
             "
           >
             <% if render_primary_activity_field? %>
@@ -42,25 +43,33 @@
               prompt: translation(".search_for_primary_activity"),
               class: "twinput tw:md:max-w-xl fieldResetsCounts" %>
             <% end %>
+
             <% if render_price_field? %>
-              <span class="tw:flex tw:flex-nowrap tw:max-w-60">
+              <span class="tw:flex tw:max-w-60 tw:flex-nowrap">
                 <%# NOTE: This isn't used yet, including it because it will be someday! %>
                 <%= hidden_field_tag :currency, @currency_sym %>
 
-                <span class="tw:block tw:py-1.5 tw:mr-1"><%= @currency_sym %></span>
+                <span class="tw:mr-1 tw:block tw:py-1.5">
+                  <%= @currency_sym %>
+                </span>
+
                 <%= label_tag :price_min_amount,
                 translation(".price_minimum"),
                 class: "twlabel tw:sr-only" %>
+
                 <%= number_field_tag :price_min_amount,
                 @price_min_amount,
                 placeholder: translation(".min"),
                 class: "twinput tw:min-w-20 fieldResetsCounts" %>
 
-                <span class="tw:block tw:py-1.5 tw:min-w-6 tw:ml-2 tw:mr-1">&ndash;
-                  <%= @currency_sym %></span>
+                <span class="tw:mr-1 tw:ml-2 tw:block tw:min-w-6 tw:py-1.5">
+                  &ndash; <%= @currency_sym %>
+                </span>
+
                 <%= label_tag :price_max_amount,
                 translation(".price_maximum"),
                 class: "twlabel tw:sr-only" %>
+
                 <%= number_field_tag :price_max_amount,
                 @price_max_amount,
                 placeholder: translation(".max"),
@@ -70,13 +79,39 @@
           </div>
         <% end %>
       </div>
+
       <div class="tw:w-20">
         <%= button_tag(type: translation(".submit"),
             class: "twbtn-blue tw:w-full tw:h-full tw:disabled:cursor-wait",
             "data-search--form-target" => "button") do %>
-          <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>
+          <svg
+            id="search-button"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 29 29"
+          >
+            <defs>
+              <style>
                 .cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}
-              </style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
+              </style>
+            </defs>
+
+            <title>searcher</title>
+
+            <circle
+              class="cls-1"
+              cx="10.39"
+              cy="10.39"
+              r="9.39"
+            />
+
+            <line
+              class="cls-2"
+              x1="17.03"
+              y1="17.03"
+              x2="28"
+              y2="28"
+            />
+          </svg>
         <% end %>
       </div>
     </div>
@@ -92,6 +127,7 @@
     <% end %>
 
     <%= render(Search::KindSelectFields::Component.new(**kind_select_options)) %>
+
     <%= if render_result_view?
       render(Search::ResultViewSelect::Component.new(result_view: @result_view))
     end %>

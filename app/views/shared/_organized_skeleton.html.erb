@@ -6,64 +6,90 @@
       <% if OrganizationDisplayer.avatar?(current_organization) %>
         <%= image_tag current_organization.avatar.url(:medium) %>
       <% end %>
+
       <h3>
         <%= t(".admin_panel") %>
-        <span>
-          <%= current_organization.name %>
-        </span>
+        <span><%= current_organization.name %></span>
       </h3>
     </header>
+
     <ul class="organized-mainmenu">
       <%# unless we're showing overview_dashboard, we want to start off with a divider - which is not true of the header menu %>
       <% unless show_overview_dashboard %>
         <li class="divider-nav-item"></li>
       <% end %>
+
       <%= render partial: "/shared/organized_menu_items", locals: {passed_organization: current_organization} %>
     </ul>
   </div>
 </nav>
+
 <div class="organized-wrap">
   <div class="<%= organized_container %>">
     <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(current_organization) %>
       <div class="organization-wide-alert alert alert-info in">
-        <button class="close" aria-label="Close" data-dismiss="alert" type="button">
+        <button
+          class="close"
+          aria-label="Close"
+          data-dismiss="alert"
+          type="button"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
+
         <p>
           <%= t(".additional_features_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
         </p>
       </div>
     <% end %>
+
     <% if OrganizationDisplayer.subscription_expired_alert?(current_organization) %>
       <div class="organization-wide-alert alert alert-info in">
-        <button class="close" aria-label="Close" data-dismiss="alert" type="button">
+        <button
+          class="close"
+          aria-label="Close"
+          data-dismiss="alert"
+          type="button"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
+
         <p>
           <%= t(".subscription_expired_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
         </p>
       </div>
     <% end %>
+
     <% if OrganizationDisplayer.bike_shop_display_integration_alert?(current_organization) %>
       <div class="organization-wide-alert alert alert-info in">
-        <button class="close" aria-label="Close" data-dismiss="alert" type="button">
+        <button
+          class="close"
+          aria-label="Close"
+          data-dismiss="alert"
+          type="button"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
+
         <div>
           <p><%= t(".use_lightspeed_retail_pos") %></p>
+
           <ul>
             <li>
               <% link = link_to t(".integrate_bike_index_with_lightspeed"), lightspeed_interface_path %>
               <%= t(".link_to_register_html", link: link) %>
             </li>
+
             <li>
               <% link = link_to t( ".how_integration_works"), lightspeed_path %>
               <%= t(".read_a_full_explanation_html", link: link) %>
             </li>
           </ul>
         </div>
+
         <div class="mt-2">
           <p><%= t(".use_ascend") %></p>
+
           <ul>
             <li>
               <% link = link_to t(".integrate_bike_index_with_ascend"), ascend_path %>
@@ -71,8 +97,10 @@
             </li>
           </ul>
         </div>
+
         <div class="mt-2">
           <p><%= t(".other_point_of_sale_system") %></p>
+
           <ul>
             <li>
               <% if controller_name == "bikes" && action_name == "new" %>
@@ -86,9 +114,11 @@
         </div>
       </div>
     <% end %>
+
     <%= yield %>
   </div>
 </div>
+
 <% if organized_include_javascript_pack? %>
   <script>
     window.passiveOrganizationId = "<%= passive_organization&.slug %>";

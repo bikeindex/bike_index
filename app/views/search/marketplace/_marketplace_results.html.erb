@@ -1,4 +1,4 @@
-<div class="tw:px-4 tw:max-w-7xl tw:mx-auto tw:mt-8 tw:lg:mt-12 tw:mb-6">
+<div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
   <% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
 
   <%= render(SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t("search.registrations.results.no_matched_marketplace"))) do %>
@@ -12,7 +12,7 @@
 
 <% if @pagy.next %>
   <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
-    <div class="tw:text-center tw:py-4">
+    <div class="tw:py-4 tw:text-center">
       <%= render LoadingSpinner::Component.new(text: "Loading more...") %>
     </div>
   <% end %>

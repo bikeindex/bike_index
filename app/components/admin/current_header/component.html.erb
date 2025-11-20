@@ -2,14 +2,15 @@
   <% if show_user? %>
     <p>
       <% if user_subject.present? %>
-        <%= viewing.pluralize %> for
+        <%= viewing.pluralize %>
+        for
         <%= link_to user_subject.display_name, admin_user_path(user_subject), class: "twlink" %>
       <% else %>
         <span class="<%= error_text_class %>">
-          User #<%= @params[:user_id] %>
-          <em>missing</em>
+          User #<%= @params[:user_id] %> <em>missing</em>
         </span>
       <% end %>
+
       <%= link_to "view for all users", url_for(sortable_search_params.merge(user_id: nil)), class: "gray-link tw:text-sm" %>
     </p>
   <% end %>
@@ -17,15 +18,17 @@
   <% if show_bike? %>
     <p>
       <% if bike_subject.present? %>
-        <%= viewing.pluralize %> for
+        <%= viewing.pluralize %>
+        for
         <%= link_to bike_subject.title_string, admin_bike_path(bike_subject), class: "twlink" %>
       <% else %>
         <span class="<%= error_text_class %>">
-          Bike #<%= @params[:search_bike_id] %>
-          <em>missing</em>
+          Bike #<%= @params[:search_bike_id] %> <em>missing</em>
         </span>
       <% end %>
+
       <%= link_to "view for all bikes", url_for(sortable_search_params.merge(search_bike_id: nil)), class: "gray-link tw:text-sm" %>
+
       <% if bike_subject.present? && bike_subject.deleted? %>
         <%= render partial: "/admin/bikes/deleted_alert", locals: { bike: bike_subject } %>
       <% end %>
@@ -35,11 +38,12 @@
   <% if show_marketplace_listing? %>
     <p>
       <% if marketplace_listing_subject.present? %>
-        <%= viewing.pluralize %> for
+        <%= viewing.pluralize %>
+        for
         <em>
           Marketplace Listing
           <%= render(Badge::Status::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %>
-          <%= "##{marketplace_listing_subject.id}," %>
+           <%= "##{marketplace_listing_subject.id}," %>
         </em>
         <%= render Admin::BikeCell::Component.new(bike: marketplace_listing_subject.item, bike_id: marketplace_listing_subject.item_id) %>
       <% else %>
@@ -48,13 +52,15 @@
           <em>missing</em>
         </span>
       <% end %>
+
       <%= link_to "view for all marketplace listings", url_for(sortable_search_params.merge(search_marketplace_listing_id: nil)), class: "gray-link tw:text-sm" %>
     </p>
   <% end %>
 
   <% if show_organization? %>
     <p>
-      <%= viewing.pluralize %> for
+      <%= viewing.pluralize %>
+      for
       <% if organization_subject.present? %>
         <em>
           <%= link_to organization_subject.short_name, admin_organization_path(organization_subject), class: "twlink" %>
@@ -66,10 +72,9 @@
       <%= link_to "view for all organizations", url_for(sortable_search_params.merge(organization_id: nil)), class: "gray-link tw:text-sm" %>
       <% if organization_subject&.deleted? %>
         <em class="d-block mt-1 less-strong">
-          (<%= organization_subject.short_name %> is <em class="<%= error_text_class %>">deleted</em>) - at
-          <span class="convertTime preciseTime">
-            <%= l organization_subject.deleted_at, format: :convert_time %>
-          </span>
+          (<%= organization_subject.short_name %> is
+          <em class="<%= error_text_class %>">deleted</em>) - at
+          <span class="convertTime preciseTime"><%= l organization_subject.deleted_at, format: :convert_time %></span>
         </em>
       <% end %>
     </p>
@@ -79,26 +84,28 @@
     <p>
       <%= viewing.pluralize %> for
       <%= link_to "Membership #{membership_id}", admin_membership_path(membership_id), class: "twlink" %>
+      
       <%= link_to "view for all memberships", url_for(sortable_search_params.merge(search_membership_id: nil)), class: "gray-link tw:text-sm" %>
     </p>
   <% end %>
 
   <% if show_kind? %>
     <p>
-      <%= viewing.pluralize %> for
-      <strong><%= kind_humanized %></strong>
-
+      <%= viewing.pluralize %> for <strong><%= kind_humanized %></strong>
       <%= link_to "view for all kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "gray-link tw:text-sm" %>
     </p>
   <% end %>
 
   <% if show_primary_activity? %>
     <p>
-      <%= viewing.pluralize %> for
+      <%= viewing.pluralize %>
+      for
       <% if primary_activity_subject.present? %>
         <%= link_to primary_activity_subject.name, admin_primary_activity_path(primary_activity_subject), class: "twlink" %>
       <% else %>
-        <span class="<%= error_text_class %>">unknown primary activity "<%= @params[:primary_activity] %>"</span>
+        <span class="<%= error_text_class %>">
+          unknown primary activity "<%= @params[:primary_activity] %>"
+        </span>
       <% end %>
 
       <%= link_to "view for all primary activities", url_for(sortable_search_params.merge(primary_activity: nil)), class: "gray-link tw:text-sm" %>

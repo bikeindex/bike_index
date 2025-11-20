@@ -7,30 +7,36 @@
       current_user: @current_user,
     ),
   ) %>
+
   <%# TODO: show this too! %>
-  <%#= render(PageSection::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing)) %>
+  <%# = render(PageSection::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing)) %>
 
   <% if @marketplace_messages.any? %>
     <% @marketplace_messages.each do |marketplace_message| %>
       <div
         id="message-<%= marketplace_message.id %>"
         class="
-          tw:p-4 tw:bg-white tw:border tw:border-gray-200 tw:rounded-sm
-          tw:dark:bg-gray-800 tw:dark:border-gray-700 tw:mt-4
+          tw:mt-4 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white
+          tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800
         "
       >
-        <div class="tw:w-full tw:mb-2 tw:gap-x-6 tw:flex tw:flex-nowrap">
-          <span class="tw:block tw:grow"><%= user_display(marketplace_message.sender_id) %></span>
-          <span class="tw:block localizeTime preciseTime">
+        <div class="tw:mb-2 tw:flex tw:w-full tw:flex-nowrap tw:gap-x-6">
+          <span class="tw:block tw:grow">
+            <%= user_display(marketplace_message.sender_id) %>
+          </span>
+
+          <span class="localizeTime preciseTime tw:block">
             <%= l marketplace_message.created_at, format: :convert_time %>
           </span>
         </div>
+
         <% if marketplace_message.id == @initial_message.id %>
-          <h2 class="tw:text-lg tw:w-full">
+          <h2 class="tw:w-full tw:text-lg">
             <strong><%= translation(".subject") %>:</strong>
             <%= @initial_message.subject %>
           </h2>
         <% end %>
+
         <%= render(
           UserTextBlockDisplay::Component.new(
             text: marketplace_message.body,
