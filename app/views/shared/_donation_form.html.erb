@@ -25,6 +25,7 @@
     <% if is_payment # If payment, have one non-arbitrary button %>
       <li class="col-xs-6 offset-sm-3">
         <a
+          href="#"
           class="btn btn-secondary active"
           data-amount="<%= initial_amount * 100 %>"
         >
@@ -37,6 +38,7 @@
       <% numbers.each do |amount| %>
         <li class="col-xs-4">
           <a
+            href="#"
             class="btn btn-secondary <%= amount == initial_amount ? "active" : "" %>"
             data-amount="<%= amount * 100 %>"
           >
@@ -58,6 +60,7 @@
             placeholder="<%= t('.other_amount') %>"
             step="0.01"
             value="<%= arbitrary_initial_value %>"
+            autocomplete="off"
           >
         </div>
       </li>
@@ -66,6 +69,7 @@
     <% if kind == "modal" %>
       <li class="col-xs-6 text-left next-steps">
         <a
+          href="#"
           class="btn btn-secondary no-donate-btn"
           aria-label="Close"
           data-dismiss="modal"
