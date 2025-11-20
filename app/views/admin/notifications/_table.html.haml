@@ -38,9 +38,9 @@
       %th.sender-cell Sender
       %th.error-cell
         Delivery Errors
-    %tbody
+    %tbody{"data-controller"=>"update-cached-sortable-links", "data-update-cached-sortable-links-base-url-value"=> url_for(sortable_search_params)}
       - notifications.each do |notification|
-        - cache(["admin_notifications_table-1", notification]) do
+        - cache(["admin_notifications_table", notification]) do
           %tr
             %td
               %span.convertTime
@@ -61,7 +61,7 @@
                     = notification_text.truncate(100)
             %td.user-cell
               - if notification.user_id.present?
-                = render Admin::UserCell::Component.new(user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable)
+                = render Admin::UserCell::Component.new(user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, render_search: true)
               - else
                 = notification.message_channel_target
                 %small.less-strong no user
