@@ -34,7 +34,11 @@ linter:
   # exclude:
   #   - 'app/views/admin/**/*'
 
-  # rules:
+  rules:
+    html-head-only-elements:
+      enabled: false
+    html-body-only-elements:
+      enabled: false
   #   erb-no-extra-newline:
   #     enabled: false
   #

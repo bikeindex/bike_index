@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-if Rails.env.development?
+if Rails.env.development? && ENV["SKIP_HERB"] != "true"
   ReActionView.configure do |config|
     # Intercept .html.erb templates and process them with `Herb::Engine` for enhanced features
     config.intercept_erb = true

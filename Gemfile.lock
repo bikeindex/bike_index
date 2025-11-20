@@ -481,7 +481,7 @@ GEM
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.26.1)
+    minitest (5.26.2)
     monetize (1.12.0)
       money (~> 6.12)
     money (6.16.0)
@@ -641,7 +641,7 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    reactionview (0.1.5)
+    reactionview (0.1.6)
       actionview (>= 7.0)
       herb (>= 0.7.5, < 1.0.0)
     redcarpet (3.6.1)
