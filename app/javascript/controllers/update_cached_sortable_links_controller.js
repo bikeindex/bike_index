@@ -2,13 +2,17 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='update-cached-sortable-links'
 export default class extends Controller {
+  static values = {
+    baseUrl: String
+  }
+
   connect () {
     this.updateLinks()
   }
 
   updateLinks () {
-    // Get base URL once
-    const baseUrl = new URL(window.location)
+    // Get base URL from value
+    const baseUrl = new URL(this.baseUrlValue, window.location.origin)
 
     // Update sortable links to preserve current URL query params
     this.element.querySelectorAll('a.display-sortable-link').forEach(link => {

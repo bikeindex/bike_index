@@ -87,7 +87,10 @@
         </thead>
       <% end %>
 
-      <tbody data-controller="update-cached-sortable-links">
+      <tbody
+        data-controller="update-cached-sortable-links"
+        data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
+      >
         <% bikes.each do |bike| %>
           <% cache(bike) do %>
             <tr>
