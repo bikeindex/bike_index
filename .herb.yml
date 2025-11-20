@@ -22,7 +22,9 @@ files:
 #   # Patterns to exclude (can exclude defaults too)
   exclude:
     - 'public/**/*'
-#     - 'tmp/**/*'
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
 
 linter:
   enabled: true
