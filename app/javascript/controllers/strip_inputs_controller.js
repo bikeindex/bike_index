@@ -11,11 +11,16 @@ export default class extends Controller {
 
     // Strip whitespace from each input
     textInputs.forEach(input => {
-      if (input.value) {
-        input.value = input.value.trim()
-      }
+      input.value = input.value.trim()
     })
-    console.log('OOOO')
-    // Let the form submit normally
+
+    // Find first invalid field after stripping
+    const firstInvalid = this.element.querySelector(':invalid')
+    if (firstInvalid) {
+      event.preventDefault()
+      // Focus and report validity on the first invalid field
+      firstInvalid.focus()
+      firstInvalid.reportValidity()
+    }
   }
 }
