@@ -4245,14 +4245,17 @@ en:
         to a bike
   organizations:
     embed:
+      registering_a_stolen_bike_click_here: Registering a stolen bike. Click here
+        to register a non-stolen bike
+      currently_registering_a_nonstolen_bike: >-
+        Currently registering a non-stolen bike. Click here to register a STOLEN bike
+        instead.
+    embed_fields:
       add_a_color: Add a color
       additional_serial: Additional serial/sticker number
       choose_color: Choose color
       choose_country: Choose country
       city: City
-      currently_registering_a_nonstolen_bike: >-
-        Currently registering a non-stolen bike. Click here to register a STOLEN bike
-        instead.
       department_city: Department & city
       description_of_the_theft: Description of the theft
       eg_if_we_tweet_about_or_someone_searches: e.g., if we tweet about or someone
@@ -4271,8 +4274,6 @@ en:
       receive_notifications_from_bike_index: Receive notifications from the Index
         about this stolen %{bike_type}
       register: Register
-      registering_a_stolen_bike_click_here: Registering a stolen bike. Click here
-        to register a non-stolen bike
       remove_color: Remove color
       secondary_color: Secondary color
       select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
