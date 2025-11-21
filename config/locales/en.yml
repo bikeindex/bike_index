@@ -4278,8 +4278,10 @@ en:
       select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
         listed
       state: State
-      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      sticker_id: Sticker ID
+      optional: optional
       student_id: Student ID
+      frame_model: Frame model
       third_color: Third color
       this: this
       unknown_serial: Unknown serial
@@ -4321,7 +4323,8 @@ en:
       secondary_color: Secondary color
       select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
         listed
-      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      sticker_id: Sticker ID
+      optional: optional
       student_id: Student ID
       third_color: Third color
       unknown_serial: Unknown serial

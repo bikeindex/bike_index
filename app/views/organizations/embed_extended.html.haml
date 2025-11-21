@@ -98,18 +98,23 @@
       .controls
         = f.select :organization_affiliation, @organization.organization_affiliation_options, class: "form-control"
   - if include_field_reg_student_id?(@organization)
+    - student_id_required = @organization.enabled?("require_student_id")
     .input-group
       .control-group
-        - label_student_id = registration_field_label(@organization, "reg_student_id") || t(".student_id")
-        = f.label :student_id, label_student_id, class: "control-label"
+        = f.label :student_id, class: "control-label" do
+          = registration_field_label(@organization, "reg_student_id") || t(".student_id")
+          - unless student_id_required
+            %small.less-strong= t(".optional")
         .controls
-          = f.text_field :student_id
+          = f.text_field :student_id, autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: student_id_required
 
   -# NOT checking bike_stickers_user_editable here - this embed form is for the organization
   - if include_field_reg_bike_sticker?(@organization)
     .input-group
       .control-group
-        = f.label :bike_sticker, t(".sticker_id_html"), class: "control-label"
+        = f.label :bike_sticker, class: "control-label" do
+          = t(".sticker_id")
+          %small.less-strong= t(".optional")
         .controls
           = f.text_field :bike_sticker, value: @b_param.bike_sticker_code
   .input-group

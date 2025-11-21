@@ -5,13 +5,17 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static inputSelector = 'input[type="text"], input[type="email"], input[type="search"], input[type="url"], input[type="tel"], input:not([type]), textarea'
 
+  // If alwaysPreventSubmit is true, THE FORM WILL NEVER SUBMIT
+  // (the embed forms have JS that handles submit, to prevent double submissions)
+  static values = { alwaysPreventSubmit: Boolean }
+
   connect () {
     // Strip all inputs when any input loses focus
-    this.element.addEventListener('focusout', this.handleFocusout.bind(this))
+    this.element.addEventListener('focusout', this.stripAllInputs.bind(this))
   }
 
   disconnect () {
-    this.element.removeEventListener('focusout', this.handleFocusout.bind(this))
+    this.element.removeEventListener('focusout', this.stripAllInputs.bind(this))
   }
 
   handleFocusout (event) {
@@ -37,6 +41,12 @@ export default class extends Controller {
       // Focus and report validity on the first invalid field
       firstInvalid.focus()
       firstInvalid.reportValidity()
+    } else {
+      // Prevent submit if configured, then dispatch event
+      if (this.alwaysPreventSubmitValue) {
+        event.preventDefault()
+      }
+      this.dispatch('valid', { detail: { form: this.element } })
     }
   }
 }
