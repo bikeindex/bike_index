@@ -43,6 +43,7 @@
       >
         <%= @builder.text_field :street,
                             placeholder: street_placeholder,
+                            required: @require_address,
                             class: "form-control" %>
 
         <% if street_requires_below_helper? %>
