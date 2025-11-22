@@ -18,7 +18,7 @@
     - else
       = t(".enter_bike_type_details_html", type_html: type_html)
 
-= form_for @bike, multipart: true do |f|
+= form_for @bike, multipart: true, html: { "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit" } do |f|
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
   - if @bike_sticker.present?
     -# Hacky way to assign sticker during creation

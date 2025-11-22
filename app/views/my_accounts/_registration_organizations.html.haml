@@ -60,7 +60,7 @@
                 registration_field_label(organization, "reg_student_id") || t(".student_id"),
                 class: "form-well-label"
               .form-well-input
-                = text_field_tag "reg_field-student_id_#{organization.id}", user_registration_organization.student_id(organization.id), autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: true, class: "form-control"
+                = text_field_tag "reg_field-student_id_#{organization.id}", user_registration_organization.student_id(organization.id), autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: organization.enabled?("require_student_id"), class: "form-control"
           - elsif registration_field == "reg_address"
             .form-group.row.unnested-field.no-divider-row
               = label_tag "reg_field-eg_address_#{organization.id}",

@@ -1,6 +1,6 @@
 - def template_url(template); template == "membership" ? edit_membership_path : edit_my_account_path(edit_template: template) end
 
-= form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form' } do |f|
+= form_for @user, url: my_account_path, method: :patch, multipart: true, html: { class: 'primary-edit-user-form', "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit" } do |f|
   .form-well-container.container
     .row
       -# NOTE: delete_account uses JS to add .no-save-button to this menu
