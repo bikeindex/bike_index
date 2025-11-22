@@ -5,14 +5,13 @@ module LegacyFormWell::AddressRecord
     STATIC_FIELDS_OPTIONS = %i[shown hidden]
 
     # NOTE: Keep in mind this renders for the embed and embed_extended views (which don't have tailwind styles)
-    def initialize(form_builder:, organization: nil, not_related_fields: false, require_address: false,
+    def initialize(form_builder:, organization: nil, not_related_fields: false,
       static_fields: false, current_country_id: nil, embed_layout: false, no_street: nil, street_2: false)
       @builder = form_builder
       @organization = organization
 
       @no_street = no_street?(no_street, @builder.object, @organization)
       @street_2 = !no_street && street_2
-      @require_address = require_address
 
       @builder.object.country_id ||= current_country_id
       @initial_country_id = @builder.object.country_id
@@ -71,8 +70,8 @@ module LegacyFormWell::AddressRecord
       translation(@organization&.school? ? :address_school : :address)
     end
 
-    def street_requires_below_helper?
-      @organization&.additional_registration_fields&.include?("reg_address") || false
+    def address_required?
+      @organization&.enabled?("require_reg_address")
     end
   end
 end

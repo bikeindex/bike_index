@@ -658,12 +658,13 @@ a {
 }
 
 .below-input-help {
-  font-size: 90%;
-  padding-bottom: 0.5em;
+  font-size: 80%;
+  padding-bottom: 0.75em;
   margin-top: -0.6em;
   display: block;
   line-height: 1.5em;
   opacity: 0.65;
+  color: $contentTextColor;
 }
 
 // cursor classes required for #motorizedWrapper

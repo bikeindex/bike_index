@@ -275,7 +275,7 @@
 <%# Note: Don't check display_edit_address_fields? because current_user is probably not owner %>
 <% if BikeServices::Builder.include_address_record?(@organization) %>
   <%= f.fields_for :address_record do |address_form| %>
-    <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, embed_layout: true, organization: @bike.creation_organization)) %>
+    <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, embed_layout: true, organization: @bike.creation_organization, street_2: true)) %>
   <% end %>
 <% end %>
 

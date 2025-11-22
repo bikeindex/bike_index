@@ -6,9 +6,8 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
   let(:user) { FactoryBot.create(:user) }
   let(:address_record) { AddressRecord.new(country: Country.united_states, user:) }
   let(:organization) { nil }
-  let(:options) { {organization:, embed_layout:, street_2:, require_address:} }
+  let(:options) { {organization:, embed_layout:, street_2:} }
   let(:embed_layout) { false }
-  let(:require_address) { false }
   let(:obj) { user }
   let(:street_2) { false }
 
@@ -66,17 +65,6 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
       expect(component).to have_field("user_address_record_attributes_street")
       expect(component).to have_field("user_address_record_attributes_street_2")
     end
-
-    context "with require_address" do
-      let(:require_address) { true }
-      it "renders with not street" do
-        expect(component).to have_css("label", text: "Street address")
-        expect(component).to have_field("user_address_record_attributes_street")
-        expect(component).to have_css("input#user_address_record_attributes_street[required]")
-        expect(component).to have_field("user_address_record_attributes_street_2")
-        expect(component).not_to have_css("input#user_address_record_attributes_street_2[required]")
-      end
-    end
   end
 
   context "with embed_layout: true" do
@@ -88,22 +76,31 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
   end
 
   context "with organization" do
-    let(:organization) { Organization.new(kind:, enabled_feature_slugs: %w[reg_address], registration_field_labels:) }
+    let(:organization) { Organization.new(kind:, enabled_feature_slugs:, registration_field_labels:) }
+    let(:enabled_feature_slugs) { %w[reg_address] }
     let(:kind) { :bike_shop }
     let(:registration_field_labels) { {} }
 
     it "renders" do
       expect(component).to have_css("label", text: "Street address")
       expect(component).to have_field("user_address_record_attributes_street", placeholder: "Street address")
+      expect(component).not_to have_css("input#user_address_record_attributes_street[required]")
+      expect(component).not_to have_field("user_address_record_attributes_street_2")
     end
 
     context "school with reg_address" do
       let(:reg_address) { "Special address label" }
+      let(:enabled_feature_slugs) { %w[reg_address require_reg_address] }
       let(:kind) { :school }
       let(:registration_field_labels) { {reg_address:}.as_json }
+      let(:street_2) { true }
       it "renders" do
         expect(component).to have_css("label", text: reg_address)
         expect(component).to have_field("user_address_record_attributes_street", placeholder: "Campus mailing address")
+        # street is required, street_2 is not
+        expect(component).to have_css("input#user_address_record_attributes_street[required]")
+        expect(component).to have_field("user_address_record_attributes_street_2")
+        expect(component).not_to have_css("input#user_address_record_attributes_street_2[required]")
       end
     end
 
