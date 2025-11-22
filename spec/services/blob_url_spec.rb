@@ -14,5 +14,35 @@ RSpec.describe BlobUrl do
         expect(described_class.for(nil)).to be_nil
       end
     end
+
+    context "cloudflare storage" do
+      let(:blob) { stolen_record.reload.image_four_by_five.blob }
+      let(:production_host) { "https://uploads.bikeindex.org" }
+      let(:dev_host) { "https://dev-uploads.bikeindex.org" }
+
+      before do
+        stub_const("BlobUrl::LOCAL_STORAGE", false)
+      end
+
+      context "cloudflare_production service" do
+        before do
+          allow(blob.service).to receive(:name).and_return(:cloudflare_production)
+        end
+
+        it "uses ACTIVE_STORAGE_HOST" do
+          expect(described_class.for(blob)).to eq "#{production_host}/#{blob.key}"
+        end
+      end
+
+      context "cloudflare_dev service" do
+        before do
+          allow(blob.service).to receive(:name).and_return(:cloudflare_dev)
+        end
+
+        it "uses ACTIVE_STORAGE_HOST_DEV" do
+          expect(described_class.for(blob)).to eq "#{dev_host}/#{blob.key}"
+        end
+      end
+    end
   end
 end
