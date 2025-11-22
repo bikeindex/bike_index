@@ -59,7 +59,6 @@ toggleRegistrationType = ->
     $('#stolen_record_phone').attr('required', false)
     $('#stolen_fields_container').slideUp 'medium', ->
       $('#stolen_fields').appendTo('#stolen_fields_store')
-    # $('.has-no-serial .stolen').fadeOut 'fast', ->
       $('#optional-phone').slideUp() if $('#optional-phone').length > 0
   else
     $('#stolen_record_phone').attr('required', true)
@@ -207,6 +206,7 @@ $(document).ready ->
     $(this).closest('.alert').fadeOut('fast')
 
   $('a.optional-form-block').click (e) ->
+    e.preventDefault()
     optionalFormUpdate(e)
 
   $('#bike_year').change ->
@@ -234,17 +234,6 @@ $(document).ready ->
   window.localTimezone ||= moment.tz.guess()
   $(".hiddenFieldTimezone").val(window.localTimezone)
 
-  # prevent double posting
-  $('#new_bike').submit ->
-    $this = $(this)
-    if $this.data().isSubmitted
-      return false
-
-    # mark the form as processed, so we will not process it again
-    $this.data().isSubmitted = true
-    updateSubmitButtonDisabled(true)
-    true
-
   new window.CheckEmail('#bike_owner_email')
 
   if $("#new-unregistered-parking-notification").length
@@ -253,3 +242,17 @@ $(document).ready ->
   if $("#us_id_data").length
     initializeStateHiding()
 
+# This prevents double posting
+# it's dispatched by the stimulus controller strip-inputs, after it strips inputs - to prevent submitting blank inputs
+document.addEventListener 'strip-inputs:valid', (event) ->
+  form = event.detail.form
+  $submitBtn = $(".submit-registration input")
+  if $submitBtn.data().isSubmitted
+    console.log("Form already submitted, not submitting again")
+    return
+
+  # mark the form as processed, so we will not process it again
+  $submitBtn.data().isSubmitted = true
+  updateSubmitButtonDisabled(true)
+  # Actually submit the form
+  form.submit()

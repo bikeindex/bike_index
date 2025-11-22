@@ -2,6 +2,6 @@
 require "rubygems"
 require "bundler/setup"
 
-ARGV.unshift("--ensure-latest")
+ARGV.unshift("--no-pager", "--ensure-latest")
 
 load Gem.bin_path("brakeman", "brakeman")

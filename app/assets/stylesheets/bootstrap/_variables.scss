@@ -473,7 +473,7 @@ $zindex-tooltip:           1070 !default;
 $zindex-navbar-fixed:      1030 !default;
 $zindex-navbar-sticky:     1030 !default;
 $zindex-modal-bg:          1040 !default;
-$zindex-modal:             1050 !default;
+$zindex-modal:             1061 !default; // NOTE: Modified so popovers don't overlap modals
 
 
 // Navbar
