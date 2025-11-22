@@ -1,0 +1,33 @@
+<div id="stolen_fields_store"></div>
+<div id="root_url" class="hidden" data-url="<%= ENV['BASE_URL'] %>"></div>
+
+<%= form_for @bike, multipart: true, multipart: true, html: { "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit", "data-strip-inputs-always-prevent-submit-value" => true, style: "padding-bottom: 30px;" } do |f| %>
+  <div class="input-group" style="border-style: none;">
+    <% if @stolen %>
+      <span id="stolen_registration_first"></span>
+    <% end %>
+
+    <% unless @stolen || @non_stolen %>
+      <div id="registration-type-tabs">
+        <a class="registration-type-tab" href="#" data-stype="description">
+          <%= t(".registering_a_stolen_bike_click_here") %>
+        </a>
+
+        <a
+          class="registration-type-tab stolen current-type"
+          href="#"
+          data-stype="serial"
+        >
+          <%= t(".currently_registering_a_nonstolen_bike") %>
+        </a>
+      </div>
+    <% end %>
+  </div>
+
+  <%# NOTE: this assumes the user entering the data is the user whose bike it is %>
+  <%# so some of the fields are slightly different than embed_extended (which assumes it's an org user) %>
+  <% label_reference = "you" %>
+  <% include_bike_sticker_field = include_field_reg_bike_sticker?(@organization, nil, true) %>
+
+  <%= render partial: "/organizations/embed_fields", locals: {f:, include_stolen: true, include_bike_sticker_field:, label_reference:} %>
+<% end %>
