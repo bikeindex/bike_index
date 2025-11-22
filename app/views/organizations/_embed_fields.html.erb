@@ -300,7 +300,7 @@
 <% end %>
 
 <% if include_field_reg_student_id?(@organization) %>
-  <% student_id_required = @organization.enabled?("require_student_id") %>
+  <% student_id_required = @organization.enabled?("require_reg_student_id") %>
   <div class="input-group">
     <div class="control-group">
       <%= f.label :student_id do %>
