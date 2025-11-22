@@ -1,7 +1,7 @@
 <div id="stolen_fields_store"></div>
 <div id="root_url" class="hidden" data-url="<%= ENV['BASE_URL'] %>"></div>
 
-<%= form_for @bike, multipart: true, multipart: true, html: { "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit", "data-strip-inputs-always-prevent-submit-value" => true, style: "padding-bottom: 30px;" } do |f| %>
+<%= form_for @bike, multipart: true, html: { "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit", "data-strip-inputs-always-prevent-submit-value" => true, style: "padding-bottom: 30px;" } do |f| %>
   <div class="input-group" style="border-style: none;">
     <% if @stolen %>
       <span id="stolen_registration_first"></span>

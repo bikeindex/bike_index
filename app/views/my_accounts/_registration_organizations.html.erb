@@ -1,0 +1,109 @@
+<div id="myAccountRegistrationOrganizations" class="form-wrap">
+  <div class="form-well-form-header-always-visible">
+    <h3><%= t(".registration_organizations") %></h3>
+  </div>
+  <div class="col-xs-12">
+    <p><%= t(".registration_organization_information") %></p>
+  </div>
+
+  <% rendered_registration_info_fields = [] %>
+  <% user_bike_ids = current_user.bike_ids.sort %>
+  <%# get the organizations, so that we can sort alphabetically %>
+  <% uro_organizations = @user.uro_organizations.paid.name_ordered %>
+  <% uro_organizations += @user.uro_organizations.unpaid.name_ordered %>
+  <% uro_organizations.each do |organization| %>
+    <% user_registration_organization = @user.user_registration_organizations.find_by(organization_id: organization.id) %>
+    <%= fields_for user_registration_organization do |uro| %>
+      <hr class="d-none d-sm-block">
+      <div class="related-fields userRegistrationOrganization">
+        <div class="form-group row">
+          <label class="form-well-label">
+            <strong><%= organization.name %></strong>
+          </label>
+          <div class="form-well-input-large">
+            <label class="pt-2 mb-0 allBikesCheck" style="line-height: 1.5em;">
+              <%= check_box_tag "user_registration_organization_all_bikes[]", user_registration_organization.id, user_registration_organization.all_bikes?, multiple: true %>
+              <%= t(".register_all_with") %>
+            </label>
+            <div class="below-input-help">
+              <em><%= t(".when_not_selected") %></em>
+              <div class="collapse mt-2 collapse-NotAllBikes <%= user_registration_organization.all_bikes? ? "" : "in" %>">
+                <span class="less-strong">
+                  <% if user_registration_organization.bikes.pluck(:id).sort == user_bike_ids %>
+                    <%= t(".all_bikes_with_organization") %>
+                  <% else %>
+                    <%# TODO: translations here %>
+                    <%= number_display(user_registration_organization.bikes.count) %>
+                    <%= t(".bike").pluralize(user_registration_organization.bikes.count) %>
+                    <%= t(".registered_with") %>
+                    <em><%= organization.short_name %></em>
+                    <% bikes_count = user_registration_organization.bikes.count %>
+                    <% if bikes_count > 0 %>
+                      -
+                      <%= safe_join(user_registration_organization.bikes.limit(5).map { |b| link_to(b.title_string, edit_bike_path(b, edit_template: "groups")) }, ", ") %>
+                      <% if bikes_count > 5 %>
+                        <em><%= t(".and_other_bikes_count", other_bikes_count: bikes_count - 5) %></em>
+                      <% end %>
+                    <% end %>
+                  <% end %>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row pt-0 collapse collapse-AllBikes <%= user_registration_organization.all_bikes? ? "in" : "" %>">
+          <label class="form-well-label">&nbsp;</label>
+          <div class="form-well-input-large small">
+            <label class="pt-2 mb-0" style="line-height: 1.5em;">
+              <%= check_box_tag "user_registration_organization_can_edit_claimed[]", user_registration_organization.id, user_registration_organization.can_edit_claimed, multiple: true %>
+              <%= t(".allow_organization_to_edit_bikes_html", org_name_em: content_tag(:em, organization.short_name)) %>
+            </label>
+          </div>
+        </div>
+        <% (organization.additional_registration_fields - rendered_registration_info_fields).each do |registration_field| %>
+          <% next if registration_field == "reg_bike_sticker" %>
+          <% if registration_field == "reg_organization_affiliation" %>
+            <div class="form-group row unnested-field no-divider-row fancy-select unfancy">
+              <%= label_tag "reg_field-organization_affiliation_#{organization.id}",
+                registration_field_label(organization, "reg_organization_affiliation") || t(".affiliation", org_name: organization.short_name),
+                class: "form-well-label" %>
+              <div class="form-well-input">
+                <%= select_tag "reg_field-organization_affiliation_#{organization.id}", options_for_select(organization.organization_affiliation_options, user_registration_organization.organization_affiliation(organization.id)), required: true, class: "form-control" %>
+              </div>
+            </div>
+          <% end %>
+          <% if registration_field == "reg_student_id" %>
+            <div class="form-group row unnested-field no-divider-row">
+              <%= label_tag "reg_field-student_id_#{organization.id}",
+                registration_field_label(organization, "reg_student_id") || t(".student_id"),
+                class: "form-well-label" %>
+              <div class="form-well-input">
+                <%= text_field_tag "reg_field-student_id_#{organization.id}", user_registration_organization.student_id(organization.id), autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: organization.enabled?("require_student_id"), class: "form-control" %>
+              </div>
+            </div>
+          <% elsif registration_field == "reg_address" %>
+            <div class="form-group row unnested-field no-divider-row">
+              <%= label_tag "reg_field-eg_address_#{organization.id}",
+                registration_field_label(organization, "reg_address") || t(".mailing_address"),
+                class: "form-well-label" %>
+              <div class="form-well-input-large mt-1">
+                <%= t(".update_your_address_on_html", user_settings_link: link_to(@edit_templates["root"], edit_my_account_path(edit_template: "root"), class: "strong")) %>
+              </div>
+            </div>
+          <% elsif registration_field == "reg_phone" %>
+            <div class="form-group row unnested-field no-divider-row">
+              <%= label_tag "reg_field-reg_phone_#{organization.id}",
+                registration_field_label(organization, "reg_phone") || t(".phone"),
+                class: "form-well-label" %>
+              <div class="form-well-input-large mt-1">
+                <%= t(".update_your_phone_on_html", user_settings_link: link_to(@edit_templates["root"], edit_my_account_path(edit_template: "root"), class: "strong")) %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render "/shared/form_well_footer_save" %>
+</div>
