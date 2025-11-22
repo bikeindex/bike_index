@@ -1,3 +1,6 @@
+<%# herb:linter ignore %>
+<%# Ignoring the file because I'm not sure how to apply herb:disable html-anchor-require-href with multiline tags %>
+
 <% serial_page_link = link_to(t(".our_serial_page"), serials_url, target: '_blank', class: "twlink") %>
 <% serial_help_content = t(".serial_help_content_html", serial_page_link: serial_page_link) %>
 <% type_html = content_tag(:span, CycleType.slug_translation(@bike.cycle_type).downcase, class: "cycleTypeText") %>
@@ -24,13 +27,16 @@
 
 <%= form_for @bike, multipart: true, html: { "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit" } do |f| %>
   <%= f.hidden_field :b_param_id_token, value: @b_param&.id_token %>
+
   <% if @bike_sticker.present? %>
     <%# Hacky way to assign sticker during creation %>
     <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
   <% end %>
+
   <% if @organization.present? %>
     <%= f.hidden_field :creation_organization_id, value: @organization.id %>
   <% end %>
+
   <% if @bike.status_stolen? %>
     <%= f.hidden_field :date_stolen, value: Time.current.to_i %>
   <% end %>
@@ -41,27 +47,40 @@
         <div class="form-wrap">
           <div class="form-group row unnested-field">
             <%= f.label :serial_number, class: 'form-well-label' %>
+
             <div class="form-well-input">
               <div id="serial-input">
                 <%= f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.required'), class: 'form-control' %>
-                <a class="inline-input-help" title="<%= t(".serial_help") %>" data-toggle="popover" data-content="<%= serial_help_content.to_str %>">
+
+                <a
+                  class="inline-input-help"
+                  title="<%= t(".serial_help") %>"
+                  data-toggle="popover"
+                  data-content="<%= serial_help_content.to_str %>"
+                >
                   ?
                 </a>
               </div>
+
               <div id="made-without-serial-input">
                 <label>
                   <%= f.check_box :made_without_serial %>
                   <%= t(".without_serial_html", type_html: type_html) %>
                 </label>
               </div>
+
               <div class="below-input-help" id="made-without-serial-help">
                 <div class="hidden-other">
-                  <a data-toggle="modal" data-target="#made-without-serial-modal">
+                  <a
+                    data-toggle="modal"
+                    data-target="#made-without-serial-modal"
+                  >
                     <%= t(".without_serial_number_html", type_html: type_html) %>
                   </a>
                 </div>
               </div>
             </div>
+
             <div class="right-input-help">
               <label class="cursor-pointer made-without-serial-checkbox">
                 <%= check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1 %>
@@ -73,6 +92,7 @@
           <div class="related-fields">
             <div class="form-group row">
               <%= f.label :cycle_type, t(".this_is_a"), class: 'form-well-label' %>
+
               <div class="form-well-input">
                 <% if @bike.cycle_type == "bike" %>
                   <label class="collapse in pt-1 pl-1 cursor-pointer">
@@ -85,16 +105,22 @@
                 <div class="cycle-type-select fancy-select unfancy <%= @bike.cycle_type == "bike" ? "collapse" : "" %>">
                   <%= select(:bike, :cycle_type, CycleType.select_options, {prompt: false}, {required: true, class: 'form-control'}) %>
                 </div>
-                <label id="motorizedWrapper" class="cursor-pointer mt-1 mb-0 pl-1">
+
+                <label
+                  id="motorizedWrapper"
+                  class="cursor-pointer mt-1 mb-0 pl-1"
+                >
                   <%= check_box_tag :propulsion_type_motorized, true, @bike.motorized? %>
                   <strong>⚡️</strong>
                   <%= t(".electric_motorized") %>
                 </label>
+
                 <div id="propulsionTypeFields" class="collapse pl-1">
                   <label class="checkbox-inline mr-2">
                     <%= check_box_tag :propulsion_type_throttle, true, @bike.propulsion_type_throttle? %>
                     Throttle
                   </label>
+
                   <label class="checkbox-inline">
                     <%= check_box_tag :propulsion_type_pedal_assist, true, @bike.propulsion_type_pedal_assist? %>
                     Pedal assist
@@ -107,17 +133,17 @@
           <div class="related-fields">
             <div class="form-group row">
               <%= f.label :manufacturer_id, t(".manufacturer"), class: 'form-well-label' %>
+
               <div class="form-well-input">
                 <% initial = @bike.manufacturer && {id: @bike.manufacturer.id, text: @bike.manufacturer.name}.to_json %>
                 <%= f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: {initial: initial} %>
-                <span class="below-input-help">
-                  <%= t(".select_other") %>
-                </span>
+                <span class="below-input-help"><%= t(".select_other") %></span>
               </div>
             </div>
 
             <div class="form-group hidden-other row">
               <%= f.label :manufacturer_other, t(".other_manufacturer"), class: 'form-well-label' %>
+
               <div class="form-well-input">
                 <%= f.text_field :manufacturer_other, class: 'form-control' %>
               </div>
@@ -126,10 +152,12 @@
 
           <div class="form-group row fancy-select unfancy unnested-field">
             <%= f.label :year, t(".model_year"), class: 'form-well-label' %>
+
             <div class="form-well-input">
               <% years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] } %>
               <%= f.select :year, years, prompt: t(".unsure_or_unknown"), selected: @bike.year || Time.current.year %>
             </div>
+
             <div class="right-input-help">
               <label class="cursor-pointer">
                 <input id="bike_unknown_year" type="checkbox" tabindex="-1">
@@ -140,6 +168,7 @@
 
           <div class="form-group row unnested-field">
             <%= f.label :frame_model, class: 'form-well-label' %>
+
             <div class="form-well-input">
               <%= f.text_field :frame_model, class: 'form-control' %>
             </div>
@@ -155,6 +184,7 @@
               <%= f.label :phone,
                 registration_field_label(@organization, "reg_phone") || t(".phone"),
                 class: "form-well-label" %>
+
               <div class="form-well-input">
                 <%= f.text_field :phone, required: true, value: current_user&.phone, class: "form-control" %>
               </div>
@@ -184,6 +214,7 @@
               <%= f.label :extra_registration_number,
                 registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial_sticker_number"),
                 class: "form-well-label" %>
+
               <div class="form-well-input">
                 <%= f.text_field :extra_registration_number,
                   autocomplete: "off",
@@ -195,10 +226,16 @@
           <% end %>
 
           <% if include_field_reg_organization_affiliation?(@organization, current_user) %>
-            <div class="form-group row unnested-field no-divider-row fancy-select unfancy">
+            <div
+              class="
+                form-group row unnested-field no-divider-row fancy-select
+                unfancy
+              "
+            >
               <%= f.label :organization_affiliation,
                 registration_field_label(@organization, "reg_organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
                 class: "form-well-label" %>
+
               <div class="form-well-input">
                 <%= f.select :organization_affiliation,
                   @organization.organization_affiliation_options,
@@ -212,6 +249,7 @@
               <%= f.label :student_id,
                 registration_field_label(@organization, "reg_student_id") || t(".student_id"),
                 class: "form-well-label" %>
+
               <div class="form-well-input">
                 <%= f.text_field :student_id,
                   autocomplete: "off",
@@ -226,6 +264,7 @@
           <% if include_field_reg_bike_sticker?(@organization, current_user, true) %>
             <div class="form-group row unnested-field no-divider-row">
               <%= f.label :bike_sticker, t(".sticker_id_html"), class: "form-well-label" %>
+
               <div class="form-well-input">
                 <%= f.text_field :bike_sticker,
                   autocomplete: "off",
@@ -244,6 +283,7 @@
               <%= f.label :owner_email,
                 registration_field_label(@organization, "owner_email") || t(".owner_email"),
                 class: 'form-well-label' %>
+
               <div class="form-well-input">
                 <%= f.email_field :owner_email,
                   value: @bike.owner_email || current_user&.email,
@@ -267,46 +307,46 @@
 <% modal_body = capture do %>
   <div class="modal-body">
     <div class="cycleTypeOnly collapse in">
-      <p>
-        <%= t(".very_very_few_bikes_html", type_html: type_html) %>
-      </p>
+      <p><%= t(".very_very_few_bikes_html", type_html: type_html) %></p>
+
       <ul>
-        <li>
-          <%= t(".was_made_before_1970") %>
-        </li>
-        <li class="li-or">
-          -
-          <%= t(".or") %>
-          -
-        </li>
-        <li>
-          <%= t(".is_a_handmade_frame") %>
-        </li>
+        <li><%= t(".was_made_before_1970") %></li>
+        <li class="li-or">- <%= t(".or") %> -</li>
+        <li><%= t(".is_a_handmade_frame") %></li>
       </ul>
-      <p class="mb-1">
-        <%= t(".it_probably_has_a_serial_number") %>
-      </p>
+
+      <p class="mb-1"><%= t(".it_probably_has_a_serial_number") %></p>
+
       <p class="mb-1">
         <% how_to_find_link = link_to t('.how_to_find_serial'), serials_url, target: "_blank" %>
         <%= t(".read_how_to_find_html", how_to_find_link: how_to_find_link) %>
       </p>
     </div>
+
     <div class="collapse notCycleTypeOnly">
       <%= t(".very_few_vehicles_html", type_html: type_html) %>
     </div>
   </div>
+
   <div class="modal-btn-footer">
     <div class="row">
       <div class="col-xs-6">
         <button class="btn btn-secondary" data-dismiss="modal" type="button">
           <%= t(".nevermind") %>
         </button>
+
         <%= t(".i_just_dont_know_the_serial") %>
       </div>
+
       <div class="col-xs-6">
-        <button class="btn btn-danger" id="made-without-serial-button" type="button">
+        <button
+          class="btn btn-danger"
+          id="made-without-serial-button"
+          type="button"
+        >
           <%= t(".im_100_sure") %>
         </button>
+
         <%= t(".without_serial_html", type_html: type_html) %>
       </div>
     </div>

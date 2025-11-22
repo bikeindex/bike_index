@@ -206,6 +206,7 @@ $(document).ready ->
     $(this).closest('.alert').fadeOut('fast')
 
   $('a.optional-form-block').click (e) ->
+    e.preventDefault()
     optionalFormUpdate(e)
 
   $('#bike_year').change ->

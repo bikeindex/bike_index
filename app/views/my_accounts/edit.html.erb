@@ -9,10 +9,9 @@
           <% @edit_templates.each do |template, description| %>
             <li>
               <% classname = @edit_template == template ? 'active' : '' %>
+
               <a href="<%= template_url(template) %>" class="<%= classname %>">
-                <h4>
-                  <%= description %>
-                </h4>
+                <h4><%= description %></h4>
               </a>
             </li>
           <% end %>
@@ -22,12 +21,16 @@
           <!-- ignore this select in dirty forms -->
           <select class="dirtyignore">
             <% @edit_templates.each do |template, description| %>
-              <option value="<%= template_url(template) %>" <%= 'selected' if @edit_template == template %>>
+              <option
+                value="<%= template_url(template) %>"
+                <%= 'selected' if @edit_template == template %>
+              >
                 <%= description %>
               </option>
             <% end %>
           </select>
         </div>
+
         <div class="edit-form-well-submit-wrapper">
           <%= hidden_field_tag :edit_template, @edit_template %>
           <%= submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary' %>
@@ -42,14 +45,17 @@
 <% end %>
 
 <div class="mobile-nonfloating-menu pl-1 pr-1 text-center">
-  <strong class="d-inline-block">
-    <%= t(".edit_pages") %>
-  </strong>
+  <strong class="d-inline-block"><%= t(".edit_pages") %></strong>
   <% menu_link_count = @edit_templates.keys.count %>
+
   <% @edit_templates.each_with_index do |t_d, i| %>
     <% template, description = t_d[0], t_d[1] %>
     <% is_active = 'active' if @edit_template.match(/#{template}/) %>
-    <a class="ml-1 mr-1 d-inline-block text-underline <%= is_active %>" href="<%= template_url(template) %>">
+
+    <a
+      class="ml-1 mr-1 d-inline-block text-underline <%= is_active %>"
+      href="<%= template_url(template) %>"
+    >
       <%= description %>
     </a>
   <% end %>
