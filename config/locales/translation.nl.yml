@@ -5285,50 +5285,10 @@ nl:
       electric_motorized: Elektrisch (gemotoriseerd)
   organizations:
     embed:
-      add_a_color: Voeg een kleur toe
-      additional_serial: Extra framenummer / stickernummer
-      choose_color: Kies een kleur
-      choose_country: Kies land
-      city: City
       currently_registering_a_nonstolen_bike: Momenteel wordt een niet-gestolen fiets
         geregistreerd. Klik hier om in plaats daarvan een STOLEN-fiets te registreren.
-      department_city: Afdeling & stad
-      description_of_the_theft: Beschrijving van de diefstal
-      eg_if_we_tweet_about_or_someone_searches: bijvoorbeeld als we tweeten of iemand
-        zoekt naar het framenummer
-      filing_a_police_report_is_important_html: Het indienen van een <strong>politierapport</strong>
-        is <span class="stolen-color">uiterst belangrijk</span> voor het herstel van
-        gestolen fietsen.
-      frame_color: Framekleur
-      image_has_been_uploaded: Afbeelding is geüpload
-      intersection_or_address: Kruising of adres
-      manufacturer_name: Naam van de fabrikant
-      model_year: Modeljaar
-      optional_upload_a_photo: Optioneel - upload een foto
-      other_manufacturer: Andere fabrikant
-      police_report_number: Nummer politie rapport
-      receive_notifications_from_bike_index: Ontvang meldingen van de Index over deze
-        gestolen %{bike_type}
-      register: Registreer
       registering_a_stolen_bike_click_here: Een gestolen fiets registreren. Klik hier
         om een niet-gestolen fiets te registreren
-      remove_color: Verwijder kleur
-      secondary_color: Secundaire Kleur
-      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
-        niet wordt vermeld
-      state: Staat
-      third_color: Derde kleur
-      this: deze
-      unknown_serial: Onbekende serie
-      unknown_year: Onbekend jaar
-      unsure_or_unknown: Onzeker of onbekend
-      when_was_it_stolen: Wanneer is het gestolen?
-      where_was_it_stolen: Waar is het gestolen?
-      your_email_address: Uw e-mailadres
-      your_phone_number: Je telefoonnummer
-      zipcode: Postcode
-      sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
-      student_id: Student-ID
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} is bij u geregistreerd via <strong>%{org_name}</strong>
         ."
@@ -5336,35 +5296,14 @@ nl:
       your_bike_has_been_added_to_bike_index: Uw %{bike_type} is toegevoegd aan Bike
         Index!
     embed_extended:
-      add_a_color: Voeg een kleur toe
-      additional_serial: Extra framenummer / stickernummer
       any_extra_words: Nog extra woorden?
-      choose_color: Kies een kleur
       choose_handlebar: Kies stuur
       choose_material: Kies materiaal
-      choose_photo: Kies foto
-      frame_color: Framekleur
-      image_has_been_uploaded: Afbeelding is geüpload
-      manufacturer_name: Naam van de fabrikant
-      model_year: Modeljaar
-      optional_additions: Optionele toevoegingen
-      org_affiliation: "%{org_name} aansluiting"
       other_defining_features: Andere bepalende kenmerken
-      other_manufacturer: Andere fabrikant
-      owners_email_address: E-mailadres van de eigenaar
-      owners_phone: Telefoon van de eigenaar
       primary_frame_material: Primair framemateriaal
-      register_this: Registreer dit
-      remove_color: Verwijder kleur
-      secondary_color: Secundaire Kleur
-      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
-        niet wordt vermeld
-      third_color: Derde kleur
-      unknown_serial: Onbekende serie
-      unknown_year: Onbekend jaar
-      unsure_or_unknown: Onzeker of onbekend
-      sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
-      student_id: Student-ID
+      handlebar_type: Type stuur
+      optional: optioneel
+      phone_number_owner: Telefoon van de eigenaar
     new:
       bike_index_for_organizations: Bike Index voor organisaties
     new_form:
@@ -5390,6 +5329,53 @@ nl:
       you_are_already_a_member_of_org_html: Je bent al lid van %{org_link}.
       your_current_account_will_be_a_member_html: Uw huidige account ( <strong>%{user_email}</strong>
         ) wordt lid van de organisatie die u maakt.
+    embed_fields:
+      add_a_color: Voeg een kleur toe
+      additional_serial: Extra framenummer / stickernummer
+      choose_color: Kies een kleur
+      choose_country: Kies land
+      city: City
+      department_city: Afdeling & stad
+      description_of_the_theft: Beschrijving van de diefstal
+      eg_if_we_tweet_about_or_someone_searches: bijvoorbeeld als we tweeten of iemand
+        zoekt naar het framenummer
+      email_address_owner: E-mailadres van de eigenaar
+      email_address_you: Uw e-mailadres
+      filing_a_police_report_is_important_html: Het indienen van een <strong>politierapport</strong>
+        is <span class="stolen-color">uiterst belangrijk</span> voor het herstel van
+        gestolen fietsen.
+      frame_color: Framekleur
+      frame_model: Frame-model
+      image_has_been_uploaded: Afbeelding is geüpload
+      intersection_or_address: Kruising of adres
+      manufacturer_name: Naam van de fabrikant
+      model_year: Modeljaar
+      optional: optioneel
+      optional_upload_a_photo: Optioneel - upload een foto
+      org_affiliation: "%{org_name} aansluiting"
+      other_manufacturer: Andere fabrikant
+      phone_number_owner: Telefoon van de eigenaar
+      phone_number_you: Je telefoonnummer
+      please_wait: Even geduld, verwerking
+      police_report_number: Nummer politie rapport
+      receive_notifications_from_bike_index: Ontvang meldingen van de Index over deze
+        gestolen %{bike_type}
+      register: Registreer
+      remove_color: Verwijder kleur
+      secondary_color: Secundaire framekleur
+      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
+        niet wordt vermeld
+      state: Staat
+      sticker_id: Sticker-ID
+      student_id: Student-ID
+      third_color: Derde kleur
+      this: deze
+      unknown_serial: Onbekende serie
+      unknown_year: Onbekend jaar
+      unsure_or_unknown: Onzeker of onbekend
+      when_was_it_stolen: Wanneer is het gestolen?
+      where_was_it_stolen: Waar is het gestolen?
+      zipcode: Postcode
   feedbacks:
     form:
       email_address: E-mailadres

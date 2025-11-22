@@ -1,9 +1,6 @@
 #root_url.hidden{data: { url: ENV['BASE_URL'] }}
 = form_for @bike, multipart: true, html: { "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit", "data-strip-inputs-always-prevent-submit-value" => true, style: "padding-bottom: 30px;" } do |f|
   = hidden_field_tag :persist_email, @persist_email
-  = f.hidden_field :b_param_id_token
-  = f.hidden_field :creation_organization_id
-  = f.hidden_field :embeded, value: true
   = f.hidden_field :embeded_extended, value: true
 
   -# NOTE: this assumes the user entering the data is an organization user
@@ -17,22 +14,30 @@
   - show_phone_field = !include_field_reg_phone?(@organization)
   - if show_phone_field
     .input-group.border-top
-      = f.label :phone, t(".phone_number_owner")
+      = f.label :phone do
+        = t(".phone_number_owner")
+        %small.less-strong= t(".optional")
       .controls
         = f.text_field :phone
   .input-group{class: (show_phone_field ? "" : "border-top") }
     .control-group.special-select-single
-      = f.label :frame_material, t(".primary_frame_material"), class: "control-label"
+      = f.label :frame_material do
+        = t(".primary_frame_material")
+        %small.less-strong= t(".optional")
       .controls
         = select(:bike, :frame_material, FrameMaterial.select_options, { include_blank: true, prompt: t(".choose_material")})
   .input-group
     .control-group.special-select-single
-      = f.label :handlebar_type, class: "control-label"
+      = f.label :handlebar_type do
+        = t(".handlebar_type")
+        %small.less-strong= t(".optional")
       .controls
         = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, prompt: t(".choose_handlebar") })
   .input-group.form-foot
     .control-group
-      = f.label :description, t(".other_defining_features"), class: "control-label"
+      = f.label :description do
+        = t(".other_defining_features")
+        %small.less-strong= t(".optional")
       .controls
         = f.text_area :description, rows: 3, placeholder: t(".any_extra_words")
 

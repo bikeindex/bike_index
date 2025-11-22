@@ -4261,6 +4261,8 @@ en:
       any_extra_words: Any extra words?
       choose_handlebar: Choose handlebar
       choose_material: Choose material
+      handlebar_type: Handlebar type
+      optional: optional
       other_defining_features: Other defining features
       phone_number_owner: Owner's phone
       primary_frame_material: Primary frame material
@@ -4287,6 +4289,7 @@ en:
       model_year: Model year
       optional: optional
       optional_upload_a_photo: Optional - upload a photo
+      org_affiliation: "%{org_name} affiliation"
       other_manufacturer: Other manufacturer
       phone_number_owner: Owner's phone
       phone_number_you: Your phone number

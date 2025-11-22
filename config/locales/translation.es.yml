@@ -3552,76 +3552,21 @@ es:
       whoops_that_link_isnt_connected_to_a_bike:
   organizations:
     embed:
-      add_a_color:
-      additional_serial:
-      choose_color:
-      choose_country:
-      city:
       currently_registering_a_nonstolen_bike:
-      department_city:
-      description_of_the_theft:
-      eg_if_we_tweet_about_or_someone_searches:
-      filing_a_police_report_is_important_html:
-      frame_color:
-      image_has_been_uploaded:
-      intersection_or_address:
-      manufacturer_name:
-      model_year:
-      optional_upload_a_photo:
-      other_manufacturer:
-      police_report_number:
-      receive_notifications_from_bike_index:
-      register:
       registering_a_stolen_bike_click_here:
-      remove_color:
-      secondary_color:
-      select_other_if_manufacturer_isnt_listed:
-      state:
-      sticker_id_html:
-      student_id:
-      third_color:
-      this:
-      unknown_serial:
-      unknown_year:
-      unsure_or_unknown:
-      when_was_it_stolen:
-      where_was_it_stolen:
-      your_email_address:
-      your_phone_number:
-      zipcode:
     embed_create_success:
       bike_was_registered_to_you_html:
       you_will_receive_an_email_confirmation:
       your_bike_has_been_added_to_bike_index:
     embed_extended:
-      add_a_color:
-      additional_serial:
       any_extra_words:
-      choose_color:
       choose_handlebar:
       choose_material:
-      choose_photo:
-      frame_color:
-      image_has_been_uploaded:
-      manufacturer_name:
-      model_year:
-      optional_additions:
-      org_affiliation:
       other_defining_features:
-      other_manufacturer:
-      owners_email_address:
-      owners_phone:
       primary_frame_material:
-      register_this:
-      remove_color:
-      secondary_color:
-      select_other_if_manufacturer_isnt_listed:
-      sticker_id_html:
-      student_id:
-      third_color:
-      unknown_serial:
-      unknown_year:
-      unsure_or_unknown:
+      handlebar_type:
+      optional:
+      phone_number_owner:
     new:
       bike_index_for_organizations:
     new_form:
@@ -3641,6 +3586,48 @@ es:
       sign_up_for_a_new_account_html:
       you_are_already_a_member_of_org_html:
       your_current_account_will_be_a_member_html:
+    embed_fields:
+      add_a_color:
+      additional_serial:
+      choose_color:
+      choose_country:
+      city:
+      department_city:
+      description_of_the_theft:
+      eg_if_we_tweet_about_or_someone_searches:
+      email_address_owner:
+      email_address_you:
+      filing_a_police_report_is_important_html:
+      frame_color:
+      frame_model:
+      image_has_been_uploaded:
+      intersection_or_address:
+      manufacturer_name:
+      model_year:
+      optional:
+      optional_upload_a_photo:
+      org_affiliation:
+      other_manufacturer:
+      phone_number_owner:
+      phone_number_you:
+      please_wait:
+      police_report_number:
+      receive_notifications_from_bike_index:
+      register:
+      remove_color:
+      secondary_color:
+      select_other_if_manufacturer_isnt_listed:
+      state:
+      sticker_id:
+      student_id:
+      third_color:
+      this:
+      unknown_serial:
+      unknown_year:
+      unsure_or_unknown:
+      when_was_it_stolen:
+      where_was_it_stolen:
+      zipcode:
   organized:
     ambassador_dashboards:
       getting_started:
