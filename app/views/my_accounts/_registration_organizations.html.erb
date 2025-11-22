@@ -100,7 +100,7 @@
                 class: "form-well-label" %>
 
               <div class="form-well-input">
-                <%= text_field_tag "reg_field-student_id_#{organization.id}", user_registration_organization.student_id(organization.id), autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: organization.enabled?("require_student_id"), class: "form-control" %>
+                <%= text_field_tag "reg_field-student_id_#{organization.id}", user_registration_organization.student_id(organization.id), autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: organization.enabled?("require_reg_student_id"), class: "form-control" %>
               </div>
             </div>
           <% elsif registration_field == "reg_address" %>

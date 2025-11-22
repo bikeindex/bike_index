@@ -70,8 +70,8 @@ module LegacyFormWell::AddressRecord
       translation(@organization&.school? ? :address_school : :address)
     end
 
-    def street_requires_below_helper?
-      @organization&.additional_registration_fields&.include?("reg_address") || false
+    def address_required?
+      @organization&.enabled?("require_reg_address")
     end
   end
 end

@@ -275,7 +275,7 @@
 <%# Note: Don't check display_edit_address_fields? because current_user is probably not owner %>
 <% if BikeServices::Builder.include_address_record?(@organization) %>
   <%= f.fields_for :address_record do |address_form| %>
-    <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, embed_layout: true, organization: @bike.creation_organization)) %>
+    <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, embed_layout: true, organization: @bike.creation_organization, street_2: true)) %>
   <% end %>
 <% end %>
 
@@ -300,7 +300,7 @@
 <% end %>
 
 <% if include_field_reg_student_id?(@organization) %>
-  <% student_id_required = @organization.enabled?("require_student_id") %>
+  <% student_id_required = @organization.enabled?("require_reg_student_id") %>
   <div class="input-group">
     <div class="control-group">
       <%= f.label :student_id do %>

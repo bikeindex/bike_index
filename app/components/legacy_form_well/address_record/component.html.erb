@@ -38,23 +38,24 @@
       <%= @builder.label :street, address_label, class: "form-well-label" %>
 
       <div
-        class="form-well-input <%= non_static_field_class %>"
+        class="form-well-input pb-0 <%= non_static_field_class %>"
         data-legacy-form-well--address-record-with-default-target="nonStaticFields"
       >
         <%= @builder.text_field :street,
                             placeholder: street_placeholder,
-                            class: "form-control" %>
-
-        <% if street_requires_below_helper? %>
-          <span class="below-input-help text-warning">
-            <%= translation(:your_full_address_is_required, org_name: @organization.short_name) %>
-          </span>
-        <% end %>
+                            required: address_required?,
+                            class: "form-control mb-1" %>
 
         <% if @street_2 %>
           <%= @builder.text_field :street_2,
                               placeholder: translation(:street_2),
-                              class: "form-control mb-2" %>
+                              class: "form-control mb-1" %>
+        <% end %>
+
+        <% if address_required? %>
+          <span class="below-input-help text-warning">
+            <%= translation(:your_full_address_is_required, org_name: @organization&.short_name) %>
+          </span>
         <% end %>
       </div>
 
