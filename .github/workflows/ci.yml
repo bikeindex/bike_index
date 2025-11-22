@@ -36,7 +36,7 @@ jobs:
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         if: success() || failure()
-        run: bin/brakeman --no-pager
+        run: bin/brakeman
 
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies
