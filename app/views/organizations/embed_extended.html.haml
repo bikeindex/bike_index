@@ -1,168 +1,38 @@
 #root_url.hidden{data: { url: ENV['BASE_URL'] }}
-= form_for @bike, multipart: true, html: { "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit", "data-strip-inputs-always-prevent-submit-value" => true } do |f|
+= form_for @bike, multipart: true, html: { "data-controller" => "strip-inputs", "data-action" => "submit->strip-inputs#submit", "data-strip-inputs-always-prevent-submit-value" => true, style: "padding-bottom: 30px;" } do |f|
   = hidden_field_tag :persist_email, @persist_email
   = f.hidden_field :b_param_id_token
   = f.hidden_field :creation_organization_id
   = f.hidden_field :embeded, value: true
   = f.hidden_field :embeded_extended, value: true
-  .input-group
-    .control-group
-      = f.label :serial_number, class: "control-label"
-      .controls
-        = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-      - if include_field_reg_extra_registration_number?(@organization)
-        - label_secondary_serial = registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial")
-        = f.label :extra_registration_number, label_secondary_serial, class: "control-label"
-        .controls
-          = f.text_field :extra_registration_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
-    .optional-checkbox
-      %label{style: "margin-top: 0.25em"}
-        = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
-        = t(".unknown_serial")
 
-  .input-group.with-additional-block
-    .control-group.select-jsonified
-      = f.label :manufacturer_id, class: "control-label"
-      .controls
-        = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name
-        %span.help-block
-          = t(".select_other_if_manufacturer_isnt_listed")
-    .hidden-other.control-group.manufacturer-other-input
-      = f.label :manufacturer_other, t(".other_manufacturer"), class: "control-label"
-      .controls
-        = f.text_field :manufacturer_other, placeholder: t(".manufacturer_name")
+  -# NOTE: this assumes the user entering the data is an organization user
+  -# so some of the labels are slightly different than embed (which assumes it's your bike)
+  - label_reference = "owner"
+  -# e.g. NOT checking bike_stickers_user_editable here, since this embed form is for the organization
+  - include_bike_sticker_field = include_field_reg_bike_sticker?(@organization)
+  = render partial: "/organizations/embed_fields", locals: {f:, include_stolen: false, include_bike_sticker_field:, label_reference:}
 
-  .input-group
-    .control-group.special-select-single
-      = f.label :year, class: "control-label" do
-        = t(".model_year")
-        %small.less-strong= t(".optional")
-      .controls
-        - years = (1900..Time.current.year+1).to_a.reverse.map {|i| [i,i] }
-        = f.select :year, years, selected: Time.current.year, prompt: t(".unsure_or_unknown")
-    .optional-checkbox
-      %label{style: "margin-top: 0.75em"}
-        %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
-        = t(".unknown_year")
-
-  .input-group
-    .control-group
-      = f.label :frame_model, class: "control-label" do
-        = t(".frame_model")
-        %small.less-strong= t(".optional")
-      .controls
-        = f.text_field :frame_model, autocomplete: 'off'
-
-  .input-group.with-optional-blocks
-    .control-group.special-select-single
-      = f.label :primary_frame_color_id, t(".frame_color"), class: "control-label"
-      .controls
-        = select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: t(".choose_color"))
-    %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
-      = t(".add_a_color")
-    %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
-      = t(".remove_color")
-    #secondary-color.hidden-other
-      .control-group.special-select-single
-        %label.control-label
-          = t(".secondary_color")
-        .controls
-          = select(:bike, :secondary_frame_color_id, Color.select_options, prompt: t(".choose_color"))
-      %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
-        = t(".add_a_color")
-      %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
-        = t(".remove_color")
-    #tertiary-color.hidden-other
-      .control-group
-        %label.control-label
-          = t(".third_color")
-        .controls.special-select-single
-          = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: t(".choose_color"))
-  -# Note: Don't check display_edit_address_fields? because current_user is probably not owner
-  - if BikeServices::Builder.include_address_record?(@organization)
-    = f.fields_for :address_record do |address_form|
-      = render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, embed_layout: true, organization: @bike.creation_organization))
-
-  - if include_field_reg_phone?(@organization)
-    - label_phone = registration_field_label(@organization, "reg_phone") || t(".your_phone_number")
-    .input-group
-      = f.label :phone, label_phone
-      .controls
-        = f.text_field :phone, required: true
-  - if include_field_reg_student_id?(@organization)
-    - student_id_required = @organization.enabled?("require_student_id")
-    .input-group
-      .control-group
-        = f.label :student_id, class: "control-label" do
-          = registration_field_label(@organization, "reg_student_id") || t(".student_id")
-          - unless student_id_required
-            %small.less-strong= t(".optional")
-        .controls
-          = f.text_field :student_id, autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: student_id_required
-
-  - if include_field_reg_bike_sticker?(@organization, nil, true)
-    .input-group
-      .control-group
-        = f.label :bike_sticker, class: "control-label" do
-          = t(".sticker_id")
-          %small.less-strong= t(".optional")
-        .controls
-          = f.text_field :bike_sticker, value: @b_param.bike_sticker_code
-  .input-group.form-foot
-    .control-group
-      %label.control-label{ for: 'bike_owner_email' }
-        = registration_field_label(@organization, "owner_email") || t(".your_email_address")
-      .controls
-        = f.email_field :owner_email, required: true
-    .submit-registration
-      = submit_tag t(".register"), class: "button-submit"
-      %span.what-you-register
-        = t(".this")
-      = select(:bike, :cycle_type, CycleType.select_options, { required: true })
-
-  .input-group.optional-group.form-photo-group
-    - if @b_param.image.present? or @b_param.image_tmp.present?
-      %strong
-        = t(".image_has_been_uploaded")
-    - else
-      .filefield-button
-        = f.file_field :image, accept: ImageUploader.permitted_extensions.join(",")
-      #filepath
-      %span
-        = t(".optional_upload_a_photo")
-        %small.less-strong
-          (#{ImageUploader.permitted_extensions_display.join(", ")})
-
-  %h3
-    = t(".optional_additions")
-  / if the organization doesn't require a phone, show the phone as optional
-  - if !include_field_reg_phone?(@organization)
-    .input-group
-      = f.label :phone, t(".owners_phone")
+  -# if the organization doesn't require a phone, show the phone as optional
+  - show_phone_field = !include_field_reg_phone?(@organization)
+  - if show_phone_field
+    .input-group.border-top
+      = f.label :phone, t(".phone_number_owner")
       .controls
         = f.text_field :phone
-  .input-group
+  .input-group{class: (show_phone_field ? "" : "border-top") }
     .control-group.special-select-single
       = f.label :frame_material, t(".primary_frame_material"), class: "control-label"
       .controls
-        = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: t(".choose_material")})
+        = select(:bike, :frame_material, FrameMaterial.select_options, { include_blank: true, prompt: t(".choose_material")})
   .input-group
     .control-group.special-select-single
       = f.label :handlebar_type, class: "control-label"
       .controls
         = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, prompt: t(".choose_handlebar") })
-  .input-group
+  .input-group.form-foot
     .control-group
       = f.label :description, t(".other_defining_features"), class: "control-label"
       .controls
         = f.text_area :description, rows: 3, placeholder: t(".any_extra_words")
-  .input-group.form-foot
-    .control-group.form-photo-group
-      - if @b_param.image.present? or @b_param.image_tmp.present?
-        %strong
-          = t(".image_has_been_uploaded")
-      - else
-        .filefield-button
-          = t(".choose_photo")
-          = f.file_field :image, accept: ImageUploader.permitted_extensions.join(",")
-        #filepath
+

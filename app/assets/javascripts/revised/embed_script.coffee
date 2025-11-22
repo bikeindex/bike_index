@@ -59,7 +59,6 @@ toggleRegistrationType = ->
     $('#stolen_record_phone').attr('required', false)
     $('#stolen_fields_container').slideUp 'medium', ->
       $('#stolen_fields').appendTo('#stolen_fields_store')
-    # $('.has-no-serial .stolen').fadeOut 'fast', ->
       $('#optional-phone').slideUp() if $('#optional-phone').length > 0
   else
     $('#stolen_record_phone').attr('required', true)
