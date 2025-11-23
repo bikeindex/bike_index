@@ -151,7 +151,7 @@ GEM
       racc
     buftok (0.2.0)
     builder (3.3.0)
-    bullet (8.0.1)
+    bullet (8.1.0)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11)
     byebug (12.0.0)
@@ -837,7 +837,7 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.1.0)
     unicode_utils (1.4.0)
-    uniform_notifier (1.16.0)
+    uniform_notifier (1.18.0)
     uri (1.1.1)
     user_agent_parser (2.7.0)
     useragent (0.16.11)
