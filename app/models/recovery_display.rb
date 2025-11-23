@@ -37,7 +37,6 @@ class RecoveryDisplay < ActiveRecord::Base
   validate :quote_not_too_long
 
   before_validation :set_calculated_attributes
-  before_save :attach_remote_image
   after_commit :update_associations
 
   default_scope { order("recovered_at desc") }
@@ -139,24 +138,16 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def enqueue_photo_processing
+    # If remote_photo_url is present, enqueue with it
+    if remote_photo_url.present?
+      RecoveryDisplay::ProcessPhotoJob.perform_async(id, remote_photo_url)
+      self.remote_photo_url = nil # Clear after enqueueing
+      return
+    end
+
+    # Otherwise, only enqueue if photo is attached and not yet processed
     return unless photo.attached? && !photo_processed.attached?
 
-    RecoveryDisplay::AfterPhotoAttachJob.perform_async(id)
-  end
-
-  def attach_remote_image
-    return if remote_photo_url.blank?
-    return if photo.attached? # Don't override existing photo
-
-    begin
-      downloaded_image = URI.parse(remote_photo_url).open
-      filename = File.basename(URI.parse(remote_photo_url).path)
-      photo.attach(io: downloaded_image, filename:)
-      self.remote_photo_url = nil # Clear after attaching
-    rescue => e
-      Rails.logger.error("Failed to attach remote image for RecoveryDisplay: #{e.message}")
-      errors.add(:remote_photo_url, "could not be downloaded")
-      false
-    end
+    RecoveryDisplay::ProcessPhotoJob.perform_async(id)
   end
 end

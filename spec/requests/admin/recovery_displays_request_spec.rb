@@ -92,12 +92,14 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
 
           recovery_display = RecoveryDisplay.last
           expect(recovery_display.quote).to eq valid_attrs[:quote]
-          expect(recovery_display.photo.attached?).to be_truthy
-          expect(recovery_display.photo.filename.to_s).to eq "recovery_3223.png"
+          expect(recovery_display.photo.attached?).to be_falsey # Not attached yet, job is enqueued
 
           Sidekiq::Job.drain_all # Process the photo in background
 
-          expect(recovery_display.reload.photo_processed.attached?).to be_truthy
+          recovery_display.reload
+          expect(recovery_display.photo.attached?).to be_truthy
+          expect(recovery_display.photo.filename.to_s).to eq "recovery_3223.png"
+          expect(recovery_display.photo_processed.attached?).to be_truthy
         end
       end
     end
