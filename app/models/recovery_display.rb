@@ -118,33 +118,6 @@ class RecoveryDisplay < ActiveRecord::Base
     has_any_image?
   end
 
-  def image_url(version = nil)
-    if photo_processed.attached?
-      # Use processed photo (800x800 square)
-      case version
-      when :medium
-        Rails.application.routes.url_helpers.rails_blob_path(photo_processed.variant(resize_to_fill: [400, 400]), only_path: true)
-      when :thumb
-        Rails.application.routes.url_helpers.rails_blob_path(photo_processed.variant(resize_to_fill: [100, 100]), only_path: true)
-      else
-        Rails.application.routes.url_helpers.rails_blob_path(photo_processed, only_path: true)
-      end
-    elsif photo.attached?
-      # Fallback to unprocessed photo if processing hasn't completed yet
-      case version
-      when :medium
-        Rails.application.routes.url_helpers.rails_blob_path(photo.variant(resize_to_fill: [400, 400]), only_path: true)
-      when :thumb
-        Rails.application.routes.url_helpers.rails_blob_path(photo.variant(resize_to_fill: [100, 100]), only_path: true)
-      else
-        Rails.application.routes.url_helpers.rails_blob_path(photo, only_path: true)
-      end
-    elsif image.present?
-      # Fall back to CarrierWave
-      image.url(version)
-    end
-  end
-
   def image_alt
     "Photo of recovered bike"
   end

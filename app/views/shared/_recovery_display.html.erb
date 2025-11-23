@@ -18,8 +18,10 @@
     </p>
 
     <span class="recovery-user">
-      <% if recovery_display.has_any_image? %>
-        <%= image_tag recovery_display.image_url(:medium), alt: recovery_display.image_alt %>
+      <% if recovery_display.photo_processed.attached? %>
+        <%= image_tag BlobUrl.for(recovery_display.photo_processed.blob), alt: recovery_display.image_alt %>
+      <% elsif recovery_display.image.present? %>
+        <%= image_tag recovery_display.image.url(:medium), alt: recovery_display.image_alt %>
       <% else %>
         <span class="no-image-spacer"></span>
       <% end %>

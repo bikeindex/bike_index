@@ -85,8 +85,10 @@
     .col-lg-6
       #recovery-photo-upload-input.form-group.mt-4.collapse.show
         = f.label :photo, "Recovery photo"
-        - if @recovery_display.image?
-          = image_tag(@recovery_display.image_url(:thumb))
+        - if @recovery_display.photo_processed.attached?
+          = image_tag(BlobUrl.for(@recovery_display.photo_processed.blob))
+        - elsif @recovery_display.image?
+          = image_tag(@recovery_display.image.url(:thumb))
         - elsif @recovery_display.id.present?
           %p.text-danger
             No picture!

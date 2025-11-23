@@ -40,11 +40,6 @@ RSpec.describe RecoveryDisplay, type: :model do
         expect(recovery_display.has_any_image?).to be_truthy
         expect(recovery_display.image?).to be_truthy
       end
-      it "returns image_url for different versions" do
-        expect(recovery_display.image_url).to be_present
-        expect(recovery_display.image_url(:medium)).to be_present
-        expect(recovery_display.image_url(:thumb)).to be_present
-      end
     end
     context "with processed photo" do
       let(:recovery_display) { FactoryBot.create(:recovery_display) }
@@ -55,11 +50,10 @@ RSpec.describe RecoveryDisplay, type: :model do
           content_type: "image/jpeg"
         )
       end
-      it "prefers processed photo for image_url" do
+      it "returns true for image_exists?" do
         expect(recovery_display.image_exists?).to be_truthy
-        url = recovery_display.image_url
-        expect(url).to be_present
-        expect(url).to include("processed")
+        expect(recovery_display.has_any_image?).to be_truthy
+        expect(BlobUrl.for(recovery_display.photo_processed.blob)).to be_present
       end
     end
   end
