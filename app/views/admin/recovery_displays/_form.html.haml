@@ -106,7 +106,7 @@
             - if @recovery_display.image_processing?
               %span.text-warning
                 Image is still processing - please check back in a few minutes before reuploading an image
-            = f.hidden_field :remote_image_url
+            = f.hidden_field :remote_photo_url
             %p#recovery-bike-image-text
               %span.using-bike-image
                 Using #{@bike.type} image

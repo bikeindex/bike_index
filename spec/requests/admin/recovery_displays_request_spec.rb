@@ -76,16 +76,16 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
         expect(recovery_display.image_processing?).to be_falsey
       end
     end
-    context "with remote_image_url" do
+    context "with remote_photo_url" do
       let(:remote_url) { "https://files.bikeindex.org/uploads/Re/3223/recovery_3223.png" }
       let(:valid_attrs) do
         {
           quote: "I got my bike back!",
-          remote_image_url: remote_url
+          remote_photo_url: remote_url
         }
       end
-      it "downloads and attaches the remote image", :vcr do
-        VCR.use_cassette("recovery_display-remote_image_url") do
+      it "downloads and attaches the remote photo", :vcr do
+        VCR.use_cassette("recovery_display-remote_photo_url") do
           expect do
             post base_url, params: {recovery_display: valid_attrs}
           end.to change(RecoveryDisplay, :count).by 1

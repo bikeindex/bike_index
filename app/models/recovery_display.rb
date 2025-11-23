@@ -31,7 +31,7 @@ class RecoveryDisplay < ActiveRecord::Base
   after_commit :enqueue_photo_processing, on: [:create, :update]
 
   attr_writer :image_cache
-  attr_accessor :date_input, :remote_image_url
+  attr_accessor :date_input, :remote_photo_url
 
   validates_presence_of :quote, :recovered_at
   validate :quote_not_too_long
@@ -145,17 +145,17 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def attach_remote_image
-    return if remote_image_url.blank?
+    return if remote_photo_url.blank?
     return if photo.attached? # Don't override existing photo
 
     begin
-      downloaded_image = URI.parse(remote_image_url).open
-      filename = File.basename(URI.parse(remote_image_url).path)
+      downloaded_image = URI.parse(remote_photo_url).open
+      filename = File.basename(URI.parse(remote_photo_url).path)
       photo.attach(io: downloaded_image, filename:)
-      self.remote_image_url = nil # Clear after attaching
+      self.remote_photo_url = nil # Clear after attaching
     rescue => e
       Rails.logger.error("Failed to attach remote image for RecoveryDisplay: #{e.message}")
-      errors.add(:remote_image_url, "could not be downloaded")
+      errors.add(:remote_photo_url, "could not be downloaded")
       false
     end
   end
