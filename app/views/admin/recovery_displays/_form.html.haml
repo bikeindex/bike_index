@@ -84,7 +84,7 @@
 
     .col-lg-6
       #recovery-photo-upload-input.form-group.mt-4.collapse.show
-        = f.label :image, "Recovery photo"
+        = f.label :photo, "Recovery photo"
         - if @recovery_display.image?
           = image_tag(@recovery_display.image_url(:thumb))
         - elsif @recovery_display.id.present?
@@ -92,11 +92,12 @@
             No picture!
         .input-group.mb-3
           .custom-file
-            = f.label :image, "Choose file", class: "custom-file-label"
-            = f.file_field :image, class: "custom-file-input", accept: ImageUploader.permitted_extensions.join(",")
-        .form-check
-          = f.check_box :remove_image, class: "form-check-input"
-          = f.label :remove_image, class: "form-check-label"
+            = f.label :photo, "Choose file", class: "custom-file-label"
+            = f.file_field :photo, class: "custom-file-input", accept: "image/jpeg,image/jpg,image/png,image/gif"
+        - if @recovery_display.photo.attached? || @recovery_display.image?
+          .form-check
+            = f.check_box :remove_image, class: "form-check-input"
+            = f.label :remove_image, class: "form-check-label"
       - if @bike.present? && !@recovery_display.image_exists?
         .form-group.mt-3
           - if @bike.public_images.present? || @bike.stock_photo_url.present?

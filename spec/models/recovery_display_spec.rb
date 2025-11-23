@@ -46,6 +46,22 @@ RSpec.describe RecoveryDisplay, type: :model do
         expect(recovery_display.image_url(:thumb)).to be_present
       end
     end
+    context "with processed photo" do
+      let(:recovery_display) { FactoryBot.create(:recovery_display) }
+      before do
+        recovery_display.photo_processed.attach(
+          io: StringIO.new("processed image"),
+          filename: "processed.jpg",
+          content_type: "image/jpeg"
+        )
+      end
+      it "prefers processed photo for image_url" do
+        expect(recovery_display.image_exists?).to be_truthy
+        url = recovery_display.image_url
+        expect(url).to be_present
+        expect(url).to include("processed")
+      end
+    end
   end
 
   describe "set_calculated_attributes" do

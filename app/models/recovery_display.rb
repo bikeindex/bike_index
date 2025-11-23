@@ -26,6 +26,9 @@ class RecoveryDisplay < ActiveRecord::Base
 
   # ActiveStorage for new image uploads (non-circular)
   has_one_attached :photo
+  has_one_attached :photo_processed
+
+  after_commit :enqueue_photo_processing, on: [:create, :update]
 
   attr_writer :image_cache
   attr_accessor :date_input
@@ -95,7 +98,9 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def image_exists?
-    if photo.attached?
+    if photo_processed.attached?
+      true
+    elsif photo.attached?
       true
     elsif image.present?
       image.file.exists?
@@ -105,7 +110,7 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def has_any_image?
-    photo.attached? || image.present?
+    photo_processed.attached? || photo.attached? || image.present?
   end
 
   # Alias for CarrierWave compatibility
@@ -114,8 +119,18 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def image_url(version = nil)
-    if photo.attached?
-      # ActiveStorage doesn't use circular images, just return the variant
+    if photo_processed.attached?
+      # Use processed photo (800x800 square)
+      case version
+      when :medium
+        Rails.application.routes.url_helpers.rails_blob_path(photo_processed.variant(resize_to_fill: [400, 400]), only_path: true)
+      when :thumb
+        Rails.application.routes.url_helpers.rails_blob_path(photo_processed.variant(resize_to_fill: [100, 100]), only_path: true)
+      else
+        Rails.application.routes.url_helpers.rails_blob_path(photo_processed, only_path: true)
+      end
+    elsif photo.attached?
+      # Fallback to unprocessed photo if processing hasn't completed yet
       case version
       when :medium
         Rails.application.routes.url_helpers.rails_blob_path(photo.variant(resize_to_fill: [400, 400]), only_path: true)
@@ -147,5 +162,11 @@ class RecoveryDisplay < ActiveRecord::Base
 
   def update_associations
     stolen_record&.update(updated_at: Time.current)
+  end
+
+  def enqueue_photo_processing
+    return unless photo.attached? && !photo_processed.attached?
+
+    RecoveryDisplay::AfterPhotoAttachJob.perform_async(id)
   end
 end
