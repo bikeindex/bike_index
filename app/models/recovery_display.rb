@@ -24,6 +24,9 @@ class RecoveryDisplay < ActiveRecord::Base
   mount_uploader :image, CircularImageUploader
   process_in_background :image, CarrierWaveProcessJob
 
+  # ActiveStorage for new image uploads (non-circular)
+  has_one_attached :photo
+
   attr_writer :image_cache
   attr_accessor :date_input
 
@@ -86,13 +89,45 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def image_processing?
-    return false unless image.present? && updated_at > Time.current - 1.minute
+    return false unless has_any_image? && updated_at > Time.current - 1.minute
 
     !image_exists?
   end
 
   def image_exists?
-    image.present? && image.file.exists?
+    if photo.attached?
+      true
+    elsif image.present?
+      image.file.exists?
+    else
+      false
+    end
+  end
+
+  def has_any_image?
+    photo.attached? || image.present?
+  end
+
+  # Alias for CarrierWave compatibility
+  def image?
+    has_any_image?
+  end
+
+  def image_url(version = nil)
+    if photo.attached?
+      # ActiveStorage doesn't use circular images, just return the variant
+      case version
+      when :medium
+        Rails.application.routes.url_helpers.rails_blob_path(photo.variant(resize_to_fill: [400, 400]), only_path: true)
+      when :thumb
+        Rails.application.routes.url_helpers.rails_blob_path(photo.variant(resize_to_fill: [100, 100]), only_path: true)
+      else
+        Rails.application.routes.url_helpers.rails_blob_path(photo, only_path: true)
+      end
+    elsif image.present?
+      # Fall back to CarrierWave
+      image.url(version)
+    end
   end
 
   def image_alt

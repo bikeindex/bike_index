@@ -26,6 +26,26 @@ RSpec.describe RecoveryDisplay, type: :model do
         expect(recovery_display.image_processing?).to be_falsey
       end
     end
+    context "with ActiveStorage photo" do
+      let(:recovery_display) { FactoryBot.create(:recovery_display) }
+      before do
+        recovery_display.photo.attach(
+          io: StringIO.new("fake image"),
+          filename: "test.jpg",
+          content_type: "image/jpeg"
+        )
+      end
+      it "returns true for image_exists?" do
+        expect(recovery_display.image_exists?).to be_truthy
+        expect(recovery_display.has_any_image?).to be_truthy
+        expect(recovery_display.image?).to be_truthy
+      end
+      it "returns image_url for different versions" do
+        expect(recovery_display.image_url).to be_present
+        expect(recovery_display.image_url(:medium)).to be_present
+        expect(recovery_display.image_url(:thumb)).to be_present
+      end
+    end
   end
 
   describe "set_calculated_attributes" do

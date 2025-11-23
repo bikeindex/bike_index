@@ -101,6 +101,19 @@ task database_size: :environment do
   puts "\n#{"Total size".ljust(name_col_length)} | #{ActiveRecord::Base.connection.execute(sql)[0]["pg_size_pretty"]}"
 end
 
+desc "Migrate RecoveryDisplay images from CarrierWave to ActiveStorage"
+task migrate_recovery_display_images: :environment do
+  recovery_display_ids = RecoveryDisplay.where.not(image: [nil, ""])
+    .where.missing(:photo_attachment)
+    .pluck(:id)
+
+  puts "Enqueueing migration for #{recovery_display_ids.count} recovery displays"
+  recovery_display_ids.each do |id|
+    RecoveryDisplayMigrateImageJob.perform_async(id)
+  end
+  puts "Done!"
+end
+
 desc "Provide DB vacuum for production environment"
 task database_vacuum: :environment do
   tables = ActiveRecord::Base.connection.tables
