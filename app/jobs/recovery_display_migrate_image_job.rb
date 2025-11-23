@@ -1,6 +1,4 @@
 class RecoveryDisplayMigrateImageJob < ApplicationJob
-  sidekiq_options queue: "high_priority"
-
   def perform(recovery_display_id)
     recovery_display = RecoveryDisplay.find_by_id(recovery_display_id)
     return unless recovery_display.present?
