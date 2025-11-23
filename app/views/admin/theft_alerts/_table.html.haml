@@ -61,9 +61,10 @@
 
           - unless skip_bike
             %td
-              = render partial: "/shared/admin/bike_cell", locals: {bike: theft_alert.bike, bike_id: theft_alert.bike_id}
+              = render Admin::BikeCell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id)
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user: theft_alert.user, render_search: true, cache: true, user_id: theft_alert.user_id}
+            = cache(theft_alert.user) do
+              = render Admin::UserCell::Component.new(user: theft_alert.user, render_search: true, user_id: theft_alert.user_id)
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
             %small

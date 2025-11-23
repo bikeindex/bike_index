@@ -10,11 +10,13 @@
     <%= render partial: "/shared/alert", locals: { body: msg, type: name } %>
   <% end %>
 
-  <% if @page_errors.present? %><%# Primarily used for form object errors %>
+  <% if @page_errors.present? %>
+    <%# Primarily used for form object errors %>
     <% title = t(".please_fix_the_following", errors: pluralize(@page_errors.count, t(".error"))) %>
     <% error_body = capture do %>
       <ul>
         <% @page_errors = @page_errors.full_messages if @page_errors.is_a?(ActiveModel::Errors) %>
+
         <% @page_errors.each do |msg| %>
           <li><%= msg %></li>
         <% end %>

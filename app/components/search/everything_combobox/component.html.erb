@@ -3,11 +3,10 @@
   data-controller="search--everything-combobox"
   data-search--everything-combobox-api-url-value="<%= API_URL %>"
 >
-
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/select2@4.0.8/dist/css/select2.min.css"
-  />
+  >
 
   <style>
     <%#
@@ -51,6 +50,7 @@
   <%= label_tag :query_items,
   translation(".query_items_description"),
   class: "twlabel tw:sr-only" %>
+
   <%= select_tag :query_items,
   options_for_select(@opt_vals, selected: @opt_vals.map(&:last)),
   :placeholder => translation(".search_descriptions"),
@@ -62,6 +62,7 @@
   translation(".search_descriptions"),
   :class => "twlabel tw:sr-only",
   "data-search--everything-combobox-target" => "nonjsfields" %>
+
   <%= text_field_tag :query,
   @query,
   :placeholder => translation(".search_descriptions"),

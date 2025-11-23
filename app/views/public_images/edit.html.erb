@@ -5,7 +5,7 @@
 
   <h2>
     <% if current_user.email == @public_image.imageable.owner_email %>
-      <% end %>
+    <% end %>
   </h2>
 
   <div class="headline-content-edit">
@@ -17,6 +17,8 @@
   <div class="padded span6">
     <div class="well"><%= render "form" %></div>
   </div>
-  <div class="padded span6"><%= link_to image_tag(@public_image.image_url(:medium)), @public_image.image_url, target: "_blank" %></div>
 
+  <div class="padded span6">
+    <%= link_to image_tag(@public_image.image_url(:medium)), @public_image.image_url, target: "_blank" %>
+  </div>
 </div>

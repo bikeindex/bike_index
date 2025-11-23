@@ -1,7 +1,5 @@
 <% if render_no_results? %>
-  <h3 class="tw:text-center tw:text-xl uncap">
-    <%= @no_results %>
-  </h3>
+  <h3 class="uncap tw:text-center tw:text-xl"><%= @no_results %></h3>
 <% else %>
   <ul class="<%= container_class %>">
     <% if @vehicles.present? %>

@@ -15,10 +15,11 @@
 <% if @owner_viewing %>
   <div class="padded">
     <p class="padded"><%= t(".looks_like_this_is_your_image") %></p>
+
     <p>
       <%= link_to t(".edit"), edit_public_image_path(@public_image) %> |
-      <%= link_to t(".destroy"), @public_image, confirm: t(".are_you_sure"), method: :delete %> |
-      <%= link_to t(".back_to_images"), public_images_path %>
+      <%= link_to t(".destroy"), @public_image, confirm: t(".are_you_sure"), method: :delete %>
+      | <%= link_to t(".back_to_images"), public_images_path %>
     </p>
   </div>
 <% end %>

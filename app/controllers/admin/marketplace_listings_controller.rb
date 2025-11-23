@@ -34,6 +34,10 @@ class Admin::MarketplaceListingsController < Admin::BaseController
       marketplace_listings = marketplace_listings.where(item_id: params[:search_bike_id], item_type: "Bike")
     end
 
+    if params[:user_id].present?
+      marketplace_listings = marketplace_listings.for_user(params[:user_id])
+    end
+
     @time_range_column = sort_column if %w[updated_at published_at end_at].include?(sort_column)
     @time_range_column ||= "created_at"
     marketplace_listings.where(@time_range_column => @time_range)

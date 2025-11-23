@@ -1,0 +1,220 @@
+<%# NOTE: Stimulus controller update-cached-sortable-links handles updating search URLs for caching %>
+
+<% bikes ||= @bikes %>
+<% no_show_header ||= false %>
+<% show_serial ||= params[:show_serial].present? %>
+<% render_sortable ||= false %>
+<% skip_user ||= false %>
+<% render_multi_check ||= false %>
+
+<%# require inline CSS setting because of caching %>
+<% unless display_dev_info? %>
+  <style>.only-dev-visible {display: none !important;} </style>
+<% end %>
+
+<% skip_manufacturer_link = params[:search_manufacturer].present? %>
+
+<% if skip_manufacturer_link %>
+  <style>.display-mnfg-link {display: none !important;}</style>
+<% end %>
+
+<% if skip_user %>
+  <style>.user-cell {display: none !important;}</style>
+<% end %>
+
+<% unless render_sortable %>
+  <style>.display-sortable-link {display: none !important;}</style>
+<% end %>
+
+<% unless render_multi_check %>
+  <style>.display-multi-check {display: none !important;}</style>
+<% end %>
+
+<%= form_tag get_destroy_admin_bike_path(id: "multi_delete"), method: :get do %>
+  <div class="display-multi-check mb-3 text-center">
+    <%= submit_tag 'Delete selected', class: 'btn btn-outline-danger' %>
+  </div>
+
+  <div class="full-screen-table">
+    <table class="table table-striped table-bordered table-sm bikeTable <%= show_serial ? "show-admin-bike-table-serial-cell" : "" %>">
+      <% unless no_show_header %>
+        <thead class="thead-light sortable">
+          <th class="display-multi-check table-checkbox-select">
+            <a id="multi-checkbox-selector" href="#"><%= check_mark %></a>
+          </th>
+
+          <th>
+            <%= sortable "id", "Added", render_sortable: render_sortable %>
+          </th>
+
+          <th class="small d-none d-xl-table-cell">
+            <%= sortable "updated_by_user_at", "Updated", render_sortable: render_sortable %>
+          </th>
+
+          <th class="d-none d-md-table-cell user-cell">
+            <div class="less-strong-hold">
+              <%= sortable "owner_email", "Sent to", render_sortable: render_sortable %>
+
+              <small
+                class="d-none d-lg-block text-info"
+                style="position: absolute; right: 0.25em; top: 0.4em;"
+              >
+                claimed?
+              </small>
+            </div>
+          </th>
+
+          <th>
+            <%= sortable "manufacturer_id", render_sortable: render_sortable %>
+          </th>
+
+          <th class="d-none d-lg-table-cell">
+            Info
+          </th>
+
+          <th class="admin-bike-table-serial-cell">
+            Serial
+          </th>
+
+          <th class="d-sm-table-cell">
+            Created by
+          </th>
+
+          <th class="d-none d-md-table-cell small">
+            Cred
+          </th>
+        </thead>
+      <% end %>
+
+      <tbody
+        data-controller="update-cached-sortable-links"
+        data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
+      >
+        <% bikes.each do |bike| %>
+          <% cache(bike) do %>
+            <tr>
+              <td class="display-multi-check table-checkbox-select">
+                <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id %>
+              </td>
+
+              <td>
+                <div class="less-strong-hold">
+                  <a class="small convertTime" href="<%= edit_admin_bike_url(bike) %>"><%= l bike.created_at, format: :convert_time %></a>
+                  
+                  <%# Add a space so that the id doesn't get grouped with the time %>
+                  &nbsp;
+                  <span class="less-strong-right d-none d-md-block only-dev-visible"><%= bike.id %></span>
+                </div>
+              </td>
+
+              <td class="d-none d-xl-table-cell">
+                <small class="convertTime">
+                  <%= l bike.updated_by_user_fallback, format: :convert_time %>
+                </small>
+              </td>
+
+              <td class="d-none d-md-table-cell user-cell">
+                <div class="less-strong-hold">
+                  <% cache(bike.user) do %>
+                    <%# Pass in search_url because caching breaks with url_for %>
+                    <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
+                    <%= render Admin::UserCell::Component.new(email: bike.owner_email, user: bike.user, search_url:) %>
+                  <% end %>
+
+                  <% if bike.claimed? %>
+                    <span
+                      class="less-strong-right text-info"
+                      title="<%= bike.type %> is claimed"
+                      style="cursor: default"
+                    >
+                      <%= check_mark %>
+                    </span>
+                  <% end %>
+                </div>
+              </td>
+
+              <td>
+                <% if bike.manufacturer_other.present? %>
+                  <span class="text-warning">
+                    <%= bike.manufacturer_other %>
+                  </span>
+                <% else %>
+                  <%= bike.mnfg_name %>
+                <% end %>
+
+                <small>
+                  <%= link_to search_emoji, admin_bikes_path(search_manufacturer: bike.mnfg_name), class: "display-mnfg-link display-sortable-link" %>
+                </small>
+              </td>
+
+              <td class="d-none d-lg-table-cell">
+                <div class="less-strong-hold">
+                  <%= render Badge::BikeHiddenAdminExplanation::Component.new(bike:) %>
+                  <%= [bike.year, bike.frame_model_truncated].join(' ') %>
+                  <%= "(#{bike.type})" unless bike.type == 'bike' %>
+
+                  <% if bike.stolen_recovery? %>
+                    <small>
+                      <%= link_to "recovery!", edit_admin_recovery_url(bike.recovered_records.first.id), class: "text-success text-underline" %>
+                    </small>
+                  <% end %>
+
+                  <% if bike.thumb_path.present? %>
+                    <small>📷</small>
+                  <% end %>
+
+                  <span class="d-none d-lg-inline less-strong">
+                    <%= bike.frame_colors.to_sentence %>
+                  </span>
+
+                  <% if BikeServices::Displayer.paint_description?(bike) %>
+                    <small class="less-strong d-none d-lg-inline">
+                      <%= link_to bike.paint_description, edit_admin_paint_url(bike.paint) %>
+                    </small>
+                  <% end %>
+
+                  <% if bike.status_stolen? %>
+                    <span class="text-danger less-strong-right">stolen</span>
+                  <% end %>
+                </div>
+              </td>
+
+              <td class="admin-bike-table-serial-cell">
+                <small class="less-strong"><%= bike.serial_number %></small>
+              </td>
+
+              <td class="d-sm-table-cell">
+                <div class="less-strong-hold">
+                  <% if bike.creation_organization.present? %>
+                    <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization.to_param) %>
+                    <%= link_to search_emoji, admin_bikes_path(organization_id: bike.creation_organization.to_param), class: "small display-sortable-link" %>
+                  <% end %>
+
+                  <% if bike.creation_description %>
+                    <span class="less-strong-right">
+                      <% if bike.bulk_import.present? %>
+                        <%= link_to origin_display(bike.creation_description), admin_bulk_import_path(bike.bulk_import), class: "less-strong" %>
+                      <% else %>
+                        <%= origin_display(bike.creation_description) %>
+                      <% end %>
+                    </span>
+                  <% end %>
+                </div>
+              </td>
+
+              <td class="d-none d-md-table-cell text-right">
+                <% if bike.credibility_score.present? %>
+                  <small
+                    style="color: <%= credibility_scorer_color_table(bike.credibility_score) %>;"
+                  >
+                    <%= bike.credibility_score %>
+                  </small>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

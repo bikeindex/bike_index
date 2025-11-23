@@ -11,15 +11,21 @@
         <div class="modal-header">
           <h2 class="modal-title uncap">
             <%= title %>
-            <button class="close" aria-label="Close" data-dismiss="modal" type="button">
-              <span aria-hidden="true">
-                &times;
-              </span>
+
+            <button
+              class="close"
+              aria-label="Close"
+              data-dismiss="modal"
+              type="button"
+            >
+              <span aria-hidden="true"> &times; </span>
             </button>
           </h2>
+
           <hr>
         </div>
       <% end %>
+
       <%= modal_body %>
     </div>
   </div>

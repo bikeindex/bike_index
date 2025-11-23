@@ -1,0 +1,23 @@
+<% if show_missing_user? %>
+  <small
+    class="<%= Alert::Component::TEXT_CLASSES[:error] %>"
+    title="<%= @user_id %>"
+  >
+    Missing user
+  </small>
+  <% if show_email_for_missing_user? %>
+    <code class="small"><%= @user_id %></code>
+  <% end %>
+<% end %>
+
+<% if show_user_link? %>
+  <%= link_to email_display, admin_user_path(@user.to_param), title: @email, class: "text-link" %>
+<% elsif show_email_only? %>
+  <span title="<%= @email %>"><%= email_display %></span>
+<% end %>
+
+<%= user_icon(@user) %>
+
+<% if show_search? %>
+  <%= link_to helpers.search_emoji, computed_search_url, class: "display-sortable-link small" %>
+<% end %>

@@ -4561,49 +4561,10 @@ nb:
         en sykkel
   organizations:
     embed:
-      add_a_color: Legg til en farge
-      additional_serial: Ekstra serie-/klistremerkenummer
-      choose_color: Velg farge
-      choose_country: Velg land
-      city: By
       currently_registering_a_nonstolen_bike: Registrerer for tiden en ikke-stjålet
         sykkel. Klikk her for å registrere en STJÅLET sykkel i stedet.
-      department_city: Avdeling og by
-      description_of_the_theft: Beskrivelse av tyveriet
-      eg_if_we_tweet_about_or_someone_searches: for eksempel hvis vi tweeter om eller
-        noen søker etter serienummeret
-      filing_a_police_report_is_important_html: Å inngi en <strong>politianmeldelse</strong>
-        er <span class="stolen-color">ekstremt viktig</span> for å få stjålet sykkel.
-      frame_color: Rammefarge
-      image_has_been_uploaded: Bildet er lastet opp
-      intersection_or_address: Kryss eller adresse
-      manufacturer_name: Produsentens navn
-      model_year: Årsmodell
-      optional_upload_a_photo: Valgfritt - last opp et bilde
-      other_manufacturer: Annen produsent
-      police_report_number: Politiets rapportnummer
-      receive_notifications_from_bike_index: Motta varsler fra indeksen om dette stjålne
-        %{bike_type}
-      register: Registrere
       registering_a_stolen_bike_click_here: Registrering av stjålet sykkel. Klikk
         her for å registrere en ikke-stjålet sykkel
-      remove_color: Fjern farge
-      secondary_color: Sekundær farge
-      select_other_if_manufacturer_isnt_listed: Velg "Annet" hvis produsenten ikke
-        er oppført
-      state: Stat
-      sticker_id_html: Klistremerke-ID <small class='less-strong'>valgfritt</small>
-      student_id: Student ID
-      third_color: Tredje farge
-      this: dette
-      unknown_serial: Ukjent serie
-      unknown_year: Ukjent årstall
-      unsure_or_unknown: Usikker eller ukjent
-      when_was_it_stolen: Når ble den stjålet?
-      where_was_it_stolen: Hvor ble det stjålet?
-      your_email_address: Din epostadresse
-      your_phone_number: Telefonnummeret ditt
-      zipcode: postnummer
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} ble registrert til deg gjennom
         <strong>%{org_name}</strong> ."
@@ -4611,35 +4572,14 @@ nb:
         kort tid.
       your_bike_has_been_added_to_bike_index: Din %{bike_type} er lagt til Bike Index!
     embed_extended:
-      add_a_color: Legg til en farge
-      additional_serial: Ekstra serie-/klistremerkenummer
       any_extra_words: Noen ekstra ord?
-      choose_color: Velg farge
       choose_handlebar: Velg styre
       choose_material: Velg materiale
-      choose_photo: Velg bilde
-      frame_color: Rammefarge
-      image_has_been_uploaded: Bildet er lastet opp
-      manufacturer_name: Produsentens navn
-      model_year: Årsmodell
-      optional_additions: Valgfrie tillegg
-      org_affiliation: "%{org_name} tilknytning"
       other_defining_features: Andre definerende funksjoner
-      other_manufacturer: Annen produsent
-      owners_email_address: Eierens e-postadresse
-      owners_phone: Eierens telefon
       primary_frame_material: Primært rammemateriale
-      register_this: Registrer dette
-      remove_color: Fjern farge
-      secondary_color: Sekundær farge
-      select_other_if_manufacturer_isnt_listed: Velg "Annet" hvis produsenten ikke
-        er oppført
-      sticker_id_html: Klistremerke-ID <small class='less-strong'>valgfritt</small>
-      student_id: Student ID
-      third_color: Tredje farge
-      unknown_serial: Ukjent serie
-      unknown_year: Ukjent årstall
-      unsure_or_unknown: Usikker eller ukjent
+      handlebar_type: Styre type
+      optional: valgfri
+      phone_number_owner: Eierens telefon
     new:
       bike_index_for_organizations: Sykkelindeks for organisasjoner
     new_form:
@@ -4665,6 +4605,52 @@ nb:
       you_are_already_a_member_of_org_html: Du er allerede medlem av %{org_link}.
       your_current_account_will_be_a_member_html: Din nåværende konto ( <strong>%{user_email}</strong>
         ) vil være medlem av organisasjonen du oppretter.
+    embed_fields:
+      add_a_color: Legg til en farge
+      additional_serial: Ekstra serie-/klistremerkenummer
+      choose_color: Velg farge
+      choose_country: Velg land
+      city: By
+      department_city: Avdeling og by
+      description_of_the_theft: Beskrivelse av tyveriet
+      eg_if_we_tweet_about_or_someone_searches: for eksempel hvis vi tweeter om eller
+        noen søker etter serienummeret
+      email_address_owner: Eierens e-postadresse
+      email_address_you: Din epostadresse
+      filing_a_police_report_is_important_html: Å inngi en <strong>politianmeldelse</strong>
+        er <span class="stolen-color">ekstremt viktig</span> for å få stjålet sykkel.
+      frame_color: Rammefarge
+      frame_model: Ramme modell
+      image_has_been_uploaded: Bildet er lastet opp
+      intersection_or_address: Kryss eller adresse
+      manufacturer_name: Produsentens navn
+      model_year: Årsmodell
+      optional: valgfri
+      optional_upload_a_photo: Valgfritt - last opp et bilde
+      org_affiliation: "%{org_name} tilknytning"
+      other_manufacturer: Annen produsent
+      phone_number_owner: Eierens telefon
+      phone_number_you: Telefonnummeret ditt
+      please_wait: Vent litt, behandles
+      police_report_number: Politiets rapportnummer
+      receive_notifications_from_bike_index: Motta varsler fra indeksen om dette stjålne
+        %{bike_type}
+      register: Registrere
+      remove_color: Fjern farge
+      secondary_color: Sekundær farge
+      select_other_if_manufacturer_isnt_listed: Velg "Annet" hvis produsenten ikke
+        er oppført
+      state: Stat
+      sticker_id: Klistremerke-ID
+      student_id: Student ID
+      third_color: Tredje farge
+      this: dette
+      unknown_serial: Ukjent serie
+      unknown_year: Ukjent årstall
+      unsure_or_unknown: Usikker eller ukjent
+      when_was_it_stolen: Når ble den stjålet?
+      where_was_it_stolen: Hvor ble det stjålet?
+      zipcode: postnummer
   organized:
     ambassador_dashboards:
       getting_started:

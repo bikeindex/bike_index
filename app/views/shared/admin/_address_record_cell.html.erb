@@ -1,8 +1,0 @@
-<%= address_record.city %>
-<small class="less-strong">
-  <% if address_record.region.present? %>
-    <%= address_record.region %>
-  <% elsif address_record.country.present? && address_record.country != Country.united_states %>
-    <%= address_record.country.abbreviation %>
-  <% end %>
-</small>

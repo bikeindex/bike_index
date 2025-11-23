@@ -1,17 +1,18 @@
-<%
-  kind ||= "law_enforcement"
+<% kind ||= "law_enforcement"
   law_enforcement_org = current_user&.organizations&.law_enforcement&.unpaid&.first
   org_name = law_enforcement_org&.name || "your organization"
 
-  modal_body = capture do
-%>
+  modal_body = capture do %>
   <div class="modal-body">
     <p><%= t(".greeting", user_name: current_user&.display_name) %></p>
     <p><%= t(".thank_you") %></p>
     <p><%= t(".law_enforcement_features") %></p>
 
     <ul>
-      <li><%= link_to t(".contact_bike_owners"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen", target: "_blank" %></li>
+      <li>
+        <%= link_to t(".contact_bike_owners"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen", target: "_blank" %>
+      </li>
+
       <li><%= t(".multiple_serial_search_pane") %></li>
     </ul>
 

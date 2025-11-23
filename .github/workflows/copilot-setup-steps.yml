@@ -45,7 +45,7 @@ jobs:
           packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.0
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1

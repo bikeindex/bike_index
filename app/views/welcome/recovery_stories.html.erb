@@ -1,16 +1,21 @@
 <div class="container">
   <div class="row">
-    <h3>
-      <%= t(".recovery_stories") %>
-    </h3>
+    <h3><%= t(".recovery_stories") %></h3>
   </div>
 
   <div id="recovery-stories-listing">
     <div class="container clearfix">
-      <div class="recovery-stories-container" data-stories-count="<%= @slice1.length %>">
+      <div
+        class="recovery-stories-container"
+        data-stories-count="<%= @slice1.length %>"
+      >
         <%= render partial: "shared/recovery_display", collection: @slice1 %>
       </div>
-      <div class="recovery-stories-container" data-stories-count="<%= @slice2.length %>">
+
+      <div
+        class="recovery-stories-container"
+        data-stories-count="<%= @slice2.length %>"
+      >
         <%= render partial: "shared/recovery_display", collection: @slice2 %>
       </div>
     </div>

@@ -4,6 +4,7 @@
       <%# Show alerts if bike is impounded or has current notifications %>
       <%= render partial: "/bikes/owner_bike_status_alerts" %>
     <% end %>
+
     <div class="edit-bike-header">
       <h1 class="uncap">
         <% if @bike.status_with_owner? %>
@@ -11,18 +12,21 @@
         <% else %>
           <%= bike_status_span(@bike) %>
         <% end %>
+
         <% if @bike.version? %>
           <strong><%= @bike.display_name %></strong>
           <small class="d-block d-md-inline">
-            of
-            <em><%= @bike_og.title_string %></em>
+            of <em><%= @bike_og.title_string %></em>
           </small>
         <% else %>
           <%= bike_title_html(@bike) %>
         <% end %>
+
         <% if @bike.deleted? %>
           <em class="text-danger uncap d-block">
-            This <%= @bike.version? ? "version" : @bike.type %> was deleted
+            This
+            <%= @bike.version? ? "version" : @bike.type %>
+            was deleted
             <% if @bike.deleted_at.present? %>
               <span class="convertTime preciseTime withPreposition">
                 <%= l(@bike.deleted_at, format: :convert_time) %>
@@ -51,17 +55,24 @@
       </p>
     </div>
   </div>
+
   <%= yield %>
 
   <div class="mobile-nonfloating-menu pl-1 pr-1 text-center bootstrapstyle">
     <strong class="d-inline-block">
       <%= t(".edit_pages", bike_type: @bike.type) %>
     </strong>
+
     <% menu_link_count = @edit_templates.keys.count %>
+
     <% @edit_templates.each_with_index do |t_d, i| %>
       <% template, description = t_d[0], t_d[1] %>
       <% is_active = 'active' if @edit_template.match(/#{template}/) %>
-      <a class="ml-1 mr-1 d-inline-block text-underline <%= is_active %>" href="<%= edit_bike_template_path_for(@bike, template) %>">
+
+      <a
+        class="ml-1 mr-1 d-inline-block text-underline <%= is_active %>"
+        href="<%= edit_bike_template_path_for(@bike, template) %>"
+      >
         <%= description %>
       </a>
     <% end %>

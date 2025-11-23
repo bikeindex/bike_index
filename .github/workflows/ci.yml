@@ -8,26 +8,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+      - run: bundle install
 
-      - name: Lint code for consistent style
-        run: bin/lint --no-fix
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          cache: 'npm'
+      - run: npm install
+
+      - name: Lint Ruby code
+        run: bundle exec standardrb --no-fix
+      - name: Lint JavaScript code
+        if: success() || failure()
+        run: npm run js:lint_check
+      - name: Lint HTML code
+        if: success() || failure()
+        run: npm run html:lint_check
+      - name: Check HTML formatting
+        if: success() || failure()
+        run: npm run html:format_check
+
       - name: Scan for common Rails security vulnerabilities using static analysis
-        run: bin/brakeman --no-pager
-      # Unfortunately, erb-formatter doesn't support an exit code -
-      # and bin/lint doesn't seem to be running it :/
-      # so run it here and check for changes
-      - name: Run erb-formatter
-        run: bundle exec erb-formatter app/components/**/*.html.erb --write
-      - name: Run erb-formatter
-        run: bundle exec erb-formatter app/components/**/*.html.erb
-      - name: Check for changes from erb-formatter
-        run: git diff HEAD --exit-code app/
+        if: success() || failure()
+        run: bin/brakeman
 
       # Eventually this should be added:
       # - name: Scan for security vulnerabilities in JavaScript dependencies
@@ -82,7 +91,7 @@ jobs:
           packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.0
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       # Install Ruby dependencies
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1

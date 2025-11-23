@@ -1,0 +1,373 @@
+<%# NOTE: YOU MUST pass these locals, because they differ between the embed forms: %>
+<%# include_bike_sticker_field, include_stolen, label_reference %>
+
+<%= f.hidden_field :b_param_id_token %>
+<%= f.hidden_field :creation_organization_id %>
+<%= f.hidden_field :embeded, value: true %>
+
+<div class="input-group">
+  <div class="control-group">
+    <%= f.label :serial_number %>
+
+    <div class="controls">
+      <%= f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' %>
+    </div>
+
+    <% if include_field_reg_extra_registration_number?(@organization) %>
+      <% label_secondary_serial = registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial") %>
+      <%= f.label :extra_registration_number, label_secondary_serial %>
+      <div class="controls">
+        <%= f.text_field :extra_registration_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="optional-checkbox">
+    <label style="margin-top: 0.25em">
+      <%= check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1 %>
+      <%= t(".unknown_serial") %>
+    </label>
+  </div>
+</div>
+
+<div class="input-group with-additional-block">
+  <div class="control-group select-jsonified">
+    <%= f.label :manufacturer_id %>
+
+    <div class="controls">
+      <%= f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name %>
+
+      <span class="help-block">
+        <%= t(".select_other_if_manufacturer_isnt_listed") %>
+      </span>
+    </div>
+  </div>
+
+  <div class="hidden-other control-group manufacturer-other-input">
+    <%= f.label :manufacturer_other, t(".other_manufacturer") %>
+
+    <div class="controls">
+      <%= f.text_field :manufacturer_other, placeholder: t(".manufacturer_name") %>
+    </div>
+  </div>
+</div>
+
+<div class="input-group">
+  <div class="control-group special-select-single">
+    <%= f.label :year do %>
+      <%= t(".model_year") %>
+      <small class="less-strong"><%= t(".optional") %></small>
+    <% end %>
+
+    <div class="controls">
+      <% years = (1900..Time.current.year+1).to_a.reverse.map {|i| [i,i] } %>
+      <%= f.select :year, years, selected: Time.current.year, prompt: t(".unsure_or_unknown") %>
+    </div>
+  </div>
+
+  <div class="optional-checkbox">
+    <label style="margin-top: 0.75em">
+      <input id="bike_unknown_year" type="checkbox" tabindex="-1">
+      <%= t(".unknown_year") %>
+    </label>
+  </div>
+</div>
+
+<div class="input-group">
+  <div class="control-group">
+    <%= f.label :frame_model do %>
+      <%= t(".frame_model") %>
+      <small class="less-strong"><%= t(".optional") %></small>
+    <% end %>
+
+    <div class="controls">
+      <%= f.text_field :frame_model, autocomplete: 'off' %>
+    </div>
+  </div>
+</div>
+
+<div class="input-group with-optional-blocks">
+  <div class="control-group special-select-single">
+    <%= f.label :primary_frame_color_id, t(".frame_color") %>
+
+    <div class="controls">
+      <%= select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: t(".choose_color")) %>
+    </div>
+  </div>
+
+  <a
+    id="add-secondary"
+    class="optional-form-block"
+    data-target="#secondary-color"
+    data-toggle="#rm-secondary"
+    href="#"
+    tabindex="-1"
+  >
+    <%= t(".add_a_color") %>
+  </a>
+
+  <a
+    id="rm-secondary"
+    class="optional-form-block rm-block currently-hidden"
+    data-target="#secondary-color"
+    data-toggle="#add-secondary"
+    href="#"
+    tabindex="-1"
+  >
+    <%= t(".remove_color") %>
+  </a>
+
+  <div id="secondary-color" class="hidden-other">
+    <div class="control-group special-select-single">
+      <label class="control-label"><%= t(".secondary_color") %></label>
+
+      <div class="controls">
+        <%= select(:bike, :secondary_frame_color_id, Color.select_options, prompt: t(".choose_color")) %>
+      </div>
+    </div>
+
+    <a
+      id="add-tertiary"
+      class="optional-form-block"
+      data-target="#tertiary-color"
+      data-toggle="#rm-tertiary"
+      href="#"
+      tabindex="-1"
+    >
+      <%= t(".add_a_color") %>
+    </a>
+
+    <a
+      id="rm-tertiary"
+      class="optional-form-block rm-block currently-hidden"
+      data-target="#tertiary-color"
+      data-toggle="#add-tertiary"
+      href="#"
+      tabindex="-1"
+    >
+      <%= t(".remove_color") %>
+    </a>
+  </div>
+
+  <div id="tertiary-color" class="hidden-other">
+    <div class="control-group">
+      <label class="control-label"><%= t(".third_color") %></label>
+
+      <div class="controls special-select-single">
+        <%= select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: t(".choose_color")) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if include_stolen %>
+  <div id="stolen_fields_container">
+    <div id="stolen_fields">
+      <%= fields_for @stolen_record do |builder| %>
+        <%= builder.hidden_field :phone_no_show, value: true %>
+
+        <% unless include_field_reg_phone?(@organization) %>
+          <div class="input-group">
+            <div class="control-group">
+              <%= builder.label :phone %>
+
+              <div class="controls">
+                <%= builder.text_field :phone, required: "true" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <div id="stolenDisplay" class="input-group">
+          <div class="control-group" style="width: 300px; max-width: 100%;">
+            <%= builder.label :date_stolen, t(".when_was_it_stolen") %>
+            <% builder.object.date_stolen = TimeParser.round(builder.object.date_stolen || Time.current) %>
+            <%= builder.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
+            <%= builder.datetime_local_field :date_stolen, max: TimeParser.round(Time.current + 1.day), required: true, class: 'form-control', style: "font-size: 90%; width: 100%;" %>
+          </div>
+        </div>
+
+        <div id="stolen-bike-location" class="input-group">
+          <div class="control-group special-select-single">
+            <%= builder.label :street, t(".where_was_it_stolen"), class: 'control-label' %>
+
+            <div
+              id="country_select_container"
+              class="controls special-select-single"
+            >
+              <%= builder.select(:country_id, Country.select_options, prompt: t(".choose_country")) %>
+            </div>
+          </div>
+
+          <div class="control-group extra-group special-select-single">
+            <div class="controls">
+              <%= builder.text_field :street, placeholder: t(".intersection_or_address") %>
+            </div>
+
+            <div class="controls extra-field">
+              <%= builder.text_field :city, placeholder: t(".city") %>
+            </div>
+
+            <div class="controls extra-field">
+              <%= builder.text_field :zipcode, placeholder: t(".zipcode") %>
+            </div>
+
+            <div
+              id="state-select"
+              class="controls extra-field special-select-single"
+            >
+              <%= builder.collection_select(:state_id, State.united_states, :id, :name, include_blank: true, prompt: t(".state") ) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <div class="control-group large-text">
+            <%= builder.label :theft_description, t(".description_of_the_theft") %>
+
+            <div class="controls">
+              <%= builder.text_area :theft_description, rows: 3 %>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <p class="stolen-suggestion">
+            <%= t(".filing_a_police_report_is_important_html") %>
+          </p>
+
+          <div class="control-group">
+            <%= builder.label :police_report_number, t(".police_report_number"), class: 'control-label' %>
+
+            <div class="controls">
+              <%= builder.text_field :police_report_number %>
+            </div>
+          </div>
+
+          <div class="control-group extra-group">
+            <%= builder.label :police_report_department, t(".department_city"), class: 'control-label' %>
+
+            <div class="controls">
+              <%= builder.text_field :police_report_department %>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <div class="control-group receive-group">
+            <div class="receive-notifications">
+              <%= builder.label :receive_notifications do %>
+                <%= builder.check_box :receive_notifications, checked: true %>
+                <%= t(".receive_notifications_from_bike_index", bike_type: @bike.type) %>
+
+                <span>
+                  <%= t(".eg_if_we_tweet_about_or_someone_searches") %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%# Note: Don't check display_edit_address_fields? because current_user is probably not owner %>
+<% if BikeServices::Builder.include_address_record?(@organization) %>
+  <%= f.fields_for :address_record do |address_form| %>
+    <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, embed_layout: true, organization: @bike.creation_organization, street_2: true)) %>
+  <% end %>
+<% end %>
+
+<% if include_field_reg_phone?(@organization) %>
+  <% label_phone = registration_field_label(@organization, "reg_phone") || t(".phone_number_#{label_reference}") %>
+  <div class="input-group">
+    <%= f.label :phone, label_phone %>
+
+    <div class="controls"><%= f.text_field :phone, required: true %></div>
+  </div>
+<% end %>
+
+<% if include_field_reg_organization_affiliation?(@organization) %>
+  <% label_affiliation = registration_field_label(@organization, "reg_organization_affiliation") || t(".org_affiliation", org_name: @organization.short_name) %>
+  <div class="input-group">
+    <%= f.label :organization_affiliation, label_affiliation %>
+
+    <div class="controls">
+      <%= f.select :organization_affiliation, @organization.organization_affiliation_options, class: "form-control" %>
+    </div>
+  </div>
+<% end %>
+
+<% if include_field_reg_student_id?(@organization) %>
+  <% student_id_required = @organization.enabled?("require_reg_student_id") %>
+  <div class="input-group">
+    <div class="control-group">
+      <%= f.label :student_id do %>
+        <%= registration_field_label(@organization, "reg_student_id") || t(".student_id") %>
+
+        <% unless student_id_required %>
+          <small class="less-strong"><%= t(".optional") %></small>
+        <% end %>
+      <% end %>
+
+      <div class="controls">
+        <%= f.text_field :student_id, autocomplete: "off", autocorrect: "off", autocapitalize: "off", required: student_id_required %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%# NOT checking bike_stickers_user_editable here - this embed form is for the organization %>
+<% if include_bike_sticker_field %>
+  <div class="input-group">
+    <div class="control-group">
+      <%= f.label :bike_sticker do %>
+        <%= t(".sticker_id") %>
+        <small class="less-strong"><%= t(".optional") %></small>
+      <% end %>
+
+      <div class="controls">
+        <%= f.text_field :bike_sticker, value: @b_param.bike_sticker_code %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<div class="input-group form-foot">
+  <div class="control-group">
+    <%= f.label :owner_email do %>
+      <%= registration_field_label(@organization, "owner_email") || t(".email_address_#{label_reference}") %>
+    <% end %>
+
+    <div class="controls">
+      <%= f.email_field :owner_email, required: true %>
+    </div>
+  </div>
+
+  <div class="submit-registration">
+    <%= submit_tag t(".register"), class: "button-submit" %>
+    <span class="what-you-register"><%= t(".this") %></span>
+    <%= select(:bike, :cycle_type, CycleType.select_options, { required: true }) %>
+
+    <div class="please-wait-text less-strong"><%= t(".please_wait") %></div>
+  </div>
+</div>
+
+<div class="input-group form-photo-group">
+  <% if @b_param.image.present? or @b_param.image_tmp.present? %>
+    <strong><%= t(".image_has_been_uploaded") %></strong>
+  <% else %>
+    <div class="filefield-button">
+      <%= f.file_field :image, accept: ImageUploader.permitted_extensions.join(",") %>
+    </div>
+    <div id="filepath"></div>
+    <span style="margin-top: 0.25em">
+      <%= t(".optional_upload_a_photo") %>
+
+      <small class="less-strong">
+        (<%= ImageUploader.permitted_extensions_display.join(", ") %>)
+      </small>
+    </span>
+  <% end %>
+</div>

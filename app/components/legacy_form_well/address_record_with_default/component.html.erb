@@ -10,20 +10,22 @@
       static_fields: @address_static_fields,
     ),
   ) %>
+
   <% if render_user_account_address? %>
     <div class="form-group row unnested-field no-divider-row">
       <label class="form-well-label"></label>
+
       <div class="form-well-input form-well-input-checks">
-        <label><%= @builder.check_box :user_account_address,
+        <label>
+          <%= @builder.check_box :user_account_address,
                              {
                                "data-action" =>
                                  "change->legacy-form-well--address-record-with-default#toggleUseAccount",
                                "data-legacy-form-well--address-record-with-default-target" =>
                                  "useAccountCheckbox",
                              } %>
-          <span class="tw:cursor-pointer">
-            <%= translation(".use_account_address") %>
-          </span>
+          
+          <span class="tw:cursor-pointer"><%= translation(".use_account_address") %></span>
           (<%= link_to translation(".edit_my_account_path"), edit_my_account_path %>)
         </label>
       </div>

@@ -103,8 +103,6 @@ gem "premailer-rails" # Inline styles for email, also auto-generates text versio
 gem "sprockets-rails"
 gem "dartsass-rails"
 gem "haml" # Template language
-gem "herb" # New ERB parsing
-gem "reactionview" # fancy view component stuff with Herb
 gem "pagy" # pagination
 gem "kramdown" # Markdown template language
 gem "importmap-rails" # New JS setup
@@ -148,7 +146,8 @@ group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem "standard" # Ruby linter
-  gem "erb-formatter" # html linter
+  gem "herb" # New ERB parsing
+  gem "reactionview" # fancy view component stuff with Herb
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"

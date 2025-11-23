@@ -32,7 +32,7 @@
         = sortable "seller_id", render_sortable: render_sortable
       %th
         = sortable "buyer_id", render_sortable: render_sortable
-    %tbody
+    %tbody{"data-controller"=>"update-cached-sortable-links", "data-update-cached-sortable-links-base-url-value"=> url_for(sortable_search_params)}
       - collection.each do |marketplace_listing|
         - cache(["admin_marketplace_listing", marketplace_listing]) do
           %tr
@@ -56,16 +56,18 @@
                 %span.convertTime
                   = l marketplace_listing.end_at, format: :convert_time
             %td.item-cell
-              = render partial: "/shared/admin/bike_cell", locals: {bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)}
+              = render Admin::BikeCell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id))
             %td
               = "#{marketplace_listing.currency_symbol}#{number_display(marketplace_listing.amount)}"
             %td
               = marketplace_listing.condition
             %td
               - if marketplace_listing.address_record
-                = render partial: "/shared/admin/address_record_cell", locals: {address_record: marketplace_listing.address_record}
+                = render Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record)
             %td
-              = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.seller, render_search: true, cache: true}
+              = cache(marketplace_listing.seller) do
+                = render Admin::UserCell::Component.new(user: marketplace_listing.seller, render_search: true)
             %td
               - if marketplace_listing.buyer_id.present?
-                = render partial: "/shared/admin/user_cell", locals: {user: marketplace_listing.buyer_id, render_search: true, cache: true}
+                = cache(marketplace_listing.buyer_id) do
+                  = render Admin::UserCell::Component.new(user: marketplace_listing.buyer_id, render_search: true)

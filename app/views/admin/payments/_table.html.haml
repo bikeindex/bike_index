@@ -41,7 +41,8 @@
                   = l payment.paid_at, format: :convert_time
           - unless skip_user
             %td
-              = render partial: "/shared/admin/user_cell", locals: {email: payment.email, user: payment.user, render_search: render_sortable, cache: true}
+              = cache(payment.user) do
+                = render Admin::UserCell::Component.new(email: payment.email, user: payment.user, render_search: render_sortable)
           %td
             - if payment.referral_source.present?
               %code.small= payment.referral_source

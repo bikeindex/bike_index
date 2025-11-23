@@ -1,4 +1,5 @@
 <%= stylesheet_link_tag "revised" %>
+
 <% bike =
   Bike.new(
     id: 35,
@@ -12,15 +13,18 @@
     thumb_path:
       "https://files.bikeindex.org/uploads/Pu/395980/small_D3C6B1AF-F1FC-4BAA-BD39-9C107871FCAE.jpeg",
   ) %>
+
 <% bike2 = Bike.status_stolen.first %>
 <% bike3 = Bike.status_impounded.first %>
 <% marketplace_listing = MarketplaceListing.for_sale.last %>
 
 <ul class="bike-boxes">
   <%= render(SearchResults::BikeBox::Component.new(bike:)) %>
+
   <% if bike2.present? %>
     <%= render(SearchResults::BikeBox::Component.new(bike: bike2)) %>
   <% end %>
+
   <% if marketplace_listing.present? %>
     <%= render(
       SearchResults::BikeBox::Component.new(
@@ -29,6 +33,7 @@
       ),
     ) %>
   <% end %>
+
   <% if bike3.present? %>
     <%= render(SearchResults::BikeBox::Component.new(bike: bike3)) %>
   <% end %>

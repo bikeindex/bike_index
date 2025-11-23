@@ -82,6 +82,6 @@
         = text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @recoveries}
+= render_admin_pagination_with_count(collection: @recoveries)
 = render partial: "table", locals: { recoveries: @recoveries, render_sortable: true }
-= render partial: "/shared/admin/pagination", locals: {collection: @recoveries, skip_total: true}
+= render_admin_pagination_with_count(collection: @recoveries, skip_total: true)
