@@ -84,6 +84,12 @@ module Bikeindex
     initializer "app_assets", after: "importmap.assets" do
       Rails.application.config.assets.paths << Rails.root.join("app")
     end
+    # Add app/components to view paths for preview templates
+    initializer "add_components_to_view_paths", after: :add_view_paths do
+      ActiveSupport.on_load(:action_controller) do
+        prepend_view_path Rails.root.join("app", "components")
+      end
+    end
     config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
     config.lookbook.preview_display_options = {theme: ["light", "dark"]} # Add dynamic 'theme' display option
 

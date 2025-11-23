@@ -81,6 +81,10 @@ RSpec.configure do |config|
   config.include HtmlContentHelpers, type: :component
   config.before(:each, :browser, type: :system) { driven_by(:selenium) }
   config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
+  # Eager load for system specs so preview classes are available
+  config.before(:each, type: :system) do
+    Rails.application.eager_load! unless Rails.application.config.eager_load
+  end
 end
 
 require "vcr"
