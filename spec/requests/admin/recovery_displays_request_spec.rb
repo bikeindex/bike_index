@@ -58,18 +58,21 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
       let(:valid_attrs) do
         {
           quote: "I recovered my bike!",
-          image: Rack::Test::UploadedFile.new(file)
+          photo: Rack::Test::UploadedFile.new(file)
         }
       end
       it "creates with a photo and processes it in the background" do
         expect do
           post base_url, params: {recovery_display: valid_attrs}
         end.to change(RecoveryDisplay, :count).by 1
-        Sidekiq::Job.drain_all # Process the backgrounded image upload
 
         recovery_display = RecoveryDisplay.last
         expect(recovery_display.quote).to eq valid_attrs[:quote]
-        expect(recovery_display.image).to be_present
+        expect(recovery_display.photo.attached?).to be_truthy
+
+        Sidekiq::Job.drain_all # Process the photo in background
+
+        expect(recovery_display.reload.photo_processed.attached?).to be_truthy
         expect(recovery_display.image_processing?).to be_falsey
       end
     end
