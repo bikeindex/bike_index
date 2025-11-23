@@ -76,6 +76,31 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
         expect(recovery_display.image_processing?).to be_falsey
       end
     end
+    context "with remote_image_url" do
+      let(:remote_url) { "https://files.bikeindex.org/uploads/Re/3223/recovery_3223.png" }
+      let(:valid_attrs) do
+        {
+          quote: "I got my bike back!",
+          remote_image_url: remote_url
+        }
+      end
+      it "downloads and attaches the remote image", :vcr do
+        VCR.use_cassette("recovery_display-remote_image_url") do
+          expect do
+            post base_url, params: {recovery_display: valid_attrs}
+          end.to change(RecoveryDisplay, :count).by 1
+
+          recovery_display = RecoveryDisplay.last
+          expect(recovery_display.quote).to eq valid_attrs[:quote]
+          expect(recovery_display.photo.attached?).to be_truthy
+          expect(recovery_display.photo.filename.to_s).to eq "recovery_3223.png"
+
+          Sidekiq::Job.drain_all # Process the photo in background
+
+          expect(recovery_display.reload.photo_processed.attached?).to be_truthy
+        end
+      end
+    end
     context "invalid create" do
       let(:invalid_attrs) do
         {
