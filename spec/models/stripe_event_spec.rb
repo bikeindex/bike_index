@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe StripeEvent, type: :model do
-  let(:re_record_interval) { 6.months }
+  let(:re_record_interval) { 7.months }
 
   describe "update_bike_index_record!" do
     let(:event_mock) do

@@ -477,8 +477,7 @@ GEM
     mimemagic (0.4.3)
       nokogiri (~> 1)
       rake
-    mini_magick (5.3.1)
-      logger
+    mini_magick (4.13.2)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (5.26.2)
@@ -924,7 +923,7 @@ DEPENDENCIES
   logstash-event
   lookbook
   memory_profiler
-  mini_magick
+  mini_magick (~> 4.13)
   money-rails (~> 1.11)
   multi_json
   observer

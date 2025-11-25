@@ -56,7 +56,7 @@ gem "redlock" # Locking
 
 # Making other files
 gem "image_processing" # what it says
-gem "mini_magick" # Required for image processing
+gem "mini_magick", "~> 4.13" # Required for image processing, pinned to 4.x for CI compatibility
 gem "ruby-vips" # Faster image processing, should eventually replace mini_magick
 gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8
