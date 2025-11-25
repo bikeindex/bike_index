@@ -6,7 +6,7 @@ class BulkImportJob < ApplicationJob
 
   class << self
     # This is a little gross. It was added in PR #2911 when adding address records to bikes
-    def address_record_attributes(address_string, country_id = nil)
+    def address_record_attributes(address_string, country_id: nil)
       return {} if address_string.blank?
 
       address_record_attributes = country_id.present? ? {country: country_id} : {}
@@ -29,6 +29,7 @@ class BulkImportJob < ApplicationJob
     private
 
     def address_array_from_parts(address_parts)
+      pp address_parts
       country = if address_parts.last.downcase == "usa"
         address_parts.pop # remove and ignore the country
         Country.united_states_id
@@ -48,7 +49,7 @@ class BulkImportJob < ApplicationJob
 
       parts = region_postal.split(" ")
       postal_code = parts.pop
-      postal_code = "#{parts.pop} #{postal_code}" if parts.last.match?(/\d/)
+      postal_code = "#{parts.pop} #{postal_code}" if parts.last&.match?(/\d/)
 
       {region_string: parts.join(" "), postal_code:}
     end
@@ -168,7 +169,7 @@ class BulkImportJob < ApplicationJob
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id,
         no_duplicate: @bulk_import.no_duplicate
-      }.merge(self.class.address_record_attributes(row[:address], @country_id)),
+      }.merge(self.class.address_record_attributes(row[:address], country_id: @country_id)),
       impound_record: impound_attrs || {},
       stolen_record: @bulk_import.stolen_record_attrs,
       # Photo need to be an array - only include if photo has a value
