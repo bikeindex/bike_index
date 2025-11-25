@@ -90,6 +90,8 @@ jobs:
         with:
           packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
           version: 1.1
+      - name: Ensure ImageMagick is available
+        run: which identify || sudo apt-get install -y imagemagick
       - name: Checkout code
         uses: actions/checkout@v6
       # Install Ruby dependencies
