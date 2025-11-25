@@ -122,6 +122,10 @@ class ImpoundRecord < ApplicationRecord
     self.impounded_at = TimeParser.parse(val, timezone)
   end
 
+  def impounded_at_with_timezone
+    impounded_at
+  end
+
   # Non-organizations don't "impound" bikes, they "find" them
   def kind
     organization_id.present? ? self.class.impounded_kind : self.class.found_kind
