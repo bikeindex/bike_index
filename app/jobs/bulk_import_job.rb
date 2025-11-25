@@ -29,27 +29,32 @@ class BulkImportJob < ApplicationJob
     private
 
     def address_array_from_parts(address_parts)
-      pp address_parts
       country = if address_parts.last.downcase == "usa"
         address_parts.pop # remove and ignore the country
         Country.united_states_id
       elsif !address_parts.last.match?(/\d/)
         address_parts.pop
       end
-
-      # Maybe don't need to check for number match here?
-      region_postal = address_parts.pop # if address_parts.last.match?(/\d/)
-      city = address_parts.pop # if address_parts.count > 1
+      region_postal = address_parts.pop
+      region_postal = "#{address_parts.pop}, #{region_postal}" if should_pop_for_region?(region_postal, address_parts)
+      city = address_parts.pop
 
       [address_parts.any? ? address_parts.join(", ") : nil, city, region_postal, country]
+    end
+
+    def should_pop_for_region?(region_postal, address_parts)
+      return false if address_parts.count < 3
+
+      # if all substrings in region_postal have numbers, they're all (probably) postal_codes
+      region_postal.split(" ").all? { it.match(/\d/) }
     end
 
     def region_and_postal(region_postal)
       return {region_string: region_postal} unless region_postal.match?(/\d/)
 
-      parts = region_postal.split(" ")
-      postal_code = parts.pop
-      postal_code = "#{parts.pop} #{postal_code}" if parts.last&.match?(/\d/)
+      parts = region_postal.match?(",") ? region_postal.split(",") : region_postal.split(" ")
+      postal_code = parts.pop&.strip
+      postal_code = "#{parts.pop&.strip} #{postal_code}" if parts.last&.match?(/\d/)
 
       {region_string: parts.join(" "), postal_code:}
     end

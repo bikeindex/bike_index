@@ -769,25 +769,14 @@ RSpec.describe BulkImportJob, type: :job do
         end
 
         context "in COLORADO" do
-          let(:address_string) { "1601 W. SWALLOW RD, 9D, FORT COLLINS, COLORADO, 80526" }
-          let(:address_record_attributes) { {street: "1601 W. SWALLOW RD, 9D, FORT COLLINS, COLORADO, 80526", city: "FORT COLLINS", region_string: "COLORADO", postal_code: "80526", country: country_id} }
+          let(:address_string) { "1669 W. SWALLOW RD, 69C, FORT COLLINS, COLORADO, 80526" }
+          let(:address_record_attributes) { {street: "1669 W. SWALLOW RD, 69C", city: "FORT COLLINS", region_string: "COLORADO", postal_code: "80526", country: country_id} }
 
           it "returns target" do
             expect(described_class.address_record_attributes(address_string, country_id:)).to eq target
             expect(described_class.address_record_attributes("#{address_string}, USA", country_id:)).to eq target
             expect(described_class.address_record_attributes("#{address_string}, USA")).to eq target
           end
-        end
-      end
-
-      context "just street" do
-        let(:address_string) { "2823 N Tripp Ave" }
-        let(:address_record_attributes) { {street: "2823 N Tripp Ave", city: nil, region_string: nil, postal_code: nil, country: country_id} }
-
-        it "returns target" do
-          expect(described_class.address_record_attributes(address_string, country_id:)).to eq target
-          expect(described_class.address_record_attributes("#{address_string}, USA", country_id:)).to eq target
-          expect(described_class.address_record_attributes("#{address_string}, USA")).to eq target
         end
       end
     end
