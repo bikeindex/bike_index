@@ -47,24 +47,30 @@
 %p
   You will have a chance to edit the text, when displaying the recovery.
   %em.text-warning Don't edit to make it displayable.
-  Only edit if you want to change what is stored about this recovery.
+%p
+  Only edit if you want to change what is stored about this recovery -
+  %a.gray-link{ href: "#editRecoveryForm", data: { toggle: "collapse", target: "#editRecoveryForm" } }
+    show edit form
 
-= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" } , html: { class: "form form-horizontal" }) do |f|
-  = render(AlertForErrors::Component.new(name: "Recovery", object: @recovery))
 
-  .row.mt-4
-    .col-md-6
-      .form-group
-        = f.label :recovered_description, "Recovery description"
-        = f.text_area :recovered_description, rows: 4, class: "form-control"
+#editRecoveryForm.collapse
+  %hr.mt-5.mb-4
+  = form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" } , html: { class: "form form-horizontal" }) do |f|
+    = render(AlertForErrors::Component.new(name: "Recovery", object: @recovery))
 
-    .col-md-6
-      .form-group.form-check
-        = f.check_box :index_helped_recovery, class: "form-check-input"
-        = f.label :index_helped_recovery, class: "form-check-label"
+    .row.mt-4
+      .col-md-6
+        .form-group
+          = f.label :recovered_description, "Recovery description"
+          = f.text_area :recovered_description, rows: 4, class: "form-control"
 
-      .form-group.form-check
-        = f.check_box :can_share_recovery, class: "form-check-input"
-        = f.label :can_share_recovery, class: "form-check-label"
-      .form-group.mt-4
-        = submit_tag "Update the recovery", class: "btn btn-success"
+      .col-md-6
+        .form-group.form-check
+          = f.check_box :index_helped_recovery, class: "form-check-input"
+          = f.label :index_helped_recovery, class: "form-check-label"
+
+        .form-group.form-check
+          = f.check_box :can_share_recovery, class: "form-check-input"
+          = f.label :can_share_recovery, class: "form-check-label"
+        .form-group.mt-4
+          = submit_tag "Update the recovery", class: "btn btn-success"
