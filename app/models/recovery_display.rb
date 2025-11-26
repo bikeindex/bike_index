@@ -28,10 +28,10 @@ class RecoveryDisplay < ActiveRecord::Base
   has_one_attached :photo
   has_one_attached :photo_processed
 
-  after_commit :enqueue_photo_processing, on: [:create, :update]
+  after_commit :enqueue_photo_processing, if: :persisted?
 
   attr_writer :image_cache
-  attr_accessor :date_input, :remote_photo_url
+  attr_accessor :date_input, :remote_photo_url, :skip_callback_job
 
   validates_presence_of :quote, :recovered_at
   validate :quote_not_too_long
@@ -94,28 +94,17 @@ class RecoveryDisplay < ActiveRecord::Base
   def image_processing?
     return false unless has_any_image? && updated_at > Time.current - 1.minute
 
-    !image_exists?
+    !photo_processed?
   end
 
-  def image_exists?
-    if photo_processed.attached?
-      true
-    elsif photo.attached?
-      true
-    elsif image.present?
-      image.file.exists?
-    else
-      false
-    end
+  def photo_processed?
+    photo_processed.attached? || image.present?
   end
 
-  def has_any_image?
-    photo_processed.attached? || photo.attached? || image.present?
-  end
+  def photo_url
+    return unless photo_processed&.blob.present?
 
-  # Alias for CarrierWave compatibility
-  def image?
-    has_any_image?
+    BlobUrl.for(photo_processed.blob)
   end
 
   def image_alt
@@ -133,21 +122,25 @@ class RecoveryDisplay < ActiveRecord::Base
     stolen_record_id.present? ? StolenRecord.current_and_not.find_by_id(stolen_record_id) : nil
   end
 
+  private
+
   def update_associations
     stolen_record&.update(updated_at: Time.current)
   end
 
+  def has_any_image?
+    photo_processed? || photo.attached?
+  end
+
   def enqueue_photo_processing
-    # If remote_photo_url is present, enqueue with it
+    return if skip_callback_job
+
     if remote_photo_url.present?
-      RecoveryDisplay::ProcessPhotoJob.perform_async(id, remote_photo_url)
-      self.remote_photo_url = nil # Clear after enqueueing
-      return
+      Images::ProcessRecoveryDisplayPhotoJob.perform_async(id, remote_photo_url)
+      self.remote_photo_url = nil # clear to ensure it doesn't get re-enqueued
+    elsif photo.attached? && !photo_processed.attached?
+      # Otherwise, only enqueue if photo is attached and there isn't a photo_processed attached
+      Images::ProcessRecoveryDisplayPhotoJob.perform_async(id)
     end
-
-    # Otherwise, only enqueue if photo is attached and not yet processed
-    return unless photo.attached? && !photo_processed.attached?
-
-    RecoveryDisplay::ProcessPhotoJob.perform_async(id)
   end
 end

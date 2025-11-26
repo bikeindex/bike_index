@@ -1,30 +1,37 @@
 <%# Toggle image initially if the recovery display hasn't been created, and there is an image to toggle %>
 <% toggle_image_initially = @recovery_display.id.blank? && (@bike&.public_images&.present? || @bike&.stock_photo_url&.present?) %>
-<div class="row mt-4 mb-4" id="recovery-display-form" data-toggleimageinitially="<%= toggle_image_initially %>">
+
+<div
+  class="row mt-4 mb-4"
+  id="recovery-display-form"
+  data-toggleimageinitially="<%= toggle_image_initially %>"
+>
   <div class="col-md-10 col-lg-8 ml-auto mr-auto">
     <h4>Recovery display approval process</h4>
+
     <ol class="tw:list-decimal">
       <li>
         Remove last name from "Quote by" field
       </li>
+
       <li>
         Make sure there is a picture!
-        <small class="less-strong">
-          By default, if the bike has an image, it will use that image. click "upload a different image" if you want to use a different.
-        </small>
+        <small class="less-strong"> By default, if the bike has an image, it will use that image. click "upload a different image" if you want to use a different. </small>
       </li>
+
       <li>
         Edit the "Body" field and:
-        <ul class="tw:list-disc tw:ml-4">
+        <ul class="tw:ml-4 tw:list-disc">
           <li>
             Make sure the text is under the character count
-            <small class="less-strong">
-              there's a counter below that updates as you type
-            </small>
+            <small class="less-strong"> there's a counter below that updates as you type </small>
           </li>
+
           <li>
-            Remove any references to race, class, homelessness, etc. of the thief
+            Remove any references to race, class, homelessness, etc. of the
+            thief
           </li>
+
           <li>
             Fix typos and grammar
           </li>
@@ -36,7 +43,8 @@
 
 <% if @bike&.manufacturer.present? %>
   <p class="mt-4">
-    <%= @bike.type_titleize %> manufacturer
+    <%= @bike.type_titleize %>
+    manufacturer
     <%= link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
     - Twitter:
     <% if @bike.manufacturer.blank? || @bike.manufacturer.other? %>
@@ -58,24 +66,26 @@
   <% if @recovery_display.stolen_record_id.present? %>
     <%= f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id %>
   <% end %>
+
   <div class="row">
     <div class="col-lg-4 col-md-6">
       <div class="form-group">
         <%= f.label :quote_by do %>
           Quote By
-          <small class="less-strong">
-            (full name: <em><%= @recovery_display.calculated_owner_name %></em>)
-          </small>
+          <small class="less-strong">(full name: <em><%= @recovery_display.calculated_owner_name %></em>)</small>
         <% end %>
+
         <%= f.text_field :quote_by, class: "form-control" %>
       </div>
     </div>
+
     <div class="col-lg-4 col-md-6">
       <div class="form-group">
         <%= f.label :location_string, "Location" %>
         <%= f.text_field :location_string, class: "form-control" %>
       </div>
     </div>
+
     <div class="col-lg-4 col-md-6">
       <div class="form-group">
         <%= f.label :link %>
@@ -95,28 +105,45 @@
       <div class="col-lg-4 col-md-6">
         <div class="form-group">
           <label>Bike url</label>
-          <input class="form-control less-strong w-100" type="text" value="<%= bike_url(@recovery_display.bike) %>" disabled="disabled">
+
+          <input
+            class="form-control less-strong w-100"
+            type="text"
+            value="<%= bike_url(@recovery_display.bike) %>"
+            autocomplete="off"
+            disabled
+          >
         </div>
       </div>
     <% end %>
   </div>
+
   <div class="row">
     <div class="col-lg-6">
       <div class="form-group">
         <%= f.label :body %>
         <%= f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control", id: "characterCounter" %>
       </div>
-      <p class="text-info text-right" style="margin-top: -1rem; font-size: 150%;">
+
+      <p
+        class="text-info text-right"
+        style="margin-top: -1rem; font-size: 150%;"
+      >
         <span id="characterTotal"></span>
       </p>
+
       <script>
         window.maxCharacterCount = <%= Integrations::TwitterTweeter::TWEET_LENGTH %>;
       </script>
     </div>
 
     <div class="col-lg-6">
-      <div id="recovery-photo-upload-input" class="form-group mt-4 collapse show">
+      <div
+        id="recovery-photo-upload-input"
+        class="form-group mt-4 collapse show"
+      >
         <%= f.label :photo, "Recovery photo" %>
+
         <% if @recovery_display.photo_processed.attached? %>
           <%= image_tag(BlobUrl.for(@recovery_display.photo_processed.blob)) %>
         <% elsif @recovery_display.image? %>
@@ -124,12 +151,14 @@
         <% elsif @recovery_display.id.present? %>
           <p class="text-danger">No picture!</p>
         <% end %>
+
         <div class="input-group mb-3">
           <div class="custom-file">
             <%= f.label :photo, "Choose file", class: "custom-file-label" %>
             <%= f.file_field :photo, class: "custom-file-input", accept: "image/jpeg,image/jpg,image/png,image/gif" %>
           </div>
         </div>
+
         <% if @recovery_display.photo.attached? || @recovery_display.image? %>
           <div class="form-check">
             <%= f.check_box :remove_image, class: "form-check-input" %>
@@ -137,12 +166,14 @@
           </div>
         <% end %>
       </div>
-      <% if @bike.present? && !@recovery_display.image_exists? %>
+
+      <% if @bike.present? && !@recovery_display.photo_processed? %>
         <div class="form-group mt-3">
           <% if @bike.public_images.present? || @bike.stock_photo_url.present? %>
             <% if @recovery_display.image_processing? %>
               <span class="text-warning">
-                Image is still processing - please check back in a few minutes before reuploading an image
+                Image is still processing - please check back in a few minutes
+                before reuploading an image
               </span>
             <% end %>
             <%= f.hidden_field :remote_photo_url %>
@@ -150,18 +181,27 @@
               <span class="using-bike-image">
                 Using <%= @bike.type %> image
               </span>
+
               <span class="not-using-bike-image">
                 <%= @bike.type_titleize %>
+
                 <% if @bike.public_images.present? %>
                   has image
                 <% else %>
                   has stock image
                 <% end %>
               </span>
-              <a class="btn btn-outline-info ml-2" id="use_image_for_display" href="#" data-url="<%= @bike.image_url %>">
+
+              <a
+                class="btn btn-outline-info ml-2"
+                id="use_image_for_display"
+                href="#"
+                data-url="<%= @bike.image_url %>"
+              >
                 <span class="not-using-bike-image">Use first image</span>
                 <span class="using-bike-image">upload a different image</span>
               </a>
+
               <%# If bike has an image and recovery_display hasn't been created to have an image yet %>
               <% if (@bike.public_images.present? || @bike.stock_photo_url.present?) && @recovery_display.id.blank? %>
                 <%= image_tag(@bike.image_url, class: "tw:mt-1 tw:w-24") %>
