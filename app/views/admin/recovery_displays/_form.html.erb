@@ -145,7 +145,7 @@
         <%= f.label :photo, "Recovery photo" %>
 
         <% if @recovery_display.photo_processed.attached? %>
-          <%= image_tag(BlobUrl.for(@recovery_display.photo_processed.blob)) %>
+          <%= image_tag(@recovery_display.photo_url) %>
         <% elsif @recovery_display.image? %>
           <%= image_tag(@recovery_display.image.url(:thumb)) %>
         <% elsif @recovery_display.id.present? %>
