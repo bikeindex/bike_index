@@ -98,8 +98,8 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
 
           recovery_display.reload
           expect(recovery_display.photo.attached?).to be_truthy
-          expect(recovery_display.photo.filename.to_s).to eq "recovery_3223.png"
           expect(recovery_display.photo_processed.attached?).to be_truthy
+          expect(recovery_display.photo_processed.filename).to eq "square_recovery-#{recovery_display.id}.jpeg"
         end
       end
     end

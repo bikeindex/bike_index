@@ -45,8 +45,6 @@ class Images::ProcessRecoveryDisplayPhotoJob < ApplicationJob
     ActiveRecord::Base.no_touching do
       # If remote_photo_url is provided, download and attach it
       if attach_remote_photo_url?(recovery_display, remote_photo_url, force_regenerate)
-        # downloaded_image = URI.parse(remote_photo_url).open
-        # filename = File.basename(URI.parse(remote_photo_url).path)
         downloaded_image = Down.download(remote_photo_url)
         recovery_display.photo.attach(io: downloaded_image, filename: "recovery-#{recovery_display_id}")
       end
