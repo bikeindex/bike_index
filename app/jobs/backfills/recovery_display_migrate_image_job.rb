@@ -1,24 +1,19 @@
 class Backfills::RecoveryDisplayMigrateImageJob < ApplicationJob
-  def perform(recovery_display_id)
+  def perform(recovery_display_id, force_regenerate = false)
     recovery_display = RecoveryDisplay.find_by_id(recovery_display_id)
-    return unless recovery_display.present?
-
-    # Skip if already migrated to ActiveStorage, or if no image
-    return if recovery_display.photo.attached? || recovery_display.image.blank?
+    return if recovery_display.blank? || skip_regeneration?(recovery_display, force_regenerate)
 
     Images::ProcessRecoveryDisplayPhotoJob.new.perform(
-      recovery_display_id, recovery_display.image.path, recovery_display:
+      recovery_display_id, recovery_display.image_url, recovery_display:
     )
+  end
 
-    # # Download the original image from CarrierWave
-    # image_file = recovery_display.image.file
-    # filename = File.basename(image_file.path)
+  private
 
-    # # Attach to ActiveStorage
-    # recovery_display.photo.attach(
-    #   io: File.open(image_file.path),
-    #   filename:,
-    #   content_type: image_file.content_type
-    # )
+  def skip_regeneration?(recovery_display, force_regenerate)
+    return false if force_regenerate
+
+    # Skip if already migrated to ActiveStorage, or if no image
+    recovery_display.photo.attached? || recovery_display.image.blank?
   end
 end
