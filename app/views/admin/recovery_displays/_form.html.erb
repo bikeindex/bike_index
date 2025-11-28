@@ -62,7 +62,6 @@
     "admin--recovery-display-form-toggle-image-initially-value" => toggle_image_initially,
     "admin--recovery-display-form-max-character-count_value" => Integrations::TwitterTweeter::TWEET_LENGTH
   }} do |f| %>
-
   <%= render(AlertForErrors::Component.new(object: @recovery_display, dismissable: true)) %>
 
   <% if @recovery_display.stolen_record_id.present? %>
@@ -124,6 +123,7 @@
     <div class="col-lg-6">
       <div class="form-group">
         <%= f.label :body %>
+
         <%= f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control", data: {
            "admin--recovery-display-form-target" => "characterCounter",
             action: "keyup->admin--recovery-display-form#updateCharacterCount"
@@ -131,10 +131,9 @@
       </div>
 
       <p
-        class="text-info text-right tw:text-lg tw:-mt-2"
+        class="text-info text-right tw:-mt-2 tw:text-lg"
         data-admin--recovery-display-form-target="characterTotal"
-      >
-      </p>
+      ></p>
     </div>
 
     <div class="col-lg-6">
@@ -176,10 +175,8 @@
                 before re-uploading an image
               </span>
             <% end %>
-
             <%= f.hidden_field :remote_photo_url,
                 data: { "admin--recovery-display-form-target" => "remoteImageUrl" } %>
-
             <p data-admin--recovery-display-form-target="bikeImageText">
               <span class="using-bike-image">
                 Using <%= @bike.type %> image
