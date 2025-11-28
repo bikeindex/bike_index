@@ -5,23 +5,25 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='admin--update-cached-sortable-links
 export default class extends Controller {
   static targets = [
-    'characterCounter',
-    'characterTotal',
-    'photoUploadInput',
-    'remoteImageUrl',
-    'bikeImageText',
-    'useImageButton'
+    "characterCounter",
+    "characterTotal",
+    "photoUploadInput",
+    "remoteImageUrl",
+    "bikeImageText",
+    "useImageButton",
+    "usingBikeImage",
+    "notUsingBikeImage"
   ]
 
   static values = {
-    toggleImageInitially: Boolean,
-    maxCharacterCount: Number
+    toggleImage: Boolean,
+    maxCharacterCount: Number,
   }
 
   connect () {
     this.setCharacterCount()
 
-    if (this.toggleImageInitiallyValue) {
+    if (this.toggleImageValue) {
       this.toggleBikeImageForDisplay()
     }
   }
@@ -31,15 +33,19 @@ export default class extends Controller {
     this.toggleBikeImageForDisplay()
   }
 
-  toggleBikeImageForDisplay () {
-    if (this.bikeImageTextTarget.classList.contains('bike-image-added')) {
-      collapse('show', this.photoUploadInputTarget)
-      this.remoteImageUrlTarget.value = ''
-      this.bikeImageTextTarget.classList.remove('bike-image-added')
-    } else {
-      collapse('hide', this.photoUploadInputTarget)
+  toggleBikeImageForDisplay() {
+    if (this.toggleImageValue) {
+      // Use bike image
+      this.usingBikeImageTargets.forEach(el => collapse('show', el))
+      this.notUsingBikeImageTargets.forEach(el => collapse('hide', el))
       this.remoteImageUrlTarget.value = this.useImageButtonTarget.dataset.url
-      this.bikeImageTextTarget.classList.add('bike-image-added')
+      this.toggleImageValue = false
+    } else {
+      // Switch back to upload form
+      this.notUsingBikeImageTargets.forEach(el => collapse('show', el))
+      this.usingBikeImageTargets.forEach(el => collapse('hide', el))
+      this.remoteImageUrlTarget.value = ""
+      this.toggleImageValue = true
     }
   }
 
