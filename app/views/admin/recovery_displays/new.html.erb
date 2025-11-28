@@ -1,0 +1,9 @@
+<%= render partial: "/admin/bikes/bike_tabs", locals: { bike: @bike, active_tab: "recovery_displays", stolen_record: @stolen_record, display_recovery: true } %>
+
+<div class="admin-subnav midpage-subnav">
+  <div class="col-12">
+    <h1>New Recovery Display</h1>
+  </div>
+</div>
+
+<%= render partial: "form" %>

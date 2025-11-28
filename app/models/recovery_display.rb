@@ -24,8 +24,14 @@ class RecoveryDisplay < ActiveRecord::Base
   mount_uploader :image, CircularImageUploader
   process_in_background :image, CarrierWaveProcessJob
 
+  # ActiveStorage for new image uploads (non-circular)
+  has_one_attached :photo
+  has_one_attached :photo_processed
+
+  after_commit :enqueue_photo_processing, if: :persisted?
+
   attr_writer :image_cache
-  attr_accessor :date_input
+  attr_accessor :date_input, :remote_photo_url, :skip_callback_job
 
   validates_presence_of :quote, :recovered_at
   validate :quote_not_too_long
@@ -86,13 +92,19 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def image_processing?
-    return false unless image.present? && updated_at > Time.current - 1.minute
+    return false unless has_any_image? && updated_at > Time.current - 1.minute
 
-    !image_exists?
+    !photo_processed?
   end
 
-  def image_exists?
-    image.present? && image.file.exists?
+  def photo_processed?
+    photo_processed.attached?
+  end
+
+  def photo_url
+    return unless photo_processed&.blob.present?
+
+    BlobUrl.for(photo_processed.blob)
   end
 
   def image_alt
@@ -110,7 +122,25 @@ class RecoveryDisplay < ActiveRecord::Base
     stolen_record_id.present? ? StolenRecord.current_and_not.find_by_id(stolen_record_id) : nil
   end
 
+  private
+
   def update_associations
     stolen_record&.update(updated_at: Time.current)
+  end
+
+  def has_any_image?
+    photo_processed? || photo.attached?
+  end
+
+  def enqueue_photo_processing
+    return if skip_callback_job
+
+    if remote_photo_url.present?
+      Images::ProcessRecoveryDisplayPhotoJob.perform_async(id, remote_photo_url)
+      self.remote_photo_url = nil # clear to ensure it doesn't get re-enqueued
+    elsif photo.attached? && !photo_processed.attached?
+      # Otherwise, only enqueue if photo is attached and there isn't a photo_processed attached
+      Images::ProcessRecoveryDisplayPhotoJob.perform_async(id)
+    end
   end
 end
