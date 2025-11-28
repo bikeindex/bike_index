@@ -142,29 +142,35 @@
         data-admin--recovery-display-form-target="notUsingBikeImage"
         class="form-group mt-4"
       >
-        <%= f.label :photo, "Recovery photo" %>
+        <div class="tw:flex tw:flex-row tw:gap-2">
+          <div>
+            <% if @recovery_display.photo_processed.attached? %>
+              <%= image_tag(@recovery_display.photo_url, class: "tw:mb-1 tw:w-24") %>
+            <% elsif @recovery_display.image? %>
+              <%= image_tag(@recovery_display.image.url(:thumb)) %>
+            <% elsif @recovery_display.id.present? %>
+              <p class="text-danger">No picture!</p>
+            <% end %>
+          </div>
 
-        <% if @recovery_display.photo_processed.attached? %>
-          <%= image_tag(@recovery_display.photo_url, class: "tw:mb-1 tw:w-24") %>
-        <% elsif @recovery_display.image? %>
-          <%= image_tag(@recovery_display.image.url(:thumb)) %>
-        <% elsif @recovery_display.id.present? %>
-          <p class="text-danger">No picture!</p>
-        <% end %>
+          <div class="input-group mb-3">
+            <%= f.label :photo, "Recovery photo" %>
 
-        <div class="input-group mb-3">
-          <div class="custom-file">
-            <%= f.label :photo, "Choose file", class: "custom-file-label" %>
-            <%= f.file_field :photo, class: "custom-file-input", accept: "image/jpeg,image/jpg,image/png,image/gif" %>
+            <div class="tw:mb-2 tw:w-full">
+              <div class="custom-file">
+                <%= f.label :photo, "Choose file", class: "custom-file-label" %>
+                <%= f.file_field :photo, class: "custom-file-input", accept: "image/jpeg,image/jpg,image/png,image/gif" %>
+              </div>
+            </div>
+
+            <% if @recovery_display.photo.attached? || @recovery_display.image? %>
+              <div class="form-check mb-3">
+                <%= f.check_box :remove_image, class: "form-check-input" %>
+                <%= f.label :remove_image, class: "form-check-label" %>
+              </div>
+            <% end %>
           </div>
         </div>
-
-        <% if @recovery_display.photo.attached? || @recovery_display.image? %>
-          <div class="form-check">
-            <%= f.check_box :remove_image, class: "form-check-input" %>
-            <%= f.label :remove_image, class: "form-check-label" %>
-          </div>
-        <% end %>
       </div>
 
       <% if @bike.present? && !@recovery_display.photo_processed? %>
@@ -178,16 +184,16 @@
             <% end %>
             <%= f.hidden_field :remote_photo_url,
                 data: { "admin--recovery-display-form-target" => "remotePhotoUrl" } %>
-
-
-
             <p data-admin--recovery-display-form-target="bikeImageText">
               <span data-admin--recovery-display-form-target="usingBikeImage">
                 Using <%= @bike.type %> image
               </span>
 
-              <span data-admin--recovery-display-form-target="notUsingBikeImage">
+              <span
+                data-admin--recovery-display-form-target="notUsingBikeImage"
+              >
                 <%= @bike.type_titleize %>
+
                 <% if @bike.public_images.present? %>
                   has image
                 <% else %>
@@ -201,17 +207,21 @@
                 data-action="click->admin--recovery-display-form#toggleImage"
                 href="#"
               >
-                <span data-admin--recovery-display-form-target="notUsingBikeImage">Use first image</span>
-                <span data-admin--recovery-display-form-target="usingBikeImage">Upload a different image</span>
+                <span
+                  data-admin--recovery-display-form-target="notUsingBikeImage"
+                >
+                  Use first image
+                </span>
+
+                <span data-admin--recovery-display-form-target="usingBikeImage">
+                  Upload a different image
+                </span>
               </a>
 
               <% if (@bike.public_images.present? || @bike.stock_photo_url.present?) && @recovery_display.id.blank? %>
                 <%= image_tag(@bike.image_url, class: "tw:mt-1 tw:w-24", data: { admin__recovery_display_form_target: "usingBikeImage" }) %>
               <% end %>
             </p>
-
-
-
           <% else %>
             Bike has no image
           <% end %>

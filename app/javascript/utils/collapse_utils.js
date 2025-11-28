@@ -1,9 +1,6 @@
 // collapse-utils.js
 // Utility class for handling element collapse animations
 
-// The only place this was used was removed in #2773
-// check that PR to see how to use it
-
 /**
  * CollapseUtils class providing element collapse/expand functionality
  */
@@ -11,12 +8,18 @@ export class CollapseUtils {
   /**
    * Handle collapsing or showing elements with animation
    * @param {string} action - 'show' or 'hide'
-   * @param {HTMLElement} element - The element to manipulate
+   * @param {HTMLElement|HTMLElement[]} element - The element(s) to manipulate
    * @param {number} duration - Animation duration in milliseconds
    */
   static collapse (action, element, duration) {
     if (!element) {
       console.warn('Cannot collapse undefined or null element')
+      return
+    }
+
+    // Handle arrays of elements
+    if (Array.isArray(element)) {
+      element.forEach(el => this.collapse(action, el, duration))
       return
     }
 

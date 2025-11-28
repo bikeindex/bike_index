@@ -5,14 +5,14 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='admin--update-cached-sortable-links
 export default class extends Controller {
   static targets = [
-    "characterCounter",
-    "characterTotal",
-    "photoUploadInput",
-    "remotePhotoUrl",
-    "bikeImageText",
-    "useImageButton",
-    "usingBikeImage",
-    "notUsingBikeImage"
+    'characterCounter',
+    'characterTotal',
+    'photoUploadInput',
+    'remotePhotoUrl',
+    'bikeImageText',
+    'useImageButton',
+    'usingBikeImage',
+    'notUsingBikeImage'
   ]
 
   static values = {
@@ -35,18 +35,18 @@ export default class extends Controller {
     this.toggleBikeImageForDisplay()
   }
 
-  toggleBikeImageForDisplay() {
+  toggleBikeImageForDisplay () {
     if (this.toggleImageValue) {
       // Use bike image
-      this.usingBikeImageTargets.forEach(el => collapse('show', el))
-      this.notUsingBikeImageTargets.forEach(el => collapse('hide', el))
+      collapse('show', this.usingBikeImageTargets)
+      collapse('hide', this.notUsingBikeImageTargets)
       this.remotePhotoUrlTarget.value = this.remotePhotoUrlValue
       this.toggleImageValue = false
     } else {
       // Switch back to upload form
-      this.notUsingBikeImageTargets.forEach(el => collapse('show', el))
-      this.usingBikeImageTargets.forEach(el => collapse('hide', el))
-      this.remotePhotoUrlTarget.value = ""
+      collapse('show', this.notUsingBikeImageTargets)
+      collapse('hide', this.usingBikeImageTargets)
+      this.remotePhotoUrlTarget.value = ''
       this.toggleImageValue = true
     }
   }
