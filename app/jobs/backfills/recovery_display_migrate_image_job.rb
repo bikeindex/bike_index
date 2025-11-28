@@ -4,7 +4,7 @@ class Backfills::RecoveryDisplayMigrateImageJob < ApplicationJob
   end
 
   def self.enqueue
-    to_migrate.pluck(:id).each { self.perform_async(it) }
+    to_migrate.pluck(:id).each { perform_async(it) }
   end
 
   def perform(recovery_display_id, force_regenerate = false)
