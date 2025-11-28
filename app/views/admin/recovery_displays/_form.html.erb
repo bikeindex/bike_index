@@ -3,8 +3,10 @@
 
 <div
   class="row mt-4 mb-4"
-  id="recovery-display-form"
-  data-toggleimageinitially="<%= toggle_image_initially %>"
+  data-controller="admin--recovery-display-form"
+  data-admin--recovery-display-form-toggle-image-initially-value="<%= toggle_image_initially %>"
+  data-admin--recovery-display-form-max-character-count-value="<%= Integrations::TwitterTweeter::TWEET_LENGTH %>">
+
 >
   <div class="col-md-10 col-lg-8 ml-auto mr-auto">
     <h4>Recovery display approval process</h4>
@@ -75,7 +77,10 @@
           <small class="less-strong">(full name: <em><%= @recovery_display.calculated_owner_name %></em>)</small>
         <% end %>
 
-        <%= f.text_field :quote_by, class: "form-control" %>
+        <%= f.text_field :quote_by, data: {
+          "admin--recovery-display-form_target" => "characterCounter",
+          action: "keyup->admin--recovery-display-form#updateCharacterCount"
+        }, class: "form-control" %>
       </div>
     </div>
 
@@ -126,26 +131,21 @@
       </div>
 
       <p
-        class="text-info text-right"
-        style="margin-top: -1rem; font-size: 150%;"
+        class="text-info text-right tw:text-lg tw:-mt-2"
+        data-admin--recovery-display-form-target="characterTotal"
       >
-        <span id="characterTotal"></span>
       </p>
-
-      <script>
-        window.maxCharacterCount = <%= Integrations::TwitterTweeter::TWEET_LENGTH %>;
-      </script>
     </div>
 
     <div class="col-lg-6">
       <div
-        id="recovery-photo-upload-input"
+        data-admin--recovery-display-form-target="photoUploadInput"
         class="form-group mt-4 collapse show"
       >
         <%= f.label :photo, "Recovery photo" %>
 
         <% if @recovery_display.photo_processed.attached? %>
-          <%= image_tag(@recovery_display.photo_url) %>
+          <%= image_tag(@recovery_display.photo_url, class: "tw:mb-1 tw:w-24") %>
         <% elsif @recovery_display.image? %>
           <%= image_tag(@recovery_display.image.url(:thumb)) %>
         <% elsif @recovery_display.id.present? %>
@@ -176,8 +176,11 @@
                 before re-uploading an image
               </span>
             <% end %>
-            <%= f.hidden_field :remote_photo_url %>
-            <p id="recovery-bike-image-text">
+
+            <%= f.hidden_field :remote_photo_url,
+                data: { "admin--recovery-display-form_target" => "remoteImageUrl" } %>
+
+            <p data-admin--recovery-display-form-target="bikeImageText">
               <span class="using-bike-image">
                 Using <%= @bike.type %> image
               </span>
@@ -194,7 +197,8 @@
 
               <a
                 class="btn btn-outline-info ml-2"
-                id="use_image_for_display"
+                data-admin--recovery-display-form-target="useImageButton"
+                data-action="click->admin--recovery-display-form#toggleImage"
                 href="#"
                 data-url="<%= @bike.image_url %>"
               >
