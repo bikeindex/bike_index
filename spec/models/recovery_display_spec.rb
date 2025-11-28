@@ -20,7 +20,7 @@ RSpec.describe RecoveryDisplay, type: :model do
       it "processing is true if recently updated" do
         # Sort of hacky, but gets us something
         allow(recovery_display).to receive(:image) { OpenStruct.new(file: OpenStruct.new("exists?" => false)) }
-        expect(recovery_display.photo_processed?).to be_truthy
+        expect(recovery_display.photo_processed?).to be_falsey
       end
     end
     context "with ActiveStorage photo" do

@@ -98,7 +98,7 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def photo_processed?
-    photo_processed.attached? || image.present?
+    photo_processed.attached?
   end
 
   def photo_url
