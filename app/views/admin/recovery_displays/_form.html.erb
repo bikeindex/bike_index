@@ -60,8 +60,8 @@
   data: {
     controller: "admin--recovery-display-form",
     "admin--recovery-display-form-toggle-image-value" => toggle_image_initially,
-    "admin--recovery-display-form-max-character-count_value" => Integrations::TwitterTweeter::TWEET_LENGTH,
-    "admin--recovery-display-form-toggle-remote-photo-url" => "d"
+    "admin--recovery-display-form-max-character-count-value" => Integrations::TwitterTweeter::TWEET_LENGTH,
+    "admin--recovery-display-form-remote-photo-url-value" => @bike&.image_url || ""
   }} do |f| %>
   <%= render(AlertForErrors::Component.new(object: @recovery_display, dismissable: true)) %>
 
@@ -177,7 +177,7 @@
               </span>
             <% end %>
             <%= f.hidden_field :remote_photo_url,
-                data: { "admin--recovery-display-form-target" => "remoteImageUrl" } %>
+                data: { "admin--recovery-display-form-target" => "remotePhotoUrl" } %>
 
 
 
@@ -200,7 +200,6 @@
                 data-admin--recovery-display-form-target="useImageButton"
                 data-action="click->admin--recovery-display-form#toggleImage"
                 href="#"
-                data-url="<%= @bike.image_url %>"
               >
                 <span data-admin--recovery-display-form-target="notUsingBikeImage">Use first image</span>
                 <span data-admin--recovery-display-form-target="usingBikeImage">Upload a different image</span>

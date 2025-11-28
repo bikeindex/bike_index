@@ -8,7 +8,7 @@ export default class extends Controller {
     "characterCounter",
     "characterTotal",
     "photoUploadInput",
-    "remoteImageUrl",
+    "remotePhotoUrl",
     "bikeImageText",
     "useImageButton",
     "usingBikeImage",
@@ -18,9 +18,11 @@ export default class extends Controller {
   static values = {
     toggleImage: Boolean,
     maxCharacterCount: Number,
+    remotePhotoUrl: String
   }
 
   connect () {
+    console.log(this.remotePhotoUrlValue)
     this.setCharacterCount()
 
     if (this.toggleImageValue) {
@@ -38,13 +40,13 @@ export default class extends Controller {
       // Use bike image
       this.usingBikeImageTargets.forEach(el => collapse('show', el))
       this.notUsingBikeImageTargets.forEach(el => collapse('hide', el))
-      this.remoteImageUrlTarget.value = this.useImageButtonTarget.dataset.url
+      this.remotePhotoUrlTarget.value = this.remotePhotoUrlValue
       this.toggleImageValue = false
     } else {
       // Switch back to upload form
       this.notUsingBikeImageTargets.forEach(el => collapse('show', el))
       this.usingBikeImageTargets.forEach(el => collapse('hide', el))
-      this.remoteImageUrlTarget.value = ""
+      this.remotePhotoUrlTarget.value = ""
       this.toggleImageValue = true
     }
   }
