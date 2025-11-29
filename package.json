@@ -17,6 +17,7 @@
   },
   "standard": {
     "ignore": [
+      "/2025_redesign/",
       "/app/assets/",
       "/public/"
     ]
