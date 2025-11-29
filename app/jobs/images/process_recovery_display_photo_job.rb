@@ -7,9 +7,8 @@ class Images::ProcessRecoveryDisplayPhotoJob < ApplicationJob
 
   sidekiq_options retry: false
 
-  # TODO: After Backfills::RecoveryDisplayMigrateImageJob is finished, remove recovery_display keyword arg
-  def perform(recovery_display_id, remote_photo_url = nil, force_regenerate = false, recovery_display: nil)
-    recovery_display ||= RecoveryDisplay.find_by_id(recovery_display_id)
+  def perform(recovery_display_id, remote_photo_url = nil, force_regenerate = false)
+    recovery_display = RecoveryDisplay.find_by_id(recovery_display_id)
     return unless recovery_display.present?
 
     recovery_display.skip_callback_job = true
