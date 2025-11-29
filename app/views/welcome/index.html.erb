@@ -23,9 +23,7 @@
         </div>
       </div>
     </header>
-
     <%= render partial: "/landing_pages/for_organizations_photo_list" %>
-
     <% cache("root_recovery_stories-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
       <div class="root-landing-recovery-stories">
         <div class="container">
@@ -43,8 +41,6 @@
         </div>
       </div>
     <% end %>
-
-
     <div class="root-landing-how-it-works">
       <div class="container">
         <h3 class="landing-container-label">
