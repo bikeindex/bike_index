@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PageSection::MarketplaceListingPanel
+module PageBlock::MarketplaceListingPanel
   class Component < ApplicationComponent
     def initialize(marketplace_listing: nil)
       @marketplace_listing = marketplace_listing

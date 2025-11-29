@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe PageSection::ChooseMembership::Component, type: :component do
+RSpec.describe PageBlock::ChooseMembership::Component, type: :component do
   let(:options) { {currency: Currency.default} }
   let(:component) { render_inline(described_class.new(**options)) }
 

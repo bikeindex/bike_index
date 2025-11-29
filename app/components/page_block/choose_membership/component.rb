@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PageSection::ChooseMembership
+module PageBlock::ChooseMembership
   class Component < ApplicationComponent
     def initialize(currency:, interval: nil, level: nil, membership: nil, referral_source: nil)
       @currency = currency

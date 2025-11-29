@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Org::BikeAccessPanel::Component, type: :component do
+RSpec.describe PageBlock::OrgBikeAccessPanel::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {bike:, organization:, current_user:} }

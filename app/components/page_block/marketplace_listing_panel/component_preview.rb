@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module PageSection::MarketplaceListingPanel
+module PageBlock::MarketplaceListingPanel
   class ComponentPreview < ApplicationComponentPreview
     def default
-      render(PageSection::MarketplaceListingPanel::Component.new(marketplace_listing:))
+      render(PageBlock::MarketplaceListingPanel::Component.new(marketplace_listing:))
     end
 
     private
