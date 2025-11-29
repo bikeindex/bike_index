@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Org::BikeAccessPanel
+module PageBlock::OrgBikeAccessPanel
   class Component < ApplicationComponent
     include OrganizedHelper
     include VehicleHelper

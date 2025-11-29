@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    page_section:
+    page_block:
       marketplace_listing_panel:
         condition: Condition
         description: Description
