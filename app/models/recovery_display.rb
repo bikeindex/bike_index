@@ -37,7 +37,6 @@ class RecoveryDisplay < ActiveRecord::Base
   validate :quote_not_too_long
 
   before_validation :set_calculated_attributes
-  after_commit :update_associations
 
   default_scope { order("recovered_at desc") }
 
@@ -124,10 +123,6 @@ class RecoveryDisplay < ActiveRecord::Base
 
   private
 
-  def update_associations
-    stolen_record&.update(updated_at: Time.current)
-  end
-
   def has_any_image?
     photo_processed? || photo.attached?
   end
@@ -135,6 +130,7 @@ class RecoveryDisplay < ActiveRecord::Base
   def enqueue_photo_processing
     return if skip_callback_job
 
+    stolen_record&.update(updated_at: Time.current)
     if remote_photo_url.present?
       Images::ProcessRecoveryDisplayPhotoJob.perform_async(id, remote_photo_url)
       self.remote_photo_url = nil # clear to ensure it doesn't get re-enqueued
