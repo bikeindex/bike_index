@@ -2,4 +2,7 @@
 en:
   components:
     page_block:
-      homepage_top: {}
+      homepage_top:
+        recoveries_value: Recoveries_value
+        organization_count: Organization_count
+        recovery_displays: Recovery_displays
