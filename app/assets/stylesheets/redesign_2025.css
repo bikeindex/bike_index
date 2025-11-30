@@ -1,3 +1,14 @@
+:root {
+  --redesign-blue-500: #3397dc;
+  --redesign-blue-800: #016ec2;
+  --redesign-red-500: #cc0000;
+  --redesign-purple-500: #715eb2;
+  --redesign-gray-100: #f5f5f5;
+  --redesign-gray-500: #666;
+  --redesign-gray-800: #333;
+}
+
+
 /* Hero Section */
 .redesign_2025_homepage .hero-section {
   background-color: white;
@@ -36,7 +47,7 @@
 }
 
 .redesign_2025_homepage .bike-tile:hover {
-  background-color: $redesign-blue-500;
+  background-color: var(--redesign-blue-500);
   padding: 20px;
   margin: -20px;
 }
@@ -47,7 +58,7 @@
 
 @keyframes redesign_2025_homepage_pulse {
   0%, 100% {
-    background-color: $redesign-red-500;
+    background-color: var(--redesign-red-500);
     padding: 20px;
     margin: -20px;
   }
@@ -98,7 +109,7 @@
 }
 
 .redesign_2025_homepage .stat-box:nth-child(1) {
-  background-image: url('assets/shield_dark-gray.png');
+  background-image: asset-url('/redesign_2025/shield_dark-gray.png');
   z-index: 1;
   margin-right: -300px;
   width: 350px;
@@ -120,7 +131,7 @@
 }
 
 .redesign_2025_homepage .stat-box:nth-child(2) {
-  background-image: url('assets/shield_light-blue.png');
+  background-image: asset-url('/redesign_2025/shield_light-blue.png');
   z-index: 3;
   width: 550px;
   height: 204px;
@@ -140,7 +151,7 @@
 }
 
 .redesign_2025_homepage .stat-box:nth-child(3) {
-  background-image: url('assets/shield_purple.png');
+  background-image: asset-url('/redesign_2025/shield_purple.png');
   z-index: 1;
   margin-left: -300px;
   width: 350px;
@@ -189,9 +200,9 @@
 .redesign_2025_homepage .hero-section h1 {
   font-size: 3.5rem;
   font-weight: bold;
-  color: $redesign-gray-800;
+  color: var(--redesign-gray-800);
   margin-bottom: 2rem;
-  background-color: rgba(white, 0.85);
+  background-color: rgba(255, 255, 255, 0.85);
   padding: 2rem 3rem;
   padding-top: 3rem;
   display: inline-block;
@@ -199,7 +210,7 @@
 
 /* For Section */
 .redesign_2025_homepage .for-section {
-  background-color: $redesign-gray-100;
+  background-color: var(--redesign-gray-100);
   padding: 3rem 0;
   position: relative;
   z-index: 10;
@@ -210,7 +221,7 @@
   text-align: center;
   font-size: 2.2rem;
   margin-bottom: 2rem;
-  color: $redesign-gray-800;
+  color: var(--redesign-gray-800);
 }
 
 .redesign_2025_homepage .buttons-grid {
@@ -239,7 +250,7 @@
 }
 
 .redesign_2025_homepage .category-button:hover span {
-  color: $redesign-purple-500;
+  color: var(--redesign-purple-500);
 }
 
 .redesign_2025_homepage .category-button:hover .img-wrapper::after {
@@ -247,7 +258,7 @@
 }
 
 .redesign_2025_homepage .category-button:nth-child(5):hover span {
-  color: $redesign-red-500;
+  color: var(--redesign-red-500);
 }
 
 .redesign_2025_homepage .img-wrapper {
@@ -265,7 +276,7 @@
   left: -5px;
   width: calc(100% + 10px);
   height: calc(100% + 10px);
-  border: 4px solid $redesign-purple-500;
+  border: 4px solid var(--redesign-purple-500);
   background-color: transparent;
   opacity: 0;
   pointer-events: none;
@@ -273,7 +284,7 @@
 }
 
 .redesign_2025_homepage .category-button:nth-child(5) .img-wrapper::after {
-  border-color: $redesign-red-500;
+  border-color: var(--redesign-red-500);
 }
 
 @keyframes redesign_2025_homepage_drawBorder {
@@ -306,14 +317,14 @@
   display: block;
   font-size: 1rem;
   font-weight: 600;
-  color: $redesign-gray-800;
+  color: var(--redesign-gray-800);
   transition: color 0.3s ease;
 }
 
 /* Stolen Bikes Section */
 .redesign_2025_homepage .stolen-bikes-section {
-  background-color: $redesign-blue-800;
-  background-image: url('assets/bikes-unique.png');
+  background-color: var(--redesign-blue-800);
+  background-image: asset-url('/redesign_2025/bikes-unique.png');
   background-size: cover;
   background-position: center;
   background-blend-mode: overlay;
@@ -329,7 +340,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba($redesign-blue-800, 0.8);
+  // background-color: rgba(var(--redesign-blue-800), 0.8);
+  background-color: color-mix(in srgb, var(--redesign-blue-800) 80%, transparent);
   z-index: 1;
 }
 
@@ -424,10 +436,10 @@
 }
 
 .redesign_2025_homepage .testimonial-box {
-  background-color: rgba(white, 0.95);
+  background-color: rgba(255, 255, 255, 0.95);
   border-radius: 0;
   padding: 1.5rem;
-  color: $redesign-gray-800;
+  color: var(--redesign-gray-800);
   position: relative;
   height: 267px;
   display: flex;
@@ -447,7 +459,7 @@
 
 .redesign_2025_homepage .recovery-date {
   font-size: 0.9rem;
-  color: $redesign-gray-500;
+  color: var(--redesign-gray-500);
   margin-bottom: 1rem;
   text-align: right;
 }
@@ -465,7 +477,7 @@
 }
 
 .redesign_2025_homepage .nav-arrow {
-  background-color: $redesign-purple-500;
+  background-color: var(--redesign-purple-500);
   color: white;
   border: none;
   border-radius: 0;
@@ -480,7 +492,7 @@
 }
 
 .redesign_2025_homepage .nav-arrow:hover {
-  background-color: $redesign-purple-500;
+  background-color: var(--redesign-purple-500);
   transform: scale(1.1);
 }
 
@@ -587,7 +599,7 @@
 
 .redesign_2025_homepage .question-text h2 {
   font-size: 2.8rem;
-  color: $redesign-blue-500;
+  color: var(--redesign-blue-500);
   line-height: 1.2;
   margin: 0;
   text-transform: uppercase;
@@ -644,7 +656,7 @@
 }
 
 .redesign_2025_homepage .step-text h3 {
-  color: $redesign-gray-800;
+  color: var(--redesign-gray-800);
   margin-bottom: 0.5rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -664,7 +676,7 @@
 
 .redesign_2025_homepage .step-text p {
   font-size: 1.1rem;
-  color: $redesign-gray-500;
+  color: var(--redesign-gray-500);
   line-height: 1.5;
   margin-bottom: 1.5rem;
 }
@@ -676,7 +688,7 @@
 }
 
 .redesign_2025_homepage .step-arrow {
-  background-color: $redesign-blue-500;
+  background-color: var(--redesign-blue-500);
   color: white;
   border: none;
   border-radius: 0;
@@ -691,13 +703,13 @@
 }
 
 .redesign_2025_homepage .step-arrow:hover {
-  background-color: $redesign-purple-500;
+  background-color: var(--redesign-purple-500);
   transform: scale(1.1);
 }
 
 .redesign_2025_homepage .step-indicator {
   font-size: 1rem;
-  color: $redesign-gray-800;
+  color: var(--redesign-gray-800);
   font-weight: 500;
 }
 

@@ -1,3 +1,5 @@
+<%= stylesheet_link_tag "redesign_2025", "data-turbo-track" => "reload" %>
+
 <div class="redesign_2025_homepage">
   <section class="hero-section">
     <div class="bike-tiles-grid" id="bikeTilesGrid"></div>
@@ -32,7 +34,7 @@
       <div class="buttons-grid">
         <div class="category-button">
           <div class="img-wrapper">
-            <img src="assets/bikeshop.gif" alt="Bike Shops">
+            <%= image_tag "redesign_2025/bikeshop.gif", alt: "Bike Shops" %>
           </div>
 
           <span>Bike Shops</span>
@@ -40,7 +42,7 @@
 
         <div class="category-button">
           <div class="img-wrapper">
-            <img src="assets/cities.gif" alt="Cities">
+            <%= image_tag "redesign_2025/cities.gif", alt: "Cities" %>
           </div>
 
           <span>Cities</span>
@@ -48,7 +50,7 @@
 
         <div class="category-button">
           <div class="img-wrapper">
-            <img src="assets/unis.gif" alt="Universities">
+            <%= image_tag "redesign_2025/unis.gif", alt: "Universities" %>
           </div>
 
           <span>Universities</span>
@@ -56,7 +58,7 @@
 
         <div class="category-button">
           <div class="img-wrapper">
-            <img src="assets/community.gif" alt="Community Groups">
+            <%= image_tag "redesign_2025/community.gif", alt: "Community Groups" %>
           </div>
 
           <span>Community Groups</span>
@@ -64,7 +66,7 @@
 
         <div class="category-button">
           <div class="img-wrapper">
-            <img src="assets/theft-victims.gif" alt="Theft Victims">
+            <%= image_tag "redesign_2025/theft-victims.gif", alt: "Theft Victims" %>
           </div>
 
           <span>Theft Victims</span>
@@ -81,11 +83,7 @@
 
       <div class="recovery-showcase">
         <div class="bike-container">
-          <img
-            src="assets/black-box.png"
-            alt="Bike recovery showcase"
-            class="black-box"
-          >
+          <%= image_tag "redesign_2025/black-box.png", alt: "Bike recovery showcase", class: "black-box" %>
 
           <div class="bike-image-placeholder">
             <div class="bike-photo" id="bikePhoto">
@@ -97,11 +95,7 @@
 
         <div class="testimonial-container">
           <div class="testimonial-box">
-            <img
-              src="assets/location-pin_purple.png"
-              alt="Location pin"
-              class="location-pin"
-            >
+            <%= image_tag "redesign_2025/location-pin_purple.png", alt: "Location pin", class: "location-pin" %>
 
             <div class="testimonial-content" id="testimonialContent">
               <div class="user-info">
@@ -137,19 +131,9 @@
       <div class="stolen-question-content">
         <div class="bike-animation-container">
           <div class="bike-transition">
-            <img
-              src="assets/bike-index-registered-single-loop.gif"
-              alt="Registered bike animation"
-              class="bike-registered"
-              id="bikeRegistered"
-            >
+            <%= image_tag "redesign_2025/bike-index-registered-single-loop.gif", alt: "Registered bike animation", class: "bike-registered", id: "bikeRegistered" %>
 
-            <img
-              src="assets/bike-index-stolen.png"
-              alt="Stolen bike"
-              class="bike-stolen"
-              id="bikeStolen"
-            >
+            <%= image_tag "redesign_2025/bike-index-stolen.png", alt: "Stolen bike", class: "bike-stolen", id: "bikeStolen" %>
           </div>
         </div>
 
@@ -162,19 +146,9 @@
       <div class="recovery-process">
         <div class="crank-animation-container">
           <div class="crank-wrapper">
-            <img
-              src="assets/Step1.gif"
-              alt="Step background"
-              class="step-background"
-              id="stepBackground"
-            >
+            <%= image_tag "redesign_2025/step1.gif", alt: "Step background", class: "step-background", id: "stepBackground" %>
 
-            <img
-              src="assets/bike-crank.png"
-              alt="Bike crank"
-              class="bike-crank"
-              id="bikeCrank"
-            >
+            <%= image_tag "redesign_2025/bike-crank.png", alt: "Bike crank", class: "bike-crank", id: "bikeCrank" %>
           </div>
         </div>
 
