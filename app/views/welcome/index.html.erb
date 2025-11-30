@@ -1,8 +1,10 @@
 <main class="root-landing-page">
   <% if Flipper.enabled?(:updated_homepage) %>
+    <%= stylesheet_link_tag "redesign_2025" %>
     <% cache("redesigned_homepage-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
       <%= render(PageBlock::HomepageTop::Component.new(recoveries_value: Counts.recoveries_value,
-        organization_count: Organization.count, recovery_displays: RecoveryDisplay.limit(5))) %>
+        organization_count: Organization.count,
+        recovery_displays: RecoveryDisplay.limit(5))) %>
     <% end %>
   <% else %>
     <header class="jumbotron root-landing-banner-header bg-image-bike-hero">
