@@ -1,8 +1,10 @@
 <%= stylesheet_link_tag "redesign_2025", "data-turbo-track" => "reload" %>
 
-<div class="redesign_2025_homepage">
+<div class="redesign_2025_homepage" data-controller="homepage-top" data-homepage-top-bike-tile-images-value="<%= bike_tile_images.to_json %>">
   <section class="hero-section">
-    <div class="bike-tiles-grid" id="bikeTilesGrid"></div>
+    <div class="bike-tiles-grid" data-homepage-top-target="bikeTilesGrid">
+
+    </div>
 
     <div class="hero-content">
       <div class="hero-stats">
