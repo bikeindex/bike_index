@@ -1,8 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
-// import { collapse } from "../../utils/collapse-utils"
 
-// Connects to data-controller='admin--update-cached-sortable-links
+// Connects to data-controller='admin--recovery-display-form'
 export default class extends Controller {
   static targets = [
     'characterCounter',
@@ -22,7 +21,6 @@ export default class extends Controller {
   }
 
   connect () {
-    console.log(this.remotePhotoUrlValue)
     this.setCharacterCount()
 
     if (this.toggleImageValue) {
