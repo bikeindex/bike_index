@@ -4643,15 +4643,6 @@ es:
     definition_list:
       row:
         no_value:
-    page_section:
-      marketplace_listing_panel:
-        condition:
-        description:
-        first_posted_at:
-        location:
-        price_is_firm_false:
-        price_is_firm_true:
-        still_for_sale_at:
     alert_for_errors:
       errors_prevented_this_from_being_saved:
     messages:
@@ -4671,8 +4662,16 @@ es:
         registered_not_stolen:
       container:
         no_results:
-    org:
-      bike_access_panel:
+    page_block:
+      marketplace_listing_panel:
+        condition:
+        description:
+        first_posted_at:
+        location:
+        price_is_firm_false:
+        price_is_firm_true:
+        still_for_sale_at:
+      org_bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
         additional_registrations_information:

@@ -5889,15 +5889,6 @@ nb:
     definition_list:
       row:
         no_value: ingen
-    page_section:
-      marketplace_listing_panel:
-        condition: Betingelse
-        description: Beskrivelse
-        first_posted_at: Postet
-        location: plassering
-        price_is_firm_false: Prisen er omsettelig
-        price_is_firm_true: prisen er fast
-        still_for_sale_at: Selger fortsatt på
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
         %{object_name} ble lagret:"
@@ -5918,8 +5909,16 @@ nb:
         registered_not_stolen: registrert, ikke stjålet
       container:
         no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
-    org:
-      bike_access_panel:
+    page_block:
+      marketplace_listing_panel:
+        condition: Betingelse
+        description: Beskrivelse
+        first_posted_at: Postet
+        location: plassering
+        price_is_firm_false: Prisen er omsettelig
+        price_is_firm_true: prisen er fast
+        still_for_sale_at: Selger fortsatt på
+      org_bike_access_panel:
         access_panel: Tilgangspanel
         added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
           på en bruker. Den ble lagt til for å spore parkeringsvarsler.
