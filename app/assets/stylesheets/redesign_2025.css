@@ -8,6 +8,11 @@
   --redesign-gray-800: #333;
 }
 
+.redesign_2025_homepage .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
 
 /* Hero Section */
 .redesign_2025_homepage .hero-section {
@@ -38,33 +43,35 @@
 .redesign_2025_homepage .bike-tile {
   width: 120px;
   height: 120px;
+  position: relative;
+}
+
+.redesign_2025_homepage .bike-tile span {
+  display: block;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  position: relative;
-  transition: background-color 0.3s ease, padding 0.3s ease, margin 0.3s ease;
-  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  transition: background-color 0.3s ease, margin 0.3s ease;
 }
 
-.redesign_2025_homepage .bike-tile:hover {
+.redesign_2025_homepage .bike-tile:hover span {
   background-color: var(--redesign-blue-500);
-  padding: 20px;
-  margin: -20px;
+  margin: -20px 0 0 -20px;
 }
 
-.redesign_2025_homepage .bike-tile.stolen-alert {
+.redesign_2025_homepage .bike-tile.stolen-alert span {
   animation: redesign_2025_homepage_pulse 2s ease-in-out infinite;
 }
 
 @keyframes redesign_2025_homepage_pulse {
   0%, 100% {
     background-color: var(--redesign-red-500);
-    padding: 20px;
-    margin: -20px;
+    margin: -20px 0 0 -20px;
   }
   50% {
     background-color: transparent;
-    padding: 0px;
     margin: 0px;
   }
 }
@@ -109,7 +116,7 @@
 }
 
 .redesign_2025_homepage .stat-box:nth-child(1) {
-  background-image: asset-url('/redesign_2025/shield_dark-gray.png');
+  background-image: url('redesign_2025/shield_dark-gray.png');
   z-index: 1;
   margin-right: -300px;
   width: 350px;
@@ -131,7 +138,7 @@
 }
 
 .redesign_2025_homepage .stat-box:nth-child(2) {
-  background-image: asset-url('/redesign_2025/shield_light-blue.png');
+  background-image: url('redesign_2025/shield_light-blue.png');
   z-index: 3;
   width: 550px;
   height: 204px;
@@ -151,7 +158,7 @@
 }
 
 .redesign_2025_homepage .stat-box:nth-child(3) {
-  background-image: asset-url('/redesign_2025/shield_purple.png');
+  background-image: url('redesign_2025/shield_purple.png');
   z-index: 1;
   margin-left: -300px;
   width: 350px;
@@ -197,6 +204,10 @@
   }
 }
 
+.redesign_2025_homepage h2 {
+  font-weight: bold;
+}
+
 .redesign_2025_homepage .hero-section h1 {
   font-size: 3.5rem;
   font-weight: bold;
@@ -230,7 +241,7 @@
   gap: 1.5rem;
   max-width: 1100px;
   margin: 0 auto;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .redesign_2025_homepage .category-button {
@@ -246,6 +257,7 @@
 }
 
 .redesign_2025_homepage .category-button:hover {
+  text-decoration: none;
   transform: translateY(-5px);
 }
 
@@ -324,7 +336,7 @@
 /* Stolen Bikes Section */
 .redesign_2025_homepage .stolen-bikes-section {
   background-color: var(--redesign-blue-800);
-  background-image: asset-url('/redesign_2025/bikes-unique.png');
+  background-image: url('redesign_2025/bikes-unique.png');
   background-size: cover;
   background-position: center;
   background-blend-mode: overlay;
@@ -340,7 +352,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  // background-color: rgba(var(--redesign-blue-800), 0.8);
   background-color: color-mix(in srgb, var(--redesign-blue-800) 80%, transparent);
   z-index: 1;
 }
@@ -356,6 +367,7 @@
   margin-bottom: 0.25rem;
   line-height: 1;
   text-transform: uppercase;
+  color: white;
 }
 
 .redesign_2025_homepage .stolen-bikes-section h3 {
@@ -365,6 +377,7 @@
   font-weight: normal;
   letter-spacing: 0.1em;
   line-height: 1;
+  color: white;
 }
 
 .redesign_2025_homepage .recovery-showcase {
@@ -393,11 +406,11 @@
 
 .redesign_2025_homepage .bike-image-placeholder {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: auto;
-  height: auto;
+  top: 5%;
+  left: 5%;
+  /*transform: translate(-50%, -50%);*/
+  width: 90%;
+  height: 90%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -445,6 +458,7 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
+  justify-content: space-between;
 }
 
 .redesign_2025_homepage .user-info {
@@ -467,7 +481,6 @@
 .redesign_2025_homepage .testimonial-text {
   font-style: italic;
   line-height: 1.6;
-  margin-bottom: 1rem;
 }
 
 .redesign_2025_homepage .testimonial-nav {
@@ -513,7 +526,6 @@
   }
 
   .redesign_2025_homepage .buttons-grid {
-    flex-wrap: wrap;
     gap: 1rem;
   }
 

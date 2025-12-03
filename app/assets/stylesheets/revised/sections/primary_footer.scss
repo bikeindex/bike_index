@@ -2,6 +2,7 @@ $primary-footer-top-margin: 6 * $vertical-height;
 
 // Because sometimes we cover this up other places
 .primary-footer {
+  position: relative;
   margin-top: $primary-footer-top-margin;
 
   .primary-footer-nav,

@@ -3,7 +3,7 @@
     <% cache("redesigned_homepage-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
       <%= render(PageBlock::HomepageTop::Component.new(recoveries_value: Counts.recoveries_value,
         organization_count: Organization.count,
-        recovery_displays: RecoveryDisplay.limit(5))) %>
+        recovery_displays: @recovery_displays)) %>
     <% end %>
   <% else %>
     <header class="jumbotron root-landing-banner-header bg-image-bike-hero">
@@ -120,7 +120,7 @@
   <% end %>
 
   <% cache("root_who_and_numbers", expires_in: 1.hour) do %>
-    <div class="root-landing-who">
+    <div class="root-landing-who scrolled">
       <div class="container">
         <h3 class="landing-container-label"><%= t(".used_by") %></h3>
 

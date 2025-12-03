@@ -1,15 +1,15 @@
 <%= stylesheet_link_tag "redesign_2025", "data-turbo-track" => "reload" %>
 
-<div class="redesign_2025_homepage" data-controller="homepage-top" data-homepage-top-bike-tile-images-value="<%= bike_tile_images.to_json %>">
+<div class="redesign_2025_homepage">
   <section class="hero-section">
-    <div class="bike-tiles-grid" data-homepage-top-target="bikeTilesGrid">
-
-    </div>
-
     <div class="hero-content">
       <div class="hero-stats">
         <div class="stat-box">
-          <div class="stat-number" data-target="32">$0M+</div>
+          <div class="stat-number"
+           data-controller="homepage--animate-count"
+           data-homepage--animate-count-target-value="<%= recoveries_value %>"
+           data-homepage--animate-count-prefix-value="$"
+           data-homepage--animate-count-suffix-value="M+">$<%= recoveries_value %>M+</div>
           <div class="stat-label">Total recovery value</div>
         </div>
 
@@ -19,79 +19,81 @@
         </div>
 
         <div class="stat-box">
-          <div class="stat-number" data-target="1795">0+</div>
+          <div class="stat-number"
+           data-controller="homepage--animate-count"
+           data-homepage--animate-count-target-value="<%= @organization_count %>"
+           data-homepage--animate-count-suffix-value="+"><%= @organization_count %>+</div>
           <div class="stat-label">Trusted organizations</div>
         </div>
       </div>
 
       <h1>The bike registry that works.</h1>
     </div>
+    <div class="bike-tiles-grid" data-controller="homepage--bike-tiles" data-homepage--bike-tiles-target="grid" data-homepage--bike-tiles-images-value="<%= bike_tile_images.to_json %>"></div>
   </section>
 
-  <!-- Section 2: Bike Index is for -->
+  <%# Section 2: Bike Index is for %>
   <section class="for-section">
     <div class="container">
       <h2>Bike Index is for:</h2>
 
       <div class="buttons-grid">
-        <div class="category-button">
+        <%= link_to for_bike_shops_path, class: "category-button" do %>
           <div class="img-wrapper">
             <%= image_tag "redesign_2025/bikeshop.gif", alt: "Bike Shops" %>
           </div>
 
           <span>Bike Shops</span>
-        </div>
+        <% end %>
 
-        <div class="category-button">
+        <%= link_to for_cities_path, class: "category-button" do %>
           <div class="img-wrapper">
             <%= image_tag "redesign_2025/cities.gif", alt: "Cities" %>
           </div>
 
           <span>Cities</span>
-        </div>
+        <% end %>
 
-        <div class="category-button">
+        <%= link_to for_schools_path, class: "category-button" do %>
           <div class="img-wrapper">
             <%= image_tag "redesign_2025/unis.gif", alt: "Universities" %>
           </div>
 
           <span>Universities</span>
-        </div>
+        <% end %>
 
-        <div class="category-button">
+        <%= link_to for_community_groups_path, class: "category-button" do %>
           <div class="img-wrapper">
             <%= image_tag "redesign_2025/community.gif", alt: "Community Groups" %>
           </div>
 
           <span>Community Groups</span>
-        </div>
+        <% end %>
 
-        <div class="category-button">
+        <%= link_to stolen_index_path, class: "category-button" do %>
           <div class="img-wrapper">
             <%= image_tag "redesign_2025/theft-victims.gif", alt: "Theft Victims" %>
           </div>
 
           <span>Theft Victims</span>
-        </div>
+        <% end %>
       </div>
     </div>
   </section>
 
-  <!-- Section 3: Stolen Bikes -->
+  <%# Section 3: Stolen Bikes %>
   <section class="stolen-bikes-section">
     <div class="container">
       <h2>Stolen Bikes</h2>
       <h3>WE'VE HELPED RECOVER:</h3>
 
-      <div class="recovery-showcase">
+      <div class="recovery-showcase" data-controller="homepage--recovery-showcase">
         <div class="bike-container">
           <%= image_tag "redesign_2025/black-box.png", alt: "Bike recovery showcase", class: "black-box" %>
 
           <div class="bike-image-placeholder">
-            <div class="bike-photo" id="bikePhoto">
-              <!-- Placeholder for bike and owner images -->
-              <div class="placeholder-content">Bike & Owner Photo</div>
-            </div>
+
+            <%= image_tag @recovery_displays.first&.photo_url, alt: @recovery_displays.first&.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
           </div>
         </div>
 
@@ -99,27 +101,30 @@
           <div class="testimonial-box">
             <%= image_tag "redesign_2025/location-pin_purple.png", alt: "Location pin", class: "location-pin" %>
 
-            <div class="testimonial-content" id="testimonialContent">
-              <div class="user-info">
-                <span class="user-name" id="userName">
-                  Sarah Johnson, Seattle
-                </span>
-              </div>
+            <ul class="tw:list-none">
+              <% @recovery_displays.each_with_index do |recovery_display, inx| %>
+                <%# Hide all but the first li %>
+                <li class="<%= inx == 0 ? '' : 'tw:hidden' %>" data-slide-index="<%= inx %>" data-image-url="<%= recovery_display.photo_url %>" data-homepage--recovery-showcase-target="slide">
+                  <div class="user-info">
+                    <span class="user-name">
+                      <%= recovery_display.quote_by %>, <%= recovery_display.location_string %>
+                    </span>
+                  </div>
 
-              <div class="recovery-date" id="recoveryDate">
-                Bike recovered on 03.15.2024
-              </div>
+                  <div class="recovery-date">
+                    <%= recovery_display&.bike&.type_titleize.presence || "bike" %> recovered on <%= l(recovery_display.recovered_at, format: :dotted) %>
+                  </div>
 
-              <div class="testimonial-text" id="testimonialText">
-                "I couldn't believe it when I got the call that my bike was
-                found! The Bike Index made it so easy to report and helped
-                connect me with the person who found it."
-              </div>
-            </div>
+                  <div class="testimonial-text">
+                    "<%= recovery_display.quote %>"
+                  </div>
+                </li>
+              <% end %>
+            </ul>
 
             <div class="testimonial-nav">
-              <button class="nav-arrow prev" id="prevTestimonial">‹</button>
-              <button class="nav-arrow next" id="nextTestimonial">›</button>
+              <button class="nav-arrow prev" data-homepage--recovery-showcase-target="prev" data-action="click->homepage--recovery-showcase#prev">‹</button>
+              <button class="nav-arrow next" data-homepage--recovery-showcase-target="next" data-action="click->homepage--recovery-showcase#next">›</button>
             </div>
           </div>
         </div>
@@ -127,8 +132,8 @@
     </div>
   </section>
 
-  <!-- Section 4: What happens if my bike gets stolen -->
-  <section class="stolen-question-section">
+  <%# Section 4: What happens if my bike gets stolen %>
+  <section class="stolen-question-section" data-controller="homepage--what-happens" data-homepage--what-happens-steps-value="<%= recovery_steps.to_json %>">
     <div class="container">
       <div class="stolen-question-content">
         <div class="bike-animation-container">
@@ -144,7 +149,7 @@
         </div>
       </div>
 
-      <!-- Recovery Process Steps -->
+      <%# Recovery Process Steps %>
       <div class="recovery-process">
         <div class="crank-animation-container">
           <div class="crank-wrapper">
@@ -166,9 +171,9 @@
           </div>
 
           <div class="step-navigation">
-            <button class="step-arrow prev" id="prevStep">‹</button>
+            <button class="step-arrow prev" data-action="click->homepage--what-happens#prevStep">‹</button>
             <span class="step-indicator" id="stepIndicator">1 / 4</span>
-            <button class="step-arrow next" id="nextStep">›</button>
+            <button class="step-arrow next" data-action="click->homepage--what-happens#nextStep">›</button>
           </div>
         </div>
       </div>
