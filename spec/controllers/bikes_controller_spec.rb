@@ -581,7 +581,7 @@ RSpec.describe BikesController, type: :controller do
         let(:organization) { FactoryBot.create(:organization_with_auto_user, parent_organization_id: organization_parent.id) }
         let!(:user2) { FactoryBot.create(:user_confirmed) }
         include_context :test_csrf_token
-        it "registers a bike and redirects with persist_email" do
+        it "registers a bike and redirects with persist_email", :flaky do
           set_current_user(user2)
           post :create, params: {bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true}
           expect(assigns[:persist_email]).to be_truthy

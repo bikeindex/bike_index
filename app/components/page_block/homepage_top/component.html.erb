@@ -1,0 +1,239 @@
+<%= stylesheet_link_tag "redesign_2025", "data-turbo-track" => "reload" %>
+
+<div class="redesign_2025_homepage">
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-stats">
+        <div class="stat-box">
+          <div
+            class="stat-number"
+            data-controller="homepage--animate-count"
+            data-homepage--animate-count-target-value="<%= recoveries_value %>"
+            data-homepage--animate-count-prefix-value="$"
+            data-homepage--animate-count-suffix-value="M+"
+          >
+            $<%= recoveries_value %>M+
+          </div>
+
+          <div class="stat-label">Total recovery value</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-label">Since</div>
+          <div class="stat-number">2013</div>
+        </div>
+
+        <div class="stat-box">
+          <div
+            class="stat-number"
+            data-controller="homepage--animate-count"
+            data-homepage--animate-count-target-value="<%= @organization_count %>"
+            data-homepage--animate-count-suffix-value="+"
+          >
+            <%= @organization_count %>+
+          </div>
+
+          <div class="stat-label">Trusted organizations</div>
+        </div>
+      </div>
+
+      <h1>The bike registry that works.</h1>
+    </div>
+
+    <div
+      class="bike-tiles-grid"
+      data-controller="homepage--bike-tiles"
+      data-homepage--bike-tiles-target="grid"
+      data-homepage--bike-tiles-images-value="<%= bike_tile_images.to_json %>"
+    ></div>
+  </section>
+
+  <%# Section 2: Bike Index is for %>
+  <section class="for-section">
+    <div class="container">
+      <h2>Bike Index is for:</h2>
+
+      <div class="buttons-grid">
+        <%= link_to for_bike_shops_path, class: "category-button" do %>
+          <div class="img-wrapper">
+            <%= image_tag "redesign_2025/bikeshop.gif", alt: "Bike Shops" %>
+          </div>
+
+          <span>Bike Shops</span>
+        <% end %>
+
+        <%= link_to for_cities_path, class: "category-button" do %>
+          <div class="img-wrapper">
+            <%= image_tag "redesign_2025/cities.gif", alt: "Cities" %>
+          </div>
+
+          <span>Cities</span>
+        <% end %>
+
+        <%= link_to for_schools_path, class: "category-button" do %>
+          <div class="img-wrapper">
+            <%= image_tag "redesign_2025/unis.gif", alt: "Universities" %>
+          </div>
+
+          <span>Universities</span>
+        <% end %>
+
+        <%= link_to for_community_groups_path, class: "category-button" do %>
+          <div class="img-wrapper">
+            <%= image_tag "redesign_2025/community.gif", alt: "Community Groups" %>
+          </div>
+
+          <span>Community Groups</span>
+        <% end %>
+
+        <%= link_to stolen_index_path, class: "category-button" do %>
+          <div class="img-wrapper">
+            <%= image_tag "redesign_2025/theft-victims.gif", alt: "Theft Victims" %>
+          </div>
+
+          <span>Theft Victims</span>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <%# Section 3: Stolen Bikes %>
+  <section class="stolen-bikes-section">
+    <div class="container">
+      <h2>Stolen Bikes</h2>
+      <h3>WE'VE HELPED RECOVER:</h3>
+
+      <div
+        class="recovery-showcase"
+        data-controller="homepage--recovery-showcase"
+      >
+        <div class="bike-container">
+          <%= image_tag "redesign_2025/black-box.png", alt: "Bike recovery showcase", class: "black-box" %>
+
+          <div class="bike-image-placeholder">
+            <% if @recovery_displays.any? %>
+              <%= image_tag @recovery_displays.first&.photo_url, alt: @recovery_displays.first&.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="testimonial-container">
+          <div class="testimonial-box">
+            <%= image_tag "redesign_2025/location-pin_purple.png", alt: "Location pin", class: "location-pin" %>
+
+            <ul class="tw:list-none">
+              <% @recovery_displays.each_with_index do |recovery_display, inx| %>
+                <%# Hide all but the first li %>
+                <li
+                  class="<%= inx == 0 ? '' : 'tw:hidden' %>"
+                  data-slide-index="<%= inx %>"
+                  data-image-url="<%= recovery_display.photo_url %>"
+                  data-homepage--recovery-showcase-target="slide"
+                >
+                  <div class="user-info">
+                    <span class="user-name">
+                      <%= recovery_display.quote_by %>,
+                      <%= recovery_display.location_string %>
+                    </span>
+                  </div>
+
+                  <div class="recovery-date">
+                    <%= recovery_display&.bike&.type_titleize.presence || "bike" %>
+                    recovered on
+                    <%= l(recovery_display.recovered_at, format: :dotted) %>
+                  </div>
+
+                  <div class="testimonial-text">
+                    "<%= recovery_display.quote %>"
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+
+            <div class="testimonial-nav">
+              <button
+                class="nav-arrow prev"
+                data-homepage--recovery-showcase-target="prev"
+                data-action="click->homepage--recovery-showcase#prev"
+              >
+                ‹
+              </button>
+
+              <button
+                class="nav-arrow next"
+                data-homepage--recovery-showcase-target="next"
+                data-action="click->homepage--recovery-showcase#next"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Section 4: What happens if my bike gets stolen %>
+  <section
+    class="stolen-question-section"
+    data-controller="homepage--what-happens"
+    data-homepage--what-happens-steps-value="<%= recovery_steps.to_json %>"
+  >
+    <div class="container">
+      <div class="stolen-question-content">
+        <div class="bike-animation-container">
+          <div class="bike-transition">
+            <%= image_tag "redesign_2025/bike-index-registered-single-loop.gif", alt: "Registered bike animation", class: "bike-registered", id: "bikeRegistered" %>
+
+            <%= image_tag "redesign_2025/bike-index-stolen.png", alt: "Stolen bike", class: "bike-stolen", id: "bikeStolen" %>
+          </div>
+        </div>
+
+        <div class="question-text">
+          <h2>What happens if my bike gets stolen?</h2>
+        </div>
+      </div>
+
+      <%# Recovery Process Steps %>
+      <div class="recovery-process">
+        <div class="crank-animation-container">
+          <div class="crank-wrapper">
+            <%= image_tag "redesign_2025/step1.gif", alt: "Step background", class: "step-background", id: "stepBackground" %>
+
+            <%= image_tag "redesign_2025/bike-crank.png", alt: "Bike crank", class: "bike-crank", id: "bikeCrank" %>
+          </div>
+        </div>
+
+        <div class="steps-content">
+          <div class="step-text" id="stepText">
+            <h3>Step 1: REGISTER YOUR BIKE</h3>
+
+            <p>
+              It's simple. Submit your name, bike manufacturer, serial number,
+              and component information to enter your bike into the most widely
+              used bike registry on the planet.
+            </p>
+          </div>
+
+          <div class="step-navigation">
+            <button
+              class="step-arrow prev"
+              data-action="click->homepage--what-happens#prevStep"
+            >
+              ‹
+            </button>
+
+            <span class="step-indicator" id="stepIndicator">1 / 4</span>
+
+            <button
+              class="step-arrow next"
+              data-action="click->homepage--what-happens#nextStep"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

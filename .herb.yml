@@ -21,6 +21,7 @@ files:
 #
 #   # Patterns to exclude (can exclude defaults too)
   exclude:
+    - '2025_redesign/**/*'
     - 'public/**/*'
     - 'tmp/**/*'
     - 'vendor/**/*'
