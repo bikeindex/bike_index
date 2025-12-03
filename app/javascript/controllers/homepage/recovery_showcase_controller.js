@@ -2,22 +2,22 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='homepage--recovery-showcase'
 export default class extends Controller {
-  static targets = ["bikePhoto", "next", "prev", "slide"]
+  static targets = ['bikePhoto', 'next', 'prev', 'slide']
   static values = { currentIndex: { type: Number, default: 0 } }
 
-  connect() {
+  connect () {
     this.slidesCount = this.slideTargets.length
   }
 
-   next() {
+  next () {
     this.goToSlide((this.currentIndexValue + 1) % this.slidesCount)
   }
 
-  prev() {
+  prev () {
     this.goToSlide((this.currentIndexValue - 1 + this.slidesCount) % this.slidesCount)
   }
 
-  goToSlide(index) {
+  goToSlide (index) {
     // Hide current slide
     this.slideTargets[this.currentIndexValue].classList.add('tw:hidden')
 

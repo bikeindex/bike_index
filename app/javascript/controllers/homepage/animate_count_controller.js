@@ -6,15 +6,15 @@ export default class extends Controller {
     target: Number,
     duration: { type: Number, default: 3000 },
     delay: { type: Number, default: 500 },
-    prefix: { type: String, default: "" },
-    suffix: { type: String, default: "" }
+    prefix: { type: String, default: '' },
+    suffix: { type: String, default: '' }
   }
 
-  connect() {
+  connect () {
     setTimeout(() => this.animate(), this.delayValue)
   }
 
-  animate() {
+  animate () {
     const increment = this.targetValue / (this.durationValue / 16) // 60fps
     let current = 0 // NOTE: Actual initial values are the final values, for SEO/no JS
 
