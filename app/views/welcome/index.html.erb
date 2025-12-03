@@ -1,44 +1,47 @@
 <main class="root-landing-page">
-  <header class="jumbotron root-landing-banner-header bg-image-bike-hero">
-    <div class="container">
-      <div class="root-landing-header-text">
-        <h2>
-          <%= t(".value_of_bikes_recovered", value: as_currency(Counts.recoveries_value)) %>
-        </h2>
-
-        <h1 class="upcase"><%= t(".hero") %></h1>
-
-        <h2>
-          <%= link_to new_bike_path do %>
-            <%= t(".register_now") %>
-            <span class="chevron">&raquo;</span>
-          <% end %>
-        </h2>
-      </div>
-    </div>
-  </header>
-
-  <%= render partial: "/landing_pages/for_organizations_photo_list" %>
-
-  <% cache("root_recovery_stories-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
-    <div class="root-landing-recovery-stories">
+  <% if Flipper.enabled?(:updated_homepage) %>
+    <% cache("redesigned_homepage-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
+      <%= render(PageBlock::HomepageTop::Component.new(recoveries_value: Counts.recoveries_value,
+        organization_count: Organization.count,
+        recovery_displays: @recovery_displays)) %>
+    <% end %>
+  <% else %>
+    <header class="jumbotron root-landing-banner-header bg-image-bike-hero">
       <div class="container">
-        <h3><%= t(".recent_recovery_stories") %></h3>
+        <div class="root-landing-header-text">
+          <h2>
+            <%= t(".value_of_bikes_recovered", value: as_currency(Counts.recoveries_value)) %>
+          </h2>
 
-        <div id="recovery-stories-container" class="extras-hidden">
-          <%= render partial: "shared/recovery_display", collection: @recovery_displays.limit(5) %>
+          <h1 class="upcase"><%= t(".hero") %></h1>
 
-          <div class="recovery-block recovery-see-more">
-            <%= link_to t(".read_more_recovery_stories"),
-              recovery_stories_path,
-              class: "see-more-link" %>
+          <h2>
+            <%= link_to new_bike_path do %>
+              <%= t(".register_now") %>
+              <span class="chevron">&raquo;</span>
+            <% end %>
+          </h2>
+        </div>
+      </div>
+    </header>
+    <%= render partial: "/landing_pages/for_organizations_photo_list" %>
+    <% cache("root_recovery_stories-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
+      <div class="root-landing-recovery-stories">
+        <div class="container">
+          <h3><%= t(".recent_recovery_stories") %></h3>
+
+          <div id="recovery-stories-container" class="extras-hidden">
+            <%= render partial: "shared/recovery_display", collection: @recovery_displays.limit(5) %>
+
+            <div class="recovery-block recovery-see-more">
+              <%= link_to t(".read_more_recovery_stories"),
+                recovery_stories_path,
+                class: "see-more-link" %>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  <% end %>
-
-  <% cache("root_body") do %>
+    <% end %>
     <div class="root-landing-how-it-works">
       <div class="container">
         <h3 class="landing-container-label">
@@ -114,8 +117,10 @@
         <%= t(".register_now") %>
       </a>
     </div>
+  <% end %>
 
-    <div class="root-landing-who">
+  <% cache("root_who_and_numbers", expires_in: 1.hour) do %>
+    <div class="root-landing-who scrolled">
       <div class="container">
         <h3 class="landing-container-label"><%= t(".used_by") %></h3>
 

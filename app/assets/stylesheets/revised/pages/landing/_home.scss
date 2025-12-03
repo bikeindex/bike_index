@@ -472,13 +472,16 @@
 
 .root-landing-who {
   padding-bottom: 6 * $vertical-height;
+  position: relative;
+  background: white;
 
   h3.landing-container-label {
     color: $gray-darker;
-    margin: (2 * $vertical-height) 0;
+    padding: (2 * $vertical-height) 0;
+    margin: 0;
 
     @include media-breakpoint-up(lg) {
-      margin: (4 * $vertical-height) 0;
+      padding: (4 * $vertical-height) 0;
     }
   }
 
@@ -537,6 +540,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  position: relative;
 
   color: rgb(172, 172, 172);
   text-align: center;

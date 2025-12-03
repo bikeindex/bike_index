@@ -6,7 +6,7 @@ class BulkImportJob < ApplicationJob
 
   class << self
     # This is a little gross. It was added in PR #2911 when adding address records to bikes
-    def address_record_attributes(address_string, country_id = nil)
+    def address_record_attributes(address_string, country_id: nil)
       return {} if address_string.blank?
 
       address_record_attributes = country_id.present? ? {country: country_id} : {}
@@ -35,20 +35,26 @@ class BulkImportJob < ApplicationJob
       elsif !address_parts.last.match?(/\d/)
         address_parts.pop
       end
-
-      # Maybe don't need to check for number match here?
-      region_postal = address_parts.pop # if address_parts.last.match?(/\d/)
-      city = address_parts.pop # if address_parts.count > 1
+      region_postal = address_parts.pop
+      region_postal = "#{address_parts.pop}, #{region_postal}" if should_pop_for_region?(region_postal, address_parts)
+      city = address_parts.pop
 
       [address_parts.any? ? address_parts.join(", ") : nil, city, region_postal, country]
+    end
+
+    def should_pop_for_region?(region_postal, address_parts)
+      return false if address_parts.count < 3
+
+      # if all substrings in region_postal have numbers, they're all (probably) postal_codes
+      region_postal.split(" ").all? { it.match(/\d/) }
     end
 
     def region_and_postal(region_postal)
       return {region_string: region_postal} unless region_postal.match?(/\d/)
 
-      parts = region_postal.split(" ")
-      postal_code = parts.pop
-      postal_code = "#{parts.pop} #{postal_code}" if parts.last.match?(/\d/)
+      parts = region_postal.match?(",") ? region_postal.split(",") : region_postal.split(" ")
+      postal_code = parts.pop&.strip
+      postal_code = "#{parts.pop&.strip} #{postal_code}" if parts.last&.match?(/\d/)
 
       {region_string: parts.join(" "), postal_code:}
     end
@@ -168,7 +174,7 @@ class BulkImportJob < ApplicationJob
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id,
         no_duplicate: @bulk_import.no_duplicate
-      }.merge(self.class.address_record_attributes(row[:address], @country_id)),
+      }.merge(self.class.address_record_attributes(row[:address], country_id: @country_id)),
       impound_record: impound_attrs || {},
       stolen_record: @bulk_import.stolen_record_attrs,
       # Photo need to be an array - only include if photo has a value

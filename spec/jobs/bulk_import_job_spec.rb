@@ -128,9 +128,7 @@ RSpec.describe BulkImportJob, type: :job do
       context "CSV file exceeds maximum size" do
         let(:csv_lines) do
           lines = [%w[manufacturer model year color owner_email serial_number]]
-          26_000.times do |i|
-            lines << ["", "", "", "", "", ""]
-          end
+          26_000.times { |i| lines << ["", "", "", "", "", ""] }
           lines
         end
 
@@ -735,52 +733,63 @@ RSpec.describe BulkImportJob, type: :job do
 
     context "San Francisco" do
       let(:address_string) { "San Francisco, CA" }
-      let(:country) { Country.united_states_id }
-      let(:address_record_attributes) { {city: "San Francisco", region_string: "CA", country:, street: nil} }
+      let(:country_id) { Country.united_states_id }
+      let(:address_record_attributes) { {city: "San Francisco", region_string: "CA", country: country_id, street: nil} }
 
       it "returns San Francisco" do
         expect(described_class.send(:region_and_postal, "CA")).to eq({region_string: "CA"})
-        expect(described_class.address_record_attributes("San Francisco, CA", country)).to eq target
-        expect(described_class.address_record_attributes("San Francisco, CA, USA", country)).to eq target
+        expect(described_class.address_record_attributes("San Francisco, CA", country_id:)).to eq target
+        expect(described_class.address_record_attributes("San Francisco, CA, USA", country_id:)).to eq target
         expect(described_class.address_record_attributes("San Francisco, CA, USA")).to eq target
         # Handle single address part
-        expect(described_class.address_record_attributes("San Francisco", country))
-          .to eq({address_record_attributes: {city: "San Francisco", country:, street: nil}})
+        expect(described_class.address_record_attributes("San Francisco", country_id:))
+          .to eq({address_record_attributes: {city: "San Francisco", country: country_id, street: nil}})
       end
 
       context "city, region and postal code" do
         let(:address_string) { "San Francisco, CA 94110" }
-        let(:address_record_attributes) { {city: "San Francisco", region_string: "CA", postal_code: "94110", country:, street: nil} }
+        let(:address_record_attributes) { {city: "San Francisco", region_string: "CA", postal_code: "94110", street: nil, country: country_id} }
         it "returns target" do
           expect(described_class.send(:region_and_postal, "CA 94110")).to eq({region_string: "CA", postal_code: "94110"})
 
-          expect(described_class.address_record_attributes(address_string, country)).to eq target
-          expect(described_class.address_record_attributes("#{address_string}, USA", country)).to eq target
+          expect(described_class.address_record_attributes(address_string, country_id:)).to eq target
+          expect(described_class.address_record_attributes("#{address_string}, USA", country_id:)).to eq target
           expect(described_class.address_record_attributes("#{address_string}, USA")).to eq target
         end
       end
 
       context "street, city, region and postal code" do
         let(:address_string) { "Suite 2, 494 14th St, San Francisco, CA 94103" }
-        let(:address_record_attributes) { {street: "Suite 2, 494 14th St", city: "San Francisco", region_string: "CA", postal_code: "94103", country:} }
+        let(:address_record_attributes) { {street: "Suite 2, 494 14th St", city: "San Francisco", region_string: "CA", postal_code: "94103", country: country_id} }
 
         it "returns target" do
-          expect(described_class.address_record_attributes(address_string, country)).to eq target
-          expect(described_class.address_record_attributes("#{address_string}, USA", country)).to eq target
+          expect(described_class.address_record_attributes(address_string, country_id:)).to eq target
+          expect(described_class.address_record_attributes("#{address_string}, USA", country_id:)).to eq target
           expect(described_class.address_record_attributes("#{address_string}, USA")).to eq target
+        end
+
+        context "in COLORADO" do
+          let(:address_string) { "1669 W. SWALLOW RD, 69C, FORT COLLINS, COLORADO, 80526" }
+          let(:address_record_attributes) { {street: "1669 W. SWALLOW RD, 69C", city: "FORT COLLINS", region_string: "COLORADO", postal_code: "80526", country: country_id} }
+
+          it "returns target" do
+            expect(described_class.address_record_attributes(address_string, country_id:)).to eq target
+            expect(described_class.address_record_attributes("#{address_string}, USA", country_id:)).to eq target
+            expect(described_class.address_record_attributes("#{address_string}, USA")).to eq target
+          end
         end
       end
     end
 
     context "with street, city, region and postal_code" do
       let(:address_string) { "15007 Stony Plain Rd, Edmonton, AB T5P 4W1" }
-      let(:address_record_attributes) { {city: "Edmonton", region_string: "AB", postal_code: "T5P 4W1", country:, street: "15007 Stony Plain Rd"} }
-      let(:country) { Country.canada_id }
+      let(:address_record_attributes) { {city: "Edmonton", region_string: "AB", postal_code: "T5P 4W1", country: country_id, street: "15007 Stony Plain Rd"} }
+      let(:country_id) { Country.canada_id }
 
       it "returns target" do
         expect(described_class.send(:region_and_postal, "AB T5P 4W1")).to eq({region_string: "AB", postal_code: "T5P 4W1"})
-        expect(described_class.address_record_attributes(address_string, country)).to eq target
-        expect(described_class.address_record_attributes("#{address_string}, CA", country)[:address_record_attributes])
+        expect(described_class.address_record_attributes(address_string, country_id:)).to eq target
+        expect(described_class.address_record_attributes("#{address_string}, CA", country_id:)[:address_record_attributes])
           .to eq address_record_attributes.merge(country: "CA")
         expect(described_class.address_record_attributes("#{address_string}, CA")[:address_record_attributes])
           .to eq address_record_attributes.merge(country: "CA")

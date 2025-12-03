@@ -80,6 +80,17 @@
           - if @bulk_import.headers.present?
             %small
               = safe_join(@bulk_import.headers.map { |a| content_tag(:code, a) }, ", ")
+      - if display_dev_info?
+        - data = @bulk_import.data || {}
+        %tr
+          %td.only-dev-visible Data
+          %td
+            - if data.blank?
+              No data
+            - elsif data.except("headers").blank?
+              No data (except <code>headers</code>)
+            - else
+              .small= pretty_print_json(data.except("headers"))
 
 .mt-4.mb-4
   %h3 Errors

@@ -1,0 +1,79 @@
+---
+en:
+  components:
+    page_block:
+      org_bike_access_panel:
+        access_panel: Access Panel
+        added_to_track_parking_notification: >-
+          This %{bike_type} is not registered to a user. It was added to track parking
+          notifications.
+        additional_registrations_information: Registrations by user
+        additional_registrations_information_visible_because: visible with %{org_name}
+          law enforcement access
+        additional_registrations_potential_duplicates: 'Potential duplicate bikes
+          matching serial segments:'
+        additional_registrations_registered_at: Registered at
+        additional_registrations_this_bike: This %{bike_type}
+        address: Registration Address
+        address_or_intersection: Address or intersection
+        as_a_bikeindex_ambassador_html: >-
+          <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you
+          can mark it as recovered:</em>
+        assign_sticker: Assign sticker
+        avery_exportable: Avery Exportable
+        believe_it_is_anyway: Believe it is anyway?
+        bike_is_not_registered_html: This %{bike_type} is <em>not</em> registered
+          with %{org_name}
+        bike_is_registered: This %{bike_type} is registered with %{org_name}
+        bike_not_marked_stolen: "%{bike_type} is not marked stolen."
+        choose_country: Choose country
+        city: City
+        claimed: Claimed
+        contact_the_owner_it_is_stolen: to the owner of this %{bike_type} that you
+          believe is stolen.
+        creation_source: Source
+        creator: Creator
+        edit: Edit
+        email_to_deal_with_this_html: Email %{support_link} to deal with this.
+        initial_registration: 'initial registration:'
+        is_false: 'false'
+        is_not_registered_html: "<em>not</em> reged with %{org_name}"
+        is_registered: reged with %{org_name}
+        is_true: 'true'
+        link_sticker: Link Sticker
+        link_url_for_online_sighting: Link url for online sighting (optional)
+        mark_bike_recovered: Mark bike recovered
+        missing_address: missing address
+        missing_owner_name: missing user name
+        model_audit: E-Vehicle audit
+        not_audited: Not audited
+        or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
+        org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
+        org_cannot_edit: "%{org_name} can not edit"
+        organization_can_edit_after_claimed: and can edit after %{bike_type} claimed
+        organization_child: Child organization
+        organization_registered: Organization
+        owner_email: Owner email
+        owner_name: Owner name
+        parking_notification_notes_html: "%{org_name} internal notes <small>not shown
+          to user</small>"
+        permission: Permission
+        registered: Registered
+        send_message: Send message
+        state: State
+        sticker: Sticker
+        sticker_code: Sticker Code
+        support_email: support@bikeindex.org
+        unable_to_display_additional_information: >-
+          Unable to display additional information because %{bike_type} is not registered
+          with %{org_name}
+        unregistered_parking_notification: created for parking notification
+        user_revoked_permission_html: >-
+          This user <strong>revoked</strong> permission to contact them prior to their
+          bike being marked stolen.
+        waiting_on_device_location: Waiting on device location
+        where_did_you_see_this_bike: >-
+          Where did you see this %{bike_type}? If you're contacting about an ad you
+          found online, include a link in the field below
+        write_a_message: Write a message
+        zipcode: Postal code
