@@ -23,7 +23,7 @@ export default class extends Controller {
   connect () {
     this.setCharacterCount()
 
-    if (this.toggleImageValue) {
+    if (this.usingBikeImageTargets.length > 0) {
       this.toggleBikeImageForDisplay()
     }
   }
