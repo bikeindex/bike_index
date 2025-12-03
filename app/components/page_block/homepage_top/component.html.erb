@@ -111,7 +111,9 @@
           <%= image_tag "redesign_2025/black-box.png", alt: "Bike recovery showcase", class: "black-box" %>
 
           <div class="bike-image-placeholder">
-            <%= image_tag @recovery_displays.first&.photo_url, alt: @recovery_displays.first&.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
+            <% if @recovery_displays.any? %>
+              <%= image_tag @recovery_displays.first&.photo_url, alt: @recovery_displays.first&.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
+            <% end %>
           </div>
         </div>
 
