@@ -11,7 +11,7 @@ module PageBlock::HomepageTop
     private
 
     def bike_tile_images
-      (0..16).map { "#{it}".rjust(2, "0") }
+      (0..16).map { it.to_s.rjust(2, "0") }
         .map { image_url("redesign_2025/bike_tiles/bike-entry_00#{it}.png") }
     end
 
