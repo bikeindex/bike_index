@@ -4,7 +4,7 @@
       <%= image_tag "redesign_2025/bikeshop.gif", alt: "Bike Shops" %>
     </div>
 
-    <span>Bike Shops</span>
+    <span><%= translation(".bike_shops") %></span>
   <% end %>
 
   <%= link_to for_cities_path, class: "category-button" do %>
@@ -12,7 +12,7 @@
       <%= image_tag "redesign_2025/cities.gif", alt: "Cities" %>
     </div>
 
-    <span>Cities</span>
+    <span><%= translation(".cities") %></span>
   <% end %>
 
   <%= link_to for_schools_path, class: "category-button" do %>
@@ -20,7 +20,7 @@
       <%= image_tag "redesign_2025/unis.gif", alt: "Universities" %>
     </div>
 
-    <span>Universities</span>
+    <span><%= translation(".schools") %></span>
   <% end %>
 
   <%= link_to for_community_groups_path, class: "category-button" do %>
@@ -28,7 +28,7 @@
       <%= image_tag "redesign_2025/community.gif", alt: "Community Groups" %>
     </div>
 
-    <span>Community Groups</span>
+    <span><%= translation(".community_groups") %></span>
   <% end %>
 
   <% unless @skip_theft %>
@@ -37,7 +37,7 @@
         <%= image_tag "redesign_2025/theft-victims.gif", alt: "Theft Victims" %>
       </div>
 
-      <span>Theft Victims</span>
+      <span><%= translation(".theft_victims") %></span>
     <% end %>
   <% end %>
 </div>
