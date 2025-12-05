@@ -148,12 +148,13 @@
                   </div>
                 </li>
               <% end %>
+
               <li
-                  class="tw:hidden"
-                  data-slide-index="<%= @recovery_displays.count %>"
-                  data-image-url="<%= image_path("revised/bike_photo_placeholder.svg") %>"
-                  data-homepage--recovery-showcase-target="slide"
-                >
+                class="tw:hidden"
+                data-slide-index="<%= @recovery_displays.count %>"
+                data-image-url="<%= image_path("revised/bike_photo_placeholder.svg") %>"
+                data-homepage--recovery-showcase-target="slide"
+              >
                 <div class="testimonial-text">
                   <h3 class="tw:mt-18! tw:mb-0!">
                     <%= link_to "Read more recovery stories", recovery_stories_path %>

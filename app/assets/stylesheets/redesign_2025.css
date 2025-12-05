@@ -269,7 +269,7 @@
   animation: redesign_2025_homepage_drawBorder 0.6s ease-in-out forwards;
 }
 
-.redesign_2025_homepage .category-button:nth-child(5):hover span {
+.redesign_2025_homepage .category-button.theft-victims:hover span {
   color: var(--redesign-red-500);
 }
 
