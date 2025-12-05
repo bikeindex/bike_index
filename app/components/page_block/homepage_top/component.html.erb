@@ -86,7 +86,7 @@
           <span>Community Groups</span>
         <% end %>
 
-        <%= link_to stolen_index_path, class: "category-button" do %>
+        <%= link_to stolen_index_path, class: "category-button theft-victims" do %>
           <div class="img-wrapper">
             <%= image_tag "redesign_2025/theft-victims.gif", alt: "Theft Victims" %>
           </div>
@@ -112,7 +112,7 @@
 
           <div class="bike-image-placeholder">
             <% if @recovery_displays.any? %>
-              <%= image_tag @recovery_displays.first&.photo_url, alt: @recovery_displays.first&.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
+              <%= image_tag @recovery_displays.first.photo_url, alt: @recovery_displays.first.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
             <% end %>
           </div>
         </div>
@@ -148,6 +148,18 @@
                   </div>
                 </li>
               <% end %>
+              <li
+                  class="tw:hidden"
+                  data-slide-index="<%= @recovery_displays.count %>"
+                  data-image-url="<%= image_path("revised/bike_photo_placeholder.svg") %>"
+                  data-homepage--recovery-showcase-target="slide"
+                >
+                <div class="testimonial-text">
+                  <h3 class="tw:mt-18! tw:mb-0!">
+                    <%= link_to "Read more recovery stories", recovery_stories_path %>
+                  </h3>
+                </div>
+              </li>
             </ul>
 
             <div class="testimonial-nav">

@@ -18,8 +18,8 @@
     </p>
 
     <span class="recovery-user">
-      <% if recovery_display.image.present? %>
-        <%= image_tag recovery_display.image_url(:medium), alt: recovery_display.image_alt %>
+      <% if recovery_display.photo_url.present? %>
+        <%= image_tag recovery_display.photo_url, alt: recovery_display.image_alt %>
       <% else %>
         <span class="no-image-spacer"></span>
       <% end %>
