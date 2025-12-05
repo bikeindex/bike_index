@@ -1,0 +1,43 @@
+<div class="redesign_2025_buttons-grid">
+  <%= link_to for_bike_shops_path, class: "category-button" do %>
+    <div class="img-wrapper">
+      <%= image_tag "redesign_2025/bikeshop.gif", alt: "Bike Shops" %>
+    </div>
+
+    <span>Bike Shops</span>
+  <% end %>
+
+  <%= link_to for_cities_path, class: "category-button" do %>
+    <div class="img-wrapper">
+      <%= image_tag "redesign_2025/cities.gif", alt: "Cities" %>
+    </div>
+
+    <span>Cities</span>
+  <% end %>
+
+  <%= link_to for_schools_path, class: "category-button" do %>
+    <div class="img-wrapper">
+      <%= image_tag "redesign_2025/unis.gif", alt: "Universities" %>
+    </div>
+
+    <span>Universities</span>
+  <% end %>
+
+  <%= link_to for_community_groups_path, class: "category-button" do %>
+    <div class="img-wrapper">
+      <%= image_tag "redesign_2025/community.gif", alt: "Community Groups" %>
+    </div>
+
+    <span>Community Groups</span>
+  <% end %>
+
+  <% unless @skip_theft %>
+    <%= link_to stolen_index_path, class: "category-button theft-victims" do %>
+      <div class="img-wrapper">
+        <%= image_tag "redesign_2025/theft-victims.gif", alt: "Theft Victims" %>
+      </div>
+
+      <span>Theft Victims</span>
+    <% end %>
+  <% end %>
+</div>
