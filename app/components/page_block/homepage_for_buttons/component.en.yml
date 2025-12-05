@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    page_block:
+      homepage_for_buttons:
+        bike_shops: Bike Shops
+        cities: Cities
+        community_groups: Community Groups
+        schools: Schools
+        theft_victims: Theft Victims

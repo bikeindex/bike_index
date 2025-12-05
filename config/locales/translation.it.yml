@@ -3229,12 +3229,6 @@ it:
       with_over_registrations_and_almost:
       you_have_the_authority_to_bring_html:
       youre_the_first_one:
-    for_organizations_photo_list:
-      bike_shops:
-      cities:
-      community_groups:
-      for:
-      schools:
     for_schools:
       bike_index_for_universities:
       bike_index_users_provide:
@@ -4601,28 +4595,14 @@ it:
       come_back_soon:
       youve_been_logged_out:
     index:
-      alert_the_community:
       bike_index_statistics:
       bikes_registered_this_week:
-      but_how_does_it_work:
-      hero: Registrazione della bicicletta che funziona
-      how_it_works:
-      identifying_your_bike:
-      if_your_bike_goes_missing:
       partner_organizations:
-      read_more_recovery_stories:
-      recent_recovery_stories:
-      recover_your_bike_for_free:
-      register_now:
-      register_your_bike:
       stolen_bikes_recovered:
       stolen_bikes_registered:
-      the_community_responds:
       total_bikes_registered:
       total_recovery_value:
       used_by:
-      value_of_bikes_recovered: Recuperato oltre %{value} di biciclette
-      you_get_your_bike_back:
     recovery_stories:
       recovery_stories:
     update_browser:
@@ -4793,3 +4773,9 @@ it:
         where_did_you_see_this_bike:
         write_a_message:
         zipcode: Codice postale
+      homepage_for_buttons:
+        bike_shops:
+        cities:
+        community_groups:
+        schools:
+        theft_victims:

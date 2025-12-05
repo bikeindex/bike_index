@@ -9,6 +9,6 @@ RSpec.describe <%= component_class %>, type: :component do
   let(:<%= attr.name %>) { nil }<% end %>
 
   it "renders" do
-    expect(component).to be_present
+    expect(component).to have_css("div")
   end
 end
