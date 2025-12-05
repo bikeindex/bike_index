@@ -1,3 +1,5 @@
+<%= stylesheet_link_tag "redesign_2025", "data-turbo-track" => "reload" %>
+
 <main class="root-landing-page">
   <% cache("redesigned_homepage-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
     <%= render(PageBlock::HomepageTop::Component.new(recoveries_value: Counts.recoveries_value,
