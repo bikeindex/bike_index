@@ -30,7 +30,6 @@ class RecoveryDisplay < ActiveRecord::Base
 
   after_commit :enqueue_photo_processing, if: :persisted?
 
-  attr_writer :image_cache
   attr_accessor :date_input, :remote_photo_url, :skip_callback_job
 
   validates_presence_of :quote, :recovered_at
