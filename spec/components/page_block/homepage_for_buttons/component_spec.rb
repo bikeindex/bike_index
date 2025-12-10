@@ -10,7 +10,7 @@ RSpec.describe PageBlock::HomepageForButtons::Component, type: :component do
   it "renders" do
     expect(component).to have_css("div")
     expect(component).to have_text("Bike Shops")
-    expect(component).to have_text("Universities")
+    expect(component).to have_text("Schools")
     expect(component).to have_text("Theft Victims")
   end
 
@@ -20,6 +20,7 @@ RSpec.describe PageBlock::HomepageForButtons::Component, type: :component do
       expect(component).to be_present
       expect(component).to have_css("div")
       expect(component).to have_text("Bike Shops")
+      expect(component).to have_text("Schools")
       expect(component).to_not have_text("Theft Victims")
     end
   end
