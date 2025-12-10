@@ -3957,12 +3957,6 @@ nl:
       used_by_law_enforcement_everywhere: Overal gebruikt door wetshandhavers
       with_over_registrations_and_almost: Met meer dan %{registrations} registraties
         en %{stolen_recoveries} gestolen fietsen weten we hoe we kunnen helpen.
-    for_organizations_photo_list:
-      bike_shops: Fietsenwinkels
-      cities: Steden
-      community_groups: Community's
-      for: Voor
-      schools: scholen
     for_schools:
       bike_index_for_universities: Fietsindex voor universiteiten
       bike_index_users_provide: Bike Index-gebruikers verstrekken serienummers, eigendomsbewijzen
@@ -5167,36 +5161,14 @@ nl:
       come_back_soon: Kom snel terug!
       youve_been_logged_out: U bent uitgelogd
     index:
-      alert_the_community: Waarschuw de community
       bike_index_statistics: Bike Index-statistieken
       bikes_registered_this_week: Fietsen zijn deze week geregistreerd
-      but_how_does_it_work: Maar hoe werkt het?
-      hero: De fietsregistratie die werkt
-      how_it_works: Het is makkelijk. Voer je naam, fietsfabrikant, framenummer en
-        overige informatie in, om je fiets te registreren bij het meest gebruikte
-        fietsregister ter wereld.
-      identifying_your_bike: Een gebruiker of partner van Bike Index komt jouw fiets
-        tegen, gebruikt Bike Index om de fiets te identificeren en kan dan contact
-        met je opnemen.
-      if_your_bike_goes_missing: Als je fiets gestolen wordt of vermist raakt, markeer
-        deze dan als gestolen of verloren om de Bike Index community en haar partners
-        hierover te informeren.
       partner_organizations: Partnerorganisaties
-      read_more_recovery_stories: Lees meer herstelverhalen
-      recover_your_bike_for_free: Met de hulp van de Bike Index community en haar
-        partners beschik je over de informatie die je nodig hebt om jouw gestolen
-        of verloren fiets (kosteloos) terug te krijgen. Dit is wat we doen.
-      register_now: Registreer nu!
-      register_your_bike: Registreer uw fiets
       stolen_bikes_recovered: Gestolen fietsen hersteld
       stolen_bikes_registered: Gestolen fietsen geregistreerd
-      the_community_responds: De community reageert
       total_bikes_registered: Totaal aantal geregistreerde fietsen
       total_recovery_value: Totale herstelwaarde
       used_by: Gebruikt door
-      value_of_bikes_recovered: Meer dan %{value} aan fietsen die teruggevonden zijn
-      you_get_your_bike_back: U krijgt uw fiets terug
-      recent_recovery_stories: 'Gestolen fietsen die we onlangs hebben helpen herstellen:'
     recovery_stories:
       recovery_stories: Verhalen over teruggekregen fietsen
     update_browser:
@@ -6047,15 +6019,6 @@ nl:
     definition_list:
       row:
         no_value: geen
-    page_section:
-      marketplace_listing_panel:
-        condition: Voorwaarde
-        description: Beschrijving
-        first_posted_at: Geplaatst
-        location: Plaats
-        price_is_firm_false: prijs is onderhandelbaar
-        price_is_firm_true: prijs is vast
-        still_for_sale_at: Nog steeds te koop bij
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
         dit %{object_name} wordt opgeslagen:"
@@ -6076,8 +6039,16 @@ nl:
         registered_not_stolen: geregistreerd, niet gestolen
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
-    org:
-      bike_access_panel:
+    page_block:
+      marketplace_listing_panel:
+        condition: Voorwaarde
+        description: Beschrijving
+        first_posted_at: Geplaatst
+        location: Plaats
+        price_is_firm_false: prijs is onderhandelbaar
+        price_is_firm_true: prijs is vast
+        still_for_sale_at: Nog steeds te koop bij
+      org_bike_access_panel:
         access_panel: Toegangspaneel
         added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
           bij een gebruiker. Het is toegevoegd om parkeermeldingen te volgen.
@@ -6150,3 +6121,9 @@ nl:
           op in het onderstaande veld
         write_a_message: Schrijf een bericht
         zipcode: Postcode
+      homepage_for_buttons:
+        bike_shops: Fietsenwinkels
+        cities: Steden
+        community_groups: Community's
+        schools: scholen
+        theft_victims: Slachtoffers van diefstal

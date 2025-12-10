@@ -22,7 +22,7 @@
             .col-sm-4.col-lg-2.mt-4
               = submit_tag t(".update"), class: "btn btn-success"
 
-  = render(Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:))
+  = render(PageBlock::OrgBikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:))
 
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status_alerts"

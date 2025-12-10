@@ -280,7 +280,7 @@ it:
       ad:
         body: Corpo
         image: Immagine
-        live: Pubblicato
+        live: In diretta
         target_url: URL di destinazione
         title: Titolo
       ambassador:
@@ -1879,142 +1879,156 @@ it:
       unsure_or_unknown:
       very_few_vehicles_html:
       very_very_few_bikes_html:
-      was_made_before_1970:
+      was_made_before_1970: È stato prodotto prima del 1970
       without_serial_html:
       without_serial_number_html:
     organization_stolen_message:
-      report_link_text:
+      report_link_text: a questo link
       report_the_theft_to_the_organization_html:
     pdf:
-      bike_description:
+      bike_description: 'Descrizione della bicicletta:'
       bike_serial:
       bikeindex_org:
       by:
-      color:
+      color: Colore
       date_stolen:
       department:
-      description_of_theft:
-      frame_size:
-      front_gears:
-      front_wheel:
-      location:
-      manufacturer:
-      model:
-      narrow_tires:
-      online:
-      owner_phone:
-      paint:
-      police_report:
-      printout:
-      rear_gears:
-      rear_wheel:
-      registered:
-      registration:
-      saddle:
-      stolen:
-      to:
-      wide_tires:
-      with:
+      description_of_theft: Descrizione del furto
+      frame_size: Taglia del telaio
+      front_gears: Ingranaggi anteriori
+      front_wheel: Ruota anteriore
+      location: Luogo
+      manufacturer: Produttore
+      model: Modello
+      narrow_tires: pneumatici stretti
+      online: online
+      owner_phone: Telefono del proprietario
+      paint: Vernice
+      police_report: Rapporto della polizia
+      printout: stampa
+      rear_gears: Ingranaggi anteriori
+      rear_wheel: Ruota posteriore
+      registered: Registrato
+      registration: Registrazione
+      saddle: Sella
+      stolen: Rubata
+      to: a
+      wide_tires: pneumatici larghi
+      with: con
       with_coaster_brake:
     scanned:
       added:
-      color:
-      isnt_linked_to_a_bike:
+      color: Colore
+      isnt_linked_to_a_bike: non è collegato a una bicicletta.
       link_bike_sticker_kind:
       link_it:
-      manufacturer:
+      manufacturer: Produttore
       mnfg_model_color_html:
-      model:
-      new_bike_link_text:
+      model: Modello
+      new_bike_link_text: Una nuova bicicletta
       or_click_html:
       please_email_support_html:
-      please_sign_in:
+      please_sign_in: accedi
       register_a_new_bike_html:
       to_link_that_card_with_a_bike:
       update:
       you_can_enter_the_url:
       you_have_claimed_the_maximum_permitted:
     show:
-      change_the_bike_sticker_linked_to:
-      contact_the_owner:
+      change_the_bike_sticker_linked_to: Cambiare la bici a cui si collega
+      contact_the_owner: Contatta il proprietario
       created_to_record_parking_notification:
-      from:
-      in:
-      is_this_linked_to_incorrect_bike:
-      know_something_about_this_bike_type:
-      link_url:
-      looking_for_correct_owner:
-      not_registered_by_user:
-      or_call:
-      owners_phone_number:
-      send_message:
-      share_it:
-      spread_the_word:
-      switch_to_new_bike_id:
-      test_registration:
-      update:
-      view_users_other_registrations:
+      from: da
+      in: in
+      is_this_linked_to_incorrect_bike: Questo adesivo è collegato alla bici sbagliata?
+      know_something_about_this_bike_type: Sapete qualcosa di questa %{bike_type}?
+      link_url: Collegamento
+      looking_for_correct_owner: Cerco il proprietario corretto di questa %{bike_type}!
+      not_registered_by_user: Non registrato ad un utente
+      or_call: O chiamare
+      owners_phone_number: 'Numero di telefono del proprietario:'
+      send_message: Invia il messaggio
+      share_it: Condividilo!
+      spread_the_word: Diffondi la notizia!
+      switch_to_new_bike_id: Passa a un nuovo codice identificativo della bicicletta
+      test_registration: registrazione di test
+      update: Aggiorna
+      view_users_other_registrations: Visualizza le altre registrazioni dell'utente
       where_did_you_see_this_bike:
-      write_them_a_message:
-      you_scanned_this_sticker_html:
-      view_public_non_listing:
+      write_them_a_message: Scrivigli un messaggio
+      you_scanned_this_sticker_html: È stata eseguita la scansione dell'adesivo <strong>%{pretty_code}</strong>,
+        assegnato a questa %{bike_type}.
+      view_public_non_listing: Visualizza la registrazione pubblica
       viewing_listing_preview:
     stolen_checklist:
-      a_photo_of_your_bike_type:
-      add:
-      add_bike_link_to_your_theft_report_html:
-      add_serial_number:
-      bike_index_does_this:
-      contact_seller:
-      facebook_instagram_etc:
-      leads_online:
-      leads_online_url:
-      list_bike_type_on_bike_index:
-      location_where_the_theft_occurred:
-      nl_digid_required:
-      nl_file_police_report:
-      nl_online:
-      nl_person:
-      nl_person_report:
-      nl_phone:
-      nl_phone_report:
-      nl_website_link_text:
-      promoted_stolen_bike_alerts:
-      push_bike_info_to:
-      push_bike_info_to_law_enforcement:
-      report_theft_html:
-      requires_a_serial_number:
-      share_on_twitter:
-      share_widely_on_your_personal_social:
+      a_photo_of_your_bike_type: una foto della tua %{bike_type}
+      add: Aggiungi
+      add_bike_link_to_your_theft_report_html: Aggiungi %{bike_link} alla tua denuncia
+        di furto
+      add_serial_number: Aggiungi il numero di serie
+      bike_index_does_this: "(Bike Index lo fa quando si inserisce il numero del rapporto
+        di polizia)"
+      contact_seller: MOLTO IMPORTANTE - Contatta il rivenditore da cui è stata acquistata
+        la bicicletta e scopri se ne è in possesso
+      facebook_instagram_etc: "(Facebook, Instagram, ecc.)"
+      leads_online: LEADSonline
+      leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
+      list_bike_type_on_bike_index: Elenca %{bike_type} su Bike Index
+      location_where_the_theft_occurred: luogo in cui si è verificato il furto
+      nl_digid_required: "(è richiesto il DigiD)"
+      nl_file_police_report: Presentate una denuncia alla polizia!
+      nl_online: Online
+      nl_person: Di persona
+      nl_person_report: Cercare la stazione di polizia più vicina,
+      nl_phone: Per telefono
+      nl_phone_report: chiamare il numero 0900-8844. Di solito riceverete un appuntamento
+        telefonico per un secondo momento, a quel punto dovrete fornire le informazioni
+        alla Polizia
+      nl_website_link_text: a questa pagina web politie.nl
+      promoted_stolen_bike_alerts: Avvisi di furto di biciclette in evidenza
+      push_bike_info_to: Carica le informazioni della bicicletta su
+      push_bike_info_to_law_enforcement: Trasmettere le informazioni sulla bicicletta
+        ai database delle forze dell'ordine (Bike Index lo fa quando si inserisce
+        il numero di rapporto della polizia)
+      report_theft_html: Denuncia il furto su Bike Index, incluso %{edit_bike_link}
+      requires_a_serial_number: richiede un numero di serie
+      share_on_twitter: Condividi su Twitter (Bike Index lo farà dopo aver esaminato
+        il tuo annuncio)
+      share_widely_on_your_personal_social: Condividete ampiamente sui vostri social
+        media personali
       supercharge_sharing_on_facebook:
-      your_police_report:
+      your_police_report: il tuo numero del rapporto della polizia
     theft_alerts:
       new:
-        best_value:
-        bike_index_can_help:
-        bike_index_promoted_alert:
-        city_state_country:
-        days:
-        here:
+        best_value: Migliore offerta
+        bike_index_can_help: Bike Index può aiutare acquistando annunci mirati su
+          Facebook per diffondere la notizia del vostro furto %{bike_type}.
+        bike_index_promoted_alert: Avviso promosso da Bike Index
+        city_state_country: Città, Provincia - Paese
+        days: Giorni
+        here: qui
         no_photos_add_photos_here_html:
-        preview:
-        purchase_alert:
-        select_an_image:
-        select_an_image_to_see_preview:
-        targeted_sharing_html:
-        views:
+        preview: Anteprima dell'avviso promosso
+        purchase_alert: Avviso di acquisto
+        select_an_image: Seleziona un'immagine
+        select_an_image_to_see_preview: 'Seleziona un''immagine della tua bicicletta
+          per vedere un''anteprima dell''avviso promosso:'
+        targeted_sharing_html: Abbiamo riscontrato che la condivisione mirata sui
+          social media ha un effetto <em>enorme</em> sul recupero delle biciclette
+          rubate.
+        views: Visualizzazioni
       show:
         stay_tuned_for_an_update_once_weve_proces:
         thank_you:
-        your_order_is_pending:
+        your_order_is_pending: Il vostro ordine è in attesa.
       table:
-        created:
-        creator:
-        end:
+        created: Creato
+        creator: Creatore
+        end: Fine
         existing_theft_alerts:
-        plan:
-        start:
-        status:
+        plan: Piano
+        start: Inizio
+        status: Stato
     header_row:
       hidden_by_owner: Nascosto dal proprietario
       no_one_but_the_user_and_bike_index_admins: Nessuno, a parte l'utente (e gli
@@ -2022,34 +2036,34 @@ it:
       test_registration:
   bikes_edit:
     accessories:
-      add_a_component:
+      add_a_component: Aggiungi un componente
     bike_details:
-      a_qr_sticker:
-      add_a_sticker_label_html:
+      a_qr_sticker: un adesivo QR
+      add_a_sticker_label_html: Aggiungi %{sticker_information_link}
       add_end:
       add_start:
-      bike_name:
+      bike_name: Nome della bicicletta
       bike_registration:
-      choose_material:
-      existing_stickers:
-      frame_size:
-      general_description:
-      made_without_serial:
-      main_frame_material:
-      manufacturer:
-      model_year:
-      nevermind:
-      other_serial_or_registration_number:
-      please_fill_in_both_fields:
-      reason_for_update:
-      remove_end:
-      remove_start:
-      seat_tube_length:
+      choose_material: Scegli il materiale
+      existing_stickers: Adesivi esistenti
+      frame_size: Taglia del telaio
+      general_description: Descrizione generale
+      made_without_serial: Realizzato senza numero di serie
+      main_frame_material: Materiale principale del telaio
+      manufacturer: Produttore
+      model_year: Anno del modello
+      nevermind: Non importa
+      other_serial_or_registration_number: Altro numero di serie o di registrazione
+      please_fill_in_both_fields: Compila entrambi i campi
+      reason_for_update: Motivo dell'aggiornamento
+      remove_end: Rimuovere la fine
+      remove_start: Rimuovere l'inizio
+      seat_tube_length: Lunghezza del tubo sella
       submit_manufacturer_correction:
       submit_serial_correction:
-      submit_update:
-      tell_us_about_your_bike:
-      unknown_year:
+      submit_update: Invia l'aggiornamento
+      tell_us_about_your_bike: Parlaci della tua bici!
+      unknown_year: Anno sconosciuto
       unsure_or_unknown:
       update_on_bike:
       update_serial_number:
@@ -3229,12 +3243,6 @@ it:
       with_over_registrations_and_almost:
       you_have_the_authority_to_bring_html:
       youre_the_first_one:
-    for_organizations_photo_list:
-      bike_shops:
-      cities:
-      community_groups:
-      for:
-      schools:
     for_schools:
       bike_index_for_universities:
       bike_index_users_provide:
@@ -4601,28 +4609,14 @@ it:
       come_back_soon:
       youve_been_logged_out:
     index:
-      alert_the_community:
       bike_index_statistics:
       bikes_registered_this_week:
-      but_how_does_it_work:
-      hero: Registrazione della bicicletta che funziona
-      how_it_works:
-      identifying_your_bike:
-      if_your_bike_goes_missing:
       partner_organizations:
-      read_more_recovery_stories:
-      recent_recovery_stories:
-      recover_your_bike_for_free:
-      register_now:
-      register_your_bike:
       stolen_bikes_recovered:
       stolen_bikes_registered:
-      the_community_responds:
       total_bikes_registered:
       total_recovery_value:
       used_by:
-      value_of_bikes_recovered: Recuperato oltre %{value} di biciclette
-      you_get_your_bike_back:
     recovery_stories:
       recovery_stories:
     update_browser:
@@ -4705,15 +4699,6 @@ it:
     definition_list:
       row:
         no_value:
-    page_section:
-      marketplace_listing_panel:
-        condition:
-        description: Descrizione
-        first_posted_at:
-        location: Luogo
-        price_is_firm_false:
-        price_is_firm_true:
-        still_for_sale_at:
     alert_for_errors:
       errors_prevented_this_from_being_saved:
     messages:
@@ -4733,8 +4718,16 @@ it:
         registered_not_stolen:
       container:
         no_results:
-    org:
-      bike_access_panel:
+    page_block:
+      marketplace_listing_panel:
+        condition:
+        description: Descrizione
+        first_posted_at:
+        location: Luogo
+        price_is_firm_false:
+        price_is_firm_true:
+        still_for_sale_at:
+      org_bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
         additional_registrations_information:
@@ -4794,3 +4787,9 @@ it:
         where_did_you_see_this_bike:
         write_a_message:
         zipcode: Codice postale
+      homepage_for_buttons:
+        bike_shops: Bicicletta
+        cities: Città
+        community_groups: Gruppi comunitari
+        schools: Scuole
+        theft_victims: Vittime di furto

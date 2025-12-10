@@ -5,7 +5,7 @@ class WelcomeController < ApplicationController
   skip_before_action :set_x_frame_options_header, only: [:bike_creation_graph, :index]
 
   def index
-    @recovery_displays = RecoveryDisplay.limit(5)
+    @recovery_displays = RecoveryDisplay.limit(10)
   end
 
   def bike_creation_graph

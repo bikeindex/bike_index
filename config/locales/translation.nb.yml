@@ -4153,12 +4153,6 @@ nb:
       youre_the_first_one: Du er den første innbyggerne dine ser på når syklene deres
         blir stjålet. Få tilgang til og søk i vår internasjonale database for å returnere
         fellesskapets sykler til deres rettmessige eiere.
-    for_organizations_photo_list:
-      bike_shops: Sykkelbutikker
-      cities: Byer
-      community_groups: Fellesskapsgrupper
-      for: til
-      schools: Skoler
     for_schools:
       bike_index_for_universities: Sykkelindeks for universiteter
       bike_index_users_provide: Bike Index-brukere gir serienummer, bevis på eierskap
@@ -5777,34 +5771,14 @@ nb:
       come_back_soon: Kom tilbake snart!
       youve_been_logged_out: Du har blitt logget ut
     index:
-      alert_the_community: Varsle fellesskapet
       bike_index_statistics: Sykkelindeksstatistikk
       bikes_registered_this_week: Sykler registrert denne uken
-      but_how_does_it_work: Men hvordan fungerer det?
-      hero: Sykkelregistrering som fungerer
-      how_it_works: Det er enkelt. Send inn navn, sykkelprodusent, serienummer og
-        komponentinformasjon for å legge inn sykkelen din i det mest brukte sykkelregisteret
-        på planeten.
-      identifying_your_bike: En bruker eller partner møter sykkelen din, bruker Bike
-        Index for å identifisere den og kontakter deg.
-      if_your_bike_goes_missing: Hvis sykkelen din blir borte, merk den som tapt eller
-        stjålet for å varsle hele Bike Index-fellesskapet og dets partnere.
       partner_organizations: Partnerorganisasjoner
-      read_more_recovery_stories: Les flere gjenopprettingshistorier
-      recent_recovery_stories: 'Stjålne sykler vi hjalp til med å gjenopprette nylig:'
-      recover_your_bike_for_free: Ved hjelp av Bike Index-fellesskapet og dets partnere
-        har du informasjonen som er nødvendig for å gjenopprette den tapte eller stjålne
-        sykkelen din uten kostnad for deg. Det er det vi gjør.
-      register_now: Registrer deg nå!
-      register_your_bike: Registrer sykkelen din
       stolen_bikes_recovered: Stjålne sykler gjenfunnet
       stolen_bikes_registered: Stjålne sykler registrert
-      the_community_responds: Samfunnet reagerer
       total_bikes_registered: Totalt registrerte sykler
       total_recovery_value: Total gjenopprettingsverdi
       used_by: Brukt av
-      value_of_bikes_recovered: Over %{value} verdi av sykler gjenvunnet
-      you_get_your_bike_back: Du får tilbake sykkelen
     recovery_stories:
       recovery_stories: Gjenopprettingshistorier
     update_browser:
@@ -5889,15 +5863,6 @@ nb:
     definition_list:
       row:
         no_value: ingen
-    page_section:
-      marketplace_listing_panel:
-        condition: Betingelse
-        description: Beskrivelse
-        first_posted_at: Postet
-        location: plassering
-        price_is_firm_false: Prisen er omsettelig
-        price_is_firm_true: prisen er fast
-        still_for_sale_at: Selger fortsatt på
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
         %{object_name} ble lagret:"
@@ -5918,8 +5883,16 @@ nb:
         registered_not_stolen: registrert, ikke stjålet
       container:
         no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
-    org:
-      bike_access_panel:
+    page_block:
+      marketplace_listing_panel:
+        condition: Betingelse
+        description: Beskrivelse
+        first_posted_at: Postet
+        location: plassering
+        price_is_firm_false: Prisen er omsettelig
+        price_is_firm_true: prisen er fast
+        still_for_sale_at: Selger fortsatt på
+      org_bike_access_panel:
         access_panel: Tilgangspanel
         added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
           på en bruker. Den ble lagt til for å spore parkeringsvarsler.
@@ -5991,3 +5964,9 @@ nb:
           om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
         write_a_message: Skrive en melding
         zipcode: Postnummer
+      homepage_for_buttons:
+        bike_shops: Sykkelbutikker
+        cities: Byer
+        community_groups: Fellesskapsgrupper
+        schools: Skoler
+        theft_victims: Tyveriofre

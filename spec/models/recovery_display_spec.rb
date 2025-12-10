@@ -9,10 +9,10 @@ RSpec.describe RecoveryDisplay, type: :model do
     end
   end
 
-  describe "image_exists? and image_processing" do
+  describe "photo_processed? and image_processing" do
     let(:recovery_display) { RecoveryDisplay.new }
     it "is false by default" do
-      expect(recovery_display.image_exists?).to be_falsey
+      expect(recovery_display.photo_processed?).to be_falsey
       expect(recovery_display.image_processing?).to be_falsey
     end
     context "with image present" do
@@ -20,10 +20,40 @@ RSpec.describe RecoveryDisplay, type: :model do
       it "processing is true if recently updated" do
         # Sort of hacky, but gets us something
         allow(recovery_display).to receive(:image) { OpenStruct.new(file: OpenStruct.new("exists?" => false)) }
-        expect(recovery_display.image_exists?).to be_falsey
+        expect(recovery_display.photo_processed?).to be_falsey
+      end
+    end
+    context "with ActiveStorage photo" do
+      let(:recovery_display) { FactoryBot.create(:recovery_display) }
+      before do
+        recovery_display.photo.attach(
+          io: StringIO.new("fake image"),
+          filename: "test.jpg",
+          content_type: "image/jpeg"
+        )
+      end
+      it "returns true for photo_processed?" do
+        expect(recovery_display.send(:has_any_image?)).to be_truthy
         expect(recovery_display.image_processing?).to be_truthy
-        recovery_display.updated_at = Time.current - 2.minutes
+        expect(recovery_display.photo_processed?).to be_falsey
+        expect(recovery_display.image?).to be_falsey
+      end
+    end
+    context "with processed photo" do
+      let(:recovery_display) { FactoryBot.create(:recovery_display) }
+      before do
+        recovery_display.photo_processed.attach(
+          io: StringIO.new("processed image"),
+          filename: "processed.jpg",
+          content_type: "image/jpeg"
+        )
+      end
+      it "returns true for photo_processed?" do
+        expect(recovery_display.photo_processed?).to be_truthy
+        expect(recovery_display.send(:has_any_image?)).to be_truthy
         expect(recovery_display.image_processing?).to be_falsey
+        expect(recovery_display.photo_url).to be_present
+        expect(recovery_display.image?).to be_falsey
       end
     end
   end
