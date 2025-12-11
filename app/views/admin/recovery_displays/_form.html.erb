@@ -146,8 +146,6 @@
           <div>
             <% if @recovery_display.photo_processed.attached? %>
               <%= image_tag(@recovery_display.photo_url, class: "tw:mb-1 tw:w-24") %>
-            <% elsif @recovery_display.image? %>
-              <%= image_tag(@recovery_display.image.url(:thumb)) %>
             <% elsif @recovery_display.id.present? %>
               <p class="text-danger">No picture!</p>
             <% end %>
@@ -162,13 +160,6 @@
                 <%= f.file_field :photo, class: "custom-file-input", accept: "image/jpeg,image/jpg,image/png,image/gif" %>
               </div>
             </div>
-
-            <% if @recovery_display.photo.attached? || @recovery_display.image? %>
-              <div class="form-check mb-3">
-                <%= f.check_box :remove_image, class: "form-check-input" %>
-                <%= f.label :remove_image, class: "form-check-label" %>
-              </div>
-            <% end %>
           </div>
         </div>
       </div>
@@ -190,6 +181,7 @@
               </span>
 
               <span
+                class="tw:hidden"
                 data-admin--recovery-display-form-target="notUsingBikeImage"
               >
                 <%= @bike.type_titleize %>
@@ -208,6 +200,7 @@
                 href="#"
               >
                 <span
+                  class="tw:hidden"
                   data-admin--recovery-display-form-target="notUsingBikeImage"
                 >
                   Use first image

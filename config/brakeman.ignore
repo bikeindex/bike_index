@@ -1412,29 +1412,6 @@
       "note": ""
     },
     {
-      "warning_type": "Command Injection",
-      "warning_code": 14,
-      "fingerprint": "b97c32bd1f9691044a8c08a94654b3ed612af82a25060f834a8d121ac2086e0e",
-      "check_name": "Execute",
-      "message": "Possible command injection",
-      "file": "app/uploaders/circular_image_uploader.rb",
-      "line": 42,
-      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
-      "code": "system(\"convert #{\"-size #{width}x#{height}\"} xc:transparent #{\"-fill #{img.path}\"} #{\"-draw 'circle #{(width / 2)},#{(height / 2)} #{((width > height) ? ([(width / 2), height]) : ([width, (height / 2)])).join(\",\")}'\"} #{\"+repage #{File.join(cache_dir, \"round_#{File.basename(img.path)}\")}\"}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "CircularImageUploader",
-        "method": "round_image"
-      },
-      "user_input": "width",
-      "confidence": "Medium",
-      "cwe_id": [
-        77
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
       "fingerprint": "bd60c52737d1d650780cb1b3d1837759750056482c0040582ea2ae2d7a0fb43a",

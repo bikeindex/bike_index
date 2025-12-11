@@ -1,5 +1,3 @@
-<%= stylesheet_link_tag "redesign_2025", "data-turbo-track" => "reload" %>
-
 <div class="redesign_2025_homepage">
   <section class="hero-section">
     <div class="hero-content">
@@ -9,7 +7,7 @@
             class="stat-number"
             data-controller="homepage--animate-count"
             data-homepage--animate-count-target-value="<%= recoveries_value %>"
-            data-homepage--animate-count-prefix-value="$"
+            data-homepage--animate-count-prefix-value="<%= recoveries_value_symbol %>"
             data-homepage--animate-count-suffix-value="M+"
           >
             $<%= recoveries_value %>M+
@@ -52,48 +50,7 @@
   <section class="for-section">
     <div class="container">
       <h2>Bike Index is for:</h2>
-
-      <div class="buttons-grid">
-        <%= link_to for_bike_shops_path, class: "category-button" do %>
-          <div class="img-wrapper">
-            <%= image_tag "redesign_2025/bikeshop.gif", alt: "Bike Shops" %>
-          </div>
-
-          <span>Bike Shops</span>
-        <% end %>
-
-        <%= link_to for_cities_path, class: "category-button" do %>
-          <div class="img-wrapper">
-            <%= image_tag "redesign_2025/cities.gif", alt: "Cities" %>
-          </div>
-
-          <span>Cities</span>
-        <% end %>
-
-        <%= link_to for_schools_path, class: "category-button" do %>
-          <div class="img-wrapper">
-            <%= image_tag "redesign_2025/unis.gif", alt: "Universities" %>
-          </div>
-
-          <span>Universities</span>
-        <% end %>
-
-        <%= link_to for_community_groups_path, class: "category-button" do %>
-          <div class="img-wrapper">
-            <%= image_tag "redesign_2025/community.gif", alt: "Community Groups" %>
-          </div>
-
-          <span>Community Groups</span>
-        <% end %>
-
-        <%= link_to stolen_index_path, class: "category-button" do %>
-          <div class="img-wrapper">
-            <%= image_tag "redesign_2025/theft-victims.gif", alt: "Theft Victims" %>
-          </div>
-
-          <span>Theft Victims</span>
-        <% end %>
-      </div>
+      <%= render(PageBlock::HomepageForButtons::Component.new) %>
     </div>
   </section>
 
@@ -112,7 +69,7 @@
 
           <div class="bike-image-placeholder">
             <% if @recovery_displays.any? %>
-              <%= image_tag @recovery_displays.first&.photo_url, alt: @recovery_displays.first&.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
+              <%= image_tag @recovery_displays.first.photo_url, alt: @recovery_displays.first.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
             <% end %>
           </div>
         </div>
@@ -148,6 +105,19 @@
                   </div>
                 </li>
               <% end %>
+
+              <li
+                class="tw:hidden"
+                data-slide-index="<%= @recovery_displays.count %>"
+                data-image-url="<%= image_path("revised/bike_photo_placeholder.svg") %>"
+                data-homepage--recovery-showcase-target="slide"
+              >
+                <div class="testimonial-text">
+                  <h3 class="tw:mt-18! tw:mb-0!">
+                    <%= link_to "Read more recovery stories", recovery_stories_path %>
+                  </h3>
+                </div>
+              </li>
             </ul>
 
             <div class="testimonial-nav">

@@ -3203,12 +3203,6 @@ es:
       with_over_registrations_and_almost:
       you_have_the_authority_to_bring_html:
       youre_the_first_one:
-    for_organizations_photo_list:
-      bike_shops: Tiendas de bicicletas
-      cities: Ciudades
-      community_groups: Grupos comunitarios
-      for: para
-      schools: Escuelas
     for_schools:
       bike_index_for_universities:
       bike_index_users_provide:
@@ -4533,34 +4527,14 @@ es:
       come_back_soon:
       youve_been_logged_out:
     index:
-      alert_the_community: Alertar a la Comunidad
       bike_index_statistics: Estadísticas del Bike Index
       bikes_registered_this_week: Bicicletas registradas esta semana
-      but_how_does_it_work: Pero, ¿cómo funciona?
-      hero: Registro de bicicletas que funciona
-      how_it_works: Es muy sencillo. Envíe su nombre, fabricante de la bicicleta,
-        número de serie e información sobre los componentes para introducir su bicicleta
-        en el registro de bicicletas más utilizado del planeta.
-      identifying_your_bike: Un usuario o socio encuentra su bicicleta, utiliza Bike
-        Index para identificarla y se pone en contacto con usted.
-      if_your_bike_goes_missing: Si pierdes tu bicicleta, márcala como perdida o robada
-        para notificarlo a toda la comunidad Bike Index y a sus socios.
       partner_organizations: Organizaciones asociadas
-      read_more_recovery_stories: Leer más historias de recuperación
-      recent_recovery_stories: 'Bicicletas robadas que ayudamos a recuperar recientemente:'
-      recover_your_bike_for_free: Con la ayuda de la comunidad Bike Index y sus socios,
-        dispones de la información necesaria para recuperar tu bicicleta perdida o
-        robada sin coste alguno para ti. Es lo que hacemos.
-      register_now: Registro ahora
-      register_your_bike: Registre su bicicleta
       stolen_bikes_recovered: Recuperación de bicicletas robadas
       stolen_bikes_registered: Bicicletas robadas Registradas
-      the_community_responds: La comunidad responde
       total_bikes_registered: Total de bicicletas registradas
       total_recovery_value: Valor total de recuperación
       used_by: Usado por
-      value_of_bikes_recovered: Más de %{value} bicicletas recuperadas
-      you_get_your_bike_back: Recupera tu bicicleta
     recovery_stories:
       recovery_stories:
     update_browser:
@@ -4731,3 +4705,9 @@ es:
         where_did_you_see_this_bike:
         write_a_message:
         zipcode:
+      homepage_for_buttons:
+        bike_shops: Tiendas de bicicletas
+        cities: Ciudades
+        community_groups: Grupos comunitarios
+        schools: Escuelas
+        theft_victims: Víctimas de robos

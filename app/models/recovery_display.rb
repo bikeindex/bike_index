@@ -4,7 +4,6 @@
 # Database name: primary
 #
 #  id               :integer          not null, primary key
-#  image            :string(255)
 #  link             :string(255)
 #  location_string  :string
 #  quote            :text
@@ -21,16 +20,11 @@
 class RecoveryDisplay < ActiveRecord::Base
   belongs_to :stolen_record
 
-  mount_uploader :image, CircularImageUploader
-  process_in_background :image, CarrierWaveProcessJob
-
-  # ActiveStorage for new image uploads (non-circular)
   has_one_attached :photo
   has_one_attached :photo_processed
 
   after_commit :enqueue_photo_processing, if: :persisted?
 
-  attr_writer :image_cache
   attr_accessor :date_input, :remote_photo_url, :skip_callback_job
 
   validates_presence_of :quote, :recovered_at

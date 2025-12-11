@@ -3762,12 +3762,6 @@ en:
         You're the first one your citizens look to when their bikes are stolen. Access
         and search our international database to return your community's bikes to
         their rightful owners.
-    for_organizations_photo_list:
-      bike_shops: Bike Shops
-      cities: Cities
-      community_groups: Community Groups
-      for: for
-      schools: Schools
     for_schools:
       bike_index_admin_guide: Bike Index Campus Management Admin Guide
       bike_index_for_universities: Bike Index for Universities
@@ -5547,38 +5541,14 @@ en:
       come_back_soon: Come back soon!
       youve_been_logged_out: You've been logged out
     index:
-      alert_the_community: Alert the Community
       bike_index_statistics: Bike Index statistics
       bikes_registered_this_week: Bikes registered this week
-      but_how_does_it_work: But How Does it work?
-      hero: Bike registration that works
-      how_it_works: >-
-        It's simple. Submit your name, bike manufacturer, serial number, and component
-        information to enter your bike into the most widely used bike registry on
-        the planet.
-      identifying_your_bike: >-
-        A user or partner encounters your bike, uses Bike Index to identify it, and
-        contacts you.
-      if_your_bike_goes_missing: >-
-        If your bike goes missing, mark it as lost or stolen to notify the entire
-        Bike Index community and its partners.
       partner_organizations: Partner Organizations
-      read_more_recovery_stories: Read more recovery stories
-      recent_recovery_stories: 'Stolen bicycles we helped recover recently:'
-      recover_your_bike_for_free: >-
-        With the help of the Bike Index community and its partners, you have the information
-        necessary to recover your lost or stolen bike at no cost to you. It's what
-        we do.
-      register_now: Register now!
-      register_your_bike: Register Your Bike
       stolen_bikes_recovered: Stolen Bikes Recovered
       stolen_bikes_registered: Stolen Bikes Registered
-      the_community_responds: The community responds
       total_bikes_registered: Total Bikes Registered
       total_recovery_value: Total Recovery value
       used_by: Used By
-      value_of_bikes_recovered: Over %{value} Worth of Bikes Recovered
-      you_get_your_bike_back: You Get your Bike Back
     recovery_stories:
       recovery_stories: Recovery Stories
     update_browser:
