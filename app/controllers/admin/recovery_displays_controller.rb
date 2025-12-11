@@ -67,7 +67,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def permitted_parameters
     params.require(:recovery_display)
       .permit(:stolen_record_id, :quote, :quote_by, :recovered_at, :link,
-        :remote_photo_url, :date_input, :remove_image, :location_string, :photo)
+        :remote_photo_url, :date_input, :location_string, :photo)
   end
 
   def find_recovery_displays

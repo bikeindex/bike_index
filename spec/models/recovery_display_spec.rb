@@ -15,14 +15,6 @@ RSpec.describe RecoveryDisplay, type: :model do
       expect(recovery_display.photo_processed?).to be_falsey
       expect(recovery_display.image_processing?).to be_falsey
     end
-    context "with image present" do
-      let(:recovery_display) { RecoveryDisplay.new(updated_at: Time.current) }
-      it "processing is true if recently updated" do
-        # Sort of hacky, but gets us something
-        allow(recovery_display).to receive(:image) { OpenStruct.new(file: OpenStruct.new("exists?" => false)) }
-        expect(recovery_display.photo_processed?).to be_falsey
-      end
-    end
     context "with ActiveStorage photo" do
       let(:recovery_display) { FactoryBot.create(:recovery_display) }
       before do
@@ -36,7 +28,6 @@ RSpec.describe RecoveryDisplay, type: :model do
         expect(recovery_display.send(:has_any_image?)).to be_truthy
         expect(recovery_display.image_processing?).to be_truthy
         expect(recovery_display.photo_processed?).to be_falsey
-        expect(recovery_display.image?).to be_falsey
       end
     end
     context "with processed photo" do
@@ -53,7 +44,6 @@ RSpec.describe RecoveryDisplay, type: :model do
         expect(recovery_display.send(:has_any_image?)).to be_truthy
         expect(recovery_display.image_processing?).to be_falsey
         expect(recovery_display.photo_url).to be_present
-        expect(recovery_display.image?).to be_falsey
       end
     end
   end
