@@ -35,6 +35,13 @@ GIT
     sidekiq-failures (1.0.4)
       sidekiq (>= 4.0.0)
 
+PATH
+  remote: gems/binx_utils
+  specs:
+    binx_utils (0.1.0)
+      activesupport (>= 7.0)
+      rails-html-sanitizer (>= 1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -480,7 +487,6 @@ GEM
       rake
     mini_magick (4.13.2)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.9)
     minitest (5.26.2)
     monetize (1.12.0)
       money (~> 6.12)
@@ -510,9 +516,6 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.4)
-    nokogiri (1.18.10)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.18.10-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.18.10-x86_64-linux-gnu)
@@ -861,7 +864,6 @@ GEM
 
 PLATFORMS
   arm64-darwin
-  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -873,6 +875,7 @@ DEPENDENCIES
   aws-sdk-s3 (= 1.170)
   axlsx (~> 3.0.0.pre)
   bcrypt
+  binx_utils!
   bootsnap
   brakeman
   bullet
@@ -986,7 +989,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-   ruby 3.4.7p58
+  ruby 3.4.7p58
 
 BUNDLED WITH
-   4.0.0.beta2
+  4.0.0.beta2

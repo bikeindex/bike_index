@@ -16,6 +16,9 @@ gem "openssl" # stuff breaks without this, 2025-10
 
 gem "rails"
 
+# Bike Index utility gems
+gem "binx_utils", path: "gems/binx_utils"
+
 # Things to improve/extend Rails
 gem "puma" # App server
 gem "bcrypt" # encryption
