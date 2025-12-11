@@ -27,9 +27,9 @@
       add '# @display redesign_2025_stylesheet true' above your preview method to render it
     %>
 
-    <% if InputNormalizer.boolean(params.dig(:lookbook, :display, :legacy_stylesheet)) %>
+    <% if BinxUtils::InputNormalizer.boolean(params.dig(:lookbook, :display, :legacy_stylesheet)) %>
       <%= stylesheet_link_tag "revised", "data-turbo-track" => "reload" %>
-    <% elsif InputNormalizer.boolean(params.dig(:lookbook, :display, :redesign_2025_stylesheet)) %>
+    <% elsif BinxUtils::InputNormalizer.boolean(params.dig(:lookbook, :display, :redesign_2025_stylesheet)) %>
       <%= stylesheet_link_tag "redesign_2025", "data-turbo-track" => "reload" %>
     <% end %>
   </head>

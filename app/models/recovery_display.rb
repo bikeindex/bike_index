@@ -68,10 +68,10 @@ class RecoveryDisplay < ActiveRecord::Base
       self.recovered_at = DateTime.strptime("#{date_input} 06", "%m-%d-%Y %H")
     end
     self.recovered_at = Time.current unless recovered_at.present?
-    self.link = InputNormalizer.string(link)
-    self.location_string = InputNormalizer.string(location_string)
-    self.quote = InputNormalizer.string(quote)
-    self.quote_by = InputNormalizer.string(quote_by)
+    self.link = BinxUtils::InputNormalizer.string(link)
+    self.location_string = BinxUtils::InputNormalizer.string(location_string)
+    self.quote = BinxUtils::InputNormalizer.string(quote)
+    self.quote_by = BinxUtils::InputNormalizer.string(quote_by)
   end
 
   def quote_not_too_long

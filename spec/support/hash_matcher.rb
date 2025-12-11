@@ -105,7 +105,7 @@ class RspecHashMatcher
       elsif options[:coerce_values_to_json]
         value.to_s == match_value.to_s
       elsif BOOLEANS.include?(value) || BOOLEANS.include?(match_value)
-        InputNormalizer.boolean(value) == InputNormalizer.boolean(match_value)
+        BinxUtils::InputNormalizer.boolean(value) == BinxUtils::InputNormalizer.boolean(match_value)
       else
         return true if !options[:match_blanks] && value.blank? && match_value.blank?
 
@@ -117,8 +117,8 @@ class RspecHashMatcher
     def times_match?(time_1, time_2, match_time_within: nil)
       return false if time_1.blank? || time_2.blank?
 
-      time_1 = TimeParser.parse(time_1) unless time_1.is_a?(Time)
-      time_2 = TimeParser.parse(time_2) unless time_2.is_a?(Time)
+      time_1 = BinxUtils::TimeParser.parse(time_1) unless time_1.is_a?(Time)
+      time_2 = BinxUtils::TimeParser.parse(time_2) unless time_2.is_a?(Time)
       match_time_within ||= 1.5
       time_2.utc.between?(time_1.utc - match_time_within, time_1.utc + match_time_within)
     end

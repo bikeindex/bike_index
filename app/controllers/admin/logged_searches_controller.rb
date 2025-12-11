@@ -42,13 +42,13 @@ class Admin::LoggedSearchesController < Admin::BaseController
       @endpoint = "all"
     end
 
-    @serial = InputNormalizer.boolean(params[:search_serial])
+    @serial = BinxUtils::InputNormalizer.boolean(params[:search_serial])
     logged_searches = logged_searches.serial if @serial
 
-    @includes_query = InputNormalizer.boolean(params[:search_includes_query])
+    @includes_query = BinxUtils::InputNormalizer.boolean(params[:search_includes_query])
     logged_searches = logged_searches.includes_query if @includes_query
 
-    @with_location = InputNormalizer.boolean(params[:search_with_location])
+    @with_location = BinxUtils::InputNormalizer.boolean(params[:search_with_location])
     logged_searches = logged_searches.with_location if @with_location
 
     if params[:search_ip_address].present?

@@ -44,7 +44,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def update
-    if InputNormalizer.boolean(params[:update_from_stripe])
+    if BinxUtils::InputNormalizer.boolean(params[:update_from_stripe])
       if @membership.update_from_stripe!
         flash[:success] = "Updated membership from Stripe successfully"
       end

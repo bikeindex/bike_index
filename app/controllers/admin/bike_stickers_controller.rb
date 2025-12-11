@@ -11,7 +11,7 @@ class Admin::BikeStickersController < Admin::BaseController
         .reorder(id: :desc)
         .includes(:organization)
     else
-      @all_batches = InputNormalizer.boolean(params[:search_all_batches])
+      @all_batches = BinxUtils::InputNormalizer.boolean(params[:search_all_batches])
       batches = BikeStickerBatch.reorder(id: :desc).includes(:organization)
       @all_batches ? batches : batches.limit(5)
     end
@@ -46,7 +46,7 @@ class Admin::BikeStickersController < Admin::BaseController
       params[:organization_id].present? &&
       params[:search_bike_sticker_batch_id].present?
     # update if possible
-    if @valid_selection && InputNormalizer.boolean(params[:reassign_now])
+    if @valid_selection && BinxUtils::InputNormalizer.boolean(params[:reassign_now])
       AdminReassignBikeStickerCodesJob.perform_async(current_user.id,
         current_organization.id,
         @bike_sticker_batch.id,

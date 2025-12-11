@@ -64,7 +64,7 @@ module Organized
 
     def available_bulk_imports
       a_bulk_imports = bulk_imports.where(created_at: @time_range, kind: permitted_kinds)
-      @show_empty = !InputNormalizer.boolean(params[:without_empty])
+      @show_empty = !BinxUtils::InputNormalizer.boolean(params[:without_empty])
       a_bulk_imports = a_bulk_imports.with_bikes unless @show_empty
       a_bulk_imports
     end

@@ -108,11 +108,11 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def matching_users
-    @search_ambassadors = InputNormalizer.boolean(params[:search_ambassadors])
-    @search_superusers = InputNormalizer.boolean(params[:search_superusers])
-    @updated_at = InputNormalizer.boolean(params[:search_updated_at])
-    @search_unconfirmed = InputNormalizer.boolean(params[:search_unconfirmed])
-    @search_confirmed = @search_unconfirmed ? false : InputNormalizer.boolean(params[:search_confirmed])
+    @search_ambassadors = BinxUtils::InputNormalizer.boolean(params[:search_ambassadors])
+    @search_superusers = BinxUtils::InputNormalizer.boolean(params[:search_superusers])
+    @updated_at = BinxUtils::InputNormalizer.boolean(params[:search_updated_at])
+    @search_unconfirmed = BinxUtils::InputNormalizer.boolean(params[:search_unconfirmed])
+    @search_confirmed = @search_unconfirmed ? false : BinxUtils::InputNormalizer.boolean(params[:search_confirmed])
     users = if current_organization.present?
       current_organization.users
     else

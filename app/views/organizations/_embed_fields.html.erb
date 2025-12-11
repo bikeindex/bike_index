@@ -181,9 +181,9 @@
         <div id="stolenDisplay" class="input-group">
           <div class="control-group" style="width: 300px; max-width: 100%;">
             <%= builder.label :date_stolen, t(".when_was_it_stolen") %>
-            <% builder.object.date_stolen = TimeParser.round(builder.object.date_stolen || Time.current) %>
+            <% builder.object.date_stolen = BinxUtils::TimeParser.round(builder.object.date_stolen || Time.current) %>
             <%= builder.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
-            <%= builder.datetime_local_field :date_stolen, max: TimeParser.round(Time.current + 1.day), required: true, class: 'form-control', style: "font-size: 90%; width: 100%;" %>
+            <%= builder.datetime_local_field :date_stolen, max: BinxUtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control', style: "font-size: 90%; width: 100%;" %>
           </div>
         </div>
 

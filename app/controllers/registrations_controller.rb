@@ -26,7 +26,7 @@ class RegistrationsController < ApplicationController
       @b_param = BParam.new(params: {bike: bike_params.as_json})
     end
     @stolen = @b_param.status_stolen?
-    @vehicle_select = !InputNormalizer.boolean(params[:skip_vehicle_select])
+    @vehicle_select = !BinxUtils::InputNormalizer.boolean(params[:skip_vehicle_select])
   end
 
   def create
@@ -43,11 +43,11 @@ class RegistrationsController < ApplicationController
   private
 
   def simple_header
-    @simple_header ||= InputNormalizer.boolean(params[:simple_header])
+    @simple_header ||= BinxUtils::InputNormalizer.boolean(params[:simple_header])
   end
 
   def find_selectable_child_organizations
-    return [] unless @organization.present? && InputNormalizer.boolean(params[:select_child_organization])
+    return [] unless @organization.present? && BinxUtils::InputNormalizer.boolean(params[:select_child_organization])
 
     @organization.child_organizations
   end

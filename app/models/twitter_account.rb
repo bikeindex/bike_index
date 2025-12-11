@@ -130,7 +130,7 @@ class TwitterAccount < ApplicationRecord
     return twitter_account_url if twitter_account_info.present?
 
     self.twitter_account_info = twitter_user
-    self.created_at = TimeParser.parse(twitter_account_info["created_at"])
+    self.created_at = BinxUtils::TimeParser.parse(twitter_account_info["created_at"])
     twitter_account_info
   end
 

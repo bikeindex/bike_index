@@ -17,7 +17,7 @@ RSpec::Matchers.define :match_time do |expected, within = DEFAULT_PRECISION|
     upper_bound = (@expected + within).to_f
 
     # Coerce subject to float
-    @subject = TimeParser.parse(subject)
+    @subject = BinxUtils::TimeParser.parse(subject)
 
     @subject.to_f.between?(lower_bound, upper_bound)
   end

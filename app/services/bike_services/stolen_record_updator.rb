@@ -38,7 +38,7 @@ class BikeServices::StolenRecordUpdator
     stolen_record.attributes = permitted_attributes(@stolen_params)
 
     if @stolen_params["date_stolen"].present?
-      stolen_record.date_stolen = TimeParser.parse(@stolen_params["date_stolen"], @stolen_params["timezone"])
+      stolen_record.date_stolen = BinxUtils::TimeParser.parse(@stolen_params["date_stolen"], @stolen_params["timezone"])
     end
 
     if @stolen_params["country"].present?

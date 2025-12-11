@@ -60,7 +60,7 @@ RSpec.describe ExternalRegistryBike::Project529Bike, type: :model do
       expect(bike.url).to match("https://project529.com/.+")
       expect(bike.image_url).to match("https://529garage-production.s3.amazonaws.com/photos/attachments")
       expect(bike.thumb_url).to match("https://529garage-production.s3.amazonaws.com/photos/attachments")
-      expect(bike.external_updated_at).to be_within(1).of TimeParser.parse("2019-10-02T03:25:47.080Z")
+      expect(bike.external_updated_at).to be_within(1).of BinxUtils::TimeParser.parse("2019-10-02T03:25:47.080Z")
     end
   end
 

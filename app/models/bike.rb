@@ -735,10 +735,10 @@ class Bike < ApplicationRecord
   def set_user_hidden
     return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
 
-    if marked_user_hidden.present? && InputNormalizer.boolean(marked_user_hidden)
+    if marked_user_hidden.present? && BinxUtils::InputNormalizer.boolean(marked_user_hidden)
       self.user_hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
-    elsif marked_user_unhidden.present? && InputNormalizer.boolean(marked_user_unhidden)
+    elsif marked_user_unhidden.present? && BinxUtils::InputNormalizer.boolean(marked_user_unhidden)
       self.user_hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
@@ -863,16 +863,16 @@ class Bike < ApplicationRecord
   def set_calculated_unassociated_attributes
     clean_frame_size
     self.manufacturer_id = Manufacturer.other.id if manufacturer_id == 0
-    self.manufacturer_other = InputNormalizer.string(manufacturer_other)
+    self.manufacturer_other = BinxUtils::InputNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
-    self.frame_model = InputNormalizer.string(frame_model)
+    self.frame_model = BinxUtils::InputNormalizer.string(frame_model)
     self.owner_email = normalized_email
     normalize_serial_number
     set_paints
-    self.name = InputNormalizer.string(name)
-    self.extra_registration_number = InputNormalizer.string(extra_registration_number)
+    self.name = BinxUtils::InputNormalizer.string(name)
+    self.extra_registration_number = BinxUtils::InputNormalizer.string(extra_registration_number)
     if extra_registration_number.present?
-      serial_sanitized = InputNormalizer.regex_escape(serial_number)
+      serial_sanitized = BinxUtils::InputNormalizer.regex_escape(serial_number)
       if serial_sanitized.present? && extra_registration_number.match?(/(serial.)?#{serial_sanitized}/i)
         self.extra_registration_number = nil
       end

@@ -102,7 +102,7 @@ class Admin::EmailDomainsController < Admin::BaseController
       email_domains = (@tld == "only_tld") ? email_domains.tld : email_domains.subdomain
     end
 
-    @show_matching_users = InputNormalizer.boolean(params[:search_matching_users])
+    @show_matching_users = BinxUtils::InputNormalizer.boolean(params[:search_matching_users])
     @time_range_column = sort_column if %w[updated_at status_changed_at].include?(sort_column)
     @time_range_column ||= "created_at"
 

@@ -72,7 +72,7 @@
               = f.text_area :recovered_description, class: 'form-control'
             .form-group
               = f.label :recovered_at, t(".when_did_you_recover_it"), class: 'form-well-label'
-              - f.object.recovered_at = TimeParser.round(f.object.recovered_at || Time.current)
+              - f.object.recovered_at = BinxUtils::TimeParser.round(f.object.recovered_at || Time.current)
               = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = f.datetime_local_field :recovered_at, max: Time.current.end_of_day, step: 3600, required: true, class: 'form-control'
             .checkbox

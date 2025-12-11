@@ -70,7 +70,7 @@
 
 - org_ids = @organization_statuses.distinct.map(&:organization_id)
 - org_names_hash = Organization.unscoped.where(id: org_ids).pluck(:id, :short_name).to_h
-- show_created_at = sort_column == "created_at" || InputNormalizer.boolean(params[:search_show_created_at])
+- show_created_at = sort_column == "created_at" || BinxUtils::InputNormalizer.boolean(params[:search_show_created_at])
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border

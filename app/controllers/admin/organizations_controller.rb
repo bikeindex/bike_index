@@ -17,7 +17,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     @locations = @organization.locations
-    @deleted_organization_roles = @organization.deleted? || InputNormalizer.boolean(params[:deleted_organization_roles])
+    @deleted_organization_roles = @organization.deleted? || BinxUtils::InputNormalizer.boolean(params[:deleted_organization_roles])
     bikes = @organization.bikes.reorder("created_at desc")
     @bikes_count = bikes.size
     @pagy, @bikes = pagy(bikes, limit: 10, page: permitted_page)
@@ -126,7 +126,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def matching_organizations
     return @matching_organizations if defined?(@matching_organizations)
 
-    @search_paid = InputNormalizer.boolean(params[:search_paid])
+    @search_paid = BinxUtils::InputNormalizer.boolean(params[:search_paid])
     matching_organizations = Organization.unscoped.where(deleted_at: nil) # We don't want deleted orgs
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?

@@ -9,7 +9,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   def new
     @invoice ||= @organization.invoices.new
-    @invoice.end_at = TimeParser.parse(params[:end_at]) if params[:end_at].present?
+    @invoice.end_at = BinxUtils::TimeParser.parse(params[:end_at]) if params[:end_at].present?
   end
 
   def show

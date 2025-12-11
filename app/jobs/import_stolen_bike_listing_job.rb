@@ -29,7 +29,7 @@ class ImportStolenBikeListingJob < ApplicationJob
         notes: row[:notes]
       }
     }
-    stolen_bike_listing.listed_at = TimeParser.parse(row[:listed_at]) if row[:listed_at]
+    stolen_bike_listing.listed_at = BinxUtils::TimeParser.parse(row[:listed_at]) if row[:listed_at]
     stolen_bike_listing.attributes = manufacturer_attrs(row[:manufacturer])
     stolen_bike_listing.attributes = color_attrs(row[:color])
     stolen_bike_listing.bike_id = find_bike_id(row[:bike_index_bike])

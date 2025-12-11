@@ -78,7 +78,7 @@ module Organized
     def organization_model_audits
       organization_model_audits = OrganizationModelAudit.where(organization_id: current_organization.id)
         .joins(:model_audit)
-      if InputNormalizer.boolean(params[:search_zero])
+      if BinxUtils::InputNormalizer.boolean(params[:search_zero])
         @time_range_column = "updated_at" # Can't be last_bike_created_at, since it's nil
       else
         @time_range_column = "last_bike_created_at"

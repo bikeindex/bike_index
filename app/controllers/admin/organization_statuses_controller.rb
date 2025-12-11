@@ -44,17 +44,17 @@ class Admin::OrganizationStatusesController < Admin::BaseController
       organization_statuses = organization_statuses.where(organization_id: current_organization.id)
     end
 
-    if InputNormalizer.boolean(params[:search_current])
+    if BinxUtils::InputNormalizer.boolean(params[:search_current])
       @current = true
       organization_statuses = organization_statuses.current
     end
 
-    if InputNormalizer.boolean(params[:search_ended])
+    if BinxUtils::InputNormalizer.boolean(params[:search_ended])
       @ended = true
       organization_statuses = organization_statuses.ended
     end
 
-    if InputNormalizer.boolean(params[:search_deleted])
+    if BinxUtils::InputNormalizer.boolean(params[:search_deleted])
       @deleted = true
       organization_statuses = organization_statuses.deleted
     end

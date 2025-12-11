@@ -35,7 +35,7 @@ module Organized
     end
 
     def separate_secondary_notifications?
-      @separate_secondary_notifications ||= InputNormalizer.boolean(params[:search_secondary])
+      @separate_secondary_notifications ||= BinxUtils::InputNormalizer.boolean(params[:search_secondary])
     end
 
     def search_params_present?

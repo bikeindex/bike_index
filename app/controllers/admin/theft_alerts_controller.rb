@@ -9,7 +9,7 @@ class Admin::TheftAlertsController < Admin::BaseController
       pagy(searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
         .includes(:theft_alert_plan, :stolen_record), limit: @per_page, page: permitted_page)
     @page_title = "Admin | Promoted alerts"
-    @location_counts = InputNormalizer.boolean(params[:search_location_counts])
+    @location_counts = BinxUtils::InputNormalizer.boolean(params[:search_location_counts])
   end
 
   def show
@@ -20,13 +20,13 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def update
-    if InputNormalizer.boolean(params[:activate_theft_alert])
+    if BinxUtils::InputNormalizer.boolean(params[:activate_theft_alert])
       new_data = @theft_alert.facebook_data || {}
       @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
       StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id, true)
       flash[:success] = "Activating, please wait"
       redirect_to admin_theft_alert_path(@theft_alert)
-    elsif InputNormalizer.boolean(params[:update_theft_alert])
+    elsif BinxUtils::InputNormalizer.boolean(params[:update_theft_alert])
       StolenBike::UpdateTheftAlertFacebookJob.new.perform(@theft_alert.id)
       flash[:success] = "Updating Facebook data"
       redirect_to admin_theft_alerts_path
@@ -113,7 +113,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def searched_theft_alerts
-    @search_recovered = InputNormalizer.boolean(params[:search_recovered])
+    @search_recovered = BinxUtils::InputNormalizer.boolean(params[:search_recovered])
     theft_alerts = if @search_recovered
       stolen_record_ids = StolenRecord.recovered.with_theft_alerts
         .where(theft_alerts: {created_at: @time_range}).pluck(:id)
@@ -139,7 +139,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     # paid_and_unpaid is "all"
     theft_alerts = theft_alerts.public_send(@search_paid_admin) if @search_paid_admin != "paid_and_unpaid"
 
-    @search_facebook_data = InputNormalizer.boolean(params[:search_facebook_data])
+    @search_facebook_data = BinxUtils::InputNormalizer.boolean(params[:search_facebook_data])
     theft_alerts = theft_alerts.facebook_updateable if @search_facebook_data
 
     if available_statuses.include?(params[:search_status])
@@ -179,9 +179,9 @@ class Admin::TheftAlertsController < Admin::BaseController
       theft_alert_attrs[:start_at] = nil
       theft_alert_attrs[:end_at] = nil
     else
-      timezone = TimeZoneParser.parse(params[:timezone])
-      theft_alert_attrs[:start_at] = TimeParser.parse(theft_alert_attrs[:start_at], timezone)
-      theft_alert_attrs[:end_at] = TimeParser.parse(theft_alert_attrs[:end_at], timezone)
+      timezone = BinxUtils::TimeZoneParser.parse(params[:timezone])
+      theft_alert_attrs[:start_at] = BinxUtils::TimeParser.parse(theft_alert_attrs[:start_at], timezone)
+      theft_alert_attrs[:end_at] = BinxUtils::TimeParser.parse(theft_alert_attrs[:end_at], timezone)
     end
 
     theft_alert_attrs

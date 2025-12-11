@@ -1,5 +1,5 @@
 / SparkPost blocks emails with URIs it disapproves of. We still want to send these emails, at least for now. So just remove urls and tags, so that sparkpost doesn't block them.
-- feedback_body = InputNormalizer.sanitize(@feedback.body).gsub(/http[^\s]*/i, '').truncate(200)
+- feedback_body = BinxUtils::InputNormalizer.sanitize(@feedback.body).gsub(/http[^\s]*/i, '').truncate(200)
 - admin_links = []
 
 - if @feedback.feedback_type == 'serial_update_request'

@@ -88,7 +88,7 @@ class OrganizationStolenMessage < ApplicationRecord
   def self.clean_body(str)
     return nil if str.blank?
 
-    InputNormalizer.sanitize(str).truncate(MAX_BODY_LENGTH, omission: "")
+    BinxUtils::InputNormalizer.sanitize(str).truncate(MAX_BODY_LENGTH, omission: "")
   end
 
   def self.default_kind_for_organization_kind(org_kind)

@@ -68,7 +68,7 @@ RSpec.describe Admin::GraphsController, type: :request do
           get "#{base_url}/variable", params: {search_kind: "users", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
           expect(response.status).to eq(200)
           expect(json_result.is_a?(Array)).to be_truthy
-          Time.zone = TimeZoneParser.parse("America/Los_Angeles")
+          Time.zone = BinxUtils::TimeZoneParser.parse("America/Los_Angeles")
           expect(assigns(:start_time).strftime("%Y-%m-%dT%H:%M")).to eq start_time
           expect(assigns(:end_time).strftime("%Y-%m-%dT%H:%M")).to eq end_time
         end
@@ -90,7 +90,7 @@ RSpec.describe Admin::GraphsController, type: :request do
           get "#{base_url}/variable", params: {search_kind: "recoveries", period: "custom", start_time: start_time, end_time: end_time, timezone: "America/Los_Angeles"}
           expect(response.status).to eq(200)
           expect(json_result.is_a?(Array)).to be_truthy
-          Time.zone = TimeZoneParser.parse("America/Los_Angeles")
+          Time.zone = BinxUtils::TimeZoneParser.parse("America/Los_Angeles")
           expect(assigns(:start_time).strftime("%Y-%m-%dT%H:%M")).to eq start_time
           expect(assigns(:end_time).strftime("%Y-%m-%dT%H:%M")).to eq end_time
         end
