@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require "spec_helper"
 
 # Tests to define what this custom matcher should do
-# file is config/lib because if it was in support it would be required by rails_helper.rb
 RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
   let(:options) { RspecHashMatcher::DEFAULT_OPTS }
+
   context "with two hashes" do
     describe "match_hash_indifferently" do
       let(:time) { Time.current }
@@ -73,37 +73,6 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
       let(:hash_2) { {updated_at: time.utc.to_s, timezone: "UTC"} }
       it "matches" do
         expect(hash_1).to match_hash_indifferently(hash_2)
-      end
-
-      context "active record obj has timestamp stored" do
-        # NOTE: This is hacky and weird, but I think it's useful to test - and this was easy to set up
-        let(:obj) { User.new(email: "something@stuff.com", updated_at: time) }
-        let(:hash) { {:email => "something@stuff.com", :updated_at => time.to_i, "timezone" => "UTC"} }
-        it "matches" do
-          expect(obj).to match_hash_indifferently hash
-        end
-      end
-    end
-  end
-
-  context "with ActiveRecord model" do
-    let(:time) { 1.hour.ago }
-    let(:invoice) do
-      Invoice.new(amount_due_cents: 2_000, subscription_start_at: time + 0.5)
-    end
-    let(:hash_1) { {amount_due_cents: "2000.0", subscription_start_at: time} }
-
-    it "matches" do
-      expect(RspecHashMatcher.send(:times_match?, invoice.subscription_start_at,
-        hash_1[:subscription_start_at])).to be_truthy
-      expect(invoice).to match_hash_indifferently(hash_1)
-    end
-
-    context "with non-matching" do
-      let(:hash_2) { hash_1.merge(subscription_start_at: time + 3) }
-
-      it "does not matches" do
-        expect(invoice).not_to match_hash_indifferently(hash_2)
       end
     end
   end

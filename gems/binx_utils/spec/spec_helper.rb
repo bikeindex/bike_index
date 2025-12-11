@@ -4,6 +4,9 @@ require "bundler/setup"
 require "binx_utils"
 require "active_model"
 
+# Load support files
+Dir[File.join(__dir__, "support", "**", "*.rb")].each { |f| require f }
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -17,11 +20,5 @@ RSpec.configure do |config|
 
   config.before(:each) do
     Time.zone = BinxUtils::TimeParser.default_time_zone
-  end
-end
-
-RSpec::Matchers.define :match_time do |expected|
-  match do |actual|
-    actual.to_i == expected.to_i
   end
 end
