@@ -24,11 +24,12 @@ module BinxUtils
       def sanitize(str = nil)
         Rails::HTML::Sanitizer.full_sanitizer.new.sanitize(str.to_s, encode_special_chars: true)
           .strip
-          .gsub("&amp;", "&")
-          .gsub(/\s+/, " ")
+          .gsub("&amp;", "&") # ampersands are commonly used - keep them normal
+          .gsub(/\s+/, " ") # remove extra whitespace
       end
 
       def regex_escape(val)
+        # Lazy hack, good enough for current purposes. Improve if required!
         string(val)&.gsub(/\W/, ".")
       end
     end
