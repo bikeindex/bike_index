@@ -51,8 +51,8 @@ gem "translation"
 gem "redis"
 gem "sidekiq" # Background job processing
 gem "connection_pool", "< 3" # temporary - see github.com/mperham/connection_pool/issues/212
-# Sidekiq failure tracking and viewing. Broken for sidekiq 8. see github.com/mhfs/sidekiq-failures/pull/159
-gem "sidekiq-failures", github: "navidemad/sidekiq-failures", branch: "feat-compatibility-sidekiq-8", ref: "63252253b1a17b7115fe086a910881467cd0e55d"
+gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+gem "sidekiq-logstash" # Better sidekiq logging
 gem "redlock" # Locking
 
 # Making other files
