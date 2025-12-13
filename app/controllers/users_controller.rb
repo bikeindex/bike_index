@@ -116,7 +116,7 @@ class UsersController < ApplicationController
     @user = current_user
     if @user.present? && params[:user].present? && @user.update(permitted_parameters)
       if params.dig(:user, :terms_of_service).present?
-        if InputNormalizer.boolean(params.dig(:user, :terms_of_service))
+        if Binxtils::InputNormalizer.boolean(params.dig(:user, :terms_of_service))
           flash[:success] = translation(:you_can_use_bike_index)
           redirect_to(my_account_url) && return
         else
@@ -124,7 +124,7 @@ class UsersController < ApplicationController
           redirect_to(accept_terms_url) && return
         end
       elsif params.dig(:user, :vendor_terms_of_service).present?
-        if InputNormalizer.boolean(params.dig(:user, :vendor_terms_of_service))
+        if Binxtils::InputNormalizer.boolean(params.dig(:user, :vendor_terms_of_service))
           @user.update(accepted_vendor_terms_of_service: true)
           flash[:success] = if @user.organization_roles.any?
             translation(:you_can_use_bike_index_as_org, org_name: @user.organization_roles.first.organization.name)

@@ -76,13 +76,13 @@
       .col-md-6
         .form-group
           = f.label :start_at, "Coverage starts"
-          - @invoice.subscription_start_at = TimeParser.round(@invoice.subscription_start_at || Time.current.beginning_of_day, "seconds")
+          - @invoice.subscription_start_at = Binxtils::TimeParser.round(@invoice.subscription_start_at || Time.current.beginning_of_day, "seconds")
           = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
           = f.datetime_local_field :start_at, step: 60, required: true, class: "form-control"
       .col-md-6
         .form-group#subscriptionEndsAt.collapse{ class: (@invoice.endless? ? "" : "show") }
           = f.label :end_at, "Coverage ends"
-          - @invoice.subscription_end_at = TimeParser.round(@invoice.subscription_end_at || Time.current + 1.year, "seconds")
+          - @invoice.subscription_end_at = Binxtils::TimeParser.round(@invoice.subscription_end_at || Time.current + 1.year, "seconds")
           = f.datetime_local_field :end_at, step: 60, required: true, class: "form-control"
     .row
       .col-md-6

@@ -98,8 +98,8 @@
     <div class="col-lg-4 col-md-6">
       <div class="form-group">
         <%= f.label :recovered_at %>
-        <% f.object.recovered_at = TimeParser.round(f.object.recovered_at || Time.current) %>
-        <%= f.datetime_local_field :recovered_at, max: TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.recovered_at, format: :convert_time) %>
+        <% f.object.recovered_at = Binxtils::TimeParser.round(f.object.recovered_at || Time.current) %>
+        <%= f.datetime_local_field :recovered_at, max: Binxtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.recovered_at, format: :convert_time) %>
       </div>
     </div>
 
@@ -146,8 +146,6 @@
           <div>
             <% if @recovery_display.photo_processed.attached? %>
               <%= image_tag(@recovery_display.photo_url, class: "tw:mb-1 tw:w-24") %>
-            <% elsif @recovery_display.image? %>
-              <%= image_tag(@recovery_display.image.url(:thumb)) %>
             <% elsif @recovery_display.id.present? %>
               <p class="text-danger">No picture!</p>
             <% end %>
@@ -162,13 +160,6 @@
                 <%= f.file_field :photo, class: "custom-file-input", accept: "image/jpeg,image/jpg,image/png,image/gif" %>
               </div>
             </div>
-
-            <% if @recovery_display.photo.attached? || @recovery_display.image? %>
-              <div class="form-check mb-3">
-                <%= f.check_box :remove_image, class: "form-check-input" %>
-                <%= f.label :remove_image, class: "form-check-label" %>
-              </div>
-            <% end %>
           </div>
         </div>
       </div>

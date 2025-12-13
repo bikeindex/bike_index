@@ -9,7 +9,7 @@ class Search::RegistrationsController < ApplicationController
       redirect_to search_marketplace_path(marketplace_redirect_params) and return
     end
 
-    @render_results = InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
+    @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
     if @render_results
       @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit:, page: @page,

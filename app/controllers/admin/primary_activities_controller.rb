@@ -5,7 +5,7 @@ class Admin::PrimaryActivitiesController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 60)
-    @search_show_count = InputNormalizer.boolean(params[:search_show_count])
+    @search_show_count = Binxtils::InputNormalizer.boolean(params[:search_show_count])
     @pagy, @collection = pagy(
       matching_primary_activities.includes(:primary_activity_family).reorder("primary_activities.#{sort_column} #{sort_direction}"),
       limit: @per_page,

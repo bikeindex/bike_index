@@ -31,7 +31,7 @@ gem "rack-throttle" # Rate limiting
 gem "secure_headers", "~> 2.5.0"
 
 # Speed, performance, etc
-gem "fast_blank", "~> 1.0"
+gem "fast_blank"
 gem "active_model_serializers", "~> 0.8.3" # NOTE: more recent versions are slower, see discourse Gemfile
 gem "oj" # optimized json
 gem "multi_json" # TODO: use this more
@@ -50,14 +50,14 @@ gem "translation"
 # Redis and Redis dependents
 gem "redis"
 gem "sidekiq" # Background job processing
-# Sidekiq failure tracking and viewing. Broken for sidekiq 8. see github.com/mhfs/sidekiq-failures/pull/159
-gem "sidekiq-failures", github: "navidemad/sidekiq-failures", branch: "feat-compatibility-sidekiq-8", ref: "63252253b1a17b7115fe086a910881467cd0e55d"
+gem "connection_pool", "< 3" # temporary - see github.com/mperham/connection_pool/issues/212
+gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+gem "sidekiq-logstash" # Better sidekiq logging
 gem "redlock" # Locking
 
 # Making other files
 gem "image_processing" # what it says
 gem "mini_magick" # Required for image processing
-gem "benchmark" # required by mini_magick (also useful and no longer part of standard lib in Ruby 3.5)
 gem "ruby-vips" # Faster image processing, should eventually replace mini_magick
 gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8

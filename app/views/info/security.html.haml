@@ -38,7 +38,7 @@
   %p#gpg-key-paragraph
     Bike Index is primarily an open source project and we welcome responsible security testing and vulnerability disclosure. If your report contains sensitive data, please contact #{link_to "seth@bikeindex.org", "mailto:seth@bikeindex.org"} (preferably using <a href="/security?show_gpg_key=true#gpg-key-paragraph" data-target="#gpgKey" data-toggle="collapse">this GPG key</a>).
   -# If someone follows the link, make the GPG Key show up
-  .collapse#gpgKey{class: (InputNormalizer.boolean(params[:show_gpg_key]) ? "show in" : "")}
+  .collapse#gpgKey{class: (Binxtils::InputNormalizer.boolean(params[:show_gpg_key]) ? "show in" : "")}
     %pre{ style: "background: #f7f7f9; border: 1px solid #EEEEEE; width: 45em; padding: 1em; line-height: 1.2; font-size: 90%;" }
       = render partial: "security_gpg_key"
   %p

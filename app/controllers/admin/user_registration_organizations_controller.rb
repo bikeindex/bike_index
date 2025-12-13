@@ -6,7 +6,7 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
     @pagy, @user_registration_organizations = pagy(matching_user_registration_organizations
       .reorder("user_registration_organizations.#{sort_column} #{sort_direction}")
       .includes(:user, :organization), limit: @per_page, page: permitted_page)
-    @render_org_counts = InputNormalizer.boolean(params[:search_org_counts])
+    @render_org_counts = Binxtils::InputNormalizer.boolean(params[:search_org_counts])
   end
 
   helper_method :matching_user_registration_organizations
@@ -30,7 +30,7 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
     if current_organization.present?
       user_registration_organizations = user_registration_organizations.where(organization_id: current_organization.id)
     end
-    @with_registration_info = InputNormalizer.boolean(params[:search_with_registration_info])
+    @with_registration_info = Binxtils::InputNormalizer.boolean(params[:search_with_registration_info])
     if @with_registration_info
       user_registration_organizations = user_registration_organizations.where.not(registration_info: {})
     end
