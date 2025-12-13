@@ -26,15 +26,6 @@ GIT
       excon (~> 0.76.0)
       json (~> 2.1, >= 2.1.0)
 
-GIT
-  remote: https://github.com/navidemad/sidekiq-failures.git
-  revision: 63252253b1a17b7115fe086a910881467cd0e55d
-  ref: 63252253b1a17b7115fe086a910881467cd0e55d
-  branch: feat-compatibility-sidekiq-8
-  specs:
-    sidekiq-failures (1.0.4)
-      sidekiq (>= 4.0.0)
-
 PATH
   remote: gems/binxtils
   specs:
@@ -754,6 +745,8 @@ GEM
       logger (>= 1.6.2)
       rack (>= 3.1.0)
       redis-client (>= 0.23.2)
+    sidekiq-failures (1.0.4)
+      sidekiq (>= 4.0.0)
     sidekiq-logstash (3.3.0)
       logstash-event (~> 1.2)
       sidekiq (~> 8.0)
@@ -973,7 +966,7 @@ DEPENDENCIES
   secure_headers (~> 2.5.0)
   selenium-webdriver
   sidekiq
-  sidekiq-failures!
+  sidekiq-failures
   sidekiq-logstash
   simplecov
   simplecov_json_formatter

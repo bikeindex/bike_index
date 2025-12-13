@@ -16,9 +16,6 @@ gem "openssl" # stuff breaks without this, 2025-10
 
 gem "rails"
 
-# Bike Index utility gems
-gem "binxtils", path: "gems/binxtils"
-
 # Things to improve/extend Rails
 gem "puma" # App server
 gem "bcrypt" # encryption
@@ -54,8 +51,7 @@ gem "translation"
 gem "redis"
 gem "sidekiq" # Background job processing
 gem "connection_pool", "< 3" # temporary - see github.com/mperham/connection_pool/issues/212
-# Sidekiq failure tracking and viewing. Broken for sidekiq 8. see github.com/mhfs/sidekiq-failures/pull/159
-gem "sidekiq-failures", github: "navidemad/sidekiq-failures", branch: "feat-compatibility-sidekiq-8", ref: "63252253b1a17b7115fe086a910881467cd0e55d"
+gem "sidekiq-failures" # Sidekiq failure tracking and viewing
 gem "sidekiq-logstash" # Better sidekiq logging
 gem "redlock" # Locking
 
@@ -72,6 +68,7 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 gem "rqrcode", "0.10.1" # QR Code image generator
 
 # Functionality extensions
+gem "binxtils", path: "gems/binxtils" # Bike Index utility gem
 gem "flipper" # Feature flagging
 gem "flipper-active_record" # Feature flagging
 gem "flipper-ui" # Feature flagging
