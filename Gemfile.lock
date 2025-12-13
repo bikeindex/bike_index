@@ -26,15 +26,6 @@ GIT
       excon (~> 0.76.0)
       json (~> 2.1, >= 2.1.0)
 
-GIT
-  remote: https://github.com/navidemad/sidekiq-failures.git
-  revision: 63252253b1a17b7115fe086a910881467cd0e55d
-  ref: 63252253b1a17b7115fe086a910881467cd0e55d
-  branch: feat-compatibility-sidekiq-8
-  specs:
-    sidekiq-failures (1.0.4)
-      sidekiq (>= 4.0.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -421,7 +412,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.16.0)
+    json (2.18.0)
     jwt (2.5.0)
     knapsack_pro (8.0.1)
       rake
@@ -480,7 +471,6 @@ GEM
       rake
     mini_magick (4.13.2)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.9)
     minitest (5.27.0)
     monetize (1.12.0)
       money (~> 6.12)
@@ -510,9 +500,6 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.4)
-    nokogiri (1.18.10)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.18.10-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.18.10-x86_64-linux-gnu)
@@ -649,7 +636,7 @@ GEM
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
-    redis-client (0.26.1)
+    redis-client (0.26.2)
       connection_pool
     redlock (2.0.6)
       redis-client (>= 0.14.1, < 1.0.0)
@@ -745,12 +732,17 @@ GEM
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
     shellany (0.0.1)
-    sidekiq (8.0.7)
+    sidekiq (8.0.10)
       connection_pool (>= 2.5.0)
       json (>= 2.9.0)
       logger (>= 1.6.2)
       rack (>= 3.1.0)
       redis-client (>= 0.23.2)
+    sidekiq-failures (1.1.0)
+      sidekiq (>= 4.0.0)
+    sidekiq-logstash (3.3.0)
+      logstash-event (~> 1.2)
+      sidekiq (~> 8.0)
     simple_oauth (0.3.1)
     simplecov (0.22.0)
       docile (~> 1.1)
@@ -863,7 +855,6 @@ GEM
 
 PLATFORMS
   arm64-darwin
-  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -967,7 +958,8 @@ DEPENDENCIES
   secure_headers (~> 2.5.0)
   selenium-webdriver
   sidekiq
-  sidekiq-failures!
+  sidekiq-failures
+  sidekiq-logstash
   simplecov
   simplecov_json_formatter
   sitemap_generator (~> 6)
