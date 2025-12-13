@@ -7,7 +7,7 @@ module Binxtils
 
     class << self
       def default_time_zone
-        @default_time_zone ||= ActiveSupport::TimeZone["Central Time (US & Canada)"]
+        @default_time_zone ||= ActiveSupport::TimeZone["UTC"]
       end
 
       def default_time_zone=(time_zone)

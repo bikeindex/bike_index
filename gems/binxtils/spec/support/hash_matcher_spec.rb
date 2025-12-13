@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "hash_matcher"
 
 # Tests to define what this custom matcher should do
 RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
