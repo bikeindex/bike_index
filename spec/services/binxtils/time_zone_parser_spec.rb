@@ -233,5 +233,3 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
     end
   end
 end
-
-

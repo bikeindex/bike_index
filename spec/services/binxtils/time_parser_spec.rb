@@ -213,4 +213,3 @@ RSpec.describe Binxtils::TimeParser, type: :service do
     end
   end
 end
-

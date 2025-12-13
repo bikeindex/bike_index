@@ -132,4 +132,3 @@ RSpec.describe Binxtils::InputNormalizer do
     end
   end
 end
-

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Binxtils
   module TimeParser
     DEFAULT_TIME_ZONE = ActiveSupport::TimeZone[Rails.application.class.config.time_zone].freeze
