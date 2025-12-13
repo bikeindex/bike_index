@@ -2,170 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
-    body:
-      encoding: US-ASCII
-      string: ''
-    headers:
-      User-Agent:
-      - Stripe/v1 RubyBindings/13.4.1
-      X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_TvxJgDHXvMwqw0","request_duration_ms":113}}'
-      Stripe-Version:
-      - 2025-01-27.acacia
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Server:
-      - nginx
-      Date:
-      - Mon, 04 Aug 2025 20:10:47 GMT
-      Content-Type:
-      - application/json
-      Content-Length:
-      - '2399'
-      Connection:
-      - keep-alive
-      Access-Control-Allow-Credentials:
-      - 'true'
-      Access-Control-Allow-Methods:
-      - GET, HEAD, PUT, PATCH, POST, DELETE
-      Access-Control-Allow-Origin:
-      - "*"
-      Access-Control-Expose-Headers:
-      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
-        X-Stripe-Privileged-Session-Required
-      Access-Control-Max-Age:
-      - '300'
-      Cache-Control:
-      - no-cache, no-store
-      Content-Security-Policy:
-      - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
-        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=zWPKpNijnXMPvhd9aNIAhKqhQdq_yVk-Lx-Lnc5chJuTorodvb39538tQJmHvjqAxZTwZxCY1GXAeaQU
-      Request-Id:
-      - req_h3voDUP6GhAllW
-      Stripe-Version:
-      - 2025-01-27.acacia
-      Vary:
-      - Origin
-      X-Stripe-Priority-Routing-Enabled:
-      - 'true'
-      X-Stripe-Routing-Context-Priority-Tier:
-      - api-testmode
-      X-Wc:
-      - ABGHIJ
-      Strict-Transport-Security:
-      - max-age=63072000; includeSubDomains; preload
-    body:
-      encoding: UTF-8
-      string: |-
-        {
-          "id": "cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
-          "object": "checkout.session",
-          "adaptive_pricing": null,
-          "after_expiration": null,
-          "allow_promotion_codes": null,
-          "amount_subtotal": 500000,
-          "amount_total": 500000,
-          "automatic_tax": {
-            "enabled": false,
-            "liability": null,
-            "provider": null,
-            "status": null
-          },
-          "billing_address_collection": null,
-          "cancel_url": "http://localhost:3001/payments/new",
-          "client_reference_id": null,
-          "client_secret": null,
-          "collected_information": {
-            "shipping_details": null
-          },
-          "consent": null,
-          "consent_collection": null,
-          "created": 1625254985,
-          "currency": "usd",
-          "currency_conversion": null,
-          "custom_fields": [],
-          "custom_text": {
-            "after_submit": null,
-            "shipping_address": null,
-            "submit": null,
-            "terms_of_service_acceptance": null
-          },
-          "customer": "cus_JmR9ccDp8JD2Mo",
-          "customer_creation": null,
-          "customer_details": {
-            "address": null,
-            "email": "testly@bikeindex.org",
-            "name": null,
-            "phone": null,
-            "tax_exempt": "none",
-            "tax_ids": []
-          },
-          "customer_email": null,
-          "discounts": [],
-          "expires_at": 1625341385,
-          "invoice": null,
-          "invoice_creation": null,
-          "livemode": false,
-          "locale": null,
-          "metadata": {},
-          "mode": "payment",
-          "origin_context": null,
-          "payment_intent": "pi_0J8sGTm0T0GBfX0v4QU0tTnn",
-          "payment_link": null,
-          "payment_method_collection": null,
-          "payment_method_configuration_details": null,
-          "payment_method_options": {
-            "card": {
-              "request_three_d_secure": "automatic"
-            }
-          },
-          "payment_method_types": [
-            "card"
-          ],
-          "payment_status": "paid",
-          "permissions": null,
-          "phone_number_collection": {
-            "enabled": false
-          },
-          "recovered_from": null,
-          "saved_payment_method_options": {
-            "allow_redisplay_filters": [
-              "always"
-            ],
-            "payment_method_remove": "disabled",
-            "payment_method_save": null
-          },
-          "setup_intent": null,
-          "shipping_address_collection": null,
-          "shipping_cost": null,
-          "shipping_details": null,
-          "shipping_options": [],
-          "status": "complete",
-          "submit_type": "pay",
-          "subscription": null,
-          "success_url": "http://localhost:3001/payments/success?session_id={CHECKOUT_SESSION_ID}",
-          "total_details": {
-            "amount_discount": 0,
-            "amount_shipping": 0,
-            "amount_tax": 0
-          },
-          "ui_mode": "hosted",
-          "url": null,
-          "wallet_options": null
-        }
-  recorded_at: Mon, 04 Aug 2025 20:10:47 GMT
-- request:
-    method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_<CLOUDFLARE_TOKEN>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
     body:
       encoding: US-ASCII
       string: ''
@@ -221,7 +58,7 @@ http_interactions:
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
-      - api-testmode
+      - api-<CLOUDFLARE_TOKEN>mode
       X-Wc:
       - ABGHIJ
       Strict-Transport-Security:
@@ -230,7 +67,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
+          "id": "cs_<CLOUDFLARE_TOKEN>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
           "object": "checkout.session",
           "adaptive_pricing": null,
           "after_expiration": null,
@@ -269,7 +106,7 @@ http_interactions:
           "customer_details": {
             "address": null,
             "business_name": null,
-            "email": "testly@bikeindex.org",
+            "email": "<CLOUDFLARE_TOKEN>ly@bikeindex.org",
             "individual_name": null,
             "name": null,
             "phone": null,
@@ -330,4 +167,172 @@ http_interactions:
           "wallet_options": null
         }
   recorded_at: Sat, 20 Sep 2025 16:40:34 GMT
+- request:
+    method: get
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_<CLOUDFLARE_TOKEN>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Stripe/v1 RubyBindings/13.4.1
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_K778TEMPqzhJgC","request_duration_ms":168}}'
+      Stripe-Version:
+      - 2025-01-27.acacia
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Sat, 13 Dec 2025 23:46:32 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2539'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Methods:
+      - GET, HEAD, PUT, PATCH, POST, DELETE
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
+        X-Stripe-Privileged-Session-Required
+      Access-Control-Max-Age:
+      - '300'
+      Cache-Control:
+      - no-cache, no-store
+      Content-Security-Policy:
+      - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
+        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=oCLnjowyd_ah8Z3T0ecdsw0A3ab4uuTYntQ-4dYv9ZorX77Enov7BY3gG3ADvspKl0Uu9haUiq78pVlW
+      Request-Id:
+      - req_vPlBI6Ru51lNv3
+      Stripe-Version:
+      - 2025-01-27.acacia
+      Vary:
+      - Origin
+      X-Stripe-Priority-Routing-Enabled:
+      - 'true'
+      X-Stripe-Routing-Context-Priority-Tier:
+      - api-<CLOUDFLARE_TOKEN>mode
+      X-Wc:
+      - ABGHIJ
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "id": "cs_<CLOUDFLARE_TOKEN>_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa",
+          "object": "checkout.session",
+          "adaptive_pricing": null,
+          "after_expiration": null,
+          "allow_promotion_codes": null,
+          "amount_subtotal": 500000,
+          "amount_total": 500000,
+          "automatic_tax": {
+            "enabled": false,
+            "liability": null,
+            "provider": null,
+            "status": null
+          },
+          "billing_address_collection": null,
+          "cancel_url": "http://localhost:3001/payments/new",
+          "client_reference_id": null,
+          "client_secret": null,
+          "collected_information": {
+            "business_name": null,
+            "individual_name": null,
+            "shipping_details": null
+          },
+          "consent": null,
+          "consent_collection": null,
+          "created": 1625254985,
+          "currency": "usd",
+          "currency_conversion": null,
+          "custom_fields": [],
+          "custom_text": {
+            "after_submit": null,
+            "shipping_address": null,
+            "submit": null,
+            "terms_of_service_acceptance": null
+          },
+          "customer": "cus_JmR9ccDp8JD2Mo",
+          "customer_account": null,
+          "customer_creation": null,
+          "customer_details": {
+            "address": null,
+            "business_name": null,
+            "email": "<CLOUDFLARE_TOKEN>ly@bikeindex.org",
+            "individual_name": null,
+            "name": null,
+            "phone": null,
+            "tax_exempt": "none",
+            "tax_ids": []
+          },
+          "customer_email": null,
+          "discounts": [],
+          "expires_at": 1625341385,
+          "invoice": null,
+          "invoice_creation": null,
+          "livemode": false,
+          "locale": null,
+          "metadata": {},
+          "mode": "payment",
+          "origin_context": null,
+          "payment_intent": "pi_0J8sGTm0T0GBfX0v4QU0tTnn",
+          "payment_link": null,
+          "payment_method_collection": null,
+          "payment_method_configuration_details": null,
+          "payment_method_options": {
+            "card": {
+              "request_three_d_secure": "automatic"
+            }
+          },
+          "payment_method_types": [
+            "card"
+          ],
+          "payment_status": "paid",
+          "permissions": null,
+          "phone_number_collection": {
+            "enabled": false
+          },
+          "recovered_from": null,
+          "saved_payment_method_options": {
+            "allow_redisplay_filters": [
+              "always"
+            ],
+            "payment_method_remove": "disabled",
+            "payment_method_save": null
+          },
+          "setup_intent": null,
+          "shipping_address_collection": null,
+          "shipping_cost": null,
+          "shipping_details": null,
+          "shipping_options": [],
+          "status": "complete",
+          "submit_type": "pay",
+          "subscription": null,
+          "success_url": "http://localhost:3001/payments/success?session_id={CHECKOUT_SESSION_ID}",
+          "total_details": {
+            "amount_discount": 0,
+            "amount_shipping": 0,
+            "amount_tax": 0
+          },
+          "ui_mode": "hosted",
+          "url": null,
+          "wallet_options": null
+        }
+  recorded_at: Sat, 13 Dec 2025 23:46:33 GMT
 recorded_with: VCR 6.3.1

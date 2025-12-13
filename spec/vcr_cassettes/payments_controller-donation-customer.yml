@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a15Mb9Rte6MgOkvjOovuH4VBeagLKw74LLFBFUvSGJHBYt83eesNXRKatJ
+    uri: https://api.stripe.com/v1/checkout/sessions/cs_<CLOUDFLARE_TOKEN>_a15Mb9Rte6MgOkvjOovuH4VBeagLKw74LLFBFUvSGJHBYt83eesNXRKatJ
     body:
       encoding: US-ASCII
       string: ''
@@ -64,7 +64,7 @@ http_interactions:
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
-      - api-testmode
+      - api-<CLOUDFLARE_TOKEN>mode
       X-Wc:
       - AB
       Strict-Transport-Security:
@@ -73,7 +73,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a15Mb9Rte6MgOkvjOovuH4VBeagLKw74LLFBFUvSGJHBYt83eesNXRKatJ",
+          "id": "cs_<CLOUDFLARE_TOKEN>_a15Mb9Rte6MgOkvjOovuH4VBeagLKw74LLFBFUvSGJHBYt83eesNXRKatJ",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": false
@@ -88,7 +88,7 @@ http_interactions:
             "status": null
           },
           "billing_address_collection": null,
-          "cancel_url": "http://test.host/payments/new",
+          "cancel_url": "http://<CLOUDFLARE_TOKEN>.host/payments/new",
           "client_reference_id": null,
           "client_secret": null,
           "consent": null,
@@ -107,7 +107,7 @@ http_interactions:
           "customer_creation": null,
           "customer_details": {
             "address": null,
-            "email": "testly@bikeindex.org",
+            "email": "<CLOUDFLARE_TOKEN>ly@bikeindex.org",
             "name": null,
             "phone": null,
             "tax_exempt": "none",
@@ -165,14 +165,14 @@ http_interactions:
           "status": "open",
           "submit_type": "donate",
           "subscription": null,
-          "success_url": "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
+          "success_url": "http://<CLOUDFLARE_TOKEN>.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
           "total_details": {
             "amount_discount": 0,
             "amount_shipping": 0,
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a15Mb9Rte6MgOkvjOovuH4VBeagLKw74LLFBFUvSGJHBYt83eesNXRKatJ#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
+          "url": "https://checkout.stripe.com/c/pay/cs_<CLOUDFLARE_TOKEN>_a15Mb9Rte6MgOkvjOovuH4VBeagLKw74LLFBFUvSGJHBYt83eesNXRKatJ#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl"
         }
   recorded_at: Sun, 02 Feb 2025 18:32:03 GMT
 - request:
@@ -239,7 +239,7 @@ http_interactions:
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
-      - api-testmode
+      - api-<CLOUDFLARE_TOKEN>mode
       X-Wc:
       - AB
       Strict-Transport-Security:
@@ -265,7 +265,7 @@ http_interactions:
           "delinquent": false,
           "description": null,
           "discount": null,
-          "email": "testly@bikeindex.org",
+          "email": "<CLOUDFLARE_TOKEN>ly@bikeindex.org",
           "invoice_prefix": "80897ED8",
           "invoice_settings": {
             "custom_fields": null,
@@ -281,7 +281,7 @@ http_interactions:
           "preferred_locales": [],
           "shipping": null,
           "tax_exempt": "none",
-          "test_clock": null
+          "<CLOUDFLARE_TOKEN>_clock": null
         }
   recorded_at: Sun, 02 Feb 2025 18:32:04 GMT
 - request:
@@ -289,14 +289,14 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: submit_type=donate&line_items[0][price_data][unit_amount]=7500&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2Ftest.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fpayments%2Fnew&customer=cus_JmR9ccDp8JD2Mo
+      string: submit_type=donate&line_items[0][price_data][unit_amount]=7500&line_items[0][price_data][currency]=USD&line_items[0][price_data][product_data][name]=Donation&line_items[0][price_data][product_data][images][0]=https%3A%2F%2Ffiles.bikeindex.org%2Fuploads%2FPu%2F151203%2Freg_hance.jpg&line_items[0][quantity]=1&mode=payment&success_url=http%3A%2F%2F<CLOUDFLARE_TOKEN>.host%2Fpayments%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2F<CLOUDFLARE_TOKEN>.host%2Fpayments%2Fnew&customer=cus_JmR9ccDp8JD2Mo
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_h37jUG0YQviAoa","request_duration_ms":278}}'
+      - '{"last_request_metrics":{"request_id":"req_XchBoweGboSuKj","request_duration_ms":333}}'
       Idempotency-Key:
-      - 55f92161-df60-442e-911f-b9a31dbc603d
+      - aa8c0bd6-6556-4db9-aade-487d20de2618
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -313,11 +313,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 20 Sep 2025 16:40:35 GMT
+      - Sat, 13 Dec 2025 23:46:34 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '3814'
+      - '3876'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -336,13 +336,13 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=R2PVEz2zR4lfOKQjgqZI00cuzKBz0hCFOGcAfdOuebZNIgswzFbtPGvEkwHREU-UfinCOh6Ft9Jits7y
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=oCLnjowyd_ah8Z3T0ecdsw0A3ab4uuTYntQ-4dYv9ZorX77Enov7BY3gG3ADvspKl0Uu9haUiq78pVlW
       Idempotency-Key:
-      - 55f92161-df60-442e-911f-b9a31dbc603d
+      - aa8c0bd6-6556-4db9-aade-487d20de2618
       Original-Request:
-      - req_bwiQYt3T3NRCgg
+      - req_6Rxm0V5xyMIBHm
       Request-Id:
-      - req_bwiQYt3T3NRCgg
+      - req_6Rxm0V5xyMIBHm
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -352,7 +352,7 @@ http_interactions:
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
-      - api-testmode
+      - api-<CLOUDFLARE_TOKEN>mode
       X-Wc:
       - ABGHIJ
       Strict-Transport-Security:
@@ -361,7 +361,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1N2meYiiBIHuyDpUcX04114zrRNB8VMr7aikrtHFqZ3VbzM62jjXlpWFy",
+          "id": "cs_<CLOUDFLARE_TOKEN>_a1naCFa9ve8Xsu3Le1wivLDFkLeM39ZBKlbhY676vpBe3wL1jkPN7Q4n6G",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": true
@@ -389,7 +389,7 @@ http_interactions:
             },
             "logo": null
           },
-          "cancel_url": "http://test.host/payments/new",
+          "cancel_url": "http://<CLOUDFLARE_TOKEN>.host/payments/new",
           "client_reference_id": null,
           "client_secret": null,
           "collected_information": {
@@ -399,7 +399,7 @@ http_interactions:
           },
           "consent": null,
           "consent_collection": null,
-          "created": 1758386435,
+          "created": 1765669594,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -410,11 +410,12 @@ http_interactions:
             "terms_of_service_acceptance": null
           },
           "customer": "cus_JmR9ccDp8JD2Mo",
+          "customer_account": null,
           "customer_creation": null,
           "customer_details": {
             "address": null,
             "business_name": null,
-            "email": "testly@bikeindex.org",
+            "email": "<CLOUDFLARE_TOKEN>ly@bikeindex.org",
             "individual_name": null,
             "name": null,
             "phone": null,
@@ -423,7 +424,7 @@ http_interactions:
           },
           "customer_email": null,
           "discounts": [],
-          "expires_at": 1758472835,
+          "expires_at": 1765755993,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -479,15 +480,15 @@ http_interactions:
           "status": "open",
           "submit_type": "donate",
           "subscription": null,
-          "success_url": "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
+          "success_url": "http://<CLOUDFLARE_TOKEN>.host/payments/success?session_id={CHECKOUT_SESSION_ID}",
           "total_details": {
             "amount_discount": 0,
             "amount_shipping": 0,
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1N2meYiiBIHuyDpUcX04114zrRNB8VMr7aikrtHFqZ3VbzM62jjXlpWFy#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
+          "url": "https://checkout.stripe.com/c/pay/cs_<CLOUDFLARE_TOKEN>_a1naCFa9ve8Xsu3Le1wivLDFkLeM39ZBKlbhY676vpBe3wL1jkPN7Q4n6G#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
           "wallet_options": null
         }
-  recorded_at: Sat, 20 Sep 2025 16:40:35 GMT
+  recorded_at: Sat, 13 Dec 2025 23:46:34 GMT
 recorded_with: VCR 6.3.1
