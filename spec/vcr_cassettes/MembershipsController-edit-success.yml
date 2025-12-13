@@ -5,7 +5,97 @@ http_interactions:
     uri: https://api.stripe.com/v1/billing_portal/sessions
     body:
       encoding: UTF-8
-      string: customer=cus_RohIc4uZhMPzxN&return_url=http%3A%2F%2F<CLOUDFLARE_TOKEN>.host%2Fmy_account
+      string: customer=cus_RohIc4uZhMPzxN&return_url=http%3A%2F%2Ftest.host%2Fmy_account
+    headers:
+      User-Agent:
+      - Stripe/v1 RubyBindings/13.4.1
+      X-Stripe-Client-Telemetry:
+      - '{"last_request_metrics":{"request_id":"req_jbN11cRLRCFoPZ","request_duration_ms":0}}'
+      Idempotency-Key:
+      - ff18897b-e868-4048-bb96-5260cbcb3131
+      Stripe-Version:
+      - 2025-01-27.acacia
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Mon, 04 Aug 2025 20:10:59 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '463'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Methods:
+      - GET, HEAD, PUT, PATCH, POST, DELETE
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Expose-Headers:
+      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
+        X-Stripe-Privileged-Session-Required
+      Access-Control-Max-Age:
+      - '300'
+      Cache-Control:
+      - no-cache, no-store
+      Content-Security-Policy:
+      - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
+        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=JDQYvOOv4jgZRbWcAIm_NT8rDgwbWop97QwMxYFEQj5iDVYZ5YbWMj_xt4B-pFr1rwd2HUP2h1b6f-JP
+      Idempotency-Key:
+      - ff18897b-e868-4048-bb96-5260cbcb3131
+      Original-Request:
+      - req_FfJWsQtl7t9aAp
+      Request-Id:
+      - req_FfJWsQtl7t9aAp
+      Stripe-Should-Retry:
+      - 'false'
+      Stripe-Version:
+      - 2025-01-27.acacia
+      Vary:
+      - Origin
+      X-Stripe-Priority-Routing-Enabled:
+      - 'true'
+      X-Stripe-Routing-Context-Priority-Tier:
+      - api-testmode
+      X-Wc:
+      - ABGHIJ
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "id": "bps_0RsUilm0T0GBfX0vCfJsj1AI",
+          "object": "billing_portal.session",
+          "configuration": "bpc_0QvSOWm0T0GBfX0vQCpYBJv1",
+          "created": 1754338259,
+          "customer": "cus_RohIc4uZhMPzxN",
+          "flow": null,
+          "livemode": false,
+          "locale": null,
+          "on_behalf_of": null,
+          "return_url": "http://test.host/my_account",
+          "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfU282d2xHN21NeFZkeTFNOTBEWUZTaHcxQ3d3b0hMRA0100nAi3BUvC"
+        }
+  recorded_at: Mon, 04 Aug 2025 20:10:59 GMT
+- request:
+    method: post
+    uri: https://api.stripe.com/v1/billing_portal/sessions
+    body:
+      encoding: UTF-8
+      string: customer=cus_RohIc4uZhMPzxN&return_url=http%3A%2F%2Ftest.host%2Fmy_account
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
@@ -68,7 +158,7 @@ http_interactions:
       X-Stripe-Priority-Routing-Enabled:
       - 'true'
       X-Stripe-Routing-Context-Priority-Tier:
-      - api-<CLOUDFLARE_TOKEN>mode
+      - api-testmode
       X-Wc:
       - ABGHIJ
       Strict-Transport-Security:
@@ -86,99 +176,8 @@ http_interactions:
           "livemode": false,
           "locale": null,
           "on_behalf_of": null,
-          "return_url": "http://<CLOUDFLARE_TOKEN>.host/my_account",
-          "url": "https://billing.stripe.com/p/session/<CLOUDFLARE_TOKEN>_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfVDVmQXVwOTVJUGdQOWpSWXlzaXJSMU1rdWJIVVREag0100YCIqntAB"
+          "return_url": "http://test.host/my_account",
+          "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfVDVmQXVwOTVJUGdQOWpSWXlzaXJSMU1rdWJIVVREag0100YCIqntAB"
         }
   recorded_at: Sat, 20 Sep 2025 16:40:30 GMT
-- request:
-    method: post
-    uri: https://api.stripe.com/v1/billing_portal/sessions
-    body:
-      encoding: UTF-8
-      string: customer=cus_RohIc4uZhMPzxN&return_url=http%3A%2F%2F<CLOUDFLARE_TOKEN>.host%2Fmy_account
-    headers:
-      User-Agent:
-      - Stripe/v1 RubyBindings/13.4.1
-      X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_SX1z3edNf9zao6","request_duration_ms":0}}'
-      Idempotency-Key:
-      - 960f9364-fd6c-4df0-89af-9f4e10a7b931
-      Stripe-Version:
-      - 2025-01-27.acacia
-      Content-Type:
-      - application/x-www-form-urlencoded
-      Accept-Encoding:
-      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
-      Accept:
-      - "*/*"
-  response:
-    status:
-      code: 200
-      message: OK
-    headers:
-      Server:
-      - nginx
-      Date:
-      - Sat, 13 Dec 2025 23:45:18 GMT
-      Content-Type:
-      - application/json
-      Content-Length:
-      - '491'
-      Connection:
-      - keep-alive
-      Access-Control-Allow-Credentials:
-      - 'true'
-      Access-Control-Allow-Methods:
-      - GET, HEAD, PUT, PATCH, POST, DELETE
-      Access-Control-Allow-Origin:
-      - "*"
-      Access-Control-Expose-Headers:
-      - Request-Id, Stripe-Manage-Version, Stripe-Should-Retry, X-Stripe-External-Auth-Required,
-        X-Stripe-Privileged-Session-Required
-      Access-Control-Max-Age:
-      - '300'
-      Cache-Control:
-      - no-cache, no-store
-      Content-Security-Policy:
-      - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
-        img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=PM5q-HCxrGYHt_pvE2qz65edhaZb39VFkQcV6nTl6xf5LB1Fr8-Ti2OUvT-20vA-G8HPXoI57UGwbfRH
-      Idempotency-Key:
-      - 960f9364-fd6c-4df0-89af-9f4e10a7b931
-      Original-Request:
-      - req_DGSOYNil73nl1E
-      Request-Id:
-      - req_DGSOYNil73nl1E
-      Stripe-Should-Retry:
-      - 'false'
-      Stripe-Version:
-      - 2025-01-27.acacia
-      Vary:
-      - Origin
-      X-Stripe-Priority-Routing-Enabled:
-      - 'true'
-      X-Stripe-Routing-Context-Priority-Tier:
-      - api-<CLOUDFLARE_TOKEN>mode
-      X-Wc:
-      - ABGHIJ
-      Strict-Transport-Security:
-      - max-age=63072000; includeSubDomains; preload
-    body:
-      encoding: UTF-8
-      string: |-
-        {
-          "id": "bps_0Se2V0m0T0GBfX0vWtPEYX04",
-          "object": "billing_portal.session",
-          "configuration": "bpc_0QvSOWm0T0GBfX0vQCpYBJv1",
-          "created": 1765669518,
-          "customer": "cus_RohIc4uZhMPzxN",
-          "customer_account": null,
-          "flow": null,
-          "livemode": false,
-          "locale": null,
-          "on_behalf_of": null,
-          "return_url": "http://<CLOUDFLARE_TOKEN>.host/my_account",
-          "url": "https://billing.stripe.com/p/session/<CLOUDFLARE_TOKEN>_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfVGJFeVJHV1BkaHh1czdaUWEyUVpBN3VPMDVrUXJDQg0100l31G6N8a"
-        }
-  recorded_at: Sat, 13 Dec 2025 23:45:18 GMT
 recorded_with: VCR 6.3.1
