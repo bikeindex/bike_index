@@ -106,6 +106,6 @@ module SetPeriod
       Time.zone = @timezone
     end
 
-    @timezone ||= TimeParser::DEFAULT_TIME_ZONE
+    @timezone ||= Binxtils::TimeParser.default_time_zone
   end
 end

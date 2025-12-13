@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
+<<<<<<<< HEAD:gems/binxtils/spec/time_zone_parser_spec.rb
 require "spec_helper"
 
 RSpec.describe Binxtils::TimeZoneParser do
   let(:subject) { described_class }
   let(:default_time_zone) { Binxtils::TimeParser.default_time_zone }
+========
+RSpec.describe Binxtils::TimeZoneParser, type: :service do
+  let(:subject) { described_class }
+  let(:default_time_zone) { Binxtils::TimeParser::DEFAULT_TIME_ZONE }
+>>>>>>>> origin/main:spec/services/binxtils/time_zone_parser_spec.rb
   before { Time.zone = default_time_zone }
 
   describe "parse" do
@@ -64,7 +70,12 @@ RSpec.describe Binxtils::TimeZoneParser do
       let(:target_time_zone) { ActiveSupport::TimeZone["Eastern Time (US & Canada)"] }
 
       it "returns correctly" do
+<<<<<<<< HEAD:gems/binxtils/spec/time_zone_parser_spec.rb
         expect(Binxtils::TimeZoneParser.parse(time_zone_str).utc_offset).to eq target_time_zone.utc_offset
+========
+        expect(subject.parse(time_zone_str).utc_offset).to eq target_time_zone.utc_offset
+        # Alternative time_zone name
+>>>>>>>> origin/main:spec/services/binxtils/time_zone_parser_spec.rb
         expect(subject.parse("Eastern Time (US & Canada)").utc_offset).to eq target_time_zone.utc_offset
       end
     end
@@ -205,14 +216,22 @@ RSpec.describe Binxtils::TimeZoneParser do
 
   describe "full_name" do
     let(:full_name) { "Pacific Time (US & Canada)" }
+<<<<<<<< HEAD:gems/binxtils/spec/time_zone_parser_spec.rb
     let(:time_zone) { Binxtils::TimeZoneParser.parse(full_name) }
+========
+    let(:time_zone) { subject.parse(full_name) }
+>>>>>>>> origin/main:spec/services/binxtils/time_zone_parser_spec.rb
     it "returns full name" do
       expect(time_zone.name).to eq full_name
       expect(described_class.full_name(time_zone)).to eq full_name
     end
     context "time_zone with abbr" do
       let(:key_name) { "America/Los_Angeles" }
+<<<<<<<< HEAD:gems/binxtils/spec/time_zone_parser_spec.rb
       let(:time_zone_shorter) { Binxtils::TimeZoneParser.parse(key_name) }
+========
+      let(:time_zone_shorter) { subject.parse(key_name) }
+>>>>>>>> origin/main:spec/services/binxtils/time_zone_parser_spec.rb
       it "returns the full name" do
         expect(time_zone_shorter.name).to eq key_name
         expect(described_class.full_name(time_zone_shorter)).to eq full_name

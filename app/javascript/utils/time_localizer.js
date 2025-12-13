@@ -1,4 +1,5 @@
 // TODO: add ability to show in og time zone
+// 2025-8-6 - switch to am/pm lowercase, without a preceding space
 // 2025-5-15 - switch to using .localizeTime class (instead of .convertTime)
 // 2025-5-12 - add onlyTodayWithoutDate option
 // 2024-11-24 - refactor code to better take advantage of luxon
@@ -128,12 +129,13 @@ export default class TimeLocalizer {
   // this manages that functionality
   hourFormat (time, baseTimeFormat, includeSeconds, withPreposition) {
     const prefix = withPreposition ? ' at ' : ''
+    const ampm = `${time.toFormat('a').toLowerCase()}`
     if (includeSeconds) {
-      return `${prefix}${time.toFormat(baseTimeFormat)}:<small>${time.toFormat(
+      return `${prefix}${time.toFormat(baseTimeFormat)}:<small class="less-strong">${time.toFormat(
         'ss'
-      )}</small> ${time.toFormat('a')}`
+      )}</small>${ampm}`
     } else {
-      return prefix + time.toFormat(`${baseTimeFormat} a`)
+      return prefix + time.toFormat(`${baseTimeFormat}`) + ampm
     }
   }
 
@@ -196,6 +198,8 @@ export default class TimeLocalizer {
 
   preciseTimeSeconds (time) {
     return time.toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)
+      .replace(' AM', 'am')
+      .replace(' PM', 'pm')
   }
 
   setHiddenTimezoneFields (el) {

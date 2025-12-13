@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
+<<<<<<<< HEAD:gems/binxtils/spec/time_parser_spec.rb
 require "spec_helper"
 
 RSpec.describe Binxtils::TimeParser do
   let(:subject) { described_class }
   let(:default_time_zone) { Binxtils::TimeParser.default_time_zone }
+========
+RSpec.describe Binxtils::TimeParser, type: :service do
+  let(:subject) { described_class }
+  let(:default_time_zone) { Binxtils::TimeParser::DEFAULT_TIME_ZONE }
+>>>>>>>> origin/main:spec/services/binxtils/time_parser_spec.rb
   before { Time.zone = default_time_zone }
 
   describe "parse" do
