@@ -19,8 +19,8 @@
               = irecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = irecord.label :impounded_at_with_timezone, "When did you find this bike?", class: 'form-well-label'
               .form-well-input
-                - irecord.object.impounded_at = TimeParser.round(irecord.object.impounded_at || Time.current)
-                = irecord.datetime_local_field :impounded_at_with_timezone, max: TimeParser.round(Time.current + 1.day), step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(irecord.object.impounded_at, format: :convert_time)
+                - irecord.object.impounded_at = Binxtils::TimeParser.round(irecord.object.impounded_at || Time.current)
+                = irecord.datetime_local_field :impounded_at_with_timezone, max: Binxtils::TimeParser.round(Time.current + 1.day), step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(irecord.object.impounded_at, format: :convert_time)
 
             .form-group.row.unnested-field
               = irecord.label :impounded_description, "Description", class: 'form-well-label'

@@ -224,7 +224,7 @@ module HeaderTags
     end
 
     def assign_user_attrs(user)
-      @page_title = InputNormalizer.sanitize(user.name) if user.name.present?
+      @page_title = Binxtils::InputNormalizer.sanitize(user.name) if user.name.present?
       @page_description = "Bike Index user account: #{user.title}" if user.title.present?
 
       if user.avatar && user.avatar.url != "https://files.bikeindex.org/blank.png"

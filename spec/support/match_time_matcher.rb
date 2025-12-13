@@ -12,18 +12,18 @@ RSpec::Matchers.define :match_time do |expected, within = DEFAULT_PRECISION|
     end
 
     # Assign to ivar so it's accessible
-    @expected = expected.in_time_zone(TimeParser::DEFAULT_TIME_ZONE)
+    @expected = expected.in_time_zone(Binxtils::TimeParser::DEFAULT_TIME_ZONE)
     lower_bound = (@expected - within).to_f
     upper_bound = (@expected + within).to_f
 
     # Coerce subject to float
-    @subject = TimeParser.parse(subject)
+    @subject = Binxtils::TimeParser.parse(subject)
 
     @subject.to_f.between?(lower_bound, upper_bound)
   end
 
   def time_display(time)
-    time.in_time_zone(TimeParser::DEFAULT_TIME_ZONE).iso8601(8)
+    time.in_time_zone(Binxtils::TimeParser::DEFAULT_TIME_ZONE).iso8601(8)
   end
 
   failure_message do |_expected|

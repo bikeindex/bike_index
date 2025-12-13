@@ -4,8 +4,8 @@
   = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
   = srecord.label :date_stolen, t(".when_was_it_stolen_at"), class: 'form-well-label'
   .form-well-input
-    - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.current)
-    = srecord.datetime_local_field :date_stolen, max: TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
+    - srecord.object.date_stolen = Binxtils::TimeParser.round(srecord.object.date_stolen || Time.current)
+    = srecord.datetime_local_field :date_stolen, max: Binxtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
 
 .related-fields
   .form-group.row

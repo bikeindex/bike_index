@@ -91,7 +91,7 @@ class Manufacturer < ApplicationRecord
       return nil if manufacturer.blank?
 
       if manufacturer.other? && manufacturer_other.present?
-        InputNormalizer.sanitize(manufacturer_other)
+        Binxtils::InputNormalizer.sanitize(manufacturer_other)
       else
         manufacturer.short_name
       end.strip.truncate(60)
@@ -116,7 +116,7 @@ class Manufacturer < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.name = InputNormalizer.string(name)
+    self.name = Binxtils::InputNormalizer.string(name)
     self.secondary_slug = Slugifyer.manufacturer(secondary_name)
     self.slug = Slugifyer.manufacturer(name)
     self.website = website.present? ? Urlifyer.urlify(website) : nil

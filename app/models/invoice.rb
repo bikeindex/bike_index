@@ -205,11 +205,11 @@ class Invoice < ApplicationRecord
   end
 
   def start_at=(val)
-    self.subscription_start_at = TimeParser.parse(val, timezone)
+    self.subscription_start_at = Binxtils::TimeParser.parse(val, timezone)
   end
 
   def end_at=(val)
-    self.subscription_end_at = TimeParser.parse(val, timezone)
+    self.subscription_end_at = Binxtils::TimeParser.parse(val, timezone)
   end
 
   def amount_due

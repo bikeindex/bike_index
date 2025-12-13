@@ -167,7 +167,7 @@ class Tweet < ApplicationRecord
   end
 
   def tweeted_at
-    TimeParser.parse(trh[:created_at])
+    Binxtils::TimeParser.parse(trh[:created_at])
   end
 
   def tweeted_image
