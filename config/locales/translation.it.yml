@@ -22,8 +22,6 @@ it:
       content_type_allowlist_error:
       content_type_denylist_error:
       rmagick_processing_error:
-      mini_magick_processing_error:
-      vips_processing_error:
       min_size_error:
       max_size_error:
       model_invalid: 'Validazione fallita: %{errors}'
@@ -61,6 +59,11 @@ it:
       record_invalid: 'Validazione fallita: %{errors}'
       carrierwave_processing_error:
       password_too_long:
+      processing_error:
+      min_width_error:
+      max_width_error:
+      min_height_error:
+      max_height_error:
     format: "%{attribute} %{message}"
     template:
       body: 'Ricontrolla i seguenti campi:'

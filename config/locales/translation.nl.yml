@@ -118,8 +118,6 @@ nl:
       carrierwave_download_error: kan niet worden gedownload
       rmagick_processing_error: 'Mislukt om te manipuleren met rmagick, misschien
         is het geen afbeelding? Oorspronkelijke fout: %{e}'
-      mini_magick_processing_error: 'Mislukken om te manipuleren met MiniMagick, misschien
-        is het geen afbeelding? Oorspronkelijke fout: %{e}'
       record_invalid: 'Validatie mislukt: %{errors}'
       invalid_currency: moet een geldige valuta zijn (bijvoorbeeld '100', '5 %{decimal}
         24' of '123 %{thousands} 456 %{decimal} 78'). Kreeg %{currency}
@@ -133,11 +131,14 @@ nl:
       content_type_allowlist_error: 'Je mag geen %{content_type}-bestanden uploaden,
         toegestane typen: %{allowed_types}'
       content_type_denylist_error: U mag geen %{content_type}-bestanden uploaden
-      vips_processing_error: 'Kan niet worden gemanipuleerd met vips, misschien is
-        het geen afbeelding? Oorspronkelijke fout: %{e}'
       min_size_error: Bestandsgrootte moet groter zijn dan %{min_size}
       max_size_error: Bestandsgrootte moet kleiner zijn dan %{max_size}
       password_too_long: is te lang
+      processing_error: Het bewerken is mislukt, misschien is het geen afbeelding?
+      min_width_error: De breedte van de afbeelding moet groter zijn dan %{min_width}px
+      max_width_error: De breedte van de afbeelding moet kleiner zijn dan %{max_width}px
+      min_height_error: De hoogte van de afbeelding moet groter zijn dan %{min_height}px
+      max_height_error: De hoogte van de afbeelding moet kleiner zijn dan %{max_height}px
     template:
       body: 'Er zijn problemen met de volgende velden:'
       header:
