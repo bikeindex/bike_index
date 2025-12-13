@@ -89,7 +89,7 @@ jobs:
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: google-chrome-stable curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
-          version: 1.1
+          version: 1.2
       - name: Ensure ImageMagick is available
         run: echo $(identify --version)
       - name: Checkout code
