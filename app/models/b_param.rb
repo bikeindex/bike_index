@@ -119,7 +119,7 @@ class BParam < ApplicationRecord
       h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
       h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
       if h["bike"].key?("owner_email_is_phone_number")
-        h["bike"]["is_phone"] = InputNormalizer.boolean(h["bike"].delete("owner_email_is_phone_number"))
+        h["bike"]["is_phone"] = Binxtils::InputNormalizer.boolean(h["bike"].delete("owner_email_is_phone_number"))
       end
       org = Organization.friendly_find(h["bike"].delete("organization_slug"))
       h["bike"]["creation_organization_id"] = org.id if org.present?
@@ -179,7 +179,7 @@ class BParam < ApplicationRecord
         status = "status_impounded" if status == "status_found" # Rename, so we can give pretty URLs to users
         return {status: status} if Bike.statuses.include?(status)
       end
-      return {status: "status_stolen"} if InputNormalizer.boolean(url_params[:stolen])
+      return {status: "status_stolen"} if Binxtils::InputNormalizer.boolean(url_params[:stolen])
 
       {}
     end
@@ -188,14 +188,14 @@ class BParam < ApplicationRecord
     def propulsion_type(passed_params)
       return nil if passed_params.blank?
 
-      throttle = InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
-      pedal_assist = InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
+      throttle = Binxtils::InputNormalizer.boolean(passed_params["propulsion_type_throttle"])
+      pedal_assist = Binxtils::InputNormalizer.boolean(passed_params["propulsion_type_pedal_assist"])
 
       if pedal_assist
         throttle ? "pedal-assist-and-throttle" : "pedal-assist"
       elsif throttle
         "throttle"
-      elsif InputNormalizer.boolean(passed_params["propulsion_type_motorized"])
+      elsif Binxtils::InputNormalizer.boolean(passed_params["propulsion_type_motorized"])
         "motorized"
       else
         passed_params["propulsion_type_slug"] || passed_params["propulsion_type"] ||
@@ -331,7 +331,7 @@ class BParam < ApplicationRecord
     end
     return "unregistered_parking_notification" if parking_notification_params.present?
     return "status_impounded" if impound_attrs.present?
-    return "status_stolen" if stolen_attrs.present? || InputNormalizer.boolean(bike["stolen"])
+    return "status_stolen" if stolen_attrs.present? || Binxtils::InputNormalizer.boolean(bike["stolen"])
 
     "status_with_owner"
   end
@@ -438,7 +438,7 @@ class BParam < ApplicationRecord
     return true if status_impounded? || unregistered_parking_notification?
 
     send_email = params.dig("bike", "send_email").to_s
-    send_email.present? && !InputNormalizer.boolean(send_email)
+    send_email.present? && !Binxtils::InputNormalizer.boolean(send_email)
   end
 
   def organization_affiliation
@@ -469,7 +469,7 @@ class BParam < ApplicationRecord
     massage_if_v2
     set_foreign_keys
     # Remove false top level param (this is gross and I wish it wasn't necessary)
-    params.delete("propulsion_type_motorized") unless InputNormalizer.boolean(params["propulsion_type_motorized"])
+    params.delete("propulsion_type_motorized") unless Binxtils::InputNormalizer.boolean(params["propulsion_type_motorized"])
     self.organization_id = creation_organization_id
     self.email = owner_email
     self
@@ -606,7 +606,7 @@ class BParam < ApplicationRecord
     attrs.merge(organization_id: creation_organization_id,
       user_id: creator_id,
       bike_id: created_bike_id,
-      use_entered_address: InputNormalizer.boolean(attrs[:use_entered_address]))
+      use_entered_address: Binxtils::InputNormalizer.boolean(attrs[:use_entered_address]))
   end
 
   def partial_notification_pre_tracking?
@@ -654,9 +654,9 @@ class BParam < ApplicationRecord
   end
 
   def clean_key_value(key, value)
-    return unless InputNormalizer.present_or_false?(value)
+    return unless Binxtils::InputNormalizer.present_or_false?(value)
 
-    clean_value = value.is_a?(String) ? InputNormalizer.sanitize(value) : value
+    clean_value = value.is_a?(String) ? Binxtils::InputNormalizer.sanitize(value) : value
     [key, clean_value]
   end
 

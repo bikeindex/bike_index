@@ -317,7 +317,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.user).to eq current_user
             expect(export.headers).to eq crushed_datetime_attrs[:headers]
             expect(export.start_at.to_i).to be_within(1).of 1535173200
-            expect(export.end_at.to_i).to be_within(1).of 1538283600 # Explicitly testing this in TimeParser
+            expect(export.end_at.to_i).to be_within(1).of 1538283600 # Explicitly testing this in Binxtils::TimeParser
             expect(export.assign_bike_codes?).to be_falsey
             expect(OrganizationExportJob).to have_enqueued_sidekiq_job(export.id)
           end

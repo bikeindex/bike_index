@@ -132,7 +132,7 @@ class Admin::PaymentsController < Admin::BaseController
   end
 
   def assign_to_membership_param?
-    InputNormalizer.boolean(params[:assign_to_membership])
+    Binxtils::InputNormalizer.boolean(params[:assign_to_membership])
   end
 
   def valid_invoice_parameters?

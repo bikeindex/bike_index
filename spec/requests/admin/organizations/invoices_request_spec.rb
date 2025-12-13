@@ -62,7 +62,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       expect(organization.enabled_feature_slugs).to eq([])
       expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
       expect(invoice.amount_due).to eq 1220
-      # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
+      # Binxtils::TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
       expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
       expect(invoice.notes).to eq params[:notes]
     end
@@ -90,7 +90,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
           expect(organization.enabled_feature_slugs).to eq(%w[parking_notifications passwordless_users])
           expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
           expect(invoice.amount_due).to eq 0
-          # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
+          # Binxtils::TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
           expect(invoice.subscription_start_at.to_i).to be_within(1.day).of Time.parse(time).to_i
           expect(invoice.subscription_end_at.to_i).to be_within(1.day).of (Time.parse(time) + 1.years).to_i
           expect(invoice.notes).to eq params[:notes]
@@ -112,7 +112,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       invoice.reload
       expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
       expect(invoice.amount_due).to eq 1220
-      # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
+      # Binxtils::TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
       expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
       expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1562385600
       expect(invoice.notes).to eq params[:notes]
@@ -128,7 +128,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
         invoice.reload
         expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
         expect(invoice.amount_due).to eq 1220
-        # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
+        # Binxtils::TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
         expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
         expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1562385600
         expect(invoice.notes).to eq params[:notes]

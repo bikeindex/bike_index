@@ -11,9 +11,9 @@
         = f.select :payment_method, Payment.admin_creatable_payment_methods.map { |m| [m.humanize, m] }, {}, class: "form-control"
     .col-md-6
       .form-group
-        - f.object.created_at = TimeParser.round(f.object.created_at || Time.current)
+        - f.object.created_at = Binxtils::TimeParser.round(f.object.created_at || Time.current)
         = f.label :created_at, "Time of payment"
-        = f.datetime_local_field :created_at, max: TimeParser.round(Time.current + 1.week), step: 60, required: true, class: 'form-control'
+        = f.datetime_local_field :created_at, max: Binxtils::TimeParser.round(Time.current + 1.week), step: 60, required: true, class: 'form-control'
     .col-md-6
       = f.label :amount
       .input-group

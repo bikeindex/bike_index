@@ -16,7 +16,7 @@ module LegacyFormWell::AddressRecord
       @builder.object.country_id ||= current_country_id
       @initial_country_id = @builder.object.country_id
       @static_fields = STATIC_FIELDS_OPTIONS.include?(static_fields) ? static_fields : false
-      @embed_layout = InputNormalizer.boolean(embed_layout)
+      @embed_layout = Binxtils::InputNormalizer.boolean(embed_layout)
 
       @wrapper_class = if @embed_layout
         "input-group"
