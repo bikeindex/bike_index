@@ -16,7 +16,7 @@ module Binxtils
           # otherwise it's a timestamp
           time = Time.at(time_str.to_i)
         else
-          time_zone = TimeZoneParser.parse(time_zone_str)
+          time_zone = Binxtils::TimeZoneParser.parse(time_zone_str)
           Time.zone = time_zone
           time = Time.zone.parse(time_str.to_s) # Assign in time zone
           Time.zone = DEFAULT_TIME_ZONE
@@ -48,7 +48,7 @@ module Binxtils
         if paychex_formatted.present?
           new_str += " #{regex_match["hour"]}:#{regex_match["minute"]}#{regex_match["ampm"]}"
         end
-        # Run it through TimeParser again
+        # Run it through Binxtils::TimeParser again
         parse(new_str, time_zone_str, in_time_zone:)
       end
 
@@ -69,10 +69,10 @@ module Binxtils
 
       def time_in_zone(time, time_zone_str:, time_str: nil, time_zone: nil)
         time_zone ||= if time_zone_str.present?
-          TimeZoneParser.parse(time_zone_str)
+          Binxtils::TimeZoneParser.parse(time_zone_str)
         elsif time_str.present?
           # If no time_zone_str was passed, try to parse it out of the time string
-          TimeZoneParser.parse_from_time_string(time_str.to_s)
+          Binxtils::TimeZoneParser.parse_from_time_string(time_str.to_s)
         end
 
         time.in_time_zone(time_zone || ActiveSupport::TimeZone["UTC"])

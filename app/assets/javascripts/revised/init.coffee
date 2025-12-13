@@ -126,7 +126,7 @@ class BikeIndex.Init extends BikeIndex
 
   localizeTimes: ->
     # NOTE: This uses time_parser-coffeeimport.js - not time_parser.js
-    window.timeParser ||= new TimeParser()
+    window.timeParser ||= new Binxtils::TimeParser()
     window.timeParser.localize()
 
   # copy of bike_index_utilities.js function

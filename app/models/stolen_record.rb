@@ -181,7 +181,7 @@ class StolenRecord < ApplicationRecord
     end
 
     def corrected_date_stolen(date = nil)
-      date = TimeParser.parse(date) || Time.current
+      date = Binxtils::TimeParser.parse(date) || Time.current
       year = date.year
       if year < (Time.current - 100.years).year
         decade = year.to_s[-2..].chars.join("")
@@ -340,14 +340,14 @@ class StolenRecord < ApplicationRecord
 
   def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
-    self.recovered_at = TimeParser.parse(info[:recovered_at], info[:timezone]) || Time.current
+    self.recovered_at = Binxtils::TimeParser.parse(info[:recovered_at], info[:timezone]) || Time.current
 
     update(
       current: false,
       recovered_description: info[:recovered_description],
       recovering_user_id: info[:recovering_user_id],
-      index_helped_recovery: InputNormalizer.boolean(info[:index_helped_recovery]),
-      can_share_recovery: InputNormalizer.boolean(info[:can_share_recovery])
+      index_helped_recovery: Binxtils::InputNormalizer.boolean(info[:index_helped_recovery]),
+      can_share_recovery: Binxtils::InputNormalizer.boolean(info[:can_share_recovery])
     )
     notify_of_promoted_alert_recovery
     true

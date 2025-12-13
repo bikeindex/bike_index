@@ -39,7 +39,7 @@ module Binxtils
 
       # TODO: This might be overly complicated garbage
       def time_string_has_zone_info?(time_str)
-        return false if TimeParser.looks_like_timestamp?(time_str)
+        return false if Binxtils::TimeParser.looks_like_timestamp?(time_str)
 
         timezone_patterns = [
           /[+-]\d{2}:?\d{2}\b/,          # +0900, +09:00, -0500, etc

@@ -31,7 +31,7 @@ class Autocomplete::Matcher
         category_cache_key: category_key_from_opts(categories)
       }
       opts.merge(
-        cache: pparms[:cache].present? ? InputNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache],
+        cache: pparms[:cache].present? ? Binxtils::InputNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache],
         cache_key: cache_key_from_opts(categories, opts[:q_array]),
         interkeys: interkeys_from_opts(opts[:category_cache_key], opts[:q_array]),
         offset: offset,

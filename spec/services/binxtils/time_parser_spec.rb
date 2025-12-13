@@ -208,7 +208,7 @@ RSpec.describe Binxtils::TimeParser, type: :service do
         parsed_time = subject.parse(time)
         expect(parsed_time).to eq time
         expect(parsed_time.time_zone.name).to eq time_zone
-        expect(TimeZoneParser.parse(time_zone)).to eq parsed_time.time_zone
+        expect(Binxtils::TimeZoneParser.parse(time_zone)).to eq parsed_time.time_zone
       end
     end
   end

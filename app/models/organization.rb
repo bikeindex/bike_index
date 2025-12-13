@@ -607,7 +607,7 @@ class Organization < ApplicationRecord
   end
 
   def strip_name_tags(str)
-    InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
+    Binxtils::InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
   end
 
   def name_shortener(str)

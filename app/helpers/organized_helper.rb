@@ -158,6 +158,6 @@ module OrganizedHelper
     txt = organization&.registration_field_labels&.dig(field_slug.to_s)
     return nil unless txt.present?
 
-    strip_tags ? InputNormalizer.sanitize(txt) : txt.html_safe
+    strip_tags ? Binxtils::InputNormalizer.sanitize(txt) : txt.html_safe
   end
 end

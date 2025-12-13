@@ -8,11 +8,11 @@
 // To re-import time_parser.js:
 //
 // 1. Copy the contents of that file below
-// 2. Delete everything before "class TimeParser"
+// 2. Delete everything before "class Binxtils::TimeParser"
 //    (specifically "import ..." and "export default")
 //
 
-class TimeParser {
+class Binxtils::TimeParser {
   constructor() {
     if (!window.localTimezone) {
       window.localTimezone = moment.tz.guess();

@@ -28,8 +28,8 @@
                       +
                     = t(".add_start")
                   #start-at.hidden-other.mb-0{ class: (show_start_at ? "unhidden" : "") }
-                    - @bike.start_at = TimeParser.round(@bike.start_at || Time.current)
-                    = f.datetime_local_field :start_at, max: TimeParser.round(Time.current + 1.day), step: 60, required: true, class: "form-control dateInputUpdateZone", "data-initialtime" => l(@bike.start_at, format: :convert_time)
+                    - @bike.start_at = Binxtils::TimeParser.round(@bike.start_at || Time.current)
+                    = f.datetime_local_field :start_at, max: Binxtils::TimeParser.round(Time.current + 1.day), step: 60, required: true, class: "form-control dateInputUpdateZone", "data-initialtime" => l(@bike.start_at, format: :convert_time)
                 .right-input-help
                   %a#rm-start-at.toggle-version-date.optional-form-block{class: (show_start_at ? "" : "currently-hidden"), data: {target: "#start-at", toggle: "#add-start-at", action: "rm-block"}}
                     %span.context-display-help
@@ -46,8 +46,8 @@
                       +
                     = t(".add_end")
                   #end-at.hidden-other.mb-0{ class: (show_end_at ? "unhidden" : "") }
-                    - @bike.end_at = TimeParser.round(@bike.end_at || Time.current)
-                    = f.datetime_local_field :end_at, max: TimeParser.round(Time.current + 1.day), step: 60, required: true, class: "form-control dateInputUpdateZone", "data-initialtime" => l(@bike.end_at, format: :convert_time)
+                    - @bike.end_at = Binxtils::TimeParser.round(@bike.end_at || Time.current)
+                    = f.datetime_local_field :end_at, max: Binxtils::TimeParser.round(Time.current + 1.day), step: 60, required: true, class: "form-control dateInputUpdateZone", "data-initialtime" => l(@bike.end_at, format: :convert_time)
                 .right-input-help
                   %a#rm-end-at.toggle-version-date.optional-form-block{class: (show_end_at ? "" : "currently-hidden"), data: {target: "#end-at", toggle: "#add-end-at", action: "rm-block"}}
                     %span.context-display-help
