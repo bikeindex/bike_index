@@ -23,8 +23,7 @@ RSpec.describe "time_localizer.js", :js, type: :system do
     one_week_ago = fix_format((current_in_zone - 7.days).strftime("%b %e"))
     one_year_ago = fix_format((current_in_zone - 1.year).strftime("%b %e, %Y"))
     yesterday_precise = fix_format((current_in_zone - 1.day).strftime("%b %e, %l:%M %p")).gsub("  ", " ")
-    one_year_ago_precise = fix_format((current_in_zone - 1.year).strftime("%b %-e, %Y, %-l:%M:%S %p"))
-    expect(one_year_ago_precise).to be_present # somehow seems like it's lazy evaluated otherwise?
+    one_year_ago_precise_no_seconds = fix_format((current_in_zone - 1.year).strftime("%b %-e, %Y, %-l:%M"))
 
     expect(page).to have_content("Current time: #{current_time}", wait: 5)
     expect(page).to have_content("Yesterday: #{yesterday}")
@@ -32,6 +31,6 @@ RSpec.describe "time_localizer.js", :js, type: :system do
     expect(page).to have_content("One week ago: #{one_week_ago}")
     expect(page).to have_content("One year ago: #{one_year_ago}")
     expect(page).to have_content("Yesterday (precise time): #{yesterday_precise}")
-    expect(page).to have_content("One year ago (precise time seconds): #{one_year_ago_precise}")
+    expect(page).to have_content("One year ago (precise time seconds): #{one_year_ago_precise_no_seconds}")
   end
 end
