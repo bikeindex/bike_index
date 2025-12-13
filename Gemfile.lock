@@ -877,7 +877,7 @@ DEPENDENCIES
   facebookbusiness!
   factory_bot_rails
   faraday_middleware
-  fast_blank (~> 1.0)
+  fast_blank
   flamegraph
   flipper
   flipper-active_record

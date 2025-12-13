@@ -31,7 +31,7 @@ gem "rack-throttle" # Rate limiting
 gem "secure_headers", "~> 2.5.0"
 
 # Speed, performance, etc
-gem "fast_blank", "~> 1.0"
+gem "fast_blank"
 gem "active_model_serializers", "~> 0.8.3" # NOTE: more recent versions are slower, see discourse Gemfile
 gem "oj" # optimized json
 gem "multi_json" # TODO: use this more
