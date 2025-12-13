@@ -49,9 +49,9 @@
   enabled_columns += ["impounded_cell"] if current_organization.enabled?("impound_bikes")
   enabled_columns += ["avery_cell"] if current_organization.enabled?("avery_export")
   # If the search_stickers param or search_address is set, start with the settings panel open
-  settings_default_open = @search_stickers.present? || @search_address.present? || params[:search_impoundedness].present? || BinxUtils::InputNormalizer.boolean(params[:search_open])
+  settings_default_open = @search_stickers.present? || @search_address.present? || params[:search_impoundedness].present? || Binxtils::InputNormalizer.boolean(params[:search_open])
   # NOTE: Checking avery incurs a performance hit - so only render it when the box is checked
-  show_avery_export = current_organization.enabled?("avery_export") && BinxUtils::InputNormalizer.boolean(params[:search_avery_export])
+  show_avery_export = current_organization.enabled?("avery_export") && Binxtils::InputNormalizer.boolean(params[:search_avery_export])
   initially_checked_columns += ["avery_cell"] if show_avery_export
   initially_checked_columns += ["impounded_cell"] if @search_impoundedness == "impounded"
   enabled_columns = enabled_columns.sort { |a, b| column_renames[a] <=> column_renames[b] }

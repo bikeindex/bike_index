@@ -8,7 +8,7 @@ class Search::MarketplaceController < ApplicationController
   around_action :set_reading_role
 
   def index
-    @render_results = BinxUtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
+    @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
     @is_marketplace = true
 
     if @render_results

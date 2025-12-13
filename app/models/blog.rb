@@ -166,7 +166,7 @@ class Blog < ApplicationRecord
     self.canonical_url = Urlifyer.urlify(canonical_url)
     set_published_at_and_published
     unless listicle?
-      self.kind = (!BinxUtils::InputNormalizer.boolean(info_kind)) ? "blog" : "info"
+      self.kind = (!Binxtils::InputNormalizer.boolean(info_kind)) ? "blog" : "info"
     end
     self.published_at = Time.current if info?
     update_title_save
@@ -176,7 +176,7 @@ class Blog < ApplicationRecord
 
   def set_published_at_and_published
     if post_date.present?
-      self.published_at = BinxUtils::TimeParser.parse(post_date, timezone)
+      self.published_at = Binxtils::TimeParser.parse(post_date, timezone)
     end
     self.published_at = Time.current if post_now == "1"
     if user_email.present?
@@ -202,7 +202,7 @@ class Blog < ApplicationRecord
   end
 
   def update_title_save
-    return true unless BinxUtils::InputNormalizer.boolean(update_title)
+    return true unless Binxtils::InputNormalizer.boolean(update_title)
 
     self.old_title_slug = title_slug
     set_title_slug
@@ -224,7 +224,7 @@ class Blog < ApplicationRecord
         markdown = Kramdown::Document.new(body)
         body_html = markdown.to_html
       end
-      abbr = BinxUtils::InputNormalizer.sanitize(body_html)
+      abbr = Binxtils::InputNormalizer.sanitize(body_html)
       # strip tags, then remove extra spaces
       abbr = abbr.tr("\n", " ").gsub(/\s+/, " ").strip if abbr.present?
       self.body_abbr = truncate(abbr, length: 200)

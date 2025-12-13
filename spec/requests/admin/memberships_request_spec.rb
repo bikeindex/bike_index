@@ -85,8 +85,8 @@ RSpec.describe Admin::MembershipsController, type: :request do
       expect(flash[:success]).to be_present
       expect(membership.reload.user_id).to eq og_user_id
       expect(membership.level).to eq "plus"
-      expect(membership.start_at).to match_time BinxUtils::TimeParser.parse(start_at)
-      expect(membership.end_at).to match_time BinxUtils::TimeParser.parse(end_at)
+      expect(membership.start_at).to match_time Binxtils::TimeParser.parse(start_at)
+      expect(membership.end_at).to match_time Binxtils::TimeParser.parse(end_at)
     end
     context "update_stripe" do
       let(:membership) { FactoryBot.create(:membership, level: "plus", start_at: nil, creator: nil) }

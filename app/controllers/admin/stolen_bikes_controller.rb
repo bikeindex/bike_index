@@ -71,7 +71,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def find_bike
-    if BinxUtils::InputNormalizer.boolean(params[:stolen_record_id])
+    if Binxtils::InputNormalizer.boolean(params[:stolen_record_id])
       @stolen_record = StolenRecord.unscoped.find(params[:id])
       @bike = Bike.unscoped.find_by_id(@stolen_record.bike_id)
     else
@@ -109,8 +109,8 @@ class Admin::StolenBikesController < Admin::BaseController
   def available_stolen_records
     return @available_stolen_records if defined?(@available_stolen_records)
 
-    @unapproved_only = !BinxUtils::InputNormalizer.boolean(params[:search_unapproved])
-    @only_without_location = BinxUtils::InputNormalizer.boolean(params[:search_without_location])
+    @unapproved_only = !Binxtils::InputNormalizer.boolean(params[:search_unapproved])
+    @only_without_location = Binxtils::InputNormalizer.boolean(params[:search_without_location])
     if @unapproved_only
       available_stolen_records = StolenRecord.current.unapproved
       unless @only_without_location
@@ -120,11 +120,11 @@ class Admin::StolenBikesController < Admin::BaseController
     else
       available_stolen_records = StolenRecord
     end
-    unless BinxUtils::InputNormalizer.boolean(params[:search_include_spam])
+    unless Binxtils::InputNormalizer.boolean(params[:search_include_spam])
       available_stolen_records = available_stolen_records.not_spam
     end
 
-    @with_promoted_alert = BinxUtils::InputNormalizer.boolean(params[:search_with_promoted_alert])
+    @with_promoted_alert = Binxtils::InputNormalizer.boolean(params[:search_with_promoted_alert])
     if @with_promoted_alert
       available_stolen_records = available_stolen_records.with_theft_alerts_paid_or_admin
     end

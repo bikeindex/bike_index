@@ -151,7 +151,7 @@ class Export < ApplicationRecord
   end
 
   def only_custom_bike_ids=(val)
-    options["only_custom_bike_ids"] = BinxUtils::InputNormalizer.boolean(val)
+    options["only_custom_bike_ids"] = Binxtils::InputNormalizer.boolean(val)
   end
 
   def partial_registrations
@@ -234,11 +234,11 @@ class Export < ApplicationRecord
   end
 
   def start_at=(val)
-    self.options = options.merge("start_at" => BinxUtils::TimeParser.parse(val, timezone))
+    self.options = options.merge("start_at" => Binxtils::TimeParser.parse(val, timezone))
   end
 
   def end_at=(val)
-    self.options = options.merge("end_at" => BinxUtils::TimeParser.parse(val, timezone))
+    self.options = options.merge("end_at" => Binxtils::TimeParser.parse(val, timezone))
   end
 
   def headers=(val)

@@ -75,7 +75,7 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
       bike.date_stolen = StolenRecord.corrected_date_stolen(date_stolen(attrs))
       bike.country = country(attrs)
       bike.info_hash = info_hash(attrs)
-      bike.external_updated_at = BinxUtils::TimeParser.parse(attrs["updated_at"])
+      bike.external_updated_at = Binxtils::TimeParser.parse(attrs["updated_at"])
 
       bike
     end

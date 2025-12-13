@@ -172,7 +172,7 @@ class Admin::BikesController < Admin::BaseController
       end
     end
     if current_organization.present?
-      bikes = if BinxUtils::InputNormalizer.boolean(params[:search_only_creation_organization])
+      bikes = if Binxtils::InputNormalizer.boolean(params[:search_only_creation_organization])
         bikes.includes(:ownerships).where(ownerships: {organization_id: current_organization.id})
       else
         bikes.organization(current_organization)
@@ -182,7 +182,7 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.includes(:ownerships).where(deleted_at: nil, ownerships: {organization_id: nil})
     end
 
-    @motorized = BinxUtils::InputNormalizer.boolean(params[:search_motorized])
+    @motorized = Binxtils::InputNormalizer.boolean(params[:search_motorized])
     bikes = bikes.motorized if @motorized
 
     # Get a query error if both are passed
@@ -216,7 +216,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
     bikes = bikes.includes(:ownerships).where(ownerships: {origin: @origin_search_type}) if @origin_search_type.present?
-    @multi_delete = BinxUtils::InputNormalizer.boolean(params[:search_multi_delete])
+    @multi_delete = Binxtils::InputNormalizer.boolean(params[:search_multi_delete])
     bikes
   end
 
@@ -227,16 +227,16 @@ class Admin::BikesController < Admin::BaseController
   def missing_manufacturer_bikes
     session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
     if params[:search_time_ordered].present?
-      session[:missing_manufacturer_time_order] = BinxUtils::InputNormalizer.boolean(params[:search_time_ordered])
+      session[:missing_manufacturer_time_order] = Binxtils::InputNormalizer.boolean(params[:search_time_ordered])
     end
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id).not_spam
-    @motorized = BinxUtils::InputNormalizer.boolean(params[:search_motorized])
-    bikes = bikes.where(likely_spam: false) unless BinxUtils::InputNormalizer.boolean(params[:search_spam])
-    bikes = bikes.where(deleted_at: nil) unless BinxUtils::InputNormalizer.boolean(params[:search_deleted])
+    @motorized = Binxtils::InputNormalizer.boolean(params[:search_motorized])
+    bikes = bikes.where(likely_spam: false) unless Binxtils::InputNormalizer.boolean(params[:search_spam])
+    bikes = bikes.where(deleted_at: nil) unless Binxtils::InputNormalizer.boolean(params[:search_deleted])
     bikes = bikes.motorized if @motorized
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
     bikes = bikes.where(created_at: @time_range) unless @period == "all"
-    @include_blank = BinxUtils::InputNormalizer.boolean(params[:search_include_blank])
+    @include_blank = Binxtils::InputNormalizer.boolean(params[:search_include_blank])
     bikes = bikes.where.not(manufacturer_other: nil) unless @include_blank
     bikes = if session[:missing_manufacturer_time_order]
       bikes.order("created_at desc")

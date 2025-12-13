@@ -90,7 +90,7 @@ class Admin::TweetsController < Admin::BaseController
 
   def matching_tweets
     tweets = Tweet
-    tweets = tweets.not_retweet unless BinxUtils::InputNormalizer.boolean(params[:search_retweet])
+    tweets = tweets.not_retweet unless Binxtils::InputNormalizer.boolean(params[:search_retweet])
     @search_kind = permitted_search_kinds.include?(params[:search_kind]) ? params[:search_kind] : "all"
     tweets = tweets.public_send(@search_kind) unless @search_kind == "all"
 

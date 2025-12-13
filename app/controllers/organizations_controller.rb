@@ -44,7 +44,7 @@ class OrganizationsController < ApplicationController
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
     @stolen = @bike.status_stolen?
-    @non_stolen = BinxUtils::InputNormalizer.boolean(params[:non_stolen]) if !@stolen
+    @non_stolen = Binxtils::InputNormalizer.boolean(params[:non_stolen]) if !@stolen
     render layout: "embed_layout"
   end
 

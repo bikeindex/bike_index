@@ -189,7 +189,7 @@ class AddressRecord < ApplicationRecord
 
   # This is used when rendering something with an address that is not the user
   def user_account_address=(val)
-    @user_account_address = BinxUtils::InputNormalizer.boolean(val)
+    @user_account_address = Binxtils::InputNormalizer.boolean(val)
   end
 
   def user_account_address
@@ -217,11 +217,11 @@ class AddressRecord < ApplicationRecord
   def set_calculated_attributes
     self.publicly_visible_attribute ||= self.class.default_visibility_for(kind)
 
-    self.street = BinxUtils::InputNormalizer.string(street)
-    self.street_2 = BinxUtils::InputNormalizer.string(street_2)
-    self.postal_code = BinxUtils::InputNormalizer.string(postal_code)
-    self.city = BinxUtils::InputNormalizer.string(city)
-    self.neighborhood = BinxUtils::InputNormalizer.string(neighborhood)
+    self.street = Binxtils::InputNormalizer.string(street)
+    self.street_2 = Binxtils::InputNormalizer.string(street_2)
+    self.postal_code = Binxtils::InputNormalizer.string(postal_code)
+    self.city = Binxtils::InputNormalizer.string(city)
+    self.neighborhood = Binxtils::InputNormalizer.string(neighborhood)
     self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
 
     assign_region_record

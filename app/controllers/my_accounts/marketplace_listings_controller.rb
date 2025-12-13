@@ -31,7 +31,7 @@ class MyAccounts::MarketplaceListingsController < ApplicationController
     pparams = permitted_params
 
     # Delete the address attributes if :user_account_address is set
-    if BinxUtils::InputNormalizer.boolean(pparams[:address_record_attributes][:user_account_address])
+    if Binxtils::InputNormalizer.boolean(pparams[:address_record_attributes][:user_account_address])
       pparams.delete(:address_record_attributes)
       # NOTE: Not user, or else admin edits overwrite the user's address
       pparams[:address_record_id] = @bike.user&.address_record_id

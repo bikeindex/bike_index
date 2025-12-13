@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Match time matcher is now provided by binx_utils gem
+# Match time matcher is now provided by binxtils gem
 # This file kept for backwards compatibility
-require "binx_utils"
-require_relative "../../gems/binx_utils/spec/support/match_time_matcher"
+require "binxtils"
+require_relative "../../gems/binxtils/spec/support/match_time_matcher"

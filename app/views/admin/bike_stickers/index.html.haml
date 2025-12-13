@@ -42,7 +42,7 @@
   = render partial: "/shared/period_select"
 
 - if @bike_sticker_batch.present?
-  - if BinxUtils::InputNormalizer.boolean(params[:search_show_problems])
+  - if Binxtils::InputNormalizer.boolean(params[:search_show_problems])
     .mt-4.mb-4
       %h4
         Showing Problem stickers

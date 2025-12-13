@@ -106,7 +106,7 @@ module BikeAttributable
   def title_string
     t = [year, mnfg_name, frame_model_truncated].join(" ")
     t += " #{type}" if type != "bike"
-    BinxUtils::InputNormalizer.sanitize(t.gsub(/\s+/, " "))
+    Binxtils::InputNormalizer.sanitize(t.gsub(/\s+/, " "))
   end
 
   def video_embed_src

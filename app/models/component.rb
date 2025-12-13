@@ -110,9 +110,9 @@ class Component < ApplicationRecord
   def set_calculated_attributes
     set_front_or_rear
     set_is_stock
-    self.manufacturer_other = BinxUtils::InputNormalizer.string(manufacturer_other)
+    self.manufacturer_other = Binxtils::InputNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
-    self.ctype_other = BinxUtils::InputNormalizer.string(ctype_other)
+    self.ctype_other = Binxtils::InputNormalizer.string(ctype_other)
     self.ctype_other = nil if ctype_other&.downcase == "other"
   end
 end

@@ -72,7 +72,7 @@
           .form-group.blog-date-toggle.collapse
             = label :post_date, "Post date", class: "control-label"
             #post-date-field
-              - @blog.post_date = BinxUtils::TimeParser.round(@blog.published_at || Time.current, "seconds")
+              - @blog.post_date = Binxtils::TimeParser.round(@blog.published_at || Time.current, "seconds")
               = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = f.datetime_local_field :post_date, max: Time.current + 1.week, step: 60, required: true, class: 'form-control'
         .col-md-6

@@ -36,9 +36,9 @@ GIT
       sidekiq (>= 4.0.0)
 
 PATH
-  remote: gems/binx_utils
+  remote: gems/binxtils
   specs:
-    binx_utils (0.1.0)
+    binxtils (0.1.0)
       activesupport (>= 7.0)
       rails-html-sanitizer (>= 1.0)
 
@@ -875,7 +875,7 @@ DEPENDENCIES
   aws-sdk-s3 (= 1.170)
   axlsx (~> 3.0.0.pre)
   bcrypt
-  binx_utils!
+  binxtils!
   bootsnap
   brakeman
   bullet

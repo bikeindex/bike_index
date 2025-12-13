@@ -98,8 +98,8 @@
     <div class="col-lg-4 col-md-6">
       <div class="form-group">
         <%= f.label :recovered_at %>
-        <% f.object.recovered_at = BinxUtils::TimeParser.round(f.object.recovered_at || Time.current) %>
-        <%= f.datetime_local_field :recovered_at, max: BinxUtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.recovered_at, format: :convert_time) %>
+        <% f.object.recovered_at = Binxtils::TimeParser.round(f.object.recovered_at || Time.current) %>
+        <%= f.datetime_local_field :recovered_at, max: Binxtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.recovered_at, format: :convert_time) %>
       </div>
     </div>
 

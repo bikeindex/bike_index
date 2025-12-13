@@ -2,7 +2,7 @@
 
 require "rails-html-sanitizer"
 
-module BinxUtils
+module Binxtils
   class InputNormalizer
     class << self
       def boolean(param = nil)

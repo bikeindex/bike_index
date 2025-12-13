@@ -6,7 +6,7 @@ class Admin::BulkImportsController < Admin::BaseController
   def index
     params[:page] || 1
     @per_page = permitted_per_page(default: 10)
-    @org_count = BinxUtils::InputNormalizer.boolean(params[:search_org_count])
+    @org_count = Binxtils::InputNormalizer.boolean(params[:search_org_count])
     @pagy, @bulk_imports = pagy(matching_bulk_imports.includes(:organization, :user, :ownerships)
       .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end

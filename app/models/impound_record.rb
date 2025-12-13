@@ -119,7 +119,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def impounded_at_with_timezone=(val)
-    self.impounded_at = BinxUtils::TimeParser.parse(val, timezone)
+    self.impounded_at = Binxtils::TimeParser.parse(val, timezone)
   end
 
   def impounded_at_with_timezone

@@ -122,7 +122,7 @@ class MailchimpDatum < ApplicationRecord
 
   def mailchimp_archived_at
     t = data&.dig("mailchimp_archived_at")
-    t.present? ? BinxUtils::TimeParser.parse(t) : nil
+    t.present? ? Binxtils::TimeParser.parse(t) : nil
   end
 
   def on_mailchimp?
@@ -161,7 +161,7 @@ class MailchimpDatum < ApplicationRecord
     end.compact
 
     new_interests = val.map do |key, value|
-      next unless BinxUtils::InputNormalizer.boolean(value)
+      next unless Binxtils::InputNormalizer.boolean(value)
 
       MailchimpValue.interest.friendly_find(key, list: list)&.slug || key
     end.compact

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BinxUtils
+module Binxtils
   module TimeParser
     EARLIEST_YEAR = 1900
     LATEST_YEAR = Time.now.year + 100
@@ -24,7 +24,7 @@ module BinxUtils
           # otherwise it's a timestamp
           time = Time.at(time_str.to_i)
         else
-          time_zone = BinxUtils::TimeZoneParser.parse(time_zone_str)
+          time_zone = Binxtils::TimeZoneParser.parse(time_zone_str)
           Time.zone = time_zone
           time = Time.zone.parse(time_str.to_s) # Assign in time zone
           Time.zone = default_time_zone
@@ -77,10 +77,10 @@ module BinxUtils
 
       def time_in_zone(time, time_zone_str:, time_str: nil, time_zone: nil)
         time_zone ||= if time_zone_str.present?
-          BinxUtils::TimeZoneParser.parse(time_zone_str)
+          Binxtils::TimeZoneParser.parse(time_zone_str)
         elsif time_str.present?
           # If no time_zone_str was passed, try to parse it out of the time string
-          BinxUtils::TimeZoneParser.parse_from_time_string(time_str.to_s)
+          Binxtils::TimeZoneParser.parse_from_time_string(time_str.to_s)
         end
 
         time.in_time_zone(time_zone || ActiveSupport::TimeZone["UTC"])

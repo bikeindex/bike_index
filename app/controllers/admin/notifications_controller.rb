@@ -6,7 +6,7 @@ class Admin::NotificationsController < Admin::BaseController
     @per_page = permitted_per_page(default: 50)
     @pagy, @notifications = pagy(matching_notifications.reorder("notifications.#{sort_column} #{sort_direction}")
       .includes(:bike, :notifiable, :user), limit: @per_page, page: permitted_page)
-    @render_kind_counts = BinxUtils::InputNormalizer.boolean(params[:search_kind_counts])
+    @render_kind_counts = Binxtils::InputNormalizer.boolean(params[:search_kind_counts])
   end
 
   helper_method :matching_notifications, :special_kind_scopes
@@ -37,11 +37,11 @@ class Admin::NotificationsController < Admin::BaseController
     else
       @kind = "all"
     end
-    if BinxUtils::InputNormalizer.boolean(params[:search_with_bike])
+    if Binxtils::InputNormalizer.boolean(params[:search_with_bike])
       @with_bike = true
       notifications = notifications.with_bike
     end
-    if BinxUtils::InputNormalizer.boolean(params[:search_undelivered])
+    if Binxtils::InputNormalizer.boolean(params[:search_undelivered])
       @undelivered = true
       notifications = notifications.not_delivery_success
     end

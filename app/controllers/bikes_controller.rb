@@ -116,7 +116,7 @@ class BikesController < Bikes::BaseController
         end
       elsif params[:bike][:embeded_extended]
         flash[:success] = translation(:bike_was_sent_to, bike_type: @bike.type, owner_email: @bike.owner_email)
-        @persist_email = BinxUtils::InputNormalizer.boolean(params[:persist_email])
+        @persist_email = Binxtils::InputNormalizer.boolean(params[:persist_email])
         redirect_to(embed_extended_organization_url(org_param, email: @persist_email ? @bike.owner_email : nil)) && return
       else
         redirect_to(controller: :organizations, action: :embed_create_success, id: org_param, bike_id: @bike.id) && return
@@ -152,7 +152,7 @@ class BikesController < Bikes::BaseController
       end
     end
 
-    if BinxUtils::InputNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
+    if Binxtils::InputNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
     end
     assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
@@ -213,7 +213,7 @@ class BikesController < Bikes::BaseController
 
     marketplace_listing = bike.current_marketplace_listing
     return false if marketplace_listing.blank? ||
-      !BinxUtils::InputNormalizer.boolean(params[:show_marketplace_preview])
+      !Binxtils::InputNormalizer.boolean(params[:show_marketplace_preview])
 
     return false unless marketplace_listing.visible_by?(current_user)
 

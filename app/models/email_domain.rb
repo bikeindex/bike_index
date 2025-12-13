@@ -142,7 +142,7 @@ class EmailDomain < ApplicationRecord
   end
 
   def broader_domain_exists?
-    BinxUtils::InputNormalizer.boolean(data&.dig("broader_domain_exists"))
+    Binxtils::InputNormalizer.boolean(data&.dig("broader_domain_exists"))
   end
 
   # Only check for ban_blockers if the domain is not banned

@@ -30,11 +30,11 @@ class BikeVersionsController < ApplicationController
   def update
     # Set the start and end at with timezone
     if permitted_params.key?(:start_at)
-      @bike_version.start_at = if BinxUtils::InputNormalizer.boolean(permitted_params[:start_at_shown])
-        BinxUtils::TimeParser.parse(permitted_params[:start_at], permitted_params[:timezone])
+      @bike_version.start_at = if Binxtils::InputNormalizer.boolean(permitted_params[:start_at_shown])
+        Binxtils::TimeParser.parse(permitted_params[:start_at], permitted_params[:timezone])
       end
-      @bike_version.end_at = if BinxUtils::InputNormalizer.boolean(permitted_params[:end_at_shown])
-        BinxUtils::TimeParser.parse(permitted_params[:end_at], permitted_params[:timezone])
+      @bike_version.end_at = if Binxtils::InputNormalizer.boolean(permitted_params[:end_at_shown])
+        Binxtils::TimeParser.parse(permitted_params[:end_at], permitted_params[:timezone])
       end
     end
     if @bike_version.update(permitted_params.except(:start_at, :end_at))

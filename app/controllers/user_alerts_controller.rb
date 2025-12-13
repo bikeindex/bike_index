@@ -10,7 +10,7 @@ class UserAlertsController < ApplicationController
         else
           flash[:error] = "We're sorry, you can't hide that alert"
         end
-      elsif BinxUtils::InputNormalizer.boolean(params[:add_bike_organization])
+      elsif Binxtils::InputNormalizer.boolean(params[:add_bike_organization])
         add_bike_organization
       else
         flash[:error] = "Unknown alert action!"

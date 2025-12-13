@@ -33,8 +33,8 @@ class Spreadsheets::Manufacturers
       else
         row[:name]
       end
-      manufacturer.frame_maker = BinxUtils::InputNormalizer.boolean(row[:makes_frames])
-      manufacturer.motorized_only = BinxUtils::InputNormalizer.boolean(row[:ebike_only])
+      manufacturer.frame_maker = Binxtils::InputNormalizer.boolean(row[:makes_frames])
+      manufacturer.motorized_only = Binxtils::InputNormalizer.boolean(row[:ebike_only])
       manufacturer.open_year = row[:open_year]
       manufacturer.close_year = row[:close_year]
       manufacturer.website = row[:website]

@@ -36,7 +36,7 @@ class UpdateMailchimpDatumJob < ApplicationJob
       mailchimp_datum.data["mailchimp_error"] = data["error"]
       return mailchimp_datum.update(status: "unsubscribed")
     end
-    updated_at = BinxUtils::TimeParser.parse(data["last_changed"])
+    updated_at = Binxtils::TimeParser.parse(data["last_changed"])
     if mailchimp_datum.mailchimp_updated_at.blank? || mailchimp_datum.mailchimp_updated_at < updated_at
       mailchimp_datum.mailchimp_updated_at = updated_at
     end

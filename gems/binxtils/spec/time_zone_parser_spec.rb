@@ -2,9 +2,9 @@
 
 require "spec_helper"
 
-RSpec.describe BinxUtils::TimeZoneParser do
+RSpec.describe Binxtils::TimeZoneParser do
   let(:subject) { described_class }
-  let(:default_time_zone) { BinxUtils::TimeParser.default_time_zone }
+  let(:default_time_zone) { Binxtils::TimeParser.default_time_zone }
   before { Time.zone = default_time_zone }
 
   describe "parse" do
@@ -64,7 +64,7 @@ RSpec.describe BinxUtils::TimeZoneParser do
       let(:target_time_zone) { ActiveSupport::TimeZone["Eastern Time (US & Canada)"] }
 
       it "returns correctly" do
-        expect(BinxUtils::TimeZoneParser.parse(time_zone_str).utc_offset).to eq target_time_zone.utc_offset
+        expect(Binxtils::TimeZoneParser.parse(time_zone_str).utc_offset).to eq target_time_zone.utc_offset
         expect(subject.parse("Eastern Time (US & Canada)").utc_offset).to eq target_time_zone.utc_offset
       end
     end
@@ -205,14 +205,14 @@ RSpec.describe BinxUtils::TimeZoneParser do
 
   describe "full_name" do
     let(:full_name) { "Pacific Time (US & Canada)" }
-    let(:time_zone) { BinxUtils::TimeZoneParser.parse(full_name) }
+    let(:time_zone) { Binxtils::TimeZoneParser.parse(full_name) }
     it "returns full name" do
       expect(time_zone.name).to eq full_name
       expect(described_class.full_name(time_zone)).to eq full_name
     end
     context "time_zone with abbr" do
       let(:key_name) { "America/Los_Angeles" }
-      let(:time_zone_shorter) { BinxUtils::TimeZoneParser.parse(key_name) }
+      let(:time_zone_shorter) { Binxtils::TimeZoneParser.parse(key_name) }
       it "returns the full name" do
         expect(time_zone_shorter.name).to eq key_name
         expect(described_class.full_name(time_zone_shorter)).to eq full_name

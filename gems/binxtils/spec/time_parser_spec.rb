@@ -2,9 +2,9 @@
 
 require "spec_helper"
 
-RSpec.describe BinxUtils::TimeParser do
+RSpec.describe Binxtils::TimeParser do
   let(:subject) { described_class }
-  let(:default_time_zone) { BinxUtils::TimeParser.default_time_zone }
+  let(:default_time_zone) { Binxtils::TimeParser.default_time_zone }
   before { Time.zone = default_time_zone }
 
   describe "parse" do
@@ -210,7 +210,7 @@ RSpec.describe BinxUtils::TimeParser do
         parsed_time = subject.parse(time)
         expect(parsed_time).to eq time
         expect(parsed_time.time_zone.name).to eq time_zone
-        expect(BinxUtils::TimeZoneParser.parse(time_zone)).to eq parsed_time.time_zone
+        expect(Binxtils::TimeZoneParser.parse(time_zone)).to eq parsed_time.time_zone
       end
     end
   end

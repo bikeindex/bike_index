@@ -75,8 +75,8 @@ class ModelAttestation < ApplicationRecord
 
   def set_calculated_attributes
     self.url = Urlifyer.urlify(url)
-    self.info = BinxUtils::InputNormalizer.string(info)
-    self.certification_type = BinxUtils::InputNormalizer.string(certification_type)
+    self.info = Binxtils::InputNormalizer.string(info)
+    self.certification_type = Binxtils::InputNormalizer.string(certification_type)
   end
 
   private

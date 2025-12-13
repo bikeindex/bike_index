@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Gem::Specification.new do |spec|
-  spec.name = "binx_utils"
+  spec.name = "binxtils"
   spec.version = "0.1.0"
   spec.authors = ["Bike Index"]
   spec.email = ["dev@bikeindex.org"]

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "bundler/setup"
-require "binx_utils"
+require "binxtils"
 require "active_model"
 
 # Load support files
@@ -19,6 +19,6 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
   config.before(:each) do
-    Time.zone = BinxUtils::TimeParser.default_time_zone
+    Time.zone = Binxtils::TimeParser.default_time_zone
   end
 end

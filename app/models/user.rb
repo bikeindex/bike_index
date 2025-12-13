@@ -299,7 +299,7 @@ class User < ApplicationRecord
   end
 
   def marketplace_message_name
-    BinxUtils::InputNormalizer.sanitize(name.present? ? name : short_username)
+    Binxtils::InputNormalizer.sanitize(name.present? ? name : short_username)
   end
 
   def display_name
@@ -373,7 +373,7 @@ class User < ApplicationRecord
   end
 
   def accepted_vendor_terms_of_service=(val)
-    return unless BinxUtils::InputNormalizer.boolean(val)
+    return unless Binxtils::InputNormalizer.boolean(val)
 
     self.vendor_terms_of_service = true
     self.when_vendor_terms_of_service = Time.current
@@ -526,7 +526,7 @@ class User < ApplicationRecord
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
-    self.title = BinxUtils::InputNormalizer.sanitize(title) if title.present?
+    self.title = Binxtils::InputNormalizer.sanitize(title) if title.present?
     if no_non_theft_notification
       self.notification_newsletters = false
       organization_roles.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }

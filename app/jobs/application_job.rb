@@ -8,6 +8,6 @@ class ApplicationJob
   end
 
   def skip_job?
-    BinxUtils::InputNormalizer.boolean(ENV.fetch(self.class.skip_env_var, nil))
+    Binxtils::InputNormalizer.boolean(ENV.fetch(self.class.skip_env_var, nil))
   end
 end

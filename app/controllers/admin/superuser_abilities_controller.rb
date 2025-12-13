@@ -42,7 +42,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
   end
 
   def searched_superuser_abilities
-    @deleted = BinxUtils::InputNormalizer.boolean(params[:search_deleted])
+    @deleted = Binxtils::InputNormalizer.boolean(params[:search_deleted])
     superuser_abilities = @deleted ? SuperuserAbility.unscoped : SuperuserAbility
 
     if SuperuserAbility.kinds.include?(params[:search_kind])
@@ -62,7 +62,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
 
   def permitted_parameters
     su_options = params.permit(*SuperuserAbility::SU_OPTIONS)
-      .select { |so| BinxUtils::InputNormalizer.boolean(params[so]) }
+      .select { |so| Binxtils::InputNormalizer.boolean(params[so]) }
     {su_options: su_options.keys}
   end
 end
