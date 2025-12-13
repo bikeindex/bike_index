@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe TimeParser, type: :service do
+RSpec.describe Binxtils::TimeParser, type: :service do
   let(:subject) { described_class }
-  let(:default_time_zone) { TimeParser::DEFAULT_TIME_ZONE }
+  let(:default_time_zone) { Binxtils::TimeParser::DEFAULT_TIME_ZONE }
   before { Time.zone = default_time_zone }
 
   describe "parse" do

@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe TimeZoneParser, type: :service do
+RSpec.describe Binxtils::TimeZoneParser, type: :service do
   let(:subject) { described_class }
-  let(:default_time_zone) { TimeParser::DEFAULT_TIME_ZONE }
+  let(:default_time_zone) { Binxtils::TimeParser::DEFAULT_TIME_ZONE }
   before { Time.zone = default_time_zone }
 
   describe "parse" do
@@ -64,7 +64,7 @@ RSpec.describe TimeZoneParser, type: :service do
       let(:target_time_zone) { ActiveSupport::TimeZone["Eastern Time (US & Canada)"] }
 
       it "returns correctly" do
-        expect(TimeZoneParser.parse(time_zone_str).utc_offset).to eq target_time_zone.utc_offset
+        expect(subject.parse(time_zone_str).utc_offset).to eq target_time_zone.utc_offset
         # Alternative time_zone name
         expect(subject.parse("Eastern Time (US & Canada)").utc_offset).to eq target_time_zone.utc_offset
       end
@@ -216,14 +216,14 @@ RSpec.describe TimeZoneParser, type: :service do
 
   describe "full_name" do
     let(:full_name) { "Pacific Time (US & Canada)" }
-    let(:time_zone) { TimeZoneParser.parse(full_name) }
+    let(:time_zone) { subject.parse(full_name) }
     it "returns full name" do
       expect(time_zone.name).to eq full_name
       expect(described_class.full_name(time_zone)).to eq full_name
     end
     context "time_zone with abbr" do
       let(:key_name) { "America/Los_Angeles" }
-      let(:time_zone_shorter) { TimeZoneParser.parse(key_name) }
+      let(:time_zone_shorter) { subject.parse(key_name) }
       it "returns the full name" do
         # I HAVE NO IDEA WHY IT'S SO FUCKING HARD AND INCONSISTENT
         # shouldn't this return the same time zone?
