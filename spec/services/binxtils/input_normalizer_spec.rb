@@ -131,3 +131,4 @@ RSpec.describe InputNormalizer do
     end
   end
 end
+

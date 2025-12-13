@@ -29,3 +29,4 @@ class InputNormalizer
     end
   end
 end
+
