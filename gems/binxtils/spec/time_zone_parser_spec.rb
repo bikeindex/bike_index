@@ -1,16 +1,9 @@
 # frozen_string_literal: true
-
-<<<<<<<< HEAD:gems/binxtils/spec/time_zone_parser_spec.rb
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe Binxtils::TimeZoneParser do
   let(:subject) { described_class }
-  let(:default_time_zone) { Binxtils::TimeParser.default_time_zone }
-========
-RSpec.describe Binxtils::TimeZoneParser, type: :service do
-  let(:subject) { described_class }
   let(:default_time_zone) { Binxtils::TimeParser::DEFAULT_TIME_ZONE }
->>>>>>>> origin/main:spec/services/binxtils/time_zone_parser_spec.rb
   before { Time.zone = default_time_zone }
 
   describe "parse" do
@@ -47,6 +40,7 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
       end
 
       it "uses default_time_zone if assigned nil" do
+        # Verify that assigning nil doesn't actually update the Time.zone - critical for the handling of parse
         Time.zone = nil
         expect(Time.zone).to eq default_time_zone
       end
@@ -59,6 +53,7 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
         expect(target_time_zone.utc_offset).to eq(-21600)
         expect(subject.parse(time_zone_str)).to eq target_time_zone
         expect(subject.parse(time_zone_str).utc_offset).to eq(-21600)
+        # And it works when you do it again on itself
         parsed_result = subject.parse(time_zone_str)
         expect(subject.parse(parsed_result)).to eq target_time_zone
         expect(subject.parse(parsed_result).utc_offset).to eq(-21600)
@@ -70,12 +65,8 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
       let(:target_time_zone) { ActiveSupport::TimeZone["Eastern Time (US & Canada)"] }
 
       it "returns correctly" do
-<<<<<<<< HEAD:gems/binxtils/spec/time_zone_parser_spec.rb
-        expect(Binxtils::TimeZoneParser.parse(time_zone_str).utc_offset).to eq target_time_zone.utc_offset
-========
         expect(subject.parse(time_zone_str).utc_offset).to eq target_time_zone.utc_offset
         # Alternative time_zone name
->>>>>>>> origin/main:spec/services/binxtils/time_zone_parser_spec.rb
         expect(subject.parse("Eastern Time (US & Canada)").utc_offset).to eq target_time_zone.utc_offset
       end
     end
@@ -125,10 +116,12 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
       expect(result_1.tzinfo.name).to eq("America/New_York")
       expect(described_class.full_name(result_1)).to eq "Eastern Time (US & Canada)"
 
+      # Summer time in EDT
       result_2 = described_class.parse_from_time_string("2024-07-01T12:00:00-04:00")
       expect(result_2.tzinfo.name).to eq("America/New_York")
       expect(described_class.full_name(result_2)).to eq "Eastern Time (US & Canada)"
 
+      # Winter time in EST
       result_3 = described_class.parse_from_time_string("2024-01-01T12:00:00-05:00")
       expect(result_3.tzinfo.name).to eq("America/New_York")
       expect(described_class.full_name(result_3)).to eq "Eastern Time (US & Canada)"
@@ -147,17 +140,18 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
       end
 
       it "handles fractional hour offsets" do
+        # India (UTC+5:30)
         expect(described_class.parse_from_time_string("2024-01-01T12:00:00+05:30").tzinfo.name)
           .to eq("Asia/Kolkata")
       end
 
       it "handles various time string formats" do
         formats = [
-          "2024-01-01 12:00:00 -0500",
-          "2024-01-01T12:00:00-05:00",
-          "Tue, 01 Jan 2024 12:00:00 -0500",
-          "01/01/2024 12:00:00 PM -0500",
-          "January 1, 2024 12:00:00 PM -0500"
+          "2024-01-01 12:00:00 -0500",          # Standard format
+          "2024-01-01T12:00:00-05:00",          # ISO8601
+          "Tue, 01 Jan 2024 12:00:00 -0500",    # RFC2822
+          "01/01/2024 12:00:00 PM -0500",       # American format
+          "January 1, 2024 12:00:00 PM -0500"   # Long format
         ]
 
         formats.each do |format|
@@ -171,6 +165,11 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
       end
 
       it "handles DST transition times" do
+        # # Spring forward doesn't work correctly
+        # spring_forward = described_class.parse_from_time_string('2024-03-10T02:30:00-04:00')
+        # expect(spring_forward.tzinfo.name).to eq('America/New_York')
+
+        # Fall back
         fall_back = described_class.parse_from_time_string("2024-11-03T01:30:00-04:00")
         expect(fall_back.tzinfo.name).to eq("America/New_York")
       end
@@ -179,6 +178,7 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
         expect(described_class.parse_from_time_string(nil)).to be_nil
         expect(described_class.parse_from_time_string("")).to be_nil
         expect(described_class.parse_from_time_string("not a time")).to be_nil
+        # Invalid offset
         expect(described_class.parse_from_time_string("2024-01-01T12:00:00-99:00")).to be_nil
       end
     end
@@ -187,6 +187,7 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
   describe "prioritized_zones_matching_offset" do
     it "returns New York first" do
       time = Time.parse("2024-07-01T12:00:00-04:00")
+      # Verify that tzinfo.name still returns the correct thing
       expect(ActiveSupport::TimeZone["America/New_York"].tzinfo.name).to eq "America/New_York"
       expect(described_class.send(:prioritized_zones_matching_offset, time, time.utc_offset).map(&:name))
         .to eq(["Eastern Time (US & Canada)", "Indiana (East)", "Caracas", "Georgetown", "La Paz", "Puerto Rico", "Santiago"])
@@ -216,23 +217,17 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
 
   describe "full_name" do
     let(:full_name) { "Pacific Time (US & Canada)" }
-<<<<<<<< HEAD:gems/binxtils/spec/time_zone_parser_spec.rb
-    let(:time_zone) { Binxtils::TimeZoneParser.parse(full_name) }
-========
     let(:time_zone) { subject.parse(full_name) }
->>>>>>>> origin/main:spec/services/binxtils/time_zone_parser_spec.rb
     it "returns full name" do
       expect(time_zone.name).to eq full_name
       expect(described_class.full_name(time_zone)).to eq full_name
     end
     context "time_zone with abbr" do
       let(:key_name) { "America/Los_Angeles" }
-<<<<<<<< HEAD:gems/binxtils/spec/time_zone_parser_spec.rb
-      let(:time_zone_shorter) { Binxtils::TimeZoneParser.parse(key_name) }
-========
       let(:time_zone_shorter) { subject.parse(key_name) }
->>>>>>>> origin/main:spec/services/binxtils/time_zone_parser_spec.rb
       it "returns the full name" do
+        # I HAVE NO IDEA WHY IT'S SO FUCKING HARD AND INCONSISTENT
+        # shouldn't this return the same time zone?
         expect(time_zone_shorter.name).to eq key_name
         expect(described_class.full_name(time_zone_shorter)).to eq full_name
       end
