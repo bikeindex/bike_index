@@ -95,17 +95,17 @@ module SetPeriod
 
     # Parse the timezone params if they are passed (tested in admin#activity_groups#index)
     if params[:timezone].present?
-      @timezone = Binxtils::TimeParser.parse_timezone(params[:timezone])
+      @timezone = Binxtils::TimeZoneParser.parse(params[:timezone])
       # If it's a valid timezone, save to session
       session[:timezone] = @timezone&.name
     end
 
     # Set the timezone on a per request basis if we have a timezone saved
     if session[:timezone].present?
-      @timezone ||= Binxtils::TimeParser.parse_timezone(session[:timezone])
+      @timezone ||= Binxtils::TimeZoneParser.parse(session[:timezone])
       Time.zone = @timezone
     end
 
-    @timezone ||= Binxtils::TimeParser::DEFAULT_TIME_ZONE
+    @timezone ||= Binxtils::TimeParser.default_time_zone
   end
 end

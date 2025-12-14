@@ -47,6 +47,10 @@ ActiveRecord::Migration.maintain_test_schema!
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
 
+# Require binxtils rspec matchers
+require Rails.root.join("gems", "binxtils", "spec", "support", "hash_matcher")
+require Rails.root.join("gems", "binxtils", "spec", "support", "match_time_matcher")
+
 # If on GitHub actions, enable knapsack pro to optimize test splitting
 if ENV["GITHUB_ACTIONS"] == "true"
   require "knapsack_pro"
