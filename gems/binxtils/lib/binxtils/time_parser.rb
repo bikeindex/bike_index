@@ -2,11 +2,18 @@
 
 module Binxtils
   module TimeParser
-    DEFAULT_TIME_ZONE = ActiveSupport::TimeZone[Rails.application.class.config.time_zone].freeze
     EARLIEST_YEAR = 1900
-    LATEST_YEAR = Time.current.year + 100
+    LATEST_YEAR = Time.now.year + 100
 
     class << self
+      def default_time_zone
+        @default_time_zone ||= ActiveSupport::TimeZone["UTC"]
+      end
+
+      def default_time_zone=(time_zone)
+        @default_time_zone = time_zone.is_a?(ActiveSupport::TimeZone) ? time_zone : ActiveSupport::TimeZone[time_zone]
+      end
+
       def parse(time_str = nil, time_zone_str = nil, in_time_zone: false)
         return nil unless time_str.present?
         return time_str if time_str.is_a?(Time)
@@ -20,7 +27,7 @@ module Binxtils
           time_zone = Binxtils::TimeZoneParser.parse(time_zone_str)
           Time.zone = time_zone
           time = Time.zone.parse(time_str.to_s) # Assign in time zone
-          Time.zone = DEFAULT_TIME_ZONE
+          Time.zone = default_time_zone
         end
         # Return in time_zone or not
         in_time_zone ? time_in_zone(time, time_str:, time_zone:, time_zone_str:) : time
@@ -49,7 +56,7 @@ module Binxtils
         if paychex_formatted.present?
           new_str += " #{regex_match["hour"]}:#{regex_match["minute"]}#{regex_match["ampm"]}"
         end
-        # Run it through Binxtils::TimeParser again
+        # Run it through TimeParser again
         parse(new_str, time_zone_str, in_time_zone:)
       end
 
