@@ -33,8 +33,8 @@ export default class extends Controller {
     return (this.element.closest('form'))
   }
 
-  // Can we use get here?
   get searchQuery () {
+    if (!this.form) { return '' }
     const formData = new FormData(this.form)
     return new URLSearchParams(formData).toString()
   }
@@ -129,6 +129,7 @@ export default class extends Controller {
   }
 
   setResetFieldListeners () {
+    if (!this.form) { return }
     this.resetFields = this.form.querySelectorAll('.fieldResetsCounts')
 
     this.resetFields?.forEach(field => {
