@@ -12,9 +12,8 @@ gem "csv"
 gem "observer"
 gem "prime"
 gem "openssl" # stuff breaks without this, 2025-10
-# Maybe ^ can be removed after 3.4 upgrade? Added to silence deprecation warnings
 
-gem "rails"
+gem "rails", "~> 8.0.4"
 
 # Things to improve/extend Rails
 gem "puma" # App server
