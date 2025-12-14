@@ -465,7 +465,7 @@
                 = f.text_area :internal_notes, class: "form-control"
 
 - if show_sticker_modal?
-  - sticker_modal_body = capture_haml do
+  - sticker_modal_body = helpers.capture_haml do
     .modal-body
       = form_for BikeSticker.new, {url: organization_sticker_path(id: "code", organization_id: @organization.to_param), action: "update", method: "PUT"} do |f|
         = f.hidden_field :bike_id, value: @bike.id
