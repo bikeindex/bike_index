@@ -34,6 +34,7 @@ class BParam < ApplicationRecord
     bike_sticker
     city
     country_id
+    ios_version
     organization_affiliation
     phone
     postal_code
@@ -60,6 +61,7 @@ class BParam < ApplicationRecord
     cycle_type_slug
     front_gear_type_slug
     handlebar_type_slug
+    ios_version
     is_bulk
     is_new
     is_pos

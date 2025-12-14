@@ -76,10 +76,6 @@ module RegistrationInfoable
     reg_info["ios_version"]
   end
 
-  def ios_version=(val)
-    update_registration_information("ios_version", val.to_s)
-  end
-
   # Accepts organization or organization.id
   def organization_affiliation(org = nil)
     reg_info[organization_affiliation_key(org)]
