@@ -85,7 +85,9 @@ module API
           {
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
-            is_new: params[:is_new]
+            is_new: params[:is_new],
+            doorkeeper_app_id: doorkeeper_application.id,
+            # ios_version:
           }.as_json
         end
 
