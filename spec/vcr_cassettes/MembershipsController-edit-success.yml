@@ -10,9 +10,9 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_jbN11cRLRCFoPZ","request_duration_ms":0}}'
+      - '{"last_request_metrics":{"request_id":"req_EYagq51kI6M171","request_duration_ms":0}}'
       Idempotency-Key:
-      - ff18897b-e868-4048-bb96-5260cbcb3131
+      - 56a10263-ce79-400b-83e8-b40dd8d9825f
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -29,11 +29,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 04 Aug 2025 20:10:59 GMT
+      - Sun, 14 Dec 2025 00:03:18 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '463'
+      - '491'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -52,13 +52,13 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=JDQYvOOv4jgZRbWcAIm_NT8rDgwbWop97QwMxYFEQj5iDVYZ5YbWMj_xt4B-pFr1rwd2HUP2h1b6f-JP
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=-chXzShNc3khkZqbcSpJWbjtfNQNrE7y9Tvdc-rjSvhMZRyLVbsY2edeCT8F5FdGDriHE6elPGchaGeN
       Idempotency-Key:
-      - ff18897b-e868-4048-bb96-5260cbcb3131
+      - 56a10263-ce79-400b-83e8-b40dd8d9825f
       Original-Request:
-      - req_FfJWsQtl7t9aAp
+      - req_ppPJJvXcHXVzfi
       Request-Id:
-      - req_FfJWsQtl7t9aAp
+      - req_ppPJJvXcHXVzfi
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -77,19 +77,20 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "bps_0RsUilm0T0GBfX0vCfJsj1AI",
+          "id": "bps_0Se2mQm0T0GBfX0vFsQmbfhy",
           "object": "billing_portal.session",
           "configuration": "bpc_0QvSOWm0T0GBfX0vQCpYBJv1",
-          "created": 1754338259,
+          "created": 1765670598,
           "customer": "cus_RohIc4uZhMPzxN",
+          "customer_account": null,
           "flow": null,
           "livemode": false,
           "locale": null,
           "on_behalf_of": null,
           "return_url": "http://test.host/my_account",
-          "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfU282d2xHN21NeFZkeTFNOTBEWUZTaHcxQ3d3b0hMRA0100nAi3BUvC"
+          "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfVGJGR3NRVE9oTTFiV3NjSnJpSzZLeWI0S0YxMHlDTg0100EUd602G0"
         }
-  recorded_at: Mon, 04 Aug 2025 20:10:59 GMT
+  recorded_at: Sun, 14 Dec 2025 00:03:18 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/billing_portal/sessions
@@ -100,9 +101,9 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_Q5oyb7bpZW8HBB","request_duration_ms":299}}'
+      - '{"last_request_metrics":{"request_id":"req_EYagq51kI6M171","request_duration_ms":0}}'
       Idempotency-Key:
-      - 91841183-6428-4484-9d7a-3ac41018ec65
+      - 1fe5876a-e7d8-491e-9bbf-0a7417a5e520
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -119,11 +120,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 20 Sep 2025 16:40:30 GMT
+      - Sun, 14 Dec 2025 00:03:29 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '463'
+      - '491'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -142,13 +143,13 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=2M7MeetXEoPYWxVa7ymvUCnU9MFRPnBL_1scEGVjqJMrehMWtv9uPWo6w5Ch67osT73QE1y5jhN9H1lC
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=rGH0SMzZehg4cSvKnwcaLs3Jb1tQWVBiwUEFAzbSHefqVoDohxWRPrsaoas9J9CkeWXe5LiAdrRL1bIs
       Idempotency-Key:
-      - 91841183-6428-4484-9d7a-3ac41018ec65
+      - 1fe5876a-e7d8-491e-9bbf-0a7417a5e520
       Original-Request:
-      - req_DngABJEFs8GIvd
+      - req_CyAnl6z0QGnkpC
       Request-Id:
-      - req_DngABJEFs8GIvd
+      - req_CyAnl6z0QGnkpC
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -167,17 +168,18 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "bps_0S9Tpqm0T0GBfX0vVbSAxoMl",
+          "id": "bps_0Se2mbm0T0GBfX0vQ4LuYCU8",
           "object": "billing_portal.session",
           "configuration": "bpc_0QvSOWm0T0GBfX0vQCpYBJv1",
-          "created": 1758386430,
+          "created": 1765670609,
           "customer": "cus_RohIc4uZhMPzxN",
+          "customer_account": null,
           "flow": null,
           "livemode": false,
           "locale": null,
           "on_behalf_of": null,
           "return_url": "http://test.host/my_account",
-          "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfVDVmQXVwOTVJUGdQOWpSWXlzaXJSMU1rdWJIVVREag0100YCIqntAB"
+          "url": "https://billing.stripe.com/p/session/test_YWNjdF8yS3NubTBUMEdCZlgwdnlQVUl4RSxfVGJGSGlCVzhtaWdhZUNRZm11VEJWSlNnRUd5RFR4RA0100MBpTUKKK"
         }
-  recorded_at: Sat, 20 Sep 2025 16:40:30 GMT
+  recorded_at: Sun, 14 Dec 2025 00:03:29 GMT
 recorded_with: VCR 6.3.1

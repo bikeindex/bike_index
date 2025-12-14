@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe StripeSubscription, type: :model do
   it_behaves_like "active_periodable"
 
-  let(:re_record_interval) { 30.days }
+  let(:re_record_interval) { 60.days }
 
   describe "factory" do
     let(:stripe_subscription) { FactoryBot.create(:stripe_subscription) }
@@ -20,7 +20,7 @@ RSpec.describe StripeSubscription, type: :model do
     let(:user) { FactoryBot.create(:user_confirmed) }
 
     it "creates a stripe_subscription" do
-      VCR.use_cassette("StripeSubscription-create_for-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+      VCR.use_cassette("StripeSubscription-create_for-success", match_requests_on: [:method], re_record_interval:) do
         stripe_subscription = StripeSubscription.create_for(stripe_price:, user:)
         expect(stripe_subscription).to be_valid
         expect(stripe_subscription.stripe_checkout_session_url).to be_present
@@ -39,7 +39,7 @@ RSpec.describe StripeSubscription, type: :model do
     end
     context "with a referral_source" do
       it "creates a stripe_subscription" do
-        VCR.use_cassette("StripeSubscription-create_for-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+        VCR.use_cassette("StripeSubscription-create_for-success", match_requests_on: [:method], re_record_interval:) do
           stripe_subscription = StripeSubscription.create_for(stripe_price:, user:, referral_source: "some-referral")
           expect(stripe_subscription).to be_valid
           expect(stripe_subscription.stripe_checkout_session_url).to be_present
@@ -62,7 +62,7 @@ RSpec.describe StripeSubscription, type: :model do
     context "user has an invalid stripe_id" do
       let(:user) { FactoryBot.create(:user_confirmed, stripe_id: "cus_xxxx") }
       it "creates a stripe_subscription" do
-        VCR.use_cassette("StripeSubscription-create_for-invalid_user_id", match_requests_on: [:method], re_record_interval: re_record_interval) do
+        VCR.use_cassette("StripeSubscription-create_for-invalid_user_id", match_requests_on: [:method], re_record_interval:) do
           stripe_subscription = StripeSubscription.create_for(stripe_price:, user:)
           expect(stripe_subscription).to be_valid
           expect(stripe_subscription.stripe_checkout_session_url).to be_present

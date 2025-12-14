@@ -2,7 +2,7 @@ require "rails_helper"
 
 base_url = "/membership"
 RSpec.describe MembershipsController, type: :request do
-  let(:re_record_interval) { 30.days }
+  let(:re_record_interval) { 60.days }
 
   describe "new" do
     context "user not logged in" do
@@ -79,7 +79,7 @@ RSpec.describe MembershipsController, type: :request do
     end
 
     it "creates a stripe_subscription" do
-      VCR.use_cassette("MembershipsController-create-no_user", match_requests_on: [:method], re_record_interval: re_record_interval) do
+      VCR.use_cassette("MembershipsController-create-no_user", match_requests_on: [:method], re_record_interval:) do
         expect {
           post base_url, params: create_params
         }.to change(StripeSubscription, :count).by 1
@@ -97,7 +97,7 @@ RSpec.describe MembershipsController, type: :request do
       it "creates a stripe_subscription" do
         Sidekiq::Job.drain_all
         ActionMailer::Base.deliveries = []
-        VCR.use_cassette("MembershipsController-create-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+        VCR.use_cassette("MembershipsController-create-success", match_requests_on: [:method], re_record_interval:) do
           expect {
             post base_url, params: create_params
           }.to change(StripeSubscription, :count).by 1
@@ -121,7 +121,7 @@ RSpec.describe MembershipsController, type: :request do
         it "creates a stripe_subscription" do
           Sidekiq::Job.drain_all
           ActionMailer::Base.deliveries = []
-          VCR.use_cassette("MembershipsController-create-yearly-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          VCR.use_cassette("MembershipsController-create-yearly-success", match_requests_on: [:method], re_record_interval:) do
             expect {
               post base_url, params: create_yearly_params
             }.to change(StripeSubscription, :count).by 1
@@ -141,7 +141,7 @@ RSpec.describe MembershipsController, type: :request do
         let(:modified_params) { create_params.merge(currency: "xxx") }
 
         it "creates a stripe_subscription" do
-          VCR.use_cassette("MembershipsController-create-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          VCR.use_cassette("MembershipsController-create-success", match_requests_on: [:method], re_record_interval:) do
             expect {
               post base_url, params: modified_params
             }.to change(StripeSubscription, :count).by 1
@@ -200,7 +200,7 @@ RSpec.describe MembershipsController, type: :request do
           current_user.update(stripe_id: "cus_RohIc4uZhMPzxN")
           expect(current_user.reload.membership_active.admin_managed?).to be_falsey
 
-          VCR.use_cassette("MembershipsController-edit-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          VCR.use_cassette("MembershipsController-edit-success", match_requests_on: [:method], re_record_interval:) do
             get "#{base_url}/edit"
             expect(response).to redirect_to(/https:\/\/billing.stripe.com\/p\/session/)
           end

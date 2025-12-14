@@ -5,14 +5,14 @@ http_interactions:
     uri: https://api.stripe.com/v1/checkout/sessions
     body:
       encoding: UTF-8
-      string: success_url=http%3A%2F%2Ftest.host%2Fmembership%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fmembership%2Fnew&mode=subscription&line_items[0][quantity]=1&line_items[0][price]=price_0Qs5rim0T0GBfX0vE7Q7cyoG&customer_email=user159s%40bikeindex.org
+      string: success_url=http%3A%2F%2Ftest.host%2Fmembership%2Fsuccess%3Fsession_id%3D%7BCHECKOUT_SESSION_ID%7D&cancel_url=http%3A%2F%2Ftest.host%2Fmembership%2Fnew&mode=subscription&line_items[0][quantity]=1&line_items[0][price]=price_0Qs5rim0T0GBfX0vE7Q7cyoG&customer_email=user7s%40bikeindex.org
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_MpcDm0QNA9iUm2","request_duration_ms":1}}'
+      - '{"last_request_metrics":{"request_id":"req_EYagq51kI6M171","request_duration_ms":607}}'
       Idempotency-Key:
-      - 93e0c42b-4a84-4511-bb68-fec26105b207
+      - 858fb03b-1c40-4043-9acc-013963467f12
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -29,11 +29,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 20 Sep 2025 16:40:29 GMT
+      - Sun, 14 Dec 2025 00:03:17 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '3589'
+      - '3647'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -52,13 +52,13 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=2M7MeetXEoPYWxVa7ymvUCnU9MFRPnBL_1scEGVjqJMrehMWtv9uPWo6w5Ch67osT73QE1y5jhN9H1lC
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=RWPC3foTd1LF2KV9ZzJMMh1Y8jDGMM3OnPA81VK9FHGHSZq_kNsvfVEkb_TlAgD6pBgmvKPnvgLNLAaQ
       Idempotency-Key:
-      - 93e0c42b-4a84-4511-bb68-fec26105b207
+      - 858fb03b-1c40-4043-9acc-013963467f12
       Original-Request:
-      - req_Q5oyb7bpZW8HBB
+      - req_Fg6i17XhzMchvW
       Request-Id:
-      - req_Q5oyb7bpZW8HBB
+      - req_Fg6i17XhzMchvW
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -77,7 +77,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a10Xv54RNl04BVcMF4QEbHLs79cPQzxeSIAW1DYosvuW0v9wFO1Cy2GXEE",
+          "id": "cs_test_a1gVyDaORY4khBUOxxdyaR3FR1Jr140ErmemrVfxKjAi1rAKcOxRYLGy2Y",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": false
@@ -115,7 +115,7 @@ http_interactions:
           },
           "consent": null,
           "consent_collection": null,
-          "created": 1758386429,
+          "created": 1765670597,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -126,20 +126,21 @@ http_interactions:
             "terms_of_service_acceptance": null
           },
           "customer": null,
+          "customer_account": null,
           "customer_creation": "always",
           "customer_details": {
             "address": null,
             "business_name": null,
-            "email": "user159s@bikeindex.org",
+            "email": "user7s@bikeindex.org",
             "individual_name": null,
             "name": null,
             "phone": null,
             "tax_exempt": "none",
             "tax_ids": null
           },
-          "customer_email": "user159s@bikeindex.org",
+          "customer_email": "user7s@bikeindex.org",
           "discounts": [],
-          "expires_at": 1758472829,
+          "expires_at": 1765756997,
           "invoice": null,
           "invoice_creation": null,
           "livemode": false,
@@ -191,8 +192,8 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a10Xv54RNl04BVcMF4QEbHLs79cPQzxeSIAW1DYosvuW0v9wFO1Cy2GXEE#fidkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1gVyDaORY4khBUOxxdyaR3FR1Jr140ErmemrVfxKjAi1rAKcOxRYLGy2Y#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
           "wallet_options": null
         }
-  recorded_at: Sat, 20 Sep 2025 16:40:29 GMT
+  recorded_at: Sun, 14 Dec 2025 00:03:17 GMT
 recorded_with: VCR 6.3.1
