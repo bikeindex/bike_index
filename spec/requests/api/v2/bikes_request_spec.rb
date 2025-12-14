@@ -156,6 +156,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect([ownership.pos?, ownership.is_new, ownership.bulk?]).to eq([true, true, false])
       expect(ownership.origin).to eq "api_v2"
       expect(ownership.creator).to eq bike.creator
+      expect(ownership.doorkeeper_app_id).to eq doorkeeper_app.id
     end
 
     it "doesn't send an email" do
