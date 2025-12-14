@@ -6,10 +6,32 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
   include_context :request_spec_logged_in_as_user
 
   describe "index" do
+    let!(:doorkeeper_app2) do
+      application = Doorkeeper::Application.new(name: "MyApp", redirect_uri: "https://app.com")
+      application.owner = FactoryBot.create(:user_confirmed)
+      application.save
+    end
     it "renders" do
       get base_url
       expect(response.status).to eq 200
       expect(response).to render_template(:index)
+      expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
+      get "#{base_url}?all=true"
+      expect(response.status).to eq 200
+      expect(response).to render_template(:index)
+      expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
+    end
+    context "superuser" do
+      it "renders, with admin" do
+        get base_url
+        expect(response.status).to eq 200
+        expect(response).to render_template(:index)
+        expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
+        get "#{base_url}?all=true"
+        expect(response.status).to eq 200
+        expect(response).to render_template(:index)
+        expect(assigns(:applications).pluck(:id)).to match_array([doorkeeper_app.id, doorkeeper_app2.id])
+      end
     end
     context "no current user" do
       let(:current_user) { false }

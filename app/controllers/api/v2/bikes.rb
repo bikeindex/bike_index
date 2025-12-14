@@ -86,7 +86,7 @@ module API
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
             is_new: params[:is_new],
-            ios_version: headers['X-IOS-VERSION']&.to_s
+            ios_version: headers["X-IOS-VERSION"]&.to_s
           }.compact.as_json
         end
 

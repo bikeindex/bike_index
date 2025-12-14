@@ -384,7 +384,7 @@ RSpec.describe "Bikes API V3", type: :request do
             cycle_type_name: "cargo tricycle (front storage)"
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json,
-            headers: json_headers.merge('X-IOS-VERSION' => 1.7)
+            headers: json_headers.merge("X-IOS-VERSION" => 1.7)
           bike_response = json_result["bike"]
           expect(bike_response["id"]).to eq(bike1.id)
           expect(bike_response["serial"]).to eq(bike1.serial_display)
@@ -1332,7 +1332,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike_organization.can_edit_claimed).to be_truthy
           expect {
             put url, params: {owner_email: "newuser@EXAMPLE.com "}.to_json,
-              headers: json_headers.merge('X-iOS-Version' => '1.6.9')
+              headers: json_headers.merge("X-iOS-Version" => "1.6.9")
           }.to change(Ownership, :count).by(1)
           expect(response.code).to eq("200")
           expect(response.headers["Content-Type"].match("json")).to be_present
@@ -1353,7 +1353,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(current_ownership.organization_id).to eq organization.id
           expect(current_ownership.initial?).to be_falsey
           expect(current_ownership.doorkeeper_app_id).to eq doorkeeper_app.id
-          expect(current_ownership.registration_info).to eq({"ios_version" => '1.6.9'})
+          expect(current_ownership.registration_info).to eq({"ios_version" => "1.6.9"})
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Confirm your #{organization.name} Bike Index registration")

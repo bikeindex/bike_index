@@ -595,7 +595,7 @@ RSpec.describe BikeServices::Creator do
       end
       let(:bike_params) do
         {primary_frame_color_id: color.id, manufacturer_id: manufacturer.id,
-         owner_email: "something@stuff.com", ios_version: '1.6.9'}
+         owner_email: "something@stuff.com", ios_version: "1.6.9"}
       end
       let(:b_param) { BParam.create(creator: user, params: {bike: bike_params}.as_json, doorkeeper_app_id: 69) }
 
@@ -604,7 +604,7 @@ RSpec.describe BikeServices::Creator do
         bike = instance.create_bike(b_param)
         expect(AddressRecord.count).to eq 1
         expect(bike).to be_valid
-        expect(bike.current_ownership.registration_info).to match_hash_indifferently({ip_address:, ios_version: '1.6.9'})
+        expect(bike.current_ownership.registration_info).to match_hash_indifferently({ip_address:, ios_version: "1.6.9"})
         expect(bike.current_ownership.doorkeeper_app_id).to eq 69
         expect(bike.address_record).to be_present
         expect(bike.address_record).to have_attributes address_hash
