@@ -76,13 +76,16 @@ module Bikeindex
 
     # Enable instrumentation for ViewComponents (used by rack-mini-profiler)
     config.view_component.instrumentation_enabled = true
-    config.view_component.use_deprecated_instrumentation_name = false # Stop annoying deprecation message
-    # ^ remove after upgrading to ViewComponent 4
-    config.default_preview_layout = "component_preview"
-    config.view_component.previews.paths << "#{Rails.root}/app/components/"
+    config.view_component.default_preview_layout = "component_preview"
     # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
     initializer "app_assets", after: "importmap.assets" do
       Rails.application.config.assets.paths << Rails.root.join("app")
+    end
+    # Add app/components to view paths for component preview templates
+    initializer "append_component_views", after: :set_autoload_paths do
+      ActiveSupport.on_load(:action_controller) do
+        prepend_view_path Rails.root.join("app/components")
+      end
     end
     config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
     config.lookbook.preview_display_options = {theme: ["light", "dark"]} # Add dynamic 'theme' display option

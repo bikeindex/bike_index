@@ -9,8 +9,6 @@ http_interactions:
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
-      X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_3xIUSkFLLiCCSg","request_duration_ms":313}}'
       Stripe-Version:
       - 2025-01-27.acacia
       Accept-Encoding:
@@ -25,11 +23,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 04 Aug 2025 20:10:47 GMT
+      - Sun, 14 Dec 2025 00:01:13 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2396'
+      - '2536'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -48,9 +46,9 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=zWPKpNijnXMPvhd9aNIAhKqhQdq_yVk-Lx-Lnc5chJuTorodvb39538tQJmHvjqAxZTwZxCY1GXAeaQU
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=ls7NXzf5z0y8xzGgJtXCy09jNr3k8Gq61hRRZjUz5UM_WRUzJfQNDuHrLheSANfLWO_dDoSTxJwKxQiY
       Request-Id:
-      - req_TvxJgDHXvMwqw0
+      - req_YnvLEWqhfnzDEq
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -85,6 +83,8 @@ http_interactions:
           "client_reference_id": null,
           "client_secret": null,
           "collected_information": {
+            "business_name": null,
+            "individual_name": null,
             "shipping_details": null
           },
           "consent": null,
@@ -100,10 +100,13 @@ http_interactions:
             "terms_of_service_acceptance": null
           },
           "customer": "cus_JmPqQDidyY7LDB",
+          "customer_account": null,
           "customer_creation": null,
           "customer_details": {
             "address": null,
+            "business_name": null,
             "email": "seth@bikeindex.org",
+            "individual_name": null,
             "name": null,
             "phone": null,
             "tax_exempt": "none",
@@ -162,7 +165,7 @@ http_interactions:
           "url": null,
           "wallet_options": null
         }
-  recorded_at: Mon, 04 Aug 2025 20:10:47 GMT
+  recorded_at: Sun, 14 Dec 2025 00:01:13 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a17wYrWqVcrfgLkOnthsa6r4STYqidDh3gTU8pkUqgGepDZSprYeoT8VxV
@@ -186,11 +189,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 20 Sep 2025 16:40:34 GMT
+      - Sun, 14 Dec 2025 00:01:46 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2508'
+      - '2536'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -209,9 +212,9 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=XpceoGb2q-BKyKdIrEn27cX5wLaq4advsGPoaKfADq5TzzZTfAJqaHxY8qbZ2yyWeuUO1QTOah3Oxpli
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=VG2uaWhJ86nQkZiT_8qb0sqOuSgFleJyLe82ZyWTvSGqkwTfgbos5ojwXOEIJ0-lBfgNP1XyzNftrFoZ
       Request-Id:
-      - req_JNeFJsXa2loaDI
+      - req_mmNwU1CshWe1eb
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -263,6 +266,7 @@ http_interactions:
             "terms_of_service_acceptance": null
           },
           "customer": "cus_JmPqQDidyY7LDB",
+          "customer_account": null,
           "customer_creation": null,
           "customer_details": {
             "address": null,
@@ -327,5 +331,5 @@ http_interactions:
           "url": null,
           "wallet_options": null
         }
-  recorded_at: Sat, 20 Sep 2025 16:40:34 GMT
+  recorded_at: Sun, 14 Dec 2025 00:01:46 GMT
 recorded_with: VCR 6.3.1
