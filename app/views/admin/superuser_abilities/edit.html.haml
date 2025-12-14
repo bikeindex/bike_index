@@ -23,7 +23,8 @@
         %tr
           %td User
           %td
-            = render partial: "/shared/admin/user_cell", locals: {user_id: @superuser_ability.user_id, user: @superuser_ability.user, render_search: false, cache: true}
+            = cache(@superuser_ability.user) do
+              = render Admin::UserCell::Component.new(user_id: @superuser_ability.user_id, user: @superuser_ability.user, render_search: false)
   .col-md-6
     %table.table-list
       %tbody

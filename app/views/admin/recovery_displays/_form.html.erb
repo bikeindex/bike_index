@@ -1,0 +1,229 @@
+<div class="row mt-4 mb-4">
+  <div class="col-md-10 col-lg-8 ml-auto mr-auto">
+    <h4>Recovery display approval process</h4>
+
+    <ol class="tw:list-decimal">
+      <li>
+        Remove last name from "Quote by" field
+      </li>
+
+      <li>
+        Make sure there is a picture!
+        <small class="less-strong"> By default, if the bike has an image, it will use that image. click "upload a different image" if you want to use a different. </small>
+      </li>
+
+      <li>
+        Edit the "Body" field and:
+        <ul class="tw:ml-4 tw:list-disc">
+          <li>
+            Make sure the text is under the character count
+            <small class="less-strong"> there's a counter below that updates as you type </small>
+          </li>
+
+          <li>
+            Remove any references to race, class, homelessness, etc. of the
+            thief
+          </li>
+
+          <li>
+            Fix typos and grammar
+          </li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<% if @bike&.manufacturer.present? %>
+  <p class="mt-4">
+    <%= @bike.type_titleize %>
+    manufacturer
+    <%= link_to @bike.mnfg_name, admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
+    - Twitter:
+    <% if @bike.manufacturer.blank? || @bike.manufacturer.other? %>
+      <em class="less-strong">"other" manufacturer, no twitter</em>
+    <% elsif @bike.manufacturer.twitter_name.present? %>
+      <strong>@<%= @bike.manufacturer.twitter_name %></strong>
+    <% else %>
+      <em class="small less-strong">Not stored</em>
+      <%= link_to "Add one", edit_admin_manufacturer_path(@bike.manufacturer), target: "_blank" %>
+    <% end %>
+  </p>
+<% end %>
+
+<hr class="mb-4">
+
+<%# Toggle image initially if the recovery display hasn't been created, and there is an image to toggle %>
+<% toggle_image_initially = @recovery_display.id.blank? && (@bike&.public_images&.present? || @bike&.stock_photo_url&.present?) %>
+
+<%= form_for [:admin, @recovery_display], html: {
+  data: {
+    controller: "admin--recovery-display-form",
+    "admin--recovery-display-form-toggle-image-value" => toggle_image_initially,
+    "admin--recovery-display-form-max-character-count-value" => Integrations::TwitterTweeter::TWEET_LENGTH,
+    "admin--recovery-display-form-remote-photo-url-value" => @bike&.image_url || ""
+  }} do |f| %>
+  <%= render(AlertForErrors::Component.new(object: @recovery_display, dismissable: true)) %>
+
+  <% if @recovery_display.stolen_record_id.present? %>
+    <%= f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id %>
+  <% end %>
+
+  <div class="row">
+    <div class="col-lg-4 col-md-6">
+      <div class="form-group">
+        <%= f.label :quote_by do %>
+          Quote By
+          <small class="less-strong">(full name: <em><%= @recovery_display.calculated_owner_name %></em>)</small>
+        <% end %>
+
+        <%= f.text_field :quote_by, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="form-group">
+        <%= f.label :location_string, "Location" %>
+        <%= f.text_field :location_string, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="form-group">
+        <%= f.label :link %>
+        <%= f.text_field :link, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="form-group">
+        <%= f.label :recovered_at %>
+        <% f.object.recovered_at = Binxtils::TimeParser.round(f.object.recovered_at || Time.current) %>
+        <%= f.datetime_local_field :recovered_at, max: Binxtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.recovered_at, format: :convert_time) %>
+      </div>
+    </div>
+
+    <% if @bike.present? %>
+      <div class="col-lg-4 col-md-6">
+        <div class="form-group">
+          <label>Bike url</label>
+
+          <input
+            class="form-control less-strong w-100"
+            type="text"
+            value="<%= bike_url(@recovery_display.bike) %>"
+            autocomplete="off"
+            disabled
+          >
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="form-group">
+        <%= f.label :body %>
+
+        <%= f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control", data: {
+           "admin--recovery-display-form-target" => "characterCounter",
+            action: "keyup->admin--recovery-display-form#updateCharacterCount"
+      } %>
+      </div>
+
+      <p
+        class="text-info text-right tw:-mt-2 tw:text-lg"
+        data-admin--recovery-display-form-target="characterTotal"
+      ></p>
+    </div>
+
+    <div class="col-lg-6">
+      <div
+        data-admin--recovery-display-form-target="notUsingBikeImage"
+        class="form-group mt-4"
+      >
+        <div class="tw:flex tw:flex-row tw:gap-2">
+          <div>
+            <% if @recovery_display.photo_processed.attached? %>
+              <%= image_tag(@recovery_display.photo_url, class: "tw:mb-1 tw:w-24") %>
+            <% elsif @recovery_display.id.present? %>
+              <p class="text-danger">No picture!</p>
+            <% end %>
+          </div>
+
+          <div class="input-group mb-3">
+            <%= f.label :photo, "Recovery photo" %>
+
+            <div class="tw:mb-2 tw:w-full">
+              <div class="custom-file">
+                <%= f.label :photo, "Choose file", class: "custom-file-label" %>
+                <%= f.file_field :photo, class: "custom-file-input", accept: "image/jpeg,image/jpg,image/png,image/gif" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if @bike.present? && !@recovery_display.photo_processed? %>
+        <div class="form-group mt-3">
+          <% if @bike.public_images.present? || @bike.stock_photo_url.present? %>
+            <% if @recovery_display.image_processing? %>
+              <span class="text-warning">
+                Image is still processing - please check back in a few minutes
+                before re-uploading an image
+              </span>
+            <% end %>
+            <%= f.hidden_field :remote_photo_url,
+                data: { "admin--recovery-display-form-target" => "remotePhotoUrl" } %>
+            <p data-admin--recovery-display-form-target="bikeImageText">
+              <span data-admin--recovery-display-form-target="usingBikeImage">
+                Using <%= @bike.type %> image
+              </span>
+
+              <span
+                class="tw:hidden"
+                data-admin--recovery-display-form-target="notUsingBikeImage"
+              >
+                <%= @bike.type_titleize %>
+
+                <% if @bike.public_images.present? %>
+                  has image
+                <% else %>
+                  has stock image
+                <% end %>
+              </span>
+
+              <a
+                class="btn btn-outline-info tw:ml-2"
+                data-admin--recovery-display-form-target="useImageButton"
+                data-action="click->admin--recovery-display-form#toggleImage"
+                href="#"
+              >
+                <span
+                  class="tw:hidden"
+                  data-admin--recovery-display-form-target="notUsingBikeImage"
+                >
+                  Use first image
+                </span>
+
+                <span data-admin--recovery-display-form-target="usingBikeImage">
+                  Upload a different image
+                </span>
+              </a>
+
+              <% if (@bike.public_images.present? || @bike.stock_photo_url.present?) && @recovery_display.id.blank? %>
+                <%= image_tag(@bike.image_url, class: "tw:mt-1 tw:w-24", data: { admin__recovery_display_form_target: "usingBikeImage" }) %>
+              <% end %>
+            </p>
+          <% else %>
+            Bike has no image
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-4 mb-4 text-right">
+    <%= f.submit "Save", class: 'btn btn-success' %>
+  </div>
+<% end %>

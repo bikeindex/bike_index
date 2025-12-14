@@ -1,0 +1,181 @@
+<%= stylesheet_link_tag "redesign_2025", "data-turbo-track" => "reload" %>
+
+<main class="root-landing-page">
+  <% cache("redesigned_homepage-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
+    <%= render(PageBlock::HomepageTop::Component.new(recoveries_value: Counts.recoveries_value,
+      organization_count: Organization.count,
+      recovery_displays: @recovery_displays)) %>
+  <% end %>
+
+  <% cache("root_who_and_numbers", expires_in: 1.hour) do %>
+    <div class="root-landing-who scrolled">
+      <div class="container">
+        <h3 class="landing-container-label"><%= t(".used_by") %></h3>
+
+        <%# These images have a color overlay (aka fill) of #676767 %>
+        <div class="root-landing-who-wrap">
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/UMD.png", alt: "University of Maryland" %>
+          </div>
+
+          <div class="root-landing-who-rectangle">
+            <%= link_to image_tag("landing_pages/partners/Bike-East-Bay.png", alt: "Bike East Bay"), "https://bikeeastbay.org/Register" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/University-of-Washington.png", alt: "University of Washington" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/Bike-Pittsburgh.png", alt: "Bike Pittsburgh" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/SFPD.png", alt: "San Francisco Police Department" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/Wisconsin-Bike-Fed.png", alt: "Wisconsin Bike Federation" %>
+          </div>
+
+          <div class="root-landing-who-rectangle">
+            <%= image_tag "landing_pages/partners/Bike-Theft-Task-Force-Portland.png", alt: "Portland Bike Theft taskforce" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= link_to image_tag("landing_pages/partners/Pinhead.png", alt: "Pinhead locks"), "https://pinheadlocks.com/" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/St-Louis-PD.png", alt: "St. Louis PD" %>
+          </div>
+
+          <div class="root-landing-who-rectangle">
+            <%= image_tag "landing_pages/partners/Seattle-Bike-Blog.png", alt: "Seattle Bike Blog" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/Sunnyvale.png", alt: "Sunnyvale" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/Stolen-Bikes-NOLA.png", alt: "Stolen Bikes NOLA" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/City-of-Bend.png", alt: "City of Bend" %>
+          </div>
+
+          <div class="root-landing-who-rectangle">
+            <%= image_tag "landing_pages/partners/Mission-Bicycle-Company.png", alt: "Mission Bicycle Company" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/Santa-Monica-PD.png", alt: "Santa Monica Police Department" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag("landing_pages/partners/Bike-Portland.png", alt: "Bike Portland") %>
+          </div>
+
+          <div class="root-landing-who-rectangle">
+            <%= image_tag("landing_pages/partners/davis-california.png", alt: "Davis California") %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag "landing_pages/partners/Drenthe.png", alt: "Provincie Drenthe" %>
+          </div>
+
+          <div class="root-landing-who-square">
+            <%= image_tag("landing_pages/partners/Op-Fietse.png", alt: "Op Fietse") %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="root-by-the-numbers">
+      <div class="container-fluid">
+        <h3 class="landing-container-label">
+          <%= t(".bike_index_statistics") %>
+        </h3>
+
+        <div class="row">
+          <div class="col-md-10 charted">
+            <% scale_color = "rgb(172, 172, 172)"
+              chartkick_library_props = {
+                animation: { duration: 5000, easing: "easeOutQuart" },
+                scales: {
+                  yAxes: [{
+                    gridLines: { color: "rgba(172, 172, 172, 0)" },
+                    ticks: { fontColor: scale_color }
+                  }],
+                  xAxes: [{
+                    weight: 5,
+                    borderColor: "rgba(0,0,0,0)",
+                    gridLines: { color: "rgba(172, 172, 172, 0)" },
+                    ticks: { fontColor: scale_color }
+                  }]
+                }
+              } %>
+
+            <%= column_chart Counts.week_creation_chart, thousands: ",", library: chartkick_library_props %>
+
+            <h4 class="chart-label"><%= t(".bikes_registered_this_week") %></h4>
+          </div>
+
+          <div class="col-md-2">
+            <div class="count-block">
+              <h4>
+                <%= t(".total_bikes_registered") %>
+
+                <span class="count-display">
+                  <%= number_with_delimiter(Counts.total_bikes) %>
+                </span>
+              </h4>
+            </div>
+
+            <div class="count-block">
+              <h4>
+                <%= t(".stolen_bikes_registered") %>
+
+                <span class="count-display">
+                  <%= number_with_delimiter(Counts.stolen_bikes) %>
+                </span>
+              </h4>
+            </div>
+
+            <div class="count-block">
+              <h4>
+                <%= t(".stolen_bikes_recovered") %>
+
+                <span class="count-display">
+                  <%= number_with_delimiter(Counts.recoveries) %>
+                </span>
+              </h4>
+            </div>
+
+            <div class="count-block">
+              <h4>
+                <%= t(".total_recovery_value") %>
+
+                <span class="count-display">
+                  $<%= number_with_delimiter(Counts.recoveries_value) %>
+                </span>
+              </h4>
+            </div>
+
+            <div class="count-block">
+              <h4>
+                <%= t(".partner_organizations") %>
+
+                <span class="count-display">
+                  <%= number_with_delimiter(Counts.organizations) %>
+                </span>
+              </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</main>

@@ -38,7 +38,7 @@
     = submit_tag "Search", name: "search", class: "btn btn-success"
 
 - if @paints.present?
-  = render partial: "/shared/admin/pagination", locals: {collection: @paints}
+  = render_admin_pagination_with_count(collection: @paints)
 
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
@@ -86,7 +86,7 @@
                   %li
                     = paint.tertiary_color.name
 
-  = render partial: "/shared/admin/pagination", locals: {collection: @paints, skip_total: true}
+  = render_admin_pagination_with_count(collection: @paints, skip_total: true)
 
 
 - else

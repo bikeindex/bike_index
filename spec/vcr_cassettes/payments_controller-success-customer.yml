@@ -10,7 +10,7 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_TvxJgDHXvMwqw0","request_duration_ms":113}}'
+      - '{"last_request_metrics":{"request_id":"req_YnvLEWqhfnzDEq","request_duration_ms":189}}'
       Stripe-Version:
       - 2025-01-27.acacia
       Accept-Encoding:
@@ -25,11 +25,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Mon, 04 Aug 2025 20:10:47 GMT
+      - Sun, 14 Dec 2025 00:01:14 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2399'
+      - '2539'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -48,9 +48,9 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=zWPKpNijnXMPvhd9aNIAhKqhQdq_yVk-Lx-Lnc5chJuTorodvb39538tQJmHvjqAxZTwZxCY1GXAeaQU
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=t8KobZ5LhL-9D_bhgBboDQhZm1xWBA3SgBa3ipMfI17lWDQ44pfNnZhAGBfvYDJIzYp_hveSc6FEFjPy
       Request-Id:
-      - req_h3voDUP6GhAllW
+      - req_MPsWJ6KPoyTCof
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -85,6 +85,8 @@ http_interactions:
           "client_reference_id": null,
           "client_secret": null,
           "collected_information": {
+            "business_name": null,
+            "individual_name": null,
             "shipping_details": null
           },
           "consent": null,
@@ -100,10 +102,13 @@ http_interactions:
             "terms_of_service_acceptance": null
           },
           "customer": "cus_JmR9ccDp8JD2Mo",
+          "customer_account": null,
           "customer_creation": null,
           "customer_details": {
             "address": null,
+            "business_name": null,
             "email": "testly@bikeindex.org",
+            "individual_name": null,
             "name": null,
             "phone": null,
             "tax_exempt": "none",
@@ -162,7 +167,7 @@ http_interactions:
           "url": null,
           "wallet_options": null
         }
-  recorded_at: Mon, 04 Aug 2025 20:10:47 GMT
+  recorded_at: Sun, 14 Dec 2025 00:01:14 GMT
 - request:
     method: get
     uri: https://api.stripe.com/v1/checkout/sessions/cs_test_a1OjyvijhWCbD9a9qWzUfM7UisfeWgROJx7tEF8Nc92PCP1uR1vjmXngCa
@@ -173,7 +178,7 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_JNeFJsXa2loaDI","request_duration_ms":197}}'
+      - '{"last_request_metrics":{"request_id":"req_mmNwU1CshWe1eb","request_duration_ms":210}}'
       Stripe-Version:
       - 2025-01-27.acacia
       Accept-Encoding:
@@ -188,11 +193,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Sat, 20 Sep 2025 16:40:34 GMT
+      - Sun, 14 Dec 2025 00:01:46 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2511'
+      - '2539'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -211,9 +216,9 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=R2PVEz2zR4lfOKQjgqZI00cuzKBz0hCFOGcAfdOuebZNIgswzFbtPGvEkwHREU-UfinCOh6Ft9Jits7y
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=rGH0SMzZehg4cSvKnwcaLs3Jb1tQWVBiwUEFAzbSHefqVoDohxWRPrsaoas9J9CkeWXe5LiAdrRL1bIs
       Request-Id:
-      - req_qQdHj5qkWML01f
+      - req_Zoo0G2o3sU3mRG
       Stripe-Version:
       - 2025-01-27.acacia
       Vary:
@@ -265,6 +270,7 @@ http_interactions:
             "terms_of_service_acceptance": null
           },
           "customer": "cus_JmR9ccDp8JD2Mo",
+          "customer_account": null,
           "customer_creation": null,
           "customer_details": {
             "address": null,
@@ -329,5 +335,5 @@ http_interactions:
           "url": null,
           "wallet_options": null
         }
-  recorded_at: Sat, 20 Sep 2025 16:40:34 GMT
+  recorded_at: Sun, 14 Dec 2025 00:01:46 GMT
 recorded_with: VCR 6.3.1

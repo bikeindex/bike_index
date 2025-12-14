@@ -4,8 +4,8 @@
 # Database name: primary
 #
 #  id               :integer          not null, primary key
-#  image            :string(255)
 #  link             :string(255)
+#  location_string  :string
 #  quote            :text
 #  quote_by         :string(255)
 #  recovered_at     :datetime
@@ -18,58 +18,86 @@
 #  index_recovery_displays_on_stolen_record_id  (stolen_record_id)
 #
 class RecoveryDisplay < ActiveRecord::Base
-  validates_presence_of :quote, :recovered_at
-  mount_uploader :image, CircularImageUploader
-  process_in_background :image, CarrierWaveProcessJob
-  attr_writer :image_cache
   belongs_to :stolen_record
+
+  has_one_attached :photo
+  has_one_attached :photo_processed
+
+  after_commit :enqueue_photo_processing, if: :persisted?
+
+  attr_accessor :date_input, :remote_photo_url, :skip_callback_job
+
+  validates_presence_of :quote, :recovered_at
+  validate :quote_not_too_long
+
+  before_validation :set_calculated_attributes
 
   default_scope { order("recovered_at desc") }
 
-  attr_accessor :date_input
+  class << self
+    def from_stolen_record_id(id)
+      stolen_record = StolenRecord.current_and_not.where(id:).first
+      return new unless stolen_record.present?
 
-  before_validation :set_time
-  after_commit :update_associations
+      new_record = new(attributes_from_stolen_record(stolen_record))
+      new_record.set_calculated_attributes
+      new_record
+    end
 
-  def set_time
+    def attributes_from_stolen_record(stolen_record)
+      bike = Bike.unscoped.find_by_id(stolen_record.bike_id) if stolen_record.bike_id.present?
+
+      {
+        stolen_record:,
+        recovered_at: stolen_record.recovered_at,
+        location_string: stolen_record.city,
+        quote: stolen_record.recovered_description,
+        quote_by: calculated_owner_name(bike)&.split(/\s/)&.first
+      }
+    end
+
+    def calculated_owner_name(bike)
+      return unless bike&.current_ownership&.present? && bike&.owner.present?
+
+      bike.owner.name
+    end
+  end
+
+  def set_calculated_attributes
     if date_input.present?
       self.recovered_at = DateTime.strptime("#{date_input} 06", "%m-%d-%Y %H")
     end
     self.recovered_at = Time.current unless recovered_at.present?
+    self.link = Binxtils::InputNormalizer.string(link)
+    self.location_string = Binxtils::InputNormalizer.string(location_string)
+    self.quote = Binxtils::InputNormalizer.string(quote)
+    self.quote_by = Binxtils::InputNormalizer.string(quote_by)
   end
 
-  validate :quote_not_too_long
-
   def quote_not_too_long
-    return true if quote.blank? || quote.length < 301
+    return if quote.blank? || quote.length < 301
 
     errors.add :base, :quote_too_long
   end
 
-  def from_stolen_record(sr_id)
-    sr = StolenRecord.current_and_not.where(id: sr_id).first
-    return true unless sr.present?
-
-    self.stolen_record = sr
-    self.recovered_at = sr.recovered_at
-    self.quote = sr.recovered_description
-    self.quote_by = calculated_owner_name&.split(/\s/)&.first
-  end
-
   def calculated_owner_name
-    return nil unless bike&.current_ownership&.present? && bike&.owner.present?
-
-    bike.owner.name
+    self.class.calculated_owner_name(bike)
   end
 
   def image_processing?
-    return false unless image.present? && updated_at > Time.current - 1.minute
+    return false unless has_any_image? && updated_at > Time.current - 1.minute
 
-    !image_exists?
+    !photo_processed?
   end
 
-  def image_exists?
-    image.present? && image.file.exists?
+  def photo_processed?
+    photo_processed.attached?
+  end
+
+  def photo_url
+    return unless photo_processed&.blob.present?
+
+    BlobUrl.for(photo_processed.blob)
   end
 
   def image_alt
@@ -78,7 +106,7 @@ class RecoveryDisplay < ActiveRecord::Base
 
   def bike
     bike_id = stolen_record&.bike_id
-    return nil unless bike_id.present?
+    return unless bike_id.present?
 
     Bike.unscoped.find_by_id(bike_id)
   end
@@ -87,7 +115,22 @@ class RecoveryDisplay < ActiveRecord::Base
     stolen_record_id.present? ? StolenRecord.current_and_not.find_by_id(stolen_record_id) : nil
   end
 
-  def update_associations
+  private
+
+  def has_any_image?
+    photo_processed? || photo.attached?
+  end
+
+  def enqueue_photo_processing
+    return if skip_callback_job
+
     stolen_record&.update(updated_at: Time.current)
+    if remote_photo_url.present?
+      Images::ProcessRecoveryDisplayPhotoJob.perform_async(id, remote_photo_url)
+      self.remote_photo_url = nil # clear to ensure it doesn't get re-enqueued
+    elsif photo.attached? && !photo_processed.attached?
+      # Otherwise, only enqueue if photo is attached and there isn't a photo_processed attached
+      Images::ProcessRecoveryDisplayPhotoJob.perform_async(id)
+    end
   end
 end

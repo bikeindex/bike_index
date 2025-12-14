@@ -2,7 +2,7 @@ class UserServices::Updator
   class << self
     def assign_address_from_bikes(user, bikes: nil, save_user: false)
       bikes ||= user.bikes
-      address_bike = bikes.with_street_address_record.first || bikes.with_street.first || bikes.with_location.first
+      address_bike = bikes.with_street.first || bikes.with_location.first
       return if address_bike.blank?
 
       address_record = user.address_record || AddressRecord.new

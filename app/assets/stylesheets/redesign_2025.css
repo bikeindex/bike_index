@@ -1,0 +1,761 @@
+:root {
+  --redesign-blue-500: #3397dc;
+  --redesign-blue-800: #016ec2;
+  --redesign-red-500: #cc0000;
+  --redesign-purple-500: #715eb2;
+  --redesign-gray-100: #f5f5f5;
+  --redesign-gray-500: #666;
+  --redesign-gray-800: #333;
+}
+
+.redesign_2025_homepage .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.redesign_2025_homepage .hero-section {
+  background-color: white;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-top: 80px;
+}
+
+.redesign_2025_homepage .bike-tiles-grid {
+  position: fixed;
+  top: -10%;
+  left: -10%;
+  right: -10%;
+  bottom: -10%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  gap: 15px;
+  z-index: 0;
+  transform: rotate(-5deg);
+  will-change: transform;
+}
+
+.redesign_2025_homepage .bike-tile {
+  width: 120px;
+  height: 120px;
+  position: relative;
+}
+
+.redesign_2025_homepage .bike-tile span {
+  display: block;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  transition: background-color 0.3s ease, margin 0.3s ease;
+}
+
+.redesign_2025_homepage .bike-tile:hover span {
+  background-color: var(--redesign-blue-500);
+  margin: -20px 0 0 -20px;
+}
+
+.redesign_2025_homepage .bike-tile.stolen-alert span {
+  animation: redesign_2025_homepage_pulse 2s ease-in-out infinite;
+}
+
+@keyframes redesign_2025_homepage_pulse {
+  0%, 100% {
+    background-color: var(--redesign-red-500);
+    margin: -20px 0 0 -20px;
+  }
+  50% {
+    background-color: transparent;
+    margin: 0px;
+  }
+}
+
+.redesign_2025_homepage .hero-content {
+  text-align: center;
+  position: absolute;
+  top: calc(50% - 40px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.redesign_2025_homepage .hero-stats {
+  display: flex;
+  gap: -3rem;
+  justify-content: center;
+  margin-bottom: -1.5rem;
+  position: relative;
+  z-index: 2;
+  animation: redesign_2025_homepage_fadeIn 1s ease-in 0.5s both;
+  margin-left: -3rem;
+}
+
+.redesign_2025_homepage .stat-box {
+  color: white;
+  padding: 1rem 1.5rem 3rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 560px;
+  min-height: 200px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.redesign_2025_homepage .stat-box:nth-child(1) {
+  background-image: url('redesign_2025/shield_dark-gray.png');
+  z-index: 1;
+  margin-right: -300px;
+  width: 350px;
+  height: 140px;
+  min-width: 350px;
+  min-height: 140px;
+  max-width: 350px;
+  max-height: 140px;
+  padding: 0.8rem 1.2rem 2.5rem;
+  transform: translateY(60px);
+}
+
+.redesign_2025_homepage .stat-box:nth-child(1) .stat-number {
+  font-size: 1.5rem;
+}
+
+.redesign_2025_homepage .stat-box:nth-child(1) .stat-label {
+  font-size: 0.65rem;
+}
+
+.redesign_2025_homepage .stat-box:nth-child(2) {
+  background-image: url('redesign_2025/shield_light-blue.png');
+  z-index: 3;
+  width: 550px;
+  height: 204px;
+  min-width: 550px;
+  min-height: 204px;
+  max-width: 550px;
+  max-height: 204px;
+  padding: 1.2rem 1.8rem 3.5rem;
+}
+
+.redesign_2025_homepage .stat-box:nth-child(2) .stat-number {
+  font-size: 2.2rem;
+}
+
+.redesign_2025_homepage .stat-box:nth-child(2) .stat-label {
+  font-size: 0.85rem;
+}
+
+.redesign_2025_homepage .stat-box:nth-child(3) {
+  background-image: url('redesign_2025/shield_purple.png');
+  z-index: 1;
+  margin-left: -300px;
+  width: 350px;
+  height: 140px;
+  min-width: 350px;
+  min-height: 140px;
+  max-width: 350px;
+  max-height: 140px;
+  padding: 0.8rem 1.2rem 2.5rem;
+  transform: translateY(60px);
+}
+
+.redesign_2025_homepage .stat-box:nth-child(3) .stat-number {
+  font-size: 1.5rem;
+}
+
+.redesign_2025_homepage .stat-box:nth-child(3) .stat-label {
+  font-size: 0.65rem;
+}
+
+.redesign_2025_homepage .stat-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+.redesign_2025_homepage .stat-label {
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.2;
+}
+
+@keyframes redesign_2025_homepage_fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.redesign_2025_homepage h2 {
+  font-weight: bold;
+}
+
+.redesign_2025_homepage .hero-section h1 {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: var(--redesign-gray-800);
+  margin-bottom: 2rem;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 2rem 3rem;
+  padding-top: 3rem;
+  display: inline-block;
+}
+
+/* For Section */
+.redesign_2025_homepage .for-section {
+  background-color: var(--redesign-gray-100);
+  padding: 3rem 0;
+  position: relative;
+  z-index: 10;
+  margin-top: -20vh;
+}
+
+.redesign_2025_homepage .for-section h2 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  color: var(--redesign-gray-800);
+}
+
+/* NOTE: not wrapped in .redesign_2025_homepage because it's rendered not on the homepage */
+.redesign_2025_buttons-grid {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.redesign_2025_buttons-grid .category-button {
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0.75rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  flex: 1;
+  min-width: 160px;
+  position: relative;
+}
+
+.redesign_2025_buttons-grid .category-button:hover {
+  text-decoration: none;
+  transform: translateY(-5px);
+}
+
+.redesign_2025_buttons-grid .category-button:hover span {
+  color: var(--redesign-purple-500);
+}
+
+.redesign_2025_buttons-grid .category-button:hover .img-wrapper::after {
+  animation: redesign_2025_homepage_drawBorder 0.6s ease-in-out forwards;
+}
+
+.redesign_2025_buttons-grid .category-button.theft-victims:hover span {
+  color: var(--redesign-red-500);
+}
+
+.redesign_2025_buttons-grid .img-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 0.75rem;
+}
+
+.redesign_2025_buttons-grid .img-wrapper::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: calc(100% + 10px);
+  height: calc(100% + 10px);
+  border: 4px solid var(--redesign-purple-500);
+  background-color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+}
+
+.redesign_2025_buttons-grid .category-button:nth-child(5) .img-wrapper::after {
+  border-color: var(--redesign-red-500);
+}
+
+@keyframes redesign_2025_homepage_drawBorder {
+  0% {
+    opacity: 1;
+    clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+  }
+  25% {
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  }
+  50% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  75% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+  100% {
+    opacity: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+.redesign_2025_buttons-grid .category-button img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.redesign_2025_buttons-grid .category-button span {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--redesign-gray-800);
+  transition: color 0.3s ease;
+}
+
+/* Stolen Bikes Section */
+.redesign_2025_homepage .stolen-bikes-section {
+  background-color: var(--redesign-blue-800);
+  background-image: url('redesign_2025/bikes-unique.png');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  padding: 4rem 0;
+  color: white;
+  position: relative;
+}
+
+.redesign_2025_homepage .stolen-bikes-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: color-mix(in srgb, var(--redesign-blue-800) 80%, transparent);
+  z-index: 1;
+}
+
+.redesign_2025_homepage .stolen-bikes-section .container {
+  position: relative;
+  z-index: 2;
+}
+
+.redesign_2025_homepage .stolen-bikes-section h2 {
+  text-align: center;
+  font-size: 3.5rem;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+  text-transform: uppercase;
+  color: white;
+}
+
+.redesign_2025_homepage .stolen-bikes-section h3 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 3rem;
+  font-weight: normal;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  color: white;
+}
+
+.redesign_2025_homepage .recovery-showcase {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.redesign_2025_homepage .bike-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.redesign_2025_homepage .black-box {
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  height: 400px;
+}
+
+.redesign_2025_homepage .bike-image-placeholder {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  /*transform: translate(-50%, -50%);*/
+  width: 90%;
+  height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.redesign_2025_homepage .bike-photo {
+  width: auto;
+  height: auto;
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  background-color: transparent;
+  border-radius: 0;
+  display: block;
+}
+
+.redesign_2025_homepage .testimonial-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 400px;
+}
+
+.redesign_2025_homepage .location-pin {
+  width: auto;
+  max-height: 133px;
+  object-fit: contain;
+  margin-left: 1rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-50%);
+  z-index: 3;
+}
+
+.redesign_2025_homepage .testimonial-box {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 0;
+  padding: 1.5rem;
+  color: var(--redesign-gray-800);
+  position: relative;
+  height: 267px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  justify-content: space-between;
+}
+
+.redesign_2025_homepage .user-info {
+  margin-bottom: 0.5rem;
+  text-align: right;
+}
+
+.redesign_2025_homepage .user-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.redesign_2025_homepage .recovery-date {
+  font-size: 0.9rem;
+  color: var(--redesign-gray-500);
+  margin-bottom: 1rem;
+  text-align: right;
+}
+
+.redesign_2025_homepage .testimonial-text {
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.redesign_2025_homepage .testimonial-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.redesign_2025_homepage .nav-arrow {
+  background-color: var(--redesign-purple-500);
+  color: white;
+  border: none;
+  border-radius: 0;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.redesign_2025_homepage .nav-arrow:hover {
+  background-color: var(--redesign-purple-500);
+  transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .redesign_2025_homepage .hero-section h1 {
+    font-size: 2.5rem;
+  }
+
+  .redesign_2025_homepage .nav-menu {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .redesign_2025_homepage .nav-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .redesign_2025_buttons-grid {
+    gap: 1rem;
+  }
+
+  .redesign_2025_homepage .recovery-showcase {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .redesign_2025_homepage .for-section h2,
+  .redesign_2025_homepage .stolen-bikes-section h2 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .redesign_2025_homepage .hero-section h1 {
+    font-size: 2rem;
+  }
+
+  .redesign_2025_buttons-grid .category-button {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .redesign_2025_buttons-grid .category-button img {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* Stolen Question Section */
+.redesign_2025_homepage .stolen-question-section {
+  background-color: white;
+  padding: 3rem 0 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.redesign_2025_homepage .stolen-question-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.redesign_2025_homepage .bike-animation-container {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.redesign_2025_homepage .bike-transition {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+}
+
+.redesign_2025_homepage .bike-registered,
+.redesign_2025_homepage .bike-stolen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 2s ease-in-out;
+}
+
+.redesign_2025_homepage .bike-registered {
+  opacity: 1;
+}
+
+.redesign_2025_homepage .bike-stolen {
+  opacity: 0;
+}
+
+.redesign_2025_homepage .question-text {
+  flex: 0 0 auto;
+}
+
+.redesign_2025_homepage .question-text h2 {
+  font-size: 2.8rem;
+  color: var(--redesign-blue-500);
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  max-width: 650px;
+  text-align: center;
+}
+
+/* Recovery Process */
+.redesign_2025_homepage .recovery-process {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  max-width: 900px;
+  margin: 2.5rem auto 0;
+  padding-top: 2.5rem;
+}
+
+.redesign_2025_homepage .crank-animation-container {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.redesign_2025_homepage .crank-wrapper {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.redesign_2025_homepage .step-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.redesign_2025_homepage .bike-crank {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
+  transition: transform 0.5s ease;
+}
+
+.redesign_2025_homepage .steps-content {
+  flex: 1;
+}
+
+.redesign_2025_homepage .step-text h3 {
+  color: var(--redesign-gray-800);
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+}
+
+.redesign_2025_homepage .step-text h3 .step-number {
+  font-size: 1.5rem;
+  display: block;
+}
+
+.redesign_2025_homepage .step-text h3 .step-title {
+  font-size: 1.1rem;
+  display: block;
+}
+
+.redesign_2025_homepage .step-text p {
+  font-size: 1.1rem;
+  color: var(--redesign-gray-500);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.redesign_2025_homepage .step-navigation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.redesign_2025_homepage .step-arrow {
+  background-color: var(--redesign-blue-500);
+  color: white;
+  border: none;
+  border-radius: 0;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.redesign_2025_homepage .step-arrow:hover {
+  background-color: var(--redesign-purple-500);
+  transform: scale(1.1);
+}
+
+.redesign_2025_homepage .step-indicator {
+  font-size: 1rem;
+  color: var(--redesign-gray-800);
+  font-weight: 500;
+}
+
+/* Responsive for stolen question section */
+@media (max-width: 768px) {
+  .redesign_2025_homepage .stolen-question-content {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .redesign_2025_homepage .bike-transition {
+    width: 120px;
+    height: 120px;
+  }
+
+  .redesign_2025_homepage .question-text h2 {
+    font-size: 1.8rem;
+  }
+
+  .redesign_2025_homepage .recovery-process {
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 2rem auto 0;
+    padding-top: 2rem;
+  }
+
+  .redesign_2025_homepage .crank-wrapper {
+    width: 200px;
+    height: 200px;
+  }
+
+  .redesign_2025_homepage .stolen-question-section {
+    padding: 2rem 0 1.5rem;
+  }
+}

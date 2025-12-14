@@ -210,7 +210,7 @@ a {
   text-align: right;
 }
 
-.has-no-serial {
+.optional-checkbox {
   margin: 24px 0 0 10px;
   float: left;
   position: relative;
@@ -223,35 +223,11 @@ a {
     cursor: pointer;
     width: 100%;
     margin: 0 15px 0 0;
-
-    // width: 105px;
-  }
-
-  .stolen {
-    display: none;
   }
 }
 
 .select2-container-disabled .select2-choice {
   color: $grayMed;
-}
-
-.unknown-year {
-  margin: 24px 0 0 10px;
-  float: left;
-  position: relative;
-
-  input {
-    margin: 0 0.5em 0 0;
-  }
-
-  label {
-    cursor: pointer;
-    width: 100%;
-    margin: 0 15px 0 0;
-
-    // width: 105px;
-  }
 }
 
 .form-save {
@@ -288,12 +264,14 @@ a {
   @include clearfix;
 }
 
-.form-photo-group {
-  padding-bottom: 30px;
+.border-top {
+  border-top: 1px solid $grayLightish;
 }
 
-.optional-group {
+.form-photo-group {
   border-bottom: none;
+  padding-bottom: 1em;
+  padding-top: 1em;
   border-top: 1px solid $grayLightish;
 
   .filefield-button {
@@ -357,10 +335,10 @@ a {
   z-index: 100;
   position: fixed;
   top: 100px;
-  left: 0;
 
-  // margin: 10px;
-  width: 100%;
+  left: 10%;
+  width: 80%;
+  max-width: 700px;
 
   // @include clearfix;
   margin: 0 auto;
@@ -370,12 +348,9 @@ a {
 
     // For IE 8
     -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#000000')";
-    z-index: 100;
-    position: absolute;
-    left: 10%;
-    width: 80%;
-    top: 20px;
+    width: 100%;
     opacity: 0.95;
+    max-width: 700px;
   }
 }
 
@@ -683,12 +658,13 @@ a {
 }
 
 .below-input-help {
-  font-size: 90%;
-  padding-bottom: 0.5em;
+  font-size: 80%;
+  padding-bottom: 0.75em;
   margin-top: -0.6em;
   display: block;
   line-height: 1.5em;
   opacity: 0.65;
+  color: $contentTextColor;
 }
 
 // cursor classes required for #motorizedWrapper

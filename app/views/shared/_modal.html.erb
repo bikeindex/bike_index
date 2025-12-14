@@ -1,0 +1,48 @@
+<%# Without a title there isn't a close button on the modal. You should definitely include a title %>
+<% title ||= false %>
+<% id ||= '' %>
+<% data_hash ||= {} %>
+<% start_open ||= false %>
+
+<%= content_tag(:div, id:, class: "bootstrapstyle modal fade", data: data_hash) do %>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <% if title %>
+        <div class="modal-header">
+          <h2 class="modal-title uncap">
+            <%= title %>
+
+            <button
+              class="close"
+              aria-label="Close"
+              data-dismiss="modal"
+              type="button"
+            >
+              <span aria-hidden="true"> &times; </span>
+            </button>
+          </h2>
+
+          <hr>
+        </div>
+      <% end %>
+
+      <%= modal_body %>
+    </div>
+  </div>
+<% end %>
+
+<% if start_open && id.present? %>
+  <script>
+    $(document).ready(function() { $("#<%= id %>").modal("show"); });
+  </script>
+<% end %>
+
+<script>
+  $(function() {
+    $("body").on("keyup", (e) => {
+      const ESC = 27;
+      if (e.keyCode !== ESC) { return; }
+      $("#<%= id %>").modal("hide");
+    });
+  });
+</script>

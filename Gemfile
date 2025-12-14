@@ -12,9 +12,8 @@ gem "csv"
 gem "observer"
 gem "prime"
 gem "openssl" # stuff breaks without this, 2025-10
-# Maybe ^ can be removed after 3.4 upgrade? Added to silence deprecation warnings
 
-gem "rails"
+gem "rails", "~> 8.0.4"
 
 # Things to improve/extend Rails
 gem "puma" # App server
@@ -31,7 +30,7 @@ gem "rack-throttle" # Rate limiting
 gem "secure_headers", "~> 2.5.0"
 
 # Speed, performance, etc
-gem "fast_blank", "~> 1.0"
+gem "fast_blank"
 gem "active_model_serializers", "~> 0.8.3" # NOTE: more recent versions are slower, see discourse Gemfile
 gem "oj" # optimized json
 gem "multi_json" # TODO: use this more
@@ -50,15 +49,16 @@ gem "translation"
 # Redis and Redis dependents
 gem "redis"
 gem "sidekiq" # Background job processing
-# Sidekiq failure tracking and viewing. Broken for sidekiq 8. see github.com/mhfs/sidekiq-failures/pull/159
-gem "sidekiq-failures", github: "navidemad/sidekiq-failures", branch: "feat-compatibility-sidekiq-8", ref: "63252253b1a17b7115fe086a910881467cd0e55d"
+gem "connection_pool", "< 3" # temporary - see github.com/mperham/connection_pool/issues/212
+gem "sidekiq-failures" # Sidekiq failure tracking and viewing
+gem "sidekiq-logstash" # Better sidekiq logging
 gem "redlock" # Locking
 
 # Making other files
 gem "image_processing" # what it says
 gem "mini_magick" # Required for image processing
 gem "ruby-vips" # Faster image processing, should eventually replace mini_magick
-gem "carrierwave", "~> 2.2.6" # File uploader
+gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
@@ -103,8 +103,6 @@ gem "premailer-rails" # Inline styles for email, also auto-generates text versio
 gem "sprockets-rails"
 gem "dartsass-rails"
 gem "haml" # Template language
-gem "herb" # New ERB parsing
-gem "reactionview" # fancy view component stuff with Herb
 gem "pagy" # pagination
 gem "kramdown" # Markdown template language
 gem "importmap-rails" # New JS setup
@@ -148,7 +146,8 @@ group :development, :test do
   gem "rspec"
   gem "rspec-rails"
   gem "standard" # Ruby linter
-  gem "erb-formatter" # html linter
+  gem "herb" # New ERB parsing
+  gem "reactionview" # fancy view component stuff with Herb
   # I18n - localization/translation
   gem "i18n-tasks"
   gem "i18n_generators"

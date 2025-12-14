@@ -33,7 +33,7 @@
     = render partial: "batches_table", locals: {bike_sticker_batches: @bike_sticker_batches, render_sortable: false, matching_count: @matching_batches}
 
 
-  = render partial: "/shared/admin/current_header", locals: { viewing: "Stickers" }
+  = render_admin_current_header(viewing: "Stickers")
 
 - if @render_chart
   = column_chart time_range_counts(collection: matching_bike_stickers, column: @time_range_column), stacked: true, thousands: ","
@@ -42,7 +42,7 @@
   = render partial: "/shared/period_select"
 
 - if @bike_sticker_batch.present?
-  - if InputNormalizer.boolean(params[:search_show_problems])
+  - if Binxtils::InputNormalizer.boolean(params[:search_show_problems])
     .mt-4.mb-4
       %h4
         Showing Problem stickers
@@ -109,8 +109,8 @@
 
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bike_stickers, skip_total: true}
+= render_admin_pagination_with_count(collection: @bike_stickers, skip_total: true)
 
 = render partial: "table", locals: { bike_stickers: @bike_stickers, render_sortable: true }
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bike_stickers, skip_total: true}
+= render_admin_pagination_with_count(collection: @bike_stickers, skip_total: true)

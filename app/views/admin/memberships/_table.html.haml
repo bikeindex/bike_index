@@ -31,7 +31,8 @@
                 = membership.id
           - unless skip_user
             %td
-              = render partial: "/shared/admin/user_cell", locals: {user: membership.user, user_id: membership.user_id, render_search: false, cache: true}
+              = cache(membership.user) do
+                = render Admin::UserCell::Component.new(user: membership.user, user_id: membership.user_id, render_search: false)
           %td
             %span.convertTime
               = l membership.start_at, format: :convert_time
@@ -46,4 +47,5 @@
               = link_to "Stripe", membership.stripe_admin_url
             - else
               .less-strong
-                = render partial: "/shared/admin/user_cell", locals: {user: membership.creator, user_id: membership.creator_id, render_search: false, cache: true}
+                = cache(membership.creator) do
+                  = render Admin::UserCell::Component.new(user: membership.creator, user_id: membership.creator_id, render_search: false)

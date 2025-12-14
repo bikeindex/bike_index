@@ -181,9 +181,9 @@ class TheftAlert < ApplicationRecord
     admin ? true : paid?
   end
 
-  # Probably don't want to activate
+  # Previously, required stolen_record_approved?
   def activateable?
-    activateable_except_approval? && stolen_record_approved?
+    activateable_except_approval?
   end
 
   def activating?
@@ -253,7 +253,7 @@ class TheftAlert < ApplicationRecord
 
   def activating_at
     t = facebook_data&.dig("activating_at")
-    t.present? ? TimeParser.parse(t) : nil
+    t.present? ? Binxtils::TimeParser.parse(t) : nil
   end
 
   def facebook_post_url

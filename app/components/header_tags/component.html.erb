@@ -5,27 +5,44 @@
 <meta name="handheldfriendly" content="true">
 <meta name="viewport" content="width=device-width">
 <meta name="description" content="<%= @page_description %>">
-<meta http-equiv="Content-Language" content="<%= I18n.locale %>"/>
-<% if @display_auto_discovery %><%= auto_discovery_link_tag(
+<meta http-equiv="Content-Language" content="<%= I18n.locale %>">
+
+<% if @display_auto_discovery %>
+  <%= auto_discovery_link_tag(
     :atom,
     news_index_url(format: "atom"),
     title: "Bike Index news atom feed",
-  ) %><% end %>
-<% if @author %><%= tag(:link, rel: "author", href: @author) %><% end %>
+  ) %>
+<% end %>
+
+<% if @author %>
+  <%= tag(:link, rel: "author", href: @author) %>
+<% end %>
 
 <meta property="og:site_name" content="Bike Index">
 <meta property="og:title" content="<%= @page_title %>">
 <meta property="og:description" content="<%= @page_description %>">
 <meta property="og:image" content="<%= facebook_image %>">
+
 <% if known_image_dimensions? %>
   <meta property="og:image:width" content="<%= image_width %>">
   <meta property="og:image:height" content="<%= image_height %>">
 <% end %>
+
 <meta property="og:url" content="<%= @page_url %>">
 <meta content="223376277803071" property="fb:app_id">
-<% if @meta_type.present? %><meta property="og:type" content="<%= @meta_type %>"><% end %>
-<% if @published_at.present? %><meta property="article:published_time" content="<%= @published_at %>"><% end %>
-<% if @updated_at.present? %><meta property="<%= og_updated_property %>" content="<%= @updated_at %>"><% end %>
+
+<% if @meta_type.present? %>
+  <meta property="og:type" content="<%= @meta_type %>">
+<% end %>
+
+<% if @published_at.present? %>
+  <meta property="article:published_time" content="<%= @published_at %>">
+<% end %>
+
+<% if @updated_at.present? %>
+  <meta property="<%= og_updated_property %>" content="<%= @updated_at %>">
+<% end %>
 
 <meta name="twitter:title" content="<%= @page_title %>">
 <meta name="twitter:description" content="<%= @page_description %>">
@@ -45,6 +62,7 @@
     "image": "https://bikeindex.org/opengraph.png"
   }
 </script>
+
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -53,6 +71,7 @@
     "url": "https://bikeindex.org"
   }
 </script>
+
 <%= tag.script(page_json_ld.to_json.html_safe, type: "application/ld+json") %>
 
 <link rel="canonical" href="<%= url_canonical %>">
@@ -66,4 +85,5 @@
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="icon" href="/icon-dark.svg" media="(prefers-color-scheme: dark)">
 <% end %>
+
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">

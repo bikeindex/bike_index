@@ -1,0 +1,19 @@
+<% if @bike.blank? %>
+  <small class="<%= Alert::Component::TEXT_CLASSES[:error] %>">
+    Missing bike
+    <% if @bike_id.present? %>
+      <code><%= @bike_id %></code>
+    <% end %>
+  </small>
+<% elsif @bike.present? %>
+  <%= render Badge::BikeHiddenAdminExplanation::Component.new(bike: @bike) %>
+  <% if bike_link_path.present? %>
+    <%= link_to bike_content, bike_link_path, class: "twlink" %>
+  <% else %>
+    <%= bike_content %>
+  <% end %>
+<% end %>
+
+<% if @render_search %>
+  <%= link_to search_emoji, search_url, class: "display-sortable-link small ml-1" %>
+<% end %>

@@ -1848,46 +1848,6 @@ ALTER SEQUENCE public.invoices_id_seq OWNED BY public.invoices.id;
 
 
 --
--- Name: item_sales; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.item_sales (
-    id bigint NOT NULL,
-    amount_cents integer,
-    currency_enum integer,
-    item_type character varying,
-    item_id bigint,
-    seller_id bigint,
-    sold_via integer,
-    sold_via_other character varying,
-    sold_at timestamp(6) without time zone,
-    ownership_id bigint,
-    new_owner_string character varying,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: item_sales_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.item_sales_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: item_sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.item_sales_id_seq OWNED BY public.item_sales.id;
-
-
---
 -- Name: listicles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3190,9 +3150,9 @@ CREATE TABLE public.recovery_displays (
     quote_by character varying(255),
     recovered_at timestamp without time zone,
     link character varying(255),
-    image character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    location_string character varying
 );
 
 
@@ -3213,6 +3173,46 @@ CREATE SEQUENCE public.recovery_displays_id_seq
 --
 
 ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays.id;
+
+
+--
+-- Name: sales; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sales (
+    id bigint NOT NULL,
+    amount_cents integer,
+    currency_enum integer,
+    item_type character varying,
+    item_id bigint,
+    seller_id bigint,
+    sold_via integer,
+    sold_via_other character varying,
+    sold_at timestamp(6) without time zone,
+    ownership_id bigint,
+    new_owner_string character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: sales_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.sales_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: sales_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.sales_id_seq OWNED BY public.sales.id;
 
 
 --
@@ -4354,13 +4354,6 @@ ALTER TABLE ONLY public.invoices ALTER COLUMN id SET DEFAULT nextval('public.inv
 
 
 --
--- Name: item_sales id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.item_sales ALTER COLUMN id SET DEFAULT nextval('public.item_sales_id_seq'::regclass);
-
-
---
 -- Name: listicles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4589,6 +4582,13 @@ ALTER TABLE ONLY public.rear_gear_types ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('public.recovery_displays_id_seq'::regclass);
+
+
+--
+-- Name: sales id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sales ALTER COLUMN id SET DEFAULT nextval('public.sales_id_seq'::regclass);
 
 
 --
@@ -5101,14 +5101,6 @@ ALTER TABLE ONLY public.invoices
 
 
 --
--- Name: item_sales item_sales_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.item_sales
-    ADD CONSTRAINT item_sales_pkey PRIMARY KEY (id);
-
-
---
 -- Name: listicles listicles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5370,6 +5362,14 @@ ALTER TABLE ONLY public.rear_gear_types
 
 ALTER TABLE ONLY public.recovery_displays
     ADD CONSTRAINT recovery_displays_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sales sales_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sales
+    ADD CONSTRAINT sales_pkey PRIMARY KEY (id);
 
 
 --
@@ -6274,27 +6274,6 @@ CREATE INDEX index_invoices_on_organization_id ON public.invoices USING btree (o
 
 
 --
--- Name: index_item_sales_on_item; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_item_sales_on_item ON public.item_sales USING btree (item_type, item_id);
-
-
---
--- Name: index_item_sales_on_ownership_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_item_sales_on_ownership_id ON public.item_sales USING btree (ownership_id);
-
-
---
--- Name: index_item_sales_on_seller_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_item_sales_on_seller_id ON public.item_sales USING btree (seller_id);
-
-
---
 -- Name: index_locks_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6757,6 +6736,27 @@ CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_disp
 
 
 --
+-- Name: index_sales_on_item; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sales_on_item ON public.sales USING btree (item_type, item_id);
+
+
+--
+-- Name: index_sales_on_ownership_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sales_on_ownership_id ON public.sales USING btree (ownership_id);
+
+
+--
+-- Name: index_sales_on_seller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sales_on_seller_id ON public.sales USING btree (seller_id);
+
+
+--
 -- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7150,6 +7150,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251210194656'),
+('20251117204111'),
 ('20251105020711'),
 ('20251101041451'),
 ('20250917185540'),

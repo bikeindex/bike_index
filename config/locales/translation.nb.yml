@@ -120,8 +120,6 @@ nb:
       carrierwave_download_error: kunne ikke lastes ned
       rmagick_processing_error: 'Kunne ikke manipulere med rmagick, kanskje det ikke
         er et bilde? Opprinnelig feil: %{e}'
-      mini_magick_processing_error: 'Kunne ikke manipulere med MiniMagick, kanskje
-        det ikke er et bilde? Opprinnelig feil: %{e}'
       in: må være i %{count}
       invalid_currency: har ugyldig format (må være '100', '5%{decimal}24' eller '123%{thousands}456%{decimal}78').
         Fikk %{currency}
@@ -133,11 +131,14 @@ nb:
       content_type_allowlist_error: 'Du har ikke lov til å laste opp %{content_type}-filer,
         tillatte typer: %{allowed_types}'
       content_type_denylist_error: Du har ikke lov til å laste opp %{content_type}-filer
-      vips_processing_error: 'Kunne ikke manipulere med vips, kanskje det ikke er
-        et bilde? Opprinnelig feil: %{e}'
       min_size_error: Filstørrelsen skal være større enn %{min_size}
       max_size_error: Filstørrelsen skal være mindre enn %{max_size}
       password_too_long: er for lang
+      processing_error: Kunne ikke manipulere, kanskje det ikke er et bilde?
+      min_width_error: Bildebredden bør være større enn %{min_width} piksler
+      max_width_error: Bildebredden bør være mindre enn %{max_width} piksler
+      min_height_error: Bildehøyden bør være større enn %{min_height} piksler
+      max_height_error: Bildehøyden bør være mindre enn %{max_height} piksler
     template:
       body: 'Det oppstod problemer med følgende felt:'
       header:
@@ -4153,12 +4154,6 @@ nb:
       youre_the_first_one: Du er den første innbyggerne dine ser på når syklene deres
         blir stjålet. Få tilgang til og søk i vår internasjonale database for å returnere
         fellesskapets sykler til deres rettmessige eiere.
-    for_organizations_photo_list:
-      bike_shops: Sykkelbutikker
-      cities: Byer
-      community_groups: Fellesskapsgrupper
-      for: til
-      schools: Skoler
     for_schools:
       bike_index_for_universities: Sykkelindeks for universiteter
       bike_index_users_provide: Bike Index-brukere gir serienummer, bevis på eierskap
@@ -4561,49 +4556,10 @@ nb:
         en sykkel
   organizations:
     embed:
-      add_a_color: Legg til en farge
-      additional_serial: Ekstra serie-/klistremerkenummer
-      choose_color: Velg farge
-      choose_country: Velg land
-      city: By
       currently_registering_a_nonstolen_bike: Registrerer for tiden en ikke-stjålet
         sykkel. Klikk her for å registrere en STJÅLET sykkel i stedet.
-      department_city: Avdeling og by
-      description_of_the_theft: Beskrivelse av tyveriet
-      eg_if_we_tweet_about_or_someone_searches: for eksempel hvis vi tweeter om eller
-        noen søker etter serienummeret
-      filing_a_police_report_is_important_html: Å inngi en <strong>politianmeldelse</strong>
-        er <span class="stolen-color">ekstremt viktig</span> for å få stjålet sykkel.
-      frame_color: Rammefarge
-      image_has_been_uploaded: Bildet er lastet opp
-      intersection_or_address: Kryss eller adresse
-      manufacturer_name: Produsentens navn
-      model_year: Årsmodell
-      optional_upload_a_photo: Valgfritt - last opp et bilde
-      other_manufacturer: Annen produsent
-      police_report_number: Politiets rapportnummer
-      receive_notifications_from_bike_index: Motta varsler fra indeksen om dette stjålne
-        %{bike_type}
-      register: Registrere
       registering_a_stolen_bike_click_here: Registrering av stjålet sykkel. Klikk
         her for å registrere en ikke-stjålet sykkel
-      remove_color: Fjern farge
-      secondary_color: Sekundær farge
-      select_other_if_manufacturer_isnt_listed: Velg "Annet" hvis produsenten ikke
-        er oppført
-      state: Stat
-      sticker_id_html: Klistremerke-ID <small class='less-strong'>valgfritt</small>
-      student_id: Student ID
-      third_color: Tredje farge
-      this: dette
-      unknown_serial: Ukjent serie
-      unknown_year: Ukjent årstall
-      unsure_or_unknown: Usikker eller ukjent
-      when_was_it_stolen: Når ble den stjålet?
-      where_was_it_stolen: Hvor ble det stjålet?
-      your_email_address: Din epostadresse
-      your_phone_number: Telefonnummeret ditt
-      zipcode: postnummer
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} ble registrert til deg gjennom
         <strong>%{org_name}</strong> ."
@@ -4611,35 +4567,14 @@ nb:
         kort tid.
       your_bike_has_been_added_to_bike_index: Din %{bike_type} er lagt til Bike Index!
     embed_extended:
-      add_a_color: Legg til en farge
-      additional_serial: Ekstra serie-/klistremerkenummer
       any_extra_words: Noen ekstra ord?
-      choose_color: Velg farge
       choose_handlebar: Velg styre
       choose_material: Velg materiale
-      choose_photo: Velg bilde
-      frame_color: Rammefarge
-      image_has_been_uploaded: Bildet er lastet opp
-      manufacturer_name: Produsentens navn
-      model_year: Årsmodell
-      optional_additions: Valgfrie tillegg
-      org_affiliation: "%{org_name} tilknytning"
       other_defining_features: Andre definerende funksjoner
-      other_manufacturer: Annen produsent
-      owners_email_address: Eierens e-postadresse
-      owners_phone: Eierens telefon
       primary_frame_material: Primært rammemateriale
-      register_this: Registrer dette
-      remove_color: Fjern farge
-      secondary_color: Sekundær farge
-      select_other_if_manufacturer_isnt_listed: Velg "Annet" hvis produsenten ikke
-        er oppført
-      sticker_id_html: Klistremerke-ID <small class='less-strong'>valgfritt</small>
-      student_id: Student ID
-      third_color: Tredje farge
-      unknown_serial: Ukjent serie
-      unknown_year: Ukjent årstall
-      unsure_or_unknown: Usikker eller ukjent
+      handlebar_type: Styre type
+      optional: valgfri
+      phone_number_owner: Eierens telefon
     new:
       bike_index_for_organizations: Sykkelindeks for organisasjoner
     new_form:
@@ -4665,6 +4600,52 @@ nb:
       you_are_already_a_member_of_org_html: Du er allerede medlem av %{org_link}.
       your_current_account_will_be_a_member_html: Din nåværende konto ( <strong>%{user_email}</strong>
         ) vil være medlem av organisasjonen du oppretter.
+    embed_fields:
+      add_a_color: Legg til en farge
+      additional_serial: Ekstra serie-/klistremerkenummer
+      choose_color: Velg farge
+      choose_country: Velg land
+      city: By
+      department_city: Avdeling og by
+      description_of_the_theft: Beskrivelse av tyveriet
+      eg_if_we_tweet_about_or_someone_searches: for eksempel hvis vi tweeter om eller
+        noen søker etter serienummeret
+      email_address_owner: Eierens e-postadresse
+      email_address_you: Din epostadresse
+      filing_a_police_report_is_important_html: Å inngi en <strong>politianmeldelse</strong>
+        er <span class="stolen-color">ekstremt viktig</span> for å få stjålet sykkel.
+      frame_color: Rammefarge
+      frame_model: Ramme modell
+      image_has_been_uploaded: Bildet er lastet opp
+      intersection_or_address: Kryss eller adresse
+      manufacturer_name: Produsentens navn
+      model_year: Årsmodell
+      optional: valgfri
+      optional_upload_a_photo: Valgfritt - last opp et bilde
+      org_affiliation: "%{org_name} tilknytning"
+      other_manufacturer: Annen produsent
+      phone_number_owner: Eierens telefon
+      phone_number_you: Telefonnummeret ditt
+      please_wait: Vent litt, behandles
+      police_report_number: Politiets rapportnummer
+      receive_notifications_from_bike_index: Motta varsler fra indeksen om dette stjålne
+        %{bike_type}
+      register: Registrere
+      remove_color: Fjern farge
+      secondary_color: Sekundær farge
+      select_other_if_manufacturer_isnt_listed: Velg "Annet" hvis produsenten ikke
+        er oppført
+      state: Stat
+      sticker_id: Klistremerke-ID
+      student_id: Student ID
+      third_color: Tredje farge
+      this: dette
+      unknown_serial: Ukjent serie
+      unknown_year: Ukjent årstall
+      unsure_or_unknown: Usikker eller ukjent
+      when_was_it_stolen: Når ble den stjålet?
+      where_was_it_stolen: Hvor ble det stjålet?
+      zipcode: postnummer
   organized:
     ambassador_dashboards:
       getting_started:
@@ -5271,11 +5252,6 @@ nb:
       edit: Endre
       image_from: Bilde fra %{image_title}
       looks_like_this_is_your_image: Ser ut som dette er bildet ditt.
-  recovery_displays:
-    recovery_display:
-      bike: Sykkel
-      recovered_date: gjenopprettet %{date}
-      translated_from_english: oversatt fra engelsk
   registrations:
     create:
       follow_link_in_email: Følg lenken i e-posten for å fullføre registreringen.
@@ -5642,6 +5618,10 @@ nb:
       without_photo_all_is_lost: Hvis du ikke har noen bilder av sykkelen din, finn
         et lagerbilde på internett og last det opp. Uten et bilde vil ikke det promoterte
         varselet være effektivt.
+    recovery_display:
+      bike: Sykkel
+      recovered_date: gjenopprettet %{date}
+      translated_from_english: oversatt fra engelsk
   stolen:
     index:
       ambassador: ambassadør
@@ -5792,34 +5772,14 @@ nb:
       come_back_soon: Kom tilbake snart!
       youve_been_logged_out: Du har blitt logget ut
     index:
-      alert_the_community: Varsle fellesskapet
       bike_index_statistics: Sykkelindeksstatistikk
       bikes_registered_this_week: Sykler registrert denne uken
-      but_how_does_it_work: Men hvordan fungerer det?
-      hero: Sykkelregistrering som fungerer
-      how_it_works: Det er enkelt. Send inn navn, sykkelprodusent, serienummer og
-        komponentinformasjon for å legge inn sykkelen din i det mest brukte sykkelregisteret
-        på planeten.
-      identifying_your_bike: En bruker eller partner møter sykkelen din, bruker Bike
-        Index for å identifisere den og kontakter deg.
-      if_your_bike_goes_missing: Hvis sykkelen din blir borte, merk den som tapt eller
-        stjålet for å varsle hele Bike Index-fellesskapet og dets partnere.
       partner_organizations: Partnerorganisasjoner
-      read_more_recovery_stories: Les flere gjenopprettingshistorier
-      recent_recovery_stories: 'Stjålne sykler vi hjalp til med å gjenopprette nylig:'
-      recover_your_bike_for_free: Ved hjelp av Bike Index-fellesskapet og dets partnere
-        har du informasjonen som er nødvendig for å gjenopprette den tapte eller stjålne
-        sykkelen din uten kostnad for deg. Det er det vi gjør.
-      register_now: Registrer deg nå!
-      register_your_bike: Registrer sykkelen din
       stolen_bikes_recovered: Stjålne sykler gjenfunnet
       stolen_bikes_registered: Stjålne sykler registrert
-      the_community_responds: Samfunnet reagerer
       total_bikes_registered: Totalt registrerte sykler
       total_recovery_value: Total gjenopprettingsverdi
       used_by: Brukt av
-      value_of_bikes_recovered: Over %{value} verdi av sykler gjenvunnet
-      you_get_your_bike_back: Du får tilbake sykkelen
     recovery_stories:
       recovery_stories: Gjenopprettingshistorier
     update_browser:
@@ -5904,15 +5864,6 @@ nb:
     definition_list:
       row:
         no_value: ingen
-    page_section:
-      marketplace_listing_panel:
-        condition: Betingelse
-        description: Beskrivelse
-        first_posted_at: Postet
-        location: plassering
-        price_is_firm_false: Prisen er omsettelig
-        price_is_firm_true: prisen er fast
-        still_for_sale_at: Selger fortsatt på
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
         %{object_name} ble lagret:"
@@ -5933,8 +5884,16 @@ nb:
         registered_not_stolen: registrert, ikke stjålet
       container:
         no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
-    org:
-      bike_access_panel:
+    page_block:
+      marketplace_listing_panel:
+        condition: Betingelse
+        description: Beskrivelse
+        first_posted_at: Postet
+        location: plassering
+        price_is_firm_false: Prisen er omsettelig
+        price_is_firm_true: prisen er fast
+        still_for_sale_at: Selger fortsatt på
+      org_bike_access_panel:
         access_panel: Tilgangspanel
         added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
           på en bruker. Den ble lagt til for å spore parkeringsvarsler.
@@ -6006,3 +5965,9 @@ nb:
           om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
         write_a_message: Skrive en melding
         zipcode: Postnummer
+      homepage_for_buttons:
+        bike_shops: Sykkelbutikker
+        cities: Byer
+        community_groups: Fellesskapsgrupper
+        schools: Skoler
+        theft_victims: Tyveriofre

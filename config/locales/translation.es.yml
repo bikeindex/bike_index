@@ -119,7 +119,6 @@ es:
       carrierwave_integrity_error:
       carrierwave_download_error:
       rmagick_processing_error:
-      mini_magick_processing_error:
       in:
       invalid_currency:
       record_invalid: 'La validación falló: %{errors}'
@@ -127,10 +126,14 @@ es:
       extension_denylist_error:
       content_type_allowlist_error:
       content_type_denylist_error:
-      vips_processing_error:
       min_size_error:
       max_size_error:
       password_too_long:
+      processing_error:
+      min_width_error:
+      max_width_error:
+      min_height_error:
+      max_height_error:
     template:
       body: 'Se encontraron problemas con los siguientes campos:'
       header:
@@ -3203,12 +3206,6 @@ es:
       with_over_registrations_and_almost:
       you_have_the_authority_to_bring_html:
       youre_the_first_one:
-    for_organizations_photo_list:
-      bike_shops: Tiendas de bicicletas
-      cities: Ciudades
-      community_groups: Grupos comunitarios
-      for: para
-      schools: Escuelas
     for_schools:
       bike_index_for_universities:
       bike_index_users_provide:
@@ -3552,76 +3549,21 @@ es:
       whoops_that_link_isnt_connected_to_a_bike:
   organizations:
     embed:
-      add_a_color:
-      additional_serial:
-      choose_color:
-      choose_country:
-      city:
       currently_registering_a_nonstolen_bike:
-      department_city:
-      description_of_the_theft:
-      eg_if_we_tweet_about_or_someone_searches:
-      filing_a_police_report_is_important_html:
-      frame_color:
-      image_has_been_uploaded:
-      intersection_or_address:
-      manufacturer_name:
-      model_year:
-      optional_upload_a_photo:
-      other_manufacturer:
-      police_report_number:
-      receive_notifications_from_bike_index:
-      register:
       registering_a_stolen_bike_click_here:
-      remove_color:
-      secondary_color:
-      select_other_if_manufacturer_isnt_listed:
-      state:
-      sticker_id_html:
-      student_id:
-      third_color:
-      this:
-      unknown_serial:
-      unknown_year:
-      unsure_or_unknown:
-      when_was_it_stolen:
-      where_was_it_stolen:
-      your_email_address:
-      your_phone_number:
-      zipcode:
     embed_create_success:
       bike_was_registered_to_you_html:
       you_will_receive_an_email_confirmation:
       your_bike_has_been_added_to_bike_index:
     embed_extended:
-      add_a_color:
-      additional_serial:
       any_extra_words:
-      choose_color:
       choose_handlebar:
       choose_material:
-      choose_photo:
-      frame_color:
-      image_has_been_uploaded:
-      manufacturer_name:
-      model_year:
-      optional_additions:
-      org_affiliation:
       other_defining_features:
-      other_manufacturer:
-      owners_email_address:
-      owners_phone:
       primary_frame_material:
-      register_this:
-      remove_color:
-      secondary_color:
-      select_other_if_manufacturer_isnt_listed:
-      sticker_id_html:
-      student_id:
-      third_color:
-      unknown_serial:
-      unknown_year:
-      unsure_or_unknown:
+      handlebar_type:
+      optional:
+      phone_number_owner:
     new:
       bike_index_for_organizations:
     new_form:
@@ -3641,6 +3583,48 @@ es:
       sign_up_for_a_new_account_html:
       you_are_already_a_member_of_org_html:
       your_current_account_will_be_a_member_html:
+    embed_fields:
+      add_a_color:
+      additional_serial:
+      choose_color:
+      choose_country:
+      city:
+      department_city:
+      description_of_the_theft:
+      eg_if_we_tweet_about_or_someone_searches:
+      email_address_owner:
+      email_address_you:
+      filing_a_police_report_is_important_html:
+      frame_color:
+      frame_model:
+      image_has_been_uploaded:
+      intersection_or_address:
+      manufacturer_name:
+      model_year:
+      optional:
+      optional_upload_a_photo:
+      org_affiliation:
+      other_manufacturer:
+      phone_number_owner:
+      phone_number_you:
+      please_wait:
+      police_report_number:
+      receive_notifications_from_bike_index:
+      register:
+      remove_color:
+      secondary_color:
+      select_other_if_manufacturer_isnt_listed:
+      state:
+      sticker_id:
+      student_id:
+      third_color:
+      this:
+      unknown_serial:
+      unknown_year:
+      unsure_or_unknown:
+      when_was_it_stolen:
+      where_was_it_stolen:
+      zipcode:
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4134,11 +4118,6 @@ es:
       edit: Editar
       image_from:
       looks_like_this_is_your_image:
-  recovery_displays:
-    recovery_display:
-      bike:
-      recovered_date:
-      translated_from_english:
   registrations:
     create:
       follow_link_in_email:
@@ -4435,6 +4414,10 @@ es:
       verify_number:
       without_location_all_is_lost:
       without_photo_all_is_lost:
+    recovery_display:
+      bike:
+      recovered_date:
+      translated_from_english:
   stolen:
     index:
       ambassador:
@@ -4547,34 +4530,14 @@ es:
       come_back_soon:
       youve_been_logged_out:
     index:
-      alert_the_community: Alertar a la Comunidad
       bike_index_statistics: Estadísticas del Bike Index
       bikes_registered_this_week: Bicicletas registradas esta semana
-      but_how_does_it_work: Pero, ¿cómo funciona?
-      hero: Registro de bicicletas que funciona
-      how_it_works: Es muy sencillo. Envíe su nombre, fabricante de la bicicleta,
-        número de serie e información sobre los componentes para introducir su bicicleta
-        en el registro de bicicletas más utilizado del planeta.
-      identifying_your_bike: Un usuario o socio encuentra su bicicleta, utiliza Bike
-        Index para identificarla y se pone en contacto con usted.
-      if_your_bike_goes_missing: Si pierdes tu bicicleta, márcala como perdida o robada
-        para notificarlo a toda la comunidad Bike Index y a sus socios.
       partner_organizations: Organizaciones asociadas
-      read_more_recovery_stories: Leer más historias de recuperación
-      recent_recovery_stories: 'Bicicletas robadas que ayudamos a recuperar recientemente:'
-      recover_your_bike_for_free: Con la ayuda de la comunidad Bike Index y sus socios,
-        dispones de la información necesaria para recuperar tu bicicleta perdida o
-        robada sin coste alguno para ti. Es lo que hacemos.
-      register_now: Registro ahora
-      register_your_bike: Registre su bicicleta
       stolen_bikes_recovered: Recuperación de bicicletas robadas
       stolen_bikes_registered: Bicicletas robadas Registradas
-      the_community_responds: La comunidad responde
       total_bikes_registered: Total de bicicletas registradas
       total_recovery_value: Valor total de recuperación
       used_by: Usado por
-      value_of_bikes_recovered: Más de %{value} bicicletas recuperadas
-      you_get_your_bike_back: Recupera tu bicicleta
     recovery_stories:
       recovery_stories:
     update_browser:
@@ -4657,15 +4620,6 @@ es:
     definition_list:
       row:
         no_value:
-    page_section:
-      marketplace_listing_panel:
-        condition:
-        description:
-        first_posted_at:
-        location:
-        price_is_firm_false:
-        price_is_firm_true:
-        still_for_sale_at:
     alert_for_errors:
       errors_prevented_this_from_being_saved:
     messages:
@@ -4685,8 +4639,16 @@ es:
         registered_not_stolen:
       container:
         no_results:
-    org:
-      bike_access_panel:
+    page_block:
+      marketplace_listing_panel:
+        condition:
+        description:
+        first_posted_at:
+        location:
+        price_is_firm_false:
+        price_is_firm_true:
+        still_for_sale_at:
+      org_bike_access_panel:
         access_panel:
         added_to_track_parking_notification:
         additional_registrations_information:
@@ -4746,3 +4708,9 @@ es:
         where_did_you_see_this_bike:
         write_a_message:
         zipcode:
+      homepage_for_buttons:
+        bike_shops: Tiendas de bicicletas
+        cities: Ciudades
+        community_groups: Grupos comunitarios
+        schools: Escuelas
+        theft_victims: Víctimas de robos

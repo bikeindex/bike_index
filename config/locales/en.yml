@@ -3762,12 +3762,6 @@ en:
         You're the first one your citizens look to when their bikes are stolen. Access
         and search our international database to return your community's bikes to
         their rightful owners.
-    for_organizations_photo_list:
-      bike_shops: Bike Shops
-      cities: Cities
-      community_groups: Community Groups
-      for: for
-      schools: Schools
     for_schools:
       bike_index_admin_guide: Bike Index Campus Management Admin Guide
       bike_index_for_universities: Bike Index for Universities
@@ -4245,51 +4239,11 @@ en:
         to a bike
   organizations:
     embed:
-      add_a_color: Add a color
-      additional_serial: Additional serial/sticker number
-      choose_color: Choose color
-      choose_country: Choose country
-      city: City
       currently_registering_a_nonstolen_bike: >-
         Currently registering a non-stolen bike. Click here to register a STOLEN bike
         instead.
-      department_city: Department & city
-      description_of_the_theft: Description of the theft
-      eg_if_we_tweet_about_or_someone_searches: e.g., if we tweet about or someone
-        searches for its serial number
-      filing_a_police_report_is_important_html: >-
-        Filing a <strong>police report</strong> is <span class="stolen-color">extremely
-        important</span> for stolen bike recovery.
-      frame_color: Frame color
-      image_has_been_uploaded: Image has been uploaded
-      intersection_or_address: Intersection or address
-      manufacturer_name: Manufacturer name
-      model_year: Model year
-      optional_upload_a_photo: Optional - upload a photo
-      other_manufacturer: Other manufacturer
-      police_report_number: Police report number
-      receive_notifications_from_bike_index: Receive notifications from the Index
-        about this stolen %{bike_type}
-      register: Register
       registering_a_stolen_bike_click_here: Registering a stolen bike. Click here
         to register a non-stolen bike
-      remove_color: Remove color
-      secondary_color: Secondary color
-      select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
-        listed
-      state: State
-      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
-      student_id: Student ID
-      third_color: Third color
-      this: this
-      unknown_serial: Unknown serial
-      unknown_year: Unknown year
-      unsure_or_unknown: Unsure or unknown
-      when_was_it_stolen: When was it stolen?
-      where_was_it_stolen: Where was it stolen?
-      your_email_address: Your email address
-      your_phone_number: Your phone number
-      zipcode: Postal Code
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} was registered to you through
         <strong>%{org_name}</strong>."
@@ -4298,35 +4252,61 @@ en:
       your_bike_has_been_added_to_bike_index: Your %{bike_type} has been added to
         Bike Index!
     embed_extended:
-      add_a_color: Add a color
-      additional_serial: Additional serial/sticker number
       any_extra_words: Any extra words?
-      choose_color: Choose color
       choose_handlebar: Choose handlebar
       choose_material: Choose material
-      choose_photo: Choose photo
+      handlebar_type: Handlebar type
+      optional: optional
+      other_defining_features: Other defining features
+      phone_number_owner: Owner's phone
+      primary_frame_material: Primary frame material
+    embed_fields:
+      add_a_color: Add a color
+      additional_serial: Additional serial/sticker number
+      choose_color: Choose color
+      choose_country: Choose country
+      city: City
+      department_city: Department & city
+      description_of_the_theft: Description of the theft
+      eg_if_we_tweet_about_or_someone_searches: e.g., if we tweet about or someone
+        searches for its serial number
+      email_address_owner: Owner's email address
+      email_address_you: Your email address
+      filing_a_police_report_is_important_html: >-
+        Filing a <strong>police report</strong> is <span class="stolen-color">extremely
+        important</span> for stolen bike recovery.
       frame_color: Frame color
+      frame_model: Frame model
       image_has_been_uploaded: Image has been uploaded
+      intersection_or_address: Intersection or address
       manufacturer_name: Manufacturer name
       model_year: Model year
-      optional_additions: Optional additions
+      optional: optional
+      optional_upload_a_photo: Optional - upload a photo
       org_affiliation: "%{org_name} affiliation"
-      other_defining_features: Other defining features
       other_manufacturer: Other manufacturer
-      owners_email_address: Owner's email address
-      owners_phone: Owner's phone
-      primary_frame_material: Primary frame material
-      register_this: Register this
+      phone_number_owner: Owner's phone
+      phone_number_you: Your phone number
+      please_wait: Please wait, processing
+      police_report_number: Police report number
+      receive_notifications_from_bike_index: Receive notifications from the Index
+        about this stolen %{bike_type}
+      register: Register
       remove_color: Remove color
       secondary_color: Secondary color
       select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
         listed
-      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      state: State
+      sticker_id: Sticker ID
       student_id: Student ID
       third_color: Third color
+      this: this
       unknown_serial: Unknown serial
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
+      when_was_it_stolen: When was it stolen?
+      where_was_it_stolen: Where was it stolen?
+      zipcode: Postal Code
     new:
       bike_index_for_organizations: Bike Index for organizations
     new_form:
@@ -4982,11 +4962,6 @@ en:
       edit: Edit
       image_from: Image from %{image_title}
       looks_like_this_is_your_image: Looks like this is your image.
-  recovery_displays:
-    recovery_display:
-      bike: Bike
-      recovered_date: recovered %{date}
-      translated_from_english: translated from English
   registrations:
     create:
       follow_link_in_email: Follow the link in the email to complete your registration.
@@ -5373,6 +5348,10 @@ en:
       to: To
       update: Update
       year: year
+    recovery_display:
+      bike: Bike
+      recovered_date: recovered %{date}
+      translated_from_english: translated from English
     user_general_alert:
       add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
       add_photo_theft_bike_title_html: Add a photo to your <strong>%{bike_title}</strong>
@@ -5562,38 +5541,14 @@ en:
       come_back_soon: Come back soon!
       youve_been_logged_out: You've been logged out
     index:
-      alert_the_community: Alert the Community
       bike_index_statistics: Bike Index statistics
       bikes_registered_this_week: Bikes registered this week
-      but_how_does_it_work: But How Does it work?
-      hero: Bike registration that works
-      how_it_works: >-
-        It's simple. Submit your name, bike manufacturer, serial number, and component
-        information to enter your bike into the most widely used bike registry on
-        the planet.
-      identifying_your_bike: >-
-        A user or partner encounters your bike, uses Bike Index to identify it, and
-        contacts you.
-      if_your_bike_goes_missing: >-
-        If your bike goes missing, mark it as lost or stolen to notify the entire
-        Bike Index community and its partners.
       partner_organizations: Partner Organizations
-      read_more_recovery_stories: Read more recovery stories
-      recent_recovery_stories: 'Stolen bicycles we helped recover recently:'
-      recover_your_bike_for_free: >-
-        With the help of the Bike Index community and its partners, you have the information
-        necessary to recover your lost or stolen bike at no cost to you. It's what
-        we do.
-      register_now: Register now!
-      register_your_bike: Register Your Bike
       stolen_bikes_recovered: Stolen Bikes Recovered
       stolen_bikes_registered: Stolen Bikes Registered
-      the_community_responds: The community responds
       total_bikes_registered: Total Bikes Registered
       total_recovery_value: Total Recovery value
       used_by: Used By
-      value_of_bikes_recovered: Over %{value} Worth of Bikes Recovered
-      you_get_your_bike_back: You Get your Bike Back
     recovery_stories:
       recovery_stories: Recovery Stories
     update_browser:

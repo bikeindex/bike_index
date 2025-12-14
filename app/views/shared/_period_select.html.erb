@@ -1,0 +1,118 @@
+<% skip_submission ||= false %>
+<% include_future ||= false %>
+<% prepend_text ||= nil %>
+<% raise "Must include :set_period for this action" unless @start_time.present? %>
+
+<%# This is duplicated with different values in stolen_bike_listings#index %>
+
+<div
+  id="timeSelectionBtnGroup"
+  class="text-right <%= @period == "custom" ? "custom-period-selected" : "" %>"
+  role="group"
+  data-nosubmit="<%= skip_submission %>"
+>
+  <% if prepend_text.present? %>
+    <span class="mr-2 less-strong d-block d-lg-inline-block">
+      <%= prepend_text %>
+    </span>
+  <% end %>
+
+  <% if include_future %>
+    <a
+      class="btn btn-outline-secondary btn-sm period-select-standard <%= "active" if @period == "next_week" %>"
+      href="<%= url_for(sortable_search_params.merge(period: "next_week")) %>"
+      data-period="next_week"
+    >
+      <span class="d-none d-md-inline-block"><%= t(".next") %></span>
+      <%= t(".seven_days") %>
+    </a>
+    <a
+      class="btn btn-outline-secondary btn-sm period-select-standard <%= "active" if @period == "next_month" %>"
+      href="<%= url_for(sortable_search_params.merge(period: "next_month")) %>"
+      data-period="next_month"
+    >
+      <span class="d-none d-md-inline-block"><%= t(".next") %></span>
+      <%= t(".thirty_days") %>
+    </a>
+  <% end %>
+
+  <a
+    class="btn btn-outline-secondary btn-sm period-select-standard <%= "active" if @period == "hour" %>"
+    href="<%= url_for(sortable_search_params.merge(period: "hour")) %>"
+    data-period="hour"
+  >
+    <span class="d-none d-md-inline-block"><%= t(".past") %></span>
+    <%= t(".hour") %>
+  </a>
+
+  <a
+    class="btn btn-outline-secondary btn-sm period-select-standard <%= "active" if @period == "day" %>"
+    href="<%= url_for(sortable_search_params.merge(period: "day")) %>"
+    data-period="day"
+  >
+    <span class="d-none d-md-inline-block"><%= t(".past") %></span>
+    <%= t(".day") %>
+  </a>
+
+  <a
+    class="btn btn-outline-secondary btn-sm period-select-standard <%= "active" if @period == "week" %>"
+    href="<%= url_for(sortable_search_params.merge(period: "week")) %>"
+    data-period="week"
+  >
+    <span class="d-none d-md-inline-block"><%= t(".past") %></span>
+    <%= t(".seven_days") %>
+  </a>
+
+  <a
+    class="btn btn-outline-secondary btn-sm period-select-standard <%= "active" if @period == "month" %>"
+    href="<%= url_for(sortable_search_params.merge(period: "month")) %>"
+    data-period="month"
+  >
+    <span class="d-none d-md-inline-block"><%= t(".past") %></span>
+    <%= t(".thirty_days") %>
+  </a>
+
+  <a
+    class="btn btn-outline-secondary btn-sm period-select-standard <%= "active" if @period == "year" %>"
+    href="<%= url_for(sortable_search_params.merge(period: "year")) %>"
+    data-period="year"
+  >
+    <span class="d-none d-md-inline-block"><%= t(".past") %></span>
+    <%= t(".year") %>
+  </a>
+
+  <a
+    class="btn btn-outline-secondary btn-sm period-select-standard <%= "active" if @period == "all" %>"
+    href="<%= url_for(sortable_search_params.merge(period: "all")) %>"
+    data-period="all"
+  >
+    <%= t(".all") %>
+  </a>
+
+  <button
+    id="periodSelectCustom"
+    class="btn btn-outline-secondary btn-sm ml-2 <%= "active" if @period == "custom" %>"
+    data-period="custom"
+  >
+    <%= t(".custom") %>
+  </button>
+</div>
+
+<form
+  id="timeSelectionCustom"
+  class="custom-time-selection mt-2 mb-2 collapse <%= @period == "custom" ? "in show" : "" %>"
+>
+  <div class="form-group">
+    <%= label_tag :start_time_selector, t(".from"), class: "control-label mr-2" %>
+    <%= datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control" %>
+  </div>
+
+  <div class="form-group end-time-contrtol">
+    <%= label_tag :end_time_selector, t(".to"), class: "control-label mr-2" %>
+    <%= datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control" %>
+  </div>
+
+  <button id="updatePeriodSelectCustom" class="btn btn-success btn-sm ml-2">
+    <%= t(".update") %>
+  </button>
+</form>

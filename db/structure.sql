@@ -3150,9 +3150,9 @@ CREATE TABLE public.recovery_displays (
     quote_by character varying(255),
     recovered_at timestamp without time zone,
     link character varying(255),
-    image character varying(255),
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    location_string character varying
 );
 
 
@@ -7150,6 +7150,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251210194656'),
+('20251117204111'),
 ('20251105020711'),
 ('20251101041451'),
 ('20250917185540'),

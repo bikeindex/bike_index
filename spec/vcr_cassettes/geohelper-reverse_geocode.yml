@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Mon, 14 Jul 2025 18:31:31 GMT
+      - Sat, 15 Nov 2025 21:47:45 GMT
       Pragma:
       - no-cache
       Expires:
@@ -31,21 +31,21 @@ http_interactions:
       Access-Control-Allow-Origin:
       - "*"
       Content-Security-Policy-Report-Only:
-      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:228:0
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:214:0
       Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to=msaifdggmnwc:228:0
+      - same-origin; report-to=msaifdggmnwc:214:0
       Report-To:
-      - '{"group":"msaifdggmnwc:228:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:228:0"}],}'
+      - '{"group":"msaifdggmnwc:214:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:214:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '26574'
+      - '29442'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=110
+      - gfet4t7; dur=120
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -90,7 +90,7 @@ http_interactions:
         : -106.3028157802915\n               }\n            }\n         },\n         \"navigation_points\"
         : \n         [\n            {\n               \"location\" : \n               {\n
         \                 \"latitude\" : 42.8487768,\n                  \"longitude\"
-        : -106.3014656\n               }\n            }\n         ],\n         \"place_id\"
+        : -106.3014525\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJd_2x8IC8YIcRXpq0Mx1lH78\",\n         \"types\" : \n         [\n            \"premise\",\n
         \           \"street_address\"\n         ]\n      },\n      {\n         \"address_components\"
         : \n         [\n            {\n               \"long_name\" : \"1740\",\n
@@ -127,7 +127,7 @@ http_interactions:
         : -106.3028106802915\n               }\n            }\n         },\n         \"navigation_points\"
         : \n         [\n            {\n               \"location\" : \n               {\n
         \                 \"latitude\" : 42.8487768,\n                  \"longitude\"
-        : -106.3014608\n               }\n            }\n         ],\n         \"place_id\"
+        : -106.3014525\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJ05jT_oC8YIcRE4qOVC2ScRo\",\n         \"plus_code\" : \n         {\n
         \           \"compound_code\" : \"RMXX+HC Casper, WY, USA\",\n            \"global_code\"
         : \"85JMRMXX+HC\"\n         },\n         \"types\" : \n         [\n            \"establishment\",\n
@@ -168,8 +168,8 @@ http_interactions:
         \           \"compound_code\" : \"RMXX+H6 Casper, WY, USA\",\n            \"global_code\"
         : \"85JMRMXX+H6\"\n         },\n         \"types\" : \n         [\n            \"street_address\"\n
         \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
-        \           {\n               \"long_name\" : \"1736\",\n               \"short_name\"
-        : \"1736\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \           {\n               \"long_name\" : \"1743\",\n               \"short_name\"
+        : \"1743\",\n               \"types\" : \n               [\n                  \"street_number\"\n
         \              ]\n            },\n            {\n               \"long_name\"
         : \"East 2nd Street\",\n               \"short_name\" : \"E 2nd St\",\n               \"types\"
         : \n               [\n                  \"route\"\n               ]\n            },\n
@@ -188,17 +188,54 @@ http_interactions:
         \              \"long_name\" : \"82601\",\n               \"short_name\" :
         \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
         \              ]\n            },\n            {\n               \"long_name\"
+        : \"3006\",\n               \"short_name\" : \"3006\",\n               \"types\"
+        : \n               [\n                  \"postal_code_suffix\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"1743 E 2nd
+        St, Casper, WY 82601, USA\",\n         \"geometry\" : \n         {\n            \"location\"
+        : \n            {\n               \"lat\" : 42.8486043,\n               \"lng\"
+        : -106.301418\n            },\n            \"location_type\" : \"ROOFTOP\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 42.8499532802915,\n                  \"lng\"
+        : -106.3000690197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 42.8472553197085,\n                  \"lng\"
+        : -106.3027669802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 42.8486509,\n                  \"longitude\"
+        : -106.3014182\n               }\n            }\n         ],\n         \"place_id\"
+        : \"ChIJt-mfWYC8YIcRxWxlB72Ns1w\",\n         \"types\" : \n         [\n            \"street_address\",\n
+        \           \"subpremise\"\n         ]\n      },\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"1736\",\n
+        \              \"short_name\" : \"1736\",\n               \"types\" : \n               [\n
+        \                 \"street_number\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"East 2nd Street\",\n               \"short_name\"
+        : \"E 2nd St\",\n               \"types\" : \n               [\n                  \"route\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Casper\",\n               \"short_name\" : \"Casper\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Natrona County\",\n               \"short_name\" : \"Natrona County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"82601\",\n               \"short_name\" :
+        \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
         : \"3007\",\n               \"short_name\" : \"3007\",\n               \"types\"
         : \n               [\n                  \"postal_code_suffix\"\n               ]\n
         \           }\n         ],\n         \"formatted_address\" : \"1736 E 2nd
         St, Casper, WY 82601, USA\",\n         \"geometry\" : \n         {\n            \"location\"
-        : \n            {\n               \"lat\" : 42.8487135,\n               \"lng\"
-        : -106.3015453\n            },\n            \"location_type\" : \"RANGE_INTERPOLATED\",\n
+        : \n            {\n               \"lat\" : 42.8487136,\n               \"lng\"
+        : -106.3015355\n            },\n            \"location_type\" : \"RANGE_INTERPOLATED\",\n
         \           \"viewport\" : \n            {\n               \"northeast\" :
-        \n               {\n                  \"lat\" : 42.85006248029149,\n                  \"lng\"
-        : -106.3001963197085\n               },\n               \"southwest\" : \n
-        \              {\n                  \"lat\" : 42.8473645197085,\n                  \"lng\"
-        : -106.3028942802915\n               }\n            }\n         },\n         \"place_id\"
+        \n               {\n                  \"lat\" : 42.8500625802915,\n                  \"lng\"
+        : -106.3001865197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 42.8473646197085,\n                  \"lng\"
+        : -106.3028844802915\n               }\n            }\n         },\n         \"place_id\"
         : \"EiQxNzM2IEUgMm5kIFN0LCBDYXNwZXIsIFdZIDgyNjAxLCBVU0EiGxIZChQKEgnN-tz4gLxghxET24QzkSIV3hDIDQ\",\n
         \        \"types\" : \n         [\n            \"street_address\"\n         ]\n
         \     },\n      {\n         \"address_components\" : \n         [\n            {\n
@@ -390,7 +427,7 @@ http_interactions:
         \              }\n            }\n         },\n         \"place_id\" : \"ChIJCzYy5IS16lQRQrfeQ5K5Oxw\",\n
         \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-  recorded_at: Mon, 14 Jul 2025 18:31:31 GMT
+  recorded_at: Sat, 15 Nov 2025 21:47:45 GMT
 - request:
     method: get
     uri: https://maps.googleapis.com/maps/api/geocode/json?key=<GOOGLE_GEOCODER>&language=en&latlng=42.8490197,-106.3015341&sensor=false
@@ -412,7 +449,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Mon, 14 Jul 2025 18:31:31 GMT
+      - Sat, 15 Nov 2025 21:47:45 GMT
       Pragma:
       - no-cache
       Expires:
@@ -422,21 +459,21 @@ http_interactions:
       Access-Control-Allow-Origin:
       - "*"
       Content-Security-Policy-Report-Only:
-      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:228:0
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:214:0
       Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to=msaifdggmnwc:228:0
+      - same-origin; report-to=msaifdggmnwc:214:0
       Report-To:
-      - '{"group":"msaifdggmnwc:228:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:228:0"}],}'
+      - '{"group":"msaifdggmnwc:214:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:214:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '26574'
+      - '29442'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=60
+      - gfet4t7; dur=47
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -481,7 +518,7 @@ http_interactions:
         : -106.3028157802915\n               }\n            }\n         },\n         \"navigation_points\"
         : \n         [\n            {\n               \"location\" : \n               {\n
         \                 \"latitude\" : 42.8487768,\n                  \"longitude\"
-        : -106.3014656\n               }\n            }\n         ],\n         \"place_id\"
+        : -106.3014525\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJd_2x8IC8YIcRXpq0Mx1lH78\",\n         \"types\" : \n         [\n            \"premise\",\n
         \           \"street_address\"\n         ]\n      },\n      {\n         \"address_components\"
         : \n         [\n            {\n               \"long_name\" : \"1740\",\n
@@ -518,7 +555,7 @@ http_interactions:
         : -106.3028106802915\n               }\n            }\n         },\n         \"navigation_points\"
         : \n         [\n            {\n               \"location\" : \n               {\n
         \                 \"latitude\" : 42.8487768,\n                  \"longitude\"
-        : -106.3014608\n               }\n            }\n         ],\n         \"place_id\"
+        : -106.3014525\n               }\n            }\n         ],\n         \"place_id\"
         : \"ChIJ05jT_oC8YIcRE4qOVC2ScRo\",\n         \"plus_code\" : \n         {\n
         \           \"compound_code\" : \"RMXX+HC Casper, WY, USA\",\n            \"global_code\"
         : \"85JMRMXX+HC\"\n         },\n         \"types\" : \n         [\n            \"establishment\",\n
@@ -559,8 +596,8 @@ http_interactions:
         \           \"compound_code\" : \"RMXX+H6 Casper, WY, USA\",\n            \"global_code\"
         : \"85JMRMXX+H6\"\n         },\n         \"types\" : \n         [\n            \"street_address\"\n
         \        ]\n      },\n      {\n         \"address_components\" : \n         [\n
-        \           {\n               \"long_name\" : \"1736\",\n               \"short_name\"
-        : \"1736\",\n               \"types\" : \n               [\n                  \"street_number\"\n
+        \           {\n               \"long_name\" : \"1743\",\n               \"short_name\"
+        : \"1743\",\n               \"types\" : \n               [\n                  \"street_number\"\n
         \              ]\n            },\n            {\n               \"long_name\"
         : \"East 2nd Street\",\n               \"short_name\" : \"E 2nd St\",\n               \"types\"
         : \n               [\n                  \"route\"\n               ]\n            },\n
@@ -579,17 +616,54 @@ http_interactions:
         \              \"long_name\" : \"82601\",\n               \"short_name\" :
         \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
         \              ]\n            },\n            {\n               \"long_name\"
+        : \"3006\",\n               \"short_name\" : \"3006\",\n               \"types\"
+        : \n               [\n                  \"postal_code_suffix\"\n               ]\n
+        \           }\n         ],\n         \"formatted_address\" : \"1743 E 2nd
+        St, Casper, WY 82601, USA\",\n         \"geometry\" : \n         {\n            \"location\"
+        : \n            {\n               \"lat\" : 42.8486043,\n               \"lng\"
+        : -106.301418\n            },\n            \"location_type\" : \"ROOFTOP\",\n
+        \           \"viewport\" : \n            {\n               \"northeast\" :
+        \n               {\n                  \"lat\" : 42.8499532802915,\n                  \"lng\"
+        : -106.3000690197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 42.8472553197085,\n                  \"lng\"
+        : -106.3027669802915\n               }\n            }\n         },\n         \"navigation_points\"
+        : \n         [\n            {\n               \"location\" : \n               {\n
+        \                 \"latitude\" : 42.8486509,\n                  \"longitude\"
+        : -106.3014182\n               }\n            }\n         ],\n         \"place_id\"
+        : \"ChIJt-mfWYC8YIcRxWxlB72Ns1w\",\n         \"types\" : \n         [\n            \"street_address\",\n
+        \           \"subpremise\"\n         ]\n      },\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"1736\",\n
+        \              \"short_name\" : \"1736\",\n               \"types\" : \n               [\n
+        \                 \"street_number\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"East 2nd Street\",\n               \"short_name\"
+        : \"E 2nd St\",\n               \"types\" : \n               [\n                  \"route\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Casper\",\n               \"short_name\" : \"Casper\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Natrona County\",\n               \"short_name\" : \"Natrona County\",\n
+        \              \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Wyoming\",\n               \"short_name\"
+        : \"WY\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"82601\",\n               \"short_name\" :
+        \"82601\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
         : \"3007\",\n               \"short_name\" : \"3007\",\n               \"types\"
         : \n               [\n                  \"postal_code_suffix\"\n               ]\n
         \           }\n         ],\n         \"formatted_address\" : \"1736 E 2nd
         St, Casper, WY 82601, USA\",\n         \"geometry\" : \n         {\n            \"location\"
-        : \n            {\n               \"lat\" : 42.8487135,\n               \"lng\"
-        : -106.3015453\n            },\n            \"location_type\" : \"RANGE_INTERPOLATED\",\n
+        : \n            {\n               \"lat\" : 42.8487136,\n               \"lng\"
+        : -106.3015355\n            },\n            \"location_type\" : \"RANGE_INTERPOLATED\",\n
         \           \"viewport\" : \n            {\n               \"northeast\" :
-        \n               {\n                  \"lat\" : 42.85006248029149,\n                  \"lng\"
-        : -106.3001963197085\n               },\n               \"southwest\" : \n
-        \              {\n                  \"lat\" : 42.8473645197085,\n                  \"lng\"
-        : -106.3028942802915\n               }\n            }\n         },\n         \"place_id\"
+        \n               {\n                  \"lat\" : 42.8500625802915,\n                  \"lng\"
+        : -106.3001865197085\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 42.8473646197085,\n                  \"lng\"
+        : -106.3028844802915\n               }\n            }\n         },\n         \"place_id\"
         : \"EiQxNzM2IEUgMm5kIFN0LCBDYXNwZXIsIFdZIDgyNjAxLCBVU0EiGxIZChQKEgnN-tz4gLxghxET24QzkSIV3hDIDQ\",\n
         \        \"types\" : \n         [\n            \"street_address\"\n         ]\n
         \     },\n      {\n         \"address_components\" : \n         [\n            {\n
@@ -781,5 +855,5 @@ http_interactions:
         \              }\n            }\n         },\n         \"place_id\" : \"ChIJCzYy5IS16lQRQrfeQ5K5Oxw\",\n
         \        \"types\" : \n         [\n            \"country\",\n            \"political\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-  recorded_at: Mon, 14 Jul 2025 18:31:31 GMT
+  recorded_at: Sat, 15 Nov 2025 21:47:45 GMT
 recorded_with: VCR 6.3.1

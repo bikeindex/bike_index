@@ -1,0 +1,219 @@
+<script>
+  var anchor, idx, url, $target;
+  url = window.location.href;
+  idx = url.indexOf('#');
+  if (idx !== -1) {
+    anchor = url.substring(idx + 1);
+    $(document).ready(function() {
+      $target = $("#" + anchor);
+      $target.collapse('show');
+      $('body').animate({ scrollTop: $target.offset().top - 120 }, 'fast');
+    });
+  }
+</script>
+
+<article>
+  <div class="faq-block" id="main-faq-block">
+    <h3><%= t(".faqs") %></h3>
+
+    <dl>
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#who-can-register" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".who_can_register_bikes") %>
+        </a>
+      </dt>
+
+      <dd id="who-can-register" class="collapse">
+        <p><%= t(".everyone_can_register_bikes_for_free") %></p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#how-verify" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".how_bikes_are_verified") %>
+        </a>
+      </dt>
+
+      <dd id="how-verify" class="collapse">
+        <p>
+          <%= t(".registration_html", partner_link: link_to(t(".partner_link"), where_url)) %>
+        </p>
+
+        <p><%= t(".verification_questions") %></p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#bike-by-serial" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".can_you_tell_me_what_bike_by_serial") %>
+        </a>
+      </dt>
+
+      <dd id="bike-by-serial" class="collapse">
+        <p><%= t(".not_yet") %></p>
+        <p><%= t(".we_recommend_searching") %></p>
+
+        <%= form_tag bikes_path, method: :get do %>
+          <%= text_field_tag :serial,
+          params[:serial],
+          placeholder: t(".bike_serial_number"),
+          class: 'faq-search-search-field' %>
+
+          <%= button_tag(type: "submit", class: "searchit") do %>
+            <%= image_tag "stolen/search.svg" %>
+          <% end %>
+        <% end %>
+
+        <p><%= t(".similar_serials") %></p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#what-if-i-sell" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".what_if_i_sell_my_bike") %>
+        </a>
+      </dt>
+
+      <dd id="what-if-i-sell" class="collapse">
+        <p><%= t(".free_to_transfer") %></p>
+
+        <p class="steps"><%= t(".go_to_edit_page") %></p>
+
+        <p class="steps"><%= t(".reveal_owner_email_html") %></p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#how-vendor" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".can_partner_with_bikeindex") %>
+        </a>
+      </dt>
+
+      <dd id="how-vendor" class="collapse">
+        <p><%= t(".absolutely") %></p>
+
+        <p>
+          <%= t(".organization_signup_html", signup_link: link_to(t(".organization_signup_link"), new_organization_path)) %>
+        </p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#how-advertising" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".how_can_i_advertise") %>
+        </a>
+      </dt>
+
+      <dd id="how-advertising" class="collapse">
+        <p><%= t(".in_the_process_of_setting_up_advertising") %></p>
+
+        <p>
+          <%= t(".email_us_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
+        </p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#already-stolen" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".bike_was_already_stolen") %>
+        </a>
+      </dt>
+
+      <dd id="already-stolen" class="collapse">
+        <p><strong><%= t(".add_details") %></strong></p>
+        <p><%= t(".comprehensive_public_database") %></p>
+
+        <p>
+          <%= t(".visit_or_add_html", add_link: link_to(t(".add_a_stolen_bike_link"), new_bike_url(status: "stolen"))) %>
+        </p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a
+          class="collapsed"
+          href="#does-this-prevent-theft"
+          data-toggle="collapse"
+        >
+          <span>&#x25B6;</span>
+          <%= t(".how_does_this_prevent_bike_theft") %>
+        </a>
+      </dt>
+
+      <dd id="does-this-prevent-theft" class="collapse">
+        <p><%= t(".people_with_good_intentions") %></p>
+        <p><%= t(".bike_index_is_that_resource") %></p>
+        <p><%= t(".we_offer_bike_shops") %></p>
+        <p><%= t(".we_successfully_recover") %></p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#kit-bro" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".how_can_i_stay_up_to_date") %>
+        </a>
+      </dt>
+
+      <dd id="kit-bro" class="collapse">
+        <p>
+          <%= t(".read_our_blog_html", blog_link: link_to(t(".blog_link"), blogs_url)) %>
+        </p>
+
+        <p>
+          <%= t(".follow_us_html", twitter_link: link_to("Twitter", "https://twitter.com/BikeIndex"), facebook_link: link_to("Facebook", "https://facebook.com/bikeindex")) %>
+        </p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#used-for-evil" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".can_thieves_search") %>
+        </a>
+      </dt>
+
+      <dd id="used-for-evil" class="collapse">
+        <p><%= t(".possible_but_uncommon") %></p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#what-about-privacy" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".what_about_my_privacy") %>
+        </a>
+      </dt>
+
+      <dd id="what-about-privacy" class="collapse">
+        <p><%= t(".your_personal_information_is_never_viewed") %></p>
+        <p><%= t(".bikes_are_public_and_searchable") %></p>
+
+        <p>
+          <%= t(".to_learn_more_html", article_link: link_to(t(".article_link"), "https://www.bikeindex.org/news/privacy-on-the-bike-index")) %>
+        </p>
+      </dd>
+
+      <dt class="collapse-faq">
+        <a class="collapsed" href="#public-serials" data-toggle="collapse">
+          <span>&#x25B6;</span>
+          <%= t(".why_public") %>
+        </a>
+      </dt>
+
+      <dd id="public-serials" class="collapse">
+        <p>
+          <strong><%= t(".serial_numbers_public") %></strong>
+          <%= t(".the_faster_and_easier_it_is") %>
+        </p>
+
+        <p><%= t(".this_isnt_optimistic_speculation") %></p>
+        <p><%= t(".weve_recovered_bikes") %></p>
+
+        <p>
+          <%= t(".other_registries_html", wikipedia_link: link_to(t(".security_by_obscurity_link"), "https://en.wikipedia.org/wiki/Security_through_obscurity")) %>
+        </p>
+
+        <p><%= t(".while_serial_numbers") %></p>
+        <p><%= t(".we_care_about_your_privacy") %></p>
+      </dd>
+    </dl>
+  </div>
+</article>

@@ -9,6 +9,9 @@ task run_scheduler: :environment do
 end
 
 task read_logged_searches: :environment do
+  # Throw an error if ripgrep isn't installed
+  abort("ripgrep (rg) is not installed") unless system("rg --version > /dev/null 2>&1")
+
   LogSearcher::Reader.write_log_lines(Time.current)
   LogSearcher::Reader.write_log_lines(Time.current - 1.hour)
 end

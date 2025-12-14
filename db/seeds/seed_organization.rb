@@ -32,7 +32,7 @@ feature_name_and_slugs = [
   {name: "Organization Views: Bulk Import stolen", feature_slugs: ["show_bulk_import_stolen"]},
   {name: "Law Enforcement functionality", feature_slugs: ["unstolen_notifications", "additional_registrations_information", "hot_sheet", "show_recoveries", "credibility_badges", "organization_stolen_message"]},
   {name: "Registration field: Student ID", feature_slugs: ["reg_student_id"]},
-  {name: "Registration field: Student ID - REQUIRED", feature_slugs: ["reg_student_id", "require_student_id"]},
+  {name: "Registration field: Student ID - REQUIRED", feature_slugs: ["reg_student_id", "require_reg_student_id"]},
   {name: "E-Vehicle Model Audits", feature_slugs: ["model_audits"]}
 ]
 feature_ids = []

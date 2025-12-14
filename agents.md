@@ -57,6 +57,7 @@ This project also uses the ViewComponent gem to render components.
 - Prefer view components to partials
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`
 - View components must initialize with keyword arguments
+- In view components, prefer instance variables to attr_accessor
 
 # Initial setup
 

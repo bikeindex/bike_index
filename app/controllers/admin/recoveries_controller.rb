@@ -55,12 +55,12 @@ class Admin::RecoveriesController < Admin::BaseController
       recoveries = recoveries.where(recovery_display_status: @recovery_display_status)
     end
 
-    if InputNormalizer.boolean(params[:search_shareable])
+    if Binxtils::InputNormalizer.boolean(params[:search_shareable])
       @shareable = true
       recoveries = recoveries.can_share_recovery
     end
 
-    if InputNormalizer.boolean(params[:search_index_helped_recovery])
+    if Binxtils::InputNormalizer.boolean(params[:search_index_helped_recovery])
       @index_helped_recovery = true
       recoveries = recoveries.where(index_helped_recovery: true)
     end

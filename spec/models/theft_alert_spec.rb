@@ -51,13 +51,14 @@ RSpec.describe TheftAlert, type: :model do
     end
     context "is activateable" do
       # let(:bike) { FactoryBot.create(:bike) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver, approved: true) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, :in_vancouver, approved:) }
+      let(:approved) { false }
       let(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, facebook_data: {}) }
       it "is truthy" do
         expect(theft_alert.reload.missing_location?).to be_falsey
         expect(stolen_record.reload.images_attached?).to be_truthy
         expect(theft_alert.missing_photo?).to be_falsey
-        expect(theft_alert.stolen_record_approved?).to be_truthy
+        expect(theft_alert.stolen_record_approved?).to be_falsey
         expect(theft_alert.paid?).to be_truthy
         expect(theft_alert.activateable?).to be_truthy
         expect(theft_alert.posted?).to be_falsey
@@ -74,22 +75,32 @@ RSpec.describe TheftAlert, type: :model do
         stolen_record.update(receive_notifications: false)
         expect(theft_alert.reload.notify?).to be_falsey
       end
-      context "bike user hidden" do
-        let!(:bike) { stolen_record.reload.bike }
-        it "is falsey" do
-          bike.update(user_hidden: true)
-          expect(bike.reload.current?).to be_falsey
-          expect(Bike.where(id: bike.id).count).to eq 0 # Because default scope
-          expect(theft_alert.reload.missing_location?).to be_falsey
-          expect(stolen_record.reload.images_attached?).to be_truthy
-          expect(theft_alert.missing_photo?).to be_falsey
+      context "approved" do
+        let(:approved) { true }
+        it "is truthy" do
+          expect(theft_alert.reload.paid?).to be_truthy
+          expect(theft_alert.activateable_except_approval?).to be_truthy
+          expect(theft_alert.activateable?).to be_truthy
           expect(theft_alert.stolen_record_approved?).to be_truthy
-          expect(theft_alert.paid?).to be_truthy
-          expect(theft_alert.activateable?).to be_falsey
-          expect(theft_alert.bike).to be_present
-          theft_alert.update(status: :inactive)
-          expect(theft_alert.reload.failed_to_activate?).to be_falsey
-          expect(theft_alert.manual_override_inactive?).to be_truthy
+          expect(theft_alert.posted?).to be_falsey
+        end
+        context "bike user hidden" do
+          let!(:bike) { stolen_record.reload.bike }
+          it "is falsey" do
+            bike.update(user_hidden: true)
+            expect(bike.reload.current?).to be_falsey
+            expect(Bike.where(id: bike.id).count).to eq 0 # Because default scope
+            expect(theft_alert.reload.missing_location?).to be_falsey
+            expect(stolen_record.reload.images_attached?).to be_truthy
+            expect(theft_alert.missing_photo?).to be_falsey
+            expect(theft_alert.stolen_record_approved?).to be_truthy
+            expect(theft_alert.paid?).to be_truthy
+            expect(theft_alert.activateable?).to be_falsey
+            expect(theft_alert.bike).to be_present
+            theft_alert.update(status: :inactive)
+            expect(theft_alert.reload.failed_to_activate?).to be_falsey
+            expect(theft_alert.manual_override_inactive?).to be_truthy
+          end
         end
       end
     end

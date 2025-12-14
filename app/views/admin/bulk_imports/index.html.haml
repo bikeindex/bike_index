@@ -33,7 +33,7 @@
       %li.nav-item
         = link_to "New bulk import", new_admin_bulk_import_url, class: "nav-link"
 
-  = render partial: "/shared/admin/current_header", locals: { viewing: "Bulk imports" }
+  = render_admin_current_header(viewing: "Bulk imports")
 
 = column_chart time_range_counts(collection: matching_bulk_imports), stacked: true, thousands: ","
 
@@ -61,7 +61,7 @@
 .mt-4
   = render partial: "/shared/period_select"
 
-= render partial: "/shared/admin/pagination", locals: {collection: @bulk_imports, count: matching_bulk_imports.size}
+= render_admin_pagination_with_count(collection: @bulk_imports, count: matching_bulk_imports.size)
 
 -# require inline CSS setting because of caching
 - unless display_dev_info?

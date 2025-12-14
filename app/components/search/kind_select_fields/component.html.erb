@@ -3,20 +3,19 @@
   data-search--kind-select-fields-api-count-url-value="<%= api_count_url %>"
   data-search--kind-select-fields-option-kinds-value="<%= option_kind.to_s %>"
 >
-
   <div
-    class="
-      tw:mt-5 tw:sm:mt-2 tw:flex tw:flex-wrap tw:sm:flex-nowrap tw:w-full tw:sm:w-min
-      tw:ml-auto <%= location_initially_shown? ? '' : 'tw:hidden' %>
-    "
+    class="tw:mt-5 tw:ml-auto tw:flex tw:w-full tw:flex-wrap tw:sm:mt-2 tw:sm:w-min tw:sm:flex-nowrap <%= location_initially_shown? ? '' : 'tw:hidden' %>"
     data-search--kind-select-fields-target="locationWrap"
   >
-
     <span class="tw:flex tw:flex-nowrap">
-      <span class="tw:block tw:py-1.5 tw:mr-2"><%= translation(".within") %></span>
+      <span class="tw:mr-2 tw:block tw:py-1.5">
+        <%= translation(".within") %>
+      </span>
+
       <%= label_tag :distance,
       translation(".search_distance"),
       class: "twlabel tw:sr-only" %>
+
       <%= number_field_tag :distance,
       @distance,
       :placeholder => default_distance,
@@ -24,11 +23,16 @@
       :class => "twinput tw:mr-2 tw:min-w-20 fieldResetsCounts",
       "data-search--kind-select-fields-target" => "distance" %>
     </span>
-    <span class="tw:flex tw:flex-nowrap tw:mt-3 tw:sm:mt-0">
-      <span class="tw:block tw:text-nowrap tw:py-1.5 tw:mr-2"><%= translation(".miles_of") %></span>
+
+    <span class="tw:mt-3 tw:flex tw:flex-nowrap tw:sm:mt-0">
+      <span class="tw:mr-2 tw:block tw:py-1.5 tw:text-nowrap">
+        <%= translation(".miles_of") %>
+      </span>
+
       <%= label_tag :location,
       translation(".search_location"),
       class: "twlabel tw:sr-only" %>
+
       <%= text_field_tag :location,
       @location,
       :placeholder => translation(".search_location"),
@@ -39,8 +43,8 @@
 
   <ul
     class="
-      tw:items-center tw:w-full tw:text-sm tw:font-medium tw:text-gray-900 tw:md:flex
-      tw:dark:text-white tw:mt-6
+      tw:mt-6 tw:w-full tw:items-center tw:text-sm tw:font-medium
+      tw:text-gray-900 tw:md:flex tw:dark:text-white
     "
   >
     <% kind_options.each do |opt| %>

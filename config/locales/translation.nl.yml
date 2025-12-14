@@ -118,8 +118,6 @@ nl:
       carrierwave_download_error: kan niet worden gedownload
       rmagick_processing_error: 'Mislukt om te manipuleren met rmagick, misschien
         is het geen afbeelding? Oorspronkelijke fout: %{e}'
-      mini_magick_processing_error: 'Mislukken om te manipuleren met MiniMagick, misschien
-        is het geen afbeelding? Oorspronkelijke fout: %{e}'
       record_invalid: 'Validatie mislukt: %{errors}'
       invalid_currency: moet een geldige valuta zijn (bijvoorbeeld '100', '5 %{decimal}
         24' of '123 %{thousands} 456 %{decimal} 78'). Kreeg %{currency}
@@ -133,11 +131,14 @@ nl:
       content_type_allowlist_error: 'Je mag geen %{content_type}-bestanden uploaden,
         toegestane typen: %{allowed_types}'
       content_type_denylist_error: U mag geen %{content_type}-bestanden uploaden
-      vips_processing_error: 'Kan niet worden gemanipuleerd met vips, misschien is
-        het geen afbeelding? Oorspronkelijke fout: %{e}'
       min_size_error: Bestandsgrootte moet groter zijn dan %{min_size}
       max_size_error: Bestandsgrootte moet kleiner zijn dan %{max_size}
       password_too_long: is te lang
+      processing_error: Het bewerken is mislukt, misschien is het geen afbeelding?
+      min_width_error: De breedte van de afbeelding moet groter zijn dan %{min_width}px
+      max_width_error: De breedte van de afbeelding moet kleiner zijn dan %{max_width}px
+      min_height_error: De hoogte van de afbeelding moet groter zijn dan %{min_height}px
+      max_height_error: De hoogte van de afbeelding moet kleiner zijn dan %{max_height}px
     template:
       body: 'Er zijn problemen met de volgende velden:'
       header:
@@ -3957,12 +3958,6 @@ nl:
       used_by_law_enforcement_everywhere: Overal gebruikt door wetshandhavers
       with_over_registrations_and_almost: Met meer dan %{registrations} registraties
         en %{stolen_recoveries} gestolen fietsen weten we hoe we kunnen helpen.
-    for_organizations_photo_list:
-      bike_shops: Fietsenwinkels
-      cities: Steden
-      community_groups: Community's
-      for: Voor
-      schools: scholen
     for_schools:
       bike_index_for_universities: Fietsindex voor universiteiten
       bike_index_users_provide: Bike Index-gebruikers verstrekken serienummers, eigendomsbewijzen
@@ -5076,6 +5071,10 @@ nl:
       search_owner_email: Zoek eigenaar e-mail
       submit: Voorleggen
       within: binnen
+    recovery_display:
+      bike: Fiets
+      recovered_date: hersteld %{date}
+      translated_from_english: vertaald uit het Engels
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5163,36 +5162,14 @@ nl:
       come_back_soon: Kom snel terug!
       youve_been_logged_out: U bent uitgelogd
     index:
-      alert_the_community: Waarschuw de community
       bike_index_statistics: Bike Index-statistieken
       bikes_registered_this_week: Fietsen zijn deze week geregistreerd
-      but_how_does_it_work: Maar hoe werkt het?
-      hero: De fietsregistratie die werkt
-      how_it_works: Het is makkelijk. Voer je naam, fietsfabrikant, framenummer en
-        overige informatie in, om je fiets te registreren bij het meest gebruikte
-        fietsregister ter wereld.
-      identifying_your_bike: Een gebruiker of partner van Bike Index komt jouw fiets
-        tegen, gebruikt Bike Index om de fiets te identificeren en kan dan contact
-        met je opnemen.
-      if_your_bike_goes_missing: Als je fiets gestolen wordt of vermist raakt, markeer
-        deze dan als gestolen of verloren om de Bike Index community en haar partners
-        hierover te informeren.
       partner_organizations: Partnerorganisaties
-      read_more_recovery_stories: Lees meer herstelverhalen
-      recover_your_bike_for_free: Met de hulp van de Bike Index community en haar
-        partners beschik je over de informatie die je nodig hebt om jouw gestolen
-        of verloren fiets (kosteloos) terug te krijgen. Dit is wat we doen.
-      register_now: Registreer nu!
-      register_your_bike: Registreer uw fiets
       stolen_bikes_recovered: Gestolen fietsen hersteld
       stolen_bikes_registered: Gestolen fietsen geregistreerd
-      the_community_responds: De community reageert
       total_bikes_registered: Totaal aantal geregistreerde fietsen
       total_recovery_value: Totale herstelwaarde
       used_by: Gebruikt door
-      value_of_bikes_recovered: Meer dan %{value} aan fietsen die teruggevonden zijn
-      you_get_your_bike_back: U krijgt uw fiets terug
-      recent_recovery_stories: 'Gestolen fietsen die we onlangs hebben helpen herstellen:'
     recovery_stories:
       recovery_stories: Verhalen over teruggekregen fietsen
     update_browser:
@@ -5281,50 +5258,10 @@ nl:
       electric_motorized: Elektrisch (gemotoriseerd)
   organizations:
     embed:
-      add_a_color: Voeg een kleur toe
-      additional_serial: Extra framenummer / stickernummer
-      choose_color: Kies een kleur
-      choose_country: Kies land
-      city: City
       currently_registering_a_nonstolen_bike: Momenteel wordt een niet-gestolen fiets
         geregistreerd. Klik hier om in plaats daarvan een STOLEN-fiets te registreren.
-      department_city: Afdeling & stad
-      description_of_the_theft: Beschrijving van de diefstal
-      eg_if_we_tweet_about_or_someone_searches: bijvoorbeeld als we tweeten of iemand
-        zoekt naar het framenummer
-      filing_a_police_report_is_important_html: Het indienen van een <strong>politierapport</strong>
-        is <span class="stolen-color">uiterst belangrijk</span> voor het herstel van
-        gestolen fietsen.
-      frame_color: Framekleur
-      image_has_been_uploaded: Afbeelding is geüpload
-      intersection_or_address: Kruising of adres
-      manufacturer_name: Naam van de fabrikant
-      model_year: Modeljaar
-      optional_upload_a_photo: Optioneel - upload een foto
-      other_manufacturer: Andere fabrikant
-      police_report_number: Nummer politie rapport
-      receive_notifications_from_bike_index: Ontvang meldingen van de Index over deze
-        gestolen %{bike_type}
-      register: Registreer
       registering_a_stolen_bike_click_here: Een gestolen fiets registreren. Klik hier
         om een niet-gestolen fiets te registreren
-      remove_color: Verwijder kleur
-      secondary_color: Secundaire Kleur
-      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
-        niet wordt vermeld
-      state: Staat
-      third_color: Derde kleur
-      this: deze
-      unknown_serial: Onbekende serie
-      unknown_year: Onbekend jaar
-      unsure_or_unknown: Onzeker of onbekend
-      when_was_it_stolen: Wanneer is het gestolen?
-      where_was_it_stolen: Waar is het gestolen?
-      your_email_address: Uw e-mailadres
-      your_phone_number: Je telefoonnummer
-      zipcode: Postcode
-      sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
-      student_id: Student-ID
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} is bij u geregistreerd via <strong>%{org_name}</strong>
         ."
@@ -5332,35 +5269,14 @@ nl:
       your_bike_has_been_added_to_bike_index: Uw %{bike_type} is toegevoegd aan Bike
         Index!
     embed_extended:
-      add_a_color: Voeg een kleur toe
-      additional_serial: Extra framenummer / stickernummer
       any_extra_words: Nog extra woorden?
-      choose_color: Kies een kleur
       choose_handlebar: Kies stuur
       choose_material: Kies materiaal
-      choose_photo: Kies foto
-      frame_color: Framekleur
-      image_has_been_uploaded: Afbeelding is geüpload
-      manufacturer_name: Naam van de fabrikant
-      model_year: Modeljaar
-      optional_additions: Optionele toevoegingen
-      org_affiliation: "%{org_name} aansluiting"
       other_defining_features: Andere bepalende kenmerken
-      other_manufacturer: Andere fabrikant
-      owners_email_address: E-mailadres van de eigenaar
-      owners_phone: Telefoon van de eigenaar
       primary_frame_material: Primair framemateriaal
-      register_this: Registreer dit
-      remove_color: Verwijder kleur
-      secondary_color: Secundaire Kleur
-      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
-        niet wordt vermeld
-      third_color: Derde kleur
-      unknown_serial: Onbekende serie
-      unknown_year: Onbekend jaar
-      unsure_or_unknown: Onzeker of onbekend
-      sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
-      student_id: Student-ID
+      handlebar_type: Type stuur
+      optional: optioneel
+      phone_number_owner: Telefoon van de eigenaar
     new:
       bike_index_for_organizations: Bike Index voor organisaties
     new_form:
@@ -5386,6 +5302,53 @@ nl:
       you_are_already_a_member_of_org_html: Je bent al lid van %{org_link}.
       your_current_account_will_be_a_member_html: Uw huidige account ( <strong>%{user_email}</strong>
         ) wordt lid van de organisatie die u maakt.
+    embed_fields:
+      add_a_color: Voeg een kleur toe
+      additional_serial: Extra framenummer / stickernummer
+      choose_color: Kies een kleur
+      choose_country: Kies land
+      city: City
+      department_city: Afdeling & stad
+      description_of_the_theft: Beschrijving van de diefstal
+      eg_if_we_tweet_about_or_someone_searches: bijvoorbeeld als we tweeten of iemand
+        zoekt naar het framenummer
+      email_address_owner: E-mailadres van de eigenaar
+      email_address_you: Uw e-mailadres
+      filing_a_police_report_is_important_html: Het indienen van een <strong>politierapport</strong>
+        is <span class="stolen-color">uiterst belangrijk</span> voor het herstel van
+        gestolen fietsen.
+      frame_color: Framekleur
+      frame_model: Frame-model
+      image_has_been_uploaded: Afbeelding is geüpload
+      intersection_or_address: Kruising of adres
+      manufacturer_name: Naam van de fabrikant
+      model_year: Modeljaar
+      optional: optioneel
+      optional_upload_a_photo: Optioneel - upload een foto
+      org_affiliation: "%{org_name} aansluiting"
+      other_manufacturer: Andere fabrikant
+      phone_number_owner: Telefoon van de eigenaar
+      phone_number_you: Je telefoonnummer
+      please_wait: Even geduld, verwerking
+      police_report_number: Nummer politie rapport
+      receive_notifications_from_bike_index: Ontvang meldingen van de Index over deze
+        gestolen %{bike_type}
+      register: Registreer
+      remove_color: Verwijder kleur
+      secondary_color: Secundaire framekleur
+      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
+        niet wordt vermeld
+      state: Staat
+      sticker_id: Sticker-ID
+      student_id: Student-ID
+      third_color: Derde kleur
+      this: deze
+      unknown_serial: Onbekende serie
+      unknown_year: Onbekend jaar
+      unsure_or_unknown: Onzeker of onbekend
+      when_was_it_stolen: Wanneer is het gestolen?
+      where_was_it_stolen: Waar is het gestolen?
+      zipcode: Postcode
   feedbacks:
     form:
       email_address: E-mailadres
@@ -5419,11 +5382,6 @@ nl:
     show:
       by: Door
       also_published: 'Ook gepubliceerd op:'
-  recovery_displays:
-    recovery_display:
-      bike: Fiets
-      recovered_date: hersteld %{date}
-      translated_from_english: vertaald uit het Engels
   stolen:
     index:
       ambassador: Ambassadeur
@@ -6062,15 +6020,6 @@ nl:
     definition_list:
       row:
         no_value: geen
-    page_section:
-      marketplace_listing_panel:
-        condition: Voorwaarde
-        description: Beschrijving
-        first_posted_at: Geplaatst
-        location: Plaats
-        price_is_firm_false: prijs is onderhandelbaar
-        price_is_firm_true: prijs is vast
-        still_for_sale_at: Nog steeds te koop bij
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
         dit %{object_name} wordt opgeslagen:"
@@ -6091,8 +6040,16 @@ nl:
         registered_not_stolen: geregistreerd, niet gestolen
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
-    org:
-      bike_access_panel:
+    page_block:
+      marketplace_listing_panel:
+        condition: Voorwaarde
+        description: Beschrijving
+        first_posted_at: Geplaatst
+        location: Plaats
+        price_is_firm_false: prijs is onderhandelbaar
+        price_is_firm_true: prijs is vast
+        still_for_sale_at: Nog steeds te koop bij
+      org_bike_access_panel:
         access_panel: Toegangspaneel
         added_to_track_parking_notification: Deze %{bike_type} is niet geregistreerd
           bij een gebruiker. Het is toegevoegd om parkeermeldingen te volgen.
@@ -6165,3 +6122,9 @@ nl:
           op in het onderstaande veld
         write_a_message: Schrijf een bericht
         zipcode: Postcode
+      homepage_for_buttons:
+        bike_shops: Fietsenwinkels
+        cities: Steden
+        community_groups: Community's
+        schools: scholen
+        theft_victims: Slachtoffers van diefstal

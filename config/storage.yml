@@ -10,12 +10,15 @@ local:
 
 cloudflare_dev:
   service: S3
-  endpoint: <%= ENV["R2_ENDPOINT"] %>
-  access_key_id: <%= ENV["R2_ACCESS_KEY"] %>
-  secret_access_key: <%= ENV["R2_ACCESS_KEY_SECRET"] %>
+  endpoint: <%= ENV["R2_DEV_ENDPOINT"] %>
+  access_key_id: <%= ENV["R2_DEV_ACCESS_KEY"] %>
+  secret_access_key: <%= ENV["R2_DEV_ACCESS_KEY_SECRET"] %>
   bucket: bikeindex-dev
   region: auto
   public: true
+  # When upgrading S3, this will need to be uncommented
+  # request_checksum_calculation: "when_required"
+  # response_checksum_validation: "when_required"
 
 cloudflare_production:
   service: S3
@@ -25,3 +28,6 @@ cloudflare_production:
   bucket: bikeindex
   region: auto
   public: true
+  # When upgrading S3, this will need to be uncommented
+  # request_checksum_calculation: "when_required"
+  # response_checksum_validation: "when_required"
