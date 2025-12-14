@@ -86,8 +86,7 @@ module API
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
             is_new: params[:is_new],
-            doorkeeper_app_id: doorkeeper_application.id,
-            # ios_version:
+            ios_version: 'dd'
           }.as_json
         end
 
@@ -260,7 +259,8 @@ module API
           found_bike = owner_duplicate_bike unless add_duplicate
           # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
-            b_param = BParam.new(creator_id: creation_user_id, params: declared_p.as_json, origin: origin_api_version)
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p.as_json, origin: origin_api_version,
+              doorkeeper_app_id: doorkeeper_application.id)
             b_param.clean_params
             @bike = found_bike
             authorize_bike_for_user
@@ -289,7 +289,7 @@ module API
             return created_bike_serialized(@bike.reload, false)
           end
           b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
-            params: declared_p.merge(creation_state_params).as_json)
+            params: declared_p.merge(creation_state_params).as_json, doorkeeper_app_id: doorkeeper_application.id)
           b_param.save
           bike = BikeServices::Creator.new.create_bike(b_param)
 
