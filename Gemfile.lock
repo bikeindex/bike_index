@@ -142,7 +142,7 @@ GEM
       racc
     buftok (0.2.0)
     builder (3.3.0)
-    bullet (8.0.1)
+    bullet (8.1.0)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11)
     byebug (12.0.0)
@@ -715,8 +715,6 @@ GEM
       google-protobuf (~> 4.29)
     sass-embedded (1.85.0-x86_64-linux-gnu)
       google-protobuf (~> 4.29)
-    secure_headers (2.5.3)
-      user_agent_parser
     securerandom (0.4.1)
     selenium-webdriver (4.35.0)
       base64 (~> 0.2)
@@ -821,9 +819,8 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.1.0)
     unicode_utils (1.4.0)
-    uniform_notifier (1.16.0)
+    uniform_notifier (1.18.0)
     uri (1.1.1)
-    user_agent_parser (2.7.0)
     useragent (0.16.11)
     vcr (6.3.1)
       base64
@@ -947,7 +944,6 @@ DEPENDENCIES
   rspec_junit_formatter
   ruby-lsp
   ruby-vips
-  secure_headers (~> 2.5.0)
   selenium-webdriver
   sidekiq
   sidekiq-failures

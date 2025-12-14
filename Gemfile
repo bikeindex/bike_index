@@ -12,7 +12,6 @@ gem "csv"
 gem "observer"
 gem "prime"
 gem "openssl" # stuff breaks without this, 2025-10
-# Maybe ^ can be removed after 3.4 upgrade? Added to silence deprecation warnings
 
 gem "rails"
 
@@ -28,7 +27,6 @@ gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
 gem "rack-throttle" # Rate limiting
-gem "secure_headers", "~> 2.5.0"
 
 # Speed, performance, etc
 gem "fast_blank"
