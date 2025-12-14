@@ -3,21 +3,22 @@
 # Table name: b_params
 # Database name: primary
 #
-#  id              :integer          not null, primary key
-#  bike_errors     :text
-#  bike_title      :string(255)
-#  email           :string
-#  id_token        :text
-#  image           :string(255)
-#  image_processed :boolean          default(FALSE)
-#  image_tmp       :string(255)
-#  origin          :string
-#  params          :jsonb
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  created_bike_id :integer
-#  creator_id      :integer
-#  organization_id :integer
+#  id                :integer          not null, primary key
+#  bike_errors       :text
+#  bike_title        :string(255)
+#  email             :string
+#  id_token          :text
+#  image             :string(255)
+#  image_processed   :boolean          default(FALSE)
+#  image_tmp         :string(255)
+#  origin            :string
+#  params            :jsonb
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  created_bike_id   :integer
+#  creator_id        :integer
+#  doorkeeper_app_id :bigint
+#  organization_id   :integer
 #
 # Indexes
 #
