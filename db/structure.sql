@@ -348,7 +348,8 @@ CREATE TABLE public.b_params (
     origin character varying,
     organization_id integer,
     email character varying,
-    params jsonb
+    params jsonb,
+    doorkeeper_app_id bigint
 );
 
 
@@ -7082,6 +7083,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251214194338'),
 ('20251214194337'),
 ('20251210194656'),
 ('20251117204111'),
