@@ -385,7 +385,6 @@ RSpec.describe "Bikes API V3", type: :request do
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json,
             headers: json_headers.merge("X-IOS-VERSION" => 1.7)
-          pp json_result
           bike_response = json_result["bike"]
           expect(bike_response["id"]).to eq(bike1.id)
           expect(bike_response["serial"]).to eq(bike1.serial_display)
