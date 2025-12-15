@@ -46,7 +46,7 @@ class CycleType
     "trail-behind": "Trail behind (half bike)",
     "pedi-cab": "Pedi Cab (rickshaw)",
     "e-scooter": "e-Scooter",
-    "personal-mobility": "e-Skateboard (e-Unicycle, Personal mobility device, etc)",
+    "personal-mobility": "e-Personal Mobility (EPAMD, e-Skateboard, e-Unicycle, etc)",
     "non-e-scooter": "Scooter (not electric)",
     "non-e-skateboard": "Skateboard (not electric)",
     "e-motorcycle": "e-Motorcycle/e-Dirtbike (no pedals)",
