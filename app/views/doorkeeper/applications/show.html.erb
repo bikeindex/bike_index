@@ -1,41 +1,78 @@
-.page-header
-  %h1
-    Application:
-    %em.header-font-uncap
-      = @application.name
-  - if @application.can_send_stolen_notifications?
-    %p.pb-4
-      %strong.text-warning
+<div class="page-header">
+  <h1>
+    Application: <em class="header-font-uncap"><%= @application.name %></em>
+  </h1>
+
+  <% if @application.can_send_stolen_notifications? %>
+    <p class="pb-4">
+      <strong class="text-warning">
         Application has permission to send stolen notifications!
-.row
-  .col-md-8
-    %h4
+      </strong>
+    </p>
+  <% end %>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <h4 class="mb-1 uncap" style="font-size: 18px;">
       Application Id:
-    %p
-      %code#application_id= @application.uid
-    %h4
+    </h4>
+
+    <p><code id="application_id"><%= @application.uid %></code></p>
+
+    <h4 class="mb-1 uncap" style="font-size: 18px;">
       Secret:
-    %p
-      %code#secret= @application.secret
-    %h4.padded
+    </h4>
+
+    <p><code id="secret"><%= @application.secret %></code></p>
+
+    <h4 class="mb-1 uncap" style="font-size: 18px;">
+      Bikes registered
+      <em class="less-strong tw:text-xs">NOTE: only tracked since <span class="convertTime"><%= START_TRACKING_REGISTRATION_APP_ID_AT %></span></em>
+    </h4>
+
+    <p>
+      <% bike_count = Bike.unscoped.includes(:ownerships).where(ownerships: {doorkeeper_app_id: @application.id}).count %>
+
+      <% if current_user.superuser? %>
+        <%= link_to number_with_delimiter(bike_count), admin_bikes_path(search_doorkeeper_app_id: @application.id) %>
+      <% else %>
+        <%= number_with_delimiter(bike_count) %>
+      <% end %>
+    </p>
+
+    <h4 class="padded mt-5 mb-1 uncap" style="font-size: 18px;">
       Callback urls:
+    </h4>
 
-    %table.table
-      %tbody
-        - @application.redirect_uri.split.each do |uri|
-          %tr
-            %td
-              %code
-                = uri
-            %td
-              = link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code', scope: 'public'), class: 'btn btn-secondary', target: '_blank'
-  .col-md-4
-    %h3 Actions
-    %p
-      = link_to 'Edit', edit_oauth_application_path(@application), class: 'btn btn-primary'
-    %p
-      = render 'delete_form', application: @application
+    <table class="table">
+      <tbody>
+        <% @application.redirect_uri.split.each do |uri| %>
+          <tr>
+            <td><code><%= uri %></code></td>
 
-%hr.mt-4.mb-4
-  %h2.header-font-alt
-    Return to #{link_to "Documentation page", documentation_index_url}
+            <td>
+              <%= link_to 'Authorize', oauth_authorization_path(client_id: @application.uid, redirect_uri: uri, response_type: 'code', scope: 'public'), class: 'btn btn-secondary', target: '_blank' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-4">
+    <h3>Actions</h3>
+
+    <p>
+      <%= link_to 'Edit', edit_oauth_application_path(@application), class: 'btn btn-primary' %>
+    </p>
+
+    <p><%= render 'delete_form', application: @application %></p>
+  </div>
+</div>
+
+<hr class="mt-4 mb-4">
+
+<h2 class="header-font-alt">
+  Return to <%= link_to "Documentation page", documentation_index_url %>
+</h2>
