@@ -12,10 +12,11 @@ class BikeServices::Updator
     end
   end
 
-  def initialize(user:, bike:, current_ownership: nil, params: nil, permitted_params: nil)
+  def initialize(user:, bike:, current_ownership: nil, params: nil, permitted_params: nil, doorkeeper_app_id: nil)
     @user = user
     @bike = bike
     @bike_params = permitted_params || self.class.permitted_params(params, bike, user)
+    @doorkeeper_app_id = doorkeeper_app_id
     @current_ownership = current_ownership
     @currently_stolen = @bike.status_stolen?
   end
@@ -39,10 +40,14 @@ class BikeServices::Updator
     ownership_org = @bike.current_ownership&.organization
     # If previous ownership was with_owner, this should be too
     status = "status_with_owner" if @bike.current_ownership&.status_with_owner?
+    registration_info = @bike_params["bike"].slice(*BParam::REGISTRATION_INFO_ATTRS) || {}
+
     @bike.ownerships.create(owner_email: new_owner_email,
       creator: @user,
       origin: "transferred_ownership",
       status:,
+      registration_info:,
+      doorkeeper_app_id: @doorkeeper_app_id,
       organization: @user&.member_of?(ownership_org) ? ownership_org : nil,
       skip_email: @bike_params.dig("bike", "skip_email"))
 
@@ -76,7 +81,9 @@ class BikeServices::Updator
     @skip_ownership_bike_save = true # Don't save bike an extra time in update ownership
     update_ownership
     update_api_components if @bike_params["components"].present?
-    update_attrs = @bike_params["bike"].except("stolen_records_attributes", "impound_records_attributes", "address_record_attributes")
+    # Skips a few REGISTRATION_INFO_ATTRS
+    update_attrs = @bike_params["bike"].except("stolen_records_attributes", "impound_records_attributes",
+      "address_record_attributes", "ios_version", "is_bulk", "is_new", "is_pos")
 
     update_attrs.merge!(address_record_attributes(update_attrs, @bike_params["bike"]["address_record_attributes"]))
 

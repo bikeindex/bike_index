@@ -194,6 +194,23 @@
       </p>
     <% end %>
 
+    <% if params[:search_doorkeeper_app_id].present? %>
+      <p>
+        Viewing only for API Application
+        <% if @doorkeeper_app.present? %>
+          <%= link_to @doorkeeper_app.name, oauth_application_path(@doorkeeper_app) %>
+        <% else %>
+          <code>ID: <%= params[:search_doorkeeper_app_id] %></code>
+          <span class="less-strong">(no app with that ID)</span>
+        <% end %>
+        <%= link_to "view for any API Application", url_for(sortable_search_params.merge(search_doorkeeper_app_id: nil)), class: "gray-link small" %>
+        <em class="less-strong tw:text-xs">
+          NOTE: only tracked since
+          <span class="localizeTime"><%= START_TRACKING_REGISTRATION_APP_ID_AT %></span>
+        </em>
+      </p>
+    <% end %>
+
     <% if params[:serial].present? %>
       <p>
         Viewing only bikes <strong>with normalized serials matching</strong>

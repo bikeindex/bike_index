@@ -6,7 +6,12 @@ module Oauth
     before_action :ensure_app_owner!, except: [:index, :new, :create]
 
     def index
-      @applications = current_user.oauth_applications.order(created_at: :desc)
+      if Binxtils::InputNormalizer.boolean(params[:all]) && current_user.superuser?
+        @applications = Doorkeeper::Application.order(id: :desc)
+        render "admin_index"
+      else
+        @applications = current_user.oauth_applications.order(id: :desc)
+      end
     end
 
     # only needed if each application must have some owner

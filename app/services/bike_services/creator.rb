@@ -234,6 +234,7 @@ class BikeServices::Creator
       pos_kind: b_param.pos_kind,
       origin: b_param.origin,
       status: b_param.status,
+      doorkeeper_app_id: b_param.doorkeeper_app_id,
       bulk_import_id: b_param.params["bulk_import_id"],
       creator_id: b_param.creator_id,
       can_edit_claimed: bike.creation_organization_id.present?,

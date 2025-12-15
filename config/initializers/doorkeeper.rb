@@ -10,6 +10,7 @@ OAUTH_SCOPES = %i[
   write_organizations
   unconfirmed
 ].freeze
+START_TRACKING_REGISTRATION_APP_ID_AT = 1765772107
 
 if Rails.env.development? && defined?(User) && defined?(User.first)
   ENV["V2_ACCESSOR_ID"] = (User.fuzzy_email_find("api@example.com") || User.first).id.to_s
