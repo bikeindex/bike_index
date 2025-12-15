@@ -204,6 +204,11 @@ class Admin::BikesController < Admin::BaseController
       bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
     end
 
+    if params[:search_doorkeeper_app_id].present?
+      @doorkeeper_app = Doorkeeper::Application.find_by_id(params[:search_doorkeeper_app_id])
+      bikes = bikes.includes(:ownerships).where(ownerships: {doorkeeper_app_id: params[:search_doorkeeper_app_id]})
+    end
+
     if params[:primary_activity].present?
       @primary_activity = PrimaryActivity.friendly_find(params[:primary_activity])
       bikes = bikes.where(primary_activity_id: @primary_activity.id) if @primary_activity.present?

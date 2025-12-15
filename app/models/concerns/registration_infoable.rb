@@ -72,14 +72,13 @@ module RegistrationInfoable
     reg_info.keys.find { |k| k.start_with?("organization_affiliation") } || "organization_affiliation"
   end
 
+  def ios_version
+    reg_info["ios_version"]
+  end
+
   # Accepts organization or organization.id
   def organization_affiliation(org = nil)
     reg_info[organization_affiliation_key(org)]
-  end
-
-  def update_registration_information(key, value)
-    update(registration_info: registration_info.merge(key => value))
-    value
   end
 
   def organization_affiliation=(val, org = nil)
@@ -91,6 +90,11 @@ module RegistrationInfoable
   end
 
   private
+
+  def update_registration_information(key, value)
+    update(registration_info: registration_info.merge(key => value))
+    value
+  end
 
   # Only internal, nil protection. Only should be nil when unsaved
   def reg_info
