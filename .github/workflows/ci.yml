@@ -86,7 +86,7 @@ jobs:
         id: cpu-info
         run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
       # install imagemagick separately, cache-apt-pkgs-action wasn't installing correctly
-      - uses: mfinelli/setup-imagemagick@v6
+      - uses: mfinelli/setup-imagemagick@v7
         with:
           cache: true
       # install system dependencies
