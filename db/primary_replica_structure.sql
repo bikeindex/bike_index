@@ -348,7 +348,8 @@ CREATE TABLE public.b_params (
     origin character varying,
     organization_id integer,
     email character varying,
-    params jsonb
+    params jsonb,
+    doorkeeper_app_id bigint
 );
 
 
@@ -2834,7 +2835,8 @@ CREATE TABLE public.ownerships (
     pos_kind integer,
     is_new boolean DEFAULT false,
     skip_email boolean DEFAULT false,
-    address_record_id bigint
+    address_record_id bigint,
+    doorkeeper_app_id bigint
 );
 
 
@@ -6610,6 +6612,13 @@ CREATE INDEX index_ownerships_on_creator_id ON public.ownerships USING btree (cr
 
 
 --
+-- Name: index_ownerships_on_doorkeeper_app_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_doorkeeper_app_id ON public.ownerships USING btree (doorkeeper_app_id);
+
+
+--
 -- Name: index_ownerships_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7150,9 +7159,11 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251214194642'),
+('20251214194338'),
+('20251214194337'),
 ('20251210194656'),
 ('20251117204111'),
-('20251105020711'),
 ('20251101041451'),
 ('20250917185540'),
 ('20250910182759'),

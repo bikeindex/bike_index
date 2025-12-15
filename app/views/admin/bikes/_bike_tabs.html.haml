@@ -110,6 +110,12 @@
                     %em
                       Via
                       = origin_display(bike.creation_description)
+                    - if bike.current_ownership&.doorkeeper_app_id.present?
+                      %small.less-strong
+                        oauth app
+                        %em
+                          = bike.current_ownership.doorkeeper_app&.name || bike.current_ownership.doorkeeper_app_id
+                      = link_to search_emoji, admin_bikes_path(search_doorkeeper_app_id: bike.current_ownership.doorkeeper_app_id), class: "ml-1 mr-1"
                   - if bike.current_ownership&.bulk_import.present?
                     %br
                     Import
