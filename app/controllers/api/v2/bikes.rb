@@ -253,13 +253,13 @@ module API
           end
         end
         post "/" do
-          declared_p = declared(params, include_missing: false).merge(creation_state_params)
+          declared_p = declared(params, include_missing: false).merge(creation_state_params).as_json
           add_duplicate = declared_p.delete("add_duplicate")
           # It's required so that the bike can be updated if there is a match
           found_bike = owner_duplicate_bike unless add_duplicate
           # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
-            b_param = BParam.new(creator_id: creation_user_id, params: declared_p.as_json,
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p,
               origin: origin_api_version, doorkeeper_app_id: doorkeeper_application.id)
             b_param.clean_params
             @bike = found_bike
@@ -289,7 +289,7 @@ module API
             return created_bike_serialized(@bike.reload, false)
           end
           b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
-            params: declared_p.as_json, doorkeeper_app_id: doorkeeper_application.id)
+            params: declared_p, doorkeeper_app_id: doorkeeper_application.id)
           b_param.save
           bike = BikeServices::Creator.new.create_bike(b_param)
 
@@ -321,10 +321,10 @@ module API
           end
         end
         put ":id" do
-          declared_p = declared(params, include_missing: false).merge(creation_state_params)
+          declared_p = declared(params, include_missing: false).merge(creation_state_params).as_json
           find_bike
           authorize_bike_for_user
-          b_param = BParam.new(params: declared_p.as_json, origin: origin_api_version)
+          b_param = BParam.new(params: declared_p, origin: origin_api_version)
           b_param.clean_params
           @bike.load_external_images(b_param.params["bike"]["external_image_urls"]) if b_param.params.dig("bike", "external_image_urls").present?
           begin
