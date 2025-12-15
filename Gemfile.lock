@@ -505,7 +505,7 @@ GEM
     observer (0.1.2)
     oj (3.16.3)
       bigdecimal (>= 3.0)
-    openssl (3.3.2)
+    openssl (4.0.0)
     ostruct (0.6.1)
     pagy (9.3.3)
     parallel (1.27.0)
