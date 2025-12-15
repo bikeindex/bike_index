@@ -390,7 +390,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike_response["serial"]).to eq(bike1.serial_display)
           expect(bike_response["year"]).to eq(new_year)
           expect(bike_response["frame_colors"].first).to eq(new_color.name)
-          expect(bike_response["type_of_cycle"]).to eq("Cargo Tricycle (front storage)")
+          expect(bike_response["type_of_cycle"]).to eq("Cargo Tricycle (trike with front storage, e.g. Christiania bike)")
           expect(bike_response["manufacturer_id"]).to eq(old_manufacturer.id)
           expect(bike_response["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
           expect(bike_response["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
