@@ -23,6 +23,7 @@ RSpec.describe CycleType, type: :model do
     context "name" do
       let(:name) { "Cargo Bike (front storage)" }
       it "tries to find the slug, given a name" do
+        expect(CycleType.send(:secondary_names_for, CycleType::NAMES[:cargo].downcase)).to eq(["cargo bike", "front storage"])
         expect(CycleType.find_sym(name)).to eq :cargo
         expect(CycleType.find_sym(8)).to eq :cargo
         expect(CycleType.find_sym("8 ")).to eq :cargo
@@ -31,6 +32,36 @@ RSpec.describe CycleType, type: :model do
         expect(finder.slug).to eq :cargo
         expect(finder.name).to eq "Cargo Bike (front storage)"
         expect(finder.short_name).to eq "Cargo Bike"
+      end
+    end
+    context "EPAMD" do
+      let(:cycle_type) { CycleType.new("personal-mobility") }
+
+      let(:name_and_secondary_names) do
+        ["personal-mobility", "e-personal mobility (epamd, e-skateboard, segway, e-unicycle, etc)",
+          "e-personal mobility", "epamd", "e-skateboard", "segway", "e-unicycle"]
+      end
+      it "finds by various names" do
+        expect(cycle_type.id).to eq 18
+        expect(CycleType.send(:names_and_secondary_names)[17]).to eq name_and_secondary_names
+        expect(cycle_type.name).to match "e-Skateboard"
+        expect(CycleType.friendly_find("E-Skateboard")&.id).to eq cycle_type.id
+        expect(CycleType.friendly_find("EPAMD")&.id).to eq cycle_type.id
+        expect(CycleType.friendly_find(" epamd ")&.id).to eq cycle_type.id
+        expect(CycleType.friendly_find("personal_mobility")&.id).to eq cycle_type.id
+      end
+    end
+    context "other cargo varieties" do
+      let(:cycle_type) { CycleType.new("cargo-trike") }
+      let(:cargo_trike_secondaries) { ["cargo tricycle", "trike with front storage", "christiania bike"] }
+      it "returns target" do
+        expect(CycleType.send(:secondary_names_for, CycleType::NAMES[:"cargo-trike"].downcase))
+          .to eq cargo_trike_secondaries
+        expect(CycleType.friendly_find("cargo-trike")&.id).to eq cycle_type.id
+        expect(CycleType.friendly_find("cargo tricycle")&.id).to eq cycle_type.id
+        expect(CycleType.friendly_find("christiania bike")&.id).to eq cycle_type.id
+        # NOTE: this is a previous name that might still be around from API clients
+        expect(CycleType.friendly_find("cargo tricycle (front storage)")&.id).to eq cycle_type.id
       end
     end
   end
