@@ -13,7 +13,7 @@ module GrapeLogging
   end
 end
 
-# validation enabled with case_insensitive_color: true (commented help finding)
+# validation enabled with case_insensitive_color: true (commented to help finding)
 class CaseInsensitiveColor < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
@@ -23,7 +23,7 @@ class CaseInsensitiveColor < Grape::Validations::Validators::Base
   end
 end
 
-# validation enabled with case_insensitive_ctype: true (commented help finding)
+# validation enabled with case_insensitive_ctype: true (commented to help finding)
 class CaseInsensitiveCtype < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
@@ -33,7 +33,7 @@ class CaseInsensitiveCtype < Grape::Validations::Validators::Base
   end
 end
 
-# validation enabled with case_insensitive_country: true (commented help finding)
+# validation enabled with case_insensitive_country: true (commented to help finding)
 class CaseInsensitiveCountry < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
@@ -43,7 +43,7 @@ class CaseInsensitiveCountry < Grape::Validations::Validators::Base
   end
 end
 
-# validation enabled with case_insensitive_propulsion_type: true (commented help finding)
+# validation enabled with case_insensitive_propulsion_type: true (commented to help finding)
 class CaseInsensitivePropulsionType < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]
@@ -53,7 +53,7 @@ class CaseInsensitivePropulsionType < Grape::Validations::Validators::Base
   end
 end
 
-# validation enabled with case_insensitive_cycle_type: true (commented help finding)
+# validation enabled with case_insensitive_cycle_type: true (commented to help finding)
 class CaseInsensitiveCycleType < Grape::Validations::Validators::Base
   def validate_param!(attr_name, params)
     val = params[attr_name]

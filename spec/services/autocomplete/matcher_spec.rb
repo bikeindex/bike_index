@@ -19,7 +19,6 @@ RSpec.describe Autocomplete::Matcher do
       Autocomplete::Loader.clear_redis
       Autocomplete::Loader.load_all
       opts = subject.params_to_opts
-      pp opts
       # Check that it's not in cache (verifies that clear_redis works correctly, etc)
       expect(subject.send(:not_in_cache?, opts[:cache_key])).to be_truthy
       result = subject.search(nil, opts)
@@ -33,13 +32,11 @@ RSpec.describe Autocomplete::Matcher do
 
       # Query result
       opts_query = subject.params_to_opts(q: "b", per_page: 10)
-      pp opts_query
       # Isn't in cache
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_truthy
       result_query = subject.search(nil, opts_query)
       expect(result_query.count).to eq 10
       target_search_ids = [color_sid, "v_0", "v_11", "v_6", "v_8", "v_12", "v_22", "v_9", "v_14", "m_#{manufacturer2.id}"]
-      pp target_search_ids.sort, result_query.map { |i| i["search_id"] }.sort
       expect(result_query.map { |i| i["search_id"] }).to eq target_search_ids
       # But it is in cache after the search
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_falsey
