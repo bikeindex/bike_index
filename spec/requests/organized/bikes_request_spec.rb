@@ -142,6 +142,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:unregistered_parking_notification)).to be_falsey
         expect(response).to render_template(:new)
+        expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       end
       context "parking_notification" do
         it "renders with unregistered_parking_notification" do
@@ -168,6 +169,7 @@ RSpec.describe Organized::BikesController, type: :request do
       get "#{base_url}/new_iframe", params: {parking_notification: 1}
       expect(response.status).to eq(200)
       expect(response).to render_template(:new_iframe)
+      expect(response.headers["X-Frame-Options"]).to be_blank
     end
     context "without current_organization" do
       include_context :request_spec_logged_in_as_user
@@ -231,6 +233,7 @@ RSpec.describe Organized::BikesController, type: :request do
             post base_url, params: {bike: bike_params.merge(image: test_photo), parking_notification: parking_notification}
             expect(flash[:success]).to match(/tricycle/i)
             expect(response).to redirect_to new_iframe_organization_bikes_path(organization_id: current_organization.to_param)
+            expect(response.headers["X-Frame-Options"]).to be_blank
           }.to change(Ownership, :count).by 1
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end

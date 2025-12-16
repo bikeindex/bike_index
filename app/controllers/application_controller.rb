@@ -9,13 +9,9 @@ class ApplicationController < ActionController::Base
   around_action :set_locale
   rescue_from Money::Bank::UnknownRate, with: :localization_failure
 
-  ensure_security_headers(csp: false,
-    hsts: "max-age=#{20.years.to_i}",
-    x_frame_options: "SAMEORIGIN",
-    x_content_type_options: "nosniff",
-    x_xss_protection: false,
-    x_download_options: false,
-    x_permitted_cross_domain_policies: false)
+  def allow_x_frame
+    SecureHeaders.opt_out_of_header(request, :x_frame_options)
+  end
 
   def handle_unverified_request
     flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])

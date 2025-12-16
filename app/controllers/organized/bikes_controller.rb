@@ -4,7 +4,7 @@ module Organized
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
 
-    skip_before_action :set_x_frame_options_header, only: [:new_iframe, :create]
+    before_action :allow_x_frame, only: [:new_iframe, :create]
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index

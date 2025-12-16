@@ -66,6 +66,7 @@ RSpec.describe SessionsController, type: :request do
     it "signs in" do
       post "/session", params: {session: {email: user.email, password: password}}
       expect(response).to redirect_to my_account_url
+      expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       user.reload
       expect(user.last_login_at).to be_within(1.second).of Time.current
     end
