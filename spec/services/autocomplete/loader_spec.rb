@@ -17,7 +17,6 @@ RSpec.describe Autocomplete::Loader do
       expect(Manufacturer.count).to eq 1
       expect(Color.count).to eq 1
       expect(PropulsionType.autocomplete_hashes.count).to eq 1
-      pp subject.info
       subject.clear_redis
       total_count = subject.load_all
       expect(total_count).to eq (cycle_type_count + 3) * category_count_for_1_item
