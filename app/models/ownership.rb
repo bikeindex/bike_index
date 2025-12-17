@@ -78,7 +78,7 @@ class Ownership < ApplicationRecord
   belongs_to :organization
   belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
-  belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application"
+  belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application", counter_cache: true
 
   has_many :notifications, as: :notifiable
 
@@ -99,7 +99,7 @@ class Ownership < ApplicationRecord
   scope :with_reg_info_location, -> { where("(registration_info -> 'city') IS NOT NULL") }
 
   before_validation :set_calculated_attributes
-  after_commit :send_notification_and_update_other_ownerships, on: :create
+  after_commit :send_notification_and_update_associations, on: :create
 
   attr_accessor :creator_email, :user_email, :can_edit_claimed
 
@@ -272,7 +272,7 @@ class Ownership < ApplicationRecord
     id.present? ? ownerships.where("id < ?", id) : ownerships
   end
 
-  def send_notification_and_update_other_ownerships
+  def send_notification_and_update_associations
     # TODO: post #2110 doing this - I'm not sure if it's a good idea...
     if current && id.present?
       bike&.update_column :current_ownership_id, id

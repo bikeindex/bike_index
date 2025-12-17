@@ -744,9 +744,9 @@ RSpec.describe Ownership, type: :model do
     it "updates the counter_cache on create" do
       expect(Doorkeeper::Application.count).to eq 0
       expect(doorkeeper_app).to be_valid
-      expect(doorkeeper_app.bikes_count).to eq 0
+      expect(doorkeeper_app.ownerships_count).to eq 0
       expect(ownership.reload.doorkeeper_app_id).to eq doorkeeper_app.id
-      expect(doorkeeper_app.reload.bikes_count).to eq 1
+      expect(doorkeeper_app.reload.ownerships_count).to eq 1
       expect(Doorkeeper::Application.count).to eq 1
     end
   end
