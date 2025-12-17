@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :doorkeeper_application do
+  factory :doorkeeper_app do
     sequence(:name) { |n| "OAuth App #{n}" }
     redirect_uri { "urn:ietf:wg:oauth:2.0:oob" }
 
