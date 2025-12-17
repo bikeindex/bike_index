@@ -713,8 +713,8 @@ GEM
       google-protobuf (~> 4.29)
     sass-embedded (1.85.0-x86_64-linux-gnu)
       google-protobuf (~> 4.29)
-    secure_headers (3.0.3)
-      useragent
+    secure_headers (4.0.2)
+      useragent (>= 0.15.0)
     securerandom (0.4.1)
     selenium-webdriver (4.35.0)
       base64 (~> 0.2)
@@ -944,7 +944,7 @@ DEPENDENCIES
   rspec_junit_formatter
   ruby-lsp
   ruby-vips
-  secure_headers (~> 3.0.0)
+  secure_headers (~> 4.0.0)
   selenium-webdriver
   sidekiq
   sidekiq-failures
