@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :doorkeeper_app, class: "Doorkeeper::Application" do
     sequence(:name) { |n| "OAuth App #{n}" }
-    redirect_uri { "urn:ietf:wg:oauth:2.0:oob" }
+
+    redirect_uri { "https://app.com" }
 
     # confidential { false } # Not used
     # scopes { "public" } # only set on tokens?
