@@ -38,10 +38,9 @@
             <span class="convertTime">
               <%= l application.created_at, format: :convert_time %>
             </span>
+
             <% if display_dev_info? %>
-              <span class="only-dev-visible">
-                <%= application.id %>
-              </span>
+              <span class="only-dev-visible"><%= application.id %></span>
             <% end %>
           </td>
 
