@@ -2,9 +2,9 @@
   <h1 class="header-font-uncap">
     Your applications
     <% if current_user.superuser? %>
-      <small class="less-strong ml-2">
-        view <%= link_to "all applications", url_for(all: true) %>
-      </small>
+      <em class="less-strong ml-2 small">
+        view <%= link_to "all applications", url_for(search_all: true) %>
+      </em>
     <% end %>
   </h1>
 
@@ -38,6 +38,11 @@
             <span class="convertTime">
               <%= l application.created_at, format: :convert_time %>
             </span>
+            <% if display_dev_info? %>
+              <span class="only-dev-visible">
+                <%= application.id %>
+              </span>
+            <% end %>
           </td>
 
           <td>
@@ -46,12 +51,6 @@
             <% if application.can_send_stolen_notifications? %>
               <span class="text-warning">
                 Has permission to send stolen notifications
-              </span>
-            <% end %>
-
-            <% if display_dev_info? %>
-              <span class="less-strong-right only-dev-visible">
-                <%= application.id %>
               </span>
             <% end %>
           </td>

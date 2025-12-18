@@ -78,7 +78,7 @@ class Ownership < ApplicationRecord
   belongs_to :organization
   belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
-  belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application", counter_cache: true
+  belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application", counter_cache: true, touch: true
 
   has_many :notifications, as: :notifiable
 
