@@ -15,6 +15,7 @@ module AdminHelper
       {title: "Dev: Ownerships", path: admin_ownerships_path, match_controller: true},
       {title: "Dev: User Reg Organizations", path: admin_user_registration_organizations_path, match_controller: true},
       {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match_controller: false},
+      {title: "Dev: OAuth Applications", path: oauth_applications_path(search_all: true), match_controller: true},
       {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
       {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true},
       {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true},

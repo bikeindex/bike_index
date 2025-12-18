@@ -45,18 +45,6 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def permitted_per_page(default: 25, max: 100)
-    per_page = params[:per_page]&.to_i
-    per_page = (per_page.present? && per_page > 0) ? per_page : default
-    per_page.clamp(1, max)
-  end
-
-  def permitted_page(max: nil)
-    page = params[:page]&.to_i || 1
-    page = 1 if page < 1
-    max.present? ? page.clamp(1, max) : page
-  end
-
   def permitted_org_bike_search_params
     @stolenness ||= params["stolenness"].present? ? params["stolenness"] : "all"
     params.permit(*Bike.permitted_search_params).merge(stolenness: @stolenness)

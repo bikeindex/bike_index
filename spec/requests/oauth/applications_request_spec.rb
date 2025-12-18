@@ -20,10 +20,11 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
         expect(response.status).to eq 200
         expect(response).to render_template(:index)
         expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
-        get "#{base_url}?all=true"
+        get "#{base_url}?search_all=true"
         expect(response.status).to eq 200
         expect(response).to render_template(:index)
         expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
+        expect(assigns(:collection)).to be_nil
       end
       context "superuser" do
         let(:application_owner) { FactoryBot.create(:superuser) }
@@ -32,10 +33,11 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
           expect(response.status).to eq 200
           expect(response).to render_template(:index)
           expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
-          get "#{base_url}?all=true"
+          get "#{base_url}?search_all=true"
           expect(response.status).to eq 200
           expect(response).to render_template(:admin_index)
-          expect(assigns(:applications).pluck(:id)).to match_array([doorkeeper_app.id, doorkeeper_app2.id])
+          expect(assigns(:applications)).to be_nil
+          expect(assigns(:collection).pluck(:id)).to match_array([doorkeeper_app.id, doorkeeper_app2.id])
         end
       end
     end
