@@ -129,14 +129,6 @@
   transform: translateY(60px);
 }
 
-.redesign_2025_homepage .stat-box:nth-child(1) .stat-number {
-  font-size: 1.5rem;
-}
-
-.redesign_2025_homepage .stat-box:nth-child(1) .stat-label {
-  font-size: 0.65rem;
-}
-
 .redesign_2025_homepage .stat-box:nth-child(2) {
   background-image: url('redesign_2025/shield_light-blue.png');
   z-index: 3;
@@ -171,23 +163,15 @@
   transform: translateY(60px);
 }
 
-.redesign_2025_homepage .stat-box:nth-child(3) .stat-number {
-  font-size: 1.5rem;
-}
-
-.redesign_2025_homepage .stat-box:nth-child(3) .stat-label {
-  font-size: 0.65rem;
-}
-
 .redesign_2025_homepage .stat-number {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 0.25rem;
   line-height: 1;
 }
 
 .redesign_2025_homepage .stat-label {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 400;
   text-align: center;
   line-height: 1.2;
