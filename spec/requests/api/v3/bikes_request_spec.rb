@@ -390,7 +390,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike_response["serial"]).to eq(bike1.serial_display)
           expect(bike_response["year"]).to eq(new_year)
           expect(bike_response["frame_colors"].first).to eq(new_color.name)
-          expect(bike_response["type_of_cycle"]).to eq("Cargo Tricycle (front storage)")
+          expect(bike_response["type_of_cycle"]).to eq("Cargo Tricycle (trike with front storage, e.g. Christiania bike)")
           expect(bike_response["manufacturer_id"]).to eq(old_manufacturer.id)
           expect(bike_response["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
           expect(bike_response["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
@@ -634,7 +634,7 @@ RSpec.describe "Bikes API V3", type: :request do
           component_type: "wheel"
         }
       ]
-      bike_attrs.merge!(components: components,
+      this_bike_attrs = bike_attrs.merge(components: components,
         front_gear_type_slug: front_gear_type.slug,
         handlebar_type_slug: handlebar_type_slug,
         is_for_sale: true,
@@ -643,20 +643,21 @@ RSpec.describe "Bikes API V3", type: :request do
         is_new: true,
         extra_registration_number: "serial:#{bike_attrs[:serial]}",
         is_pos: true,
+        cycle_type: "e-skateboard", # CycleType secondary name (not the name or symbol)
         bike_sticker: bike_sticker.code.downcase,
         external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
         description: "<svg/onload=alert(document.cookie)>")
       expect {
-        post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        post "/api/v3/bikes?access_token=#{token.token}", params: this_bike_attrs.to_json, headers: json_headers
       }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
       expect(response.code).to eq("201")
       result = json_result["bike"]
-      expect(result["serial"]).to eq(bike_attrs[:serial])
-      expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
+      expect(result["serial"]).to eq(this_bike_attrs[:serial])
+      expect(result["manufacturer_name"]).to eq(this_bike_attrs[:manufacturer])
       bike = Bike.find(result["id"])
       expect(bike.example).to be_falsey
       expect(bike.is_for_sale).to be_truthy
-      expect(bike.frame_material).to eq(bike_attrs[:frame_material])
+      expect(bike.frame_material).to eq(this_bike_attrs[:frame_material])
       expect(bike.serial_unknown?).to be_falsey
       expect(bike.serial_normalized).to eq "69 N0N EXAMP1E"
       expect(bike.components.count).to eq(3)

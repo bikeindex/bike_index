@@ -13,7 +13,7 @@ gem "observer"
 gem "prime"
 gem "openssl" # stuff breaks without this, 2025-10
 
-gem "rails", "~> 8.0.4"
+gem "rails"
 
 # Things to improve/extend Rails
 gem "puma" # App server
@@ -27,7 +27,7 @@ gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
 gem "rack-throttle" # Rate limiting
-gem "secure_headers", "~> 2.5.0"
+gem "secure_headers", "~> 7.0"
 
 # Speed, performance, etc
 gem "fast_blank"

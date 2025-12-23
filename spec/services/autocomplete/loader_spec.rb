@@ -23,7 +23,7 @@ RSpec.describe Autocomplete::Loader do
       info = subject.info
       # IDK, db0 seems to cause problems
       expect(info.keys - [:db0]).to match_array(%i[category_keys cache_keys used_memory used_memory_peak])
-      expect(info[:category_keys]).to eq 4128
+      expect(info[:category_keys]).to eq 4432
       expect(info[:cache_keys]).to eq 0
     end
 

@@ -25,7 +25,7 @@ RSpec.describe Autocomplete::Matcher do
       expect(result.count).to eq 5
       color_sid = "c_#{color.id}"
       expect(result.first["search_id"]).to eq color_sid
-      cycle_type_search_ids = [0, 11, 16].map { |i| "v_#{i}" }
+      cycle_type_search_ids = ["v_0", "v_11", "v_16"]
       expect(result.map { |i| i["search_id"] }).to eq([color_sid] + ["p_10"] + cycle_type_search_ids)
       # And now, the response is the in the cache
       expect(subject.send(:not_in_cache?, opts[:cache_key])).to be_falsey
@@ -36,7 +36,7 @@ RSpec.describe Autocomplete::Matcher do
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_truthy
       result_query = subject.search(nil, opts_query)
       expect(result_query.count).to eq 10
-      target_search_ids = [color_sid, "v_0", "v_11", "v_6", "v_8", "v_22", "v_9", "v_14", "m_#{manufacturer2.id}", "m_#{manufacturer1.id}"]
+      target_search_ids = [color_sid, "v_0", "v_11", "v_6", "v_8", "v_12", "v_22", "v_9", "v_14", "m_#{manufacturer2.id}"]
       expect(result_query.map { |i| i["search_id"] }).to eq target_search_ids
       # But it is in cache after the search
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_falsey

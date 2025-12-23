@@ -1,0 +1,96 @@
+<%# require inline CSS setting because of caching %>
+<% unless display_dev_info? %>
+  <style>.only-dev-visible {display: none !important;} </style>
+<% end %>
+
+<% unless render_sortable %>
+  <style>.display-sortable-link {display: none !important;}</style>
+<% end %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm mt-4">
+    <thead class="sortable">
+      <tr>
+        <th><%= sortable "created_at", render_sortable: %></th>
+
+        <th><%= sortable "name", render_sortable: %></th>
+
+        <th><%= sortable "owner_id", render_sortable: %></th>
+
+        <th>
+          Callback URLs
+        </th>
+
+        <th>
+          <small>
+            <%= sortable "tokens_count", "Tokens #", render_sortable: %>
+          </small>
+        </th>
+
+        <th>
+          <span
+            title="NOTE: only tracked since <%= Time.at(START_TRACKING_REGISTRATION_APP_ID_AT).to_date %>"
+          >
+            <%= sortable "ownerships_count", "Ownerships #", render_sortable: %>
+          </span>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody
+      data-controller="update-cached-sortable-links"
+      data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
+    >
+      <% collection.each do |application| %>
+        <% cache(application) do %>
+          <tr id="application_<%= application.id %>">
+            <td>
+              <a
+                class="convertTime"
+                href="<%= oauth_application_url(application) %>"
+              >
+                <%= l application.created_at, format: :convert_time %>
+              </a>
+            </td>
+
+            <td>
+              <div class="less-strong-hold">
+                <%= application.name %>
+
+                <span class="less-strong-right only-dev-visible">
+                  <%= application.id %>
+                </span>
+              </div>
+
+              <% if application.can_send_stolen_notifications? %>
+                <span class="text-warning">
+                  Has permission to send stolen notifications
+                </span>
+              <% end %>
+            </td>
+
+            <td>
+              <% cache(application.owner) do %>
+                <%# Pass in search_url because caching breaks with url_for %>
+                <% search_url = oauth_applications_path(user_id: application.owner_id, search_all: true) %>
+                <%= render Admin::UserCell::Component.new(user: application.owner, user_id: application.owner_id, search_url:) %>
+              <% end %>
+            </td>
+
+            <td style="overflow-x: scroll; max-width: 33vw;">
+              <pre class="small mb-2"><%= application.redirect_uri.gsub(/\s+/, "\n") %></pre>
+            </td>
+
+            <td>
+              <small>
+                <%= number_display(application.access_tokens.count) %>
+              </small>
+            </td>
+
+            <td><%= number_display(application.ownerships_count) %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

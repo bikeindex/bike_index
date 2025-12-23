@@ -31,6 +31,10 @@ module Bikeindex
 
     config.load_defaults 8.0
 
+    # Clear Rails default security headers - secure_headers gem manages these instead
+    # (secure_headers has a bug where it tries to delete lowercase keys but Rails uses mixed case)
+    config.action_dispatch.default_headers.clear
+
     # directly using Sidekiq is preferred, but some things (e.g. active_storage) use active job
     config.active_job.queue_adapter = :sidekiq
     config.active_job.default_queue_name = :low_priority

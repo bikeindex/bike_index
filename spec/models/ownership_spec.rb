@@ -737,4 +737,19 @@ RSpec.describe Ownership, type: :model do
       end
     end
   end
+
+  describe "doorkeeper_app counter_cache" do
+    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
+    let(:ownership) { FactoryBot.create(:ownership, doorkeeper_app:) }
+    it "updates the counter_cache on create" do
+      expect(Doorkeeper::Application.count).to eq 0
+      expect(doorkeeper_app).to be_valid
+      doorkeeper_app.update_column :updated_at, Time.current - 1.day
+      expect(doorkeeper_app.ownerships_count).to eq 0
+      expect(ownership.reload.doorkeeper_app_id).to eq doorkeeper_app.id
+      expect(doorkeeper_app.reload.ownerships_count).to eq 1
+      expect(doorkeeper_app.updated_at).to be_within(1).of Time.current
+      expect(Doorkeeper::Application.count).to eq 1
+    end
+  end
 end

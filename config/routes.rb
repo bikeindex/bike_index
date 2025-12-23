@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
+      get :shop_display_qr
     end
   end
 
