@@ -27,7 +27,7 @@ gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
 gem "rack-throttle" # Rate limiting
-gem "secure_headers", "~> 3.0.0"
+gem "secure_headers", "~> 7.0"
 
 # Speed, performance, etc
 gem "fast_blank"
