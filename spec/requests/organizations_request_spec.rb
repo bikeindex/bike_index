@@ -224,6 +224,18 @@ RSpec.describe OrganizationsController, type: :request do
     end
   end
 
+  describe "shop_display_qr" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    it "renders" do
+      get "#{base_url}/#{organization.slug}/shop_display_qr"
+      expect(response).to redirect_to("#{base_url}/#{organization.slug}/shop_display_qr.png")
+
+      get "#{base_url}/#{organization.slug}/shop_display_qr.png"
+      expect(response.status).to eq(200)
+    end
+  end
+
   describe "lightspeed_interface" do
     context "with user with organization" do
       include_context :request_spec_logged_in_as_organization_admin

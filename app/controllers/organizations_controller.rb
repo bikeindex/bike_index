@@ -1,6 +1,6 @@
 class OrganizationsController < ApplicationController
-  before_action :set_bparam, only: [:embed, :embed_extended]
-  before_action :allow_x_frame, only: [:embed, :embed_extended, :embed_create_success]
+  before_action :set_bparam, only: %i[embed embed_extended]
+  before_action :allow_x_frame, only: %i[embed embed_extended embed_create_success]
 
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
@@ -61,6 +61,18 @@ class OrganizationsController < ApplicationController
     find_organization
     @bike = Bike.find(params[:bike_id])
     render layout: "embed_layout"
+  end
+
+  def shop_display_qr
+    find_organization
+    redirect_to(format: "png") && return unless request.format == "png"
+
+    respond_to do |format|
+      format.png do
+        qrcode = RQRCode::QRCode.new(embed_organization_url(@organization, non_stolen: true, shop_display: true))
+        render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
+      end
+    end
   end
 
   protected
