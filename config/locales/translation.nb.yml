@@ -1122,6 +1122,9 @@ nb:
       hour: time
       minute: minutt
       second: sekund
+    relative:
+      future: i %{time}
+      past: For %{time} siden
   helpers:
     select:
       prompt: Vennligst velg
