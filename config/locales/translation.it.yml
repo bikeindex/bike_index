@@ -1123,6 +1123,9 @@ it:
       hour: Ora
       minute: Minuto
       second: Secondi
+    relative:
+      future:
+      past:
   helpers:
     select:
       prompt: Seleziona...

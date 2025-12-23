@@ -13,7 +13,7 @@ gem "observer"
 gem "prime"
 gem "openssl" # stuff breaks without this, 2025-10
 
-gem "rails", "~> 8.0.4"
+gem "rails"
 
 # Things to improve/extend Rails
 gem "puma" # App server
