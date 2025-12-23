@@ -286,7 +286,7 @@ module API
             end
 
             status :found
-            return created_bike_serialized(@bike.reload, false)
+            next created_bike_serialized(@bike.reload, false)
           end
           b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
             params: declared_p, doorkeeper_app_id: doorkeeper_application.id)
