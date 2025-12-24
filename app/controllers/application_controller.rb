@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   include ControllerHelpers
   include SetPeriod
   include Turbo::Redirection
-  include Pagy::Backend
+  include Pagy::Method
 
   protect_from_forgery
 
