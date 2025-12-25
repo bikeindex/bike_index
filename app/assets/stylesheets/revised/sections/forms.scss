@@ -4,11 +4,6 @@ input[type="checkbox"], input[type="radio"] {
 //
 // Input helpers
 //
-.hide-selectize-dropdown-arrow {
-  .selectize-control.single .selectize-input:after {
-    display: none;
-  }
-}
 
 .form-circle-item {
   // Mixin for help blocks

@@ -709,8 +709,8 @@ en:
         bike: Bike
         cargo: Cargo Bike (front storage)
         cargo_rear: Cargo Bike Rear (e.g. longtail)
-        cargo_trike: Cargo Tricycle (front storage)
-        cargo_trike_rear: Cargo Tricycle (rear storage)
+        cargo_trike: Cargo Tricycle (trike with front storage, e.g. Christiania bike)
+        cargo_trike_rear: Cargo Tricycle (trike with rear storage)
         e_motorcycle: e-Motorcycle/e-Dirtbike (no pedals)
         e_scooter: e-Scooter
         elliptical: Elliptical bike
@@ -718,7 +718,8 @@ en:
         non_e_skateboard: Skateboard (not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
-        personal_mobility: e-Skateboard (e-Unicycle, Personal mobility device, etc)
+        personal_mobility: e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle,
+          etc)
         recumbent: Recumbent
         stroller: Stroller
         tall_bike: Tall Bike (multiple frames fused together)

@@ -1124,6 +1124,9 @@ nl:
       hour: uur
       minute: minuut
       second: seconde
+    relative:
+      future: in %{time}
+      past: "%{time} geleden"
   helpers:
     select:
       prompt: Maak een keuze

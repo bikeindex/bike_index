@@ -57,9 +57,9 @@ RSpec.shared_examples "bike_attributable" do
       let(:type) { "personal-mobility" }
       let(:propulsion_type) { "throttle" }
       it "returns expected" do
-        expect(obj.cycle_type_name).to eq "e-Skateboard (e-Unicycle, Personal mobility device, etc)"
-        expect(obj.type).to eq "e-skateboard"
-        expect(obj.type_titleize).to eq "e-Skateboard"
+        expect(obj.cycle_type_name).to eq "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)"
+        expect(obj.type).to eq "e-personal mobility"
+        expect(obj.type_titleize).to eq "e-Personal Mobility"
         expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end

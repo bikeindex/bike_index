@@ -2530,7 +2530,8 @@ CREATE TABLE public.oauth_applications (
     is_internal boolean DEFAULT false NOT NULL,
     can_send_stolen_notifications boolean DEFAULT false NOT NULL,
     scopes character varying(255) DEFAULT ''::character varying NOT NULL,
-    confidential boolean DEFAULT false NOT NULL
+    confidential boolean DEFAULT false NOT NULL,
+    ownerships_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -3283,7 +3284,6 @@ CREATE TABLE public.stolen_notifications (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     receiver_email character varying(255),
-    oauth_application_id integer,
     reference_url text,
     send_dates json,
     kind integer,
@@ -6746,13 +6746,6 @@ CREATE INDEX index_stolen_notifications_on_doorkeeper_app_id ON public.stolen_no
 
 
 --
--- Name: index_stolen_notifications_on_oauth_application_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_stolen_notifications_on_oauth_application_id ON public.stolen_notifications USING btree (oauth_application_id);
-
-
---
 -- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7083,6 +7076,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251217162136'),
+('20251217161834'),
 ('20251214194338'),
 ('20251214194337'),
 ('20251210194656'),

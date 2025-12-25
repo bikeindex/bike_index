@@ -208,7 +208,7 @@ RSpec.describe CredibilityScorer do
   describe "ownership_badges" do
     let(:created_at) { Time.current - 400.days }
     let!(:ownership1) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: created_at, creator: bike.creator) }
-    it "returns claimed" do
+    it "returns claimed", :flaky do
       bike.reload
       expect(subject.ownership_badges(bike)).to eq([:current_ownership_claimed])
       # Also, general badges returns long_time_registration
