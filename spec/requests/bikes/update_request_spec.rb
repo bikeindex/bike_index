@@ -441,4 +441,20 @@ RSpec.describe "BikesController#update", type: :request do
       expect(impound_record).to match_hash_indifferently impound_params.except(:impounded_at_with_timezone, :timezone)
     end
   end
+  context "paper_trail versioning" do
+    it "creates a version when bike is updated" do
+      bike.reload
+      expect {
+        patch base_url, params: {bike: {description: "New description"}}
+        expect(flash[:success]).to be_present
+      }.to change(Version, :count).by(1)
+      bike.reload
+      expect(bike.description).to eq "New description"
+      version = Version.last
+      expect(version.item_type).to eq "Bike"
+      expect(version.item_id).to eq bike.id
+      expect(version.event).to eq "update"
+      expect(version.object_changes).to have_key("description")
+    end
+  end
 end
