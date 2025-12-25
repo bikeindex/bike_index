@@ -42,6 +42,8 @@ class Sale < ApplicationRecord
   belongs_to :seller, class_name: "User"
   belongs_to :ownership
 
+  has_many :marketplace_listings
+
   validates_presence_of :item_id
   validates_presence_of :seller_id
 end

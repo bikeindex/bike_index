@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2193,7 +2194,8 @@ CREATE TABLE public.marketplace_listings (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     price_negotiable boolean DEFAULT false,
-    description text
+    description text,
+    sale_id bigint
 );
 
 
@@ -6336,6 +6338,13 @@ CREATE INDEX index_marketplace_listings_on_buyer_id ON public.marketplace_listin
 --
 
 CREATE INDEX index_marketplace_listings_on_item ON public.marketplace_listings USING btree (item_type, item_id);
+
+
+--
+-- Name: index_marketplace_listings_on_sale_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_listings_on_sale_id ON public.marketplace_listings USING btree (sale_id);
 
 
 --

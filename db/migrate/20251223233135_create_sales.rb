@@ -13,5 +13,7 @@ class CreateSales < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_reference :marketplace_listings, :sale, index: true
   end
 end
