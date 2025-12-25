@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   include ControllerHelpers
   include SetPeriod
   include Turbo::Redirection
-  include Pagy::Backend
+  include Pagy::Method
 
   protect_from_forgery
 
@@ -110,5 +110,15 @@ class ApplicationController < ActionController::Base
     flash[:error] = "#{locale} localization is unavailable. Please try again later."
     params.delete(:locale)
     redirect_to root_url
+  end
+
+  # Override pagy to handle overflow by showing the last valid page
+  # (replicates the old pagy overflow: :last_page behavior)
+  def pagy(paginator = :offset, collection, **options)
+    pagy_obj, records = super
+    return [pagy_obj, records] if pagy_obj.in_range?
+
+    # Page is out of range, re-paginate with the last valid page
+    super(paginator, collection, **options.merge(page: pagy_obj.last))
   end
 end

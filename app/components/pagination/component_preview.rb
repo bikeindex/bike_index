@@ -27,7 +27,7 @@ module Pagination
     private
 
     def pagy_arg(opts = default_opts)
-      Pagy.new(**opts)
+      Pagy::Offset.new(**opts)
     end
 
     def default_opts
