@@ -79,6 +79,7 @@ class Ownership < ApplicationRecord
   belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
   belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application", counter_cache: true, touch: true
+  belongs_to :sale
 
   has_many :notifications, as: :notifiable
 
@@ -116,6 +117,10 @@ class Ownership < ApplicationRecord
   def bike
     # Get it unscoped, because example/hidden/deleted
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
+  end
+
+  def bike_type
+    bike&.type || "bike"
   end
 
   def bike_scoped

@@ -5,6 +5,8 @@ RSpec.describe SalesController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:item) { FactoryBot.create(:bike, :with_primary_activity, :with_ownership_claimed, user:) }
+  let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item:) }
+  let(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:) }
   let(:ownership) { item.current_ownership }
   let(:current_user) { user }
 
@@ -36,8 +38,66 @@ RSpec.describe SalesController, type: :request do
   end
 
   describe "create" do
-    it "creates a sale" do
+    context "with marketplace_message" do
+      let(:sale_params) do
+        {
+          amount: 123.69,
+          currency: "USD",
+          marketplace_message_id: marketplace_message.id,
+          ownership_id: ownership.id
+        }
+      end
+      let(:target_attrs) do
+        {
+          amount_cents: 12369,
+          currency_enum: 'usd',
+          ownership_id: ownership.id,
+          marketplace_message_id: marketplace_message.id,
+          seller_id: user.id,
+          sold_via: "bike_index_marketplace",
+          item_id: item.id,
+          item_type: 'Bike',
+          sold_at: Time.current
 
+        }
+      end
+      let(:new_ownership_attrs) do
+        {
+          bike_id: item.id,
+          user_id: marketplace_message.sender_id,
+        }
+      end
+      before { expect(marketplace_message).to be_present }
+
+      it "creates a sale" do
+        expect(item.reload.is_for_sale).to be_truthy
+        expect do
+          post base_url, params: {sale: sale_params}
+          expect(response).to redirect_to bike_path(item.id)
+          expect(flash[:success]).to be_present
+        end.to change(Sale, :count).by(1)
+          .and change(Callbacks::AfterSaleCreateJob.jobs, :count).by 1
+
+        Callbacks::AfterSaleCreateJob.drain
+
+        expect(Sale.count).to eq 1
+        sale = Sale.last
+        expect(sale).to match_hash_indifferently target_attrs
+        expect(sale.sold_at).to be_within(2).of Time.current
+        expect(sale.new_ownership).to be_present
+        expect(sale.new_ownership).to match_hash_indifferently new_ownership_attrs
+        expect(sale.buyer_id).to eq marketplace_message.sender_id
+
+        expect(item.reload.is_for_sale).to be_falsey
+        expect(item.current_ownership_id).to eq sale.new_ownership.id
+      end
+
+      context "not bike owner" do
+        it "doesn't create a sale"
+      end
+      context "bike has already transferred" do
+        it "creates a sale"
+      end
     end
   end
 end

@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2839,7 +2838,8 @@ CREATE TABLE public.ownerships (
     is_new boolean DEFAULT false,
     skip_email boolean DEFAULT false,
     address_record_id bigint,
-    doorkeeper_app_id bigint
+    doorkeeper_app_id bigint,
+    sale_id bigint
 );
 
 
@@ -3186,15 +3186,16 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 
 CREATE TABLE public.sales (
     id bigint NOT NULL,
-    amount_cents integer,
-    currency_enum integer,
+    ownership_id bigint,
     item_type character varying,
     item_id bigint,
     seller_id bigint,
+    marketplace_message_id bigint,
+    amount_cents integer,
+    currency_enum integer,
     sold_via integer,
     sold_via_other character varying,
     sold_at timestamp(6) without time zone,
-    ownership_id bigint,
     new_owner_string character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -6642,6 +6643,13 @@ CREATE INDEX index_ownerships_on_organization_id ON public.ownerships USING btre
 
 
 --
+-- Name: index_ownerships_on_sale_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_sale_id ON public.ownerships USING btree (sale_id);
+
+
+--
 -- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6758,6 +6766,13 @@ CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_disp
 --
 
 CREATE INDEX index_sales_on_item ON public.sales USING btree (item_type, item_id);
+
+
+--
+-- Name: index_sales_on_marketplace_message_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_sales_on_marketplace_message_id ON public.sales USING btree (marketplace_message_id);
 
 
 --

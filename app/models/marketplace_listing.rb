@@ -20,7 +20,6 @@
 #  address_record_id :bigint
 #  buyer_id          :bigint
 #  item_id           :bigint
-#  sale_id           :bigint
 #  seller_id         :bigint
 #
 # Indexes
@@ -28,7 +27,6 @@
 #  index_marketplace_listings_on_address_record_id  (address_record_id)
 #  index_marketplace_listings_on_buyer_id           (buyer_id)
 #  index_marketplace_listings_on_item               (item_type,item_id)
-#  index_marketplace_listings_on_sale_id            (sale_id)
 #  index_marketplace_listings_on_seller_id          (seller_id)
 #
 class MarketplaceListing < ApplicationRecord
