@@ -106,7 +106,7 @@ class Bike < ApplicationRecord
   include AddressRecordedWithinBoundingBox
   include PgSearch::Model
 
-  has_paper_trail ignore: [:cached_data]
+  has_paper_trail versions: {class_name: "Version"}, ignore: [:cached_data]
 
   PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
 
