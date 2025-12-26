@@ -21,7 +21,7 @@ class BikeServices::Updator
     @currently_stolen = @bike.status_stolen?
   end
 
-  def update_ownership
+  def update_ownership(sale_id: nil)
     # Because this is a mess, managed independently in ProcessImpoundUpdatesJob
     new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
     return false if new_owner_email.blank? || @bike.owner_email == new_owner_email
@@ -49,7 +49,8 @@ class BikeServices::Updator
       registration_info:,
       doorkeeper_app_id: @doorkeeper_app_id,
       organization: @user&.member_of?(ownership_org) ? ownership_org : nil,
-      skip_email: @bike_params.dig("bike", "skip_email"))
+      skip_email: @bike_params.dig("bike", "skip_email"),
+      sale_id:)
 
     # If the bike is a unregistered_parking_notification, switch to being a normal bike, since it's been sent to a new owner
     @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
