@@ -33,7 +33,7 @@ class UserAlertsController < ApplicationController
       bike_organization = BikeOrganization.find_or_create_by(bike_id: @user_alert.bike_id,
         organization_id: @user_alert.organization_id)
       @user_alert.resolve! if bike_organization.valid?
-      ::Callbacks::AfterUserChangeJob.perform_async(@user_alert.user_id)
+      ::CallbackJob::AfterUserChangeJob.perform_async(@user_alert.user_id)
     else
       flash[:error] = "You don't have permission to edit that bike"
     end

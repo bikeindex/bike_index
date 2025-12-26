@@ -1,4 +1,4 @@
-class Callbacks::AfterUserChangeJob < ApplicationJob
+class CallbackJob::AfterUserChangeJob < ApplicationJob
   sidekiq_options retry: false
 
   def perform(user_id, user = nil, skip_bike_update = false)
@@ -110,7 +110,7 @@ class Callbacks::AfterUserChangeJob < ApplicationJob
   end
 
   def process_bikes(user)
-    user.bike_ids.each { |id| ::Callbacks::AfterBikeSaveJob.perform_async(id, true, true) }
+    user.bike_ids.each { |id| ::CallbackJob::AfterBikeSaveJob.perform_async(id, true, true) }
   end
 
   def update_superuser_abilities(user)

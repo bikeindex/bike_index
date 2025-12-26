@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Callbacks::AfterManufacturerChangeJob < ApplicationJob
+class CallbackJob::AfterManufacturerChangeJob < ApplicationJob
   sidekiq_options queue: "low_priority"
 
   def perform(manufacturer_id)

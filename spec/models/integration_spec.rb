@@ -23,7 +23,7 @@ RSpec.describe Integration, type: :model do
 
       it "creates a user, associate it if the emails match and run new user tasks" do
         expect {
-          expect_any_instance_of(::Callbacks::AfterUserCreateJob).to receive(:perform_confirmed_jobs)
+          expect_any_instance_of(::CallbackJob::AfterUserCreateJob).to receive(:perform_confirmed_jobs)
           FactoryBot.create(:integration, information: info)
         }.to change(User, :count).by 1
       end
@@ -55,7 +55,7 @@ RSpec.describe Integration, type: :model do
 
       it "creates a user, associate it if the emails match and run new user tasks" do
         expect {
-          expect_any_instance_of(::Callbacks::AfterUserCreateJob).to receive(:perform_confirmed_jobs)
+          expect_any_instance_of(::CallbackJob::AfterUserCreateJob).to receive(:perform_confirmed_jobs)
           FactoryBot.create(:integration, information: info)
         }.to change(User, :count).by 1
       end

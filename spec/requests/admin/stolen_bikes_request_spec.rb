@@ -87,8 +87,8 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(StolenBike::ApproveStolenListingJob.jobs.count).to eq 1
           expect(StolenBike::ApproveStolenListingJob.jobs.map { |j| j["args"] }.last.flatten).to eq([bike.id])
 
-          expect(::Callbacks::AfterUserChangeJob.jobs.count).to eq 1
-          ::Callbacks::AfterUserChangeJob.drain
+          expect(::CallbackJob::AfterUserChangeJob.jobs.count).to eq 1
+          ::CallbackJob::AfterUserChangeJob.drain
 
           expect(StolenBike::ActivateTheftAlertJob.jobs.count).to eq 1
           expect(StolenBike::ActivateTheftAlertJob.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])

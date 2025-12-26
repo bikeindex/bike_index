@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Callbacks::AddressRecordUpdateAssociationsJob, type: :job do
+RSpec.describe CallbackJob::AddressRecordUpdateAssociationsJob, type: :job do
   let(:instance) { described_class.new }
 
   let(:user) { FactoryBot.create(:user) }
