@@ -3196,7 +3196,8 @@ CREATE TABLE public.sales (
     sold_via integer,
     sold_via_other character varying,
     sold_at timestamp(6) without time zone,
-    new_owner_string character varying,
+    new_owner_email character varying,
+    remove_not_transfer boolean,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

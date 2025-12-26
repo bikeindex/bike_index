@@ -7,7 +7,8 @@
 #  amount_cents           :integer
 #  currency_enum          :integer
 #  item_type              :string
-#  new_owner_string       :string
+#  new_owner_email        :string
+#  remove_not_transfer    :boolean
 #  sold_at                :datetime
 #  sold_via               :integer
 #  sold_via_other         :string
@@ -49,8 +50,8 @@ class Sale < ApplicationRecord
   belongs_to :marketplace_message
 
   has_one :marketplace_listings
-  has_one :new_ownership, class_name: "Ownership"
-  # has_one :buyer, through: :new_ownership, class_name: "User"
+  has_one :new_ownership, class_name: "Ownership", foreign_key: :sale_id
+  has_one :buyer, through: :new_ownership, class_name: "User", source: :user
 
   # validates_presence_of :item_id
   validates_presence_of :seller_id
@@ -62,12 +63,20 @@ class Sale < ApplicationRecord
   private
 
   def set_calculated_attributes
+    self.seller_id ||= ownership&.user_id
     self.sold_at ||= Time.current
     self.sold_via ||= :bike_index_marketplace if marketplace_message_id.present?
     self.item ||= ownership&.bike
+    self.new_owner_email ||= email_from_marketplace_message
+  end
+
+  def email_from_marketplace_message
+    return unless marketplace_message&.buyer_id.present?
+
+    User.find_by_id(marketplace_message.buyer_id)&.email
   end
 
   def enqueue_callback_job
-    ::Callbacks::AfterSaleCreateJob.perform_async(id)
+    CallbackJob::AfterSaleCreateJob.perform_async(id)
   end
 end
