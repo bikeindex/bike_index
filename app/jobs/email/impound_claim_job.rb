@@ -21,7 +21,7 @@ class Email::ImpoundClaimJob < ApplicationJob
       end
     end
 
-    ::CallbackJob::AfterUserChangeJob.perform_async(impound_claim.user_id)
+    CallbackJob::AfterUserChangeJob.perform_async(impound_claim.user_id)
   end
 
   def calculated_email_to_send(impound_claim)

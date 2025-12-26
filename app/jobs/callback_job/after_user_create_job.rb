@@ -23,7 +23,7 @@ class CallbackJob::AfterUserCreateJob < ApplicationJob
     # Auto confirming the user actually ends up running perform_confirmed_jobs.
     associate_organization_role_invites(user, email)
     send_welcoming_email(user)
-    ::CallbackJob::AfterUserCreateJob.perform_async(user.id, "async")
+    CallbackJob::AfterUserCreateJob.perform_async(user.id, "async")
   end
 
   def perform_merged_jobs(user, email)
@@ -36,7 +36,7 @@ class CallbackJob::AfterUserCreateJob < ApplicationJob
   def perform_confirmed_jobs(user, email)
     UserEmail.create_confirmed_primary_email(user)
     create_passwordless_domain_organization_roles(user)
-    ::CallbackJob::AfterUserCreateJob.perform_async(user.id, "async")
+    CallbackJob::AfterUserCreateJob.perform_async(user.id, "async")
   end
 
   def perform_async_jobs(user, email)

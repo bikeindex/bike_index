@@ -56,7 +56,7 @@ task seed_test_users_and_bikes: :environment do
       puts "\n Bike error \n #{bike.errors.messages}"
     end
   end
-  Bike.pluck(:id).each { |b| ::CallbackJob::AfterBikeSaveJob.perform_async(b) }
+  Bike.pluck(:id).each { |b| CallbackJob::AfterBikeSaveJob.perform_async(b) }
 end
 
 task seed_dup_bikes: :environment do

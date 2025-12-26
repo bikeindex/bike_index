@@ -99,7 +99,7 @@ class BikeServices::Updator
       update_stolen_record
       update_impound_record
     end
-    ::CallbackJob::AfterBikeSaveJob.perform_async(@bike.id) if @bike.present? # run immediately
+    CallbackJob::AfterBikeSaveJob.perform_async(@bike.id) if @bike.present? # run immediately
     remove_blank_components
     @bike
   end

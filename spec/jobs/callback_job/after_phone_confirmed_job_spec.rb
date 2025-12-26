@@ -17,7 +17,7 @@ RSpec.describe CallbackJob::AfterPhoneConfirmedJob, type: :job do
 
     context "it adds the bike to the user" do
       it "adds the bike" do
-        ::CallbackJob::AfterUserChangeJob.new.perform(user.id, user)
+        CallbackJob::AfterUserChangeJob.new.perform(user.id, user)
         expect(user.alert_slugs).to eq(["phone_waiting_confirmation"])
 
         bike.reload

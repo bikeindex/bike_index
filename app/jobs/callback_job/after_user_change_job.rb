@@ -110,7 +110,7 @@ class CallbackJob::AfterUserChangeJob < ApplicationJob
   end
 
   def process_bikes(user)
-    user.bike_ids.each { |id| ::CallbackJob::AfterBikeSaveJob.perform_async(id, true, true) }
+    user.bike_ids.each { |id| CallbackJob::AfterBikeSaveJob.perform_async(id, true, true) }
   end
 
   def update_superuser_abilities(user)

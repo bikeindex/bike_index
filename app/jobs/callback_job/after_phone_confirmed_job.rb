@@ -11,6 +11,6 @@ class CallbackJob::AfterPhoneConfirmedJob < ApplicationJob
     end
 
     # Manually run after user change to update user alerts
-    ::CallbackJob::AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)
+    CallbackJob::AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)
   end
 end

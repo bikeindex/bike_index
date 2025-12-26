@@ -21,7 +21,7 @@ RSpec.describe Email::ImpoundClaimJob, type: :job do
         Email::ImpoundClaimJob.new.perform(impound_claim.id)
         Email::ImpoundClaimJob.new.perform(impound_claim.id)
       }.to change(Notification, :count).by(1)
-      expect(::CallbackJob::AfterUserChangeJob.jobs.count).to eq 1 # To bump user so
+      expect(CallbackJob::AfterUserChangeJob.jobs.count).to eq 1 # To bump user so
       notification = Notification.last
       expect(impound_claim.reload.notifications.pluck(:id)).to eq([notification.id])
       expect(impound_claim.bike_claimed_id).to be_present

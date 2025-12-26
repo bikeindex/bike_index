@@ -21,6 +21,6 @@ class UserPhoneConfirmationJob < ApplicationJob
 
     # Manually run after user change to add a user alert
     # (rather than spinning up a new worker)
-    ::CallbackJob::AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)
+    CallbackJob::AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)
   end
 end
