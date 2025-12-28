@@ -40,7 +40,8 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
       expect(sale.item_id).to eq bike.id
       expect(sale.new_ownership).to be_blank
       expect(sale.sold_via).to eq "bike_index_marketplace"
-      # expect(sale.ownership.sale_sold_in&.id).to eq ownership.id
+
+      expect(ownership.sale_sold_in&.id).to eq sale.id
 
       expect(marketplace_listing.reload.sale_id).to be_nil
       expect(marketplace_listing.status).to eq "for_sale"
@@ -52,6 +53,7 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
 
       expect do
         instance.perform(sale.id)
+        instance.perform(sale.id)
       end.to change(Ownership, :count).by 1
 
       expect(sale.reload.new_owner_email).to eq buyer.email
@@ -61,8 +63,10 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
 
       expect(bike.reload.is_for_sale).to be_falsey
       expect(bike.current_ownership.id).to eq new_ownership.id
+
       expect(ownership.reload.current).to be_falsey
       expect(ownership.sale_id).to be_nil
+      expect(ownership.sale_sold_in&.id).to eq sale.id
 
       expect(marketplace_listing.reload.sale_id).to eq sale.id
       expect(marketplace_listing.status).to eq "sold"

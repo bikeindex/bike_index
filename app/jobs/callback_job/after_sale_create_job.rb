@@ -12,6 +12,8 @@ class CallbackJob::AfterSaleCreateJob < ApplicationJob
   private
 
   def create_new_ownership(sale)
+    return if sale.new_ownership.present?
+
     updator = BikeServices::Updator.new(user: sale.seller, bike: sale.item,
       permitted_params: {bike: {owner_email: sale.new_owner_email}}.as_json)
     updator.update_ownership(sale_id: sale.id)
