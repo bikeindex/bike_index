@@ -76,17 +76,16 @@ RSpec.describe SalesController, type: :request do
           expect(response).to redirect_to bike_path(item.id)
           expect(flash[:success]).to be_present
         end.to change(Sale, :count).by(1)
-          .and change(Callbacks::AfterSaleCreateJob.jobs, :count).by 1
+          .and change(CallbackJob::AfterSaleCreateJob.jobs, :count).by 1
 
-        Callbacks::AfterSaleCreateJob.drain
+        CallbackJob::AfterSaleCreateJob.drain
 
         expect(Sale.count).to eq 1
         sale = Sale.last
         expect(sale).to match_hash_indifferently target_attrs
         expect(sale.sold_at).to be_within(2).of Time.current
-        expect(sale.new_ownership).to be_present
         expect(sale.new_ownership).to match_hash_indifferently new_ownership_attrs
-        expect(sale.buyer_id).to eq marketplace_message.sender_id
+        expect(sale.buyer&.id).to eq marketplace_message.sender_id
 
         expect(item.reload.is_for_sale).to be_falsey
         expect(item.current_ownership_id).to eq sale.new_ownership.id
