@@ -111,7 +111,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.status_stolen?).to be_falsey
       expect(bike.claimed?).to be_falsey
       expect(bike.authorized?(current_user)).to be_truthy
-      ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
+      CallbackJob::AfterUserChangeJob.new.perform(current_user.id)
       expect(current_user.reload.alert_slugs).to eq([])
       Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
@@ -177,7 +177,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.status_stolen?).to be_falsey
         expect(bike.claimed?).to be_falsey
         expect(bike.user&.id).to eq current_user.id
-        ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
+        CallbackJob::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq([])
         expect(current_user.formatted_address_string(visible_attribute: :street)).to eq "278 Broadway, New York, NY 10007"
         expect(current_user.address_set_manually).to be_truthy
@@ -362,7 +362,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone_for_users).to be_truthy
         expect(stolen_record.phone_for_shops).to be_truthy
         expect(stolen_record.phone_for_police).to be_truthy
-        ::Callbacks::AfterUserChangeJob.new.perform(current_user.id)
+        CallbackJob::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
         current_user.update_column :updated_at, Time.current - 5.minutes
         Sidekiq::Job.clear_all

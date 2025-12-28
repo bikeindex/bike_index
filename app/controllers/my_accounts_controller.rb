@@ -113,7 +113,7 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue ::Callbacks::AfterUserChangeJob
+    @user.update(updated_at: Time.current) # Bump user to enqueue CallbackJob::AfterUserChangeJob
     @user
   end
 
@@ -128,7 +128,7 @@ class MyAccountsController < ApplicationController
         user.address_set_manually = true
         user.address_record = address_record.reload
         # Updates the user association, user needs to be assigned
-        ::Callbacks::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
+        CallbackJob::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
       end
     end
     user.update(pparams)

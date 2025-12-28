@@ -78,8 +78,8 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_ban.description).to eq "something here"
         # Bump the auth token, because we want to sign out the user
         expect(user_subject.auth_token).to_not eq og_auth_token
-        expect(::Callbacks::AfterUserChangeJob.jobs.count).to be > 0
-        ::Callbacks::AfterUserChangeJob.new.perform(user_subject.id)
+        expect(CallbackJob::AfterUserChangeJob.jobs.count).to be > 0
+        CallbackJob::AfterUserChangeJob.new.perform(user_subject.id)
         expect(user_subject.superuser_abilities.count).to eq 1
         expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
       end
