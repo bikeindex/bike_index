@@ -50,13 +50,13 @@ RSpec.describe SalesController, type: :request do
       let(:target_attrs) do
         {
           amount_cents: 12369,
-          currency_enum: 'usd',
+          currency_enum: "usd",
           ownership_id: ownership.id,
           marketplace_message_id: marketplace_message.id,
           seller_id: user.id,
           sold_via: "bike_index_marketplace",
           item_id: item.id,
-          item_type: 'Bike',
+          item_type: "Bike",
           sold_at: Time.current
 
         }
@@ -64,7 +64,7 @@ RSpec.describe SalesController, type: :request do
       let(:new_ownership_attrs) do
         {
           bike_id: item.id,
-          user_id: marketplace_message.sender_id,
+          user_id: marketplace_message.sender_id
         }
       end
       before { expect(marketplace_message).to be_present }
@@ -92,7 +92,16 @@ RSpec.describe SalesController, type: :request do
       end
 
       context "not bike owner" do
-        it "doesn't create a sale"
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "doesn't create a sale" do
+          expect(ownership)
+          expect(item.reload.is_for_sale).to be_truthy
+          expect do
+            post base_url, params: {sale: sale_params}
+            expect(response).to redirect_to my_account_path
+            expect(flash[:error]).to be_present
+          end.to change(Sale, :count).by(0)
+        end
       end
       context "bike has already transferred" do
         it "creates a sale"

@@ -59,7 +59,6 @@ class Sale < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :enqueue_callback_job, on: :create
 
-
   private
 
   def set_calculated_attributes

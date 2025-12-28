@@ -29,7 +29,7 @@ class SalesController < ApplicationController
     if current_user.present?
       return if @ownership&.user_id == current_user.id
 
-      flash[:error] = "You don't have permission to sell that #{@ownership&.bike_type || 'Bike'}"
+      flash[:error] = "You don't have permission to sell that #{@ownership&.bike_type || "Bike"}"
       redirect_back(fallback_location: user_root_url) && return
     end
 
