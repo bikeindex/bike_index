@@ -3,7 +3,7 @@ module Oauth
     include ControllerHelpers
     include SetPeriod
     include SortableTable
-    include Pagy::Backend
+    include Pagy::Method
 
     before_action :store_return_and_authenticate_user
     before_action :ensure_app_owner!, except: %i[index new create]

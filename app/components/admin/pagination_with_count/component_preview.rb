@@ -4,7 +4,7 @@ module Admin::PaginationWithCount
   class ComponentPreview < ApplicationComponentPreview
     # @group PaginationWithCount Variants
     def default
-      pagy = Pagy.new(count: 100, page: 1, items: 25)
+      pagy = Pagy::Offset.new(count: 100, page: 1, limit: 25)
       render(Admin::PaginationWithCount::Component.new(
         collection: collection,
         pagy:,
@@ -14,7 +14,7 @@ module Admin::PaginationWithCount
     end
 
     def with_viewing_override
-      pagy = Pagy.new(count: 50, page: 1, items: 25)
+      pagy = Pagy::Offset.new(count: 50, page: 1, limit: 25)
       render(Admin::PaginationWithCount::Component.new(
         collection: collection,
         viewing: "Custom Items",
@@ -25,7 +25,7 @@ module Admin::PaginationWithCount
     end
 
     def skip_total
-      pagy = Pagy.new(count: 100, page: 2, items: 50)
+      pagy = Pagy::Offset.new(count: 100, page: 2, limit: 50)
       render(Admin::PaginationWithCount::Component.new(
         collection: collection,
         skip_total: true,
@@ -36,7 +36,7 @@ module Admin::PaginationWithCount
     end
 
     def with_time_range
-      pagy = Pagy.new(count: 75, page: 1, items: 25)
+      pagy = Pagy::Offset.new(count: 75, page: 1, limit: 25)
       time_range = (1.week.ago..Time.current)
       render(Admin::PaginationWithCount::Component.new(
         collection: collection,
