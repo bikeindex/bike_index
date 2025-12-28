@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Callbacks::AmbassadorTaskAfterCreateJob, type: :job do
+RSpec.describe CallbackJob::AmbassadorTaskAfterCreateJob, type: :job do
   describe "#perform" do
     it "assigns the given task to all ambassadors" do
       task = FactoryBot.create(:ambassador_task)

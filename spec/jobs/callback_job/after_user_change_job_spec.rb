@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Callbacks::AfterUserChangeJob, type: :job do
+RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
   let(:instance) { described_class.new }
 
   context "no user" do

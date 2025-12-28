@@ -35,6 +35,6 @@ class AmbassadorTask < ApplicationRecord
 
   # Assigns the task to all ambassadors, if not already assigned
   def ensure_assigned_to_all_ambassadors!
-    ::Callbacks::AmbassadorTaskAfterCreateJob.perform_async(id)
+    CallbackJob::AmbassadorTaskAfterCreateJob.perform_async(id)
   end
 end

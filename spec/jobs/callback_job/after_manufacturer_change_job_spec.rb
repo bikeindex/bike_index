@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Callbacks::AfterManufacturerChangeJob, type: :job do
+RSpec.describe CallbackJob::AfterManufacturerChangeJob, type: :job do
   let(:instance) { described_class.new }
 
   let(:manufacturer) { FactoryBot.create(:manufacturer, name: "something") }

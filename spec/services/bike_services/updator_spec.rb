@@ -255,7 +255,7 @@ RSpec.describe BikeServices::Updator do
     expect(update_bike).to receive(:update_ownership).and_return(true)
     expect {
       update_bike.update_available_attributes
-    }.to change(::Callbacks::AfterBikeSaveJob.jobs, :size).by(1)
+    }.to change(CallbackJob::AfterBikeSaveJob.jobs, :size).by(1)
   end
 
   describe "update_address_record" do

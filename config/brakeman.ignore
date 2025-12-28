@@ -409,50 +409,6 @@
       "note": ""
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "3297dbbe43376b4246e8771edc2aaa3e4c6051bc67d3cad5c985084e07986548",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/organized/manages/_location_fields.html.haml",
-      "line": 28,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_data(true, \"'\".freeze, :usid => Country.united_states_id)",
-      "render_path": null,
-      "location": {
-        "type": "template",
-        "template": "organized/manages/_location_fields"
-      },
-      "user_input": "Country.united_states_id",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "3297dbbe43376b4246e8771edc2aaa3e4c6051bc67d3cad5c985084e07986548",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/organized/manages/_location_fields.html.haml",
-      "line": 55,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_data(true, \"'\".freeze, :usid => Country.united_states_id)",
-      "render_path": null,
-      "location": {
-        "type": "template",
-        "template": "organized/manages/_location_fields"
-      },
-      "user_input": "Country.united_states_id",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "354344ca6574126e6a3f013a91eaea8665a9171780ba98853442fc39a4ad9ee6",
@@ -655,40 +611,6 @@
       "confidence": "Medium",
       "cwe_id": [
         89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "49414f62c1cb836d1de8eb5ed94f7d110b0c403217850b41e971cd45455883e8",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/organized/bikes/new_iframe.html.haml",
-      "line": 109,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_data(true, \"'\", :usid => Country.united_states_id)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::BikesController",
-          "method": "new_iframe",
-          "line": 103,
-          "file": "app/controllers/organized/bikes_controller.rb",
-          "rendered": {
-            "name": "organized/bikes/new_iframe",
-            "file": "app/views/organized/bikes/new_iframe.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/bikes/new_iframe"
-      },
-      "user_input": "Country.united_states_id",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
       ],
       "note": ""
     },
@@ -1130,50 +1052,6 @@
       "note": ""
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "9bb17505fa4850bb607d1c46a974466303e0b219a92cc1e579131a7c5dfb62ad",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/bikes_edit/bike_fields/_stolen_location.html.haml",
-      "line": 7,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_data(true, \"'\", :usid => Country.united_states_id)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "BikesController",
-          "method": "new",
-          "line": 95,
-          "file": "app/controllers/bikes_controller.rb",
-          "rendered": {
-            "name": "bikes/new",
-            "file": "app/views/bikes/new.html.erb"
-          }
-        },
-        {
-          "type": "template",
-          "name": "bikes/new",
-          "line": 196,
-          "file": "app/views/bikes/new.html.erb",
-          "rendered": {
-            "name": "bikes_edit/bike_fields/_stolen_location",
-            "file": "app/views/bikes_edit/bike_fields/_stolen_location.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "bikes_edit/bike_fields/_stolen_location"
-      },
-      "user_input": "Country.united_states_id",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "9de2dec925781dd5563bb05130413fef190ee0c95cead55d2442d4dac71c28bc",
@@ -1319,40 +1197,6 @@
         77
       ],
       "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "a781a68835361643c043a9864004eed0cc8159f2a958b3316e55b12b6bc54711",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/organized/model_audits/show.html.haml",
-      "line": 64,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_data(true, \"'\", :toggle => \"modal\", :target => \"#update-model-cert-modal\", :modelauditid => ModelAudit.find(params[:id]).id, :mnfgname => ModelAudit.find(params[:id]).mnfg_name, :framemodel => ModelAudit.find(params[:id]).frame_model)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::ModelAuditsController",
-          "method": "show",
-          "line": 24,
-          "file": "app/controllers/organized/model_audits_controller.rb",
-          "rendered": {
-            "name": "organized/model_audits/show",
-            "file": "app/views/organized/model_audits/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/model_audits/show"
-      },
-      "user_input": "ModelAudit.find(params[:id]).mnfg_name",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
     },
     {
       "warning_type": "Redirect",
@@ -2170,5 +2014,5 @@
       "note": ""
     }
   ],
-  "brakeman_version": "7.1.1"
+  "brakeman_version": "7.1.2"
 }
