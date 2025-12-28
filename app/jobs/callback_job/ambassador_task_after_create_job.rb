@@ -1,4 +1,4 @@
-class Callbacks::AmbassadorTaskAfterCreateJob < ApplicationJob
+class CallbackJob::AmbassadorTaskAfterCreateJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def self.assign_task_to_all_ambassadors(ambassador_task)

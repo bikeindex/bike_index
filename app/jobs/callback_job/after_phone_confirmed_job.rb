@@ -1,4 +1,4 @@
-class Callbacks::AfterPhoneConfirmedJob < ApplicationJob
+class CallbackJob::AfterPhoneConfirmedJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform(user_phone_id)
@@ -11,6 +11,6 @@ class Callbacks::AfterPhoneConfirmedJob < ApplicationJob
     end
 
     # Manually run after user change to update user alerts
-    ::Callbacks::AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)
+    CallbackJob::AfterUserChangeJob.new.perform(user_phone.user_id, user_phone.user)
   end
 end

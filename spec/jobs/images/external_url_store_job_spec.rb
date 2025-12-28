@@ -21,7 +21,7 @@ RSpec.describe Images::ExternalUrlStoreJob, type: :job do
         expect(public_image.image).to be_present
       end
       expect(Sidekiq::Job.jobs.count).to eq 1
-      expect(::Callbacks::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+      expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
     end
     context "is_private true" do
       let(:is_private) { true }
@@ -35,7 +35,7 @@ RSpec.describe Images::ExternalUrlStoreJob, type: :job do
           expect(public_image.image).to be_present
         end
         expect(Sidekiq::Job.jobs.count).to eq 1
-        expect(::Callbacks::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+        expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
       end
     end
   end

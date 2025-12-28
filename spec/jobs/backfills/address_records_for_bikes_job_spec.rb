@@ -29,7 +29,7 @@ RSpec.describe Backfills::AddressRecordsForBikesJob, type: :job do
       expect do
         described_class.build_or_create_for(bike_chicago)
       end.to change(AddressRecord, :count).by 1
-      expect(Callbacks::AddressRecordUpdateAssociationsJob.jobs.count).to eq 0
+      expect(CallbackJob::AddressRecordUpdateAssociationsJob.jobs.count).to eq 0
 
       expect(bike_chicago.reload.address_record_id).to be_present
       expect(bike_chicago.address_record).to match_hash_indifferently target_attrs
@@ -58,7 +58,7 @@ RSpec.describe Backfills::AddressRecordsForBikesJob, type: :job do
         expect do
           described_class.build_or_create_for(bike_amsterdam)
         end.to change(AddressRecord, :count).by 1
-        expect(Callbacks::AddressRecordUpdateAssociationsJob.jobs.count).to eq 0
+        expect(CallbackJob::AddressRecordUpdateAssociationsJob.jobs.count).to eq 0
 
         expect(bike_amsterdam.reload.address_record_id).to be_present
         expect(bike_amsterdam.address_record).to match_hash_indifferently target_attrs
