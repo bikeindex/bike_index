@@ -204,7 +204,7 @@ class AddressRecord < ApplicationRecord
     # Bikes and ownerships handle address assignment separately
     return if skip_callback_job || bike? || ownership?
 
-    ::Callbacks::AddressRecordUpdateAssociationsJob.perform_async(id)
+    CallbackJob::AddressRecordUpdateAssociationsJob.perform_async(id)
   end
 
   def should_be_geocoded?

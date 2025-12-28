@@ -1,5 +1,5 @@
 # TODO: eventually this should merge with after_user_change_worker.rb, or something
-class Callbacks::AfterUserCreateJob < ApplicationJob
+class CallbackJob::AfterUserCreateJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   # Generally, this is called inline - so it makes sense to pass in the user rather than just the user_id
@@ -23,7 +23,7 @@ class Callbacks::AfterUserCreateJob < ApplicationJob
     # Auto confirming the user actually ends up running perform_confirmed_jobs.
     associate_organization_role_invites(user, email)
     send_welcoming_email(user)
-    ::Callbacks::AfterUserCreateJob.perform_async(user.id, "async")
+    CallbackJob::AfterUserCreateJob.perform_async(user.id, "async")
   end
 
   def perform_merged_jobs(user, email)
@@ -36,7 +36,7 @@ class Callbacks::AfterUserCreateJob < ApplicationJob
   def perform_confirmed_jobs(user, email)
     UserEmail.create_confirmed_primary_email(user)
     create_passwordless_domain_organization_roles(user)
-    ::Callbacks::AfterUserCreateJob.perform_async(user.id, "async")
+    CallbackJob::AfterUserCreateJob.perform_async(user.id, "async")
   end
 
   def perform_async_jobs(user, email)

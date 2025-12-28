@@ -19,7 +19,7 @@ RSpec.describe MarkGraduatedNotificationRemainingJob, type: :job do
       # This is one scenario
       it "deletes a bike and associations, doesn't error if bike is deleted already" do
         expect(user_registration_organization.reload.bikes.pluck(:id)).to eq([bike1.id])
-        ::Callbacks::AfterUserChangeJob.new.perform(user.id)
+        CallbackJob::AfterUserChangeJob.new.perform(user.id)
         graduated_notification1.save
         expect(graduated_notification1.reload.user).to be_present
         expect(graduated_notification1.processed?).to be_falsey

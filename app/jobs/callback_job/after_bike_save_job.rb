@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Callbacks::AfterBikeSaveJob < ApplicationJob
+class CallbackJob::AfterBikeSaveJob < ApplicationJob
   sidekiq_options retry: false
 
   POST_URL = ENV["BIKE_WEBHOOK_URL"]
@@ -22,7 +22,7 @@ class Callbacks::AfterBikeSaveJob < ApplicationJob
     update_coordinates(bike)
     unless skip_user_update
       # Update the user to update any user alerts relevant to bikes
-      ::Callbacks::AfterUserChangeJob.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
+      CallbackJob::AfterUserChangeJob.new.perform(bike.owner.id, bike.owner.reload, true) if bike.owner.present?
     end
     bike.bike_versions.each do |bike_version|
       bike_version.set_calculated_attributes

@@ -394,7 +394,7 @@ class StolenRecord < ApplicationRecord
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
     enqueue_worker(@alert_location_changed)
-    ::Callbacks::AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
+    CallbackJob::AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
   end
 
   private

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Callbacks::AfterBikeSaveJob, type: :job do
+RSpec.describe CallbackJob::AfterBikeSaveJob, type: :job do
   let(:instance) { described_class.new }
   before { Sidekiq::Job.clear_all }
 
@@ -206,7 +206,7 @@ RSpec.describe Callbacks::AfterBikeSaveJob, type: :job do
     end
     context "with webhook url set" do
       it "calls the things we expect it to call" do
-        stub_const("::Callbacks::AfterBikeSaveJob::POST_URL", "https://example.com")
+        stub_const("CallbackJob::AfterBikeSaveJob::POST_URL", "https://example.com")
         expect_any_instance_of(Faraday::Connection).to receive(:post) { true }
         instance.post_bike_to_webhook(instance.serialized(bike))
       end
