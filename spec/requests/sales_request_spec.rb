@@ -11,14 +11,35 @@ RSpec.describe SalesController, type: :request do
   let(:current_user) { user }
 
   describe "new" do
-    it "renders" do
-      expect(ownership.id).to be_present
-      get "#{base_url}/new?ownership_id=#{ownership.id}"
-      expect(response).to render_template(:new)
-      expect(flash).to be_blank
+    context "with a marketplace_message_id" do
+      it "renders" do
+        expect(marketplace_message.id).to be_present
+        expect(item.reload.authorized?(current_user)).to be_truthy
+        get "#{base_url}/new?marketplace_message_id=#{marketplace_message.id}"
+        expect(response).to render_template(:new)
+        expect(flash).to be_blank
+        expect(assigns(:sale)).to be_present
+      end
+      context "not user's marketplace_message" do
+        let(:current_user) { marketplace_message.sender }
+        it "redirects" do
+          expect(item.reload.authorized?(current_user)).to be_falsey
+          get "#{base_url}/new?marketplace_message_id=#{marketplace_message.id}"
+          expect(response).to redirect_to(my_account_path)
+          expect(flash[:error]).to be_present
+        end
+      end
+      context "bike has already been transferred" do
+        # TODO: improve handling of this (and existing sale record)
+        it "redirects" do
+
+        end
+      end
     end
     context "with an existing sale record" do
-      it "IDK What to do about this!"
+      # TODO: improve handling of this (and bike already transferred)
+      it "redirects" do
+      end
     end
 
     context "without a current_user" do
@@ -31,7 +52,7 @@ RSpec.describe SalesController, type: :request do
       context "without a found ownership" do
         it "redirects" do
           get "#{base_url}/new?ownership_id=3333333"
-          expect(response.status).to eq 404
+          expect(flash[:error].match(/log in/i)).to be_present
         end
       end
     end
@@ -99,7 +120,7 @@ RSpec.describe SalesController, type: :request do
           expect do
             post base_url, params: {sale: sale_params}
             expect(response).to redirect_to my_account_path
-            expect(flash[:error]).to be_present
+            expect(flash[:error]).to match(/permission to sell/i)
           end.to change(Sale, :count).by(0)
         end
       end

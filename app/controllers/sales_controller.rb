@@ -1,18 +1,16 @@
 class SalesController < ApplicationController
-  before_action :find_ownership
-  before_action :authorize_user_and_set_flash
+  before_action :build_and_authorize_sale!
 
   def new
-    @bike = Bike.unscoped.find(@ownership.bike_id)
-    @sale = Sale.new(ownership_id: @ownership.id)
+    @bike = @sale.item
   end
 
   def create
-    @sale = Sale.new(permitted_create_params)
+    @sale.attributes = permitted_create_params
 
     if @sale.save
-      flash[:success] = "#{@ownership.bike_type} marked sold!"
-      redirect_to(bike_path(@ownership.bike_id))
+      flash[:success] = "#{@sale.item_cycle_type} marked sold!"
+      redirect_to(bike_path(@sale.item_id))
     else
       render :new
     end
@@ -20,16 +18,12 @@ class SalesController < ApplicationController
 
   private
 
-  def find_ownership
-    ownership_id = params[:ownership_id] || params.dig(:sale, :ownership_id)
-    @ownership = Ownership.find(ownership_id)
-  end
-
-  def authorize_user_and_set_flash
+  def build_and_authorize_sale!
     if current_user.present?
-      return if @ownership&.user_id == current_user.id
+      @sale, error_message = Sale.build_and_authorize(user: current_user, marketplace_message_id:)
+      return if error_message.blank?
 
-      flash[:error] = "You don't have permission to sell that #{@ownership&.bike_type || "Bike"}"
+      flash[:error] = error_message
       redirect_back(fallback_location: user_root_url) && return
     end
 
@@ -40,8 +34,11 @@ class SalesController < ApplicationController
     end
   end
 
+  def marketplace_message_id
+    params[:marketplace_message_id] || params.dig(:sale, :marketplace_message_id)
+  end
+
   def permitted_create_params
-    params.require(:sale).permit(:amount, :currency, :marketplace_message_id, :ownership_id)
-      .merge(seller_id: current_user.id)
+    params.require(:sale).permit(:amount, :currency)
   end
 end
