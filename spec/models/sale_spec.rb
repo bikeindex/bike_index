@@ -27,7 +27,7 @@ RSpec.describe Sale, type: :model do
           ownership_id: ownership.id,
           seller_id: ownership.user_id,
           sold_via: "bike_index_marketplace",
-          new_owner_email: marketplace_message.sender.email,
+          new_owner_email: marketplace_message.sender.email
         }
       end
       let(:user) { ownership.user }

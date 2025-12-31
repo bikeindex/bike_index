@@ -85,7 +85,7 @@ class Sale < ApplicationRecord
   end
 
   def item_cycle_type
-    "#{ownership&.bike_type || CycleType::DEFAULT}"
+    ownership&.bike_type || CycleType::DEFAULT
   end
 
   private
