@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-class BikeServices::OwnershipCreator
+class BikeServices::OwnershipTransferer
   class << self
     def registration_info_from_params(params)
       params.dig("bike")&.slice(*BParam::REGISTRATION_INFO_ATTRS) || {}
     end
 
     # Returns new_ownership (nil if no new ownership)
-    def transfer_if_changed(bike, updator:, new_owner_email: nil, doorkeeper_app_id: nil, registration_info: {}, skip_save: false, skip_email: false)
+    def create_if_changed(bike, updator:, new_owner_email: nil, doorkeeper_app_id: nil, registration_info: {}, skip_save: false, skip_email: false)
       return if new_owner_email.blank? || bike.owner_email == new_owner_email
 
       # Since we've deleted the owner_email from the update hash, we have to assign it here

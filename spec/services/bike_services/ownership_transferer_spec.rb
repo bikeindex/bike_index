@@ -1,15 +1,15 @@
 require "rails_helper"
 
-RSpec.describe BikeServices::OwnershipCreator do
+RSpec.describe BikeServices::OwnershipTransferer do
   let(:updator) { FactoryBot.create(:user) }
 
-  describe "transfer_if_changed" do
+  describe "create_if_changed" do
     let!(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:initial_ownership) { Ownership.order(:created_at).where(bike_id: bike.id).first }
 
     it "does nothing" do
       expect do
-        expect(described_class.transfer_if_changed(bike, updator:)).to be_nil
+        expect(described_class.create_if_changed(bike, updator:)).to be_nil
       end.to change(Ownership, :count).by 0
     end
 
@@ -26,7 +26,7 @@ RSpec.describe BikeServices::OwnershipCreator do
       end
       it "creates an ownership" do
         expect do
-          result = described_class.transfer_if_changed(bike, updator:,
+          result = described_class.create_if_changed(bike, updator:,
             new_owner_email: "example@bikeindex.org")
           expect(result.is_a?(Ownership)).to be_truthy
         end.to change(Ownership, :count).by 1

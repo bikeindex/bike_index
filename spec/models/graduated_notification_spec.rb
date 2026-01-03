@@ -661,7 +661,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification.user_id).to be_blank
 
         expect(bike.ownerships.count).to eq 1
-        BikeServices::OwnershipCreator.transfer_if_changed(bike, updator: user2, new_owner_email: user2.email)
+        BikeServices::OwnershipTransferer.create_if_changed(bike, updator: user2, new_owner_email: user2.email)
         expect(bike.reload.owner_email).to eq user2.email
         expect(bike.user.id).to eq user2.id
         expect(bike.ownerships.count).to eq 2

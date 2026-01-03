@@ -123,7 +123,7 @@ class Ownership < ApplicationRecord
   end
 
   def bike_type
-    bike&.type || CycleType::DEFAULT.downcase # match BikeAttributable#type
+    bike&.type || CycleType::DEFAULT.downcase # match BikeAttributable#type case
   end
 
   def initial?
