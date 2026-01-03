@@ -30,13 +30,12 @@ RSpec.describe SalesController, type: :request do
         end
       end
       context "bike has already been transferred" do
-        # TODO: improve handling of this (and existing sale record)
-        it "redirects" do
+        it "renders" do
         end
       end
     end
     context "with an existing sale record" do
-      # TODO: improve handling of this (and bike already transferred)
+      # TODO: improve handling of this (and create)
       it "redirects" do
       end
     end
@@ -124,6 +123,7 @@ RSpec.describe SalesController, type: :request do
         end
       end
       context "bike has already transferred" do
+        # TODO: improve handling of this (and new)
         it "creates a sale"
       end
     end

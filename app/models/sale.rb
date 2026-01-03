@@ -75,6 +75,16 @@ class Sale < ApplicationRecord
     end
   end
 
+  def item_cycle_type
+    ownership&.bike_type || CycleType::DEFAULT
+  end
+
+  def created_after_transfer?
+    (new_ownership&.created_at + 60) < (created_at || Time.current)
+  end
+
+  private
+
   def set_calculated_attributes
     self.ownership_id ||= marketplace_message&.item&.current_ownership&.id
     self.seller_id ||= ownership&.user_id
@@ -83,12 +93,6 @@ class Sale < ApplicationRecord
     self.item ||= ownership&.bike
     self.new_owner_email ||= email_from_marketplace_message
   end
-
-  def item_cycle_type
-    ownership&.bike_type || CycleType::DEFAULT
-  end
-
-  private
 
   def seller_is_owner
     return if ownership.present? && ownership.user_id == seller_id
