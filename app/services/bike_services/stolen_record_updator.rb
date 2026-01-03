@@ -10,10 +10,10 @@ class BikeServices::StolenRecordUpdator
       recovery_posted tsved_at estimated_value].freeze
   end
 
-  def initialize(creation_params = {})
-    @bike = creation_params[:bike]
-    b_param = creation_params[:b_param]
-    @stolen_params = b_param&.stolen_attrs || {}
+  def initialize(bike: nil, b_param: nil, params: nil)
+    @bike = bike
+    b_param ||= BParam.new(params:)
+    @stolen_params = b_param&.stolen_attrs
   end
 
   attr_reader :stolen_params

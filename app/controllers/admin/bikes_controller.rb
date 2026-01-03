@@ -95,9 +95,13 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def update
-    updator = BikeServices::Updator.new(user: current_user, bike: @bike, params:)
-    updator.update_ownership
-    updator.update_stolen_record
+    update_params = permitted_parameters.except(:stolen_records_attributes)
+    new_owner_email = EmailNormalizer.normalize(update_params.delete("owner_email"))
+    BikeServices::OwnershipCreator.transfer_if_changed(@bike, updator: current_user,
+      new_owner_email:, skip_email: update_params.delete("skip_email"))
+
+    BikeServices::StolenRecordUpdator.new(bike: @bike, params:).update_records
+
     if params[:mark_recovered_reason].present?
       @bike.current_stolen_record.add_recovery_information(
         recovered_description: params[:mark_recovered_reason],
@@ -106,7 +110,7 @@ class Admin::BikesController < Admin::BaseController
         recovering_user_id: current_user.id
       )
     end
-    if @bike.update(permitted_parameters.except(:stolen_records_attributes))
+    if @bike.update(update_params)
       @bike.create_normalized_serial_segments
       return if return_to_if_present
 
