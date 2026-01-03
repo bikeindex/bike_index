@@ -29,9 +29,9 @@ class BikeServices::Updator
     # Because this is a mess, managed independently in ProcessImpoundUpdatesJob
     new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
     registration_info = BikeServices::OwnershipCreator.registration_info_from_params(@bike_params)
-    @bike, new_ownership = BikeServices::OwnershipCreator.transfer_if_changed(@bike, new_owner_email:, updator: @user,
-      doorkeeper_app_id: @doorkeeper_app_id, skip_save: true, registration_info:)
 
+    new_ownership = BikeServices::OwnershipCreator.transfer_if_changed(@bike, new_owner_email:, updator: @user,
+      doorkeeper_app_id: @doorkeeper_app_id, skip_save: true, registration_info:)
     # Don't update other bike_params unless new ownership was created
     return unless new_ownership&.valid?
 

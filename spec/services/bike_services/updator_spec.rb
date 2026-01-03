@@ -31,6 +31,7 @@ RSpec.describe BikeServices::Updator do
       expect(Ownership.count).to eq 1
       update_bike = BikeServices::Updator.new(bike:, params:, user:)
       update_bike.update_ownership
+      bike.save
       bike.reload
       expect(bike.updator).to eq(user)
       expect(Ownership.count).to eq 2
@@ -97,6 +98,7 @@ RSpec.describe BikeServices::Updator do
         {organization_id: nil, origin: "transferred_ownership", status: "status_with_owner", impound_record_id: nil}
       end
       it "does not pass organization" do
+        bike.update_column :updated_at, Time.current - 2.hours
         expect(bike.reload.current_ownership.organization).to be_present
         expect(bike.created_at).to be < Time.current - 1.hour
         expect(bike.not_updated_by_user?).to be_truthy
@@ -107,13 +109,17 @@ RSpec.describe BikeServices::Updator do
         expect(ownership.organization_id).to eq organization.id
         update_bike = BikeServices::Updator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
         update_bike.update_ownership
+        # Bike hasn't been saved
+        expect(bike.updated_at).to be < Time.current - 1.hour
+        bike.save
         expect(Ownership.count).to eq 2
         expect(bike.reload.current_ownership.id).to_not eq ownership.id
         expect(bike.current_ownership).to have_attributes(new_ownership_attrs)
         expect(bike.bike_organizations.count).to eq 1
         expect(bike.bike_organizations.first.organization).to eq organization
         expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-        expect(bike.reload.updated_by_user_at).to be > Time.current - 1
+        expect(bike.updated_at).to be > Time.current - 2
+        expect(bike.updated_by_user_at).to be > Time.current - 2
         expect(bike.not_updated_by_user?).to be_falsey
         expect(bike.updator_id).to eq user.id
       end
@@ -133,6 +139,7 @@ RSpec.describe BikeServices::Updator do
           expect(ownership.organization_id).to eq organization.id
           update_bike = BikeServices::Updator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
           update_bike.update_ownership
+          bike.save
           expect(Ownership.count).to eq 2
           expect(bike.reload.current_ownership.id).to_not eq ownership.id
           expect(bike.current_ownership.new_registration?).to be_falsey
