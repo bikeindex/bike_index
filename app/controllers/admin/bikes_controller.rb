@@ -96,9 +96,9 @@ class Admin::BikesController < Admin::BaseController
 
   def update
     update_params = permitted_parameters.except(:stolen_records_attributes)
-    new_owner_email = EmailNormalizer.normalize(update_params.delete("owner_email"))
     BikeServices::OwnershipTransferer.create_if_changed(@bike, updator: current_user,
-      new_owner_email:, skip_email: update_params.delete("skip_email"))
+      new_owner_email: update_params.delete("owner_email"),
+      skip_email: update_params.delete("skip_email"))
 
     BikeServices::StolenRecordUpdator.new(bike: @bike, params:).update_records
 

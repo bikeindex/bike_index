@@ -10,6 +10,8 @@ RSpec.describe BikeServices::OwnershipTransferer do
     it "does nothing" do
       expect do
         expect(described_class.create_if_changed(bike, updator:)).to be_nil
+        expect(described_class.create_if_changed(bike, updator:, new_owner_email: bike.owner_email.upcase))
+          .to be_nil
       end.to change(Ownership, :count).by 0
     end
 
