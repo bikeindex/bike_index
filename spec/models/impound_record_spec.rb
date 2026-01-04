@@ -267,7 +267,7 @@ RSpec.describe ImpoundRecord, type: :model do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
     let(:bike_user) { bike.user }
     let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user:, bike:, organization:) }
-    let(:organization_role2) { FactoryBot.create(:organization_role, user:) }
+    let(:organization_role2) { FactoryBot.create(:organization_role_claimed, user:) }
     let(:organization2) { organization_role2.organization }
     let(:superuser) { User.new(superuser: true) }
     it "is not authorized by bike_user" do
@@ -293,14 +293,16 @@ RSpec.describe ImpoundRecord, type: :model do
 
     context "without organization" do
       let(:impound_record) { FactoryBot.create(:impound_record, user:, bike:) }
-      it "is not authorized by bike_user" do
+      # Impounding a bike doesn't give users the ability to override ownership access -
+      # only organization impounded records
+      it "authorized by bike_user" do
         expect(impound_record.reload.organized?).to be_falsey
         bike.reload
         expect(bike_user).to be_present
         expect(bike.send(:authorization_requires_impound_organization?)).to be_falsey
         expect(bike.send(:editable_organization_ids)).to eq([])
-        expect(bike.authorized?(bike_user)).to be_falsey
-        expect(bike.authorized?(user)).to be_truthy
+        expect(bike.authorized?(bike_user)).to be_truthy
+        expect(bike.authorized?(user)).to be_falsey
         expect(bike.current_impound_record).to be_present
         expect(bike.current_impound_record.authorized?(bike.user)).to be_falsey
         expect(bike.current_impound_record.authorized?(user)).to be_truthy

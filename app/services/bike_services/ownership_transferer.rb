@@ -6,7 +6,8 @@ class BikeServices::OwnershipTransferer
       params.dig("bike")&.slice(*BParam::REGISTRATION_INFO_ATTRS) || {}
     end
 
-    # Returns new_ownership (nil if no new ownership)
+    # Returns new_ownership, or nil if no new ownership created
+    # DOES NOT authorize
     def create_if_changed(bike, updator:, new_owner_email: nil, doorkeeper_app_id: nil, registration_info: {},
       skip_save: false, skip_email: false)
       # ^
@@ -18,23 +19,21 @@ class BikeServices::OwnershipTransferer
       bike.owner_email = new_owner_email
       bike.attributes = BikeServices::Updator.updator_attrs(updator)
 
-      # even if skip_save, still update if an unregistered parking notification
-      if bike.unregistered_parking_notification?
+      # even if skip_save, still update if an abandoned bike
+      if %w[unregistered_parking_notification status_abandoned status_impounded].include?(bike.status)
         bike.update(status: "status_with_owner", marked_user_unhidden: true)
+        status = "status_with_owner"
       elsif !skip_save
         bike.save
       end
       # If updator is a member of the creation organization, add org to the new ownership!
       ownership_org = bike.current_ownership&.organization
 
-      # If previous ownership was with_owner, this should be too. Required for impounding :shrug:
-      status = "status_with_owner" if bike.current_ownership&.status_with_owner?
-
       bike.ownerships.create(owner_email: new_owner_email,
         creator: updator,
         origin: "transferred_ownership",
         organization: updator&.member_of?(ownership_org) ? ownership_org : nil,
-        # status:,
+        status:,
         registration_info:,
         doorkeeper_app_id:,
         skip_email:)

@@ -180,6 +180,16 @@ RSpec.describe Users::MergeAdditionalEmailJob, type: :job do
       end
     end
 
+    context "impound_record" do
+      let(:impound_record) { FactoryBot.create(:impound_record, user: old_user) }
+
+      it "updates the bike_verions" do
+        expect(impound_record.reload.user_id).to eq old_user.id
+        instance.perform(user_email.id)
+        expect(impound_record.reload.user_id).to eq user.id
+      end
+    end
+
     context "marketplace_listings" do
       let!(:address_record_current) { FactoryBot.create(:address_record, user:, kind: :user) }
       let!(:address_record_old) { FactoryBot.create(:address_record, user: old_user, kind: :user) }

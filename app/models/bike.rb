@@ -562,10 +562,6 @@ class Bike < ApplicationRecord
     # We have either a org or a user - if no user, we only need to check org
     return editable_org_ids.include?(org.id) if u.blank?
 
-    # if authorization_requires_impound_organization?
-    #   return u.present? && u.member_of?(current_impound_record.organization)
-    # end
-
     unless current_impound_record.present?
       return false if claimable_by?(u) || u == owner # authorized by owner, not organization
     end
@@ -589,12 +585,9 @@ class Bike < ApplicationRecord
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?
 
-    if current_impound_record.blank?
+    unless authorization_requires_impound_organization?
       # Doesn't require an organization, authorize by user (but if not, check org below)
       return true if passed_user == owner || claimable_by?(passed_user)
-    elsif !authorization_requires_impound_organization?
-      # Means the impound record was not organized. REQUIRES impound record authorization
-      return current_impound_record.authorized?(passed_user, no_superuser_override:)
     end
 
     authorized_by_organization?(u: passed_user)
