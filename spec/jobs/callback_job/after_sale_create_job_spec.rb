@@ -73,5 +73,16 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
       expect(marketplace_listing.buyer_id).to eq buyer.id
       expect(marketplace_listing.end_at).to be_within(5).of Time.current
     end
+
+    context "with bike already transferred" do
+      it "assigns the ownership" do
+      end
+
+      context "with a different owner" do
+        it "doesn't assign the ownership" do
+
+        end
+      end
+    end
   end
 end
