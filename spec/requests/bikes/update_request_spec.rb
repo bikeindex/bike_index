@@ -236,7 +236,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.user_hidden).to be_truthy
       expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
       expect(bike.ownerships.count).to eq 1
-      expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+      expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
       expect(bike.stolen_records.count).to eq 0
       expect(ownership1.user_hidden).to be_truthy
       expect(ownership1.current).to be_truthy
@@ -273,7 +273,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.stolen_records.count).to eq 0
       expect(bike.status).to eq "status_with_owner"
       expect(bike.user_hidden).to be_falsey
-      expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+      expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
       expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
     end
     context "add extra information" do
@@ -292,7 +292,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.unregistered_parking_notification?).to be_truthy
         expect(bike.user_hidden).to be_truthy
         expect(bike.ownerships.count).to eq 1
-        expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+        expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
         Sidekiq::Job.clear_all
         expect {
           patch base_url, params: {bike: {description: "sooo cool and stuff"}}

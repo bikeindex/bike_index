@@ -501,7 +501,7 @@ class Bike < ApplicationRecord
 
   def serial_display(u = nil)
     if serial_hidden?
-      # show the serial to the user, even if authorization_requires_organization?
+      # show the serial to the user, even if authorization_requires_impound_organization?
       return "Hidden" unless can_see_hidden_serial?(u)
     end
     return serial_number.humanize if no_serial?
@@ -553,28 +553,26 @@ class Bike < ApplicationRecord
     current_ownership&.blank? || current_ownership == first_ownership
   end
 
-  def editable_organizations
-    # Only the impound organization can edit it if it's impounded
-    return Organization.where(id: current_impound_record.organization_id) if current_impound_record.present?
-    return organizations if first_ownership? && organized? && !claimed?
-
-    can_edit_claimed_organizations
-  end
-
   def authorized_by_organization?(u: nil, org: nil)
-    editable_organization_ids = editable_organizations.pluck(:id)
-    return false unless editable_organization_ids.any?
-    return true unless u.present? || org.present?
+    editable_org_ids = editable_organization_ids
+    return false if editable_org_ids.none? || u.blank? && org.blank?
+    # WTF, why is this here:
+    # return true unless u.present? || org.present?
+
     # We have either a org or a user - if no user, we only need to check org
-    return editable_organization_ids.include?(org.id) if u.blank?
+    return editable_org_ids.include?(org.id) if u.blank?
+
+    # if authorization_requires_impound_organization?
+    #   return u.present? && u.member_of?(current_impound_record.organization)
+    # end
 
     unless current_impound_record.present?
       return false if claimable_by?(u) || u == owner # authorized by owner, not organization
     end
     # Ensure the user is part of the organization and the organization can edit if passed both
-    return u.member_bike_edit_of?(org) && editable_organization_ids.include?(org.id) if org.present?
+    return u.member_bike_edit_of?(org) && editable_org_ids.include?(org.id) if org.present?
 
-    editable_organizations.any? { |o| u.member_bike_edit_of?(o) }
+    editable_org_ids.any? { |o_id| u.member_bike_edit_of?(o_id, no_superuser_override: true) }
   end
 
   def first_owner_email
@@ -591,11 +589,14 @@ class Bike < ApplicationRecord
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?
 
-    # authorization requires organization if impounded or marked abandoned by an organization
-    unless authorization_requires_organization?
-      # Since it doesn't require an organization, authorize by user
+    if current_impound_record.blank?
+      # Doesn't require an organization, authorize by user (but if not, check org below)
       return true if passed_user == owner || claimable_by?(passed_user)
+    elsif !authorization_requires_impound_organization?
+      # Means the impound record was not organized. REQUIRES impound record authorization
+      return current_impound_record.authorized?(passed_user, no_superuser_override:)
     end
+
     authorized_by_organization?(u: passed_user)
   end
 
@@ -906,11 +907,21 @@ class Bike < ApplicationRecord
     "status_with_owner"
   end
 
+  private
+
+  def editable_organization_ids
+    if current_impound_record.present?
+      # equivalent to authorization_requires_impound_organization?
+      return current_impound_record.organized? ? [current_impound_record.organization_id] : []
+    end
+    return bike_organizations.pluck(:organization_id) if first_ownership? && organized? && !claimed?
+
+    can_edit_claimed_organizations.pluck(:id)
+  end
+
   def enqueue_duplicate_bike_finder_worker
     DuplicateBikeFinderJob.perform_async(id)
   end
-
-  private
 
   def fetch_current_impound_record
     self.current_impound_record = impound_records.current.last
@@ -923,7 +934,7 @@ class Bike < ApplicationRecord
     (cml.present? && cml.for_sale?) ? cml : nil
   end
 
-  def authorization_requires_organization?
+  def authorization_requires_impound_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
   end

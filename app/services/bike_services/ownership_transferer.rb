@@ -34,7 +34,7 @@ class BikeServices::OwnershipTransferer
         creator: updator,
         origin: "transferred_ownership",
         organization: updator&.member_of?(ownership_org) ? ownership_org : nil,
-        status:,
+        # status:,
         registration_info:,
         doorkeeper_app_id:,
         skip_email:)

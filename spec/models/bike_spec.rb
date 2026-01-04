@@ -854,13 +854,12 @@ RSpec.describe Bike, type: :model do
       it "returns correctly for all sorts of convoluted things" do
         bike.reload
         expect(bike.creation_organization).to eq organization
-        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.send(:editable_organization_ids)).to eq([organization.id])
         expect(bike.claimed?).to be_falsey
         expect(bike.authorize_and_claim_for_user(member)).to be_truthy
         expect(bike.authorize_and_claim_for_user(member)).to be_truthy
         expect(bike.claimed?).to be_falsey
         # And test authorized_by_organization?
-        expect(bike.authorized_by_organization?).to be_truthy
         expect(member.authorized?(bike)).to be_truthy
         expect(bike.authorized_by_organization?(u: member)).to be_truthy
         expect(bike.authorized_by_organization?(u: member, org: organization)).to be_truthy
@@ -874,7 +873,6 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized?(member_no_bikes)).to be_falsey
         # If the member has multiple organization_roles, it should only work for the correct organization
         new_organization_role = FactoryBot.create(:organization_role_claimed, user: member)
-        expect(bike.authorized_by_organization?).to be_truthy
         expect(bike.authorized_by_organization?(u: member)).to be_truthy
         expect(bike.authorized_by_organization?(u: member, org: new_organization_role.organization)).to be_falsey
         # It should be authorized for the owner, but not be authorized_by_organization
@@ -900,7 +898,7 @@ RSpec.describe Bike, type: :model do
         end
         it "returns false" do
           expect(bike.organizations.pluck(:id)).to eq([organization.id])
-          expect(bike.editable_organizations).to eq([])
+          expect(bike.send(:editable_organization_ids)).to eq([])
           expect(bike.authorized?(member)).to be_falsey
           expect(member.authorized?(bike)).to be_falsey
           expect(bike.authorized_by_organization?).to be_falsey
@@ -912,10 +910,9 @@ RSpec.describe Bike, type: :model do
           let(:can_edit_claimed) { true }
           it "returns true" do
             expect(bike.owner).to eq owner
-            expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+            expect(bike.send(:editable_organization_ids)).to eq([organization.id])
             expect(bike.authorized?(member)).to be_truthy
             expect(member.authorized?(bike)).to be_truthy
-            expect(bike.authorized_by_organization?).to be_truthy
             expect(bike.claimed?).to be_truthy
             expect(bike.organized?).to be_truthy
             expect(bike.organized?(organization)).to be_truthy
@@ -942,7 +939,6 @@ RSpec.describe Bike, type: :model do
             expect(bike.claimed?).to be_falsey
             expect(bike.owner).to eq user
             expect(bike.ownerships.count).to eq 2
-            expect(bike.authorized_by_organization?).to be_truthy
             expect(bike.authorized_by_organization?(org: organization)).to be_truthy
             expect(bike.authorized?(member)).to be_truthy
             expect(bike.authorize_and_claim_for_user(member)).to be_truthy
@@ -979,14 +975,14 @@ RSpec.describe Bike, type: :model do
         expect(bike.reload.claimed?).to be_falsey
         expect(bike.owner).to eq creator
         expect(bike.claimable_by?(user)).to be_truthy
-        expect(bike.editable_organizations.pluck(:id)).to eq([])
+        expect(bike.send(:editable_organization_ids)).to eq([])
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           impound_record.save
           bike.reload
           expect(bike.status).to eq "status_impounded"
           expect(bike.serial_display).to eq "Hidden"
-          expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
+          expect(bike.send(:editable_organization_ids)).to eq([organization.id]) # impound org can edit
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
           expect(bike.authorized?(organization_user)).to be_truthy
           expect(bike.current_impound_record_id).to eq impound_record.id
@@ -995,7 +991,7 @@ RSpec.describe Bike, type: :model do
         impound_record.reload
         expect(impound_record.resolved?).to be_truthy
         bike.reload
-        expect(bike.editable_organizations.pluck(:id)).to eq([]) # No longer impounded by that org
+        expect(bike.send(:editable_organization_ids)).to eq([]) # No longer impounded by that org
         expect(bike.status).to eq "status_with_owner"
         expect(bike.authorize_and_claim_for_user(creator)).to be_truthy
         expect(bike.authorized?(user)).to be_truthy
@@ -1007,13 +1003,13 @@ RSpec.describe Bike, type: :model do
           expect(bike.reload.claimed?).to be_truthy
           expect(bike.authorized?(creator)).to be_falsey
           expect(bike.authorized?(user)).to be_truthy
-          expect(bike.editable_organizations.pluck(:id)).to eq([])
+          expect(bike.send(:editable_organization_ids)).to eq([])
           Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             impound_record.save
             bike.reload
             expect(bike.status).to eq "status_impounded"
-            expect(bike.editable_organizations.pluck(:id)).to eq([organization.id]) # impound org can edit
+            expect(bike.send(:editable_organization_ids)).to eq([organization.id]) # impound org can edit
             expect(bike.authorized?(user)).to be_falsey
             expect(bike.authorized?(organization_user)).to be_truthy
             impound_record.impound_record_updates.create(kind: "retrieved_by_owner", user: organization_user)
@@ -1021,7 +1017,7 @@ RSpec.describe Bike, type: :model do
           impound_record.reload
           expect(impound_record.resolved?).to be_truthy
           bike.reload
-          expect(bike.editable_organizations.pluck(:id)).to eq([]) # No longer impounded by that org
+          expect(bike.send(:editable_organization_ids)).to eq([]) # No longer impounded by that org
           expect(bike.status).to eq "status_with_owner"
           expect(bike.authorized?(user)).to be_truthy
           expect(bike.authorized?(organization_user)).to be_falsey # Because no organization organization_role
@@ -1042,9 +1038,8 @@ RSpec.describe Bike, type: :model do
     it "checks the passed organization" do
       bike.reload
       expect(bike.claimed?).to be_truthy
-      expect(bike.editable_organizations.pluck(:id)).to eq([organization2.id])
+      expect(bike.send(:editable_organization_ids)).to eq([organization2.id])
       expect(bike.authorized_by_organization?(u: user)).to be_falsey # Because the user is the owner
-      expect(bike.authorized_by_organization?).to be_truthy
       expect(bike.authorized_by_organization?(u: organization_user)).to be_truthy
       expect(bike.authorized_by_organization?(org: organization)).to be_falsey
       expect(bike.authorized_by_organization?(u: organization_user, org: organization)).to be_falsey
