@@ -131,6 +131,10 @@ class Ownership < ApplicationRecord
     Bike.find_by_id(bike_id)
   end
 
+  def bike_type
+    bike&.type || CycleType::DEFAULT.downcase # match BikeAttributable#type case
+  end
+
   def initial?
     return previous_ownership_id.blank? if id.present?
 

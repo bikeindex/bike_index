@@ -123,12 +123,12 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
       let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_images, bike:) }
 
-      it "updates the bike and calls update_ownership and serial_normalizer" do
-        expect_any_instance_of(BikeServices::Updator).to receive(:update_ownership)
-        expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
+      it "Doesn't update" do
+        # This functionality was removed in PR #3029, because I don't know where there is a form that uses it
+        # Now it just shows a flash error. If someone tells me about where it happens, I will fix!
         put "#{base_url}/#{bike.id}", params: {bike: {serial_number: "stuff"}}
         expect(response).to redirect_to(:edit_admin_stolen_bike)
-        expect(flash[:success]).to be_present
+        expect(flash[:error]).to be_present
       end
       context "without public image" do
         # Sometimes bikes have alert images even though they have no photo, this enables deleting it
