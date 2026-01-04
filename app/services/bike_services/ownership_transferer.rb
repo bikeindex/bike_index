@@ -8,10 +8,15 @@ class BikeServices::OwnershipTransferer
 
     # Returns new_ownership, or nil if no new ownership created
     # DOES NOT authorize
-    def create_if_changed(bike, updator:, new_owner_email: nil, doorkeeper_app_id: nil, registration_info: {},
-      skip_save: false, skip_email: false)
-      # ^
-
+    def create_if_changed(
+      bike,
+      updator:,
+      new_owner_email: nil,
+      doorkeeper_app_id: nil,
+      registration_info: {},
+      skip_save: false,
+      skip_email: false
+    )
       new_owner_email = EmailNormalizer.normalize(new_owner_email)
       return if new_owner_email.blank? || bike.owner_email == new_owner_email
 
