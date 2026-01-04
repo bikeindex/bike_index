@@ -144,16 +144,12 @@ RSpec.describe Admin::BikesController, type: :request do
     end
 
     context "success" do
-      let(:bike) { FactoryBot.create(:stolen_bike) }
+      let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership) }
       let(:organization) { FactoryBot.create(:organization) }
-      it "updates the bike and calls update_ownership and serial_normalizer" do
-        expect_any_instance_of(BikeServices::Updator).to receive(:update_ownership)
-        expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
-        stolen_record = bike.fetch_current_stolen_record
-        expect(stolen_record).to be_present
-        expect(stolen_record.is_a?(StolenRecord)).to be_truthy
-        bike_attributes = {
+      let(:bike_attributes) do
+        {
           serial_number: "new thing and stuff",
+          owner_email: "new@example.com",
           bike_organization_ids: ["", organization.id.to_s],
           made_without_serial: "0",
           stolen_records_attributes: {
@@ -163,12 +159,25 @@ RSpec.describe Admin::BikesController, type: :request do
             }
           }
         }
+      end
+      it "updates the bike and calls update_ownership and serial_normalizer" do
+        # expect_any_instance_of(BikeServices::Updator).to receive(:update_ownership)
+        expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
+        stolen_record = bike.fetch_current_stolen_record
+        expect(stolen_record).to be_present
+        expect(stolen_record.is_a?(StolenRecord)).to be_truthy
+        current_ownership_id = bike.reload.current_ownership&.id
+        expect(bike.updator_id).to be_nil
+
         put "#{base_url}/#{bike.id}", params: {bike: bike_attributes}
         expect(flash[:success]).to be_present
         expect(response).to redirect_to(:edit_admin_bike)
-        bike.reload
+        expect(bike.reload.current_ownership_id).to_not eq current_ownership_id
         expect(bike.serial_number).to eq bike_attributes[:serial_number]
         expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
+        expect(bike.owner_email).to eq "new@example.com"
+        expect(bike.updated_by_user_at).to be_within(2).of Time.current
+        expect(bike.updator_id).to eq current_user.id
         stolen_record.reload
         expect(stolen_record.street).to eq "Cortland and Ashland"
         expect(stolen_record.city).to eq "Chicago"

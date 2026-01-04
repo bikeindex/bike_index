@@ -10,6 +10,10 @@ class BikeServices::Updator
         bike: params.require(:bike).permit(BikeServices::Creator.old_attr_accessible)
       }.as_json
     end
+
+    def updator_attrs(user)
+      {updated_by_user_at: Time.current}.merge(user.present? ? {updator_id: user.id} : {})
+    end
   end
 
   def initialize(user:, bike:, current_ownership: nil, params: nil, permitted_params: nil, doorkeeper_app_id: nil)
@@ -24,32 +28,12 @@ class BikeServices::Updator
   def update_ownership
     # Because this is a mess, managed independently in ProcessImpoundUpdatesJob
     new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
-    return false if new_owner_email.blank? || @bike.owner_email == new_owner_email
+    registration_info = BikeServices::OwnershipTransferer.registration_info_from_params(@bike_params)
 
-    # Since we've deleted the owner_email from the update hash, we have to assign it here
-    # This is required because ownership_creator uses it :/ - not a big fan of this side effect though
-    @bike.owner_email = new_owner_email
-    @bike.attributes = updator_attrs
-    if @bike.unregistered_parking_notification?
-      @bike.update(status: "status_with_owner", marked_user_unhidden: true)
-    elsif !@skip_ownership_bike_save
-      # If this is not called from update_available_attributes, save to set the updator attributes
-      @bike.save
-    end
-    # If updator is a member of the creation organization, add org to the new ownership!
-    ownership_org = @bike.current_ownership&.organization
-    # If previous ownership was with_owner, this should be too
-    status = "status_with_owner" if @bike.current_ownership&.status_with_owner?
-    registration_info = @bike_params["bike"].slice(*BParam::REGISTRATION_INFO_ATTRS) || {}
-
-    @bike.ownerships.create(owner_email: new_owner_email,
-      creator: @user,
-      origin: "transferred_ownership",
-      status:,
-      registration_info:,
-      doorkeeper_app_id: @doorkeeper_app_id,
-      organization: @user&.member_of?(ownership_org) ? ownership_org : nil,
-      skip_email: @bike_params.dig("bike", "skip_email"))
+    new_ownership = BikeServices::OwnershipTransferer.create_if_changed(@bike, new_owner_email:, updator: @user,
+      doorkeeper_app_id: @doorkeeper_app_id, skip_save: true, registration_info:)
+    # Don't update other bike_params unless new ownership was created
+    return unless new_ownership&.valid?
 
     # If the bike is a unregistered_parking_notification, switch to being a normal bike, since it's been sent to a new owner
     @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
@@ -78,7 +62,6 @@ class BikeServices::Updator
   def update_available_attributes
     ensure_ownership!
     set_protected_attributes
-    @skip_ownership_bike_save = true # Don't save bike an extra time in update ownership
     update_ownership
     update_api_components if @bike_params["components"].present?
     # Skips a few REGISTRATION_INFO_ATTRS
@@ -95,7 +78,7 @@ class BikeServices::Updator
       @bike.propulsion_type_slug = update_attrs["propulsion_type"] || update_attrs["propulsion_type_slug"] || @bike.propulsion_type
       update_attrs = update_attrs.except(*propulsion_updates)
     end
-    if @bike.update(update_attrs.merge(updator_attrs))
+    if @bike.update(update_attrs.merge(self.class.updator_attrs(@user)))
       update_stolen_record
       update_impound_record
     end
@@ -129,10 +112,6 @@ class BikeServices::Updator
     return unless impound_params.present? && impound_record.present?
 
     impound_record.update(impound_params)
-  end
-
-  def updator_attrs
-    {updated_by_user_at: Time.current}.merge(@user.present? ? {updator_id: @user.id} : {})
   end
 
   # TODO: Remove :update_attrs - only need address_record_attributes - once backfill is finished - #2922
