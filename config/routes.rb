@@ -83,6 +83,7 @@ Rails.application.routes.draw do
   end
 
   resources :ownerships, only: %i[show]
+  resources :sales, only: %i[new create]
 
   resources :stolen_notifications, only: %i[create new]
 
