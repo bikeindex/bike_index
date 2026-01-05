@@ -6,20 +6,20 @@ class BikeServices::OwnershipTransferer
       params.dig("bike")&.slice(*BParam::REGISTRATION_INFO_ATTRS) || {}
     end
 
-    # Returns new_ownership, or nil if no new ownership created
-    # DOES NOT authorize
-    def create_if_changed(
+    # Returns an Ownership (either a new one or the existing one if the email is the same)
+    # does NOT authorize creation, just creates with the parameters given
+    def find_or_create(
       bike,
       updator:,
       new_owner_email: nil,
       doorkeeper_app_id: nil,
       registration_info: {},
       processing_impound_record_id: nil,
-      skip_save: false,
+      skip_bike_save: false,
       skip_email: false
     )
       new_owner_email = EmailNormalizer.normalize(new_owner_email)
-      return if new_owner_email.blank? || bike.owner_email == new_owner_email
+      return bike.current_ownership if new_owner_email.blank? || bike.owner_email == new_owner_email
 
       impound_record_id = processing_impound_record_id || bike.current_impound_record_id
       bike.attributes = updated_bike_attrs(new_owner_email, updator)
@@ -27,8 +27,7 @@ class BikeServices::OwnershipTransferer
       if bike.current_parking_notification.present? || bike.current_impound_record.present?
         update_impound_and_parking_notifications(bike, updator) unless processing_impound_record_id.present?
         bike.status = "status_with_owner"
-        # Force saving if an active parking_notification or impound_record
-        skip_save = false
+        skip_bike_save = false # always save if an active parking_notification or impound_record
       end
 
       # If updator is a member of the creation organization, add org to the new ownership!
@@ -46,7 +45,7 @@ class BikeServices::OwnershipTransferer
         impound_record_id:,
         skip_email:)
 
-      bike.save unless skip_save
+      bike.save unless skip_bike_save
 
       new_ownership
     end
@@ -58,15 +57,14 @@ class BikeServices::OwnershipTransferer
         owner_email:,
         delete_address_record: true,
         is_phone: false, # TODO: base on new ownership, but phone regs aren't being used
-        marked_user_unhidden: true,
+        user_hidden: false,
         is_for_sale: false
       )
     end
 
     def update_impound_and_parking_notifications(bike, updator)
       if bike.current_impound_record.present?
-        # NOTE: ProcessImpoundUpdatesJob will call create_if_changed - but, since the email's the same,
-        # it's a no-op
+        # NOTE: ProcessImpoundUpdatesJob will call this class - but, since the email's the same, it's a no-op
         bike.current_impound_record.impound_record_updates.create(
           kind: :transferred_to_new_owner,
           user_id: updator.id,

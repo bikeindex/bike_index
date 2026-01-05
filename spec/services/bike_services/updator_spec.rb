@@ -25,12 +25,12 @@ RSpec.describe BikeServices::Updator do
     let(:user) { bike.user }
     let(:ownership) { bike.ownerships.first }
     let(:passed_params) { {id: bike.id, bike: {owner_email: "another@email.co"}} }
-    it "calls create_ownership if the email has changed" do
+    it "creates ownership if the email has changed" do
       expect(bike.reload.updator_id).to be_nil
       expect(bike.user_id).to be_present
       expect(Ownership.count).to eq 1
       update_bike = BikeServices::Updator.new(bike:, params:, user:)
-      update_bike.update_ownership
+      update_bike.send(:update_ownership)
       bike.save
       bike.reload
       expect(bike.updator).to eq(user)
@@ -38,11 +38,11 @@ RSpec.describe BikeServices::Updator do
     end
     context "email doesn't change" do
       let(:email) { "another@email.co" }
-      it "does not call create_ownership if the email hasn't changed" do
+      it "does not create ownership if the email hasn't changed" do
         bike.reload
         expect(Ownership.count).to eq 1
         update_bike = BikeServices::Updator.new(bike:, user:, params:)
-        update_bike.update_ownership
+        update_bike.send(:update_ownership)
         expect(Ownership.count).to eq 1
       end
     end
@@ -108,7 +108,7 @@ RSpec.describe BikeServices::Updator do
         expect(ownership.origin).to eq "web"
         expect(ownership.organization_id).to eq organization.id
         update_bike = BikeServices::Updator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
-        update_bike.update_ownership
+        update_bike.send(:update_ownership)
         # Bike hasn't been saved
         expect(bike.updated_at).to be < Time.current - 1.hour
         bike.save
@@ -186,7 +186,7 @@ RSpec.describe BikeServices::Updator do
           expect(ownership.origin).to eq "web"
           expect(ownership.organization_id).to eq organization.id
           update_bike = BikeServices::Updator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
-          update_bike.update_ownership
+          update_bike.send(:update_ownership)
           expect(Ownership.count).to eq 2
           expect(bike.reload.current_ownership.id).to_not eq ownership.id
           expect(bike.current_ownership).to have_attributes(new_ownership_attrs.merge(organization_id: organization.id))
