@@ -6,8 +6,8 @@ class BikeServices::OwnershipTransferer
       params.dig("bike")&.slice(*BParam::REGISTRATION_INFO_ATTRS) || {}
     end
 
-    # Returns new_ownership
-    # DOES NOT authorize
+    # Returns an Ownership (either a new one or the existing one if the email is the same)
+    # does NOT authorize creation, just creates with the parameters given
     def find_or_create(
       bike,
       updator:,
@@ -15,7 +15,7 @@ class BikeServices::OwnershipTransferer
       doorkeeper_app_id: nil,
       registration_info: {},
       processing_impound_record_id: nil,
-      skip_save: false,
+      skip_bike_save: false,
       skip_email: false
     )
       new_owner_email = EmailNormalizer.normalize(new_owner_email)
@@ -28,7 +28,7 @@ class BikeServices::OwnershipTransferer
         update_impound_and_parking_notifications(bike, updator) unless processing_impound_record_id.present?
         bike.status = "status_with_owner"
         # Force saving if an active parking_notification or impound_record
-        skip_save = false
+        skip_bike_save = false
       end
 
       # If updator is a member of the creation organization, add org to the new ownership!
@@ -46,7 +46,7 @@ class BikeServices::OwnershipTransferer
         impound_record_id:,
         skip_email:)
 
-      bike.save unless skip_save
+      bike.save unless skip_bike_save
 
       new_ownership
     end

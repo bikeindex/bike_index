@@ -30,7 +30,7 @@ class BikeServices::Updator
     registration_info = BikeServices::OwnershipTransferer.registration_info_from_params(@bike_params)
     new_ownership = BikeServices::OwnershipTransferer.find_or_create(@bike, updator: @user,
       new_owner_email: @bike_params["bike"].delete("owner_email"),
-      doorkeeper_app_id: @doorkeeper_app_id, skip_save: true, registration_info:)
+      doorkeeper_app_id: @doorkeeper_app_id, skip_bike_save: true, registration_info:)
     # Don't update other bike_params unless new ownership was just created
     return unless new_ownership&.valid? && new_ownership.created_at > (Time.current - 5.minutes)
 
