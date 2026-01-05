@@ -31,12 +31,12 @@ class BikeServices::Updator
     new_ownership = BikeServices::OwnershipTransferer.find_or_create(@bike, updator: @user,
       new_owner_email: @bike_params["bike"].delete("owner_email"),
       doorkeeper_app_id: @doorkeeper_app_id, skip_bike_save: true, registration_info:)
-    # Don't update other bike_params unless new ownership was just created
+    # Don't update bike_params unless new ownership was created
     return if ownership_unchanged?(new_ownership, ownership_id)
 
-    # If the bike is a unregistered_parking_notification, switch to being a normal bike, since it's been sent to a new owner
-    @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
-    @bike_params["bike"]["address_set_manually"] = false # Because we don't want the old owner address
+    # OwnershipTransferer updates these attributes - remove the parameters in case they were set automatically
+    @bike_params["bike"]["is_for_sale"] = false
+    @bike_params["bike"]["address_set_manually"] = false
   end
 
   def update_api_components
@@ -53,10 +53,9 @@ class BikeServices::Updator
     @bike_params["bike"]["manufacturer_id"] = @bike.manufacturer_id
     @bike_params["bike"]["manufacturer_other"] = @bike.manufacturer_other
     @bike_params["bike"]["creation_organization_id"] = @bike.creation_organization_id
-    @bike_params["bike"]["creator"] = @bike.creator
-    @bike_params["bike"].delete("creator") # = @bike.creator
+    @bike_params["bike"].delete("creator")
     @bike_params["bike"]["example"] = @bike.example
-    @bike_params["bike"]["user_hidden"] = @bike.user_hidden
+    @bike_params["bike"].delete("user_hidden")
   end
 
   def update_available_attributes

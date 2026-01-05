@@ -171,7 +171,37 @@ RSpec.describe ParkingNotification, type: :model do
     let(:parking_notification1) { FactoryBot.create(:parking_notification_unregistered, kind: "parked_incorrectly_notification") }
     let(:organization) { parking_notification1.organization }
     let!(:bike) { parking_notification1.bike }
-    it "sets the impound record" do
+    let(:user) { parking_notification1.user }
+
+    it "becomes user_hidden false if transferred" do
+      bike.reload
+      expect(bike.status).to eq "unregistered_parking_notification"
+      expect(bike.user_hidden).to be_truthy
+      expect(bike.current_ownership).to be_present
+      expect(bike.current_impound_record&.id).to be_nil
+      expect(bike.current_parking_notification&.id).to eq parking_notification1.id
+
+      expect(parking_notification1.unregistered_bike?).to be_truthy
+      expect(parking_notification1.resolved_at).to be_blank
+      expect(parking_notification1.retrieved_kind).to be_blank
+
+      # Transfer ownership:
+      BikeServices::Updator.new(user:, bike:, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json)
+        .update_available_attributes
+
+      expect(bike.reload.status).to eq "status_with_owner"
+      expect(bike.user_hidden).to be_falsey
+      expect(bike.current_impound_record&.id).to be_nil
+      expect(bike.current_parking_notification&.id).to be_nil
+
+      expect(parking_notification1.reload.unregistered_bike?).to be_truthy
+      expect(parking_notification1.resolved_at).to be_within(2).of Time.current
+      expect(parking_notification1.retrieved_kind).to eq "ownership_transfer"
+      expect(parking_notification1.retrieved_by_id).to eq user.id
+      expect(parking_notification1.status).to eq "retrieved"
+    end
+
+    it "sets the impound record with a follow" do
       bike.reload
       expect(bike.status).to eq "unregistered_parking_notification"
       expect(bike.user_hidden).to be_truthy
@@ -191,9 +221,26 @@ RSpec.describe ParkingNotification, type: :model do
       expect(bike.status).to eq "status_impounded"
       expect(parking_notification2.unregistered_bike?).to be_truthy
       expect(bike.user_hidden).to be_falsey
+      expect(bike.current_impound_record&.id).to eq parking_notification2.impound_record_id
+      expect(bike.current_parking_notification&.id).to be_nil
 
-      expect(parking_notification1.reload.resolved_at).to be_present
+      expect(parking_notification1.reload.resolved_at).to be_within(2).of Time.current
       expect(parking_notification1.retrieved_kind).to be_blank
+
+      # Transfer ownership:
+      BikeServices::Updator.new(user:, bike:, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json)
+        .update_available_attributes
+
+      expect(bike.reload.status).to eq "status_with_owner"
+      expect(bike.user_hidden).to be_falsey
+      expect(bike.current_impound_record&.id).to be_nil
+      expect(bike.current_parking_notification&.id).to be_nil
+
+      expect(parking_notification1.reload.unregistered_bike?).to be_truthy
+      expect(parking_notification1.resolved_at).to be_within(5).of Time.current
+      expect(parking_notification1.retrieved_kind).to eq "ownership_transfer"
+      expect(parking_notification1.retrieved_by_id).to eq user.id
+      expect(parking_notification1.status).to eq "retrieved"
     end
   end
 
