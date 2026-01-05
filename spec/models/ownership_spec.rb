@@ -199,7 +199,7 @@ RSpec.describe Ownership, type: :model do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: email) }
       let!(:ownership1) { bike.ownerships.first }
       let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
-      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike, unregistered_bike: true) }
       let(:new_email) { "impound_user@stuff.com" }
       it "is new_registration" do
         expect(bike.reload.claimed?).to be_truthy

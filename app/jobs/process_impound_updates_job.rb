@@ -3,9 +3,8 @@ class ProcessImpoundUpdatesJob < ApplicationJob
 
   def perform(impound_record_id)
     impound_record = ImpoundRecord.find(impound_record_id)
-    # bike = impound_record.bike
-    update_display_ids(impound_record) if impound_record.organized?
 
+    update_display_ids(impound_record) if impound_record.organized?
     claim_retrieved = nil
     # Run each impound_record_updates that hasn't been run
     impound_record.impound_record_updates.unprocessed.each do |impound_record_update|

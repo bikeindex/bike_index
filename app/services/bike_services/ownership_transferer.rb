@@ -26,11 +26,7 @@ class BikeServices::OwnershipTransferer
 
       if bike.current_parking_notification.present? || bike.current_impound_record.present?
         update_impound_and_parking_notifications(bike, updator) unless processing_impound_record_id.present?
-
         bike.status = "status_with_owner"
-
-        status = "status_with_owner"
-
         # Force saving if an active parking_notification or impound_record
         skip_save = false
       end
@@ -38,11 +34,12 @@ class BikeServices::OwnershipTransferer
       # If updator is a member of the creation organization, add org to the new ownership!
       ownership_org = bike.current_ownership&.organization
 
-      new_ownership = bike.ownerships.create(owner_email: new_owner_email,
+      new_ownership = bike.ownerships.create(current: true,
+        owner_email: new_owner_email,
         creator: updator,
-        origin: "transferred_ownership",
+        origin: processing_impound_record_id.present? ? :impound_process : :transferred_ownership,
         organization: updator&.member_of?(ownership_org) ? ownership_org : nil,
-        status:,
+        status: bike.status, # bike.status might be assigned but not saved, it's calculated in ownership
         registration_info:,
         doorkeeper_app_id:,
         impound_record_id:,
@@ -67,7 +64,7 @@ class BikeServices::OwnershipTransferer
 
     def update_impound_and_parking_notifications(bike, updator)
       if bike.current_impound_record.present?
-        # NOTE: ProcessImpoundUpdatesJob will call create_if_changed - but, since the email will be the same,
+        # NOTE: ProcessImpoundUpdatesJob will call create_if_changed - but, since the email's the same,
         # it's a no-op
         bike.current_impound_record.impound_record_updates.create(
           kind: :transferred_to_new_owner,
