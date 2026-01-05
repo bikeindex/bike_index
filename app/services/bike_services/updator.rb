@@ -25,20 +25,6 @@ class BikeServices::Updator
     @currently_stolen = @bike.status_stolen?
   end
 
-  def update_ownership
-    # Because this is a mess, managed independently in ProcessImpoundUpdatesJob
-    registration_info = BikeServices::OwnershipTransferer.registration_info_from_params(@bike_params)
-    new_ownership = BikeServices::OwnershipTransferer.create_if_changed(@bike, updator: @user,
-      new_owner_email: @bike_params["bike"].delete("owner_email"),
-      doorkeeper_app_id: @doorkeeper_app_id, skip_save: true, registration_info:)
-    # Don't update other bike_params unless new ownership was created
-    return unless new_ownership&.valid?
-
-    # If the bike is a unregistered_parking_notification, switch to being a normal bike, since it's been sent to a new owner
-    @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
-    @bike_params["bike"]["address_set_manually"] = false # Because we don't want the old owner address
-  end
-
   def update_api_components
     ComponentCreator.new(bike: @bike, b_param: @bike_params).update_components_from_params
   end
@@ -46,17 +32,6 @@ class BikeServices::Updator
   # This is a separate method because it's called in admin
   def update_stolen_record
     BikeServices::StolenRecordUpdator.new(bike: @bike, b_param: BParam.new(params: @bike_params)).update_records
-  end
-
-  def set_protected_attributes
-    @bike_params["bike"]["serial_number"] = @bike.serial_number
-    @bike_params["bike"]["manufacturer_id"] = @bike.manufacturer_id
-    @bike_params["bike"]["manufacturer_other"] = @bike.manufacturer_other
-    @bike_params["bike"]["creation_organization_id"] = @bike.creation_organization_id
-    # @bike_params["bike"]["creator"] = @bike.creator
-    @bike_params["bike"].delete("creator") # = @bike.creator
-    @bike_params["bike"]["example"] = @bike.example
-    @bike_params["bike"]["user_hidden"] = @bike.user_hidden
   end
 
   def update_available_attributes
@@ -90,11 +65,41 @@ class BikeServices::Updator
 
   private
 
+  def update_ownership
+    registration_info = BikeServices::OwnershipTransferer.registration_info_from_params(@bike_params)
+    ownership_id = @bike.current_ownership_id
+    new_ownership = BikeServices::OwnershipTransferer.find_or_create(@bike, updator: @user,
+      new_owner_email: @bike_params["bike"].delete("owner_email"),
+      doorkeeper_app_id: @doorkeeper_app_id, skip_bike_save: true, registration_info:)
+    # Don't update bike_params unless new ownership was created
+    return if ownership_unchanged?(new_ownership, ownership_id)
+
+    # OwnershipTransferer updates these attributes - remove the parameters in case they were set automatically
+    @bike_params["bike"]["is_for_sale"] = false
+    @bike_params["bike"]["address_set_manually"] = false
+  end
+
   def ensure_ownership!
     return true if @current_ownership && @current_ownership.owner == @user # So we can pass in ownership and skip query
     return true if @bike.authorized?(@user)
 
     raise BikeServices::UpdatorError, "Oh no! It looks like you don't own that bike."
+  end
+
+  def ownership_unchanged?(new_ownership, previous_ownership_id)
+    return true unless new_ownership.valid?
+
+    new_ownership.id == previous_ownership_id
+  end
+
+  def set_protected_attributes
+    @bike_params["bike"]["serial_number"] = @bike.serial_number
+    @bike_params["bike"]["manufacturer_id"] = @bike.manufacturer_id
+    @bike_params["bike"]["manufacturer_other"] = @bike.manufacturer_other
+    @bike_params["bike"]["creation_organization_id"] = @bike.creation_organization_id
+    @bike_params["bike"]["example"] = @bike.example
+    @bike_params["bike"].delete("creator")
+    @bike_params["bike"].delete("user_hidden")
   end
 
   def remove_blank_components

@@ -63,7 +63,8 @@
 // Links, buttons, and more within the dropdown menu
 //
 // `<button>`-specific styles are denoted with `// For <button>s`
-.dropdown-item {
+// 2026-1-6 - Added .dropdown-menu prefix to override tailwind styles
+.dropdown-menu .dropdown-item {
   display: block;
   width: 100%; // For `<button>`s
   padding: 3px $dropdown-item-padding-x;
