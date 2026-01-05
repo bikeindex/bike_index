@@ -27,8 +27,7 @@ class BikeServices::OwnershipTransferer
       if bike.current_parking_notification.present? || bike.current_impound_record.present?
         update_impound_and_parking_notifications(bike, updator) unless processing_impound_record_id.present?
         bike.status = "status_with_owner"
-        # Force saving if an active parking_notification or impound_record
-        skip_bike_save = false
+        skip_bike_save = false # always save if an active parking_notification or impound_record
       end
 
       # If updator is a member of the creation organization, add org to the new ownership!
@@ -58,7 +57,7 @@ class BikeServices::OwnershipTransferer
         owner_email:,
         delete_address_record: true,
         is_phone: false, # TODO: base on new ownership, but phone regs aren't being used
-        marked_user_unhidden: true,
+        user_hidden: false,
         is_for_sale: false
       )
     end

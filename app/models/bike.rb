@@ -897,12 +897,12 @@ class Bike < ApplicationRecord
   end
 
   def set_user_hidden
-    return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
+    return unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
 
-    if marked_user_hidden.present? && Binxtils::InputNormalizer.boolean(marked_user_hidden)
+    if Binxtils::InputNormalizer.boolean(marked_user_hidden)
       self.user_hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
-    elsif marked_user_unhidden.present? && Binxtils::InputNormalizer.boolean(marked_user_unhidden)
+    elsif Binxtils::InputNormalizer.boolean(marked_user_unhidden)
       self.user_hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end

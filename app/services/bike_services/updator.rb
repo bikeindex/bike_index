@@ -53,8 +53,8 @@ class BikeServices::Updator
     @bike_params["bike"]["manufacturer_id"] = @bike.manufacturer_id
     @bike_params["bike"]["manufacturer_other"] = @bike.manufacturer_other
     @bike_params["bike"]["creation_organization_id"] = @bike.creation_organization_id
-    @bike_params["bike"].delete("creator")
     @bike_params["bike"]["example"] = @bike.example
+    @bike_params["bike"].delete("creator")
     @bike_params["bike"].delete("user_hidden")
   end
 
