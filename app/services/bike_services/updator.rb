@@ -26,13 +26,13 @@ class BikeServices::Updator
   end
 
   def update_ownership
-    # Because this is a mess, managed independently in ProcessImpoundUpdatesJob
     registration_info = BikeServices::OwnershipTransferer.registration_info_from_params(@bike_params)
+    ownership_id = @bike.current_ownership_id
     new_ownership = BikeServices::OwnershipTransferer.find_or_create(@bike, updator: @user,
       new_owner_email: @bike_params["bike"].delete("owner_email"),
       doorkeeper_app_id: @doorkeeper_app_id, skip_bike_save: true, registration_info:)
     # Don't update other bike_params unless new ownership was just created
-    return unless new_ownership&.valid? && new_ownership.created_at > (Time.current - 5.minutes)
+    return if ownership_unchanged?(new_ownership, ownership_id)
 
     # If the bike is a unregistered_parking_notification, switch to being a normal bike, since it's been sent to a new owner
     @bike_params["bike"]["is_for_sale"] = false # Because, it's been given to a new owner
@@ -53,7 +53,7 @@ class BikeServices::Updator
     @bike_params["bike"]["manufacturer_id"] = @bike.manufacturer_id
     @bike_params["bike"]["manufacturer_other"] = @bike.manufacturer_other
     @bike_params["bike"]["creation_organization_id"] = @bike.creation_organization_id
-    # @bike_params["bike"]["creator"] = @bike.creator
+    @bike_params["bike"]["creator"] = @bike.creator
     @bike_params["bike"].delete("creator") # = @bike.creator
     @bike_params["bike"]["example"] = @bike.example
     @bike_params["bike"]["user_hidden"] = @bike.user_hidden
@@ -95,6 +95,12 @@ class BikeServices::Updator
     return true if @bike.authorized?(@user)
 
     raise BikeServices::UpdatorError, "Oh no! It looks like you don't own that bike."
+  end
+
+  def ownership_unchanged?(new_ownership, previous_ownership_id)
+    return true unless new_ownership.valid?
+
+    new_ownership.id == previous_ownership_id
   end
 
   def remove_blank_components

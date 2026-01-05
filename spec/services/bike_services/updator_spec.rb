@@ -25,7 +25,7 @@ RSpec.describe BikeServices::Updator do
     let(:user) { bike.user }
     let(:ownership) { bike.ownerships.first }
     let(:passed_params) { {id: bike.id, bike: {owner_email: "another@email.co"}} }
-    it "calls create_ownership if the email has changed" do
+    it "creates ownership if the email has changed" do
       expect(bike.reload.updator_id).to be_nil
       expect(bike.user_id).to be_present
       expect(Ownership.count).to eq 1
@@ -38,7 +38,7 @@ RSpec.describe BikeServices::Updator do
     end
     context "email doesn't change" do
       let(:email) { "another@email.co" }
-      it "does not call create_ownership if the email hasn't changed" do
+      it "does not create ownership if the email hasn't changed" do
         bike.reload
         expect(Ownership.count).to eq 1
         update_bike = BikeServices::Updator.new(bike:, user:, params:)
