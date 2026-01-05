@@ -28,11 +28,9 @@ class BikeServices::Updator
   def update_ownership
     # Because this is a mess, managed independently in ProcessImpoundUpdatesJob
     registration_info = BikeServices::OwnershipTransferer.registration_info_from_params(@bike_params)
-    pp "-------"
     new_ownership = BikeServices::OwnershipTransferer.create_if_changed(@bike, updator: @user,
       new_owner_email: @bike_params["bike"].delete("owner_email"),
       doorkeeper_app_id: @doorkeeper_app_id, skip_save: true, registration_info:)
-    pp "new ownership: #{new_ownership&.valid?}"
     # Don't update other bike_params unless new ownership was created
     return unless new_ownership&.valid?
 
@@ -55,7 +53,8 @@ class BikeServices::Updator
     @bike_params["bike"]["manufacturer_id"] = @bike.manufacturer_id
     @bike_params["bike"]["manufacturer_other"] = @bike.manufacturer_other
     @bike_params["bike"]["creation_organization_id"] = @bike.creation_organization_id
-    @bike_params["bike"]["creator"] = @bike.creator
+    # @bike_params["bike"]["creator"] = @bike.creator
+    @bike_params["bike"].delete("creator") # = @bike.creator
     @bike_params["bike"]["example"] = @bike.example
     @bike_params["bike"]["user_hidden"] = @bike.user_hidden
   end
@@ -79,6 +78,7 @@ class BikeServices::Updator
       @bike.propulsion_type_slug = update_attrs["propulsion_type"] || update_attrs["propulsion_type_slug"] || @bike.propulsion_type
       update_attrs = update_attrs.except(*propulsion_updates)
     end
+
     if @bike.update(update_attrs.merge(self.class.updator_attrs(@user)))
       update_stolen_record
       update_impound_record

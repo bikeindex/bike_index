@@ -2,7 +2,6 @@ class ProcessImpoundUpdatesJob < ApplicationJob
   sidekiq_options queue: "high_priority"
 
   def perform(impound_record_id)
-    pp "PROCESSSSSSSS"
     impound_record = ImpoundRecord.find(impound_record_id)
     # bike = impound_record.bike
     update_display_ids(impound_record) if impound_record.organized?
@@ -16,15 +15,6 @@ class ProcessImpoundUpdatesJob < ApplicationJob
           processing_impound_record_id: impound_record_id,
           updator: impound_record_update.user)
 
-        # bike.update(status: "status_with_owner",
-        #   owner_email: impound_record_update.transfer_email,
-        #   is_for_sale: false,
-        #   address_set_manually: false,
-        #   marked_user_hidden: false)
-        # bike.ownerships.create!(owner_email: impound_record_update.transfer_email,
-        #   impound_record_id: impound_record.id,
-        #   creator_id: impound_record_update.user_id,
-        #   current: true)
       elsif %w[removed_from_bike_index expired].include?(impound_record_update.kind)
         impound_record.bike.destroy
       elsif impound_record_update.kind == "retrieved_by_owner" &&

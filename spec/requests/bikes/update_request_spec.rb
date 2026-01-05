@@ -261,7 +261,7 @@ RSpec.describe "BikesController#update", type: :request do
       Sidekiq::Job.drain_all
       expect(bike.reload.ownerships.count).to eq 2
 
-      expect(ownership1.reload.user_hidden).to be_falsey # Meh, maybe not ideal? But convenient
+      expect(ownership1.reload.user_hidden).to be_truthy
       expect(ownership1.current).to be_falsey
       expect(ownership1.organization_pre_registration).to be_truthy
       expect(ownership1.status).to eq "unregistered_parking_notification"
@@ -283,15 +283,15 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.stolen_records.count).to eq 0
       expect(bike.status).to eq "status_with_owner"
       expect(bike.user_hidden).to be_falsey
-      expect(bike.serial_hidden).to be_falsey
+      expect(bike.serial_hidden?).to be_falsey
       expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
       expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
       expect(bike.to_coordinates.compact.count).to eq 2
 
       expect(parking_notification.reload.active?).to be_falsey
       expect(parking_notification.send_email?).to be_falsey
-      expect(parking_notification.status).to eq "current"
-      expect(parking_notification.kind).to eq "appears_abandoned_notification"
+      expect(parking_notification.status).to eq "retrieved"
+      expect(parking_notification.kind).to eq "parked_incorrectly_notification"
       expect(parking_notification.retrieved_kind).to eq "ownership_transfer"
     end
     context "add extra information" do
