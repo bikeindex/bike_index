@@ -58,6 +58,7 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
 
       expect(sale.reload.new_owner_email).to eq buyer.email
       expect(sale.amount_cents).to be_nil
+      expect(sale.created_after_transfer?).to be_falsey
       new_ownership = sale.new_ownership
       expect(new_ownership).to match_hash_indifferently new_ownership_attrs
 
@@ -75,7 +76,29 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
     end
 
     context "with bike already transferred" do
-      it "assigns the ownership" do
+      let(:updator) { FactoryBot.create(:user_confirmed) } # It doesn't matter who transferred the bike
+      let(:new_owner_email) { buyer.email }
+      let(:new_ownership) do
+        BikeServices::OwnershipTransferer.create_if_changed(bike, updator:, new_owner_email:)
+      end
+      it "assigns sale to the ownership" do
+        expect(new_ownership).to be_valid
+
+        expect(bike.reload.current_ownership_id).to eq new_ownership.id
+        expect(bike.is_for_sale).to be_falsey
+        expect(bike.ownerships.count).to eq 2
+
+        expect do
+          instance.perform(sale.id)
+          instance.perform(sale.id)
+        end.to change(Ownership, :count).by 0
+
+        expect(sale.reload.new_owner_email).to eq buyer.email
+        expect(sale.amount_cents).to be_nil
+        expect(sale.created_after_transfer?).to be_truthy
+        expect(sale.new_ownership.id).to eq new_ownership.id
+
+        expect(new_ownership.reload).to match_hash_indifferently new_ownership_attrs
       end
 
       context "with a different owner" do

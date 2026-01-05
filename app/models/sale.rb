@@ -80,7 +80,9 @@ class Sale < ApplicationRecord
   end
 
   def created_after_transfer?
-    (new_ownership&.created_at + 60) < (created_at || Time.current)
+    return false if new_ownership.blank?
+
+    (new_ownership.created_at + 60) < (created_at || Time.current)
   end
 
   private
