@@ -160,7 +160,7 @@ RSpec.describe Admin::BikesController, type: :request do
           }
         }
       end
-      it "updates the bike and calls update_ownership and serial_normalizer" do
+      it "updates the bike and updates ownership and serial_normalizer" do
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         stolen_record = bike.fetch_current_stolen_record
         expect(stolen_record).to be_present
