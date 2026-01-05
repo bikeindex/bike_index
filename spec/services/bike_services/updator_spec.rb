@@ -125,31 +125,56 @@ RSpec.describe BikeServices::Updator do
       end
       context "bike is impounded" do
         let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:, organization:) }
+        let!(:organization_user) { FactoryBot.create(:organization_role_claimed, organization:).user }
+        let(:impound_ownership_attrs) { new_ownership_attrs.merge(impound_record_id: impound_record.id, organization_id: organization.id) }
         it "creates a new ownership with status_with_owner" do
+          expect(bike.reload.status).to eq "status_impounded"
           ProcessImpoundUpdatesJob.new.perform(impound_record.id)
+
           expect(bike.reload.current_ownership.organization).to be_present
           expect(bike.created_at).to be < Time.current - 1.hour
           expect(bike.not_updated_by_user?).to be_truthy
           expect(bike.updator_id).to be_blank
           expect(bike.status).to eq "status_impounded"
           expect(bike.current_ownership.status).to eq "status_with_owner"
+          expect(bike.unregistered_parking_notification?).to be_falsey
+          expect(bike.send(:authorization_requires_impound_organization?)).to be_truthy
           expect(user.member_of?(organization)).to be_falsey
+          expect(bike.authorized?(user)).to be_falsey
+          expect(organization_user.member_of?(organization)).to be_truthy
+          expect(bike.authorized?(organization_user)).to be_truthy
+
           expect(ownership.reload.organization_pre_registration?).to be_falsey
           expect(ownership.origin).to eq "web"
           expect(ownership.organization_id).to eq organization.id
-          update_bike = BikeServices::Updator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json, user: user)
-          update_bike.update_ownership
-          bike.save
+
+          Sidekiq::Job.clear_all
+          expect do
+            BikeServices::Updator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json,
+              user: organization_user).update_available_attributes
+          end.to change(Ownership, :count).by(1)
+            .and change(ImpoundRecordUpdate, :count).by(1)
+
+          expect(ProcessImpoundUpdatesJob.jobs.count).to eq 1
+          expect do
+            Sidekiq::Job.drain_all
+          end.to change(Ownership, :count).by(0)
+            .and change(ActionMailer::Base.deliveries, :count).by 1 # Make sure only one transfer email is sent
+
           expect(Ownership.count).to eq 2
           expect(bike.reload.current_ownership.id).to_not eq ownership.id
+          expect(bike.status).to eq "status_with_owner"
+          expect(bike.current_impound_record).to be_blank
+          expect(bike.current_ownership).to have_attributes(impound_ownership_attrs)
           expect(bike.current_ownership.new_registration?).to be_falsey
-          expect(bike.current_ownership).to have_attributes(new_ownership_attrs)
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.organization).to eq organization
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
           expect(bike.reload.updated_by_user_at).to be > Time.current - 1
           expect(bike.not_updated_by_user?).to be_falsey
-          expect(bike.updator_id).to eq user.id
+          expect(bike.updator_id).to eq organization_user.id
+
+          expect(impound_record.reload.resolved?).to be_truthy
         end
       end
       context "user is an organization member" do

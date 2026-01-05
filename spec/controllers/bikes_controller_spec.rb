@@ -116,7 +116,7 @@ RSpec.describe BikesController, type: :controller do
       let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       before { set_current_user(user) }
       it "renders" do
-        expect(bike.editable_organizations.pluck(:id)).to eq([])
+        expect(bike.send(:editable_organization_ids)).to eq([])
         get :show, params: {id: bike.id}
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
@@ -128,7 +128,7 @@ RSpec.describe BikesController, type: :controller do
       context "bike created by organization" do
         let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
         it "renders" do
-          expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+          expect(bike.send(:editable_organization_ids)).to eq([organization.id])
           get :show, params: {id: bike.id}
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
@@ -139,7 +139,7 @@ RSpec.describe BikesController, type: :controller do
       context "bike owned by organization" do
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
         it "renders" do
-          expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+          expect(bike.send(:editable_organization_ids)).to eq([organization.id])
           get :show, params: {id: bike.id}
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
@@ -150,7 +150,7 @@ RSpec.describe BikesController, type: :controller do
       context "bike owned by organization, without can_edit_claimed" do
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, creation_organization: organization) }
         it "renders" do
-          expect(bike.editable_organizations.pluck(:id)).to eq([])
+          expect(bike.send(:editable_organization_ids)).to eq([])
           get :show, params: {id: bike.id}
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
@@ -1115,7 +1115,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.send(key)).to eq value
         end
         expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
-        expect(bike.editable_organizations.pluck(:id)).to eq([organization2.id])
+        expect(bike.send(:editable_organization_ids)).to eq([organization2.id])
       end
 
       context "organization_ids_can_edit_claimed_present" do
@@ -1130,7 +1130,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.send(key)).to eq value
           end
           expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
-          expect(bike.editable_organizations.pluck(:id)).to eq([])
+          expect(bike.send(:editable_organization_ids)).to eq([])
         end
 
         context "removing creation organization" do
@@ -1147,7 +1147,7 @@ RSpec.describe BikesController, type: :controller do
             bike.reload
             expect(bike.creation_organization_id).to eq organization.id
             expect(bike.bike_organization_ids).to match_array([organization2.id])
-            expect(bike.editable_organizations.pluck(:id)).to eq([]) # when adding a new organization, it starts out without editing
+            expect(bike.send(:editable_organization_ids)).to eq([]) # when adding a new organization, it starts out without editing
           end
         end
       end
@@ -1162,7 +1162,7 @@ RSpec.describe BikesController, type: :controller do
       it "updates the bike" do
         bike.reload
         expect(bike.owner).to_not eq(user)
-        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.send(:editable_organization_ids)).to eq([organization.id])
         expect(bike.authorized_by_organization?(u: user)).to be_truthy
         put :update, params: {id: bike.id, bike: {
           description: "new description",
@@ -1177,7 +1177,7 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.user_hidden).to be_falsey
         expect(bike.description).to eq "new description"
         expect(bike.handlebar_type).to eq "forward"
-        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.send(:editable_organization_ids)).to eq([organization.id])
         expect(bike.frame_size_unit).to eq "cm"
         expect(bike.frame_size_number).to eq 54
         expect(bike.frame_size).to eq "54cm"
@@ -1187,7 +1187,7 @@ RSpec.describe BikesController, type: :controller do
         it "fails to update" do
           bike.reload
           expect(bike.owner).to_not eq(user)
-          expect(bike.editable_organizations.pluck(:id)).to eq([])
+          expect(bike.send(:editable_organization_ids)).to eq([])
           expect(bike.authorized_by_organization?(u: user)).to be_falsey
           put :update, params: {id: bike.id, bike: {description: "new description", handlebar_type: "forward"}}
           expect(flash[:error]).to be_present
@@ -1199,7 +1199,7 @@ RSpec.describe BikesController, type: :controller do
           it "updates the bike" do
             bike.reload
             expect(bike.owner).to_not eq(user)
-            expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+            expect(bike.send(:editable_organization_ids)).to eq([organization.id])
             expect(bike.authorized_by_organization?(u: user)).to be_truthy
             put :update, params: {id: bike.id, bike: {description: "new description", handlebar_type: "forward"}}
             expect(response).to redirect_to edit_bike_url(bike)

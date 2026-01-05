@@ -123,7 +123,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(bike.id).to eq b_param.created_bike_id
         expect(bike.creator_id).to eq user.id
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
-        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.send(:editable_organization_ids)).to eq([organization.id])
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.manufacturer_id).to eq manufacturer.id
         expect(bike.current_ownership.origin).to eq "organization_form"

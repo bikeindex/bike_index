@@ -211,7 +211,7 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(bike.current_ownership.organization).to eq current_organization
         expect(bike.current_ownership.owner_email).to eq "a@b.c"
         expect(bike.current_ownership.initial?).to be_falsey
-        expect(bike.current_ownership.new_registration?).to be_truthy
+        expect(bike.current_ownership.new_registration?).to be_falsey
       end
       context "without a transfer_email" do
         it "returns with a flash error" do

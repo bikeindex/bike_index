@@ -146,7 +146,9 @@ class Ownership < ApplicationRecord
   end
 
   def new_registration?
-    return true if initial? || impound_record_id.present?
+    return true if initial?
+
+    return impound_record.unregistered_bike? if impound_record.present?
 
     previous_ownership.present? && previous_ownership.organization_pre_registration?
   end
