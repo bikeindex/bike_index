@@ -131,11 +131,15 @@ class ImpoundRecord < ApplicationRecord
     organization_id.present? ? self.class.impounded_kind : self.class.found_kind
   end
 
-  def authorized?(u = nil)
-    return false if u.blank?
-    return true if u.superuser?
+  def authorized?(passed_user = nil, no_superuser_override: false)
+    return false if passed_user.blank?
+    return true if !no_superuser_override && passed_user.superuser?
 
-    organized? ? u.authorized?(organization) : u.id == user_id
+    if organized?
+      passed_user.authorized?(organization, no_superuser_override:)
+    else
+      passed_user.id == user_id
+    end
   end
 
   # For now at least, we don't want to show exact address
