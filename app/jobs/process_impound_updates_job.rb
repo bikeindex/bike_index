@@ -9,7 +9,7 @@ class ProcessImpoundUpdatesJob < ApplicationJob
     # Run each impound_record_updates that hasn't been run
     impound_record.impound_record_updates.unprocessed.each do |impound_record_update|
       if impound_record_update.kind == "transferred_to_new_owner"
-        BikeServices::OwnershipTransferer.create_if_changed(impound_record.bike,
+        BikeServices::OwnershipTransferer.find_or_create(impound_record.bike,
           new_owner_email: impound_record_update.transfer_email,
           processing_impound_record_id: impound_record_id,
           updator: impound_record_update.user)

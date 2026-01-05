@@ -6,9 +6,9 @@ class BikeServices::OwnershipTransferer
       params.dig("bike")&.slice(*BParam::REGISTRATION_INFO_ATTRS) || {}
     end
 
-    # Returns new_ownership, or nil if no new ownership created
+    # Returns new_ownership
     # DOES NOT authorize
-    def create_if_changed(
+    def find_or_create(
       bike,
       updator:,
       new_owner_email: nil,
@@ -19,7 +19,7 @@ class BikeServices::OwnershipTransferer
       skip_email: false
     )
       new_owner_email = EmailNormalizer.normalize(new_owner_email)
-      return if new_owner_email.blank? || bike.owner_email == new_owner_email
+      return bike.current_ownership if new_owner_email.blank? || bike.owner_email == new_owner_email
 
       impound_record_id = processing_impound_record_id || bike.current_impound_record_id
       bike.attributes = updated_bike_attrs(new_owner_email, updator)

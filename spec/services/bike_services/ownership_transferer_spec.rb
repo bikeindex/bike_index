@@ -3,16 +3,16 @@ require "rails_helper"
 RSpec.describe BikeServices::OwnershipTransferer do
   let(:updator) { FactoryBot.create(:user) }
 
-  describe "create_if_changed" do
+  describe "find_or_create" do
     let!(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:initial_ownership) { Ownership.order(:created_at).where(bike_id: bike.id).first }
 
     it "does nothing" do
-      expect do
-        expect(described_class.create_if_changed(bike, updator:)).to be_nil
-        expect(described_class.create_if_changed(bike, updator:, new_owner_email: bike.owner_email.upcase))
-          .to be_nil
-      end.to change(Ownership, :count).by 0
+      expect(Ownership.count).to eq 1
+      expect(described_class.find_or_create(bike, updator:).id).to eq initial_ownership.id
+      expect(described_class.find_or_create(bike, updator:, new_owner_email: bike.owner_email.upcase).id)
+        .to eq initial_ownership.id
+      expect(Ownership.count).to eq 1
     end
 
     context "with new email" do
@@ -29,7 +29,7 @@ RSpec.describe BikeServices::OwnershipTransferer do
       end
       it "creates an ownership" do
         expect do
-          result = described_class.create_if_changed(bike, updator:,
+          result = described_class.find_or_create(bike, updator:,
             new_owner_email: "example@bikeindex.org")
           expect(result.is_a?(Ownership)).to be_truthy
         end.to change(Ownership, :count).by 1
@@ -47,7 +47,7 @@ RSpec.describe BikeServices::OwnershipTransferer do
           expect(bike.reload.address_set_manually).to be_truthy
           expect(bike.address_record_id).to be_present
           expect do
-            described_class.create_if_changed(bike, updator:, new_owner_email: "example@bikeindex.org")
+            described_class.find_or_create(bike, updator:, new_owner_email: "example@bikeindex.org")
           end.to change(Ownership, :count).by 1
 
           expect(initial_ownership.reload.current?).to be_falsey
