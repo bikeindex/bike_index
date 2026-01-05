@@ -147,16 +147,33 @@ RSpec.describe BikeServices::Updator do
           expect(ownership.origin).to eq "web"
           expect(ownership.organization_id).to eq organization.id
 
-          BikeServices::Updator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json,
-            user: organization_user).update_available_attributes
+          Sidekiq::Job.clear_all
+          expect do
+            BikeServices::Updator.new(bike:, permitted_params: {id: bike.id, bike: {owner_email: "another@EMAIL.co"}}.as_json,
+              user: organization_user).update_available_attributes
+            pp "SPEC SPEC SPEC"
+          end.to change(Ownership, :count).by(1)
+            .and change(ImpoundRecordUpdate, :count).by(1)
+
+          pp "in spec #{bike.id}"
+          pp bike.reload.owner_email, bike.ownerships.count
+
+          expect(ProcessImpoundUpdatesJob.jobs.count).to eq 1
+          expect do
+            Sidekiq::Job.drain_all
+            pp bike.reload.owner_email
+          end.to change(Ownership, :count).by(0)
+            .and change(ActionMailer::Base.deliveries, :count).by 1 # Make sure only one transfer email is sent
+
 
           expect(Ownership.count).to eq 2
           expect(bike.reload.current_ownership.id).to_not eq ownership.id
           expect(bike.status).to eq "status_with_owner"
           expect(bike.current_impound_record).to be_blank
-          # expect(bike.)
+
           expect(bike.current_ownership.new_registration?).to be_falsey
           expect(bike.current_ownership).to have_attributes(new_ownership_attrs)
+          expect(bike.new_registration?).to be_falsey
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.organization).to eq organization
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy

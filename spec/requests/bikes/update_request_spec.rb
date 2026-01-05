@@ -237,12 +237,20 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
       expect(bike.ownerships.count).to eq 1
       expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
+      expect(bike.to_coordinates.compact.count).to eq 2
       expect(bike.stolen_records.count).to eq 0
+
       expect(ownership1.user_hidden).to be_truthy
       expect(ownership1.current).to be_truthy
       expect(ownership1.organization_pre_registration).to be_truthy
       expect(ownership1.status).to eq "unregistered_parking_notification"
       expect(ownership1.origin).to eq "creator_unregistered_parking_notification"
+      expect(parking_notification.reload.active?).to be_truthy
+      expect(parking_notification.send_email?).to be_falsey
+      expect(parking_notification.status).to eq "current"
+      expect(parking_notification.kind).to eq "parked_incorrectly_notification"
+      expect(parking_notification.retrieved_kind).to be_nil
+
       Sidekiq::Job.clear_all
       expect {
         patch base_url, params: {
@@ -252,6 +260,7 @@ RSpec.describe "BikesController#update", type: :request do
       }.to change(Ownership, :count).by 1
       Sidekiq::Job.drain_all
       expect(bike.reload.ownerships.count).to eq 2
+
       expect(ownership1.reload.user_hidden).to be_falsey # Meh, maybe not ideal? But convenient
       expect(ownership1.current).to be_falsey
       expect(ownership1.organization_pre_registration).to be_truthy
@@ -266,6 +275,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(ownership2.origin).to eq "transferred_ownership"
 
       expect(bike.claimed?).to be_falsey
+      expect(bike.owner_email).to eq "newuser@example.com"
       expect(bike.current_ownership.user_id).to be_blank
       expect(bike.current_ownership_id).to eq ownership2.id
       expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
@@ -273,8 +283,16 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.stolen_records.count).to eq 0
       expect(bike.status).to eq "status_with_owner"
       expect(bike.user_hidden).to be_falsey
+      expect(bike.serial_hidden).to be_falsey
       expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
       expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
+      expect(bike.to_coordinates.compact.count).to eq 2
+
+      expect(parking_notification.reload.active?).to be_falsey
+      expect(parking_notification.send_email?).to be_falsey
+      expect(parking_notification.status).to eq "current"
+      expect(parking_notification.kind).to eq "appears_abandoned_notification"
+      expect(parking_notification.retrieved_kind).to eq "ownership_transfer"
     end
     context "add extra information" do
       let(:auto_user) { current_user }
@@ -439,6 +457,17 @@ RSpec.describe "BikesController#update", type: :request do
       # TODO: uncomment this and fix it - #2922
       # expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
       expect(impound_record).to match_hash_indifferently impound_params.except(:impounded_at_with_timezone, :timezone)
+    end
+
+    context "updating with new owner email" do
+      it "sends to the new owner" do
+        expect {
+          patch base_url, params: {
+            bike: {owner_email: "newuser@example.com"}
+          }
+          expect(flash[:success]).to be_present
+        }.to change(Ownership, :count).by 1
+      end
     end
   end
 end

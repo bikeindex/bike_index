@@ -696,6 +696,12 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.address_record).to have_attributes target_attrs
         expect(ownership.address_record.to_coordinates.map(&:round)).to eq([41, -78])
         expect(ownership.bike.valid_mailing_address?).to be_truthy
+        ownership.bike.update(address_record_id: ownership.address_record_id)
+        expect(AddressRecord.count).to eq 1
+
+        expect { ownership.bike.update(delete_address_record: true) }.to_not change(AddressRecord, :count)
+        expect(ownership.bike.reload.address_record_id).to be_nil
+        expect(ownership.reload.address_record).to have_attributes target_attrs
       end
     end
 

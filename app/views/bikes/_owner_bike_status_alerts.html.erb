@@ -1,0 +1,113 @@
+<%# TODO: Add translations %>
+<% if @bike.impounded? && @bike.current_impound_record.organized? %>
+  <div class="alert alert-danger mt-4 mb-4">
+    <h3 class="uncap">
+      Your
+      <%= @bike.type %>
+      is currently impounded!
+    </h3>
+    Impounded
+    <em class="localizeTime">
+      <%= l @bike.current_impound_record.impounded_at, format: :convert_time %>
+    </em>
+    <em class="small localizeTimezone"></em>
+    by
+    <strong>
+      <%= @bike.current_impound_record.organization&.name %>
+    </strong>
+    <% if @bike.current_impound_record.parking_notification.present? %>
+      from
+      <%= @bike.current_impound_record.parking_notification.address %>
+    <% end %>
+  </div>
+<% end %>
+<% if @bike.parking_notifications.active.any? %>
+  <% parking_notifications = @bike.parking_notifications.active.reorder(created_at: :desc) %>
+  <div class="alert alert-warning mt-4 mb-4">
+    <h3 class="uncap">
+      <%= pluralize parking_notifications.count, "current notification" %>
+      for this <%= @bike.type %>!
+    </h3>
+    <table class="table table-striped table-bordered table-sm without-exterior-border text-dark" style="color: #666;">
+      <thead class="small-header hidden-md-down">
+        <tr>
+          <th>
+            Created
+            <small class="localizeTimezone"></small>
+          </th>
+          <th>Address</th>
+          <th>Kind</th>
+          <th>By</th>
+          <th>
+            <small>Notification#</small>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% parking_notifications.each do |parking_notification| %>
+          <tr>
+            <td>
+              <% if current_user.superuser? || @bike.authorized_by_organization?(u: current_user, org: parking_notification.organization) %>
+                <%= link_to l(parking_notification.created_at, format: :convert_time), organization_parking_notification_path(parking_notification.id, organization_id: parking_notification.organization_id), class: "localizeTime preciseTime" %>
+              <% else %>
+                <span class="localizeTime preciseTime">
+                  <%= l(parking_notification.created_at, format: :convert_time) %>
+                </span>
+              <% end %>
+              <span class="extended-col-info small">
+                - <em><%= parking_notification.kind_humanized %></em> -
+                by
+                <strong><%= parking_notification.organization.short_name %></strong>
+                <small class="less-strong">
+                  (<%= parking_notification.user&.display_name %>)
+                </small>
+              </span>
+              <% if parking_notification.repeat_number > 0 %>
+                <strong class="extended-col-info">
+                  Notification #<%= parking_notification.repeat_number %>
+                </strong>
+              <% end %>
+            </td>
+            <td class="hidden-sm-cells">
+              <small><%= address_formatted(parking_notification) %></small>
+            </td>
+            <td class="hidden-sm-cells">
+              <em>
+                <%= parking_notification.kind_humanized %>
+              </em>
+            </td>
+            <td class="hidden-sm-cells">
+              <strong><%= parking_notification.organization.short_name %></strong>
+              <small class="less-strong">
+                (<%= parking_notification.user&.display_name %>)
+              </small>
+            </td>
+            <td class="small hidden-sm-cells">
+              <% if parking_notification.repeat_record? %>
+                <%= parking_notification.notification_number %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% current_parking_notification = @bike.current_parking_notification %>
+    <% if current_parking_notification.present? %>
+      <h3 class="uncap text-center mt-4 mb-2">
+        <strong>
+          <% if @bike.unregistered_parking_notification? %>
+            Was this bike retrieved?
+          <% else %>
+            Have you retrieved this <%= @bike.type %>?
+          <% end %>
+        </strong>
+      </h3>
+      <p class="text-center">
+        <% unless @bike.unregistered_parking_notification? %>
+          <em>Let <%= current_parking_notification.organization&.short_name %> know</em>
+        <% end %>
+        <%= link_to "mark retrieved", bike_path(@bike.to_param, user_recovery: true, parking_notification_retrieved: current_parking_notification.retrieval_link_token), class: "btn btn-sm btn-success", style: "color: white;" %>
+      </p>
+    <% end %>
+  </div>
+<% end %>

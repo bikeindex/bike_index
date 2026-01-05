@@ -19,8 +19,12 @@ RSpec.describe Bike, type: :model do
       expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
       expect(bike.reload.address_set_manually).to be_truthy # Required to get the address_record coordinates
       expect(bike.to_coordinates.map(&:round)).to eq([52, 5])
+      expect(bike.address_record_id).to be_present
       expect(AddressRecord.pluck(:id)).to eq([address_record.id])
       expect(Bike.with_street.pluck(:id)).to eq([bike.id])
+
+      expect { bike.update(delete_address_record: true) }.to change(AddressRecord, :count).by(-1)
+      expect(bike.reload.address_record_id).to be_nil
     end
 
     context "with user" do
@@ -1376,7 +1380,6 @@ RSpec.describe Bike, type: :model do
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do
         expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
-        bike.reload
         expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
         expect(bike.registration_address(true)).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
       end

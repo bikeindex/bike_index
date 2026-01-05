@@ -176,7 +176,7 @@ class Bike < ApplicationRecord
     :image, :image_cache, :b_param_id, :embeded, :embeded_extended, :paint_name,
     :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
     :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr,
-    :bike_sticker
+    :bike_sticker, :delete_address_record
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
@@ -221,6 +221,7 @@ class Bike < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :enqueue_duplicate_bike_finder_worker, on: :destroy
+  after_commit :remove_address_record_if_deleted
 
   pg_search_scope :pg_search, against: {
     serial_number: "A",
@@ -556,8 +557,6 @@ class Bike < ApplicationRecord
   def authorized_by_organization?(u: nil, org: nil)
     editable_org_ids = editable_organization_ids
     return false if editable_org_ids.none? || u.blank? && org.blank?
-    # WTF, why is this here:
-    # return true unless u.present? || org.present?
 
     # We have either a org or a user - if no user, we only need to check org
     return editable_org_ids.include?(org.id) if u.blank?
@@ -884,6 +883,13 @@ class Bike < ApplicationRecord
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at
     set_user_hidden
+    # Requires special handling, so the correct address records are deleted
+    if delete_address_record && address_record_id.present?
+      @deleted_address_record_id = address_record_id
+      self.address_record_id = nil
+      self.address_set_manually = false
+    end
+
     # cache_bike
     self.all_description = cached_description_and_stolen_description
     self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
@@ -914,6 +920,13 @@ class Bike < ApplicationRecord
 
   def enqueue_duplicate_bike_finder_worker
     DuplicateBikeFinderJob.perform_async(id)
+  end
+
+  def remove_address_record_if_deleted
+    return if @deleted_address_record_id.blank?
+
+    deleted_addy = AddressRecord.find_by_id(@deleted_address_record_id)
+    deleted_addy.destroy if deleted_addy.bike? && deleted_addy.bike_id == id
   end
 
   def fetch_current_impound_record

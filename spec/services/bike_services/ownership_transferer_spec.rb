@@ -23,7 +23,8 @@ RSpec.describe BikeServices::OwnershipTransferer do
           organization_id: nil,
           registration_info: {},
           doorkeeper_app_id: nil,
-          skip_email: false
+          skip_email: false,
+          is_phone: false
         }
       end
       it "creates an ownership" do
@@ -40,10 +41,11 @@ RSpec.describe BikeServices::OwnershipTransferer do
       end
 
       context "bike has attributes that should be changed" do
-        let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_address_record, is_for_sale: true, address_set_manually: true) }
+        let!(:bike) { FactoryBot.create(:bike, :with_ownership, :with_address_record, :phone_registration, is_for_sale: true, address_set_manually: true) }
 
         it "updates the attributes" do
           expect(bike.reload.address_set_manually).to be_truthy
+          expect(bike.address_record_id).to be_present
           expect do
             described_class.create_if_changed(bike, updator:, new_owner_email: "example@bikeindex.org")
           end.to change(Ownership, :count).by 1
@@ -52,8 +54,11 @@ RSpec.describe BikeServices::OwnershipTransferer do
 
           expect(bike.reload.current_ownership_id).to_not eq initial_ownership.id
           expect(bike.current_ownership).to match_hash_indifferently target_attributes
+
           expect(bike.address_set_manually).to be_falsey
-          expect(bike.is_for_sale).to be_truthy
+          expect(bike.address_record).to be_blank
+          expect(bike.is_for_sale).to be_falsey
+          expect(bike.is_phone).to be_falsey
         end
       end
     end
