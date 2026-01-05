@@ -288,7 +288,7 @@ RSpec.describe Bike, type: :model do
 
     describe "#normalize_serial_number" do
       let(:bike) { Bike.new(serial_number: serial_number) }
-      before { bike.normalize_serial_number }
+      before { bike.send(:normalize_serial_number) }
 
       context "given a bike made with no serial number" do
         no_serials = [
@@ -638,7 +638,7 @@ RSpec.describe Bike, type: :model do
     context "crap in size string" do
       let(:frame_size) { '19\\\\"' }
       it "removes crap" do
-        bike.clean_frame_size
+        bike.send(:clean_frame_size)
         expect(bike.frame_size_number).to eq(19)
         expect(bike.frame_size).to eq("19in")
         expect(bike.frame_size_unit).to eq("in")
@@ -647,7 +647,7 @@ RSpec.describe Bike, type: :model do
     context "passed cm number" do
       let(:frame_size) { "Med/54cm" }
       it "figures out that it's cm" do
-        bike.clean_frame_size
+        bike.send(:clean_frame_size)
         expect(bike.frame_size_number).to eq(54)
         expect(bike.frame_size).to eq("54cm")
         expect(bike.frame_size_unit).to eq("cm")
@@ -655,7 +655,7 @@ RSpec.describe Bike, type: :model do
     end
     context "ordinal letter" do
       let(:frame_size) { "M" }
-      before { bike.clean_frame_size }
+      before { bike.send(:clean_frame_size) }
       it "is cool with ordinal sizing" do
         expect(bike.frame_size).to eq("m")
         expect(bike.frame_size_unit).to eq("ordinal")
@@ -679,7 +679,7 @@ RSpec.describe Bike, type: :model do
     context "ordinal string" do
       let(:frame_size) { "Med" }
       it "is sets on save" do
-        bike.clean_frame_size
+        bike.send(:clean_frame_size)
         expect(bike.frame_size).to eq("m")
         expect(bike.frame_size_unit).to eq("ordinal")
       end
@@ -1170,7 +1170,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { ownership.bike }
     it "marks updates ownership user hidden, marks self hidden" do
       bike.marked_user_hidden = true
-      bike.set_user_hidden
+      bike.send(:set_user_hidden)
       expect(bike.user_hidden).to be_truthy
       expect(ownership.reload.user_hidden).to be_truthy
     end
@@ -1286,7 +1286,7 @@ RSpec.describe Bike, type: :model do
     context "Made without serial" do
       it "returns made_without_serial" do
         bike = Bike.new(made_without_serial: true)
-        bike.normalize_serial_number
+        bike.send(:normalize_serial_number)
         expect(bike.serial_display).to eq("Made without serial")
       end
     end
@@ -1431,7 +1431,7 @@ RSpec.describe Bike, type: :model do
       FactoryBot.create(:color, name: "Bluety")
       bike = Bike.new
       allow(bike).to receive(:paint_name).and_return(" blueTy")
-      expect { bike.set_paints }.not_to change(Paint, :count)
+      expect { bike.send(:set_paints) }.not_to change(Paint, :count)
       expect(bike.paint).to be_nil
     end
     it "removes paint id if paint_name is nil" do
@@ -1445,13 +1445,13 @@ RSpec.describe Bike, type: :model do
       FactoryBot.create(:paint, name: "poopy pile")
       bike = Bike.new
       allow(bike).to receive(:paint_name).and_return("Poopy PILE  ")
-      expect { bike.set_paints }.not_to change(Paint, :count)
+      expect { bike.send(:set_paints) }.not_to change(Paint, :count)
       expect(bike.paint.name).to eq("poopy pile")
     end
     it "creates a new paint and set it otherwise" do
       bike = Bike.new
       bike.paint_name = ["Food Time SOOON"]
-      expect { bike.set_paints }.to change(Paint, :count).by(1)
+      expect { bike.send(:set_paints) }.to change(Paint, :count).by(1)
       expect(bike.paint.name).to eq("food time sooon")
     end
   end
@@ -1652,18 +1652,18 @@ RSpec.describe Bike, type: :model do
       let(:organization) { FactoryBot.create(:organization) }
       context "slug" do
         it "returns true" do
-          expect(bike.validated_organization_id(organization.slug)).to eq organization.id
+          expect(bike.send(:validated_organization_id, organization.slug)).to eq organization.id
         end
       end
       context "id" do
         it "returns true" do
-          expect(bike.validated_organization_id(organization.id)).to eq organization.id
+          expect(bike.send(:validated_organization_id, organization.id)).to eq organization.id
         end
       end
     end
     context "unable to find organization" do
       it "adds an error to the bike" do
-        expect(bike.validated_organization_id("some org")).to be_nil
+        expect(bike.send(:validated_organization_id, "some org")).to be_nil
         expect(bike.errors[:organizations].to_s).to match(/not found/)
         expect(bike.errors[:organizations].to_s).to match(/some org/)
       end

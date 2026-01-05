@@ -40,6 +40,7 @@ class BikeServices::OwnershipTransferer
         origin: processing_impound_record_id.present? ? :impound_process : :transferred_ownership,
         organization: updator&.member_of?(ownership_org) ? ownership_org : nil,
         status: bike.status, # bike.status might be assigned but not saved, it's calculated in ownership
+        user_hidden: false,
         registration_info:,
         doorkeeper_app_id:,
         impound_record_id:,
