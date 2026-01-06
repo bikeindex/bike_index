@@ -79,10 +79,13 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
       let(:updator) { FactoryBot.create(:user_confirmed) } # It doesn't matter who transferred the bike
       let(:new_owner_email) { buyer.email }
       let(:new_ownership) do
-        BikeServices::OwnershipTransferer.create_if_changed(bike, updator:, new_owner_email:)
+        new_o = BikeServices::OwnershipTransferer.find_or_create(bike, updator:, new_owner_email:)
+        new_o.update_column(:created_at, Time.current - 1.hour)
+        new_o
       end
       it "assigns sale to the ownership" do
-        expect(new_ownership).to be_valid
+        og_ownership_id = ownership.id
+        expect(new_ownership.id).to_not eq og_ownership_id
 
         expect(bike.reload.current_ownership_id).to eq new_ownership.id
         expect(bike.is_for_sale).to be_falsey
@@ -95,15 +98,28 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
 
         expect(sale.reload.new_owner_email).to eq buyer.email
         expect(sale.amount_cents).to be_nil
+        expect(sale.new_ownership&.id).to eq new_ownership.id
         expect(sale.created_after_transfer?).to be_truthy
-        expect(sale.new_ownership.id).to eq new_ownership.id
 
-        expect(new_ownership.reload).to match_hash_indifferently new_ownership_attrs
+        expect(new_ownership.reload).to match_hash_indifferently new_ownership_attrs.except(:creator_id)
       end
 
       context "with a different owner" do
+        let(:new_owner_email) { "someoneelse@example.com" }
         it "doesn't assign the ownership" do
+          expect(new_ownership).to be_valid
 
+          expect(bike.reload.current_ownership_id).to eq new_ownership.id
+          expect(bike.is_for_sale).to be_falsey
+          expect(bike.ownerships.count).to eq 2
+
+          expect do
+            instance.perform(sale.id)
+            instance.perform(sale.id)
+          end.to change(Ownership, :count).by 0
+
+          expect(new_ownership.reload.current).to be_truthy
+          expect(bike.reload.owner_email).to eq new_owner_email
         end
       end
     end

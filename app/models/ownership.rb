@@ -123,10 +123,6 @@ class Ownership < ApplicationRecord
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
   end
 
-  def bike_type
-    bike&.type || "bike"
-  end
-
   def bike_scoped
     Bike.find_by_id(bike_id)
   end
