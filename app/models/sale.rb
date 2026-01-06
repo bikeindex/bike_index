@@ -49,7 +49,7 @@ class Sale < ApplicationRecord
   belongs_to :ownership
   belongs_to :marketplace_message
 
-  has_one :marketplace_listings
+  has_one :marketplace_listing, through: :marketplace_message
   has_one :new_ownership, class_name: "Ownership", foreign_key: :sale_id
   has_one :buyer, through: :new_ownership, class_name: "User", source: :user
 
@@ -88,8 +88,8 @@ class Sale < ApplicationRecord
   private
 
   def set_calculated_attributes
-    self.ownership_id ||= marketplace_message&.item&.current_ownership&.id
-    self.seller_id ||= ownership&.user_id
+    self.ownership_id ||= marketplace_listing&.bike_ownership&.id
+    self.seller_id ||= marketplace_listing&.seller_id || ownership&.user_id
     self.sold_at ||= Time.current
     self.sold_via ||= :bike_index_marketplace if marketplace_message_id.present?
     self.item ||= ownership&.bike

@@ -15,7 +15,11 @@ RSpec.describe Sale, type: :model do
 
   describe "build_and_authorize" do
     let(:item) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, cycle_type: :unicycle) }
-    let(:ownership) { item.current_ownership }
+    let!(:ownership) do
+      ows = item.current_ownership
+      ows.update_columns(created_at: Time.current - 1.day, claimed_at: Time.current - 2.hours)
+      ows
+    end
 
     context "marketplace_message sale" do
       let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item:) }
@@ -34,9 +38,9 @@ RSpec.describe Sale, type: :model do
 
       it "returns sale and nil" do
         expect(result.length).to eq 2
+        expect(result.last).to be_nil
         expect(result.first).to match_hash_indifferently target_attrs
         expect(result.first.valid?).to be_truthy
-        expect(result.last).to be_nil
       end
 
       context "not user's" do
@@ -45,6 +49,24 @@ RSpec.describe Sale, type: :model do
           expect(result.length).to eq 2
           expect(result.first.valid?).to be_falsey
           expect(result.last).to eq "You don't have permission to sell that unicycle"
+        end
+      end
+
+      context "transferred by superadmin" do
+        let(:updator) { FactoryBot.create(:superuser) }
+        let(:new_ownership) do
+          BikeServices::OwnershipTransferer.find_or_create(item, updator:, new_owner_email: "whoever@example.com")
+        end
+        it "returns sale and nil" do
+          expect(marketplace_listing.seller_id).to eq ownership.user_id
+          expect(new_ownership.id).to_not eq ownership.id
+          expect(marketplace_message.seller_id).to eq marketplace_listing.seller_id
+          expect(item.reload.current_ownership_id).to eq new_ownership.id
+
+          expect(result.length).to eq 2
+          expect(result.last).to be_nil
+          expect(result.first).to match_hash_indifferently target_attrs
+          expect(result.first.valid?).to be_truthy
         end
       end
     end

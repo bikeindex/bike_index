@@ -30,7 +30,17 @@ RSpec.describe SalesController, type: :request do
         end
       end
       context "bike has already been transferred" do
+        let(:new_ownership) do
+          BikeServices::OwnershipTransferer.find_or_create(item, updator: user,
+            new_owner_email: "someone-else@example.com")
+        end
         it "renders" do
+          expect(marketplace_message.id).to be_present
+          expect(item.reload.authorized?(current_user)).to be_truthy
+          get "#{base_url}/new?marketplace_message_id=#{marketplace_message.id}"
+          expect(response).to render_template(:new)
+          expect(flash).to be_blank
+          expect(assigns(:sale)).to be_present
         end
       end
     end
@@ -88,16 +98,16 @@ RSpec.describe SalesController, type: :request do
       end
       before { expect(marketplace_message).to be_present }
 
-      it "creates a sale" do
-        expect(item.reload.is_for_sale).to be_truthy
+      def expect_created_sale(target_sale_attrs:, ownership_change: 1)
         expect do
-          post base_url, params: {sale: sale_params}
+          post "/sales", params: {sale: sale_params}
           expect(response).to redirect_to bike_path(item.id)
           expect(flash[:success]).to be_present
         end.to change(Sale, :count).by(1)
           .and change(CallbackJob::AfterSaleCreateJob.jobs, :count).by 1
 
-        CallbackJob::AfterSaleCreateJob.drain
+        expect { CallbackJob::AfterSaleCreateJob.drain }
+          .to change(Ownership, :count).by ownership_change
 
         expect(Sale.count).to eq 1
         sale = Sale.last
@@ -108,6 +118,12 @@ RSpec.describe SalesController, type: :request do
 
         expect(item.reload.is_for_sale).to be_falsey
         expect(item.current_ownership_id).to eq sale.new_ownership.id
+      end
+
+      it "creates a sale" do
+        expect(item.reload.is_for_sale).to be_truthy
+
+        expect_created_sale(target_sale_attrs: target_attrs)
       end
 
       context "not bike owner" do
@@ -123,8 +139,15 @@ RSpec.describe SalesController, type: :request do
         end
       end
       context "bike has already transferred" do
-        # TODO: improve handling of this (and new)
-        it "creates a sale"
+        let(:new_owner_email) { marketplace_message.sender.email }
+        let!(:new_ownership) do
+          BikeServices::OwnershipTransferer.find_or_create(item, updator: user, new_owner_email:)
+        end
+        it "creates a sale" do
+          expect(item.reload.is_for_sale).to be_falsey
+
+          expect_created_sale(target_sale_attrs: target_attrs, ownership_change: 0)
+        end
       end
     end
   end

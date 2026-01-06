@@ -108,14 +108,24 @@ class Ownership < ApplicationRecord
 
   attr_accessor :creator_email, :user_email, :can_edit_claimed
 
-  def self.origins
-    ORIGIN_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def origins
+      ORIGIN_ENUM.keys.map(&:to_s)
+    end
 
-  def self.origin_humanized(str)
-    return nil unless str.present?
+    def origin_humanized(str)
+      return nil unless str.present?
 
-    str.titleize.downcase
+      str.titleize.downcase
+    end
+
+    def current_at(time)
+      where("created_at < ?", time).order(created_at: :desc).first
+    end
+
+    def claimed_at(time)
+      where("claimed_at < ?", time).order(created_at: :desc).first
+    end
   end
 
   def bike

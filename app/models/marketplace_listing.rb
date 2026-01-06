@@ -189,7 +189,7 @@ class MarketplaceListing < ApplicationRecord
   def bike_ownership
     return nil unless item_type == "Bike"
 
-    item.ownerships.order(:created_at).claimed.where("claimed_at < ?", created_at).last
+    item.ownerships.claimed_at(created_at)
   end
 
   def price_firm?
