@@ -57,12 +57,12 @@ RSpec.describe Invoice, type: :model do
     let(:invoice3) { invoice2.create_following_invoice }
     it "returns correct invoices" do
       expect(invoice.previous_invoice).to be_nil
-      expect(invoice2.subscription_first_invoice).to eq invoice
+      expect(invoice2.send(:subscription_first_invoice)).to eq invoice
       invoice2.update_attribute :force_active, true # So we can create another invoice after
       expect(invoice2.expired?).to be_truthy
       expect(invoice2.active?).to be_falsey
       expect(invoice2.was_active?).to be_truthy
-      expect(invoice3.subscription_first_invoice).to eq invoice
+      expect(invoice3.send(:subscription_first_invoice_id)).to eq invoice.id
       expect(invoice2.subscription_start_at).to be_within(1.minute).of Time.current - 3.years
       expect(invoice2.renewal_invoice?).to be_truthy
       expect(invoice2.previous_invoice).to eq invoice
@@ -131,6 +131,35 @@ RSpec.describe Invoice, type: :model do
         expect(organization.reload.paid_money?).to be_truthy
         expect(organization.law_enforcement_features_enabled?).to be_truthy
         expect(OrganizationDisplayer.law_enforcement_missing_verified_features?(organization)).to be_falsey
+      end
+    end
+  end
+
+  context "paid_money_in_full?" do
+    let(:invoice) { FactoryBot.create(:invoice_with_payment, amount_due_cents:) }
+    let(:amount_due_cents) { 5_000 }
+    let!(:payment) { FactoryBot.create(:payment, amount_cents: 5_000, invoice:) }
+
+    it "is truthy" do
+      expect(invoice.reload.paid_in_full?).to be_truthy
+      expect(invoice.paid_money_in_full?).to be_truthy
+      expect(invoice.paid_money_but_no_cost?).to be_falsey
+      UpdateOrganizationAssociationsJob.new.perform(invoice.organization_id)
+      expect(invoice.organization.reload.paid_money?).to be_truthy
+      expect(Organization.paid_money.pluck(:id)).to eq([invoice.organization_id])
+    end
+
+    context 'with amount due 0' do
+      let(:amount_due_cents) { 0 }
+
+      it "is falsey" do
+        expect(invoice.reload.paid_in_full?).to be_truthy
+        expect(invoice.paid_money_in_full?).to be_falsey
+        expect(invoice.no_cost?).to be_truthy
+        expect(invoice.amount_paid_cents).to eq(5_000)
+        expect(invoice.paid_money_but_no_cost?).to be_truthy
+        UpdateOrganizationAssociationsJob.new.perform(invoice.organization_id)
+        expect(invoice.organization.reload.paid_money?).to be_falsey
       end
     end
   end

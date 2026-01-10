@@ -165,6 +165,9 @@
         and
       %em.less-strong
         = link_to "#{pluralize(@organization.invoices.count, 'invoice')} total", admin_organization_invoices_path(organization_id: @organization)
+      - if OrganizationDisplayer.subscription_expired_alert?(@organization)
+        %span.text-danger{title: "the subscription expired message will be shown to them in their portal"}
+          Subscription expired
     - if @organization.parent_organization.present?
       %p
         Parent

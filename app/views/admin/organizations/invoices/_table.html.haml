@@ -84,7 +84,7 @@
             %span{ class: invoice.paid_in_full? ? "text-success" : "" }
               = invoice.amount_paid_formatted
             - if invoice.payments.any?
-              %ul
+              %ul.tw:list-disc.tw:pl-2
                 - invoice.payments.each do |payment|
                   %li{ style: "font-size: 80%;" }
                     #{link_to "#{payment.amount_formatted} #{payment.payment_method}", admin_payment_path(payment)},
