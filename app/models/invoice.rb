@@ -281,6 +281,6 @@ class Invoice < ApplicationRecord
   end
 
   def costs_money?
-    amount_due_cents > 0
+    amount_due_cents.present? && amount_due_cents > 0
   end
 end

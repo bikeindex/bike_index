@@ -149,7 +149,7 @@ RSpec.describe Invoice, type: :model do
       expect(Organization.paid_money.pluck(:id)).to eq([invoice.organization_id])
     end
 
-    context 'with amount due 0' do
+    context "with amount due 0" do
       let(:amount_due_cents) { 0 }
 
       it "is falsey" do
