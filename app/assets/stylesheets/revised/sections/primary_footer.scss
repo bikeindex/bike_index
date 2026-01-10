@@ -60,6 +60,11 @@ $primary-footer-top-margin: 6 * $vertical-height;
       margin: 0;
     }
 
+    li {
+      padding: 0.5em 0;
+      line-height: 1.25em;
+    }
+
     .social-nav {
       text-align: center;
 
@@ -67,7 +72,7 @@ $primary-footer-top-margin: 6 * $vertical-height;
         display: block;
         float: left;
         width: 25%;
-        padding: 0 6px;
+        padding: 0 6px 6px;
       }
 
       a {
