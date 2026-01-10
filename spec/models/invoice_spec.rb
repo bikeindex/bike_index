@@ -162,6 +162,20 @@ RSpec.describe Invoice, type: :model do
         expect(invoice.organization.reload.paid_money?).to be_falsey
       end
     end
+
+    context "with amount due nil" do
+      let(:amount_due_cents) { nil }
+
+      it "is falsey" do
+        expect(invoice.reload.paid_in_full?).to be_truthy
+        expect(invoice.paid_money_in_full?).to be_falsey
+        expect(invoice.no_cost?).to be_truthy
+        expect(invoice.amount_paid_cents).to eq(5_000)
+        expect(invoice.paid_money_but_no_cost?).to be_truthy
+        UpdateOrganizationAssociationsJob.new.perform(invoice.organization_id)
+        expect(invoice.organization.reload.paid_money?).to be_falsey
+      end
+    end
   end
 
   describe "child_enabled_feature_slugs" do

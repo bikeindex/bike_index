@@ -121,7 +121,8 @@ class Invoice < ApplicationRecord
   end
 
   def paid_in_full?
-    amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents
+    return false unless amount_paid_cents.present?
+    amount_paid_cents >= (amount_due_cents || 0)
   end
 
   def no_cost?
