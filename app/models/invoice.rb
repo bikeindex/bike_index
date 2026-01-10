@@ -121,11 +121,8 @@ class Invoice < ApplicationRecord
   end
 
   def paid_in_full?
-    amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents
-  end
-
-  def costs_money?
-    amount_due_cents > 0
+    return false unless amount_paid_cents.present?
+    amount_paid_cents >= (amount_due_cents || 0)
   end
 
   def no_cost?
@@ -136,16 +133,10 @@ class Invoice < ApplicationRecord
     paid_in_full? && costs_money?
   end
 
-  def subscription_first_invoice_id
-    first_invoice_id || id
-  end
+  def paid_money_but_no_cost?
+    return false if costs_money? || paid_money_in_full?
 
-  def subscription_first_invoice
-    first_invoice || self
-  end
-
-  def subscription_invoices
-    self.class.where(first_invoice_id: subscription_first_invoice_id).where.not(id: id)
+    amount_paid_cents.present? && amount_paid_cents > 0
   end
 
   def display_name
@@ -274,5 +265,23 @@ class Invoice < ApplicationRecord
 
   def update_organization
     UpdateOrganizationAssociationsJob.perform_async(organization_id)
+  end
+
+  private
+
+  def subscription_first_invoice
+    first_invoice || self
+  end
+
+  def subscription_first_invoice_id
+    first_invoice_id || id
+  end
+
+  def subscription_invoices
+    self.class.where(first_invoice_id: subscription_first_invoice_id).where.not(id: id)
+  end
+
+  def costs_money?
+    amount_due_cents.present? && amount_due_cents > 0
   end
 end
