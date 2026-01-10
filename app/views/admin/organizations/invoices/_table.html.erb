@@ -1,0 +1,180 @@
+<% render_sortable ||= false %>
+<% display_organization ||= false %>
+<% skip_discount_due ||= false %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered sortable <%= render_sortable ? '' : 'table-sm' %>">
+    <thead class="thead-light">
+      <tr>
+        <th>
+          <% if render_sortable %>
+            <%= sortable "id", "#" %>
+          <% else %>
+            #
+          <% end %>
+        </th>
+
+        <th class="small">Active</th>
+
+        <% if display_organization %>
+          <th>
+            <% if render_sortable %>
+              <%= sortable "organization_id" %>
+            <% else %>
+              Organization
+            <% end %>
+          </th>
+        <% end %>
+
+        <th>
+          <% if render_sortable %>
+            <%= sortable "subscription_start_at", "Start" %>
+          <% else %>
+            Start
+          <% end %>
+        </th>
+
+        <th>
+          <% if render_sortable %>
+            <%= sortable "subscription_end_at", "End" %>
+          <% else %>
+            End
+          <% end %>
+        </th>
+
+        <% unless skip_discount_due %>
+          <th>
+            <small>
+              <% if render_sortable %>
+                <%= sortable "amount_due_cents", "$ Due" %>
+              <% else %>
+                $&nbsp;Due
+              <% end %>
+            </small>
+          </th>
+        <% end %>
+
+        <th>
+          <% if render_sortable %>
+            <%= sortable "amount_paid_cents", "$ Paid" %>
+          <% else %>
+            $&nbsp;paid
+          <% end %>
+        </th>
+
+        <% unless skip_discount_due %>
+          <th>Discount</th>
+        <% end %>
+
+        <th>Features</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% invoices.each do |invoice| %>
+        <% organization = Organization.unscoped.find_by_id(invoice.organization_id) %>
+        <% next if organization.blank? %>
+
+        <tr>
+          <td>
+            <% if organization.present? %>
+              <%= link_to invoice.display_name.gsub(/invoice\s?/i, ""), edit_admin_organization_invoice_path(organization_id: organization.to_param, id: invoice.to_param) %>
+            <% end %>
+          </td>
+
+          <td class="small">
+            <% if invoice.active? %>
+              <small class="text-success d-block">Active</small>
+            <% end %>
+
+            <% if invoice.previous_invoice.present? %>
+              <small class="less-strong d-block mt-1">
+                Follows #<%= invoice.previous_invoice.id %>
+              </small>
+            <% end %>
+          </td>
+
+          <% if display_organization %>
+            <td>
+              <% if organization.present? %>
+                <%= link_to organization.short_name, admin_organization_path(organization.to_param) %>
+                <%= link_to search_emoji, admin_invoices_path(organization_id: organization.to_param) %>
+                <% unless invoice.organization.present? %>
+                  <small class="text-danger">organization is deleted!</small>
+                <% end %>
+              <% end %>
+            </td>
+          <% end %>
+
+          <td>
+            <% if invoice.subscription_start_at.present? %>
+              <span class="convertTime">
+                <%= l invoice.subscription_start_at, format: :convert_time %>
+              </span>
+            <% end %>
+          </td>
+
+          <td>
+            <% if invoice.endless? %>
+              <small class="less-strong">endless</small>
+            <% elsif invoice.subscription_end_at.present? %>
+              <span class="convertTime <%= invoice.subscription_end_at < Time.current ? 'text-danger' : '' %>">
+                <%= l invoice.subscription_end_at, format: :convert_time %>
+              </span>
+            <% end %>
+          </td>
+
+          <% unless skip_discount_due %>
+            <td><%= invoice.amount_due_formatted %></td>
+          <% end %>
+
+          <td>
+            <span class="<%= invoice.paid_in_full? ? 'text-success' : '' %>">
+              <%= invoice.amount_paid_formatted %>
+            </span>
+
+            <% if invoice.payments.any? %>
+              <ul class="tw:list-disc tw:pl-2">
+                <% invoice.payments.each do |payment| %>
+                  <li style="font-size: 80%;">
+                    <%= link_to "#{payment.amount_formatted} #{payment.payment_method}", admin_payment_path(payment) %>,
+                    <span class="convertTime"><%= l payment.created_at, format: :convert_time %></span>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+
+            <% if invoice.current? && invoice.paid_money_but_no_cost? %>
+              <em class="tw:block tw:text-sm/4">
+                <strong class="text-danger">doesn't make organization "paid"</strong>
+                even though it is paid - because amount due is $0
+              </em>
+            <% end %>
+          </td>
+
+          <% unless skip_discount_due %>
+            <td>
+              <span class="<%= invoice.discount_cents > 0 ? 'text-danger' : '' %>">
+                <%= invoice.discount_formatted %>
+              </span>
+            </td>
+          <% end %>
+
+          <td>
+            <ul class="mt-1 mb-1 pl-3" style="font-size: 80%;">
+              <% invoice.organization_features.each do |organization_feature| %>
+                <li>
+                  <%= link_to organization_feature.name, edit_admin_organization_feature_path(organization_feature) %>
+                </li>
+              <% end %>
+            </ul>
+
+            <small>
+              <%= safe_join(invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ") %>
+            </small>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,137 @@
+<% if @invoice.payments.none? %>
+  <% additional_link = link_to("Delete invoice", admin_organization_invoice_path(organization_id: @organization.to_param, id: @invoice.to_param), method: :delete, data: { confirm: "Are you sure you want to delete this? This can't be undone" }, class: "btn btn-danger btn-sm float-right") %>
+<% else %>
+  <% additional_link = nil %>
+<% end %>
+
+<%= render partial: "/admin/organizations/display_header", locals: {current_action: "Edit #{@invoice.display_name} for", additional_link: additional_link} %>
+
+<div class="row">
+  <div class="col-sm-6">
+    <table class="table-list">
+      <tr>
+        <td>Associated invoices:</td>
+
+        <td>
+          <ul>
+            <li>
+              Previous:
+              <% if @invoice.previous_invoice.present? %>
+                <%= link_to @invoice.previous_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.previous_invoice.id) %>
+              <% end %>
+            </li>
+
+            <li>
+              Next:
+              <% if @invoice.following_invoice.present? %>
+                <%= link_to @invoice.following_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.following_invoice.id) %>
+              <% else %>
+                <% if @invoice.paid_in_full? %>
+                  <strong>
+                    <%= link_to "create following invoice", admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.id, create_following_invoice: true), method: "PUT", action: "update" %>
+                  </strong>
+                <% else %>
+                  Invoice must be paid before you can create a following invoice
+                <% end %>
+              <% end %>
+            </li>
+
+            <li>
+              <small class="less-strong">
+                <%= link_to "all organization invoices", admin_organization_invoices_path(@invoice.organization) %>
+              </small>
+            </li>
+          </ul>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Paid in full:</td>
+
+        <td>
+          <strong><%= @invoice.paid_in_full? ? "Yes" : "No" %></strong>
+
+          <span class="less-strong">
+            <%= MoneyFormatter.money_format(@invoice.amount_paid_cents, @invoice.currency_name) %>
+          </span>
+
+          <ul class="mb-2">
+            <% @invoice.payments.each do |payment| %>
+              <li>
+                <%= link_to "#{payment.amount_formatted}", admin_payment_path(payment) %>
+
+                <span class="convertTime withPreposition">
+                  <%= l payment.created_at, format: :convert_time %>
+                </span>
+              </li>
+            <% end %>
+          </ul>
+
+          <% if @invoice.law_enforcement_functionality_invoice? %>
+            <strong class="less-strong">
+              Verified Law Enforcement functionality
+            </strong>
+            invoice
+          <% end %>
+
+          <% if @invoice.paid_money_but_no_cost? %>
+            <strong class="less-strong">Amount due is $0</strong>
+            this invoice doesn't make the organization "Paid"
+            <% if @invoice.payments.any? %>
+              <span class="d-block mt-1">
+                <strong class="text-danger">This invoice has a payment,</strong>
+                but because amount due is $0, this doesn't make the
+                organization isn't marked "paid"
+              </span>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="col-sm-6">
+    <table class="table-list">
+      <tr>
+        <td>Active:</td>
+
+        <td>
+          <strong>
+            <% if @invoice.active? %>
+              "Yes"
+            <% elsif @invoice.expired? %>
+              <em class="small text-danger">Expired</em>
+            <% elsif @invoice.future? %>
+              <em class="small text-danger">Starts in the future</em>
+            <% else %>
+              no
+            <% end %>
+          </strong>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <% if @invoice.expired? %>
+            Expired:
+          <% else %>
+            Expires:
+          <% end %>
+        </td>
+
+        <td>
+          <% if @invoice.endless? %>
+            <span class="text-warning">Endless</span>
+            (invoice never ends)
+          <% elsif @invoice.subscription_end_at.present? %>
+            <span class="convertTime preciseTimeSeconds">
+              <%= l @invoice.subscription_end_at, format: :convert_time %>
+            </span>
+          <% end %>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<%= render "form" %>
