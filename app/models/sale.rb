@@ -62,8 +62,8 @@ class Sale < ApplicationRecord
 
   class << self
     # returns [sale, nil] or [invalid-sale, "error message"}
-    def build_and_authorize(user:, marketplace_message_id: nil)
-      new_sale = new(seller: user, marketplace_message_id:)
+    def build_and_authorize(user:, marketplace_message: nil, marketplace_message_id: nil)
+      new_sale = new(seller: user, marketplace_message_id:, marketplace_message:)
       new_sale.validate
       error_message = new_sale.errors[:ownership]
 

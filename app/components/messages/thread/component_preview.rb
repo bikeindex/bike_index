@@ -3,7 +3,10 @@
 module Messages::Thread
   class ComponentPreview < ApplicationComponentPreview
     def default
-      {template: "messages/thread/component_preview/default", locals: {current_user:, marketplace_messages:}}
+      {
+        template: "messages/thread/component_preview/default",
+        locals: {current_user: lookbook_user, marketplace_messages:}
+      }
     end
 
     private
@@ -14,10 +17,6 @@ module Messages::Thread
         built_marketplace_message(default_marketplace_message_attrs.merge(body: "yes")),
         built_marketplace_message(default_marketplace_message_attrs.merge(body: long_body, created_at: Time.current - 6.months))
       ]
-    end
-
-    def current_user
-      @current_user ||= User.find(ENV.fetch("LOOKBOOK_USER_ID", 1))
     end
 
     def other_user
@@ -32,7 +31,7 @@ module Messages::Thread
         body: "When are you available? Can I come by to pick it up sometime this week?",
         initial_record_id: 42,
         marketplace_listing: marketplace_listing,
-        receiver: current_user,
+        receiver: lookbook_user,
         sender: other_user,
         created_at: Time.current - 2.hours
       }
@@ -40,7 +39,7 @@ module Messages::Thread
 
     def marketplace_listing
       item = Bike.new(id: 42, year: Date.current.year - 4, mnfg_name: "Salsa", cycle_type: "bike")
-      MarketplaceListing.new(id: 42, seller: current_user, item:)
+      MarketplaceListing.new(id: 42, seller: lookbook_user, item:)
     end
 
     def built_marketplace_message(attrs)

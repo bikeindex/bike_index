@@ -2,7 +2,6 @@ class SalesController < ApplicationController
   before_action :build_and_authorize_sale!
 
   def new
-    @bike = @sale.item
   end
 
   def create

@@ -1,3 +1,6 @@
 <div>
-  PageBlock::NewSaleForm::Component component
+  <%= form_for @sale, builder: BikeIndexFormBuilder, url: sales_path, method: :post do |f| %>
+
+    <%= f.submit "Save", class: "twbtn-blue" %>
+  <% end %>
 </div>

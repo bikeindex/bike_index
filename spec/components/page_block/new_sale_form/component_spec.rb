@@ -10,7 +10,12 @@ RSpec.describe PageBlock::NewSaleForm::Component, type: :component do
   let(:item) { nil }
   let(:marketplace_message) { nil }
 
-  it "renders" do
-    expect(component).to have_css("div")
+  context "with marketplace_message" do
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
+
+    it "renders" do
+      expect(component).to have_css "div"
+      expect(component).to have_text "save"
+    end
   end
 end
