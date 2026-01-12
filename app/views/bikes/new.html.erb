@@ -151,7 +151,10 @@
           </div>
 
           <div class="form-group row fancy-select unfancy unnested-field">
-            <%= f.label :year, t(".model_year"), class: 'form-well-label' %>
+            <%= f.label :year, class: 'form-well-label' do %>
+              <%= t(".model_year") %>
+              <small class='less-strong'><%= t(".optional") %></small>
+            <% end %>
 
             <div class="form-well-input">
               <% years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] } %>
@@ -167,7 +170,10 @@
           </div>
 
           <div class="form-group row unnested-field">
-            <%= f.label :frame_model, class: 'form-well-label' %>
+            <%= f.label :frame_model, class: 'form-well-label' do %>
+              <%= t(".model") %>
+              <small class='less-strong'><%= t(".optional") %></small>
+            <% end %>
 
             <div class="form-well-input">
               <%= f.text_field :frame_model, class: 'form-control' %>
@@ -263,7 +269,10 @@
 
           <% if include_field_reg_bike_sticker?(@organization, current_user, true) %>
             <div class="form-group row unnested-field no-divider-row">
-              <%= f.label :bike_sticker, t(".sticker_id_html"), class: "form-well-label" %>
+              <%= f.label :bike_sticker, class: "form-well-label" do %>
+                <%= t(".sticker_id") %>
+                <small class='less-strong'><%= t(".optional") %></small>
+              <% end %>
 
               <div class="form-well-input">
                 <%= f.text_field :bike_sticker,
