@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    messages:
+      for_sale_item:
+        no_results: No registrations exactly matched your search

@@ -1,5 +1,20 @@
 <div>
+  <%= render(
+    Messages::ForSaleItem::Component.new(
+      result_view: :bike_box,
+      search_kind: :marketplace,
+      vehicles: [@marketplace_listing.item],
+      current_user: @current_user,
+    ),
+  ) %>
+
+  <%= render(Messages::ThreadShow::Component.new(current_user:, marketplace_messages: @marketplace_messages, marketplace_listing: @marketplace_listing)) %>
+
   <%= form_for @sale, builder: BikeIndexFormBuilder, url: sales_path, method: :post do |f| %>
+    <%= f.hidden_field :sale_id, @sale.id %>
+    <%= f.hidden_field :marketplace_message_id, @marketplace_message.id %>
+
+
 
     <%= f.submit "Save", class: "twbtn-blue" %>
   <% end %>

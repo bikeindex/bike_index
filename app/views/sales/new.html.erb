@@ -1,1 +1,10 @@
+<%= render(
+    Messages::ForSaleItem::Component.new(
+      result_view: :bike_box,
+      search_kind: :marketplace,
+      vehicles: [@marketplace_listing.item],
+      current_user: @current_user,
+    ),
+  ) %>
 
+<%= render PageBlock::NewSaleForm::Component.new(sale: @sale, marketplace_message: @marketplace_message) %>
