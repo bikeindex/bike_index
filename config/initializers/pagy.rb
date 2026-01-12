@@ -9,8 +9,9 @@ Pagy.options[:limit] = 25
 Pagy.options[:limit_max] = 100
 Pagy.options[:max_pages] = 5000
 
-# Overflow handling: we handle overflow in Pagy::Method override below
-# to replicate the old pagy overflow: :last_page behavior
+# Raise RangeError for out-of-range pages so we can redirect to last valid page
+# (handled in ApplicationController via rescue_from)
+Pagy.options[:raise_range_error] = true
 
 # Load the series helper for pagination component
 require "pagy/toolbox/helpers/support/series"

@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
 
   around_action :set_locale
   rescue_from Money::Bank::UnknownRate, with: :localization_failure
+  rescue_from Pagy::RangeError, with: :redirect_to_last_page
 
   def allow_x_frame
     SecureHeaders.opt_out_of_header(request, :x_frame_options)
@@ -112,13 +113,9 @@ class ApplicationController < ActionController::Base
     redirect_to root_url
   end
 
-  # Override pagy to handle overflow by showing the last valid page
-  # (replicates the old pagy overflow: :last_page behavior)
-  def pagy(paginator = :offset, collection, **options)
-    pagy_obj, records = super
-    return [pagy_obj, records] if pagy_obj.in_range?
-
-    # Page is out of range, re-paginate with the last valid page
-    super(paginator, collection, **options.merge(page: pagy_obj.last))
+  # Redirect to last valid page when page is out of range
+  # Replicates the old pagy overflow: :last_page behavior
+  def redirect_to_last_page(exception)
+    redirect_to url_for(page: exception.pagy.last), allow_other_host: false
   end
 end
