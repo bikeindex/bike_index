@@ -1876,7 +1876,6 @@ it:
       select_other:
       serial_help:
       serial_help_content_html:
-      sticker_id_html:
       student_id:
       this_is_a:
       traditional_bike:
@@ -1888,6 +1887,9 @@ it:
       was_made_before_1970: È stato prodotto prima del 1970
       without_serial_html:
       without_serial_number_html:
+      model: Modello
+      optional:
+      sticker_id:
     organization_stolen_message:
       report_link_text: a questo link
       report_the_theft_to_the_organization_html:

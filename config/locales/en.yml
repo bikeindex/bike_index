@@ -1141,6 +1141,7 @@ en:
       model: Model
       model_year: Model year
       nevermind: Nevermind
+      optional: optional
       or: or
       other_manufacturer: Other manufacturer
       our_serial_page: our serial page
@@ -1157,7 +1158,6 @@ en:
         Every bike has a unique serial number, it's how they are identified. To learn
         more or see some examples, go to %{serial_page_link} <small>(opens in a separate
         window)</small>.
-      optional: optional
       sticker_id: Sticker id
       student_id: Student ID
       this_is_a: This is a
