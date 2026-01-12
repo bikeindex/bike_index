@@ -1,4 +1,5 @@
 // TODO: add ability to show in og time zone
+// 2026-1-4 - Updated writeTimezone to use abbreviated timezone
 // 2025-8-6 - switch to am/pm lowercase, without a preceding space
 // 2025-5-15 - switch to using .localizeTime class (instead of .convertTime)
 // 2025-5-12 - add onlyTodayWithoutDate option
@@ -229,7 +230,7 @@ export default class TimeLocalizer {
   }
 
   writeTimezone (el) {
-    el.textContent = this.now.toFormat('z')
+    el.textContent = this.now.toFormat('ZZZZ')
     el.classList.remove('localizeTimezone')
   }
 }

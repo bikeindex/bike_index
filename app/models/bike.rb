@@ -176,7 +176,7 @@ class Bike < ApplicationRecord
     :image, :image_cache, :b_param_id, :embeded, :embeded_extended, :paint_name,
     :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
     :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr,
-    :bike_sticker
+    :bike_sticker, :delete_address_record
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
@@ -221,6 +221,7 @@ class Bike < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :enqueue_duplicate_bike_finder_worker, on: :destroy
+  after_commit :remove_address_record_if_deleted
 
   pg_search_scope :pg_search, against: {
     serial_number: "A",
@@ -501,7 +502,7 @@ class Bike < ApplicationRecord
 
   def serial_display(u = nil)
     if serial_hidden?
-      # show the serial to the user, even if authorization_requires_organization?
+      # show the serial to the user, even if authorization_requires_impound_organization?
       return "Hidden" unless can_see_hidden_serial?(u)
     end
     return serial_number.humanize if no_serial?
@@ -553,28 +554,20 @@ class Bike < ApplicationRecord
     current_ownership&.blank? || current_ownership == first_ownership
   end
 
-  def editable_organizations
-    # Only the impound organization can edit it if it's impounded
-    return Organization.where(id: current_impound_record.organization_id) if current_impound_record.present?
-    return organizations if first_ownership? && organized? && !claimed?
-
-    can_edit_claimed_organizations
-  end
-
   def authorized_by_organization?(u: nil, org: nil)
-    editable_organization_ids = editable_organizations.pluck(:id)
-    return false unless editable_organization_ids.any?
-    return true unless u.present? || org.present?
+    editable_org_ids = editable_organization_ids
+    return false if editable_org_ids.none? || u.blank? && org.blank?
+
     # We have either a org or a user - if no user, we only need to check org
-    return editable_organization_ids.include?(org.id) if u.blank?
+    return editable_org_ids.include?(org.id) if u.blank?
 
     unless current_impound_record.present?
       return false if claimable_by?(u) || u == owner # authorized by owner, not organization
     end
     # Ensure the user is part of the organization and the organization can edit if passed both
-    return u.member_bike_edit_of?(org) && editable_organization_ids.include?(org.id) if org.present?
+    return u.member_bike_edit_of?(org) && editable_org_ids.include?(org.id) if org.present?
 
-    editable_organizations.any? { |o| u.member_bike_edit_of?(o) }
+    editable_org_ids.any? { |o_id| u.member_bike_edit_of?(o_id, no_superuser_override: true) }
   end
 
   def first_owner_email
@@ -591,11 +584,11 @@ class Bike < ApplicationRecord
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?
 
-    # authorization requires organization if impounded or marked abandoned by an organization
-    unless authorization_requires_organization?
-      # Since it doesn't require an organization, authorize by user
+    unless authorization_requires_impound_organization?
+      # Doesn't require an organization, authorize by user (but if not, check org below)
       return true if passed_user == owner || claimable_by?(passed_user)
     end
+
     authorized_by_organization?(u: passed_user)
   end
 
@@ -721,107 +714,8 @@ class Bike < ApplicationRecord
       .each(&:destroy)
   end
 
-  def validated_organization_id(organization_id)
-    return nil unless organization_id.present?
-
-    organization = Organization.friendly_find(organization_id)
-    return organization.id if organization.present?
-
-    not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike])
-    errors.add(:organizations, "#{organization_id} #{not_found}")
-    nil
-  end
-
-  def set_user_hidden
-    return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
-
-    if marked_user_hidden.present? && Binxtils::InputNormalizer.boolean(marked_user_hidden)
-      self.user_hidden = true
-      current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
-    elsif marked_user_unhidden.present? && Binxtils::InputNormalizer.boolean(marked_user_unhidden)
-      self.user_hidden = false
-      current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
-    end
-  end
-
-  def normalize_serial_number
-    self.serial_number = if made_without_serial?
-      "made_without_serial"
-    else
-      SerialNormalizer.unknown_and_absent_corrected(serial_number)
-    end
-
-    if %w[made_without_serial unknown].include?(serial_number)
-      self.made_without_serial = serial_number == "made_without_serial"
-      self.serial_normalized = nil
-      self.serial_normalized_no_space = nil
-    else
-      self.made_without_serial = false
-      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
-      self.serial_normalized_no_space = SerialNormalizer.no_space(serial_normalized)
-    end
-    true
-  end
-
   def create_normalized_serial_segments
     SerialNormalizer.new(serial: serial_number).save_segments(id)
-  end
-
-  def clean_frame_size
-    return true unless frame_size.present? || frame_size_number.present?
-
-    if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
-      # Don't overwrite frame_size_number if frame_size_number was passed
-      if frame_size_number.blank? || !frame_size_number_changed?
-        self.frame_size_number = frame_size.match(/\d+\.?\d*/)[0].to_f
-      end
-    end
-
-    if frame_size_unit.blank?
-      self.frame_size_unit = if frame_size_number.present?
-        if frame_size_number < 30 # Good guessing?
-          "in"
-        else
-          "cm"
-        end
-      else
-        "ordinal"
-      end
-    end
-
-    self.frame_size = if frame_size_number.present?
-      frame_size_number.to_s.gsub(".0", "") + frame_size_unit
-    else
-      case frame_size.downcase
-      when /xxs/
-        "xxs"
-      when /x*sma/, "xs"
-        "xs"
-      when /sma/, "s"
-        "s"
-      when /med/, "m"
-        "m"
-      when /(lg)|(large)/, "l"
-        "l"
-      when /xxl/
-        "xxl"
-      when /x*l/, "xl"
-        "xl"
-      end
-    end
-    true
-  end
-
-  def set_paints
-    self.paint_id = nil if paint_id.present? && paint_name.blank? && !paint_name.nil?
-    return true unless paint_name.present?
-
-    self.paint_name = paint_name[0] if paint_name.is_a?(Array)
-    return true if Color.friendly_find(paint_name).present?
-
-    paint = Paint.friendly_find(paint_name)
-    paint = Paint.create(name: paint_name) unless paint.present?
-    self.paint_id = paint.id
   end
 
   def valid_mailing_address?
@@ -890,6 +784,13 @@ class Bike < ApplicationRecord
     self.status = calculated_status unless skip_status_update
     self.updated_by_user_at ||= created_at
     set_user_hidden
+    # Requires special handling, so the correct address records are deleted
+    if delete_address_record && address_record_id.present?
+      @deleted_address_record_id = address_record_id
+      self.address_record_id = nil
+      self.address_set_manually = false
+    end
+
     # cache_bike
     self.all_description = cached_description_and_stolen_description
     self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
@@ -906,11 +807,127 @@ class Bike < ApplicationRecord
     "status_with_owner"
   end
 
+  private
+
+  def validated_organization_id(organization_id)
+    return nil unless organization_id.present?
+
+    organization = Organization.friendly_find(organization_id)
+    return organization.id if organization.present?
+
+    not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike])
+    errors.add(:organizations, "#{organization_id} #{not_found}")
+    nil
+  end
+
+  def clean_frame_size
+    return true unless frame_size.present? || frame_size_number.present?
+
+    if frame_size.present? && frame_size.match(/\d+\.?\d*/).present?
+      # Don't overwrite frame_size_number if frame_size_number was passed
+      if frame_size_number.blank? || !frame_size_number_changed?
+        self.frame_size_number = frame_size.match(/\d+\.?\d*/)[0].to_f
+      end
+    end
+
+    if frame_size_unit.blank?
+      self.frame_size_unit = if frame_size_number.present?
+        if frame_size_number < 30 # Good guessing?
+          "in"
+        else
+          "cm"
+        end
+      else
+        "ordinal"
+      end
+    end
+
+    self.frame_size = if frame_size_number.present?
+      frame_size_number.to_s.gsub(".0", "") + frame_size_unit
+    else
+      case frame_size.downcase
+      when /xxs/
+        "xxs"
+      when /x*sma/, "xs"
+        "xs"
+      when /sma/, "s"
+        "s"
+      when /med/, "m"
+        "m"
+      when /(lg)|(large)/, "l"
+        "l"
+      when /xxl/
+        "xxl"
+      when /x*l/, "xl"
+        "xl"
+      end
+    end
+    true
+  end
+
+  def set_paints
+    self.paint_id = nil if paint_id.present? && paint_name.blank? && !paint_name.nil?
+    return true unless paint_name.present?
+
+    self.paint_name = paint_name[0] if paint_name.is_a?(Array)
+    return true if Color.friendly_find(paint_name).present?
+
+    paint = Paint.friendly_find(paint_name)
+    paint = Paint.create(name: paint_name) unless paint.present?
+    self.paint_id = paint.id
+  end
+
+  def normalize_serial_number
+    self.serial_number = if made_without_serial?
+      "made_without_serial"
+    else
+      SerialNormalizer.unknown_and_absent_corrected(serial_number)
+    end
+
+    if %w[made_without_serial unknown].include?(serial_number)
+      self.made_without_serial = serial_number == "made_without_serial"
+      self.serial_normalized = nil
+      self.serial_normalized_no_space = nil
+    else
+      self.made_without_serial = false
+      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+      self.serial_normalized_no_space = SerialNormalizer.no_space(serial_normalized)
+    end
+    true
+  end
+
+  def set_user_hidden
+    return unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
+
+    if Binxtils::InputNormalizer.boolean(marked_user_hidden)
+      self.user_hidden = true
+      current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
+    elsif Binxtils::InputNormalizer.boolean(marked_user_unhidden)
+      self.user_hidden = false
+      current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
+    end
+  end
+
+  def editable_organization_ids
+    if current_impound_record.present?
+      # equivalent to authorization_requires_impound_organization?
+      return current_impound_record.organized? ? [current_impound_record.organization_id] : []
+    end
+    return bike_organizations.pluck(:organization_id) if first_ownership? && organized? && !claimed?
+
+    can_edit_claimed_organizations.pluck(:id)
+  end
+
   def enqueue_duplicate_bike_finder_worker
     DuplicateBikeFinderJob.perform_async(id)
   end
 
-  private
+  def remove_address_record_if_deleted
+    return if @deleted_address_record_id.blank?
+
+    deleted_addy = AddressRecord.find_by_id(@deleted_address_record_id)
+    deleted_addy.destroy if deleted_addy.bike? && deleted_addy.bike_id == id
+  end
 
   def fetch_current_impound_record
     self.current_impound_record = impound_records.current.last
@@ -923,7 +940,7 @@ class Bike < ApplicationRecord
     (cml.present? && cml.for_sale?) ? cml : nil
   end
 
-  def authorization_requires_organization?
+  def authorization_requires_impound_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
   end

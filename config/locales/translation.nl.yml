@@ -1872,7 +1872,6 @@ nl:
       unsure_or_unknown: Onzeker of onbekend
       was_made_before_1970: Werd vóór 1970 gemaakt
       manufacturer: Fabrikant
-      sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
       owner_email: E-mailadres eigenaar
       register_with: Registreer bij %{organization_name}
@@ -1891,6 +1890,9 @@ nl:
       very_very_few_bikes_html: 'Er zijn heel <em>weinig</em> %{type_html} gemaakt
         zonder serienummers. Tenzij dit %{type_html}:'
       electric_motorized: Elektrisch (gemotoriseerd)
+      model: Model
+      optional: optioneel
+      sticker_id: Sticker-ID
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial

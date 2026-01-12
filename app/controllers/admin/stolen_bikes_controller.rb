@@ -46,16 +46,7 @@ class Admin::StolenBikesController < Admin::BaseController
     if %w[regenerate_alert_image delete].include?(params[:update_action])
       update_image
     else
-      BikeServices::Updator.new(user: current_user, bike: @bike, params:).update_ownership
-
-      if @bike.update(permitted_parameters)
-        SerialNormalizer.new(serial: @bike.serial_number).save_segments(@bike.id)
-        flash[:success] = "Bike was successfully updated."
-      else
-        flash[:error] = "Unable to update!"
-        render action: "edit"
-        return
-      end
+      flash[:error] = "Unknown update action! Please let Seth know where you encountered this!"
     end
     redirect_back(fallback_location: edit_admin_stolen_bike_url(@bike))
   end

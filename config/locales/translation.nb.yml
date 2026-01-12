@@ -1904,7 +1904,6 @@ nb:
       serial_help_content_html: Hver sykkel har et unikt serienummer, det er hvordan
         de identifiseres. For å lære mer eller se noen eksempler, gå til %{serial_page_link}
         <small>(åpnes i et eget vindu)</small> .
-      sticker_id_html: Klistremerke-ID <small class='less-strong'>valgfritt</small>
       student_id: Student ID
       this_is_a: Dette er en
       traditional_bike: Tradisjonell sykkel
@@ -1922,6 +1921,9 @@ nb:
       very_very_few_bikes_html: 'Veldig <em>svært</em> få %{type_html} er laget uten
         serier. Med mindre dette %{type_html}:'
       electric_motorized: Elektrisk (motorisert)
+      model: Modell
+      optional: valgfri
+      sticker_id: Klistremerke-ID
     organization_stolen_message:
       report_link_text: på denne linken
       report_the_theft_to_the_organization_html: <span class="text-warning">Rapporter

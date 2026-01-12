@@ -1,5 +1,5 @@
 -# requires being passed locals: bike:, stolen_record:
-%h3
+%h3.mt-4
   Bike Images
   - if bike.public_images.any?
     = link_to "user edit", edit_bike_path(bike, edit_template: "photos", return_to: url_for), class: "user-edit-link"

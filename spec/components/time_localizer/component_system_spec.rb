@@ -24,6 +24,7 @@ RSpec.describe "time_localizer.js", :js, type: :system do
     one_year_ago = fix_format((current_in_zone - 1.year).strftime("%b %e, %Y"))
     yesterday_precise = fix_format((current_in_zone - 1.day).strftime("%b %e, %l:%M %p")).gsub("  ", " ")
     one_year_ago_precise_no_seconds = fix_format((current_in_zone - 1.year).strftime("%b %-e, %Y, %-l:%M"))
+    tz_str = Binxtils::TimeZoneParser.parse(time_zone).now.strftime("%Z")
 
     expect(page).to have_content("Current time: #{current_time}", wait: 5)
     expect(page).to have_content("Yesterday: #{yesterday}")
@@ -32,5 +33,6 @@ RSpec.describe "time_localizer.js", :js, type: :system do
     expect(page).to have_content("One year ago: #{one_year_ago}")
     expect(page).to have_content("Yesterday (precise time): #{yesterday_precise}")
     expect(page).to have_content("One year ago (precise time seconds): #{one_year_ago_precise_no_seconds}")
+    expect(page).to have_content("In time zone: #{tz_str}")
   end
 end

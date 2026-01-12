@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CycleType
   include Enumable
   include AutocompleteHashable
@@ -28,8 +30,9 @@ class CycleType
     elliptical: 22
   }.freeze
 
+  DEFAULT = "Bike"
   NAMES = {
-    bike: "Bike",
+    bike: DEFAULT,
     tandem: "Tandem",
     unicycle: "Unicycle",
     tricycle: "Tricycle",

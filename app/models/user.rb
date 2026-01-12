@@ -414,28 +414,28 @@ class User < ApplicationRecord
     true
   end
 
-  def role(organization)
-    m = OrganizationRole.where(user_id: id, organization_id: organization.id).first
+  def role(org_or_id)
+    m = OrganizationRole.where(user_id: id, organization_id: org_id(org_or_id)).first
     m&.role
   end
 
-  def member_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).limit(1).any?
+  def member_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).limit(1).any?
 
     superuser? && !no_superuser_override
   end
 
-  def member_bike_edit_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).not_member_no_bike_edit.limit(1).any?
+  def member_bike_edit_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).not_member_no_bike_edit.limit(1).any?
 
     superuser? && !no_superuser_override
   end
 
-  def admin_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).admin.limit(1).any?
+  def admin_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).admin.limit(1).any?
 
     superuser? && !no_superuser_override
   end
@@ -584,6 +584,10 @@ class User < ApplicationRecord
 
   private
 
+  def org_id(org_or_id)
+    org_or_id.is_a?(Organization) ? org_or_id.id : org_or_id
+  end
+
   def short_username
     username&.truncate(11)
   end
@@ -592,8 +596,8 @@ class User < ApplicationRecord
     auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
   end
 
-  def claimed_organization_roles_for(organization_id)
-    OrganizationRole.claimed.where(user_id: id, organization_id: organization_id)
+  def claimed_organization_roles_for(org_or_id)
+    OrganizationRole.claimed.where(user_id: id, organization_id: org_id(org_or_id))
   end
 
   def preferred_language_is_an_available_locale

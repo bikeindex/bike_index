@@ -122,6 +122,10 @@ class Ownership < ApplicationRecord
     Bike.find_by_id(bike_id)
   end
 
+  def bike_type
+    bike&.type || CycleType::DEFAULT.downcase # match BikeAttributable#type case
+  end
+
   def initial?
     return previous_ownership_id.blank? if id.present?
 
@@ -142,7 +146,9 @@ class Ownership < ApplicationRecord
   end
 
   def new_registration?
-    return true if initial? || impound_record_id.present?
+    return true if initial?
+
+    return impound_record.unregistered_bike? if impound_record.present?
 
     previous_ownership.present? && previous_ownership.organization_pre_registration?
   end

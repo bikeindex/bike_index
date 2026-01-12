@@ -99,7 +99,7 @@
       .col-lg-4
         .row
           .form-group.col-sm-6
-            = f.label :current_user
+            = f.label :creator_email
             = f.email_field :creator_email, value: current_user.email, class: "form-control"
           .form-group.col-md-6
             = f.label :user_email

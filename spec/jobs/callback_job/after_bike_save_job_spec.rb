@@ -235,7 +235,7 @@ RSpec.describe CallbackJob::AfterBikeSaveJob, type: :job do
       expect(bike.current_ownership.organization_id).to eq organization.id
       expect(bike.current_ownership.origin).to eq "embed_partial"
       expect(bike.organizations.pluck(:id)).to eq([organization.id])
-      expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+      expect(bike.send(:editable_organization_ids)).to eq([organization.id])
     end
     context "bike already has organization" do
       let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: user, organization: FactoryBot.create(:organization)) }

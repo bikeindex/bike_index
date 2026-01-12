@@ -95,7 +95,7 @@ RSpec.describe UserAlertsController, type: :request do
         expect(bike.claimed?).to be_falsey
         expect(current_user.authorized?(bike)).to be_truthy
         expect(bike.organizations.pluck(:id)).to eq([])
-        expect(bike.editable_organizations.pluck(:id)).to eq([])
+        expect(bike.send(:editable_organization_ids)).to eq([])
         expect(current_user.alert_slugs).to eq([])
         CallbackJob::AfterUserChangeJob.new.perform(current_user.id)
         user_alert.reload
@@ -110,7 +110,7 @@ RSpec.describe UserAlertsController, type: :request do
         bike.reload
         expect(bike.claimed?).to be_falsey
         expect(bike.organizations.pluck(:id)).to match_array([organization.id])
-        expect(bike.editable_organizations.pluck(:id)).to match_array([organization.id])
+        expect(bike.send(:editable_organization_ids)).to match_array([organization.id])
 
         user_alert.reload
         expect(user_alert.resolved?).to be_truthy
