@@ -103,7 +103,7 @@
         = t(".only_stolen_html")
     - if current_organization.enabled?("csv_exports") && !only_show_bikes
       %p.search-sort-btns.text-right
-        = link_to t(".create_export_of_vehicles", cycle_type: cycle_type), organization_bikes_path(search_params.merge(create_export: true)), class: "gray-link"
+        = link_to t(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)), organization_bikes_path(search_params.merge(create_export: true)), class: "gray-link"
 
   - settings_button = capture_haml do
     %a.float-right.btn.btn-sm.btn-outline-primary.uncap{href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin-top: 0.1em;"}
