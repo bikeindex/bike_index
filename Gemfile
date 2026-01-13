@@ -21,6 +21,7 @@ gem "bcrypt" # encryption
 gem "bootsnap" # Faster bootup
 gem "pg" # Postgres
 gem "paranoia" # soft delete
+gem "paper_trail" # track changes
 gem "pg_search"
 gem "lograge" # Structure log data, put it in single lines to improve the functionality
 gem "logstash-event" # Use logstash format for logging data
