@@ -75,7 +75,7 @@ RSpec.describe Organized::BikesController, type: :request do
           get base_url, params: {stolenness: "impounded", create_export: true}
         }.to change(Export, :count).by 0
         expect(flash[:error]).to match(/no match/)
-        expect(response).to redirect_to(new_organization_export_url(organization_id: current_organization.id, only_custom_bike_ids: true, custom_bike_ids: ''))
+        expect(response).to redirect_to(new_organization_export_url(organization_id: current_organization.id, only_custom_bike_ids: true, custom_bike_ids: ""))
       end
       context "without search params" do
         let(:params_blank) do
@@ -107,7 +107,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(start_at.to_i).to be_within(5).of((Time.current.beginning_of_day - 1.year).to_i)
 
           end_at = redirected_to.match(/end_at=(\d+)/)[1]
-          expect(end_at.to_i).to be_within(5).of((Time.current).to_i)
+          expect(end_at.to_i).to be_within(5).of(Time.current.to_i)
         end
       end
       context "directly create export", :flaky do

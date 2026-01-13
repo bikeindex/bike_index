@@ -1,37 +1,35 @@
 <div class="organized-exports">
   <div class="organized-page-header">
-    <h1>
-      <em>
-        <%= current_organization.name %>
-      </em>
-      new export
-    </h1>
+    <h1><em><%= current_organization.name %></em> new export</h1>
   </div>
 
   <%= form_for @export, url: organization_exports_path(organization_id: current_organization.to_param), html: { class: "organized-form" } do |f| %>
     <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
+
     <% if current_organization.enabled?("avery_export") %>
       <div class="form-group row">
         <%= f.label :avery_export, "Avery Label Export", class: "org-form-label" %>
-        <div class="col-sm-4">
-          <%= f.check_box :avery_export %>
-        </div>
+
+        <div class="col-sm-4"><%= f.check_box :avery_export %></div>
       </div>
     <% elsif current_organization.enabled?("bike_stickers") %>
       <div class="form-group row">
         <%= f.label :assign_bike_codes, "Assign bike stickers", class: "org-form-label" %>
-        <div class="col-sm-4">
-          <%= f.check_box :assign_bike_codes %>
-        </div>
+
+        <div class="col-sm-4"><%= f.check_box :assign_bike_codes %></div>
       </div>
     <% end %>
+
     <% if current_organization.enabled?("avery_export") || current_organization.enabled?("bike_stickers") %>
       <div class="form-group row shownOnAssignBikeCodes">
         <%= f.label :bike_code_start, "Initial Sticker #", class: "org-form-label" %>
+
         <div class="col-sm-6">
           <%= f.text_field :bike_code_start, value: current_organization.bike_stickers.next_unclaimed_code&.pretty_code, class: "form-control" %>
+
           <span class="below-input-help">
-            Starting with given input, stickers will be incrementally assigned to bikes.
+            Starting with given input, stickers will be incrementally assigned
+            to bikes.
             <%# For avery, we assign bike stickers unless they leave blank. Otherwise, unselect "assign_bike_codes" %>
             <% if current_organization.enabled?("avery_export") %>
               Leave blank to skip assigning stickers to bikes
@@ -40,19 +38,23 @@
         </div>
       </div>
     <% end %>
+
     <div class="row mt-2 hiddenOnAveryExport">
       <div class="col-lg-4">
         <p class="export-included-columns-label">
           Included columns:
         </p>
       </div>
+
       <div class="col-lg-8">
         <div class="row">
           <% checked_headers = @export.headers.present? ? @export.headers : Export.default_headers %>
+
           <% Export.permitted_headers(current_organization).sort.each do |header| %>
             <div class="form-group col-xs-6 col-md-4">
               <label class="checkbox">
                 <%= f.check_box :headers, { multiple: true, checked: checked_headers.include?(header) }, header, 1 %>
+
                 <% if header == "motorized" %>
                   Motorized / e-vehicle
                 <% else %>
@@ -64,78 +66,112 @@
         </div>
       </div>
     </div>
+
     <div class="form-group row mt-4 hiddenOnOnlyCustom">
       <%= f.label :start_at, "Registered after", class: "org-form-label" %>
+
       <div class="col-sm-4">
         <% show_start = @export.start_at.present? %>
-        <a class="field-expander" href="#" style="<%= show_start ? 'display: none;' : '' %>">
+
+        <a
+          class="field-expander"
+          href="#"
+          style="<%= show_start ? 'display: none;' : '' %>"
+        >
           Set after time
         </a>
-        <div class="collapsed-fields" style="<%= show_start ? 'display: block;' : '' %>">
+
+        <div
+          class="collapsed-fields"
+          style="<%= show_start ? 'display: block;' : '' %>"
+        >
           <%= f.datetime_local_field :start_at, step: 60, class: "form-control" %>
-          <a class="field-collapser" href="#">
-            remove
-          </a>
+          <a class="field-collapser" href="#"> remove </a>
         </div>
       </div>
     </div>
+
     <div class="form-group row hiddenOnOnlyCustom">
       <%= f.label :end_at, "Registered before", class: "org-form-label" %>
+
       <div class="col-sm-4">
         <% show_end = @export.end_at.present? %>
-        <a class="field-expander" href="#" style="<%= show_start ? 'display: none;' : '' %>">
+
+        <a
+          class="field-expander"
+          href="#"
+          style="<%= show_start ? 'display: none;' : '' %>"
+        >
           Set before time
         </a>
-        <div class="collapsed-fields" style="<%= show_start ? 'display: block;' : '' %>">
+
+        <div
+          class="collapsed-fields"
+          style="<%= show_start ? 'display: block;' : '' %>"
+        >
           <%= f.datetime_local_field :end_at, step: 60, class: "form-control" %>
-          <a class="field-collapser" href="#">
-            remove
-          </a>
+          <a class="field-collapser" href="#"> remove </a>
         </div>
       </div>
     </div>
+
     <div class="form-group row">
       <%= f.label :custom_bike_ids, "Bikes to export", class: "org-form-label" %>
+
       <div class="col-sm-8">
         <div class="row hiddenOnOnlyCustom">
           <% if current_organization.enabled?("show_partial_registrations") %>
             <% include_full = @export.partial_registrations != "only" %>
             <% include_partial = @export.partial_registrations != false %>
-            <div class="col-xs-4 mb-0 hiddenOnAveryExport" style="line-height: 1.25;">
+            <div
+              class="col-xs-4 mb-0 hiddenOnAveryExport"
+              style="line-height: 1.25;"
+            >
               <label class="checkbox">
                 <%= check_box_tag :include_full_registrations, true, include_full %>
                 Registered bikes
               </label>
             </div>
-            <div class="col-xs-4 mb-0 hiddenOnAveryExport" style="line-height: 1.25;">
+            <div
+              class="col-xs-4 mb-0 hiddenOnAveryExport"
+              style="line-height: 1.25;"
+            >
               <label class="checkbox">
                 <%= check_box_tag :include_partial_registrations, true, include_partial %>
                 Incomplete registrations
               </label>
             </div>
           <% end %>
+
           <div class="col-xs-4 mb-0">
             <a id="addSpecificBikes" class="field-expander" href="#">
               Add specific bikes to export
             </a>
           </div>
         </div>
+
         <div class="collapsed-fields" id="expandCustomBikeIds">
           <%= f.text_area :custom_bike_ids, value: @export.custom_bike_ids&.join(", "), placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control mt-1" %>
+
           <span class="below-input-help mt-2">
-            For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
+            For example:
+            <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
+            
             <br>
             <span class="less-strong">(can also be just the IDs - e.g. for the above: <code>123, 4567</code>)</span>
           </span>
+
           <label class="checkbox mt-0">
-            <%= f.check_box :only_custom_bike_ids %>
-            <em>Only</em> include specific bikes
+            <%= f.check_box :only_custom_bike_ids %> <em>Only</em> include
+            specific bikes
           </label>
         </div>
       </div>
     </div>
+
     <div class="form-group row mt-2 hiddenOnAveryExport">
       <%= f.label :format, "Export file format", class: "org-form-label" %>
+
       <div class="col-sm-4">
         <%= f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control" %>
       </div>
