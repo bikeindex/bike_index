@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: show deleted and sold items info
-
 module Messages::ForSaleItem
   class Component < ApplicationComponent
     def initialize(result_view: nil, current_user: nil, vehicle: nil, vehicle_id: nil, marketplace_listing: nil)

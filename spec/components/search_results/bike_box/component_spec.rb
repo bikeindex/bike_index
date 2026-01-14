@@ -3,9 +3,9 @@
 require "rails_helper"
 
 RSpec.describe SearchResults::BikeBox::Component, type: :component do
-  let(:options) { {bike:, current_user:, skip_cache:, render_removed:, event_record:} }
+  let(:options) { {bike:, current_user:, skip_cache:, render_deleted:, event_record:} }
   let(:event_record) { nil }
-  let(:render_removed) { false }
+  let(:render_deleted) { false }
   let(:skip_cache) { false }
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
@@ -50,8 +50,8 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
       expect(component).not_to have_css "li"
     end
 
-    context "with render_removed: true" do
-      let(:render_removed) { true }
+    context "with render_deleted: true" do
+      let(:render_deleted) { true }
 
       it "renders" do
         expect(component).to have_content bike.mnfg_name
@@ -190,8 +190,8 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
           expect(component).not_to have_css "li"
         end
 
-        context "with render_removed: true" do
-          let(:render_removed) { true }
+        context "with render_deleted: true" do
+          let(:render_deleted) { true }
           it "renders marketplace_listing" do
             expect(marketplace_listing.reload.status).to eq "removed"
             expect(bike.reload.deleted?).to be_truthy
@@ -224,8 +224,8 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
           expect_serial_is_visible(component, bike.serial_number)
         end
 
-        context "with render_removed: true" do
-          let(:render_removed) { true }
+        context "with render_deleted: true" do
+          let(:render_deleted) { true }
 
           it "renders marketplace_listing" do
             expect(marketplace_listing.reload.status).to eq "sold"

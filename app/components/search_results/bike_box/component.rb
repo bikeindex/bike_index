@@ -6,9 +6,9 @@ module SearchResults::BikeBox
 
     # NOTE: be cautious about passing in current_user and caching,
     # since current_user shows their hidden serials
-    def initialize(bike:, current_user: nil, event_record: nil, search_kind: nil, skip_cache: false, render_removed: false)
-      @render_removed = render_removed
-      return if bike.blank? || !@render_removed && bike.deleted?
+    def initialize(bike:, current_user: nil, event_record: nil, search_kind: nil, skip_cache: false, render_deleted: false)
+      @render_deleted = render_deleted
+      return if bike.blank? || !@render_deleted && bike.deleted?
 
       @bike = bike
       @search_kind = SearchResults::Container::Component.permitted_search_kind(search_kind)
