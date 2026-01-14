@@ -3,7 +3,9 @@
 require "rails_helper"
 
 RSpec.describe SearchResults::BikeBox::Component, type: :component do
-  let(:options) { {bike:, current_user:, skip_cache:} }
+  let(:options) { {bike:, current_user:, skip_cache:, render_deleted:, event_record:} }
+  let(:event_record) { nil }
+  let(:render_deleted) { false }
   let(:skip_cache) { false }
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
@@ -39,6 +41,26 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
       expect(component).to have_content(l(stolen_record.date_stolen, format: :convert_time))
 
       expect_serial_is_visible(component, bike.serial_number)
+    end
+  end
+
+  context "when deleted" do
+    let(:bike) { FactoryBot.create(:bike, deleted_at: Time.current - 1.day) }
+    it "doesn't render" do
+      expect(component).not_to have_css "li"
+    end
+
+    context "with render_deleted: true" do
+      let(:render_deleted) { true }
+
+      it "renders" do
+        expect(component).to have_content bike.mnfg_name
+        expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
+        expect(component).to have_content(l(bike.deleted_at, format: :convert_time))
+
+        expect_serial_is_visible(component, bike.serial_number)
+        expect(component).to have_content("Deleted")
+      end
     end
   end
 
@@ -98,7 +120,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
   end
 
   context "with marketplace_record" do
-    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, status:) }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, status:, amount_cents: 55_100) }
     let(:bike) { marketplace_listing.item }
     let(:status) { :draft }
 
@@ -107,6 +129,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
       expect(bike.reload.status).to eq "status_with_owner"
       expect(component).to have_content bike.mnfg_name
       expect(component).to_not have_content "for sale"
+      expect(component).to_not have_content "551"
       expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
 
       expect_serial_is_visible(component, bike.serial_number)
@@ -122,7 +145,7 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
         expect(component).to have_content "for sale"
         expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
         expect(component).to have_content(l(marketplace_listing.published_at, format: :convert_time))
-        expect(component).to have_content marketplace_listing.amount
+        expect(component).to have_content "551"
 
         expect_serial_is_visible(component, bike.serial_number)
       end
@@ -136,8 +159,88 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
           expect(component).to have_content "stolen"
           expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
           expect(component).to have_content(l(stolen_record.date_stolen, format: :convert_time))
+          expect(component).to_not have_content "551"
 
           expect_serial_is_visible(component, bike.serial_number)
+        end
+      end
+    end
+
+    context "passed event_record" do
+      let(:event_record) { marketplace_listing }
+
+      it "renders marketplace_listing" do
+        expect(marketplace_listing.reload.status).to eq "draft"
+        expect(bike.reload.status).to eq "status_with_owner"
+        expect(component).to have_content bike.mnfg_name
+        expect(component).to_not have_content "for sale"
+        expect(component).to have_content "551"
+        expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
+        expect(component).to have_content "551"
+
+        expect_serial_is_visible(component, bike.serial_number)
+      end
+
+      context "with deleted bike" do
+        before { bike.update(deleted_at: Time.current - 1.day) }
+        let(:status) { :removed }
+
+        it "renders marketplace_listing" do
+          expect(marketplace_listing.reload.status).to eq "removed"
+          expect(component).not_to have_css "li"
+        end
+
+        context "with render_deleted: true" do
+          let(:render_deleted) { true }
+          it "renders marketplace_listing" do
+            expect(marketplace_listing.reload.status).to eq "removed"
+            expect(bike.reload.deleted?).to be_truthy
+            expect(bike.current_event_record&.id).to be_nil
+            expect(component).to have_content bike.mnfg_name
+            expect(component).to have_content "Deleted"
+            expect(component).to_not have_content "for sale"
+            expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
+            expect(component).to have_content(l(bike.deleted_at, format: :convert_time))
+            expect(component).to have_content(l(marketplace_listing.published_at, format: :convert_time))
+            expect(component).to have_content "551"
+
+            expect_serial_is_visible(component, bike.serial_number)
+          end
+        end
+      end
+
+      context "with sold and event_record passed" do
+        let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :sold, amount_cents: 55_100) }
+
+        it "renders marketplace_listing" do
+          expect(marketplace_listing.reload.status).to eq "sold"
+          expect(bike.reload.status).to eq "status_with_owner"
+          expect(bike.current_event_record&.id).to be_nil
+          expect(component).to have_content bike.mnfg_name
+          expect(component).to_not have_content "for sale"
+          expect(component).to have_content "551"
+          expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
+
+          expect_serial_is_visible(component, bike.serial_number)
+        end
+
+        context "with render_deleted: true" do
+          let(:render_deleted) { true }
+
+          it "renders marketplace_listing" do
+            expect(marketplace_listing.reload.status).to eq "sold"
+            expect(bike.reload.deleted?).to be_falsey
+            expect(bike.current_event_record&.id).to be_nil
+            expect(component).to have_content bike.mnfg_name
+            expect(component).to_not have_content "Deleted"
+            expect(component).to_not have_content "for sale"
+            expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
+            expect(component).to have_content(l(marketplace_listing.published_at, format: :convert_time))
+            expect(component).to have_content(l(marketplace_listing.end_at, format: :convert_time))
+            expect(component).to have_content "551"
+
+            expect_serial_is_visible(component, bike.serial_number)
+          end
         end
       end
     end

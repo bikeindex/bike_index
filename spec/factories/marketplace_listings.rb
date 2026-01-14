@@ -29,7 +29,7 @@ FactoryBot.define do
     end
 
     trait :sold do
-      end_at { Time.current - 1.minute }
+      end_at { Time.current - 5.minutes }
       published_at { Time.current - 1.week }
       buyer { FactoryBot.create(:user_confirmed) }
       status { :sold }

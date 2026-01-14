@@ -14,6 +14,18 @@ RSpec.describe "Search API V3", type: :request do
         expect(response.header["Total"]).to eq("1")
         result = JSON.parse(response.body)
         expect(result["bikes"][0]["id"]).to eq bike2.id
+        expect(response.headers["Per-Page"]).to eq("1")
+        # Link headers aren't working in request specs :/
+        # expect(response.headers["Link"]).to eq('"<http://localhost:3042/api/v3/search?page=1>; rel="first", <http://localhost:3042/api/v3/search?page=5000>; rel="prev"')
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+
+        # Outside permitted page params
+        get "/api/v3/search", params: query_params.merge(page: 500, per_page: 50_000, format: :json)
+        # IDK why this returns 1 for total
+        # expect(response.headers["Total"]).to eq("2")
+        expect(response.headers["Per-Page"]).to eq("100")
+        # expect(response.headers["Link"]).to eq('"<http://localhost:3042/api/v3/search?page=1>; rel="first", <http://localhost:3042/api/v3/search?page=4999>; rel="prev"')
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       end

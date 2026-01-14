@@ -1148,6 +1148,7 @@ it:
       hidden_for_unauthorized_users:
       made_without_serial:
       unknown:
+      deleted:
     organization_helper:
       address:
       address_school:
@@ -4716,12 +4717,19 @@ it:
         to:
       thread_show:
         subject: Oggetto
+      for_sale_item:
+        no_results:
     search_results:
       bike_box:
         location: Luogo
         posted_at:
         primary_colors: Colori primari
         serial: Seriale
+        deleted:
+        ended_at:
+        not_applicable:
+        price:
+        removed_from:
       vehicle_thumbnail:
         registered_not_stolen:
       container:

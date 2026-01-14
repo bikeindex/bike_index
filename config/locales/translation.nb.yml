@@ -1147,6 +1147,7 @@ nb:
       hidden_for_unauthorized_users: skjult for uautoriserte brukere
       made_without_serial: laget uten serie
       unknown: ukjent
+      deleted: Slettet
     organization_helper:
       address: gateadresse
       address_school: Campus postadresse
@@ -5879,12 +5880,19 @@ nb:
         to: Til
       thread_show:
         subject: Emne
+      for_sale_item:
+        no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
     search_results:
       bike_box:
         location: plassering
         posted_at: Oppført
         primary_colors: Primærfarger
         serial: Seriell
+        deleted: Slettet
+        ended_at: Avsluttet
+        not_applicable: Ikke aktuelt
+        price: Pris
+        removed_from: Fjernet fra sykkelindeksen
       vehicle_thumbnail:
         registered_not_stolen: registrert, ikke stjålet
       container:
