@@ -12,3 +12,4 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     expect(component).to have_css("div")
   end
 end
+

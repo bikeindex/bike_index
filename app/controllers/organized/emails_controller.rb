@@ -28,8 +28,7 @@ module Organized
         render Emails::FinishedRegistration::Component.new(
           ownership: @ownership,
           bike: @bike,
-          email_preview: true,
-          email_preview_tokenized_url: @email_preview_tokenized_url
+          email_preview: true
         ), layout: "email"
       end
     end

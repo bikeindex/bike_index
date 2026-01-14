@@ -5,11 +5,10 @@ module Emails::FinishedRegistration
     include ActionView::Helpers::UrlHelper
     include Rails.application.routes.url_helpers
 
-    def initialize(ownership:, bike: nil, email_preview: false, email_preview_tokenized_url: nil)
+    def initialize(ownership:, bike: nil, email_preview: false)
       @ownership = ownership
       @bike = bike
       @email_preview = email_preview
-      @email_preview_tokenized_url = email_preview_tokenized_url
     end
 
     private
@@ -66,7 +65,7 @@ module Emails::FinishedRegistration
 
     def bike_url_with_token
       if @email_preview
-        @email_preview_tokenized_url
+        "/404"
       else
         bike_url(bike, t: @ownership.token, email:)
       end
@@ -74,7 +73,7 @@ module Emails::FinishedRegistration
 
     def recovery_url
       if @email_preview
-        @email_preview_tokenized_url
+        "/404"
       else
         edit_bike_recovery_url(bike_id: bike.id, token: bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
       end
