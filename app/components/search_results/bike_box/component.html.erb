@@ -18,6 +18,18 @@
     </h5>
 
     <ul class="attr-list">
+      <% if @bike.deleted? %>
+        <li>
+          <strong class="attr-title">
+            <%= translation(".removed_from") %>:
+          </strong>
+
+          <span class="localizeTime">
+            <%= l @bike.deleted_at, format: :convert_time %>
+          </span>
+        </li>
+      <% end %>
+
       <li>
         <strong class="attr-title"><%= translation(".serial") %>:</strong>
         <%# current_user is only present if not cached %>

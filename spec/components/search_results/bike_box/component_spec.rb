@@ -42,6 +42,26 @@ RSpec.describe SearchResults::BikeBox::Component, type: :component do
     end
   end
 
+  context "when deleted" do
+    let(:bike) { FactoryBot.create(:bike, deleted_at: Time.current - 1.day) }
+    it "doesn't render" do
+      expect(component).not_to have_css "li"
+    end
+
+    context "with render_deleted: true" do
+      let(:options) { {bike:, current_user:, skip_cache:, render_deleted: true} }
+
+      it "renders" do
+        expect(component).to have_content bike.mnfg_name
+        expect(component.css("a").first["href"]).to match("/bikes/#{bike.id}")
+        expect(component).to have_content(l(bike.deleted_at, format: :convert_time))
+
+        expect_serial_is_visible(component, bike.serial_number)
+        expect(component).to have_content("Deleted")
+      end
+    end
+  end
+
   context "with impound_record" do
     let!(:impound_record) { FactoryBot.create(:impound_record, bike:) }
     it "renders" do

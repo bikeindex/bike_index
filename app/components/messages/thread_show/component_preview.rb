@@ -2,6 +2,7 @@
 
 module Messages::ThreadShow
   class ComponentPreview < ApplicationComponentPreview
+    # @display legacy_stylesheet true
     def default
       marketplace_message = built_marketplace_message(default_marketplace_message_attrs)
 

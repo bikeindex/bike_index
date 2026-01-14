@@ -6,9 +6,9 @@ module SearchResults::BikeBox
 
     # NOTE: be cautious about passing in current_user and caching,
     # since current_user shows their hidden serials
-    def initialize(bike:, current_user: nil, current_event_record: nil, search_kind: nil, skip_cache: false)
+    def initialize(bike:, current_user: nil, current_event_record: nil, search_kind: nil, skip_cache: false, render_deleted: false)
+      return if bike.blank? || !render_deleted && bike.deleted?
       @bike = bike
-      return if @bike.blank?
 
       @search_kind = SearchResults::Container::Component.permitted_search_kind(search_kind)
       @current_event_record ||= @bike.current_event_record
@@ -29,7 +29,9 @@ module SearchResults::BikeBox
     end
 
     def render_for_sale_info?
-      @bike.is_for_sale? && @current_event_record.is_a?(MarketplaceListing)
+      return false unless @current_event_record.is_a?(MarketplaceListing)
+      # If
+      @bike.is_for_sale? || @bike.deleted?
     end
 
     def occurred_at_with_fallback

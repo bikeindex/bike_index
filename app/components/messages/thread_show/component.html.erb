@@ -3,7 +3,8 @@
     Messages::ForSaleItem::Component.new(
       vehicle: @marketplace_listing.item,
       vehicle_id: @marketplace_listing.item_id,
-      current_user: @current_user
+      current_user: @current_user,
+      marketplace_listing: @marketplace_listing
     )
   ) %>
 
