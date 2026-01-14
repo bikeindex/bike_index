@@ -1,11 +1,10 @@
 <div>
   <%= render(
     Messages::ForSaleItem::Component.new(
-      result_view: :bike_box,
-      search_kind: :marketplace,
-      vehicles: [@marketplace_listing.item],
-      current_user: @current_user,
-    ),
+      vehicle: @marketplace_listing.item,
+      vehicle_id: @marketplace_listing.item_id,
+      current_user: @current_user
+    )
   ) %>
 
   <% if @marketplace_messages.any? %>
