@@ -137,12 +137,12 @@ RSpec.describe Organized::EmailsController, type: :request do
         it "renders" do
           get "#{base_url}/finished_registration"
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/finished_registration")
+          expect(response).to render_template("layouts/email")
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
           # And it defaults to finished registration, if unable to parse kind
           get "#{base_url}/whateverrrrr"
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/finished_registration")
+          expect(response).to render_template("layouts/email")
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
         end
       end
@@ -163,7 +163,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(organization_stolen_message.body).to be_blank
           get "#{base_url}/organization_stolen_message"
           expect(response.status).to eq(200)
-          expect(response).to render_template("organized_mailer/finished_registration")
+          expect(response).to render_template("layouts/email")
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
           expect(assigns(:bike).id).to eq 42
           expect(assigns(:bike).current_stolen_record).to be_present
@@ -179,7 +179,7 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(current_organization.bikes.pluck(:id)).to eq([bike.id])
             get "#{base_url}/organization_stolen_message"
             expect(response.status).to eq(200)
-            expect(response).to render_template("organized_mailer/finished_registration")
+            expect(response).to render_template("layouts/email")
             expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
             expect(assigns(:bike).id).to eq bike.id
             expect(assigns(:bike).current_stolen_record).to be_present

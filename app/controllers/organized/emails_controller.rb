@@ -25,7 +25,12 @@ module Organized
         render template: "/organized_mailer/partial_registration", layout: "email"
       else # Default to finished email
         build_finished_email
-        render template: "/organized_mailer/finished_registration", layout: "email"
+        render Emails::FinishedRegistration::Component.new(
+          ownership: @ownership,
+          bike: @bike,
+          email_preview: true,
+          email_preview_tokenized_url: @email_preview_tokenized_url
+        ), layout: "email"
       end
     end
 
