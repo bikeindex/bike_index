@@ -11,6 +11,13 @@ module Emails::FinishedRegistration
       @email_preview = email_preview
     end
 
+    def before_render
+      # Set instance variables for partials that expect them
+      helpers.instance_variable_set(:@bike, bike)
+      helpers.instance_variable_set(:@ownership, @ownership)
+      helpers.instance_variable_set(:@email_preview, @email_preview)
+    end
+
     private
 
     def bike
