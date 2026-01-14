@@ -44,9 +44,9 @@
     <% if registered_by_owner? %>
       <%= translation("you_added_a_bike_type_on_bike_index", bike_type: bike_type_for_message) %>
     <% elsif new_bike? %>
-      <%= translation("org_added_a_bike_html", org_name:, bike_type: bike_type_for_message) %>
+      <strong><%= org_name %></strong> <%= translation("org_added_a_bike", bike_type: bike_type_for_message) %>
     <% else %>
-      <%= translation("org_sent_a_bike_html", org_name:, bike_type: bike_type_for_message) %>
+      <strong><%= org_name %></strong> <%= translation("org_sent_a_bike", bike_type: bike_type_for_message) %>
     <% end %>
   </p>
   <% unless @ownership.claimed %>
@@ -59,13 +59,14 @@
 <% if bike.status_stolen_or_impounded? %>
   <p>
     <% if bike.status_impounded? %>
-      <% edit_bike_link = link_to translation("give_us_a_heads_up"), edit_bike_url(bike) %>
-      <%= translation("hopefully_you_find_the_owner_html", edit_bike_link:) %>
+      <%= translation("hopefully_you_find_the_owner_prefix") %>
+      <%= link_to translation("give_us_a_heads_up"), helpers.edit_bike_url(bike) %>
+      <%= translation("hopefully_you_find_the_owner_suffix") %>
     <% else %>
-      <%= translation("hopefully_you_find_the_bike_html", bike_type: bike.type) %>
+      <%= translation("hopefully_you_find_the_bike", bike_type: bike.type) %>
       <strong>
-        <% mark_recovered_link = link_to(translation("mark_your_bike_recovered"), recovery_url, "data-pm-no-track" => true) %>
-        <%= translation("mark_recovered_link_html", mark_recovered_link:) %>
+        <%= link_to(translation("mark_your_bike_recovered"), recovery_url, "data-pm-no-track" => true) %>
+        <%= translation("when_you_do") %>
       </strong>
     <% end %>
   </p>
@@ -74,13 +75,15 @@
 <% if donation_message? %>
   <div class="donate-message">
     <h5>
-      <% donating_link = link_to translation("donating"), why_donate_url %>
-      <%= translation("please_consider_donating_html", donating_link:) %>
+      <%= translation("please_consider_prefix") %>
+      <%= link_to translation("donating"), helpers.why_donate_url %>
+      <%= translation("please_consider_suffix") %>
     </h5>
 
     <p>
-      <% prioritize_link = link_to translation("prioritize_your_listing"), news_url('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso') %>
-      <%= translation("a_donation_will_prioritize_html", prioritize_link:) %>
+      <%= translation("a_donation_will_prioritize_prefix") %>
+      <%= link_to translation("prioritize_your_listing"), helpers.news_url('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso') %>
+      <%= translation("a_donation_will_prioritize_suffix") %>
     </p>
   </div>
 <% end %>
@@ -118,8 +121,8 @@
       </ul>
 
       <p>
-        <% protecting_your_bike_link = link_to translation("protecting_your_bike_here"), protect_your_bike_url %>
-        <%= translation("read_more_about_protecting_html", link: protecting_your_bike_link) %>
+        <%= translation("read_more_about_prefix") %>
+        <%= link_to translation("protecting_your_bike_here"), helpers.protect_your_bike_url %>.
       </p>
 
       <div class="locking-demonstration">
