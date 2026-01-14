@@ -274,8 +274,10 @@ module Organized
     end
 
     def no_org_search_params?
-      params.slice(:search_address, :search_email, :search_model_audit_id, :search_status,
-        :search_stickers).values.reject(&:blank?).none?
+      return false if params[:search_stickers].present? && params[:search_stickers] != "none"
+
+      params.slice(:search_address, :search_email, :search_model_audit_id, :search_status)
+        .values.reject(&:blank?).none?
     end
 
     def no_interpreted_params?
