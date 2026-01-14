@@ -1149,6 +1149,7 @@ nl:
       hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
       made_without_serial: gemaakt zonder serie
       unknown: Onbekend
+      deleted: Verwijderd
     organization_helper:
       address: Adres
       address_school: Postadres van de campus
@@ -6035,12 +6036,19 @@ nl:
         to: Naar
       thread_show:
         subject: Onderwerp
+      for_sale_item:
+        no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
     search_results:
       bike_box:
         location: Plaats
         posted_at: Genoteerd
         primary_colors: Primaire kleuren
         serial: Serie
+        deleted: Verwijderd
+        ended_at: Einde
+        not_applicable: Niet van toepassing
+        price: Prijs
+        removed_from: Verwijderd uit de fietsindex
       vehicle_thumbnail:
         registered_not_stolen: geregistreerd, niet gestolen
       container:

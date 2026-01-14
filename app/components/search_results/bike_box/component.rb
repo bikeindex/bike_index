@@ -6,12 +6,15 @@ module SearchResults::BikeBox
 
     # NOTE: be cautious about passing in current_user and caching,
     # since current_user shows their hidden serials
-    def initialize(bike:, current_user: nil, current_event_record: nil, search_kind: nil, skip_cache: false)
-      @bike = bike
-      return if @bike.blank?
+    def initialize(bike:, current_user: nil, event_record: nil, search_kind: nil, skip_cache: false, render_deleted: false)
+      @render_deleted = render_deleted
+      return if bike.blank? || !@render_deleted && bike.deleted?
 
+      @bike = bike
       @search_kind = SearchResults::Container::Component.permitted_search_kind(search_kind)
-      @current_event_record ||= @bike.current_event_record
+
+      # NOTE: passed event_record renders - even if it isn't the current_event_record
+      @event_record = event_record || @bike.current_event_record
 
       # If this is cached (it is by default), don't show the serial for the user
       @is_cached = !skip_cache
@@ -25,15 +28,22 @@ module SearchResults::BikeBox
     private
 
     def render_second_column?
-      @current_event_record.present?
+      @event_record.present?
     end
 
     def render_for_sale_info?
-      @bike.is_for_sale? && @current_event_record.is_a?(MarketplaceListing)
+      @event_record.is_a?(MarketplaceListing)
+    end
+
+    # If for sale, return "For Sale" - otherwise returns price
+    def price_span
+      return bike_status_span(@bike) if @event_record.for_sale?
+
+      content_tag(:strong, translation(".price"), class: "attr-title")
     end
 
     def occurred_at_with_fallback
-      @bike.occurred_at || @current_event_record&.updated_at || @bike.updated_at
+      @bike.occurred_at || @event_record&.updated_at || @bike.updated_at
     end
 
     # copies from application_helper

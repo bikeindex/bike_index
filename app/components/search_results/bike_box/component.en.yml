@@ -3,7 +3,12 @@ en:
   components:
     search_results:
       bike_box:
+        deleted: Deleted
+        ended_at: Ended
         location: Location
+        not_applicable: N/A
         posted_at: Listed
+        price: Price
         primary_colors: Primary colors
+        removed_from: Removed from Bike Index
         serial: Serial
