@@ -46,6 +46,16 @@ module Emails::FinishedRegistration
       @ownership.user.present? && bike.creator_id == @ownership.user_id
     end
 
+    def show_tempo_partial?
+      return false unless bike.status_with_owner && new_bike? && registered_by_owner?
+
+      tempo_snippet.present? && tempo_snippet.is_enabled
+    end
+
+    def tempo_snippet
+      @tempo_snippet ||= MailSnippet.tempo.order(:id).last
+    end
+
     def org_name
       creation_org&.name || @ownership&.creator&.display_name
     end
@@ -64,7 +74,7 @@ module Emails::FinishedRegistration
       if @email_preview
         "/404"
       else
-        helpers.bike_url(bike, t: @ownership.token, email:)
+        bike_url(bike, t: @ownership.token, email:)
       end
     end
 
@@ -72,7 +82,7 @@ module Emails::FinishedRegistration
       if @email_preview
         "/404"
       else
-        helpers.edit_bike_recovery_url(bike_id: bike.id, token: bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
+        edit_bike_recovery_url(bike_id: bike.id, token: bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
       end
     end
 
