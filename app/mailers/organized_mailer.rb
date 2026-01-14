@@ -24,26 +24,17 @@ class OrganizedMailer < ApplicationMailer
   end
 
   def finished_registration(ownership)
-    # Things set here are also set in emails_controller - if updating, make sure to update there too
     @ownership = ownership
-    @user = ownership.owner
     @bike = Bike.unscoped.find(@ownership.bike_id)
     @organization = @ownership.organization
-    @vars = {
-      new_bike: @ownership.new_registration?,
-      email: @ownership.owner_email,
-      new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
-      donation_message: @bike.status_stolen? && !(@organization && !@organization.paid?),
-      registered_by_owner: @ownership.user.present? && @bike.creator_id == @ownership.user_id
-    }
     subject = I18n.t("organized_mailer.finished#{finished_registration_type}_registration.subject", **default_subject_vars)
     tag = __callee__
     tag = "#{tag}_pos" if @ownership.pos? && @ownership.new_registration?
-    I18n.with_locale(@user&.preferred_language) do
+    I18n.with_locale(@ownership.owner&.preferred_language) do
       mail(reply_to: reply_to,
-        to: @vars[:email],
-        subject: subject,
-        tag: tag)
+        to: @ownership.owner_email,
+        subject:,
+        tag:)
     end
   end
 

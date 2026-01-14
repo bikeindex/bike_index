@@ -1,3 +1,134 @@
-<div>
-  Emails::FinishedRegistration::Component component
-</div>
+<%# `MailSnippet`s are only available in english for now %>
+<% if organization&.mail_snippet_body('welcome').present? %>
+  <%= organization.mail_snippet_body('welcome').html_safe %>
+<% end %>
+
+<% if @ownership.claim_message.present? %>
+  <% if show_organization_stolen_message? %>
+    <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: bike.current_stolen_record} %>
+  <% end %>
+  <%= render partial: "/shared/claim_message", locals: {bike:, skip_to_see: true} %>
+<% else %>
+  <% if new_user? %>
+    <h2 style="margin-bottom: 12px;">
+      <%= translation("welcome_to_bike_index") %>
+    </h2>
+  <% end %>
+  <% if bike.status_impounded? %>
+    <h1>
+      <%= translation("thanks_for_adding_this_bike_type_you_found", bike_type: bike.type) %>
+    </h1>
+  <% elsif bike.status_stolen? %>
+    <h1>
+      <%= translation("bike_type_thieves_are_jerks", bike_type: bike.type) %>
+    </h1>
+    <% if show_organization_stolen_message? %>
+      <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: bike.current_stolen_record} %>
+    <% end %>
+    <p>
+      <%= translation("were_sorry_your_bike_type_was_stolen", bike_type: bike.type) %>
+    </p>
+  <% else %>
+    <h1 class="uncap">
+      <% if organization.present? %>
+        <%= translation("bike_register_with_bike_index_and_org", bike_type: bike.type, org_name: organization.short_name) %>
+      <% else %>
+        <%= translation("bike_register_with_bike_index", bike_type: bike.type) %>
+      <% end %>
+    </h1>
+  <% end %>
+  <% if organization&.mail_snippet_body('after_welcome').present? %>
+    <%= organization.mail_snippet_body('after_welcome').html_safe %>
+  <% end %>
+  <p>
+    <% if registered_by_owner? %>
+      <%= translation("you_added_a_bike_type_on_bike_index", bike_type: bike_type_for_message) %>
+    <% elsif new_bike? %>
+      <%= translation("org_added_a_bike_html", org_name:, bike_type: bike_type_for_message) %>
+    <% else %>
+      <%= translation("org_sent_a_bike_html", org_name:, bike_type: bike_type_for_message) %>
+    <% end %>
+  </p>
+  <% unless @ownership.claimed %>
+    <h2><%= translation("youre_almost_done_registering") %></h2>
+  <% end %>
+<% end %>
+
+<%= render partial: 'shared/email_bike_box', locals: {bike_url_path: bike_url_with_token} %>
+
+<% if bike.status_stolen_or_impounded? %>
+  <p>
+    <% if bike.status_impounded? %>
+      <% edit_bike_link = link_to translation("give_us_a_heads_up"), edit_bike_url(bike) %>
+      <%= translation("hopefully_you_find_the_owner_html", edit_bike_link:) %>
+    <% else %>
+      <%= translation("hopefully_you_find_the_bike_html", bike_type: bike.type) %>
+      <strong>
+        <% mark_recovered_link = link_to(translation("mark_your_bike_recovered"), recovery_url, "data-pm-no-track" => true) %>
+        <%= translation("mark_recovered_link_html", mark_recovered_link:) %>
+      </strong>
+    <% end %>
+  </p>
+<% end %>
+
+<% if donation_message? %>
+  <div class="donate-message">
+    <h5>
+      <% donating_link = link_to translation("donating"), why_donate_url %>
+      <%= translation("please_consider_donating_html", donating_link:) %>
+    </h5>
+
+    <p>
+      <% prioritize_link = link_to translation("prioritize_your_listing"), news_url('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso') %>
+      <%= translation("a_donation_will_prioritize_html", prioritize_link:) %>
+    </p>
+  </div>
+<% end %>
+
+<% unless @ownership.claimed? %>
+  <% if registered_by_owner? %>
+    <%= link_to translation("claim_the_bike_type", bike_type: bike.type), bike_url_with_token, "data-pm-no-track" => true, class: 'binx-button' %>
+  <% else %>
+    <%= link_to translation("confirm_this_bike_type", bike_type: bike.type), bike_url_with_token, "data-pm-no-track" => true, class: 'binx-button' %>
+  <% end %>
+  <p>
+    <%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %>
+  </p>
+<% end %>
+
+<% if organization && organization.mail_snippet_body("security").present? %>
+  <%= organization.mail_snippet_body("security").html_safe %>
+<% else %>
+  <% unless bike.status_impounded? %>
+    <div>
+      <% unless donation_message? %>
+        <hr>
+      <% end %>
+
+      <h2><%= translation("protect_your_bike_by_following_these_lock") %></h2>
+
+      <ul class="binx-bulleted-list">
+        <li>
+          <strong><%= translation("use_a_ulock") %></strong>
+          <%= translation("cable_locks_should_never_be_used") %>
+        </li>
+
+        <li><%= translation("secure_both_wheels_either_with_two_ulocks") %></li>
+        <li><%= translation("before_locking_check") %></li>
+      </ul>
+
+      <p>
+        <% protecting_your_bike_link = link_to translation("protecting_your_bike_here"), protect_your_bike_url %>
+        <%= translation("read_more_about_protecting_html", link: protecting_your_bike_link) %>
+      </p>
+
+      <div class="locking-demonstration">
+        <%= image_tag 'https://files.bikeindex.org/email_assets/locking.gif', alt: translation("correctly_locking_a_bike"), title: translation("pink_power_ulocks_tm") %>
+      </div>
+
+      <p class="center-text">
+        <em><%= translation("a_correctly_locked_bike") %></em>
+      </p>
+    </div>
+  <% end %>
+<% end %>

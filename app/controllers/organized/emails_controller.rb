@@ -136,13 +136,6 @@ module Organized
     def build_finished_email
       @bike = (@kind == "organization_stolen_message") ? default_stolen_bike : default_bike
       @ownership ||= @bike.current_ownership # Gross things to make default_bike work
-      @user = @ownership.owner
-      @vars = {
-        new_bike: @ownership.new_registration?,
-        email: @ownership.owner_email,
-        new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
-        registered_by_owner: @ownership.user.present? && @bike.creator_id == @ownership.user_id
-      }
     end
 
     def find_or_build_graduated_notification
