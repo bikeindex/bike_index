@@ -1133,6 +1133,7 @@ es:
       hidden_for_unauthorized_users:
       made_without_serial:
       unknown:
+      deleted:
     organization_helper:
       address:
       address_school:
@@ -4634,12 +4635,19 @@ es:
         to:
       thread_show:
         subject:
+      for_sale_item:
+        no_results:
     search_results:
       bike_box:
         location:
         posted_at:
         primary_colors:
         serial:
+        deleted:
+        ended_at:
+        not_applicable:
+        price:
+        removed_from:
       vehicle_thumbnail:
         registered_not_stolen:
       container:

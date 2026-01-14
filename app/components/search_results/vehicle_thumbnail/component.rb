@@ -5,12 +5,12 @@ module SearchResults::VehicleThumbnail
     include BikeHelper
 
     # current_user is ignored, but included to match other SearchResults components
-    def initialize(bike:, current_user: nil, current_event_record: nil, skip_cache: false, search_kind: nil)
+    def initialize(bike:, current_user: nil, event_record: nil, skip_cache: false, search_kind: nil)
       @bike = bike
       return if @bike.blank?
 
       @search_kind = SearchResults::Container::Component.permitted_search_kind(search_kind)
-      @current_event_record ||= @bike.current_event_record
+      @event_record = event_record || @bike.current_event_record
 
       @is_cached = !skip_cache
     end
@@ -30,15 +30,15 @@ module SearchResults::VehicleThumbnail
     end
 
     def render_for_sale_info?
-      @bike.is_for_sale? && @current_event_record.is_a?(MarketplaceListing)
+      @event_record.is_a?(MarketplaceListing)
     end
 
     def render_event_date?
-      @current_event_record.present? && !@current_event_record.is_a?(MarketplaceListing)
+      @event_record.present? && !@event_record.is_a?(MarketplaceListing)
     end
 
     def occurred_at_with_fallback
-      @bike.occurred_at || @current_event_record&.updated_at || @bike.updated_at
+      @bike.occurred_at || @event_record&.updated_at || @bike.updated_at
     end
 
     def vehicle_image_tag
@@ -56,10 +56,10 @@ module SearchResults::VehicleThumbnail
     end
 
     def address_formatted
-      @address_formatted ||= if @current_event_record.is_a?(MarketplaceListing)
-        @current_event_record.formatted_address_string
+      @address_formatted ||= if @event_record.is_a?(MarketplaceListing)
+        @event_record.formatted_address_string
       else
-        @current_event_record&.address(country: [:iso])
+        @event_record&.address(country: [:iso])
       end
     end
   end

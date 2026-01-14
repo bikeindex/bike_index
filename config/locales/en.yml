@@ -2352,12 +2352,12 @@ en:
       warning: Warning
   helpers:
     bike_helper:
+      deleted: Deleted
       hidden: hidden
       hidden_because_status: because %{bike_type} is %{status}
       hidden_for_unauthorized_users: hidden for unauthorized users
       made_without_serial: made without serial
       unknown: unknown
-      deleted: Deleted
     organization_helper:
       address: Street address
       address_school: Campus mailing address
