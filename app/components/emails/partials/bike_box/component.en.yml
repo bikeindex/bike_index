@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    emails:
+      partials:
+        bike_box:
+          bike_photo: Bike photo
+          color: Color
+          color_may_be_incorrect: Color may be incorrect because it was set during POS import
+          found: "Found:"
+          make: "Make:"
+          serial: "Serial:"
+          stolen_at: "Stolen at:"
+          stolen_from: "Stolen from:"

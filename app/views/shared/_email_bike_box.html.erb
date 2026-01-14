@@ -1,3 +1,4 @@
+
 <% @ownership ||= @bike.current_ownership %>
 <% bike_url_path ||= bike_url(@bike, t: @ownership.token) %>
 <% skip_link_tracking = bike_url_path.match?(/\?/) # Skip link tracking if there are query parameters - e.g. token %>

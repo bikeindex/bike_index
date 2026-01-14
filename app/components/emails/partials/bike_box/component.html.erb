@@ -1,0 +1,56 @@
+<table class="bike-display">
+  <tbody>
+    <tr>
+      <td class="image-holder <%= 'placeholder' if placeholder? %>">
+        <a href="<%= @bike_url_path %>" data-pm-no-track="<%= skip_link_tracking? %>">
+          <%= image_tag thumb_url, alt: translation("bike_photo") %>
+        </a>
+      </td>
+
+      <td class="info-holder">
+        <ul>
+          <li>
+            <strong><%= translation("make") %></strong><%= @bike.mnfg_name %>
+          </li>
+
+          <li>
+            <strong><%= translation("serial") %></strong>
+            <%= helpers.render_serial_display(@bike, skip_explanation: true) %>
+          </li>
+
+          <li>
+            <strong>
+              <%= color_label %>:
+              <%= @bike.frame_colors.to_sentence %>
+            </strong>
+
+            <% if show_paint_description? %>
+              <small class="less-strong">
+                - <%= @bike.paint_description %>
+              </small>
+            <% end %>
+          </li>
+
+          <% if stolen_record.present? %>
+            <li>
+              <strong>
+                <%= @bike.status_impounded? ? translation("found") : translation("stolen_from") %>
+              </strong>
+              <%= stolen_record.address(country: [:skip_default]) %>
+            </li>
+            <li>
+              <strong><%= translation("stolen_at") %></strong>
+              <%= helpers.l stolen_record.date_stolen, format: :dotted %>
+            </li>
+          <% end %>
+
+          <% if show_color_warning? %>
+            <li>
+              <em class="less-strong"><%= translation("color_may_be_incorrect") %></em>
+            </li>
+          <% end %>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>

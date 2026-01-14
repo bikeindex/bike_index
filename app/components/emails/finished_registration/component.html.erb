@@ -56,7 +56,7 @@
   <% end %>
 <% end %>
 
-<%= render partial: 'shared/email_bike_box', locals: {bike_url_path: bike_url_with_token} %>
+<%= render(Emails::Partials::BikeBox::Component.new(bike:, ownership: @ownership, bike_url_path: bike_url_with_token)) %>
 
 <% if bike.status_stolen_or_impounded? %>
   <p>
