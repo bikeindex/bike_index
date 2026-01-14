@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    emails:
+      finished_registration:
+        ownership: Ownership
