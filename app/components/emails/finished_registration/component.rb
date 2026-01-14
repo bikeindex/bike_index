@@ -2,9 +2,6 @@
 
 module Emails::FinishedRegistration
   class Component < ApplicationComponent
-    include ActionView::Helpers::UrlHelper
-    include Rails.application.routes.url_helpers
-
     def initialize(ownership:, bike: nil, email_preview: false)
       @ownership = ownership
       @bike = bike
@@ -74,7 +71,7 @@ module Emails::FinishedRegistration
       if @email_preview
         "/404"
       else
-        bike_url(bike, t: @ownership.token, email:)
+        helpers.bike_url(bike, t: @ownership.token, email:)
       end
     end
 
@@ -82,16 +79,12 @@ module Emails::FinishedRegistration
       if @email_preview
         "/404"
       else
-        edit_bike_recovery_url(bike_id: bike.id, token: bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
+        helpers.edit_bike_recovery_url(bike_id: bike.id, token: bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
       end
     end
 
     def show_organization_stolen_message?
       OrganizationStolenMessage.shown_to?(bike.current_stolen_record)
-    end
-
-    def default_url_options
-      {host: "bikeindex.org", protocol: "https"}
     end
   end
 end
