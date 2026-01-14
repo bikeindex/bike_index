@@ -89,7 +89,7 @@ RSpec.describe Organized::BikesController, type: :request do
         end
         it "redirects to export new" do
           expect {
-            get base_url, params: params_blank
+            get base_url, params: params_blank.merge(search_stickers: "none")
           }.to change(Export, :count).by 0
           expect(flash).to be_blank
           expect(response).to redirect_to new_organization_export_url(organization_id: current_organization.id)
