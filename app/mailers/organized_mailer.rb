@@ -28,14 +28,14 @@ class OrganizedMailer < ApplicationMailer
     @ownership = ownership
     @user = ownership.owner
     @bike = Bike.unscoped.find(@ownership.bike_id)
+    @organization = @ownership.organization
     @vars = {
       new_bike: @ownership.new_registration?,
       email: @ownership.owner_email,
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
+      donation_message: @bike.status_stolen? && !(@organization && !@organization.paid?),
       registered_by_owner: @ownership.user.present? && @bike.creator_id == @ownership.user_id
     }
-    @organization = @ownership.organization
-    @vars[:donation_message] = @bike.status_stolen? && !(@organization && !@organization.paid?)
     subject = I18n.t("organized_mailer.finished#{finished_registration_type}_registration.subject", **default_subject_vars)
     tag = __callee__
     tag = "#{tag}_pos" if @ownership.pos? && @ownership.new_registration?
