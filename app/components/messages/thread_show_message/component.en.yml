@@ -2,5 +2,7 @@
 en:
   components:
     messages:
-      thread_show:
+      thread_show_message:
         subject: Subject
+        to: to
+        me: me

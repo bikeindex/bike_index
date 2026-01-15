@@ -242,7 +242,7 @@ class MarketplaceMessage < ApplicationRecord
   def set_calculated_attributes
     self.kind ||= (sender_id == seller_id) ? "sender_seller" : "sender_buyer"
     if reply_message?
-      self.subject = I18n.t("re", original_subject: initial_record.subject,
+      self.subject = I18n.t("re", original_subject: initial_record&.subject,
         scope: %i[activerecord errors messages])
     end
     self.initial_record ||= self

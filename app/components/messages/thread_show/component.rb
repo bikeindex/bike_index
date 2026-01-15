@@ -15,15 +15,5 @@ module Messages::ThreadShow
     def render?
       @initial_message.present? || @marketplace_listing.present?
     end
-
-    private
-
-    def user_display(user_id)
-      if user_id == @current_user.id
-        @current_user.marketplace_message_name
-      else
-        @other_user_name
-      end
-    end
   end
 end
