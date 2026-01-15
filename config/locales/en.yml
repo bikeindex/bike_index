@@ -1597,6 +1597,19 @@ en:
       wide: Wide
       wide_help: "> 38mm (1.5in)"
       wide_title: Tires that are at least 39mm (1.5 inches) wide
+  components:
+    emails:
+      partials:
+        bike_box:
+          bike_photo: Bike photo
+          color: Color
+          color_may_be_incorrect: Color may be incorrect because it was set during
+            POS import
+          found: 'Found:'
+          make: 'Make:'
+          serial: 'Serial:'
+          stolen_at: 'Stolen at:'
+          stolen_from: 'Stolen from:'
   controllers:
     application:
       handle_unverified_request:

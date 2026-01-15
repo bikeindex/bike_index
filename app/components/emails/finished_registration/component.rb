@@ -46,10 +46,9 @@ module Emails::FinishedRegistration
       @ownership.user.present? && bike.creator_id == @ownership.user_id
     end
 
-    def show_tempo_partial?
-      return false unless bike.status_with_owner && new_bike? && registered_by_owner?
-
-      tempo_snippet.present? && tempo_snippet.is_enabled
+    def render_tempo_partial?
+      bike.status_with_owner? && new_bike? && organization.blank? &&
+        tempo_snippet.present? && tempo_snippet.is_enabled
     end
 
     def tempo_snippet

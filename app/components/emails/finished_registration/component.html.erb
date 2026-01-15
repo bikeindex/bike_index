@@ -137,3 +137,7 @@
     </div>
   <% end %>
 <% end %>
+
+<% if render_tempo_partial? %>
+  <%= tempo_snippet.body.html_safe %>
+<% end %>

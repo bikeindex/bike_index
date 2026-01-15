@@ -2,7 +2,10 @@
   <tbody>
     <tr>
       <td class="image-holder <%= 'placeholder' if placeholder? %>">
-        <a href="<%= @bike_url_path %>" data-pm-no-track="<%= skip_link_tracking? %>">
+        <a
+          href="<%= @bike_url_path %>"
+          data-pm-no-track="<%= skip_link_tracking? %>"
+        >
           <%= image_tag thumb_url, alt: translation("bike_photo") %>
         </a>
       </td>
@@ -10,7 +13,8 @@
       <td class="info-holder">
         <ul>
           <li>
-            <strong><%= translation("make") %></strong><%= @bike.mnfg_name %>
+            <strong><%= translation("make") %></strong>
+            <%= @bike.mnfg_name %>
           </li>
 
           <li>
@@ -20,8 +24,7 @@
 
           <li>
             <strong>
-              <%= color_label %>:
-              <%= @bike.frame_colors.to_sentence %>
+              <%= color_label %>: <%= @bike.frame_colors.to_sentence %>
             </strong>
 
             <% if show_paint_description? %>
@@ -36,6 +39,7 @@
               <strong>
                 <%= @bike.status_impounded? ? translation("found") : translation("stolen_from") %>
               </strong>
+
               <%= stolen_record.address(country: [:skip_default]) %>
             </li>
             <li>
@@ -46,7 +50,9 @@
 
           <% if show_color_warning? %>
             <li>
-              <em class="less-strong"><%= translation("color_may_be_incorrect") %></em>
+              <em class="less-strong">
+                <%= translation("color_may_be_incorrect") %>
+              </em>
             </li>
           <% end %>
         </ul>

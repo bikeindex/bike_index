@@ -6,6 +6,13 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
   let(:component) { render_inline(described_class.new(**options)) }
   let(:options) { {ownership:, bike:} }
   let(:bike) { ownership.bike }
+  let!(:tempo_snippet) do
+    FactoryBot.create(:mail_snippet,
+      kind: :tempo,
+      is_enabled: tempo_snippet_is_enabled,
+      body: "<p>tempo-snippet</p>")
+  end
+  let(:tempo_snippet_is_enabled) { true }
 
   context "non-stolen bike" do
     let(:ownership) { FactoryBot.create(:ownership_claimed) }
@@ -15,6 +22,18 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to have_content("Protect your bike by following these locking guidelines")
       expect(component).to have_content("Use a U-Lock")
       expect(component).to_not have_content("thieves are jerks")
+      expect(component).to have_content("tempo-snippet")
+    end
+    context "tempo_snippet not is_enabled" do
+      let(:tempo_snippet_is_enabled) { false }
+      it "renders" do
+        expect(ownership.claim_message).to be_blank
+        expect(component).to have_content("Congrats on registering your bike with Bike Index")
+        expect(component).to have_content("Protect your bike by following these locking guidelines")
+        expect(component).to have_content("Use a U-Lock")
+        expect(component).to_not have_content("thieves are jerks")
+        expect(component).to_not have_content("tempo-snippet")
+      end
     end
   end
 
@@ -29,6 +48,7 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to have_content("Mark your bike recovered")
       expect(component).to have_content("Please consider")
       expect(component).to have_content("donating")
+      expect(component).to_not have_content("tempo-snippet")
     end
   end
 
@@ -40,6 +60,7 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(ownership.claim_message).to be_blank
       expect(component).to have_content("Congrats on registering your bike with Bike Index and #{organization.short_name}")
       expect(component).to have_content("Protect your bike by following these locking guidelines")
+      expect(component).to_not have_content("tempo-snippet")
     end
   end
 end
