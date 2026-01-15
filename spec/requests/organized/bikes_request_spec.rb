@@ -80,6 +80,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect {
           get base_url, params: {search_stickers: "none", create_export: true}
         }.to change(Export, :count).by 0
+        expect(flash).to be_blank
         redirected_to = response.redirect_url
         expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
         custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
@@ -99,13 +100,13 @@ RSpec.describe Organized::BikesController, type: :request do
           expect {
             get base_url, params: params_blank.merge(search_stickers: "all")
           }.to change(Export, :count).by 0
-          expect(flash).to be_blank
+          expect(flash[:error]).to match(/no bikes selected/i)
           expect(response).to redirect_to new_organization_export_url(organization_id: current_organization.id)
 
           expect {
             get base_url, params: params_blank.merge(period: "year")
           }.to change(Export, :count).by 0
-          expect(flash).to be_blank
+          expect(flash[:error]).to match(/no bikes selected/i)
 
           redirected_to = response.redirect_url
           expect(redirected_to.gsub(/end_at=\d+&?/, "").gsub(/start_at=\d+&?/, "").gsub(/\?\z/, ""))

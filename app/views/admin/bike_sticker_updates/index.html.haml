@@ -200,10 +200,12 @@
               = bike_sticker_update.kind.gsub("_claim", "").humanize
           %td
             - unless bike_sticker_update.creator_user?
-              %small
-                - if bike_sticker_update.creator_export?
-                  = link_to "export", organization_export_path(bike_sticker_update.export_id, organization_id: bike_sticker_update.organization_id)
-                - else
-                  = bike_sticker_update.creator_kind_humanized
+              %small{title: "bulk_import_id: '#{bike_sticker_update.bulk_import_id}' export_id: '#{bike_sticker_update.export_id}'"}
+                = bike_sticker_update.creator_kind_humanized
+              - if bike_sticker_update.export_id.present?
+                = link_to "##{bike_sticker_update.export_id}", organization_export_path(bike_sticker_update.export_id, organization_id: bike_sticker_update.organization_id), class: "small"
+              - if bike_sticker_update.bulk_import_id.present?
+                = link_to "##{bike_sticker_update.bulk_import_id}", organization_bulk_import_path(bike_sticker_update.bulk_import_id, organization_id: bike_sticker_update.organization_id), class: "small"
+
 
 
