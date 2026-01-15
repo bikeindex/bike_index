@@ -241,7 +241,7 @@ RSpec.describe MarketplaceMessage, type: :model do
     context "with built reply" do
       let(:initial_record) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: initial_sender) }
       let(:initial_sender) { user }
-      let(:marketplace_message) { FactoryBot.build(:marketplace_message, marketplace_listing:, sender: user, initial_record:, marketplace_listing: nil) }
+      let(:marketplace_message) { FactoryBot.build(:marketplace_message, sender: user, initial_record:, marketplace_listing: nil) }
       it "is truthy" do
         expect(initial_record).to be_valid
         expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_truthy
@@ -292,17 +292,21 @@ RSpec.describe MarketplaceMessage, type: :model do
   end
 
   describe "duplicate_of" do
-    let(:marketplace_message_2) { FactoryBot.create(:marketplace_message_reply) }
+    let(:marketplace_message_2) { FactoryBot.create(:marketplace_message_reply, body:) }
     let(:marketplace_message_1) { marketplace_message_2.initial_record }
     let(:body) { "Thank you" }
 
     it "returns true for a duplicate" do
+      expect(marketplace_message_1.ignored_duplicate?).to be_falsey
       expect(marketplace_message_2.ignored_duplicate?).to be_falsey
       expect(marketplace_message_2).to be_valid
-      duplicate = MarketplaceMessage.new(sender_id: marketplace_message_2.sender_id, body:, initial_record_id: marketplace_message_1.id)
-      expect(duplicate).to be_valid
+      duplicate = MarketplaceMessage.new(sender_id: marketplace_message_2.sender_id, body: "#{body} ", initial_record_id: marketplace_message_1.id)
+      expect(duplicate.can_send?).to be_truthy
+
+      expect(duplicate.send(:duplicate_of)&.id).to eq marketplace_message_2.id
       expect(duplicate.ignored_duplicate?).to be_truthy
       expect(duplicate.save).to be_truthy
+      expect(duplicate.body).to eq body
     end
   end
 end

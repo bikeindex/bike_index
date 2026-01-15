@@ -142,16 +142,14 @@ class MarketplaceMessage < ApplicationRecord
   end
 
   # Should be called before creation
-  # validates
+  # NOTE: This calls validations on this instance
   def can_send?
     self.class.can_send_message?(user: sender, marketplace_listing:, marketplace_message: self)
   end
 
   # Should be called before creation
   def ignored_duplicate?
-    return if initial_message?
-
-    duplicate_of.blank?
+    reply_message? && duplicate_of.present?
   end
 
   def buyer_seller_message?
@@ -250,6 +248,7 @@ class MarketplaceMessage < ApplicationRecord
     self.initial_record ||= self
     self.marketplace_listing_id ||= initial_record&.marketplace_listing_id
     self.messages_prior_count ||= messages_prior.count
+    self.body = Binxtils::InputNormalizer.string(body)
     self.receiver_id = if initial_message?
       seller_id
     else
@@ -264,6 +263,9 @@ class MarketplaceMessage < ApplicationRecord
   end
 
   def duplicate_of
-    self.class.where(initial_record_id:, sender_id:, receiver_id:, body:).order(:id).first
+    duplicates = self.class.where(initial_record_id:, sender_id:, receiver_id:, body:)
+      .order(:id)
+
+    id.blank? ? duplicates.first : duplicates.where("id < ?", id).first
   end
 end
