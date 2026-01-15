@@ -127,9 +127,22 @@
         <%= link_to translation("protecting_your_bike_here"), protect_your_bike_url %>.
       </p>
 
-      <div class="locking-demonstration">
-        <%= image_tag 'https://files.bikeindex.org/email_assets/locking.gif', alt: translation("correctly_locking_a_bike"), title: translation("pink_power_ulocks_tm") %>
-      </div>
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border: 12px solid #dddddd; margin-top: 24px;"
+      >
+        <tr>
+          <td align="center" style="padding: 0;">
+            <%= image_tag 'https://files.bikeindex.org/email_assets/locking.gif',
+                          alt: translation("correctly_locking_a_bike"),
+                          title: translation("pink_power_ulocks_tm"),
+                          style: "display: block; width: 80%; max-width: 300px; height: auto; margin: 0 auto;" %>
+          </td>
+        </tr>
+      </table>
 
       <p class="center-text">
         <em><%= translation("a_correctly_locked_bike") %></em>
