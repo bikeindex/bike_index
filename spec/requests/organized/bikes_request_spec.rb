@@ -76,6 +76,14 @@ RSpec.describe Organized::BikesController, type: :request do
         }.to change(Export, :count).by 0
         expect(flash[:error]).to match(/no match/)
         expect(response).to redirect_to(new_organization_export_url(organization_id: current_organization.id, only_custom_bike_ids: true, custom_bike_ids: ""))
+
+        expect {
+          get base_url, params: {search_stickers: "none", create_export: true}
+        }.to change(Export, :count).by 0
+        redirected_to = response.redirect_url
+        expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
+        custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
+        expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
       end
       context "without search params" do
         let(:params_blank) do
@@ -89,7 +97,7 @@ RSpec.describe Organized::BikesController, type: :request do
         end
         it "redirects to export new" do
           expect {
-            get base_url, params: params_blank.merge(search_stickers: "none")
+            get base_url, params: params_blank.merge(search_stickers: "all")
           }.to change(Export, :count).by 0
           expect(flash).to be_blank
           expect(response).to redirect_to new_organization_export_url(organization_id: current_organization.id)

@@ -274,7 +274,7 @@ module Organized
     end
 
     def no_org_search_params?
-      return false if params[:search_stickers].present? && params[:search_stickers] != "none"
+      return false if params[:search_stickers].present? && params[:search_stickers] != "all"
 
       params.slice(:search_address, :search_email, :search_model_audit_id, :search_status)
         .values.reject(&:blank?).none?
