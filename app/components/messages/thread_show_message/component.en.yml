@@ -5,4 +5,6 @@ en:
       thread_show_message:
         subject: Subject
         to: to
-        me: me
+        me: Me
+        you_to: you to
+        to_me: to me

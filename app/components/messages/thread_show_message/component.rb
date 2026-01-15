@@ -17,6 +17,10 @@ module Messages::ThreadShowMessage
 
     private
 
+    def currently_buyer?
+      @initial_message.sender_id == @current_user.id
+    end
+
     def initial_message?
       @marketplace_message.id == @initial_message.id
     end

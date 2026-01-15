@@ -3,21 +3,19 @@
 module Messages::ThreadShow
   class ComponentPreview < ApplicationComponentPreview
     # @display legacy_stylesheet true
-    def buyer
-      @item_owner = :other_user
-      marketplace_message = built_marketplace_message(marketplace_message_attrs)
+    # @param message_id text "Message ID to view (only works in dev)"
+    def buyer(message_id: nil)
+      marketplace_messages = mocked_marketplace_messages(item_owner: :other_user)
 
-      render(Messages::ThreadShow::Component.new(current_user: lookbook_user,
-        marketplace_messages: [marketplace_message]))
+      render(Messages::ThreadShow::Component.new(current_user: lookbook_user, marketplace_messages:))
     end
 
     # @display legacy_stylesheet true
-    def seller
-      @item_owner = :lookbook_user
-      marketplace_message = built_marketplace_message(marketplace_message_attrs)
+    # @param message_id text "Message ID to view (only works in dev)"
+    def seller(message_id: nil)
+      marketplace_messages = mocked_marketplace_messages(item_owner: :lookbook_user)
 
-      render(Messages::ThreadShow::Component.new(current_user: other_user,
-        marketplace_messages: [marketplace_message]))
+      render(Messages::ThreadShow::Component.new(current_user: other_user, marketplace_messages:))
     end
 
     private
@@ -29,37 +27,41 @@ module Messages::ThreadShow
         User.new(name: "John Smith", username: "some-username", id: 42)
     end
 
-    def marketplace_message_attrs(receiver: lookbook_user, sender: other_user)
-      sender_val = (@item_owner == :other_user) ? lookbook_user : other_user
+    def mocked_marketplace_messages(item_owner: :other_user, is_initial_message: false)
+      marketplace_listing = marketplace_listing((item_owner == :other_user) ? other_user : lookbook_user)
+      marketplace_message = build_marketplace_message(id: 42, marketplace_listing:)
+
+      [marketplace_message]
+    end
+
+    def build_marketplace_message(id:, marketplace_listing:, initial_record: nil, body: nil)
       # The initial record always needs to be
-      (@item_owner == :other_user) ? other_user : lookbook_user
-      {
+      message = MarketplaceMessage.new(
         id: 42,
         messages_prior_count: 0,
         subject: "I'm interested in buying this bike",
         body: "When are you available? Can I come by to pick it up sometime this week?",
-        initial_record_id: MarketplaceMessage.new(id: 42, sender: sender_val, marketplace_listing:),
+        initial_record:,
         marketplace_listing:,
         receiver:,
         sender:,
         created_at: Time.current - 2.hours - 6.months
-      }
+      )
+      message.send(:set_calculated_attributes)
+      message
     end
 
-    def marketplace_listing
-      return @marketplace_listing if defined? @marketplace_listing
-      seller_val = (@item_owner == :other_user) ? other_user : lookbook_user
-
-      @marketplace_listing = MarketplaceListing.new(id: 42, seller: seller_val, item:,
+    def marketplace_listing(seller)
+      MarketplaceListing.new(id: 42, seller:, item:,
         condition: :excellent, amount_cents: 10_000, status: :for_sale,
         published_at: Time.current - 1.day)
     end
 
-    def built_marketplace_message(attrs)
-      message = MarketplaceMessage.new(attrs)
-      message.send(:set_calculated_attributes)
-      message
-    end
+    # def built_marketplace_message(attrs)
+    #   message = MarketplaceMessage.new(attrs)
+    #   message.send(:set_calculated_attributes)
+    #   message
+    # end
 
     def item
       Bike.new(

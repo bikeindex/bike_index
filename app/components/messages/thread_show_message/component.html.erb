@@ -7,13 +7,25 @@
 >
   <div class="tw:mb-2 tw:flex tw:w-full tw:flex-nowrap tw:gap-x-6">
     <span class="tw:block tw:grow">
-      <%= user_display(@marketplace_message.sender_id) %>
-
       <% if initial_message? %>
-        <span class="less-strong tw:text-sm">
-          <%= translation(".to") %>
-          <%= receiver_display %>
-        </span>
+        <% if currently_buyer? %>
+          <%= translation(".me") %>
+          (
+          <%= user_display(@marketplace_message.sender_id) %>
+          )
+          <span class="less-strong tw:text-sm">
+            <%= translation(".to") %>
+            <%= user_display(@marketplace_message.receiver_id) %>
+          </span>
+        <% else %>
+          <%= user_display(@marketplace_message.sender_id) %>
+          <span class="less-strong tw:text-sm">
+            <%= translation(".to_me") %>
+            (<%= user_display(@marketplace_message.sender_id) %>)
+          </span>
+        <% end %>
+      <% else %>
+        <%= user_display(@marketplace_message.sender_id) %>
       <% end %>
     </span>
 
