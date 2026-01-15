@@ -10,27 +10,12 @@ module Organized
     def index
       set_period
       @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
-      if current_organization.enabled?("bike_search")
 
+      if current_organization.enabled?("bike_search")
         @per_page = permitted_per_page(default: 10)
         search_organization_bikes
-        if current_organization.enabled?("csv_exports") && Binxtils::InputNormalizer.boolean(params[:create_export])
-          if @available_bikes.count > 10_000 # Don't want everything to explode...
-            flash[:error] = "Too many bikes selected to export"
-          elsif directly_create_export?
-            # There is probably a better way to handle this, via storing in session or building the export but not starting
-            # ... but, this works
-            flash[:info] = "Directly creating export - can't configure with over 1,000 bikes"
-            export = Export.create(create_export_params)
-            OrganizationExportJob.perform_async(export.id)
-            redirect_to organization_export_path(export, organization_id: current_organization.id)
-          else
-            if @available_bikes.count > 300
-              flash[:info] = "Warning: Exporting from search with this many matching bikes may not work correctly"
-            end
-            redirect_to new_organization_export_path(build_export_params)
-          end
-        end
+
+        create_export_and_redirect if create_export?
       else
         @per_page = permitted_per_page(default: 50)
         @available_bikes = if current_organization.enabled?("claimed_ownerships")
@@ -201,6 +186,7 @@ module Organized
       bikes.where(created_at: @time_range)
     end
 
+    # NOTE: Make sure to add any custom search params to no_org_search_params?
     def search_organization_bikes
       @permitted_org_bike_search_params = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?)
       @search_query_present = permitted_org_bike_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
@@ -257,11 +243,64 @@ module Organized
       @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : valid_statuses.last
     end
 
-    def directly_create_export?
-      Binxtils::InputNormalizer.boolean(params[:directly_create_export]) || @available_bikes.count > 999
+    def create_export?
+      current_organization.enabled?("csv_exports") && Binxtils::InputNormalizer.boolean(params[:create_export])
     end
 
-    def build_export_params
+    def create_export_and_redirect
+      if no_org_search_params? && no_interpreted_params?
+        redirect_to new_organization_export_path(new_export_params)
+        return
+      end
+
+      bikes_count = @available_bikes.count
+      if bikes_count > 10_000 # Don't want everything to explode...
+        flash.now[:error] = "Too many bikes selected to export"
+      elsif directly_create_export?(bikes_count)
+        # There is probably a better way to handle this, via storing in session or building the export but not starting
+        # ... but, this works
+        flash[:info] = "Directly creating export - can't configure with over 1,000 bikes"
+        export = Export.create(create_export_params)
+        OrganizationExportJob.perform_async(export.id)
+        redirect_to organization_export_path(export, organization_id: current_organization.id)
+      else
+        if bikes_count == 0
+          flash.now[:error] = "There are no matching bikes!"
+        elsif bikes_count > 300
+          flash[:info] = "Warning: Exporting from search with this many matching bikes may not work correctly"
+        end
+        redirect_to new_organization_export_path(new_export_params_custom_bike_ids)
+      end
+    end
+
+    def no_org_search_params?
+      return false if params[:search_stickers].present? && params[:search_stickers] != "none"
+
+      params.slice(:search_address, :search_email, :search_model_audit_id, :search_status)
+        .values.reject(&:blank?).none?
+    end
+
+    def no_interpreted_params?
+      # TODO: Enable stolenness for export selection
+      return false if @interpreted_params[:stolenness]&.downcase != "all"
+
+      @interpreted_params.except(:stolenness).values.reject(&:blank?).none?
+    end
+
+    def directly_create_export?(bikes_count)
+      Binxtils::InputNormalizer.boolean(params[:directly_create_export]) || bikes_count > 999
+    end
+
+    def new_export_params
+      time_params = if @period == "all"
+        {}
+      else
+        {start_at: @start_time.to_i, end_at: @end_time.to_i}
+      end
+      {organization_id: current_organization.id}.merge(time_params)
+    end
+
+    def new_export_params_custom_bike_ids
       {
         organization_id: current_organization.id,
         only_custom_bike_ids: true,
@@ -270,7 +309,7 @@ module Organized
     end
 
     def create_export_params
-      build_export_params.merge(kind: "organization",
+      new_export_params_custom_bike_ids.merge(kind: "organization",
         headers: Export.permitted_headers(current_organization),
         user_id: current_user.id)
     end

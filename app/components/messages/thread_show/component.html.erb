@@ -1,15 +1,12 @@
 <div>
   <%= render(
-    SearchResults::Container::Component.new(
-      result_view: :bike_box,
-      search_kind: :marketplace,
-      vehicles: [@marketplace_listing.item],
+    Messages::ForSaleItem::Component.new(
+      vehicle: @marketplace_listing.item,
+      vehicle_id: @marketplace_listing.item_id,
       current_user: @current_user,
-    ),
+      marketplace_listing: @marketplace_listing
+    )
   ) %>
-
-  <%# TODO: show this too! %>
-  <%# = render(PageBlock::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing)) %>
 
   <% if @marketplace_messages.any? %>
     <% @marketplace_messages.each do |marketplace_message| %>

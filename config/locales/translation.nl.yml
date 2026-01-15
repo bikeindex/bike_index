@@ -1149,6 +1149,7 @@ nl:
       hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
       made_without_serial: gemaakt zonder serie
       unknown: Onbekend
+      deleted: Verwijderd
     organization_helper:
       address: Adres
       address_school: Postadres van de campus
@@ -4617,59 +4618,6 @@ nl:
     finished_owned_registration:
       subject: "%{organization_name} Registratie van fietsindex succesvol"
     finished_registration:
-      html:
-        a_correctly_locked_bike: Een correct vergrendelde fiets. Het frame is vergrendeld
-          aan het fietsenrek en beide wielen zijn vastgezet.
-        a_donation_will_prioritize_html: Een donatie zal %{prioritize_link} en ons
-          helpen uw fiets bij u terug te krijgen. We zijn een 501 (c) (3) non-profit
-          en zijn afhankelijk van donaties om te opereren
-        before_locking_check: Controleer voordat u vergrendelt, dat wat u vergrendelt,
-          niet eenvoudig kan worden verwijderd.
-        cable_locks_should_never_be_used: Kabelsloten mogen nooit worden gebruikt
-          als primair middel om een fiets in een stad te vergrendelen.
-        correctly_locking_a_bike: Een fiets correct vergrendelen
-        donating: doneren
-        give_us_a_heads_up: Geef ons een waarschuwing
-        hopefully_you_find_the_owner_html: Hopelijk vind je snel de eigenaar. %{edit_bike_link}
-          wanneer u dat doet!
-        mark_recovered_link_html: "%{mark_recovered_link} wanneer u dat doet!"
-        mark_your_bike_recovered: Markeer je fiets als hersteld
-        org_added_a_bike_html: "<strong>%{org_name}</strong> heeft voor jou een %{bike_type}
-          toegevoegd op Bike Index"
-        org_sent_a_bike_html: "<strong>%{org_name}</strong> heeft u een <strong>%{bike_type}</strong>
-          gestuurd op Bike Index"
-        pink_power_ulocks_tm: Pink Power U-Locks zijn een geregistreerd handelsmerk
-          van Bike Index, NFP
-        please_consider_donating_html: Overweeg %{donating_link} naar Bike Index!
-        prioritize_your_listing: geef prioriteit aan uw vermelding
-        protect_your_bike_by_following_these_lock: Bescherm uw fiets door deze vergrendelingsrichtlijnen
-          te volgen.
-        protecting_your_bike_here: hier je fiets beschermen
-        read_more_about_protecting_html: Lees meer over %{link}.
-        secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - hetzij
-          met twee U-sloten, of één U-slot en één zware kabel.
-        use_a_ulock: Gebruik een U-Lock.
-        welcome_to_bike_index: Welkom bij Bike Index
-        you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
-          Bike Index
-        youre_almost_done_registering: Je bent bijna klaar met registreren
-        bike_type_thieves_are_jerks: "%{bike_type} dieven zijn klootzakken."
-        claim_the_bike_type: Claim de %{bike_type}
-        confirm_this_bike_type: Bevestig dit %{bike_type}
-        recovered_bike_type: hersteld / gevonden %{bike_type}
-        stolen_bike_type: gestolen %{bike_type}
-        thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
-          deze %{bike_type} die je aan Bike Index hebt gevonden
-        were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
-          gestolen.
-        bike_register_with_bike_index: Gefeliciteerd met het registreren van uw %{bike_type}
-          bij Bike Index
-        bike_register_with_bike_index_and_org: Gefeliciteerd met het registreren van
-          uw %{bike_type} bij Bike Index en %{org_name}
-        hopefully_you_find_the_bike_html: Hopelijk vindt u de %{bike_type} binnenkort.
-        sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
-          je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor
-          te zorgen dat je nooit je vertrouwde ros uit het oog verliest!
       subject: Bevestig uw %{organization_name} Bike Index-registratie
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
@@ -6041,6 +5989,11 @@ nl:
         posted_at: Genoteerd
         primary_colors: Primaire kleuren
         serial: Serie
+        deleted: Verwijderd
+        ended_at: Einde
+        not_applicable: Niet van toepassing
+        price: Prijs
+        removed_from: Verwijderd uit de fietsindex
       vehicle_thumbnail:
         registered_not_stolen: geregistreerd, niet gestolen
       container:
@@ -6133,3 +6086,68 @@ nl:
         community_groups: Community's
         schools: scholen
         theft_victims: Slachtoffers van diefstal
+    emails:
+      partials:
+        bike_box:
+          bike_photo: Fietsfoto
+          color: Kleur
+          color_may_be_incorrect: De kleur kan onjuist zijn omdat deze tijdens de
+            POS-import is ingesteld.
+          found: 'gevonden:'
+          make: 'Maken:'
+          serial: 'Serial:'
+          stolen_at: 'Gestolen bij:'
+          stolen_from: 'Gestolen van:'
+      finished_registration:
+        a_correctly_locked_bike: Een correct vergrendelde fiets. Het frame is vergrendeld
+          aan het fietsenrek en beide wielen zijn vastgezet.
+        a_donation_will_prioritize_prefix: Een donatie zal
+        a_donation_will_prioritize_suffix: En help ons uw fiets terug te bezorgen.
+          Wij zijn een 501(c)(3) non-profitorganisatie en zijn afhankelijk van donaties
+          om te kunnen functioneren.
+        before_locking_check: Controleer voordat u vergrendelt, dat wat u vergrendelt,
+          niet eenvoudig kan worden verwijderd.
+        bike_register_with_bike_index: Gefeliciteerd met het registreren van uw %{bike_type}
+          bij Bike Index
+        bike_register_with_bike_index_and_org: Gefeliciteerd met het registreren van
+          uw %{bike_type} bij Bike Index en %{org_name}
+        bike_type_thieves_are_jerks: "%{bike_type} dieven zijn klootzakken."
+        cable_locks_should_never_be_used: Kabelsloten mogen nooit worden gebruikt
+          als primair middel om een fiets in een stad te vergrendelen.
+        claim_the_bike_type: Claim de %{bike_type}
+        confirm_this_bike_type: Bevestig dit %{bike_type}
+        correctly_locking_a_bike: Een fiets correct vergrendelen
+        donating: doneren
+        give_us_a_heads_up: Geef ons een waarschuwing
+        hopefully_you_find_the_bike: Hopelijk vindt u de %{bike_type} binnenkort.
+        hopefully_you_find_the_owner_prefix: Hopelijk vind je de eigenaar snel.
+        hopefully_you_find_the_owner_suffix: wanneer je dat doet!
+        mark_your_bike_recovered: Markeer je fiets als hersteld
+        org_added_a_bike: Ik heb een %{bike_type} toegevoegd aan Bike Index voor jou.
+        org_sent_a_bike: Ik heb je een %{bike_type} gestuurd via Bike Index
+        pink_power_ulocks_tm: Pink Power U-Locks zijn een geregistreerd handelsmerk
+          van Bike Index, NFP
+        please_consider_prefix: Houd hier rekening mee.
+        please_consider_suffix: Welkom bij Bike Index!
+        prioritize_your_listing: geef prioriteit aan uw vermelding
+        protect_your_bike_by_following_these_lock: Bescherm uw fiets door deze vergrendelingsrichtlijnen
+          te volgen.
+        protecting_your_bike_here: hier je fiets beschermen
+        read_more_about_prefix: Lees meer over
+        recovered_bike_type: hersteld / gevonden %{bike_type}
+        secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - hetzij
+          met twee U-sloten, of één U-slot en één zware kabel.
+        sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
+          je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor
+          te zorgen dat je nooit je vertrouwde ros uit het oog verliest!
+        stolen_bike_type: gestolen %{bike_type}
+        thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
+          deze %{bike_type} die je aan Bike Index hebt gevonden
+        use_a_ulock: Gebruik een U-Lock.
+        welcome_to_bike_index: Welkom bij Bike Index
+        were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
+          gestolen.
+        when_you_do: wanneer je dat doet!
+        you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
+          Bike Index
+        youre_almost_done_registering: Je bent bijna klaar met registreren!

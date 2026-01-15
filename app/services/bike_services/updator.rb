@@ -29,11 +29,6 @@ class BikeServices::Updator
     ComponentCreator.new(bike: @bike, b_param: @bike_params).update_components_from_params
   end
 
-  # This is a separate method because it's called in admin
-  def update_stolen_record
-    BikeServices::StolenRecordUpdator.new(bike: @bike, b_param: BParam.new(params: @bike_params)).update_records
-  end
-
   def update_available_attributes
     ensure_ownership!
     set_protected_attributes
@@ -55,7 +50,8 @@ class BikeServices::Updator
     end
 
     if @bike.update(update_attrs.merge(self.class.updator_attrs(@user)))
-      update_stolen_record
+      BikeServices::StolenRecordUpdator.new(bike: @bike, b_param: BParam.new(params: @bike_params))
+        .update_records
       update_impound_record
     end
     CallbackJob::AfterBikeSaveJob.perform_async(@bike.id) if @bike.present? # run immediately

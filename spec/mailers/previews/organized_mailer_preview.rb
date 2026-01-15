@@ -11,11 +11,11 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def finished_registration
-    unclaimed_unorganized_bikes = Bike.left_joins(:ownerships)
-      .where(ownerships: {claimed: false})
-      .unorganized
-
     render_finished_registration(unclaimed_unorganized_bikes)
+  end
+
+  def finished_registration_transferred
+    render_finished_registration(unclaimed_unorganized_bikes(not_initial: true))
   end
 
   def finished_registration_organization
@@ -56,5 +56,16 @@ class OrganizedMailerPreview < ActionMailer::Preview
   def render_finished_registration(bikes, bike = nil)
     bike ||= bikes.reorder(:created_at).limit(50).sample
     OrganizedMailer.finished_registration(bike.current_ownership)
+  end
+
+  def unclaimed_unorganized_bikes(not_initial: false, status: :status_with_owner)
+    bikes = Bike.left_joins(:current_ownership).where(ownerships: {claimed: false})
+      .where(status:).unorganized
+
+    if not_initial
+      bikes.where.not(ownerships: {previous_ownership_id: nil})
+    else
+      bikes.where(ownerships: {previous_ownership_id: nil})
+    end
   end
 end

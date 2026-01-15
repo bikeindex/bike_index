@@ -2,16 +2,15 @@
 
 module Messages::ThreadShow
   class ComponentPreview < ApplicationComponentPreview
+    # @display legacy_stylesheet true
     def default
       marketplace_message = built_marketplace_message(default_marketplace_message_attrs)
-      render(Messages::ThreadShow::Component.new(current_user:, marketplace_messages: [marketplace_message]))
+
+      render(Messages::ThreadShow::Component.new(current_user: lookbook_user,
+        marketplace_messages: [marketplace_message]))
     end
 
     private
-
-    def current_user
-      @current_user ||= User.find(ENV.fetch("LOOKBOOK_USER_ID", 1))
-    end
 
     def other_user
       User.new(name: "John Smith", username: "some-username", id: 42)
@@ -25,14 +24,14 @@ module Messages::ThreadShow
         body: "When are you available? Can I come by to pick it up sometime this week?",
         initial_record_id: 42,
         marketplace_listing: marketplace_listing,
-        receiver: current_user,
+        receiver: lookbook_user,
         sender: other_user,
         created_at: Time.current - 2.hours - 6.months
       }
     end
 
     def marketplace_listing
-      MarketplaceListing.new(id: 42, seller: current_user, item:, condition: :excellent,
+      MarketplaceListing.new(id: 42, seller: lookbook_user, item:, condition: :excellent,
         amount_cents: 1_000, status: :for_sale)
     end
 

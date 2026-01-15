@@ -29,8 +29,8 @@
     <%= render(
       SearchResults::BikeBox::Component.new(
         bike: marketplace_listing.item,
-        current_event_record: marketplace_listing,
-      ),
+        event_record: marketplace_listing
+      )
     ) %>
   <% end %>
 

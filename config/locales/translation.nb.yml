@@ -1147,6 +1147,7 @@ nb:
       hidden_for_unauthorized_users: skjult for uautoriserte brukere
       made_without_serial: laget uten serie
       unknown: ukjent
+      deleted: Slettet
     organization_helper:
       address: gateadresse
       address_school: Campus postadresse
@@ -5108,58 +5109,6 @@ nb:
     finished_owned_registration:
       subject: "%{organization_name}Sykkelindeksregistrering vellykket"
     finished_registration:
-      html:
-        a_correctly_locked_bike: En riktig låst sykkel. Rammen er låst til sykkelstativet
-          og begge hjulene er sikret.
-        a_donation_will_prioritize_html: En donasjon vil %{prioritize_link} hjelpe
-          oss med å få sykkelen din tilbake til deg. Vi er en 501(c)(3) ideell organisasjon
-          og er avhengig av donasjoner for å kunne operere
-        before_locking_check: Før du låser, sjekk at det du låser til ikke lett kan
-          fjernes.
-        bike_register_with_bike_index: Gratulerer med å registrere din %{bike_type}
-          med Bike Index
-        bike_register_with_bike_index_and_org: Gratulerer med registreringen av din
-          %{bike_type} med Bike Index og %{org_name}
-        bike_type_thieves_are_jerks: "%{bike_type} tyver er idioter."
-        cable_locks_should_never_be_used: Kabellåser bør aldri brukes som et primært
-          middel for å låse en sykkel i en by.
-        claim_the_bike_type: Gjør krav på %{bike_type}
-        confirm_this_bike_type: Bekreft dette %{bike_type}
-        correctly_locking_a_bike: Bilde av en riktig låst sykkel
-        donating: donere
-        give_us_a_heads_up: Gi oss en heads up
-        hopefully_you_find_the_bike_html: Forhåpentligvis finner du %{bike_type} snart.
-        hopefully_you_find_the_owner_html: Forhåpentligvis finner du eieren snart.
-          %{edit_bike_link} når du gjør det!
-        mark_recovered_link_html: "%{mark_recovered_link} når du gjør det!"
-        mark_your_bike_recovered: Merk sykkelen din som gjenopprettet
-        org_added_a_bike_html: "<strong>%{org_name}</strong> la til en %{bike_type}
-          på Bike Index for deg"
-        org_sent_a_bike_html: "<strong>%{org_name}</strong> sendte deg en %{bike_type}
-          på Bike Index"
-        pink_power_ulocks_tm: Pink Power U-Locks er et registrert varemerke for Bike
-          Index, NFP
-        please_consider_donating_html: Vennligst vurder %{donating_link} til Bike
-          Index!
-        prioritize_your_listing: prioriter oppføringen din
-        protect_your_bike_by_following_these_lock: Beskytt sykkelen din ved å følge
-          disse retningslinjene for låsing.
-        protecting_your_bike_here: beskytte sykkelen din her
-        read_more_about_protecting_html: Les mer om %{link}.
-        recovered_bike_type: gjenopprettet/funnet %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: Sikre begge hjulene - enten med
-          to U-låser, eller en U-lås og en kraftig kabel.
-        sign_up_on_bikeindexorg_to_claim_your_bik: Registrer deg på BikeIndex.org
-          for å kreve din %{bike_type} og redigere den, last opp bilder og sørg for
-          at du aldri mister oversikten over din pålitelige hest!
-        stolen_bike_type: stjålet %{bike_type}
-        thanks_for_adding_this_bike_type_you_found: Takk for at du la til denne %{bike_type}
-          du fant til Bike Index
-        use_a_ulock: Bruk en U-lås.
-        welcome_to_bike_index: Velkommen til Bike Index
-        were_sorry_your_bike_type_was_stolen: Vi beklager at %{bike_type} ble stjålet.
-        you_added_a_bike_type_on_bike_index: Du la til en %{bike_type} på Bike Index
-        youre_almost_done_registering: Du er nesten ferdig med å registrere deg
       subject: Bekreft registreringen av %{organization_name}Bike Index
     finished_stolen_registration:
       subject: Bekreft din %{organization_name}stjålne %{bike_type} på Bike Index
@@ -5885,6 +5834,11 @@ nb:
         posted_at: Oppført
         primary_colors: Primærfarger
         serial: Seriell
+        deleted: Slettet
+        ended_at: Avsluttet
+        not_applicable: Ikke aktuelt
+        price: Pris
+        removed_from: Fjernet fra sykkelindeksen
       vehicle_thumbnail:
         registered_not_stolen: registrert, ikke stjålet
       container:
@@ -5976,3 +5930,66 @@ nb:
         community_groups: Fellesskapsgrupper
         schools: Skoler
         theft_victims: Tyveriofre
+    emails:
+      partials:
+        bike_box:
+          bike_photo: Sykkelbilde
+          color: Farge
+          color_may_be_incorrect: Fargen kan være feil fordi den ble angitt under
+            POS-import
+          found: 'Funnet:'
+          make: 'Gjøre:'
+          serial: 'Serie:'
+          stolen_at: 'Stjålet på:'
+          stolen_from: 'Stjålet fra:'
+      finished_registration:
+        a_correctly_locked_bike: En riktig låst sykkel. Rammen er låst til sykkelstativet
+          og begge hjulene er sikret.
+        a_donation_will_prioritize_prefix: En donasjon vil
+        a_donation_will_prioritize_suffix: og hjelp oss med å få sykkelen din tilbake
+          til deg. Vi er en ideell organisasjon med 501(c)(3)-status og er avhengige
+          av donasjoner for å drive driften.
+        before_locking_check: Før du låser, sjekk at det du låser til ikke lett kan
+          fjernes.
+        bike_register_with_bike_index: Gratulerer med å registrere din %{bike_type}
+          med Bike Index
+        bike_register_with_bike_index_and_org: Gratulerer med registreringen av din
+          %{bike_type} med Bike Index og %{org_name}
+        bike_type_thieves_are_jerks: "%{bike_type} tyver er idioter."
+        cable_locks_should_never_be_used: Kabellåser bør aldri brukes som et primært
+          middel for å låse en sykkel i en by.
+        claim_the_bike_type: Gjør krav på %{bike_type}
+        confirm_this_bike_type: Bekreft dette %{bike_type}
+        correctly_locking_a_bike: Bilde av en riktig låst sykkel
+        donating: donere
+        give_us_a_heads_up: Gi oss en heads up
+        hopefully_you_find_the_bike: Forhåpentligvis finner du %{bike_type} snart.
+        hopefully_you_find_the_owner_prefix: Håper du finner eieren snart.
+        hopefully_you_find_the_owner_suffix: når du gjør det!
+        mark_your_bike_recovered: Merk sykkelen din som gjenopprettet
+        org_added_a_bike: la til en %{bike_type} på Bike Index for deg
+        org_sent_a_bike: sendte deg en %{bike_type} på Bike Index
+        pink_power_ulocks_tm: Pink Power U-Locks er et registrert varemerke for Bike
+          Index, NFP
+        please_consider_prefix: Vennligst vurder
+        please_consider_suffix: til sykkelindeksen!
+        prioritize_your_listing: prioriter oppføringen din
+        protect_your_bike_by_following_these_lock: Beskytt sykkelen din ved å følge
+          disse retningslinjene for låsing.
+        protecting_your_bike_here: beskytte sykkelen din her
+        read_more_about_prefix: Les mer om
+        recovered_bike_type: gjenopprettet/funnet %{bike_type}
+        secure_both_wheels_either_with_two_ulocks: Sikre begge hjulene - enten med
+          to U-låser, eller en U-lås og en kraftig kabel.
+        sign_up_on_bikeindexorg_to_claim_your_bik: Registrer deg på BikeIndex.org
+          for å kreve din %{bike_type} og redigere den, last opp bilder og sørg for
+          at du aldri mister oversikten over din pålitelige hest!
+        stolen_bike_type: stjålet %{bike_type}
+        thanks_for_adding_this_bike_type_you_found: Takk for at du la til denne %{bike_type}
+          du fant til Bike Index
+        use_a_ulock: Bruk en U-lås.
+        welcome_to_bike_index: Velkommen til Bike Index
+        were_sorry_your_bike_type_was_stolen: Vi beklager at %{bike_type} ble stjålet.
+        when_you_do: når du gjør det!
+        you_added_a_bike_type_on_bike_index: Du la til en %{bike_type} på Bike Index
+        youre_almost_done_registering: Du er nesten ferdig med registreringen!

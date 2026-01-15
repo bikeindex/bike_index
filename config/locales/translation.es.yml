@@ -1133,6 +1133,7 @@ es:
       hidden_for_unauthorized_users:
       made_without_serial:
       unknown:
+      deleted:
     organization_helper:
       address:
       address_school:
@@ -4004,41 +4005,6 @@ es:
     finished_owned_registration:
       subject:
     finished_registration:
-      html:
-        a_correctly_locked_bike:
-        a_donation_will_prioritize_html:
-        before_locking_check:
-        bike_register_with_bike_index:
-        bike_register_with_bike_index_and_org:
-        bike_type_thieves_are_jerks:
-        cable_locks_should_never_be_used:
-        claim_the_bike_type:
-        confirm_this_bike_type:
-        correctly_locking_a_bike:
-        donating:
-        give_us_a_heads_up:
-        hopefully_you_find_the_bike_html:
-        hopefully_you_find_the_owner_html:
-        mark_recovered_link_html:
-        mark_your_bike_recovered:
-        org_added_a_bike_html:
-        org_sent_a_bike_html:
-        pink_power_ulocks_tm:
-        please_consider_donating_html:
-        prioritize_your_listing:
-        protect_your_bike_by_following_these_lock:
-        protecting_your_bike_here:
-        read_more_about_protecting_html:
-        recovered_bike_type:
-        secure_both_wheels_either_with_two_ulocks:
-        sign_up_on_bikeindexorg_to_claim_your_bik:
-        stolen_bike_type:
-        thanks_for_adding_this_bike_type_you_found:
-        use_a_ulock:
-        welcome_to_bike_index:
-        were_sorry_your_bike_type_was_stolen:
-        you_added_a_bike_type_on_bike_index:
-        youre_almost_done_registering:
       subject:
     finished_stolen_registration:
       subject:
@@ -4640,6 +4606,11 @@ es:
         posted_at:
         primary_colors:
         serial:
+        deleted:
+        ended_at:
+        not_applicable:
+        price:
+        removed_from:
       vehicle_thumbnail:
         registered_not_stolen:
       container:
@@ -4719,3 +4690,52 @@ es:
         community_groups: Grupos comunitarios
         schools: Escuelas
         theft_victims: Víctimas de robos
+    emails:
+      partials:
+        bike_box:
+          bike_photo:
+          color:
+          color_may_be_incorrect:
+          found:
+          make:
+          serial:
+          stolen_at:
+          stolen_from:
+      finished_registration:
+        a_correctly_locked_bike:
+        a_donation_will_prioritize_prefix:
+        a_donation_will_prioritize_suffix:
+        before_locking_check:
+        bike_register_with_bike_index:
+        bike_register_with_bike_index_and_org:
+        bike_type_thieves_are_jerks:
+        cable_locks_should_never_be_used:
+        claim_the_bike_type:
+        confirm_this_bike_type:
+        correctly_locking_a_bike:
+        donating:
+        give_us_a_heads_up:
+        hopefully_you_find_the_bike:
+        hopefully_you_find_the_owner_prefix:
+        hopefully_you_find_the_owner_suffix:
+        mark_your_bike_recovered:
+        org_added_a_bike:
+        org_sent_a_bike:
+        pink_power_ulocks_tm:
+        please_consider_prefix:
+        please_consider_suffix:
+        prioritize_your_listing:
+        protect_your_bike_by_following_these_lock:
+        protecting_your_bike_here:
+        read_more_about_prefix:
+        recovered_bike_type:
+        secure_both_wheels_either_with_two_ulocks:
+        sign_up_on_bikeindexorg_to_claim_your_bik:
+        stolen_bike_type:
+        thanks_for_adding_this_bike_type_you_found:
+        use_a_ulock:
+        welcome_to_bike_index:
+        were_sorry_your_bike_type_was_stolen:
+        when_you_do:
+        you_added_a_bike_type_on_bike_index:
+        youre_almost_done_registering:
