@@ -51,7 +51,8 @@ class MailSnippet < ApplicationRecord
     theft_survey_4_2022: 13,
     theft_survey_2023: 15,
     stolen_notification_oauth: 16,
-    newsletter: 17
+    newsletter: 17,
+    tempo: 19
   }.freeze
 
   belongs_to :organization
