@@ -241,12 +241,13 @@ RSpec.describe MarketplaceMessage, type: :model do
     context "with built reply" do
       let(:initial_record) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: initial_sender) }
       let(:initial_sender) { user }
-      let(:marketplace_message) { FactoryBot.build(:marketplace_message, marketplace_listing:, sender: user, initial_record:) }
+      let(:marketplace_message) { FactoryBot.build(:marketplace_message, marketplace_listing:, sender: user, initial_record:, marketplace_listing: nil) }
       it "is truthy" do
         expect(initial_record).to be_valid
         expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_truthy
         expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_truthy
         expect(marketplace_message).to be_valid
+        expect(marketplace_message.marketplace_listing_id).to eq initial_record.marketplace_listing_id
         expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
         expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
       end
@@ -287,6 +288,21 @@ RSpec.describe MarketplaceMessage, type: :model do
         expect(marketplace_message.other_user(12)).to eq([nil, :sender])
         expect(marketplace_message.other_user_display_and_id(receiver)).to eq(["(user removed)", 11])
       end
+    end
+  end
+
+  describe "duplicate_of" do
+    let(:marketplace_message_2) { FactoryBot.create(:marketplace_message_reply) }
+    let(:marketplace_message_1) { marketplace_message_2.initial_record }
+    let(:body) { "Thank you" }
+
+    it "returns true for a duplicate" do
+      expect(marketplace_message_2.ignored_duplicate?).to be_falsey
+      expect(marketplace_message_2).to be_valid
+      duplicate = MarketplaceMessage.new(sender_id: marketplace_message_2.sender_id, body:, initial_record_id: marketplace_message_1.id)
+      expect(duplicate).to be_valid
+      expect(duplicate.ignored_duplicate?).to be_truthy
+      expect(duplicate.save).to be_truthy
     end
   end
 end
