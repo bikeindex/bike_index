@@ -2,15 +2,10 @@
 
 module Emails::FinishedRegistration
   class Component < ApplicationComponent
-    def self.render_tempo_partial?(ownership)
+    def self.tempo_snippet_for_ownership?(ownership)
       ownership.status_with_owner? &&
         ownership.new_registration? &&
-        ownership.organization_id.blank? &&
-        tempo_snippet&.is_enabled || false
-    end
-
-    def self.tempo_snippet
-      @tempo_snippet ||= MailSnippet.tempo.order(:id).last
+        ownership.organization_id.blank?
     end
 
     def initialize(ownership:, bike: nil, email_preview: false)
@@ -57,8 +52,12 @@ module Emails::FinishedRegistration
       @ownership.user.present? && bike.creator_id == @ownership.user_id
     end
 
-    def render_tempo_partial?
-      self.class.render_tempo_partial?(@ownership)
+    def render_tempo_snippet?
+      self.class.tempo_snippet_for_ownership?(@ownership) && tempo_snippet&.is_enabled
+    end
+
+    def tempo_snippet
+      @tempo_snippet ||= MailSnippet.tempo.order(:id).last
     end
 
     def org_name

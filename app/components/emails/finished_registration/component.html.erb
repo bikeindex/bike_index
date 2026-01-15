@@ -138,6 +138,6 @@
   <% end %>
 <% end %>
 
-<% if render_tempo_partial? %>
-  <%= self.class.tempo_snippet.body.html_safe %>
+<% if render_tempo_snippet? %>
+  <%= tempo_snippet.body.html_safe %>
 <% end %>

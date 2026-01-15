@@ -26,6 +26,7 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     end
     context "tempo_snippet not is_enabled" do
       let(:tempo_snippet_is_enabled) { false }
+
       it "renders" do
         expect(ownership.claim_message).to be_blank
         expect(component).to have_content("Congrats on registering your bike with Bike Index")
