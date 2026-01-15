@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    messages:
+      thread_show:
+        subject: Subject
