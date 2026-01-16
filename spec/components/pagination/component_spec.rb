@@ -11,7 +11,7 @@ RSpec.describe Pagination::Component, type: :component do
 
   context "bike pagy" do
     let(:page) { 1 }
-    let(:pagy) { Pagy.new(count: 1_384_155, limit: 10, page:, max_pages: 100) }
+    let(:pagy) { Pagy::Offset.new(count: 1_384_155, limit: 10, page:, max_pages: 100) }
 
     it "renders without previous" do
       with_request_url "/search/registrations" do
@@ -47,7 +47,7 @@ RSpec.describe Pagination::Component, type: :component do
   end
 
   context "one page" do
-    let(:pagy) { Pagy.new(count: 25, limit: 25, page: 1) }
+    let(:pagy) { Pagy::Offset.new(count: 25, limit: 25, page: 1) }
 
     it "doesn't render" do
       expect(instance.render?).to be_falsey

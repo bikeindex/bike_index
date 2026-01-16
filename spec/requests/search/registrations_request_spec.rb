@@ -107,17 +107,14 @@ RSpec.describe Search::RegistrationsController, type: :request do
             end
           end
           context "invalid page params" do
-            it "renders page 1" do
+            it "redirects out-of-range pages to last valid page" do
+              # Only 4 bikes exist, so page 100 is out of range
               get base_url, params: {page: 100}, as: :turbo_stream
-              expect(response.status).to eq 200
-              expect(assigns(:page)).to eq 100
-              expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
-              # over MAX_PAGE
+              expect(response).to redirect_to("#{base_url}?page=1")
+              # over MAX_PAGE - permitted_page caps to 100, still out of range
               get base_url, params: {page: 101}, as: :turbo_stream
-              expect(response.status).to eq 200
-              expect(assigns(:page)).to eq 100
-              expect(assigns(:interpreted_params)).to eq({stolenness: "stolen"})
-              # blank
+              expect(response).to redirect_to("#{base_url}?page=1")
+              # blank defaults to page 1, which is valid
               get base_url, params: {page: ""}, as: :turbo_stream
               expect(response.status).to eq 200
               expect(assigns(:page)).to eq 1
