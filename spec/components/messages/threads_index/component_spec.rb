@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Messages::Thread::Component, type: :component do
+RSpec.describe Messages::ThreadsIndex::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {marketplace_message:, current_user:} }

@@ -143,8 +143,14 @@ class MarketplaceMessage < ApplicationRecord
   end
 
   # Should be called before creation
+  # NOTE: This calls validations on this instance
   def can_send?
     self.class.can_send_message?(user: sender, marketplace_listing:, marketplace_message: self)
+  end
+
+  # Should be called before creation
+  def ignored_duplicate?
+    reply_message? && duplicate_of.present?
   end
 
   def buyer_seller_message?
@@ -237,11 +243,13 @@ class MarketplaceMessage < ApplicationRecord
   def set_calculated_attributes
     self.kind ||= (sender_id == seller_id) ? "sender_seller" : "sender_buyer"
     if reply_message?
-      self.subject = I18n.t("re", original_subject: initial_record.subject,
+      self.subject = I18n.t("re", original_subject: initial_record&.subject,
         scope: %i[activerecord errors messages])
     end
     self.initial_record ||= self
+    self.marketplace_listing_id ||= initial_record&.marketplace_listing_id
     self.messages_prior_count ||= messages_prior.count
+    self.body = Binxtils::InputNormalizer.string(body)
     self.receiver_id = if initial_message?
       seller_id
     else
@@ -253,5 +261,12 @@ class MarketplaceMessage < ApplicationRecord
     return if skip_processing
 
     Email::MarketplaceMessageJob.perform_async(id)
+  end
+
+  def duplicate_of
+    duplicates = self.class.where(initial_record_id:, sender_id:, receiver_id:, body:)
+      .order(:id)
+
+    id.blank? ? duplicates.first : duplicates.where("id < ?", id).first
   end
 end

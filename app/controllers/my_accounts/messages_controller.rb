@@ -40,7 +40,7 @@ class MyAccounts::MessagesController < ApplicationController
     if !@marketplace_message.can_send?
       flash[:error] = translation(:can_not_send_message)
       render :show
-    elsif @marketplace_message.save
+    elsif @marketplace_message.ignored_duplicate? || @marketplace_message.save
       flash[:success] = translation(:message_sent)
       redirect_to my_account_messages_path
     else

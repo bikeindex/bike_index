@@ -5,7 +5,7 @@
 
   <% @marketplace_messages.each do |marketplace_message| %>
     <% cache(marketplace_message) do %>
-      <%= render(Messages::Thread::Component.new(marketplace_message:, current_user:)) %>
+      <%= render(Messages::ThreadsIndex::Component.new(marketplace_message:, current_user:)) %>
     <% end %>
   <% end %>
 

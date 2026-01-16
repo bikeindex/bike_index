@@ -190,17 +190,27 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       Email::MarketplaceMessageJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
 
+      follow_up_params = new_params.merge(initial_record_id: marketplace_message.id, body: "More thanks")
       Sidekiq::Testing.inline! do
         expect do
-          post base_url, params: {marketplace_message: new_params.merge(initial_record_id: marketplace_message.id)}
+          post base_url, params: {marketplace_message: follow_up_params}
           expect(flash[:success]).to be_present
         end.to change(MarketplaceMessage, :count).by(1)
           .and change(ActionMailer::Base.deliveries, :count).by 1
       end
 
       expect(MarketplaceMessage.last).to match_hash_indifferently({initial_record_id: marketplace_message.id,
-        sender_id: current_user.id, receiver_id: marketplace_listing.seller_id, body: new_params[:body],
+        sender_id: current_user.id, receiver_id: marketplace_listing.seller_id, body: follow_up_params[:body],
         subject: "Re: #{new_params[:subject]}", marketplace_listing_id: marketplace_listing.id})
+
+      # Sending repeats doesn't create duplicates
+      Sidekiq::Testing.inline! do
+        expect do
+          post base_url, params: {marketplace_message: follow_up_params}
+          post base_url, params: {marketplace_message: follow_up_params}
+          post base_url, params: {marketplace_message: follow_up_params}
+        end.to change(MarketplaceMessage, :count).by 0
+      end
     end
 
     context "invalid post" do

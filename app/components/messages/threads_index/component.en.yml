@@ -2,7 +2,7 @@
 en:
   components:
     messages:
-      thread:
+      threads_index:
         from: From
         me: me
         to: To

@@ -249,6 +249,7 @@ module Organized
 
     def create_export_and_redirect
       if no_org_search_params? && no_interpreted_params?
+        flash[:error] = "No bikes selected. This export will contain all your bikes"
         redirect_to new_organization_export_path(new_export_params)
         return
       end
@@ -265,7 +266,7 @@ module Organized
         redirect_to organization_export_path(export, organization_id: current_organization.id)
       else
         if bikes_count == 0
-          flash.now[:error] = "There are no matching bikes!"
+          flash[:error] = "There are no matching bikes!"
         elsif bikes_count > 300
           flash[:info] = "Warning: Exporting from search with this many matching bikes may not work correctly"
         end
@@ -274,7 +275,7 @@ module Organized
     end
 
     def no_org_search_params?
-      return false if params[:search_stickers].present? && params[:search_stickers] != "none"
+      return false if params[:search_stickers].present? && params[:search_stickers] != "all"
 
       params.slice(:search_address, :search_email, :search_model_audit_id, :search_status)
         .values.reject(&:blank?).none?

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # NOTE: This component makes a number of DB calls - so rendering of this should be cached!
-module Messages::Thread
+module Messages::ThreadsIndex
   class Component < ApplicationComponent
     TRUNCATED_MESSAGE_LENGTH = 120
 
