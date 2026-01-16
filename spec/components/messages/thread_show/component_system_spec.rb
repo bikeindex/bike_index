@@ -12,6 +12,8 @@ RSpec.describe Messages::ThreadShow::Component, :js, type: :system do
     visit(preview_path)
 
     expect(page).to have_content "When are you available"
+
+    expect(page).to have_content("Me (")
   end
 
   context "seller preview" do
@@ -20,6 +22,7 @@ RSpec.describe Messages::ThreadShow::Component, :js, type: :system do
       visit(preview_path)
 
       expect(page).to have_content "When are you available"
+      expect(page).to have_content("to me")
     end
   end
 end

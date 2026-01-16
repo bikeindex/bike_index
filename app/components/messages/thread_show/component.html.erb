@@ -1,4 +1,4 @@
-<div>
+<div class="twbootcontainer">
   <%= render(
     Messages::ForSaleItem::Component.new(
       vehicle: @marketplace_listing.item,
@@ -17,5 +17,16 @@
         other_user_name: @other_user_name,
         other_user_id: @other_user_id)) %>
     <% end %>
+  <% end %>
+
+  <% if @can_send_message %>
+    <%# matches Messages::ThreadShowMessage::Component#margin_class for sender %>
+    <div class="tw:ml-4 tw:lg:ml-8">
+      <%= render partial: "my_accounts/messages/form", locals: {marketplace_message: @new_marketplace_message} %>
+    </div>
+  <% else %>
+    <div class="tw:mt-10">
+      <%= render(Alert::Component.new(text: translation(".can_not_send_new_message"), kind: :error)) %>
+    </div>
   <% end %>
 </div>

@@ -25,11 +25,23 @@ module Messages::ThreadShowMessage
       @marketplace_message.id == @initial_message.id
     end
 
-    def user_display(user_id)
-      if user_id == @current_user.id
+    def user_display(user_id, parens: false)
+      str = if user_id == @current_user.id
         @current_user.marketplace_message_name
       else
         @other_user_name
+      end
+      parens ? "(#{str})" : str
+    end
+
+    # make sent messages align right, received left
+    def margin_class
+      # return "" if initial_message?
+
+      if @current_user.id == @marketplace_message.sender_id
+        "tw:ml-4 tw:lg:ml-8"
+      else
+        "tw:mr-4 tw:lg:mr-8"
       end
     end
 
