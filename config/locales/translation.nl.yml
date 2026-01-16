@@ -5632,8 +5632,6 @@ nl:
         send_message: Verstuur bericht
       index:
         marketplace_messages: Marktplaatsberichten
-      show:
-        can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -5976,13 +5974,6 @@ nl:
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
         dit %{object_name} wordt opgeslagen:"
-    messages:
-      thread:
-        from: uit
-        me: mij
-        to: Naar
-      thread_show:
-        subject: Onderwerp
     search_results:
       bike_box:
         location: Plaats
@@ -6151,3 +6142,16 @@ nl:
         you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
           Bike Index
         youre_almost_done_registering: Je bent bijna klaar met registreren!
+    messages:
+      thread_show:
+        can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
+      thread_show_message:
+        me: Mij
+        subject: Onderwerp
+        to: Naar
+        to_me: voor mij
+        you_to: jij naar
+      threads_index:
+        from: uit
+        me: mij
+        to: Naar

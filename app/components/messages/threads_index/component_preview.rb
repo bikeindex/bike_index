@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-module Messages::Thread
+module Messages::ThreadsIndex
   class ComponentPreview < ApplicationComponentPreview
     def default
       {
-        template: "messages/thread/component_preview/default",
+        template: "messages/threads_index/component_preview/default",
         locals: {current_user: lookbook_user, marketplace_messages:}
       }
     end
