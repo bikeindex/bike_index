@@ -3,8 +3,8 @@ en:
   components:
     messages:
       thread_show_message:
+        me: Me
         subject: Subject
         to: to
-        me: Me
-        you_to: you to
         to_me: to me
+        you_to: you to

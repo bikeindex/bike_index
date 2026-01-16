@@ -34,10 +34,9 @@ module Messages::ThreadShowMessage
       parens ? "(#{str})" : str
     end
 
-    # make sent messages align right, received left
+    # Make sent messages align right, received left
+    # duplicated in Messages::ThreadShow for the reply form
     def margin_class
-      # return "" if initial_message?
-
       if @current_user.id == @marketplace_message.sender_id
         "tw:ml-4 tw:lg:ml-8"
       else

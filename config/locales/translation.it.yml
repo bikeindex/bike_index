@@ -3577,8 +3577,6 @@ it:
         send_message:
       index:
         marketplace_messages:
-      show:
-        can_not_send_new_message:
   news:
     index:
       bike_index_blog:
@@ -4675,13 +4673,6 @@ it:
         no_value:
     alert_for_errors:
       errors_prevented_this_from_being_saved:
-    messages:
-      thread:
-        from:
-        me:
-        to:
-      thread_show:
-        subject: Oggetto
     search_results:
       bike_box:
         location: Luogo
@@ -4821,3 +4812,16 @@ it:
         when_you_do:
         you_added_a_bike_type_on_bike_index:
         youre_almost_done_registering:
+    messages:
+      thread_show:
+        can_not_send_new_message:
+      thread_show_message:
+        me:
+        subject: Oggetto
+        to: a
+        to_me:
+        you_to:
+      threads_index:
+        from: Da
+        me:
+        to: A

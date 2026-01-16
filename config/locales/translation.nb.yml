@@ -4542,8 +4542,6 @@ nb:
         send_message: Sende melding
       index:
         marketplace_messages: Markedsplassmeldinger
-      show:
-        can_not_send_new_message: Beklager, du kan ikke sende en ny melding.
   news:
     index:
       bike_index_blog: Sykkelindeksblogg
@@ -5821,13 +5819,6 @@ nb:
     alert_for_errors:
       errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
         %{object_name} ble lagret:"
-    messages:
-      thread:
-        from: Fra
-        me: meg
-        to: Til
-      thread_show:
-        subject: Emne
     search_results:
       bike_box:
         location: plassering
@@ -5993,3 +5984,16 @@ nb:
         when_you_do: når du gjør det!
         you_added_a_bike_type_on_bike_index: Du la til en %{bike_type} på Bike Index
         youre_almost_done_registering: Du er nesten ferdig med registreringen!
+    messages:
+      thread_show:
+        can_not_send_new_message: Beklager, du kan ikke sende en ny melding.
+      thread_show_message:
+        me: Meg
+        subject: Emne
+        to: til
+        to_me: til meg
+        you_to: deg til
+      threads_index:
+        from: Fra
+        me: meg
+        to: Til
