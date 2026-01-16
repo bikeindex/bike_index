@@ -35,6 +35,7 @@ class MarketplaceMessage < ApplicationRecord
   belongs_to :initial_record, class_name: "MarketplaceMessage"
 
   has_many :notifications, as: :notifiable
+  has_one :sale
 
   validates_presence_of :marketplace_listing_id, :sender_id, :receiver_id, :subject, :body
   validate :users_match_initial_record, if: -> { buyer_seller_message? }

@@ -14,6 +14,7 @@ class BikeServices::OwnershipTransferer
       new_owner_email: nil,
       doorkeeper_app_id: nil,
       registration_info: {},
+      sale_id: nil,
       processing_impound_record_id: nil,
       skip_bike_save: false,
       skip_email: false
@@ -43,6 +44,7 @@ class BikeServices::OwnershipTransferer
         registration_info:,
         doorkeeper_app_id:,
         impound_record_id:,
+        sale_id:,
         skip_email:)
 
       bike.save unless skip_bike_save
