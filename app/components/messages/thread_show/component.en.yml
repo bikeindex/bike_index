@@ -3,4 +3,4 @@ en:
   components:
     messages:
       thread_show:
-        subject: Subject
+        can_not_send_new_message: Sorry, you can't send a new message.

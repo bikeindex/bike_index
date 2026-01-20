@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :marketplace_message do
     marketplace_listing { FactoryBot.create(:marketplace_listing, :for_sale) }
     subject { "some subject" }
-    body { "Some message body" }
+    sequence(:body) { |n| "Some message body #{n}" }
     sender { FactoryBot.create(:user_confirmed) }
 
     trait :reply do
