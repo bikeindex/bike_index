@@ -34,6 +34,10 @@ module API
         end
       end
       resource :search, desc: "Searching for bikes" do
+        before do
+          params[:per_page] = [params[:per_page].to_i, 100].min if params[:per_page].to_i > 100
+        end
+
         desc "Search for bikes", {
           notes: <<-NOTE
             `stolenness` is the sort of bikes to match. "**all**": every bike, "**non**": only not-stolen, "**stolen**": all stolen, "**proximity**": only stolen within `distance` of included `location`.
