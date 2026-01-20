@@ -34,10 +34,6 @@ module API
         end
       end
       resource :search, desc: "Searching for bikes" do
-        before do
-          params[:per_page] = [params[:per_page].to_i, 100].min if params[:per_page].to_i > 100
-        end
-
         desc "Search for bikes", {
           notes: <<-NOTE
             `stolenness` is the sort of bikes to match. "**all**": every bike, "**non**": only not-stolen, "**stolen**": all stolen, "**proximity**": only stolen within `distance` of included `location`.
@@ -49,7 +45,7 @@ module API
             If `location` is "**IP**" (the default), the location is determined via geolocation of your IP address.
           NOTE
         }
-        paginate
+        paginate max_per_page: Pagy.options[:limit_max]
         params do
           use :search
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
@@ -113,7 +109,7 @@ module API
             It returns matches that are off of the submitted `serial` by less than 3 characters (postgres levenshtein, if you're curious).
           NOTE
         }
-        paginate
+        paginate max_per_page: Pagy.options[:limit_max]
         params do
           requires :serial, type: String, desc: "Serial, homoglyph matched"
           use :non_serial_search_params
@@ -133,7 +129,7 @@ module API
                 It returns bikes with partially-matching serial numbers (for which the requested serial is a substring).
           NOTE
         }
-        paginate
+        paginate max_per_page: Pagy.options[:limit_max]
         params do
           requires :serial, type: String, desc: "Serial, homoglyph matched"
           use :non_serial_search_params
@@ -155,7 +151,7 @@ module API
                  If no exact matches are found, partial matches are returned.
           NOTE
         }
-        paginate
+        paginate max_per_page: Pagy.options[:limit_max]
         params do
           requires :serial, type: String, desc: "Serial, homoglyph matched"
           use :non_serial_search_params
