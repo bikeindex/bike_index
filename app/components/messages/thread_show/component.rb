@@ -2,7 +2,14 @@
 
 module Messages::ThreadShow
   class Component < ApplicationComponent
-    def initialize(current_user:, marketplace_messages:, initial_message: nil, marketplace_listing: nil, can_send_message: false, new_marketplace_message: nil)
+    def initialize(
+      current_user:,
+      marketplace_messages:,
+      initial_message: nil,
+      marketplace_listing: nil,
+      can_send_message: false,
+      new_marketplace_message: nil
+    )
       @marketplace_messages = marketplace_messages || []
 
       @initial_message = initial_message || @marketplace_messages&.first
@@ -20,6 +27,13 @@ module Messages::ThreadShow
 
     def render?
       @initial_message.present? || @marketplace_listing.present?
+    end
+
+    private
+
+    def show_mark_sold?
+      @initial_message.receiver_id == @current_user.id &&
+        @marketplace_listing.current?
     end
   end
 end

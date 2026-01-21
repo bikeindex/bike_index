@@ -29,4 +29,13 @@
       <%= render(Alert::Component.new(text: translation(".can_not_send_new_message"), kind: :error)) %>
     </div>
   <% end %>
+
+  <% if show_mark_sold? %>
+    <div class="tw:mt-15 tw:text-center">
+      <%= link_to new_sale_path(marketplace_message_id: @initial_message.id), class: "twbtn-blue tw:px-8" do %>
+        <%= translation(".sold_to", bike_type: @marketplace_listing.item_type_display.downcase) %>
+        <em><%= @other_user_name %></em>
+      <% end %>
+    </div>
+  <% end %>
 </div>

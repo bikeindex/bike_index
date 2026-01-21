@@ -4,3 +4,4 @@ en:
     messages:
       thread_show:
         can_not_send_new_message: Sorry, you can't send a new message.
+        sold_to: Mark %{bike_type} sold to
