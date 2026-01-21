@@ -11,6 +11,7 @@ module Organized
       @email_preview = true
       # NOTE: This is a bad hack, but there isn't a good place to define this
       @email_preview_tokenized_url = "/404"
+      @organization = current_organization
       if ParkingNotification.kinds.include?(@kind)
         find_or_build_parking_notification
         render template: "/organized_mailer/parking_notification", layout: "email"
@@ -25,11 +26,7 @@ module Organized
         render template: "/organized_mailer/partial_registration", layout: "email"
       else # Default to finished email
         build_finished_email
-        render Emails::FinishedRegistration::Component.new(
-          ownership: @ownership,
-          bike: @bike,
-          email_preview: true
-        ), layout: "email"
+        render template: "/organized_mailer/finished_registration", layout: "email"
       end
     end
 
@@ -63,7 +60,8 @@ module Organized
 
     # What if they don't have any bikes! return something
     def default_bike
-      bike = current_organization.bikes.last
+      bike = current_organization.created_bikes.reorder(:id).last
+      bike ||= current_organization.bikes.reorder(:id).last
       return bike if bike.present?
 
       bike = Bike.new(id: 42,
