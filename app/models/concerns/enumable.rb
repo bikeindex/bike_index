@@ -74,7 +74,7 @@ module Enumable
     end
 
     def ignored_secondaries
-      ["etc"]
+      ["etc"].freeze
     end
 
     def secondary_names_for(name_downcase)
