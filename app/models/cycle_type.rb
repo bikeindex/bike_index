@@ -52,7 +52,7 @@ class CycleType
     "personal-mobility": "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)",
     "non-e-scooter": "Scooter (not electric)",
     "non-e-skateboard": "Skateboard (not electric)",
-    "e-motorcycle": "e-Motorcycle/e-Dirtbike (no pedals)",
+    "e-motorcycle": "e-Motorcycle (e-Dirt bike, e-bike with no pedals)",
     elliptical: "Elliptical bike"
   }.freeze
 
@@ -110,6 +110,12 @@ class CycleType
 
     def default_slug
       "bike"
+    end
+
+    private
+
+    def ignored_secondaries
+      ["etc", "not electric"].freeze
     end
   end
 
