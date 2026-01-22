@@ -197,19 +197,19 @@ RSpec.describe "Bikes API V2", type: :request do
       bike_attrs.merge!(organization_slug: organization.slug,
         cycle_type_name: "e-dirt bike",
         stolen_record: {
-        phone: "1", # phone number isn't validated in any way
-        date_stolen: 1357192800,
-        theft_description: "This bike was stolen and that's no fair.",
-        country: "US",
-        city: "New York",
-        address: "278 Broadway",
-        zipcode: "10007",
-        state: "NY",
-        police_report_number: "99999999",
-        police_report_department: "New York"
-        # locking_description: "some locking description",
-        # lock_defeat_description: "broken in some crazy way"
-      })
+          phone: "1", # phone number isn't validated in any way
+          date_stolen: 1357192800,
+          theft_description: "This bike was stolen and that's no fair.",
+          country: "US",
+          city: "New York",
+          address: "278 Broadway",
+          zipcode: "10007",
+          state: "NY",
+          police_report_number: "99999999",
+          police_report_department: "New York"
+          # locking_description: "some locking description",
+          # lock_defeat_description: "broken in some crazy way"
+        })
       expect {
         post "/api/v2/bikes?access_token=#{token.token}",
           params: bike_attrs.to_json,

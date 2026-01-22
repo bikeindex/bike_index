@@ -31,13 +31,14 @@ RSpec.describe Autocomplete::Matcher do
       expect(subject.send(:not_in_cache?, opts[:cache_key])).to be_falsey
 
       # Query result
-      opts_query = subject.params_to_opts(q: "b", per_page: 10)
+      opts_query = subject.params_to_opts(q: "b", per_page: 11)
       # Isn't in cache
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_truthy
       result_query = subject.search(nil, opts_query)
-      expect(result_query.count).to eq 10
-      target_search_ids = [color_sid, "v_0", "v_11", "v_6", "v_8", "v_12", "v_22", "v_9", "v_14", "m_#{manufacturer2.id}"]
-      expect(result_query.map { |i| i["search_id"] }).to eq target_search_ids
+      expect(result_query.count).to eq 11
+      target_search_ids = [color_sid, "v_0", "v_11", "v_6", "v_8", "v_12", "v_21", "v_22", "v_9", "v_14", "m_#{manufacturer2.id}"]
+      # pp result_query.map { "#{it["search_id"]} - #{it["text"]}" }
+      expect(result_query.map { it["search_id"] }).to eq target_search_ids
       # But it is in cache after the search
       expect(subject.send(:not_in_cache?, opts_query[:cache_key])).to be_falsey
 
@@ -49,6 +50,27 @@ RSpec.describe Autocomplete::Matcher do
       paginated_opts = subject.params_to_opts(page: 2, per_page: 4)
       result_paginated = subject.search(nil, paginated_opts)
       expect(result_paginated.map { |i| i["search_id"] }).to eq(%w[v_16 v_18 v_5 v_1])
+    end
+
+    it "finds e-vehicles" do
+      Autocomplete::Loader.clear_redis
+      Autocomplete::Loader.load_all
+
+      # searching for e-scooter, e-skateboard, e-vehicles
+      # (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)
+      e_dash_result = described_class.search(nil, described_class.params_to_opts(q: "e-", per_page: 10))
+      # pp e_dash_result.map { "#{it["search_id"]} - #{it["text"]}" }
+      expect(e_dash_result.count).to eq 9
+      target_e_result_ids = %w[p_10 v_11 v_16 v_18 v_12 v_21 v_22 v_19 v_20]
+      expect(e_dash_result.map { it["search_id"] }).to eq target_e_result_ids
+
+      e_space_result = described_class.search(nil, described_class.params_to_opts(q: "e ", per_page: 10))
+      expect(e_space_result).to eq e_dash_result
+
+      skateboard_result = described_class.search(nil, described_class.params_to_opts(q: "skate", per_page: 10))
+      # pp skateboard_result.map { "#{it["search_id"]} - #{it["text"]}" }
+      expect(skateboard_result.count).to eq 2
+      expect(skateboard_result.map { it["search_id"] }).to eq(%w[v_18 v_20])
     end
   end
 
