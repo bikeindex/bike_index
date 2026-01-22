@@ -711,7 +711,7 @@ en:
         cargo_rear: Cargo Bike Rear (e.g. longtail)
         cargo_trike: Cargo Tricycle (trike with front storage, e.g. Christiania bike)
         cargo_trike_rear: Cargo Tricycle (trike with rear storage)
-        e_motorcycle: e-Motorcycle/e-Dirtbike (no pedals)
+        e_motorcycle: e-Motorcycle (e-Dirt bike, e-bike with no pedals)
         e_scooter: e-Scooter
         elliptical: Elliptical bike
         non_e_scooter: Scooter (not electric)
