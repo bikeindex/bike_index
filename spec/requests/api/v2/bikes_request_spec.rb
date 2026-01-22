@@ -194,11 +194,11 @@ RSpec.describe "Bikes API V2", type: :request do
       Country.united_states
       FactoryBot.create(:state_new_york)
       organization.save
-      bike_attrs[:organization_slug] = organization.slug
-      date_stolen = 1357192800
-      bike_attrs[:stolen_record] = {
+      bike_attrs.merge!(organization_slug: organization.slug,
+        cycle_type_name: "e-dirt bike",
+        stolen_record: {
         phone: "1", # phone number isn't validated in any way
-        date_stolen: date_stolen,
+        date_stolen: 1357192800,
         theft_description: "This bike was stolen and that's no fair.",
         country: "US",
         city: "New York",
@@ -209,18 +209,18 @@ RSpec.describe "Bikes API V2", type: :request do
         police_report_department: "New York"
         # locking_description: "some locking description",
         # lock_defeat_description: "broken in some crazy way"
-      }
+      })
       expect {
         post "/api/v2/bikes?access_token=#{token.token}",
           params: bike_attrs.to_json,
           headers: json_headers
       }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
-      result = json_result
-      expect(result).to include("bike")
-      expect(result["bike"]["serial"]).to eq(bike_attrs[:serial].upcase)
-      expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
-      expect(result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
-      bike = Bike.find(result["bike"]["id"])
+      expect(json_result).to include("bike")
+      expect(json_result["bike"]["serial"]).to eq(bike_attrs[:serial].upcase)
+      expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
+      expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(bike_attrs[:stolen_record][:date_stolen])
+      expect(json_result["bike"]["type_of_cycle"]).to eq "e-Motorcycle (e-Dirt bike, e-bike with no pedals)"
+      bike = Bike.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to eq(organization)
       expect(bike.current_ownership.origin).to eq "api_v2"
       expect(bike.current_ownership.organization).to eq organization
