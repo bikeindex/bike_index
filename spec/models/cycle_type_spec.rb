@@ -51,6 +51,36 @@ RSpec.describe CycleType, type: :model do
         expect(CycleType.friendly_find("personal_mobility")&.id).to eq cycle_type.id
       end
     end
+    context "e-Dirtbike" do
+      let(:cycle_type) { CycleType.new("e-motorcycle") }
+      let(:name_and_secondary_names) do
+        ["e-motorcycle", "e-motorcycle (e-dirt bike, e-bike with no pedals)", "e-dirt bike",
+          "e-bike with no pedals"]
+      end
+      it "finds by various names" do
+        expect(cycle_type.id).to eq 21
+        expect(CycleType.send(:names_and_secondary_names)[20]).to eq name_and_secondary_names
+        expect(cycle_type.name).to match "e-Motorcycle"
+        expect(CycleType.friendly_find("e-Dirt bike")&.id).to eq cycle_type.id
+        expect(CycleType.friendly_find("e-bike with no pedals")&.id).to eq cycle_type.id
+        expect(CycleType.friendly_find("e-MOTORCYCLE")&.id).to eq cycle_type.id
+      end
+    end
+    context "not electric" do
+      let(:scooter) { CycleType.new("non-e-scooter") }
+      let(:skateboard) { CycleType.new("non-e-skateboard") }
+      it "isn't included in name_and_secondary_names" do
+        expect(scooter.id).to eq 19
+        expect(scooter.name).to eq "Scooter (not electric)"
+        expect(CycleType.send(:names_and_secondary_names)[18])
+          .to eq(["non-e-scooter", "scooter (not electric)", "scooter"])
+
+        expect(skateboard.id).to eq 20
+        expect(skateboard.name).to eq "Skateboard (not electric)"
+        expect(CycleType.send(:names_and_secondary_names)[19])
+          .to eq(["non-e-skateboard", "skateboard (not electric)", "skateboard"])
+      end
+    end
     context "other cargo varieties" do
       let(:cycle_type) { CycleType.new("cargo-trike") }
       let(:cargo_trike_secondaries) { ["cargo tricycle", "trike with front storage", "christiania bike"] }

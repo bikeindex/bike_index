@@ -12,6 +12,11 @@ class MyAccounts::MessagesController < ApplicationController
   end
 
   def show
+    if new_message_to_self?
+      flash[:notice] = translation(:sorry_that_is_you)
+      redirect_back(fallback_location: bike_path(@marketplace_listing.item_id)) && return
+    end
+
     @marketplace_messages = matching_marketplace_thread
     @initial_record = @marketplace_messages.first
 
@@ -76,5 +81,13 @@ class MyAccounts::MessagesController < ApplicationController
 
   def matching_marketplace_messages
     MarketplaceMessage.threads_for_user(current_user)
+  end
+
+  def new_message_to_self?
+    marketplace_listing_id = MarketplaceMessage.decoded_marketplace_listing_id(id: params[:id])
+    return false if marketplace_listing_id.blank?
+
+    @marketplace_listing = MarketplaceListing.find_by_id(marketplace_listing_id)
+    @marketplace_listing&.seller_id == current_user.id
   end
 end

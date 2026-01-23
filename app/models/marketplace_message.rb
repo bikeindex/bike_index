@@ -35,6 +35,7 @@ class MarketplaceMessage < ApplicationRecord
   belongs_to :initial_record, class_name: "MarketplaceMessage"
 
   has_many :notifications, as: :notifiable
+  has_one :sale
 
   validates_presence_of :marketplace_listing_id, :sender_id, :receiver_id, :subject, :body
   validate :users_match_initial_record, if: -> { buyer_seller_message? }
@@ -65,7 +66,7 @@ class MarketplaceMessage < ApplicationRecord
       where(sender_id: user_id).or(where(receiver_id: user_id))
     end
 
-    def decoded_marketplace_listing_id(user:, id:)
+    def decoded_marketplace_listing_id(id:, user: nil)
       # marketplace_listing_id can be encoded as "ml_#{id}"
       return unless id.is_a?(String) && id.start_with?(/ml_/i)
 
@@ -159,7 +160,13 @@ class MarketplaceMessage < ApplicationRecord
   def buyer_id
     return unless buyer_seller_message?
 
-    sender_buyer? ? sender_id : buyer_id
+    sender_buyer? ? sender_id : receiver_id
+  end
+
+  def buyer_name
+    return unless buyer_seller_message?
+
+    (sender_buyer? ? sender : receiver)&.marketplace_message_name
   end
 
   # TODO: do we need all these other_user methods?

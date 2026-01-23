@@ -2445,6 +2445,9 @@ nl:
         create:
           can_not_send_message: Helaas kunt u geen bericht naar deze advertentie sturen
           message_sent: Bericht verzonden
+        show:
+          sorry_that_is_you: Dat is jouw advertentie! Je kunt geen nieuw bericht naar
+            jezelf sturen.
       marketplace_listings:
         ensure_user_allowed_to_edit!:
           you_dont_own_that: Oh nee! Het lijkt erop dat je die %{item_type} niet hebt.
@@ -6077,6 +6080,11 @@ nl:
         community_groups: Community's
         schools: scholen
         theft_victims: Slachtoffers van diefstal
+      new_sale_form:
+        record_sale: Recordverkoop
+        sold_for: Verkoopbedrag voor
+        transfer_to: Hierdoor wordt de registratie overgedragen naar %{buyer_name}
+          en de vermelding op de marktplaats gesloten.
     emails:
       partials:
         bike_box:
@@ -6145,6 +6153,7 @@ nl:
     messages:
       thread_show:
         can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
+        sold_to: Mark %{item_type} verkocht aan
       thread_show_message:
         me: Mij
         subject: Onderwerp

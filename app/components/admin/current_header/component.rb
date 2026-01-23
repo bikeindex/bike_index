@@ -14,11 +14,11 @@ module Admin::CurrentHeader
       user_id
     ].freeze
 
-    def initialize(params:, viewing: nil, kind_humanized: nil, user: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
+    def initialize(params:, viewing: nil, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
       @params = params
       @viewing = viewing
       @kind_humanized = kind_humanized
-      @user = user
+      @user_subject = user_subject
       @bike = bike
       @marketplace_listing = marketplace_listing
       @primary_activity = primary_activity
@@ -37,11 +37,7 @@ module Admin::CurrentHeader
     end
 
     def show_user?
-      user_subject.present? || @params[:user_id].present?
-    end
-
-    def user_subject
-      @user_subject ||= @user || User.unscoped.find_by_id(@params[:user_id])
+      @user_subject.present? || @params[:user_id].present?
     end
 
     def show_bike?

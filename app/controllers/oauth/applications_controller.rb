@@ -64,8 +64,7 @@ module Oauth
       doorkeeper_apps = Doorkeeper::Application
 
       if params[:user_id].present?
-        @user = User.friendly_find(params[:user_id])
-        doorkeeper_apps = doorkeeper_apps.where(owner_id: params[:user_id])
+        doorkeeper_apps = doorkeeper_apps.where(owner_id: user_subject&.id || params[:user_id])
       end
 
       @time_range_column = sort_column if %w[updated_at].include?(sort_column)

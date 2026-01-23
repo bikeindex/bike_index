@@ -72,7 +72,7 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def find_user
-    @user = User.unscoped.username_friendly_find(params[:id])
+    @user = User.unscoped.friendly_find(params[:id])
     raise ActiveRecord::RecordNotFound unless @user.present?
   end
 

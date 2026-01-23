@@ -30,6 +30,7 @@
 #  impound_record_id             :bigint
 #  organization_id               :bigint
 #  previous_ownership_id         :bigint
+#  sale_id                       :bigint
 #  user_id                       :integer
 #
 # Indexes
@@ -41,6 +42,7 @@
 #  index_ownerships_on_doorkeeper_app_id  (doorkeeper_app_id)
 #  index_ownerships_on_impound_record_id  (impound_record_id)
 #  index_ownerships_on_organization_id    (organization_id)
+#  index_ownerships_on_sale_id            (sale_id)
 #  index_ownerships_on_user_id            (user_id)
 #
 class Ownership < ApplicationRecord
@@ -79,6 +81,9 @@ class Ownership < ApplicationRecord
   belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
   belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application", counter_cache: true, touch: true
+  belongs_to :sale
+
+  has_one :sale_sold_in, class_name: "Sale" # Mainly to distinguish from the belongs_to :sale
 
   has_many :notifications, as: :notifiable
 
@@ -103,14 +108,24 @@ class Ownership < ApplicationRecord
 
   attr_accessor :creator_email, :user_email, :can_edit_claimed
 
-  def self.origins
-    ORIGIN_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def origins
+      ORIGIN_ENUM.keys.map(&:to_s)
+    end
 
-  def self.origin_humanized(str)
-    return nil unless str.present?
+    def origin_humanized(str)
+      return nil unless str.present?
 
-    str.titleize.downcase
+      str.titleize.downcase
+    end
+
+    def current_at(time)
+      where("created_at < ?", time).order(created_at: :desc).first
+    end
+
+    def claimed_at(time)
+      where("claimed_at < ?", time).order(created_at: :desc).first
+    end
   end
 
   def bike

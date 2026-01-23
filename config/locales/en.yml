@@ -711,7 +711,7 @@ en:
         cargo_rear: Cargo Bike Rear (e.g. longtail)
         cargo_trike: Cargo Tricycle (trike with front storage, e.g. Christiania bike)
         cargo_trike_rear: Cargo Tricycle (trike with rear storage)
-        e_motorcycle: e-Motorcycle/e-Dirtbike (no pedals)
+        e_motorcycle: e-Motorcycle (e-Dirt bike, e-bike with no pedals)
         e_scooter: e-Scooter
         elliptical: Elliptical bike
         non_e_scooter: Scooter (not electric)
@@ -1762,6 +1762,9 @@ en:
         create:
           can_not_send_message: Sorry, you can't send a message to that listing
           message_sent: Message sent
+        show:
+          sorry_that_is_you: That's your listing! You can't start a new message to
+            yourself.
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.

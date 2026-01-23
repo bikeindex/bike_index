@@ -13,7 +13,7 @@ module Autocomplete
     def normalize(str)
       return "" if str.blank?
 
-      I18n.transliterate(str.downcase).gsub(/[^\p{Word}\ ]/i, "")
+      I18n.transliterate(str.downcase).tr("-", " ").gsub(/[^\p{Word}\ ]/i, "")
         .strip.gsub(/\s+/, " ")
     end
 

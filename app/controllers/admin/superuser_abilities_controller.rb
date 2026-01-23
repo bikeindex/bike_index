@@ -52,7 +52,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
       @kind = "all"
     end
     if params[:user_id].present?
-      superuser_abilities = superuser_abilities.where(user_id: params[:user_id])
+      superuser_abilities = superuser_abilities.where(user_id: user_subject&.id || params[:user_id])
     end
 
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)

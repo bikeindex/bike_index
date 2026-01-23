@@ -158,14 +158,13 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def matching_bikes
-    if params[:user_id].present?
-      @user = User.friendly_find(params[:user_id])
-      bikes = @user.bikes
+    bikes = if params[:user_id].present?
+      user_subject&.bikes
     elsif params[:search_phone].present?
-      bikes = Bike.search_phone(params[:search_phone])
+      Bike.search_phone(params[:search_phone])
     else
       # This unscopes, so it doesn't work with anything above
-      bikes = Bike.unscoped
+      Bike.unscoped
     end
     if params[:search_manufacturer].present?
       @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer])
@@ -190,7 +189,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.motorized if @motorized
 
     # Get a query error if both are passed
-    if params[:search_email].present? && @user.blank?
+    if params[:search_email].present? && user_subject.blank?
       @search_email = params[:search_email]
       bikes = bikes.admin_text_search(@search_email)
     elsif params[:search_domain].present?
