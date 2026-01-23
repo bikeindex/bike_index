@@ -75,10 +75,6 @@
 
       <div class="binx-footer">
         <h5>
-          <%= Time.current.year %>
-          &copy;
-          <%= t(".bike_index") %>
-          .
           <% if render_donation?(@organization) %>
             <%= t(".help_prevent_theft") %>
             <%= link_to(t(".make_a_donation"), support_the_index_url) %>

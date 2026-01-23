@@ -73,12 +73,16 @@ module Enumable
       end
     end
 
+    def ignored_secondaries
+      ["etc"].freeze
+    end
+
     def secondary_names_for(name_downcase)
       return [] unless name_downcase[/\(/].present?
       primary, *secondaries = name_downcase.delete(")").split("(").map(&:strip)
       secondaries = secondaries.map do |str|
         str.split(",").map { it.gsub("e.g.", "").strip }
-      end.flatten - ["etc"]
+      end.flatten - ignored_secondaries
 
       [primary] + secondaries
     end

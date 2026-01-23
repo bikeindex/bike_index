@@ -8,6 +8,9 @@
     <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: bike.current_stolen_record} %>
   <% end %>
   <%= render partial: "/shared/claim_message", locals: {bike:, skip_to_see: true} %>
+  <% if organization&.mail_snippet_body('after_welcome').present? %>
+    <%= organization.mail_snippet_body('after_welcome').html_safe %>
+  <% end %>
 <% else %>
   <% if new_user? %>
     <h2 style="margin-bottom: 12px;">
