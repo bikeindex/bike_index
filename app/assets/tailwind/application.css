@@ -60,7 +60,7 @@
   }
 
   .twhr {
-    @apply tw:border-0 tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
+    @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }
 }
 

@@ -8,7 +8,7 @@ RSpec.describe PageBlock::NewSaleForm::Component, type: :component do
   let(:options) { {sale:, item:, marketplace_message:} }
   let(:item) { nil }
   let(:marketplace_message) { nil }
-  let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+  let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 16900) }
   let(:current_user) { marketplace_listing.seller }
 
   context "with marketplace_message" do
@@ -17,9 +17,12 @@ RSpec.describe PageBlock::NewSaleForm::Component, type: :component do
 
     it "renders" do
       sale.validate
+      expect(sale.amount).to be_nil
       expect(sale.validate).to be_truthy
       expect(component).to have_css "div"
       expect(component).to have_text "sold to"
+      # Rendering assigns amount
+      expect(sale.amount_cents).to eq 16900
     end
   end
 end

@@ -3,9 +3,10 @@ en:
   components:
     page_block:
       new_sale_form:
-        please_fill_in: Please fill in these optional fields, to help us make the
-          marketplace better
+        please_fill_in: "Please fill in these optional fields, to help us make the
+          marketplace better:"
         record_sale: Record sale
         transfer_to: >-
           This will transfer the registration to %{buyer_name} and close the marketplace
           listing.
+        sold_for: Amount sold for

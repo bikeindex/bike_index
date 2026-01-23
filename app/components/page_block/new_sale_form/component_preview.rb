@@ -3,7 +3,8 @@
 module PageBlock::NewSaleForm
   class ComponentPreview < ApplicationComponentPreview
     def default
-      render(PageBlock::NewSaleForm::Component.new(sale:, marketplace_message:))
+      render(PageBlock::NewSaleForm::Component.new(currency: Currency.default, sale:,
+        marketplace_message:))
     end
 
     private
