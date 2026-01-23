@@ -30,8 +30,7 @@ class Admin::UserAlertsController < Admin::BaseController
       @activeness = "all"
     end
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      user_alerts = user_alerts.where(user_id: @user.id) if @user.present?
+      user_alerts = user_alerts.where(user_id: user_subject&.id || params[:user_id])
     end
     if params[:search_bike_id].present?
       @bike = Bike.unscoped.find(params[:search_bike_id])
