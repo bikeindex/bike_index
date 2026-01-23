@@ -9,7 +9,9 @@ class SalesController < ApplicationController
 
     if @sale.save
       flash[:success] = "#{@sale.item_cycle_type} marked sold!"
-      redirect_to(bike_path(@sale.item_id))
+
+      # Direct to my_account because it takes a little while for the sale to process
+      redirect_to(my_account_path)
     else
       render :new
     end

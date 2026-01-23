@@ -100,7 +100,7 @@ RSpec.describe SalesController, type: :request do
       def expect_created_sale(target_sale_attrs:, ownership_change: 1)
         expect do
           post "/sales", params: {sale: sale_params}
-          expect(response).to redirect_to bike_path(item.id)
+          expect(response).to redirect_to my_account_path
           expect(flash[:success]).to be_present
         end.to change(Sale, :count).by(1)
           .and change(CallbackJob::AfterSaleCreateJob.jobs, :count).by 1
