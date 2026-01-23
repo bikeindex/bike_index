@@ -8,7 +8,7 @@
 Pagy.options[:limit] = 25
 Pagy.options[:limit_max] = 100
 Pagy.options[:max_pages] = 5000
-Pagy::DEFAULT[:max_per_page] = 100
+Pagy.options[:max_per_page] = 100
 
 # Raise RangeError for out-of-range pages so we can redirect to last valid page
 # (handled in ApplicationController via rescue_from)
