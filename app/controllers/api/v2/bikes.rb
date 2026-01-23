@@ -82,11 +82,17 @@ module API
         end
 
         def creation_state_params
+          ios_version = if headers["X-REQUESTED-WITH"]&.match?("app-ios-")
+            headers["X-REQUESTED-WITH"].gsub("app-ios-", "")
+          end
+          # Previous ios version header - replaced in ios version 1.6.2
+          # fallback can be removed when there are no longer new registrations being created with it
+          ios_version ||= headers["X-IOS-VERSION"]&.to_s
           {
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
             is_new: params[:is_new],
-            ios_version: headers["X-IOS-VERSION"]&.to_s
+            ios_version:
           }.compact.as_json
         end
 
