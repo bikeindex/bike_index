@@ -36,7 +36,8 @@ RSpec.describe Messages::ThreadShow::Component, type: :component do
       expect(component).to have_content "Subject"
       expect(component).to have_button "Send message"
 
-      expect(component).to_not have_content " to "
+      component_text = whitespace_normalized_body_text(component.to_html)
+      expect(component_text).to_not match " to "
       expect(component_text).to_not match(/bike sold to/)
     end
   end
@@ -87,7 +88,7 @@ RSpec.describe Messages::ThreadShow::Component, type: :component do
       let(:current_user) { initial_message.receiver }
       let(:can_send_message) { false }
 
-      xit "includes subject" do
+      it "includes subject" do
         expect(marketplace_message.initial_message?).to be_falsey
         expect(component).to have_css("div")
         expect(component).to have_content marketplace_message.body

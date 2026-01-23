@@ -66,7 +66,7 @@ class MarketplaceMessage < ApplicationRecord
       where(sender_id: user_id).or(where(receiver_id: user_id))
     end
 
-    def decoded_marketplace_listing_id(user:, id:)
+    def decoded_marketplace_listing_id(user: nil, id:)
       # marketplace_listing_id can be encoded as "ml_#{id}"
       return unless id.is_a?(String) && id.start_with?(/ml_/i)
 

@@ -67,7 +67,8 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
         let(:current_user) { marketplace_listing.seller }
         it "404s" do
           get show_url
-          expect(response.status).to eq(404)
+          expect(response).to redirect_to(bike_path(marketplace_listing.item_id))
+          expect(flash[:notice]).to be_present
         end
 
         context "with existing marketplace_message" do
