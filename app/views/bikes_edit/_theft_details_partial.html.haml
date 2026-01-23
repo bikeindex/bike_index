@@ -57,8 +57,8 @@
   = srecord.label :theft_description, t(".description_of_the_incident"), class:  'form-well-label'
   .form-well-input-large
     = srecord.text_area :theft_description, rows: 3, class: 'form-control'
-
-.form-group.row.unnested-field
+-# policeReportNumber is used in the stolen checklist to link directly to the field
+.form-group.row.unnested-field#policeReportNumber
   = srecord.label :police_report_number, t(".police_report"), class: 'form-well-label'
   .form-well-input
     = srecord.text_field :police_report_number, class: 'form-control'
