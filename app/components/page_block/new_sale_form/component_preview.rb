@@ -2,6 +2,7 @@
 
 module PageBlock::NewSaleForm
   class ComponentPreview < ApplicationComponentPreview
+    # @display legacy_stylesheet true
     def default
       render(PageBlock::NewSaleForm::Component.new(currency: Currency.default, sale:,
         marketplace_message:))

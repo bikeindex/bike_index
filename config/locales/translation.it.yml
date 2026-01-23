@@ -2375,6 +2375,8 @@ it:
         create:
           can_not_send_message:
           message_sent:
+        show:
+          sorry_that_is_you:
       marketplace_listings:
         ensure_user_allowed_to_edit!:
           you_dont_own_that:
@@ -4763,6 +4765,10 @@ it:
         community_groups: Gruppi comunitari
         schools: Scuole
         theft_victims: Vittime di furto
+      new_sale_form:
+        record_sale:
+        sold_for:
+        transfer_to:
     emails:
       partials:
         bike_box:
@@ -4815,6 +4821,7 @@ it:
     messages:
       thread_show:
         can_not_send_new_message:
+        sold_to:
       thread_show_message:
         me:
         subject: Oggetto
