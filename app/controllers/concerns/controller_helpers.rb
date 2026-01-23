@@ -442,6 +442,6 @@ module ControllerHelpers
   end
 
   def user_subject
-    @user ||= User.unscoped.friendly_find(params[:user_id])
+    @user_subject ||= User.unscoped.friendly_find(params[:user_id])
   end
 end

@@ -72,4 +72,4 @@
 
 = render_admin_pagination_with_count(collection: @user_alerts, count: matching_user_alerts.size)
 
-= render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @user_alerts, skip_user: @user.present?}
+= render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @user_alerts, skip_user: @user_subject.present?}

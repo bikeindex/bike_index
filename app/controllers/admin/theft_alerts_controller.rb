@@ -130,7 +130,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     end
     @search_paid_admin = if available_paid_admin.include?(params[:search_paid_admin])
       params[:search_paid_admin]
-    elsif @user.present? || @bike.present?
+    elsif user_subject.present? || @bike.present?
       "paid_and_unpaid" # by default, include all paid and unpaid if user or bike is searched
     else
       available_paid_admin.first

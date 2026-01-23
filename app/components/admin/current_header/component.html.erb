@@ -1,10 +1,10 @@
 <div class="col-12 mt-4">
   <% if show_user? %>
     <p>
-      <% if user_subject.present? %>
+      <% if @user_subject.present? %>
         <%= viewing.pluralize %>
         for
-        <%= link_to user_subject.display_name, admin_user_path(user_subject), class: "twlink" %>
+        <%= link_to @user_subject.display_name, admin_user_path(@user_subject), class: "twlink" %>
       <% else %>
         <span class="<%= error_text_class %>">
           User #<%= @params[:user_id] %> <em>missing</em>

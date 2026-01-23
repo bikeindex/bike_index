@@ -19,7 +19,7 @@ class Admin::MembershipsController < Admin::BaseController
     @membership.set_calculated_attributes # Sets start_at and level
 
     if params[:user_id].present?
-      user = User.friendly_find(id: params[:user_id])
+      user = User.friendly_find(params[:user_id])
       @membership.user_email = user.email if user.present?
     end
   end
