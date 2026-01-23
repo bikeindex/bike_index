@@ -440,4 +440,8 @@ module ControllerHelpers
     page = 1 if page < 1
     max.present? ? page.clamp(1, max) : page
   end
+
+  def user_subject
+    @user ||= User.unscoped.friendly_find(params[:user_id])
+  end
 end

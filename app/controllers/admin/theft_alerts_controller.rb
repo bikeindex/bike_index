@@ -122,8 +122,7 @@ class Admin::TheftAlertsController < Admin::BaseController
       TheftAlert
     end
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
+      theft_alerts = theft_alerts.where(user_id: user_subject&.id || params[:user_id])
     end
     if params[:search_bike_id].present?
       @bike = Bike.unscoped.friendly_find(params[:search_bike_id])

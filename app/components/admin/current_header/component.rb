@@ -41,7 +41,7 @@ module Admin::CurrentHeader
     end
 
     def user_subject
-      @user_subject ||= @user || User.unscoped.find_by_id(@params[:user_id])
+      @user_subject ||= @user || User.unscoped.friendly_find(@params[:user_id])
     end
 
     def show_bike?

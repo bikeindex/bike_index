@@ -38,6 +38,11 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
           expect(response).to render_template(:admin_index)
           expect(assigns(:applications)).to be_nil
           expect(assigns(:collection).pluck(:id)).to match_array([doorkeeper_app.id, doorkeeper_app2.id])
+          get "#{base_url}?user_id=#{doorkeeper_app2.owner.email}"
+          expect(response.status).to eq 200
+          expect(response).to render_template(:admin_index)
+          expect(assigns(:applications)).to be_nil
+          expect(assigns(:collection).pluck(:id)).to match_array([doorkeeper_app2.id])
         end
       end
     end

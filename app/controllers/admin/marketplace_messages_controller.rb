@@ -46,8 +46,7 @@ class Admin::MarketplaceMessagesController < Admin::BaseController
     end
 
     if params[:user_id].present?
-      @user = User.unscoped.find_by(id: params[:user_id])
-      marketplace_messages = marketplace_messages.for_user(params[:user_id])
+      marketplace_messages = marketplace_messages.for_user(user_subject&.id || params[:user_id])
     end
 
     marketplace_messages.where(created_at: @time_range)

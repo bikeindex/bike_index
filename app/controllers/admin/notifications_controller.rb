@@ -46,8 +46,7 @@ class Admin::NotificationsController < Admin::BaseController
       notifications = notifications.not_delivery_success
     end
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      notifications = notifications.notifications_sent_or_received_by(@user.id) if @user.present?
+      notifications = notifications.notifications_sent_or_received_by(user_subject&.id || params[:user_id])
     end
     if params[:search_bike_id].present?
       @bike = Bike.unscoped.friendly_find(params[:search_bike_id])

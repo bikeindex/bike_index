@@ -117,7 +117,7 @@
             view notifications
             = link_to "for all bikes", organization_parking_notifications_path(sortable_search_params.merge(search_bike_id: nil)), class: "linkWithSortableSearchParams", "data-urlparams" => "search_bike_id,"
       - if params[:user_id].present?
-        - user = User.find_by_id(params[:user_id])
+        - user = @user || User.find_by_id(params[:user_id])
         Only notifications created by
         %strong
           = user&.display_name&.truncate(20)

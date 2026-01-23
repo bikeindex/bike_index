@@ -35,7 +35,7 @@ class Admin::MarketplaceListingsController < Admin::BaseController
     end
 
     if params[:user_id].present?
-      marketplace_listings = marketplace_listings.for_user(params[:user_id])
+      marketplace_listings = marketplace_listings.for_user(user_subject&.id || params[:user_id])
     end
 
     @time_range_column = sort_column if %w[updated_at published_at end_at].include?(sort_column)

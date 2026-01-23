@@ -37,8 +37,7 @@ class Admin::FeedbacksController < Admin::BaseController
       @search_kind = "all"
     end
     if params[:user_id].present?
-      @user = User.friendly_find(params[:user_id])
-      feedbacks = feedbacks.where(user_id: @user.id) if @user.present?
+      feedbacks = feedbacks.where(user_id: user_subject&.id || params[:user_id])
     end
     if params[:search_email].present?
       feedbacks = feedbacks.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%")
