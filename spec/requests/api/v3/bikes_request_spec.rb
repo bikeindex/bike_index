@@ -955,7 +955,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(ownership2.new_registration?).to be_truthy
           expect(ownership2.organization_pre_registration?).to be_falsey
           expect(ownership2.organization_id).to eq organization.id
-          expect(ownership2.ios_version).to eq '1.6.9'
+          expect(ownership2.ios_version).to eq "1.6.9"
 
           mail2 = ActionMailer::Base.deliveries.last
           expect(mail2.subject).to eq("Confirm your #{organization.name} Bike Index registration")
