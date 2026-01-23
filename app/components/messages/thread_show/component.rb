@@ -31,7 +31,13 @@ module Messages::ThreadShow
 
     private
 
+    def new_thread?
+      @initial_message.blank?
+    end
+
     def show_mark_sold?
+      return false if new_thread?
+
       @initial_message.receiver_id == @current_user.id &&
         @marketplace_listing.current?
     end
