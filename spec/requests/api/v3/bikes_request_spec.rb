@@ -780,7 +780,8 @@ RSpec.describe "Bikes API V3", type: :request do
           police_report_department: "New York"
         }
         expect {
-          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json,
+            headers: json_headers.merge("X-IOS-VERSION" => "1.6.9")
         }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
         expect(json_result).to include("bike")
         expect(json_result["bike"]["serial"]).to eq "Unknown"
@@ -797,6 +798,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike_organization.can_edit_claimed).to be_truthy
         expect(bike.current_ownership.origin).to eq "api_v3"
         expect(bike.current_ownership.organization).to eq organization
+        expect(bike.current_ownership.ios_version).to eq "1.6.9"
         expect(bike.current_stolen_record_id).to be_present
         expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
         expect(bike.current_stolen_record.phone).to eq("1234567890")
