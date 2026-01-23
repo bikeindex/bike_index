@@ -24,8 +24,7 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
   def matching_user_registration_organizations
     user_registration_organizations = UserRegistrationOrganization
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      user_registration_organizations = user_registration_organizations.where(user_id: @user.id)
+      user_registration_organizations = user_registration_organizations.where(user_id: user_subject&.id || params[:user_id])
     end
     if current_organization.present?
       user_registration_organizations = user_registration_organizations.where(organization_id: current_organization.id)

@@ -29,7 +29,7 @@
         for searched user
         %em
           - if params[:user_id].present?
-            = @user.present? ? @user.email : "unknown user"
+            = @user_subject.present? ? @user_subject.email : "unknown user"
           - else
             = params[:search_email]
         = link_to "view for all users", url_for(sortable_search_params.merge(user_id: nil, search_email: nil)), class: "gray-link small ml-1"

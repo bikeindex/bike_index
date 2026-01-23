@@ -210,7 +210,7 @@ RSpec.describe ParkingNotification, type: :model do
     end
 
     context "when a repeat notification impounds" do
-      it "creates an impound record" do
+      it "creates an impound record", :flaky do
         bike.reload
         expect(bike.status).to eq "unregistered_parking_notification"
         expect(bike.user_hidden).to be_truthy

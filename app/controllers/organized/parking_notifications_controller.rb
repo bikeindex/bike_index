@@ -113,7 +113,7 @@ module Organized
         notifications = notifications.search_bounding_box(*@search_bounding_box)
       end
       if params[:user_id].present?
-        notifications = notifications.where(user_id: params[:user_id])
+        notifications = notifications.where(user_id: user_subject&.id || params[:user_id])
       end
       notifications = notifications.where(kind: @search_kind) unless @search_kind == "all"
       if @search_unregistered == "only_unregistered"

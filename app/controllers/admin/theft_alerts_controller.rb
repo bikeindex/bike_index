@@ -122,8 +122,7 @@ class Admin::TheftAlertsController < Admin::BaseController
       TheftAlert
     end
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      theft_alerts = theft_alerts.where(user_id: @user.id) if @user.present?
+      theft_alerts = theft_alerts.where(user_id: user_subject&.id || params[:user_id])
     end
     if params[:search_bike_id].present?
       @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
@@ -131,7 +130,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     end
     @search_paid_admin = if available_paid_admin.include?(params[:search_paid_admin])
       params[:search_paid_admin]
-    elsif @user.present? || @bike.present?
+    elsif user_subject.present? || @bike.present?
       "paid_and_unpaid" # by default, include all paid and unpaid if user or bike is searched
     else
       available_paid_admin.first

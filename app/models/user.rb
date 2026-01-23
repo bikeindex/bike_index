@@ -177,6 +177,8 @@ class User < ApplicationRecord
     end
 
     def username_friendly_find(str)
+      return if str.blank?
+
       if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
         where(id: str).first
       else
@@ -185,7 +187,7 @@ class User < ApplicationRecord
     end
 
     def friendly_find(str)
-      fuzzy_email_find(str) || username_friendly_find(str)
+      username_friendly_find(str) || fuzzy_email_find(str)
     end
 
     def friendly_find_id(str)

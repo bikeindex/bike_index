@@ -226,7 +226,7 @@ module AdminHelper
       params:,
       viewing:,
       kind_humanized:,
-      user: @user,
+      user_subject: @user_subject,
       bike: @bike,
       marketplace_listing: @marketplace_listing,
       primary_activity: @primary_activity,
