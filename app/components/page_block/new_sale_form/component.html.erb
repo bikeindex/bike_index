@@ -1,16 +1,16 @@
-<div>
-  <p></p>
+<%= render(Card::Component.new) do %>
+  <p>Please fill in these optional fields, to help us make the marketplace better</p>
+
 
   <%= form_for @sale, builder: BikeIndexFormBuilder, url: sales_path, method: :post do |f| %>
     <%= f.hidden_field :marketplace_message_id %>
 
-    <%= translation(".sold_to", item_type:) %>
-
-    <em><%= buyer_name %></em>
-
-    <%= f.submit class: "twbtn-green" do %>
-      <%# = translation(".sold_to", item_type:) %>
-      <em><%= buyer_name %></em>
-    <% end %>
+    <hr class="twhr tw:mt-8 tw:mb-4">
+    <div class="tw:text-center">
+      <%= f.submit translation(:record_sale), class: "twbtn-green twbtn-lg tw:mr-2" %>
+      <span class="tw:text-sm tw:italic">
+        <%= translation(:transfer_to, buyer_name:) %>
+      </span>
+    </div>
   <% end %>
-</div>
+<% end %>

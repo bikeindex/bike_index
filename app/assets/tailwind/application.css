@@ -43,6 +43,12 @@
       tw:disabled:hover:bg-blue-600;
   }
 
+  .twbtn.twbtn-lg,
+  .twbtn-blue.twbtn-lg,
+  .twbtn-green.twbtn-lg {
+    @apply tw:px-6 tw:text-lg;
+  }
+
   .twinput {
     @apply tw:bg-white tw:border tw:border-gray-300 tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:rounded-sm
       tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
@@ -51,6 +57,10 @@
   }
   .twlabel {
     @apply tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
+  }
+
+  .twhr {
+    @apply tw:border-0 tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
   }
 }
 
