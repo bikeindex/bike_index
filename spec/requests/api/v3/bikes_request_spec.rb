@@ -384,7 +384,7 @@ RSpec.describe "Bikes API V3", type: :request do
             cycle_type_name: "cargo tricycle (front storage)"
           }
           post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json,
-            headers: json_headers.merge("X-IOS-VERSION" => 1.7)
+            headers: json_headers.merge("X-Requested-With" => "app-ios-1.6.2")
           bike_response = json_result["bike"]
           expect(bike_response["id"]).to eq(bike1.id)
           expect(bike_response["serial"]).to eq(bike1.serial_display)
@@ -943,7 +943,7 @@ RSpec.describe "Bikes API V3", type: :request do
           # (needs to use a new token)
           put "/api/v3/bikes/#{bike.id}?access_token=#{v2_access_token.token}",
             params: {owner_email: "newperson@stuff.com"}.to_json,
-            headers: json_headers
+            headers: json_headers.merge("X-REQUESTED-WITH" => "app-ios-1.6.9")
 
           expect(response.status).to eq(200)
           expect(bike.ownerships.count).to eq 2
@@ -955,6 +955,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(ownership2.new_registration?).to be_truthy
           expect(ownership2.organization_pre_registration?).to be_falsey
           expect(ownership2.organization_id).to eq organization.id
+          expect(ownership2.ios_version).to eq '1.6.9'
 
           mail2 = ActionMailer::Base.deliveries.last
           expect(mail2.subject).to eq("Confirm your #{organization.name} Bike Index registration")
@@ -1333,7 +1334,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike_organization.can_edit_claimed).to be_truthy
           expect {
             put url, params: {owner_email: "newuser@EXAMPLE.com "}.to_json,
-              headers: json_headers.merge("X-iOS-Version" => "1.6.9")
+              headers: json_headers.merge("X-REQUESTED-WITH" => "app-ios-1.6.9")
           }.to change(Ownership, :count).by(1)
           expect(response.code).to eq("200")
           expect(response.headers["Content-Type"].match("json")).to be_present
