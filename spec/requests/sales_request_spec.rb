@@ -20,6 +20,16 @@ RSpec.describe SalesController, type: :request do
         expect(flash).to be_blank
         expect(assigns(:sale)).to be_present
       end
+      context "turbo_stream request" do
+        it "renders turbo_stream" do
+          expect(marketplace_message.id).to be_present
+          get "#{base_url}/new?marketplace_message_id=#{marketplace_message.id}",
+            headers: {"Accept" => "text/vnd.turbo-stream.html"}
+          expect(response.media_type).to eq Mime[:turbo_stream]
+          expect(response.body).to include("mark_sold_section")
+          expect(assigns(:sale)).to be_present
+        end
+      end
       context "not user's marketplace_message" do
         let(:current_user) { marketplace_message.sender }
         it "redirects" do
