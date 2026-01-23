@@ -41,7 +41,7 @@ RSpec.describe Messages::ThreadShowMessage::Component, type: :component do
   context "when not initial message" do
     let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply) }
 
-    it "includes subject" do
+    it "doesn't include subject" do
       expect(marketplace_message.initial_message?).to be_falsey
       expect(component).to have_css("div")
       expect(component).to have_content marketplace_message.body

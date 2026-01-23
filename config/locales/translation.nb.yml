@@ -2465,6 +2465,9 @@ nb:
         create:
           can_not_send_message: Beklager, du kan ikke sende en melding til den oppføringen
           message_sent: Melding sendt
+        show:
+          sorry_that_is_you: Det er oppføringen din! Du kan ikke starte en ny melding
+            til deg selv.
       marketplace_listings:
         ensure_user_allowed_to_edit!:
           you_dont_own_that: Å nei! Det ser ut som du ikke eier den %{item_type}.
@@ -5921,6 +5924,11 @@ nb:
         community_groups: Fellesskapsgrupper
         schools: Skoler
         theft_victims: Tyveriofre
+      new_sale_form:
+        record_sale: Rekordsalg
+        sold_for: Beløp solgt for
+        transfer_to: Dette vil overføre registreringen til %{buyer_name} og lukke
+          markedsplassen.
     emails:
       partials:
         bike_box:
@@ -5987,6 +5995,7 @@ nb:
     messages:
       thread_show:
         can_not_send_new_message: Beklager, du kan ikke sende en ny melding.
+        sold_to: Merke %{item_type} solgt til
       thread_show_message:
         me: Meg
         subject: Emne

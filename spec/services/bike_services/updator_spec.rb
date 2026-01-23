@@ -47,8 +47,6 @@ RSpec.describe BikeServices::Updator do
       end
     end
 
-    # NOTE: This is intended as a fallback catch
-    # There should be specific functionality added for handling sales
     context "when there is a marketplace listing" do
       let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
 
@@ -72,7 +70,7 @@ RSpec.describe BikeServices::Updator do
 
       context "with published_at" do
         let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
-        it "updates the marketplace_listing to be removed" do
+        it "updates the marketplace_listing to be sold" do
           expect(marketplace_listing.reload.status).to eq "for_sale"
           expect(bike.reload.is_for_sale).to be_truthy
           Sidekiq::Job.clear_all

@@ -2335,6 +2335,8 @@ es:
         create:
           can_not_send_message:
           message_sent:
+        show:
+          sorry_that_is_you:
       marketplace_listings:
         ensure_user_allowed_to_edit!:
           you_dont_own_that:
@@ -4681,6 +4683,10 @@ es:
         community_groups: Grupos comunitarios
         schools: Escuelas
         theft_victims: Víctimas de robos
+      new_sale_form:
+        record_sale:
+        sold_for:
+        transfer_to:
     emails:
       partials:
         bike_box:
@@ -4733,6 +4739,7 @@ es:
     messages:
       thread_show:
         can_not_send_new_message:
+        sold_to:
       thread_show_message:
         me:
         subject:
