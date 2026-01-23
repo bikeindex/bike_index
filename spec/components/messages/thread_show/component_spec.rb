@@ -64,7 +64,7 @@ RSpec.describe Messages::ThreadShow::Component, type: :component do
     let(:marketplace_message) { FactoryBot.create(:marketplace_message_reply) }
     let(:user_ids) do
       [marketplace_message.sender_id, marketplace_message.receiver_id, initial_message.sender_id,
-       initial_message.receiver_id, marketplace_listing.seller_id]
+        initial_message.receiver_id, marketplace_listing.seller_id]
     end
 
     it "includes subject" do

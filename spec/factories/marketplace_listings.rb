@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :marketplace_listing do
     buyer { nil }
-    item { FactoryBot.create(:bike, :with_primary_activity) }
+    item { FactoryBot.create(:bike, :with_primary_activity, :with_ownership_claimed) }
     seller { item&.user || FactoryBot.create(:user_confirmed) }
     amount_cents { 5_000 }
     condition { "excellent" }

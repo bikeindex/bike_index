@@ -1,8 +1,16 @@
 <div>
-  <%= form_for @sale, builder: BikeIndexFormBuilder, url: sales_path, method: :post do |f| %>
-    <%= f.hidden_field :sale_id, @sale.id %>
-    <%= f.hidden_field :marketplace_message_id, @marketplace_message.id %>
+  <p></p>
 
-    <%= f.submit "Save", class: "twbtn-blue" %>
+  <%= form_for @sale, builder: BikeIndexFormBuilder, url: sales_path, method: :post do |f| %>
+    <%= f.hidden_field :marketplace_message_id %>
+
+    <%= translation(".sold_to", item_type:) %>
+
+    <em><%= buyer_name %></em>
+
+    <%= f.submit class: "twbtn-green" do %>
+      <%# = translation(".sold_to", item_type:) %>
+      <em><%= buyer_name %></em>
+    <% end %>
   <% end %>
 </div>

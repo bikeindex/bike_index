@@ -3,6 +3,4 @@ en:
   components:
     page_block:
       new_sale_form:
-        sale: Sale
-        item: Item
-        marketplace_message: Marketplace_message
+        sold_to: Mark %{item_type} sold to

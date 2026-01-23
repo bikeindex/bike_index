@@ -31,16 +31,11 @@
   <% end %>
 
   <% if show_mark_sold? %>
-    <div class="tw:mt-15 tw:text-center" data-controller="collapse">
-      <button data-action="click->collapse#toggle" data-collapse-target="content" class="twbtn-blue tw:px-8">
-        <%= translation(".sold_to", bike_type: @marketplace_listing.item_type_display.downcase) %>
+    <div class="tw:mt-15 tw:text-center">
+      <%= link_to new_sale_path(marketplace_message_id: @initial_message.id), class: "twbtn-blue tw:px-8" do %>
+        <%= translation(".sold_to", item_type: @marketplace_listing.item_type_display.downcase) %>
         <em><%= @other_user_name %></em>
-      </button>
-
-      <div data-collapse-target="content">
-        <%#= render() %>
-      </div>
+      <% end %>
     </div>
-
   <% end %>
 </div>

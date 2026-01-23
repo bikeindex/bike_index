@@ -63,7 +63,7 @@ class Sale < ApplicationRecord
   class << self
     # returns [sale, nil] or [invalid-sale, "error message"}
     def build_and_authorize(user:, marketplace_message: nil, marketplace_message_id: nil)
-      new_sale = new(seller: user, marketplace_message_id:, marketplace_message:)
+      new_sale = new(seller: user, **{marketplace_message_id:, marketplace_message:}.compact)
       new_sale.validate
       error_message = new_sale.errors[:ownership]
 
@@ -88,6 +88,7 @@ class Sale < ApplicationRecord
   private
 
   def set_calculated_attributes
+    self.marketplace_listing ||= marketplace_message&.marketplace_listing
     self.ownership_id ||= marketplace_listing&.bike_ownership&.id
     self.seller_id ||= marketplace_listing&.seller_id || ownership&.user_id
     self.sold_at ||= Time.current

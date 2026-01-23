@@ -46,8 +46,7 @@ RSpec.describe SalesController, type: :request do
     end
     context "with an existing sale record" do
       # TODO: improve handling of this (and create)
-      it "redirects" do
-      end
+      it "redirects"
     end
 
     context "without a current_user" do
