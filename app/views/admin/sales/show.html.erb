@@ -39,11 +39,7 @@
           <td>Amount</td>
 
           <td>
-            <% if @sale.amount_cents.present? %>
-              <%= amount_display(@sale, currency_name_suffix: true) %>
-            <% else %>
-              <span class="less-strong">not set</span>
-            <% end %>
+            <%= amount_display(@sale, currency_name_suffix: true) %>
           </td>
         </tr>
 
