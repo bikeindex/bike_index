@@ -1,0 +1,75 @@
+.admin-subnav
+  .col-md-12
+    %h1
+      Bike Version
+
+.row.mt-4
+  .col-md-6
+    %table.table-list
+      %tbody
+        - if display_dev_info?
+          %tr
+            %td.only-dev-visible ID
+            %td
+              %code= @bike_version.id
+        %tr
+          %td Name
+          %td= @bike_version.name
+        %tr
+          %td Owner
+          %td
+            = render Admin::UserCell::Component.new(user: @bike_version.owner, user_id: @bike_version.owner_id)
+        %tr
+          %td Visibility
+          %td
+            - visibility_class = "text-success" if @bike_version.all_visible?
+            - visibility_class = "less-strong" if @bike_version.user_hidden?
+            %span{class: visibility_class}
+              = @bike_version.visibility&.humanize
+        %tr
+          %td Bike
+          %td
+            = render Admin::BikeCell::Component.new(bike: @bike, bike_id: @bike_version.bike_id)
+        %tr.small
+          %td Created
+          %td
+            %span.convertTime.preciseTime
+              = l @bike_version.created_at, format: :convert_time
+        - if @bike_version.deleted_at.present?
+          %tr.small
+            %td
+              %span.text-danger Deleted
+            %td
+              %span.convertTime.preciseTime
+                = l @bike_version.deleted_at, format: :convert_time
+
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td Manufacturer
+          %td= @bike_version.mnfg_name
+        %tr
+          %td Frame model
+          %td= @bike_version.frame_model
+        %tr
+          %td Year
+          %td= @bike_version.year
+        %tr
+          %td Colors
+          %td= @bike_version.frame_colors.join(", ")
+        %tr
+          %td Cycle type
+          %td= @bike_version.cycle_type_name
+        - if @bike_version.description.present?
+          %tr
+            %td Description
+            %td= truncate(@bike_version.description, length: 200)
+
+- if @bike_version.public_images.any?
+  .mt-4
+    %h3 Images
+    .row
+      - @bike_version.public_images.each do |image|
+        .col-md-3
+          = image_tag image.image_url(:medium), class: "img-fluid"

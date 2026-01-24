@@ -27,6 +27,7 @@ module AdminHelper
     ([
       {title: "Users", path: admin_users_path, match_controller: true},
       {title: "Bikes", path: admin_bikes_path, match_controller: true},
+      {title: "Bike Versions", path: admin_bike_versions_path, match_controller: true},
       {title: "Stolen Bikes", path: admin_stolen_bikes_path, match_controller: true},
       {title: "Stolen Notifications", path: admin_stolen_notifications_url, match_controller: true},
       {title: "External Registry Bikes", path: admin_external_registry_bikes_path, match_controller: true},
