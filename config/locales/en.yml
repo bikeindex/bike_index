@@ -4046,8 +4046,8 @@ en:
       save_changes: Save changes
     messages:
       form:
+        already_sold: 'heads up: this %{item_type} has been %{listing_status}'
         body_placeholder: Add some message text
-        already_sold: "heads up: this %{item_type} has been %{listing_status}"
         message: message
         new_message: New message
         reply_to_message: Reply to message

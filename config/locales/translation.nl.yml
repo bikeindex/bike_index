@@ -5633,6 +5633,7 @@ nl:
         new_message: Nieuw bericht
         reply_to_message: Reageer op bericht
         send_message: Verstuur bericht
+        already_sold: 'Let op: dit %{item_type} is %{listing_status} geweest.'
       index:
         marketplace_messages: Marktplaatsberichten
   bikes_edit:
@@ -6083,7 +6084,7 @@ nl:
       new_sale_form:
         record_sale: Recordverkoop
         sold_for: Verkoopbedrag voor
-        transfer_to: Hierdoor wordt de registratie overgedragen naar %{buyer_name}
+        transfer_to_html: Hierdoor wordt de registratie overgedragen naar %{buyer_html}
           en de vermelding op de marktplaats gesloten.
     emails:
       partials:

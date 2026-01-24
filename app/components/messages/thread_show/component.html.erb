@@ -13,6 +13,7 @@
       <% if @sale.present? && @sale.created_at < marketplace_message.created_at && !sold_alert_rendered? %>
         <%= render_sold_alert %>
       <% end %>
+
       <%= render(Messages::ThreadShowMessage::Component.new(
         marketplace_message:,
         initial_message: @initial_message,
@@ -28,7 +29,7 @@
 
   <% if @can_send_message %>
     <%# matches Messages::ThreadShowMessage::Component#margin_class for sender %>
-    <div class="tw:ml-4 tw:lg:ml-8 tw:mb-15">
+    <div class="tw:mb-15 tw:ml-4 tw:lg:ml-8">
       <%= render partial: "my_accounts/messages/form", locals: {marketplace_message: @new_marketplace_message} %>
     </div>
   <% else %>
