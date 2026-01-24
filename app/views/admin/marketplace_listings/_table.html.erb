@@ -31,6 +31,7 @@
       <th>City</th>
       <th><%= sortable "seller_id", render_sortable: render_sortable %></th>
       <th><%= sortable "buyer_id", render_sortable: render_sortable %></th>
+      <th><small>messages #</small></th>
     </thead>
 
     <tbody
@@ -101,6 +102,14 @@
                 <%= cache(marketplace_listing.buyer_id) do %>
                   <%= render Admin::UserCell::Component.new(user: marketplace_listing.buyer_id, render_search: true) %>
                 <% end %>
+              <% end %>
+            </td>
+
+            <td>
+              <%= cache(marketplace_listing) do %>
+                <small>
+                  <%= number_display(marketplace_listing.marketplace_messages.count) %>
+                </small>
               <% end %>
             </td>
           </tr>

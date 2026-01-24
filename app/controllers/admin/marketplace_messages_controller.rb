@@ -19,6 +19,10 @@ class Admin::MarketplaceMessagesController < Admin::BaseController
 
   protected
 
+  def earliest_period_date
+    Time.at(1746075600) # 2025-05-01 00:00 - first message sent this month
+  end
+
   def sortable_columns
     %w[created_at marketplace_listing kind amount_cents initial_record_id sender_id receiver_id
       messages_prior_count]

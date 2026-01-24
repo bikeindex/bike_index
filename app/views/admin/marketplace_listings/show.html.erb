@@ -126,19 +126,6 @@
         <% end %>
 
         <tr>
-          <td>Messages</td>
-
-          <td>
-            <% messages_count = @marketplace_listing.marketplace_messages.count %>
-
-            <%= link_to admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) do %>
-              <%= number_display(messages_count) %>
-              <%= "message".pluralize(messages_count) %>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
           <td>Location</td>
 
           <td>
@@ -156,4 +143,23 @@
       </tbody>
     </table>
   </div>
+</div>
+
+<div class="tw:mt-10">
+  <h2>
+    <% messages_count = @marketplace_listing.marketplace_messages.count %>
+
+    <%= link_to admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) do %>
+      <%= number_display(messages_count) %>
+      <%= "message".pluralize(messages_count) %>
+    <% end %>
+
+    <% if messages_count > @marketplace_messages.count %>
+      <small>
+        most recent <%= number_display(@marketplace_messages.count) %> shown
+      </small>
+    <% end %>
+  </h2>
+
+  <%= render partial: "/admin/marketplace_messages/table", locals: { collection: @marketplace_messages, render_sortable: false, skip_marketplace_listing: true } %>
 </div>

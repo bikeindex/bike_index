@@ -12,6 +12,7 @@ class Admin::MarketplaceListingsController < Admin::BaseController
 
   def show
     @marketplace_listing = MarketplaceListing.find(params[:id])
+    @marketplace_messages = @marketplace_listing.marketplace_messages.order(id: :desc).limit(25)
   end
 
   helper_method :matching_marketplace_listings, :searchable_statuses
@@ -20,6 +21,10 @@ class Admin::MarketplaceListingsController < Admin::BaseController
 
   def sortable_columns
     %w[created_at updated_at published_at end_at item_id amount_cents condition status seller_id buyer_id]
+  end
+
+  def earliest_period_date
+    Time.at(1746075600) # 2025-05-01 00:00 - first message sent this month
   end
 
   def searchable_statuses
