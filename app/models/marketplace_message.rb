@@ -100,7 +100,6 @@ class MarketplaceMessage < ApplicationRecord
         sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
 
       threads_past_week = sent_messages.where(created_at: (Time.current - 1.week)...).distinct_threads
-      # pp "#{threads_past_week.count > SPAM_LIMIT_WEEK} #{threads_past_week.where(created_at: (Time.current - 1.day)...).count > SPAM_LIMIT_DAY}"
       threads_past_week.count > SPAM_LIMIT_WEEK ||
         threads_past_week.where(created_at: (Time.current - 1.day)...).count > SPAM_LIMIT_DAY
     end
