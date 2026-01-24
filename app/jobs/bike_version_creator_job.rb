@@ -1,9 +1,10 @@
 class BikeVersionCreatorJob < ApplicationJob
   sidekiq_options retry: false, queue: "high_priority"
 
-  def perform(bike_id)
+  def perform(bike_id, owner_id = nil)
     bike = Bike.unscoped.find_by_id(bike_id)
-    bike_version = bike.bike_versions.build(owner_id: bike.owner.id,
+    owner_id ||= bike.owner&.id
+    bike_version = bike.bike_versions.build(owner_id:,
       frame_model: bike.frame_model,
       cycle_type: bike.cycle_type,
       handlebar_type: bike.handlebar_type,
@@ -43,6 +44,8 @@ class BikeVersionCreatorJob < ApplicationJob
 
     bike_version # Needs to return bike version because it is run inline
   end
+
+  private
 
   def version_name_for(bike)
     version_number = bike.bike_versions.where(owner_id: bike.user&.id).count + 1
