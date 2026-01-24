@@ -7,11 +7,10 @@ class Admin::MembershipsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(
+    @pagy, @collection = pagy(:countish,
       matching_memberships.includes(:user, :creator, :stripe_subscriptions).reorder("memberships.#{sort_column} #{sort_direction}"),
       limit: @per_page,
-      page: permitted_page
-    )
+      page: permitted_page)
   end
 
   def new

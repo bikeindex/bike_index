@@ -40,7 +40,7 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+          pagy, records = pagy(:countish, matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
             .includes(:user, :bike, :impound_record), limit: @per_page, page: permitted_page)
           # This was already set up, so I left it when upgrading to pagy
           set_pagination_headers(pagy, @per_page)

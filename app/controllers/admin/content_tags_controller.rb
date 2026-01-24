@@ -5,7 +5,7 @@ class Admin::ContentTagsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 100)
-    @pagy, @content_tags = pagy(matching_content_tags
+    @pagy, @content_tags = pagy(:countish, matching_content_tags
       .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 

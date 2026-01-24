@@ -8,7 +8,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 10)
     @pagy, @organization_statuses =
-      pagy(matching_organization_statuses
+      pagy(:countish, matching_organization_statuses
         .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 

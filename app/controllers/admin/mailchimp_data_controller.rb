@@ -3,7 +3,7 @@ class Admin::MailchimpDataController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @mailchimp_data = pagy(matching_mailchimp_data.includes(:user, :feedbacks)
+    @pagy, @mailchimp_data = pagy(:countish, matching_mailchimp_data.includes(:user, :feedbacks)
       .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 

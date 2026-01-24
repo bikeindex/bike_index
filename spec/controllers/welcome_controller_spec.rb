@@ -96,12 +96,10 @@ RSpec.describe WelcomeController, type: :controller do
       expect(flash).to_not be_present
     end
 
-    it "renders first two recovery stories if requested page exceeds valid range" do
+    it "redirects to last valid page if requested page exceeds valid range" do
       FactoryBot.create_list(:recovery_display, 2)
       get :recovery_stories, params: {per_page: 2, page: 2}
-      expect(response.status).to eq(200)
-      expect(response).to render_template("recovery_stories")
-      expect(assigns(:recovery_displays).count).to eq 2
+      expect(response).to redirect_to(recovery_stories_path(page: 1))
     end
     context "with user" do
       include_context :logged_in_as_user

@@ -6,7 +6,7 @@ class Admin::UsersController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page
-    @pagy, @users = pagy(matching_users.reorder("users.#{sort_column} #{sort_direction}")
+    @pagy, @users = pagy(:countish, matching_users.reorder("users.#{sort_column} #{sort_direction}")
       .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :organization_roles, :ambassador_tasks, :email_bans_active),
       limit: @per_page, page: permitted_page)
   end

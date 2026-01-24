@@ -5,7 +5,7 @@ module Organized
 
     def index
       @per_page = permitted_per_page
-      @pagy, @exports = pagy(exports.order(created_at: :desc), limit: @per_page, page: permitted_page)
+      @pagy, @exports = pagy(:countish, exports.order(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def show
