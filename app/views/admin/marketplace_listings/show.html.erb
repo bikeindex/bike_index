@@ -1,0 +1,164 @@
+<div class="admin-subnav">
+  <div class="col-md-12">
+    <h1>Marketplace Listing</h1>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <% if display_dev_info? %>
+          <tr>
+            <td class="only-dev-visible">ID</td>
+            <td><code><%= @marketplace_listing.id %></code></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Status</td>
+
+          <td>
+            <% status_class = "text-info" if @marketplace_listing.for_sale? %>
+            <% status_class = "text-success" if @marketplace_listing.sold? %>
+
+            <span class="<%= status_class %>">
+              <%= @marketplace_listing.status_humanized %>
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Seller</td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: @marketplace_listing.seller, user_id: @marketplace_listing.seller_id) %>
+          </td>
+        </tr>
+
+        <% if @marketplace_listing.buyer.present? %>
+          <tr>
+            <td>Buyer</td>
+
+            <td>
+              <%= render Admin::UserCell::Component.new(user: @marketplace_listing.buyer, user_id: @marketplace_listing.buyer_id) %>
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Price</td>
+
+          <td>
+            <%= amount_display(@marketplace_listing, currency_name: true) %>
+
+            <% if @marketplace_listing.price_negotiable? %>
+              <small class="less-strong">(negotiable)</small>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Condition</td>
+          <td><%= @marketplace_listing.condition_humanized %></td>
+        </tr>
+
+        <tr class="small">
+          <td>Created</td>
+
+          <td>
+            <span class="convertTime preciseTime">
+              <%= l @marketplace_listing.created_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+
+        <% if @marketplace_listing.published_at.present? %>
+          <tr class="small">
+            <td>Published</td>
+
+            <td>
+              <span class="convertTime preciseTime">
+                <%= l @marketplace_listing.published_at, format: :convert_time %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @marketplace_listing.end_at.present? %>
+          <tr class="small">
+            <td>Ended</td>
+
+            <td>
+              <span class="convertTime preciseTime">
+                <%= l @marketplace_listing.end_at, format: :convert_time %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Item</td>
+
+          <td>
+            <% if @marketplace_listing.item.is_a?(Bike) %>
+              <%= render Admin::BikeCell::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, show_marketplace_preview: true)) %>
+            <% elsif @marketplace_listing.item.is_a?(BikeVersion) %>
+              BikeVersion
+              <%= link_to @marketplace_listing.item_id, bike_version_path(@marketplace_listing.item_id) %>
+              <small>
+                (bike:
+                <%= link_to @marketplace_listing.item.bike_id, admin_bike_path(@marketplace_listing.item.bike_id) %>)
+              </small>
+            <% end %>
+          </td>
+        </tr>
+
+        <% if @marketplace_listing.sale.present? %>
+          <tr>
+            <td>Sale</td>
+
+            <td>
+              <%= link_to @marketplace_listing.sale_id, admin_sale_path(@marketplace_listing.sale_id) %>
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Messages</td>
+
+          <td>
+            <% messages_count = @marketplace_listing.marketplace_messages.count %>
+
+            <%= link_to admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) do %>
+              <%= number_display(messages_count) %>
+              <%= "message".pluralize(messages_count) %>
+            <% end %>
+          </td>
+        </tr>
+
+        <% if @marketplace_listing.address_record.present? %>
+          <tr>
+            <td>Location</td>
+            <td><%= @marketplace_listing.address_record.address_display %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @marketplace_listing.description.present? %>
+  <div class="mt-4">
+    <%= render(Card::Component.new(shadow: true)) do %>
+      <p><strong>Description:</strong></p>
+      <%= render(UserTextBlockDisplay::Component.new(text: @marketplace_listing.description, max_height_class: "")) %>
+    <% end %>
+  </div>
+<% end %>

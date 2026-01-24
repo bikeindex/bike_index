@@ -10,6 +10,10 @@ class Admin::MarketplaceListingsController < Admin::BaseController
       page: permitted_page)
   end
 
+  def show
+    @marketplace_listing = MarketplaceListing.find(params[:id])
+  end
+
   helper_method :matching_marketplace_listings, :searchable_statuses
 
   protected
