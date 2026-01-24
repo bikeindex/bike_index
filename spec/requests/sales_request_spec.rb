@@ -93,10 +93,7 @@ RSpec.describe SalesController, type: :request do
           marketplace_message_id: marketplace_message.id,
           seller_id: user.id,
           sold_via: "bike_index_marketplace",
-          item_id: item.id,
-          item_type: "Bike",
           sold_at: Time.current
-
         }
       end
       let(:new_ownership_attrs) do
@@ -116,7 +113,8 @@ RSpec.describe SalesController, type: :request do
           .and change(CallbackJob::AfterSaleCreateJob.jobs, :count).by 1
 
         expect { CallbackJob::AfterSaleCreateJob.drain }
-          .to change(Ownership, :count).by ownership_change
+          .to change(Ownership, :count).by(ownership_change)
+          .and change(BikeVersion, :count).by(1)
 
         expect(Sale.count).to eq 1
         sale = Sale.last
@@ -124,6 +122,10 @@ RSpec.describe SalesController, type: :request do
         expect(sale.sold_at).to be_within(2).of Time.current
         expect(sale.new_ownership).to match_hash_indifferently new_ownership_attrs
         expect(sale.buyer&.id).to eq marketplace_message.sender_id
+
+        bike_version = item.bike_versions.last
+        expect(bike_version.owner_id).to eq ownership.user_id
+        expect(sale.item).to eq bike_version
 
         expect(item.reload.is_for_sale).to be_falsey
         expect(item.current_ownership_id).to eq sale.new_ownership.id
