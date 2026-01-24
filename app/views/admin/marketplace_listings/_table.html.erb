@@ -81,7 +81,7 @@
             </td>
 
             <td>
-              <%= amount_display(marketplace_listing, currency_name_suffix: true) %>
+              <%= amount_display(marketplace_listing, currency_name_suffix: :if_not_default) %>
             </td>
 
             <td><%= marketplace_listing.condition %></td>
