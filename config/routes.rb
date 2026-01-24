@@ -240,6 +240,7 @@ Rails.application.routes.draw do
     ].each { resources it, only: %i[index] }
 
     resources :marketplace_messages, only: %i[index show]
+    resources :sales, only: %i[index show]
 
     resources :bike_stickers do
       collection { get :reassign }

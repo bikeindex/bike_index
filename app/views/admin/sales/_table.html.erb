@@ -1,0 +1,88 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th><%= sortable "sold_at", render_sortable: render_sortable %></th>
+
+      <th>
+        <%= sortable "amount_cents", "amount", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "sold_via", render_sortable: render_sortable %></th>
+
+      <th>Item</th>
+
+      <th>
+        <%= sortable "seller_id", "Seller", render_sortable: render_sortable %>
+      </th>
+
+      <th>Buyer</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |sale| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <%= link_to admin_sale_path(sale), class: "convertTime" do %>
+                <%= l sale.created_at, format: :convert_time %>
+              <% end %>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= sale.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td>
+            <small class="convertTime">
+              <%= l sale.sold_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td>
+            <% if sale.amount_cents.present? %>
+              <small>
+                <%= sale.currency_symbol %>
+                <%= number_display(sale.amount) %>
+              </small>
+            <% end %>
+          </td>
+
+          <td><small><%= sale.sold_via&.humanize %></small></td>
+
+          <td>
+            <% bike = sale.ownership&.bike %>
+
+            <% if bike.present? %>
+              <%= render Admin::BikeCell::Component.new(bike: bike, bike_id: bike.id) %>
+            <% end %>
+          </td>
+
+          <td>
+            <% cache(sale.seller) do %>
+              <%= render Admin::UserCell::Component.new(user: sale.seller, render_search: true) %>
+            <% end %>
+          </td>
+
+          <td>
+            <% if sale.buyer.present? %>
+              <% cache(sale.buyer) do %>
+                <%= render Admin::UserCell::Component.new(user: sale.buyer, render_search: true) %>
+              <% end %>
+            <% else %>
+              <small class="less-strong">
+                <%= sale.new_owner_email&.truncate(20) %>
+              </small>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
