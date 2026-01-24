@@ -34,7 +34,8 @@ module Pagination
     end
 
     def pagy_t(key, **opts)
-      Pagy::I18n.translate(I18n.locale, key, **opts)
+      Pagy::I18n.locale = I18n.locale.to_s
+      Pagy::I18n.translate(key, **opts)
     end
 
     # Multiline classes strings here were confusing tailwind somehow :(
@@ -59,8 +60,12 @@ module Pagination
         "tw:disabled:cursor-default tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-gray-300 tw:dark:border-gray-700 tw:bg-gray-200 tw:dark:bg-gray-600 tw:text-gray-800 tw:dark:text-gray-200 "
     end
 
+    def pagy_series
+      @pagy.send(:series)
+    end
+
     def show_previous
-      @pagy.prev.present?
+      @pagy.previous.present?
     end
 
     def show_next
@@ -68,12 +73,12 @@ module Pagination
     end
 
     def prev_html
-      if (p_prev = @pagy.prev)
-        link_to(pagy_t("pagy.prev").html_safe, @params.merge(page: p_prev), class: active_classes + " tw:rounded-s-md",
-          "aria-label": pagy_t("pagy.aria_label.prev"), data: @data)
+      if (p_prev = @pagy.previous)
+        link_to(pagy_t("pagy.previous").html_safe, @params.merge(page: p_prev), class: active_classes + " tw:rounded-s-md",
+          "aria-label": pagy_t("pagy.aria_label.previous"), data: @data)
       else
-        content_tag(:a, pagy_t("pagy.prev").html_safe, role: "link", class: disabled_classes + " tw:rounded-s-md",
-          disabled: true, "aria-disabled": "true", "aria-label": pagy_t("pagy.aria_label.prev"))
+        content_tag(:a, pagy_t("pagy.previous").html_safe, role: "link", class: disabled_classes + " tw:rounded-s-md",
+          disabled: true, "aria-disabled": "true", "aria-label": pagy_t("pagy.aria_label.previous"))
       end
     end
 

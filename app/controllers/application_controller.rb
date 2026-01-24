@@ -2,12 +2,13 @@ class ApplicationController < ActionController::Base
   include ControllerHelpers
   include SetPeriod
   include Turbo::Redirection
-  include Pagy::Backend
+  include Pagy::Method
 
   protect_from_forgery
 
   around_action :set_locale
   rescue_from Money::Bank::UnknownRate, with: :localization_failure
+  rescue_from Pagy::RangeError, with: :redirect_to_last_page
 
   def allow_x_frame
     SecureHeaders.opt_out_of_header(request, :x_frame_options)
@@ -110,5 +111,11 @@ class ApplicationController < ActionController::Base
     flash[:error] = "#{locale} localization is unavailable. Please try again later."
     params.delete(:locale)
     redirect_to root_url
+  end
+
+  # Redirect to last valid page when page is out of range
+  # Replicates the old pagy overflow: :last_page behavior
+  def redirect_to_last_page(exception)
+    redirect_to url_for(page: exception.pagy.last), allow_other_host: false
   end
 end
