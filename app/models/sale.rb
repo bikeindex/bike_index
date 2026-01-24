@@ -100,6 +100,7 @@ class Sale < ApplicationRecord
   private
 
   def set_calculated_attributes
+    self.marketplace_message_id = marketplace_message&.initial_record_id
     self.ownership_id ||= marketplace_listing&.bike_ownership&.id
     self.seller_id ||= marketplace_listing&.seller_id || ownership&.user_id
     self.sold_at ||= Time.current

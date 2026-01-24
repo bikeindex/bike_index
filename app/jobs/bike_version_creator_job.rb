@@ -3,7 +3,7 @@ class BikeVersionCreatorJob < ApplicationJob
 
   def perform(bike_id, owner_id = nil)
     bike = Bike.unscoped.find_by_id(bike_id)
-    owner_id ||= bike.owner
+    owner_id ||= bike.owner&.id
     bike_version = bike.bike_versions.build(owner_id:,
       frame_model: bike.frame_model,
       cycle_type: bike.cycle_type,

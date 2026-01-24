@@ -117,7 +117,8 @@ RSpec.describe Sale, type: :model do
           seller_id: ownership.user_id,
           sold_via: "bike_index_marketplace",
           new_owner_email: marketplace_message.sender.email,
-          sold_at: Time.current
+          sold_at: Time.current,
+          marketplace_message_id: marketplace_message.id
         }
       end
 
@@ -126,6 +127,18 @@ RSpec.describe Sale, type: :model do
         sale.save!
         expect(sale).to match_hash_indifferently target_attrs
         expect(sale.marketplace_listing&.id).to eq marketplace_listing.id
+      end
+
+      context "reply" do
+        let(:marketplace_message_reply) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message) }
+        let(:sale) { Sale.new(marketplace_message_id: marketplace_message_reply.id) }
+        it "sets the target" do
+          expect(marketplace_message_reply.reload.marketplace_listing_id).to eq marketplace_listing.id
+          expect(sale).to be_valid
+          sale.save!
+          expect(sale).to match_hash_indifferently target_attrs
+          expect(sale.marketplace_listing&.id).to eq marketplace_listing.id
+        end
       end
     end
   end
