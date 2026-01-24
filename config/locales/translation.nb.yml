@@ -4543,6 +4543,7 @@ nb:
         new_message: Ny melding
         reply_to_message: Svar på melding
         send_message: Sende melding
+        already_sold: 'Merk: dette %{item_type} har vært %{listing_status}'
       index:
         marketplace_messages: Markedsplassmeldinger
   news:
@@ -5927,7 +5928,7 @@ nb:
       new_sale_form:
         record_sale: Rekordsalg
         sold_for: Beløp solgt for
-        transfer_to: Dette vil overføre registreringen til %{buyer_name} og lukke
+        transfer_to_html: Dette vil overføre registreringen til %{buyer_html} og lukke
           markedsplassen.
     emails:
       partials:

@@ -85,6 +85,10 @@ class Sale < ApplicationRecord
     (new_ownership.created_at + 60) < (created_at || Time.current)
   end
 
+  def buyer_name
+    buyer&.marketplace_message_name || new_owner_email
+  end
+
   private
 
   def set_calculated_attributes

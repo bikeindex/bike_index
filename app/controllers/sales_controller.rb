@@ -2,13 +2,17 @@ class SalesController < ApplicationController
   before_action :build_and_authorize_sale!
 
   def new
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def create
     @sale.attributes = permitted_create_params
 
     if @sale.save
-      flash[:success] = "#{@sale.item_cycle_type} marked sold!"
+      flash[:success] = "#{@sale.item_cycle_type.titleize} marked sold and transferred!"
 
       # Direct to my_account because it takes a little while for the sale to process
       redirect_to(my_account_path)

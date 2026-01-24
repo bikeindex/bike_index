@@ -47,6 +47,9 @@ RSpec.describe Admin::UsersController, type: :request do
         og_auth_token = user_subject.auth_token
         expect(user_subject.banned?).to be_falsey
         current_user.reload
+        bike = FactoryBot.create(:bike, :with_primary_activity, :with_ownership_claimed, user: user_subject)
+        marketplace_listing = FactoryBot.create(:marketplace_listing, :for_sale, item: bike)
+        expect(marketplace_listing).to be_valid
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{user_subject.id}", params: {
           user: {
@@ -82,6 +85,7 @@ RSpec.describe Admin::UsersController, type: :request do
         CallbackJob::AfterUserChangeJob.new.perform(user_subject.id)
         expect(user_subject.superuser_abilities.count).to eq 1
         expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
+        expect(marketplace_listing.reload.status).to eq "removed"
       end
     end
     context "developer" do

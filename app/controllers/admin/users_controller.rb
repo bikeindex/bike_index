@@ -40,7 +40,6 @@ class Admin::UsersController < Admin::BaseController
       @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
       @user.phone = params[:user][:phone]
       if @user.save
-        @user.update_auth_token("auth_token") if @user.banned? # Force reauthentication for the user
         @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
         redirect_to admin_users_url, notice: "User Updated"
       else

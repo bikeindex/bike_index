@@ -22,7 +22,15 @@
     <%= f.text_area :body, rows: 5, placeholder: t(".body_placeholder"), required: true, class: "twinput" %>
   </div>
 
-  <div class="tw:mt-3 tw:flex tw:items-center tw:justify-end">
+  <div class="tw:mt-3 tw:flex tw:items-center tw:justify-end tw:gap-4">
+    <% listing_status = marketplace_message.marketplace_listing&.status %>
+
+    <% if MarketplaceListing::ENDED_STATUSES.include?(listing_status&.to_sym) %>
+      <em class="less-strong">
+        <%= t(".already_sold", item_type: marketplace_message.marketplace_listing.item_type_display.downcase, listing_status:) %>
+      </em>
+    <% end %>
+
     <%= f.submit t(".send_message"), class: "twbtn-green" %>
   </div>
 <% end %>

@@ -3538,6 +3538,7 @@ es:
         new_message:
         reply_to_message:
         send_message:
+        already_sold:
       index:
         marketplace_messages:
   news:
@@ -4686,7 +4687,7 @@ es:
       new_sale_form:
         record_sale:
         sold_for:
-        transfer_to:
+        transfer_to_html:
     emails:
       partials:
         bike_box:
