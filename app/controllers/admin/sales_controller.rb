@@ -26,6 +26,10 @@ class Admin::SalesController < Admin::BaseController
     "sales.#{sort_column} #{sort_direction}"
   end
 
+  def earliest_period_date
+    Time.at(1746075600) # 2025-05-01 00:00 - first listing created this month
+  end
+
   def matching_sales
     sales = Sale.all
 

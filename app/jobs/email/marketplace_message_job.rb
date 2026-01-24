@@ -22,7 +22,7 @@ class Email::MarketplaceMessageJob < ApplicationJob
     # Bust caches on the associations
     marketplace_message.sender&.update(updated_at: Time.current)
     marketplace_message.receiver&.update(updated_at: Time.current)
-    marketplace_listing.update(updated_at: Time.current)
+    marketplace_message.marketplace_listing&.update(updated_at: Time.current)
 
     delivery # so that we can check the actual email response in tests
   end
