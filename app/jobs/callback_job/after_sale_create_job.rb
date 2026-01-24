@@ -14,23 +14,23 @@ class CallbackJob::AfterSaleCreateJob < ApplicationJob
 
   def create_bike_version(sale)
     return unless sale.item.is_a?(Bike)
-    return if sale.marketplace_listing&.bike_version_id.present?
 
     bike_version = BikeVersionCreatorJob.new.perform(sale.item_id)
-    sale.marketplace_listing&.update(bike_version_id: bike_version.id)
+    sale.update(item: bike_version)
   end
 
   def create_new_ownership(sale)
     return if sale.new_ownership.present?
 
-    if sale.item.current_ownership_id == sale.ownership_id
+    bike = sale.ownership.bike
+    if bike.current_ownership_id == sale.ownership_id
       # It hasn't been updated yet! Transfer the bike
-      BikeServices::OwnershipTransferer.find_or_create(sale.item, updator: sale.seller,
+      BikeServices::OwnershipTransferer.find_or_create(bike, updator: sale.seller,
         new_owner_email: sale.new_owner_email, sale_id: sale.id)
-    elsif sale.item.current_ownership&.owner_email == sale.new_owner_email
+    elsif bike.current_ownership&.owner_email == sale.new_owner_email
       # Ownership was transferred to the same person the sale is to -
       # so update the ownership to be
-      sale.item.current_ownership.update(sale_id: sale.id)
+      bike.current_ownership.update(sale_id: sale.id)
     end
   end
 

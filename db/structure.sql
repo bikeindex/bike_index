@@ -2195,8 +2195,7 @@ CREATE TABLE public.marketplace_listings (
     updated_at timestamp(6) without time zone NOT NULL,
     price_negotiable boolean DEFAULT false,
     description text,
-    sale_id bigint,
-    bike_version_id bigint
+    sale_id bigint
 );
 
 
@@ -6332,13 +6331,6 @@ CREATE INDEX index_marketplace_listings_on_address_record_id ON public.marketpla
 
 
 --
--- Name: index_marketplace_listings_on_bike_version_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_marketplace_listings_on_bike_version_id ON public.marketplace_listings USING btree (bike_version_id);
-
-
---
 -- Name: index_marketplace_listings_on_buyer_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7187,7 +7179,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260124180000'),
 ('20260124024709'),
 ('20251223233135'),
 ('20251217162136'),
