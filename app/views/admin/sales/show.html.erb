@@ -1,0 +1,150 @@
+<div class="admin-subnav">
+  <div class="col-md-12">
+    <h1>Sale</h1>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <% if display_dev_info? %>
+          <tr>
+            <td class="only-dev-visible">ID</td>
+            <td><code><%= @sale.id %></code></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Seller</td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: @sale.seller, user_id: @sale.seller_id) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Buyer</td>
+
+          <td>
+            <% if @sale.buyer.present? %>
+              <%= render Admin::UserCell::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
+            <% else %>
+              <span class="less-strong"><%= @sale.new_owner_email %></span>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Amount</td>
+
+          <td>
+            <% if @sale.amount_cents.present? %>
+              <%= amount_display(@sale, currency_name_suffix: true) %>
+            <% else %>
+              <span class="less-strong">not set</span>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Sold via</td>
+          <td><%= @sale.sold_via&.humanize %></td>
+        </tr>
+
+        <tr class="small">
+          <td>Sold at</td>
+
+          <td>
+            <span class="convertTime preciseTime">
+              <%= l @sale.sold_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+
+        <tr class="small">
+          <td>Created</td>
+
+          <td>
+            <span class="convertTime preciseTime">
+              <%= l @sale.created_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Item</td>
+
+          <td>
+            <% if @sale.item.is_a?(Bike) %>
+              <%= render Admin::BikeCell::Component.new(bike: @sale.item, bike_id: @sale.item_id) %>
+            <% elsif @sale.item.is_a?(BikeVersion) %>
+              BikeVersion
+              <%= link_to @sale.item_id, bike_version_path(@sale.item_id) %>
+              <small>
+                (bike:
+                <%= link_to @sale.item.bike_id, admin_bike_path(@sale.item.bike_id) %>)
+              </small>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Ownership</td>
+
+          <td>
+            <% if @sale.ownership.present? %>
+              <%= link_to @sale.ownership_id, admin_ownership_path(@sale.ownership_id) %>
+              <small>
+                (bike:
+                <%= link_to @sale.ownership.bike_id, admin_bike_path(@sale.ownership.bike_id) %>)
+              </small>
+            <% end %>
+          </td>
+        </tr>
+
+        <% if @marketplace_listing.present? %>
+          <tr>
+            <td>Marketplace Listing</td>
+
+            <td>
+              <%= link_to @marketplace_listing.id, admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) %>
+
+              <span class="<%= @marketplace_listing.sold? ? "text-success" : "text-info" %>">
+                <%= @marketplace_listing.status_humanized %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @sale.marketplace_message.present? %>
+          <tr>
+            <td>Marketplace Message</td>
+
+            <td>
+              <%= link_to @sale.marketplace_message_id, admin_marketplace_message_path(@sale.marketplace_message_id) %>
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>New Ownership</td>
+
+          <td>
+            <% if @sale.new_ownership.present? %>
+              <%= link_to @sale.new_ownership.id, admin_ownership_path(@sale.new_ownership.id) %>
+            <% else %>
+              <span class="less-strong">pending</span>
+            <% end %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

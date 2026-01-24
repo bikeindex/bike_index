@@ -46,12 +46,7 @@
           </td>
 
           <td>
-            <% if sale.amount_cents.present? %>
-              <small>
-                <%= sale.currency_symbol %>
-                <%= number_display(sale.amount) %>
-              </small>
-            <% end %>
+            <%= amount_display(sale, currency_name_suffix: :if_not_default) %>
           </td>
 
           <td><small><%= sale.sold_via&.humanize %></small></td>
