@@ -5,7 +5,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @payments = pagy(matching_payments.includes(:user, :organization, :invoice)
+    @pagy, @payments = pagy(:countish, matching_payments.includes(:user, :organization, :invoice)
       .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 

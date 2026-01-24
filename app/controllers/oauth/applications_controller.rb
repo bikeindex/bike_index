@@ -14,7 +14,7 @@ module Oauth
         @max_per_page = 500
         @per_page = permitted_per_page(default: 50, max: @max_per_page)
 
-        @pagy, @collection = pagy(ordered_applications, limit: @per_page)
+        @pagy, @collection = pagy(:countish, ordered_applications, limit: @per_page)
         @matching_applications = admin_oauth_applications
 
         render "admin_index", layout: "admin"

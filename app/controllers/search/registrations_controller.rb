@@ -12,7 +12,7 @@ class Search::RegistrationsController < ApplicationController
     @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
     if @render_results
-      @pagy, @bikes = pagy(Bike.search(@interpreted_params), limit:, page: @page,
+      @pagy, @bikes = pagy(:countish, Bike.search(@interpreted_params), limit:, page: @page,
         max_pages: MAX_INDEX_PAGE)
     end
 
@@ -23,12 +23,12 @@ class Search::RegistrationsController < ApplicationController
   end
 
   def similar_serials
-    @pagy, @bikes = pagy(Bike.search_close_serials(@interpreted_params), limit:, page: @page,
+    @pagy, @bikes = pagy(:countish, Bike.search_close_serials(@interpreted_params), limit:, page: @page,
       max_pages: MAX_INDEX_PAGE)
   end
 
   def serials_containing
-    @pagy, @bikes = pagy(Bike.search_serials_containing(@interpreted_params), limit:, page: @page,
+    @pagy, @bikes = pagy(:countish, Bike.search_serials_containing(@interpreted_params), limit:, page: @page,
       max_pages: MAX_INDEX_PAGE)
   end
 

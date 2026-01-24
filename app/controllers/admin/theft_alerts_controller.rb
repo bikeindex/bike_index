@@ -6,7 +6,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   def index
     @per_page = permitted_per_page
     @pagy, @theft_alerts =
-      pagy(searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
+      pagy(:countish, searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
         .includes(:theft_alert_plan, :stolen_record), limit: @per_page, page: permitted_page)
     @page_title = "Admin | Promoted alerts"
     @location_counts = Binxtils::InputNormalizer.boolean(params[:search_location_counts])

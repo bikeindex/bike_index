@@ -3,7 +3,7 @@ class Admin::StripeSubscriptionsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(
+    @pagy, @collection = pagy(:countish, 
       matching_stripe_subscriptions.includes(:user, :stripe_price, :payments).reorder("stripe_subscriptions.#{sort_column} #{sort_direction}"),
       limit: @per_page,
       page: permitted_page

@@ -8,7 +8,7 @@ class Admin::OrganizationRolesController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(
+    @pagy, @collection = pagy(:countish, 
       matching_organization_roles.includes(:user, :sender, :organization).reorder("organization_roles.#{sort_column} #{sort_direction}"),
       limit: @per_page,
       page: permitted_page

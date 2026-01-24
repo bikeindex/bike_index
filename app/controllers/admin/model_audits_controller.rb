@@ -4,7 +4,7 @@ class Admin::ModelAuditsController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 50)
     @pagy, @model_audits =
-      pagy(matching_model_audits
+      pagy(:countish, matching_model_audits
         .includes(:organization_model_audits, :model_attestations)
         .reorder(sort_ordered), limit: @per_page, page: permitted_page)
   end

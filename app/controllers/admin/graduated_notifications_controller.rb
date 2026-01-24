@@ -3,7 +3,7 @@ class Admin::GraduatedNotificationsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @graduated_notifications = pagy(matching_graduated_notifications.includes(:user, :organization, :bike)
+    @pagy, @graduated_notifications = pagy(:countish, matching_graduated_notifications.includes(:user, :organization, :bike)
       .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 

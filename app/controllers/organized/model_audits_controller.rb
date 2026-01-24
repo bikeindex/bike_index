@@ -8,7 +8,7 @@ module Organized
       @page_title = "E-Vehicle Audits"
       @per_page = permitted_per_page
       @model_attestation ||= ModelAttestation.new
-      @pagy, @organization_model_audits = pagy(organization_model_audits
+      @pagy, @organization_model_audits = pagy(:countish, organization_model_audits
         .reorder(sort_ordered), limit: @per_page, page: permitted_page)
     end
 
@@ -20,7 +20,7 @@ module Organized
       bikes = @organization_model_audit&.bikes&.reorder(created_at: :desc) || Bike.none
       @bikes_count = @organization_model_audit&.bikes_count || 0
       @per_page = 10
-      @pagy, @bikes = pagy(bikes, limit: @per_page, page: permitted_page)
+      @pagy, @bikes = pagy(:countish, bikes, limit: @per_page, page: permitted_page)
     end
 
     # NOTE: This is really "create model_attestation"
