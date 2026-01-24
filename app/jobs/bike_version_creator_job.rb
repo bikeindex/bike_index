@@ -45,6 +45,8 @@ class BikeVersionCreatorJob < ApplicationJob
     bike_version # Needs to return bike version because it is run inline
   end
 
+  private
+
   def version_name_for(bike)
     version_number = bike.bike_versions.where(owner_id: bike.user&.id).count + 1
     [

@@ -5,9 +5,9 @@ class CallbackJob::AfterSaleCreateJob < ApplicationJob
     sale = Sale.find_by_id(sale_id)
     return if sale.blank?
 
-    create_bike_version(sale)
+    bike_version = create_bike_version(sale)
     create_new_ownership(sale)
-    update_marketplace_listing(sale)
+    update_marketplace_listing(sale, bike_version)
   end
 
   private
@@ -17,6 +17,7 @@ class CallbackJob::AfterSaleCreateJob < ApplicationJob
 
     bike_version = BikeVersionCreatorJob.new.perform(sale.item_id, sale.ownership.user_id)
     sale.update(item: bike_version)
+    bike_version
   end
 
   def create_new_ownership(sale)
@@ -34,10 +35,11 @@ class CallbackJob::AfterSaleCreateJob < ApplicationJob
     end
   end
 
-  def update_marketplace_listing(sale)
+  def update_marketplace_listing(sale, bike_version = nil)
     marketplace_listing = sale.marketplace_message&.marketplace_listing
     return unless marketplace_listing.present? && !marketplace_listing.sold?
 
+    marketplace_listing.item = bike_version if bike_version.present?
     marketplace_listing.update(sale:, status: :sold, buyer_id: sale.buyer&.id)
   end
 end

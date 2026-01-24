@@ -188,9 +188,11 @@ class MarketplaceListing < ApplicationRecord
   end
 
   def bike_ownership
-    return nil unless item_type == "Bike"
-
-    item.ownerships.claimed_at(created_at)
+    if item_type == "BikeVersion"
+      item.bike&.ownerships&.claimed_at(created_at)
+    elsif item_type == "Bike"
+      item.ownerships.claimed_at(created_at)
+    end
   end
 
   def price_firm?

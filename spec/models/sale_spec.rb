@@ -22,7 +22,7 @@ RSpec.describe Sale, type: :model do
     end
 
     context "marketplace_message sale" do
-      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item:) }
+      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item:, created_at: Time.current - 30.minutes) }
       let(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:) }
       let(:result) { Sale.build_and_authorize(user:, marketplace_message_id: marketplace_message.id) }
       let(:target_attrs) do
@@ -47,8 +47,10 @@ RSpec.describe Sale, type: :model do
         let(:user) { marketplace_message.sender }
         it "returns invalid sale and error_message" do
           expect(result.length).to eq 2
-          expect(result.first.valid?).to be_falsey
           expect(result.last).to eq "You don't have permission to sell that unicycle"
+          blank_sale = result.first
+          expect(blank_sale.errors.full_messages).to eq(["Ownership You don't have permission to sell that unicycle"])
+          expect(blank_sale.valid?).to be_falsey
         end
       end
 
@@ -62,6 +64,24 @@ RSpec.describe Sale, type: :model do
           expect(new_ownership.id).to_not eq ownership.id
           expect(marketplace_message.seller_id).to eq marketplace_listing.seller_id
           expect(item.reload.current_ownership_id).to eq new_ownership.id
+
+          expect(result.length).to eq 2
+          expect(result.last).to be_nil
+          expect(result.first).to match_hash_indifferently target_attrs
+          expect(result.first.valid?).to be_truthy
+        end
+      end
+
+      context "already sold" do
+        let(:marketplace_message2) { FactoryBot.create(:marketplace_message, marketplace_listing:) }
+        let(:sale_initial) { Sale.create(marketplace_message: marketplace_message2) }
+        it "returns valid" do
+          expect(marketplace_message).to be_valid
+          expect(sale_initial).to be_valid
+          CallbackJob::AfterSaleCreateJob.new.perform(sale_initial.id)
+          expect(item.reload.ownerships.count).to eq 2
+          expect(marketplace_listing.reload.status).to eq "sold"
+          expect(marketplace_listing.bike_ownership&.id).to eq ownership.id
 
           expect(result.length).to eq 2
           expect(result.last).to be_nil
@@ -105,6 +125,7 @@ RSpec.describe Sale, type: :model do
         expect(sale).to be_valid
         sale.save!
         expect(sale).to match_hash_indifferently target_attrs
+        expect(sale.marketplace_listing&.id).to eq marketplace_listing.id
       end
     end
   end

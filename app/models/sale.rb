@@ -49,7 +49,6 @@ class Sale < ApplicationRecord
   belongs_to :ownership
   belongs_to :marketplace_message
 
-  has_one :marketplace_listing, through: :marketplace_message
   has_one :new_ownership, class_name: "Ownership", foreign_key: :sale_id
   has_one :buyer, through: :new_ownership, class_name: "User", source: :user
 
@@ -61,18 +60,27 @@ class Sale < ApplicationRecord
   after_commit :enqueue_callback_job, on: :create
 
   class << self
-    # returns [sale, nil] or [invalid-sale, "error message"}
+    # returns [sale, nil] or [new sale, "error message"}
     def build_and_authorize(user:, marketplace_message: nil, marketplace_message_id: nil)
       new_sale = new(seller: user, **{marketplace_message_id:, marketplace_message:}.compact)
       new_sale.validate
       error_message = new_sale.errors[:ownership]
 
       if error_message.any?
-        [new, error_message.join(", ")] # return a blank sale, to prevent leaking info
+        empty_sale = new # return a blank sale, to prevent leaking info
+        empty_sale.errors.merge!(new_sale.errors)
+        [empty_sale, error_message.join(", ")]
       else
         [new_sale, nil]
       end
     end
+  end
+
+  def marketplace_listing
+    return @marketplace_listing if defined?(@marketplace_listing)
+    @marketplace_listing = MarketplaceListing.find_by(sale_id: id) if id.present?
+    @marketplace_listing ||= marketplace_message&.marketplace_listing
+    @marketplace_listing
   end
 
   def item_cycle_type
@@ -92,7 +100,6 @@ class Sale < ApplicationRecord
   private
 
   def set_calculated_attributes
-    self.marketplace_listing ||= marketplace_message&.marketplace_listing
     self.ownership_id ||= marketplace_listing&.bike_ownership&.id
     self.seller_id ||= marketplace_listing&.seller_id || ownership&.user_id
     self.sold_at ||= Time.current

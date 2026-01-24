@@ -55,8 +55,14 @@ RSpec.describe SalesController, type: :request do
       end
     end
     context "with an existing sale record" do
-      # TODO: improve handling of this (and create)
-      it "redirects"
+      it "renders" do
+        expect(marketplace_message.id).to be_present
+        expect(item.reload.authorized?(current_user)).to be_truthy
+        get "#{base_url}/new?marketplace_message_id=#{marketplace_message.id}"
+        expect(response).to render_template(:new)
+        expect(flash).to be_blank
+        expect(assigns(:sale)).to be_present
+      end
     end
 
     context "without a current_user" do
@@ -116,8 +122,7 @@ RSpec.describe SalesController, type: :request do
           .to change(Ownership, :count).by(ownership_change)
           .and change(BikeVersion, :count).by(1)
 
-        expect(Sale.count).to eq 1
-        sale = Sale.last
+        sale = Sale.order(:id).last
         expect(sale).to match_hash_indifferently target_attrs
         expect(sale.sold_at).to be_within(2).of Time.current
         expect(sale.new_ownership).to match_hash_indifferently new_ownership_attrs
@@ -135,6 +140,7 @@ RSpec.describe SalesController, type: :request do
         expect(item.reload.is_for_sale).to be_truthy
 
         expect_created_sale(target_sale_attrs: target_attrs)
+        expect(marketplace_listing.reload.sale_id).to eq Sale.last.id
       end
 
       context "not bike owner" do
@@ -159,8 +165,47 @@ RSpec.describe SalesController, type: :request do
           expect(ownership).to be_present
           expect(new_ownership.id).to_not eq ownership.id
           expect(item.reload.is_for_sale).to be_falsey
+          expect(marketplace_listing.reload.sale_id).to be_nil
 
           expect_created_sale(target_sale_attrs: target_attrs, ownership_change: 0)
+          expect(marketplace_listing.reload.sale_id).to eq Sale.last.id
+        end
+      end
+
+      context "bike has already been sold" do
+        let(:marketplace_message2) { FactoryBot.create(:marketplace_message, marketplace_listing:) }
+        let(:sale_initial) { Sale.create(marketplace_message: marketplace_message2) }
+        it "creates a sale, doesn't alter existing sale record" do
+          expect(ownership).to be_present
+          expect(sale_initial).to be_valid
+          expect(sale_initial.marketplace_listing&.id).to eq marketplace_listing&.id
+          expect { CallbackJob::AfterSaleCreateJob.new.perform(sale_initial.id) }.to change(BikeVersion, :count).by(1)
+          Sidekiq::Job.clear_all
+          expect(sale_initial.reload.new_ownership).to be_present
+          expect(item.reload.is_for_sale).to be_falsey
+          expect(marketplace_listing.reload.sale_id).to eq sale_initial.id
+          expect(marketplace_listing.item_type).to eq "BikeVersion"
+          # Validate new sale is authorized - help diagnose problems
+          expect(Sale.build_and_authorize(user: current_user, marketplace_message_id: marketplace_message.id).last).to be_nil
+
+          expect do
+            post "/sales", params: {sale: sale_params}
+            expect(response).to redirect_to my_account_path
+            expect(flash[:success]).to be_present
+          end.to change(Sale, :count).by(1)
+            .and change(CallbackJob::AfterSaleCreateJob.jobs, :count).by 1
+
+          expect { CallbackJob::AfterSaleCreateJob.drain }
+            .to change(Ownership, :count).by(0)
+            .and change(BikeVersion, :count).by(0)
+
+          sale = Sale.order(:id).last
+          expect(sale).to match_hash_indifferently target_attrs
+          expect(sale.sold_at).to be_within(2).of Time.current
+          expect(sale.new_ownership).to be_blank
+          expect(sale.buyer).to be_blank
+
+          expect(marketplace_listing.reload.sale_id).to eq sale_initial.id
         end
       end
     end

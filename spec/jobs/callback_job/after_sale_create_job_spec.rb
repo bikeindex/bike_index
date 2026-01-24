@@ -83,6 +83,8 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
       expect(marketplace_listing.status).to eq "sold"
       expect(marketplace_listing.buyer_id).to eq buyer.id
       expect(marketplace_listing.end_at).to be_within(5).of Time.current
+      expect(marketplace_listing.item_id).to eq bike_version.id
+      expect(marketplace_listing.item_type).to eq "BikeVersion"
     end
 
     context "with bike already transferred" do
@@ -104,7 +106,8 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
         expect do
           instance.perform(sale.id)
           instance.perform(sale.id)
-        end.to change(Ownership, :count).by 0
+        end.to change(Ownership, :count).by(0)
+          .and change(BikeVersion, :count).by(1)
 
         expect(sale.reload.new_owner_email).to eq buyer.email
         expect(sale.amount_cents).to be_nil
@@ -126,7 +129,8 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
           expect do
             instance.perform(sale.id)
             instance.perform(sale.id)
-          end.to change(Ownership, :count).by 0
+          end.to change(Ownership, :count).by(0)
+            .and change(BikeVersion, :count).by(0)
 
           expect(new_ownership.reload.current).to be_truthy
           expect(bike.reload.owner_email).to eq new_owner_email
