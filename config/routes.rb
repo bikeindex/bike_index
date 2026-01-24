@@ -240,7 +240,7 @@ Rails.application.routes.draw do
     ].each { resources it, only: %i[index] }
 
     %i[
-      b_params feedbacks marketplace_listings marketplace_messages sales
+      b_params bike_versions feedbacks marketplace_listings marketplace_messages sales
     ].each { resources it, only: %i[index show] }
 
     resources :bike_stickers do
