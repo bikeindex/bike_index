@@ -92,18 +92,6 @@ class MarketplaceMessage < ApplicationRecord
         !likely_spam?(user:, marketplace_listing:, marketplace_message:)
     end
 
-    def likely_spam?(user:, marketplace_listing:, marketplace_message: nil)
-      return false if user.blank? || user.can_send_many_marketplace_messages || user.superuser
-
-      sent_messages = MarketplaceMessage.where(sender_id: user.id)
-      return false if marketplace_listing&.id.present? &&
-        sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
-
-      threads_past_week = sent_messages.where(created_at: (Time.current - 1.week)...).distinct_threads
-      threads_past_week.count > SPAM_LIMIT_WEEK ||
-        threads_past_week.where(created_at: (Time.current - 1.day)...).count > SPAM_LIMIT_DAY
-    end
-
     def can_see_messages?(marketplace_listing:, user: nil, marketplace_message: nil)
       return false if user.blank?
 
@@ -155,15 +143,23 @@ class MarketplaceMessage < ApplicationRecord
         matches.any? ? matches : false
       end
     end
+
+    def likely_spam?(user:, marketplace_listing:, marketplace_message: nil)
+      return false if user.blank? || user.can_send_many_marketplace_messages || user.superuser
+
+      sent_messages = MarketplaceMessage.where(sender_id: user.id)
+      return false if marketplace_listing&.id.present? &&
+        sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
+
+      threads_past_week = sent_messages.where(created_at: (Time.current - 1.week)...).distinct_threads
+      threads_past_week.count > SPAM_LIMIT_WEEK ||
+        threads_past_week.where(created_at: (Time.current - 1.day)...).count > SPAM_LIMIT_DAY
+    end
   end
 
   # Should be called before creation
   # NOTE: This calls validations on this instance
   def can_send?
-    self.class.can_send_message?(user: sender, marketplace_listing:, marketplace_message: self)
-  end
-
-  def likely_spam?
     self.class.can_send_message?(user: sender, marketplace_listing:, marketplace_message: self)
   end
 
