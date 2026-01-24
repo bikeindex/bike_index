@@ -3,7 +3,7 @@ class Admin::UserAlertsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @user_alerts = pagy(matching_user_alerts.order(sort_column => sort_direction), limit: @per_page, page: permitted_page)
+    @pagy, @user_alerts = pagy(:countish, matching_user_alerts.order(sort_column => sort_direction), limit: @per_page, page: permitted_page)
     @render_kind_counts = Binxtils::InputNormalizer.boolean(params[:search_kind_counts])
   end
 

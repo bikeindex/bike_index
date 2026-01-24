@@ -4,7 +4,7 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
   def index
     @per_page = permitted_per_page
     @pagy, @bike_sticker_updates =
-      pagy(matching_bike_sticker_updates
+      pagy(:countish, matching_bike_sticker_updates
         .reorder("bike_sticker_updates.#{sort_column} #{sort_direction}")
         .includes(:organization, :user, :bike), limit: @per_page, page: permitted_page)
   end

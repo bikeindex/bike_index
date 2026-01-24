@@ -5,7 +5,7 @@ class Admin::PaintsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 100)
-    @pagy, @paints = pagy(matching_paints.reorder("paints.#{sort_column} #{sort_direction}")
+    @pagy, @paints = pagy(:countish, matching_paints.reorder("paints.#{sort_column} #{sort_direction}")
       .includes(:color, :secondary_color, :tertiary_color), limit: @per_page, page: permitted_page)
   end
 
@@ -18,7 +18,7 @@ class Admin::PaintsController < Admin::BaseController
     bikes = Bike.unscoped.default_includes.includes(:paint)
       .where(paint_id: @paint.id).order("created_at desc")
     @bikes_count = bikes.size
-    @pagy, @bikes = pagy(bikes, limit: @per_page, page: permitted_page)
+    @pagy, @bikes = pagy(:countish, bikes, limit: @per_page, page: permitted_page)
   end
 
   def update

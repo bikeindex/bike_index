@@ -3,11 +3,10 @@ class Admin::MarketplaceMessagesController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(
+    @pagy, @collection = pagy(:countish,
       matching_marketplace_messages.includes(:marketplace_listing, :sender, :receiver).reorder(sortable_opts),
       limit: @per_page,
-      page: permitted_page
-    )
+      page: permitted_page)
   end
 
   def show

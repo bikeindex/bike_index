@@ -108,7 +108,7 @@ class UsersController < ApplicationController
     end
 
     @per_page = permitted_per_page(default: 15)
-    @pagy, @bikes = pagy(user.bikes(false), limit: @per_page, page: permitted_page)
+    @pagy, @bikes = pagy(:countish, user.bikes(false), limit: @per_page, page: permitted_page)
   end
 
   # this action should only be for terms of service (or vendor_terms_of_service)

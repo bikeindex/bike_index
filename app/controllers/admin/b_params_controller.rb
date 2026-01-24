@@ -3,7 +3,7 @@ class Admin::BParamsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page
-    @pagy, @b_params = pagy(matching_b_params
+    @pagy, @b_params = pagy(:countish, matching_b_params
       .includes(:creator, :organization)
       .reorder("b_params.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end

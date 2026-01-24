@@ -4,7 +4,7 @@ class Admin::InvoicesController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 50)
     @pagy, @invoices =
-      pagy(matching_invoices
+      pagy(:countish, matching_invoices
         .includes(:organization, :payments, :organization_features, :first_invoice)
         .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end

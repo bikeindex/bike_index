@@ -7,7 +7,7 @@ module Organized
 
     def index
       @per_page = permitted_per_page
-      @pagy, @bike_stickers = pagy(searched.includes(:bike)
+      @pagy, @bike_stickers = pagy(:countish, searched.includes(:bike)
         .reorder("bike_stickers.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
     end
 
