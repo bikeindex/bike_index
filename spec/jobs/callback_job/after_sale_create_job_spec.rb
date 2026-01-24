@@ -46,15 +46,18 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
       expect(marketplace_listing.reload.sale_id).to be_nil
       expect(marketplace_listing.status).to eq "for_sale"
       expect(marketplace_listing.buyer_id).to be_nil
+      expect(marketplace_listing.bike_version_id).to be_nil
 
       expect(bike.reload.current_ownership.id).to eq ownership.id
       expect(bike.is_for_sale).to be_truthy
       expect(bike.ownerships.count).to eq 1
+      expect(bike.bike_versions.count).to eq 0
 
       expect do
         instance.perform(sale.id)
         instance.perform(sale.id)
-      end.to change(Ownership, :count).by 1
+      end.to change(Ownership, :count).by(1)
+        .and change(BikeVersion, :count).by(1)
 
       expect(sale.reload.new_owner_email).to eq buyer.email
       expect(sale.amount_cents).to be_nil
@@ -64,6 +67,10 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
 
       expect(bike.reload.is_for_sale).to be_falsey
       expect(bike.current_ownership.id).to eq new_ownership.id
+      expect(bike.bike_versions.count).to eq 1
+
+      bike_version = bike.bike_versions.first
+      expect(bike_version.owner_id).to eq user.id
 
       expect(ownership.reload.current).to be_falsey
       expect(ownership.sale_id).to be_nil
@@ -73,6 +80,7 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
       expect(marketplace_listing.status).to eq "sold"
       expect(marketplace_listing.buyer_id).to eq buyer.id
       expect(marketplace_listing.end_at).to be_within(5).of Time.current
+      expect(marketplace_listing.bike_version_id).to eq bike_version.id
     end
 
     context "with bike already transferred" do

@@ -5,11 +5,20 @@ class CallbackJob::AfterSaleCreateJob < ApplicationJob
     sale = Sale.find_by_id(sale_id)
     return if sale.blank?
 
+    create_bike_version(sale)
     create_new_ownership(sale)
     update_marketplace_listing(sale)
   end
 
   private
+
+  def create_bike_version(sale)
+    return unless sale.item.is_a?(Bike)
+    return if sale.marketplace_listing&.bike_version_id.present?
+
+    bike_version = BikeVersionCreatorJob.new.perform(sale.item_id)
+    sale.marketplace_listing&.update(bike_version_id: bike_version.id)
+  end
 
   def create_new_ownership(sale)
     return if sale.new_ownership.present?

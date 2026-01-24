@@ -18,6 +18,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  address_record_id :bigint
+#  bike_version_id   :bigint
 #  buyer_id          :bigint
 #  item_id           :bigint
 #  sale_id           :bigint
@@ -26,6 +27,7 @@
 # Indexes
 #
 #  index_marketplace_listings_on_address_record_id  (address_record_id)
+#  index_marketplace_listings_on_bike_version_id    (bike_version_id)
 #  index_marketplace_listings_on_buyer_id           (buyer_id)
 #  index_marketplace_listings_on_item               (item_type,item_id)
 #  index_marketplace_listings_on_sale_id            (sale_id)
@@ -50,6 +52,7 @@ class MarketplaceListing < ApplicationRecord
   belongs_to :item, polymorphic: true
   belongs_to :address_record
   belongs_to :sale
+  belongs_to :bike_version
 
   has_many :marketplace_messages
 
