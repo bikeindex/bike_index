@@ -101,6 +101,7 @@ RSpec.describe Admin::UsersController, type: :request do
             email: user_subject.email,
             superuser: false,
             can_send_many_stolen_notifications: true,
+            can_send_many_marketplace_messages: true,
             banned: false
           }
         }

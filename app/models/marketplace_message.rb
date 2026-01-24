@@ -93,7 +93,7 @@ class MarketplaceMessage < ApplicationRecord
     end
 
     def likely_spam?(user:, marketplace_listing:, marketplace_message: nil)
-      return false if user.blank? || user.can_send_many_marketplace_messages
+      return false if user.blank? || user.can_send_many_marketplace_messages || user.superuser
 
       sent_messages = MarketplaceMessage.where(sender_id: user.id)
       return false if marketplace_listing&.id.present? &&
