@@ -59,6 +59,7 @@ RSpec.describe Admin::UsersController, type: :request do
             superuser: true,
             developer: "1",
             can_send_many_stolen_notifications: true,
+            can_send_many_marketplace_messages: true,
             banned: true,
             phone: "9876543210",
             user_ban_attributes: {
@@ -72,6 +73,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.superuser).to be_truthy
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
+        expect(user_subject.can_send_many_marketplace_messages).to be_truthy
         expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
         user_ban = user_subject.user_ban

@@ -22,7 +22,7 @@ class Admin::MarketplaceMessagesController < Admin::BaseController
 
   def sortable_columns
     %w[created_at marketplace_listing kind amount_cents initial_record_id sender_id receiver_id
-       messages_prior_count]
+      messages_prior_count]
   end
 
   def sortable_opts

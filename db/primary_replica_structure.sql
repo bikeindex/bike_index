@@ -3980,7 +3980,8 @@ CREATE TABLE public.users (
     admin_options jsonb,
     time_single_format boolean DEFAULT false,
     deleted_at timestamp without time zone,
-    address_record_id bigint
+    address_record_id bigint,
+    can_send_many_marketplace_messages boolean DEFAULT false NOT NULL
 );
 
 
@@ -7177,6 +7178,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260124024709'),
 ('20251223233135'),
 ('20251217162136'),
 ('20251217161834'),

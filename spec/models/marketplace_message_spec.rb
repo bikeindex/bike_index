@@ -151,7 +151,7 @@ RSpec.describe MarketplaceMessage, type: :model do
   end
 
   describe "can_send_message?" do
-    let(:user) { FactoryBot.create(:user) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, status:) }
     let(:seller) { marketplace_listing.seller }
     let(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: user) }
@@ -261,6 +261,59 @@ RSpec.describe MarketplaceMessage, type: :model do
 
           expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_falsey
           expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_falsey
+        end
+      end
+    end
+
+    context "likely_spam?" do
+      let!(:marketplace_message1) { FactoryBot.create(:marketplace_message, sender: user, created_at: Time.current - 250) }
+      let!(:marketplace_message2) { FactoryBot.create(:marketplace_message, sender: user, created_at: Time.current - 190) }
+      let!(:marketplace_message3) { FactoryBot.create(:marketplace_message, sender: user, created_at: Time.current - 120) }
+      let!(:marketplace_message4) { FactoryBot.create(:marketplace_message, sender: user, created_at:) }
+      let(:marketplace_listing4) { FactoryBot.create(:marketplace_listing, :for_sale) }
+      let(:created_at) { Time.current - 10.minutes }
+      it "is likely_spam" do
+        expect(MarketplaceMessage.likely_spam?(user:, marketplace_listing:)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_falsey
+      end
+
+      context "with a message to the same listing" do
+        let!(:marketplace_message4) do
+          FactoryBot.create(:marketplace_message, sender: user, created_at:,
+            initial_record: marketplace_message3,
+            marketplace_listing: marketplace_message3.marketplace_listing)
+        end
+        it "is valid" do
+          expect(MarketplaceMessage.likely_spam?(user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
+
+          expect(marketplace_message.save).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+        end
+      end
+      context "with message yesterday" do
+        let(:created_at) { Time.current - 25.hours }
+        it "is valid" do
+          expect(MarketplaceMessage.likely_spam?(user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
+
+          expect(marketplace_message.save).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+        end
+      end
+
+      context "with user with can_send_many_marketplace_messages" do
+        let(:user) { FactoryBot.create(:user_confirmed, can_send_many_marketplace_messages: true) }
+        it "is valid" do
+          expect(MarketplaceMessage.likely_spam?(user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
+
+          expect(marketplace_message.save).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
         end
       end
     end

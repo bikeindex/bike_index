@@ -38,6 +38,7 @@ class Admin::UsersController < Admin::BaseController
       end
       @user.username = params[:user][:username]
       @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
+      @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
       @user.phone = params[:user][:phone]
       if @user.save
         @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
