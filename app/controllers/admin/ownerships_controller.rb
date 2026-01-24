@@ -9,6 +9,10 @@ class Admin::OwnershipsController < Admin::BaseController
       .includes(:bike, :organization, :creator, :user), limit: @per_page, page: permitted_page)
   end
 
+  def show
+    redirect_to edit_admin_ownership_path
+  end
+
   def edit
   end
 

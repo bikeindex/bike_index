@@ -49,8 +49,7 @@
 
           <td>
             <small>
-              <%= marketplace_message.marketplace_listing.currency_symbol %>
-              <%= number_display(marketplace_message.marketplace_listing.amount) %>
+              <%= amount_display(marketplace_message.marketplace_listing, currency_name_suffix: :if_not_default) %>
             </small>
           </td>
 

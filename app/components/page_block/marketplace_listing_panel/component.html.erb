@@ -1,11 +1,6 @@
 <%= render(Card::Component.new) do %>
   <h2 class="twtext-color! tw:my-2! tw:text-4xl! tw:font-normal">
-    <%= @marketplace_listing.currency_symbol %>
-    <%= number_display(@marketplace_listing.amount) %>
-
-    <small class="tw:text-2xl!">
-      <%= @marketplace_listing.currency_name %>
-    </small>
+    <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
 
     <span class="uncap tw:text-xl! tw:opacity-65">
       <%= translation(".price_is_firm_#{@marketplace_listing.price_firm?}") %>

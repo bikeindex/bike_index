@@ -43,9 +43,8 @@
       <ul class="attr-list">
         <% if render_for_sale_info? %>
           <li>
-            <%= price_span %>: <%= @event_record.currency_symbol %>
-            <%= number_display(@event_record.amount) %>
-            <small><%= @event_record.currency_name %></small>
+            <%= price_span %>:
+            <%= amount_display(@event_record, currency_name_suffix: true) %>
           </li>
           <%= attr_list_item(
             @event_record.formatted_address_string,

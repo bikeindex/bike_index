@@ -1,13 +1,18 @@
 = render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, target: "ownerships" }
 
-.admin-subnav.midpage-subnav
+%h1.mt-5.mb-4
+  Ownerships
+= render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
+
+%div{class: "admin-subnav midpage-subnav"}
   .col-12
-    %h1 Edit ownership
-.row
-  .col-auto
+    %h1
+      Edit ownership
+      %code= @ownership.id
     %h2
       %span.text-danger
         BE CAREFUL. YOU CAN BREAK STUFF HERE
+
 .row
   .col-md-6
     = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|

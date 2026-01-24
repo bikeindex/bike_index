@@ -184,7 +184,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index", as: :root
     resources :ambassador_tasks, except: :show
-    resources :ambassador_task_assignments, only: [:index]
+    resources :ambassador_task_assignments, only: %i[index]
     resources :exchange_rates, only: %i[index new create edit update destroy]
 
     resources :external_registry_bikes, only: %i[index show]
@@ -234,12 +234,14 @@ Rails.application.routes.draw do
 
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
-      mailchimp_data marketplace_listings model_attestations model_audits
+      mailchimp_data model_attestations model_audits
       notifications organization_statuses parking_notifications
       stripe_prices stripe_subscriptions user_alerts user_registration_organizations
     ].each { resources it, only: %i[index] }
 
-    resources :marketplace_messages, only: %i[index show]
+    %i[
+      b_params feedbacks marketplace_listings marketplace_messages sales
+    ].each { resources it, only: %i[index show] }
 
     resources :bike_stickers do
       collection { get :reassign }
@@ -270,9 +272,7 @@ Rails.application.routes.draw do
         get :variable
       end
     end
-    resources :b_params, only: %i[index show]
-    resources :feedbacks, only: %i[index show]
-    resources :ownerships, only: %i[edit update index]
+    resources :ownerships, only: %i[show edit update index]
     resources :tweets
     resources :twitter_accounts, except: %i[new] do
       member { get :check_credentials }
