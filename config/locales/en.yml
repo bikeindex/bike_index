@@ -1760,7 +1760,9 @@ en:
           unable_to_update: 'Unable to save %{item_type}: %{errors}'
       messages:
         create:
-          can_not_send_message: Sorry, you can't send a message to that listing
+          can_not_send_message: >-
+            Sorry, you can't send a message to that listing. Contact gavin@bikeindex.org
+            if you have questions.
           message_sent: Message sent
         show:
           sorry_that_is_you: That's your listing! You can't start a new message to

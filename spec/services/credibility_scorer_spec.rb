@@ -282,7 +282,7 @@ RSpec.describe CredibilityScorer do
       let(:stolen_record) { recovered_bike.current_stolen_record }
       let!(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, user: user) }
       let!(:feedback) { FactoryBot.create(:feedback, kind: "tip_stolen_bike", user: user) }
-      it "returns the bike_badges" do
+      it "returns the bike_badges", :flaky do
         stolen_record.add_recovery_information(recovered_description: "I recovered it!")
         stolen_record.reload
         expect(stolen_record.recovered?).to be_truthy

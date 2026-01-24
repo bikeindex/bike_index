@@ -26,6 +26,8 @@ class MarketplaceMessage < ApplicationRecord
   # enum because eventually may have notifications about sale or alerts about suspicious behavior
   KIND_ENUM = {sender_buyer: 0, sender_seller: 1}.freeze
   BUYER_SELLER_MESSAGE_KINDS = %w[sender_buyer sender_seller]
+  SPAM_LIMIT_WEEK = 15
+  SPAM_LIMIT_DAY = 3
 
   enum :kind, KIND_ENUM
 
@@ -86,7 +88,8 @@ class MarketplaceMessage < ApplicationRecord
 
     # TODO: permit sending message only X days after sale/removal, only to new owner post sale, etc.
     def can_send_message?(marketplace_listing:, user: nil, marketplace_message: nil)
-      can_see_messages?(user:, marketplace_listing:, marketplace_message:)
+      can_see_messages?(user:, marketplace_listing:, marketplace_message:) &&
+        !likely_spam?(user:, marketplace_listing:, marketplace_message:)
     end
 
     def can_see_messages?(marketplace_listing:, user: nil, marketplace_message: nil)
@@ -139,6 +142,18 @@ class MarketplaceMessage < ApplicationRecord
 
         matches.any? ? matches : false
       end
+    end
+
+    def likely_spam?(user:, marketplace_listing:, marketplace_message: nil)
+      return false if user.blank? || user.can_send_many_marketplace_messages || user.superuser
+
+      sent_messages = MarketplaceMessage.where(sender_id: user.id)
+      return false if marketplace_listing&.id.present? &&
+        sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
+
+      threads_past_week = sent_messages.where(created_at: (Time.current - 1.week)...).distinct_threads
+      threads_past_week.count > SPAM_LIMIT_WEEK ||
+        threads_past_week.where(created_at: (Time.current - 1.day)...).count > SPAM_LIMIT_DAY
     end
   end
 
