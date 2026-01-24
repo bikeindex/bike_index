@@ -4,7 +4,7 @@ class Admin::SalesController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(:countish,
-      matching_sales.includes(:seller, :ownership, :marketplace_listing).reorder(sortable_opts),
+      matching_sales.includes(:seller, :ownership).reorder(sortable_opts),
       limit: @per_page,
       page: permitted_page)
   end
@@ -24,6 +24,10 @@ class Admin::SalesController < Admin::BaseController
 
   def sortable_opts
     "sales.#{sort_column} #{sort_direction}"
+  end
+
+  def earliest_period_date
+    Time.at(1746075600) # 2025-05-01 00:00 - first listing created this month
   end
 
   def matching_sales
