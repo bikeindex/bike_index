@@ -61,7 +61,7 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
 
       expect(bike.reload.bike_versions.count).to eq 1
       bike_version = bike.bike_versions.first
-      expect(bike_version.owner_id).to eq user.id
+      expect(bike_version.owner_id).to eq sale.ownership.user_id
 
       expect(sale.reload.new_owner_email).to eq buyer.email
       expect(sale.amount_cents).to be_nil

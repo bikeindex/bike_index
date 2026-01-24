@@ -15,7 +15,7 @@ class CallbackJob::AfterSaleCreateJob < ApplicationJob
   def create_bike_version(sale)
     return unless sale.item.is_a?(Bike)
 
-    bike_version = BikeVersionCreatorJob.new.perform(sale.item_id)
+    bike_version = BikeVersionCreatorJob.new.perform(sale.item_id, sale.ownership.user_id)
     sale.update(item: bike_version)
   end
 
