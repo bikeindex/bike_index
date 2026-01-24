@@ -34,7 +34,8 @@
 class MarketplaceListing < ApplicationRecord
   STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
   CONDITION_ENUM = {new_in_box: 0, excellent: 1, good: 2, poor: 3, salvage: 4}.freeze
-  CURRENT_STATUSES = %i[draft for_sale]
+  CURRENT_STATUSES = %i[draft for_sale].freeze
+  ENDED_STATUSES = STATUS_ENUM.keys - CURRENT_STATUSES
 
   include AddressRecorded
   include AddressRecordedWithinBoundingBox

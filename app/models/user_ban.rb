@@ -34,7 +34,18 @@ class UserBan < ApplicationRecord
 
   validates_presence_of :reason, :user_id
 
+  after_commit :update_user_on_create, on: :create
+
   def self.reasons
     REASON_ENUM.keys.map(&:to_s)
+  end
+
+  def update_user_on_create
+    return if id.blank?
+
+    # Sign them out
+    user.update_auth_token("auth_token")
+    # Remove their marketplace listing (so that they don't show up anymore)
+    user.marketplace_listings.for_sale.each { it.update(status: :removed) }
   end
 end
