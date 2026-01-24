@@ -14,11 +14,10 @@ class Admin::BikesController < Admin::BaseController
 
   def missing_manufacturer
     @per_page = permitted_per_page(default: 100)
-    @pagy, @bikes = pagy(:countish, 
+    @pagy, @bikes = pagy(:countish,
       missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
       limit: @per_page,
-      page: permitted_page
-    )
+      page: permitted_page)
   end
 
   def update_manufacturers

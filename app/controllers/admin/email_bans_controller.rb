@@ -3,11 +3,10 @@ class Admin::EmailBansController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(:countish, 
+    @pagy, @collection = pagy(:countish,
       matching_email_bans.includes(:user).reorder("email_bans.#{sort_column} #{sort_direction}"),
       limit: @per_page,
-      page: permitted_page
-    )
+      page: permitted_page)
   end
 
   helper_method :matching_email_bans
