@@ -273,7 +273,7 @@ RSpec.describe MarketplaceMessage, type: :model do
       let(:marketplace_listing4) { FactoryBot.create(:marketplace_listing, :for_sale) }
       let(:created_at) { Time.current - 10.minutes }
       it "is likely_spam" do
-        expect(MarketplaceMessage.likely_spam?(user:, marketplace_listing:)).to be_truthy
+        expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_truthy
         expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
         expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_falsey
       end
@@ -285,7 +285,7 @@ RSpec.describe MarketplaceMessage, type: :model do
             marketplace_listing: marketplace_message3.marketplace_listing)
         end
         it "is valid" do
-          expect(MarketplaceMessage.likely_spam?(user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_falsey
           expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
           expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
 
@@ -296,7 +296,7 @@ RSpec.describe MarketplaceMessage, type: :model do
       context "with message yesterday" do
         let(:created_at) { Time.current - 25.hours }
         it "is valid" do
-          expect(MarketplaceMessage.likely_spam?(user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_falsey
           expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
           expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
 
@@ -308,7 +308,7 @@ RSpec.describe MarketplaceMessage, type: :model do
       context "with user with can_send_many_marketplace_messages" do
         let(:user) { FactoryBot.create(:user_confirmed, can_send_many_marketplace_messages: true) }
         it "is valid" do
-          expect(MarketplaceMessage.likely_spam?(user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_falsey
           expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
           expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
 
