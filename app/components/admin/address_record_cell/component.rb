@@ -5,5 +5,9 @@ module Admin::AddressRecordCell
     def initialize(address_record:)
       @address_record = address_record
     end
+
+    def render?
+      @address_record.present?
+    end
   end
 end

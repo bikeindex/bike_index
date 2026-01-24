@@ -42,9 +42,7 @@
           <tr>
             <td>
               <div class="less-strong-hold">
-                <span class="convertTime">
-                  <%= l marketplace_listing.created_at, format: :convert_time %>
-                </span>
+                <%= link_to l(marketplace_listing.created_at, format: :convert_time), admin_marketplace_listing_path(marketplace_listing), class: "localizeTime" %>
 
                 <span class="less-strong-right d-none d-md-block only-dev-visible">
                   <%= marketplace_listing.id %>
@@ -53,7 +51,7 @@
             </td>
 
             <td class="only-dev-visible">
-              <small class="convertTime">
+              <small class="localizeTime">
                 <%= l marketplace_listing.updated_at, format: :convert_time %>
               </small>
             </td>
@@ -64,7 +62,7 @@
 
             <td>
               <% if marketplace_listing.published_at.present? %>
-                <span class="convertTime">
+                <span class="localizeTime">
                   <%= l marketplace_listing.published_at, format: :convert_time %>
                 </span>
               <% end %>
@@ -72,7 +70,7 @@
 
             <td>
               <% if marketplace_listing.end_at.present? %>
-                <span class="convertTime">
+                <span class="localizeTime">
                   <%= l marketplace_listing.end_at, format: :convert_time %>
                 </span>
               <% end %>
@@ -83,15 +81,13 @@
             </td>
 
             <td>
-              <%= amount_display(marketplace_listing, currency_name: true) %>
+              <%= amount_display(marketplace_listing, currency_name_suffix: true) %>
             </td>
 
             <td><%= marketplace_listing.condition %></td>
 
             <td>
-              <% if marketplace_listing.address_record %>
-                <%= render Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
-              <% end %>
+              <%= render Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
             </td>
 
             <td>

@@ -50,7 +50,7 @@
           <td>Price</td>
 
           <td>
-            <%= amount_display(@marketplace_listing, currency_name: true) %>
+            <%= amount_display(@marketplace_listing, currency_name_suffix: true) %>
 
             <% if @marketplace_listing.price_negotiable? %>
               <small class="less-strong">(negotiable)</small>
@@ -143,22 +143,18 @@
           </td>
         </tr>
 
-        <% if @marketplace_listing.address_record.present? %>
-          <tr>
-            <td>Location</td>
-            <td><%= @marketplace_listing.address_record.address_display %></td>
-          </tr>
-        <% end %>
+        <tr>
+          <td>Location</td>
+          <td>
+            <%= render Admin::AddressRecordCell::Component.new(address_record: @marketplace_listing.address_record) %>
+          </td>
+        </tr>
+        <tr>
+          <td>Description</td>
+          <td>
+            <%= render(UserTextBlockDisplay::Component.new(text: @marketplace_listing.description, max_height_class: "")) %>
+          </td>
       </tbody>
     </table>
   </div>
 </div>
-
-<% if @marketplace_listing.description.present? %>
-  <div class="mt-4">
-    <%= render(Card::Component.new(shadow: true)) do %>
-      <p><strong>Description:</strong></p>
-      <%= render(UserTextBlockDisplay::Component.new(text: @marketplace_listing.description, max_height_class: "")) %>
-    <% end %>
-  </div>
-<% end %>

@@ -4,7 +4,7 @@ class Admin::SalesController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(:countish,
-      matching_sales.includes(:seller, :ownership, :marketplace_listing).reorder(sortable_opts),
+      matching_sales.includes(:seller, :ownership).reorder(sortable_opts),
       limit: @per_page,
       page: permitted_page)
   end
