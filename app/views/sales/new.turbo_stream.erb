@@ -1,5 +1,4 @@
 <%= turbo_stream.replace "mark_sold_section" do %>
-  <div id="mark_sold_section">
-    <%= render PageBlock::NewSaleForm::Component.new(currency: current_currency, sale: @sale) %>
-  </div>
+  <%= render PageBlock::NewSaleForm::Component.new(currency: current_currency, sale: @sale) %>
 <% end %>
+

@@ -10,10 +10,11 @@
     </div>
 
     <div class="tw:mt-12">
-      <%= f.submit translation(:record_sale), class: "twbtn-green twbtn-lg tw:mr-2" %>
+      <%= f.submit translation(:record_sale), class: "twbtn-blue twbtn-lg tw:mr-2" %>
 
       <span class="tw:text-sm tw:italic">
-        <%= translation(:transfer_to, buyer_name:) %>
+        <% buyer_html = content_tag(:strong, buyer_name) %>
+        <%= translation(:transfer_to_html, buyer_html:).html_safe %>
       </span>
     </div>
   <% end %>
