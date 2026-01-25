@@ -107,7 +107,7 @@ class Feedback < ApplicationRecord
   end
 
   def notify_admins
-    BikeDeleterJob.new.perform(bike.id) if delete_request? && bike.present?
+    BikeDeleterJob.new.perform(bike.id, false, user_id) if delete_request? && bike.present?
     return true if self.class.no_notification_kinds.include?(kind)
 
     Email::FeedbackNotificationJob.perform_async(id)
