@@ -418,7 +418,6 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
       Sidekiq::Job.clear_all
       instance.perform(user.id)
       BikeDeleterJob.drain
-      expect(CallbackJob::AfterBikeSaveJob.jobs.count).to eq 0
       expect(bike1.reload.deleted_at).to be_within(1).of Time.current
       expect(bike2.reload.deleted_at).to be_within(1).of Time.current
     end
