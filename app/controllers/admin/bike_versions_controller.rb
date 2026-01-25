@@ -27,7 +27,7 @@ class Admin::BikeVersionsController < Admin::BaseController
   end
 
   def earliest_period_date
-    Time.at(1759294800) # 2025-10-01 - first bike version
+    Time.at(1641016800) # 2022-01-01 00:00 - first bike version
   end
 
   def matching_bike_versions

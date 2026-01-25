@@ -13,6 +13,7 @@ module AdminHelper
       {title: "Dev: Mailchimp Data", path: admin_mailchimp_data_path, match_controller: true},
       {title: "Dev: User Alerts", path: admin_user_alerts_path, match_controller: true},
       {title: "Dev: Ownerships", path: admin_ownerships_path, match_controller: true},
+      {title: "Dev: User Bans", path: admin_user_bans_path, match_controller: true},
       {title: "Dev: User Reg Organizations", path: admin_user_registration_organizations_path, match_controller: true},
       {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match_controller: false},
       {title: "Dev: OAuth Applications", path: oauth_applications_path(search_all: true), match_controller: true},
@@ -26,7 +27,6 @@ module AdminHelper
   def admin_nav_select_links
     ([
       {title: "Users", path: admin_users_path, match_controller: true},
-      {title: "User Bans", path: admin_user_bans_path, match_controller: true},
       {title: "Bikes", path: admin_bikes_path, match_controller: true},
       {title: "Bike Versions", path: admin_bike_versions_path, match_controller: true},
       {title: "Stolen Bikes", path: admin_stolen_bikes_path, match_controller: true},

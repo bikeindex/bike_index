@@ -34,12 +34,12 @@
           <td><%= user_ban.reason.humanize %></td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: user_ban.creator, render_sortable: render_sortable) %>
+            <%= render Admin::UserCell::Component.new(user: user_ban.creator, render_search: render_sortable) %>
           </td>
 
           <td>
             <small title="<%= user_ban.description %>">
-              <%= user_ban.description&.truncate(50) %>
+              <%= user_ban.description&.truncate(100) %>
             </small>
           </td>
         </tr>
