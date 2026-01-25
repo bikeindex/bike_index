@@ -51,7 +51,7 @@ class MyAccountsController < ApplicationController
 
   def destroy
     if current_user.deletable?
-      Users::DeleteJob.new.perform(current_user.id, user: current_user)
+      current_user.destroy
       remove_session
       redirect_to goodbye_url, notice: "Account deleted!"
     else
