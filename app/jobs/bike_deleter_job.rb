@@ -14,8 +14,8 @@ class BikeDeleterJob < ApplicationJob
       PublicImage.where(imageable_type: "Bike", imageable_id: bike_id).destroy_all
       bike.really_destroy!
     else
-      CallbackJob::AfterBikeSaveJob.perform_async(bike_id)
       bike.destroy
+      CallbackJob::AfterBikeSaveJob.perform_async(bike_id)
     end
   end
 end
