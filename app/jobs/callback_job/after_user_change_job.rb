@@ -6,7 +6,7 @@ class CallbackJob::AfterUserChangeJob < ApplicationJob
     return false unless user.present?
 
     # Bump updated_at to bust cache
-    user.update(updated_at: Time.current, skip_update: true)
+    user.update(updated_at: Time.current, skip_update: true) unless user.deleted?
     update_superuser_abilities(user)
 
     add_phones_for_verification(user)

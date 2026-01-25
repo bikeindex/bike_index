@@ -406,4 +406,21 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
       expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id])
     end
   end
+
+  describe "deleted user" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    it "calls BikeDeleterJob for each bike" do
+      expect(user.bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
+      user.update(deleted_at: Time.current)
+      expect(user.deleted?).to be_truthy
+      Sidekiq::Job.clear_all
+      instance.perform(user.id)
+      BikeDeleterJob.drain
+      expect(CallbackJob::AfterBikeSaveJob.jobs.count).to eq 0
+      expect(bike1.reload.deleted_at).to be_within(1).of Time.current
+      expect(bike2.reload.deleted_at).to be_within(1).of Time.current
+    end
+  end
 end
