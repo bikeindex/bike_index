@@ -305,6 +305,6 @@ class MarketplaceMessage < ApplicationRecord
   end
 
   def generate_reply_token
-    SecureRandom.urlsafe_base64(16)
+    SecureRandom.alphanumeric(12)
   end
 end
