@@ -21,6 +21,32 @@ RSpec.describe BikeDeleterJob, type: :job do
     expect(PublicImage.find_by_id(public_image.id)).to be_present
   end
 
+  context "with marketplace_listing" do
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+    let!(:bike) { marketplace_listing.item }
+
+    it "marks marketplace_listing as removed" do
+      expect(marketplace_listing.status).to eq "for_sale"
+      instance.perform(bike.id)
+      expect(marketplace_listing.reload.status).to eq "removed"
+    end
+  end
+
+  context "with current_impound_record" do
+    let!(:impound_record) { FactoryBot.create(:impound_record, bike:) }
+    let(:user) { FactoryBot.create(:user) }
+
+    it "creates impound_record_update with removed_from_bike_index" do
+      expect(bike.reload.current_impound_record).to eq impound_record
+      expect {
+        instance.perform(bike.id, false, user.id)
+      }.to change(ImpoundRecordUpdate, :count).by(1)
+      impound_update = impound_record.impound_record_updates.last
+      expect(impound_update.kind).to eq "removed_from_bike_index"
+      expect(impound_update.user_id).to eq user.id
+    end
+  end
+
   context "really delete" do
     let(:bike_id) { bike.id }
     let(:public_image_id) { public_image.id }

@@ -107,15 +107,7 @@ class Feedback < ApplicationRecord
   end
 
   def notify_admins
-    if delete_request? && bike.present?
-      if bike.current_impound_record.present?
-        impound_update = bike.current_impound_record.impound_record_updates.new(user_id: user_id, kind: "removed_from_bike_index")
-        impound_update.save
-      else
-        bike.current_marketplace_listing&.update(status: "removed")
-        bike.destroy
-      end
-    end
+    BikeDeleterJob.new.perform(bike.id) if delete_request? && bike.present?
     return true if self.class.no_notification_kinds.include?(kind)
 
     Email::FeedbackNotificationJob.perform_async(id)
