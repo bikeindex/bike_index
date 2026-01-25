@@ -67,7 +67,7 @@
           %td
             Tags
           %td
-            = user_icon(@user, full_text: true)
+            = render(Admin::UserIcon::Component.new(user: @user, full_text: true))
         %tr
           %td
             Created

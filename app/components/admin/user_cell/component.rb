@@ -3,7 +3,6 @@
 module Admin::UserCell
   class Component < ApplicationComponent
     include SortableHelper
-    include AdminHelper # for user_icon
 
     def initialize(user: nil, user_id: nil, email: nil, search_url: nil, render_search: nil)
       @user = user

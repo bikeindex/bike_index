@@ -1,0 +1,50 @@
+<span>
+  <% if tags.include?(:donor) %>
+    <span class="donor-icon user-icon ml-1" title="Donor">D</span>
+    <% if @full_text %>
+      <span class="less-strong">onor</span>
+    <% end %>
+  <% end %>
+
+  <% if tags.include?(:member) %>
+    <span class="donor-icon user-icon ml-1" title="Member">M</span>
+    <% if @full_text %>
+      <span class="less-strong">ember</span>
+    <% end %>
+  <% end %>
+
+  <% if tags.include?(:organization_role) %>
+    <span class="org-member-icon user-icon ml-1" title="<%= org_full_text %>">
+      <%= org_icon_text %>
+    </span>
+    <% if @full_text %>
+      <span class="ml-1 less-strong"><%= org_full_text %></span>
+    <% end %>
+  <% end %>
+
+  <% if tags.include?(:recovery) %>
+    <span class="recovery-icon user-icon ml-1" title="Recovered bike">R</span>
+    <% if @full_text %>
+      <span class="less-strong">ecovered bike</span>
+    <% end %>
+  <% end %>
+
+  <% if tags.include?(:superuser) %>
+    <span class="superuser-icon user-icon ml-1" title="Superuser">S</span>
+    <% if @full_text %>
+      <span class="less-strong">uperuser</span>
+    <% end %>
+  <% end %>
+
+  <% if tags.include?(:theft_alert) %>
+    <span
+      class="theft-alert-icon user-icon ml-1"
+      title="Promoted alert purchaser"
+    >
+      P
+    </span>
+    <% if @full_text %>
+      <span class="less-strong">romoted alert</span>
+    <% end %>
+  <% end %>
+</span>
