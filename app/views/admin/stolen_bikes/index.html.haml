@@ -135,13 +135,13 @@
                   = [stolen_record.city, stolen_record.state&.abbreviation, stolen_record.zipcode].reject(&:blank?).first
               %td.table-cell-check
                 = check_mark if stolen_record.approved
-                = user_icon(bike&.user)
+                = render(Admin::UserIcon::Component.new(user: bike&.user))
             - else
               %td
               %td
               %td
               %td
-                = user_icon(bike&.user)
+                = render(Admin::UserIcon::Component.new(user: bike&.user))
   .mb-3.text-center
     = submit_tag 'Approve selected', class: 'btn btn-outline-primary'
 = render_admin_pagination_with_count(collection: @stolen_records, count: available_stolen_records.count, viewing: "Stolen Bike", skip_total: true)
