@@ -224,6 +224,7 @@ class CustomerMailer < ApplicationMailer
     I18n.with_locale(@user&.preferred_language) do
       mail(
         to: @user.email,
+        reply_to: @marketplace_message.reply_to_address,
         subject: @marketplace_message.subject,
         references: @marketplace_message.email_references_id,
         tag: __callee__

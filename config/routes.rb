@@ -3,6 +3,7 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
+  mount ActionMailbox::Engine => "/rails/action_mailbox"
   mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
   mount PgHero::Engine, at: "/pghero", constraints: AdminRestriction
 

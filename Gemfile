@@ -14,6 +14,7 @@ gem "prime"
 gem "openssl" # stuff breaks without this, 2025-10
 
 gem "rails"
+gem "actionmailbox" # Inbound email processing
 
 # Things to improve/extend Rails
 gem "puma" # App server

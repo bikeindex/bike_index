@@ -857,6 +857,7 @@ PLATFORMS
 
 DEPENDENCIES
   MailchimpMarketing!
+  actionmailbox
   active_model_serializers (~> 0.8.3)
   annotaterb
   api-pagination
