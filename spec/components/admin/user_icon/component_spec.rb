@@ -26,14 +26,12 @@ RSpec.describe Admin::UserIcon::Component, type: :component do
     it "renders donor icon" do
       expect(user.donor?).to be_truthy
       result = render_component(user:)
-      expect(result).to have_css(".donor-icon", text: "D")
-      expect(result).to have_css("[title='Donor']")
-    end
+      expect(result).to have_text("D")
+      expect(result).to have_css("[title='Donor']", text: "D")
 
-    it "renders full text" do
-      result = render_component(user:, full_text: true)
-      expect(result).to have_css(".donor-icon", text: "D")
-      expect(result).to have_text("onor")
+      result_full = render_component(user:, full_text: true)
+      expect(result_full).to have_css("[title='Donor']", text: "D")
+      expect(result_full).to have_text(/D\s*onor/)
     end
 
     context "with theft alert" do
@@ -43,16 +41,13 @@ RSpec.describe Admin::UserIcon::Component, type: :component do
         expect(user.donor?).to be_truthy
         expect(user.theft_alert_purchaser?).to be_truthy
         result = render_component(user:)
-        expect(result).to have_css(".donor-icon", text: "D")
-        expect(result).to have_css(".theft-alert-icon", text: "P")
-      end
+        expect(result).to have_css("[title='Donor']", text: "D")
+        expect(result).to have_css("[title='Promoted alert purchaser']", text: "P")
 
-      it "renders only superuser when superuser" do
+        # If superuser, don't show other stuff
         user.superuser = true
-        result = render_component(user:)
-        expect(result).to have_css(".superuser-icon", text: "S")
-        expect(result).not_to have_css(".donor-icon")
-        expect(result).not_to have_css(".theft-alert-icon")
+        result_superuser = render_component(user:)
+        expect(result_superuser).to have_css("[title='Superuser']", text: "S")
       end
     end
   end
@@ -66,13 +61,16 @@ RSpec.describe Admin::UserIcon::Component, type: :component do
       expect(membership.reload.status).to eq "active"
       expect(user.donor?).to be_falsey
       result = render_component(user:)
-      expect(result).to have_css(".donor-icon", text: "M")
       expect(result).to have_css("[title='Member']")
+
+      component_text = whitespace_normalized_body_text(result.to_html)
+      expect(component_text).to eq("M")
     end
 
     it "renders full text" do
       result = render_component(user:, full_text: true)
-      expect(result).to have_text("ember")
+      component_text = whitespace_normalized_body_text(result.to_html)
+      expect(component_text).to eq("M Member")
     end
 
     context "membership ended" do
@@ -94,7 +92,8 @@ RSpec.describe Admin::UserIcon::Component, type: :component do
     it "renders recovery icon" do
       expect(user.reload).to be_present
       result = render_component(user:)
-      expect(result).to have_css(".recovery-icon", text: "R")
+      component_text = whitespace_normalized_body_text(result.to_html)
+      expect(component_text).to eq("R")
     end
   end
 
@@ -105,8 +104,8 @@ RSpec.describe Admin::UserIcon::Component, type: :component do
     it "renders org icon for unpaid org" do
       expect(user.paid_org?).to be_falsey
       result = render_component(user:)
-      expect(result).to have_css(".org-member-icon")
       expect(result).to have_css("[title='organization member - Bike Shop']")
+      expect(result).to have_text("O-BS")
     end
 
     context "paid org" do
@@ -114,15 +113,59 @@ RSpec.describe Admin::UserIcon::Component, type: :component do
 
       it "renders paid org icon" do
         expect(user.paid_org?).to be_truthy
+        allow_any_instance_of(Organization).to receive(:paid_money?).and_return(true)
         result = render_component(user:)
-        expect(result).to have_css(".org-member-icon", text: "$O P")
         expect(result).to have_css("[title='Paid organization member - Law Enforcement']")
-      end
 
-      it "renders full text" do
-        result = render_component(user:, full_text: true)
-        expect(result).to have_text("Paid organization member - Law Enforcement")
+        component_text = whitespace_normalized_body_text(result.to_html)
+        expect(component_text).to eq("$O-P")
+
+        result_full = render_component(user:, full_text: true)
+        component_text = whitespace_normalized_body_text(result_full.to_html)
+        expect(component_text).to eq("$O-P Paid organization member - Law Enforcement")
       end
+    end
+  end
+
+  describe "banned" do
+    let(:user) { FactoryBot.create(:user, banned: true) }
+    it "shows banned" do
+      result = render_component(user:)
+      expect(result).to have_text("B")
+      expect(result).to have_css("[title='Banned']")
+
+      result_full = render_component(user:, full_text: true)
+      component_text = whitespace_normalized_body_text(result_full.to_html)
+      expect(component_text).to eq("B Banned")
+    end
+
+    context "with user_ban" do
+      let!(:user_ban) { UserBan.create(user:, reason: :known_criminal) }
+
+      it "shows ban reason" do
+        user.reload
+        result = render_component(user:)
+        expect(result).to have_text("B")
+        expect(result).to have_css("[title='Banned: Known criminal']")
+
+        result_full = render_component(user:, full_text: true)
+        component_text = whitespace_normalized_body_text(result_full.to_html)
+        expect(component_text).to eq("B Banned: Known criminal")
+      end
+    end
+  end
+
+  describe "email_ban" do
+    let(:email_ban) { FactoryBot.create(:email_ban) }
+    let(:user) { email_ban.user }
+    it "shows email banned" do
+      result = render_component(user:)
+      expect(result).to have_text("EB")
+      expect(result).to have_css("[title='Email Banned: domain']")
+
+      result_full = render_component(user:, full_text: true)
+      component_text = whitespace_normalized_body_text(result_full.to_html)
+      expect(component_text).to eq("EB Email Banned: domain")
     end
   end
 end
