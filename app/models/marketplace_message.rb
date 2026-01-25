@@ -7,6 +7,7 @@
 #  body                   :text
 #  kind                   :integer
 #  messages_prior_count   :integer
+#  reply_token            :string
 #  subject                :text
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
@@ -20,6 +21,7 @@
 #  index_marketplace_messages_on_initial_record_id       (initial_record_id)
 #  index_marketplace_messages_on_marketplace_listing_id  (marketplace_listing_id)
 #  index_marketplace_messages_on_receiver_id             (receiver_id)
+#  index_marketplace_messages_on_reply_token             (reply_token) UNIQUE
 #  index_marketplace_messages_on_sender_id               (sender_id)
 #
 class MarketplaceMessage < ApplicationRecord
@@ -251,6 +253,16 @@ class MarketplaceMessage < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
+  def reply_to_address
+    return nil if reply_token.blank?
+
+    "reply+#{reply_token}@#{self.class.reply_email_domain}"
+  end
+
+  def self.reply_email_domain
+    ENV.fetch("INBOUND_EMAIL_DOMAIN", "reply.bikeindex.org")
+  end
+
   private
 
   def users_match_initial_record
@@ -262,6 +274,7 @@ class MarketplaceMessage < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.reply_token ||= generate_reply_token
     self.kind ||= (sender_id == seller_id) ? "sender_seller" : "sender_buyer"
     if reply_message?
       self.subject = I18n.t("re", original_subject: initial_record&.subject,
@@ -289,5 +302,9 @@ class MarketplaceMessage < ApplicationRecord
       .order(:id)
 
     id.blank? ? duplicates.first : duplicates.where("id < ?", id).first
+  end
+
+  def generate_reply_token
+    SecureRandom.alphanumeric(12)
   end
 end

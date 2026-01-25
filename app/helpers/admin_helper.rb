@@ -68,6 +68,7 @@ module AdminHelper
       {title: "Model Audits", path: admin_model_audits_path, match_controller: true},
       {title: "Marketplace Listings", path: admin_marketplace_listings_path, match_controller: true},
       {title: "Marketplace Messages", path: admin_marketplace_messages_path, match_controller: true},
+      {title: "Inbound Emails", path: admin_inbound_emails_path, match_controller: true},
       {title: "Sales", path: admin_sales_path, match_controller: true},
       {title: "Logged bike searches", path: admin_logged_searches_path, match_controller: true},
       {title: "Organization statuses", path: admin_organization_statuses_path, match_controller: true},
@@ -135,6 +136,15 @@ module AdminHelper
       "text-info"
     else
       ""
+    end
+  end
+
+  def inbound_email_status_class(status)
+    case status
+    when "delivered" then "text-success"
+    when "failed", "bounced" then "text-danger"
+    when "processing" then "text-info"
+    else ""
     end
   end
 

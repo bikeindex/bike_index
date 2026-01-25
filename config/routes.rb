@@ -3,6 +3,7 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
+  mount ActionMailbox::Engine => "/rails/action_mailbox"
   mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
   mount PgHero::Engine, at: "/pghero", constraints: AdminRestriction
 
@@ -240,7 +241,7 @@ Rails.application.routes.draw do
     ].each { resources it, only: %i[index] }
 
     %i[
-      b_params bike_versions feedbacks marketplace_listings marketplace_messages sales
+      b_params bike_versions feedbacks inbound_emails marketplace_listings marketplace_messages sales
     ].each { resources it, only: %i[index show] }
 
     resources :bike_stickers do

@@ -42,6 +42,39 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: action_mailbox_inbound_emails; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.action_mailbox_inbound_emails (
+    id bigint NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    message_id character varying NOT NULL,
+    message_checksum character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: action_mailbox_inbound_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.action_mailbox_inbound_emails_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: action_mailbox_inbound_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.action_mailbox_inbound_emails_id_seq OWNED BY public.action_mailbox_inbound_emails.id;
+
+
+--
 -- Name: active_storage_attachments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2232,7 +2265,8 @@ CREATE TABLE public.marketplace_messages (
     kind integer,
     messages_prior_count integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    reply_token character varying
 );
 
 
@@ -4039,6 +4073,13 @@ ALTER SEQUENCE public.wheel_sizes_id_seq OWNED BY public.wheel_sizes.id;
 
 
 --
+-- Name: action_mailbox_inbound_emails id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_mailbox_inbound_emails ALTER COLUMN id SET DEFAULT nextval('public.action_mailbox_inbound_emails_id_seq'::regclass);
+
+
+--
 -- Name: active_storage_attachments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4729,6 +4770,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.wheel_sizes ALTER COLUMN id SET DEFAULT nextval('public.wheel_sizes_id_seq'::regclass);
+
+
+--
+-- Name: action_mailbox_inbound_emails action_mailbox_inbound_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.action_mailbox_inbound_emails
+    ADD CONSTRAINT action_mailbox_inbound_emails_pkey PRIMARY KEY (id);
 
 
 --
@@ -5529,6 +5578,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_action_mailbox_inbound_emails_uniqueness; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_action_mailbox_inbound_emails_uniqueness ON public.action_mailbox_inbound_emails USING btree (message_id, message_checksum);
 
 
 --
@@ -6379,6 +6435,13 @@ CREATE INDEX index_marketplace_messages_on_receiver_id ON public.marketplace_mes
 
 
 --
+-- Name: index_marketplace_messages_on_reply_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_marketplace_messages_on_reply_token ON public.marketplace_messages USING btree (reply_token);
+
+
+--
 -- Name: index_marketplace_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7178,6 +7241,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260124200001'),
+('20260124200000'),
 ('20260124024709'),
 ('20251223233135'),
 ('20251217162136'),
