@@ -64,12 +64,8 @@ class Admin::BikesController < Admin::BaseController
     if params[:id] == "multi_delete"
       bike_ids = defined?(params[:bikes_selected].keys) ? params[:bikes_selected].keys : params[:bikes_selected]
       if bike_ids.any?
-        bike_ids.each do |id|
-          Bike.unscoped.find(id).destroy!
-          CallbackJob::AfterBikeSaveJob.perform_async(id)
-        end
-        # Lazy pluralize hack
-        flash[:success] = "#{bike_ids.count} #{(bike_ids.count == 1) ? "bike" : "bikes"} deleted!"
+        bike_ids.each { |id| BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
+        flash[:success] = "#{bike_ids.count} #{"bike".pluralize(bike_ids.count)} deleted!"
       else
         flash[:error] = "No bikes selected to delete!"
       end
@@ -146,8 +142,7 @@ class Admin::BikesController < Admin::BaseController
 
   def destroy_bike
     find_bike
-    @bike.destroy
-    CallbackJob::AfterBikeSaveJob.perform_async(@bike.id)
+    BikeDeleterJob.new.perform(@bike.id, false, current_user.id)
     flash[:success] = "Bike deleted!"
     redirect_to admin_bikes_url
   end

@@ -2,7 +2,8 @@ class BikeDeleterJob < ApplicationJob
   sidekiq_options retry: false, queue: "low_priority"
 
   def perform(bike_id, really_delete = false, user_id = nil)
-    bike = Bike.unscoped.find(bike_id)
+    bike = Bike.unscoped.find_by_id(bike_id)
+    return if bike.blank?
 
     bike.current_marketplace_listing&.update(status: "removed")
     if bike.current_impound_record.present?
