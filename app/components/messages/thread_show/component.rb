@@ -43,6 +43,7 @@ module Messages::ThreadShow
     end
 
     def user_banned?
+      pp "user_banned? #{@initial_message.sender&.banned?} #{@initial_message.receiver&.banned?}"
       return false if @initial_message.blank?
 
       @initial_message.sender&.banned? || @initial_message.receiver&.banned?

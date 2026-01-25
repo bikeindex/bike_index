@@ -121,20 +121,24 @@ RSpec.describe Messages::ThreadShow::Component, type: :component do
     end
 
     context "user is banned" do
+      let(:marketplace_listing) { marketplace_message.marketplace_listing }
       before do
-        marketplace_listing.seller.update(banned: true)
-        UserBan.create!(user: marketplace_listing.seller, reason: :abuse)
+        initial_message.sender.update(banned: true)
+        UserBan.create!(user: initial_message.sender, reason: :abuse)
       end
       it "renders removed" do
         expect(marketplace_message.initial_message?).to be_falsey
+        expect(marketplace_listing.seller_id).to eq marketplace_message.sender_id
+        expect(marketplace_listing.seller_id).to_not eq current_user.id
         expect(component).to have_css("div")
         expect(component).to have_content marketplace_message.body
         expect(component).to have_content "Subject"
+        pp component.to_html
         expect(component).to_not have_button "Send message"
 
         component_text = whitespace_normalized_body_text(component.to_html)
         expect(component_text)
-          .to match(/#{marketplace_message.receiver.marketplace_message_name} to me \(#{current_user.marketplace_message_name}\)/)
+          .to match(/Me \(#{marketplace_message.sender.marketplace_message_name}\) to #{current_user.marketplace_message_name}/)
         expect(component_text).to match(/banned/)
       end
     end
