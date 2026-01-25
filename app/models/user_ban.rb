@@ -22,7 +22,8 @@ class UserBan < ApplicationRecord
     abuse: 0,
     extortion: 1,
     known_criminal: 2,
-    bad_actor: 3
+    bad_actor: 3,
+    spamming: 4
   }.freeze
 
   acts_as_paranoid
