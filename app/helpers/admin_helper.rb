@@ -139,6 +139,15 @@ module AdminHelper
     end
   end
 
+  def inbound_email_status_class(status)
+    case status
+    when "delivered" then "text-success"
+    when "failed", "bounced" then "text-danger"
+    when "processing" then "text-info"
+    else ""
+    end
+  end
+
   # Add icon for unconfirmed, email banned
   def user_icon(user = nil, full_text: false)
     icon_hash = user_icon_hash(user)

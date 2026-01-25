@@ -256,10 +256,10 @@ class MarketplaceMessage < ApplicationRecord
   def reply_to_address
     return nil if reply_token.blank?
 
-    "reply+#{reply_token}@#{reply_email_domain}"
+    "reply+#{reply_token}@#{self.class.reply_email_domain}"
   end
 
-  def reply_email_domain
+  def self.reply_email_domain
     ENV.fetch("INBOUND_EMAIL_DOMAIN", "reply.bikeindex.org")
   end
 

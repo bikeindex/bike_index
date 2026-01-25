@@ -19,14 +19,7 @@
           <td>Status</td>
 
           <td>
-            <% status_class = case @inbound_email.status
-              when "delivered" then "text-success"
-              when "failed", "bounced" then "text-danger"
-              when "processing" then "text-info"
-              else ""
-            end %>
-
-            <span class="<%= status_class %>">
+            <span class="<%= inbound_email_status_class(@inbound_email.status) %>">
               <%= @inbound_email.status %>
             </span>
           </td>

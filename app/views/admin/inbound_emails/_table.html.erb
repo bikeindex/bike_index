@@ -28,14 +28,7 @@
           </td>
 
           <td>
-            <% status_class = case inbound_email.status
-              when "delivered" then "text-success"
-              when "failed", "bounced" then "text-danger"
-              when "processing" then "text-info"
-              else ""
-            end %>
-
-            <small class="<%= status_class %>">
+            <small class="<%= inbound_email_status_class(inbound_email.status) %>">
               <%= inbound_email.status %>
             </small>
           </td>
