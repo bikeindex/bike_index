@@ -79,6 +79,37 @@ RSpec.describe "Search API V3", type: :request do
     end
   end
 
+  describe "/geojson" do
+    include_context :geocoder_default_location
+    let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
+    let!(:bike2) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer) }
+    let(:target) do
+      {
+        type: "Feature",
+        properties: {id: bike2.id, color: "#BD1622"},
+        geometry: {type: "Point", coordinates: [-74.01,40.71]}
+      }
+    end
+    context "with per_page" do
+      it "returns matching bikes, defaults to stolen" do
+        expect(Bike.count).to eq 2
+        get "/api/v3/search/geojson?lat=#{default_location[:latitude]}&lng=#{default_location[:longitude]}"
+        result = JSON.parse(response.body)
+        expect(result.keys).to match_array(["type", "features"])
+        expect(result["type"]).to eq "FeatureCollection"
+        expect(result["features"].count).to eq 1
+        expect_hashes_to_match(result["features"].first, target)
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+
+        get "/api/v3/search/geojson?lat=#{default_location[:latitude]}&lng=#{default_location[:longitude]}&query=#{manufacturer.name}"
+        result2 = JSON.parse(response.body)
+        expect(result2["features"].count).to eq 1
+        expect_hashes_to_match(result2["features"].first, target)
+      end
+    end
+  end
+
   describe "/close_serials" do
     let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "something") }
     let(:query_params) { {serial: "somethind", stolenness: "non"} }
