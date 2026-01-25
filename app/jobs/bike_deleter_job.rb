@@ -7,7 +7,7 @@ class BikeDeleterJob < ApplicationJob
 
     bike.current_marketplace_listing&.update(status: "removed")
     if bike.current_impound_record.present?
-      bike.current_impound_record.impound_record_updates.create(user_id:, kind: "removed_from_bike_index")
+      bike.current_impound_record.impound_record_updates.create!(user_id:, kind: "removed_from_bike_index")
     end
 
     if really_delete
