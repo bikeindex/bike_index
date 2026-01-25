@@ -14,7 +14,10 @@
   <% end %>
 
   <% if @tags.include?(:organization_role) %>
-    <span class="org-<%= icon_classes(:organization_role) %>" title="<%= org_full_text %>">
+    <span
+      class="org- <%= icon_classes(:organization_role) %>"
+      title="<%= org_full_text %>"
+    >
       <%= org_icon_text %>
     </span>
     <% if @full_text %>
@@ -49,10 +52,7 @@
   <% end %>
 
   <% if banned? %>
-    <span
-      class="<%= icon_classes(:banned) %>"
-      title="<%= banned_text %>"
-    >
+    <span class="<%= icon_classes(:banned) %>" title="<%= banned_text %>">
       B
     </span>
     <% if @full_text %>

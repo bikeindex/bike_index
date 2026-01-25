@@ -3,6 +3,7 @@
 <% unless render_deleted %>
   <style>.deleted-cell {display: none !important;}</style>
 <% end %>
+
 <% unless display_dev_info? %>
   <style>.only-dev-visible {display: none !important;}</style>
 <% end %>
@@ -10,40 +11,47 @@
 <div class="full-screen-table">
   <table class="table table-bordered table-striped table-sm">
     <thead class="thead-light sortable">
-      <th>
-        <%= sortable "created_at", render_sortable: render_sortable %>
-      </th>
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
       <th class="only-dev-visible">
-        <small><%= sortable "updated_at", render_sortable: render_sortable %></small>
+        <small>
+          <%= sortable "updated_at", render_sortable: render_sortable %>
+        </small>
       </th>
+
       <th class="deleted-cell">
-        <small><%= sortable "deleted_at", render_sortable: render_sortable %></small>
+        <small>
+          <%= sortable "deleted_at", render_sortable: render_sortable %>
+        </small>
       </th>
-      <th>
-        <%= sortable "email", render_sortable: render_sortable %>
-      </th>
+
+      <th><%= sortable "email", render_sortable: render_sortable %></th>
+
       <th>
         Secondary Emails
       </th>
+
       <th>
         Name
       </th>
+
       <th>
         Bikes
       </th>
+
       <th>
         OrganizationRoles
       </th>
-      <th>
-        <small>Ambassador tasks</small>
-      </th>
+
+      <th><small>Ambassador tasks</small></th>
+
       <th>
         Admin?
       </th>
-      <th>
-        <small>Confirmed</small>
-      </th>
+
+      <th><small>Confirmed</small></th>
     </thead>
+
     <tbody>
       <% @users.each do |user| %>
         <% cache(user) do %>
@@ -53,11 +61,13 @@
                 <%= l user.created_at, format: :convert_time %>
               </span>
             </td>
+
             <td class="only-dev-visible">
               <small class="convertTime">
                 <%= l user.updated_at, format: :convert_time %>
               </small>
             </td>
+
             <td class="deleted-cell">
               <% if user.deleted_at.present? %>
                 <span class="convertTime text-danger">
@@ -65,56 +75,63 @@
                 </span>
               <% end %>
             </td>
+
             <td>
               <div class="less-strong-hold">
                 <%= render Admin::UserCell::Component.new(email: user.email, user: user, render_search: false) %>
-                <small class="less-strong-right">
-                  &nbsp;<%= user.id %>
-                </small>
+                <small class="less-strong-right">&nbsp;<%= user.id %></small>
               </div>
             </td>
+
             <td>
               <small class="less-strong">
                 <%= user.secondary_emails.join(', ') %>
               </small>
             </td>
+
             <td>
               <% if user.name? %>
                 <%= user.name %>
               <% end %>
             </td>
-            <td>
-              <%= user.ownerships.count %>
-            </td>
+
+            <td><%= user.ownerships.count %></td>
+
             <td>
               <% if user.organization_roles.present? %>
                 <% first_org_rendered = false %>
                 <% user.organization_roles.each do |organization_role| %>
                   <% next if organization_role.organization.ambassador? %>
+
                   <% if first_org_rendered %>
                     <small class="less-strong">|</small>
                   <% else %>
                     <% first_org_rendered = true %>
                   <% end %>
+
                   <%= link_to organization_role.organization.name.gsub(" ", "\u00a0"), admin_users_path(organization_id: organization_role.organization_id), class: "small" %>
                 <% end %>
               <% end %>
             </td>
+
             <td>
               <% if user.ambassador? %>
                 <% ambassador = Ambassador.find(user.id) %>
                 <%= ambassador.progress_count %>
               <% end %>
             </td>
+
             <td>
               <small>
                 <%= "super" if user.superuser? %>
                 <%= "developer" if user.developer? %>
+
                 <% if user.superuser_abilities.non_universal.any? %>
                   <span class="text-info">limited</span>
                 <% end %>
               </small>
             </td>
+
             <td class="table-cell-check">
               <%= check_mark if user.confirmed %>
             </td>
