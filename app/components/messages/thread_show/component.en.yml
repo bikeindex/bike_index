@@ -5,3 +5,5 @@ en:
       thread_show:
         can_not_send_new_message: Sorry, you can't send a new message.
         sold_to: Mark %{item_type} sold to
+        banned_message: "We're sorry, but that user has been banned"
+        removed_message: "We're sorry, but that user has deleted their account"

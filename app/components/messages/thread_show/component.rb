@@ -40,6 +40,14 @@ module Messages::ThreadShow
       @initial_message.receiver_id == @current_user.id
     end
 
+    def user_banned?
+      @initial_message.sender&.banned? || @initial_message.receiver&.banned?
+    end
+
+    def user_deleted?
+      @initial_message.sender.blank? || @initial_message.receiver&.blank?
+    end
+
     def show_mark_sold?
       return false if new_thread?
 

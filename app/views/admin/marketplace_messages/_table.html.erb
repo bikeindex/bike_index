@@ -23,7 +23,7 @@
 
       <th>
         <small>
-          <%= sortable "messages_prior_count", "Prior #", render_sortable: render_sortable %>
+          <%= sortable "messages_prior_count", "Prior&nbsp;#".html_safe, render_sortable: render_sortable %>
         </small>
       </th>
 
@@ -55,7 +55,7 @@
 
           <% unless skip_marketplace_listing %>
             <td>
-              <%= render Admin::BikeCell::Component.new(bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), render_search: render_sortable) %>
+              <%= render Admin::BikeCell::Component.new(bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), search_url: url_for(sortable_search_params.merge(search_marketplace_listing_id: marketplace_message.marketplace_listing_id)), render_search: render_sortable) %>
             </td>
           <% end %>
 
