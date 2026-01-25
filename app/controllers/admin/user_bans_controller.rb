@@ -9,7 +9,7 @@ class Admin::UserBansController < Admin::BaseController
       page: permitted_page)
   end
 
-  helper_method :matching_user_bans
+  helper_method :matching_user_bans, :viewing_deleted?
 
   protected
 
@@ -17,7 +17,12 @@ class Admin::UserBansController < Admin::BaseController
     %w[created_at reason user_id creator_id]
   end
 
+  def viewing_deleted?
+    @viewing_deleted ||= params[:deleted].present?
+  end
+
   def matching_user_bans
-    UserBan.where(created_at: @time_range)
+    user_bans = viewing_deleted? ? UserBan.only_deleted : UserBan
+    user_bans.where(created_at: @time_range)
   end
 end
