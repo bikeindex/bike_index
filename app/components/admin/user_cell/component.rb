@@ -12,6 +12,10 @@ module Admin::UserCell
       @render_search = render_search.nil? ? @search_url.present? : render_search
     end
 
+    def render?
+      @user.present? || @user_id.present? || @email.present?
+    end
+
     private
 
     def email_display

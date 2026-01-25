@@ -45,7 +45,7 @@
 
           <td>
             <% cache(bike_version.owner) do %>
-              <%= render Admin::UserCell::Component.new(user: bike_version.owner, render_search: true) %>
+              <%= render Admin::UserCell::Component.new(user: bike_version.owner, render_search: render_sortable) %>
             <% end %>
           </td>
 
