@@ -2,7 +2,7 @@ class CallbackJob::AfterUserChangeJob < ApplicationJob
   sidekiq_options retry: false
 
   def perform(user_id, user = nil, skip_bike_update = false)
-    user ||= User.find_by_id(user_id)
+    user ||= User.unscoped.find_by_id(user_id)
     return false unless user.present?
 
     # Bump updated_at to bust cache
@@ -110,7 +110,11 @@ class CallbackJob::AfterUserChangeJob < ApplicationJob
   end
 
   def process_bikes(user)
-    user.bike_ids.each { |id| CallbackJob::AfterBikeSaveJob.perform_async(id, true, true) }
+    if user.deleted?
+      user.bike_ids.each { |id| BikeDeleterJob.perform_async(id, false, user.id) }
+    else
+      user.bike_ids.each { |id| CallbackJob::AfterBikeSaveJob.perform_async(id, true, true) }
+    end
   end
 
   def update_superuser_abilities(user)
