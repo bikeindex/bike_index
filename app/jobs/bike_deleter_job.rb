@@ -13,6 +13,9 @@ class BikeDeleterJob < ApplicationJob
     if really_delete
       Ownership.where(bike_id:).destroy_all
       PublicImage.where(imageable_type: "Bike", imageable_id: bike_id).destroy_all
+      BikeOrganization.where(bike_id:).destroy_all
+      NormalizedSerialSegment.where(bike_id:).destroy_all
+      BParam.where(created_bike_id: bike_id).destroy_all
       bike.really_destroy!
     else
       bike.destroy
