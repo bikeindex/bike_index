@@ -1,13 +1,13 @@
 class MarketplaceRepliesMailbox < ApplicationMailbox
   def process
     original_message = find_original_message
-    return log_missing_message if original_message.blank?
+    return if original_message.blank?
 
     sender = find_sender
-    return log_unauthorized_sender if sender.blank?
+    return if sender.blank?
 
     receiver = find_receiver(original_message:, sender:)
-    return log_unauthorized_sender if receiver.blank?
+    return if receiver.blank?
 
     create_reply(original_message:, sender:, receiver:)
   end
@@ -55,11 +55,4 @@ class MarketplaceRepliesMailbox < ApplicationMailbox
     mail.text_part&.decoded || mail.body.decoded.gsub(/<[^>]*>/, "").strip
   end
 
-  def log_missing_message
-    Rails.logger.warn("MarketplaceRepliesMailbox: Could not find message for token: #{reply_token}")
-  end
-
-  def log_unauthorized_sender
-    Rails.logger.warn("MarketplaceRepliesMailbox: Unauthorized sender #{mail.from.first} for token: #{reply_token}")
-  end
 end
