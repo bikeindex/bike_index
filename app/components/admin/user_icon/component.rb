@@ -32,7 +32,7 @@ module Admin::UserIcon
 
       @banned_text = [
         "Banned",
-        @user.user_ban.present? ? @user.user_ban.reason.humanize : nil
+        @user.user_ban.present? ? @user.user_ban.reason&.humanize : nil
       ].compact.join(": ")
     end
 

@@ -85,6 +85,9 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.auth_token).to_not eq og_auth_token
         expect(CallbackJob::AfterUserChangeJob.jobs.count).to be > 0
         CallbackJob::AfterUserChangeJob.new.perform(user_subject.id)
+        expect(BikeDeleterJob.jobs.count).to be > 0
+        BikeDeleterJob.drain
+        expect(bike.reload.deleted_at).to be_within(1).of Time.current
         expect(user_subject.superuser_abilities.count).to eq 1
         expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
         expect(marketplace_listing.reload.status).to eq "removed"

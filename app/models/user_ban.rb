@@ -46,7 +46,7 @@ class UserBan < ApplicationRecord
 
     # Sign them out
     user.update_auth_token("auth_token")
-    # Remove their marketplace listing (so that they don't show up anymore)
-    user.marketplace_listings.for_sale.each { it.update(status: :removed) }
+    # Delete their bikes
+    user.bike_ids(true).each { BikeDeleterJob.perform_async(it, false, creator_id) }
   end
 end
