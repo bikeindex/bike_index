@@ -46,7 +46,7 @@ RSpec.describe Email::MarketplaceMessageJob, type: :job do
       expect(marketplace_message_reply.reload.email_references_id).to eq "<#{notification.message_id}>"
     end
   end
-  context "donation, existing notification" do
+  context "existing notification" do
     let!(:notification) do
       Notification.create(notifiable: marketplace_message, kind: "marketplace_message", delivery_status: "delivery_success")
     end
@@ -59,6 +59,29 @@ RSpec.describe Email::MarketplaceMessageJob, type: :job do
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       expect(Notification.count).to eq 1
       expect(notification.reload.message_id).to be_blank
+    end
+  end
+
+  context "likely_spam?" do
+    it "sends blocked email to admin" do
+      ActionMailer::Base.deliveries = []
+      expect(marketplace_message).to receive(:likely_spam?).and_return(true)
+      allow(MarketplaceMessage).to receive(:find_by).with(id: marketplace_message.id).and_return(marketplace_message)
+
+      expect(Notification.count).to eq 0
+      expect {
+        described_class.new.perform(marketplace_message.id)
+      }.to change(Notification, :count).by(1)
+
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.subject).to eq "Marketplace message blocked!"
+      expect(mail.to).to eq(["contact@bikeindex.org"])
+
+      notification = Notification.last
+      expect(notification.kind).to eq "marketplace_message_blocked"
+      expect(notification.notifiable).to eq marketplace_message
+      expect(notification.delivery_status).to eq "delivery_success"
     end
   end
 end

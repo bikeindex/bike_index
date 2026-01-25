@@ -35,6 +35,12 @@ class AdminMailer < ApplicationMailer
       subject: "Stolen notification blocked!")
   end
 
+  def blocked_marketplace_message_email(marketplace_message)
+    @marketplace_message = marketplace_message
+    mail(to: "contact@bikeindex.org",
+      subject: "Marketplace message blocked!")
+  end
+
   def unknown_organization_for_ascend_import(notification)
     @bulk_import = notification.notifiable
     mail(to: ["gavin@bikeindex.org", "craig@bikeindex.org"],
