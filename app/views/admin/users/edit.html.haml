@@ -470,12 +470,22 @@
               .form-group
                 = user_ban.label :description, "Description/notes"
                 = user_ban.text_area :description, class: "form-control"
+              %p
+                %em.small
+                  Banning a user will:
+              %ul
+                %li
+                  Log them out and prevent them from logging back in
+                %li
+                  (soft) delete all their bikes - which will remove all their marketplace listings
+                %li
+                  Show any user they were messaging with a message telling them that they're banned
 
 - if @user.present?
   %hr{style: "margin-top: 60px;"}
   .mt-4.mb-4.row
     .col-sm-6.mb-4
-      = link_to "Delete #{@user.email}!", admin_user_url(@user.id, method: :delete), data: { confirm: "Are you sure?" }, class: "btn btn-danger less-strong"
+      = link_to "Delete #{@user.email}!", admin_user_url(@user.id, method: :delete), data: { confirm: "Are you sure? Generally it's better to delete than ban" }, class: "btn btn-danger less-strong"
     .col-sm-6.mb-4
       .text-right
         %a.gray-link{ href: "#forceMergeEmail", data: { toggle: "collapse", target: "#forceMergeEmail" } }
