@@ -91,7 +91,8 @@ class MarketplaceMessage < ApplicationRecord
     # TODO: permit sending message only X days after sale/removal, only to new owner post sale, etc.
     def can_send_message?(marketplace_listing:, user: nil, marketplace_message: nil)
       can_see_messages?(user:, marketplace_listing:, marketplace_message:) &&
-        !likely_spam?(user:, marketplace_listing:, marketplace_message:)
+        !likely_spam?(user:, marketplace_listing:, marketplace_message:) &&
+        users_present_and_unbanned?(marketplace_message:, marketplace_listing:)
     end
 
     def can_see_messages?(marketplace_listing:, user: nil, marketplace_message: nil)
@@ -156,6 +157,13 @@ class MarketplaceMessage < ApplicationRecord
           .order(:id)
 
         matches.any? ? matches : false
+      end
+    end
+
+    def users_present_and_unbanned?(marketplace_message:, marketplace_listing:)
+      if marketplace_message.present?
+        return true if marketplace_message.sender.blank? || marketplace_message.sender.banned? ||
+          marketplace_message.receiver.blank? || marketplace_message.receiver.banned?
       end
     end
   end

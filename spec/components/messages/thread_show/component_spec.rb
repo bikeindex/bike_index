@@ -74,6 +74,7 @@ RSpec.describe Messages::ThreadShow::Component, type: :component do
 
       component_text = whitespace_normalized_body_text(component.to_html)
       expect(component_text).to match(/this bike has been removed/i)
+      expect(component_text).to_not match(/banned/)
     end
   end
 
@@ -116,6 +117,25 @@ RSpec.describe Messages::ThreadShow::Component, type: :component do
         expect(component_text)
           .to match(/#{marketplace_message.receiver.marketplace_message_name} to me \(#{current_user.marketplace_message_name}\)/)
         expect(component_text).to match(/bike sold to/)
+      end
+    end
+
+    context "user is banned" do
+      before do
+        marketplace_listing.seller.update(banned: true)
+        UserBan.create!(user: marketplace_listing.seller, reason: :abuse)
+      end
+      it "renders removed" do
+        expect(marketplace_message.initial_message?).to be_falsey
+        expect(component).to have_css("div")
+        expect(component).to have_content marketplace_message.body
+        expect(component).to have_content "Subject"
+        expect(component).to_not have_button "Send message"
+
+        component_text = whitespace_normalized_body_text(component.to_html)
+        expect(component_text)
+          .to match(/#{marketplace_message.receiver.marketplace_message_name} to me \(#{current_user.marketplace_message_name}\)/)
+        expect(component_text).to match(/banned/)
       end
     end
   end
