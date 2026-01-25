@@ -17,12 +17,19 @@ class Admin::UserBansController < Admin::BaseController
     %w[created_at reason user_id creator_id]
   end
 
+  def earliest_period_date
+    Time.at(1665173442) # 2022-10-01 00:00 - user ban model added
+  end
+
   def viewing_deleted?
-    @viewing_deleted ||= params[:deleted].present?
+    Binxtils::InputNormalizer.boolean(params[:deleted])
   end
 
   def matching_user_bans
     user_bans = viewing_deleted? ? UserBan.only_deleted : UserBan
+
+    user_bans = user_bans.where(creator_id: params[:user_id]) if params[:user_id].present?
+
     user_bans.where(created_at: @time_range)
   end
 end
