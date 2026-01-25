@@ -695,15 +695,18 @@ RSpec.describe MyAccountsController, type: :request do
 
   describe "delete" do
     let!(:current_user) { let!(:user) { FactoryBot.create(:user_confirmed, :with_organization, role: "member") } }
-    let!(:bike) { FactoryBot.create(:bike, :with_ownership, user: current_user) }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+    before { current_user.skip_update = false }
     include_context :request_spec_logged_in_as_user
 
-    it "deletes" do
+    it "deletes and enqueues BikeDeleterJob" do
       expect(current_user.reload.deletable?).to be_truthy
-      expect do
-        delete base_url
-      end.to change(User, :count).by(-1)
-      expect(Bike.count).to eq 0
+      Sidekiq::Job.clear_all
+      Sidekiq::Testing.inline! do
+        expect do
+          delete base_url
+        end.to change(User, :count).by(-1).and change(Bike, :count).by(-1)
+      end
       expect(response).to redirect_to(goodbye_url)
       expect(flash[:notice]).to be_present
     end

@@ -261,20 +261,18 @@ RSpec.describe Admin::BikesController, type: :request do
       end
     end
     context "multi_destroy" do
-      it "destroys the all", :flaky do
+      it "enqueues BikeDeleterJob for each bike" do
         bike1 = FactoryBot.create(:bike)
         bike2 = FactoryBot.create(:bike, example: true)
         bike3 = FactoryBot.create(:bike)
         expect(Bike.pluck(:id)).to eq([bike1.id, bike3.id])
-        expect {
-          get "#{base_url}/multi_delete/get_destroy", params: {
-            id: "multi_destroy",
-            bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
-          }
-        }.to change(Bike, :count).by(-1)
-        expect(flash[:success]).to be_present
-        expect(Bike.pluck(:id)).to eq([bike3.id])
-        expect(Bike.unscoped.where.not(deleted_at: nil).pluck(:id)).to match_array([bike1.id, bike2.id])
+        get "#{base_url}/multi_delete/get_destroy", params: {
+          id: "multi_destroy",
+          bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
+        }
+        expect(flash[:success]).to eq "2 bikes deleted!"
+        expect(BikeDeleterJob).to have_enqueued_sidekiq_job(bike1.id, false, current_user.id)
+        expect(BikeDeleterJob).to have_enqueued_sidekiq_job(bike2.id, false, current_user.id)
       end
     end
   end
