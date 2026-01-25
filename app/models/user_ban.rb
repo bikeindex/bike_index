@@ -19,6 +19,7 @@
 #
 class UserBan < ApplicationRecord
   REASON_ENUM = {
+    spamming: 4,
     abuse: 0,
     extortion: 1,
     known_criminal: 2,

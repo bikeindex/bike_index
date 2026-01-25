@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id                     :bigint           not null, primary key
+#  blocked                :boolean          default(FALSE), not null
 #  body                   :text
 #  kind                   :integer
 #  messages_prior_count   :integer
@@ -47,6 +48,7 @@ class MarketplaceMessage < ApplicationRecord
 
   attr_accessor :skip_processing
 
+  scope :blocked, -> { where(blocked: true) }
   scope :initial_message, -> { where("id = initial_record_id") }
   scope :reply_message, -> { where.not("id = initial_record_id") }
   scope :buyer_seller_message, -> { where(kind: BUYER_SELLER_MESSAGE_KINDS) }
@@ -126,9 +128,10 @@ class MarketplaceMessage < ApplicationRecord
       return false if marketplace_listing&.id.present? &&
         sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
 
-      threads_past_week = sent_messages.where(created_at: (Time.current - 1.week)...).distinct_threads
+      time = marketplace_message&.created_at || Time.current
+      threads_past_week = sent_messages.where(created_at: (time - 1.week)..time).distinct_threads
       threads_past_week.count > SPAM_LIMIT_WEEK ||
-        threads_past_week.where(created_at: (Time.current - 1.day)...).count > SPAM_LIMIT_DAY
+        threads_past_week.where(created_at: (time - 1.day)..time).count > SPAM_LIMIT_DAY
     end
 
     private

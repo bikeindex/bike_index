@@ -25,20 +25,17 @@ class AdminMailer < ApplicationMailer
 
   def no_admins_notification_email(organization)
     @organization = organization
-    mail(to: "contact@bikeindex.org",
-      subject: "#{@organization.name} doesn't have any admins!")
+    mail(subject: "#{@organization.name} doesn't have any admins!")
   end
 
   def blocked_stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
-    mail(to: "contact@bikeindex.org",
-      subject: "Stolen notification blocked!")
+    mail(subject: "Stolen notification blocked!")
   end
 
   def blocked_marketplace_message_email(marketplace_message)
     @marketplace_message = marketplace_message
-    mail(to: "contact@bikeindex.org",
-      subject: "Marketplace message blocked!")
+    mail(subject: "Marketplace message blocked!")
   end
 
   def unknown_organization_for_ascend_import(notification)

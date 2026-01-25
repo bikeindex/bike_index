@@ -55,8 +55,7 @@
 
           <% unless skip_marketplace_listing %>
             <td>
-              <%= render Admin::BikeCell::Component.new(bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages")) %>
-              <%= link_to search_emoji, url_for(sortable_search_params.merge(search_marketplace_listing_id: marketplace_message.marketplace_listing_id)), class: "display-sortable-link small ml-1" %>
+              <%= render Admin::BikeCell::Component.new(bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), render_search: render_sortable) %>
             </td>
           <% end %>
 
@@ -78,7 +77,7 @@
 
           <td>
             <% cache(marketplace_message.sender) do %>
-              <%= render Admin::UserCell::Component.new(user: marketplace_message.sender, render_search: true) %>
+              <%= render Admin::UserCell::Component.new(user: marketplace_message.sender, render_search: render_sortable) %>
             <% end %>
           </td>
         </tr>

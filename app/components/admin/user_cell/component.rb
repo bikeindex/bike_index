@@ -15,6 +15,10 @@ module Admin::UserCell
 
     private
 
+    def banned?
+      @user&.banned
+    end
+
     def email_display
       @email&.truncate(30)
     end
