@@ -138,46 +138,6 @@ module AdminHelper
     end
   end
 
-  # Add icon for unconfirmed, email banned
-  def user_icon(user = nil, full_text: false)
-    icon_hash = user_icon_hash(user)
-    return "" if icon_hash[:tags].empty?
-
-    # TODO: return individual tags, so you can show them e.g. for organizations
-    content_tag :span do
-      if icon_hash[:tags].include?(:donor)
-        concat(content_tag(:span, "D", class: "donor-icon user-icon ml-1", title: "Donor"))
-        concat(content_tag(:span, "onor", class: "less-strong")) if full_text
-      end
-      if icon_hash[:tags].include?(:member)
-        concat(content_tag(:span, "M", class: "donor-icon user-icon ml-1", title: "Member"))
-        concat(content_tag(:span, "ember", class: "less-strong")) if full_text
-      end
-      if icon_hash[:tags].include?(:organization_role)
-        org_full_text = [
-          icon_hash[:organization][:paid] ? "Paid" : nil,
-          "organization member -",
-          Organization.kind_humanized(icon_hash[:organization][:kind])
-        ].compact.join(" ")
-        concat(content_tag(:span, org_icon_text(**icon_hash[:organization]), class: "org-member-icon user-icon ml-1", title: org_full_text))
-        concat(content_tag(:span, org_full_text, class: "ml-1 less-strong")) if full_text
-      end
-
-      if icon_hash[:tags].include?(:recovery)
-        concat(content_tag(:span, "R", class: "recovery-icon user-icon ml-1", title: "Recovered bike"))
-        concat(content_tag(:span, "ecovered bike", class: "less-strong")) if full_text
-      end
-      if icon_hash[:tags].include?(:superuser)
-        concat(content_tag(:span, "S", class: "superuser-icon user-icon ml-1", title: "Superuser"))
-        concat(content_tag(:span, "uperuser", class: "less-strong")) if full_text
-      end
-      if icon_hash[:tags].include?(:theft_alert)
-        concat(content_tag(:span, "P", class: "theft-alert-icon user-icon ml-1", title: "Promoted alert purchaser"))
-        concat(content_tag(:span, "romoted alert", class: "less-strong")) if full_text
-      end
-    end
-  end
-
   def admin_path_for_object(obj = nil)
     return nil unless obj&.id.present?
 
@@ -234,43 +194,5 @@ module AdminHelper
       primary_activity: @primary_activity,
       current_organization:
     ))
-  end
-
-  private
-
-  def user_icon_hash(user = nil)
-    icon_hash = {tags: []}
-    return icon_hash if user&.id.blank?
-
-    if user.superuser?
-      icon_hash[:tags] = [:superuser]
-      return icon_hash
-    end
-    icon_hash[:tags] += [:donor] if user.donor?
-    icon_hash[:tags] += [:member] if user.membership_active.present?
-    icon_hash[:tags] += [:recovery] if user.recovered_records.limit(1).any?
-    icon_hash[:tags] += [:theft_alert] if user.theft_alert_purchaser?
-    org = user.organization_prioritized
-    if org.present?
-      icon_hash[:tags] += [:organization_role]
-      icon_hash[:organization] = {kind: org.kind.to_sym, paid: org.paid?}
-    end
-    icon_hash
-  end
-
-  def org_icon_text(kind:, paid:)
-    kind_letter = {
-      bike_shop: "BS",
-      bike_advocacy: "V",
-      law_enforcement: "P",
-      school: "S",
-      bike_manufacturer: "M",
-      ambassador: "A"
-    }
-    [
-      paid ? "$" : nil,
-      "O ",
-      kind_letter[kind] || "O" # Other
-    ].compact.join("")
   end
 end
