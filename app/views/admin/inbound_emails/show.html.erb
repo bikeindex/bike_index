@@ -1,0 +1,90 @@
+<div class="admin-subnav">
+  <div class="col-md-12">
+    <h1>Inbound Email</h1>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <% if display_dev_info? %>
+          <tr>
+            <td class="only-dev-visible">ID</td>
+            <td><code><%= @inbound_email.id %></code></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Status</td>
+
+          <td>
+            <% status_class = case @inbound_email.status
+              when "delivered" then "text-success"
+              when "failed", "bounced" then "text-danger"
+              when "processing" then "text-info"
+              else ""
+            end %>
+
+            <span class="<%= status_class %>">
+              <%= @inbound_email.status %>
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Message ID</td>
+          <td><code class="small"><%= @inbound_email.message_id %></code></td>
+        </tr>
+
+        <tr class="small">
+          <td>Created</td>
+
+          <td>
+            <span class="localizeTime preciseTime">
+              <%= l @inbound_email.created_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+
+        <tr class="small">
+          <td>Updated</td>
+
+          <td>
+            <span class="localizeTime preciseTime">
+              <%= l @inbound_email.updated_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>From</td>
+          <td><%= @inbound_email.mail.from&.join(", ") %></td>
+        </tr>
+
+        <tr>
+          <td>To</td>
+          <td><%= @inbound_email.mail.to&.join(", ") %></td>
+        </tr>
+
+        <tr>
+          <td>Subject</td>
+          <td><%= @inbound_email.mail.subject %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-4">
+  <%= render(Card::Component.new(shadow: true)) do %>
+    <p><strong>Body:</strong></p>
+    <%= render(UserTextBlockDisplay::Component.new(text: @inbound_email.mail.text_part&.decoded || @inbound_email.mail.body.decoded, max_height_class: "")) %>
+  <% end %>
+</div>

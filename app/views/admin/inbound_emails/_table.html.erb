@@ -1,0 +1,58 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+      <th><%= sortable "status", render_sortable: render_sortable %></th>
+      <th>From</th>
+      <th>To</th>
+      <th>Subject</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |inbound_email| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <%= link_to admin_inbound_email_path(inbound_email), class: "localizeTime" do %>
+                <%= l inbound_email.created_at, format: :convert_time %>
+              <% end %>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= inbound_email.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td>
+            <% status_class = case inbound_email.status
+              when "delivered" then "text-success"
+              when "failed", "bounced" then "text-danger"
+              when "processing" then "text-info"
+              else ""
+            end %>
+
+            <small class="<%= status_class %>">
+              <%= inbound_email.status %>
+            </small>
+          </td>
+
+          <td>
+            <small><%= inbound_email.mail.from&.first&.truncate(30) %></small>
+          </td>
+
+          <td>
+            <small><%= inbound_email.mail.to&.first&.truncate(30) %></small>
+          </td>
+
+          <td>
+            <small><%= inbound_email.mail.subject&.truncate(40) %></small>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
