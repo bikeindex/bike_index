@@ -26,6 +26,7 @@ module AdminHelper
   def admin_nav_select_links
     ([
       {title: "Users", path: admin_users_path, match_controller: true},
+      {title: "User Bans", path: admin_user_bans_path, match_controller: true},
       {title: "Bikes", path: admin_bikes_path, match_controller: true},
       {title: "Bike Versions", path: admin_bike_versions_path, match_controller: true},
       {title: "Stolen Bikes", path: admin_stolen_bikes_path, match_controller: true},

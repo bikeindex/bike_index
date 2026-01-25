@@ -1,0 +1,47 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: %></th>
+      <th><%= sortable "reason", render_sortable: %></th>
+      <th><%= sortable "user_id", render_sortable: %></th>
+      <th><%= sortable "creator_id", title: "Creator", render_sortable: %></th>
+      <th>Description</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |user_ban| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <span class="localizeTime">
+                <%= l user_ban.created_at, format: :convert_time %>
+              </span>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= user_ban.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td><%= user_ban.reason&.humanize %></td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: user_ban.user, render_search: true) %>
+          </td>
+
+          <td>
+            <% if user_ban.creator.present? %>
+              <%= render Admin::UserCell::Component.new(user: user_ban.creator) %>
+            <% end %>
+          </td>
+
+          <td><small><%= user_ban.description&.truncate(50) %></small></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
