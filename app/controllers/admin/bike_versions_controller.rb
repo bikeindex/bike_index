@@ -26,6 +26,10 @@ class Admin::BikeVersionsController < Admin::BaseController
     "bike_versions.#{sort_column} #{sort_direction}"
   end
 
+  def earliest_period_date
+    Time.at(1759294800) # 2025-10-01 - first bike version
+  end
+
   def matching_bike_versions
     bike_versions = BikeVersion.unscoped
 

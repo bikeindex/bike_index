@@ -28,7 +28,9 @@ class Admin::UserBansController < Admin::BaseController
   def matching_user_bans
     user_bans = viewing_deleted? ? UserBan.only_deleted : UserBan
 
-    user_bans = user_bans.where(creator_id: params[:user_id]) if params[:user_id].present?
+    if params[:user_id].present?
+      user_bans = user_bans.where(creator_id: user_subject&.id || params[:user_id])
+    end
 
     user_bans.where(created_at: @time_range)
   end

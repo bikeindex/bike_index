@@ -4,8 +4,8 @@
   <table class="table table-striped table-bordered table-sm">
     <thead class="thead-light">
       <th><%= sortable "created_at", render_sortable: %></th>
-      <th><%= sortable "reason", render_sortable: %></th>
       <th><%= sortable "user_id", render_sortable: %></th>
+      <th><%= sortable "reason", render_sortable: %></th>
       <th><%= sortable "creator_id", render_sortable: %></th>
       <th>Description</th>
     </thead>
@@ -27,19 +27,21 @@
             </div>
           </td>
 
+          <td>
+            <%= render Admin::UserCell::Component.new(user: user_ban.user, render_search: false) %>
+          </td>
+
           <td><%= user_ban.reason.humanize %></td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: user_ban.user, render_search: true) %>
+            <%= render Admin::UserCell::Component.new(user: user_ban.creator, render_sortable: render_sortable) %>
           </td>
 
           <td>
-            <% if user_ban.creator.present? %>
-              <%= render Admin::UserCell::Component.new(user: user_ban.creator) %>
-            <% end %>
+            <small title="<%= user_ban.description %>">
+              <%= user_ban.description&.truncate(50) %>
+            </small>
           </td>
-
-          <td><small title="<%= user_ban.description %>"><%= user_ban.description&.truncate(50) %></small></td>
         </tr>
       <% end %>
     </tbody>
