@@ -31,21 +31,24 @@
     <%= render(Alert::Component.new(kind: :warning, text: translation(user_banned? ? :banned_message : :removed_message), margin_classes: "tw:my-8")) %>
   <% elsif @can_send_message %>
     <%# matches Messages::ThreadShowMessage::Component#margin_class for sender %>
-    <div class="tw:mb-15 tw:ml-4 tw:lg:ml-8">
+    <div class="tw:mb-8 tw:ml-4 tw:lg:ml-8">
       <%= render partial: "my_accounts/messages/form", locals: {marketplace_message: @new_marketplace_message} %>
     </div>
   <% else %>
-    <%= render(Alert::Component.new(text: translation(".can_not_send_new_message"), kind: :error, margin_classes: "tw:mt-10 tw:mb-15")) %>
+    <%= render(Alert::Component.new(text: translation(".can_not_send_new_message"), kind: :error, margin_classes: "tw:my-10")) %>
   <% end %>
 
   <% if show_mark_sold? %>
-    <%= helpers.turbo_frame_tag "mark_sold_section" do %>
-      <div class="tw:mt-15 tw:text-center">
-        <%= link_to new_sale_path(marketplace_message_id: @initial_message.id), class: "twbtn-blue tw:px-8", data: {turbo_stream: true} do %>
-          <%= translation(".sold_to", item_type: item_type_display) %>
-          <em><%= @other_user_name %></em>
-        <% end %>
-      </div>
-    <% end %>
+    <%# marketplace_message_email links to this anchor %>
+    <div class="tw:mt-15" id="markSoldSection">
+      <%= helpers.turbo_frame_tag "mark_sold_section" do %>
+        <div class="tw:text-center">
+          <%= link_to new_sale_path(marketplace_message_id: @initial_message.id), class: "twbtn-blue tw:px-8", data: {turbo_stream: true} do %>
+            <%= translation(".sold_to", item_type: item_type_display) %>
+            <em><%= @other_user_name %></em>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
   <% end %>
 </div>
