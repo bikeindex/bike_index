@@ -108,7 +108,7 @@ class Notification < ApplicationRecord
     end
 
     def admin_kinds
-      %w[stolen_notification_blocked unknown_organization_for_ascend].freeze +
+      %w[stolen_notification_blocked marketplace_message_blocked unknown_organization_for_ascend].freeze +
         pos_integration_broken_kinds
     end
 

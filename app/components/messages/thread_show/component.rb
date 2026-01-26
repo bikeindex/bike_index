@@ -37,7 +37,21 @@ module Messages::ThreadShow
     end
 
     def current_user_seller?
+      return false if @initial_message.blank?
+
       @initial_message.receiver_id == @current_user.id
+    end
+
+    def user_banned?
+      return false if @initial_message.blank?
+
+      @initial_message.sender&.banned? || @initial_message.receiver&.banned?
+    end
+
+    def user_deleted?
+      return false if @initial_message.blank?
+
+      @initial_message.sender.blank? || @initial_message.receiver&.blank?
     end
 
     def show_mark_sold?

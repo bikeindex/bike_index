@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id                     :bigint           not null, primary key
+#  blocked                :boolean          default(FALSE), not null
 #  body                   :text
 #  kind                   :integer
 #  messages_prior_count   :integer
@@ -47,6 +48,7 @@ class MarketplaceMessage < ApplicationRecord
 
   attr_accessor :skip_processing
 
+  scope :blocked, -> { where(blocked: true) }
   scope :initial_message, -> { where("id = initial_record_id") }
   scope :reply_message, -> { where.not("id = initial_record_id") }
   scope :buyer_seller_message, -> { where(kind: BUYER_SELLER_MESSAGE_KINDS) }
@@ -89,7 +91,7 @@ class MarketplaceMessage < ApplicationRecord
     # TODO: permit sending message only X days after sale/removal, only to new owner post sale, etc.
     def can_send_message?(marketplace_listing:, user: nil, marketplace_message: nil)
       can_see_messages?(user:, marketplace_listing:, marketplace_message:) &&
-        !likely_spam?(user:, marketplace_listing:, marketplace_message:)
+        users_present_and_unbanned?(marketplace_message:, marketplace_listing:)
     end
 
     def can_see_messages?(marketplace_listing:, user: nil, marketplace_message: nil)
@@ -119,6 +121,20 @@ class MarketplaceMessage < ApplicationRecord
       str&.to_s&.gsub("sender_", "")
     end
 
+    def likely_spam?(user:, marketplace_listing:, marketplace_message: nil)
+      return false if user.blank? || user.can_send_many_marketplace_messages || user.superuser
+
+      sent_messages = MarketplaceMessage.where(sender_id: user.id)
+      sent_messages = sent_messages.where(id: ...marketplace_message.id) if marketplace_message.present?
+      return false if marketplace_listing&.id.present? &&
+        sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
+
+      time = marketplace_message&.created_at || Time.current
+      threads_past_week = sent_messages.where(created_at: (time - 1.week)..time).distinct_threads
+      threads_past_week.count >= SPAM_LIMIT_WEEK ||
+        threads_past_week.where(created_at: (time - 1.day)..time).count >= SPAM_LIMIT_DAY
+    end
+
     private
 
     # This returns either an ActiveRecord::Collection or false
@@ -144,16 +160,12 @@ class MarketplaceMessage < ApplicationRecord
       end
     end
 
-    def likely_spam?(user:, marketplace_listing:, marketplace_message: nil)
-      return false if user.blank? || user.can_send_many_marketplace_messages || user.superuser
+    def users_present_and_unbanned?(marketplace_message:, marketplace_listing:)
+      # Assume the first message is ok
+      return true if marketplace_message&.id.blank?
 
-      sent_messages = MarketplaceMessage.where(sender_id: user.id)
-      return false if marketplace_listing&.id.present? &&
-        sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
-
-      threads_past_week = sent_messages.where(created_at: (Time.current - 1.week)...).distinct_threads
-      threads_past_week.count > SPAM_LIMIT_WEEK ||
-        threads_past_week.where(created_at: (Time.current - 1.day)...).count > SPAM_LIMIT_DAY
+      marketplace_message.sender.present? && !marketplace_message.sender.banned? &&
+        marketplace_message.receiver.present? && !marketplace_message.receiver.banned?
     end
   end
 
@@ -161,6 +173,10 @@ class MarketplaceMessage < ApplicationRecord
   # NOTE: This calls validations on this instance
   def can_send?
     self.class.can_send_message?(user: sender, marketplace_listing:, marketplace_message: self)
+  end
+
+  def likely_spam?
+    self.class.likely_spam?(user: sender, marketplace_listing:, marketplace_message: self)
   end
 
   # Should be called before creation
@@ -249,6 +265,10 @@ class MarketplaceMessage < ApplicationRecord
 
   def kind_humanized
     self.class.kind_humanized(kind)
+  end
+
+  def blocked_reason
+    :likely_spam # Currently the only reason! But there could be more in the future
   end
 
   private
