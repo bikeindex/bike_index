@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Badge::BikeHiddenAdminExplanation::Component, type: :component do
+RSpec.describe Admin::BikeHiddenExplanation::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {bike:} }
@@ -14,7 +14,7 @@ RSpec.describe Badge::BikeHiddenAdminExplanation::Component, type: :component do
 
   context "with deleted bike" do
     let(:deleted_at) { Time.current - 1.minute }
-    let(:bike) { Bike.new(deleted_at: deleted_at) }
+    let(:bike) { Bike.new(deleted_at:) }
     it "renders" do
       expect(component).to have_css("small")
       expect(component).to have_content I18n.l(deleted_at, format: :convert_time)
@@ -23,7 +23,7 @@ RSpec.describe Badge::BikeHiddenAdminExplanation::Component, type: :component do
     end
 
     context "also example and user_hidden" do
-      let(:bike) { Bike.new(deleted_at: deleted_at, example: true, user_hidden: true) }
+      let(:bike) { Bike.new(deleted_at:, example: true, user_hidden: true) }
 
       it "renders" do
         expect(component).to have_css("small")
@@ -52,7 +52,7 @@ RSpec.describe Badge::BikeHiddenAdminExplanation::Component, type: :component do
     end
   end
 
-  context "with example" do
+  context "with likely_spam" do
     let(:bike) { Bike.new(likely_spam: true) }
     it "renders" do
       expect(component).to have_css("small")

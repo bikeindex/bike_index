@@ -145,7 +145,7 @@
 
               <td class="d-none d-lg-table-cell">
                 <div class="less-strong-hold">
-                  <%= render Badge::BikeHiddenAdminExplanation::Component.new(bike:) %>
+                  <%= render Admin::BikeHiddenExplanation::Component.new(bike:) %>
                   <%= [bike.year, bike.frame_model_truncated].join(' ') %>
                   <%= "(#{bike.type})" unless bike.type == 'bike' %>
 
