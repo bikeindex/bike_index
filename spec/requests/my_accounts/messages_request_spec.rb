@@ -279,32 +279,32 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
 
     context "likely_spam" do
       let!(:prior_messages) do
-        # Create messages to 3 different listings to hit SPAM_LIMIT_DAY
-        3.times.map do
-          listing = FactoryBot.create(:marketplace_listing, :for_sale)
-          FactoryBot.create(:marketplace_message, sender: current_user)
-        end
+        # Create messages to 4 different listings to exceed SPAM_LIMIT_DAY (3)
+        4.times.map { FactoryBot.create(:marketplace_message, sender: current_user, skip_processing: true) }
       end
 
       it "creates message and sends blocked email to admin" do
-        expect(prior_messages.count).to eq 3
-        expect(MarketplaceMessage.where(sender_id: current_user.id).distinct_threads.count).to eq 3
+        expect(prior_messages.count).to eq 4
+        expect(MarketplaceMessage.where(sender_id: current_user.id).distinct_threads.count).to eq 4
+        # Ensure marketplace_listing is created before clearing jobs
+        expect(marketplace_listing).to be_present
 
+        Sidekiq::Worker.clear_all
         ActionMailer::Base.deliveries = []
-        Sidekiq::Testing.inline! do
-          expect {
-            post base_url, params: {marketplace_message: new_params}
-          }.to change(MarketplaceMessage, :count).by(1)
-            .and change(ActionMailer::Base.deliveries, :count).by(1)
-        end
 
-        expect(flash[:success]).to be_present
-        expect(response).to redirect_to(my_account_messages_path)
+        expect {
+          post base_url, params: {marketplace_message: new_params}
+          expect(flash[:success]).to be_present
+        }.to change(MarketplaceMessage, :count).by(1)
 
-        marketplace_message = MarketplaceMessage.last
-        expect(marketplace_message.likely_spam?).to be_truthy
-        expect(marketplace_message.notifications.count).to eq 1
-        expect(marketplace_message.notifications.first.kind).to eq "marketplace_message_blocked"
+        new_message = MarketplaceMessage.last
+        expect(new_message.likely_spam?).to be_truthy
+        expect(Email::MarketplaceMessageJob.jobs.count).to eq 1
+
+        Email::MarketplaceMessageJob.drain
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        expect(new_message.notifications.count).to eq 1
+        expect(new_message.notifications.first.kind).to eq "marketplace_message_blocked"
 
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to match(/blocked/i)

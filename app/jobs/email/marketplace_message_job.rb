@@ -8,6 +8,14 @@ class Email::MarketplaceMessageJob < ApplicationJob
     return if marketplace_message.blank?
 
     likely_spam = marketplace_message.likely_spam?
+
+    # Don't send a notification if there are already notifications in the past 24 hours
+    if likely_spam
+      return if Notification.marketplace_message_blocked
+        .where(user_id: marketplace_message.sender_id).where(created_at: (Time.current - 24.hours)..)
+        .count > 0
+    end
+
     kind = likely_spam ? :marketplace_message_blocked : :marketplace_message
     notification = marketplace_message.notifications.first
     notification ||= Notification.create(kind:, notifiable: marketplace_message,

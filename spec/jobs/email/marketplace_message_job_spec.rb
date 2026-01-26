@@ -63,9 +63,10 @@ RSpec.describe Email::MarketplaceMessageJob, type: :job do
   end
 
   context "likely_spam?" do
+    before { allow_any_instance_of(MarketplaceMessage).to receive(:likely_spam?).and_return(true) }
     it "sends blocked email to admin" do
       ActionMailer::Base.deliveries = []
-      allow_any_instance_of(MarketplaceMessage).to receive(:likely_spam?).and_return(true)
+
 
       expect(Notification.count).to eq 0
       expect {
@@ -81,6 +82,20 @@ RSpec.describe Email::MarketplaceMessageJob, type: :job do
       expect(notification.kind).to eq "marketplace_message_blocked"
       expect(notification.notifiable).to eq marketplace_message
       expect(notification.delivery_status).to eq "delivery_success"
+    end
+
+    context "with notification sent today already" do
+      let!(:notification) { Notification.create!(kind: :marketplace_message_blocked, user_id: marketplace_message.sender_id) }
+      it "doesn't send a notification to admin" do
+        ActionMailer::Base.deliveries = []
+
+        expect(Notification.count).to eq 1
+        expect {
+          described_class.new.perform(marketplace_message.id)
+        }.to change(Notification, :count).by(0)
+
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
     end
   end
 end
