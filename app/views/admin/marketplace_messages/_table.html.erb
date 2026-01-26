@@ -60,6 +60,13 @@
           <% end %>
 
           <td>
+            <% if marketplace_message.blocked? %>
+              <small class="tw:text-red-500">
+                Message blocked!
+                <%= marketplace_message.blocked_reason&.to_s&.humanize %>
+              </small>
+            <% end %>
+
             <span title="<%= marketplace_message.body %>">
               <%= marketplace_message.body.truncate(truncate_length) %>
             </span>

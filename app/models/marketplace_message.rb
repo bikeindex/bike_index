@@ -268,6 +268,10 @@ class MarketplaceMessage < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
+  def blocked_reason
+    :likely_spam # Currently the only reason! But there could be more in the future
+  end
+
   private
 
   def users_match_initial_record

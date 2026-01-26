@@ -1,5 +1,6 @@
 class AdminMailer < ApplicationMailer
   helper TranslationHelper
+  helper ApplicationComponentHelper
 
   default content_type: "multipart/alternative",
     parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"],

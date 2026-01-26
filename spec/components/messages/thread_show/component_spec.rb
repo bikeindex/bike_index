@@ -73,7 +73,6 @@ RSpec.describe Messages::ThreadShow::Component, type: :component do
       expect(component).to have_content marketplace_message.sender.marketplace_message_name
 
       component_text = whitespace_normalized_body_text(component.to_html)
-      pp component_text
       expect(component_text).to match(/this bike has been removed/i)
       expect(component_text).to_not match(/banned/)
     end
