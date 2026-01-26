@@ -5997,6 +5997,10 @@ nb:
       thread_show:
         can_not_send_new_message: Beklager, du kan ikke sende en ny melding.
         sold_to: Merke %{item_type} solgt til
+        banned_message: Beklager, men den brukeren er utestengt og kan ikke motta
+          nye meldinger.
+        deleted_message: Beklager, men den brukeren har slettet kontoen sin og kan
+          ikke motta nye meldinger.
       thread_show_message:
         me: Meg
         subject: Emne

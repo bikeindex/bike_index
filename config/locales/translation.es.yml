@@ -4741,6 +4741,8 @@ es:
       thread_show:
         can_not_send_new_message:
         sold_to:
+        banned_message:
+        deleted_message:
       thread_show_message:
         me:
         subject:
