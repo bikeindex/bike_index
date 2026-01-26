@@ -39,6 +39,7 @@
   <% end %>
 
   <% if show_mark_sold? %>
+    <%# marketplace_message_email links to this anchor %>
     <div class="tw:mt-15" id="markSoldSection">
       <%= helpers.turbo_frame_tag "mark_sold_section" do %>
         <div class="tw:text-center">
