@@ -42,8 +42,10 @@ class MyAccounts::MessagesController < ApplicationController
     # raises if can't see
     @can_send_message = verify_can_see_message!(@marketplace_listing, @marketplace_message)
 
-    # Save even if spam - the job will send to admin instead of receiver
-    if @marketplace_message.ignored_duplicate? || @marketplace_message.save
+    if !@marketplace_message.can_send?
+      flash[:error] = translation(:can_not_send_message)
+      render :show
+    elsif @marketplace_message.ignored_duplicate? || @marketplace_message.save
       flash[:success] = translation(:message_sent)
       redirect_to my_account_messages_path
     else

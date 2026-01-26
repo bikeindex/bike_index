@@ -273,7 +273,7 @@ RSpec.describe MarketplaceMessage, type: :model do
       it "is likely_spam" do
         expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_truthy
         expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
-        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_falsey
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
       end
 
       context "with a message to the same listing" do
