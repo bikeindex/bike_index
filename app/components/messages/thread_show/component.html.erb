@@ -26,7 +26,7 @@
   <% if @sale.present? && !sold_alert_rendered? %>
     <%= render_sold_alert %>
   <% end %>
-  <h2>banned: <%= user_banned? %></h2>
+
   <% if user_banned? || user_deleted? %>
     <%= render(Alert::Component.new(kind: :warning, text: translation(user_banned? ? :banned_message : :removed_message), margin_classes: "tw:my-8")) %>
   <% elsif @can_send_message %>

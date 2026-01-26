@@ -126,6 +126,7 @@ class MarketplaceMessage < ApplicationRecord
       return false if user.blank? || user.can_send_many_marketplace_messages || user.superuser
 
       sent_messages = MarketplaceMessage.where(sender_id: user.id)
+      sent_messages = sent_messages.where(id: ...marketplace_message.id) if marketplace_message.present?
       return false if marketplace_listing&.id.present? &&
         sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
 
@@ -161,10 +162,11 @@ class MarketplaceMessage < ApplicationRecord
     end
 
     def users_present_and_unbanned?(marketplace_message:, marketplace_listing:)
-      if marketplace_message.present?
-        return true if marketplace_message.sender.blank? || marketplace_message.sender.banned? ||
-          marketplace_message.receiver.blank? || marketplace_message.receiver.banned?
-      end
+      # Assume the first message is ok
+      return true if marketplace_message&.id.blank?
+
+      marketplace_message.sender.present? && !marketplace_message.sender.banned? &&
+        marketplace_message.receiver.present? && !marketplace_message.receiver.banned?
     end
   end
 
