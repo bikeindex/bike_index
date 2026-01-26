@@ -1,0 +1,635 @@
+<% last_email_errored = @user.user_emails&.last_email_errored || UserEmail.none %>
+
+<% if @user.banned? || @user.deleted? || last_email_errored.any? || @user.email_banned? %>
+  <div class="row mb-4">
+    <% if @user.deleted? %>
+      <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3 mt-4">
+        <div class="alert alert-danger mb-4">
+          <h4 class="text-danger">User deleted</h4>
+          Deleted:
+          <span class="convertTime preciseTime">
+            <%= l @user.deleted_at, format: :convert_time %>
+          </span>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @user.banned? %>
+      <% user_ban = @user.user_ban %>
+      <div class="col-md-8 offset-md-2 mt-4">
+        <h4 class="text-danger"><strong>User banned</strong></h4>
+
+        <table class="table-list">
+          <tbody>
+            <tr>
+              <td>Banned at</td>
+
+              <td class="convertTime preciseTime">
+                <% time = user_ban&.created_at || @user.updated_at %>
+                <%= l time, format: :convert_time %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>By</td>
+
+              <td>
+                <% if user_ban&.creator.present? %>
+                  <%= user_ban.creator.display_name %>
+                <% elsif user_ban&.creator_id.present? %>
+                  User #
+                  <%= user_ban.creator_id %>
+                  (unknown user)
+                <% end %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>Reason</td>
+              <td><%= user_ban&.reason&.humanize %></td>
+            </tr>
+
+            <tr>
+              <td>Notes</td>
+              <td><%= user_ban&.description %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+
+    <% if last_email_errored.any? %>
+      <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3 mt-4">
+        <div class="alert alert-danger mb-4">
+          <h4 class="text-danger">Last email to user errored!</h4>
+          Check the notifications "Delivery Errors" (below)
+        </div>
+      </div>
+    <% end %>
+
+    <% if @user.email_banned? %>
+      <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3 mt-4">
+        <div class="alert alert-danger mb-4">
+          <h4 class="text-danger">User's email banned (not delivered)</h4>
+          Reasons:
+          <% @user.email_bans_active.each do |email_ban| %>
+            <%= email_ban.reason_humanized %>
+
+            <small class="less-strong">
+              <% if email_ban.reason == "email_domain" %>
+                - the
+                <%= link_to "email domain", admin_email_domain_path(email_ban.email_domain) %>
+                was banned.
+              <% elsif email_ban.reason == "email_duplicate" %>
+                - the email looks like a duplicate of another email. In 2025, we
+                were getting a lot of user sign up spam with emails that just
+                had extra periods added in (which still deliver to gmail)
+              <% elsif email_ban.reason == "delivery_failure" %>
+                - a recent email to them failed to be delivered. Have them check
+                their spam folder!
+              <% end %>
+            </small>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="row">
+  <div class="col-md-6">
+    <h1>
+      <small>Editing</small>
+      <%= @user.display_name %>
+
+      <% if helpers.display_dev_info? %>
+        <em class="small less-strong only-dev-visible">id: <%= @user.id %></em>
+      <% end %>
+    </h1>
+
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Icons</td>
+
+          <td>
+            <%= render(Admin::UserIcon::Component.new(user: @user, full_text: true)) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Created</td>
+
+          <td class="convertTime preciseTime">
+            <%= l @user.created_at, format: :convert_time %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Updated</td>
+
+          <td class="convertTime preciseTime">
+            <%= l @user.updated_at, format: :convert_time %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Last&nbsp;login</td>
+
+          <td>
+            <% if @user.last_login_at.present? %>
+              <span class="convertTime preciseTime">
+                <%= l @user.last_login_at, format: :convert_time %>
+              </span>
+            <% end %>
+
+            <% if @user.last_login_ip.present? %>
+              <small class="less-strong"><%= @user.last_login_ip %></small>
+            <% end %>
+          </td>
+        </tr>
+
+        <% if helpers.display_dev_info? %>
+          <tr class="only-dev-visible">
+            <td>No Address</td>
+
+            <td>
+              <% if @user.no_address? %>
+                <strong class="text-success">TRUE</strong>
+              <% else %>
+                <small class="less-strong">address permitted</small>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Superuser</td>
+
+          <td>
+            <% if @user.developer? %>
+              <span class="only-dev-visible">developer</span>
+            <% end %>
+
+            <% superuser_abilities = @user.superuser_abilities %>
+
+            <% if @user.superuser? %>
+              <strong>full superuser</strong>
+              <% superuser_ability = superuser_abilities.universal.first %>
+              <% if superuser_ability.present? %>
+                <small class="less-strong">
+                  since
+                  <span class="convertTime preciseTime"><%= l superuser_ability.created_at, format: :convert_time %></span>
+                </small>
+              <% end %>
+            <% elsif superuser_abilities.any? %>
+              <%= link_to "limited", admin_superuser_abilities_path(user_id: @user.id), class: "text-info" %>
+              <ul class="small mb-0">
+                <% superuser_abilities.each do |superuser_ability| %>
+                  <li>
+                    <% if superuser_ability.universal? %>
+                      <strong>full superuser</strong>
+                    <% else %>
+                      Can access
+                      <% if superuser_ability.action_name.present? %>
+                        <em><%= superuser_ability.action_name %></em>
+                        in
+                      <% end %>
+                      <%= superuser_ability.controller_name %>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Emails</td>
+
+          <td>
+            <div class="row">
+              <div class="col-4">
+                <small
+                  class="d-block border-bottom"
+                  title="Receive Bike Index newsletters"
+                >
+                  Newsletters
+                </small>
+
+                <% if @user.notification_newsletters %>
+                  <%= check_mark %>
+                <% else %>
+                  <small class="less-strong">false</small>
+                <% end %>
+              </div>
+
+              <div class="col-4">
+                <small
+                  class="d-block border-bottom"
+                  title="Receive non-stolen theft emails"
+                >
+                  Unstolen
+                </small>
+
+                <% if @user.notification_unstolen %>
+                  <%= check_mark %>
+                <% else %>
+                  <small class="text-danger less-strong">false</small>
+                <% end %>
+              </div>
+
+              <div class="col-4">
+                <small
+                  class="d-block border-bottom"
+                  title="No non theft emails"
+                >
+                  NONE
+                </small>
+
+                <% if @user.no_non_theft_notification %>
+                  <span class="text-danger"><%= check_mark %></span>
+                <% else %>
+                  <small class="less-strong">false</small>
+                <% end %>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6 mt-auto">
+    <table class="table-list">
+      <tr>
+        <td>Confirmed?</td>
+
+        <td>
+          <% if @user.confirmed? %>
+            <%= check_mark %>
+          <% else %>
+            <small class="less-strong">false</small>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>email</td>
+
+        <td>
+          <%= @user.email %>
+
+          <% if @user.secondary_emails.any? %>
+            <small><%= @user.secondary_emails.join(", ") %></small>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Name</td>
+        <td><%= @user.name %></td>
+      </tr>
+
+      <tr>
+        <td>Photo</td>
+
+        <td>
+          <% if @user.avatar? %>
+            <%= @user.avatar %>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Social</td>
+
+        <td>
+          <small>
+            <% if @user.show_bikes? %>
+              <%= link_to "Bike Index profile page", "/users/#{@user.username}", class: "gray-link" %>
+              <% if @user.twitter.present? %>
+                <br>
+              <% end %>
+            <% end %>
+
+            <% if @user.twitter.present? %>
+              Twitter:
+              <%= link_to @user.twitter, "https://twitter.com/#{@user.twitter}" %>
+            <% end %>
+          </small>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Phone</td>
+
+        <td>
+          <% display_phone = @user.phone.present? %>
+
+          <% if display_phone || @user.user_phones.any? %>
+            <ul class="mb-0">
+              <% @user.user_phones.each do |user_phone| %>
+                <li>
+                  <%= phone_display(user_phone.phone) %>
+
+                  <small class="less-strong <%= user_phone.confirmed? ? "text-success" : "text-warning" %>">
+                    <%= user_phone.confirmed? ? "confirmed" : "unconfirmed" %>
+                  </small>
+
+                  <small class="less-strong convertTime withPreposition">
+                    <%= l user_phone.created_at, format: :convert_time %>
+                  </small>
+
+                  <% if display_phone && Phonifyer.phonify(user_phone.phone) == Phonifyer.phonify(@user.phone) %>
+                    <% display_phone = false %>
+                  <% end %>
+                </li>
+              <% end %>
+
+              <% if display_phone %>
+                <li>
+                  <%= phone_display(@user.phone) %>
+                  <small class="less-strong text-warning">unconfirmed</small>
+                </li>
+              <% end %>
+            </ul>
+            <% unless Flipper.enabled?(:phone_verification) %>
+              <em class="small less-strong">
+                Phone verification is currently disabled, users don't see the
+                option to confirm their phones
+              </em>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Website</td>
+        <td><%= @user.mb_link_target %></td>
+      </tr>
+
+      <tr>
+        <td>Address</td>
+
+        <td>
+          <small>
+            <%= @user.formatted_address_string(visible_attribute: :street, current_country_id: helpers.current_country_id) %>
+          </small>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Vendor terms?</td>
+
+        <td>
+          <% if @user.when_vendor_terms_of_service.present? %>
+            <span class="convertTime preciseTime">
+              <%= l @user.when_vendor_terms_of_service, format: :convert_time %>
+            </span>
+          <% end %>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<% if @user.ambassador? %>
+  <h4 class="mt-4">Ambassador Tasks</h4>
+  <% ambassador = Ambassador.find(@user.id) %>
+  <p><strong><%= "#{ambassador.progress_count} complete" %></strong></p>
+  <table class="table table-striped table-bordered ambassador-tasks-table">
+    <thead class="small-header thead-light">
+      <tr>
+        <th>Task</th>
+        <th>Completed at</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% ambassador.ambassador_task_assignments.each do |task| %>
+        <tr>
+          <td><strong><%= task.title %></strong></td>
+
+          <td>
+            <% if task.completed_at %>
+              <span class="convertTime">
+                <%= l task.completed_at, format: :convert_time %>
+              </span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <h4 class="mt-4">Ambassador <small class="less-strong">false</small></h4>
+<% end %>
+
+<h4 class="mt-4">
+  Bikes
+  <small><%= link_to number_display(@bikes_count), admin_bikes_path(user_id: @user.id) %></small>
+</h4>
+
+<% if @bikes_count > 0 %>
+  <%= render partial: "admin/bikes/table", locals: {bikes: @bikes, skip_user: true} %>
+<% end %>
+
+<h4 class="mt-4">
+  Marketplace Messages
+  <small><%= link_to number_display(marketplace_messages.count), admin_marketplace_messages_path(user_id: @user.id) %> <% if marketplace_messages.count > object_limit %><em>(only <%= object_limit %> most recent shown)</em><% end %></small>
+</h4>
+
+<% if marketplace_messages.count > 0 %>
+  <%= render partial: "/admin/marketplace_messages/table", locals: {collection: marketplace_messages.limit(object_limit)} %>
+<% end %>
+
+<h4 class="mt-4">
+  Memberships
+  <small><%= link_to number_display(memberships.count), admin_memberships_path(user_id: @user.id) %> <% if memberships.count > object_limit %><em>(only <%= object_limit %> most recent shown)</em><% end %></small>
+</h4>
+
+<% if memberships.count > 0 %>
+  <%= render partial: "/admin/memberships/table", locals: {memberships: memberships.limit(object_limit), skip_user: true} %>
+<% end %>
+
+<h4 class="mt-4">
+  <%= "Active Alert".pluralize(user_alerts.active.count) %>
+  <%= number_display(user_alerts.active.count) %>
+
+  <em class="small ml-2">
+    <%= link_to "#{user_alerts.count} total", admin_user_alerts_path(user_id: @user.id) %>
+  </em>
+</h4>
+
+<% if user_alerts.any? %>
+  <%= render partial: "admin/user_alerts/table", locals: {user_alerts: user_alerts.active, skip_user: true} %>
+<% end %>
+
+<h4 class="mt-4">
+  Donations/payments
+  <small><%= link_to number_display(payments.count), admin_payments_path(user_id: @user.id, period: "all") %> <% if payments.count > object_limit %><em>(only <%= object_limit %> most recent shown)</em><% end %></small>
+</h4>
+
+<% if payments.any? %>
+  <%= render partial: "/admin/payments/table", locals: {payments: payments.limit(object_limit), skip_user: true} %>
+<% end %>
+
+<h4 class="mt-4">
+  OrganizationRoles
+  <small class="less-strong mr-3"><%= number_display(@user.organization_roles.count) %></small>
+  
+  <small class="d-inline-block less-strong"><% reg_orgs_count = @user.user_registration_organizations.count %> <%= link_to admin_user_registration_organizations_path(user_id: @user.id) do %><%= number_display(reg_orgs_count) %><% end %> <%= "registration org".pluralize(reg_orgs_count) %></small>
+</h4>
+
+<% if @user.organization_roles.count > 0 %>
+  <%= render partial: "/admin/organization_roles/table", locals: {organization_roles: @user.organization_roles} %>
+<% end %>
+
+<% notifications = Notification.notifications_sent_or_received_by(@user).order(id: :desc) %>
+
+<h4 class="mt-4">
+  Notifications
+  <small><%= link_to number_display(notifications.count), admin_notifications_path(user_id: @user.id) %> <% if notifications.count > object_limit %><em>(only <%= object_limit %> most recent shown)</em><% end %></small>
+</h4>
+
+<% if notifications.count > 0 %>
+  <%= render partial: "/admin/notifications/table", locals: {notifications: notifications.limit(object_limit), skip_user: true} %>
+<% end %>
+
+<% feedbacks = Feedback.where(user_id: @user.id).order(id: :desc) %>
+
+<h4 class="mt-4">
+  Feedbacks
+  <small><%= link_to number_display(feedbacks.count), admin_feedbacks_path(user_id: @user.id) %> <% if notifications.count > object_limit %><em>(only <%= object_limit %> most recent shown)</em><% end %></small>
+</h4>
+
+<% if feedbacks.count > 0 %>
+  <%= render partial: "/admin/feedbacks/table", locals: {feedbacks: feedbacks.limit(object_limit), skip_user: true} %>
+<% end %>
+
+<h4 class="mt-4">User emails</h4>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead>
+      <th>Created&nbsp;<small class="convertTimezone"></small></th>
+      <th></th>
+      <th>Confirmed</th>
+      <th>Primary</th>
+      <th>Old User Id</th>
+    </thead>
+
+    <tbody>
+      <% @user.user_emails.each do |user_email| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <span class="less-strong-right medium-screens">
+                <%= user_email.id %>
+              </span>
+
+              <span class="convertTime">
+                <%= l user_email.created_at, format: :convert_time %>
+              </span>
+            </div>
+          </td>
+
+          <td><%= user_email.email %></td>
+
+          <td>
+            <% if user_email.confirmed? %>
+              <%= check_mark %>
+            <% else %>
+              <small class="less-strong">false</small>
+            <% end %>
+          </td>
+
+          <td>
+            <% if user_email.primary? %>
+              <%= check_mark %>
+            <% else %>
+              <small class="less-strong">false</small>
+            <% end %>
+          </td>
+
+          <td><%= user_email.old_user_id %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<hr class="mt-4">
+
+<h4>
+  <% if mailchimp_datum.blank? %>
+    No
+  <% end %>
+  Mailchimp data
+  <% if mailchimp_datum.present? %>
+    <em class="small">
+      <a
+        class="small"
+        href=".mailchimpRawData"
+        aria-expanded="false"
+        data-toggle="collapse"
+      >
+        show raw data
+      </a>
+    </em>
+  <% end %>
+</h4>
+
+<% if mailchimp_datum.present? %>
+  <div class="row">
+    <div class="col-md-6">
+      <table class="table-list">
+        <tbody>
+          <% if helpers.display_dev_info? %>
+            <tr class="only-dev-visible collapse mailchimpRawData">
+              <td class="small">ID</td>
+              <td class="small"><%= mailchimp_datum.id %></td>
+            </tr>
+          <% end %>
+
+          <tr>
+            <td>Status</td>
+            <td><%= @user.mailchimp_datum.status %></td>
+          </tr>
+
+          <tr>
+            <td>Lists</td>
+            <td><%= @user.mailchimp_datum.lists.join(", ") %></td>
+          </tr>
+
+          <tr>
+            <td>Mailchimp updated</td>
+
+            <td>
+              <% if mailchimp_datum.mailchimp_updated_at.present? %>
+                <span class="convertTime">
+                  <%= l(mailchimp_datum.mailchimp_updated_at, format: :convert_time) %>
+                </span>
+              <% end %>
+            </td>
+          </tr>
+
+          <tr class="collapse small mailchimpRawData">
+            <td>Feedbacks</td>
+
+            <td>
+              <%= safe_join(mailchimp_datum.feedbacks.map { |f| link_to(f.kind_humanized, admin_feedback_path(f), class: "small") }, ", ") %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-md-6">
+      <div class="collapse small mailchimpRawData">
+        <%= helpers.pretty_print_json(mailchimp_datum.data) %>
+      </div>
+    </div>
+  </div>
+<% end %>
