@@ -109,6 +109,17 @@ RSpec.describe AdminMailer, type: :mailer do
     end
   end
 
+  describe "blocked_marketplace_message_email" do
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message, body: "Test Message", subject: "Test subject") }
+    let(:mail) { AdminMailer.blocked_marketplace_message_email(marketplace_message) }
+
+    it "renders email" do
+      expect(mail.subject[/blocked/i].present?).to be_truthy
+      expect(mail.body.encoded).to match(marketplace_message.body)
+      expect(mail.tag).to eq("admin")
+    end
+  end
+
   describe "#theft_alert_notification" do
     context "given notify_of_recovered true" do
       it "renders email with recovered notification" do

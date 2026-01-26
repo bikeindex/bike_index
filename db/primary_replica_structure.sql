@@ -2232,7 +2232,8 @@ CREATE TABLE public.marketplace_messages (
     kind integer,
     messages_prior_count integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    blocked boolean DEFAULT false NOT NULL
 );
 
 
@@ -7178,6 +7179,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260125184905'),
 ('20260124024709'),
 ('20251223233135'),
 ('20251217162136'),

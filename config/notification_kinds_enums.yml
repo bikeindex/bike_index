@@ -27,4 +27,5 @@
 :unknown_organization_for_ascend: 29
 :password_reset: 8
 :marketplace_message: 30
+:marketplace_message_blocked: 32
 :newsletter: 31
