@@ -256,6 +256,16 @@
 
 - object_limit = 10
 
+- marketplace_messages = MarketplaceMessage.where(sender_id: @user.id).order(id: :desc)
+%h4.mt-4
+  Marketplace Messages
+  %small
+    = link_to number_display(marketplace_messages.count), admin_marketplace_messages_path(user_id: @user.id)
+    - if marketplace_messages.count > object_limit
+      %em (only #{object_limit} most recent shown)
+- if marketplace_messages.count > 0
+  = render partial: "/admin/marketplace_messages/table", locals: {collection: marketplace_messages.limit(object_limit)}
+
 - memberships = Membership.where(user_id: @user.id).order(id: :desc)
 %h4.mt-4
   Memberships
