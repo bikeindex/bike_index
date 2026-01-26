@@ -1,0 +1,5 @@
+<div>
+  <% UI::Badge::Component::COLORS.keys.each do |color| %>
+    <%= render UI::Badge::Component.new(text: color.to_s.humanize, color:) %>
+  <% end %>
+</div>
