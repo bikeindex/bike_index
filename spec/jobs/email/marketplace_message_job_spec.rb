@@ -65,8 +65,7 @@ RSpec.describe Email::MarketplaceMessageJob, type: :job do
   context "likely_spam?" do
     it "sends blocked email to admin" do
       ActionMailer::Base.deliveries = []
-      expect(marketplace_message).to receive(:likely_spam?).and_return(true)
-      allow(MarketplaceMessage).to receive(:find_by).with(id: marketplace_message.id).and_return(marketplace_message)
+      allow_any_instance_of(MarketplaceMessage).to receive(:likely_spam?).and_return(true)
 
       expect(Notification.count).to eq 0
       expect {

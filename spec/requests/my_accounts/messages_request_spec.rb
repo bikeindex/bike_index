@@ -190,6 +190,8 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       expect(Email::MarketplaceMessageJob.jobs.count).to eq 1
       Email::MarketplaceMessageJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
+      expect(marketplace_message.notifications.count).to eq 1
+      expect(marketplace_message.notifications.first.delivery_status).to eq "delivery_success"
 
       follow_up_params = new_params.merge(initial_record_id: marketplace_message.id, body: "More thanks")
       Sidekiq::Testing.inline! do
@@ -270,6 +272,43 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
         expect(new_marketplace_message.receiver_id).to eq marketplace_message.sender_id
 
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+        expect(marketplace_message.notifications.count).to eq 1
+        expect(marketplace_message.notifications.first.delivery_status).to eq "delivery_success"
+      end
+    end
+
+    context "likely_spam" do
+      let!(:prior_messages) do
+        # Create messages to 3 different listings to hit SPAM_LIMIT_DAY
+        3.times.map do
+          listing = FactoryBot.create(:marketplace_listing, :for_sale)
+          FactoryBot.create(:marketplace_message, sender: current_user)
+        end
+      end
+
+      it "creates message and sends blocked email to admin" do
+        expect(prior_messages.count).to eq 3
+        expect(MarketplaceMessage.where(sender_id: current_user.id).distinct_threads.count).to eq 3
+
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! do
+          expect {
+            post base_url, params: {marketplace_message: new_params}
+          }.to change(MarketplaceMessage, :count).by(1)
+            .and change(ActionMailer::Base.deliveries, :count).by(1)
+        end
+
+        expect(flash[:success]).to be_present
+        expect(response).to redirect_to(my_account_messages_path)
+
+        marketplace_message = MarketplaceMessage.last
+        expect(marketplace_message.likely_spam?).to be_truthy
+        expect(marketplace_message.notifications.count).to eq 1
+        expect(marketplace_message.notifications.first.kind).to eq "marketplace_message_blocked"
+
+        mail = ActionMailer::Base.deliveries.last
+        expect(mail.subject).to match(/blocked/i)
+        expect(mail.to).to eq(["contact@bikeindex.org"])
       end
     end
   end
