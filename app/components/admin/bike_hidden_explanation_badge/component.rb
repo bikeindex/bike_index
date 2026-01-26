@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Admin::BikeHiddenExplanation
+module Admin::BikeHiddenExplanationBadge
   class Component < ApplicationComponent
     def initialize(bike:)
       @bike = bike
