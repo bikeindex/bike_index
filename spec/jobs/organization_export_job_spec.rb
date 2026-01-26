@@ -370,7 +370,9 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(bike_sticker.claimed?).to be_truthy
             expect(bike_sticker.bike).to eq bike
             expect(bike_sticker.user).to eq user
+            pp "******"
             expect(export.assign_bike_codes?).to be_falsey
+            pp "--------"
             expect(export.headers).to eq Export.permitted_headers("include_paid")
             expect(bike.reload.user&.id).to be_blank
             expect(bike.owner_name).to eq nil
@@ -379,6 +381,8 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(bike.organization_affiliation).to eq "community_member"
             expect(bike.registration_address(true).except("country")).to eq target_address
             expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
+            # pp export.options
+            pp "----- #{export.id}"
             instance.perform(export.id)
           end
           export.reload
@@ -522,7 +526,10 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
         end
       end
-      context "impounded"
+      context "impounded" do
+        let(:enabled_feature_slugs) { %w[impound_bikes] }
+        let(:export_options) { {headers: Export.permitted_headers(organization)} }
+      end
     end
   end
 

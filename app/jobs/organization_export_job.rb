@@ -157,6 +157,7 @@ class OrganizationExportJob < ApplicationJob
     when "serial" then bike.serial_number
     when "is_stolen" then bike.status_stolen? ? "true" : nil
     when "is_impounded" then bike.status_impounded? ? "true" : nil
+    when "impounded_at" then bike.current_impound_record&.impounded_at&.utc
     when "address" then bike.registration_address["street"] # These are the expanded values for bike registration address
     when "address_2" then bike.registration_address["street_2"]
     when "city" then bike.registration_address["city"]

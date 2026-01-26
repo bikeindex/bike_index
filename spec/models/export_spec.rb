@@ -216,24 +216,49 @@ RSpec.describe Export, type: :model do
     let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
     let(:additional_headers) { %w[address bike_sticker organization_affiliation phone student_id] }
-    let(:all_headers) { permitted_headers + additional_headers }
+    let(:all_headers) do
+      %w[
+        address
+        bike_sticker
+        color
+        extra_registration_number
+        impounded_at
+        is_impounded
+        is_stolen
+        link
+        manufacturer
+        model
+        motorized
+        organization_affiliation
+        owner_email
+        owner_name
+        partial_registration
+        phone
+        registered_at
+        registered_by
+        serial
+        status
+        student_id
+        thumbnail
+        vehicle_type
+      ]
+    end
     it "returns the array we expect" do
       expect(permitted_headers.count).to eq 15
       expect(Export.permitted_headers).to eq permitted_headers
-      expect(Export.permitted_headers("include_paid")).to match_array all_headers
+      # expect(Export.permitted_headers(:include_all)).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
       expect(organization_reg_phone.additional_registration_fields).to eq(["reg_phone"])
       expect(Export.permitted_headers(organization_reg_phone)).to eq(permitted_headers + ["phone"])
       expect(organization_full.additional_registration_fields.map { |s| s.gsub("reg_", "") }).to eq additional_headers
-      expect(Export.permitted_headers(organization_full)).to eq all_headers
+      expect(Export.permitted_headers(organization_full).sort).to eq(all_headers - %w[is_impounded impounded_at partial_registration])
     end
     context "with impounded and partial" do
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes show_partial_registrations]) }
+      # All headers except the reg_field headers
+      let(:permitted_headers) { all_headers - %w[address bike_sticker organization_affiliation phone student_id] }
       it "returns the array we expect" do
-        expect(permitted_headers.count).to eq 15
-        expect(Export.permitted_headers).to eq permitted_headers
-        expect(Export.permitted_headers("include_paid")).to match_array all_headers
-        expect(Export.permitted_headers(organization)).to match_array(permitted_headers + %w[is_impounded impounded_at partial_registration])
+        expect(Export.permitted_headers(organization).sort).to eq permitted_headers
       end
     end
     context "with bike_stickers from regional organization" do
@@ -259,6 +284,16 @@ RSpec.describe Export, type: :model do
         expect(organization_in_region.enabled?("reg_bike_sticker")).to be_truthy
         expect(organization_in_region.additional_registration_fields).to eq(["reg_bike_sticker"])
         expect(Export.permitted_headers(organization_in_region)).to eq(permitted_headers + ["bike_sticker"])
+      end
+    end
+    context "with superuser" do
+      let(:user) { FactoryBot.create(:superuser) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:export) { Export.new(user:, options: {headers: all_headers}, kind: :organization, organization:) }
+      it "returns all_headers" do
+        expect(Export.permitted_headers(:include_all).sort).to eq all_headers
+        expect(export).to be_valid
+        expect(export.headers.sort).to eq all_headers
       end
     end
   end
