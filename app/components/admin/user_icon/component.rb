@@ -79,20 +79,17 @@ module Admin::UserIcon
       ].compact.join(" ")
     end
 
-    def icon_classes(variant = nil)
-      base = "tw:ml-1 tw:inline-block tw:text-white tw:text-[75%] tw:font-extrabold tw:px-1 tw:py-0.5 tw:border tw:border-gray-300 tw:leading-none tw:rounded-lg tw:cursor-default"
-
-      bg = case variant
-      when :donor then "tw:bg-emerald-500"
-      when :organization_role then "tw:bg-blue-600"
-      when :superuser then "tw:bg-purple-800"
-      when :recovery then "tw:bg-amber-400"
-      when :theft_alert then "tw:bg-cyan-600"
-      when :banned then "tw:bg-red-500"
-      when :email_banned then "tw:bg-red-400"
-      end
-
-      [base, bg].compact.join(" ")
+    def badge_color(variant)
+      {
+        donor: :emerald,
+        member: :emerald,
+        organization_role: :blue,
+        superuser: :purple,
+        recovery: :amber,
+        theft_alert: :cyan,
+        banned: :red,
+        email_banned: :red_light
+      }[variant] || :gray
     end
   end
 end

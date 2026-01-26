@@ -15,8 +15,9 @@ module UI::Badge
       gray: "tw:bg-gray-500"
     }.freeze
 
-    def initialize(text:, color: :gray)
+    def initialize(text:, color: :gray, title: nil)
       @text = text
+      @title = title || text
       @color = COLORS.key?(color) ? color : :gray
     end
 

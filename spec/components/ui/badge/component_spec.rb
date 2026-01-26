@@ -5,9 +5,10 @@ require "rails_helper"
 RSpec.describe UI::Badge::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
-  let(:options) { {text:, color:}.compact }
+  let(:options) { {text:, color:, title:}.compact }
   let(:text) { "Test Badge" }
   let(:color) { nil }
+  let(:title) { nil }
 
   it "renders with default gray color" do
     expect(component).to have_css("span")
@@ -15,17 +16,42 @@ RSpec.describe UI::Badge::Component, type: :component do
     expect(component.to_html).to include("tw:bg-gray-500")
   end
 
-  context "with emerald color" do
-    let(:color) { :emerald }
-    it "renders with emerald background" do
-      expect(component.to_html).to include("tw:bg-emerald-500")
+  it "includes base classes" do
+    html = component.to_html
+    expect(html).to include("tw:inline-block")
+    expect(html).to include("tw:text-white")
+    expect(html).to include("tw:rounded-lg")
+  end
+
+  it "uses text as default title" do
+    expect(component).to have_css("span[title='Test Badge']")
+  end
+
+  context "with custom title" do
+    let(:title) { "Custom Title" }
+    it "uses custom title" do
+      expect(component).to have_css("span[title='Custom Title']")
+      expect(component).to have_text("Test Badge")
     end
   end
 
-  context "with red color" do
-    let(:color) { :red }
-    it "renders with red background" do
-      expect(component.to_html).to include("tw:bg-red-500")
+  describe "colors" do
+    {
+      emerald: "tw:bg-emerald-500",
+      blue: "tw:bg-blue-600",
+      purple: "tw:bg-purple-800",
+      amber: "tw:bg-amber-400",
+      cyan: "tw:bg-cyan-600",
+      red: "tw:bg-red-500",
+      red_light: "tw:bg-red-400",
+      gray: "tw:bg-gray-500"
+    }.each do |color_name, css_class|
+      context "with #{color_name}" do
+        let(:color) { color_name }
+        it "renders with #{css_class}" do
+          expect(component.to_html).to include(css_class)
+        end
+      end
     end
   end
 

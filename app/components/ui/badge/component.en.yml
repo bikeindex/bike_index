@@ -1,8 +1,0 @@
----
-en:
-  components:
-    ui:
-      badge:
-        color: Color
-        size: Size
-        text: Text

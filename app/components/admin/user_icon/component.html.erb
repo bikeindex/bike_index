@@ -1,72 +1,55 @@
 <span>
   <% if @tags.include?(:donor) %>
-    <span class="<%= icon_classes(:donor) %>" title="Donor">D</span>
+    <%= render ::UI::Badge::Component.new(text: "D", title: "Donor", color: badge_color(:donor)) %>
     <% if @full_text %>
       <span class="less-strong">Donor</span>
     <% end %>
   <% end %>
 
   <% if @tags.include?(:member) %>
-    <span class="<%= icon_classes(:donor) %>" title="Member">M</span>
+    <%= render ::UI::Badge::Component.new(text: "M", title: "Member", color: badge_color(:member)) %>
     <% if @full_text %>
       <span class="less-strong">Member</span>
     <% end %>
   <% end %>
 
   <% if @tags.include?(:organization_role) %>
-    <span
-      class="org- <%= icon_classes(:organization_role) %>"
-      title="<%= org_full_text %>"
-    >
-      <%= org_icon_text %>
-    </span>
+    <%= render ::UI::Badge::Component.new(text: org_icon_text, title: org_full_text, color: badge_color(:organization_role)) %>
     <% if @full_text %>
       <span class="ml-1 less-strong"><%= org_full_text %></span>
     <% end %>
   <% end %>
 
   <% if @tags.include?(:recovery) %>
-    <span class="<%= icon_classes(:recovery) %>" title="Recovered bike">R</span>
+    <%= render ::UI::Badge::Component.new(text: "R", title: "Recovered bike", color: badge_color(:recovery)) %>
     <% if @full_text %>
       <span class="less-strong">Recovered bike</span>
     <% end %>
   <% end %>
 
   <% if @tags.include?(:superuser) %>
-    <span class="<%= icon_classes(:superuser) %>" title="Superuser">S</span>
+    <%= render ::UI::Badge::Component.new(text: "S", title: "Superuser", color: badge_color(:superuser)) %>
     <% if @full_text %>
       <span class="less-strong">Superuser</span>
     <% end %>
   <% end %>
 
   <% if @tags.include?(:theft_alert) %>
-    <span
-      class="<%= icon_classes(:theft_alert) %>"
-      title="Promoted alert purchaser"
-    >
-      P
-    </span>
+    <%= render ::UI::Badge::Component.new(text: "P", title: "Promoted alert purchaser", color: badge_color(:theft_alert)) %>
     <% if @full_text %>
       <span class="less-strong">Promoted alert</span>
     <% end %>
   <% end %>
 
   <% if banned? %>
-    <span class="<%= icon_classes(:banned) %>" title="<%= banned_text %>">
-      B
-    </span>
+    <%= render ::UI::Badge::Component.new(text: "B", title: banned_text, color: badge_color(:banned)) %>
     <% if @full_text %>
       <span class="less-strong"><%= banned_text %></span>
     <% end %>
   <% end %>
 
   <% if email_banned? %>
-    <span
-      class="<%= icon_classes(:email_banned) %>"
-      title="Email Banned: <%= email_banned_text %>"
-    >
-      EB
-    </span>
+    <%= render ::UI::Badge::Component.new(text: "EB", title: "Email Banned: #{email_banned_text}", color: badge_color(:email_banned)) %>
     <% if @full_text %>
       <span class="less-strong">Email Banned: <%= email_banned_text %></span>
     <% end %>
