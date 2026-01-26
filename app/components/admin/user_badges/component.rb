@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Admin::UserIcon
+module Admin::UserBadges
   class Component < ApplicationComponent
     KIND_LETTERS = {
       bike_shop: "BS",

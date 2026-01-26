@@ -2,10 +2,6 @@
 
 module UI::Badge
   class ComponentPreview < ApplicationComponentPreview
-    def all_colors
-      render_with_template(template: "ui/badge/component_preview/all_colors")
-    end
-
     # @group Colors
     def emerald
       render(UI::Badge::Component.new(text: "Donor", color: :emerald))
