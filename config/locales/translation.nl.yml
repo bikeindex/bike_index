@@ -6155,6 +6155,10 @@ nl:
       thread_show:
         can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
         sold_to: Mark %{item_type} verkocht aan
+        banned_message: Het spijt ons, maar die gebruiker is geblokkeerd en kan geen
+          nieuwe berichten meer ontvangen.
+        deleted_message: Het spijt ons, maar die gebruiker heeft zijn account verwijderd
+          en kan geen nieuwe berichten meer ontvangen.
       thread_show_message:
         me: Mij
         subject: Onderwerp
