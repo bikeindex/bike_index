@@ -233,7 +233,7 @@ RSpec.describe Export, type: :model do
         expect(permitted_headers.count).to eq 15
         expect(Export.permitted_headers).to eq permitted_headers
         expect(Export.permitted_headers("include_paid")).to match_array all_headers
-        expect(Export.permitted_headers(organization)).to match_array(permitted_headers + %w[is_impounded partial_registration])
+        expect(Export.permitted_headers(organization)).to match_array(permitted_headers + %w[is_impounded impounded_at partial_registration])
       end
     end
     context "with bike_stickers from regional organization" do

@@ -102,8 +102,8 @@ class Export < ApplicationRecord
       additional_headers = OrganizationFeature::REG_FIELDS
     elsif organization_or_overide.is_a?(Organization)
       additional_headers = organization_or_overide.additional_registration_fields
-      additional_headers += ["partial_registration"] if organization_or_overide.enabled?("show_partial_registrations")
-      additional_headers += ["is_impounded"] if organization_or_overide.enabled?("impound_bikes")
+      additional_headers += %w[partial_registration] if organization_or_overide.enabled?("show_partial_registrations")
+      additional_headers += %w[is_impounded impounded_at] if organization_or_overide.enabled?("impound_bikes")
     end
     additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
     # We always give the option to export extra_registration_number, don't double up if org can add too

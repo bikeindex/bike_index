@@ -232,6 +232,7 @@ RSpec.describe OrganizationExportJob, type: :job do
         expect(export.rows).to eq 1
       end
     end
+
     context "special headers" do
       let(:enabled_feature_slugs) { ["csv_exports"] }
       let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
@@ -330,7 +331,7 @@ RSpec.describe OrganizationExportJob, type: :job do
         end
       end
       context "including every available field + stickers" do
-        let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + ["bike_stickers"] }
+        let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes] }
         let(:export_options) { {headers: Export.permitted_headers(organization)} }
         let(:bike_row_hash) do
           {
@@ -357,7 +358,9 @@ RSpec.describe OrganizationExportJob, type: :job do
             address_2: nil,
             city: "San Francisco",
             state: "CA",
-            zipcode: "94103"
+            zipcode: "94103",
+            is_impounded: false,
+            impounded_at: nil
           }
         end
         it "returns the expected values" do
@@ -519,6 +522,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
         end
       end
+      context "impounded"
     end
   end
 
