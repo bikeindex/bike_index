@@ -132,8 +132,8 @@ class MarketplaceMessage < ApplicationRecord
 
       time = marketplace_message&.created_at || Time.current
       threads_past_week = sent_messages.where(created_at: (time - 1.week)..time).distinct_threads
-      threads_past_week.count > SPAM_LIMIT_WEEK ||
-        threads_past_week.where(created_at: (time - 1.day)..time).count > SPAM_LIMIT_DAY
+      threads_past_week.count >= SPAM_LIMIT_WEEK ||
+        threads_past_week.where(created_at: (time - 1.day)..time).count >= SPAM_LIMIT_DAY
     end
 
     private

@@ -67,7 +67,6 @@ RSpec.describe Email::MarketplaceMessageJob, type: :job do
     it "sends blocked email to admin" do
       ActionMailer::Base.deliveries = []
 
-
       expect(Notification.count).to eq 0
       expect {
         described_class.new.perform(marketplace_message.id)

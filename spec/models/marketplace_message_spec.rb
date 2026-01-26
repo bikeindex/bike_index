@@ -268,9 +268,7 @@ RSpec.describe MarketplaceMessage, type: :model do
     context "likely_spam?" do
       let!(:marketplace_message1) { FactoryBot.create(:marketplace_message, sender: user, created_at: Time.current - 250) }
       let!(:marketplace_message2) { FactoryBot.create(:marketplace_message, sender: user, created_at: Time.current - 190) }
-      let!(:marketplace_message3) { FactoryBot.create(:marketplace_message, sender: user, created_at: Time.current - 120) }
-      let!(:marketplace_message4) { FactoryBot.create(:marketplace_message, sender: user, created_at:) }
-      let(:marketplace_listing4) { FactoryBot.create(:marketplace_listing, :for_sale) }
+      let!(:marketplace_message3) { FactoryBot.create(:marketplace_message, sender: user, created_at:) }
       let(:created_at) { Time.current - 10.minutes }
       it "is likely_spam" do
         expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_truthy
@@ -279,10 +277,10 @@ RSpec.describe MarketplaceMessage, type: :model do
       end
 
       context "with a message to the same listing" do
-        let!(:marketplace_message4) do
+        let!(:marketplace_message3) do
           FactoryBot.create(:marketplace_message, sender: user, created_at:,
-            initial_record: marketplace_message3,
-            marketplace_listing: marketplace_message3.marketplace_listing)
+            initial_record: marketplace_message2,
+            marketplace_listing: marketplace_message2.marketplace_listing)
         end
         it "is valid" do
           expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_falsey

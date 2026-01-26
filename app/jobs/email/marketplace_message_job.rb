@@ -8,7 +8,6 @@ class Email::MarketplaceMessageJob < ApplicationJob
     return if marketplace_message.blank?
 
     likely_spam = marketplace_message.likely_spam?
-
     # Don't send a notification if there are already notifications in the past 24 hours
     if likely_spam
       return if Notification.marketplace_message_blocked

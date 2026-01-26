@@ -258,12 +258,11 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       it "sends a message" do
         ActionMailer::Base.deliveries = []
 
-        Sidekiq::Testing.inline! do
-          expect do
-            post base_url, params: {marketplace_message: reply_params}
-            expect(flash[:success]).to be_present
-          end.to change(MarketplaceMessage, :count).by 1
-        end
+        expect do
+          post base_url, params: {marketplace_message: reply_params}
+          expect(flash[:success]).to be_present
+        end.to change(MarketplaceMessage, :count).by(1)
+          .and change(Email::MarketplaceMessageJob.jobs, :count).by(1)
 
         new_marketplace_message = MarketplaceMessage.last
         expect(new_marketplace_message).to match_hash_indifferently(reply_params.except(:subject))
@@ -271,21 +270,20 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
         expect(new_marketplace_message.sender_id).to eq current_user.id
         expect(new_marketplace_message.receiver_id).to eq marketplace_message.sender_id
 
-        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
-        expect(marketplace_message.notifications.count).to eq 1
-        expect(marketplace_message.notifications.first.delivery_status).to eq "delivery_success"
+        expect(Email::MarketplaceMessageJob.jobs.map { |j| j["args"] }.flatten).to include(marketplace_message.id)
+        Email::MarketplaceMessageJob.drain
+        expect(ActionMailer::Base.deliveries.blank?).to be_falsey
+        expect(marketplace_message.reload.notifications.first.delivery_status).to eq "delivery_success"
       end
     end
 
     context "likely_spam" do
       let!(:prior_messages) do
-        # Create messages to 4 different listings to exceed SPAM_LIMIT_DAY (3)
-        4.times.map { FactoryBot.create(:marketplace_message, sender: current_user, skip_processing: true) }
+        3.times { FactoryBot.create(:marketplace_message, sender: current_user, skip_processing: true) }
       end
 
       it "creates message and sends blocked email to admin" do
-        expect(prior_messages.count).to eq 4
-        expect(MarketplaceMessage.where(sender_id: current_user.id).distinct_threads.count).to eq 4
+        expect(MarketplaceMessage.where(sender_id: current_user.id).distinct_threads.count).to eq 3
         # Ensure marketplace_listing is created before clearing jobs
         expect(marketplace_listing).to be_present
 
