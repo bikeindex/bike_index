@@ -1,8 +1,0 @@
----
-en:
-  components:
-    admin:
-      user_show:
-        user: User
-        bikes: Bikes
-        bikes_count: Bikes_count
