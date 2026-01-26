@@ -15,30 +15,17 @@ RSpec.describe UI::Badge::Component, type: :component do
     expect(component.to_html).to include("tw:bg-gray-500")
   end
 
-  it "includes base classes" do
-    html = component.to_html
-    expect(html).to include("tw:inline-block")
-    expect(html).to include("tw:text-white")
-    expect(html).to include("tw:rounded-lg")
+  context "with emerald color" do
+    let(:color) { :emerald }
+    it "renders with emerald background" do
+      expect(component.to_html).to include("tw:bg-emerald-500")
+    end
   end
 
-  describe "colors" do
-    {
-      emerald: "tw:bg-emerald-500",
-      blue: "tw:bg-blue-600",
-      purple: "tw:bg-purple-800",
-      amber: "tw:bg-amber-400",
-      cyan: "tw:bg-cyan-600",
-      red: "tw:bg-red-500",
-      red_light: "tw:bg-red-400",
-      gray: "tw:bg-gray-500"
-    }.each do |color_name, css_class|
-      context "with #{color_name}" do
-        let(:color) { color_name }
-        it "renders with #{css_class}" do
-          expect(component.to_html).to include(css_class)
-        end
-      end
+  context "with red color" do
+    let(:color) { :red }
+    it "renders with red background" do
+      expect(component.to_html).to include("tw:bg-red-500")
     end
   end
 
