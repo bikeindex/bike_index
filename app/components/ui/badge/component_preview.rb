@@ -3,36 +3,32 @@
 module UI::Badge
   class ComponentPreview < ApplicationComponentPreview
     # @group Colors
-    def emerald
-      render(UI::Badge::Component.new(text: "Donor", color: :emerald))
+    def green
+      render(UI::Badge::Component.new(text: "Donor", color: :green))
     end
 
-    def blue
-      render(UI::Badge::Component.new(text: "Organization", color: :blue))
+    def blue_sm
+      render(UI::Badge::Component.new(text: "Organization", color: :blue, size: :sm))
     end
 
-    def purple
-      render(UI::Badge::Component.new(text: "Superuser", color: :purple))
+    def purple_md
+      render(UI::Badge::Component.new(text: "Superuser", color: :purple, size: :md))
     end
 
-    def amber
-      render(UI::Badge::Component.new(text: "Recovery", color: :amber))
+    def amber_lg
+      render(UI::Badge::Component.new(text: "Recovery", color: :amber, size: :lg))
     end
 
-    def cyan
-      render(UI::Badge::Component.new(text: "Theft Alert", color: :cyan))
+    def gray_sm
+      render(UI::Badge::Component.new(text: "Default", color: :gray, size: :sm))
     end
 
-    def red
-      render(UI::Badge::Component.new(text: "Banned", color: :red))
+    def red_md
+      render(UI::Badge::Component.new(text: "Banned", color: :red, size: :md))
     end
 
-    def red_light
-      render(UI::Badge::Component.new(text: "Email Banned", color: :red_light))
-    end
-
-    def gray
-      render(UI::Badge::Component.new(text: "Default", color: :gray))
+    def cyan_lg
+      render(UI::Badge::Component.new(text: "Theft Alert", color: :cyan, size: :lg))
     end
     # @endgroup
   end

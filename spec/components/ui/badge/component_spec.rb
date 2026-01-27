@@ -13,18 +13,12 @@ RSpec.describe UI::Badge::Component, type: :component do
   it "renders with default gray color" do
     expect(component).to have_css("span")
     expect(component).to have_text("Test Badge")
-    expect(component.to_html).to include("tw:bg-gray-500")
-  end
-
-  it "includes base classes" do
-    html = component.to_html
-    expect(html).to include("tw:inline-block")
-    expect(html).to include("tw:text-white")
-    expect(html).to include("tw:rounded-lg")
-  end
-
-  it "uses text as default title" do
     expect(component).to have_css("span[title='Test Badge']")
+
+    html = component.to_html
+    expect(html).to include("tw:bg-gray-300")
+    expect(html).to include("tw:inline-flex")
+    expect(html).to include("tw:rounded-full")
   end
 
   context "with custom title" do
@@ -37,14 +31,13 @@ RSpec.describe UI::Badge::Component, type: :component do
 
   describe "colors" do
     {
-      emerald: "tw:bg-emerald-500",
-      blue: "tw:bg-blue-600",
-      purple: "tw:bg-purple-800",
-      amber: "tw:bg-amber-400",
-      cyan: "tw:bg-cyan-600",
-      red: "tw:bg-red-500",
-      red_light: "tw:bg-red-400",
-      gray: "tw:bg-gray-500"
+      success: "tw:bg-emerald-500",
+      notice: "tw:bg-blue-300",
+      purple: "tw:bg-purple-300",
+      warning: "tw:bg-amber-300",
+      cyan: "tw:bg-cyan-400",
+      error: "tw:bg-red-300",
+      gray: "tw:bg-gray-300"
     }.each do |color_name, css_class|
       context "with #{color_name}" do
         let(:color) { color_name }
@@ -58,7 +51,7 @@ RSpec.describe UI::Badge::Component, type: :component do
   context "with invalid color" do
     let(:color) { :invalid_color }
     it "falls back to gray" do
-      expect(component.to_html).to include("tw:bg-gray-500")
+      expect(component.to_html).to include("tw:bg-gray-300")
     end
   end
 end

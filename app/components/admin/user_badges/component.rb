@@ -79,17 +79,21 @@ module Admin::UserBadges
       ].compact.join(" ")
     end
 
+    def wrapper_class
+      "tw:flex tw:flex-wrap tw:gap-1 #{"tw:gap-x-3" if @full_text}"
+    end
+
     def badge_color(variant)
       {
-        donor: :emerald,
-        member: :emerald,
-        organization_role: :blue,
+        donor: :success,
+        member: :success,
+        organization_role: :notice,
         superuser: :purple,
-        recovery: :amber,
+        recovery: :warning,
         theft_alert: :cyan,
-        banned: :red,
-        email_banned: :red_light
-      }[variant] || :gray
+        banned: :error,
+        email_banned: :error
+      }[variant]
     end
   end
 end

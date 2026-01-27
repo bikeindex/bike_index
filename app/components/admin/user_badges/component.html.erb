@@ -1,57 +1,81 @@
-<span>
+<span class="<%= wrapper_class %>">
   <% if @tags.include?(:donor) %>
-    <%= render ::UI::Badge::Component.new(text: "D", title: "Donor", color: badge_color(:donor)) %>
-    <% if @full_text %>
-      <span class="less-strong">Donor</span>
-    <% end %>
+    <span>
+      <%= render ::UI::Badge::Component.new(text: "D", title: "Donor", color: badge_color(:donor)) %>
+
+      <% if @full_text %>
+        <span class="less-strong">Donor</span>
+      <% end %>
+    </span>
   <% end %>
 
   <% if @tags.include?(:member) %>
-    <%= render ::UI::Badge::Component.new(text: "M", title: "Member", color: badge_color(:member)) %>
-    <% if @full_text %>
-      <span class="less-strong">Member</span>
-    <% end %>
+    <span>
+      <%= render ::UI::Badge::Component.new(text: "M", title: "Member", color: badge_color(:member)) %>
+
+      <% if @full_text %>
+        <span class="less-strong">Member</span>
+      <% end %>
+    </span>
   <% end %>
 
   <% if @tags.include?(:organization_role) %>
-    <%= render ::UI::Badge::Component.new(text: org_icon_text, title: org_full_text, color: badge_color(:organization_role)) %>
-    <% if @full_text %>
-      <span class="ml-1 less-strong"><%= org_full_text %></span>
-    <% end %>
+    <span>
+      <%= render ::UI::Badge::Component.new(text: org_icon_text, title: org_full_text, color: badge_color(:organization_role)) %>
+
+      <% if @full_text %>
+        <span class="less-strong"><%= org_full_text %></span>
+      <% end %>
+    </span>
   <% end %>
 
   <% if @tags.include?(:recovery) %>
-    <%= render ::UI::Badge::Component.new(text: "R", title: "Recovered bike", color: badge_color(:recovery)) %>
-    <% if @full_text %>
-      <span class="less-strong">Recovered bike</span>
-    <% end %>
+    <span>
+      <%= render ::UI::Badge::Component.new(text: "R", title: "Recovered bike", color: badge_color(:recovery)) %>
+
+      <% if @full_text %>
+        <span class="less-strong">Recovered bike</span>
+      <% end %>
+    </span>
   <% end %>
 
   <% if @tags.include?(:superuser) %>
-    <%= render ::UI::Badge::Component.new(text: "S", title: "Superuser", color: badge_color(:superuser)) %>
-    <% if @full_text %>
-      <span class="less-strong">Superuser</span>
-    <% end %>
+    <span>
+      <%= render ::UI::Badge::Component.new(text: "S", title: "Superuser", color: badge_color(:superuser)) %>
+
+      <% if @full_text %>
+        <span class="less-strong">Superuser</span>
+      <% end %>
+    </span>
   <% end %>
 
   <% if @tags.include?(:theft_alert) %>
-    <%= render ::UI::Badge::Component.new(text: "P", title: "Promoted alert purchaser", color: badge_color(:theft_alert)) %>
-    <% if @full_text %>
-      <span class="less-strong">Promoted alert</span>
-    <% end %>
+    <span>
+      <%= render ::UI::Badge::Component.new(text: "P", title: "Promoted alert purchaser", color: badge_color(:theft_alert)) %>
+
+      <% if @full_text %>
+        <span class="less-strong">Promoted alert</span>
+      <% end %>
+    </span>
   <% end %>
 
   <% if banned? %>
-    <%= render ::UI::Badge::Component.new(text: "B", title: banned_text, color: badge_color(:banned)) %>
-    <% if @full_text %>
-      <span class="less-strong"><%= banned_text %></span>
-    <% end %>
+    <span>
+      <%= render ::UI::Badge::Component.new(text: "B", title: banned_text, color: badge_color(:banned)) %>
+
+      <% if @full_text %>
+        <span class="less-strong"><%= banned_text %></span>
+      <% end %>
+    </span>
   <% end %>
 
   <% if email_banned? %>
-    <%= render ::UI::Badge::Component.new(text: "EB", title: "Email Banned: #{email_banned_text}", color: badge_color(:email_banned)) %>
-    <% if @full_text %>
-      <span class="less-strong">Email Banned: <%= email_banned_text %></span>
-    <% end %>
+    <span>
+      <%= render ::UI::Badge::Component.new(text: "EB", title: "Email Banned: #{email_banned_text}", color: badge_color(:email_banned)) %>
+
+      <% if @full_text %>
+        <span class="less-strong">Email Banned: <%= email_banned_text %></span>
+      <% end %>
+    </span>
   <% end %>
 </span>
