@@ -5817,12 +5817,6 @@ nb:
       address_record_with_default:
         edit_my_account_path: redigering på kontoen min
         use_account_address: Bruk kontoadresse
-    definition_list:
-      row:
-        no_value: ingen
-    alert_for_errors:
-      errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
-        %{object_name} ble lagret:"
     search_results:
       bike_box:
         location: plassering
@@ -6011,3 +6005,10 @@ nb:
         from: Fra
         me: meg
         to: Til
+    ui:
+      definition_list:
+        row:
+          no_value: ingen
+      alert_for_errors:
+        errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
+          %{object_name} ble lagret:"
