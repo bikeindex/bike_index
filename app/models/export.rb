@@ -108,6 +108,7 @@ class Export < ApplicationRecord
         additional_headers += %w[partial_registration] if organization_or_overide.enabled?("show_partial_registrations")
         additional_headers += %w[is_impounded impounded_at] if organization_or_overide.enabled?("impound_bikes")
       end
+      additional_headers ||= []
       # We always give the option to export extra_registration_number, don't double up if org can add too
       (PERMITTED_HEADERS + additional_headers).uniq
     end

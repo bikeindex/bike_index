@@ -131,7 +131,10 @@ class OrganizationExportJob < ApplicationJob
       # Remove address and re-add, because we want to keep them in line
       @export_headers = (@export_headers - ["address"]) + %w[address address_2 city state zipcode]
     end
-    @export_headers += ["partial_registration"] if @export.partial_registrations.present?
+    # If there are partial registrations, always include partial_registration
+    if @export.partial_registrations.present? && @export_headers.exclude?("partial_registration")
+      @export_headers += ["partial_registration"]
+    end
     if @export.assign_bike_codes?
       @export_headers << "assigned_sticker"
       @bike_stickers = []

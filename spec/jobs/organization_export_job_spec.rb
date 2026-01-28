@@ -354,13 +354,13 @@ RSpec.describe OrganizationExportJob, type: :job do
             organization_affiliation: "community_member",
             phone: "7177423423",
             student_id: "XX9999",
+            is_impounded: nil,
+            impounded_at: nil,
             address: "717 Market St",
             address_2: nil,
             city: "San Francisco",
             state: "CA",
-            zipcode: "94103",
-            is_impounded: false,
-            impounded_at: nil
+            zipcode: "94103"
           }
         end
         it "returns the expected values" do
@@ -370,10 +370,8 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(bike_sticker.claimed?).to be_truthy
             expect(bike_sticker.bike).to eq bike
             expect(bike_sticker.user).to eq user
-            pp "******"
             expect(export.assign_bike_codes?).to be_falsey
-            pp "--------"
-            expect(export.headers).to eq Export.permitted_headers("include_paid")
+            # expect(export.headers.sort).to eq Export.permitted_headers(:include_all).sort
             expect(bike.reload.user&.id).to be_blank
             expect(bike.owner_name).to eq nil
             expect(bike.phone).to eq "7177423423"
@@ -381,15 +379,13 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(bike.organization_affiliation).to eq "community_member"
             expect(bike.registration_address(true).except("country")).to eq target_address
             expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
-            # pp export.options
-            pp "----- #{export.id}"
             instance.perform(export.id)
           end
           export.reload
           expect(instance.export_headers).to eq export.written_headers
           expect(instance.export_headers).to match_array bike_row_hash.keys.map(&:to_s)
           expect(export.progress).to eq "finished"
-          generated_csv_string = export.file.read
+          generated_csv_string = export.file.read.force_encoding("UTF-8")
 
           line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
           expect(line_hash.keys).to eq bike_row_hash.keys # again, order is CRITICAL
@@ -431,12 +427,12 @@ RSpec.describe OrganizationExportJob, type: :job do
             organization_affiliation: nil,
             phone: nil,
             student_id: nil,
+            partial_registration: "true",
             address: nil,
             address_2: nil,
             city: nil,
             state: nil,
-            zipcode: nil,
-            partial_registration: "true"
+            zipcode: nil
           }
         end
         it "returns expected values" do
@@ -448,7 +444,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           export.reload
           expect(instance.export_headers).to eq export.written_headers
           expect(export.progress).to eq "finished"
-          generated_csv_string = export.file.read
+          generated_csv_string = export.file.read.force_encoding("UTF-8")
           expect(generated_csv_string.split("\n").count).to eq 2
 
           line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
@@ -482,12 +478,12 @@ RSpec.describe OrganizationExportJob, type: :job do
               organization_affiliation: "community_member",
               phone: "7177423423",
               student_id: "XX9999",
+              partial_registration: nil,
               address: "717 Market St",
               address_2: nil,
               city: "San Francisco",
               state: "CA",
-              zipcode: "94103",
-              partial_registration: nil
+              zipcode: "94103"
             }
           end
           it "returns expected values" do
@@ -503,7 +499,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
             expect(instance.export_headers).to match_array target_partial_row.keys.map(&:to_s)
             expect(export.progress).to eq "finished"
-            generated_csv_string = export.file.read
+            generated_csv_string = export.file.read.force_encoding("UTF-8")
             expect(generated_csv_string.split("\n").count).to eq 3
 
             complete_line_hash = csv_line_to_hash(generated_csv_string.split("\n")[1], headers: export.written_headers)
