@@ -64,7 +64,7 @@ gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # b
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
-gem "rqrcode", "0.10.1" # QR Code image generator
+gem "rqrcode", "3.2.0" # QR Code image generator
 
 # Functionality extensions
 gem "flipper" # Feature flagging

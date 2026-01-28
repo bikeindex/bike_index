@@ -655,8 +655,10 @@ GEM
       railties (>= 5.0)
     rexml (3.4.4)
     rouge (4.6.1)
-    rqrcode (0.10.1)
+    rqrcode (3.2.0)
       chunky_png (~> 1.0)
+      rqrcode_core (~> 2.0)
+    rqrcode_core (2.1.0)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -944,7 +946,7 @@ DEPENDENCIES
   redlock
   rerun
   responders
-  rqrcode (= 0.10.1)
+  rqrcode (= 3.2.0)
   rspec
   rspec-github
   rspec-rails
