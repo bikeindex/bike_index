@@ -19,7 +19,7 @@
           <td>Status</td>
 
           <td>
-            <%= render Badge::Status::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+            <%= render Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
           </td>
         </tr>
 
@@ -137,7 +137,7 @@
           <td>Description</td>
 
           <td>
-            <%= render(UserTextBlockDisplay::Component.new(text: @marketplace_listing.description, max_height_class: "")) %>
+            <%= render(UI::UserTextBlockDisplay::Component.new(text: @marketplace_listing.description, max_height_class: "")) %>
           </td>
         </tr>
       </tbody>

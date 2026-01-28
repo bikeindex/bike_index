@@ -16,7 +16,7 @@
 .row
   .col-md-6
     = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
-      = render(AlertForErrors::Component.new(object: @ownership))
+      = render(UI::AlertForErrors::Component.new(object: @ownership))
 
       .form-group
         = f.label :creator_id

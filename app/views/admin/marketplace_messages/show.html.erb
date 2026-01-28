@@ -112,7 +112,7 @@
           <td>Listing status</td>
 
           <td>
-            <%= render Badge::Status::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+            <%= render Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
           </td>
         </tr>
 
@@ -172,10 +172,10 @@
 </div>
 
 <div class="mt-4">
-  <%= render(Card::Component.new(shadow: true)) do %>
+  <%= render(UI::Card::Component.new(shadow: true)) do %>
     <p><strong>subject:</strong><%= @marketplace_message.subject %></p>
 
-    <%= render(UserTextBlockDisplay::Component.new(text: @marketplace_message.body, max_height_class: "")) %>
+    <%= render(UI::UserTextBlockDisplay::Component.new(text: @marketplace_message.body, max_height_class: "")) %>
   <% end %>
 </div>
 

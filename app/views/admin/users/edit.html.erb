@@ -5,7 +5,7 @@
 <h4>Edit</h4>
 
 <%= form_for @user, url: admin_user_path, method: :patch do |f| %>
-  <%= render(AlertForErrors::Component.new(object: @user)) %>
+  <%= render(UI::AlertForErrors::Component.new(object: @user)) %>
 
   <div class="row mt-4">
     <div class="col-md-6">

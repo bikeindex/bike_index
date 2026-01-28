@@ -2,7 +2,7 @@
   .card-body
     = form_for [:admin, @membership] do |f|
       - if @membership.errors.any?
-        = render(AlertForErrors::Component.new(object: @membership, dismissable: true))
+        = render(UI::AlertForErrors::Component.new(object: @membership, dismissable: true))
 
       - if @membership.id.blank?
         .form-group

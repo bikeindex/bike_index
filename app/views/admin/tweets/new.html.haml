@@ -4,7 +4,7 @@
       New Tweet
 
 #tweetForm
-  = render(AlertForErrors::Component.new(object: @tweet))
+  = render(UI::AlertForErrors::Component.new(object: @tweet))
 
   = form_for [:admin, @tweet], url: { action: "create", controller: "tweets" } do |f|
     .row

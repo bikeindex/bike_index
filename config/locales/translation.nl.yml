@@ -5972,12 +5972,6 @@ nl:
       address_record_with_default:
         edit_my_account_path: bewerken op mijn account
         use_account_address: Gebruik accountadres
-    definition_list:
-      row:
-        no_value: geen
-    alert_for_errors:
-      errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-        dit %{object_name} wordt opgeslagen:"
     search_results:
       bike_box:
         location: Plaats
@@ -6169,3 +6163,10 @@ nl:
         from: uit
         me: mij
         to: Naar
+    ui:
+      definition_list:
+        row:
+          no_value: geen
+      alert_for_errors:
+        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+          dit %{object_name} wordt opgeslagen:"

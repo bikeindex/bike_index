@@ -1,6 +1,0 @@
----
-en:
-  components:
-    alert_for_errors:
-      errors_prevented_this_from_being_saved: "%{errors_count} prevented this %{object_name}
-        from being saved:"

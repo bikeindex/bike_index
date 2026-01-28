@@ -1,5 +1,5 @@
 = form_for [:admin, @ctype], html: {class: "form-group"} do |f|
-  = render(AlertForErrors::Component.new(name: "Component Type", object: @ctype))
+  = render(UI::AlertForErrors::Component.new(name: "Component Type", object: @ctype))
 
   .form-group
     = f.label :name, "Name"
