@@ -42,7 +42,7 @@
 
   -# alert
   - if @marketplace_preview
-    = render(Alert::Component.new(kind: :notice)) do
+    = render(UI::Alert::Component.new(kind: :notice)) do
       = t(".viewing_listing_preview")
       #{link_to(t(".view_public_non_listing"), bike_path(@bike))}.
   .row

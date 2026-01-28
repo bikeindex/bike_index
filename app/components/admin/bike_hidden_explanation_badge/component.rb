@@ -22,7 +22,7 @@ module Admin::BikeHiddenExplanationBadge
     def user_hidden_content
       return unless @bike.user_hidden?
 
-      content_tag(:small, "user hidden", class: Alert::Component::TEXT_CLASSES[:notice])
+      content_tag(:small, "user hidden", class: UI::Alert::Component::TEXT_CLASSES[:notice])
     end
 
     def example_content
@@ -43,11 +43,11 @@ module Admin::BikeHiddenExplanationBadge
       content_tag(:small,
         content_tag(:span, "deleted: ") +
           content_tag(:span, l(@bike.deleted_at, format: :convert_time), class: "localizeTime"),
-        class: Alert::Component::TEXT_CLASSES[:warning])
+        class: UI::Alert::Component::TEXT_CLASSES[:warning])
     end
 
     def error_class
-      Alert::Component::TEXT_CLASSES[:error]
+      UI::Alert::Component::TEXT_CLASSES[:error]
     end
   end
 end

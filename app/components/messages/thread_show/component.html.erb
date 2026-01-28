@@ -28,14 +28,14 @@
   <% end %>
 
   <% if user_banned? || user_deleted? %>
-    <%= render(Alert::Component.new(kind: :warning, text: translation(user_banned? ? :banned_message : :removed_message), margin_classes: "tw:my-8")) %>
+    <%= render(UI::Alert::Component.new(kind: :warning, text: translation(user_banned? ? :banned_message : :removed_message), margin_classes: "tw:my-8")) %>
   <% elsif @can_send_message %>
     <%# matches Messages::ThreadShowMessage::Component#margin_class for sender %>
     <div class="tw:mb-8 tw:ml-4 tw:lg:ml-8">
       <%= render partial: "my_accounts/messages/form", locals: {marketplace_message: @new_marketplace_message} %>
     </div>
   <% else %>
-    <%= render(Alert::Component.new(text: translation(".can_not_send_new_message"), kind: :error, margin_classes: "tw:my-10")) %>
+    <%= render(UI::Alert::Component.new(text: translation(".can_not_send_new_message"), kind: :error, margin_classes: "tw:my-10")) %>
   <% end %>
 
   <% if show_mark_sold? %>

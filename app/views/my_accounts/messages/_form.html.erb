@@ -5,7 +5,7 @@
 </h2>
 
 <%= form_with(model: marketplace_message, url: my_account_messages_path, method: :post, local: true, class: "") do |f| %>
-  <%= render(AlertForErrors::Component.new(object: marketplace_message, name: t(".message"), dismissable: true)) %>
+  <%= render(UI::AlertForErrors::Component.new(object: marketplace_message, name: t(".message"), dismissable: true)) %>
 
   <%= f.hidden_field :initial_record_id %>
   <%= f.hidden_field :marketplace_listing_id %>

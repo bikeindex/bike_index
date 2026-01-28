@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    ui:
+      definition_list:
+        row:
+          no_value: none

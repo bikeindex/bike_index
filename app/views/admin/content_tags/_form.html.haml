@@ -1,5 +1,5 @@
 = form_for [:admin, @content_tag] do |f|
-  = render(AlertForErrors::Component.new(object: @content_tag))
+  = render(UI::AlertForErrors::Component.new(object: @content_tag))
 
   .row
     .col-md-6

@@ -172,10 +172,10 @@
 </div>
 
 <div class="mt-4">
-  <%= render(Card::Component.new(shadow: true)) do %>
+  <%= render(UI::Card::Component.new(shadow: true)) do %>
     <p><strong>subject:</strong><%= @marketplace_message.subject %></p>
 
-    <%= render(UserTextBlockDisplay::Component.new(text: @marketplace_message.body, max_height_class: "")) %>
+    <%= render(UI::UserTextBlockDisplay::Component.new(text: @marketplace_message.body, max_height_class: "")) %>
   <% end %>
 </div>
 

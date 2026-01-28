@@ -1,5 +1,5 @@
 <% if @bike.blank? %>
-  <small class="<%= Alert::Component::TEXT_CLASSES[:error] %>">
+  <small class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
     Missing bike
     <% if @bike_id.present? %>
       <code><%= @bike_id %></code>

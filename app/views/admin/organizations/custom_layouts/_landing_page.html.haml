@@ -1,4 +1,4 @@
-= render(AlertForErrors::Component.new(object: @organization))
+= render(UI::AlertForErrors::Component.new(object: @organization))
 
 = form_for @organization, {as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update'} do |f|
   = hidden_field_tag :kind, "landing_page"

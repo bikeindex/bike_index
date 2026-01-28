@@ -51,7 +51,7 @@
 
 
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
-  = render(AlertForErrors::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))
+  = render(UI::AlertForErrors::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))
 
   .row.mt-4
     .col-md-6.col-lg-3

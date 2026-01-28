@@ -22,7 +22,7 @@ module Admin::OrganizationCell
     end
 
     def error_text_class
-      Alert::Component::TEXT_CLASSES[:error]
+      UI::Alert::Component::TEXT_CLASSES[:error]
     end
   end
 end

@@ -27,9 +27,9 @@ module Badge::Status
 
     def status_class
       case @status
-      when "for_sale" then Alert::Component::TEXT_CLASSES[:notice]
-      when "sold" then Alert::Component::TEXT_CLASSES[:success]
-      when "removed" then Alert::Component::TEXT_CLASSES[:warning]
+      when "for_sale" then UI::Alert::Component::TEXT_CLASSES[:notice]
+      when "sold" then UI::Alert::Component::TEXT_CLASSES[:success]
+      when "removed" then UI::Alert::Component::TEXT_CLASSES[:warning]
       else
         ""
       end
