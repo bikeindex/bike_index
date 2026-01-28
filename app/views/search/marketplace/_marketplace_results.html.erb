@@ -13,7 +13,7 @@
 <% if @pagy.next %>
   <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
     <div class="tw:py-4 tw:text-center">
-      <%= render LoadingSpinner::Component.new(text: "Loading more...") %>
+      <%= render UI::LoadingSpinner::Component.new(text: "Loading more...") %>
     </div>
   <% end %>
 <% end %>

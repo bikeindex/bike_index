@@ -4671,11 +4671,6 @@ it:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:
-    definition_list:
-      row:
-        no_value:
-    alert_for_errors:
-      errors_prevented_this_from_being_saved:
     search_results:
       bike_box:
         location: Luogo
@@ -4835,3 +4830,9 @@ it:
         from: Da
         me:
         to: A
+    ui:
+      definition_list:
+        row:
+          no_value:
+      alert_for_errors:
+        errors_prevented_this_from_being_saved:

@@ -94,7 +94,7 @@
       Send bike owner an email
 
     - if @customer_contact.errors.any?
-      = render(AlertForErrors::Component.new(object: @customer_contact))
+      = render(UI::AlertForErrors::Component.new(object: @customer_contact))
     .row
       .col-lg-4
         .row

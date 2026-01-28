@@ -58,7 +58,7 @@
             </td>
 
             <td>
-              <%= render Badge::Status::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+              <%= render Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing) %>
             </td>
 
             <td>

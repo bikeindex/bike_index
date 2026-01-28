@@ -93,7 +93,7 @@
               \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org", target: "_blank"}.
       = f.text_area :body, rows: 4, maxlength: @object.max_body_length, placeholder: "Custom text", class: "form-control"
     - if @kind == "other_parking_notification"
-      = render(Alert::Component.new(text: "Other parking notifications don't include a \"picked up the bike\" link", kind: :info, margin_classes: 'tw:mt-2 mb-4'))
+      = render(UI::Alert::Component.new(text: "Other parking notifications don't include a \"picked up the bike\" link", kind: :info, margin_classes: 'tw:mt-2 mb-4'))
 
     .form-group
       = f.check_box :is_enabled
@@ -107,7 +107,7 @@
       = submit_tag "Save", class: "btn btn-success btn-md-lg"
 
 - else
-  = render(Alert::Component.new(header: "Not customizable directly", text: "Ask Bike Index support for help", kind: :info))
+  = render(UI::Alert::Component.new(header: "Not customizable directly", text: "Ask Bike Index support for help", kind: :info))
 
 -# We can't preview impound_claims unless there are impound records
 - if @impound_claim_kind && @impound_claim.blank?

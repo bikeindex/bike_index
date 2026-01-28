@@ -45,7 +45,7 @@
     .card.bg-light
       .card-body
         = form_for [:admin, @superuser_ability] do |f|
-          = render(AlertForErrors::Component.new(object: @superuser_ability))
+          = render(UI::AlertForErrors::Component.new(object: @superuser_ability))
 
           - SuperuserAbility::SU_OPTIONS.each do |ability|
             .form-group

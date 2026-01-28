@@ -1610,6 +1610,10 @@ en:
           serial: 'Serial:'
           stolen_at: 'Stolen at:'
           stolen_from: 'Stolen from:'
+    ui:
+      definition_list:
+        row:
+          no_value: none
   controllers:
     application:
       handle_unverified_request:
