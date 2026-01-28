@@ -7,13 +7,13 @@ class StolenBike::ApproveStolenListingJob < ApplicationJob
     return if TWEETING_DISABLED
 
     bike = Bike.find(bike_id)
-    new_tweet = Integrations::TwitterTweeter.new(bike).create_tweet
-    send_stolen_bike_alert_email(bike, new_tweet)
+    new_post = Integrations::SocialPoster.new(bike).create_post
+    send_stolen_bike_alert_email(bike, new_post)
   end
 
-  def send_stolen_bike_alert_email(bike, tweet)
-    if bike.current_stolen_record.blank? || tweet.blank?
-      raise ArgumentError, error_context(bike, tweet)
+  def send_stolen_bike_alert_email(bike, post)
+    if bike.current_stolen_record.blank? || post.blank?
+      raise ArgumentError, error_context(bike, post)
     end
 
     title_string =
@@ -31,21 +31,21 @@ class StolenBike::ApproveStolenListingJob < ApplicationJob
         title: title_string,
         user_email: bike.owner_email,
         creator_email: "bryan@bikeindex.org",
-        info_hash: tweet.details_hash
+        info_hash: post.details_hash
       )
 
     if customer_contact.save
       EmailStolenBikeAlertJob.perform_async(customer_contact.id)
     else
-      raise ArgumentError, error_context(bike, tweet, customer_contact.errors.full_messages)
+      raise ArgumentError, error_context(bike, post, customer_contact.errors.full_messages)
     end
   end
 
-  def error_context(bike, tweet, errors = [])
+  def error_context(bike, post, errors = [])
     {
       message: "failed creating alert for stolen listing",
       bike: bike&.id,
-      tweet: tweet&.id,
+      post: post&.id,
       errors: errors
     }
   end
