@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # NOTE: Currently not a badge, just colored text.
-module Badge::Status
+module Admin::Badges::MarketplaceListing
   class Component < ApplicationComponent
     KINDS = %i[marketplace_listing].freeze
 

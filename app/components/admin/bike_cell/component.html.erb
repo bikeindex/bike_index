@@ -6,7 +6,7 @@
     <% end %>
   </small>
 <% elsif @bike.present? %>
-  <%= render Admin::BikeHiddenExplanationBadge::Component.new(bike: @bike) %>
+  <%= render Admin::Badges::BikeHiddenExplanation::Component.new(bike: @bike) %>
   <% if bike_link_path.present? %>
     <%= link_to bike_content, bike_link_path, class: "twlink" %>
   <% else %>

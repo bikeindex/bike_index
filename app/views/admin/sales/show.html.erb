@@ -110,7 +110,7 @@
             <td>
               <%= link_to @marketplace_listing.id, admin_marketplace_messages_path(search_marketplace_listing_id: @marketplace_listing.id) %>
 
-              <%= render Badge::Status::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+              <%= render Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
             </td>
           </tr>
         <% end %>

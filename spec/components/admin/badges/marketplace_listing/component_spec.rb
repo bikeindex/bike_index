@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Badge::Status::Component, type: :component do
+RSpec.describe Admin::Badges::MarketplaceListing::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {status:, kind:, status_humanized:} }
