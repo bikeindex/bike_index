@@ -52,8 +52,9 @@ class Export < ApplicationRecord
     thumbnail
     vehicle_type
   ].freeze
-  AVERY_HEADERS = %w[address owner_name].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
+  FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at].freeze
+  HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
 
   mount_uploader :file, ExportUploader
 
@@ -63,55 +64,65 @@ class Export < ApplicationRecord
   enum :kind, VALID_KINDS
   enum :file_format, VALID_FILE_FORMATS
 
-  before_validation :set_calculated_attributes
+  before_validation :set_calculated_attributes, on: :create
+  before_validation :set_progress
 
   scope :avery, -> { where("(options -> 'avery_export') IS NOT NULL") }
 
   attr_accessor :timezone # permit assignment
   attr_reader :avery_export
 
-  def self.default_headers
-    DEFAULT_HEADERS
-  end
-
-  def self.default_options(kind)
-    {"headers" => default_headers}.merge(default_kind_options[kind.to_s])
-  end
-
-  def self.default_kind_options
-    {
-      stolen: {
-        with_blocklist: false,
-        only_serials_and_police_reports: false
-      },
-      organization: {
-        partial_registrations: false,
-        start_at: nil,
-        end_at: nil
-      },
-      manufacturer: {
-        frame_only: false
-      }
-    }.as_json.freeze
-  end
-
-  def self.permitted_headers(organization_or_overide = nil)
-    return PERMITTED_HEADERS unless organization_or_overide.present?
-
-    if organization_or_overide == "include_paid" # passing include_paid overrides
-      additional_headers = OrganizationFeature::REG_FIELDS
-    elsif organization_or_overide.is_a?(Organization)
-      additional_headers = organization_or_overide.additional_registration_fields
-      additional_headers += ["partial_registration"] if organization_or_overide.enabled?("show_partial_registrations")
-      additional_headers += ["is_impounded"] if organization_or_overide.enabled?("impound_bikes")
+  class << self
+    def default_headers
+      DEFAULT_HEADERS
     end
-    additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
-    # We always give the option to export extra_registration_number, don't double up if org can add too
-    (PERMITTED_HEADERS + additional_headers).uniq
-  end
 
-  def self.with_bike_sticker_code(bike_sticker_code)
-    where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
+    def default_options(kind)
+      {"headers" => default_headers}.merge(default_kind_options[kind.to_s])
+    end
+
+    def default_kind_options
+      {
+        stolen: {
+          with_blocklist: false,
+          only_serials_and_police_reports: false
+        },
+        organization: {
+          partial_registrations: false,
+          start_at: nil,
+          end_at: nil
+        },
+        manufacturer: {
+          frame_only: false
+        }
+      }.as_json.freeze
+    end
+
+    def permitted_headers(organization_or_overide = nil)
+      return PERMITTED_HEADERS unless organization_or_overide.present?
+
+      if organization_or_overide == :include_all # passing include_all overrides
+        additional_headers = reg_field_headers(OrganizationFeature::REG_FIELDS) + FEATURE_HEADERS
+      elsif organization_or_overide.is_a?(Organization)
+        additional_headers = reg_field_headers(organization_or_overide.additional_registration_fields)
+        additional_headers += %w[partial_registration] if organization_or_overide.enabled?("show_partial_registrations")
+        additional_headers += %w[is_impounded impounded_at] if organization_or_overide.enabled?("impound_bikes")
+      end
+      additional_headers ||= []
+      # We always give the option to export extra_registration_number, don't double up if org can add too
+      (PERMITTED_HEADERS + additional_headers).uniq
+    end
+
+    def with_bike_sticker_code(bike_sticker_code)
+      where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
+    end
+
+    private
+
+    def reg_field_headers(arr)
+      # skip the reg_ prefix, we don't want to display it
+      arr.map { |h| h.gsub("reg_", "") }
+    end
   end
 
   def finished_processing?
@@ -200,7 +211,7 @@ class Export < ApplicationRecord
   def avery_export=(val)
     if val
       self.options = options.merge(avery_export: true)
-      self.attributes = {file_format: "xlsx", headers: AVERY_HEADERS}
+      self.attributes = {file_format: "xlsx", headers: HEADERS_FOR_AVERY_EXPORT}
     end
   end
 
@@ -299,6 +310,9 @@ class Export < ApplicationRecord
   def set_calculated_attributes
     self.options = validated_options(options)
     errors.add :organization_id, :required if kind == "organization" && organization_id.blank?
+  end
+
+  def set_progress
     self.progress = calculated_progress
   end
 
@@ -309,15 +323,15 @@ class Export < ApplicationRecord
     ((created_at || Time.current) < Time.current - 10.minutes) ? "errored" : progress
   end
 
+  private
+
   def validated_options(opts)
     opts = self.class.default_options(kind).merge(opts)
     # Permit setting any header - we'll block organizations setting those headers via show and also via controller
     # but if we want to manually create an export, we should be able to do so
-    opts["headers"] = opts["headers"] & self.class.permitted_headers("include_paid")
+    opts["headers"] = opts["headers"] & self.class.permitted_headers(:include_all)
     opts
   end
-
-  private
 
   def bikes_within_time(bikes)
     return bikes unless option?("start_at") || option?("end_at")

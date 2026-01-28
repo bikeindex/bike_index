@@ -337,7 +337,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(export.kind).to eq "organization"
             expect(export.file_format).to eq "xlsx"
             expect(export.user).to eq current_user
-            expect(export.headers).to eq Export::AVERY_HEADERS
+            expect(export.headers).to eq Export::HEADERS_FOR_AVERY_EXPORT
             expect(export.avery_export?).to be_truthy
             expect(export.start_at.to_i).to be_within(1).of start_at
             expect(export.end_at.to_i).to be_within(1).of end_at

@@ -131,7 +131,10 @@ class OrganizationExportJob < ApplicationJob
       # Remove address and re-add, because we want to keep them in line
       @export_headers = (@export_headers - ["address"]) + %w[address address_2 city state zipcode]
     end
-    @export_headers += ["partial_registration"] if @export.partial_registrations.present?
+    # If there are partial registrations, always include partial_registration
+    if @export.partial_registrations.present? && @export_headers.exclude?("partial_registration")
+      @export_headers += ["partial_registration"]
+    end
     if @export.assign_bike_codes?
       @export_headers << "assigned_sticker"
       @bike_stickers = []
@@ -157,6 +160,7 @@ class OrganizationExportJob < ApplicationJob
     when "serial" then bike.serial_number
     when "is_stolen" then bike.status_stolen? ? "true" : nil
     when "is_impounded" then bike.status_impounded? ? "true" : nil
+    when "impounded_at" then bike.current_impound_record&.impounded_at&.utc
     when "address" then bike.registration_address["street"] # These are the expanded values for bike registration address
     when "address_2" then bike.registration_address["street_2"]
     when "city" then bike.registration_address["city"]
