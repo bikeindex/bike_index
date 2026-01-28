@@ -54,7 +54,7 @@ class Export < ApplicationRecord
   ].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
   FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at].freeze
-  AVERY_HEADERS = %w[address owner_name].freeze
+  HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
 
   mount_uploader :file, ExportUploader
 
@@ -102,7 +102,7 @@ class Export < ApplicationRecord
       return PERMITTED_HEADERS unless organization_or_overide.present?
 
       if organization_or_overide == :include_all # passing include_all overrides
-        additional_headers = reg_field_headers(OrganizationFeature::REG_FIELDS) + AVERY_HEADERS + FEATURE_HEADERS
+        additional_headers = reg_field_headers(OrganizationFeature::REG_FIELDS) + FEATURE_HEADERS
       elsif organization_or_overide.is_a?(Organization)
         additional_headers = reg_field_headers(organization_or_overide.additional_registration_fields)
         additional_headers += %w[partial_registration] if organization_or_overide.enabled?("show_partial_registrations")
@@ -211,7 +211,7 @@ class Export < ApplicationRecord
   def avery_export=(val)
     if val
       self.options = options.merge(avery_export: true)
-      self.attributes = {file_format: "xlsx", headers: AVERY_HEADERS}
+      self.attributes = {file_format: "xlsx", headers: HEADERS_FOR_AVERY_EXPORT}
     end
   end
 

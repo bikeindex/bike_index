@@ -246,7 +246,6 @@ RSpec.describe Export, type: :model do
     it "returns the array we expect" do
       expect(permitted_headers.count).to eq 15
       expect(Export.permitted_headers).to eq permitted_headers
-      # expect(Export.permitted_headers(:include_all)).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
       expect(organization_reg_phone.additional_registration_fields).to eq(["reg_phone"])
       expect(Export.permitted_headers(organization_reg_phone)).to eq(permitted_headers + ["phone"])

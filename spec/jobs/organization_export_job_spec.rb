@@ -110,7 +110,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
             expect(Export.with_bike_sticker_code(bike_sticker).pluck(:id)).to eq([])
             expect(export.avery_export?).to be_truthy
-            expect(export.headers).to eq Export::AVERY_HEADERS
+            expect(export.headers).to eq Export::HEADERS_FOR_AVERY_EXPORT
 
             expect(BikeServices::CalculateLocation.registration_address_source(bike_for_avery)).to eq "initial_creation"
             bike_for_avery.update(updated_at: Time.current)
@@ -332,7 +332,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
         end
         context "including every available field + stickers" do
-          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes] }
+          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes show_partial_registrations] }
           let(:export_options) { {headers: Export.permitted_headers(organization)} }
           let(:bike_row_hash) do
             {
@@ -355,6 +355,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               organization_affiliation: "community_member",
               phone: "7177423423",
               student_id: "XX9999",
+              partial_registration: nil,
               is_impounded: nil,
               impounded_at: nil,
               address: "717 Market St",
@@ -366,13 +367,20 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
           it "returns the expected values" do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
+              expect(organization.reload.enabled_feature_slugs).to eq enabled_feature_slugs.sort
+              target_header_keys = (bike_row_hash.keys.map(&:to_s) - %w[address_2 city state zipcode]).sort
+              expect(Export.permitted_headers(organization).count).to eq target_header_keys.count
+              expect(Export.permitted_headers(organization).sort).to eq target_header_keys
+              expect(Export.permitted_headers(organization).count).to eq(Export.permitted_headers(:include_all).count)
+              expect(Export.permitted_headers(organization).sort).to eq(Export.permitted_headers(:include_all).sort)
               bike_sticker.claim(user: user, bike: bike)
               bike_sticker.reload
               expect(bike_sticker.claimed?).to be_truthy
               expect(bike_sticker.bike).to eq bike
               expect(bike_sticker.user).to eq user
               expect(export.assign_bike_codes?).to be_falsey
-              # expect(export.headers.sort).to eq Export.permitted_headers(:include_all).sort
+              expect(export.headers.count).to eq(Export.permitted_headers(:include_all).count)
+              expect(export.headers.sort).to eq(Export.permitted_headers(:include_all).sort)
               expect(bike.reload.user&.id).to be_blank
               expect(bike.owner_name).to eq nil
               expect(bike.phone).to eq "7177423423"
@@ -553,7 +561,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           }
         end
         it "returns impound values" do
-          expect(bike.reload.occurred_at).to eq impounded_at
+          expect(bike.reload.occurred_at.round).to eq impounded_at.round
           expect(bike.status).to eq "status_impounded"
           expect(export.bikes_scoped.pluck(:id)).to eq([bike.id])
           instance.perform(export.id)
