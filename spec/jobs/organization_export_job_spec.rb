@@ -208,7 +208,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           status: nil, # no status
           thumbnail: nil,
           vehicle_type: "Bike",
-          assigned_sticker: nil # assigned_sticker
+          assigned_sticker: nil
         }
       end
       let(:bike_values) { bike_row_hash.values }
@@ -250,149 +250,152 @@ RSpec.describe OrganizationExportJob, type: :job do
          student_id: "XX9999"}
       end
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, extra_registration_number: "cool extra serial", creation_registration_info: registration_info, cycle_type: "cargo", propulsion_type: "pedal-assist") }
-      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
       let!(:state) { FactoryBot.create(:state_california) }
       let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).merge(street_2: nil).as_json }
-      include_context :geocoder_real
+      include_context :geocoder_real # Include to verify that it isn't called except when expected
 
-      context "assigning stickers" do
-        let(:export_options) { {headers: %w[link phone extra_registration_number address organization_affiliation student_id], bike_code_start: "ff333333"} }
-        let(:target_headers) { %w[link phone extra_registration_number organization_affiliation student_id address address_2 city state zipcode assigned_sticker] }
-        let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "XX9999", "717 Market St", "", "San Francisco", "CA", "94103", "FF 333 333"] }
-        it "returns the expected values" do
-          expect(export.reload.avery_export?).to be_falsey
-          VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
-            bike.reload
-            bike_sticker.reload
-            expect(bike_sticker.claimed?).to be_falsey
-            expect(bike.phone).to eq "7177423423"
-            expect(bike.extra_registration_number).to eq "cool extra serial"
-            expect(bike.organization_affiliation).to eq "community_member"
-            expect(export.assign_bike_codes?).to be_truthy
+      context "with sticker" do
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "ff333333") }
+        context "assigning stickers" do
+          let(:export_options) { {headers: %w[link phone extra_registration_number address organization_affiliation student_id], bike_code_start: "ff333333"} }
+          let(:target_headers) { %w[link phone extra_registration_number organization_affiliation student_id address address_2 city state zipcode assigned_sticker] }
+          let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "XX9999", "717 Market St", "", "San Francisco", "CA", "94103", "FF 333 333"] }
+          it "returns the expected values" do
+            expect(export.reload.avery_export?).to be_falsey
+            VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
+              bike.reload
+              bike_sticker.reload
+              expect(bike_sticker.claimed?).to be_falsey
+              expect(bike.phone).to eq "7177423423"
+              expect(bike.extra_registration_number).to eq "cool extra serial"
+              expect(bike.organization_affiliation).to eq "community_member"
+              expect(export.assign_bike_codes?).to be_truthy
 
-            expect(bike.registration_address(true).except("country")).to eq target_address
-            instance.perform(export.id)
-          end
-          export.reload
-          expect(instance.export_headers).to eq target_headers
-          expect(export.progress).to eq "finished"
-          generated_csv_string = export.file.read
-          bike_line = generated_csv_string.split("\n").last
-          expect(bike_line.split(",").count).to eq target_headers.count
-          expect(bike_line).to eq instance.comma_wrapped_string(bike_values).strip
-
-          bike_sticker.reload
-          expect(bike_sticker.claimed?).to be_truthy
-          expect(bike_sticker.bike).to eq bike
-          expect(bike_sticker.user).to eq user
-        end
-      end
-      context "header only organization_affiliation" do
-        let(:target_headers) { %w[organization_affiliation] }
-        let(:export_options) { {headers: target_headers} }
-        it "returns the expected values" do
-          VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
-            bike_sticker.reload
-            expect(bike_sticker.claimed?).to be_falsey
-            instance.perform(export.id)
+              expect(bike.registration_address(true).except("country")).to eq target_address
+              instance.perform(export.id)
+            end
             export.reload
             expect(instance.export_headers).to eq target_headers
             expect(export.progress).to eq "finished"
             generated_csv_string = export.file.read
             bike_line = generated_csv_string.split("\n").last
             expect(bike_line.split(",").count).to eq target_headers.count
-            expect(bike_line).to eq "\"community_member\""
+            expect(bike_line).to eq instance.comma_wrapped_string(bike_values).strip
 
-            bike_sticker.reload
-            expect(bike_sticker.claimed?).to be_falsey
-          end
-        end
-      end
-      context "header only student_id" do
-        let(:target_headers) { %w[student_id] }
-        let(:export_options) { {headers: target_headers} }
-        it "returns the expected values" do
-          bike_sticker.reload
-          expect(bike_sticker.claimed?).to be_falsey
-          expect(bike.student_id).to eq "XX9999"
-          VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
-            instance.perform(export.id)
-            export.reload
-            expect(instance.export_headers).to eq target_headers
-            expect(export.progress).to eq "finished"
-            generated_csv_string = export.file.read
-            bike_line = generated_csv_string.split("\n").last
-            expect(bike_line.split(",").count).to eq target_headers.count
-            expect(bike_line).to eq "\"XX9999\""
-
-            bike_sticker.reload
-            expect(bike_sticker.claimed?).to be_falsey
-          end
-        end
-      end
-      context "including every available field + stickers" do
-        let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes] }
-        let(:export_options) { {headers: Export.permitted_headers(organization)} }
-        let(:bike_row_hash) do
-          {
-            color: "Black",
-            extra_registration_number: "cool extra serial",
-            is_stolen: nil,
-            link: "http://test.host/bikes/#{bike.id}",
-            manufacturer: bike.mnfg_name,
-            model: nil,
-            motorized: "true",
-            owner_email: bike.owner_email,
-            owner_name: nil,
-            registered_at: bike.created_at.utc.to_s,
-            registered_by: nil,
-            serial: bike.serial_number,
-            status: nil,
-            thumbnail: nil,
-            vehicle_type: "Cargo Bike",
-            bike_sticker: "FF 333 333",
-            organization_affiliation: "community_member",
-            phone: "7177423423",
-            student_id: "XX9999",
-            is_impounded: nil,
-            impounded_at: nil,
-            address: "717 Market St",
-            address_2: nil,
-            city: "San Francisco",
-            state: "CA",
-            zipcode: "94103"
-          }
-        end
-        it "returns the expected values" do
-          VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
-            bike_sticker.claim(user: user, bike: bike)
             bike_sticker.reload
             expect(bike_sticker.claimed?).to be_truthy
             expect(bike_sticker.bike).to eq bike
             expect(bike_sticker.user).to eq user
-            expect(export.assign_bike_codes?).to be_falsey
-            # expect(export.headers.sort).to eq Export.permitted_headers(:include_all).sort
-            expect(bike.reload.user&.id).to be_blank
-            expect(bike.owner_name).to eq nil
-            expect(bike.phone).to eq "7177423423"
-            expect(bike.extra_registration_number).to eq "cool extra serial"
-            expect(bike.organization_affiliation).to eq "community_member"
-            expect(bike.registration_address(true).except("country")).to eq target_address
-            expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
-            instance.perform(export.id)
           end
-          export.reload
-          expect(instance.export_headers).to eq export.written_headers
-          expect(instance.export_headers).to match_array bike_row_hash.keys.map(&:to_s)
-          expect(export.progress).to eq "finished"
-          generated_csv_string = export.file.read.force_encoding("UTF-8")
+        end
+        context "header only organization_affiliation" do
+          let(:target_headers) { %w[organization_affiliation] }
+          let(:export_options) { {headers: target_headers} }
+          it "returns the expected values" do
+            VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
+              bike_sticker.reload
+              expect(bike_sticker.claimed?).to be_falsey
+              instance.perform(export.id)
+              export.reload
+              expect(instance.export_headers).to eq target_headers
+              expect(export.progress).to eq "finished"
+              generated_csv_string = export.file.read
+              bike_line = generated_csv_string.split("\n").last
+              expect(bike_line.split(",").count).to eq target_headers.count
+              expect(bike_line).to eq "\"community_member\""
 
-          line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
-          expect(line_hash.keys).to eq bike_row_hash.keys # again, order is CRITICAL
-          expect(line_hash).to match_hash_indifferently(bike_row_hash)
-          expect(generated_csv_string).to eq csv_string
+              bike_sticker.reload
+              expect(bike_sticker.claimed?).to be_falsey
+            end
+          end
+        end
+        context "header only student_id" do
+          let(:target_headers) { %w[student_id] }
+          let(:export_options) { {headers: target_headers} }
+          it "returns the expected values" do
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_falsey
+            expect(bike.student_id).to eq "XX9999"
+            VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
+              instance.perform(export.id)
+              export.reload
+              expect(instance.export_headers).to eq target_headers
+              expect(export.progress).to eq "finished"
+              generated_csv_string = export.file.read
+              bike_line = generated_csv_string.split("\n").last
+              expect(bike_line.split(",").count).to eq target_headers.count
+              expect(bike_line).to eq "\"XX9999\""
+
+              bike_sticker.reload
+              expect(bike_sticker.claimed?).to be_falsey
+            end
+          end
+        end
+        context "including every available field + stickers" do
+          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes] }
+          let(:export_options) { {headers: Export.permitted_headers(organization)} }
+          let(:bike_row_hash) do
+            {
+              color: "Black",
+              extra_registration_number: "cool extra serial",
+              is_stolen: nil,
+              link: "http://test.host/bikes/#{bike.id}",
+              manufacturer: bike.mnfg_name,
+              model: nil,
+              motorized: "true",
+              owner_email: bike.owner_email,
+              owner_name: nil,
+              registered_at: bike.created_at.utc.to_s,
+              registered_by: nil,
+              serial: bike.serial_number,
+              status: nil,
+              thumbnail: nil,
+              vehicle_type: "Cargo Bike",
+              bike_sticker: "FF 333 333",
+              organization_affiliation: "community_member",
+              phone: "7177423423",
+              student_id: "XX9999",
+              is_impounded: nil,
+              impounded_at: nil,
+              address: "717 Market St",
+              address_2: nil,
+              city: "San Francisco",
+              state: "CA",
+              zipcode: "94103"
+            }
+          end
+          it "returns the expected values" do
+            VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
+              bike_sticker.claim(user: user, bike: bike)
+              bike_sticker.reload
+              expect(bike_sticker.claimed?).to be_truthy
+              expect(bike_sticker.bike).to eq bike
+              expect(bike_sticker.user).to eq user
+              expect(export.assign_bike_codes?).to be_falsey
+              # expect(export.headers.sort).to eq Export.permitted_headers(:include_all).sort
+              expect(bike.reload.user&.id).to be_blank
+              expect(bike.owner_name).to eq nil
+              expect(bike.phone).to eq "7177423423"
+              expect(bike.extra_registration_number).to eq "cool extra serial"
+              expect(bike.organization_affiliation).to eq "community_member"
+              expect(bike.registration_address(true).except("country")).to eq target_address
+              expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
+              instance.perform(export.id)
+            end
+            export.reload
+            expect(instance.export_headers).to eq export.written_headers
+            expect(instance.export_headers).to match_array bike_row_hash.keys.map(&:to_s)
+            expect(export.progress).to eq "finished"
+            generated_csv_string = export.file.read.force_encoding("UTF-8")
+
+            line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
+            expect(line_hash.keys).to eq bike_row_hash.keys # again, order is CRITICAL
+            expect(line_hash).to match_hash_indifferently(bike_row_hash)
+            expect(generated_csv_string).to eq csv_string
+          end
         end
       end
+
       context "with partial registrations, every available field without sticker" do
         let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
         let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: "only"} }
@@ -522,9 +525,54 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
         end
       end
+
       context "impounded" do
         let(:enabled_feature_slugs) { %w[impound_bikes] }
         let(:export_options) { {headers: Export.permitted_headers(organization)} }
+        let(:impounded_at) { Time.current - 3.days }
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:, organization:, impounded_at:) }
+        let(:target_impound_row) do
+          {
+            color: "Black",
+            extra_registration_number: "cool extra serial",
+            is_stolen: nil,
+            link: "http://test.host/bikes/#{bike.id}",
+            manufacturer: bike.mnfg_name,
+            model: nil,
+            motorized: "true",
+            owner_email: bike.owner_email,
+            owner_name: nil,
+            registered_at: bike.created_at.utc.to_s,
+            registered_by: nil,
+            serial: bike.serial_number,
+            status: "impounded",
+            thumbnail: nil,
+            vehicle_type: "Cargo Bike",
+            is_impounded: "true",
+            impounded_at: impounded_at.utc.to_s
+          }
+        end
+        it "returns impound values" do
+          expect(bike.reload.occurred_at).to eq impounded_at
+          expect(bike.status).to eq "status_impounded"
+          expect(export.bikes_scoped.pluck(:id)).to eq([bike.id])
+          instance.perform(export.id)
+          export.reload
+          expect(instance.export_headers).to eq export.reload.written_headers
+          expect(export.headers.count).to eq target_impound_row.keys.count
+          expect(export.headers.sort).to eq target_impound_row.keys.map(&:to_s).sort
+          expect(export.progress).to eq "finished"
+          generated_csv_string = export.file.read.force_encoding("UTF-8")
+          expect(generated_csv_string.split("\n").count).to eq 2
+
+          line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
+          expect(line_hash.keys).to eq target_impound_row.keys # again, order is CRITICAL
+          expect(line_hash).to match_hash_indifferently(target_impound_row)
+
+          target_csv_string = [export.written_headers, target_impound_row.values].map { |r| instance.comma_wrapped_string(r) }.join
+          expect(generated_csv_string).to eq target_csv_string
+          expect(export.exported_bike_ids).to eq([bike.id])
+        end
       end
     end
   end
