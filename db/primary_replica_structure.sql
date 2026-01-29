@@ -1717,7 +1717,8 @@ CREATE TABLE public.impound_records (
     display_id character varying,
     display_id_prefix character varying,
     impounded_description text,
-    unregistered_bike boolean DEFAULT false
+    unregistered_bike boolean DEFAULT false,
+    address_record_id bigint
 );
 
 
@@ -6205,6 +6206,13 @@ CREATE INDEX index_impound_record_updates_on_user_id ON public.impound_record_up
 
 
 --
+-- Name: index_impound_records_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_address_record_id ON public.impound_records USING btree (address_record_id);
+
+
+--
 -- Name: index_impound_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7179,6 +7187,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260129092646'),
 ('20260128220133'),
 ('20260125184905'),
 ('20260124024709'),

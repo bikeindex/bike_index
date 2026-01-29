@@ -19,6 +19,7 @@
 #  zipcode               :text
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  address_record_id     :bigint
 #  bike_id               :integer
 #  country_id            :bigint
 #  display_id            :string
@@ -29,16 +30,18 @@
 #
 # Indexes
 #
-#  index_impound_records_on_bike_id          (bike_id)
-#  index_impound_records_on_country_id       (country_id)
-#  index_impound_records_on_location_id      (location_id)
-#  index_impound_records_on_organization_id  (organization_id)
-#  index_impound_records_on_state_id         (state_id)
-#  index_impound_records_on_user_id          (user_id)
+#  index_impound_records_on_address_record_id  (address_record_id)
+#  index_impound_records_on_bike_id            (bike_id)
+#  index_impound_records_on_country_id         (country_id)
+#  index_impound_records_on_location_id        (location_id)
+#  index_impound_records_on_organization_id    (organization_id)
+#  index_impound_records_on_state_id           (state_id)
+#  index_impound_records_on_user_id            (user_id)
 #
 class ImpoundRecord < ApplicationRecord
   include Geocodeable
   include DefaultCurrencyable
+  include AddressRecorded
 
   belongs_to :bike, touch: true
   belongs_to :user
@@ -282,6 +285,13 @@ class ImpoundRecord < ApplicationRecord
     organization&.fetch_impound_configuration&.email ||
       organization&.auto_user&.email ||
       user&.email
+  end
+
+  # Override AddressRecorded delegation to fall back to legacy fields
+  def address_present?
+    return address_record.address_present? if address_record?
+
+    [street, city, zipcode].any?(&:present?)
   end
 
   private
