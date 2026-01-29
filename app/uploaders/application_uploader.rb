@@ -20,7 +20,7 @@ class ApplicationUploader < CarrierWave::Uploader::Base
   end
 
   def base_store_dir
-    "uploads/#{model.class.to_s[0, 2]}"
+    "uploads/#{model_abbr}"
   end
 
   def delete_empty_upstream_dirs
@@ -35,5 +35,15 @@ class ApplicationUploader < CarrierWave::Uploader::Base
 
   def cache_dir
     Rails.root.join("tmp", "cache")
+  end
+
+  private
+
+  def model_abbr
+    if defined?(model.class.uploader_abbr)
+      model.class.uploader_abbr
+    else
+      model.class.to_s[0, 2]
+    end
   end
 end
