@@ -377,7 +377,6 @@ RSpec.describe ImpoundRecord, type: :model do
       let(:latitude) { 41.9202384 }
       let(:longitude) { -87.7158185 }
       let(:impound_record) { FactoryBot.build(:impound_record, street: "3554 W Shakespeare Ave, 60647") }
-      # TODO: Fix this - #2922 - Something with the vcr cassette
       xit "geocodes if no address and if address changes" do
         VCR.use_cassette("impound_record-address_lookup") do
           impound_record.save

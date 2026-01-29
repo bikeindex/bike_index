@@ -3,22 +3,10 @@
 module RegistrationInfoable
   extend ActiveSupport::Concern
 
-  LOCATION_KEYS = %w[city country state street street_2 zipcode latitude longitude].freeze
-
-  # Currently not used, keeping it around for reference
-  # REGISTRATION_INFO_KEYS = %w[
-  #   organization_affiliation
-  #   student_id
-  #   phone
-  #   bike_sticker
-  #   city
-  #   country
-  #   state
-  #   street
-  #   zipcode
-  #   latitude
-  #   longitude
-  # ].freeze
+  # Keys used for address records - country is a string that AddressRecord.country= converts to country_id
+  LOCATION_KEYS = %w[city country postal_code region_string street street_2 latitude longitude].freeze
+  # Old format keys for backward compatibility with existing registration_info data
+  LEGACY_LOCATION_KEYS = %w[state zipcode].freeze
 
   class_methods do
     def org_id_for_org(org = nil)
