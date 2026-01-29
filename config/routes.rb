@@ -273,8 +273,8 @@ Rails.application.routes.draw do
       end
     end
     resources :ownerships, only: %i[show edit update index]
-    resources :tweets
-    resources :twitter_accounts, except: %i[new] do
+    resources :social_posts
+    resources :social_accounts, except: %i[new] do
       member { get :check_credentials }
     end
 

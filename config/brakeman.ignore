@@ -239,39 +239,6 @@
       "note": ""
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "275b040bf97293ef7fb7a6fcf1edb751183b91cecae49faf3986deea47dc17c7",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/landing_pages/_tweet.html.haml",
-      "line": 19,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "Tweet.friendly_find(nil).body_html",
-      "render_path": [
-        {
-          "type": "template",
-          "name": "admin/tweets/_display",
-          "line": 51,
-          "file": "app/views/admin/tweets/_display.html.haml",
-          "rendered": {
-            "name": "landing_pages/_tweet",
-            "file": "app/views/landing_pages/_tweet.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "landing_pages/_tweet"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Redirect",
       "warning_code": 18,
       "fingerprint": "2843118e7bef96258449dfb2f745e07476f8a3193835936f63af1254bdf24a9c",
@@ -324,7 +291,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/memberships_controller.rb",
-      "line": 112,
+      "line": 111,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "Membership.all.where(:status => ((params[:search_status] or nil))).where(:level => ((params[:search_level] or nil))).send((params[:search_manager] or nil))",
       "render_path": null,
@@ -626,6 +593,39 @@
       "note": ""
     },
     {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "4fa18c3eb274a5d4739a7199624aedb14d56c4ed3aae53b98d5541386c62f871",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/landing_pages/_social_post.html.haml",
+      "line": 9,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "::Haml::AttributeBuilder.build_class(true, \"tweet-display\", \"tweet-align-#{SocialPost.friendly_find(nil).alignment}\")",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "admin/social_posts/_display",
+          "line": 51,
+          "file": "app/views/admin/social_posts/_display.html.haml",
+          "rendered": {
+            "name": "landing_pages/_social_post",
+            "file": "app/views/landing_pages/_social_post.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "landing_pages/_social_post"
+      },
+      "user_input": "SocialPost.friendly_find(nil).alignment",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Dynamic Render Path",
       "warning_code": 15,
       "fingerprint": "5043744ea937fd3be7d63b2927d5e40d854db678dfd418daafcb459968bfb0f5",
@@ -681,39 +681,6 @@
         77
       ],
       "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "51676d24662d018c7348b72d8c44b5f9c69972aa115968de9bfdf17e888df010",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/landing_pages/_tweet.html.haml",
-      "line": 9,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, \"tweet-display\", \"tweet-align-#{Tweet.friendly_find(nil).alignment}\")",
-      "render_path": [
-        {
-          "type": "template",
-          "name": "admin/tweets/_display",
-          "line": 51,
-          "file": "app/views/admin/tweets/_display.html.haml",
-          "rendered": {
-            "name": "landing_pages/_tweet",
-            "file": "app/views/landing_pages/_tweet.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "landing_pages/_tweet"
-      },
-      "user_input": "Tweet.friendly_find(nil).alignment",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
     },
     {
       "warning_type": "Dangerous Send",
@@ -817,6 +784,39 @@
       "note": ""
     },
     {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "70c04d4e0dcd9b3a91d7eff4ac5e48c4bbe9fbe0774c7c78ddb02e646aad9c67",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/landing_pages/_social_post.html.haml",
+      "line": 19,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "SocialPost.friendly_find(nil).body_html",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "admin/social_posts/_display",
+          "line": 51,
+          "file": "app/views/admin/social_posts/_display.html.haml",
+          "rendered": {
+            "name": "landing_pages/_social_post",
+            "file": "app/views/landing_pages/_social_post.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "landing_pages/_social_post"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        79
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "770a3703fbf8ef4b8ae5ba3a5aa0fb4e120dcf12aaa000ef55d76d9ff05e9841",
@@ -865,11 +865,34 @@
     {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
+      "fingerprint": "7b993ab8de5333c83b4730b13be3e4bbe62c9b67843384513576f270f5c3c42a",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "app/controllers/admin/social_posts_controller.rb",
+      "line": 95,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "SocialPost.not_repost.public_send((params[:search_kind] or \"all\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admin::SocialPostsController",
+        "method": "matching_social_posts"
+      },
+      "user_input": "params[:search_kind]",
+      "confidence": "High",
+      "cwe_id": [
+        77
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
       "fingerprint": "7e76033efdc3fd033fc62a7360eb95ff695c36087e35565d2854ec4374d7b29a",
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/marketplace_listings_controller.rb",
-      "line": 29,
+      "line": 37,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "MarketplaceListing.send((params[:search_status] or nil))",
       "render_path": null,
@@ -892,7 +915,7 @@
       "check_name": "PermitAttributes",
       "message": "Potentially dangerous key allowed for mass assignment",
       "file": "app/controllers/admin/organization_roles_controller.rb",
-      "line": 63,
+      "line": 62,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.require(:organization_role).permit(:organization_id, :user_id, :role, :invited_email)",
       "render_path": null,
@@ -1050,29 +1073,6 @@
         89
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Dangerous Send",
-      "warning_code": 23,
-      "fingerprint": "9ebeeef082d701423f5d70f13aee14007a388ea271d0efef52b5a3bf85f85f70",
-      "check_name": "Send",
-      "message": "User controlled method execution",
-      "file": "app/controllers/admin/tweets_controller.rb",
-      "line": 95,
-      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
-      "code": "Tweet.not_retweet.public_send((params[:search_kind] or \"all\"))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Admin::TweetsController",
-        "method": "matching_tweets"
-      },
-      "user_input": "params[:search_kind]",
-      "confidence": "High",
-      "cwe_id": [
-        77
-      ],
-      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1330,7 +1330,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/models/export.rb",
-      "line": 261,
+      "line": 272,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "`wc -l \"#{tmp_file.path}\"`",
       "render_path": null,
@@ -1506,7 +1506,7 @@
           "type": "controller",
           "class": "Admin::MembershipsController",
           "method": "show",
-          "line": 40,
+          "line": 39,
           "file": "app/controllers/admin/memberships_controller.rb",
           "rendered": {
             "name": "admin/memberships/show",
@@ -1576,7 +1576,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/impound_claims_controller.rb",
-      "line": 45,
+      "line": 44,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "ImpoundClaim.public_send((params[:search_status] or available_statuses.first))",
       "render_path": null,
@@ -1599,7 +1599,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/primary_activities_controller.rb",
-      "line": 49,
+      "line": 48,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "PrimaryActivity.send(params[:search_scope])",
       "render_path": null,
@@ -1870,7 +1870,7 @@
           "type": "controller",
           "class": "Admin::MembershipsController",
           "method": "show",
-          "line": 40,
+          "line": 39,
           "file": "app/controllers/admin/memberships_controller.rb",
           "rendered": {
             "name": "admin/memberships/show",
