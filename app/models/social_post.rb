@@ -53,47 +53,54 @@ class SocialPost < ApplicationRecord
   scope :not_repost, -> { where(original_post: nil) }
   scope :not_stolen, -> { where.not(kind: "stolen_post") }
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
-  end
-
-  def self.friendly_find(id)
-    return nil if id.blank?
-
-    id = id.to_s
-    query = (id.length > 15) ? {platform_id: id} : {id: id}
-    order(created_at: :desc).find_by(query)
-  end
-
-  def self.auto_link_text(text, platform: :twitter)
-    if platform.to_sym == :bluesky
-      text.gsub(/@([^\s])*/) { |username|
-        "<a href=\"https://bsky.app/profile/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
-      }.gsub(/#([^\s])*/) do |hashtag|
-        "<a href=\"https://bsky.app/search?q=#{CGI.escape(hashtag)}\" target=\"_blank\">#{hashtag}</a>"
-      end
-    else
-      text.gsub(/@([^\s])*/) { |username|
-        "<a href=\"https://twitter.com/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
-      }.gsub(/#([^\s])*/) do |hashtag|
-        "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
-      end
+  class << self
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
     end
-  end
 
-  def self.admin_search(str)
-    return none unless str.present?
+    def friendly_find(id)
+      return nil if id.blank?
 
-    text = str.strip
-    # If passed a number, assume it is a bike ID and search for that bike_id
-    if text.is_a?(Integer) || text.match(/\A\d+\z/).present?
-      if text.to_i > 2147483647 # max rails integer, assume it's a platform_id instead
-        return where("platform_id ILIKE ?", "%#{text}%")
+      id = id.to_s
+      query = (id.length > 15) ? {platform_id: id} : {id: id}
+      order(created_at: :desc).find_by(query)
+    end
+
+    def auto_link_text(text, platform: :twitter)
+      if platform.to_sym == :bluesky
+        text.gsub(/@([^\s])*/) { |username|
+          "<a href=\"https://bsky.app/profile/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
+        }.gsub(/#([^\s])*/) do |hashtag|
+          "<a href=\"https://bsky.app/search?q=#{CGI.escape(hashtag)}\" target=\"_blank\">#{hashtag}</a>"
+        end
       else
-        return includes(:stolen_record).where(stolen_records: {bike_id: text})
+        text.gsub(/@([^\s])*/) { |username|
+          "<a href=\"https://twitter.com/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
+        }.gsub(/#([^\s])*/) do |hashtag|
+          "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
+        end
       end
     end
-    where("body_html ILIKE ?", "%#{text}%").or(where("body ILIKE ?", "%#{text}%"))
+
+    def admin_search(str)
+      return none unless str.present?
+
+      text = str.strip
+      # If passed a number, assume it is a bike ID and search for that bike_id
+      if text.is_a?(Integer) || text.match(/\A\d+\z/).present?
+        if text.to_i > 2147483647 # max rails integer, assume it's a platform_id instead
+          return where("platform_id ILIKE ?", "%#{text}%")
+        else
+          return includes(:stolen_record).where(stolen_records: {bike_id: text})
+        end
+      end
+      where("body_html ILIKE ?", "%#{text}%").or(where("body ILIKE ?", "%#{text}%"))
+    end
+
+    # Required because of the rename from Tweet
+    def uploader_abbr
+      "Tw"
+    end
   end
 
   # TODO: Add actual testing of this. It isn't tested right now, sorry :/
