@@ -399,12 +399,12 @@ class Ownership < ApplicationRecord
   end
 
   def reg_info_location_hash
-    reg_info_location = registration_info.slice(*LOCATION_KEYS).reject { |_k, v| v.blank? }
+    reg_info_location = registration_info.slice(*(LOCATION_KEYS + LEGACY_LOCATION_KEYS)).reject { |_k, v| v.blank? }
     return unless reg_info_location.present?
 
-    reg_info_location["postal_code"] = reg_info_location.delete("zipcode")
-    reg_info_location["region_string"] = reg_info_location.delete("state")
-    reg_info_location["country"] ||= "US"
-    reg_info_location.with_indifferent_access
+    # Convert legacy keys to new format
+    reg_info_location["postal_code"] ||= reg_info_location.delete("zipcode")
+    reg_info_location["region_string"] ||= reg_info_location.delete("state")
+    reg_info_location.compact.with_indifferent_access
   end
 end
