@@ -3233,6 +3233,98 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: social_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.social_accounts (
+    id integer NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    "default" boolean DEFAULT false NOT NULL,
+    "national" boolean DEFAULT false NOT NULL,
+    latitude double precision,
+    longitude double precision,
+    address_string character varying,
+    append_block character varying,
+    city character varying,
+    consumer_key character varying NOT NULL,
+    consumer_secret character varying NOT NULL,
+    language character varying,
+    neighborhood character varying,
+    screen_name character varying NOT NULL,
+    user_secret character varying NOT NULL,
+    user_token character varying NOT NULL,
+    account_info jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    last_error character varying,
+    last_error_at timestamp without time zone,
+    street character varying,
+    zipcode character varying,
+    state_id bigint,
+    country_id bigint
+);
+
+
+--
+-- Name: social_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.social_accounts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: social_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.social_accounts_id_seq OWNED BY public.social_accounts.id;
+
+
+--
+-- Name: social_posts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.social_posts (
+    id integer NOT NULL,
+    platform_id character varying,
+    platform_response json,
+    body_html text,
+    image character varying,
+    alignment character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    social_account_id integer,
+    stolen_record_id integer,
+    original_post_id integer,
+    kind integer,
+    body text
+);
+
+
+--
+-- Name: social_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.social_posts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: social_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.social_posts_id_seq OWNED BY public.social_posts.id;
+
+
+--
 -- Name: states; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3654,98 +3746,6 @@ CREATE SEQUENCE public.theft_alerts_id_seq
 --
 
 ALTER SEQUENCE public.theft_alerts_id_seq OWNED BY public.theft_alerts.id;
-
-
---
--- Name: tweets; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tweets (
-    id integer NOT NULL,
-    twitter_id character varying,
-    twitter_response json,
-    body_html text,
-    image character varying,
-    alignment character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    twitter_account_id integer,
-    stolen_record_id integer,
-    original_tweet_id integer,
-    kind integer,
-    body text
-);
-
-
---
--- Name: tweets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.tweets_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: tweets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.tweets_id_seq OWNED BY public.tweets.id;
-
-
---
--- Name: twitter_accounts; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.twitter_accounts (
-    id integer NOT NULL,
-    active boolean DEFAULT false NOT NULL,
-    "default" boolean DEFAULT false NOT NULL,
-    "national" boolean DEFAULT false NOT NULL,
-    latitude double precision,
-    longitude double precision,
-    address_string character varying,
-    append_block character varying,
-    city character varying,
-    consumer_key character varying NOT NULL,
-    consumer_secret character varying NOT NULL,
-    language character varying,
-    neighborhood character varying,
-    screen_name character varying NOT NULL,
-    user_secret character varying NOT NULL,
-    user_token character varying NOT NULL,
-    twitter_account_info jsonb DEFAULT '{}'::jsonb,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    last_error character varying,
-    last_error_at timestamp without time zone,
-    street character varying,
-    zipcode character varying,
-    state_id bigint,
-    country_id bigint
-);
-
-
---
--- Name: twitter_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.twitter_accounts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: twitter_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.twitter_accounts_id_seq OWNED BY public.twitter_accounts.id;
 
 
 --
@@ -4600,6 +4600,20 @@ ALTER TABLE ONLY public.sales ALTER COLUMN id SET DEFAULT nextval('public.sales_
 
 
 --
+-- Name: social_accounts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.social_accounts ALTER COLUMN id SET DEFAULT nextval('public.social_accounts_id_seq'::regclass);
+
+
+--
+-- Name: social_posts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.social_posts ALTER COLUMN id SET DEFAULT nextval('public.social_posts_id_seq'::regclass);
+
+
+--
 -- Name: states id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4667,20 +4681,6 @@ ALTER TABLE ONLY public.theft_alert_plans ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.theft_alerts ALTER COLUMN id SET DEFAULT nextval('public.theft_alerts_id_seq'::regclass);
-
-
---
--- Name: tweets id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tweets ALTER COLUMN id SET DEFAULT nextval('public.tweets_id_seq'::regclass);
-
-
---
--- Name: twitter_accounts id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.twitter_accounts ALTER COLUMN id SET DEFAULT nextval('public.twitter_accounts_id_seq'::regclass);
 
 
 --
@@ -5381,6 +5381,22 @@ ALTER TABLE ONLY public.sales
 
 
 --
+-- Name: social_accounts social_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.social_accounts
+    ADD CONSTRAINT social_accounts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: social_posts social_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.social_posts
+    ADD CONSTRAINT social_posts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: states states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5458,22 +5474,6 @@ ALTER TABLE ONLY public.theft_alert_plans
 
 ALTER TABLE ONLY public.theft_alerts
     ADD CONSTRAINT theft_alerts_pkey PRIMARY KEY (id);
-
-
---
--- Name: tweets tweets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tweets
-    ADD CONSTRAINT tweets_pkey PRIMARY KEY (id);
-
-
---
--- Name: twitter_accounts twitter_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.twitter_accounts
-    ADD CONSTRAINT twitter_accounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -6793,6 +6793,55 @@ CREATE INDEX index_sales_on_seller_id ON public.sales USING btree (seller_id);
 
 
 --
+-- Name: index_social_accounts_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_country_id ON public.social_accounts USING btree (country_id);
+
+
+--
+-- Name: index_social_accounts_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_latitude_and_longitude ON public.social_accounts USING btree (latitude, longitude);
+
+
+--
+-- Name: index_social_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_screen_name ON public.social_accounts USING btree (screen_name);
+
+
+--
+-- Name: index_social_accounts_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_state_id ON public.social_accounts USING btree (state_id);
+
+
+--
+-- Name: index_social_posts_on_original_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_posts_on_original_post_id ON public.social_posts USING btree (original_post_id);
+
+
+--
+-- Name: index_social_posts_on_social_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_posts_on_social_account_id ON public.social_posts USING btree (social_account_id);
+
+
+--
+-- Name: index_social_posts_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_posts_on_stolen_record_id ON public.social_posts USING btree (stolen_record_id);
+
+
+--
 -- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6937,55 +6986,6 @@ CREATE INDEX index_theft_alerts_on_theft_alert_plan_id ON public.theft_alerts US
 --
 
 CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (user_id);
-
-
---
--- Name: index_tweets_on_original_tweet_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tweets_on_original_tweet_id ON public.tweets USING btree (original_tweet_id);
-
-
---
--- Name: index_tweets_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tweets_on_stolen_record_id ON public.tweets USING btree (stolen_record_id);
-
-
---
--- Name: index_tweets_on_twitter_account_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tweets_on_twitter_account_id ON public.tweets USING btree (twitter_account_id);
-
-
---
--- Name: index_twitter_accounts_on_country_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_twitter_accounts_on_country_id ON public.twitter_accounts USING btree (country_id);
-
-
---
--- Name: index_twitter_accounts_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_twitter_accounts_on_latitude_and_longitude ON public.twitter_accounts USING btree (latitude, longitude);
-
-
---
--- Name: index_twitter_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_twitter_accounts_on_screen_name ON public.twitter_accounts USING btree (screen_name);
-
-
---
--- Name: index_twitter_accounts_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_twitter_accounts_on_state_id ON public.twitter_accounts USING btree (state_id);
 
 
 --
@@ -7179,6 +7179,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260128220133'),
 ('20260125184905'),
 ('20260124024709'),
 ('20251223233135'),

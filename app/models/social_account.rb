@@ -1,45 +1,45 @@
 # == Schema Information
 #
-# Table name: twitter_accounts
+# Table name: social_accounts
 # Database name: primary
 #
-#  id                   :integer          not null, primary key
-#  active               :boolean          default(FALSE), not null
-#  address_string       :string
-#  append_block         :string
-#  city                 :string
-#  consumer_key         :string           not null
-#  consumer_secret      :string           not null
-#  default              :boolean          default(FALSE), not null
-#  language             :string
-#  last_error           :string
-#  last_error_at        :datetime
-#  latitude             :float
-#  longitude            :float
-#  national             :boolean          default(FALSE), not null
-#  neighborhood         :string
-#  screen_name          :string           not null
-#  street               :string
-#  twitter_account_info :jsonb
-#  user_secret          :string           not null
-#  user_token           :string           not null
-#  zipcode              :string
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  country_id           :bigint
-#  state_id             :bigint
+#  id              :integer          not null, primary key
+#  account_info    :jsonb
+#  active          :boolean          default(FALSE), not null
+#  address_string  :string
+#  append_block    :string
+#  city            :string
+#  consumer_key    :string           not null
+#  consumer_secret :string           not null
+#  default         :boolean          default(FALSE), not null
+#  language        :string
+#  last_error      :string
+#  last_error_at   :datetime
+#  latitude        :float
+#  longitude       :float
+#  national        :boolean          default(FALSE), not null
+#  neighborhood    :string
+#  screen_name     :string           not null
+#  street          :string
+#  user_secret     :string           not null
+#  user_token      :string           not null
+#  zipcode         :string
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  country_id      :bigint
+#  state_id        :bigint
 #
 # Indexes
 #
-#  index_twitter_accounts_on_country_id              (country_id)
-#  index_twitter_accounts_on_latitude_and_longitude  (latitude,longitude)
-#  index_twitter_accounts_on_screen_name             (screen_name)
-#  index_twitter_accounts_on_state_id                (state_id)
+#  index_social_accounts_on_country_id              (country_id)
+#  index_social_accounts_on_latitude_and_longitude  (latitude,longitude)
+#  index_social_accounts_on_screen_name             (screen_name)
+#  index_social_accounts_on_state_id                (state_id)
 #
-class TwitterAccount < ApplicationRecord
+class SocialAccount < ApplicationRecord
   include Geocodeable
 
-  has_many :tweets, dependent: :destroy
+  has_many :social_posts, dependent: :destroy
 
   validates \
     :consumer_key,
@@ -93,9 +93,9 @@ class TwitterAccount < ApplicationRecord
 
   def self.find_or_create_from_twitter_oauth(info)
     attrs = attrs_from_user_info(info)
-    twitter_account = find_or_initialize_by(screen_name: attrs.delete(:screen_name))
-    twitter_account.update(attrs)
-    twitter_account
+    social_account = find_or_initialize_by(screen_name: attrs.delete(:screen_name))
+    social_account.update(attrs)
+    social_account
   end
 
   def self.attrs_from_user_info(info)
@@ -109,8 +109,8 @@ class TwitterAccount < ApplicationRecord
     }
   end
 
-  def self.get_tweet(tweet_id)
-    default_account.get_tweet(tweet_id)
+  def self.get_post(post_id)
+    default_account.get_post(post_id)
   end
 
   def self.in_proximity(obj = nil)
@@ -122,32 +122,32 @@ class TwitterAccount < ApplicationRecord
     ].flatten.compact.uniq
   end
 
-  def twitter_account_url
+  def account_url
     "https://twitter.com/#{screen_name}"
   end
 
   def fetch_account_info
-    return twitter_account_url if twitter_account_info.present?
+    return account_url if account_info.present?
 
-    self.twitter_account_info = twitter_user
-    self.created_at = Binxtils::TimeParser.parse(twitter_account_info["created_at"])
-    twitter_account_info
+    self.account_info = platform_user
+    self.created_at = Binxtils::TimeParser.parse(account_info["created_at"])
+    account_info
   end
 
-  def twitter_user
-    @twitter_user ||= twitter_client.user(screen_name).to_h
+  def platform_user
+    @platform_user ||= platform_client.user(screen_name).to_h
   end
 
   def account_info_name
-    return if twitter_account_info.blank?
+    return if account_info.blank?
 
-    twitter_account_info["name"]
+    account_info["name"]
   end
 
   def account_info_image
-    return if twitter_account_info.blank?
+    return if account_info.blank?
 
-    twitter_account_info["profile_image_url_https"]
+    account_info["profile_image_url_https"]
   end
 
   def set_error(message)
@@ -168,37 +168,37 @@ class TwitterAccount < ApplicationRecord
 
   def check_credentials
     clear_error
-    twitter_client.verify_credentials
+    platform_client.verify_credentials
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
   end
 
-  def tweet(text, photo = nil, **opts)
+  def post(text, photo = nil, **opts)
     nil unless text.present?
 
     # Commented out in #2618 - twitter is disabled
     #
     # if photo.present?
-    #   twitter_client.update_with_media(text, photo, opts)
+    #   platform_client.update_with_media(text, photo, opts)
     # else
-    #   twitter_client.update(text, opts)
+    #   platform_client.update(text, opts)
     # end
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
     nil
   end
 
-  def retweet(tweet_id)
-    return unless tweet_id.present?
+  def repost(post_id)
+    return unless post_id.present?
 
-    twitter_client.retweet(tweet_id).first
+    platform_client.retweet(post_id).first
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
     nil
   end
 
-  def get_tweet(tweet_id)
-    twitter_client.status(tweet_id)
+  def get_post(post_id)
+    platform_client.status(post_id)
   end
 
   def should_be_reverse_geocoded?
@@ -209,8 +209,8 @@ class TwitterAccount < ApplicationRecord
 
   private
 
-  def twitter_client
-    @twitter_client ||= Twitter::REST::Client.new { |config|
+  def platform_client
+    @platform_client ||= Twitter::REST::Client.new { |config|
       config.consumer_key = consumer_key
       config.consumer_secret = consumer_secret
       config.access_token = user_token
