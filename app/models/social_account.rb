@@ -9,8 +9,8 @@
 #  address_string  :string
 #  append_block    :string
 #  city            :string
-#  consumer_key    :string           not null
-#  consumer_secret :string           not null
+#  consumer_key    :string
+#  consumer_secret :string
 #  default         :boolean          default(FALSE), not null
 #  language        :string
 #  last_error      :string
@@ -19,9 +19,10 @@
 #  longitude       :float
 #  national        :boolean          default(FALSE), not null
 #  neighborhood    :string
+#  platform        :integer          default("twitter"), not null
 #  screen_name     :string           not null
 #  street          :string
-#  user_secret     :string           not null
+#  user_secret     :string
 #  user_token      :string           not null
 #  zipcode         :string
 #  created_at      :datetime         not null
@@ -33,26 +34,26 @@
 #
 #  index_social_accounts_on_country_id              (country_id)
 #  index_social_accounts_on_latitude_and_longitude  (latitude,longitude)
+#  index_social_accounts_on_platform                (platform)
 #  index_social_accounts_on_screen_name             (screen_name)
 #  index_social_accounts_on_state_id                (state_id)
 #
 class SocialAccount < ApplicationRecord
   include Geocodeable
 
+  PLATFORM_ENUM = {twitter: 0, bluesky: 1}.freeze
+
   has_many :social_posts, dependent: :destroy
 
-  validates \
-    :consumer_key,
-    :consumer_secret,
-    :user_secret,
-    :user_token,
-    :screen_name,
-    presence: true
+  validates :screen_name, :user_token, presence: true
+  validates :consumer_key, :consumer_secret, :user_secret, presence: true, if: :twitter?
 
-  validates :screen_name, uniqueness: true
+  validates :screen_name, uniqueness: {scope: :platform}
 
   before_save :reverse_geocode, if: :should_be_reverse_geocoded?
-  before_save :fetch_account_info
+  before_save :fetch_account_info, if: :twitter?
+
+  enum :platform, PLATFORM_ENUM
 
   scope :active, -> { where(active: true) }
   scope :national, -> { active.where(national: true) }
@@ -123,7 +124,11 @@ class SocialAccount < ApplicationRecord
   end
 
   def account_url
-    "https://twitter.com/#{screen_name}"
+    if bluesky?
+      "https://bsky.app/profile/#{screen_name}"
+    else
+      "https://twitter.com/#{screen_name}"
+    end
   end
 
   def fetch_account_info

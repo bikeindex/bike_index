@@ -9,6 +9,7 @@
 #  body_html         :text
 #  image             :string
 #  kind              :integer
+#  platform          :integer          default("twitter"), not null
 #  platform_response :json
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
@@ -20,13 +21,15 @@
 # Indexes
 #
 #  index_social_posts_on_original_post_id   (original_post_id)
+#  index_social_posts_on_platform           (platform)
 #  index_social_posts_on_social_account_id  (social_account_id)
 #  index_social_posts_on_stolen_record_id   (stolen_record_id)
 #
 class SocialPost < ApplicationRecord
   KIND_ENUM = {stolen_post: 0, imported_post: 1, app_post: 2}.freeze
+  PLATFORM_ENUM = {twitter: 0, bluesky: 1}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
-  validates :platform_id, uniqueness: true, allow_blank: true
+  validates :platform_id, uniqueness: {scope: :platform}, allow_blank: true
   has_many :public_images, as: :imageable, dependent: :destroy
 
   belongs_to :social_account
@@ -41,8 +44,10 @@ class SocialPost < ApplicationRecord
   mount_uploader :image, ImageUploader
 
   before_validation :set_calculated_attributes
+  before_validation :set_platform_from_account
 
   enum :kind, KIND_ENUM
+  enum :platform, PLATFORM_ENUM
 
   scope :repost, -> { where.not(original_post: nil) }
   scope :not_repost, -> { where(original_post: nil) }
@@ -60,13 +65,19 @@ class SocialPost < ApplicationRecord
     order(created_at: :desc).find_by(query)
   end
 
-  def self.auto_link_text(text)
-    text.gsub(/@([^\s])*/) {
-      username = Regexp.last_match[0]
-      "<a href=\"https://twitter.com/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
-    }.gsub(/#([^\s])*/) do
-      hashtag = Regexp.last_match[0]
-      "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
+  def self.auto_link_text(text, platform: :twitter)
+    if platform.to_sym == :bluesky
+      text.gsub(/@([^\s])*/) { |username|
+        "<a href=\"https://bsky.app/profile/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
+      }.gsub(/#([^\s])*/) do |hashtag|
+        "<a href=\"https://bsky.app/search?q=#{CGI.escape(hashtag)}\" target=\"_blank\">#{hashtag}</a>"
+      end
+    else
+      text.gsub(/@([^\s])*/) { |username|
+        "<a href=\"https://twitter.com/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
+      }.gsub(/#([^\s])*/) do |hashtag|
+        "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
+      end
     end
   end
 
@@ -199,7 +210,17 @@ class SocialPost < ApplicationRecord
   end
 
   def post_link
-    if social_account.present?
+    if bluesky?
+      # Bluesky platform_id is an AT URI like at://did:plc:xxx/app.bsky.feed.post/rkey
+      if platform_id&.start_with?("at://")
+        parts = platform_id.split("/")
+        did = parts[2]
+        rkey = parts.last
+        "https://bsky.app/profile/#{did}/post/#{rkey}"
+      else
+        social_account&.account_url
+      end
+    elsif social_account.present?
       [social_account.account_url, "status", platform_id].join("/")
     else
       "https://twitter.com/#{poster}/status/#{platform_id}"
@@ -228,6 +249,10 @@ class SocialPost < ApplicationRecord
   def open_image
     local_image = image&._storage&.to_s == "CarrierWave::Storage::File"
     local_image ? File.open(image.path, "r") : URI.parse(image.url).open
+  end
+
+  def set_platform_from_account
+    self.platform ||= social_account&.platform
   end
 
   private

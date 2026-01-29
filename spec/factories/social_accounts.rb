@@ -37,5 +37,12 @@ FactoryBot.define do
     trait :default do
       default { true }
     end
+
+    trait :bluesky do
+      platform { :bluesky }
+      consumer_key { nil }
+      consumer_secret { nil }
+      user_secret { nil }
+    end
   end
 end

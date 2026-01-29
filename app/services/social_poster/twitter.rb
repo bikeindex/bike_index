@@ -2,7 +2,7 @@ require "twitter"
 require "tempfile"
 require "open-uri"
 
-class Integrations::SocialPoster
+class SocialPoster::Twitter
   TWEET_LENGTH = 280
   MAX_REPOST_COUNT = (ENV["MAX_RETWEET_COUNT"] || 3).to_i
 
@@ -25,7 +25,7 @@ class Integrations::SocialPoster
     if bike.image_url.present?
       self.bike_photo_url = bike.image_url(:large)
     end
-    self.close_social_accounts = SocialAccount.in_proximity(stolen_record)
+    self.close_social_accounts = SocialAccount.twitter.in_proximity(stolen_record)
     self.nearest_social_account = close_social_accounts.find { |i| i.not_national? } || close_social_accounts.first
     self.city = stolen_record&.city
     self.state = stolen_record&.state&.abbreviation
@@ -33,7 +33,7 @@ class Integrations::SocialPoster
   end
 
   # To manually send a post (e.g. if authentication failed)
-  # Integrations::SocialPoster.new(Bike.find(XXX)).create_post
+  # SocialPoster::Twitter.new(Bike.find(XXX)).create_post
   def create_post
     return if stolen_record.blank? || nearest_social_account.blank?
 

@@ -1,14 +1,14 @@
 class StolenBike::ApproveStolenListingJob < ApplicationJob
   sidekiq_options queue: "notify", retry: 1
 
-  TWEETING_DISABLED = ENV["TWITTER_IS_FUCKED"].present?
+  POSTING_DISABLED = ENV["SOCIAL_POSTING_DISABLED"].present?
 
   def perform(bike_id)
-    return if TWEETING_DISABLED
+    return if POSTING_DISABLED
 
     bike = Bike.find(bike_id)
-    new_post = Integrations::SocialPoster.new(bike).create_post
-    send_stolen_bike_alert_email(bike, new_post)
+    bluesky_post = SocialPoster::Bluesky.new(bike).create_post
+    send_stolen_bike_alert_email(bike, bluesky_post)
   end
 
   def send_stolen_bike_alert_email(bike, post)
@@ -18,9 +18,9 @@ class StolenBike::ApproveStolenListingJob < ApplicationJob
 
     title_string =
       if bike.status_abandoned?
-        "We tweeted about the bike you found!"
+        "We posted about the bike you found!"
       else
-        "We tweeted about your stolen bike!"
+        "We posted about your stolen bike!"
       end
 
     customer_contact =

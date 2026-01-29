@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3246,12 +3247,12 @@ CREATE TABLE public.social_accounts (
     address_string character varying,
     append_block character varying,
     city character varying,
-    consumer_key character varying NOT NULL,
-    consumer_secret character varying NOT NULL,
+    consumer_key character varying,
+    consumer_secret character varying,
     language character varying,
     neighborhood character varying,
     screen_name character varying NOT NULL,
-    user_secret character varying NOT NULL,
+    user_secret character varying,
     user_token character varying NOT NULL,
     account_info jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
@@ -3261,7 +3262,8 @@ CREATE TABLE public.social_accounts (
     street character varying,
     zipcode character varying,
     state_id bigint,
-    country_id bigint
+    country_id bigint,
+    platform integer DEFAULT 0 NOT NULL
 );
 
 
@@ -3301,7 +3303,8 @@ CREATE TABLE public.social_posts (
     stolen_record_id integer,
     original_post_id integer,
     kind integer,
-    body text
+    body text,
+    platform integer DEFAULT 0 NOT NULL
 );
 
 
@@ -6807,6 +6810,13 @@ CREATE INDEX index_social_accounts_on_latitude_and_longitude ON public.social_ac
 
 
 --
+-- Name: index_social_accounts_on_platform; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_platform ON public.social_accounts USING btree (platform);
+
+
+--
 -- Name: index_social_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6825,6 +6835,13 @@ CREATE INDEX index_social_accounts_on_state_id ON public.social_accounts USING b
 --
 
 CREATE INDEX index_social_posts_on_original_post_id ON public.social_posts USING btree (original_post_id);
+
+
+--
+-- Name: index_social_posts_on_platform; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_posts_on_platform ON public.social_posts USING btree (platform);
 
 
 --
@@ -7179,6 +7196,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260128220135'),
+('20260128220134'),
 ('20260128220133'),
 ('20260125184905'),
 ('20260124024709'),

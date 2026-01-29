@@ -60,7 +60,7 @@
   data: {
     controller: "admin--recovery-display-form",
     "admin--recovery-display-form-toggle-image-value" => toggle_image_initially,
-    "admin--recovery-display-form-max-character-count-value" => Integrations::SocialPoster::TWEET_LENGTH,
+    "admin--recovery-display-form-max-character-count-value" => SocialPoster::Twitter::TWEET_LENGTH,
     "admin--recovery-display-form-remote-photo-url-value" => @bike&.image_url || ""
   }} do |f| %>
   <%= render(UI::AlertForErrors::Component.new(object: @recovery_display, dismissable: true)) %>
