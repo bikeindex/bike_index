@@ -30,7 +30,7 @@ RSpec.describe Backfills::AddressRecordsForImpoundRecordsJob, type: :job do
         country_id: Country.united_states_id,
         street: "1300 W 14th Pl",
         postal_code: "60608",
-        kind: "impound_record",
+        kind: "impounded_from",
         user_id: impound_record.user_id
       }
     end
