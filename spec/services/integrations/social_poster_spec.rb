@@ -59,7 +59,7 @@ RSpec.describe Integrations::SocialPoster do
 
         context "long string" do
           # post without append block is 68 characters - so frame model needs to be >
-          # POST_LENGTH - 68 - 10 (#bikeParty) = 202
+          # TWEET_LENGTH - 68 - 10 (#bikeParty) = 202
           let(:color) { FactoryBot.create(:color, name: "Stickers tape or other cover-up") }
           let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Salsa") }
           let(:bike) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, frame_model: long_string) }

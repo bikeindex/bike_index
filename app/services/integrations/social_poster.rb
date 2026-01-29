@@ -3,7 +3,7 @@ require "tempfile"
 require "open-uri"
 
 class Integrations::SocialPoster
-  POST_LENGTH = 280
+  TWEET_LENGTH = 280
   MAX_REPOST_COUNT = (ENV["MAX_RETWEET_COUNT"] || 3).to_i
 
   attr_accessor \
@@ -92,13 +92,13 @@ class Integrations::SocialPoster
     # a REST client.configuration call
     #
     # spaces between slugs
-    # max_char = POST_LENGTH - https_length - at_screen_name.length - 3
+    # max_char = TWEET_LENGTH - https_length - at_screen_name.length - 3
 
     https_length = 23
     media_length = 23
 
     # spaces between slugs
-    max = POST_LENGTH - https_length - stolen_slug.size - 3
+    max = TWEET_LENGTH - https_length - stolen_slug.size - 3
     max -= bike_photo_url ? media_length : 0
 
     max
