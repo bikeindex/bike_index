@@ -68,10 +68,10 @@ RSpec.describe BikeDeleterJob, type: :job do
         .and change(NormalizedSerialSegment, :count).by(-1)
         .and change(BParam, :count).by(-1)
       expect(Bike.unscoped.find_by_id(bike_id)).to be_nil
-      expect(Ownership.where(id: ownership.id).count).to eq 0
-      expect(PublicImage.find_by_id(public_image_id)).to be_nil
-      expect(BikeOrganization.find_by_id(bike_organization.id)).to be_nil
-      expect(BParam.find_by_id(b_param.id)).to be_nil
+      expect(Ownership.unscoped.where(id: ownership.id).count).to eq 0
+      expect(PublicImage.unscoped.find_by_id(public_image_id)).to be_nil
+      expect(BikeOrganization.unscoped.find_by_id(bike_organization.id)).to be_nil
+      expect(BParam.unscoped.find_by_id(b_param.id)).to be_nil
     end
   end
 
