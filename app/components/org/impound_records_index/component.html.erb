@@ -43,10 +43,9 @@
   </div>
 </div>
 
-<%# Form needs to wrap the table too %>
+<%# Form needs to wrap the table too. Similar to form on parking notification show %>
 <%= form_for ImpoundRecordUpdate.new, url: organization_impound_record_path("multi_update", organization_id: @current_organization), action: "update", method: :patch do |f| %>
   <div id="makeMultiUpdate" class="collapse">
-    <%# similar form on parking notification show %>
     <div class="row">
       <div class="mt-4 mb-4 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
         <div class="card">
@@ -61,9 +60,6 @@
               </h3>
             </div>
             <div class="card-body">
-              <%# This gets us the correct kinds for the current impound_record - e.g. no retrieved_by_owner for unregistered_parking_notification %>
-              <%# Never include claim_approved or denied, even if they're valid update kinds - they have to be done through impound_claims %>
-              <%# Also - never display "current" because it can't be updated that way %>
               <div id="impoundRecordUpdateForm">
                 <div class="row">
                   <div class="col-sm-6 mb-2" id="kindUpdate">
