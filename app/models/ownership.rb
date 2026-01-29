@@ -405,6 +405,7 @@ class Ownership < ApplicationRecord
     # Convert legacy keys to new format
     reg_info_location["postal_code"] ||= reg_info_location.delete("zipcode")
     reg_info_location["region_string"] ||= reg_info_location.delete("state")
+    reg_info_location["country"] ||= "US"
     reg_info_location.compact.with_indifferent_access
   end
 end
