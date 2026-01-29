@@ -268,9 +268,6 @@ class ImpoundRecord < ApplicationRecord
     self.attributes = if parking_notification.present?
       parking_notification.attributes.slice(*Geocodeable.location_attrs)
     else
-      # IDK WTF but duplicating this fixes the failing bulk_import_job_spec
-      # TODO: Remove this once backfill is finished - #2922
-      GeocodeHelper.assignable_address_hash_for(address(force_show_address: true))
       GeocodeHelper.assignable_address_hash_for(address(force_show_address: true))
     end
   end

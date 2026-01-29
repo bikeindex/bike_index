@@ -393,7 +393,9 @@ class Bike < ApplicationRecord
   end
 
   def find_or_build_address_record(country_id: nil)
-    Backfills::AddressRecordsForBikesJob.build_or_create_for(self, country_id:)
+    return address_record if address_record?
+
+    build_address_record(bike_id: id, kind: :bike, country_id:)
   end
 
   def latitude_public

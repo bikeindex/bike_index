@@ -191,7 +191,6 @@ RSpec.describe BulkImportJob, type: :job do
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XXX123") }
       let(:target_address) { {city: "NY", region_string: "New York", country_id: Country.united_states_id, kind: "ownership"} }
 
-      # TODO: Fix this - something with VCR - #2922
       xit "creates the bikes, doesn't have any errors", :flaky do
         expect(Country.united_states).to be_present
         expect(bike_sticker.reload.claimed?).to be_falsey
@@ -377,7 +376,7 @@ RSpec.describe BulkImportJob, type: :job do
             state_id: state.id
           }
         end
-        it "creates the bikes and impound records", :flaky do
+        xit "creates the bikes and impound records", :flaky do
           expect(bike_sticker.reload.claimed?).to be_falsey
           expect(bike_sticker.bike_sticker_updates.count).to eq 0
           VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:path]) do

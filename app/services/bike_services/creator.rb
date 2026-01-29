@@ -79,12 +79,10 @@ class BikeServices::Creator
     timezone
     zipcode
   ].freeze
-  # TODO: Remove this once backfill is finished - #2922
-  ADDRESS_ATTRS = %i[city country_id state_id street zipcode]
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator
   def self.old_attr_accessible
-    (PERMITTED_ATTRS + ADDRESS_ATTRS + [
+    (PERMITTED_ATTRS + [
       stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
       impound_records_attributes: PERMITTED_IMPOUND_ATTRS,
       components_attributes: Component.permitted_attributes,
@@ -186,7 +184,6 @@ class BikeServices::Creator
 
   def save_bike(b_param, bike)
     # TODO: Figure out why this needs to be called separately, before save. See PR #2848
-    # Maybe can be removed in #2922
     bike.attributes = BikeServices::CalculateLocation.stored_location_attrs(bike)
     bike.save
 
@@ -205,7 +202,6 @@ class BikeServices::Creator
       bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
         organization: bike.creation_organization, creator_kind: "creator_bike_creation")
     end
-    # TODO: consolidate into create_parking_notification in #2922
     if b_param.unregistered_parking_notification?
       # We skipped setting address, with Builder.default_parking_notification_attrs,
       # notification will update it

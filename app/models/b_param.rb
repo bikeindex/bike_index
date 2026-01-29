@@ -320,7 +320,6 @@ class BParam < ApplicationRecord
     s_attrs
   end
 
-  # registration_info_attrs is assigned to ownership. Update to use address_record_attributes in #2922
   def registration_info_attrs
     ria = params["bike"]&.slice(*REGISTRATION_INFO_ATTRS) || {}
     # Include legacy address attributes
