@@ -12,7 +12,7 @@
 = render partial: "/shared/period_select"
 
 .mt-4
-  -# render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_impound_records_path(organization_id: current_organization.to_param)} %>
+  = render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_impound_records_path(organization_id: current_organization.to_param)}
 
 .row.mt-4.mb-4
   .col-sm-9
