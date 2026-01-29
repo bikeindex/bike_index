@@ -276,15 +276,17 @@ RSpec.describe BParam, type: :model do
         external_image_urls: ["xxxxx"],
         bike_sticker: "xxxx",
         phone: "919929333",
-        street: "123 Main St",
-        city: "Nevernever Land",
-        zipcode: "11111",
-        state: "CA"
+        address_record_attributes: {
+          street: "123 Main St",
+          city: "Nevernever Land",
+          postal_code: "11111",
+          region_string: "CA"
+        }
       }
     end
     before { allow(bike).to receive(:b_params) { [b_param] } }
     it "has the expected fields" do
-      expect(described_class.address_record_attributes(b_param.bike)).to eq target_address
+      expect(described_class.address_record_attributes(b_param.bike)).to match_hash_indifferently target_address
       expect(b_param.bike_sticker_code).to eq "xxxx"
       expect(b_param.organization_affiliation).to eq "employee"
       expect(b_param.phone).to eq "919929333"
@@ -728,26 +730,6 @@ RSpec.describe BParam, type: :model do
         it "returns target attributes" do
           expect(described_class.address_record_attributes(b_param.bike).except(:region_record_id))
             .to match_hash_indifferently target[:address_record_attributes].except(:region_record_id)
-          expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
-        end
-      end
-      context "with legacy attributes" do
-        let(:bike_params) do
-          {
-            city: "Golden",
-            phone: "1112223333",
-            state: "CO",
-            street: "1812 Miners Spur, Building 2015 Unit 99999-69",
-            embeded: "true",
-            zipcode: "80401",
-            country_id: Country.united_states_id,
-            student_id: "99999999",
-            email: "stuff@example.com"
-          }
-        end
-        it "returns target attributes" do
-          expect(described_class.address_record_attributes(b_param.bike))
-            .to match_hash_indifferently target[:address_record_attributes]
           expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
         end
       end

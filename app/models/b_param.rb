@@ -27,7 +27,6 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
-  # Also uses address_record_attributes to get legacy address attributes
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
     bike_code
@@ -43,20 +42,12 @@ class BParam < ApplicationRecord
     student_id
     user_name
   ].freeze
-  # attrs that need to be skipped on bike assignment, mostly legacy reasons
+  # attrs that need to be skipped on bike assignment
   SKIPPED_BIKE_ATTRS = %w[
     abandoned
     accuracy
-    address
-    address_city
-    address_country
-    address_state
-    address_zipcode
     bike_code
     bike_sticker
-    city
-    country
-    country_id
     cycle_type_name
     cycle_type_slug
     front_gear_type_slug
@@ -70,11 +61,8 @@ class BParam < ApplicationRecord
     propulsion_type_slug
     rear_gear_type_slug
     revised_new
-    state
     state_id
     stolen
-    street
-    zipcode
   ].freeze
   mount_uploader :image, ImageUploader
   process_in_background :image, CarrierWaveStoreJob
@@ -211,28 +199,10 @@ class BParam < ApplicationRecord
     end
 
     def address_record_attributes(bike_params)
-      # If nested address_record_attributes hash is present, no legacy handling required!
       ar_attrs = bike_params["address_record_attributes"]&.slice(*AddressRecord.permitted_params.map(&:to_s))
-      ar_attrs ||= AddressRecord.permitted_params.map { |k| [k, legacy_address_field_value(bike_params, k)] }.to_h
+      return {} if ar_attrs.blank? || ar_attrs.values.none?
 
-      ar_attrs.values.any? ? ar_attrs.compact.merge(kind: "ownership") : {}
-    end
-
-    private
-
-    # Deal with the legacy address concerns
-    def legacy_address_field_value(bike_params, field)
-      if field == :street # If looking for street or address, try both street and address
-        bike_params["street"] || bike_params["address"] || bike_params["address_street"]
-      elsif field == :postal_code
-        bike_params[field.to_s] || bike_params["zipcode"] || bike_params["address_zipcode"]
-      elsif field == :region_string
-        bike_params[field.to_s] || bike_params["state"] || bike_params["address_state"]
-      elsif field == :country_id
-        bike_params[field.to_s] || bike_params["country"] || bike_params["address_country"]
-      else
-        bike_params[field.to_s] || bike_params["address_#{field}"]
-      end
+      ar_attrs.compact.merge(kind: "ownership")
     end
   end
 
@@ -322,8 +292,7 @@ class BParam < ApplicationRecord
 
   def registration_info_attrs
     ria = params["bike"]&.slice(*REGISTRATION_INFO_ATTRS) || {}
-    # Include legacy address attributes
-    (ria.key?("street") ? ria : ria.merge(self.class.address_record_attributes(bike))).reject { |_k, v| v.blank? }.to_h
+    ria.merge(self.class.address_record_attributes(bike)).reject { |_k, v| v.blank? }.to_h
   end
 
   def status
