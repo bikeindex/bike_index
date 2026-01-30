@@ -161,7 +161,8 @@ CREATE TABLE public.address_records (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     bike_id bigint,
-    street_2 character varying
+    street_2 character varying,
+    organization_id bigint
 );
 
 
@@ -1913,7 +1914,8 @@ CREATE TABLE public.locations (
     not_publicly_visible boolean DEFAULT false,
     impound_location boolean DEFAULT false,
     default_impound_location boolean DEFAULT false,
-    neighborhood character varying
+    neighborhood character varying,
+    address_record_id bigint
 );
 
 
@@ -5564,7 +5566,7 @@ CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.ac
 -- Name: index_address_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id);
+CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id) WHERE (bike_id IS NOT NULL);
 
 
 --
@@ -5572,6 +5574,13 @@ CREATE INDEX index_address_records_on_bike_id ON public.address_records USING bt
 --
 
 CREATE INDEX index_address_records_on_country_id ON public.address_records USING btree (country_id);
+
+
+--
+-- Name: index_address_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_organization_id ON public.address_records USING btree (organization_id) WHERE (organization_id IS NOT NULL);
 
 
 --
@@ -5585,7 +5594,7 @@ CREATE INDEX index_address_records_on_region_record_id ON public.address_records
 -- Name: index_address_records_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id);
+CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id) WHERE (user_id IS NOT NULL);
 
 
 --
@@ -6279,6 +6288,13 @@ CREATE INDEX index_invoices_on_first_invoice_id ON public.invoices USING btree (
 --
 
 CREATE INDEX index_invoices_on_organization_id ON public.invoices USING btree (organization_id);
+
+
+--
+-- Name: index_locations_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_locations_on_address_record_id ON public.locations USING btree (address_record_id);
 
 
 --
@@ -7179,6 +7195,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260129122352'),
+('20260129122350'),
 ('20260128220133'),
 ('20260125184905'),
 ('20260124024709'),
