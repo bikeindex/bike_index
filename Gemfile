@@ -130,6 +130,7 @@ group :development do
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
   gem "annotaterb" # Add comments with the attributes to Rails Model
+  gem "benchmark"
 end
 
 group :development, :test do

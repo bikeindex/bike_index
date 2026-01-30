@@ -4567,15 +4567,10 @@ nl:
     manages:
       location_fields:
         address: Adres
-        choose_country: Kies land
-        city: City
         location_name: Locatie naam
         name: Naam
         phone_number: Telefoonnummer
         remove: Locatie verwijderen
-        state: Staat
-        street: Straat
-        zipcode: Postcode
       locations:
         add_location: Locatie toevoegen
         bike_index_partner_map: Bike Index-partnerkaart
@@ -6170,3 +6165,12 @@ nl:
       alert_for_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
           dit %{object_name} wordt opgeslagen:"
+    org:
+      location_address_fields:
+        address: Adres
+        choose_country: Kies land
+        city: City
+        postal_code: Postcode
+        region: Regio / Provincie
+        state: Staat
+        street: Straat
