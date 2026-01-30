@@ -1910,7 +1910,13 @@ CREATE TABLE public.locations (
     not_publicly_visible boolean DEFAULT false,
     impound_location boolean DEFAULT false,
     default_impound_location boolean DEFAULT false,
-    address_record_id bigint
+    address_record_id bigint,
+    state_id integer,
+    country_id integer,
+    zipcode character varying,
+    street character varying,
+    neighborhood character varying,
+    city character varying
 );
 
 
@@ -7198,7 +7204,6 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260130170531'),
-('20260130162732'),
 ('20260129220857'),
 ('20260129122352'),
 ('20260129122350'),
