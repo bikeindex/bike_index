@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../config/environment"
+require "benchmark"
+
+def bench(name, query_params, results, iterations: 5)
+  interpreted = BikeSearchable.searchable_interpreted_params(query_params)
+  times = iterations.times.map { Benchmark.realtime { Bike.search(interpreted).limit(25).to_a } }
+  avg = (times.sum / times.size * 1000).round(1)
+  puts "#{avg.to_s.rjust(8)}ms  #{name}"
+  results << avg
+end
+
+puts "Bikes: #{Bike.count} total, #{Bike.stolen_or_impounded.count} stolen"
+puts
+
+results = []
+manufacturer = Manufacturer.find_by(name: "Trek") || Manufacturer.first
+color = Color.find_by(name: "Black") || Color.first
+color2 = Color.find_by(name: "Red") || Color.second
+
+bench "Stolen (default)", {}, results
+bench "All bikes", {stolenness: "all"}, results
+bench "Non-stolen", {stolenness: "non"}, results
+bench "Serial exact", {serial: "WTU123456"}, results
+bench "Serial partial", {serial: "WTU"}, results
+bench "Manufacturer (#{manufacturer&.name})", {manufacturer: manufacturer&.id}, results
+bench "Color (#{color&.name})", {colors: [color&.id].compact}, results
+bench "Two colors", {colors: [color&.id, color2&.id].compact}, results
+bench "Text query 'trek'", {query: "trek"}, results
+bench "Text query 'blue mountain'", {query: "blue mountain"}, results
+bench "Manufacturer + color", {manufacturer: manufacturer&.id, colors: [color&.id].compact}, results
+bench "Manufacturer + query", {manufacturer: manufacturer&.id, query: "mountain"}, results
+bench "Serial + manufacturer", {serial: "WTU", manufacturer: manufacturer&.id}, results
+bench "Proximity Chicago 100mi", {stolenness: "proximity", location: "Chicago, IL", distance: 100}, results
+bench "Proximity Chicago 10mi", {stolenness: "proximity", location: "Chicago, IL", distance: 10}, results
+bench "Proximity NYC 50mi", {stolenness: "proximity", location: "New York, NY", distance: 50}, results
+bench "Proximity LA 25mi", {stolenness: "proximity", location: "Los Angeles, CA", distance: 25}, results
+bench "Complex: serial+mfg+color+prox", {
+  serial: "WTU",
+  manufacturer: manufacturer&.id,
+  colors: [color&.id].compact,
+  stolenness: "proximity",
+  location: "Chicago, IL",
+  distance: 100
+}, results
+
+puts
+puts "#{results.sum.round(1).to_s.rjust(8)}ms  TOTAL (#{results.size} searches)"
