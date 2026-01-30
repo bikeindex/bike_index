@@ -191,7 +191,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def permitted_locations_params
     %i[name zipcode city state_id _destroy id country_id street phone email publicly_visible
-      impound_location default_impound_location]
+      impound_location default_impound_location] + [address_record_attributes: AddressRecord.permitted_params + [:id]]
   end
 
   def update_organization_stolen_message

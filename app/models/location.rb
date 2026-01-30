@@ -20,12 +20,18 @@
 #  zipcode                  :string(255)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  address_record_id        :bigint
 #  country_id               :integer
 #  organization_id          :integer
 #  state_id                 :integer
 #
+# Indexes
+#
+#  index_locations_on_address_record_id  (address_record_id)
+#
 class Location < ApplicationRecord
   include Geocodeable
+  include AddressRecorded
 
   acts_as_paranoid
 
@@ -34,7 +40,8 @@ class Location < ApplicationRecord
   has_many :bikes
   has_many :impound_records
 
-  validates :name, :city, :country, :organization, presence: true
+  validates :name, presence: true
+  validate :organization_present
 
   scope :by_state, -> { order(:state_id) }
   scope :shown, -> { where(shown: true) }
@@ -44,6 +51,7 @@ class Location < ApplicationRecord
   # scope :international, where("country_id IS NOT #{Country.united_states_id}")
 
   before_validation :set_calculated_attributes
+  before_validation :sync_address_record_from_legacy_fields
   after_commit :update_associations
   before_destroy :ensure_destroy_permitted!
 
@@ -60,6 +68,28 @@ class Location < ApplicationRecord
 
   def address
     Geocodeable.address(self, country: %i[name])
+  end
+
+  # Override AddressRecorded delegation to fall back to legacy fields
+  def address_present?
+    return address_record.address_present? if address_record?
+
+    [street, city, zipcode].any?(&:present?)
+  end
+
+  def find_or_build_address_record
+    return address_record if address_record?
+
+    if street.present? || city.present?
+      build_address_record(AddressRecord.attrs_from_legacy(self).merge(kind: :organization, organization_id:))
+    else
+      d_address_record = AddressRecord.where(organization_id:).order(:id).first
+      return AddressRecord.new if d_address_record.blank?
+
+      AddressRecord.new(country_id: d_address_record.country_id,
+        region_record_id: d_address_record.region_record_id,
+        region_string: d_address_record.region_string)
+    end
   end
 
   def org_location_id
@@ -115,6 +145,26 @@ class Location < ApplicationRecord
   end
 
   private
+
+  def organization_present
+    return if organization.present? || organization_id.present?
+
+    errors.add(:organization, :blank)
+  end
+
+  def sync_address_record_from_legacy_fields
+    return if skip_update || city.blank? && street.blank?
+    # Don't overwrite if address_record was explicitly set via nested attributes
+    return if address_record.present? && address_record.changed?
+
+    # Skip geocoding on address_record - Location handles geocoding via Geocodeable
+    legacy_attrs = AddressRecord.attrs_from_legacy(self).merge(skip_geocoding: true)
+    if address_record.present?
+      address_record.attributes = legacy_attrs
+    else
+      self.address_record = AddressRecord.new(legacy_attrs.merge(kind: :organization, organization_id:))
+    end
+  end
 
   def calculated_shown
     return false if not_publicly_visible

@@ -62,7 +62,7 @@ class BikeServices::CalculateLocation
         bike.current_impound_record&.address_hash,
         bike.current_parking_notification&.address_hash,
         bike.registration_address(true, address_record_id: true), # temporary cludge?
-        bike.creation_organization&.default_location&.address_hash
+        bike.creation_organization&.default_location&.address_hash_legacy
       ].compact
       l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
         l_hashes.find { |rec| rec&.dig("latitude").present? }
