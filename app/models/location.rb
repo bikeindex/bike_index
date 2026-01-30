@@ -20,12 +20,18 @@
 #  zipcode                  :string(255)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  address_record_id        :bigint
 #  country_id               :integer
 #  organization_id          :integer
 #  state_id                 :integer
 #
+# Indexes
+#
+#  index_locations_on_address_record_id  (address_record_id)
+#
 class Location < ApplicationRecord
   include Geocodeable
+  include AddressRecorded
 
   acts_as_paranoid
 
@@ -60,6 +66,13 @@ class Location < ApplicationRecord
 
   def address
     Geocodeable.address(self, country: %i[name])
+  end
+
+  # Override AddressRecorded delegation to fall back to legacy fields
+  def address_present?
+    return address_record.address_present? if address_record?
+
+    [street, city, zipcode].any?(&:present?)
   end
 
   def org_location_id

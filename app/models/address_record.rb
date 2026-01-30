@@ -18,6 +18,7 @@
 #  updated_at                 :datetime         not null
 #  bike_id                    :bigint
 #  country_id                 :bigint
+#  organization_id            :bigint
 #  region_record_id           :bigint
 #  user_id                    :bigint
 #
@@ -25,11 +26,12 @@
 #
 #  index_address_records_on_bike_id           (bike_id)
 #  index_address_records_on_country_id        (country_id)
+#  index_address_records_on_organization_id   (organization_id)
 #  index_address_records_on_region_record_id  (region_record_id)
 #  index_address_records_on_user_id           (user_id)
 #
 class AddressRecord < ApplicationRecord
-  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3}.freeze
+  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, location: 4}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
   ADDRESS_ATTRS = %i[street street_2 city region_record_id postal_code country_id latitude longitude]
@@ -39,6 +41,7 @@ class AddressRecord < ApplicationRecord
 
   belongs_to :user
   belongs_to :bike # TODO: Make this polymorphic?
+  belongs_to :organization
   belongs_to :country
   belongs_to :region_record, class_name: "State"
 
@@ -201,8 +204,8 @@ class AddressRecord < ApplicationRecord
   private
 
   def update_associations
-    # Bikes and ownerships handle address assignment separately
-    return if skip_callback_job || bike? || ownership?
+    # Bikes, ownerships, and locations handle address assignment separately
+    return if skip_callback_job || bike? || ownership? || location?
 
     CallbackJob::AddressRecordUpdateAssociationsJob.perform_async(id)
   end
