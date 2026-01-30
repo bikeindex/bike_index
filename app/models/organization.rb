@@ -150,20 +150,20 @@ class Organization < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  delegate \
-    :address,
-    :city,
-    :country,
-    :country_id,
-    :latitude,
-    :longitude,
-    :state,
-    :state_id,
-    :street,
-    :zipcode,
-    :metric_units?,
-    to: :default_location,
-    allow_nil: true
+  # delegate \
+  #   :address,
+  #   :city,
+  #   :country,
+  #   :country_id,
+  #   :latitude,
+  #   :longitude,
+  #   :state,
+  #   :state_id,
+  #   :street,
+  #   :zipcode,
+  #   :metric_units?,
+  #   to: :default_location,
+  #   allow_nil: true
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
 
@@ -390,6 +390,16 @@ class Organization < ApplicationRecord
   # Try for publicly_visible, fall back to whatever - TODO: make this configurable
   def default_location
     locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first
+  end
+
+  # TODO: when default_location is configurable, use default location
+  def metric_units?
+    return @metric_units if defined?(@metric_units)
+
+    default_country_id = if id.present?
+      AddressRecord.organization.where(organization_id: id).reorder(:id).pick(:id)
+    end
+    @metric_units = Country.metric_units?(default_country_id)
   end
 
   def search_coordinates

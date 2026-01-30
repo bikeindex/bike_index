@@ -201,6 +201,10 @@ class AddressRecord < ApplicationRecord
     user&.address_record_id == id
   end
 
+  def metric_units?
+    Country.metric_units?(country_id)
+  end
+
   private
 
   def update_associations

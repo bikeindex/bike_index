@@ -4,10 +4,7 @@ require "rails_helper"
 
 RSpec.describe Org::LocationAddressFields::Component, type: :component do
   let(:address_record) { AddressRecord.new(country: Country.united_states) }
-  let(:options) { {default_country_id:, default_region_record_id:, default_region_string:} }
-  let(:default_country_id) { nil }
-  let(:default_region_record_id) { nil }
-  let(:default_region_string) { nil }
+  let(:options) { {} }
 
   def rendered_component(address_record, options)
     render_in_view_context do

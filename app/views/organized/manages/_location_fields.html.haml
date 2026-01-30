@@ -1,16 +1,10 @@
-<script>window.unitedStatesID = #{Country.united_states_id};</script>
 -# Note - this has to have a separate div with collapse, because the fieldset breaks styles
 -# The collapse class is what the slideup is called on
 - organization ||= @organization || current_organization
 - default_name ||= organization.name
 - f.object.name ||= default_name
 
-- f.object.address_record = f.object.find_or_build_address_record
--# TODO: Probably don't need these anymore...
-- default_country_id ||= organization.locations.first&.country_id || current_user&.address_record&.country_id || Country.united_states_id
-- default_region_record_id ||= organization.locations.first&.state_id || current_user&.address_record&.region_record_id
-
-- state_class = (f.object.country_id == Country.united_states_id) ? "unhidden" : ""
+- f.object.address_record = f.object.find_or_build_address_record(current_country_id:)
 
 -# This is primarily used for the new form
 -# BUT! We didn't use to require location, so it's included in the main manage page for orgs without locations
@@ -21,7 +15,7 @@
     %label.org-form-label
       = f.label :street, t(".address")
     = f.fields_for :address_record do |address_form|
-      = render(Org::LocationAddressFields::Component.new(form_builder: address_form, default_country_id:, default_region_record_id:))
+      = render(Org::LocationAddressFields::Component.new(form_builder: address_form))
 
 
 - else

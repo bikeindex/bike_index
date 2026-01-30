@@ -31,6 +31,30 @@ RSpec.describe Location, type: :model do
     end
   end
 
+  describe "find_or_build_address_record" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:location) { FactoryBot.create(:location, organization:, address_record: nil) }
+
+    context "when no organization address_record exists" do
+      it "returns a new AddressRecord with current_country_id" do
+        result = location.find_or_build_address_record(current_country_id: Country.united_states_id)
+        expect(result).to be_a_new(AddressRecord)
+        expect(result.country_id).to eq Country.united_states_id
+      end
+    end
+
+    context "when organization has an existing address_record" do
+      let!(:existing_address_record) { FactoryBot.create(:address_record, organization:) }
+
+      it "returns a new AddressRecord with values from the existing record" do
+        result = location.find_or_build_address_record(current_country_id: 999)
+        expect(result).to be_a_new(AddressRecord)
+        expect(result.country_id).to eq existing_address_record.country_id
+        expect(result.region_record_id).to eq existing_address_record.region_record_id
+      end
+    end
+  end
+
   describe "no name" do
     let(:organization) { FactoryBot.create(:organization) }
     it "uses the org name" do
