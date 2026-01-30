@@ -133,7 +133,8 @@ class Location < ApplicationRecord
   def sync_address_record_from_legacy_fields
     return if skip_update || city.blank? && street.blank?
 
-    legacy_attrs = AddressRecord.attrs_from_legacy(self)
+    # Skip geocoding on address_record - Location handles geocoding via Geocodeable
+    legacy_attrs = AddressRecord.attrs_from_legacy(self).merge(skip_geocoding: true)
     if address_record.present?
       address_record.attributes = legacy_attrs
     else
