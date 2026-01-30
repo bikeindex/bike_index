@@ -76,7 +76,7 @@ class BulkImportJob < ApplicationJob
     end
 
     # Used in address_record_attributes
-    @country_id = @bulk_import.organization&.country_id
+    @country_id = @bulk_import.organization&.default_address_record&.country_id
     process_csv(open_file)
 
     @bulk_import.unlink_tempfile

@@ -23,13 +23,13 @@ RSpec.describe OrganizationsController, type: :request do
 
   describe "create" do
     include_context :request_spec_logged_in_as_user
-    let(:location_attrs) { {street: "somewhere", city: "San Francisco", zipcode: "94119", country_id: Country.united_states.id} }
+    let(:address_record_attrs) { {street: "somewhere", city: "San Francisco", postal_code: "94119", country_id: Country.united_states.id} }
     let(:org_attrs) do
       {
         name: "a new org",
         kind: "bike_shop",
         website: "http://example.com",
-        locations_attributes: {"0" => location_attrs}
+        locations_attributes: {"0" => {name: "Main", address_record_attributes: address_record_attrs}}
       }
     end
     it "creates org, organization_role, filters approved attrs & redirect to org with current_user" do
@@ -47,7 +47,7 @@ RSpec.describe OrganizationsController, type: :request do
       expect(organization.website).to eq "http://example.com"
 
       expect(organization.locations.count).to eq 1
-      expect(organization.locations.first).to match_hash_indifferently location_attrs
+      expect(organization.locations.first.address_record).to have_attributes(address_record_attrs)
     end
 
     it "creates org, organization_role, filters approved attrs & redirect to org with current_user and mails" do

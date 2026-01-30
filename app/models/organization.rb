@@ -378,6 +378,10 @@ class Organization < ApplicationRecord
     locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first
   end
 
+  def default_address_record
+    default_location&.address_record
+  end
+
   # TODO: when default_location is configurable, use default location
   def metric_units?
     return @metric_units if defined?(@metric_units)

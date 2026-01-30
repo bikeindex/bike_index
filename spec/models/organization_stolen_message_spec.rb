@@ -153,9 +153,10 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         let(:prospect_park) { {latitude: 40.655135, longitude: -73.9648107} }
         let(:williamsburg) { {latitude: 40.7031836, longitude: -73.9639495} }
         let(:attrs) { area_attrs } # Assigns it to be first
-        let!(:organization_default_location) { FactoryBot.create(:location_nyc, {organization: organization, skip_geocoding: true}.merge(williamsburg)) }
+        let(:williamsburg_address) { FactoryBot.create(:address_record, :new_york, williamsburg.merge(skip_geocoding: true)) }
+        let!(:organization_default_location) { FactoryBot.create(:location, organization:, address_record: williamsburg_address) }
         it "returns the closer area" do
-          expect(organization.reload.default_location.to_coordinates).to eq(williamsburg.values)
+          expect([organization.reload.default_location.latitude, organization.reload.default_location.longitude]).to eq(williamsburg.values)
           stolen_record.update(prospect_park.merge(skip_geocoding: true))
           expect(stolen_record.reload.to_coordinates).to eq(prospect_park.values)
           expect(organization_stolen_message.id).to be_present

@@ -142,8 +142,8 @@ RSpec.describe BikeServices::CalculateLocation do
 
       it "takes location from the creation org" do
         expect(bike.reload.address_record_id).to be_blank
-        expect(bike.latitude).to eq organization.latitude
-        expect(bike.longitude).to eq organization.longitude
+        expect(bike.latitude).to eq organization.default_location.latitude
+        expect(bike.longitude).to eq organization.default_location.longitude
       end
     end
 
