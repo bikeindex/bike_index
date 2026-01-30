@@ -3901,15 +3901,10 @@ it:
     manages:
       location_fields:
         address:
-        choose_country:
-        city:
         location_name:
         name: Nome
         phone_number:
         remove:
-        state:
-        street:
-        zipcode:
       locations:
         add_location:
         bike_index_partner_map:
@@ -4836,3 +4831,12 @@ it:
           no_value:
       alert_for_errors:
         errors_prevented_this_from_being_saved:
+    org:
+      location_address_fields:
+        address: Indirizzo
+        choose_country:
+        city: Città
+        postal_code: Codice postale
+        region:
+        state: Stato
+        street: Via

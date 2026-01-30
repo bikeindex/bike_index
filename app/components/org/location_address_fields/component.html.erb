@@ -1,0 +1,50 @@
+<div
+  class="form-group address-group"
+  data-controller="legacy-form-well--address-record"
+  data-legacy-form-well--address-record-us-id-value="<%= Country.united_states_id %>"
+>
+  <%= @builder.label :street, translation(:address) %>
+  <%= @builder.text_field :street, placeholder: translation(:street), class: "form-control" %>
+  <%= @builder.text_field :city, required: true, placeholder: translation(:city), class: "form-control" %>
+
+  <div class="row countrystatezip">
+    <div class="col-sm-4">
+      <%= @builder.collection_select(
+        :region_record_id,
+        State.united_states,
+        :id,
+        :name,
+        { include_blank: true, prompt: translation(".state") },
+        {
+          :class => "form-control tw:mt-2! #{initial_state_class}",
+          "data-legacy-form-well--address-record-target" => "state",
+        },
+      ) %>
+
+      <%= @builder.text_field(
+        :region_string,
+        :placeholder => translation(".region"),
+        :class => "form-control tw:mt-2! #{initial_region_class}",
+        "data-legacy-form-well--address-record-target" => "region",
+      ) %>
+    </div>
+
+    <div class="col-sm-4">
+      <%= @builder.text_field :postal_code,
+                          placeholder: translation(".postal_code"),
+                          class: "form-control tw:mt-2!" %>
+    </div>
+
+    <div data-usid="<%= Country.united_states_id %>" class="col-sm-4">
+      <%= @builder.select(
+        :country_id,
+        Country.select_options,
+        { prompt: translation(".choose_country"), required: true },
+        {
+          :class => "form-control tw:mt-2!",
+          "data-legacy-form-well--address-record-target" => "country",
+        }
+      ) %>
+    </div>
+  </div>
+</div>

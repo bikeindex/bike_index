@@ -214,6 +214,9 @@ RSpec.describe Organized::ManagesController, type: :request do
             update[:locations_attributes]["0"].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
               expect(location1.send(k)).to_not eq v
             end
+            # verify address_record is created from legacy fields
+            expect(location1.address_record).to have_attributes(street: "some street 2", city: "First city",
+              postal_code: "2222222", region_record_id: state.id, country_id: country.id)
 
             # second location
             location2 = current_organization.locations.last
@@ -225,6 +228,92 @@ RSpec.describe Organized::ManagesController, type: :request do
             # ensure we are not permitting crazy assignment for created location
             update[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
               expect(location1.send(k)).to_not eq v
+            end
+            # verify address_record is created from legacy fields for new location
+            expect(location2.address_record).to have_attributes(street: "some street 2", city: "cool city",
+              postal_code: "12243444", region_record_id: state.id, country_id: country.id)
+          end
+        end
+
+        context "with address_record_attributes" do
+          let(:address_record_attributes) do
+            {street: "999 New St", city: "New City", postal_code: "99999"}
+          end
+          it "creates an address_record via nested attributes" do
+            # IDK, dumb extra stuff
+            current_organization.locations.each { it.really_destroy! }
+            expect(current_organization.reload.locations.count).to eq 0
+            AddressRecord.first&.destroy
+            expect(AddressRecord.count).to eq 0
+
+            put base_url, params: {
+              organization_id: current_organization.to_param,
+              organization: {
+                locations_attributes: {
+                  Time.current.to_i.to_s => {
+                    name: "New Location",
+                    address_record_attributes: address_record_attributes
+                  }
+                }
+              }
+            }
+            expect(AddressRecord.count).to eq 1
+            expect(current_organization.reload.locations.count).to eq 1
+
+            location = current_organization.reload.locations.first
+            expect(location.name).to eq "New Location"
+            expect(location.address_record).to have_attributes(street: "999 New St", city: "New City", postal_code: "99999")
+          end
+          context "with existing address record" do
+            it "updates address_record via nested attributes" do
+              expect(location1.address_record).to be_present
+              original_address_record_id = location1.address_record.id
+              expect(AddressRecord.count).to eq 1
+              put base_url, params: {
+                organization_id: current_organization.to_param,
+                organization: {
+                  locations_attributes: {
+                    "0" => {
+                      id: location1.id,
+                      name: "Other location",
+                      address_record_attributes: address_record_attributes.merge(id: location1.address_record.id)
+                    }
+                  }
+                }
+              }
+              expect(flash[:success]).to be_present
+              expect(AddressRecord.count).to eq 1
+
+              expect(location1.reload.address_record.id).to eq original_address_record_id
+              expect(location1.name).to eq "Other location"
+              expect(location1.address_record.reload).to have_attributes(street: "999 New St", city: "New City", postal_code: "99999")
+            end
+
+            context "with invalid address_record id" do
+              it "updates address_record via nested attributes" do
+                other_address_record = FactoryBot.create(:address_record)
+                expect(location1.address_record).to be_present
+                original_address_record_id = location1.address_record.id
+                expect(AddressRecord.count).to eq 2
+                put base_url, params: {
+                  organization_id: current_organization.to_param,
+                  organization: {
+                    locations_attributes: {
+                      "0" => {
+                        id: location1.id,
+                        name: "Other location",
+                        address_record_attributes: address_record_attributes.merge(id: other_address_record.id)
+                      }
+                    }
+                  }
+                }
+                expect(flash[:success]).to be_blank
+                expect(AddressRecord.count).to eq 2
+
+                # Location is not updated
+                expect(location1.reload.address_record.id).to eq original_address_record_id
+                expect(location1.name).to eq "cool name"
+              end
             end
           end
         end

@@ -4948,15 +4948,10 @@ nb:
     manages:
       location_fields:
         address: Adresse
-        choose_country: Velg land
-        city: By
         location_name: Stedsnavn
         name: Navn
         phone_number: Telefonnummer
         remove: Fjern plassering
-        state: Stat
-        street: gate
-        zipcode: Postnummer
       locations:
         add_location: Legg til plassering
         bike_index_partner_map: Bike Index partner kart
@@ -6012,3 +6007,12 @@ nb:
       alert_for_errors:
         errors_prevented_this_from_being_saved: "%{errors_count} forhindret at denne
           %{object_name} ble lagret:"
+    org:
+      location_address_fields:
+        address: Adresse
+        choose_country: Velg land
+        city: By
+        postal_code: postnummer
+        region: Region/provins
+        state: Stat
+        street: gate
