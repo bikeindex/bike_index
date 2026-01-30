@@ -97,9 +97,7 @@
   - if @bulk_import.import_errors == {}
     %span.less-strong No errors
   - else
-    .card.mb-5
-      .card-body.pb-1
-        = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
+    = render partial: "/organized/bulk_imports/error_display", locals: {bulk_import: @bulk_import}
 
 
 - if @bulk_import.ownerships.count < 1 || params[:show_reprocess]

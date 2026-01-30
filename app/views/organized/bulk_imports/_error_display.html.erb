@@ -1,0 +1,81 @@
+<% if bulk_import.import_errors? %>
+  <%= render(UI::Card::Component.new) do %>
+    <%# use non-standard height so that it doesn't clip at a line break %>
+    <div class="tw:max-h-[402px] tw:overflow-y-auto">
+      <% if bulk_import.ascend_unprocessable? %>
+        <p class="mt-2">
+          Bulk Import <span class="text-danger">failed to process</span>
+          because no organization was found with the ascend name of
+          <strong><%= @bulk_import.ascend_name %></strong>
+        </p>
+        <p>Fix this by:</p>
+        <ol class="tw:ml-4 tw:list-decimal">
+          <li>
+            Go to <%= link_to "organizations", admin_organizations_path %>
+          </li>
+
+          <li>
+            Find the organization this bulk import should have been assigned to
+          </li>
+
+          <li>
+            Edit the organization and add the ascend name
+            <code><%= @bulk_import.ascend_name %></code>
+          </li>
+
+          <li>Return here and click the "reprocess import" button below</li>
+        </ol>
+        <hr>
+      <% end %>
+
+      <% if bulk_import.line_errors.present? %>
+        <strong><span class="text-danger">Line errors:</span></strong>
+        <ul class="tw:ml-4 tw:list-disc">
+          <% bulk_import.line_errors.each do |le| %>
+            <li>
+              <% if le.is_a?(Array) && le.first.is_a?(Integer) %>
+                <span class="d-block">
+                  Line: <strong><%= le.first %></strong>
+                </span>
+                <code><%= le[1..-1].join(", ") %></code>
+              <% else %>
+                <%= le %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if bulk_import.file_errors.present? %>
+        <strong><span class="text-danger">File errors:</span></strong>
+        <ul class="tw:ml-4 tw:list-disc">
+          <% bulk_import.file_errors.each_with_index do |ie, ind| %>
+            <% file_line_error = bulk_import.file_import_error_lines[ind] %>
+
+            <li>
+              <%= ie %>
+
+              <% if file_line_error.present? %>
+                (line:
+                <%= file_line_error %>
+                )
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% other_errors = bulk_import.import_errors.except("file", "file_lines", "line", "ascend", "bikes") %>
+
+      <% if other_errors.present? %>
+        <%= pretty_print_json(other_errors) %>
+      <% end %>
+
+      <% if display_dev_info? %>
+        <code class="small d-block only-dev-visible p-1">
+          <%= bulk_import.import_errors %>
+        </code>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

@@ -43,6 +43,23 @@
               = link_to kind_display, organization_parking_notifications_path(kind_link_params), class: "dropdown-item linkWithSortableSearchParams #{kind_active ? 'active' : ''}", "data-urlparams" => "search_kind,#{kind}"
               - if kind == "all" # Add a divider after all
                 .dropdown-divider
+        %li.nav-item
+          %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
+            - if @search_unregistered == "not_unregistered"
+              Registered bikes only
+            - else
+              #{@search_unregistered.humanize} bikes
+          .dropdown-menu
+            - unregistered_all_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: "all")
+            = link_to "All bikes", organization_parking_notifications_path(unregistered_all_link_params), class: "dropdown-item linkWithSortableSearchParams #{@search_unregistered == 'all' ? 'active' : ''}", "data-urlparams" => "search_unregistered,all"
+            .dropdown-divider
+            - unregistered_active = @search_unregistered == "only_unregistered"
+            - unregistered_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_active ? nil : "only_unregistered"))
+            = link_to "Only unregistered bikes", organization_parking_notifications_path(unregistered_link_params), class: "dropdown-item linkWithSortableSearchParams #{unregistered_active ? 'active' : ''}", "data-urlparams" => "search_unregistered,only_unregistered"
+
+            - unregistered_not_active = @search_unregistered == "not_unregistered"
+            - unregistered_not_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_not_active ? nil : "not_unregistered"))
+            = link_to "Registered bikes only", organization_parking_notifications_path(unregistered_not_link_params), class: "dropdown-item linkWithSortableSearchParams #{unregistered_not_active ? 'active' : ''}", "data-urlparams" => "search_unregistered,only_unregistered"
         %li.nav-item.parking-notification-status-li
           :ruby
             status_display_hash = {
@@ -74,23 +91,6 @@
                   %small.less-strong= display_hash[:s]
               - if status == :all # Add a divider after all
                 .dropdown-divider
-        %li.nav-item
-          %a.dropdown-toggle.uncap.btn.btn-sm.btn-outline-primary{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false" }
-            - if @search_unregistered == "not_unregistered"
-              Registered bikes only
-            - else
-              #{@search_unregistered.humanize} bikes
-          .dropdown-menu
-            - unregistered_all_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: "all")
-            = link_to "All bikes", organization_parking_notifications_path(unregistered_all_link_params), class: "dropdown-item linkWithSortableSearchParams #{@search_unregistered == 'all' ? 'active' : ''}", "data-urlparams" => "search_unregistered,all"
-            .dropdown-divider
-            - unregistered_active = @search_unregistered == "only_unregistered"
-            - unregistered_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_active ? nil : "only_unregistered"))
-            = link_to "Only unregistered bikes", organization_parking_notifications_path(unregistered_link_params), class: "dropdown-item linkWithSortableSearchParams #{unregistered_active ? 'active' : ''}", "data-urlparams" => "search_unregistered,only_unregistered"
-
-            - unregistered_not_active = @search_unregistered == "not_unregistered"
-            - unregistered_not_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_unregistered: (unregistered_not_active ? nil : "not_unregistered"))
-            = link_to "Registered bikes only", organization_parking_notifications_path(unregistered_not_link_params), class: "dropdown-item linkWithSortableSearchParams #{unregistered_not_active ? 'active' : ''}", "data-urlparams" => "search_unregistered,only_unregistered"
 
         %li.nav-item
           %a#FitMapTrigger{href: "#", class: (@page_data[:default_location] ? "currently-hidden" : "")}
