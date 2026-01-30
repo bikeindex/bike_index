@@ -5566,7 +5566,7 @@ CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.ac
 -- Name: index_address_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id);
+CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id) WHERE (bike_id IS NOT NULL);
 
 
 --
@@ -5594,7 +5594,7 @@ CREATE INDEX index_address_records_on_region_record_id ON public.address_records
 -- Name: index_address_records_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id);
+CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id) WHERE (user_id IS NOT NULL);
 
 
 --
@@ -7196,6 +7196,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260129122352'),
+('20260129122350'),
 ('20260128220133'),
 ('20260125184905'),
 ('20260124024709'),
