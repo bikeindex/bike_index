@@ -4,16 +4,18 @@
 require_relative "../config/environment"
 require "benchmark"
 
+VERBOSE = ARGV.include?("-v") || ARGV.include?("--verbose")
+
 def bench(name, query_params, results, iterations: 5)
   interpreted = BikeSearchable.searchable_interpreted_params(query_params)
   times = iterations.times.map { Benchmark.realtime { Bike.search(interpreted).limit(25).to_a } }
   avg = (times.sum / times.size * 1000).round(1)
-  puts "#{avg.to_s.rjust(8)}ms  #{name}"
+  puts "#{avg.to_s.rjust(8)}ms  #{name}" if VERBOSE
   results << avg
 end
 
 puts "Bikes: #{Bike.count} total, #{Bike.stolen_or_impounded.count} stolen"
-puts
+puts if VERBOSE
 
 results = []
 manufacturer = Manufacturer.find_by(name: "Trek") || Manufacturer.first
@@ -46,5 +48,5 @@ bench "Complex: serial+mfg+color+prox", {
   distance: 100
 }, results
 
-puts
+puts if VERBOSE
 puts "#{results.sum.round(1).to_s.rjust(8)}ms  TOTAL (#{results.size} searches)"
