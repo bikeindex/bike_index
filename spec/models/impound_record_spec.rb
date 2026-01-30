@@ -247,6 +247,24 @@ RSpec.describe ImpoundRecord, type: :model do
       impound_record.reload
       expect(impound_record.location).to eq location2
     end
+
+    context "with impounded_from address_record" do
+      let(:impounded_from_address) { FactoryBot.create(:address_record) }
+      let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user:, bike:, organization:, address_record: impounded_from_address) }
+      it "updates address_record_id to location's address_record_id without deleting impounded_from" do
+        location2.reload
+        expect(location2.address_record).to be_present
+        expect(impound_record.reload.address_record_id).to eq impounded_from_address.id
+        expect(impound_record.location).to eq location
+
+        impound_record_update.save
+        impound_record.reload
+
+        expect(impound_record.location).to eq location2
+        expect(impound_record.address_record_id).to eq location2.address_record_id
+        expect(AddressRecord.exists?(impounded_from_address.id)).to be_truthy
+      end
+    end
   end
 
   describe "update_associations" do

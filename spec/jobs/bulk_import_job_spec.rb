@@ -402,6 +402,8 @@ RSpec.describe BulkImportJob, type: :job do
             expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
             expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
+            # Verify impounded_from address_record is created
+            expect(bike1_impound_record.address_record).to have_attributes(kind: "impounded_from", street: "1409 Martin Luther King Junior Way", city: "Berkeley")
 
             expect(bike1.to_coordinates).to eq bike1_impound_record.to_coordinates
             expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
@@ -432,6 +434,8 @@ RSpec.describe BulkImportJob, type: :job do
             expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
             expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
             expect(bike2.to_coordinates).to eq bike2_impound_record.to_coordinates
+            # Verify impounded_from address_record is created
+            expect(bike2_impound_record.address_record).to have_attributes(kind: "impounded_from", street: "327 17th Street", city: "Oakland")
           end
         end
       end

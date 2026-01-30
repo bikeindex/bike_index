@@ -14,6 +14,16 @@ class Backfills::AddressRecordsForImpoundRecordsJob < ApplicationJob
     def build_or_create_for(impound_record)
       return impound_record.address_record if impound_record.address_record?
 
+      # Check if there's a move_location update - if so, use the location's address_record
+      move_location_update = impound_record.impound_record_updates.with_location.order(:id).last
+      if move_location_update&.location&.address_record_id.present?
+        # Create impounded_from address_record from legacy fields (for historical purposes)
+        create_impounded_from_address_record(impound_record)
+        # But set the impound_record's address_record to the location's address_record
+        impound_record.update(address_record_id: move_location_update.location.address_record_id)
+        return impound_record.address_record
+      end
+
       existing_address_record = AddressRecord.where(kind: :impounded_from).find_by(user_id: impound_record.user_id)
       if existing_address_record.present? && existing_address_record.internal_address_attrs == AddressRecord.new(AddressRecord.attrs_from_legacy(impound_record)).internal_address_attrs
         impound_record.update(address_record: existing_address_record)
@@ -24,6 +34,11 @@ class Backfills::AddressRecordsForImpoundRecordsJob < ApplicationJob
       impound_record.address_record.attributes = AddressRecord.attrs_from_legacy(impound_record)
       impound_record.save
       impound_record.address_record
+    end
+
+    def create_impounded_from_address_record(impound_record)
+      attrs = AddressRecord.attrs_from_legacy(impound_record).merge(kind: :impounded_from)
+      AddressRecord.create(attrs)
     end
   end
 

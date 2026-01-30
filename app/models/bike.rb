@@ -729,7 +729,7 @@ class Bike < ApplicationRecord
 
   # NOTE! This will return different hashes - legacy hashes for stolen & impound
   def address_hash
-    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
+    current_stolen_record&.address_hash || current_impound_record&.address_hash_legacy ||
       address_record&.address_hash
   end
 
