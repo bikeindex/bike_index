@@ -40,7 +40,7 @@ class Location < ApplicationRecord
   has_many :bikes
   has_many :impound_records
 
-  validates :name, :city, :country, :organization, presence: true
+  validates :name, :organization_id, presence: true
 
   scope :by_state, -> { order(:state_id) }
   scope :shown, -> { where(shown: true) }
@@ -74,6 +74,21 @@ class Location < ApplicationRecord
     return address_record.address_present? if address_record?
 
     [street, city, zipcode].any?(&:present?)
+  end
+
+  def find_or_build_address_record
+    return address_record if address_record?
+
+    if street.present? || city.present?
+      build_address_record(AddressRecord.attrs_from_legacy(self).merge(kind: :organization, organization_id:))
+    else
+      d_address_record = AddressRecord.where(organization_id:).order(:id).first
+      return AddressRecord.new if d_address_record.blank?
+
+      AddressRecord.new(country_id: d_address_record.country_id,
+        region_record_id: d_address_record.region_record_id,
+        region_string: d_address_record.region_string)
+    end
   end
 
   def org_location_id

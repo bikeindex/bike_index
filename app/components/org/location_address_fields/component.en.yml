@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    org:
+      location_address_fields:
+        address: Address
+        street: Street
+        city: City
+        postal_code: Postal Code
+        region: Region / Province
+        state: State
+        choose_country: Choose country
