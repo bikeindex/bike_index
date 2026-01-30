@@ -1897,9 +1897,6 @@ ALTER SEQUENCE public.listicles_id_seq OWNED BY public.listicles.id;
 CREATE TABLE public.locations (
     id integer NOT NULL,
     organization_id integer,
-    zipcode character varying(255),
-    city character varying(255),
-    street character varying(255),
     phone character varying(255),
     email character varying(255),
     name character varying(255),
@@ -1909,12 +1906,9 @@ CREATE TABLE public.locations (
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
     shown boolean DEFAULT false,
-    country_id integer,
-    state_id integer,
     not_publicly_visible boolean DEFAULT false,
     impound_location boolean DEFAULT false,
     default_impound_location boolean DEFAULT false,
-    neighborhood character varying,
     address_record_id bigint
 );
 
@@ -7195,6 +7189,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260130032427'),
 ('20260129122352'),
 ('20260129122350'),
 ('20260128220133'),
