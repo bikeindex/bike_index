@@ -30,7 +30,6 @@
 #  index_locations_on_address_record_id  (address_record_id)
 #
 class Location < ApplicationRecord
-  include Geocodeable
   include AddressRecorded
 
   acts_as_paranoid
@@ -62,10 +61,6 @@ class Location < ApplicationRecord
 
   def other_organization_locations
     Location.where(organization_id: organization_id).where.not(id: id)
-  end
-
-  def address
-    Geocodeable.address(self, country: %i[name])
   end
 
   # Override AddressRecorded delegation to fall back to legacy fields
