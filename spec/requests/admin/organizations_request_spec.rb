@@ -169,6 +169,28 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(location2.address_record).to have_attributes(street: "some street 2", city: "cool city",
         postal_code: "12243444", region_record_id: state.id, country_id: country.id)
     end
+    context "with address_record_attributes" do
+      let(:location1) { FactoryBot.create(:location, organization:, name: "Original") }
+      it "updates address_record via nested attributes" do
+        expect(location1.address_record).to be_present
+        original_address_record_id = location1.address_record.id
+
+        put "#{base_url}/#{organization.to_param}", params: {
+          organization: {
+            locations_attributes: {
+              "0" => {
+                id: location1.id,
+                address_record_attributes: {id: location1.address_record.id, street: "999 New St", city: "New City", postal_code: "99999"}
+              }
+            }
+          }
+        }
+
+        location1.reload
+        expect(location1.address_record.id).to eq original_address_record_id
+        expect(location1.address_record).to have_attributes(street: "999 New St", city: "New City", postal_code: "99999")
+      end
+    end
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }
       it "updates the organization" do

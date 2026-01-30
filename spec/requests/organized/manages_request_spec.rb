@@ -235,6 +235,29 @@ RSpec.describe Organized::ManagesController, type: :request do
           end
         end
 
+        context "with address_record_attributes" do
+          it "updates address_record via nested attributes" do
+            expect(location1.address_record).to be_present
+            original_address_record_id = location1.address_record.id
+
+            put base_url, params: {
+              organization_id: current_organization.to_param,
+              organization: {
+                locations_attributes: {
+                  "0" => {
+                    id: location1.id,
+                    address_record_attributes: {id: location1.address_record.id, street: "999 New St", city: "New City", postal_code: "99999"}
+                  }
+                }
+              }
+            }
+
+            location1.reload
+            expect(location1.address_record.id).to eq original_address_record_id
+            expect(location1.address_record).to have_attributes(street: "999 New St", city: "New City", postal_code: "99999")
+          end
+        end
+
         context "matching short_name" do
           let!(:organization2) { FactoryBot.create(:organization, short_name: "cool short name") }
           it "doesn't update" do
