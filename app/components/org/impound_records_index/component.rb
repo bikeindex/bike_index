@@ -17,6 +17,10 @@ module Org::ImpoundRecordsIndex
     private
 
     def kinds_for_select
+      # This gets us the correct kinds for the current impound_record
+      # e.g. no retrieved_by_owner for unregistered_parking_notification
+      # Never include claim_approved or denied, even if they're valid update kinds - they have to be done through impound_claims
+      # Also - never display "current" because it can't be updated that way
       ImpoundRecordUpdate.kinds_humanized.except(:claim_approved, :claim_denied, :current, :expired)
     end
 

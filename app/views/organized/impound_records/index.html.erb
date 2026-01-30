@@ -16,10 +16,6 @@
 </div>
 <%= render partial: "/shared/period_select" %>
 
-<div class="mt-4">
-  <%= render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_impound_records_path(organization_id: current_organization.to_param)} %>
-</div>
-
 <%= render(Org::ImpoundRecordsIndex::Component.new(
   pagy: @pagy,
   impound_records: @impound_records,

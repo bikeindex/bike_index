@@ -1,3 +1,7 @@
+<div class="mt-4">
+  <%= render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_impound_records_path(organization_id: @current_organization.to_param)} %>
+</div>
+
 <div class="row mt-4 mb-4">
   <div class="col-sm-9">
     <%= pluralize(number_with_delimiter(@pagy.count), "matching impound record") %>
