@@ -114,7 +114,8 @@ class OrganizationsController < ApplicationController
   end
 
   def permitted_locations_params
-    %i[name zipcode city state_id country_id street phone publicly_visible]
+    %i[name zipcode city state_id country_id street phone publicly_visible] +
+      [address_record_attributes: AddressRecord.permitted_params + [:id]]
   end
 
   def find_organization

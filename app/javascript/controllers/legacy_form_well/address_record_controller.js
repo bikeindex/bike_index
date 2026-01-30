@@ -11,7 +11,6 @@ export default class extends Controller {
   }
 
   updateRegionFieldOnCountryChange () {
-    console.log('changed')
     this.countryTarget.addEventListener('change', (event) => {
       if (event.target.value === this.usIdValue) {
         // Show the state select
