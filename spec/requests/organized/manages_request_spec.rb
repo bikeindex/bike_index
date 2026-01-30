@@ -215,12 +215,8 @@ RSpec.describe Organized::ManagesController, type: :request do
               expect(location1.send(k)).to_not eq v
             end
             # verify address_record is created from legacy fields
-            expect(location1.address_record).to be_present
-            expect(location1.address_record.street).to eq "some street 2"
-            expect(location1.address_record.city).to eq "First city"
-            expect(location1.address_record.postal_code).to eq "2222222"
-            expect(location1.address_record.region_record_id).to eq state.id
-            expect(location1.address_record.country_id).to eq country.id
+            expect(location1.address_record).to have_attributes(street: "some street 2", city: "First city",
+              postal_code: "2222222", region_record_id: state.id, country_id: country.id)
 
             # second location
             location2 = current_organization.locations.last
@@ -234,12 +230,8 @@ RSpec.describe Organized::ManagesController, type: :request do
               expect(location1.send(k)).to_not eq v
             end
             # verify address_record is created from legacy fields for new location
-            expect(location2.address_record).to be_present
-            expect(location2.address_record.street).to eq "some street 2"
-            expect(location2.address_record.city).to eq "cool city"
-            expect(location2.address_record.postal_code).to eq "12243444"
-            expect(location2.address_record.region_record_id).to eq state.id
-            expect(location2.address_record.country_id).to eq country.id
+            expect(location2.address_record).to have_attributes(street: "some street 2", city: "cool city",
+              postal_code: "12243444", region_record_id: state.id, country_id: country.id)
           end
         end
 

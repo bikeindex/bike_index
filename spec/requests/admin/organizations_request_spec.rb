@@ -157,11 +157,17 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(location1.organization).to eq organization
       location1_update = update[:locations_attributes]["0"]
       expect(location1).to match_hash_indifferently location1_update.except(:latitude, :longitude, :organization_id, :created_at, :_destroy)
+      # verify address_record is created from legacy fields
+      expect(location1.address_record).to have_attributes(street: "some street 2", city: "First city",
+        postal_code: "2222222", region_record_id: state.id, country_id: country.id)
 
       # still existing location
       location2 = organization.locations.last
       location2_update = update[:locations_attributes][update[:locations_attributes].keys.last]
       expect(location2).to match_hash_indifferently location2_update.except(:latitude, :longitude, :organization_id, :created_at)
+      # verify address_record is created from legacy fields
+      expect(location2.address_record).to have_attributes(street: "some street 2", city: "cool city",
+        postal_code: "12243444", region_record_id: state.id, country_id: country.id)
     end
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }

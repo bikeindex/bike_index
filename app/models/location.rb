@@ -131,7 +131,7 @@ class Location < ApplicationRecord
   private
 
   def sync_address_record_from_legacy_fields
-    return unless city.present? || street.present?
+    return if skip_update || city.blank? && street.blank?
 
     legacy_attrs = AddressRecord.attrs_from_legacy(self)
     if address_record.present?

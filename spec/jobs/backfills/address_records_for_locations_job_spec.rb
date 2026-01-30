@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Backfills::AddressRecordsForLocationsJob, type: :job do
   let(:instance) { described_class.new }
-  let(:location) { FactoryBot.create(:location_chicago) }
+  let(:location) { FactoryBot.create(:location_chicago, skip_update: true) }
 
   describe "build_or_create_for" do
     let(:target_attrs) do
@@ -38,7 +38,7 @@ RSpec.describe Backfills::AddressRecordsForLocationsJob, type: :job do
   end
 
   describe "perform" do
-    let(:location2) { FactoryBot.create(:location_nyc) }
+    let(:location2) { FactoryBot.create(:location_nyc, skip_update: true) }
 
     before { location && location2 }
 
