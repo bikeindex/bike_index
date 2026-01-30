@@ -47,21 +47,6 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
           $check.prop("checked", false)
       updateImpoundedChecks()
 
-    # This is pulled from ToggleHiddenOther
-    # It's different because it delegates so it works for dynamically generated location fields
-    if window.unitedStatesID # This var is defined in location_fields template
-      $("form").on "change", ".country-select-input", (e) ->
-        $target = $(e.target)
-        return true unless $target.hasClass 'form-control'
-        $other_field = $target.parents('.countrystatezip').find('.hidden-other')
-        if "#{$target.val()}" == "#{window.unitedStatesID}"
-          $other_field.slideDown 'fast', ->
-            $other_field.addClass('unhidden').removeClass('currently-hidden')
-        else
-          $other_field.slideUp 'fast', ->
-            $other_field.removeClass('unhidden').addClass('currently-hidden')
-            $other_field.find('.form-control').val('')
-
   updateImpoundedChecks: ->
     # Hide the default impound location checks if there isn't more than one impound location
     if $(".impoundLocationCheck:checked").length > 1

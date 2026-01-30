@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Location, type: :model do
   it_behaves_like "geocodeable"
+  it_behaves_like "address_recorded"
 
   describe "set_calculated_attributes" do
     it "strips the non-digit numbers from the phone input" do

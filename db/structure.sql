@@ -161,7 +161,8 @@ CREATE TABLE public.address_records (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     bike_id bigint,
-    street_2 character varying
+    street_2 character varying,
+    organization_id bigint
 );
 
 
@@ -1896,9 +1897,6 @@ ALTER SEQUENCE public.listicles_id_seq OWNED BY public.listicles.id;
 CREATE TABLE public.locations (
     id integer NOT NULL,
     organization_id integer,
-    zipcode character varying(255),
-    city character varying(255),
-    street character varying(255),
     phone character varying(255),
     email character varying(255),
     name character varying(255),
@@ -1908,12 +1906,16 @@ CREATE TABLE public.locations (
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
     shown boolean DEFAULT false,
-    country_id integer,
-    state_id integer,
     not_publicly_visible boolean DEFAULT false,
     impound_location boolean DEFAULT false,
     default_impound_location boolean DEFAULT false,
-    neighborhood character varying
+    address_record_id bigint,
+    state_id integer,
+    country_id integer,
+    zipcode character varying,
+    street character varying,
+    neighborhood character varying,
+    city character varying
 );
 
 
@@ -5564,7 +5566,7 @@ CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.ac
 -- Name: index_address_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id);
+CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id) WHERE (bike_id IS NOT NULL);
 
 
 --
@@ -5572,6 +5574,13 @@ CREATE INDEX index_address_records_on_bike_id ON public.address_records USING bt
 --
 
 CREATE INDEX index_address_records_on_country_id ON public.address_records USING btree (country_id);
+
+
+--
+-- Name: index_address_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_organization_id ON public.address_records USING btree (organization_id) WHERE (organization_id IS NOT NULL);
 
 
 --
@@ -5585,7 +5594,7 @@ CREATE INDEX index_address_records_on_region_record_id ON public.address_records
 -- Name: index_address_records_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id);
+CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id) WHERE (user_id IS NOT NULL);
 
 
 --
@@ -5802,14 +5811,21 @@ CREATE INDEX index_bike_versions_on_tertiary_frame_color_id ON public.bike_versi
 -- Name: index_bikes_on_address_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_address_record_id ON public.bikes USING btree (address_record_id);
+CREATE INDEX index_bikes_on_address_record_id ON public.bikes USING btree (address_record_id) WHERE (address_record_id IS NOT NULL);
+
+
+--
+-- Name: index_bikes_on_creation_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_creation_organization_id ON public.bikes USING btree (creation_organization_id) WHERE (creation_organization_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_current_impound_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_current_impound_record_id ON public.bikes USING btree (current_impound_record_id);
+CREATE INDEX index_bikes_on_current_impound_record_id ON public.bikes USING btree (current_impound_record_id) WHERE (current_impound_record_id IS NOT NULL);
 
 
 --
@@ -5823,21 +5839,21 @@ CREATE INDEX index_bikes_on_current_ownership_id ON public.bikes USING btree (cu
 -- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_current_stolen_record_id ON public.bikes USING btree (current_stolen_record_id);
+CREATE INDEX index_bikes_on_current_stolen_record_id ON public.bikes USING btree (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_deleted_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at);
+CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at) WHERE (deleted_at IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_example; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_example ON public.bikes USING btree (example);
+CREATE INDEX index_bikes_on_example ON public.bikes USING btree (example) WHERE (example IS NOT NULL);
 
 
 --
@@ -5865,28 +5881,21 @@ CREATE INDEX index_bikes_on_manufacturer_id ON public.bikes USING btree (manufac
 -- Name: index_bikes_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_audit_id);
-
-
---
--- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_organization_id ON public.bikes USING btree (creation_organization_id);
+CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_audit_id) WHERE (model_audit_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_paint_id ON public.bikes USING btree (paint_id);
+CREATE INDEX index_bikes_on_paint_id ON public.bikes USING btree (paint_id) WHERE (paint_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_primary_activity_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_primary_activity_id ON public.bikes USING btree (primary_activity_id);
+CREATE INDEX index_bikes_on_primary_activity_id ON public.bikes USING btree (primary_activity_id) WHERE (primary_activity_id IS NOT NULL);
 
 
 --
@@ -5900,7 +5909,7 @@ CREATE INDEX index_bikes_on_primary_frame_color_id ON public.bikes USING btree (
 -- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree (secondary_frame_color_id);
+CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL);
 
 
 --
@@ -5921,14 +5930,14 @@ CREATE INDEX index_bikes_on_status ON public.bikes USING btree (status);
 -- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_tertiary_frame_color_id ON public.bikes USING btree (tertiary_frame_color_id);
+CREATE INDEX index_bikes_on_tertiary_frame_color_id ON public.bikes USING btree (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_user_hidden; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_user_hidden ON public.bikes USING btree (user_hidden);
+CREATE INDEX index_bikes_on_user_hidden ON public.bikes USING btree (user_hidden) WHERE (user_hidden IS NOT NULL);
 
 
 --
@@ -6279,6 +6288,13 @@ CREATE INDEX index_invoices_on_first_invoice_id ON public.invoices USING btree (
 --
 
 CREATE INDEX index_invoices_on_organization_id ON public.invoices USING btree (organization_id);
+
+
+--
+-- Name: index_locations_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_locations_on_address_record_id ON public.locations USING btree (address_record_id);
 
 
 --
@@ -7179,6 +7195,9 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260129220857'),
+('20260129122352'),
+('20260129122350'),
 ('20260128220133'),
 ('20260125184905'),
 ('20260124024709'),

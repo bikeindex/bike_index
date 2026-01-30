@@ -1,7 +1,10 @@
 -# TODO: use organized/manages/location_fields instead of this
 
-- f.object.country_id ||= @organization.locations.first&.country_id || Country.united_states_id
+- f.object.organization_id ||= @organization.id
 - f.object.name ||= @organization.name
+- f.object.address_record = f.object.find_or_build_address_record
+
+
 .col-md-6.mt-4
   %fieldset.mr-2.ml-2
     .card.bg-light
@@ -13,24 +16,25 @@
           .col-lg-6
             .form-group
               = f.text_field :phone, placeholder: "Phone number", class: "form-control"
+          .col-12
+            = f.fields_for :address_record do |address_form|
+              = render(Org::LocationAddressFields::Component.new(form_builder: address_form))
         .row
           .col-lg-6
-            .form-group
-              = f.text_field :street, placeholder: "Street", class: "form-control mt-1"
-          .col-lg-6
-            .form-group
-              = f.text_field :city, placeholder: "City", class: "form-control mt-1"
-        .row
-          .col-lg-6
-            .form-group.fancy-select.unfancy.no-restore-on-backspace
-              = f.collection_select(:state_id, State.united_states, :id, :name, {prompt: "State", include_blank: true}, class: "form-control mt-1" )
-          .col-lg-6
-            .form-group
-              = f.text_field :zipcode, placeholder: "Zipcode", class: "form-control mt-1"
-        .row
-          .col-lg-6
-            .form-group.fancy-select.unfancy.no-restore-on-backspace
-              = f.select(:country_id, Country.select_options, class: "form-control mt-1" )
+            .form-check
+              = f.check_box :publicly_visible
+              = f.label :publicly_visible, class: "ml-1" do
+                Publicly visible
+                - unless @organization.allowed_show?
+                  %small.text-warning.ml-1 org not shown on map, checking this won't change that
+            - if @organization.enabled?("impound_bikes")
+              .form-check
+                = f.check_box :impound_location
+                = f.label :impound_location
+              .form-check
+                = f.check_box :default_impound_location
+                = f.label :default_impound_location
+
           .col-lg-6
             .form-group.text-center
               - if f.object.destroy_forbidden?
@@ -39,19 +43,3 @@
               - else
                 = f.check_box :_destroy, class: "d-none"
                 = f.label :_destroy, "Remove", class: "remove_fields btn btn-danger"
-        .row
-          .form-check
-            = f.check_box :publicly_visible
-            = f.label :publicly_visible, class: "ml-1" do
-              Publicly visible
-              - unless @organization.allowed_show?
-                %small.text-warning.ml-1 org not shown on map, checking this won't change that
-          - if @organization.enabled?("impound_bikes")
-            .form-check
-              = f.check_box :impound_location
-              = f.label :impound_location
-            .form-check
-              = f.check_box :default_impound_location
-              = f.label :default_impound_location
-
-

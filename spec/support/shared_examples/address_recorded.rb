@@ -10,7 +10,8 @@ RSpec.shared_examples "address_recorded" do
 
     it "is updated from the job" do
       # bikes handling is via BikeServices::CalculateLocation
-      unless subject.instance_of?(Bike)
+      # locations handle geocoding independently via Geocodeable
+      unless subject.instance_of?(Bike) || subject.instance_of?(Location)
         expect(address_record).to be_valid
 
         expect do
