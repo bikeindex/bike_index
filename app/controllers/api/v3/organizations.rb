@@ -52,7 +52,17 @@ module API
             relations = permitted[:locations].map { |loc|
               state = State.where(name: loc[:state]).first
               country = Country.where(name: loc[:country]).first
-              loc.merge(state: state, country: country).to_h
+              {
+                name: loc[:name],
+                phone: loc[:phone],
+                address_record_attributes: {
+                  street: loc[:street],
+                  city: loc[:city],
+                  postal_code: loc[:zipcode],
+                  region_record_id: state&.id,
+                  country_id: country&.id
+                }
+              }
             }
             organization.locations.build(relations)
           end

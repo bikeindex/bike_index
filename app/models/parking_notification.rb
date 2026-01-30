@@ -284,10 +284,11 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def set_location_from_organization
-    self.country_id = organization&.country&.id
-    self.city = organization&.city
-    self.zipcode = organization&.zipcode
-    self.state_id = organization&.state&.id
+    org_address = organization&.default_address_record
+    self.country_id = org_address&.country_id
+    self.city = org_address&.city
+    self.zipcode = org_address&.postal_code
+    self.state_id = org_address&.region_record_id
   end
 
   def set_calculated_attributes

@@ -267,7 +267,7 @@ RSpec.describe MailchimpDatum, type: :model do
         end
 
         it "responds with lightspeed" do
-          expect(location.reload&.state&.abbreviation).to eq "IL"
+          expect(location.reload.address_record.region_record&.abbreviation).to eq "IL"
           organization.update(website: "test.com")
           expect(user).to be_present
           organization.update(pos_kind: "lightspeed_pos")
