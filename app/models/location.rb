@@ -40,7 +40,8 @@ class Location < ApplicationRecord
   has_many :bikes
   has_many :impound_records
 
-  validates :name, :organization_id, presence: true
+  validates :name, presence: true
+  validate :organization_present
 
   scope :by_state, -> { order(:state_id) }
   scope :shown, -> { where(shown: true) }
@@ -144,6 +145,12 @@ class Location < ApplicationRecord
   end
 
   private
+
+  def organization_present
+    return if organization.present? || organization_id.present?
+
+    errors.add(:organization, :blank)
+  end
 
   def sync_address_record_from_legacy_fields
     return if skip_update || city.blank? && street.blank?
