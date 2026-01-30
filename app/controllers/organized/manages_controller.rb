@@ -66,7 +66,7 @@ module Organized
 
     def permitted_locations_params
       %i[name zipcode city state_id country_id street phone email id _destroy publicly_visible
-        impound_location default_impound_location]
+        impound_location default_impound_location] + [address_record_attributes: AddressRecord.permitted_params + [:id]]
     end
 
     def notify_admins(type)

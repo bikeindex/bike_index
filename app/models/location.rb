@@ -50,6 +50,7 @@ class Location < ApplicationRecord
   # scope :international, where("country_id IS NOT #{Country.united_states_id}")
 
   before_validation :set_calculated_attributes
+  before_validation :sync_address_record_from_legacy_fields
   after_commit :update_associations
   before_destroy :ensure_destroy_permitted!
 
@@ -128,6 +129,17 @@ class Location < ApplicationRecord
   end
 
   private
+
+  def sync_address_record_from_legacy_fields
+    return unless city.present? || street.present?
+
+    legacy_attrs = AddressRecord.attrs_from_legacy(self)
+    if address_record.present?
+      address_record.attributes = legacy_attrs
+    else
+      self.address_record = AddressRecord.new(legacy_attrs.merge(kind: :organization, organization_id:))
+    end
+  end
 
   def calculated_shown
     return false if not_publicly_visible

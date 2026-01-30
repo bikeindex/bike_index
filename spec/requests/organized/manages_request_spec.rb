@@ -214,6 +214,13 @@ RSpec.describe Organized::ManagesController, type: :request do
             update[:locations_attributes]["0"].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
               expect(location1.send(k)).to_not eq v
             end
+            # verify address_record is created from legacy fields
+            expect(location1.address_record).to be_present
+            expect(location1.address_record.street).to eq "some street 2"
+            expect(location1.address_record.city).to eq "First city"
+            expect(location1.address_record.postal_code).to eq "2222222"
+            expect(location1.address_record.region_record_id).to eq state.id
+            expect(location1.address_record.country_id).to eq country.id
 
             # second location
             location2 = current_organization.locations.last
@@ -226,6 +233,13 @@ RSpec.describe Organized::ManagesController, type: :request do
             update[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
               expect(location1.send(k)).to_not eq v
             end
+            # verify address_record is created from legacy fields for new location
+            expect(location2.address_record).to be_present
+            expect(location2.address_record.street).to eq "some street 2"
+            expect(location2.address_record.city).to eq "cool city"
+            expect(location2.address_record.postal_code).to eq "12243444"
+            expect(location2.address_record.region_record_id).to eq state.id
+            expect(location2.address_record.country_id).to eq country.id
           end
         end
 
