@@ -100,6 +100,10 @@ class Location < ApplicationRecord
     self.shown = calculated_shown
     self.latitude = address_record&.latitude
     self.longitude = address_record&.longitude
+    if address_record.present?
+      address_record.organization_id = organization_id
+      address_record.kind = :organization
+    end
   end
 
   def update_associations
