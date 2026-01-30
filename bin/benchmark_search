@@ -22,7 +22,7 @@ end
 
 def bench(name, query_params, results, iterations: 5)
   interpreted = BikeSearchable.searchable_interpreted_params(query_params)
-  times = iterations.times.map { Benchmark.realtime { Bike.search(interpreted).limit(25).to_a } }
+  times = iterations.times.map { Benchmark.realtime { Bike.search(interpreted).count } }
   avg = (times.sum / times.size * 1000).round(1)
   puts "#{avg.to_s.rjust(8)}ms  #{name}" if VERBOSE
   results << avg
@@ -33,7 +33,7 @@ def bench_proximity(name, coords, distance, results, iterations: 5)
     stolenness: "proximity",
     bounding_box: bounding_box(coords[0], coords[1], distance)
   }
-  times = iterations.times.map { Benchmark.realtime { Bike.search(interpreted).limit(25).to_a } }
+  times = iterations.times.map { Benchmark.realtime { Bike.search(interpreted).count } }
   avg = (times.sum / times.size * 1000).round(1)
   puts "#{avg.to_s.rjust(8)}ms  #{name}" if VERBOSE
   results << avg
@@ -71,7 +71,7 @@ bench_proximity "Proximity LA 25mi", COORDS[:la], 25, results
 interpreted = BikeSearchable.searchable_interpreted_params({serial: "WTU", manufacturer: manufacturer&.id, colors: [color&.id].compact})
 interpreted[:stolenness] = "proximity"
 interpreted[:bounding_box] = bounding_box(COORDS[:chicago][0], COORDS[:chicago][1], 100)
-times = 5.times.map { Benchmark.realtime { Bike.search(interpreted).limit(25).to_a } }
+times = 5.times.map { Benchmark.realtime { Bike.search(interpreted).count } }
 avg = (times.sum / times.size * 1000).round(1)
 puts "#{avg.to_s.rjust(8)}ms  Complex: serial+mfg+color+prox" if VERBOSE
 results << avg
