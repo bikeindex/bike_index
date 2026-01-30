@@ -26,7 +26,7 @@
 #
 #  index_address_records_on_bike_id           (bike_id)
 #  index_address_records_on_country_id        (country_id)
-#  index_address_records_on_organization_id   (organization_id)
+#  index_address_records_on_organization_id   (organization_id) WHERE (organization_id IS NOT NULL)
 #  index_address_records_on_region_record_id  (region_record_id)
 #  index_address_records_on_user_id           (user_id)
 #

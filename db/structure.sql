@@ -5580,7 +5580,7 @@ CREATE INDEX index_address_records_on_country_id ON public.address_records USING
 -- Name: index_address_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_organization_id ON public.address_records USING btree (organization_id);
+CREATE INDEX index_address_records_on_organization_id ON public.address_records USING btree (organization_id) WHERE (organization_id IS NOT NULL);
 
 
 --
