@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe Location, type: :model do
-  it_behaves_like "geocodeable"
   it_behaves_like "address_recorded"
 
   describe "set_calculated_attributes" do
@@ -11,16 +10,17 @@ RSpec.describe Location, type: :model do
     end
   end
 
-  describe "address" do
-    it "creates an address, ignoring blank fields" do
-      c = Country.create(name: "Neverland", iso: "NEV")
-      s = State.create(country_id: c.id, name: "BullShit", abbreviation: "BS")
+  describe "formatted_address_string" do
+    it "returns address from address_record, ignoring blank fields" do
+      country = Country.create(name: "Neverland", iso: "NEV")
+      state = State.create(country_id: country.id, name: "BullShit", abbreviation: "BS")
+      address_record = AddressRecord.create(street: "300 Blossom Hill Dr", city: "Lancaster", region_record_id: state.id, postal_code: "17601", country_id: country.id, skip_geocoding: true)
+      location = FactoryBot.create(:location, address_record:)
 
-      location = Location.create(street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
-      expect(location.address).to eq("300 Blossom Hill Dr, Lancaster, BS 17601, Neverland")
+      expect(location.formatted_address_string(visible_attribute: :street, render_country: true)).to eq("300 Blossom Hill Dr, Lancaster, BS 17601, Neverland")
 
-      location.update(street: " ")
-      expect(location.address).to eq("Lancaster, BS 17601, Neverland")
+      address_record.update(street: nil)
+      expect(location.formatted_address_string(visible_attribute: :street, render_country: true)).to eq("Lancaster, BS 17601, Neverland")
     end
   end
 

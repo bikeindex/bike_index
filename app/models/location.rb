@@ -39,9 +39,7 @@ class Location < ApplicationRecord
   has_many :bikes
   has_many :impound_records
 
-  validates :name, :city, :country, :organization, presence: true
-
-  scope :by_state, -> { order(:state_id) }
+  validates :name, :address_record, :organization, presence: true
   scope :shown, -> { where(shown: true) }
   scope :publicly_visible, -> { shown.where(not_publicly_visible: false) }
   scope :impound_locations, -> { where(impound_location: true) }
@@ -61,13 +59,6 @@ class Location < ApplicationRecord
 
   def other_organization_locations
     Location.where(organization_id: organization_id).where.not(id: id)
-  end
-
-  # Override AddressRecorded delegation to fall back to legacy fields
-  def address_present?
-    return address_record.address_present? if address_record?
-
-    [street, city, zipcode].any?(&:present?)
   end
 
   def org_location_id
