@@ -33,7 +33,7 @@
               = f.text_field :phone, class: "form-control"
 
         = f.fields_for :address_record do |address_form|
-          = render(Org::LocationAddressFields::Component.new(form_builder: address_form, default_country_id:, default_region_record_id:))
+          = render(Org::LocationAddressFields::Component.new(form_builder: address_form))
 
         .row
           .col-xs-6

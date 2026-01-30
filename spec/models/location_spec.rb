@@ -8,6 +8,23 @@ RSpec.describe Location, type: :model do
       location = FactoryBot.create(:location, phone: "773.83ddp+83(887)")
       expect(location.phone).to eq("77383ddp+83887")
     end
+
+    it "sets address_record organization_id and kind with nested attributes" do
+      organization = FactoryBot.create(:organization)
+      location = organization.locations.create!(
+        name: "Main Office",
+        address_record_attributes: {
+          street: "123 Main St",
+          city: "Chicago",
+          country_id: Country.united_states_id,
+          skip_geocoding: true
+        }
+      )
+      expect(location.address_record).to be_present
+      expect(location.address_record.organization_id).to eq organization.id
+      expect(location.address_record.kind).to eq "organization"
+      expect(location.address_record.city).to eq "Chicago"
+    end
   end
 
   describe "formatted_address_string" do
