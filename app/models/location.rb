@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id                       :integer          not null, primary key
+#  city                     :string
 #  default_impound_location :boolean          default(FALSE)
 #  deleted_at               :datetime
 #  email                    :string(255)
@@ -11,13 +12,18 @@
 #  latitude                 :float
 #  longitude                :float
 #  name                     :string(255)
+#  neighborhood             :string
 #  not_publicly_visible     :boolean          default(FALSE)
 #  phone                    :string(255)
 #  shown                    :boolean          default(FALSE)
+#  street                   :string
+#  zipcode                  :string
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  address_record_id        :bigint
+#  country_id               :integer
 #  organization_id          :integer
+#  state_id                 :integer
 #
 # Indexes
 #
