@@ -136,14 +136,14 @@ RSpec.describe BikeServices::Builder do
 
       context "with organization with reg_address" do
         let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
-        let(:state_id) { organization.state_id }
+        let(:org_address) { organization.default_address_record }
         let(:target_attributes) do
-          {id: nil, kind: "ownership", city: "Chicago", region_record_id: state_id,
+          {id: nil, kind: "ownership", city: "Chicago", region_record_id: org_address.region_record_id,
            country_id: Country.united_states_id, street: nil, postal_code: nil}
         end
         it "returns address with organization's country, region_string and city" do
-          expect(organization.reload.city).to eq "Chicago"
-          expect(organization.street).to be_present
+          expect(org_address.city).to eq "Chicago"
+          expect(org_address.street).to be_present
           expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
           expect(BParam.address_record_attributes(b_param.bike)).to be_blank
           expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
@@ -166,8 +166,8 @@ RSpec.describe BikeServices::Builder do
             }
           end
           it "returns the b_param address_record_attributes" do
-            expect(organization.reload.city).to eq "Chicago"
-            expect(organization.street).to be_present
+            expect(org_address.city).to eq "Chicago"
+            expect(org_address.street).to be_present
             expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
             expect(BParam.address_record_attributes(b_param.bike)).to be_present
             expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
@@ -179,10 +179,9 @@ RSpec.describe BikeServices::Builder do
           # NOTE: This would be an error situation, just want to make sure things don't explode
           let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_address"]) }
           it "returns an address_record" do
-            expect(organization.reload.city).to be_blank
+            expect(organization.default_address_record).to be_blank
             expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
-            expect(bike.address_record).to be_present
-            expect(bike.address_record.attributes.compact).to match_hash_indifferently(kind: "ownership")
+            expect(bike.address_record).to be_blank
           end
         end
       end

@@ -111,8 +111,11 @@ class BikeServices::Builder
     end
 
     def org_address_record(bike)
-      AddressRecord.new(AddressRecord.attrs_from_legacy(bike.creation_organization)
-        .slice(:city, :region_record_id, :country_id)
+      org_address = bike.creation_organization.default_address_record
+      return if org_address.blank?
+
+      AddressRecord.new(org_address.attributes
+        .slice("city", "region_record_id", "country_id")
         .merge(kind: :ownership, bike:))
     end
   end

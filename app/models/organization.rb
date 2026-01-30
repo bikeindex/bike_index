@@ -102,6 +102,7 @@ class Organization < ApplicationRecord
 
   has_many :organization_manufacturers
   has_many :locations, inverse_of: :organization, dependent: :destroy
+  has_many :location_address_records, -> { where(kind: :organization) }, class_name: "AddressRecord", foreign_key: :organization_id
   has_many :mail_snippets
   has_many :parking_notifications
   has_many :impound_records
@@ -149,21 +150,6 @@ class Organization < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
-
-  delegate \
-    :address,
-    :city,
-    :country,
-    :country_id,
-    :latitude,
-    :longitude,
-    :state,
-    :state_id,
-    :street,
-    :zipcode,
-    :metric_units?,
-    to: :default_location,
-    allow_nil: true
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
 
@@ -228,8 +214,8 @@ class Organization < ApplicationRecord
       return nil unless n.present?
 
       str = "%#{n.strip}%"
-      match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
-      joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
+      match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name address_records.city]
+      left_outer_joins(:locations, :location_address_records)
         .distinct
         .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), {str: str})
     end
@@ -390,6 +376,17 @@ class Organization < ApplicationRecord
   # Try for publicly_visible, fall back to whatever - TODO: make this configurable
   def default_location
     locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first
+  end
+
+  def default_address_record
+    default_location&.address_record
+  end
+
+  # TODO: when default_location is configurable, use default location
+  def metric_units?
+    return @metric_units if defined?(@metric_units)
+
+    @metric_units = Country.metric_units?(location_address_records.order(:id).pick(:country_id))
   end
 
   def search_coordinates
