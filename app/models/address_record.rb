@@ -40,7 +40,7 @@ class AddressRecord < ApplicationRecord
   enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
 
   belongs_to :user
-  belongs_to :bike # TODO: Make this polymorphic?
+  belongs_to :bike
   belongs_to :organization
   belongs_to :country
   belongs_to :region_record, class_name: "State"
