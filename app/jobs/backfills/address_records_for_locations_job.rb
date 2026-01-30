@@ -14,14 +14,14 @@ class Backfills::AddressRecordsForLocationsJob < ApplicationJob
     def build_or_create_for(location)
       return location.address_record if location.address_record?
 
-      existing_address_record = AddressRecord.where(kind: :location, organization_id: location.organization_id)
+      existing_address_record = AddressRecord.where(kind: :organization, organization_id: location.organization_id)
         .find_by(street: location.street, city: location.city)
       if existing_address_record.present? && existing_address_record.internal_address_attrs == AddressRecord.new(AddressRecord.attrs_from_legacy(location)).internal_address_attrs
         location.update(address_record: existing_address_record)
         return existing_address_record
       end
 
-      location.address_record = AddressRecord.new(kind: :location, organization_id: location.organization_id)
+      location.address_record = AddressRecord.new(kind: :organization, organization_id: location.organization_id)
       location.address_record.attributes = AddressRecord.attrs_from_legacy(location)
       location.save
       location.address_record

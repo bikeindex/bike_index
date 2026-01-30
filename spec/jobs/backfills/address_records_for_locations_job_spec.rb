@@ -16,7 +16,7 @@ RSpec.describe Backfills::AddressRecordsForLocationsJob, type: :job do
         country_id: location.country_id,
         street: location.street,
         postal_code: location.zipcode,
-        kind: "location",
+        kind: "organization",
         user_id: nil
       }
     end
