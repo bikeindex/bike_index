@@ -1,4 +1,4 @@
-- cache("where/shown-#{@organizations.count}-#{@organizations.maximum(:updated_at)}") do
+- cache("where/shown2-#{@organizations.count}-#{@organizations.maximum(:updated_at)}") do
   -# Collect all visible locations from organizations
   - all_locations = @organizations.flat_map { |org| org.locations.shown.includes(:address_record) }
   - us_locations = all_locations.select { |loc| loc.address_record&.country_id == Country.united_states&.id }

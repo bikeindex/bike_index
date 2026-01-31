@@ -39,8 +39,10 @@ RSpec.describe Location, type: :model do
       let(:location) { FactoryBot.create(:location, address_record:) }
       it "is correct" do
         expect(location).to be_valid
-        expect(location.address_record).to have_attributes(kind: "organization", region_string: "AB",
-          region_record_id: nil, country_id: Country.canada_id, street: "9320 Groat Rd NW")
+        expect(location.address_record.kind).to eq "organization"
+        expect(location.address_record.city).to eq "Edmonton"
+        expect(location.address_record.region_record.abbreviation).to eq "AB"
+        expect(location.address_record.country).to eq Country.canada
       end
     end
   end
