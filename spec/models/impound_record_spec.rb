@@ -4,6 +4,29 @@ RSpec.describe ImpoundRecord, type: :model do
   it_behaves_like "default_currencyable"
   it_behaves_like "address_recorded"
 
+  describe "factory" do
+    context "with_address_record" do
+      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :chicago) }
+      it "is valid with address_record" do
+        expect(impound_record).to be_valid
+        expect(impound_record.address_record).to be_present
+        expect(impound_record.address_record.kind).to eq "impounded_from"
+        expect(impound_record.address_record.city).to eq "Chicago"
+        expect(impound_record.address_record.region_record.abbreviation).to eq "IL"
+        expect(impound_record.address_record.country).to eq Country.united_states
+      end
+    end
+
+    context "with_address_record and different address" do
+      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :new_york) }
+      it "uses the specified address" do
+        expect(impound_record).to be_valid
+        expect(impound_record.address_record.city).to eq "New York"
+        expect(impound_record.address_record.region_record.abbreviation).to eq "NY"
+      end
+    end
+  end
+
   let!(:bike) { FactoryBot.create(:bike, created_at: Time.current - 1.day) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:impound_configuration) { organization.fetch_impound_configuration }
@@ -233,8 +256,8 @@ RSpec.describe ImpoundRecord, type: :model do
   end
 
   describe "impound_location" do
-    let!(:location) { FactoryBot.create(:location, organization: organization, impound_location: true, default_impound_location: true) }
-    let!(:location2) { FactoryBot.create(:location, organization: organization, impound_location: true) }
+    let!(:location) { FactoryBot.create(:location, :with_address_record, organization: organization, impound_location: true, default_impound_location: true) }
+    let!(:location2) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization, impound_location: true) }
     let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
     let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, location: location2) }
     it "sets the impound location by default" do
