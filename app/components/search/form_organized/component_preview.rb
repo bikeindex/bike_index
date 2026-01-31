@@ -24,7 +24,6 @@ module Search::FormOrganized
     def default_options(interpreted_params = {})
       {
         target_search_path:,
-        target_frame: :search_organized_results_frame,
         interpreted_params:
       }
     end

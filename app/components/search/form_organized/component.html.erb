@@ -1,93 +1,62 @@
-<div data-controller="search--form">
-  <%= form_with(url: @target_search_path,
-      builder: BikeIndexFormBuilder,
-      method: :get,
-      id: "Search_Form",
-      data: { turbo_frame: @target_frame, turbo_action: "advance",
-        turbo: true, "search--form-target" => "form"}) do |f| %>
-    <%# search_no_js is removed in the search--form stimulus controller. If it's present, the results render synchronously (rather than as a turbo frame) %>
-    <%= hidden_field_tag :search_no_js, true %>
+<%= form_with(url: @target_search_path,
+    builder: BikeIndexFormBuilder,
+    method: :get,
+    id: "Search_Form",
+    data: {turbo: false}) do |f| %>
+  <div class="tw:flex tw:flex-nowrap tw:gap-4">
+    <div class="search-fields tw:flex-grow">
+      <%= render(
+        Search::EverythingCombobox::Component.new(
+          selected_query_items_options: @selected_query_items_options,
+          query:,
+        ),
+      ) %>
 
-    <div class="tw:flex tw:flex-nowrap tw:gap-4">
-      <div class="search-fields tw:flex-grow">
-        <%= render(
-          Search::EverythingCombobox::Component.new(
-            selected_query_items_options: @selected_query_items_options,
-            query:,
-          ),
-        ) %>
+      <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2 tw:md:flex-nowrap">
+        <%= label_tag :search_email,
+          translation(".search_owner_email"),
+          class: "twlabel tw:sr-only" %>
+        <%= text_field_tag :search_email,
+          search_email_value,
+          placeholder: translation(".search_owner_email"),
+          class: "twinput tw:flex-1 fieldResetsCounts" %>
 
-        <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2 tw:md:flex-nowrap">
-          <%= label_tag :search_email,
-            translation(".search_owner_email"),
+        <% if render_serial_field? %>
+          <%= label_tag :serial,
+            translation(".search_for_serial_number"),
             class: "twlabel tw:sr-only" %>
-          <%= text_field_tag :search_email,
-            search_email_value,
-            placeholder: translation(".search_owner_email"),
+          <%= text_field_tag :serial,
+            serial_value,
+            placeholder: translation(".search_for_serial_number"),
             class: "twinput tw:flex-1 fieldResetsCounts" %>
-
-          <% if render_serial_field? %>
-            <%= label_tag :serial,
-              translation(".search_for_serial_number"),
-              class: "twlabel tw:sr-only" %>
-            <%= text_field_tag :serial,
-              serial_value,
-              placeholder: translation(".search_for_serial_number"),
-              class: "twinput tw:flex-1 fieldResetsCounts" %>
-          <% end %>
-        </div>
-      </div>
-
-      <div class="tw:w-20">
-        <%= button_tag(type: translation(".submit"),
-            class: "twbtn-blue tw:w-full tw:h-full tw:disabled:cursor-wait",
-            "data-search--form-target" => "button") do %>
-          <svg
-            id="search-button"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 29 29"
-          >
-            <defs>
-              <style>
-                .cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}
-              </style>
-            </defs>
-
-            <title>searcher</title>
-
-            <circle
-              class="cls-1"
-              cx="10.39"
-              cy="10.39"
-              r="9.39"
-            />
-
-            <line
-              class="cls-2"
-              x1="17.03"
-              y1="17.03"
-              x2="28"
-              y2="28"
-            />
-          </svg>
         <% end %>
       </div>
     </div>
 
-    <% if render_serial_field? && serial_looks_like_not_a_serial? %>
-      <%= render(
-        UI::Alert::Component.new(
-          text: translation(".doesnt_look_like_serial"),
-          kind: :warning,
-          margin_classes: "tw:my-2",
-        ),
-      ) %>
-    <% end %>
+    <div class="tw:w-20">
+      <%= button_tag(type: translation(".submit"),
+          class: "twbtn-blue tw:w-full tw:h-full") do %>
+        <%= helpers.inline_svg_tag "icons/searcher.svg",
+          id: "search-button",
+          class: "tw:text-white",
+          title: "searcher" %>
+      <% end %>
+    </div>
+  </div>
 
-    <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
-    <%= hidden_field_tag :search_stickers, search_stickers %>
-    <%= hidden_field_tag :search_address, search_address %>
-    <%= hidden_field_tag :search_secondary, search_secondary %>
-    <%= hidden_field_tag :search_model_audit_id, search_model_audit_id %>
+  <% if render_serial_field? && serial_looks_like_not_a_serial? %>
+    <%= render(
+      UI::Alert::Component.new(
+        text: translation(".doesnt_look_like_serial"),
+        kind: :warning,
+        margin_classes: "tw:my-2",
+      ),
+    ) %>
   <% end %>
-</div>
+
+  <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
+  <%= hidden_field_tag :search_stickers, search_stickers %>
+  <%= hidden_field_tag :search_address, search_address %>
+  <%= hidden_field_tag :search_secondary, search_secondary %>
+  <%= hidden_field_tag :search_model_audit_id, search_model_audit_id %>
+<% end %>

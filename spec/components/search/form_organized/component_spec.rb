@@ -5,14 +5,12 @@ require "rails_helper"
 RSpec.describe Search::FormOrganized::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
-  let(:options) { {target_search_path:, target_frame:, interpreted_params:} }
+  let(:options) { {target_search_path:, interpreted_params:} }
   let(:target_search_path) { "/bikes" }
-  let(:target_frame) { "search_results" }
   let(:interpreted_params) { {} }
 
   it "renders form with search fields" do
-    expect(component).to have_css("div[data-controller='search--form']")
-    expect(component).to have_css("form#Search_Form")
+    expect(component).to have_css("form#Search_Form[data-turbo='false']")
     expect(component).to have_css("input[name='search_email']")
     expect(component).to have_css("input[name='serial']")
     expect(component).to have_css("input[name='search_stickers']", visible: :hidden)
@@ -41,7 +39,7 @@ RSpec.describe Search::FormOrganized::Component, type: :component do
   end
 
   context "with skip_serial_field" do
-    let(:options) { {target_search_path:, target_frame:, interpreted_params:, skip_serial_field: true} }
+    let(:options) { {target_search_path:, interpreted_params:, skip_serial_field: true} }
 
     it "renders without serial field" do
       expect(component).to have_css("form#Search_Form")

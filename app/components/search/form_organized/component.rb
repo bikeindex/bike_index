@@ -2,9 +2,8 @@
 
 module Search::FormOrganized
   class Component < ApplicationComponent
-    def initialize(target_search_path:, target_frame:, interpreted_params:, skip_serial_field: false)
+    def initialize(target_search_path:, interpreted_params:, skip_serial_field: false)
       @target_search_path = target_search_path
-      @target_frame = target_frame
       @interpreted_params = interpreted_params
       @skip_serial_field = skip_serial_field
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
