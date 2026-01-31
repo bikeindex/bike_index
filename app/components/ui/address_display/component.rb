@@ -2,7 +2,9 @@
 
 module UI::AddressDisplay
   class Component < ApplicationComponent
-    def initialize(address_record: nil, address_hash: nil, visible_attribute: nil, render_country: false)
+    KINDS = %i[multiline single_line]
+    def initialize(address_record: nil, address_hash: nil, visible_attribute: nil, render_country: false, kind: nil)
+      @kind = KINDS.include?(kind) ? kind : KINDS.first
       @address_record = address_record
       @address_hash = address_hash&.with_indifferent_access
       @visible_attribute = AddressRecord.permitted_visible_attribute(visible_attribute)
@@ -36,7 +38,7 @@ module UI::AddressDisplay
         @address_hash[:street]&.split(",")&.map(&:strip)
       end.compact
 
-      street_lines.map { content_tag(:span, it + "\n", class: line_classes) }
+      street_lines.map { content_tag(:span, it + line_separator, class: line_classes) }
     end
 
     def final_line
@@ -57,8 +59,16 @@ module UI::AddressDisplay
       content_tag(:span, final_line.compact.join(", "), class: line_classes)
     end
 
+    def single_line?
+      @kind == :single_line
+    end
+
+    def line_separator
+      single_line? ? ", " : "\n"
+    end
+
     def line_classes
-      "tw:block"
+      single_line? ? "tw:inline-block" : "tw:block"
     end
   end
 end

@@ -499,7 +499,9 @@
           </tr>
           <tr>
             <td>Regional address</td>
-            <td><%= @organization.default_location&.address %></td>
+            <td>
+              <%= render UI::AddressDisplay::Component.new(address_record: @organization.default_address_record, visible_attribute: :street, kind: :single_line) %>
+            </td>
           </tr>
           <tr>
             <td>Search radius</td>
@@ -643,6 +645,9 @@
       <div class="col-lg-4 col-sm-6 mb-4">
         <div class="card">
           <div class="card-body">
+            <% if display_dev_info? %>
+              <p>ID: <code class="only-dev-visible"><%= location.id %></code></p>
+            <% end %>
             <% if location.impound_location %>
               <strong>
                 <% if location.default_impound_location %>
@@ -658,7 +663,9 @@
 
             <p>Name: <%= location.name %></p>
             <p>Phone: <%= phone_display(location.phone) %></p>
-            <p>Address: <%= location.formatted_address_string %></p>
+            <p>
+              Address: <%= render(UI::AddressDisplay::Component.new(address_record: location.formatted_address_string, visible_attribute: :street)) %>
+            </p>
           </div>
         </div>
       </div>
