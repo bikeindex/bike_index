@@ -135,7 +135,7 @@
                       %td
                         - address = @bike.registration_address
                         - if @bike.valid_mailing_address?
-                          %small= render AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(@bike), visible_attribute: :street)
+                          %small= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(@bike), visible_attribute: :street)
                         - else
                           -# Don't show address if it's the organizations default address
                           - unless address == @organization.default_location&.address_hash

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module AddressDisplay
+module UI::AddressDisplay
   class Component < ApplicationComponent
     def initialize(address_record: nil, address_hash: nil, visible_attribute: nil, render_country: false)
       @address_record = address_record

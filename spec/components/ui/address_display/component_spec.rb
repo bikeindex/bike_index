@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe AddressDisplay::Component, type: :component do
+RSpec.describe UI::AddressDisplay::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {address_record:, address_hash:, visible_attribute:, render_country:} }
