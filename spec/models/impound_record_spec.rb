@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe ImpoundRecord, type: :model do
-  it_behaves_like "geocodeable"
   it_behaves_like "default_currencyable"
   it_behaves_like "address_recorded"
 

@@ -360,10 +360,8 @@ RSpec.describe BulkImportJob, type: :job do
             impounded_description: "It was locked to a handicap railing",
             display_id: "2020-33333",
             unregistered_bike: true,
-            street: "1409 Martin Luther King Junior Way",
-            city: "Berkeley",
-            zipcode: "94709", # NOTE: the zipcode that is entered is 94710
-            state_id: state.id
+            street: "1409 Martin Luther King Jr Way",
+            city: "Berkeley"
           }
         end
         let(:impound_record2_target) do
@@ -372,9 +370,7 @@ RSpec.describe BulkImportJob, type: :job do
             display_id: "1",
             unregistered_bike: true,
             street: "327 17th Street",
-            city: "Oakland",
-            zipcode: "94612",
-            state_id: state.id
+            city: "Oakland"
           }
         end
         it "creates the bikes and impound records", :flaky do
@@ -403,7 +399,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
             expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
             # Verify impounded_from address_record is created
-            expect(bike1_impound_record.address_record).to have_attributes(kind: "impounded_from", street: "1409 Martin Luther King Junior Way", city: "Berkeley")
+            expect(bike1_impound_record.address_record).to have_attributes(kind: "impounded_from", street: "1409 Martin Luther King Jr Way", city: "Berkeley")
 
             expect(bike1.to_coordinates).to eq bike1_impound_record.to_coordinates
             expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
@@ -557,11 +553,14 @@ RSpec.describe BulkImportJob, type: :job do
         let(:target_impound) do
           {
             impounded_at_with_timezone: "2021-02-04",
-            street: "1409 Martin Luther King Jr Way",
-            city: "Berkeley",
-            state: "CA",
-            zipcode: "94710",
-            country: "US",
+            address_record_attributes: {
+              kind: :impounded_from,
+              street: "1409 Martin Luther King Jr Way",
+              city: "Berkeley",
+              region_string: "CA",
+              postal_code: "94710",
+              country: "US"
+            },
             display_id: "ddd33333",
             impounded_description: nil,
             organization_id: bulk_import.organization_id

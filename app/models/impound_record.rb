@@ -39,9 +39,9 @@
 #  index_impound_records_on_user_id            (user_id)
 #
 class ImpoundRecord < ApplicationRecord
-  include Geocodeable
   include DefaultCurrencyable
   include AddressRecorded
+  include AddressRecordedWithinBoundingBox
 
   belongs_to :bike, touch: true
   belongs_to :user
@@ -57,7 +57,6 @@ class ImpoundRecord < ApplicationRecord
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
 
   before_validation :set_calculated_attributes
-  before_validation :sync_address_record_from_legacy_fields
   after_commit :update_associations
 
   enum :status, ImpoundRecordUpdate::KIND_ENUM
@@ -71,6 +70,8 @@ class ImpoundRecord < ApplicationRecord
   scope :with_claims, -> { joins(:impound_claims).where.not(impound_claims: {id: nil}) }
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
+
+  delegate :latitude, :longitude, :street, :city, :country, :country_id, to: :address_record, allow_nil: true
 
   def self.statuses
     ImpoundRecordUpdate::KIND_ENUM.keys.map(&:to_s) - ImpoundRecordUpdate.update_only_kinds
@@ -151,18 +152,19 @@ class ImpoundRecord < ApplicationRecord
     false
   end
 
-  # geocoding is managed by set_calculated_attributes
-  def should_be_geocoded?
-    false
+  def address(force_show_address: false)
+    address_record&.formatted_address_string(visible_attribute: force_show_address ? :street : :city)
   end
 
-  # force_show_address, just like parking_notification
-  def address(force_show_address: false, country: [:iso, :optional, :skip_default])
-    Geocodeable.address(
-      self,
-      street: force_show_address || show_address,
-      country: country
-    ).presence
+  # For latitude_public/longitude_public compatibility
+  def latitude_public
+    return nil unless address_record?
+    show_address ? latitude : latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
+  def longitude_public
+    return nil unless address_record?
+    show_address ? longitude : longitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def unorganized?
@@ -269,17 +271,8 @@ class ImpoundRecord < ApplicationRecord
     self.impounded_at = created_at if created_at.present? && created_at > impounded_at + 10.years
     # unregistered_bike means essentially that the bike was created for this impound record
     self.unregistered_bike ||= calculated_unregistered_bike?
-    # Don't geocode if location is present and address hasn't changed
-    return if !address_changed? && with_location?
-
-    self.attributes = if parking_notification.present?
-      parking_notification.attributes.slice(*Geocodeable.location_attrs)
-    else
-      # IDK WTF but duplicating this fixes the failing bulk_import_job_spec
-      # TODO: Remove this once backfill is finished - #2922
-      GeocodeHelper.assignable_address_hash_for(address(force_show_address: true))
-      GeocodeHelper.assignable_address_hash_for(address(force_show_address: true))
-    end
+    # Set address_record from parking_notification if present and no address_record yet
+    set_address_record_from_parking_notification if parking_notification.present? && !address_record? && !move_location_update
   end
 
   def reply_to_email
@@ -289,13 +282,6 @@ class ImpoundRecord < ApplicationRecord
     organization&.fetch_impound_configuration&.email ||
       organization&.auto_user&.email ||
       user&.email
-  end
-
-  # Override AddressRecorded delegation to fall back to legacy fields
-  def address_present?
-    return address_record.address_present? if address_record?
-
-    [street, city, zipcode].any?(&:present?)
   end
 
   private
@@ -355,18 +341,12 @@ class ImpoundRecord < ApplicationRecord
       (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
   end
 
-  def sync_address_record_from_legacy_fields
-    return if skip_update || city.blank? && street.blank?
-    # Don't create address_record if move_location update set it
-    return if impound_record_updates.with_location.any?
-    # Don't overwrite if address_record was explicitly set via nested attributes
+  def set_address_record_from_parking_notification
     return if address_record.present? && address_record.changed?
 
-    legacy_attrs = AddressRecord.attrs_from_legacy(self).merge(kind: :impounded_from, organization_id:)
-    if address_record.present?
-      address_record.attributes = legacy_attrs
-    else
-      self.address_record = AddressRecord.new(legacy_attrs)
-    end
+    # Create address_record from parking_notification's legacy fields
+    self.address_record = AddressRecord.new(
+      AddressRecord.attrs_from_legacy(parking_notification).merge(kind: :impounded_from, organization_id:)
+    )
   end
 end
