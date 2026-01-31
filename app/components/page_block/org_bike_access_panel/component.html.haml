@@ -138,7 +138,7 @@
                           %small= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(@bike), visible_attribute: :street)
                         - else
                           -# Don't show address if it's the organizations default address
-                          - unless address == @organization.default_location&.address_hash
+                          - unless address == @organization.default_location&.address_hash_legacy
                             - address.except("latitude", "longitude", "country").each do |k, v|
                               %span.less-strong
                                 #{k == "address" ? "street" : k}:

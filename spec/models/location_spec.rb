@@ -27,6 +27,15 @@ RSpec.describe Location, type: :model do
     end
   end
 
+  describe "factory" do
+    let(:location) { FactoryBot.create(:location_chicago) }
+    it "is correct" do
+      expect(location).to be_valid
+      expect(location.address_record).to have_attributes(kind: :organization, region_string: "AB",
+        region_record_id: nil, country_id: Country.canada_id)
+    end
+  end
+
   describe "formatted_address_string" do
     it "returns address from address_record, ignoring blank fields" do
       country = Country.create(name: "Neverland", iso: "NEV")
