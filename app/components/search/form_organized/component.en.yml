@@ -3,8 +3,7 @@ en:
   components:
     search:
       form_organized:
-        target_search_path: Target_search_path
-        target_frame: Target_frame
-        interpreted_params: Interpreted_params
-        skip_serial_field: Skip_serial_field
-        result_view: Result_view
+        search_owner_email: Search owner email
+        search_for_serial_number: Search for serial number
+        submit: submit
+        doesnt_look_like_serial: "This doesn't look like a serial number. Serials are usually 6+ letters and numbers, located under the bottom bracket."
