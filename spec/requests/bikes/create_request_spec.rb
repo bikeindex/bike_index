@@ -135,7 +135,7 @@ RSpec.describe "BikesController#create", type: :request do
     context "successful creation" do
       include_context :geocoder_real
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"], search_radius_miles: search_radius_miles) }
-      let!(:organization_default_location) { FactoryBot.create(:location_chicago, organization: organization) }
+      let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: organization) }
       let(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
       let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "area", body: "Something cool", search_radius_miles: search_radius_miles} }
       let(:search_radius_miles) { 5 }
@@ -182,7 +182,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(organization_stolen_message.reload.stolen_records.count).to eq 1
       end
       context "outside of area" do
-        let!(:organization_default_location) { FactoryBot.create(:location_nyc, organization: organization) }
+        let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization) }
         it "doesn't assign organization_stolen_message" do
           expect(organization_stolen_message.reload.longitude).to be_within(2).of(-74)
           expect(organization_stolen_message.reload.search_radius_miles).to eq 5

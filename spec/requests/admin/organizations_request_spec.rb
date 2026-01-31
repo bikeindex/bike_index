@@ -35,7 +35,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
     end
     context "with location" do
-      let!(:location) { FactoryBot.create(:location_chicago, organization:, name: "Main Office") }
+      let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, name: "Main Office") }
       it "renders location with address" do
         expect(location.address_record).to be_present
         get "#{base_url}/#{organization.to_param}"
