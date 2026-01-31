@@ -183,5 +183,26 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       end
     end
+
+    context "impound_notification with location" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      let(:location) { FactoryBot.create(:location_chicago, organization: organization, name: "Impound Facility") }
+      let(:impound_record) { FactoryBot.create(:impound_record, organization: organization, location: location) }
+      let(:parking_notification) do
+        FactoryBot.create(:parking_notification_organized,
+          organization: organization,
+          kind: "impound_notification",
+          impound_record: impound_record)
+      end
+      it "sends email with location address" do
+        expect(location.address_record).to be_present
+        expect(parking_notification.impound_record.location).to eq location
+        instance.perform(parking_notification.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        mail = ActionMailer::Base.deliveries.last
+        expect(mail.body.encoded).to match "Impound Facility"
+        expect(mail.body.encoded).to match location.formatted_address_string
+      end
+    end
   end
 end
