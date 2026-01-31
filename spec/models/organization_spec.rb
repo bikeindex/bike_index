@@ -224,8 +224,8 @@ RSpec.describe Organization, type: :model do
         end
       end
       context "by location city" do
-        let(:location) { FactoryBot.create(:location_chicago) }
-        let!(:location2) { FactoryBot.create(:location_chicago, organization:) }
+        let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago) }
+        let!(:location2) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:) }
         it "finds the organization" do
           expect(Organization.admin_text_search("chi")).to eq([organization])
         end
@@ -301,7 +301,7 @@ RSpec.describe Organization, type: :model do
     end
     context "organization with a location" do
       let(:organization) { FactoryBot.create(:organization, approved: true, show_on_map: true) }
-      let!(:location) { FactoryBot.create(:location, organization:) }
+      let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:) }
       let(:address_record2) { FactoryBot.create(:address_record, latitude: 12, longitude: -111, skip_geocoding: true) }
       let!(:location2) { FactoryBot.create(:location, organization:, address_record: address_record2) }
       it "is the locations coordinates for the first publicly_visible location, falls back to the first location if neither publicly_visible" do
@@ -590,7 +590,7 @@ RSpec.describe Organization, type: :model do
 
     describe "set_locations_shown" do
       let(:organization) { FactoryBot.create(:organization, show_on_map: true, approved: true) }
-      let(:location) { FactoryBot.create(:location_chicago, organization:, shown: true) }
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, shown: true) }
       context "organization approved" do
         it "sets the locations shown to be org shown on save" do
           expect(organization.allowed_show?).to be_truthy

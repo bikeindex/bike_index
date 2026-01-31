@@ -1,7 +1,12 @@
-- cache("where/shown-#{@organizations.count}-#{@organizations.maximum(:updated_at)}") do
-  -# Cache these queries
-  - @states = State.includes(:locations).all
-  - @countries = Country.where('iso != ?', 'US').includes(:locations)
+- cache("where/shown2-#{@organizations.count}-#{@organizations.maximum(:updated_at)}") do
+  -# Collect all visible locations from organizations
+  - all_locations = @organizations.flat_map { |org| org.locations.shown.includes(:address_record) }
+  - us_locations = all_locations.select { |loc| loc.address_record&.country_id == Country.united_states&.id }
+  - international_locations = all_locations.reject { |loc| loc.address_record&.country_id == Country.united_states&.id }
+
+  -# Group locations by state/country
+  - us_by_state = us_locations.group_by { |loc| loc.address_record&.region_record }.compact
+  - intl_by_country = international_locations.group_by { |loc| loc.address_record&.country }.compact
 
   -# Set the locations on the window for the partial
   - locations = []
@@ -23,13 +28,12 @@
     = t(".us_partner_organizations")
 
   %article.where-shops-list#list_of_partners
-    - @states.each do |state|
-      - next unless state.locations.where(shown: true).any?
+    - us_by_state.sort_by { |state, _| state&.name.to_s }.each do |state, state_locations|
+      - next if state.blank? || state_locations.empty?
       %p.state-name
         = state.name
       %ul.state-list
-        - state.locations.each do |location|
-          - next unless location.shown
+        - state_locations.each do |location|
           %li
             .collapse-faq
               %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", data: { toggle: "collapse"} }
@@ -38,12 +42,12 @@
                 = location.display_name
                 %em
                   &nbsp;&nbsp;
-                  = location.city
+                  = location.address_record&.city
             .shop-info.collapse{ id: "shop#{location.org_location_id}" }
-              - if location.street.present?
+              - if location.address_record&.street.present?
                 %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
                   = t(".show_location_on_map", location_name: location.display_name)
-                %p= [location.street, location.city, "#{location.state.abbreviation} #{location.zipcode}"].join(", ")
+                %p= [location.address_record.street, location.address_record.city, "#{location.address_record.region_record&.abbreviation} #{location.address_record.postal_code}"].compact.join(", ")
               - if location.phone.present?
                 %p= phone_link(location.phone)
               - if location&.organization&.website.present?
@@ -52,22 +56,21 @@
                 .window-content
                   %h3= location.display_name
                   %p
-                    = location.street
+                    = location.address_record&.street
                     %br
-                    = [location.city, "#{location.state.abbreviation} #{location.zipcode}"].join(", ")
+                    = [location.address_record&.city, "#{location.address_record&.region_record&.abbreviation} #{location.address_record&.postal_code}"].compact.join(", ")
                   - if location.phone.present?
                     .map-telephone
                       = link_to number_to_phone(location.phone), "tel:#{ location.phone }"
     %h3.padded
       = t(".international_partner_organizations")
 
-    - @countries.each do |country|
-      - next unless country.locations.where(shown: true).any?
+    - intl_by_country.sort_by { |country, _| country&.name.to_s }.each do |country, country_locations|
+      - next if country.blank? || country_locations.empty?
       %p.state-name
         = country.name
       %ul.state-list
-        - country.locations.each do |location|
-          - next unless location.shown
+        - country_locations.each do |location|
           %li
             .collapse-faq
               %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", data: { toggle: "collapse"} }
@@ -76,12 +79,12 @@
                 = location.display_name
                 %em
                   &nbsp;&nbsp;
-                  = location.city
+                  = location.address_record&.city
             .shop-info.collapse{ id: "shop#{location.org_location_id}" }
-              - if location.street.present?
+              - if location.address_record&.street.present?
                 %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
                   = t(".show_location_on_map", location_name: location.display_name)
-                %p= [location.street, location.city, location.zipcode, location.country.name].join(", ")
+                %p= [location.address_record.street, location.address_record.city, location.address_record.postal_code, location.address_record.country&.name].compact.join(", ")
 
               - if location.phone.present?
                 %p= phone_link(location.phone)
@@ -93,9 +96,9 @@
                 .window-content
                   %h3= location.display_name
                   %p
-                    = location.street
+                    = location.address_record&.street
                     %br
-                    = [location.city, location.zipcode, location.country.name].join(", ")
+                    = [location.address_record&.city, location.address_record&.postal_code, location.address_record&.country&.name].compact.join(", ")
 
                   - if location.phone.present?
                     .map-telephone

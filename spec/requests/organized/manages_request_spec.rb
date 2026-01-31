@@ -140,7 +140,7 @@ RSpec.describe Organized::ManagesController, type: :request do
       context "with locations and normal show_on_map" do
         let(:state) { FactoryBot.create(:state) }
         let(:country) { state.country }
-        let(:location1) { FactoryBot.create(:location, organization: current_organization, name: "cool name") }
+        let(:location1) { FactoryBot.create(:location, :with_address_record, organization: current_organization, name: "cool name") }
         let(:update) do
           {
             name: current_organization.name,
@@ -348,7 +348,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           end
           context "location is default impound location" do
             let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
-            let(:location1) { FactoryBot.create(:location, organization: current_organization, name: "cool name", impound_location: true) }
+            let(:location1) { FactoryBot.create(:location, :with_address_record, organization: current_organization, name: "cool name", impound_location: true) }
             let(:blocked_destroy_params) do
               # Only pass one location, and keep it default impound location
               update.merge(kind: "bike_shop",

@@ -724,7 +724,7 @@ class Bike < ApplicationRecord
     return false if addy["street"].blank? || addy["city"].blank?
     return true if creation_organization&.default_location.blank?
 
-    creation_organization.default_location.address_hash != addy
+    creation_organization.default_location.address_hash_legacy != addy
   end
 
   # NOTE! This will return different hashes - legacy hashes for stolen & impound
