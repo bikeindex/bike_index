@@ -17,6 +17,10 @@ module UI::AddressDisplay
       render(UI::AddressDisplay::Component.new(address_record:, visible_attribute:))
     end
 
+    def single_line
+      render(UI::AddressDisplay::Component.new(address_record:, visible_attribute: :street, kind: :single_line))
+    end
+
     private
 
     def address_record
