@@ -41,7 +41,9 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         get "#{base_url}/#{organization.to_param}"
         expect(response.status).to eq(200)
         expect(response.body).to include("Main Office")
-        expect(response.body).to include(location.formatted_address_string)
+        # AddressDisplay component renders with HTML spans, so check for address parts
+        expect(response.body).to include("1300 W 14th Pl")
+        expect(response.body).to include("Chicago")
       end
     end
   end
@@ -179,7 +181,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         postal_code: "12243444", region_record_id: state.id, country_id: country.id)
     end
     context "with address_record_attributes" do
-      let(:location1) { FactoryBot.create(:location, organization:, name: "Original") }
+      let(:location1) { FactoryBot.create(:location, :with_address_record, organization:, name: "Original") }
       it "updates address_record via nested attributes" do
         expect(location1.address_record).to be_present
         original_address_record_id = location1.address_record.id

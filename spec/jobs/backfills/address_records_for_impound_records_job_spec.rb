@@ -75,7 +75,7 @@ RSpec.describe Backfills::AddressRecordsForImpoundRecordsJob, type: :job do
   describe "impound_record with impound_record_update to location" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes impound_bikes_locations]) }
     let(:user) { FactoryBot.create(:organization_user, organization:) }
-    let!(:location) { FactoryBot.create(:location, organization:, impound_location: true) }
+    let!(:location) { FactoryBot.create(:location, :with_address_record, organization:, impound_location: true) }
     let(:impound_record) { FactoryBot.create(:impound_record_with_organization, user:, organization:) }
 
     before do
@@ -134,7 +134,7 @@ RSpec.describe Backfills::AddressRecordsForImpoundRecordsJob, type: :job do
 
   describe "impound_record from parking_notification then moved to location" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes impound_bikes_locations]) }
-    let!(:location) { FactoryBot.create(:location, organization:, impound_location: true) }
+    let!(:location) { FactoryBot.create(:location, :with_address_record, organization:, impound_location: true) }
     let(:parking_notification) do
       pn = FactoryBot.create(:parking_notification_organized, organization:, kind: "impound_notification")
       ProcessParkingNotificationJob.new.perform(pn.id)
