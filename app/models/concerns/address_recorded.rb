@@ -18,7 +18,7 @@ module AddressRecorded
   def address_hash_legacy(address_record_id: false)
     return address_record.address_hash_legacy(address_record_id:) if address_record?
     # To ease migration, use the existing attrs. Handle if they've been dropped
-    return {} unless defined?(street)
+    return {} unless has_attribute?(:street)
 
     # Copies Geocodeable#address_hash
     address_attrs = Geocodeable.location_attrs - %w[country_id country state_id state neighborhood]
@@ -35,13 +35,13 @@ module AddressRecorded
   private
 
   def legacy_state_abbr
-    return nil unless state_id.present?
+    return nil unless has_attribute?(:state_id) && state_id.present?
 
     State.find(state_id)&.abbreviation
   end
 
   def legacy_country_iso
-    return nil unless country_id.present?
+    return nil unless has_attribute?(:country_id) && country_id.present?
 
     Country.find(country_id)&.iso
   end
