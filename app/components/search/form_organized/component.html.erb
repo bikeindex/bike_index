@@ -8,7 +8,7 @@
       <%= render(
         Search::EverythingCombobox::Component.new(
           selected_query_items_options: @selected_query_items_options,
-          query:,
+          query: @interpreted_params[:query],
         ),
       ) %>
 
@@ -17,7 +17,7 @@
           translation(".search_owner_email"),
           class: "twlabel tw:sr-only" %>
         <%= text_field_tag :search_email,
-          search_email_value,
+          @interpreted_params[:search_email],
           placeholder: translation(".search_owner_email"),
           class: "twinput tw:flex-1 fieldResetsCounts" %>
 
@@ -26,7 +26,7 @@
             translation(".search_for_serial_number"),
             class: "twlabel tw:sr-only" %>
           <%= text_field_tag :serial,
-            serial_value,
+            @interpreted_params[:raw_serial],
             placeholder: translation(".search_for_serial_number"),
             class: "twinput tw:flex-1 fieldResetsCounts" %>
         <% end %>
@@ -55,8 +55,8 @@
   <% end %>
 
   <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
-  <%= hidden_field_tag :search_stickers, search_stickers %>
-  <%= hidden_field_tag :search_address, search_address %>
-  <%= hidden_field_tag :search_secondary, search_secondary %>
-  <%= hidden_field_tag :search_model_audit_id, search_model_audit_id %>
+  <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>
+  <%= hidden_field_tag :search_address, @interpreted_params[:search_address] %>
+  <%= hidden_field_tag :search_secondary, @interpreted_params[:search_secondary] %>
+  <%= hidden_field_tag :search_model_audit_id, @interpreted_params[:search_model_audit_id] %>
 <% end %>
