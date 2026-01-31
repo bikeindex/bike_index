@@ -28,13 +28,20 @@ RSpec.describe Location, type: :model do
   end
 
   describe "factory" do
-    let(:location) { FactoryBot.create(:location_chicago) }
+    let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :edmonton) }
     it "is correct" do
       expect(location).to be_valid
-      expect(location.address_record.kind).to eq "organization"
-      expect(location.address_record.city).to eq "Chicago"
-      expect(location.address_record.region_record.abbreviation).to eq "IL"
-      expect(location.address_record.country).to eq Country.united_states
+      expect(location.address_record).to have_attributes(kind: "organization", region_string: "AB",
+        region_record_id: nil, country_id: Country.canada_id, street: "9330 Groat Rd NW")
+    end
+    context "with passed address_record" do
+      let(:address_record) { FactoryBot.create(:address_record, :edmonton, kind: :organization, street: "9320 Groat Rd NW") }
+      let(:location) { FactoryBot.create(:location, address_record:) }
+      it "is correct" do
+        expect(location).to be_valid
+        expect(location.address_record).to have_attributes(kind: "organization", region_string: "AB",
+          region_record_id: nil, country_id: Country.canada_id, street: "9320 Groat Rd NW")
+      end
     end
   end
 

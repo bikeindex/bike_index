@@ -186,7 +186,7 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
 
     context "impound_notification with location" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
-      let(:location) { FactoryBot.create(:location_chicago, organization: organization, name: "Impound Facility") }
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: organization, name: "Impound Facility") }
       let(:impound_record) { FactoryBot.create(:impound_record, organization: organization, location: location) }
       let(:parking_notification) do
         FactoryBot.create(:parking_notification_organized,
@@ -201,7 +201,10 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
         expect(ActionMailer::Base.deliveries.count).to eq 1
         mail = ActionMailer::Base.deliveries.last
         expect(mail.body.encoded).to match "Impound Facility"
-        expect(mail.body.encoded).to match location.formatted_address_string
+        # AddressDisplay component renders with HTML spans, so check for address parts
+        expect(mail.body.encoded).to match "1300 W 14th Pl"
+        expect(mail.body.encoded).to match "Chicago"
+        expect(mail.body.encoded).to match "IL 60608"
       end
     end
   end

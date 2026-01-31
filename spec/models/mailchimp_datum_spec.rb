@@ -259,7 +259,7 @@ RSpec.describe MailchimpDatum, type: :model do
         end
       end
       context "lightspeed" do
-        let!(:location) { FactoryBot.create(:location_chicago, organization: organization) }
+        let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: organization) }
         let(:lightspeed_merge_fields) do
           target_merge_fields.merge(organization_country: "US",
             organization_city: "Chicago",
