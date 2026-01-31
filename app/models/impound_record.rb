@@ -19,6 +19,7 @@
 #  zipcode               :text
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  address_record_id     :bigint
 #  bike_id               :integer
 #  country_id            :bigint
 #  display_id            :string
@@ -29,16 +30,18 @@
 #
 # Indexes
 #
-#  index_impound_records_on_bike_id          (bike_id)
-#  index_impound_records_on_country_id       (country_id)
-#  index_impound_records_on_location_id      (location_id)
-#  index_impound_records_on_organization_id  (organization_id)
-#  index_impound_records_on_state_id         (state_id)
-#  index_impound_records_on_user_id          (user_id)
+#  index_impound_records_on_address_record_id  (address_record_id)
+#  index_impound_records_on_bike_id            (bike_id)
+#  index_impound_records_on_country_id         (country_id)
+#  index_impound_records_on_location_id        (location_id)
+#  index_impound_records_on_organization_id    (organization_id)
+#  index_impound_records_on_state_id           (state_id)
+#  index_impound_records_on_user_id            (user_id)
 #
 class ImpoundRecord < ApplicationRecord
   include Geocodeable
   include DefaultCurrencyable
+  include AddressRecorded
 
   belongs_to :bike, touch: true
   belongs_to :user
@@ -54,6 +57,7 @@ class ImpoundRecord < ApplicationRecord
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
 
   before_validation :set_calculated_attributes
+  before_validation :sync_address_record_from_legacy_fields
   after_commit :update_associations
 
   enum :status, ImpoundRecordUpdate::KIND_ENUM
@@ -257,6 +261,9 @@ class ImpoundRecord < ApplicationRecord
     self.status = calculated_status
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
+    # Only update address_record_id from location if there's an explicit move_location update
+    move_location_update = impound_record_updates.with_location.order(:id).last
+    self.address_record_id = move_location_update.location.address_record_id if move_location_update&.location&.address_record_id.present?
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
     self.impounded_at = created_at if created_at.present? && created_at > impounded_at + 10.years
@@ -282,6 +289,13 @@ class ImpoundRecord < ApplicationRecord
     organization&.fetch_impound_configuration&.email ||
       organization&.auto_user&.email ||
       user&.email
+  end
+
+  # Override AddressRecorded delegation to fall back to legacy fields
+  def address_present?
+    return address_record.address_present? if address_record?
+
+    [street, city, zipcode].any?(&:present?)
   end
 
   private
@@ -339,5 +353,20 @@ class ImpoundRecord < ApplicationRecord
     end
     bike&.current_ownership&.status == "status_impounded" &&
       (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
+  end
+
+  def sync_address_record_from_legacy_fields
+    return if skip_update || city.blank? && street.blank?
+    # Don't create address_record if move_location update set it
+    return if impound_record_updates.with_location.any?
+    # Don't overwrite if address_record was explicitly set via nested attributes
+    return if address_record.present? && address_record.changed?
+
+    legacy_attrs = AddressRecord.attrs_from_legacy(self).merge(kind: :impounded_from, organization_id:)
+    if address_record.present?
+      address_record.attributes = legacy_attrs
+    else
+      self.address_record = AddressRecord.new(legacy_attrs)
+    end
   end
 end

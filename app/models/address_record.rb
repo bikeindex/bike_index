@@ -31,7 +31,7 @@
 #  index_address_records_on_user_id           (user_id) WHERE (user_id IS NOT NULL)
 #
 class AddressRecord < ApplicationRecord
-  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, organization: 4}.freeze
+  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, organization: 4, impounded_from: 5}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
   ADDRESS_ATTRS = %i[street street_2 city region_record_id postal_code country_id latitude longitude]
@@ -208,7 +208,7 @@ class AddressRecord < ApplicationRecord
   private
 
   def update_associations
-    # Bikes, ownerships, and locations handle address assignment separately
+    # Bikes, ownerships, impound_records and locations/organizations handle address assignment separately
     return if skip_callback_job || bike? || ownership? || organization?
 
     CallbackJob::AddressRecordUpdateAssociationsJob.perform_async(id)

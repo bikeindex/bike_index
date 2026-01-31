@@ -59,7 +59,7 @@ class BikeServices::CalculateLocation
     # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
     def location_record_coordinates(bike)
       l_hashes = [
-        bike.current_impound_record&.address_hash,
+        bike.current_impound_record&.address_hash_legacy,
         bike.current_parking_notification&.address_hash,
         bike.registration_address(true, address_record_id: true), # temporary cludge?
         bike.creation_organization&.default_location&.address_hash_legacy
