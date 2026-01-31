@@ -336,14 +336,14 @@ RSpec.describe HeaderTags::Component, type: :component do
         end
       end
       context "found" do
-        let!(:impound_record) { FactoryBot.create(:impound_record, :in_nyc, bike: bike) }
+        let!(:impound_record) { FactoryBot.create(:impound_record, :with_address_record, address_in: :new_york, bike: bike) }
         let(:description) do
           "#{bike.primary_frame_color.name} #{title}, serial: Hidden. Cool description. " \
-          "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY 10007, US"
+          "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY, United States"
         end
         let(:title_extended) { "Found #{title}" }
         it "returns expected things" do
-          expect(bike.reload.current_impound_record.address).to eq "New York, NY 10007"
+          expect(bike.reload.current_impound_record.address).to eq "New York, NY"
           expect(bike.status_humanized).to eq "found"
           expect(bike.title_string).to eq title
           expect_matching_tags(title: title_extended, description:, image: stock_photo_url, updated_at: bike.updated_at)
@@ -352,16 +352,16 @@ RSpec.describe HeaderTags::Component, type: :component do
       context "impounded" do
         let(:parking_notification) { FactoryBot.create(:parking_notification_organized, :in_edmonton, bike: bike, use_entered_address: true) }
         let(:organization) { parking_notification.organization }
-        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike, parking_notification: parking_notification, organization: organization) }
+        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, address_in: :edmonton, bike: bike, parking_notification: parking_notification, organization: organization) }
         let(:title_extended) { "Impounded #{title}" }
         let(:description) do
           "#{bike.primary_frame_color.name} #{title}, serial: Hidden. Cool description. " \
-          "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB T6G 2B3, CA"
+          "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB, Canada"
         end
         it "returns expected things" do
           expect(parking_notification.reload.address).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, CA"
           impound_record.reload
-          expect(bike.reload.current_impound_record.address).to eq "Edmonton, AB T6G 2B3, CA"
+          expect(bike.reload.current_impound_record.address).to eq "Edmonton, AB"
           expect(bike.status_humanized).to eq "impounded"
 
           expect_matching_tags(title: title_extended, description:, image: stock_photo_url, updated_at: bike.updated_at)
