@@ -61,8 +61,6 @@ class ImpoundRecord < ApplicationRecord
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
-  delegate :latitude, :longitude, :street, :city, :country, :country_id, to: :address_record, allow_nil: true
-
   def self.statuses
     ImpoundRecordUpdate::KIND_ENUM.keys.map(&:to_s) - ImpoundRecordUpdate.update_only_kinds
   end
@@ -142,19 +140,22 @@ class ImpoundRecord < ApplicationRecord
     false
   end
 
-  def address(force_show_address: false)
-    address_record&.formatted_address_string(visible_attribute: force_show_address ? :street : :city)
+  def address(force_show_address: false, country: nil)
+    visible_attr = force_show_address ? :street : :city
+    # Translate Geocodeable-style country param to AddressRecord render_country param
+    render_country = country.present? && !country.include?(:skip_default)
+    address_record&.formatted_address_string(visible_attribute: visible_attr, render_country:)
   end
 
   # For latitude_public/longitude_public compatibility
   def latitude_public
     return nil unless address_record?
-    show_address ? latitude : latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+    show_address ? address_record.latitude : address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def longitude_public
     return nil unless address_record?
-    show_address ? longitude : longitude&.round(Bike::PUBLIC_COORD_LENGTH)
+    show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def unorganized?
