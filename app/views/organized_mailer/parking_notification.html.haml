@@ -20,7 +20,7 @@
         It is being held at #{impound_record.location.name}
       %br
       %em
-      = impound_record.location.address
+      = impound_record.location.formatted_address_string
 
 - if @parking_notification.message.present?
   %div{ style: "padding: 0.5rem 1rem; border: 1px solid #ccc; margin: 1rem 0 2rem;" }

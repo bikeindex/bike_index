@@ -11,7 +11,7 @@ This is for your #{@bike.title_string}.
   - if impound_record.location.present?
     It is being held at #{impound_record.location.name}
 
-    = impound_record.location.address
+    = impound_record.location.formatted_address_string
 
 - if @parking_notification.impound_notification?
   It was located at: #{@parking_notification.address}
