@@ -5,7 +5,7 @@ module UI::AddressDisplay
     KINDS = %i[multiline single_line]
     def initialize(address_record: nil, address_hash: nil, visible_attribute: nil, render_country: false, kind: nil)
       @kind = KINDS.include?(kind) ? kind : KINDS.first
-      @address_record = address_record
+      @address_record = address_record.is_a?(AddressRecord) ? address_record : nil
       @address_hash = address_hash&.with_indifferent_access
       @visible_attribute = AddressRecord.permitted_visible_attribute(visible_attribute)
       @render_country = render_country
@@ -43,20 +43,20 @@ module UI::AddressDisplay
 
     def final_line
       if @address_record.present?
-        final_line = [@address_record.region]
-        final_line += [@address_record.postal_code] unless @visible_attribute == :city
+        line_parts = [@address_record.region]
+        line_parts += [@address_record.postal_code] unless @visible_attribute == :city
 
-        final_line = [@address_record.city, final_line.join(" ")]
-        final_line += [@address_record.country_name] if @render_country
+        line_parts = [@address_record.city, line_parts.join(" ")]
+        line_parts += [@address_record.country_name] if @render_country
       else
-        final_line = [@address_hash[:state]]
-        final_line += [@address_hash[:zipcode]] unless @visible_attribute == :city
+        line_parts = [@address_hash[:state]]
+        line_parts += [@address_hash[:zipcode]] unless @visible_attribute == :city
 
-        final_line = [@address_hash[:city], final_line.join(" ")]
-        final_line += [@address_hash[:country]] if @render_country
+        line_parts = [@address_hash[:city], line_parts.join(" ")]
+        line_parts += [@address_hash[:country]] if @render_country
       end
 
-      content_tag(:span, final_line.compact.join(", "), class: line_classes)
+      content_tag(:span, line_parts.compact.join(", "), class: line_classes)
     end
 
     def single_line?

@@ -18,7 +18,9 @@ RSpec.describe UI::AddressDisplay::Component, type: :component do
 
   context "with address_record" do
     let(:address_record) { FactoryBot.build(:address_record, publicly_visible_attribute: "postal_code", street_2: "C/O BicyclingPlus") }
-    it "renders" do
+    it "renders with region_record" do
+      expect(address_record.region_record).to be_present
+      expect(address_record.region).to eq "CA"
       expect(address_record.publicly_visible_attribute).to eq "postal_code"
       expect(component).to have_content "Davis, CA 95616"
       expect(component).to_not have_content "One Shields Ave"
@@ -41,6 +43,17 @@ RSpec.describe UI::AddressDisplay::Component, type: :component do
         it "renders on single line" do
           expect(component).to have_content "One Shields Ave, C/O BicyclingPlus, Davis, CA 95616"
           expect(component).not_to have_css("span.tw\\:block")
+        end
+      end
+
+      context "with persisted address_record" do
+        let(:address_record) { FactoryBot.create(:address_record, :chicago, street_2: nil) }
+        it "renders with region abbreviation" do
+          expect(address_record.region_record).to be_present
+          expect(address_record.region_record.abbreviation).to eq "IL"
+          expect(address_record.region).to eq "IL"
+          expect(component).to have_content "1300 W 14th Pl"
+          expect(component).to have_content "Chicago, IL 60608"
         end
       end
     end
