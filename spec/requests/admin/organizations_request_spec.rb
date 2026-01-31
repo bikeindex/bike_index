@@ -34,6 +34,16 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response.status).to eq 404
       end
     end
+    context "with location" do
+      let!(:location) { FactoryBot.create(:location_chicago, organization: organization, name: "Main Office") }
+      it "renders location with address" do
+        expect(location.address_record).to be_present
+        get "#{base_url}/#{organization.to_param}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("Main Office")
+        expect(response.body).to include(location.formatted_address_string)
+      end
+    end
   end
 
   describe "edit" do
