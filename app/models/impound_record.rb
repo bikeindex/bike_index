@@ -8,6 +8,8 @@
 #  display_id_prefix     :string
 #  impounded_at          :datetime
 #  impounded_description :text
+#  latitude              :float
+#  longitude             :float
 #  resolved_at           :datetime
 #  status                :integer          default("current")
 #  unregistered_bike     :boolean          default(FALSE)

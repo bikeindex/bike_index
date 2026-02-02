@@ -1711,7 +1711,9 @@ CREATE TABLE public.impound_records (
     display_id_prefix character varying,
     impounded_description text,
     unregistered_bike boolean DEFAULT false,
-    address_record_id bigint
+    address_record_id bigint,
+    latitude double precision,
+    longitude double precision
 );
 
 
