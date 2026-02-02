@@ -359,79 +359,83 @@ RSpec.describe BulkImportJob, type: :job do
           {
             impounded_description: "It was locked to a handicap railing",
             display_id: "2020-33333",
-            unregistered_bike: true
+            unregistered_bike: true,
+            street: "1409 Martin Luther King Junior Way",
+            city: "Berkeley",
+            zipcode: "94709", # NOTE: the zipcode that is entered is 94710
+            state_id: state.id
           }
         end
         let(:impound_record2_target) do
           {
             impounded_description: "Appears to be abandoned",
             display_id: "1",
-            unregistered_bike: true
+            unregistered_bike: true,
+            street: "327 17th Street",
+            city: "Oakland",
+            zipcode: "94612",
+            state_id: state.id
           }
         end
         it "creates the bikes and impound records", :flaky do
           expect(bike_sticker.reload.claimed?).to be_falsey
           expect(bike_sticker.bike_sticker_updates.count).to eq 0
-          Sidekiq::Testing.inline! do
-            VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:path]) do
-              allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
-              expect {
-                instance.perform(bulk_import.id)
-                # This test is being flaky! Add debug printout #2101
-                pp "Error valid file impounded", bulk_import.import_errors if bulk_import.reload.blocking_error?
-              }.to change(Bike, :count).by 2
-              bulk_import.reload
-              expect(bulk_import.progress).to eq "finished"
-              expect(bulk_import.bikes.count).to eq 2
-              expect(bulk_import.file_errors).to_not be_present
-              expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size bike_sticker photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
+          VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:path]) do
+            allow_any_instance_of(BulkImport).to receive(:open_file) { URI.parse(file_url).open }
+            expect {
+              instance.perform(bulk_import.id)
+              # This test is being flaky! Add debug printout #2101
+              pp "Error valid file impounded", bulk_import.import_errors if bulk_import.reload.blocking_error?
+            }.to change(Bike, :count).by 2
+            bulk_import.reload
+            expect(bulk_import.progress).to eq "finished"
+            expect(bulk_import.bikes.count).to eq 2
+            expect(bulk_import.file_errors).to_not be_present
+            expect(bulk_import.headers).to eq(%w[manufacturer model color owner_email serial_number year description phone secondary_serial owner_name frame_size bike_sticker photo impounded_at impounded_street impounded_city impounded_state impounded_zipcode impounded_country impounded_id impounded_description])
 
-              bike1 = bulk_import.bikes.reorder(:created_at).first
-              expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
-              expect(bike1.current_ownership.status).to eq "status_impounded"
-              expect(bike1).to match_hash_indifferently bike1_target
-              expect(bike1.created_by_notification_or_impounding?).to be_truthy
-              bike1_impound_record = bike1.current_impound_record
-              expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
-              expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
-              expect(bike1_impound_record.address_record.latitude).to be_within(0.01).of 37.881
-              # Verify impounded_from address_record is created
-              expect(bike1_impound_record.address_record).to have_attributes(kind: "impounded_from", street: "1409 Martin Luther King Jr Way", city: "Berkeley")
+            bike1 = bulk_import.bikes.reorder(:created_at).first
+            expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
+            expect(bike1.current_ownership.status).to eq "status_impounded"
+            expect(bike1).to match_hash_indifferently bike1_target
+            expect(bike1.created_by_notification_or_impounding?).to be_truthy
+            bike1_impound_record = bike1.current_impound_record
+            expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
+            expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
+            expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
+            # Verify impounded_from address_record is created
+            expect(bike1_impound_record.address_record).to have_attributes(kind: "impounded_from", street: "1409 Martin Luther King Junior Way", city: "Berkeley")
 
-              # Note: bike coordinates sync happens asynchronously via ProcessImpoundUpdatesJob
-              # The address_record has coordinates which is the important part
-              expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
-              expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
-              bike_sticker.reload
-              expect(bike_sticker.claimed?).to be_truthy
-              expect(bike_sticker.bike_id).to eq bike1.id
-              expect(bike_sticker.organization_id).to be_blank
-              expect(bike_sticker.secondary_organization_id).to eq organization.id
-              expect(bike_sticker.bike_sticker_updates.count).to eq 1
-              bike_sticker_update = bike_sticker.bike_sticker_updates.first
-              expect(bike_sticker_update.organization_id).to eq organization.id
-              expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
-              expect(bike_sticker_update.creator_kind).to eq "creator_import"
+            expect(bike1.to_coordinates).to eq bike1_impound_record.to_coordinates
+            expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+            expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_truthy
+            expect(bike_sticker.bike_id).to eq bike1.id
+            expect(bike_sticker.organization_id).to be_blank
+            expect(bike_sticker.secondary_organization_id).to eq organization.id
+            expect(bike_sticker.bike_sticker_updates.count).to eq 1
+            bike_sticker_update = bike_sticker.bike_sticker_updates.first
+            expect(bike_sticker_update.organization_id).to eq organization.id
+            expect(bike_sticker_update.bulk_import_id).to eq bulk_import.id
+            expect(bike_sticker_update.creator_kind).to eq "creator_import"
 
-              bike2 = bulk_import.bikes.reorder(:created_at).last
-              expect(bike2.reload.id).to_not eq bike1.id
-              expect(bike2).to match_hash_indifferently bike2_target
-              expect(bike2.public_images.count).to eq 1 # Commented out because it's broken with VCR
-              expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
-              expect(bike2.current_ownership.status).to eq "status_impounded"
-              expect(bike2.created_by_notification_or_impounding?).to be_truthy
-              bike2_impound_record = bike2.current_impound_record
-              expect(ImpoundRecord.count).to eq 2
+            bike2 = bulk_import.bikes.reorder(:created_at).last
+            expect(bike2.reload.id).to_not eq bike1.id
+            expect(bike2).to match_hash_indifferently bike2_target
+            expect(bike2.public_images.count).to eq 1 # Commented out because it's broken with VCR
+            expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
+            expect(bike2.current_ownership.status).to eq "status_impounded"
+            expect(bike2.created_by_notification_or_impounding?).to be_truthy
+            bike2_impound_record = bike2.current_impound_record
+            expect(ImpoundRecord.count).to eq 2
 
-              expect(bike2_impound_record.address_record.street).to eq "327 17th St"
-              expect(bike2_impound_record).to match_hash_indifferently impound_record2_target
-              expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
-              # Verify coordinates exist and are in Bay Area range (VCR matching may vary)
-              expect(bike2_impound_record.address_record.latitude).to be_between(37.7, 38.0)
-              # Note: bike coordinates sync happens asynchronously
-              # Verify impounded_from address_record is created
-              expect(bike2_impound_record.address_record).to have_attributes(kind: "impounded_from", street: "327 17th St", city: "Oakland")
-            end
+            expect(bike2_impound_record.street).to eq "327 17th Street"
+            expect(bike2_impound_record).to match_hash_indifferently impound_record2_target
+            expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
+            expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
+            expect(bike2.to_coordinates).to eq bike2_impound_record.to_coordinates
+            # Verify impounded_from address_record is created
+            expect(bike2_impound_record.address_record).to have_attributes(kind: "impounded_from", street: "327 17th Street", city: "Oakland")
           end
         end
       end
@@ -553,14 +557,11 @@ RSpec.describe BulkImportJob, type: :job do
         let(:target_impound) do
           {
             impounded_at_with_timezone: "2021-02-04",
-            address_record_attributes: {
-              kind: :impounded_from,
-              street: "1409 Martin Luther King Jr Way",
-              city: "Berkeley",
-              region_string: "CA",
-              postal_code: "94710",
-              country: "US"
-            },
+            street: "1409 Martin Luther King Jr Way",
+            city: "Berkeley",
+            state: "CA",
+            zipcode: "94710",
+            country: "US",
             display_id: "ddd33333",
             impounded_description: nil,
             organization_id: bulk_import.organization_id
