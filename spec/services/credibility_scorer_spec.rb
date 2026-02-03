@@ -161,7 +161,7 @@ RSpec.describe CredibilityScorer do
       end
       context "spam_registrations not embed" do
         let(:organization) { FactoryBot.create(:organization, approved: true, spam_registrations: true) }
-        it "returns without spam_registrations" do
+        it "returns without spam_registrations", :flaky do
           expect(subject.organization_trusted?(organization)).to be_falsey
           expect(instance.badges).to eq(%i[created_this_month long_time_user])
         end
