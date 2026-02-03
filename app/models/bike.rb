@@ -926,7 +926,7 @@ class Bike < ApplicationRecord
     return if @deleted_address_record_id.blank?
 
     deleted_addy = AddressRecord.find_by_id(@deleted_address_record_id)
-    deleted_addy.destroy if deleted_addy.bike? && deleted_addy.bike_id == id
+    deleted_addy.destroy if deleted_addy&.bike? && deleted_addy.bike_id == id
   end
 
   def fetch_current_impound_record

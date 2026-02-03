@@ -170,7 +170,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def organized?
-    organization_id.present?
+    organization.present?
   end
 
   def impound_claim_retrieved?
