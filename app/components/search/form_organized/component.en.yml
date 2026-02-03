@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    search:
+      form_organized:
+        target_search_path: Target_search_path
+        target_frame: Target_frame
+        interpreted_params: Interpreted_params
+        skip_serial_field: Skip_serial_field
+        result_view: Result_view

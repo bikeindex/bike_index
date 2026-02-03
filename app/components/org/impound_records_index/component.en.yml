@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    org:
+      impound_records_index:
+        per_page: Per_page
+        interpreted_params: Interpreted_params
+        pagy: Pagy
+        impound_records: Impound_records
