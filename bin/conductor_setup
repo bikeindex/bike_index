@@ -1,0 +1,46 @@
+#!/bin/sh
+#/ Usage: bin/conductor-setup
+#/
+#/ Setup files that are not tracked in git for Conductor workspaces.
+#/ This is run automatically when a new workspace is created.
+
+set -e
+cd $(dirname "$0")/..
+
+if [ -n "$CONDUCTOR_ROOT_PATH" ]; then
+  # Copy .env.* files (e.g., .env.development) from root repo
+  for envfile in "$CONDUCTOR_ROOT_PATH"/.env.*; do
+    if [ -f "$envfile" ]; then
+      filename=$(basename "$envfile")
+      echo "Copying $filename from $CONDUCTOR_ROOT_PATH..."
+      cp "$envfile" "$filename"
+    fi
+  done
+
+  # Symlink storage directory for Active Storage
+  if [ -d "$CONDUCTOR_ROOT_PATH/storage" ]; then
+    echo "Symlinking storage from $CONDUCTOR_ROOT_PATH/storage..."
+    rm -rf storage 2>/dev/null || true
+    ln -sf "$CONDUCTOR_ROOT_PATH/storage" storage
+  else
+    echo "Creating storage directory at $CONDUCTOR_ROOT_PATH/storage..."
+    mkdir -p "$CONDUCTOR_ROOT_PATH/storage"
+    ln -sf "$CONDUCTOR_ROOT_PATH/storage" storage
+  fi
+
+  # Copy Facebook VCR cassettes
+  if [ -d "$CONDUCTOR_ROOT_PATH/spec/vcr_cassettes/facebook" ]; then
+    echo "Copying spec/vcr_cassettes/facebook from $CONDUCTOR_ROOT_PATH..."
+    mkdir -p spec/vcr_cassettes/facebook
+    cp -r "$CONDUCTOR_ROOT_PATH/spec/vcr_cassettes/facebook/"* spec/vcr_cassettes/facebook/
+  fi
+else
+  echo "Not running in Conductor (CONDUCTOR_ROOT_PATH not set), skipping env setup."
+fi
+
+# Install dependencies
+echo "Installing dependencies..."
+bundle check || bundle install
+npm install
+
+echo "Conductor setup complete!"
