@@ -1,5 +1,5 @@
 {
-  "setup": "bin/conductor_setup",
+  "setup": "bin/setup",
   "server": "bin/dev",
   "teardown": "bin/conductor_teardown"
 }

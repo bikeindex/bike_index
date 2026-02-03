@@ -14,8 +14,14 @@ fi
 
 echo "Tearing down Conductor workspace: $CONDUCTOR_WORKSPACE_NAME"
 
+# Drop workspace-specific development databases
+for db in "bikeindex_development_${CONDUCTOR_WORKSPACE_NAME}" \
+          "bikeindex_analytics_development_${CONDUCTOR_WORKSPACE_NAME}"; do
+  echo "Dropping database: $db"
+  dropdb --if-exists "$db" 2>/dev/null || true
+done
+
 # Drop workspace-specific test databases
-# Using dropdb with --if-exists to avoid errors if DB doesn't exist
 for db in "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}" \
           "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}_replica" \
           "bikeindex_analytics_test_${CONDUCTOR_WORKSPACE_NAME}"; do

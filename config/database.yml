@@ -19,16 +19,16 @@ default_local: &default_local
 development:
   primary:
     <<: *default_local
-    database: bikeindex_development
+    database: bikeindex_development<%= ENV["CONDUCTOR_WORKSPACE_NAME"] ? "_#{ENV["CONDUCTOR_WORKSPACE_NAME"]}" : "" %>
   primary_replica:
     <<: *default_local
     # Using primary database, replica not actually replicating
-    database: bikeindex_development
+    database: bikeindex_development<%= ENV["CONDUCTOR_WORKSPACE_NAME"] ? "_#{ENV["CONDUCTOR_WORKSPACE_NAME"]}" : "" %>
     # database: bikeindex_development_replica
     # replica: true
   analytics:
     <<: *default_local
-    database: bikeindex_analytics_development
+    database: bikeindex_analytics_development<%= ENV["CONDUCTOR_WORKSPACE_NAME"] ? "_#{ENV["CONDUCTOR_WORKSPACE_NAME"]}" : "" %>
     migrations_paths: db/analytics_migrate
 
 
