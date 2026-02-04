@@ -20,11 +20,7 @@ require "rack/throttle"
 if Rails.env.development? || Rails.env.test?
   ENV["BASE_URL"] = Rails.env.test? ? "http://test.host" : "http://localhost:#{ENV['DEV_PORT']}"
 
-  db_suffix = [ENV.fetch("CONDUCTOR_WORKSPACE_NAME", ""), ENV.fetch("TEST_ENV_NUMBER", "")].reject(&:empty?).join("_")
-  ENV["DB_SUFFIX"] = db_suffix.empty? ? "" : "_#{db_suffix}"
-
-  redis_db = ENV['DEV_PORT'].to_i % 16 + ENV["TEST_ENV_NUMBER"].to_i
-  ENV['REDIS_URL'] ||= "redis://localhost:6379/#{redis_db}"
+  ENV["DB_SUFFIX"] = ENV.fetch("CONDUCTOR_WORKSPACE_NAME", "")
 end
 
 # Require the gems listed in Gemfile, including any gems
@@ -33,7 +29,12 @@ Bundler.require(*Rails.groups)
 
 module Bikeindex
   class Application < Rails::Application
-    config.redis_default_url = ENV["REDIS_URL"].presence || "redis://localhost:6379/#{redis_db}"
+    config.redis_default_url = if ENV["REDIS_URL"].presence
+      ENV["REDIS_URL"]
+    else
+      redis_db = ENV['DEV_PORT'].to_i % 16 + ENV["TEST_ENV_NUMBER"].to_i
+      "redis://localhost:6379/#{redis_db}"
+    end
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
 
     config.load_defaults 8.0

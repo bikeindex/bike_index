@@ -38,14 +38,14 @@ development:
 test:
   primary:
     <<: *default_local
-    database: bikeindex_test<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_test<%= ENV["DB_SUFFIX"] %><%= ENV["TEST_ENV_NUMBER"] %>
   primary_replica:
     <<: *default_local
-    database: bikeindex_test_replica<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_test_replica<%= ENV["DB_SUFFIX"] %><%= ENV["TEST_ENV_NUMBER"] %>
     replica: true
   analytics:
     <<: *default_local
-    database: bikeindex_analytics_test<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_analytics_test<%= ENV["DB_SUFFIX"] %><%= ENV["TEST_ENV_NUMBER"] %>
     migrations_paths: db/analytics_migrate
 
 production:
