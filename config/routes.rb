@@ -3,7 +3,7 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-  mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
+  mount Sidekiq::Web => "/sidekiq", constraints: AdminRestriction
   mount PgHero::Engine, at: "/pghero", constraints: AdminRestriction
 
   use_doorkeeper do

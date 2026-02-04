@@ -1714,7 +1714,13 @@ CREATE TABLE public.impound_records (
     display_id_prefix character varying,
     impounded_description text,
     unregistered_bike boolean DEFAULT false,
-    address_record_id bigint
+    address_record_id bigint,
+    street text,
+    city text,
+    neighborhood text,
+    zipcode text,
+    state_id bigint,
+    country_id bigint
 );
 
 
@@ -7086,13 +7092,6 @@ CREATE INDEX index_users_on_token_for_password_reset ON public.users USING btree
 
 
 --
--- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_users_on_username ON public.users USING btree (username) WHERE (deleted_at IS NULL);
-
-
---
 -- Name: unique_assignment_to_ambassador; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7185,8 +7184,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260204050421'),
-('20260131040119'),
 ('20260130170531'),
 ('20260130162732'),
 ('20260129220857'),
