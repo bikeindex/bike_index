@@ -72,7 +72,7 @@ class OrganizationRole < ApplicationRecord
   def self.admin_text_search(str)
     q = "%#{str.to_s.strip.downcase}%"
     left_joins(:user)
-      .where("LOWER(organization_roles.invited_email) LIKE ? OR LOWER(users.name) LIKE ? OR LOWER(users.email) LIKE ?", q, q, q)
+      .where("organization_roles.invited_email LIKE ? OR users.name ILIKE ? OR users.email LIKE ?", q, q, q)
       .references(:users)
   end
 

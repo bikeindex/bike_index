@@ -58,8 +58,7 @@
 #
 #  index_users_on_address_record_id         (address_record_id)
 #  index_users_on_auth_token                (auth_token)
-#  index_users_on_lower_email               (lower((email)::text)) WHERE (deleted_at IS NULL)
-#  index_users_on_lower_username            (lower((username)::text)) WHERE (deleted_at IS NULL)
+#  index_users_on_email                     (email) WHERE (deleted_at IS NULL)
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
 #  index_users_on_username                  (username) WHERE (deleted_at IS NULL)
 #
@@ -201,12 +200,12 @@ class User < ApplicationRecord
     def admin_text_search(str)
       q = "%#{str.to_s.strip.downcase}%"
       unscoped.includes(:user_emails)
-        .where("LOWER(users.name) LIKE ? OR LOWER(users.email) LIKE ? OR LOWER(user_emails.email) LIKE ?", q, q, q)
+        .where("users.name ILIKE ? OR users.email LIKE ? OR user_emails.email LIKE ?", q, q, q)
         .distinct.references(:user_emails)
     end
 
     def matching_domain(str)
-      where("LOWER(users.email) LIKE ?", "%#{str.to_s.strip.downcase}")
+      where("users.email LIKE ?", "%#{str.to_s.strip.downcase}")
     end
 
     def search_phone(str)
