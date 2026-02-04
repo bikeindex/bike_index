@@ -3,8 +3,8 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-  mount Sidekiq::Web => "/sidekiq", constraints: AdminRestriction
-  mount PgHero::Engine, at: "/pghero", constraints: AdminRestriction
+  mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
+  mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
 
   use_doorkeeper do
     controllers applications: "oauth/applications"
@@ -290,7 +290,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show edit update destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
-      :constraints => AdminRestriction,
+      :constraints => DeveloperRestriction,
       :as => :feature_flags
   end
 

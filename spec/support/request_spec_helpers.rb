@@ -30,6 +30,11 @@ module RequestSpecHelpers
     before { log_in(current_user) }
   end
 
+  RSpec.shared_context :request_spec_logged_in_as_developer do
+    let(:current_user) { FactoryBot.create(:developer) }
+    before { log_in(current_user) }
+  end
+
   RSpec.shared_context :request_spec_logged_in_as_organization_admin do
     let(:current_organization) { FactoryBot.create(:organization) }
     let(:current_user) { FactoryBot.create(:organization_admin, organization: current_organization) }

@@ -1,4 +1,4 @@
-class AdminRestriction
+class DeveloperRestriction
   def self.matches?(req)
     cookie = req.cookies["auth"]
     return false unless cookie.present?
@@ -10,8 +10,6 @@ class AdminRestriction
       auth = JSON.parse(Base64.decode64(auth.dig("_rails", "message")))
     end
 
-    user = User.from_auth(auth)
-
-    user&.superuser?
+    User.from_auth(auth)&.developer?
   end
 end
