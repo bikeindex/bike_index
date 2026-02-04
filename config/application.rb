@@ -18,6 +18,7 @@ require "rack/throttle"
 
 # Set the database suffixes if in dev or test
 if Rails.env.development? || Rails.env.test?
+  # NOTE: DEV_PORT is set in bin/dev
   ENV["BASE_URL"] = Rails.env.test? ? "http://test.host" : "http://localhost:#{ENV["DEV_PORT"]}"
 
   ENV["DB_SUFFIX"] = ENV.fetch("CONDUCTOR_WORKSPACE_NAME", "")
