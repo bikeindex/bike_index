@@ -41,8 +41,9 @@ test:
     database: bikeindex_test<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %><%= ENV["TEST_ENV_NUMBER"] %>
   primary_replica:
     <<: *default_local
-    database: bikeindex_test_replica<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %><%= ENV["TEST_ENV_NUMBER"] %>
-    replica: true
+    # Using primary database, replica not actually replicating
+    database: bikeindex_test<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %><%= ENV["TEST_ENV_NUMBER"] %>
+    # replica: true
   analytics:
     <<: *default_local
     database: bikeindex_analytics_test<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %><%= ENV["TEST_ENV_NUMBER"] %>
