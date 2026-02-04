@@ -31,16 +31,6 @@ This project uses Rspec for tests. All business logic should be tested.
 - Avoid testing private methods
 - Avoid mocking objects
 
-### Running Tests
-
-Run tests with turbo_tests:
-
-```bash
-bin/turbo_tests
-# Or, to run just specific tests
-bin/turbo_tests {FILE OR FOLDER}
-```
-
 ## Frontend Development
 
 This project uses Stimulus.js for JavaScript interactivity and Tailwind CSS for styling. There are scss styles and coffeescript files, but they are deprecated.

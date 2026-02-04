@@ -4,28 +4,22 @@
 # Database name: primary
 #
 #  id                    :integer          not null, primary key
-#  city                  :text
 #  display_id_integer    :bigint
 #  display_id_prefix     :string
 #  impounded_at          :datetime
 #  impounded_description :text
 #  latitude              :float
 #  longitude             :float
-#  neighborhood          :text
 #  resolved_at           :datetime
 #  status                :integer          default("current")
-#  street                :text
 #  unregistered_bike     :boolean          default(FALSE)
-#  zipcode               :text
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  address_record_id     :bigint
 #  bike_id               :integer
-#  country_id            :bigint
 #  display_id            :string
 #  location_id           :bigint
 #  organization_id       :integer
-#  state_id              :bigint
 #  user_id               :integer
 #
 # Indexes
