@@ -1,4 +1,4 @@
-class AdminRestriction
+class DeveloperRestriction
   def self.matches?(req)
     cookie = req.cookies["auth"]
     return false unless cookie.present?
@@ -12,6 +12,6 @@ class AdminRestriction
 
     user = User.from_auth(auth)
 
-    user&.superuser?
+    user&.developer?
   end
 end
