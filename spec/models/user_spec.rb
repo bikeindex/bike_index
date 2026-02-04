@@ -367,8 +367,7 @@ RSpec.describe User, type: :model do
     end
 
     it "normalizes username to lowercase and validates uniqueness" do
-      user1 = FactoryBot.create(:user)
-      user1.update(username: "CoolName")
+      user1 = FactoryBot.create(:user, username: "CoolName")
       expect(user1.reload.username).to eq("coolname")
 
       user2 = FactoryBot.build(:user, username: "COOLNAME")

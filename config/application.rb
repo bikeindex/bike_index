@@ -16,21 +16,25 @@ require "sprockets/railtie"
 
 require "rack/throttle"
 
+# Set the database suffixes if in dev or test
+if Rails.env.development? || Rails.env.test?
+  ENV["BASE_URL"] = Rails.env.test? ? "http://test.host" : "http://localhost:#{ENV['DEV_PORT']}"
+
+  db_suffix = [ENV.fetch("CONDUCTOR_WORKSPACE_NAME", ""), ENV.fetch("TEST_ENV_NUMBER", "")].reject(&:empty?).join("_")
+  ENV["DB_SUFFIX"] = db_suffix.empty? ? "" : "_#{db_suffix}"
+
+  redis_db = ENV['DEV_PORT'].to_i % 16 + ENV["TEST_ENV_NUMBER"].to_i
+  ENV['REDIS_URL'] ||= "redis://localhost:6379/#{redis_db}"
+end
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
 module Bikeindex
   class Application < Rails::Application
-    # Calculate Redis database: base from DEV_PORT, offset by TEST_ENV_NUMBER for parallel tests
-    redis_base_db = if ENV["REDIS_URL"].present?
-      ENV["REDIS_URL"].split("/").last.to_i
-    else
-      (ENV.fetch("DEV_PORT", 3042).to_i % 16)
-    end
-    redis_db = Rails.env.test? ? (redis_base_db + ENV["TEST_ENV_NUMBER"].to_i) % 16 : redis_base_db
     config.redis_default_url = ENV["REDIS_URL"].presence || "redis://localhost:6379/#{redis_db}"
-    config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL") { config.redis_default_url }
+    config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
 
     config.load_defaults 8.0
 
