@@ -2,7 +2,7 @@
 
 <html class="doorkeeper" lang="<%= I18n.locale %>">
   <head>
-    <%= render(HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= render(PageBlock::HeaderTags::Component.new(**header_tags_component_options)) %>
     <%= csrf_meta_tags %>
     <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
 

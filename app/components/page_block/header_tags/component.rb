@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module HeaderTags
+module PageBlock::HeaderTags
   class Component < ApplicationComponent
     DEFAULT_IMAGE = "/opengraph.png"
     DEFAULT_TWITTER = "@bikeindex"

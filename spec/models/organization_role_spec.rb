@@ -59,6 +59,20 @@ RSpec.describe OrganizationRole, type: :model do
     end
   end
 
+  describe "admin_text_search" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user_confirmed, name: "Jane Smith", email: "JANE@Example.COM") }
+    let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, user:, invited_email: "JANE@Example.COM") }
+
+    it "finds by invited_email case-insensitively" do
+      expect(OrganizationRole.admin_text_search("jane@example.com ").pluck(:id)).to eq([organization_role.id])
+      expect(OrganizationRole.admin_text_search("jane@example").pluck(:id)).to eq([organization_role.id])
+      expect(OrganizationRole.admin_text_search("jane smith").pluck(:id)).to eq([organization_role.id])
+      expect(OrganizationRole.admin_text_search("jane s").pluck(:id)).to eq([organization_role.id])
+      expect(OrganizationRole.admin_text_search("e@EXAMPLE.COM").pluck(:id)).to eq([organization_role.id])
+    end
+  end
+
   describe "ambassador organization_role without user" do
     let!(:organization) { FactoryBot.create(:organization_ambassador) }
     let!(:ambassador_task) { FactoryBot.create(:ambassador_task) }

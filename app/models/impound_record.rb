@@ -32,10 +32,8 @@
 #
 #  index_impound_records_on_address_record_id  (address_record_id)
 #  index_impound_records_on_bike_id            (bike_id)
-#  index_impound_records_on_country_id         (country_id)
 #  index_impound_records_on_location_id        (location_id)
 #  index_impound_records_on_organization_id    (organization_id)
-#  index_impound_records_on_state_id           (state_id)
 #  index_impound_records_on_user_id            (user_id)
 #
 class ImpoundRecord < ApplicationRecord

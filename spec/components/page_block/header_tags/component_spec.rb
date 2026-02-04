@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe HeaderTags::Component, type: :component do
+RSpec.describe PageBlock::HeaderTags::Component, type: :component do
   let(:options) { {page_title:, page_obj:, controller_name:, controller_namespace:, action_name:, request_url:, organization_name:} }
   let(:request_url) { "https://test.com" }
   let(:page_title) { nil }
