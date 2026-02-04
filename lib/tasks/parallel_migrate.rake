@@ -7,6 +7,17 @@ if Rails.env.development? && ENV["SKIP_PARALLEL_MIGRATIONS"].blank?
   ENV["PARALLEL_TEST_FIRST_IS_1"] = "true"
 
   Rake::Task["db:migrate"].enhance do
+    # Remove postgres 17 additions that cause CI failures
+    Dir.glob("db/*.sql").each do |file|
+      content = File.read(file)
+      cleaned = content.lines.reject { |line|
+        line.include?("SET transaction_timeout = 0;") ||
+          line.start_with?("\\restrict ") ||
+          line.start_with?("\\unrestrict ")
+      }.join
+      File.write(file, cleaned) if cleaned != content
+    end
+
     puts "Running parallel:migrate for test databases..."
     system("rake parallel:migrate")
     system("rake parallel:prepare")
