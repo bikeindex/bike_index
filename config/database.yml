@@ -41,10 +41,8 @@ test:
     database: bikeindex_test<%= ENV["DB_SUFFIX"] %>
   primary_replica:
     <<: *default_local
-    # Using primary database, replica not actually replicating
-    database: bikeindex_test<%= ENV["DB_SUFFIX"] %>
-    # database: bikeindex_test_replica
-    # replica: true
+    database: bikeindex_test_replica<%= ENV["DB_SUFFIX"] %>
+    replica: true
   analytics:
     <<: *default_local
     database: bikeindex_analytics_test<%= ENV["DB_SUFFIX"] %>
