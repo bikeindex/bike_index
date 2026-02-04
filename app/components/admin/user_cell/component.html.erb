@@ -17,7 +17,7 @@
     <span title="<%= @email %>"><%= email_display %></span>
   <% end %>
 
-  <%= render(Admin::UserBadges::Component.new(user: @user)) %>
+  <%= render(Admin::Badges::User::Component.new(user: @user)) %>
 
   <% if show_search? %>
     <%= link_to helpers.search_emoji, computed_search_url, class: "display-sortable-link small" %>
