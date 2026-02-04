@@ -124,7 +124,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :user_ban
 
-  validates_uniqueness_of :username, case_sensitive: false
+  validates_uniqueness_of :username
 
   validates :password,
     presence: true,
@@ -142,7 +142,7 @@ class User < ApplicationRecord
   validate :preferred_language_is_an_available_locale
 
   validates_presence_of :email
-  validates_uniqueness_of :email, case_sensitive: false
+  validates_uniqueness_of :email
 
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
@@ -577,7 +577,7 @@ class User < ApplicationRecord
   protected
 
   def generate_username_confirmation_and_auth
-    usrname = username || SecureRandom.urlsafe_base64
+    usrname = Slugifyer.slugify(username || SecureRandom.urlsafe_base64)
     while User.where(username: usrname).where.not(id: id).exists?
       usrname = SecureRandom.urlsafe_base64
     end
