@@ -205,14 +205,12 @@
 
           <% if @bike.status_impounded? %>
             <%= fields_for @bike.impound_records.last do |irecord| %>
-              <% irecord.object.find_or_build_address_record(country_id: current_country_id) %>
+              <% irecord.object.address_record = f.object.find_or_build_address_record(country_id: current_country_id) %>
               <%= irecord.fields_for :address_record do |address_form| %>
                 <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status: @bike.status)) %>
               <% end %>
             <% end %>
-          <% end %>
-
-          <% if BikeServices::Builder.include_address_record?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user) %>
+          <% elsif BikeServices::Builder.include_address_record?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user) %>
             <%= f.fields_for :address_record do |address_form| %>
               <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @bike.creation_organization, street_2: true)) %>
             <% end %>

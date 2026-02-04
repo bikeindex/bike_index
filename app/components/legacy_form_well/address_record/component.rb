@@ -24,9 +24,7 @@ module LegacyFormWell::AddressRecord
       @initial_country_id = @builder.object.country_id
       @static_fields = STATIC_FIELDS_OPTIONS.include?(static_fields) ? static_fields : false
       @embed_layout = Binxtils::InputNormalizer.boolean(embed_layout)
-      @bike_status = if bike_status.present?
-        Bike.status_humanized_translated(Bike.status_humanized(bike_status))
-      end
+      @bike_status = translated_status(bike_status)
 
       @wrapper_class = if @embed_layout
         "input-group"
@@ -90,6 +88,15 @@ module LegacyFormWell::AddressRecord
       return true if @bike_status.present?
 
       @organization&.enabled?("require_reg_address")
+    end
+
+    def translated_status(bike_status)
+      return nil if bike_status.blank?
+
+      humanized_status = Bike.status_humanized(bike_status)
+      # it makes more sense to show "where was it found" than impounded
+      humanized_status = "found" if humanized_status == "impounded"
+      Bike.status_humanized_translated(humanized_status)
     end
   end
 end
