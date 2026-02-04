@@ -1713,7 +1713,13 @@ CREATE TABLE public.impound_records (
     display_id_prefix character varying,
     impounded_description text,
     unregistered_bike boolean DEFAULT false,
-    address_record_id bigint
+    address_record_id bigint,
+    street text,
+    city text,
+    neighborhood text,
+    zipcode text,
+    state_id bigint,
+    country_id bigint
 );
 
 
@@ -7185,7 +7191,6 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260204050421'),
-('20260131040119'),
 ('20260130170531'),
 ('20260130162732'),
 ('20260129220857'),
