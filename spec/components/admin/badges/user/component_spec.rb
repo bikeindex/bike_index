@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Admin::UserBadges::Component, type: :component do
+RSpec.describe Admin::Badges::User::Component, type: :component do
   def render_component(user:, full_text: false)
     render_inline(described_class.new(user:, full_text:))
   end

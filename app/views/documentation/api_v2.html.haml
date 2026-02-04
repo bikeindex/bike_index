@@ -1,7 +1,7 @@
 !!!
 %html
   %head
-    = render(HeaderTags::Component.new(**header_tags_component_options))
+    = render(PageBlock::HeaderTags::Component.new(**header_tags_component_options))
     = csrf_meta_tags
     = stylesheet_link_tag 'documentation_v2', media: "all"
     = stylesheet_link_tag 'og_application', media: "all"
