@@ -8,6 +8,11 @@ REDIS_DB=$((DEV_PORT % 16))
 export REDIS_URL="redis://localhost:6379/${REDIS_DB}"
 export REDIS_CACHE_URL="redis://localhost:6379/${REDIS_DB}"
 
+# Set database suffix for Conductor workspaces
+if [ -n "$CONDUCTOR_WORKSPACE_NAME" ]; then
+  export DB_SUFFIX="_${CONDUCTOR_WORKSPACE_NAME}"
+fi
+
 touch log/development.log
 > log/development.log # Clear out development log, otherwise it balloons
 > log/test.log # Clear out test log too
