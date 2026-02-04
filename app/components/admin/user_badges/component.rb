@@ -80,7 +80,7 @@ module Admin::UserBadges
     end
 
     def wrapper_class
-      "tw:flex tw:flex-wrap tw:gap-1 #{"tw:gap-x-3" if @full_text}"
+      "tw:inline-flex tw:gap-1 #{"tw:gap-x-3" if @full_text}"
     end
 
     def badge_color(variant)
