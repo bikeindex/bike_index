@@ -6,7 +6,8 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
   let(:user) { FactoryBot.create(:user) }
   let(:address_record) { AddressRecord.new(country: Country.united_states, user:) }
   let(:organization) { nil }
-  let(:options) { {organization:, embed_layout:, street_2:} }
+  let(:options) { {organization:, embed_layout:, street_2:, bike_status:} }
+  let(:bike_status) { nil }
   let(:embed_layout) { false }
   let(:obj) { user }
   let(:street_2) { false }
@@ -112,6 +113,43 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
         expect(component).not_to have_field("user_address_record_attributes_street")
         expect(component).to have_css("label", text: "Address")
       end
+    end
+  end
+
+  context "with bike" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:obj) { bike }
+    before { bike.find_or_build_address_record }
+
+    it "renders" do
+      expect(component).to have_css("label", text: "Street address")
+      expect(component).to have_field("bike_address_record_attributes_street", placeholder: "Street address")
+      expect(component).not_to have_field("bike_address_record_attributes_street_2")
+      expect(component).not_to have_css("input#bike_address_record_attributes_street[required]")
+    end
+
+    context "with bike_status" do
+      # NOTE: the label only makes sense with statuses: status_stolen, status_abandoned, status_impounded
+      # but it isn't locked to just those statuses
+      let(:bike_status) { "status_stolen" }
+      it "renders with stolen" do
+        expect(component).to have_css("label", text: "Where was it stolen?")
+        pp component.to_html
+        expect(component).to have_field("bike_address_record_attributes_street", placeholder: "Address or intersection")
+        expect(component).to_not have_field("bike_address_record_attributes_street_2")
+        expect(component).not_to have_css("input#bike_address_record_attributes_street[required]")
+      end
+
+      # context "with bike_status abandoned" do
+      #   let(:bike_status) { "status_abandoned" }
+
+      #   it "renders with abandoned" do
+      #     expect(component).to have_css("label", text: "Where was it abandoned?")
+      #     expect(component).to have_field("bike_address_record_attributes_street")
+      #     expect(component).to_not have_field("bike_address_record_attributes_street_2")
+      #     expect(component).not_to have_css("input#bike_address_record_attributes_street[required]")
+      #   end
+      # end
     end
   end
 end

@@ -149,6 +149,18 @@ class ImpoundRecord < ApplicationRecord
     address_record&.formatted_address_string(visible_attribute: visible_attr, render_country:)
   end
 
+  def find_or_build_address_record(country_id: nil)
+    return address_record if address_record?
+
+    country_id ||= Country.united_states_id
+    d_address_record = AddressRecord.where(organization_id:).order(:id).first if organization_id.present?
+    return AddressRecord.new(country_id:) if d_address_record.blank?
+
+    AddressRecord.new(country_id: d_address_record.country_id || country_id,
+      region_record_id: d_address_record.region_record_id,
+      region_string: d_address_record.region_string)
+  end
+
   # For latitude_public/longitude_public compatibility
   def latitude_public
     return nil unless address_record?

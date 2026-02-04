@@ -1707,13 +1707,13 @@ CREATE TABLE public.impound_records (
     status integer DEFAULT 0,
     location_id bigint,
     impounded_at timestamp without time zone,
+    latitude double precision,
+    longitude double precision,
     display_id character varying,
     display_id_prefix character varying,
     impounded_description text,
     unregistered_bike boolean DEFAULT false,
-    address_record_id bigint,
-    latitude double precision,
-    longitude double precision
+    address_record_id bigint
 );
 
 
