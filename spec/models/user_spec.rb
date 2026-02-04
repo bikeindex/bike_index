@@ -365,6 +365,15 @@ RSpec.describe User, type: :model do
       expect(user2.reload.username).not_to eq(target)
       expect(user1.reload.username).to eq(target)
     end
+
+    it "normalizes username to lowercase and validates uniqueness" do
+      user1 = FactoryBot.create(:user, username: "CoolName")
+      expect(user1.reload.username).to eq("coolname")
+
+      user2 = FactoryBot.build(:user, username: "COOLNAME")
+      expect(user2.valid?).to be_falsey
+      expect(user2.errors[:username]).to include("has already been taken")
+    end
   end
 
   describe "email and phone" do

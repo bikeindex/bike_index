@@ -19,16 +19,16 @@ default_local: &default_local
 development:
   primary:
     <<: *default_local
-    database: bikeindex_development<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_development<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %>
   primary_replica:
     <<: *default_local
     # Using primary database, replica not actually replicating
-    database: bikeindex_development<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_development<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %>
     # database: bikeindex_development_replica
     # replica: true
   analytics:
     <<: *default_local
-    database: bikeindex_analytics_development<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_analytics_development<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %>
     migrations_paths: db/analytics_migrate
 
 
@@ -38,14 +38,14 @@ development:
 test:
   primary:
     <<: *default_local
-    database: bikeindex_test<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_test<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %><%= ENV["TEST_ENV_NUMBER"] %>
   primary_replica:
     <<: *default_local
-    database: bikeindex_test_replica<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_test_replica<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %><%= ENV["TEST_ENV_NUMBER"] %>
     replica: true
   analytics:
     <<: *default_local
-    database: bikeindex_analytics_test<%= ENV["DB_SUFFIX"] %>
+    database: bikeindex_analytics_test<%= ENV["CONDUCTOR_WORKSPACE_NAME"] %><%= ENV["TEST_ENV_NUMBER"] %>
     migrations_paths: db/analytics_migrate
 
 production:

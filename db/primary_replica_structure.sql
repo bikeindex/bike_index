@@ -1709,17 +1709,17 @@ CREATE TABLE public.impound_records (
     impounded_at timestamp without time zone,
     latitude double precision,
     longitude double precision,
-    street text,
-    zipcode text,
-    city text,
-    neighborhood text,
-    country_id bigint,
-    state_id bigint,
     display_id character varying,
     display_id_prefix character varying,
     impounded_description text,
     unregistered_bike boolean DEFAULT false,
-    address_record_id bigint
+    address_record_id bigint,
+    street text,
+    city text,
+    neighborhood text,
+    zipcode text,
+    state_id bigint,
+    country_id bigint
 );
 
 
@@ -6223,13 +6223,6 @@ CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING bt
 
 
 --
--- Name: index_impound_records_on_country_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_impound_records_on_country_id ON public.impound_records USING btree (country_id);
-
-
---
 -- Name: index_impound_records_on_location_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6241,13 +6234,6 @@ CREATE INDEX index_impound_records_on_location_id ON public.impound_records USIN
 --
 
 CREATE INDEX index_impound_records_on_organization_id ON public.impound_records USING btree (organization_id);
-
-
---
--- Name: index_impound_records_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_impound_records_on_state_id ON public.impound_records USING btree (state_id);
 
 
 --
@@ -7098,17 +7084,10 @@ CREATE INDEX index_users_on_auth_token ON public.users USING btree (auth_token);
 
 
 --
--- Name: index_users_on_lower_email; Type: INDEX; Schema: public; Owner: -
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_users_on_lower_email ON public.users USING btree (lower((email)::text)) WHERE (deleted_at IS NULL);
-
-
---
--- Name: index_users_on_lower_username; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_users_on_lower_username ON public.users USING btree (lower((username)::text)) WHERE (deleted_at IS NULL);
+CREATE INDEX index_users_on_email ON public.users USING btree (email) WHERE (deleted_at IS NULL);
 
 
 --
@@ -7218,6 +7197,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260204181849'),
+('20260204180206'),
 ('20260204054435'),
 ('20260204050421'),
 ('20260130170531'),
