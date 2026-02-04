@@ -13,6 +13,7 @@ touch log/redis.log
 redis-server > log/redis.log &
 
 export DEV_PORT=${CONDUCTOR_PORT:-${DEV_PORT:-3042}}
+export BASE_URL=http://localhost:$DEV_PORT
 
 # If there is a development specific environment file
 if test -f .env.development; then

@@ -15,6 +15,7 @@ if ENV["COVERAGE"] == "true"
 end
 
 # Assign here because only one .env file
+ENV["BASE_URL"] = "http://test.host"
 ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
 ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly

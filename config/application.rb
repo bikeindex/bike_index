@@ -16,14 +16,6 @@ require "sprockets/railtie"
 
 require "rack/throttle"
 
-# Set the database suffixes if in dev or test
-if Rails.env.development? || Rails.env.test?
-  # NOTE: DEV_PORT is set in bin/dev
-  ENV["BASE_URL"] = Rails.env.test? ? "http://test.host" : "http://localhost:#{ENV["DEV_PORT"]}"
-
-  ENV["DB_SUFFIX"] = ENV.fetch("CONDUCTOR_WORKSPACE_NAME", "")
-end
-
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -33,6 +25,7 @@ module Bikeindex
     config.redis_default_url = if ENV["REDIS_URL"].presence
       ENV["REDIS_URL"]
     else
+      # NOTE: DEV_PORT is set in bin/dev
       redis_db = ENV["DEV_PORT"].to_i % 16 + ENV["TEST_ENV_NUMBER"].to_i
       "redis://localhost:6379/#{redis_db}"
     end
