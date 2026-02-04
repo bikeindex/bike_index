@@ -1,4 +1,13 @@
 #!/bin/bash
+
+export DEV_PORT=${CONDUCTOR_PORT:-${DEV_PORT:-3042}}
+export BASE_URL=http://localhost:$DEV_PORT
+
+# Use different Redis database per workspace to avoid collisions (0-15)
+REDIS_DB=$((DEV_PORT % 16))
+export REDIS_URL="redis://localhost:6379/${REDIS_DB}"
+export REDIS_CACHE_URL="redis://localhost:6379/${REDIS_DB}"
+
 touch log/development.log
 > log/development.log # Clear out development log, otherwise it balloons
 > log/test.log # Clear out test log too

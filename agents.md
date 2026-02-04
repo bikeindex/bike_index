@@ -6,7 +6,7 @@ Bike Index is a Rails webapp
 
 Start the dev server with `bin/dev`
 
-This will start a dev server at [http://localhost:3042](http://localhost:3042)
+This will start a dev server at [http://localhost:3042](http://localhost:3042) (or the configured `DEV_PORT`)
 
 ## Code style
 
