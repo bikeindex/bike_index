@@ -22,15 +22,14 @@ Bundler.require(*Rails.groups)
 
 module Bikeindex
   class Application < Rails::Application
-    # Calculate Redis database: base from DEV_PORT, offset by TEST_ENV_NUMBER for parallel tests
-    redis_base_db = if ENV["REDIS_URL"].present?
-      ENV["REDIS_URL"].split("/").last.to_i
+    config.redis_default_url = if ENV["REDIS_URL"].presence
+      ENV["REDIS_URL"]
     else
-      (ENV.fetch("DEV_PORT", 3042).to_i % 16)
+      # NOTE: DEV_PORT is set in bin/dev
+      redis_db = ENV["DEV_PORT"].to_i % 16 + ENV["TEST_ENV_NUMBER"].to_i
+      "redis://localhost:6379/#{redis_db}"
     end
-    redis_db = Rails.env.test? ? (redis_base_db + ENV["TEST_ENV_NUMBER"].to_i) % 16 : redis_base_db
-    config.redis_default_url = ENV["REDIS_URL"].presence || "redis://localhost:6379/#{redis_db}"
-    config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL") { config.redis_default_url }
+    config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
 
     config.load_defaults 8.0
 
