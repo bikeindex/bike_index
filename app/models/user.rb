@@ -199,14 +199,14 @@ class User < ApplicationRecord
     end
 
     def admin_text_search(str)
-      q = "%#{str.to_s.strip}%"
+      q = "%#{str.to_s.strip.downcase}%"
       unscoped.includes(:user_emails)
-        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
+        .where("LOWER(users.name) LIKE ? OR LOWER(users.email) LIKE ? OR LOWER(user_emails.email) LIKE ?", q, q, q)
         .distinct.references(:user_emails)
     end
 
     def matching_domain(str)
-      where("users.email ILIKE ?", "%#{str.to_s.strip}")
+      where("LOWER(users.email) LIKE ?", "%#{str.to_s.strip.downcase}")
     end
 
     def search_phone(str)
