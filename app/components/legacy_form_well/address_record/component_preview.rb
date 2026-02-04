@@ -12,6 +12,11 @@ module LegacyFormWell::AddressRecord
        locals: {organization:}}
     end
 
+    def with_stolen_type(bike_status: "status_impounded")
+      {template: "legacy_form_well/address_record/component_preview/default",
+       locals: {bike_status:}}
+    end
+
     # TODO: WTF, why isn't the @param working :/
     # def with_organization
     # end

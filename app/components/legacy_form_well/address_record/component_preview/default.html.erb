@@ -1,12 +1,13 @@
 <% bike_status ||= %>
 <% if bike_status.present %>
-  <% @bike = Bike.new %>
+  <% @bike = Bike.new(status: bike_status) %>
   <%= form_for @bike, url: bikes_path, method: :post, multipart: true do |f| %>
-    <% @bike.find_or_build_address_record %>
-    <%= f.fields_for :address_record do |address_form| %>
-      <%= render(
-        LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization:)
-      ) %>
+    <% bike.impound_records.build %>
+    <%= fields_for @bike.impound_records.last do |irecord| %>
+      <% irecord.object.address_record = f.object.find_or_build_address_record(country_id: current_country_id) %>
+      <%= irecord.fields_for :address_record do |address_form| %>
+        <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status: @bike.status)) %>
+      <% end %>
     <% end %>
   <% end %>
 <% else %>
