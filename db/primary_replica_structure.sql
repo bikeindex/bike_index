@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -7085,6 +7086,13 @@ CREATE INDEX index_users_on_token_for_password_reset ON public.users USING btree
 
 
 --
+-- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_username ON public.users USING btree (username) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: unique_assignment_to_ambassador; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7177,6 +7185,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260204050421'),
 ('20260131040119'),
 ('20260130170531'),
 ('20260130162732'),

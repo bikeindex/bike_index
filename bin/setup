@@ -10,8 +10,38 @@ def system!(*args)
 end
 
 chdir APP_ROOT do
-  # This script is a starting point to setup your application.
-  # Add necessary setup steps to this file.
+  # Conductor workspace setup
+  if ENV["CONDUCTOR_ROOT_PATH"]
+    root = ENV["CONDUCTOR_ROOT_PATH"]
+    puts "== Setting up Conductor workspace =="
+
+    # Copy .env.test from root repo
+    env_test = File.join(root, ".env.test")
+    if File.exist?(env_test)
+      puts "Copying .env.test from #{root}..."
+      cp env_test, ".env.test"
+    end
+
+    # Symlink storage directory for Active Storage
+    root_storage = File.join(root, "storage")
+    if Dir.exist?(root_storage)
+      puts "Symlinking storage from #{root_storage}..."
+      rm_rf "storage"
+      ln_sf root_storage, "storage"
+    else
+      puts "Creating storage directory at #{root_storage}..."
+      mkdir_p root_storage
+      ln_sf root_storage, "storage"
+    end
+
+    # Copy Facebook VCR cassettes
+    fb_cassettes = File.join(root, "spec/vcr_cassettes/facebook")
+    if Dir.exist?(fb_cassettes)
+      puts "Copying spec/vcr_cassettes/facebook from #{root}..."
+      mkdir_p "spec/vcr_cassettes/facebook"
+      Dir.glob(File.join(fb_cassettes, "*")).each { |f| cp f, "spec/vcr_cassettes/facebook/" }
+    end
+  end
 
   puts "== Installing dependencies =="
   system! "gem install bundler --conservative"
