@@ -10,8 +10,6 @@ class DeveloperRestriction
       auth = JSON.parse(Base64.decode64(auth.dig("_rails", "message")))
     end
 
-    user = User.from_auth(auth)
-
-    user&.developer?
+    User.from_auth(auth)&.developer?
   end
 end
