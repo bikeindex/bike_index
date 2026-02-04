@@ -79,7 +79,8 @@ RSpec.describe DeveloperRestriction, type: :request do
       before { set_auth_cookie }
       it "renders" do
         get "/pghero"
-        expect(response.code).to eq("200")
+        # pghero redirects to a specific database endpoint
+        expect(response.code).to eq("302")
       end
     end
   end
