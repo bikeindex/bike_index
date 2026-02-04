@@ -18,7 +18,7 @@ require "rack/throttle"
 
 # Set the database suffixes if in dev or test
 if Rails.env.development? || Rails.env.test?
-  ENV["BASE_URL"] = Rails.env.test? ? "http://test.host" : "http://localhost:#{ENV['DEV_PORT']}"
+  ENV["BASE_URL"] = Rails.env.test? ? "http://test.host" : "http://localhost:#{ENV["DEV_PORT"]}"
 
   ENV["DB_SUFFIX"] = ENV.fetch("CONDUCTOR_WORKSPACE_NAME", "")
 end
@@ -32,7 +32,7 @@ module Bikeindex
     config.redis_default_url = if ENV["REDIS_URL"].presence
       ENV["REDIS_URL"]
     else
-      redis_db = ENV['DEV_PORT'].to_i % 16 + ENV["TEST_ENV_NUMBER"].to_i
+      redis_db = ENV["DEV_PORT"].to_i % 16 + ENV["TEST_ENV_NUMBER"].to_i
       "redis://localhost:6379/#{redis_db}"
     end
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
