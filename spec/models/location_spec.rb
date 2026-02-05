@@ -33,7 +33,7 @@ RSpec.describe Location, type: :model do
       expect(location).to be_valid
       expect(location.address_record.kind).to eq "organization"
       expect(location.address_record.city).to eq "Edmonton"
-      expect(location.address_record.region_record.abbreviation).to eq "AB"
+      expect(location.address_record.region_string).to eq "AB"
       expect(location.address_record.country.id).to eq Country.canada.id
       expect(location.address_record.street).to eq "9330 Groat Rd NW"
     end
@@ -44,7 +44,7 @@ RSpec.describe Location, type: :model do
         expect(location).to be_valid
         expect(location.address_record.kind).to eq "organization"
         expect(location.address_record.city).to eq "Edmonton"
-        expect(location.address_record.region_record.abbreviation).to eq "AB"
+        expect(location.address_record.region_string).to eq "AB"
         expect(location.address_record.country.id).to eq Country.canada.id
         expect(location.address_record.street).to eq "9320 Groat Rd NW"
       end
