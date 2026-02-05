@@ -787,6 +787,4 @@ RSpec.describe BParam, type: :model do
       end
     end
   end
-
-  describe ""
 end
