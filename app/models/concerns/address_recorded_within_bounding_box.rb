@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Ownership does not have coordinates, but does include AddressRecorded
-# So this needs to be a separate concern
+# Most AddressRecorded models don't have coordinates, so this needs to be a separate concern
+# ... currently only works with model that do have coordinate attributes
 module AddressRecordedWithinBoundingBox
   extend ActiveSupport::Concern
 

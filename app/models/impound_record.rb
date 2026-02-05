@@ -8,8 +8,6 @@
 #  display_id_prefix     :string
 #  impounded_at          :datetime
 #  impounded_description :text
-#  latitude              :float
-#  longitude             :float
 #  resolved_at           :datetime
 #  status                :integer          default("current")
 #  unregistered_bike     :boolean          default(FALSE)
@@ -33,7 +31,6 @@
 class ImpoundRecord < ApplicationRecord
   include DefaultCurrencyable
   include AddressRecorded
-  include AddressRecordedWithinBoundingBox
 
   belongs_to :bike, touch: true
   belongs_to :user
@@ -137,23 +134,11 @@ class ImpoundRecord < ApplicationRecord
     end
   end
 
-  # For now at least, we don't want to show exact address
-  def show_address
-    false
-  end
-
-  def address(force_show_address: false, country: nil)
-    visible_attr = force_show_address ? :street : :city
-    # Translate Geocodeable-style country param to AddressRecord render_country param
-    render_country = country.present? && !country.include?(:skip_default)
-    address_record&.formatted_address_string(visible_attribute: visible_attr, render_country:)
-  end
-
   def find_or_build_address_record(country_id: nil)
     return address_record if address_record?
 
     country_id ||= Country.united_states_id
-    d_address_record = AddressRecord.where(organization_id:).order(:id).first if organization_id.present?
+    d_address_record = organization.default_address_record if organization.present?
     return AddressRecord.new(country_id:) if d_address_record.blank?
 
     AddressRecord.new(country_id: d_address_record.country_id || country_id,
@@ -161,16 +146,22 @@ class ImpoundRecord < ApplicationRecord
       region_string: d_address_record.region_string)
   end
 
-  # For latitude_public/longitude_public compatibility
-  def latitude_public
-    return nil unless address_record?
-    show_address ? address_record.latitude : address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+  # For now at least, we don't want to show exact address
+  def show_address
+    false
   end
 
-  def longitude_public
-    return nil unless address_record?
-    show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
-  end
+  # def latitude_public
+  #   return nil unless address_record&.latitude.present?
+
+  #   show_address ? address_record&.latitude : address_record&.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+  # end
+
+  # def longitude_public
+  #   return nil unless address_record&.longitude.present?
+
+  #   show_address ? address_record&.longitude : address_record&.longitude.round(Bike::PUBLIC_COORD_LENGTH)
+  # end
 
   def unorganized?
     !organized?
@@ -329,7 +320,7 @@ class ImpoundRecord < ApplicationRecord
     if impound_record_updates.where.not(user_id: nil).any?
       impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
     else
-      user_id.present? ? user_id : organization.auto_user&.id
+      user_id.present? ? user_id : organization&.auto_user&.id
     end
   end
 
