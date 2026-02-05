@@ -339,11 +339,11 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
         let!(:impound_record) { FactoryBot.create(:impound_record, :with_address_record, address_in: :new_york, bike: bike) }
         let(:description) do
           "#{bike.primary_frame_color.name} #{title}, serial: Hidden. Cool description. " \
-          "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY, United States"
+          "Found: #{Time.current.strftime("%Y-%m-%d")}, in: New York, NY 10007"
         end
         let(:title_extended) { "Found #{title}" }
         it "returns expected things" do
-          expect(bike.reload.current_impound_record.address).to eq "New York, NY"
+          expect(bike.reload.current_impound_record.formatted_address_string).to eq "New York, NY 10007"
           expect(bike.status_humanized).to eq "found"
           expect(bike.title_string).to eq title
           expect_matching_tags(title: title_extended, description:, image: stock_photo_url, updated_at: bike.updated_at)
@@ -356,12 +356,12 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
         let(:title_extended) { "Impounded #{title}" }
         let(:description) do
           "#{bike.primary_frame_color.name} #{title}, serial: Hidden. Cool description. " \
-          "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB, Canada"
+          "Impounded: #{Time.current.strftime("%Y-%m-%d")}, in: Edmonton, AB T6G 2B3, Canada"
         end
         it "returns expected things" do
           expect(parking_notification.reload.address).to eq "9330 Groat Rd NW, Edmonton, AB T6G 2B3, CA"
           impound_record.reload
-          expect(bike.reload.current_impound_record.address).to eq "Edmonton, AB"
+          expect(bike.reload.current_impound_record.formatted_address_string).to eq "Edmonton, AB T6G 2B3, Canada"
           expect(bike.status_humanized).to eq "impounded"
 
           expect_matching_tags(title: title_extended, description:, image: stock_photo_url, updated_at: bike.updated_at)
