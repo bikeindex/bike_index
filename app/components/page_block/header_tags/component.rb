@@ -210,7 +210,7 @@ module PageBlock::HeaderTags
       elsif bike.status_stolen? && bike.current_stolen_record.present?
         "#{status_prefix}: #{date(bike.current_stolen_record.date_stolen)}, from: #{bike.current_stolen_record.address(country: [:iso])}"
       elsif bike.current_impound_record.present?
-        "#{status_prefix}: #{date(bike.current_impound_record.impounded_at)}, in: #{bike.current_impound_record.address(country: [:iso, :optional])}"
+        "#{status_prefix}: #{date(bike.current_impound_record.impounded_at)}, in: #{bike.current_impound_record.formatted_address_string}"
       end
 
       # Don't show serial on bike versions

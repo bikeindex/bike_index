@@ -99,13 +99,13 @@ class AddressRecord < ApplicationRecord
       (kind == "organization") ? :street : :postal_code
     end
 
-    def permitted_visible_attribute(string_or_sym, default: :postal_code)
+    def permitted_visible_attribute(string_or_sym, default: nil)
       if string_or_sym.present?
         target_attr = string_or_sym&.to_sym
         return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
       end
 
-      default.to_sym
+      (default.presence || :postal_code).to_sym
     end
   end
 
@@ -177,7 +177,7 @@ class AddressRecord < ApplicationRecord
 
   def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     f_hash = address_hash(visible_attribute:, render_country:, current_country_id:, current_country_iso:)
-    arr = f_hash.values_at(:street, :city)
+    arr = f_hash.values_at(:street, :street_2, :city)
     arr << f_hash.values_at(:region, :postal_code).reject(&:blank?).join(" ") # region and postal code don't have a comma
     (arr << f_hash[:country]).reject(&:blank?).join(", ")
   end
@@ -208,8 +208,8 @@ class AddressRecord < ApplicationRecord
   private
 
   def update_associations
-    # Bikes, ownerships, impound_records and locations/organizations handle address assignment separately
-    return if skip_callback_job || bike? || ownership? || organization?
+    # Bikes, ownerships and impound_records handle address assignment separately
+    return if skip_callback_job || %w[bike ownership impounded_from].include?(kind)
 
     CallbackJob::AddressRecordUpdateAssociationsJob.perform_async(id)
   end

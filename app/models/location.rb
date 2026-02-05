@@ -68,6 +68,7 @@ class Location < ApplicationRecord
   def find_or_build_address_record(current_country_id: nil)
     return address_record if address_record?
 
+    current_country_id ||= Country.united_states_id
     d_address_record = AddressRecord.where(organization_id:).order(:id).first
     return AddressRecord.new(country_id: current_country_id) if d_address_record.blank?
 

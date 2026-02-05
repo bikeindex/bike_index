@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 05 Oct 2025 17:25:26 GMT
+      - Thu, 05 Feb 2026 17:43:57 GMT
       Pragma:
       - no-cache
       Expires:
@@ -33,21 +33,21 @@ http_interactions:
       X-Goog-Maps-Metro-Area:
       - Chicago, IL
       Content-Security-Policy-Report-Only:
-      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:214:0
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:213:0
       Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to=msaifdggmnwc:214:0
+      - same-origin; report-to=msaifdggmnwc:213:0
       Report-To:
-      - '{"group":"msaifdggmnwc:214:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:214:0"}],}'
+      - '{"group":"msaifdggmnwc:213:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:213:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '3273'
+      - '3280'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=106
+      - gfet4t7; dur=246
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -81,18 +81,18 @@ http_interactions:
         : \n               [\n                  \"postal_code_suffix\"\n               ]\n
         \           }\n         ],\n         \"formatted_address\" : \"3550 W Shakespeare
         Ave, Chicago, IL 60647, USA\",\n         \"geometry\" : \n         {\n            \"location\"
-        : \n            {\n               \"lat\" : 41.9202405,\n               \"lng\"
-        : -87.7156554\n            },\n            \"location_type\" : \"RANGE_INTERPOLATED\",\n
+        : \n            {\n               \"lat\" : 41.9202404,\n               \"lng\"
+        : -87.7156588\n            },\n            \"location_type\" : \"RANGE_INTERPOLATED\",\n
         \           \"viewport\" : \n            {\n               \"northeast\" :
-        \n               {\n                  \"lat\" : 41.9214939802915,\n                  \"lng\"
-        : -87.71430446970848\n               },\n               \"southwest\" : \n
-        \              {\n                  \"lat\" : 41.9187960197085,\n                  \"lng\"
-        : -87.7170024302915\n               }\n            }\n         },\n         \"navigation_points\"
+        \n               {\n                  \"lat\" : 41.9214939302915,\n                  \"lng\"
+        : -87.71430786970849\n               },\n               \"southwest\" : \n
+        \              {\n                  \"lat\" : 41.9187959697085,\n                  \"lng\"
+        : -87.7170058302915\n               }\n            }\n         },\n         \"navigation_points\"
         : \n         [\n            {\n               \"location\" : \n               {\n
         \                 \"latitude\" : 41.9200585,\n                  \"longitude\"
-        : -87.7156517\n               }\n            }\n         ],\n         \"place_id\"
+        : -87.71565509999999\n               }\n            }\n         ],\n         \"place_id\"
         : \"Ei4zNTUwIFcgU2hha2VzcGVhcmUgQXZlLCBDaGljYWdvLCBJTCA2MDY0NywgVVNBIjESLwoUChIJm9ZhPWvND4gRlgAk98FUWaEQ3hsqFAoSCXfgB2pmzQ-IEaIyran4cOEx\",\n
         \        \"types\" : \n         [\n            \"street_address\"\n         ]\n
         \     }\n   ],\n   \"status\" : \"OK\"\n}"
-  recorded_at: Sun, 05 Oct 2025 17:25:26 GMT
+  recorded_at: Thu, 05 Feb 2026 17:43:57 GMT
 recorded_with: VCR 6.3.1

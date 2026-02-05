@@ -5,6 +5,7 @@ en:
       address_record:
         address: Street address
         address_no_street: Address
+        address_or_intersection: Address or intersection
         address_school: Campus mailing address
         choose_country: Choose country
         city: City
@@ -12,4 +13,5 @@ en:
         region: Region / Province
         state: State
         street_2: Street address line 2 (optional)
+        where_was_it_status: Where was it %{bike_status}?
         your_full_address_is_required: Your full address is required by %{org_name}
