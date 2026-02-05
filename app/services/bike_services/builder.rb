@@ -28,7 +28,7 @@ class BikeServices::Builder
       end
       # Use bike status because it takes into account new_attrs
       bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
-      bike.build_new_impound_record(b_param.impound_attrs) if bike.status_impounded?
+      bike.current_impound_record = build_new_impound_record(bike, b_param.impound_attrs) if bike.status_impounded?
       bike = check_organization(b_param, bike)
       bike.creation_organization ||= passed_organization
       bike = check_example(b_param, bike)
@@ -117,6 +117,14 @@ class BikeServices::Builder
       AddressRecord.new(org_address.attributes
         .slice("city", "region_record_id", "country_id")
         .merge(kind: :ownership, bike:))
+    end
+
+    def build_new_impound_record(bike, impound_attrs)
+      impound_record = bike.impound_records
+        .build({status: "current", user_id: bike.creator_id}.merge(impound_attrs))
+      impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
+
+      impound_record
     end
   end
 end

@@ -678,14 +678,6 @@ class Bike < ApplicationRecord
     new_stolen_record
   end
 
-  def build_new_impound_record(new_attrs = {})
-    new_impound_record = impound_records
-      .build({status: "current", user_id: creator_id}.merge(new_attrs))
-    new_impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
-
-    self.current_impound_record = new_impound_record
-  end
-
   def fetch_current_stolen_record
     return current_stolen_record if defined?(manual_csr)
 
