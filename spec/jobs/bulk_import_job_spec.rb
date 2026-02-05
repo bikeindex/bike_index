@@ -189,10 +189,13 @@ RSpec.describe BulkImportJob, type: :job do
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XXX123") }
-      let(:target_address) { {city: "NY", region_string: "New York", country_id: Country.united_states_id, kind: "ownership"} }
+      let(:target_address) do
+        {city: "New York", region_string: "NY", country_id: Country.united_states_id, kind: "ownership",
+         neighborhood: "Tribeca", postal_code: "10007", street: "278 Broadway", publicly_visible_attribute: "postal_code"}
+      end
 
       # TODO: Fix this - something with VCR - #2922
-      xit "creates the bikes, doesn't have any errors", :flaky do
+      it "creates the bikes, doesn't have any errors", :flaky do
         expect(Country.united_states).to be_present
         expect(bike_sticker.reload.claimed?).to be_falsey
         expect(bike_sticker.bike_sticker_updates.count).to eq 0
@@ -226,12 +229,14 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike1.frame_size_unit).to eq "in"
           expect(bike1.public_images.count).to eq 0
           expect(bike1.phone).to eq("8887776666")
-          # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
-          expect(bike1.address_record.attributes.except(:id, :latitude, :longitude).compact).to match_hash_indifferently target_address
+          # Previously, was actually geocoding things - but that didn't seem to help people.
+          # But then we switched back and are geocoding things again with address_record
+          expect(bike1.address_record.attributes.slice(*target_address.keys.map(&:to_s)))
+            .to match_hash_indifferently target_address
           expect(BikeServices::CalculateLocation.registration_address_source(bike1)).to eq "initial_creation"
           # IDK why this is failing, post address_record for ownerships - PR #2912
-          # expect(bike1.current_ownership.address_record.to_coordinates.compact.count).to eq 2
-          # expect(bike1.to_coordinates).to eq default_location.slice(:latitude, :longitude).values
+          expect(bike1.current_ownership.address_record.to_coordinates.compact.count).to eq 2
+          expect(bike1.to_coordinates).to eq default_location.slice(:latitude, :longitude).values
           expect(bike1.extra_registration_number).to be_nil
           expect(bike1.owner_name).to be_nil
           expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])

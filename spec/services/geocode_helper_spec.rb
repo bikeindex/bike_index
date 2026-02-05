@@ -100,13 +100,13 @@ RSpec.describe GeocodeHelper do
       let(:target_assignable_hash) do
         {
           street: nil,
-          city: "San Francisco",
+          city: "Brentwood",
           state_id: state.id,
           zipcode: nil,
           country_id: country.id,
           neighborhood: nil,
-          latitude: 37.7506,
-          longitude: -122.4121
+          latitude: 37.9285,
+          longitude: -121.6881
         }
       end
       it "finds the address" do
@@ -117,8 +117,8 @@ RSpec.describe GeocodeHelper do
       context "another IP address" do
         let(:address) { "50.211.197.209" }
         let(:target_address_hash) do
-          target_assignable_hash.merge(latitude: 37.6196, longitude: -122.4816, city: "Pacifica",
-            formatted_address: "Pacifica, CA, US")
+          target_assignable_hash.merge(latitude: 37.7506, longitude: -122.4121, city: "San Francisco",
+            formatted_address: "San Francisco, CA, US")
         end
         it "finds the address" do
           VCR.use_cassette("geohelper-ip_address2", vcr_config) do

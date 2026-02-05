@@ -28,9 +28,11 @@ class BikeServices::Builder
       end
       # Use bike status because it takes into account new_attrs
       bike.build_new_stolen_record(b_param.stolen_attrs) if bike.status_stolen?
-      bike.current_impound_record = build_new_impound_record(bike, b_param.impound_attrs) if bike.status_impounded?
       bike = check_organization(b_param, bike)
       bike.creation_organization ||= passed_organization
+      if bike.status_impounded?
+        bike.current_impound_record = build_new_impound_record(bike, b_param.impound_attrs, bike.creation_organization_id)
+      end
       bike = check_example(b_param, bike)
       if b_param.unregistered_parking_notification?
         bike.attributes = default_parking_notification_attrs(b_param, bike)
@@ -119,11 +121,12 @@ class BikeServices::Builder
         .merge(kind: :ownership, bike:))
     end
 
-    def build_new_impound_record(bike, impound_attrs)
+    def build_new_impound_record(bike, impound_attrs, organization_id)
       impound_params = ActionController::Parameters.new(impound_attrs)
         .permit(*BikeServices::Creator::PERMITTED_IMPOUND_ATTRS)
+        .merge(status: "current", user_id: bike.creator_id, organization_id:)
 
-      impound_record = bike.impound_records.build(impound_params.merge(status: "current", user_id: bike.creator_id))
+      impound_record = bike.impound_records.build(impound_params)
       impound_record.impounded_at ||= Time.current # in case a blank value was passed in impound_attrs
       impound_record.address_record&.kind = :impounded_from
       impound_record
