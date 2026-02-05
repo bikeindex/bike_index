@@ -74,7 +74,7 @@ RSpec.describe AddressRecord, type: :model do
           longitude: -113.5508765,
           street: "9330 Groat Rd NW",
           street_2: nil,
-          postal_code: "AB T6G 2B3",
+          postal_code: "T6G 2B3",
           city: "Edmonton",
           region_record_id: obj.address_record.region_record_id,
           country_id: Country.canada_id,

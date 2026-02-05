@@ -374,7 +374,8 @@ RSpec.describe BulkImportJob, type: :job do
         let(:impound_record1_address_target_corrected) do
           impound_record1_address_target.merge(
             street: "1409 Martin Luther King Junior Way",
-            postal_code: "94709") # NOTE: the zipcode that is entered is 94710
+            postal_code: "94709"
+          ) # NOTE: the zipcode that is entered is 94710
         end
         let(:impound_record2_target) do
           {
