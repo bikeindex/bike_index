@@ -921,15 +921,7 @@ class Bike < ApplicationRecord
   end
 
   def fetch_current_impound_record
-    # Check if already set (e.g., by build_new_impound_record) and ensure current_impound_record_id is set
-    if current_impound_record.present? && current_impound_record.current?
-      self.current_impound_record_id = current_impound_record.id if current_impound_record.id.present? && current_impound_record_id.blank?
-      return current_impound_record
-    end
-
-    current_ir = impound_records.current.last
-    self.current_impound_record = current_ir
-    self.current_impound_record_id = current_ir&.id
+    self.current_impound_record = impound_records.current.last
   end
 
   def current_for_sale_marketplace_listing
