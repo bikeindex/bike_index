@@ -120,10 +120,10 @@ class BikeServices::Builder
     end
 
     def build_new_impound_record(bike, impound_attrs)
-      impound_params = ActionController::Parameters.new({status: "current", user_id: bike.creator_id}.merge(impound_attrs))
+      impound_params = ActionController::Parameters.new(impound_attrs)
         .permit(*BikeServices::Creator::PERMITTED_IMPOUND_ATTRS)
 
-      impound_record = bike.impound_records.build(impound_params)
+      impound_record = bike.impound_records.build(impound_params.merge(status: "current", user_id: bike.creator_id))
       impound_record.impounded_at ||= Time.current # in case a blank value was passed in impound_attrs
       impound_record.address_record&.kind = :impounded_from
       impound_record
