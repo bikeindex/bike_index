@@ -25,6 +25,7 @@
 #
 class Location < ApplicationRecord
   include AddressRecorded
+  include AddressRecordedWithinBoundingBox
 
   acts_as_paranoid
 

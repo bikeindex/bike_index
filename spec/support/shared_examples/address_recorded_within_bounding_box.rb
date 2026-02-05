@@ -13,6 +13,7 @@ RSpec.shared_examples "address_recorded_within_bounding_box" do
     let(:box_fail) { [] } # This is the return for an unknown bounding box
 
     it "responds with records inside the bounding box" do
+      pp instance.address_record
       expect(instance.reload.latitude).to eq 34.05223
       expect(subject.class.within_bounding_box(box_matching).pluck(:id)).to eq([instance.id])
       expect(subject.class.within_bounding_box(box_outside).pluck(:id)).to eq([])

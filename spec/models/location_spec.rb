@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Location, type: :model do
   it_behaves_like "address_recorded"
+  it_behaves_like "address_recorded_within_bounding_box"
 
   describe "set_calculated_attributes" do
     it "strips the non-digit numbers from the phone input" do
