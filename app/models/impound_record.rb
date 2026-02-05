@@ -264,6 +264,7 @@ class ImpoundRecord < ApplicationRecord
     self.address_record_id = move_location_update.location.address_record_id if move_location_update&.location&.address_record_id.present?
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
+    # TODO: Unify with StolenRecord.corrected_date_stolen
     self.impounded_at = created_at if created_at.present? && created_at > impounded_at + 10.years
     # unregistered_bike means essentially that the bike was created for this impound record
     self.unregistered_bike ||= calculated_unregistered_bike?

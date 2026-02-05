@@ -29,15 +29,37 @@ RSpec.describe BikeServices::Builder do
       end
       context "with impound attrs" do
         let(:time) { Time.current - 12.hours }
-        let(:b_param_params) { {bike: {status: "status_with_owner"}, impound_record: {impounded_at: time}} }
+        let(:b_param_params) do
+          {
+            bike: {status: "status_with_owner"},
+            impound_record: {
+              impounded_at: time,
+              impounded_description: "Some description or whatever",
+              resolved_at: time, # Not a permitted attribute, so ignored
+              address_record_attributes: {
+                country_id: Country.united_states_id,
+                street: "1233 Howard St",
+                city: "san Francisco",
+                region_record_id: FactoryBot.create(:state_california).id,
+                region_string: "california",
+                postal_code: "94103"
+              }
+            }
+          }
+        end
         it "is abandoned" do
           expect(b_param.status).to eq "status_impounded"
           expect(b_param.impound_attrs).to be_present
           expect(bike.id).to be_blank
           impound_record = bike.impound_records.last
+          expect(bike.current_impound_record).to eq impound_record
           expect(impound_record).to be_present
-          expect(impound_record.kind).to eq "found"
+          expect(impound_record.formatted_address_string(visible_attribute: :street))
+            .to eq "1233 Howard St, san Francisco, CA 94103"
+          expect(impound_record.address_record).to have_attributes(kind: "impounded_from", id: nil)
+          expect(impound_record.resolved_at).to be_blank
           expect(impound_record.impounded_at).to be_within(1).of time
+          expect(impound_record).to have_attributes(kind: "found", impounded_description: "Some description or whatever")
           expect(bike.status_humanized).to eq "found"
         end
       end

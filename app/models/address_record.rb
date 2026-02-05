@@ -99,13 +99,13 @@ class AddressRecord < ApplicationRecord
       (kind == "organization") ? :street : :postal_code
     end
 
-    def permitted_visible_attribute(string_or_sym, default: :postal_code)
+    def permitted_visible_attribute(string_or_sym, default: nil)
       if string_or_sym.present?
         target_attr = string_or_sym&.to_sym
         return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
       end
 
-      default.to_sym
+      (default.presence || :postal_code).to_sym
     end
   end
 
