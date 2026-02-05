@@ -456,31 +456,6 @@ RSpec.describe ImpoundRecord, type: :model do
     let(:latitude) { 41.9202384 }
     let(:longitude) { -87.7158185 }
     let(:impound_record) { FactoryBot.build(:impound_record, street: "3554 W Shakespeare Ave, 60647") }
-    # TODO: DELETE - I don't think this is necessary anymore
-    # it "geocodes if no address and if address changes" do
-    #   VCR.use_cassette("impound_record-address_lookup") do
-    #     impound_record.save
-    #     impound_record.reload
-    #     expect(impound_record.address_record.street).to eq "3554 West Shakespeare Avenue"
-    #     expect(impound_record.address_record.formatted_address_string).to eq "Chicago, IL 60647"
-    #     expect(impound_record.address_record.formatted_address_string(visible_attribute: :street)).to eq "3554 West Shakespeare Avenue, Chicago, IL 60647"
-    #     expect(impound_record.address_record.latitude).to eq latitude
-    #     expect(impound_record.address_record.longitude).to eq longitude
-    #     expect(impound_record.valid?).to be_truthy
-    #     expect(impound_record.id).to be_present
-    #     expect(impound_record.state_id).to eq state.id
-    #     expect(impound_record.country_id).to eq Country.united_states.id
-    #     # It changes, so regeocodes
-    #     impound_record.update(street: "2554 West Shakespeare ave")
-    #     impound_record.reload
-    #     expect(impound_record.address(force_show_address: true)).to eq "2554 West Shakespeare Avenue, Chicago, IL 60647"
-    #     expect(impound_record.latitude).to_not eq latitude
-    #     expect(impound_record.longitude).to_not eq longitude
-    #     # It does not change, no re-geocoding
-    #     expect(GeocodeHelper).to_not receive(:assignable_address_hash_for)
-    #     impound_record.update(status: "retrieved_by_owner")
-    #   end
-    # end
     context "no location" do
       let(:impound_record) { FactoryBot.create(:impound_record) }
       it "does not geocode" do
