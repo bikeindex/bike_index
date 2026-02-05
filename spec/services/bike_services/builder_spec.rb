@@ -153,7 +153,29 @@ RSpec.describe BikeServices::Builder do
       end
 
       context "with address_record_attributes: street" do
-        it "creates"
+        let(:b_param_params) do
+          {
+            bike: {
+              address_record_attributes: {
+                street: "123 Main St",
+                city: "Oakland",
+                region_string: "CA",
+                postal_code: "94612",
+                country_id: Country.united_states_id
+              }
+            }
+          }
+        end
+        it "creates" do
+          expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
+          expect(BParam.address_record_attributes(b_param.bike)).to be_present
+          expect(bike.address_record).to be_present
+          expect(bike.address_record).to have_attributes(
+            street: "123 Main St",
+            city: "Oakland",
+            kind: "ownership"
+          )
+        end
       end
 
       context "with organization with reg_address" do

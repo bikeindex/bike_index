@@ -927,7 +927,9 @@ class Bike < ApplicationRecord
       return current_impound_record
     end
 
-    self.current_impound_record = impound_records.current.last
+    current_ir = impound_records.current.last
+    self.current_impound_record = current_ir
+    self.current_impound_record_id = current_ir&.id
   end
 
   def current_for_sale_marketplace_listing
