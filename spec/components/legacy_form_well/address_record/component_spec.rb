@@ -134,10 +134,9 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
       let(:bike_status) { "status_stolen" }
       it "renders with stolen" do
         expect(component).to have_css("label", text: "Where was it stolen?")
-        pp component.to_html
         expect(component).to have_field("bike_address_record_attributes_street", placeholder: "Address or intersection")
         expect(component).to_not have_field("bike_address_record_attributes_street_2")
-        expect(component).not_to have_css("input#bike_address_record_attributes_street[required]")
+        expect(component).to have_css("input#bike_address_record_attributes_street[required]")
       end
 
       context "with bike_status abandoned" do
@@ -147,7 +146,7 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
           expect(component).to have_css("label", text: "Where was it abandoned?")
           expect(component).to have_field("bike_address_record_attributes_street")
           expect(component).to_not have_field("bike_address_record_attributes_street_2")
-          expect(component).not_to have_css("input#bike_address_record_attributes_street[required]")
+          expect(component).to have_css("input#bike_address_record_attributes_street[required]")
         end
       end
 
@@ -158,7 +157,7 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, type: :component do
           expect(component).to have_css("label", text: "Where was it found?")
           expect(component).to have_field("bike_address_record_attributes_street")
           expect(component).to_not have_field("bike_address_record_attributes_street_2")
-          expect(component).not_to have_css("input#bike_address_record_attributes_street[required]")
+          expect(component).to have_css("input#bike_address_record_attributes_street[required]")
         end
       end
     end

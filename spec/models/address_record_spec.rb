@@ -28,6 +28,20 @@ RSpec.describe AddressRecord, type: :model do
         expect(address_record.formatted_address_string(visible_attribute: "street")).to eq "Spuistraat 134afd.Gesch., Amsterdam, North Holland 1012, Netherlands"
       end
     end
+    context "with street_2" do
+      let(:address_record) do
+        FactoryBot.create(:address_record, :davis, street: "1233 Howard St", street_2: "Mechanics shop",
+          city: "San Francisco", postal_code: "94103")
+      end
+      it "is valid" do
+        expect(address_record).to be_valid
+        expect(address_record.region).to eq "CA"
+        expect(address_record.formatted_address_string(render_country: true)).to eq "San Francisco, CA 94103, United States"
+        expect(address_record.formatted_address_string).to eq "San Francisco, CA 94103"
+        expect(address_record.formatted_address_string(visible_attribute: "street"))
+          .to eq "1233 Howard St, Mechanics shop, San Francisco, CA 94103"
+      end
+    end
   end
 
   describe "attrs_to_duplicate" do

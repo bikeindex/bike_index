@@ -33,8 +33,8 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, :js, type: :system do
     )
   end
 
-  context "bike status" do
-    let(:preview_path) { "#{base_path}with_stolen_type" }
+  context "impounded_bike" do
+    let(:preview_path) { "#{base_path}impounded_bike" }
 
     it "renders" do
       FactoryBot.create(:state_california)
@@ -43,24 +43,24 @@ RSpec.describe LegacyFormWell::AddressRecord::Component, :js, type: :system do
       visit(preview_path)
 
       expect(page).to have_select(
-        "bike[address_record_attributes][country_id]", selected: "United States"
+        "impound_record[address_record_attributes][country_id]", selected: "United States"
       )
       expect(page).to have_select(
-        "bike[address_record_attributes][region_record_id]", selected: "State"
+        "impound_record[address_record_attributes][region_record_id]", selected: "State"
       )
-      select "California", from: "bike[address_record_attributes][region_record_id]"
+      select "California", from: "impound_record[address_record_attributes][region_record_id]"
 
       # Switching to canada
-      select "Canada", from: "bike[address_record_attributes][country_id]"
-      expect(page).to have_field("bike[address_record_attributes][region_string]", type: "text")
+      select "Canada", from: "impound_record[address_record_attributes][country_id]"
+      expect(page).to have_field("impound_record[address_record_attributes][region_string]", type: "text")
 
       # Switch back to US
-      select "United States", from: "bike[address_record_attributes][country_id]"
+      select "United States", from: "impound_record[address_record_attributes][country_id]"
 
       expect(page).to have_css("label", text: "Where was it found?")
-      expect(page).to have_field("bike_address_record_attributes_street")
-      expect(page).to_not have_field("bike_address_record_attributes_street_2")
-      expect(page).not_to have_css("input#bike_address_record_attributes_street[required]")
+      expect(page).to have_field("impound_record_address_record_attributes_street")
+      expect(page).to_not have_field("impound_record_address_record_attributes_street_2")
+      expect(page).to have_css("input#impound_record_address_record_attributes_street[required]")
     end
   end
 end

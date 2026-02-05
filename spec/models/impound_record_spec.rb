@@ -20,6 +20,7 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(impound_record.address_record.city).to eq "Chicago"
         expect(impound_record.address_record.region_record.abbreviation).to eq "IL"
         expect(impound_record.address_record.country).to eq Country.united_states
+        expect(impound_record.address_record.publicly_visible_attribute).to eq "postal_code"
       end
     end
 

@@ -177,7 +177,7 @@ class AddressRecord < ApplicationRecord
 
   def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     f_hash = address_hash(visible_attribute:, render_country:, current_country_id:, current_country_iso:)
-    arr = f_hash.values_at(:street, :city)
+    arr = f_hash.values_at(:street, :street_2, :city)
     arr << f_hash.values_at(:region, :postal_code).reject(&:blank?).join(" ") # region and postal code don't have a comma
     (arr << f_hash[:country]).reject(&:blank?).join(", ")
   end

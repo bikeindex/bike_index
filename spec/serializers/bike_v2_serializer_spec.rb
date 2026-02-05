@@ -58,16 +58,16 @@ RSpec.describe BikeV2Serializer do
       end
     end
     context "found bike" do
-      let!(:impound_record) { FactoryBot.create(:impound_record, :in_nyc, bike: bike) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, :with_address_record, address_in: :new_york, bike: bike) }
       let(:target_found) do
-        target.merge(location_found: "278 Broadway, New York, NY 10007, US",
+        target.merge(location_found: "New York, NY 10007, United States",
           status: "found",
           serial: "Hidden")
       end
       it "returns the expected thing" do
         expect(bike.reload.status).to eq "status_impounded"
-        expect(impound_record.reload.address).to eq "New York, NY 10007"
-        expect(impound_record.to_coordinates).to eq([40.7143528, -74.0059731])
+        expect(impound_record.reload.address_record.to_coordinates).to eq([40.7143528, -74.0059731])
+        expect(impound_record.address_record.publicly_visible_attribute).to eq "postal_code"
         expect(bike.to_coordinates).to eq([40.7143528, -74.0059731])
         expect(serializer.as_json(root: false)).to eq target_found
       end
