@@ -146,6 +146,23 @@ class ImpoundRecord < ApplicationRecord
       region_string: d_address_record.region_string)
   end
 
+  # For now at least, we don't want to show exact address
+  def show_address
+    false
+  end
+
+  def latitude_public
+    return unless address_record&.latitude.present?
+
+    show_address ? address_record.latitude : address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
+  def longitude_public
+    return unless address_record&.latitude.present?
+
+    show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
   def unorganized?
     !organized?
   end
