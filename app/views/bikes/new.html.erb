@@ -206,6 +206,7 @@
           <% if @bike.status_impounded? %>
             <%= fields_for @bike.impound_records.last do |irecord| %>
               <% irecord.object.address_record = f.object.find_or_build_address_record(country_id: current_country_id) %>
+
               <%= irecord.fields_for :address_record do |address_form| %>
                 <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status: @bike.status)) %>
               <% end %>

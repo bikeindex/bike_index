@@ -1,10 +1,16 @@
 <% bike_status ||= nil %>
+
 <% if bike_status.present? %>
   <% @bike = Bike.new(status: bike_status) %>
   <%= form_for @bike, url: bikes_path, method: :post, multipart: true do |f| %>
     <%= fields_for(@bike.impound_records.last || @bike.impound_records.build) do |irecord| %>
       <% irecord.object.address_record = f.object.find_or_build_address_record(country_id: Country.united_states_id) %>
-      <h2><%= Country.united_states_id %>: <%= irecord.object.address_record.country_id %></h2>
+
+      <h2>
+        <%= Country.united_states_id %>:
+        <%= irecord.object.address_record.country_id %>
+      </h2>
+
       <%= irecord.fields_for :address_record do |address_form| %>
         <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status:  bike_status)) %>
       <% end %>
@@ -14,7 +20,6 @@
   <% organization ||= nil %>
   <% @user = User.new %>
   <% @user.address_record = AddressRecord.new(country: organization&.country || Country.united_states, user: @user) %>
-
   <%= form_for @user, url: my_account_path, method: :patch, multipart: true do |f| %>
     <%= f.fields_for :address_record do |address_form| %>
       <%= render(
