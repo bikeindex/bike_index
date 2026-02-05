@@ -921,6 +921,8 @@ class Bike < ApplicationRecord
   end
 
   def fetch_current_impound_record
+    return current_impound_record if current_impound_record.present? && current_impound_record.current?
+
     self.current_impound_record = impound_records.current.last
   end
 

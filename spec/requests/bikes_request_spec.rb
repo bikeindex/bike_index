@@ -123,6 +123,8 @@ RSpec.describe BikesController, type: :request do
         expect(bike.status).to eq "status_impounded"
         expect(bike.impound_records.last).to be_present
         expect(response).to render_template(:new)
+
+        expect(response.body).to match "Where was it found?"
       end
       it "found is impounded" do
         get "#{base_url}/new?status=found"
@@ -131,6 +133,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.status).to eq "status_impounded"
         expect(bike.impound_records.last).to be_present
         expect(response).to render_template(:new)
+        expect(response.body).to match "Where was it found?"
       end
     end
   end
