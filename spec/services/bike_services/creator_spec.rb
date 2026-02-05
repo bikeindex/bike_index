@@ -434,7 +434,7 @@ RSpec.describe BikeServices::Creator do
           owner_email: user.email
         }
       end
-      let(:impound_record_params) { {street: "278 Broadway", city: "New York", zipcode: "10007", state_id: state.id.to_s, country_id: Country.united_states.id} }
+      let(:impound_record_params) { {address_record_attributes: {street: "278 Broadway", city: "New York", postal_code: "10007", region_record_id: state.id.to_s, country_id: Country.united_states.id}} }
       # This the same way b_param is treated in bikes_controller
       let(:b_param) { BParam.new(creator: user) }
       before { b_param.clean_params({bike: bike_params, impound_record: impound_record_params}) }
@@ -458,7 +458,10 @@ RSpec.describe BikeServices::Creator do
         expect(impound_record.organized?).to be_falsey
         expect(impound_record.user).to eq user
         expect(impound_record.display_id).to be_blank
-        expect(impound_record.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
+        expect(impound_record.address_record).to be_present
+        expect(impound_record.address_record).to have_attributes(street: "278 Broadway",
+          city: "New York", kind: "impounded_from", region_record_id: state.id)
+        expect(impound_record.address_record.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
         ownership = bike.current_ownership
         expect(ownership.send_email).to be_falsey
         expect(ownership.impound_record_id).to eq impound_record.id

@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe User, type: :model do
   it_behaves_like "address_recorded"
+  it_behaves_like "address_recorded_within_bounding_box"
 
   describe "address factories" do
     let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :amsterdam) }

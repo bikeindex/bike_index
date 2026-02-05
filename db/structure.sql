@@ -1707,19 +1707,11 @@ CREATE TABLE public.impound_records (
     status integer DEFAULT 0,
     location_id bigint,
     impounded_at timestamp without time zone,
-    latitude double precision,
-    longitude double precision,
     display_id character varying,
     display_id_prefix character varying,
     impounded_description text,
     unregistered_bike boolean DEFAULT false,
-    address_record_id bigint,
-    street text,
-    city text,
-    neighborhood text,
-    zipcode text,
-    state_id bigint,
-    country_id bigint
+    address_record_id bigint
 );
 
 
@@ -7197,7 +7189,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260204181849'),
+('20260205050421'),
 ('20260204180206'),
 ('20260204054435'),
 ('20260204050421'),

@@ -28,7 +28,7 @@ RSpec.shared_examples "search_radius_metricable" do
       let(:organization) { FactoryBot.create(:organization, :in_edmonton) }
       it "is truthy" do
         expect(location.address_record.country).to eq Country.canada
-        expect(location.address_record.region_record).to be_present
+        expect(location.address_record.region_string).to be_present
         expect(location.latitude).to be_within(0.1).of 53.5069377
 
         expect(instance.search_radius_metric_units?).to be_truthy

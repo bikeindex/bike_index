@@ -32,7 +32,8 @@ FactoryBot.define do
           impound_record: impound_record,
           kind: evaluator.status)
 
-        impound_record.bike&.update(updated_at: Time.current)
+        # Process the update to recalculate status from the impound_record_update and update the bike
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
       end
     end
   end

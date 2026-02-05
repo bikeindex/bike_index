@@ -54,7 +54,7 @@
                 %small
                   = impound_record.location&.name
             %td
-              = impound_record.address
+              = impound_record.formatted_address_string(visible_attribute: :street)
 
   .pt-4.pb-4
     = render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

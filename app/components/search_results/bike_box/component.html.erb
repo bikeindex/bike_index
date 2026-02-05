@@ -80,7 +80,7 @@
             <span class="localizeTime"><%= l occurred_at_with_fallback, format: :convert_time %></span>
           </li>
           <%= attr_list_item(
-            @event_record.address(country: [:iso]),
+            address_string,
             translation(".location"),
           ) %>
         <% end %>
