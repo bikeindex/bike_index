@@ -3,30 +3,32 @@
 # Table name: impound_records
 # Database name: primary
 #
-#  id                    :integer          not null, primary key
-#  display_id_integer    :bigint
-#  display_id_prefix     :string
-#  impounded_at          :datetime
-#  impounded_description :text
-#  resolved_at           :datetime
-#  status                :integer          default("current")
-#  unregistered_bike     :boolean          default(FALSE)
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#  address_record_id     :bigint
-#  bike_id               :integer
-#  display_id            :string
-#  location_id           :bigint
-#  organization_id       :integer
-#  user_id               :integer
+#  id                               :integer          not null, primary key
+#  display_id_integer               :bigint
+#  display_id_prefix                :string
+#  impounded_at                     :datetime
+#  impounded_description            :text
+#  resolved_at                      :datetime
+#  status                           :integer          default("current")
+#  unregistered_bike                :boolean          default(FALSE)
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
+#  address_record_id                :bigint
+#  bike_id                          :integer
+#  display_id                       :string
+#  impounded_from_address_record_id :bigint
+#  location_id                      :bigint
+#  organization_id                  :integer
+#  user_id                          :integer
 #
 # Indexes
 #
-#  index_impound_records_on_address_record_id  (address_record_id)
-#  index_impound_records_on_bike_id            (bike_id)
-#  index_impound_records_on_location_id        (location_id)
-#  index_impound_records_on_organization_id    (organization_id)
-#  index_impound_records_on_user_id            (user_id)
+#  index_impound_records_on_address_record_id                 (address_record_id)
+#  index_impound_records_on_bike_id                           (bike_id)
+#  index_impound_records_on_impounded_from_address_record_id  (impounded_from_address_record_id) WHERE (impounded_from_address_record_id IS NOT NULL)
+#  index_impound_records_on_location_id                       (location_id)
+#  index_impound_records_on_organization_id                   (organization_id)
+#  index_impound_records_on_user_id                           (user_id)
 #
 class ImpoundRecord < ApplicationRecord
   include DefaultCurrencyable
@@ -36,6 +38,7 @@ class ImpoundRecord < ApplicationRecord
   belongs_to :user
   belongs_to :organization
   belongs_to :location # organization location
+  belongs_to :impounded_from_address_record, class_name: "AddressRecord"
 
   has_one :parking_notification
   has_one :ownership
@@ -139,9 +142,9 @@ class ImpoundRecord < ApplicationRecord
 
     country_id ||= Country.united_states_id
     d_address_record = organization.default_address_record if organization.present?
-    return AddressRecord.new(country_id:, bike_id:, user_id:, impound_record: self) if d_address_record.blank?
+    return AddressRecord.new(country_id:, bike_id:, user_id:) if d_address_record.blank?
 
-    AddressRecord.new(bike_id:, user_id:, impound_record: self,
+    AddressRecord.new(bike_id:, user_id:,
       country_id: d_address_record.country_id || country_id,
       region_record_id: d_address_record.region_record_id,
       region_string: d_address_record.region_string)
@@ -163,12 +166,6 @@ class ImpoundRecord < ApplicationRecord
 
     show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
-
-  # def address_record_impounded_from
-  #   return @address_record_impounded_from if defined?(@address_record_impounded_from)
-
-  #   @address_record_impounded_from = AddressRecord.impounded_from.where
-  # end
 
   def unorganized?
     !organized?
@@ -266,17 +263,20 @@ class ImpoundRecord < ApplicationRecord
     self.status = calculated_status
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
-    # Only update address_record_id from location if there's an explicit move_location update
-    move_location_update = impound_record_updates.with_location.order(:id).last
-    self.address_record_id = move_location_update.location.address_record_id if move_location_update&.location&.address_record_id.present?
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
     # TODO: Unify with StolenRecord.corrected_date_stolen
     self.impounded_at = created_at if created_at.present? && created_at > impounded_at + 10.years
     # unregistered_bike means essentially that the bike was created for this impound record
     self.unregistered_bike ||= calculated_unregistered_bike?
+    # Update address_record_id from location if there's an explicit move_location update
+    move_location_update = impound_record_updates.with_location.order(:id).last
     # Set address_record from parking_notification if present and no address_record yet
     set_address_record_from_parking_notification if parking_notification.present? && !address_record? && !move_location_update
+    if address_record.present? && address_record.impounded_from?
+      self.impounded_from_address_record ||= address_record
+    end
+    self.address_record_id = location.address_record_id if location.present?
   end
 
   def reply_to_email

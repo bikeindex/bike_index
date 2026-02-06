@@ -162,8 +162,7 @@ CREATE TABLE public.address_records (
     updated_at timestamp(6) without time zone NOT NULL,
     bike_id bigint,
     street_2 character varying,
-    organization_id bigint,
-    impound_record_id bigint
+    organization_id bigint
 );
 
 
@@ -1712,7 +1711,8 @@ CREATE TABLE public.impound_records (
     display_id_prefix character varying,
     impounded_description text,
     unregistered_bike boolean DEFAULT false,
-    address_record_id bigint
+    address_record_id bigint,
+    impounded_from_address_record_id bigint
 );
 
 
@@ -5565,13 +5565,6 @@ CREATE INDEX index_address_records_on_country_id ON public.address_records USING
 
 
 --
--- Name: index_address_records_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_address_records_on_impound_record_id ON public.address_records USING btree (impound_record_id) WHERE (impound_record_id IS NOT NULL);
-
-
---
 -- Name: index_address_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6220,6 +6213,13 @@ CREATE INDEX index_impound_records_on_address_record_id ON public.impound_record
 --
 
 CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING btree (bike_id);
+
+
+--
+-- Name: index_impound_records_on_impounded_from_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_impounded_from_address_record_id ON public.impound_records USING btree (impounded_from_address_record_id) WHERE (impounded_from_address_record_id IS NOT NULL);
 
 
 --
@@ -7197,7 +7197,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260206172057'),
+('20260206174653'),
 ('20260205050421'),
 ('20260204180206'),
 ('20260204054435'),

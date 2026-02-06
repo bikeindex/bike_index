@@ -426,7 +426,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect(bike1_impound_record.address_record.latitude).to be_within(0.01).of 37.881
             expect(bike1.to_coordinates).to eq bike1_impound_record.address_record.to_coordinates
             expect(bike1_impound_record.address_record).to match_hash_indifferently impound_record1_address_target
-            expect(bike1_impound_record.address_record).to have_attributes(impound_record_id: bike1_impound_record.id, bike_id: bike1.id)
+            expect(bike1_impound_record.impounded_from_address_record_id).to eq bike1_impound_record.address_record_id
 
             expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
             expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
@@ -456,7 +456,7 @@ RSpec.describe BulkImportJob, type: :job do
             expect(bike2_impound_record.address_record.latitude).to be_within(0.01).of 37.8053
             expect(bike2.to_coordinates).to eq bike2_impound_record.address_record.to_coordinates
             expect(bike2_impound_record.address_record).to match_hash_indifferently impound_record2_address_target
-            expect(bike2_impound_record.address_record).to have_attributes(impound_record_id: bike2_impound_record.id, bike_id: bike2.id)
+            expect(bike2_impound_record.impounded_from_address_record_id).to eq bike2_impound_record.address_record_id
 
             # TODO: These should actually use the geocoder corrected attributes:
             # expect(bike1_impound_record.address_record).to match_hash_indifferently impound_record1_address_target_corrected
