@@ -4581,6 +4581,8 @@ es:
         your_full_address_is_required:
         address_no_street:
         street_2:
+        address_or_intersection:
+        where_was_it_status:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:
