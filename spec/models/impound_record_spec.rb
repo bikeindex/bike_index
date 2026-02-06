@@ -185,6 +185,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.creator&.id).to eq user2.id
           expect(impound_record.location).to be_blank
           expect(impound_record.status).to eq "current"
+          # Make certain the address_record doesn't re-geocode - since it might be from a phone's precise location
           expect(impound_record.address_record.to_coordinates).to eq parking_notification.to_coordinates
           expect(impound_record.impounded_from_address_record_id).to eq impound_record.address_record_id
           expect(impound_record.authorized?(user)).to be_truthy
