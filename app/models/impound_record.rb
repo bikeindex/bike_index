@@ -350,7 +350,8 @@ class ImpoundRecord < ApplicationRecord
 
     # Create address_record from parking_notification's legacy fields
     self.address_record = AddressRecord.new(
-      AddressRecord.attrs_from_legacy(parking_notification).merge(kind: :impounded_from, organization_id:)
+      AddressRecord.attrs_from_legacy(parking_notification)
+        .merge(kind: :impounded_from, organization_id:, bike_id:)
     )
   end
 end
