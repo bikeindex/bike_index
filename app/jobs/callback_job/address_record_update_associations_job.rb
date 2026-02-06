@@ -13,6 +13,9 @@ class CallbackJob::AddressRecordUpdateAssociationsJob < ApplicationJob
       if address_record.user.address_record_id == address_record.id
         update_association(address_record, address_record.user)
       end
+    elsif address_record.organization?
+      location = Location.find_by(address_record_id: address_record.id)
+      update_association(address_record, location) if location.present?
     elsif address_record.kind.blank?
       # Currently just handles marketplace_listings, but can be easily updated!
       if address_record.marketplace_listings.any?
