@@ -58,4 +58,23 @@ RSpec.describe CallbackJob::AddressRecordUpdateAssociationsJob, type: :job do
       expect(address_record.reload.to_coordinates.compact).to eq target_coordinates
     end
   end
+
+  context "impound_record" do
+    include_context :geocoder_default_location
+
+    let(:address_record) { FactoryBot.create(:address_record, kind: :impounded_from) }
+    let(:impound_record) { FactoryBot.create(:impound_record, address_record:) }
+
+    it "assigns the location coordinates" do
+      expect(impound_record.reload.impounded_from_address_record_id).to eq address_record.id
+      expect(address_record.reload.bike_id).to be_nil
+      expect(address_record.user_id).to be_nil
+
+      instance.perform(address_record.id)
+
+      expect(impound_record.reload.impounded_from_address_record_id).to eq address_record.id
+      expect(address_record.reload.bike_id).to eq impound_record.bike_id
+      expect(address_record.user_id).to eq impound_record.user_id
+    end
+  end
 end

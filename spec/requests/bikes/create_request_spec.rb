@@ -260,6 +260,7 @@ RSpec.describe "BikesController#create", type: :request do
           expect(impound_record.kind).to eq "found"
           expect(impound_record.impounded_description).to eq "Cool description"
           expect(impound_record.address_record).to be_present
+          expect(impound_record.impounded_from_address_record_id).to eq impound_record.address_record_id
           expect(impound_record.address_record).to have_attributes(
             street: "2459 West Division Street",
             city: "Chicago",
