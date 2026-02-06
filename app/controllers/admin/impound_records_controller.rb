@@ -47,6 +47,9 @@ class Admin::ImpoundRecordsController < Admin::BaseController
     if params[:search_bike_id].present?
       impound_records = impound_records.where(bike_id: params[:search_bike_id])
     end
+    if params[:user_id].present?
+      impound_records = impound_records.where(user_id: user_subject&.id || params[:user_id])
+    end
     impound_records = impound_records.where(organization_id: current_organization.id) if current_organization.present?
     impound_records.where(created_at: @time_range)
   end

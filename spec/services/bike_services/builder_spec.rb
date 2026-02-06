@@ -57,6 +57,7 @@ RSpec.describe BikeServices::Builder do
           expect(impound_record.formatted_address_string(visible_attribute: :street))
             .to eq "1233 Howard St, san Francisco, CA 94103"
           expect(impound_record.address_record).to have_attributes(kind: "impounded_from", id: nil)
+          expect(impound_record.address_record.impound_record).to eq impound_record
           expect(impound_record.resolved_at).to be_blank
           expect(impound_record.impounded_at).to be_within(1).of time
           expect(impound_record).to have_attributes(kind: "found", impounded_description: "Some description or whatever")

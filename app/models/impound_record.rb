@@ -139,9 +139,10 @@ class ImpoundRecord < ApplicationRecord
 
     country_id ||= Country.united_states_id
     d_address_record = organization.default_address_record if organization.present?
-    return AddressRecord.new(country_id:) if d_address_record.blank?
+    return AddressRecord.new(country_id:, bike_id:, user_id:, impound_record: self) if d_address_record.blank?
 
-    AddressRecord.new(country_id: d_address_record.country_id || country_id,
+    AddressRecord.new(bike_id:, user_id:, impound_record: self,
+      country_id: d_address_record.country_id || country_id,
       region_record_id: d_address_record.region_record_id,
       region_string: d_address_record.region_string)
   end
@@ -162,6 +163,12 @@ class ImpoundRecord < ApplicationRecord
 
     show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
+
+  # def address_record_impounded_from
+  #   return @address_record_impounded_from if defined?(@address_record_impounded_from)
+
+  #   @address_record_impounded_from = AddressRecord.impounded_from.where
+  # end
 
   def unorganized?
     !organized?

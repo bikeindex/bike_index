@@ -42,6 +42,7 @@ class AddressRecord < ApplicationRecord
   belongs_to :user
   belongs_to :bike
   belongs_to :organization
+  belongs_to :impound_record
   belongs_to :country
   belongs_to :region_record, class_name: "State"
 
@@ -209,7 +210,7 @@ class AddressRecord < ApplicationRecord
 
   def update_associations
     # Bikes, ownerships and impound_records handle address assignment separately
-    return if skip_callback_job || %w[bike ownership impounded_from].include?(kind)
+    return if skip_callback_job || %w[bike ownership].include?(kind)
 
     CallbackJob::AddressRecordUpdateAssociationsJob.perform_async(id)
   end
@@ -232,6 +233,7 @@ class AddressRecord < ApplicationRecord
     self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
 
     assign_region_record
+    assign_impound_attrs if impounded_from?
   end
 
   def assign_region_record
@@ -243,6 +245,14 @@ class AddressRecord < ApplicationRecord
     if region_string.present?
       self.region_record_id = State.friendly_find(region_string, country_id:)&.id
       self.region_string = nil if region_record_id.present?
+    end
+  end
+
+  def assign_impound_attrs
+    self.bike = impound_record&.bike if bike_id.blank?
+    self.user = impound_record&.user if user_id.blank?
+    if impound_record.blank? && id.present?
+      self.impound_record_id ||= ImpoundRecord.find_by(address_record_id: id)&.id
     end
   end
 

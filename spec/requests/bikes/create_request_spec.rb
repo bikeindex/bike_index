@@ -263,7 +263,10 @@ RSpec.describe "BikesController#create", type: :request do
           expect(impound_record.address_record).to have_attributes(
             street: "2459 West Division Street",
             city: "Chicago",
-            kind: "impounded_from"
+            kind: "impounded_from",
+            impound_record_id: impound_record.id,
+            # bike_id: new_bike.id, # IDK, should be set
+            user_id: current_user.id
           )
           expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
           expect(impound_record.send(:calculated_unregistered_bike?)).to be_truthy

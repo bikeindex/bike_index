@@ -14,7 +14,8 @@ FactoryBot.define do
       end
 
       address_record do
-        FactoryBot.build(:address_record, address_in, kind: :impounded_from, organization: instance.organization)
+        FactoryBot.build(:address_record, address_in, kind: :impounded_from,
+          organization: instance.organization, impound_record: instance)
       end
     end
 

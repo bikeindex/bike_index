@@ -129,6 +129,7 @@ class BikeServices::Builder
       impound_record = bike.impound_records.build(impound_params)
       impound_record.impounded_at ||= Time.current # in case a blank value was passed in impound_attrs
       impound_record.address_record&.kind = :impounded_from
+      impound_record.address_record&.impound_record = impound_record
       impound_record
     end
   end

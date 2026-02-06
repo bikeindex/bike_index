@@ -1,0 +1,114 @@
+<% render_sortable ||= false %>
+<% skip_status ||= false %>
+<% skip_organization ||= false %>
+<% skip_claims ||= false %>
+
+<table
+  class="table table-striped table-bordered table-sm without-exterior-border"
+  id="recordsTable"
+>
+  <thead class="small-header hidden-md-down">
+    <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+    <th class="small">
+      <%= sortable "updated_at", render_sortable: render_sortable %>
+    </th>
+
+    <th>
+      Impounded
+    </th>
+
+    <% unless skip_organization %>
+      <th>
+        <%= sortable "organization_id", render_sortable: render_sortable %>
+      </th>
+    <% end %>
+
+    <th><%= sortable "location_id", render_sortable: render_sortable %></th>
+    <th>Bike</th>
+    <th><%= sortable "status", render_sortable: render_sortable %></th>
+
+    <th>
+      <%= sortable "user_id", "last updator", render_sortable: render_sortable %>
+    </th>
+
+    <% unless skip_status %>
+      <th><%= sortable "resolved_at", render_sortable: render_sortable %></th>
+    <% end %>
+
+    <% unless skip_claims %>
+      <th class="small">Claims</th>
+    <% end %>
+  </thead>
+
+  <tbody>
+    <% impound_records.each do |impound_record| %>
+      <tr>
+        <td>
+          <a
+            class="convertTime preciseTime"
+            href="<%= admin_impound_record_path("pkey-#{impound_record.id}") %>"
+          >
+            <%= l(impound_record.created_at, format: :convert_time) %>
+          </a>
+        </td>
+
+        <td>
+          <small class="convertTime preciseTime">
+            <%= l(impound_record.updated_at, format: :convert_time) %>
+          </small>
+        </td>
+
+        <td>
+          <% if impound_record.impounded_at.present? %>
+            <small class="convertTime preciseTime">
+              <%= l(impound_record.impounded_at, format: :convert_time) %>
+            </small>
+          <% end %>
+        </td>
+
+        <% unless skip_organization %>
+          <td>
+            <% if impound_record.organization_id.present? %>
+              <%= link_to impound_record.organization&.short_name || impound_record.organization_id, admin_impound_records_path(sortable_search_params.merge(organization_id: impound_record.organization_id)) %>
+            <% end %>
+          </td>
+        <% end %>
+
+        <td><small><%= impound_record.location&.name %></small></td>
+
+        <td>
+          <% if impound_record.bike.present? %>
+            <%= link_to organized_bike_text(impound_record.bike), admin_bike_path(impound_record.bike) %>
+          <% end %>
+        </td>
+
+        <td>
+          <em><%= status_display(impound_record.status_humanized_short) %></em>
+        </td>
+
+        <td>
+          <%= render Admin::UserCell::Component.new(user: impound_record.user, render_search: render_sortable) %>
+        </td>
+
+        <% unless skip_status %>
+          <td>
+            <% if impound_record.resolved_at.present? %>
+              <span class="convertTime preciseTime">
+                <%= l(impound_record.resolved_at, format: :convert_time) %>
+              </span>
+            <% end %>
+          </td>
+        <% end %>
+
+        <% unless skip_claims %>
+          <td>
+            <% if impound_record.bike_id.present? %>
+              <%= link_to number_display(impound_record.impound_claims.count), admin_impound_claims_path(search_bike_id: impound_record.bike_id) %>
+            <% end %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

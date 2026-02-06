@@ -15,8 +15,12 @@ RSpec.describe ImpoundRecord, type: :model do
       let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :chicago) }
       it "is valid with address_record" do
         expect(impound_record).to be_valid
+        expect(impound_record.bike.reload.user&.id).to be_blank
         expect(impound_record.address_record).to be_present
         expect(impound_record.address_record.kind).to eq "impounded_from"
+        expect(impound_record.address_record.impound_record_id).to eq impound_record.id
+        expect(impound_record.address_record.bike_id).to eq impound_record.bike_id
+        expect(impound_record.address_record.user_id).to eq impound_record.user_id
         expect(impound_record.address_record.city).to eq "Chicago"
         expect(impound_record.address_record.region_record.abbreviation).to eq "IL"
         expect(impound_record.address_record.country).to eq Country.united_states
@@ -25,11 +29,16 @@ RSpec.describe ImpoundRecord, type: :model do
     end
 
     context "with_address_record and different address" do
-      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :new_york) }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :new_york, bike:) }
       it "uses the specified address" do
         expect(impound_record).to be_valid
+        expect(impound_record.bike.reload.user&.id).to be_present
         expect(impound_record.address_record.city).to eq "New York"
         expect(impound_record.address_record.region_record.abbreviation).to eq "NY"
+        expect(impound_record.address_record.bike_id).to eq impound_record.bike_id
+        expect(impound_record.address_record.user_id).to eq impound_record.user_id
+        expect(impound_record.address_record.impound_record_id).to eq impound_record.id
       end
     end
   end
