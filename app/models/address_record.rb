@@ -232,7 +232,6 @@ class AddressRecord < ApplicationRecord
     self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
 
     assign_region_record
-    assign_impound_attrs if impounded_from?
   end
 
   def assign_region_record
@@ -245,11 +244,6 @@ class AddressRecord < ApplicationRecord
       self.region_record_id = State.friendly_find(region_string, country_id:)&.id
       self.region_string = nil if region_record_id.present?
     end
-  end
-
-  def assign_impound_attrs
-    self.bike = impound_record&.bike if bike_id.blank?
-    self.user = impound_record&.user if user_id.blank?
   end
 
   def address_changed?
