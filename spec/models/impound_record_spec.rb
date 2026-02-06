@@ -157,6 +157,9 @@ RSpec.describe ImpoundRecord, type: :model do
             created_at: Time.current - 1.hour,
             organization: organization,
             user: user2,
+            latitude: 34.939393,
+            longitude: -118.939393,
+            use_entered_address: false,
             kind: "impound_notification")
           # Process parking_notification in the actual code path that creates the impound record
           ProcessParkingNotificationJob.new.perform(pn.id)
@@ -168,6 +171,8 @@ RSpec.describe ImpoundRecord, type: :model do
         # NOTE: This is permitted, but blocked in the controller.
         # Testing here to document and because maybe someday might want to error
         it "does not error" do
+          expect(parking_notification.reload.latitude).to eq(34.939393)
+          expect(parking_notification.longitude).to eq(-118.939393)
           bike.update(updated_at: Time.current)
           expect(bike.reload.impounded?).to be_truthy
           expect(bike.status_impounded?).to be_truthy
@@ -181,6 +186,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.location).to be_blank
           expect(impound_record.status).to eq "current"
           expect(impound_record.address_record.to_coordinates).to eq parking_notification.to_coordinates
+          expect(impound_record.impounded_from_address_record_id).to eq impound_record.address_record_id
           expect(impound_record.authorized?(user)).to be_truthy
           expect(impound_record.authorized?(organization_user)).to be_truthy
           # Doesn't include move update kind, because there is no location
