@@ -53,7 +53,7 @@
           %em
             = status_display(impound_record.status_humanized_short)
         %td
-          = impound_record.user&.display_name&.truncate(20)
+          = render Admin::UserCell::Component.new(user: impound_record.user, render_search: render_sortable)
         - unless skip_status
           %td
             - if impound_record.resolved_at.present?
