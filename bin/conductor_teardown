@@ -1,0 +1,49 @@
+#!/bin/sh
+#/ Usage: bin/conductor_teardown
+#/
+#/ Clean up workspace-specific resources when a Conductor workspace is closed.
+#/ This drops the workspace-specific test databases.
+
+set -e
+cd $(dirname "$0")/..
+
+if [ -z "$CONDUCTOR_WORKSPACE_NAME" ]; then
+  echo "Not running in Conductor (CONDUCTOR_WORKSPACE_NAME not set), skipping teardown."
+  exit 0
+fi
+
+echo "Tearing down Conductor workspace: $CONDUCTOR_WORKSPACE_NAME"
+
+# Drop workspace-specific development databases
+for db in "bikeindex_development_${CONDUCTOR_WORKSPACE_NAME}" \
+          "bikeindex_analytics_development_${CONDUCTOR_WORKSPACE_NAME}"; do
+  echo "Dropping database: $db"
+  dropdb --if-exists "$db" 2>/dev/null || true
+done
+
+# Drop workspace-specific test databases
+for db in "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}" \
+          "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}_replica" \
+          "bikeindex_analytics_test_${CONDUCTOR_WORKSPACE_NAME}"; do
+  echo "Dropping database: $db"
+  dropdb --if-exists "$db" 2>/dev/null || true
+done
+
+# Also drop parallel test databases (TEST_ENV_NUMBER suffixed)
+for i in $(seq 1 8); do
+  for db in "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}${i}" \
+            "bikeindex_test_${CONDUCTOR_WORKSPACE_NAME}_replica${i}" \
+            "bikeindex_analytics_test_${CONDUCTOR_WORKSPACE_NAME}${i}"; do
+    dropdb --if-exists "$db" 2>/dev/null || true
+  done
+done
+
+# Delete the workspace git branch
+CURRENT_BRANCH=$(git branch --show-current)
+if [ "$CURRENT_BRANCH" != "main" ] && [ "$CURRENT_BRANCH" != "master" ]; then
+  git checkout main 2>/dev/null || git checkout master 2>/dev/null
+  git branch -D "$CURRENT_BRANCH" 2>/dev/null || true
+  git push origin --delete "$CURRENT_BRANCH" 2>/dev/null || true
+fi
+
+echo "Conductor teardown complete!"

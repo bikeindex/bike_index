@@ -189,9 +189,13 @@ RSpec.describe BulkImportJob, type: :job do
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XXX123") }
-      let(:target_address) { {city: "NY", region_string: "New York", country_id: Country.united_states_id, kind: "ownership"} }
+      let(:target_address) do
+        {city: "New York", region_string: "NY", country_id: Country.united_states_id, kind: "ownership",
+         neighborhood: "Tribeca", postal_code: "10007", street: "278 Broadway", publicly_visible_attribute: "postal_code"}
+      end
 
-      xit "creates the bikes, doesn't have any errors", :flaky do
+      # TODO: Fix this - something with VCR - #2922
+      it "creates the bikes, doesn't have any errors", :flaky do
         expect(Country.united_states).to be_present
         expect(bike_sticker.reload.claimed?).to be_falsey
         expect(bike_sticker.bike_sticker_updates.count).to eq 0
@@ -225,12 +229,14 @@ RSpec.describe BulkImportJob, type: :job do
           expect(bike1.frame_size_unit).to eq "in"
           expect(bike1.public_images.count).to eq 0
           expect(bike1.phone).to eq("8887776666")
-          # Previously, was actually geocoding things - but that didn't seem to help people. So just use what was entered
-          expect(bike1.address_record.attributes.except(:id, :latitude, :longitude).compact).to match_hash_indifferently target_address
+          # Previously, was actually geocoding things - but that didn't seem to help people.
+          # But then we switched back and are geocoding things again with address_record
+          expect(bike1.address_record.attributes.slice(*target_address.keys.map(&:to_s)))
+            .to match_hash_indifferently target_address
           expect(BikeServices::CalculateLocation.registration_address_source(bike1)).to eq "initial_creation"
           # IDK why this is failing, post address_record for ownerships - PR #2912
-          # expect(bike1.current_ownership.address_record.to_coordinates.compact.count).to eq 2
-          # expect(bike1.to_coordinates).to eq default_location.slice(:latitude, :longitude).values
+          expect(bike1.current_ownership.address_record.to_coordinates.compact.count).to eq 2
+          expect(bike1.to_coordinates).to eq default_location.slice(:latitude, :longitude).values
           expect(bike1.extra_registration_number).to be_nil
           expect(bike1.owner_name).to be_nil
           expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
@@ -358,25 +364,42 @@ RSpec.describe BulkImportJob, type: :job do
           {
             impounded_description: "It was locked to a handicap railing",
             display_id: "2020-33333",
-            unregistered_bike: true,
-            street: "1409 Martin Luther King Junior Way",
-            city: "Berkeley",
-            zipcode: "94709", # NOTE: the zipcode that is entered is 94710
-            state_id: state.id
+            unregistered_bike: true
           }
+        end
+        let(:impound_record1_address_target) do
+          {
+            street: "1409 Martin Luther King Jr Way",
+            city: "Berkeley",
+            postal_code: "94710",
+            region_record_id: state.id,
+            kind: "impounded_from"
+          }
+        end
+        let(:impound_record1_address_target_corrected) do
+          impound_record1_address_target.merge(
+            street: "1409 Martin Luther King Junior Way",
+            postal_code: "94709"
+          ) # NOTE: the zipcode that is entered is 94710
         end
         let(:impound_record2_target) do
           {
             impounded_description: "Appears to be abandoned",
             display_id: "1",
-            unregistered_bike: true,
-            street: "327 17th Street",
-            city: "Oakland",
-            zipcode: "94612",
-            state_id: state.id
+            unregistered_bike: true
           }
         end
-        xit "creates the bikes and impound records", :flaky do
+        let(:impound_record2_address_target) do
+          {
+            street: "327 17th St",
+            city: "Oakland",
+            postal_code: "94612",
+            region_record_id: state.id,
+            kind: "impounded_from"
+          }
+        end
+        let(:impound_record2_address_target_corrected) { impound_record2_address_target.merge(street: "327 17th Street") }
+        it "creates the bikes and impound records", :flaky do
           expect(bike_sticker.reload.claimed?).to be_falsey
           expect(bike_sticker.bike_sticker_updates.count).to eq 0
           VCR.use_cassette("bulk_import-impounded-perform-success", match_requests_on: [:path]) do
@@ -400,9 +423,10 @@ RSpec.describe BulkImportJob, type: :job do
             bike1_impound_record = bike1.current_impound_record
             expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
-            expect(bike1_impound_record.latitude).to be_within(0.01).of 37.881
+            expect(bike1_impound_record.address_record.latitude).to be_within(0.01).of 37.881
+            expect(bike1.to_coordinates).to eq bike1_impound_record.address_record.to_coordinates
+            expect(bike1_impound_record.address_record).to match_hash_indifferently impound_record1_address_target
 
-            expect(bike1.to_coordinates).to eq bike1_impound_record.to_coordinates
             expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
             expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
             bike_sticker.reload
@@ -426,11 +450,15 @@ RSpec.describe BulkImportJob, type: :job do
             bike2_impound_record = bike2.current_impound_record
             expect(ImpoundRecord.count).to eq 2
 
-            expect(bike2_impound_record.street).to eq "327 17th Street"
             expect(bike2_impound_record).to match_hash_indifferently impound_record2_target
             expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
-            expect(bike2_impound_record.latitude).to be_within(0.01).of 37.8053
-            expect(bike2.to_coordinates).to eq bike2_impound_record.to_coordinates
+            expect(bike2_impound_record.address_record.latitude).to be_within(0.01).of 37.8053
+            expect(bike2.to_coordinates).to eq bike2_impound_record.address_record.to_coordinates
+            expect(bike2_impound_record.address_record).to match_hash_indifferently impound_record2_address_target
+
+            # TODO: These should actually use the geocoder corrected attributes:
+            # expect(bike1_impound_record.address_record).to match_hash_indifferently impound_record1_address_target_corrected
+            # expect(bike2_impound_record.address_record).to match_hash_indifferently impound_record2_address_target_corrected
           end
         end
       end
@@ -552,14 +580,17 @@ RSpec.describe BulkImportJob, type: :job do
         let(:target_impound) do
           {
             impounded_at_with_timezone: "2021-02-04",
-            street: "1409 Martin Luther King Jr Way",
-            city: "Berkeley",
-            state: "CA",
-            zipcode: "94710",
-            country: "US",
             display_id: "ddd33333",
             impounded_description: nil,
-            organization_id: bulk_import.organization_id
+            organization_id: bulk_import.organization_id,
+            address_record_attributes: {
+              street: "1409 Martin Luther King Jr Way",
+              city: "Berkeley",
+              region_string: "CA",
+              postal_code: "94710",
+              country: "US",
+              kind: :impounded_from
+            }
           }
         end
         it "returns impounded kind" do

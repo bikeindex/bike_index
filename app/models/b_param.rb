@@ -282,12 +282,12 @@ class BParam < ApplicationRecord
   end
 
   def impound_attrs
-    s_attrs = params["impound_record"] || {}
+    i_attrs = params["impound_record"] || {}
     nested_params = params.dig("bike", "impound_records_attributes")
     if nested_params&.values&.first.is_a?(Hash)
-      s_attrs = nested_params.values.reject(&:blank?).last
+      i_attrs = nested_params.values.reject(&:blank?).last
     end
-    s_attrs
+    i_attrs # WARNING! DOES NOT WHITELIST. Permitted in BikeServices::Builder
   end
 
   def registration_info_attrs

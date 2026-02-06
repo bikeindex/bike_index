@@ -1,0 +1,76 @@
+- social_posts ||= @social_posts
+- render_sortable ||= false
+- skip_social_account ||= false
+- skip_kind ||= false
+- skip_stolen_record ||= false
+- skip_reposts ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        - if render_sortable
+          = sortable "created_at"
+        - else
+          Created
+      %th.small Platform ID
+      - unless skip_social_account
+        %th
+          - if render_sortable
+            = sortable "social_account_id"
+          - else
+            Social Account
+      - unless skip_kind
+        %th
+          - if render_sortable
+            = sortable "kind"
+          - else
+            Kind
+      %th Post
+      - unless skip_stolen_record
+        %th Stolen Record
+      %th Image?
+      - unless skip_reposts
+        %th
+          Reposts
+    %tbody
+      - social_posts.each do |social_post|
+        %tr
+          %td
+            %a.convertTime{ href: admin_social_post_path(social_post.id) }
+              = l(social_post.created_at, format: :convert_time)
+          %td
+            %small.less-strong
+              = link_to social_post.platform_id || "ID MISSING!", social_post.post_link
+          - unless skip_social_account
+            %td
+              - if social_post.social_account.present?
+                = link_to social_post.social_account.screen_name, admin_social_posts_path(search_social_account_id: social_post.social_account.to_param)
+              - else
+                = social_post.poster
+          - unless skip_kind
+            %td.small
+              = social_post.kind&.gsub(/_?post/, "")&.humanize
+          %td
+            - if social_post.repost?
+              %strong RT:
+              = link_to social_post.original_post&.poster, admin_social_post_path(social_post.original_post)
+            - else
+              %small
+                - if social_post.body_html.present?
+                  = Binxtils::InputNormalizer.sanitize(social_post.body_html)
+                - else
+                  = social_post.body
+          - unless skip_stolen_record
+            %td
+              - if social_post.stolen_post?
+                %small.less-strong
+                  - link_text = social_post.bike.title_string if social_post.bike.present?
+                  - link_text ||= social_post.stolen_record.id
+                  = link_to link_text, admin_stolen_bike_path(social_post.stolen_record_id, stolen_record_id: true) if social_post.stolen_record.present?
+          %td
+            = check_mark if social_post.image.present? || social_post.posted_image.present?
+          - unless skip_reposts
+            %td
+              - unless social_post.repost?
+                = social_post.reposts.count

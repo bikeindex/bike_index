@@ -15,7 +15,7 @@ RSpec.describe StolenBike::ApproveStolenListingJob, type: :job, vcr: true do
     end
   end
 
-  context "given no twitter client" do
+  context "given no social account" do
     it "raises ArgumentError" do
       bike = FactoryBot.create(:stolen_bike)
       job = -> { StolenBike::ApproveStolenListingJob.new.perform(bike.id) }
@@ -25,19 +25,19 @@ RSpec.describe StolenBike::ApproveStolenListingJob, type: :job, vcr: true do
 
   # Commented out in #2618 - twitter is disabled
   #
-  # context "given a bike with a current stolen record and a nearby twitter account" do
-  #   let!(:twitter_account) { FactoryBot.create(:twitter_account_1, :active, :in_nyc) }
+  # context "given a bike with a current stolen record and a nearby social account" do
+  #   let!(:social_account) { FactoryBot.create(:social_account_1, :active, :in_nyc) }
   #   let!(:bike) { FactoryBot.create(:stolen_bike) }
-  #   it "creates twitter stolen bike alert" do
+  #   it "creates social stolen bike alert" do
   #     expect {
   #       StolenBike::ApproveStolenListingJob.new.perform(bike.id)
-  #     }.to change(Tweet, :count).by 1
+  #     }.to change(SocialPost, :count).by 1
   #   end
-  #   it "skips if tweeting disabled" do
+  #   it "skips if posting disabled" do
   #     stub_const("StolenBike::ApproveStolenListingJob::TWEETING_DISABLED", true)
   #     expect {
   #       StolenBike::ApproveStolenListingJob.new.perform(bike.id)
-  #     }.to change(Tweet, :count).by 0
+  #     }.to change(SocialPost, :count).by 0
   #   end
   # end
 end

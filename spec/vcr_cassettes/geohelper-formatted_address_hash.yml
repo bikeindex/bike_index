@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Sun, 05 Oct 2025 17:25:26 GMT
+      - Thu, 05 Feb 2026 17:43:56 GMT
       Pragma:
       - no-cache
       Expires:
@@ -33,21 +33,21 @@ http_interactions:
       X-Goog-Maps-Metro-Area:
       - San Francisco, CA
       Content-Security-Policy-Report-Only:
-      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:214:0
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:213:0
       Cross-Origin-Opener-Policy-Report-Only:
-      - same-origin; report-to=msaifdggmnwc:214:0
+      - same-origin; report-to=msaifdggmnwc:213:0
       Report-To:
-      - '{"group":"msaifdggmnwc:214:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:214:0"}],}'
+      - '{"group":"msaifdggmnwc:213:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:213:0"}],}'
       Server:
       - mafe
       Content-Length:
-      - '2979'
+      - '3312'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=93
+      - gfet4t7; dur=112
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -78,17 +78,22 @@ http_interactions:
         \"94103\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
         \              ]\n            }\n         ],\n         \"formatted_address\"
         : \"717 Market St, San Francisco, CA 94103, USA\",\n         \"geometry\"
-        : \n         {\n            \"location\" : \n            {\n               \"lat\"
-        : 37.7870205,\n               \"lng\" : -122.403928\n            },\n            \"location_type\"
-        : \"ROOFTOP\",\n            \"viewport\" : \n            {\n               \"northeast\"
-        : \n               {\n                  \"lat\" : 37.78847753029149,\n                  \"lng\"
-        : -122.4026156197085\n               },\n               \"southwest\" : \n
-        \              {\n                  \"lat\" : 37.7857795697085,\n                  \"lng\"
-        : -122.4053135802915\n               }\n            }\n         },\n         \"navigation_points\"
-        : \n         [\n            {\n               \"location\" : \n               {\n
-        \                 \"latitude\" : 37.7871928,\n                  \"longitude\"
-        : -122.4039456\n               }\n            }\n         ],\n         \"place_id\"
-        : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n         \"types\" : \n         [\n            \"street_address\",\n
-        \           \"subpremise\"\n         ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-  recorded_at: Sun, 05 Oct 2025 17:25:26 GMT
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 37.7870771,\n                  \"lng\"
+        : -122.4034128\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 37.7866579,\n                  \"lng\" : -122.4040148\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 37.7868631,\n               \"lng\" : -122.4037053\n
+        \           },\n            \"location_type\" : \"ROOFTOP\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 37.7882962302915,\n                  \"lng\" : -122.4023648197085\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 37.7855982697085,\n                  \"lng\" : -122.4050627802915\n               }\n
+        \           }\n         },\n         \"navigation_points\" : \n         [\n
+        \           {\n               \"location\" : \n               {\n                  \"latitude\"
+        : 37.7871928,\n                  \"longitude\" : -122.4039456\n               }\n
+        \           }\n         ],\n         \"place_id\" : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n
+        \        \"types\" : \n         [\n            \"premise\",\n            \"street_address\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+  recorded_at: Thu, 05 Feb 2026 17:43:56 GMT
 recorded_with: VCR 6.3.1

@@ -1,23 +1,25 @@
-<% if show_missing_user? %>
-  <small
-    class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>"
-    title="<%= @user_id %>"
-  >
-    Missing user
-  </small>
-  <% if show_email_for_missing_user? %>
-    <code class="small"><%= @user_id %></code>
+<span class="tw:flex tw:items-baseline tw:gap-x-2">
+  <% if show_missing_user? %>
+    <small
+      class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>"
+      title="<%= @user_id %>"
+    >
+      Missing user
+    </small>
+    <% if show_email_for_missing_user? %>
+      <code class="small"><%= @user_id %></code>
+    <% end %>
   <% end %>
-<% end %>
 
-<% if show_user_link? %>
-  <%= link_to email_display, admin_user_path(@user.to_param), title: @email, class: "text-link" %>
-<% elsif show_email_only? %>
-  <span title="<%= @email %>"><%= email_display %></span>
-<% end %>
+  <% if show_user_link? %>
+    <%= link_to email_display, admin_user_path(@user.to_param), title: @email, class: "text-link" %>
+  <% elsif show_email_only? %>
+    <span title="<%= @email %>"><%= email_display %></span>
+  <% end %>
 
-<%= render(Admin::UserBadges::Component.new(user: @user)) %>
+  <%= render(Admin::Badges::User::Component.new(user: @user)) %>
 
-<% if show_search? %>
-  <%= link_to helpers.search_emoji, computed_search_url, class: "display-sortable-link small" %>
-<% end %>
+  <% if show_search? %>
+    <%= link_to helpers.search_emoji, computed_search_url, class: "display-sortable-link small" %>
+  <% end %>
+</span>

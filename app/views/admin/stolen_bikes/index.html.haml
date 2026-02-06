@@ -14,7 +14,7 @@
       %li.nav-item
         = link_to "graph", admin_stolen_bikes_url(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-= render partial: "/admin/twitter_accounts/errored"
+= render partial: "/admin/social_accounts/errored"
 
 - if @render_chart
   .col-12.mt-2.mb-4
@@ -135,13 +135,13 @@
                   = [stolen_record.city, stolen_record.state&.abbreviation, stolen_record.zipcode].reject(&:blank?).first
               %td.table-cell-check
                 = check_mark if stolen_record.approved
-                = render(Admin::UserBadges::Component.new(user: bike&.user))
+                = render(Admin::Badges::User::Component.new(user: bike&.user))
             - else
               %td
               %td
               %td
               %td
-                = render(Admin::UserBadges::Component.new(user: bike&.user))
+                = render(Admin::Badges::User::Component.new(user: bike&.user))
   .mb-3.text-center
     = submit_tag 'Approve selected', class: 'btn btn-outline-primary'
 = render_admin_pagination_with_count(collection: @stolen_records, count: available_stolen_records.count, viewing: "Stolen Bike", skip_total: true)

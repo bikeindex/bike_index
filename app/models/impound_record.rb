@@ -4,41 +4,33 @@
 # Database name: primary
 #
 #  id                    :integer          not null, primary key
-#  city                  :text
 #  display_id_integer    :bigint
 #  display_id_prefix     :string
 #  impounded_at          :datetime
 #  impounded_description :text
-#  latitude              :float
-#  longitude             :float
-#  neighborhood          :text
 #  resolved_at           :datetime
 #  status                :integer          default("current")
-#  street                :text
 #  unregistered_bike     :boolean          default(FALSE)
-#  zipcode               :text
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  address_record_id     :bigint
 #  bike_id               :integer
-#  country_id            :bigint
 #  display_id            :string
 #  location_id           :bigint
 #  organization_id       :integer
-#  state_id              :bigint
 #  user_id               :integer
 #
 # Indexes
 #
-#  index_impound_records_on_bike_id          (bike_id)
-#  index_impound_records_on_country_id       (country_id)
-#  index_impound_records_on_location_id      (location_id)
-#  index_impound_records_on_organization_id  (organization_id)
-#  index_impound_records_on_state_id         (state_id)
-#  index_impound_records_on_user_id          (user_id)
+#  index_impound_records_on_address_record_id  (address_record_id)
+#  index_impound_records_on_bike_id            (bike_id)
+#  index_impound_records_on_location_id        (location_id)
+#  index_impound_records_on_organization_id    (organization_id)
+#  index_impound_records_on_user_id            (user_id)
 #
 class ImpoundRecord < ApplicationRecord
-  include Geocodeable
   include DefaultCurrencyable
+  include AddressRecorded
 
   belongs_to :bike, touch: true
   belongs_to :user
@@ -142,23 +134,33 @@ class ImpoundRecord < ApplicationRecord
     end
   end
 
+  def find_or_build_address_record(country_id: nil)
+    return address_record if address_record?
+
+    country_id ||= Country.united_states_id
+    d_address_record = organization.default_address_record if organization.present?
+    return AddressRecord.new(country_id:) if d_address_record.blank?
+
+    AddressRecord.new(country_id: d_address_record.country_id || country_id,
+      region_record_id: d_address_record.region_record_id,
+      region_string: d_address_record.region_string)
+  end
+
   # For now at least, we don't want to show exact address
   def show_address
     false
   end
 
-  # geocoding is managed by set_calculated_attributes
-  def should_be_geocoded?
-    false
+  def latitude_public
+    return unless address_record&.latitude.present?
+
+    show_address ? address_record.latitude : address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
-  # force_show_address, just like parking_notification
-  def address(force_show_address: false, country: [:iso, :optional, :skip_default])
-    Geocodeable.address(
-      self,
-      street: force_show_address || show_address,
-      country: country
-    ).presence
+  def longitude_public
+    return unless address_record&.latitude.present?
+
+    show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def unorganized?
@@ -166,7 +168,7 @@ class ImpoundRecord < ApplicationRecord
   end
 
   def organized?
-    organization_id.present?
+    organization.present?
   end
 
   def impound_claim_retrieved?
@@ -257,19 +259,17 @@ class ImpoundRecord < ApplicationRecord
     self.status = calculated_status
     self.resolved_at = resolving_update&.created_at
     self.location_id = calculated_location_id
+    # Only update address_record_id from location if there's an explicit move_location update
+    move_location_update = impound_record_updates.with_location.order(:id).last
+    self.address_record_id = move_location_update.location.address_record_id if move_location_update&.location&.address_record_id.present?
     self.user_id = calculated_user_id
     self.impounded_at ||= created_at || Time.current
+    # TODO: Unify with StolenRecord.corrected_date_stolen
     self.impounded_at = created_at if created_at.present? && created_at > impounded_at + 10.years
     # unregistered_bike means essentially that the bike was created for this impound record
     self.unregistered_bike ||= calculated_unregistered_bike?
-    # Don't geocode if location is present and address hasn't changed
-    return if !address_changed? && with_location?
-
-    self.attributes = if parking_notification.present?
-      parking_notification.attributes.slice(*Geocodeable.location_attrs)
-    else
-      GeocodeHelper.assignable_address_hash_for(address(force_show_address: true))
-    end
+    # Set address_record from parking_notification if present and no address_record yet
+    set_address_record_from_parking_notification if parking_notification.present? && !address_record? && !move_location_update
   end
 
   def reply_to_email
@@ -321,7 +321,7 @@ class ImpoundRecord < ApplicationRecord
     if impound_record_updates.where.not(user_id: nil).any?
       impound_record_updates.where.not(user_id: nil).reorder(:id).last&.user_id
     else
-      user_id.present? ? user_id : organization.auto_user&.id
+      user_id.present? ? user_id : organization&.auto_user&.id
     end
   end
 
@@ -336,5 +336,14 @@ class ImpoundRecord < ApplicationRecord
     end
     bike&.current_ownership&.status == "status_impounded" &&
       (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
+  end
+
+  def set_address_record_from_parking_notification
+    return if address_record.present? && address_record.changed?
+
+    # Create address_record from parking_notification's legacy fields
+    self.address_record = AddressRecord.new(
+      AddressRecord.attrs_from_legacy(parking_notification).merge(kind: :impounded_from, organization_id:)
+    )
   end
 end

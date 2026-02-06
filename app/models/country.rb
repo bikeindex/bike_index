@@ -71,6 +71,12 @@ class Country < ApplicationRecord
     def valid_names
       StatesAndCountries.countries.map { |c| c[:name] }
     end
+
+    def metric_units?(country_id)
+      return false if country_id.blank?
+
+      country_id != Country.united_states_id
+    end
   end
 
   def united_states?

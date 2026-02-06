@@ -6,7 +6,7 @@ Bike Index is a Rails webapp
 
 Start the dev server with `bin/dev`
 
-This will start a dev server at [http://localhost:3042](http://localhost:3042)
+This will start a dev server at [http://localhost:3042](http://localhost:3042) (or the configured `DEV_PORT`)
 
 ## Code style
 
@@ -30,16 +30,6 @@ This project uses Rspec for tests. All business logic should be tested.
 - Use request specs, not controller specs. Everything making the same request should be in a single test
 - Avoid testing private methods
 - Avoid mocking objects
-
-### Running Tests
-
-Run tests with turbo_tests:
-
-```bash
-bin/turbo_tests
-# Or, to run just specific tests
-bin/turbo_tests {FILE OR FOLDER}
-```
 
 ## Frontend Development
 

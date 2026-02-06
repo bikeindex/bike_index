@@ -161,7 +161,8 @@ CREATE TABLE public.address_records (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     bike_id bigint,
-    street_2 character varying
+    street_2 character varying,
+    organization_id bigint
 );
 
 
@@ -1706,18 +1707,11 @@ CREATE TABLE public.impound_records (
     status integer DEFAULT 0,
     location_id bigint,
     impounded_at timestamp without time zone,
-    latitude double precision,
-    longitude double precision,
-    street text,
-    zipcode text,
-    city text,
-    neighborhood text,
-    country_id bigint,
-    state_id bigint,
     display_id character varying,
     display_id_prefix character varying,
     impounded_description text,
-    unregistered_bike boolean DEFAULT false
+    unregistered_bike boolean DEFAULT false,
+    address_record_id bigint
 );
 
 
@@ -1896,9 +1890,6 @@ ALTER SEQUENCE public.listicles_id_seq OWNED BY public.listicles.id;
 CREATE TABLE public.locations (
     id integer NOT NULL,
     organization_id integer,
-    zipcode character varying(255),
-    city character varying(255),
-    street character varying(255),
     phone character varying(255),
     email character varying(255),
     name character varying(255),
@@ -1908,12 +1899,10 @@ CREATE TABLE public.locations (
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
     shown boolean DEFAULT false,
-    country_id integer,
-    state_id integer,
     not_publicly_visible boolean DEFAULT false,
     impound_location boolean DEFAULT false,
     default_impound_location boolean DEFAULT false,
-    neighborhood character varying
+    address_record_id bigint
 );
 
 
@@ -3233,6 +3222,98 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: social_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.social_accounts (
+    id integer NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    "default" boolean DEFAULT false NOT NULL,
+    "national" boolean DEFAULT false NOT NULL,
+    latitude double precision,
+    longitude double precision,
+    address_string character varying,
+    append_block character varying,
+    city character varying,
+    consumer_key character varying NOT NULL,
+    consumer_secret character varying NOT NULL,
+    language character varying,
+    neighborhood character varying,
+    screen_name character varying NOT NULL,
+    user_secret character varying NOT NULL,
+    user_token character varying NOT NULL,
+    account_info jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    last_error character varying,
+    last_error_at timestamp without time zone,
+    street character varying,
+    zipcode character varying,
+    state_id bigint,
+    country_id bigint
+);
+
+
+--
+-- Name: social_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.social_accounts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: social_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.social_accounts_id_seq OWNED BY public.social_accounts.id;
+
+
+--
+-- Name: social_posts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.social_posts (
+    id integer NOT NULL,
+    platform_id character varying,
+    platform_response json,
+    body_html text,
+    image character varying,
+    alignment character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    social_account_id integer,
+    stolen_record_id integer,
+    original_post_id integer,
+    kind integer,
+    body text
+);
+
+
+--
+-- Name: social_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.social_posts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: social_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.social_posts_id_seq OWNED BY public.social_posts.id;
+
+
+--
 -- Name: states; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3654,98 +3735,6 @@ CREATE SEQUENCE public.theft_alerts_id_seq
 --
 
 ALTER SEQUENCE public.theft_alerts_id_seq OWNED BY public.theft_alerts.id;
-
-
---
--- Name: tweets; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tweets (
-    id integer NOT NULL,
-    twitter_id character varying,
-    twitter_response json,
-    body_html text,
-    image character varying,
-    alignment character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    twitter_account_id integer,
-    stolen_record_id integer,
-    original_tweet_id integer,
-    kind integer,
-    body text
-);
-
-
---
--- Name: tweets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.tweets_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: tweets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.tweets_id_seq OWNED BY public.tweets.id;
-
-
---
--- Name: twitter_accounts; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.twitter_accounts (
-    id integer NOT NULL,
-    active boolean DEFAULT false NOT NULL,
-    "default" boolean DEFAULT false NOT NULL,
-    "national" boolean DEFAULT false NOT NULL,
-    latitude double precision,
-    longitude double precision,
-    address_string character varying,
-    append_block character varying,
-    city character varying,
-    consumer_key character varying NOT NULL,
-    consumer_secret character varying NOT NULL,
-    language character varying,
-    neighborhood character varying,
-    screen_name character varying NOT NULL,
-    user_secret character varying NOT NULL,
-    user_token character varying NOT NULL,
-    twitter_account_info jsonb DEFAULT '{}'::jsonb,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    last_error character varying,
-    last_error_at timestamp without time zone,
-    street character varying,
-    zipcode character varying,
-    state_id bigint,
-    country_id bigint
-);
-
-
---
--- Name: twitter_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.twitter_accounts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: twitter_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.twitter_accounts_id_seq OWNED BY public.twitter_accounts.id;
 
 
 --
@@ -4600,6 +4589,20 @@ ALTER TABLE ONLY public.sales ALTER COLUMN id SET DEFAULT nextval('public.sales_
 
 
 --
+-- Name: social_accounts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.social_accounts ALTER COLUMN id SET DEFAULT nextval('public.social_accounts_id_seq'::regclass);
+
+
+--
+-- Name: social_posts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.social_posts ALTER COLUMN id SET DEFAULT nextval('public.social_posts_id_seq'::regclass);
+
+
+--
 -- Name: states id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4667,20 +4670,6 @@ ALTER TABLE ONLY public.theft_alert_plans ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.theft_alerts ALTER COLUMN id SET DEFAULT nextval('public.theft_alerts_id_seq'::regclass);
-
-
---
--- Name: tweets id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tweets ALTER COLUMN id SET DEFAULT nextval('public.tweets_id_seq'::regclass);
-
-
---
--- Name: twitter_accounts id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.twitter_accounts ALTER COLUMN id SET DEFAULT nextval('public.twitter_accounts_id_seq'::regclass);
 
 
 --
@@ -5381,6 +5370,22 @@ ALTER TABLE ONLY public.sales
 
 
 --
+-- Name: social_accounts social_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.social_accounts
+    ADD CONSTRAINT social_accounts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: social_posts social_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.social_posts
+    ADD CONSTRAINT social_posts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: states states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5458,22 +5463,6 @@ ALTER TABLE ONLY public.theft_alert_plans
 
 ALTER TABLE ONLY public.theft_alerts
     ADD CONSTRAINT theft_alerts_pkey PRIMARY KEY (id);
-
-
---
--- Name: tweets tweets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tweets
-    ADD CONSTRAINT tweets_pkey PRIMARY KEY (id);
-
-
---
--- Name: twitter_accounts twitter_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.twitter_accounts
-    ADD CONSTRAINT twitter_accounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -5564,7 +5553,7 @@ CREATE UNIQUE INDEX index_active_storage_variant_records_uniqueness ON public.ac
 -- Name: index_address_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id);
+CREATE INDEX index_address_records_on_bike_id ON public.address_records USING btree (bike_id) WHERE (bike_id IS NOT NULL);
 
 
 --
@@ -5572,6 +5561,13 @@ CREATE INDEX index_address_records_on_bike_id ON public.address_records USING bt
 --
 
 CREATE INDEX index_address_records_on_country_id ON public.address_records USING btree (country_id);
+
+
+--
+-- Name: index_address_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_address_records_on_organization_id ON public.address_records USING btree (organization_id) WHERE (organization_id IS NOT NULL);
 
 
 --
@@ -5585,7 +5581,7 @@ CREATE INDEX index_address_records_on_region_record_id ON public.address_records
 -- Name: index_address_records_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id);
+CREATE INDEX index_address_records_on_user_id ON public.address_records USING btree (user_id) WHERE (user_id IS NOT NULL);
 
 
 --
@@ -5802,14 +5798,21 @@ CREATE INDEX index_bike_versions_on_tertiary_frame_color_id ON public.bike_versi
 -- Name: index_bikes_on_address_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_address_record_id ON public.bikes USING btree (address_record_id);
+CREATE INDEX index_bikes_on_address_record_id ON public.bikes USING btree (address_record_id) WHERE (address_record_id IS NOT NULL);
+
+
+--
+-- Name: index_bikes_on_creation_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_creation_organization_id ON public.bikes USING btree (creation_organization_id) WHERE (creation_organization_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_current_impound_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_current_impound_record_id ON public.bikes USING btree (current_impound_record_id);
+CREATE INDEX index_bikes_on_current_impound_record_id ON public.bikes USING btree (current_impound_record_id) WHERE (current_impound_record_id IS NOT NULL);
 
 
 --
@@ -5823,21 +5826,21 @@ CREATE INDEX index_bikes_on_current_ownership_id ON public.bikes USING btree (cu
 -- Name: index_bikes_on_current_stolen_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_current_stolen_record_id ON public.bikes USING btree (current_stolen_record_id);
+CREATE INDEX index_bikes_on_current_stolen_record_id ON public.bikes USING btree (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_deleted_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at);
+CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at) WHERE (deleted_at IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_example; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_example ON public.bikes USING btree (example);
+CREATE INDEX index_bikes_on_example ON public.bikes USING btree (example) WHERE (example IS NOT NULL);
 
 
 --
@@ -5865,28 +5868,21 @@ CREATE INDEX index_bikes_on_manufacturer_id ON public.bikes USING btree (manufac
 -- Name: index_bikes_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_audit_id);
-
-
---
--- Name: index_bikes_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_organization_id ON public.bikes USING btree (creation_organization_id);
+CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_audit_id) WHERE (model_audit_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_paint_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_paint_id ON public.bikes USING btree (paint_id);
+CREATE INDEX index_bikes_on_paint_id ON public.bikes USING btree (paint_id) WHERE (paint_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_primary_activity_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_primary_activity_id ON public.bikes USING btree (primary_activity_id);
+CREATE INDEX index_bikes_on_primary_activity_id ON public.bikes USING btree (primary_activity_id) WHERE (primary_activity_id IS NOT NULL);
 
 
 --
@@ -5900,7 +5896,7 @@ CREATE INDEX index_bikes_on_primary_frame_color_id ON public.bikes USING btree (
 -- Name: index_bikes_on_secondary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree (secondary_frame_color_id);
+CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL);
 
 
 --
@@ -5921,14 +5917,14 @@ CREATE INDEX index_bikes_on_status ON public.bikes USING btree (status);
 -- Name: index_bikes_on_tertiary_frame_color_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_tertiary_frame_color_id ON public.bikes USING btree (tertiary_frame_color_id);
+CREATE INDEX index_bikes_on_tertiary_frame_color_id ON public.bikes USING btree (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL);
 
 
 --
 -- Name: index_bikes_on_user_hidden; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikes_on_user_hidden ON public.bikes USING btree (user_hidden);
+CREATE INDEX index_bikes_on_user_hidden ON public.bikes USING btree (user_hidden) WHERE (user_hidden IS NOT NULL);
 
 
 --
@@ -6205,17 +6201,17 @@ CREATE INDEX index_impound_record_updates_on_user_id ON public.impound_record_up
 
 
 --
+-- Name: index_impound_records_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_address_record_id ON public.impound_records USING btree (address_record_id);
+
+
+--
 -- Name: index_impound_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING btree (bike_id);
-
-
---
--- Name: index_impound_records_on_country_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_impound_records_on_country_id ON public.impound_records USING btree (country_id);
 
 
 --
@@ -6230,13 +6226,6 @@ CREATE INDEX index_impound_records_on_location_id ON public.impound_records USIN
 --
 
 CREATE INDEX index_impound_records_on_organization_id ON public.impound_records USING btree (organization_id);
-
-
---
--- Name: index_impound_records_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_impound_records_on_state_id ON public.impound_records USING btree (state_id);
 
 
 --
@@ -6279,6 +6268,13 @@ CREATE INDEX index_invoices_on_first_invoice_id ON public.invoices USING btree (
 --
 
 CREATE INDEX index_invoices_on_organization_id ON public.invoices USING btree (organization_id);
+
+
+--
+-- Name: index_locations_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_locations_on_address_record_id ON public.locations USING btree (address_record_id);
 
 
 --
@@ -6793,6 +6789,55 @@ CREATE INDEX index_sales_on_seller_id ON public.sales USING btree (seller_id);
 
 
 --
+-- Name: index_social_accounts_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_country_id ON public.social_accounts USING btree (country_id);
+
+
+--
+-- Name: index_social_accounts_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_latitude_and_longitude ON public.social_accounts USING btree (latitude, longitude);
+
+
+--
+-- Name: index_social_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_screen_name ON public.social_accounts USING btree (screen_name);
+
+
+--
+-- Name: index_social_accounts_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_accounts_on_state_id ON public.social_accounts USING btree (state_id);
+
+
+--
+-- Name: index_social_posts_on_original_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_posts_on_original_post_id ON public.social_posts USING btree (original_post_id);
+
+
+--
+-- Name: index_social_posts_on_social_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_posts_on_social_account_id ON public.social_posts USING btree (social_account_id);
+
+
+--
+-- Name: index_social_posts_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_social_posts_on_stolen_record_id ON public.social_posts USING btree (stolen_record_id);
+
+
+--
 -- Name: index_states_on_country_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6940,55 +6985,6 @@ CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (u
 
 
 --
--- Name: index_tweets_on_original_tweet_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tweets_on_original_tweet_id ON public.tweets USING btree (original_tweet_id);
-
-
---
--- Name: index_tweets_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tweets_on_stolen_record_id ON public.tweets USING btree (stolen_record_id);
-
-
---
--- Name: index_tweets_on_twitter_account_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tweets_on_twitter_account_id ON public.tweets USING btree (twitter_account_id);
-
-
---
--- Name: index_twitter_accounts_on_country_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_twitter_accounts_on_country_id ON public.twitter_accounts USING btree (country_id);
-
-
---
--- Name: index_twitter_accounts_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_twitter_accounts_on_latitude_and_longitude ON public.twitter_accounts USING btree (latitude, longitude);
-
-
---
--- Name: index_twitter_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_twitter_accounts_on_screen_name ON public.twitter_accounts USING btree (screen_name);
-
-
---
--- Name: index_twitter_accounts_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_twitter_accounts_on_state_id ON public.twitter_accounts USING btree (state_id);
-
-
---
 -- Name: index_user_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7080,10 +7076,24 @@ CREATE INDEX index_users_on_auth_token ON public.users USING btree (auth_token);
 
 
 --
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email ON public.users USING btree (email) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_token_for_password_reset ON public.users USING btree (token_for_password_reset);
+
+
+--
+-- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_username ON public.users USING btree (username) WHERE (deleted_at IS NULL);
 
 
 --
@@ -7179,6 +7189,16 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260205050421'),
+('20260204180206'),
+('20260204054435'),
+('20260204050421'),
+('20260130170531'),
+('20260130162732'),
+('20260129220857'),
+('20260129122352'),
+('20260129122350'),
+('20260128220133'),
 ('20260125184905'),
 ('20260124024709'),
 ('20251223233135'),

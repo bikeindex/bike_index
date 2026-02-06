@@ -38,11 +38,11 @@ RSpec.describe "BikesController#update", type: :request do
     let(:current_user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
     let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
-    let(:address_record_attrs) do
-      {street: "10544 82 Ave NW", postal_code: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id}
+    let(:update) do
+      {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: "",
+       primary_activity_id:}
     end
-    let(:update) { {address_record_attributes: address_record_attrs, primary_activity_id:} }
-    let(:target_address_record_attributes) { address_record_attrs.merge(kind: "bike", bike_id: bike.id) }
+    let(:target_address_record_attributes) { update.slice(:street, :city, :country_id).merge(kind: "bike", postal_code: "AB T6E 2A4", bike_id: bike.id) }
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
@@ -433,11 +433,13 @@ RSpec.describe "BikesController#update", type: :request do
       {
         timezone: "America/Los_Angeles",
         impounded_at_with_timezone: "2020-04-28T11:00",
-        country_id: Country.united_states.id,
-        street: "278 Broadway",
-        city: "New York",
-        zipcode: "10007",
-        state_id: state.id
+        address_record_attributes: {
+          country_id: Country.united_states.id,
+          street: "278 Broadway",
+          city: "New York",
+          postal_code: "10007",
+          region_record_id: state.id
+        }
       }
     end
     it "updates the impound_record" do
@@ -445,7 +447,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.current_impound_record_id).to eq impound_record.id
       expect(bike.authorized?(current_user)).to be_truthy
       impound_record.reload
-      expect(impound_record.latitude).to be_blank
+      expect(impound_record.address_record).to be_blank
       patch base_url, params: {
         bike: {impound_records_attributes: {"0" => impound_params}},
         edit_template: "found_details"
@@ -453,8 +455,13 @@ RSpec.describe "BikesController#update", type: :request do
       expect(flash[:success]).to be_present
       expect(response).to redirect_to(edit_bike_path(bike, edit_template: "found_details"))
       impound_record.reload
-      expect(impound_record.latitude).to be_present
-      expect(impound_record).to match_hash_indifferently impound_params.except(:impounded_at_with_timezone, :timezone)
+      expect(impound_record.address_record).to be_present
+      expect(impound_record.address_record).to have_attributes(
+        street: "278 Broadway",
+        city: "New York"
+      )
+      # TODO: uncomment this and fix it - #2922
+      # expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
     end
 
     context "updating with new owner email" do

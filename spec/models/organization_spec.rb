@@ -112,11 +112,11 @@ RSpec.describe Organization, type: :model do
     let(:organization_child2) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 3, parent_organization: organization_parent) }
     let(:organization_child3) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 3, parent_organization: organization_parent) }
     let(:organization_shop) { FactoryBot.create(:organization, kind: "bike_shop") }
-    let(:location_parent) { organization_parent.locations.create(state: state, country: country, city: "Los Angeles", street: "100 West 1st Street", zipcode: "90012", name: organization_parent.name) }
-    let(:location_child1) { organization_child1.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "90014", name: organization_child1.name) }
-    let(:location_child2) { organization_child2.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "90017", name: organization_child2.name) }
-    let(:location_child3) { organization_child3.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "91325", name: organization_child3.name) }
-    let(:location_shop) { organization_shop.locations.create(state: state, country: country, city: "Los Angeles", street: "1626 S Hill St", zipcode: "90015", name: organization_shop.name) }
+    let(:location_parent) { organization_parent.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", street: "100 West 1st Street", postal_code: "90012"), name: organization_parent.name) }
+    let(:location_child1) { organization_child1.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", postal_code: "90014"), name: organization_child1.name) }
+    let(:location_child2) { organization_child2.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", postal_code: "90017"), name: organization_child2.name) }
+    let(:location_child3) { organization_child3.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", postal_code: "91325"), name: organization_child3.name) }
+    let(:location_shop) { organization_shop.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", street: "1626 S Hill St", postal_code: "90015"), name: organization_shop.name) }
     let(:organization_ids) { [organization_parent.id, organization_child1.id, organization_child2.id, organization_child3.id, organization_shop.id] }
     it "matches organizations as expected" do
       VCR.use_cassette("organizations-nearby_organizations", match_requests_on: [:path]) do
@@ -224,8 +224,8 @@ RSpec.describe Organization, type: :model do
         end
       end
       context "by location city" do
-        let(:location) { FactoryBot.create(:location, city: "Chicago") }
-        let!(:location2) { FactoryBot.create(:location, city: "Chicago", organization: organization) }
+        let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago) }
+        let!(:location2) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:) }
         it "finds the organization" do
           expect(Organization.admin_text_search("chi")).to eq([organization])
         end
@@ -301,20 +301,21 @@ RSpec.describe Organization, type: :model do
     end
     context "organization with a location" do
       let(:organization) { FactoryBot.create(:organization, approved: true, show_on_map: true) }
-      let!(:location) { FactoryBot.create(:location, organization: organization) }
-      let!(:location2) { FactoryBot.create(:location, organization: organization, latitude: 12, longitude: -111, skip_geocoding: true) }
+      let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:) }
+      let(:address_record2) { FactoryBot.create(:address_record, latitude: 12, longitude: -111, skip_geocoding: true) }
+      let!(:location2) { FactoryBot.create(:location, organization:, address_record: address_record2) }
       it "is the locations coordinates for the first publicly_visible location, falls back to the first location if neither publicly_visible" do
         expect(organization.default_location).to eq location
-        expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+        expect(organization.map_focus_coordinates).to eq(latitude: 41.8624488, longitude: -87.6591502)
         location.update(publicly_visible: false, skip_update: false)
         organization.reload
         expect(organization.default_location.id).to eq location2.id
         expect(organization.map_focus_coordinates).to eq(latitude: 12, longitude: -111)
-        location2.update(not_publicly_visible: true, skip_geocoding: true, skip_update: false)
+        location2.update(not_publicly_visible: true, skip_update: false)
         organization.reload
         # Now get the first location
         expect(organization.default_location).to eq location
-        expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+        expect(organization.map_focus_coordinates).to eq(latitude: 41.8624488, longitude: -87.6591502)
       end
     end
   end
@@ -588,9 +589,8 @@ RSpec.describe Organization, type: :model do
     end
 
     describe "set_locations_shown" do
-      let(:country) { FactoryBot.create(:country) }
       let(:organization) { FactoryBot.create(:organization, show_on_map: true, approved: true) }
-      let(:location) { Location.create(country_id: country.id, city: "Chicago", name: "stuff", organization_id: organization.id, shown: true) }
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, shown: true) }
       context "organization approved" do
         it "sets the locations shown to be org shown on save" do
           expect(organization.allowed_show?).to be_truthy

@@ -1,0 +1,53 @@
+.admin-subnav
+  .col-sm-9.col-md-10
+    %h1 Social Accounts
+  .col-sm-3.col-md-2
+    = link_to "New Account", "/auth/twitter", class: "btn btn-success float-right"
+
+  .col-12.mt-4
+    %h4
+      = pluralize(@social_accounts.count, "Matching Social account")
+
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th= sortable "created_at"
+      %th= sortable "screen_name", "Handle"
+      %th= sortable "last_error_at", "Errored?"
+      %th Active?
+      %th Default?
+      %th= sortable "national", "National?"
+      %th= sortable "language"
+      %th Address
+      %th Neighborhood
+      %th= sortable "city"
+      %th State
+      %th= sortable "country"
+      %th Posts
+
+    %tbody
+      - @social_accounts.each do |social_account|
+        %tr
+          %td
+            %a.convertTime{ href: admin_social_account_path(social_account) }
+              = l(social_account.created_at, format: :convert_time)
+          %td
+            = social_account.screen_name
+
+          %td= cross_mark if social_account.errored?
+          %td= check_mark if social_account.active?
+          %td= check_mark if social_account.default?
+          %td= check_mark if social_account.national?
+          %td= social_account.language
+          %td
+            %small.less-strong= social_account.address
+          %td
+            %small.less-strong= social_account.neighborhood
+          %td
+            %small.less-strong= social_account.city
+          %td
+            %small.less-strong= social_account.state&.abbreviation
+          %td
+            %small.less-strong= social_account.country&.name
+          %td
+            = number_with_delimiter(social_account.social_posts.count)

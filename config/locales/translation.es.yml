@@ -3862,15 +3862,10 @@ es:
     manages:
       location_fields:
         address:
-        choose_country:
-        city:
         location_name:
         name: Nombre
         phone_number:
         remove:
-        state:
-        street:
-        zipcode:
       locations:
         add_location:
         bike_index_partner_map:
@@ -4586,6 +4581,8 @@ es:
         your_full_address_is_required:
         address_no_street:
         street_2:
+        address_or_intersection:
+        where_was_it_status:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:
@@ -4754,3 +4751,12 @@ es:
           no_value:
       alert_for_errors:
         errors_prevented_this_from_being_saved:
+    org:
+      location_address_fields:
+        address:
+        choose_country:
+        city:
+        postal_code:
+        region:
+        state:
+        street:
