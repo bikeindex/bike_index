@@ -64,7 +64,6 @@ RSpec.describe BikesController, type: :request do
         let(:b_param) { FactoryBot.create(:b_param, params: {bike: bike_params}) }
         let(:manufacturer_id) { FactoryBot.create(:manufacturer).id }
         let(:bike_params) do
-          # NOTE: This version of address is super old and probably won't be seen anymore #2922
           {owner_email: current_user.email, manufacturer_id:, creation_organization_id: organization2.id,
            address: "212 Main St", address_city: "Chicago", address_state: "IL", address_zipcode: "60647"}
         end
