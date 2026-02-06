@@ -1,15 +1,76 @@
 require "rails_helper"
 
 RSpec.describe ImpoundRecord, type: :model do
-  it_behaves_like "geocodeable"
   it_behaves_like "default_currencyable"
   it_behaves_like "address_recorded"
 
-  let!(:bike) { FactoryBot.create(:bike, created_at: Time.current - 1.day) }
+  let(:bike) { FactoryBot.create(:bike, created_at: Time.current - 1.day) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
   let(:impound_configuration) { organization.fetch_impound_configuration }
   let(:user) { FactoryBot.create(:organization_user, organization: organization) }
   let(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
+
+  describe "factory" do
+    context "with_address_record" do
+      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :chicago) }
+      it "is valid with address_record" do
+        expect(impound_record).to be_valid
+        expect(impound_record.address_record).to be_present
+        expect(impound_record.address_record.kind).to eq "impounded_from"
+        expect(impound_record.address_record.city).to eq "Chicago"
+        expect(impound_record.address_record.region_record.abbreviation).to eq "IL"
+        expect(impound_record.address_record.country).to eq Country.united_states
+        expect(impound_record.address_record.publicly_visible_attribute).to eq "postal_code"
+      end
+    end
+
+    context "with_address_record and different address" do
+      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :new_york) }
+      it "uses the specified address" do
+        expect(impound_record).to be_valid
+        expect(impound_record.address_record.city).to eq "New York"
+        expect(impound_record.address_record.region_record.abbreviation).to eq "NY"
+      end
+    end
+  end
+
+  describe "find_or_build_address_record" do
+    let(:impound_record) { FactoryBot.create(:impound_record, :with_address_record, address_in: :amsterdam) }
+    it "returns the address_record" do
+      address_record_id = impound_record.reload.address_record_id
+      expect(address_record_id).to be_present
+      # Passing a country_id doesn't effect the existing address record
+      built_address_record = impound_record.find_or_build_address_record(country_id: Country.united_states_id)
+      expect(built_address_record.id).to eq address_record_id
+      expect(built_address_record.country_id).to eq Country.netherlands.id
+    end
+    context "new impound_record" do
+      let(:impound_record) { ImpoundRecord.new }
+      it "returns with a new address_record" do
+        built_address_record = impound_record.find_or_build_address_record(country_id: Country.canada_id)
+        expect(built_address_record.id).to be_nil
+        expect(built_address_record.country_id).to eq Country.canada_id
+      end
+      context "with an organization" do
+        let(:impound_record) { ImpoundRecord.new(organization:) }
+        let!(:organization) { FactoryBot.create(:organization) }
+        it "returns with a new address_record" do
+          built_address_record = impound_record.find_or_build_address_record(country_id: Country.canada_id)
+          expect(built_address_record.id).to be_nil
+          expect(built_address_record.country_id).to eq Country.canada_id
+        end
+        context "with an organization with a location" do
+          let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :amsterdam, organization:) }
+          it "org location assigns default attributes" do
+            expect(organization.reload.default_address_record.country_id).to eq Country.netherlands.id
+            built_address_record = impound_record.find_or_build_address_record(country_id: Country.canada_id)
+            expect(built_address_record).to have_attributes(id: nil, country_id: Country.netherlands.id,
+              region_record_id: nil, region_string: "North Holland")
+          end
+        end
+      end
+    end
+  end
 
   describe "validations" do
     it "marks the bike impounded only once" do
@@ -38,7 +99,7 @@ RSpec.describe ImpoundRecord, type: :model do
     context "bike already impounded" do
       let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike, display_id: "fasdfasdf1", display_id_prefix: "fasdfasdf", display_id_integer: 1) }
       it "errors" do
-        expect(impound_record.reload.to_coordinates).to eq([nil, nil])
+        expect(impound_record.reload.address_record).to be_blank
         expect(impound_record.organization_id).to be_blank
         # Blank out the display id for unorganized records
         expect(impound_record.display_id).to be_blank
@@ -109,7 +170,7 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.creator&.id).to eq user2.id
           expect(impound_record.location).to be_blank
           expect(impound_record.status).to eq "current"
-          expect(impound_record.to_coordinates).to eq parking_notification.to_coordinates
+          expect(impound_record.address_record.to_coordinates).to eq parking_notification.to_coordinates
           expect(impound_record.authorized?(user)).to be_truthy
           expect(impound_record.authorized?(organization_user)).to be_truthy
           # Doesn't include move update kind, because there is no location
@@ -234,8 +295,8 @@ RSpec.describe ImpoundRecord, type: :model do
   end
 
   describe "impound_location" do
-    let!(:location) { FactoryBot.create(:location, organization: organization, impound_location: true, default_impound_location: true) }
-    let!(:location2) { FactoryBot.create(:location, organization: organization, impound_location: true) }
+    let!(:location) { FactoryBot.create(:location, :with_address_record, organization: organization, impound_location: true, default_impound_location: true) }
+    let!(:location2) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization, impound_location: true) }
     let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
     let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, location: location2) }
     it "sets the impound location by default" do
@@ -390,44 +451,16 @@ RSpec.describe ImpoundRecord, type: :model do
   end
 
   describe "geocoding" do
-    context "real geocoding" do
-      include_context :geocoder_real
-      let!(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
-      let(:latitude) { 41.9202384 }
-      let(:longitude) { -87.7158185 }
-      let(:impound_record) { FactoryBot.build(:impound_record, street: "3554 W Shakespeare Ave, 60647") }
-      # TODO: Fix this - #2922 - Something with the vcr cassette
-      xit "geocodes if no address and if address changes" do
-        VCR.use_cassette("impound_record-address_lookup") do
-          impound_record.save
-          impound_record.reload
-          expect(impound_record.street).to eq "3554 West Shakespeare Avenue"
-          expect(impound_record.address).to eq "Chicago, IL 60647"
-          expect(impound_record.address(force_show_address: true)).to eq "3554 West Shakespeare Avenue, Chicago, IL 60647"
-          expect(impound_record.address(force_show_address: true, country: [:skip_default])).to eq "3554 West Shakespeare Avenue, Chicago, IL 60647"
-          expect(impound_record.latitude).to eq latitude
-          expect(impound_record.longitude).to eq longitude
-          expect(impound_record.valid?).to be_truthy
-          expect(impound_record.id).to be_present
-          expect(impound_record.state_id).to eq state.id
-          expect(impound_record.country_id).to eq Country.united_states.id
-          # It changes, so regeocodes
-          impound_record.update(street: "2554 West Shakespeare ave")
-          impound_record.reload
-          expect(impound_record.address(force_show_address: true)).to eq "2554 West Shakespeare Avenue, Chicago, IL 60647"
-          expect(impound_record.latitude).to_not eq latitude
-          expect(impound_record.longitude).to_not eq longitude
-          # It does not change, no re-geocoding
-          expect(GeocodeHelper).to_not receive(:assignable_address_hash_for)
-          impound_record.update(status: "retrieved_by_owner")
-        end
-      end
-    end
+    include_context :geocoder_real
+    let!(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
+    let(:latitude) { 41.9202384 }
+    let(:longitude) { -87.7158185 }
+    let(:impound_record) { FactoryBot.build(:impound_record, street: "3554 W Shakespeare Ave, 60647") }
     context "no location" do
       let(:impound_record) { FactoryBot.create(:impound_record) }
       it "does not geocode" do
         impound_record.reload
-        expect(impound_record.to_coordinates).to eq([nil, nil])
+        expect(impound_record.address_record).to be_blank
       end
     end
   end

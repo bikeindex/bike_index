@@ -2,31 +2,28 @@ FactoryBot.define do
   factory :location do
     sequence(:name) { |n| "Location #{n}" }
     organization { FactoryBot.create(:organization) }
-    address_record { FactoryBot.create(:address_record, :chicago) }
+
+    # Set latitude and longitude from address_record if it's present
+    latitude { address_record&.latitude }
+    longitude { address_record&.longitude }
 
     after(:create) do |location|
       # Save to simulate after_commit callback
       location.organization.save
     end
 
+    trait :with_address_record do
+      transient do
+        address_in { :chicago }
+      end
+
+      address_record do
+        FactoryBot.build(:address_record, address_in, kind: :organization, organization: instance.organization)
+      end
+    end
+
     trait :regional_organization do
       organization { FactoryBot.create(:organization_with_regional_bike_counts) }
-    end
-
-    factory :location_chicago do
-      address_record { FactoryBot.create(:address_record, :chicago) }
-    end
-
-    factory :location_nyc do
-      address_record { FactoryBot.create(:address_record, :new_york) }
-    end
-
-    factory :location_los_angeles do
-      address_record { FactoryBot.create(:address_record, :los_angeles) }
-    end
-
-    factory :location_edmonton do
-      address_record { FactoryBot.create(:address_record, :edmonton) }
     end
   end
 end

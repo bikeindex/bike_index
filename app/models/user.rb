@@ -58,7 +58,9 @@
 #
 #  index_users_on_address_record_id         (address_record_id)
 #  index_users_on_auth_token                (auth_token)
+#  index_users_on_email                     (email) WHERE (deleted_at IS NULL)
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
+#  index_users_on_username                  (username) WHERE (deleted_at IS NULL)
 #
 class User < ApplicationRecord
   include FeatureFlaggable
@@ -122,7 +124,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :user_ban
 
-  validates_uniqueness_of :username, case_sensitive: false
+  validates_uniqueness_of :username
 
   validates :password,
     presence: true,
@@ -140,7 +142,7 @@ class User < ApplicationRecord
   validate :preferred_language_is_an_available_locale
 
   validates_presence_of :email
-  validates_uniqueness_of :email, case_sensitive: false
+  validates_uniqueness_of :email
 
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
@@ -196,14 +198,14 @@ class User < ApplicationRecord
     end
 
     def admin_text_search(str)
-      q = "%#{str.to_s.strip}%"
+      q = "%#{str.to_s.strip.downcase}%"
       unscoped.includes(:user_emails)
-        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
+        .where("users.name ILIKE ? OR users.email LIKE ? OR user_emails.email LIKE ?", q, q, q)
         .distinct.references(:user_emails)
     end
 
     def matching_domain(str)
-      where("users.email ILIKE ?", "%#{str.to_s.strip}")
+      where("users.email LIKE ?", "%#{str.to_s.strip.downcase}")
     end
 
     def search_phone(str)
@@ -575,7 +577,7 @@ class User < ApplicationRecord
   protected
 
   def generate_username_confirmation_and_auth
-    usrname = username || SecureRandom.urlsafe_base64
+    usrname = Slugifyer.slugify(username || SecureRandom.urlsafe_base64)
     while User.where(username: usrname).where.not(id: id).exists?
       usrname = SecureRandom.urlsafe_base64
     end

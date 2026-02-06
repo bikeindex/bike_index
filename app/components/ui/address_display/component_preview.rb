@@ -1,20 +1,24 @@
 # frozen_string_literal: true
 
-module AddressDisplay
+module UI::AddressDisplay
   class ComponentPreview < ApplicationComponentPreview
     # @group Address Variants
 
     def with_address_record
-      render(AddressDisplay::Component.new(address_record:, visible_attribute: :street))
+      render(UI::AddressDisplay::Component.new(address_record:, visible_attribute: :street))
     end
 
     def with_address_hash
-      render(AddressDisplay::Component.new(address_hash:, visible_attribute: :street))
+      render(UI::AddressDisplay::Component.new(address_hash:, visible_attribute: :street))
     end
 
     # @param visible_attribute text "Visible attribute"
     def with_address_record_and_visible_attribute(visible_attribute: "city")
-      render(AddressDisplay::Component.new(address_record:, visible_attribute:))
+      render(UI::AddressDisplay::Component.new(address_record:, visible_attribute:))
+    end
+
+    def single_line
+      render(UI::AddressDisplay::Component.new(address_record:, visible_attribute: :street, kind: :single_line))
     end
 
     private

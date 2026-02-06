@@ -52,7 +52,7 @@
                               class: "form-control mb-1" %>
         <% end %>
 
-        <% if address_required? %>
+        <% if address_required? && @bike_status.blank? %>
           <span class="below-input-help text-warning">
             <%= translation(:your_full_address_is_required, org_name: @organization&.short_name) %>
           </span>

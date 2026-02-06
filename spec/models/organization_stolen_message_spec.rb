@@ -68,7 +68,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
 
   describe "for stolen_record" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: "bike_shop", enabled_feature_slugs: ["organization_stolen_message"]) }
-    let!(:organization_default_location) { FactoryBot.create(:location_nyc, organization: organization) }
+    let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization) }
     let!(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
     let(:attrs) { {kind: "association", is_enabled: true, body: "Something cool"} }
     before { organization_stolen_message.update(attrs) }

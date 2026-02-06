@@ -8,6 +8,16 @@ FactoryBot.define do
       user { FactoryBot.create(:organization_user, organization: organization) }
     end
 
+    trait :with_address_record do
+      transient do
+        address_in { :chicago }
+      end
+
+      address_record do
+        FactoryBot.build(:address_record, address_in, kind: :impounded_from, organization: instance.organization)
+      end
+    end
+
     factory :impound_record_with_organization, traits: [:with_organization]
 
     # Bump the bike to make impound_record the current_impound_record, if it should be
@@ -22,7 +32,8 @@ FactoryBot.define do
           impound_record: impound_record,
           kind: evaluator.status)
 
-        impound_record.bike&.update(updated_at: Time.current)
+        # Process the update to recalculate status from the impound_record_update and update the bike
+        ProcessImpoundUpdatesJob.new.perform(impound_record.id)
       end
     end
   end

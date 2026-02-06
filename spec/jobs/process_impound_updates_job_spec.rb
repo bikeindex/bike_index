@@ -82,6 +82,18 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
     end
   end
 
+  context "organization deleted" do
+    let(:organization) { impound_record.organization }
+    it "doesn't error" do
+      expect(impound_record.organized?).to be_truthy
+      organization.destroy
+      impound_record.reload
+      expect(impound_record.organization_id).to be_present
+      expect(impound_record.organization).to be_nil
+      described_class.new.perform(impound_record.id)
+    end
+  end
+
   context "display_id_next_integer" do
     let(:impound_configuration) { FactoryBot.create(:impound_configuration, display_id_prefix: "A", display_id_next_integer: 1212) }
     let(:organization) { impound_configuration.organization }

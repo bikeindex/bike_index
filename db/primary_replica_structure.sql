@@ -1707,14 +1707,6 @@ CREATE TABLE public.impound_records (
     status integer DEFAULT 0,
     location_id bigint,
     impounded_at timestamp without time zone,
-    latitude double precision,
-    longitude double precision,
-    street text,
-    zipcode text,
-    city text,
-    neighborhood text,
-    country_id bigint,
-    state_id bigint,
     display_id character varying,
     display_id_prefix character varying,
     impounded_description text,
@@ -6223,13 +6215,6 @@ CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING bt
 
 
 --
--- Name: index_impound_records_on_country_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_impound_records_on_country_id ON public.impound_records USING btree (country_id);
-
-
---
 -- Name: index_impound_records_on_location_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6241,13 +6226,6 @@ CREATE INDEX index_impound_records_on_location_id ON public.impound_records USIN
 --
 
 CREATE INDEX index_impound_records_on_organization_id ON public.impound_records USING btree (organization_id);
-
-
---
--- Name: index_impound_records_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_impound_records_on_state_id ON public.impound_records USING btree (state_id);
 
 
 --
@@ -7098,10 +7076,24 @@ CREATE INDEX index_users_on_auth_token ON public.users USING btree (auth_token);
 
 
 --
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email ON public.users USING btree (email) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_token_for_password_reset ON public.users USING btree (token_for_password_reset);
+
+
+--
+-- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_username ON public.users USING btree (username) WHERE (deleted_at IS NULL);
 
 
 --
@@ -7197,6 +7189,10 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260205050421'),
+('20260204180206'),
+('20260204054435'),
+('20260204050421'),
 ('20260130170531'),
 ('20260130162732'),
 ('20260129220857'),

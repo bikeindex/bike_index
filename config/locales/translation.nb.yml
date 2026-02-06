@@ -133,7 +133,7 @@ nb:
       content_type_denylist_error: Du har ikke lov til å laste opp %{content_type}-filer
       min_size_error: Filstørrelsen skal være større enn %{min_size}
       max_size_error: Filstørrelsen skal være mindre enn %{max_size}
-      password_too_long: er for lang
+      password_too_long: er for langt
       processing_error: Kunne ikke manipulere, kanskje det ikke er et bilde?
       min_width_error: Bildebredden bør være større enn %{min_width} piksler
       max_width_error: Bildebredden bør være mindre enn %{max_width} piksler
@@ -277,38 +277,38 @@ nb:
         access_tokens: Tilgangspoletter
         authorized_applications: Autoriserte søknader
         authorized_tokens: Autoriserte tokens
-        can_send_stolen_notifications: Kan sende stjålne varsler
+        can_send_stolen_notifications: Kan sende tyverivarsler
         is_internal: Er intern
         owner_type: Eiertype
         secret: Secret
         uid: Uid
       ad:
-        body: Kropp
+        body: Innhold
         image: Bilde
         live: Bo
         target_url: Målnettadresse
         title: Tittel
       ambassador:
-        ambassador_task_assignments: Ambassadøroppgaver
+        ambassador_task_assignments: Ambassadøroppgavetildelinger
         ambassador_tasks: Ambassadøroppgaver
         auth_token: Auth token
         avatar: Avatar
         banned: Utestengt
-        can_send_many_stolen_notifications: Kan sende mange stjålne varsler
+        can_send_many_stolen_notifications: Kan sende mange tyverivarsler
         city: By
         confirmation_token: Bekreftelseskode
         confirmed: Bekreftet
-        created_bikes: Laget sykler
+        created_bikes: Opprettede sykler
         created_ownerships: Opprettet eierskap
-        creation_states: Skapelsen sier
+        creation_states: Opprettelsestilstander
         current_ownerships: Nåværende eierskap
         currently_owned_bikes: Sykler som eies i dag
         description: Beskrivelse
         developer: Utvikler
         email: E-post
         integrations: Integrasjoner
-        last_login_at: Siste pålogging kl
-        last_login_ip: Siste innlogging ip
+        last_login_at: Siste påloggingstidspunkt
+        last_login_ip: Siste påloggings-IP
         latitude: Breddegrad
         locks: Låser
         longitude: Lengdegrad
@@ -327,9 +327,9 @@ nb:
         password_digest: Passordsammendrag
         payments: Betalinger
         phone: Telefon
-        preferred_language: Foretrukket Språk
-        received_stolen_notifications: Mottatt stjålne varsler
-        sent_stolen_notifications: Sendte stjålne varsler
+        preferred_language: Foretrukket språk
+        received_stolen_notifications: Mottatte tyverivarsel
+        sent_stolen_notifications: Sendte tyverivarsel
         show_bikes: Vis sykler
         show_phone: Vis telefonen
         show_twitter: Vis twitter
@@ -345,7 +345,7 @@ nb:
         vendor_terms_of_service: Leverandørens vilkår for bruk
         website: Nettsted
         when_vendor_terms_of_service: Når leverandørens vilkår for bruk
-        zipcode: postnummer
+        zipcode: Postnummer
         token_for_password_reset: Token for tilbakestilling av passord
         organization_roles: Organisasjonsroller
         sent_organization_roles: Sendte organisasjonsroller
@@ -412,12 +412,12 @@ nb:
         rear_tire_narrow: Bakdekk smalt
         recovered_records: Gjenopprettet poster
         registered_new: Registrert ny
-        serial_normalized: Seriell normalisert
+        serial_normalized: Normalisert serienummer
         serial_number: Serienummer
         stock_photo_url: Arkivfoto-url
         stolen: Stjålet
-        stolen_notifications: Stjålne varsler
-        stolen_records: Stjålet poster
+        stolen_notifications: Tyverivarsel
+        stolen_records: Tyverihistorikk
         thumb_path: Tommelvei
         video_embed: Video innebygd
         year: år
@@ -483,7 +483,7 @@ nb:
         iso: Iso
         locations: Steder
         name: Navn
-        stolen_records: Stjålet poster
+        stolen_records: Tyverihistorikk
       creation_state:
         is_bulk: Er bulk
         is_new: Er ny
@@ -711,33 +711,33 @@ nb:
         abbreviation: Forkortelse
         locations: Steder
         name: Navn
-        stolen_records: Stjålet poster
+        stolen_records: Tyverihistorikk
       stolen_notification:
         message: Beskjed
         receiver_email: Mottaker e-post
         reference_url: Referanse-url
-        send_dates: Send datoer
+        send_dates: Sendingsdatoer
         subject: Emne
       stolen_record:
         approved: Godkjent
-        can_share_recovery: Kan dele gjenoppretting
+        can_share_recovery: Kan dele tilbakekomst
         city: By
         create_open311: Opprett open311
         current: Nåværende
         date_stolen: Dato stjålet
-        estimated_value: Antatt verdi
+        estimated_value: Omtrentlig verdi
         index_helped_recovery: Indeks hjalp utvinningen
         latitude: Breddegrad
-        lock_defeat_description: Beskrivelse av låse nederlag
+        lock_defeat_description: Beskrivelse av låsens nederlag
         locking_description: Låsebeskrivelse
         longitude: Lengdegrad
         phone: Telefon
         phone_for_everyone: Telefon for alle
-        phone_for_police: Telefon til politiet
+        phone_for_police: Telefon for politiet
         phone_for_shops: Telefon for butikker
         phone_for_users: Telefon for brukere
-        police_report_department: Politiets rapportavdeling
-        police_report_number: Politiets rapportnummer
+        police_report_department: Anmeldelsens politikontor
+        police_report_number: Politianmeldelsens saksnummer
         proof_of_ownership: Bevis på eierskap
         receive_notifications: Motta varsler
         recovered_at: Dato gjenopprettet
@@ -906,7 +906,7 @@ nb:
           excellent: glimrende
           good: god
           new_in_box: ny i esken
-          salvage: berging
+          salvage: deler
           poor: dårlig - trenger service
         condition_description:
           excellent: lett ridd
@@ -1859,7 +1859,7 @@ nb:
       propulsion_type: Fremdrift
       rear: Bak
       rear_wheel_diameter: Bakhjuls diameter
-      serial: Seriell
+      serial: Serienummer
       stock_photo: Arkivbilde av en %{year} %{model}
       stolen_at: Stjålet kl
       stolen_details: Tyveridetaljer
@@ -1901,14 +1901,14 @@ nb:
       register_with: Registrer deg med %{organization_name}
       required: nødvendig - eller merke mangler
       select_other: Velg "Annet" hvis produsenten ikke vises når du skriver inn
-      serial_help: Seriell hjelp
+      serial_help: Serienummerhjelp
       serial_help_content_html: Hver sykkel har et unikt serienummer, det er hvordan
         de identifiseres. For å lære mer eller se noen eksempler, gå til %{serial_page_link}
         <small>(åpnes i et eget vindu)</small> .
       student_id: Student ID
       this_is_a: Dette er en
       traditional_bike: Tradisjonell sykkel
-      traditional_bike_definition: 2 hjul, 1 sete, pedal
+      traditional_bike_definition: 2 hjul, 1 sete, pedaler
       unknown_year: Ukjent årstall
       unsure_or_unknown: Usikker eller ukjent
       was_made_before_1970: Ble laget før 1970
@@ -1949,7 +1949,7 @@ nb:
       online: på nett
       owner_phone: Eiers telefon
       paint: Maling
-      police_report: Politi anmeldelse
+      police_report: Politianmeldelse
       printout: utskrift
       rear_gears: Bakre gir
       rear_wheel: Bakhjul
@@ -2027,7 +2027,7 @@ nb:
       list_bike_type_on_bike_index: List %{bike_type} på Bike Index
       location_where_the_theft_occurred: stedet der tyveriet skjedde
       nl_digid_required: "(DigiD kreves)"
-      nl_file_police_report: Send inn politianmeldelse!
+      nl_file_police_report: Send inn en politianmeldelse!
       nl_online: på nett
       nl_person: Personlig
       nl_person_report: Søk etter nærmeste politistasjon,
@@ -2045,7 +2045,7 @@ nb:
         oppføringen din)
       share_widely_on_your_personal_social: Del mye på dine personlige sosiale medier
       supercharge_sharing_on_facebook: Supercharge deling på Facebook med Bike Index
-      your_police_report: ditt politianmeldelsesnummer
+      your_police_report: din politianmeldelses saksnummer
     theft_alerts:
       new:
         best_value: Beste verdi
@@ -2139,7 +2139,7 @@ nb:
         model_year: Årsmodell
         other_manufacturer: Annen produsent
         part_description: delbeskrivelse
-        part_serial: Del seriell
+        part_serial: Delens serienummer
         part_type: Del type
         remove_part: Fjern delen
         select_other: Velg "Annet" hvis produsenten ikke vises når du skriver inn
@@ -2172,7 +2172,7 @@ nb:
       propulsion_type: Fremdrift
       submit_correction: Send inn rettelse
       submit_update: Send inn oppdatering
-      traditional_bike_definition: 2 hjul, 1 sete, pedal
+      traditional_bike_definition: 2 hjul, 1 sete, pedaler
       update_propulsion: Oppdater fremdrift
       update_vehicle_type: Oppdater kjøretøytype
       vehicle_type: Bil type
@@ -2458,7 +2458,7 @@ nb:
         delete_account: Slett konto
         membership: Medlemskap
       update:
-        current_password_doesnt_match: Gjeldende passord stemmer ikke, det er nødvendig
+        current_password_doesnt_match: Nåværende passord stemmer ikke, det er nødvendig
           for å oppdatere passordet ditt.
         successfully_updated: Informasjonen din ble oppdatert.
       messages:
@@ -2751,10 +2751,10 @@ nb:
           bør du sannsynligvis %{link}.
         please_click_the_button_below_to_create_a: Vennligst klikk på knappen nedenfor
           for å opprette et nytt passord.
-        reset_password: tilbakestille passord
+        reset_password: Tilbakestill passord
         tell_us: Fortell oss
         whoops_it_appears_you_have_forgotten_your: Oops! Det ser ut til at du har
-          glemt passordet til Bike Index!
+          glemt passordet ditt til Bike Index!
       subject: Instruksjoner for å tilbakestille passordet ditt
     recovered_from_link:
       html:
@@ -3105,35 +3105,35 @@ nb:
     protect_your_bike:
       211547_bikes_were_reported_stolen: 211 547 sykler ble meldt stjålet
       9_in_10_incidents_of_bike_theft: 9 av 10 hendelser med sykkeltyveri
-      a_correctly_locked_bicycle: En riktig låst sykkel
+      a_correctly_locked_bicycle: En skikkelig låst sykkel
       according_to_fbi_statistics_html: I følge FBI-statistikk, %{stolen_link} i 2014,
-        det siste tilgjengelige året med data. Anslagsvis %{theft_link} blir urapportert.
+        det siste tilgjengelige året med data. Anslagsvis %{theft_link} forblir urapporterte.
         Det er mange sykler! Hvis du vil lese mer om sykkeltyveri i USA, sjekk ut
         Priceonomics %{priceonomics_link} om emnet. %{back_link}.
-      aim_to_have_the_hardest_bike_to_steal_on_: Mål å ha den vanskeligste sykkelen
-        å stjele på stativet. Vi anser to U-låser, eller en U-lås og en kraftig kabel,
-        som minimum som kreves i store byer for å holde en sykkel sikker.
+      aim_to_have_the_hardest_bike_to_steal_on_: Forsøk å ha den vanskeligste sykkelen
+        å stjele på sykkelstativet. Vi anser to U-låser, eller én U-lås og én kraftig
+        kabel som minstekravet for å holde sykler sikre i store byer.
       cable_locks_should_never_be_used_as_primary: Kabellåser bør aldri brukes som
-        et primært middel for å låse en sykkel i en by.
+        hovedtiltaket for å låse en sykkel i en by.
       cheaper_and_older_ulocks_can_often_be_broken: Billigere og eldre U-låser kan
-        ofte brytes uten verktøy.
+        ofte ødelegges uten verktøy.
       checkout_out_bestbikelock_html: "- sjekk ut %{link} for anbefalinger om de beste
         låsene."
       correctly_locking_a_bike: Riktig låsing av en sykkel
-      dont_rely_on_foot_traffic_to_keep_your_bi: Ikke stol på gangtrafikk for å holde
-        sykkelen din trygg; år med rapporter har lært oss at mange tyverier, spesielt
-        de som involverer kutting av kabellåser, skjer under dekke av publikumsaktivitet
+      dont_rely_on_foot_traffic_to_keep_your_bi: Ikke stol på fotgjengere for å holde
+        sykkelen din trygg; årevis med rapporter har lært oss at mange tyverier, spesielt
+        de som involverer kutting av kabellåser, skjer blant mylderet i en folkemengde
         eller foran travle kafeer eller restauranter.
-      dont_rely_on_the_presence_of_cameras_to_k: Ikke stol på tilstedeværelsen av
-        kameraer for å holde sykkelen din sikker. Sikkerhetsopptak er sjelden til
-        stor nytte når en sykkel er borte, og tyvene vet dette.
+      dont_rely_on_the_presence_of_cameras_to_k: Ikke stol på overvåkningskameraer
+        for å holde sykkelen din sikker. Kameraopptak er sjelden til stor nytte når
+        en sykkel er borte, og tyvene vet dette.
       exploration: utforskning
       jump_to_footnote_1: Gå tilbake til fotnote 1 i teksten
       make_sure_your_bike_isnt_one_of_them: Pass på at sykkelen din ikke er en av
         dem
       many_bicycles_are_stolen_from_garages_and: Mange sykler blir stjålet fra garasjer
-        og lagerrom. Lås sykkelen din sikkert til en fast gjenstand selv om den er
-        på et "sikkert" sted.
+        og boder. Lås sykkelen din sikkert til en fast gjenstand selv om den er på
+        et "sikkert" sted.
       over_a_million_bikes_are_stolen_yearly: Over en million sykler blir stjålet
         hvert år i USA
       pink_power_ulocks: Pink Power U-Locks er et registrert varemerke for Bike Index,
@@ -3144,10 +3144,10 @@ nb:
         artikkel om valg av lås.
       the_frame_is_locked_to_an_immovable_objec: Rammen er låst til en fast gjenstand.
         Begge hjul er sikret.
-      tug_on_whatever_youre_about_to_lock_to_ma: Trekk på det du er i ferd med å låse
-        for å sikre at det ikke lett kan fjernes. Spesielt skilter kan enkelt fjernes
-        ved å løsne dem, og noen er allerede frigjort.
-      use_a_ulock_that_costs_at_least_40: Bruk en u-lås som koster minst $40
+      tug_on_whatever_youre_about_to_lock_to_ma: Rykk på det du er i ferd med å låse
+        for å sikre at det ikke lett kan fjernes. Spesielt stolper kan enkelt frigjøres
+        ved å skru løs bolter, og noen er løse fra før av.
+      use_a_ulock_that_costs_at_least_40: Bruk en U-lås som koster minst 500 kr
     resources:
       api_documentation: API-dokumentasjon
       bike_index_resources: Ressurser for sykkelindeks
@@ -3211,7 +3211,7 @@ nb:
         . Dette er foran på sykkelen.
       schwinn_serial: Schwinn serienummer
       searching_serials_on_bike_index: Søker etter serier på Bike Index
-      serial_search_input: Seriell søkeinngang
+      serial_search_input: Felt for serienummersøk
       some_bikes_have_multiple_html: Noen sykler har <em>flere serienumre</em> .
       some_schwinn_bicycles_also: Noen Schwinn-sykler har også det unike identifikasjonsnummeret
         (deres serienummer) på hoderøret.
@@ -3803,7 +3803,7 @@ nb:
         no_matches_found_html: Ingen sykler med serienummer som ligner på "%{serial}"
           funnet
         searching_html: Søker etter sykler med serienumre som ligner på "%{serial}"...
-      serial: Seriell
+      serial: Serienummer
       serial_search: 'Serienummer: %{serial}'
       stolen: Stjålet
       unknown: Ukjent
@@ -4379,7 +4379,7 @@ nb:
     users_accept_vendor_terms: Organisasjonsvilkår - Bike Index
     users_confirm: Bekreft e-posten din - Bike Index
     users_new: Registrer deg - Bike Index
-    users_password_reset: Tilbakestill passord - Bike Index
+    users_password_reset: Passordtilbaketilling - Bike Index
     users_request_password_reset: Tilbakestill passord - Bike Index
     welcome_goodbye: Logget ut
     welcome_index: Bike Index - Sykkelregistrering som fungerer
@@ -4404,7 +4404,7 @@ nb:
       new_password: Nytt passord
       new_password_confirmation: Bekreftelse av nytt passord
       password_helper_text_html: Passordet må være på minst 12 tegn. Lengre er %{better_password_link}.
-      reset_password: tilbakestille passord
+      reset_password: Tilbakestill passord
     registration_organizations:
       affiliation: "%{org_name} tilknytning"
       all_bikes_with_organization: Alle syklene dine er registrert hos denne organisasjonen
@@ -4453,9 +4453,9 @@ nb:
       unconfirmed: ubekreftet!
       unconfirmed_emails: Ubekreftede e-poster
       verified: verifisert
-      why_you_should_text: Les hvorfor du bør
+      why_you_should_text: Les hvorfor dette er en god ide
       time_single_format: Vis kun datoer
-      time_single_format_small: "(ikke i dag, i går osv.)"
+      time_single_format_small: "(ikke «i dag», «i går» osv.)"
     sharing:
       choose_file: Velg Fil...
       create_page: Lag side
@@ -4510,7 +4510,7 @@ nb:
       primary_colors: Primærfarger
       register_new_items: Registrer nye varer
       registered: Registrert
-      serial: Seriell
+      serial: Serienummer
       sorry_your_bike_was_stolen: Vi beklager at %{bikes_last_type} ble stjålet, men
         forhåpentligvis, med alle som kan søke etter den, får du den tilbake!
       tell_us_more_about_yourself: Fortell oss mer om deg selv.
@@ -5155,8 +5155,8 @@ nb:
       å sende meldinger til brukere selv om de ikke har merket sykler som stjålne</li><li>
       Søk på tvers av databaser</li><li> Integrasjon med LeadsOnline</li><li> Daglig
       stjålne sykler hot sheet</li></ol>
-    organization_dashboard: By- og rettshåndhevelsesdashbord - analyser statistikk
-      om lokal registrering basert på postnummer
+    organization_dashboard: By- og politidashbord - analyser statistikk om lokal registrering
+      basert på postnummer
     priority_programming_support: Prioritert programmering, hosting og støtte
     qr_sticker: QR-klistremerke skanning og meldinger
     qr_sticker_scanning_and_messaging: QR-klistremerke skanning og meldinger
@@ -5293,7 +5293,7 @@ nb:
       make_a_difference: Gjør en forskjell i sykkeltyveri
       other_pages: Andre sider
       protect_your_bike: Beskytt sykkelen din
-      related: I slekt
+      related: Relatert
       sign_up_your_organization: Registrer din organisasjon
       where: Hvor
     donation_form:
@@ -5576,61 +5576,58 @@ nb:
   stolen:
     index:
       ambassador: ambassadør
-      bike_index: Sykkelindeks
-      bike_index_will_broadcast: Bike Index vil kringkaste den stjålne sykkelen din
-        til det lokale Twitter-håndtaket på Stolen Bike og spre ordet via andre sosiale
-        kanaler. Vår stjålne sykkeldata er knyttet til LeadsOnline, så hvis sykkelen
-        din havner i "systemet" vil den bli flagget og du vil bli kontaktet. Samfunnet
-        vårt vil være på utkikk på ulike videresalgskanaler.
+      bike_index: Bike Index
+      bike_index_will_broadcast: Bike Index vil kringkaste informasjon om den stjålne
+        sykkelen via sosiale kanaler. Vår stjålne sykkeldata er knyttet til LeadsOnline,
+        så hvis sykkelen din havner i "systemet" og ditt lokale politikontor bruker
+        LeadsOnline vil den bli flagget og du vil bli kontaktet. Bike Index-felleskapet
+        vil være på utkikk på ulike videresalgskanaler.
       check_out_your_local_flea_market: Sjekk ut ditt lokale loppemarked for sykkelen
         din.
       donation: donasjon
       error: feil
-      file_a_police_report: Send inn politianmeldelse. Hvis du kan, gå inn i ditt
-        lokale distrikt og få en offiser til å komme og ta en rapport. Få dem engasjert
-        i din situasjon!
+      file_a_police_report: Send inn en politianmeldelse.
       if_you_are_here_your_bike_was_probably_stolen: 'Hvis du er her, er sannsynligvis
         sykkelen din stjålet. Det er kjipt, men vi er her for å hjelpe. Her er hva
         du bør gjøre:'
-      keep_an_eye_on_craigslist: Hold øye med Craigslist. Sett opp et spesifikt varsel
-        ved å bruke ifttt.com for å flagge oppføring som samsvarer med sykkelen din.
-        Spor apper som OfferUp og LetGo ettersom de brukes ofte i gjerdesykler.
-      list_recent_stolen_bikes_html: List opp nylige stjålne sykler på nettstedet
-        ditt med vår %{stolen_widget_link}
-      look_for_local_stolen_bike_groups_on_face: Se etter lokale stjålne sykkelgrupper
-        på Facebook (søk etter «stjålet sykkel {bynavn}» Mange av disse frivillige
-        gruppene finnes over hele verden og kan støtte gjenopprettingsarbeidet ditt.
+      keep_an_eye_on_craigslist: 'Hold et øye med finn.no. Sett opp et søkevarsel
+        som samsvarer med sykkelen din. '
+      list_recent_stolen_bikes_html: Vis nylige stjålne sykler på nettstedet ditt
+        med vår %{stolen_widget_link}
+      look_for_local_stolen_bike_groups_on_face: Se etter lokale sykkelgrupper på
+        Facebook. Mange av disse gruppene finnes over hele verden og kan bistå i gjenopprettingsarbeidet.
       make_sure_your_bike_is_registered_html: Sørg for at sykkelen din er registrert
-        på %{new_bike_link} og eventuelle lokale register i samfunnet ditt som kan
-        eksistere. Merk sykkelen din som <strong>stjålet</strong> på Bike Index for
-        å utløse fellesskapet vårt.
+        på %{new_bike_link} og eventuelle registre i lokalsamfunnet ditt. Merk sykkelen
+        din som <strong>stjålet</strong> på Bike Index for å ta nytte av fellesskapet
+        vårt.
       other_recovery_tools: Andre gjenopprettingsverktøy
       please_fix_the_following: Vennligst fiks følgende %{errors}
       please_login_to_make_report_html: Vennligst %{login_link} for å lage denne rapporten
-      register_it: registrere den
-      report_a_bicycle_chop_shop: Rapporter en sykkelhoggeri
+      register_it: registrer den
+      report_a_bicycle_chop_shop: Rapporter et sykkelhoggeri
       report_bike_theft_issues: 'Rapporter problemer med sykkeltyveri:'
       report_someone_selling_a_stolen_bike: Rapporter noen som selger en stjålet sykkel
       reporting_your_own_bike_stolen_html: Melde din egen sykkel stjålet? Du må %{register_it_link}
         først
       send_alert: Send varsel!
-      sign_in: Logg inn
+      sign_in: logg inn
       stolen_widget: stjålet widget
       tell_everyone_you_know: Fortell alle du kjenner om den stjålne sykkelen din.
-        Trykk på alle dine sosiale nettverk (Facebook, Instagram, Twitter, etc.) og
-        send en e-post til alle du kjenner.
-      we_wish_you_the_best_of_luck_html: Vi ønsker deg lykke til med å gjenopprette
+        Bruk alle dine sosiale nettverk (Facebook, Instagram, Twitter, etc.) og send
+        en e-post til alle du kjenner.
+      we_wish_you_the_best_of_luck_html: Vi ønsker deg lykke til med å få tilbake
         sykkelen din. Vi vil gjerne legge til historien din til våre %{recoveries_count}
         gjenopprettede sykler. Hvis du ønsker å støtte saken vår, kan du vurdere en
         %{donations_link} eller bli med i vårt %{ambassadors_link}-program.
-      what_happens_next: Hva skjer etterpå?
+      what_happens_next: Hva skjer nå?
       what_to_do_if_your_bike_is_stolen: Hva gjør du hvis sykkelen din blir stjålet
       where_is_this_happening: Hvor skjer dette? URL, adresse - all informasjon du
         har
       your_email_address: Din epostadresse
-      your_local_police_department_will_do_what: Din lokale politiavdeling vil gjøre
-        det den gjør for å hjelpe med å gjenopprette sykkelen din. Hold deg i kommunikasjon
-        med dem.
+      your_local_police_department_will_do_what: Ditt lokale politikontor vil gjøre
+        det de gjør for å forsøke å finne sykkelen din. Du kan kontakte dem på et
+        senere tidspunkt for å høre om de har funnet sykkelen. Følg med om de publiserer
+        informasjon om sykkelauksjoner e.l.
   theft_alert_plans:
     theft_alert_plan:
       days: Dager
@@ -5691,7 +5688,7 @@ nb:
     send_password_reset_email:
       follow_the_link_back: Følg lenken tilbake til nettstedet for å tilbakestille
         passordet ditt!
-      password_reset: Reset passord
+      password_reset: Passordtilbakestilling
       weve_sent_an_email: Vi har sendt en e-post til adressen du har registrert hos
         oss.
     show:
@@ -5708,7 +5705,7 @@ nb:
       better_password: bedre
       choose_a_new_password: Velg et nytt passord!
       password: Passord
-      password_confirmation: Passord bekreftelse
+      password_confirmation: Passordbekreftelse
       password_helper_text_html: Passordet må være på minst 12 tegn. Lengre er %{better_password_link}.
       update_password: Oppdater passord
       update_your_password: Oppdater passordet ditt
@@ -5741,7 +5738,7 @@ nb:
     bikes:
       location: plassering
       primary_colors: Primærfarger
-      serial: Seriell
+      serial: Serienummer
   memberships:
     success:
       bike_index_team: Bike Index team
@@ -5804,11 +5801,13 @@ nb:
         choose_country: Velg land
         city: By
         postal_code: postnummer
-        region: Region/provins
+        region: Region/provins/fylke
         state: Stat
         your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
         address_no_street: Adresse
         street_2: Gateadresse linje 2 (valgfritt)
+        address_or_intersection: Adresse eller veikryss
+        where_was_it_status: Hvor var det %{bike_status}?
       address_record_with_default:
         edit_my_account_path: redigering på kontoen min
         use_account_address: Bruk kontoadresse
@@ -5817,7 +5816,7 @@ nb:
         location: plassering
         posted_at: Oppført
         primary_colors: Primærfarger
-        serial: Seriell
+        serial: Serienummer
         deleted: Slettet
         ended_at: Avsluttet
         not_applicable: Ikke aktuelt

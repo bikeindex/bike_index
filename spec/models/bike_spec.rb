@@ -242,30 +242,6 @@ RSpec.describe Bike, type: :model do
       end
     end
 
-    describe "build_new_impound_record" do
-      let(:bike) { FactoryBot.create(:bike) }
-      let(:us_id) { Country.united_states.id }
-      it "builds a new record" do
-        impound_record = bike.build_new_impound_record
-        expect(impound_record.country_id).to eq us_id
-        expect(impound_record.impounded_at).to be > Time.current - 1.second
-        expect(impound_record.organization_id).to be_blank
-      end
-      context "organized record" do
-        let(:bike) { FactoryBot.create(:bike_organized) }
-        let(:organization) { bike.creation_organization }
-        let(:country) { FactoryBot.create(:country) }
-        it "builds new record without organization" do
-          bike.update(created_at: Time.current - 2.days)
-          # Accepts properties
-          impound_record = bike.build_new_impound_record(country_id: country.id)
-          expect(impound_record.country_id).to eq country.id
-          expect(impound_record.impounded_at).to be > Time.current - 1.second
-          expect(impound_record.organization_id).to be_blank
-        end
-      end
-    end
-
     context "unknown, absent serials" do
       let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
       let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
@@ -1391,6 +1367,46 @@ RSpec.describe Bike, type: :model do
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to be_blank
           expect(bike.registration_address.values.compact).to eq([])
         end
+      end
+    end
+  end
+
+  describe "valid_mailing_address?" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+
+    it "is falsey without registration address" do
+      expect(bike.registration_address).to eq({})
+      expect(bike.valid_mailing_address?).to be_falsey
+    end
+
+    context "with address matching organization default location" do
+      let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :chicago, address_set_manually: true) }
+      let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization) }
+      it "is falsey when address matches organization default" do
+        expect(organization.default_location).to be_present
+        expect(user.address_record).to be_present
+        # Use Bike.find to get a fresh instance (avoids memoization from factory)
+        reloaded_bike = Bike.find(bike.id)
+        expect(reloaded_bike.user).to eq user
+        expect(reloaded_bike.user.address_set_manually).to be_truthy
+        expect(BikeServices::CalculateLocation.registration_address_source(reloaded_bike)).to eq "user"
+        expect(reloaded_bike.registration_address).to be_present
+        expect(reloaded_bike.registration_address).to eq organization.default_location.address_hash_legacy
+        expect(reloaded_bike.valid_mailing_address?).to be_falsey
+      end
+    end
+
+    context "with different address than organization default" do
+      let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :new_york, address_set_manually: true) }
+      let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization) }
+      it "is truthy when address differs from organization default" do
+        expect(organization.default_location).to be_present
+        # Use Bike.find to get a fresh instance (avoids memoization from factory)
+        reloaded_bike = Bike.find(bike.id)
+        expect(reloaded_bike.registration_address).to be_present
+        expect(reloaded_bike.registration_address).to_not eq organization.default_location.address_hash_legacy
+        expect(reloaded_bike.valid_mailing_address?).to be_truthy
       end
     end
   end

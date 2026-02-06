@@ -2,7 +2,7 @@
 
 <html lang="<%= I18n.locale %>">
   <head>
-    <%= render(HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= render(PageBlock::HeaderTags::Component.new(**header_tags_component_options)) %>
 
     <%# TODO: Cache this ^ %>
     <%= csrf_meta_tags %>

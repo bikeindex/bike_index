@@ -141,15 +141,10 @@ class BulkImportJob < ApplicationJob
       impound_attrs = {
         # impounded_at_with_timezone parses with timeparser, and doesn't need timezone
         impounded_at_with_timezone: row[:impounded_at],
-        street: row[:impounded_street],
-        city: row[:impounded_city],
-        state: row[:impounded_state],
-        zipcode: row[:impounded_zipcode],
-        country: row[:impounded_country],
         impounded_description: row[:impounded_description],
         display_id: row[:impounded_id],
         organization_id: @bulk_import.organization_id
-      }
+      }.merge(impound_address_record_attributes(row))
     end
 
     {
@@ -184,6 +179,19 @@ class BulkImportJob < ApplicationJob
 
   def rescue_blank_serial(serial)
     SerialNormalizer.unknown_and_absent_corrected(serial)
+  end
+
+  def impound_address_record_attributes(row)
+    street = row[:impounded_street]
+    city = row[:impounded_city]
+    region_string = row[:impounded_state]
+    postal_code = row[:impounded_zipcode]
+    country = row[:impounded_country]
+    return {} if [street, city, region_string, postal_code, country].all?(&:blank?)
+
+    address_attrs = {kind: :impounded_from, street:, city:, region_string:, postal_code:}.compact
+    address_attrs[:country] = country if country.present?
+    {address_record_attributes: address_attrs}
   end
 
   def creator_id
