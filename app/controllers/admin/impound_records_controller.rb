@@ -55,7 +55,11 @@ class Admin::ImpoundRecordsController < Admin::BaseController
   end
 
   def find_impound_record
-    @impound_record = ImpoundRecord.friendly_find(params[:id])
+    @impound_record = if params[:id].match?(/\A\d+\z/)
+      ImpoundRecord.find(params[:id])
+    else
+      ImpoundRecord.friendly_find!(params[:id])
+    end
     @bike = @impound_record.bike
   end
 end
