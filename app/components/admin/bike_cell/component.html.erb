@@ -7,7 +7,10 @@
   </small>
 <% elsif @bike.present? %>
   <% unless @bike.status_with_owner? %>
-    <strong class="<%= "#{@bike.status_humanized.tr(" ", "-")}-color uppercase" %>" title="<%= Bike.status_humanized_translated(@bike.status_humanized) %>">
+    <strong
+      class="<%= "#{@bike.status_humanized.tr(" ", "-")}-color uppercase" %>"
+      title="<%= Bike.status_humanized_translated(@bike.status_humanized) %>"
+    >
       <%= Bike.status_humanized_translated(@bike.status_humanized).first %>
     </strong>
   <% end %>
