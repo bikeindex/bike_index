@@ -1,0 +1,152 @@
+<% impound_record_id = @impound_record.display_id || @impound_record.id %>
+<% organization_name = @impound_record.organization.present? ? @impound_record.organization.name : @impound_record.organization_id %>
+
+<div class="admin-subnav">
+  <div class="col-12">
+    <h1>
+      Impound Record
+      <% if @bike.present? && @bike.creator_unregistered_parking_notification? %>
+        <small class="text-warning">
+          for
+          <em>unregistered <%= @bike.type %></em>
+        </small>
+      <% end %>
+    </h1>
+    <% if organization_name.present? %>
+      <h2 class="mt-4">
+        <em><%= link_to "View record in organization", organization_impound_record_path(@impound_record.display_id, organization_id: @impound_record.organization_id) %></em>
+      </h2>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Created</td>
+          <td>
+            <span class="convertTime preciseTime">
+              <%= l(@impound_record.created_at, format: :convert_time) %>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td>Updated</td>
+          <td>
+            <span class="convertTime preciseTime">
+              <%= l(@impound_record.updated_at, format: :convert_time) %>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td>
+            <em><%= status_display(@impound_record.status_humanized) %></em>
+          </td>
+        </tr>
+        <tr>
+          <td>Organization</td>
+          <td>
+            <% if organization_name.present? %>
+              <%= link_to organization_name, admin_organization_path(@impound_record.organization_id) %>
+            <% else %>
+              <small class="less-strong">NO organization</small>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td>Bike</td>
+          <td>
+            <%= render Admin::BikeCell::Component.new(bike: @impound_record.bike) %>
+          </td>
+        </tr>
+        <tr>
+          <td>User</td>
+          <td>
+            <%= render Admin::UserCell::Component.new(user: @impound_record.user) %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-sm-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Impounded from</td>
+          <td>
+            <% if @impound_record.impounded_from_address_record.blank? %>
+              <em class="less-strong">No impounded from address</em>
+            <% else %>
+              <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address_record, visible_attribute: :street)) %>
+            <% end %>
+          </td>
+        </tr>
+        <tr>
+          <td>Current address</td>
+          <td>
+            <% if @impound_record.address_record_id.blank? %>
+              <em class="less-strong">No current address</em>
+            <% elsif @impound_record.address_record_id == @impound_record.impounded_from_address_record_id %>
+              <em class="less-strong">same as impounded from</em>
+            <% else %>
+              <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.address_record, visible_attribute: :street)) %>
+            <% end %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<h2 class="mt-5">Impound record updates</h2>
+<% if @impound_record.impound_record_updates.none? %>
+  <p class="less-strong">no updates</p>
+<% else %>
+  <table class="table table-striped table-bordered table-sm without-exterior-border">
+    <thead class="small-header hidden-md-down">
+      <th>Updated</th>
+      <th>By</th>
+      <th>Kind</th>
+      <th>Info</th>
+    </thead>
+    <tbody>
+      <% @impound_record.impound_record_updates.each do |impound_record_update| %>
+        <tr>
+          <td>
+            <span class="convertTime preciseTime">
+              <%= l(impound_record_update.created_at, format: :convert_time) %>
+            </span>
+          </td>
+          <td>
+            <%= render Admin::UserCell::Component.new(user: impound_record_update.user) %>
+          </td>
+          <td>
+            <em><%= impound_record_update.kind_humanized %></em>
+          </td>
+          <td>
+            <% if impound_record_update.move_location? %>
+              Moved to <%= impound_record_update.location&.name %>
+            <% elsif impound_record_update.transferred_to_new_owner? %>
+              Sent to <strong><%= impound_record_update.transfer_email %></strong>
+            <% end %>
+            <% if !impound_record_update.note? && impound_record_update.notes.present? %>
+              <br>
+            <% end %>
+            <small><%= impound_record_update.notes %></small>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<h2 class="mt-5">Impound claims</h2>
+<% if @impound_record.impound_claims.none? %>
+  <p class="less-strong">no claims</p>
+<% else %>
+  <%= render partial: "admin/impound_claims/table", locals: {impound_claims: @impound_record.impound_claims} %>
+<% end %>
+

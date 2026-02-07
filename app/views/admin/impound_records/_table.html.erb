@@ -78,9 +78,7 @@
         <td><small><%= impound_record.location&.name %></small></td>
 
         <td>
-          <% if impound_record.bike.present? %>
-            <%= link_to organized_bike_text(impound_record.bike), admin_bike_path(impound_record.bike) %>
-          <% end %>
+          <%= render Admin::BikeCell::Component.new(bike: impound_record.bike, bike_id: impound_record.bike_id) %>
         </td>
 
         <td>
