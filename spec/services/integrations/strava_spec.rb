@@ -3,10 +3,8 @@ require "rails_helper"
 RSpec.describe Integrations::Strava, type: :service do
   let(:strava_integration) do
     FactoryBot.create(:strava_integration,
-      access_token: ENV["STRAVA_TEST_ACCESS_TOKEN"],
-      refresh_token: ENV["STRAVA_TEST_REFRESH_TOKEN"],
       token_expires_at: Time.current + 6.hours,
-      athlete_id: ENV["STRAVA_TEST_USER_ID"])
+      athlete_id: "2430215")
   end
 
   describe ".authorization_url" do
@@ -51,7 +49,7 @@ RSpec.describe Integrations::Strava, type: :service do
   describe ".fetch_athlete_stats" do
     it "returns athlete stats" do
       VCR.use_cassette("strava-get_athlete_stats") do
-        result = described_class.fetch_athlete_stats(strava_integration, ENV["STRAVA_TEST_USER_ID"])
+        result = described_class.fetch_athlete_stats(strava_integration, "2430215")
         expect(result["all_ride_totals"]["count"]).to eq(1655)
         expect(result["all_run_totals"]["count"]).to eq(162)
       end

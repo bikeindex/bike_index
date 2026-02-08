@@ -358,7 +358,10 @@ RSpec.describe Bikes::EditsController, type: :request do
     end
 
     context "without strava integration" do
-      before { strava_integration.destroy }
+      before do
+        strava_integration.destroy
+        current_user.reload
+      end
 
       it "redirects to default edit template" do
         get "#{base_url}/strava_gear"

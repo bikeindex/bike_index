@@ -1545,15 +1545,17 @@ en:
     report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     strava_gear:
-      strava_gear: Strava Gear
-      connect_bike_to_strava_gear: Connect this bike to one of your Strava bikes to track which bike you're riding.
-      strava_bike: Strava Bike
-      none_selected: "-- None --"
-      currently_connected: "Currently connected to:"
-      save_strava_gear: Save Strava Gear
-      no_bikes_in_strava: No bikes found in your Strava account.
-      strava_not_connected: Your Strava account is not connected or has not finished syncing.
+      connect_bike_to_strava_gear: Connect this bike to one of your Strava bikes to
+        track which bike you're riding.
       connect_strava: Connect Strava on your account page
+      currently_connected: 'Currently connected to:'
+      no_bikes_in_strava: No bikes found in your Strava account.
+      none_selected: "-- None --"
+      save_strava_gear: Save Strava Gear
+      strava_bike: Strava Bike
+      strava_gear: Strava Gear
+      strava_not_connected: Your Strava account is not connected or has not finished
+        syncing.
     theft_details:
       charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
         ad on Facebook.
@@ -1620,6 +1622,11 @@ en:
           serial: 'Serial:'
           stolen_at: 'Stolen at:'
           stolen_from: 'Stolen from:'
+    page_block:
+      strava_integration:
+        activities_synced:
+          one: "%{count} activity synced"
+          other: "%{count} activities synced"
     ui:
       definition_list:
         row:

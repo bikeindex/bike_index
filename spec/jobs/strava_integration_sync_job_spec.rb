@@ -10,10 +10,8 @@ RSpec.describe StravaIntegrationSyncJob, type: :job do
   describe "perform" do
     let(:strava_integration) do
       FactoryBot.create(:strava_integration,
-        access_token: ENV["STRAVA_TEST_ACCESS_TOKEN"],
-        refresh_token: ENV["STRAVA_TEST_REFRESH_TOKEN"],
         token_expires_at: Time.current + 6.hours,
-        athlete_id: ENV["STRAVA_TEST_USER_ID"])
+        athlete_id: "2430215")
     end
 
     it "fetches athlete, updates integration, and enqueues page sync" do

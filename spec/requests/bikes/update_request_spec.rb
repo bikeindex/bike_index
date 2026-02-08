@@ -525,7 +525,10 @@ RSpec.describe "BikesController#update", type: :request do
     end
 
     context "without strava integration" do
-      before { strava_integration.destroy }
+      before do
+        strava_integration.destroy
+        current_user.reload
+      end
 
       it "shows error" do
         patch base_url, params: {strava_gear_id: "b12345", edit_template: "strava_gear"}
