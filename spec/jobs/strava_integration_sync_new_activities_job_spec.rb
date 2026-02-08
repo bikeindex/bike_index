@@ -1,18 +1,13 @@
 require "rails_helper"
 
 RSpec.describe StravaIntegrationSyncNewActivitiesJob, type: :job do
-  let(:instance) { described_class.new }
+  include_context :scheduled_job
+  include_examples :scheduled_job_tests
 
-  it "is a ScheduledJob" do
-    expect(described_class).to be < ScheduledJob
-  end
+  let(:instance) { described_class.new }
 
   it "has the correct frequency" do
     expect(described_class.frequency).to eq(6.hours)
-  end
-
-  it "is the correct queue" do
-    expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
   end
 
   describe "perform with no args (enqueue_workers)" do
