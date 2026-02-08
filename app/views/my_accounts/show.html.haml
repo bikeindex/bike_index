@@ -171,6 +171,8 @@
                   = t(".tell_us_more_about_yourself")
                 = link_to t(".update_your_profile"), edit_my_account_url
 
+      = render "my_accounts/strava_integration"
+
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do
   = render "/shared/donation_modal"

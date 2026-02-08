@@ -104,6 +104,7 @@ class User < ApplicationRecord
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
   has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
+  has_many :strava_activities, through: :strava_integration
   has_many :stripe_subscriptions
   has_many :superuser_abilities
   has_many :theft_alerts
@@ -120,6 +121,7 @@ class User < ApplicationRecord
 
   has_one :membership_active, -> { active }, class_name: "Membership"
   has_one :mailchimp_datum
+  has_one :strava_integration, dependent: :destroy
   has_one :user_ban
 
   accepts_nested_attributes_for :user_ban

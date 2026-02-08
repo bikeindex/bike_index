@@ -115,6 +115,12 @@ Rails.application.routes.draw do
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
+
+  # Strava integration
+  get "strava/connect", to: "strava_integrations#connect", as: :strava_connect
+  get "strava/callback", to: "strava_integrations#callback", as: :strava_callback
+  delete "strava/disconnect", to: "strava_integrations#destroy", as: :strava_disconnect
+  get "strava/sync_status", to: "strava_integrations#sync_status", as: :strava_sync_status
   # Legacy - there are places where user_home existed in emails, etc, so keep this
   get "user_home", to: redirect("/my_account")
   get :accept_vendor_terms, to: "users#accept_vendor_terms"

@@ -4196,6 +4196,23 @@ en:
       welcome: Welcome
       you_have_no_registered_bikes: You have no registered bikes
       you_have_no_registered_locks: You have no registered locks
+    strava_integration:
+      strava_integration: Strava Integration
+      integrate_your_bikes_with_strava: Integrate your bikes with Strava and sync your riding activities.
+      connect_with_strava: Connect with Strava
+      syncing_activities: Syncing activities...
+      downloaded_count: "%{count} of %{total} activities downloaded"
+      sync_running_in_background: Sync is running in the background. This page will update automatically.
+      connected_to_strava: Connected to Strava
+      activities_synced:
+        one: "%{count} activity synced"
+        other: "%{count} activities synced"
+      your_strava_gear: "Your Strava gear:"
+      sync_error: Sync error
+      sync_error_description: There was an error syncing your Strava activities. Please try disconnecting and reconnecting.
+      strava_connected_pending: Connected to Strava. Sync will begin shortly.
+      disconnect_strava: Disconnect Strava
+      disconnect_confirm: Are you sure you want to disconnect Strava? This will remove all synced activities.
   news:
     index:
       bike_index_blog: Bike Index Blog
