@@ -51,6 +51,7 @@ class ScheduledJobRunner < ScheduledJob
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
       Spreadsheets::TsvCreatorJob,
+      StravaIntegrationSyncNewActivitiesJob,
       StolenBike::DeactivateExpiredTheftAlertJob,
       StolenBike::RemoveOrphanedImagesJob,
       StolenBike::UpdateTheftAlertFacebookJob,

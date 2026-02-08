@@ -86,10 +86,53 @@ class Integrations::StravaConnection
       raise e
     end
 
+    # Fetch only activities newer than the most recent stored activity.
+    # Used by the scheduled job for incremental syncs.
+    def sync_new_activities(strava_integration)
+      ensure_valid_token!(strava_integration)
+
+      latest_activity = strava_integration.strava_activities.order(start_date: :desc).first
+      after_epoch = latest_activity&.start_date&.to_i
+
+      page = 1
+      new_activity_ids = []
+
+      loop do
+        params = {per_page: ACTIVITIES_PER_PAGE, page: page}
+        params[:after] = after_epoch if after_epoch.present?
+
+        activities = get(strava_integration, "/athlete/activities", **params)
+        break if activities.blank? || !activities.is_a?(Array)
+
+        activities.each do |summary|
+          saved = save_activity_from_summary(strava_integration, summary)
+          new_activity_ids << saved.id if saved.cycling?
+        end
+
+        break if activities.size < ACTIVITIES_PER_PAGE
+        page += 1
+        sleep(REQUEST_DELAY)
+      end
+
+      # Fetch detailed info for any new cycling activities
+      fetch_cycling_activity_details_for(strava_integration, new_activity_ids) if new_activity_ids.any?
+
+      strava_integration.update(
+        activities_downloaded_count: strava_integration.strava_activities.count
+      )
+    end
+
     private
 
     def fetch_cycling_activity_details(strava_integration)
-      strava_integration.strava_activities.cycling.find_each do |activity|
+      fetch_cycling_activity_details_for(
+        strava_integration,
+        strava_integration.strava_activities.cycling.pluck(:id)
+      )
+    end
+
+    def fetch_cycling_activity_details_for(strava_integration, activity_ids)
+      StravaActivity.where(id: activity_ids).find_each do |activity|
         ensure_valid_token!(strava_integration)
         detail = get(strava_integration, "/activities/#{activity.strava_id}")
         next unless detail

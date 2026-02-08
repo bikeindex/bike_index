@@ -119,4 +119,52 @@ RSpec.describe Integrations::StravaConnection, type: :service do
       end
     end
   end
+
+  describe ".sync_new_activities" do
+    let!(:existing_activity) do
+      FactoryBot.create(:strava_activity,
+        strava_integration: strava_integration,
+        strava_id: "9876543",
+        title: "Morning Ride",
+        activity_type: "Ride",
+        start_date: Time.parse("2025-06-15T08:00:00Z"))
+    end
+
+    it "fetches only activities after the most recent stored activity" do
+      VCR.use_cassette("strava-list_new_activities", match_requests_on: [:path]) do
+        VCR.use_cassette("strava-get_activity_afternoon_ride", match_requests_on: [:path]) do
+          expect {
+            described_class.sync_new_activities(strava_integration)
+          }.to change(StravaActivity, :count).by(1)
+
+          new_activity = strava_integration.strava_activities.find_by(strava_id: "9876600")
+          expect(new_activity.title).to eq("Afternoon Ride")
+          expect(new_activity.activity_type).to eq("Ride")
+          expect(new_activity.distance).to eq(32000.0)
+        end
+      end
+    end
+
+    it "fetches details for new cycling activities" do
+      VCR.use_cassette("strava-list_new_activities", match_requests_on: [:path]) do
+        VCR.use_cassette("strava-get_activity_afternoon_ride", match_requests_on: [:path]) do
+          described_class.sync_new_activities(strava_integration)
+
+          new_activity = strava_integration.strava_activities.find_by(strava_id: "9876600")
+          expect(new_activity.description).to eq("Quick spin through the park after work.")
+          expect(new_activity.location_city).to eq("San Francisco")
+          expect(new_activity.gear_name).to eq("My Road Bike")
+        end
+      end
+    end
+
+    it "updates activities_downloaded_count" do
+      VCR.use_cassette("strava-list_new_activities", match_requests_on: [:path]) do
+        VCR.use_cassette("strava-get_activity_afternoon_ride", match_requests_on: [:path]) do
+          described_class.sync_new_activities(strava_integration)
+          expect(strava_integration.reload.activities_downloaded_count).to eq(2)
+        end
+      end
+    end
+  end
 end
