@@ -15,8 +15,12 @@ RSpec.describe ImpoundRecord, type: :model do
       let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :chicago) }
       it "is valid with address_record" do
         expect(impound_record).to be_valid
+        expect(impound_record.bike.reload.user&.id).to be_blank
+        expect(impound_record.impounded_from_address_record_id).to eq impound_record.address_record_id
         expect(impound_record.address_record).to be_present
         expect(impound_record.address_record.kind).to eq "impounded_from"
+        expect(impound_record.address_record.bike_id).to eq impound_record.bike_id
+        expect(impound_record.address_record.user_id).to eq impound_record.user_id
         expect(impound_record.address_record.city).to eq "Chicago"
         expect(impound_record.address_record.region_record.abbreviation).to eq "IL"
         expect(impound_record.address_record.country).to eq Country.united_states
@@ -25,11 +29,16 @@ RSpec.describe ImpoundRecord, type: :model do
     end
 
     context "with_address_record and different address" do
-      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :new_york) }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      let(:impound_record) { FactoryBot.create(:impound_record, :with_organization, :with_address_record, address_in: :new_york, bike:) }
       it "uses the specified address" do
         expect(impound_record).to be_valid
+        expect(impound_record.bike.reload.user&.id).to be_present
         expect(impound_record.address_record.city).to eq "New York"
         expect(impound_record.address_record.region_record.abbreviation).to eq "NY"
+        expect(impound_record.address_record.bike_id).to eq impound_record.bike_id
+        expect(impound_record.address_record.user_id).to eq impound_record.user_id
+        expect(impound_record.impounded_from_address_record_id).to eq impound_record.address_record_id
       end
     end
   end
@@ -123,6 +132,7 @@ RSpec.describe ImpoundRecord, type: :model do
       let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, user: user2, kind: "retrieved_by_owner") }
       let(:valid_update_kinds) { ImpoundRecordUpdate.kinds - %w[move_location claim_approved claim_denied expired] }
       it "updates the record and the user" do
+        expect(impound_record.reload.address_record_id).to be_blank
         ProcessImpoundUpdatesJob.new.perform(impound_record.id)
         bike.reload
         expect(bike.impounded?).to be_truthy
@@ -147,6 +157,9 @@ RSpec.describe ImpoundRecord, type: :model do
             created_at: Time.current - 1.hour,
             organization: organization,
             user: user2,
+            latitude: 34.939393,
+            longitude: -118.939393,
+            use_entered_address: false,
             kind: "impound_notification")
           # Process parking_notification in the actual code path that creates the impound record
           ProcessParkingNotificationJob.new.perform(pn.id)
@@ -158,6 +171,8 @@ RSpec.describe ImpoundRecord, type: :model do
         # NOTE: This is permitted, but blocked in the controller.
         # Testing here to document and because maybe someday might want to error
         it "does not error" do
+          expect(parking_notification.reload.latitude).to eq(34.939393)
+          expect(parking_notification.longitude).to eq(-118.939393)
           bike.update(updated_at: Time.current)
           expect(bike.reload.impounded?).to be_truthy
           expect(bike.status_impounded?).to be_truthy
@@ -170,7 +185,9 @@ RSpec.describe ImpoundRecord, type: :model do
           expect(impound_record.creator&.id).to eq user2.id
           expect(impound_record.location).to be_blank
           expect(impound_record.status).to eq "current"
+          # Make certain the address_record doesn't re-geocode - since it might be from a phone's precise location
           expect(impound_record.address_record.to_coordinates).to eq parking_notification.to_coordinates
+          expect(impound_record.impounded_from_address_record_id).to eq impound_record.address_record_id
           expect(impound_record.authorized?(user)).to be_truthy
           expect(impound_record.authorized?(organization_user)).to be_truthy
           # Doesn't include move update kind, because there is no location
@@ -300,23 +317,28 @@ RSpec.describe ImpoundRecord, type: :model do
     let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user: user, bike: bike, organization: organization) }
     let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, location: location2) }
     it "sets the impound location by default" do
+      expect(impound_record.reload.address_record_id).to eq location.address_record_id
       organization.reload
       expect(organization.enabled?("impound_bikes_locations")).to be_truthy
       expect(organization.default_impound_location).to eq location
       expect(impound_record.location).to eq location
+      expect(impound_record.impounded_from_address_record_id).to be_nil
       impound_record_update.save
       impound_record.reload
       expect(impound_record.location).to eq location2
+      expect(impound_record.address_record_id).to eq location2.address_record_id
+      expect(impound_record.impounded_from_address_record_id).to be_nil
     end
 
     context "with impounded_from address_record" do
-      let(:impounded_from_address) { FactoryBot.create(:address_record) }
+      let(:impounded_from_address) { FactoryBot.create(:address_record, kind: :impounded_from) }
       let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user:, bike:, organization:, address_record: impounded_from_address) }
       it "updates address_record_id to location's address_record_id without deleting impounded_from" do
         location2.reload
         expect(location2.address_record).to be_present
-        expect(impound_record.reload.address_record_id).to eq impounded_from_address.id
-        expect(impound_record.location).to eq location
+        expect(impound_record.reload.impounded_from_address_record_id).to eq impounded_from_address.id
+        expect(impound_record.location_id).to eq location.id
+        expect(impound_record.address_record_id).to eq location.address_record_id
 
         impound_record_update.save
         impound_record.reload

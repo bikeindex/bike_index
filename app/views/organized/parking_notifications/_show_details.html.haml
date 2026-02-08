@@ -41,7 +41,7 @@
                   = status_display(current_notification.status)
             - elsif @parking_notification.impounded?
               %span.text-danger
-                This #{passed_bike.type} was impounded
+                This #{passed_bike&.type || CycleType::DEFAULT} was impounded
               - unless viewing_impound_record
                 %br
                 %strong
