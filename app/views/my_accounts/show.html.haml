@@ -171,7 +171,8 @@
                   = t(".tell_us_more_about_yourself")
                 = link_to t(".update_your_profile"), edit_my_account_url
 
-      = render(PageBlock::StravaIntegration::Component.new(user: current_user))
+      - if Flipper.enabled?(:strava_integration, current_user)
+        = render(PageBlock::StravaIntegration::Component.new(user: current_user))
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do

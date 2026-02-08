@@ -1,0 +1,85 @@
+<%= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f| %>
+  <% if params[:return_to].present? %>
+    <%= hidden_field_tag :return_to, params[:return_to] %>
+  <% end %>
+
+  <div class="form-well-container container edit-bike-page-<%= @edit_template %>">
+    <div class="row">
+      <%= render partial: '/bikes_edit/primary_menu', locals: { no_save_button: true } %>
+
+      <div class="col-md-8 form-well">
+        <div class="form-wrap">
+          <div class="form-well-form-header">
+            <h3><%= t(".strava_gear") %></h3>
+          </div>
+
+          <div class="related-fields">
+            <p class="mb-3"><%= t(".connect_bike_to_strava_gear") %></p>
+
+            <% strava_integration = current_user.strava_integration %>
+
+            <% if strava_integration&.synced? && strava_integration.athlete_gear.present? %>
+              <% bike_gear = @bike.strava_gear_association %>
+              <% bikes_from_strava = strava_integration.athlete_gear.select { |g| g["resource_state"].present? } %>
+              <% if bikes_from_strava.any? %>
+                <div class="form-group row unnested-field">
+                  <label class="form-well-label">
+                    <%= t(".strava_bike") %>
+                  </label>
+
+                  <div class="form-well-input">
+                    <select class="form-control" name="strava_gear_id">
+                      <option value="" <%= "selected" if bike_gear.blank? %>><%= t(".none_selected") %></option>
+
+                      <% bikes_from_strava.each do |gear| %>
+                        <option
+                          value="<%= gear["id"] %>"
+                          <%= "selected" if bike_gear&.strava_gear_id == gear["id"] %>
+                        >
+                          <%= gear["name"] %>
+
+                          <% if gear["distance"].present? %>
+                            (
+                            <%= (gear["distance"].to_f / 1000).round(0) %>
+                            km)
+                          <% end %>
+                        </option>
+                      <% end %>
+                    </select>
+                  </div>
+                </div>
+                <% if bike_gear.present? %>
+                  <div class="mt-3 p-3 bg-light rounded">
+                    <p class="mb-1">
+                      <strong><%= t(".currently_connected") %></strong>
+                    </p>
+
+                    <p class="mb-0">
+                      <%= bike_gear.strava_gear_display_name %>
+                    </p>
+                  </div>
+                <% end %>
+                <div class="mt-3">
+                  <%= hidden_field_tag :edit_template, @edit_template %>
+                  <%= submit_tag t(".save_strava_gear"), class: 'btn btn-lg btn-primary' %>
+                </div>
+              <% else %>
+                <div class="alert alert-info">
+                  <%= t(".no_bikes_in_strava") %>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="alert alert-warning">
+                <%= t(".strava_not_connected") %>
+
+                <% unless strava_integration.present? %>
+                  <%= link_to t(".connect_strava"), my_account_path, class: "alert-link" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
