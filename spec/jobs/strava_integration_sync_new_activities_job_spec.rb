@@ -31,24 +31,31 @@ RSpec.describe StravaIntegrationSyncNewActivitiesJob, type: :job do
         start_date: Time.parse("2025-06-15T08:00:00Z"))
     end
 
-    it "enqueues page sync job with after_epoch" do
-      instance.perform(strava_integration.id)
-      expect(StravaActivityPageSyncJob.jobs.size).to eq(1)
-      job_args = StravaActivityPageSyncJob.jobs.first["args"]
-      expect(job_args[0]).to eq(strava_integration.id)
-      expect(job_args[1]).to eq(1)
-      expect(job_args[2]).to eq(existing_activity.start_date.to_i)
+    it "creates a list_activities request with after_epoch" do
+      expect {
+        instance.perform(strava_integration.id)
+      }.to change(StravaRequest, :count).by(1)
+
+      request = StravaRequest.last
+      expect(request.request_type).to eq("list_activities")
+      expect(request.endpoint).to eq("athlete/activities")
+      expect(request.parameters["page"]).to eq(1)
+      expect(request.parameters["per_page"]).to eq(200)
+      expect(request.parameters["after"]).to eq(existing_activity.start_date.to_i)
+      expect(StravaRequestRunnerJob.jobs.size).to eq(1)
     end
 
     it "skips non-synced integrations" do
       strava_integration.update_column(:status, StravaIntegration.statuses[:pending])
-      instance.perform(strava_integration.id)
-      expect(StravaActivityPageSyncJob.jobs.size).to eq(0)
+      expect {
+        instance.perform(strava_integration.id)
+      }.not_to change(StravaRequest, :count)
     end
 
     it "does nothing when integration not found" do
-      instance.perform(-1)
-      expect(StravaActivityPageSyncJob.jobs.size).to eq(0)
+      expect {
+        instance.perform(-1)
+      }.not_to change(StravaRequest, :count)
     end
   end
 end

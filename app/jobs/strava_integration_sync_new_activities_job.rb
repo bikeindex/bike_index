@@ -16,7 +16,14 @@ class StravaIntegrationSyncNewActivitiesJob < ScheduledJob
     latest = si.strava_activities.order(start_date: :desc).first
     after_epoch = latest&.start_date&.to_i
 
-    StravaActivityPageSyncJob.perform_async(si.id, 1, after_epoch)
+    StravaRequest.create!(
+      user_id: si.user_id,
+      strava_integration_id: si.id,
+      request_type: :list_activities,
+      endpoint: "athlete/activities",
+      parameters: {page: 1, per_page: 200, after: after_epoch}.compact
+    )
+    StravaRequestRunnerJob.perform_async
   end
 
   def enqueue_workers

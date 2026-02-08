@@ -14,23 +14,24 @@ RSpec.describe StravaIntegrationSyncJob, type: :job do
         athlete_id: ENV["STRAVA_TEST_USER_ID"])
     end
 
-    it "fetches athlete, updates integration, and enqueues page sync" do
-      VCR.use_cassette("strava-get_athlete") do
-        VCR.use_cassette("strava-get_athlete_stats") do
-          instance.perform(strava_integration.id)
+    it "creates a fetch_athlete request and enqueues the runner" do
+      expect {
+        instance.perform(strava_integration.id)
+      }.to change(StravaRequest, :count).by(1)
 
-          strava_integration.reload
-          expect(strava_integration.athlete_id).to eq("2430215")
-          expect(strava_integration.athlete_activity_count).to eq(1817)
-          expect(strava_integration.status).to eq("syncing")
-          expect(StravaActivityPageSyncJob.jobs.size).to eq(1)
-        end
-      end
+      request = StravaRequest.last
+      expect(request.request_type).to eq("fetch_athlete")
+      expect(request.endpoint).to eq("athlete")
+      expect(request.strava_integration_id).to eq(strava_integration.id)
+      expect(request.user_id).to eq(strava_integration.user_id)
+      expect(StravaRequestRunnerJob.jobs.size).to eq(1)
     end
 
     it "does nothing when integration not found" do
-      instance.perform(-1)
-      expect(StravaActivityPageSyncJob.jobs.size).to eq(0)
+      expect {
+        instance.perform(-1)
+      }.not_to change(StravaRequest, :count)
+      expect(StravaRequestRunnerJob.jobs.size).to eq(0)
     end
   end
 end
