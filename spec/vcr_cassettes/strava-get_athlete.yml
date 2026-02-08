@@ -4,9 +4,13 @@ http_interactions:
     method: get
     uri: https://www.strava.com/api/v3/athlete
     body:
-      encoding: UTF-8
+      encoding: US-ASCII
       string: ''
     headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
       - "*/*"
   response:
@@ -16,8 +20,57 @@ http_interactions:
     headers:
       Content-Type:
       - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 08 Feb 2026 22:46:40 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '46'
+      Server:
+      - istio-envoy
+      Status:
+      - 200 OK
+      X-Ratelimit-Usage:
+      - '7,26'
+      X-Ratelimit-Limit:
+      - '600,6000'
+      Vary:
+      - Accept, Origin
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - 1c27a634-903c-4b15-b0fe-25fd0ad46661
+      X-Readratelimit-Limit:
+      - '300,3000'
+      X-Download-Options:
+      - noopen
+      Etag:
+      - W/"99f4c6b9eb593b4f85867f4ee14f7d17"
+      X-Frame-Options:
+      - DENY
+      X-Readratelimit-Usage:
+      - '7,26'
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 744bd06c47c689d0ef4608fa37cf1bcc.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - CmPRq9zgHBIHw6fHQJ8sXK72uxWUn6FZ-LhO1ckGG3JUr8Wo_W1LuQ==
     body:
-      encoding: UTF-8
-      string: '{"id":12345678,"username":"testathlete","firstname":"Test","lastname":"User","city":"San Francisco","state":"California","country":"United States","sex":"M","premium":true,"created_at":"2015-01-01T00:00:00Z","updated_at":"2025-01-01T00:00:00Z","follower_count":50,"friend_count":100,"measurement_preference":"feet","bikes":[{"id":"b1234","primary":true,"name":"My Road Bike","distance":50000.0,"resource_state":2},{"id":"b5678","primary":false,"name":"My Mountain Bike","distance":25000.0,"resource_state":2}],"shoes":[{"id":"g9012","primary":true,"name":"Running Shoes","distance":1000.0,"resource_state":2}]}'
-  recorded_at: Sun, 08 Feb 2026 12:00:01 GMT
-recorded_with: VCR 6.0.0
+      encoding: ASCII-8BIT
+      string: '{"id":2430215,"username":"sethherr","resource_state":2,"firstname":"seth","lastname":"herr","bio":"","city":"San
+        Francisco","state":"California","country":"United States","sex":"M","premium":true,"summit":true,"created_at":"2013-06-26T20:41:15Z","updated_at":"2026-02-02T18:05:52Z","badge_type_id":1,"weight":72.5747,"profile_medium":"https://dgalywyr863hv.cloudfront.net/pictures/athletes/2430215/2807433/6/medium.jpg","profile":"https://dgalywyr863hv.cloudfront.net/pictures/athletes/2430215/2807433/6/large.jpg","friend":null,"follower":null}'
+  recorded_at: Sun, 08 Feb 2026 22:46:40 GMT
+recorded_with: VCR 6.3.1

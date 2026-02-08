@@ -3,7 +3,7 @@
     <%= hidden_field_tag :return_to, params[:return_to] %>
   <% end %>
 
-  <div class="form-well-container container edit-bike-page-<%= @edit_template %>">
+  <div class="form-well-container container edit-bike-page- <%= @edit_template %>">
     <div class="row">
       <%= render partial: '/bikes_edit/primary_menu', locals: { no_save_button: true } %>
 

@@ -40,7 +40,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
 
       context "with valid code" do
         it "creates strava integration and enqueues sync job" do
-          VCR.use_cassette("strava-exchange_token", match_requests_on: [:path]) do
+          VCR.use_cassette("strava-exchange_token") do
             expect {
               get "/strava_integration/callback", params: {code: "test_auth_code"}
             }.to change(StravaIntegration, :count).by(1)
@@ -50,9 +50,9 @@ RSpec.describe StravaIntegrationsController, type: :request do
             expect(flash[:success]).to match(/connected/i)
 
             si = current_user.reload.strava_integration
-            expect(si.access_token).to eq("strava_access_token_xyz")
-            expect(si.refresh_token).to eq("strava_refresh_token_abc")
-            expect(si.athlete_id).to eq("12345678")
+            expect(si.access_token).to be_present
+            expect(si.refresh_token).to be_present
+            expect(si.athlete_id).to eq("2430215")
             expect(si.status).to eq("pending")
           end
         end
@@ -61,13 +61,12 @@ RSpec.describe StravaIntegrationsController, type: :request do
           let!(:existing) { FactoryBot.create(:strava_integration, user: current_user) }
 
           it "updates existing integration" do
-            VCR.use_cassette("strava-exchange_token", match_requests_on: [:path]) do
+            VCR.use_cassette("strava-exchange_token") do
               expect {
                 get "/strava_integration/callback", params: {code: "test_auth_code"}
               }.not_to change(StravaIntegration, :count)
 
-              existing.reload
-              expect(existing.access_token).to eq("strava_access_token_xyz")
+              expect(existing.reload.athlete_id).to eq("2430215")
             end
           end
         end
@@ -75,7 +74,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
 
       context "with invalid code" do
         it "redirects with error flash" do
-          VCR.use_cassette("strava-exchange_token_failure", match_requests_on: [:path]) do
+          VCR.use_cassette("strava-exchange_token_failure") do
             get "/strava_integration/callback", params: {code: "bad_code"}
             expect(response).to redirect_to(my_account_path)
             expect(flash[:error]).to match(/unable to connect/i)
@@ -98,7 +97,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
 
       context "with strava integration" do
         let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user) }
-        let!(:strava_activity) { FactoryBot.create(:strava_activity, strava_integration: strava_integration) }
+        let!(:strava_activity) { FactoryBot.create(:strava_activity, strava_integration:) }
 
         it "destroys the integration and activities" do
           expect {
