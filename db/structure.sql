@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -7333,22 +7334,6 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
--- Name: strava_gear_associations fk_rails_0286c649e4; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.strava_gear_associations
-    ADD CONSTRAINT fk_rails_0286c649e4 FOREIGN KEY (strava_integration_id) REFERENCES public.strava_integrations(id);
-
-
---
--- Name: strava_activities fk_rails_193e7d53e0; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.strava_activities
-    ADD CONSTRAINT fk_rails_193e7d53e0 FOREIGN KEY (strava_integration_id) REFERENCES public.strava_integrations(id);
-
-
---
 -- Name: theft_alerts fk_rails_3c23dcdc45; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -7410,14 +7395,6 @@ ALTER TABLE ONLY public.active_storage_variant_records
 
 ALTER TABLE ONLY public.active_storage_attachments
     ADD CONSTRAINT fk_rails_c3b3935057 FOREIGN KEY (blob_id) REFERENCES public.active_storage_blobs(id);
-
-
---
--- Name: strava_integrations fk_rails_d4c8c83758; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.strava_integrations
-    ADD CONSTRAINT fk_rails_d4c8c83758 FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --

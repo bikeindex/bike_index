@@ -28,10 +28,6 @@
 #  index_strava_activities_on_strava_integration_id                (strava_integration_id)
 #  index_strava_activities_on_strava_integration_id_and_strava_id  (strava_integration_id,strava_id) UNIQUE
 #
-# Foreign Keys
-#
-#  fk_rails_...  (strava_integration_id => strava_integrations.id)
-#
 class StravaActivity < ApplicationRecord
   CYCLING_TYPES = %w[
     Ride

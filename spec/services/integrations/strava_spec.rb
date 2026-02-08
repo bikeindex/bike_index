@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Integrations::StravaConnection, type: :service do
+RSpec.describe Integrations::Strava, type: :service do
   let(:strava_integration) do
     FactoryBot.create(:strava_integration,
       access_token: "strava_access_token_xyz",

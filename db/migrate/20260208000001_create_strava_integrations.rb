@@ -1,7 +1,7 @@
 class CreateStravaIntegrations < ActiveRecord::Migration[8.0]
   def change
     create_table :strava_integrations do |t|
-      t.references :user, null: false, foreign_key: true, index: {unique: true}
+      t.references :user, null: false, foreign_key: false, index: {unique: true}
       t.text :access_token, null: false
       t.text :refresh_token, null: false
       t.datetime :token_expires_at

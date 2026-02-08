@@ -1,7 +1,7 @@
 class CreateStravaGearAssociations < ActiveRecord::Migration[8.0]
   def change
     create_table :strava_gear_associations do |t|
-      t.references :strava_integration, null: false, foreign_key: true
+      t.references :strava_integration, null: false, foreign_key: false
       t.references :item, polymorphic: true, null: false
       t.string :strava_gear_id, null: false
       t.string :strava_gear_name

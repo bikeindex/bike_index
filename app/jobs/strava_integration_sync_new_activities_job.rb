@@ -13,7 +13,7 @@ class StravaIntegrationSyncNewActivitiesJob < ScheduledJob
     strava_integration = StravaIntegration.find_by(id: strava_integration_id)
     return unless strava_integration&.synced?
 
-    Integrations::StravaConnection.sync_new_activities(strava_integration)
+    Integrations::Strava.sync_new_activities(strava_integration)
   end
 
   def enqueue_workers

@@ -44,7 +44,7 @@ RSpec.describe StravaIntegrationSyncNewActivitiesJob, type: :job do
         start_date: Time.parse("2025-06-15T08:00:00Z"))
     end
 
-    before { allow(Integrations::StravaConnection).to receive(:sleep) }
+    before { allow(Integrations::Strava).to receive(:sleep) }
 
     it "syncs new activities for the integration" do
       VCR.use_cassette("strava-list_new_activities", match_requests_on: [:path]) do

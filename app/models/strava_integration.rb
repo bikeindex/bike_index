@@ -20,10 +20,6 @@
 #
 #  index_strava_integrations_on_user_id  (user_id) UNIQUE
 #
-# Foreign Keys
-#
-#  fk_rails_...  (user_id => users.id)
-#
 class StravaIntegration < ApplicationRecord
   STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3}.freeze
 

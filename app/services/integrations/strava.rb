@@ -1,4 +1,4 @@
-class Integrations::StravaConnection
+class Integrations::Strava
   BASE_URL = "https://www.strava.com"
   API_URL = "https://www.strava.com/api/v3"
   STRAVA_KEY = ENV["STRAVA_KEY"]

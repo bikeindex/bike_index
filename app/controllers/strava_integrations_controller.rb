@@ -5,7 +5,7 @@ class StravaIntegrationsController < ApplicationController
   before_action :find_strava_integration, only: %i[destroy sync_status]
 
   def new
-    redirect_to Integrations::StravaConnection.authorization_url, allow_other_host: true
+    redirect_to Integrations::Strava.authorization_url, allow_other_host: true
   end
 
   def callback
@@ -15,7 +15,7 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    token_data = Integrations::StravaConnection.exchange_token(params[:code])
+    token_data = Integrations::Strava.exchange_token(params[:code])
     if token_data.blank?
       flash[:error] = "Unable to connect to Strava. Please try again."
       redirect_to my_account_path
