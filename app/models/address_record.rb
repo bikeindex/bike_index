@@ -208,8 +208,8 @@ class AddressRecord < ApplicationRecord
   private
 
   def update_associations
-    # Bikes, ownerships and impound_records handle address assignment separately
-    return if skip_callback_job || %w[bike ownership impounded_from].include?(kind)
+    # Bikes & ownerships handle address assignment separately
+    return if skip_callback_job || %w[bike ownership].include?(kind)
 
     CallbackJob::AddressRecordUpdateAssociationsJob.perform_async(id)
   end

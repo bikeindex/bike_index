@@ -49,6 +49,9 @@
           %td
             - if @bike.present?
               = link_to organized_bike_text(@bike), bike_path(@bike, organization_id: current_organization.to_param)
+            - else
+              %span.text-danger No bike
+
             - if display_dev_info? && @impound_record.impound_claim_retrieved?
               - og_bike = Bike.unscoped.find_by_id(@impound_record.bike_id)
               .only-dev-visible
@@ -83,6 +86,13 @@
               - if @impound_record.resolved_at.present?
                 %span.convertTime.preciseTime
                   = l(@impound_record.resolved_at, format: :convert_time)
+        %tr
+          %td Impounded from
+          %td
+            - if @impound_record.impounded_from_address_record.blank?
+              <em class="less-strong">No impounded from address</em>
+            - else
+              = render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address_record, visible_attribute: :street))
 
 .row.mt-4.mb-4
   - if @impound_record.active?

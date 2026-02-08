@@ -112,6 +112,22 @@ class BikeServices::Displayer
       single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
     end
 
+    def origin_title(creation_description)
+      return nil unless creation_description.present?
+
+      extended_description = {
+        "web" => "Registered with self registration process",
+        "org reg" => "Registered by internal, organization member form",
+        "landing page" => "Registration began with incomplete registration, via organization landing page",
+        "bulk reg" => "Registered by spreadsheet import"
+      }
+      if %w[Lightspeed Ascend].include?(creation_description)
+        "Automatically registered by bike shop point of sale (#{creation_description} POS)"
+      else
+        extended_description[creation_description] || "Registered via #{creation_description}"
+      end
+    end
+
     private
 
     def user_edit_bike_address?(bike, user = nil)

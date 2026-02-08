@@ -13,6 +13,11 @@ class CallbackJob::AddressRecordUpdateAssociationsJob < ApplicationJob
       if address_record.user.address_record_id == address_record.id
         update_association(address_record, address_record.user)
       end
+    elsif address_record.organization?
+      location = Location.find_by(address_record_id: address_record.id)
+      update_association(address_record, location) if location.present?
+    elsif address_record.impounded_from?
+      update_from_impound_record(address_record)
     elsif address_record.kind.blank?
       # Currently just handles marketplace_listings, but can be easily updated!
       if address_record.marketplace_listings.any?
@@ -31,5 +36,14 @@ class CallbackJob::AddressRecordUpdateAssociationsJob < ApplicationJob
     association.latitude = address_record.latitude
     association.longitude = address_record.longitude
     association.save if association.changed?
+  end
+
+  def update_from_impound_record(address_record)
+    impound_record = ImpoundRecord.find_by(impounded_from_address_record_id: address_record.id)
+    return unless impound_record.present?
+
+    address_record.bike_id ||= impound_record.bike_id
+    address_record.user_id ||= impound_record.user_id
+    address_record.save if address_record.changed?
   end
 end

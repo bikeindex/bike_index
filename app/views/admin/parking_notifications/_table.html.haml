@@ -44,7 +44,7 @@
         %td
           - if parking_notification.status == "impounded"
             - if parking_notification.impound_record_id.present?
-              = link_to "Impounded", organization_impound_record_path(parking_notification.impound_record_id, organization_id: parking_notification.organization_id), class: "text-danger small"
+              = link_to "Impounded", admin_impound_record_path(parking_notification.impound_record_id), class: "text-danger small tw:underline!"
             - else
               %span.text-danger no impound record!
           - else

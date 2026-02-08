@@ -6,6 +6,14 @@
     <% end %>
   </small>
 <% elsif @bike.present? %>
+  <% unless @bike.status_with_owner? %>
+    <strong
+      class="<%= "#{@bike.status_humanized.tr(" ", "-")}-color uppercase" %>"
+      title="<%= Bike.status_humanized_translated(@bike.status_humanized) %>"
+    >
+      <%= Bike.status_humanized_translated(@bike.status_humanized).first %>
+    </strong>
+  <% end %>
   <%= render Admin::Badges::BikeHiddenExplanation::Component.new(bike: @bike) %>
   <% if bike_link_path.present? %>
     <%= link_to bike_content, bike_link_path, class: "twlink" %>
