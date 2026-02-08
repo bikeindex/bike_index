@@ -56,7 +56,7 @@ class Integrations::StravaConnection
     # Download all activities, paginating through the list endpoint.
     # For cycling activities, fetch individual details for extra fields.
     def sync_all_activities(strava_integration)
-      strava_integration.update(status: "syncing")
+      strava_integration.update(status: :syncing)
       ensure_valid_token!(strava_integration)
 
       page = 1
@@ -80,9 +80,9 @@ class Integrations::StravaConnection
       # For cycling activities, fetch full details for description, photos, location
       fetch_cycling_activity_details(strava_integration)
 
-      strava_integration.update(status: "synced")
+      strava_integration.update(status: :synced)
     rescue => e
-      strava_integration.update(status: "error")
+      strava_integration.update(status: :error)
       raise e
     end
 

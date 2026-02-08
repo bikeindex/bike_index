@@ -9,7 +9,7 @@ class CreateStravaIntegrations < ActiveRecord::Migration[8.0]
       t.integer :athlete_activity_count
       t.jsonb :athlete_gear, default: []
       t.integer :activities_downloaded_count, default: 0, null: false
-      t.string :status, default: "pending", null: false
+      t.integer :status, default: 0, null: false
 
       t.timestamps
     end

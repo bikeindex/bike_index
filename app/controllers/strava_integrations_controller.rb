@@ -4,8 +4,8 @@ class StravaIntegrationsController < ApplicationController
   before_action :authenticate_user_for_strava
   before_action :find_strava_integration, only: %i[destroy sync_status]
 
-  def connect
-    redirect_uri = strava_callback_url
+  def new
+    redirect_uri = callback_strava_integration_url
     redirect_to Integrations::StravaConnection.authorization_url(redirect_uri), allow_other_host: true
   end
 
@@ -29,7 +29,7 @@ class StravaIntegrationsController < ApplicationController
       refresh_token: token_data["refresh_token"],
       token_expires_at: Time.at(token_data["expires_at"]),
       athlete_id: token_data.dig("athlete", "id")&.to_s,
-      status: "pending"
+      status: :pending
     )
     strava_integration.save!
 

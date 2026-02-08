@@ -19,7 +19,7 @@
         </div>
         <p class="small less-strong"><%= translation(".sync_running_in_background") %></p>
         <div data-controller="strava-sync-status"
-             data-strava-sync-status-url-value="<%= helpers.strava_sync_status_path %>">
+             data-strava-sync-status-url-value="<%= helpers.sync_status_strava_integration_path %>">
         </div>
 
       <% elsif synced? %>
@@ -44,14 +44,14 @@
       <% end %>
 
       <%= link_to translation(".disconnect_strava"),
-            helpers.strava_disconnect_path,
+            helpers.strava_integration_path,
             method: :delete,
             class: "btn btn-sm btn-outline-danger mt-2",
             data: { confirm: translation(".disconnect_confirm") } %>
 
     <% else %>
       <p><%= translation(".integrate_your_bikes_with_strava") %></p>
-      <%= link_to helpers.strava_connect_path, class: "btn btn-primary" do %>
+      <%= link_to helpers.new_strava_integration_path, class: "btn btn-primary" do %>
         <%= translation(".connect_with_strava") %>
       <% end %>
     <% end %>

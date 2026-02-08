@@ -1,27 +1,14 @@
 class StravaIntegration < ApplicationRecord
-  STATUSES = %w[pending syncing synced error].freeze
+  STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3}.freeze
 
   belongs_to :user
   has_many :strava_activities, dependent: :destroy
   has_many :strava_gear_associations, dependent: :destroy
 
+  enum :status, STATUS_ENUM
+
   validates :access_token, presence: true
   validates :refresh_token, presence: true
-  validates :status, inclusion: {in: STATUSES}
-
-  scope :syncing, -> { where(status: "syncing") }
-
-  def syncing?
-    status == "syncing"
-  end
-
-  def synced?
-    status == "synced"
-  end
-
-  def error?
-    status == "error"
-  end
 
   def sync_progress_percent
     return 0 if athlete_activity_count.blank? || athlete_activity_count.zero?

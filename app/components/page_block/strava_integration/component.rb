@@ -26,7 +26,7 @@ module PageBlock::StravaIntegration
     end
 
     def pending?
-      connected? && @strava_integration.status == "pending"
+      connected? && @strava_integration.pending?
     end
 
     def progress_percent

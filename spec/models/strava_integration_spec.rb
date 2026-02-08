@@ -14,17 +14,16 @@ RSpec.describe StravaIntegration, type: :model do
       expect(si.errors[:refresh_token]).to be_present
     end
 
-    it "validates status inclusion" do
-      si = FactoryBot.build(:strava_integration, status: "invalid")
-      expect(si).not_to be_valid
-      expect(si.errors[:status]).to be_present
+    it "raises ArgumentError for invalid status" do
+      expect {
+        FactoryBot.build(:strava_integration, status: "invalid")
+      }.to raise_error(ArgumentError)
     end
+  end
 
-    it "allows valid statuses" do
-      %w[pending syncing synced error].each do |status|
-        si = FactoryBot.build(:strava_integration, status: status)
-        expect(si.errors[:status]).to be_blank
-      end
+  describe "enum" do
+    it "defines expected statuses" do
+      expect(StravaIntegration.statuses.keys).to eq(%w[pending syncing synced error])
     end
   end
 
@@ -54,24 +53,30 @@ RSpec.describe StravaIntegration, type: :model do
     let(:si) { FactoryBot.build(:strava_integration) }
 
     it "syncing?" do
-      si.status = "syncing"
+      si.status = :syncing
       expect(si.syncing?).to be_truthy
-      si.status = "synced"
+      si.status = :synced
       expect(si.syncing?).to be_falsey
     end
 
     it "synced?" do
-      si.status = "synced"
+      si.status = :synced
       expect(si.synced?).to be_truthy
-      si.status = "syncing"
+      si.status = :syncing
       expect(si.synced?).to be_falsey
     end
 
     it "error?" do
-      si.status = "error"
+      si.status = :error
       expect(si.error?).to be_truthy
-      si.status = "synced"
+      si.status = :synced
       expect(si.error?).to be_falsey
+    end
+
+    it "pending?" do
+      expect(si.pending?).to be_truthy
+      si.status = :syncing
+      expect(si.pending?).to be_falsey
     end
   end
 
