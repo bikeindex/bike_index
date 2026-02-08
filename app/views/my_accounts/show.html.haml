@@ -171,7 +171,7 @@
                   = t(".tell_us_more_about_yourself")
                 = link_to t(".update_your_profile"), edit_my_account_url
 
-      = render "my_accounts/strava_integration"
+      = render(PageBlock::StravaIntegration::Component.new(user: current_user))
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do
