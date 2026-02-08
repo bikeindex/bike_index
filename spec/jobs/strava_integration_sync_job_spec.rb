@@ -16,6 +16,8 @@ RSpec.describe StravaIntegrationSyncJob, type: :job do
         athlete_id: "12345678")
     end
 
+    before { allow(Integrations::StravaConnection).to receive(:sleep) }
+
     it "fetches athlete and syncs activities" do
       VCR.use_cassette("strava-get_athlete", match_requests_on: [:path]) do
         VCR.use_cassette("strava-get_athlete_stats", match_requests_on: [:path]) do

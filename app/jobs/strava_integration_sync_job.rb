@@ -7,8 +7,7 @@ class StravaIntegrationSyncJob < ApplicationJob
     strava_integration = StravaIntegration.find_by(id: strava_integration_id)
     return unless strava_integration
 
-    connection = Integrations::StravaConnection.new(strava_integration)
-    connection.fetch_athlete_and_update
-    connection.sync_all_activities
+    Integrations::StravaConnection.fetch_athlete_and_update(strava_integration)
+    Integrations::StravaConnection.sync_all_activities(strava_integration)
   end
 end

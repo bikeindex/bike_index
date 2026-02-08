@@ -475,4 +475,67 @@ RSpec.describe "BikesController#update", type: :request do
       end
     end
   end
+
+  context "setting strava_gear" do
+    let!(:strava_integration) do
+      FactoryBot.create(:strava_integration, :synced, user: current_user,
+        athlete_gear: [
+          {"id" => "b12345", "name" => "My Road Bike", "resource_state" => 2},
+          {"id" => "b67890", "name" => "My MTB", "resource_state" => 2}
+        ])
+    end
+
+    it "connects bike to strava gear" do
+      expect(bike.strava_gear_association).to be_nil
+      patch base_url, params: {strava_gear_id: "b12345", edit_template: "strava_gear"}
+      expect(flash[:success]).to match(/My Road Bike/)
+
+      bike.reload
+      expect(bike.strava_gear_association).to be_present
+      expect(bike.strava_gear_association.strava_gear_id).to eq("b12345")
+      expect(bike.strava_gear_association.strava_gear_name).to eq("My Road Bike")
+    end
+
+    it "updates existing strava gear connection" do
+      FactoryBot.create(:strava_gear_association,
+        item: bike,
+        strava_integration: strava_integration,
+        strava_gear_id: "b12345",
+        strava_gear_name: "My Road Bike")
+
+      patch base_url, params: {strava_gear_id: "b67890", edit_template: "strava_gear"}
+      expect(flash[:success]).to match(/My MTB/)
+
+      bike.reload
+      expect(bike.strava_gear_association.strava_gear_id).to eq("b67890")
+    end
+
+    it "disconnects strava gear when blank value" do
+      FactoryBot.create(:strava_gear_association,
+        item: bike,
+        strava_integration: strava_integration,
+        strava_gear_id: "b12345",
+        strava_gear_name: "My Road Bike")
+
+      expect {
+        patch base_url, params: {strava_gear_id: "", edit_template: "strava_gear"}
+      }.to change(StravaGearAssociation, :count).by(-1)
+
+      expect(flash[:success]).to match(/disconnected/)
+    end
+
+    context "without strava integration" do
+      before { strava_integration.destroy }
+
+      it "shows error" do
+        patch base_url, params: {strava_gear_id: "b12345", edit_template: "strava_gear"}
+        expect(flash[:error]).to match(/No synced Strava/)
+      end
+    end
+
+    it "shows error for invalid gear id" do
+      patch base_url, params: {strava_gear_id: "b99999", edit_template: "strava_gear"}
+      expect(flash[:error]).to match(/not found/)
+    end
+  end
 end

@@ -3,6 +3,7 @@ class StravaIntegration < ApplicationRecord
 
   belongs_to :user
   has_many :strava_activities, dependent: :destroy
+  has_many :strava_gear_associations, dependent: :destroy
 
   validates :access_token, presence: true
   validates :refresh_token, presence: true

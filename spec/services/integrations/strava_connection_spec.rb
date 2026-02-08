@@ -8,9 +8,8 @@ RSpec.describe Integrations::StravaConnection, type: :service do
       token_expires_at: Time.current + 6.hours,
       athlete_id: "12345678")
   end
-  let(:instance) { described_class.new(strava_integration) }
 
-  before { allow(instance).to receive(:sleep) }
+  before { allow(described_class).to receive(:sleep) }
 
   describe ".authorization_url" do
     it "builds the correct authorization URL" do
@@ -34,11 +33,11 @@ RSpec.describe Integrations::StravaConnection, type: :service do
     end
   end
 
-  describe "#fetch_athlete_and_update" do
+  describe ".fetch_athlete_and_update" do
     it "fetches athlete profile and updates integration" do
       VCR.use_cassette("strava-get_athlete", match_requests_on: [:path]) do
         VCR.use_cassette("strava-get_athlete_stats", match_requests_on: [:path]) do
-          instance.fetch_athlete_and_update
+          described_class.fetch_athlete_and_update(strava_integration)
 
           strava_integration.reload
           expect(strava_integration.athlete_id).to eq("12345678")
@@ -51,13 +50,13 @@ RSpec.describe Integrations::StravaConnection, type: :service do
     end
   end
 
-  describe "#sync_all_activities" do
+  describe ".sync_all_activities" do
     it "downloads activities and saves them" do
       VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
         VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
           VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
             expect {
-              instance.sync_all_activities
+              described_class.sync_all_activities(strava_integration)
             }.to change(StravaActivity, :count).by(3)
           end
         end
@@ -68,7 +67,7 @@ RSpec.describe Integrations::StravaConnection, type: :service do
       VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
         VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
           VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            instance.sync_all_activities
+            described_class.sync_all_activities(strava_integration)
 
             ride = strava_integration.strava_activities.find_by(strava_id: "9876543")
             expect(ride.title).to eq("Morning Ride")
@@ -86,7 +85,7 @@ RSpec.describe Integrations::StravaConnection, type: :service do
       VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
         VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
           VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            instance.sync_all_activities
+            described_class.sync_all_activities(strava_integration)
 
             run = strava_integration.strava_activities.find_by(strava_id: "9876544")
             expect(run.title).to eq("Evening Run")
@@ -102,7 +101,7 @@ RSpec.describe Integrations::StravaConnection, type: :service do
       VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
         VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
           VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            instance.sync_all_activities
+            described_class.sync_all_activities(strava_integration)
             expect(strava_integration.reload.status).to eq("synced")
           end
         end
@@ -113,7 +112,7 @@ RSpec.describe Integrations::StravaConnection, type: :service do
       VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
         VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
           VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            instance.sync_all_activities
+            described_class.sync_all_activities(strava_integration)
             expect(strava_integration.reload.activities_downloaded_count).to eq(3)
           end
         end

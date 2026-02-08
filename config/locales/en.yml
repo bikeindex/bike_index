@@ -1544,6 +1544,16 @@ en:
       were_so_glad: We're so glad you got your %{bike_type} back!
     report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
+    strava_gear:
+      strava_gear: Strava Gear
+      connect_bike_to_strava_gear: Connect this bike to one of your Strava bikes to track which bike you're riding.
+      strava_bike: Strava Bike
+      none_selected: "-- None --"
+      currently_connected: "Currently connected to:"
+      save_strava_gear: Save Strava Gear
+      no_bikes_in_strava: No bikes found in your Strava account.
+      strava_not_connected: Your Strava account is not connected or has not finished syncing.
+      connect_strava: Connect Strava on your account page
     theft_details:
       charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
         ad on Facebook.
@@ -1652,6 +1662,7 @@ en:
         remove_or_transfer: Transfer, Hide or Delete
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
+        strava_gear: Strava Gear
         theft_details: Theft details
         versions: Versions
       ensure_user_allowed_to_edit:

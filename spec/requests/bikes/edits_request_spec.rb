@@ -344,4 +344,26 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(assigns(:bike).id).to eq bike.id
     end
   end
+
+  context "strava_gear template" do
+    let!(:strava_integration) do
+      FactoryBot.create(:strava_integration, :synced, user: current_user,
+        athlete_gear: [{"id" => "b12345", "name" => "My Road Bike", "resource_state" => 2}])
+    end
+
+    it "renders strava_gear edit page" do
+      get "#{base_url}/strava_gear"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:strava_gear)
+    end
+
+    context "without strava integration" do
+      before { strava_integration.destroy }
+
+      it "redirects to default edit template" do
+        get "#{base_url}/strava_gear"
+        expect(response).to redirect_to(edit_bike_url(bike, edit_template: "bike_details"))
+      end
+    end
+  end
 end

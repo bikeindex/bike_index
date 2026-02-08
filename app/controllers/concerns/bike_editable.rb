@@ -72,6 +72,10 @@ module BikeEditable
         end
       end
 
+      if show_strava_gear_link?
+        h[:strava_gear] = translation(:strava_gear, scope: t_scope)
+      end
+
       h[:remove] = if @bike.version?
         translation(:remove, scope: t_scope)
       else
@@ -107,6 +111,11 @@ module BikeEditable
 
     @skip_general_alert = %w[photos theft_details report_recovered remove alert alert_purchase_confirmation].include?(@edit_template)
     true
+  end
+
+  def show_strava_gear_link?
+    return false if @bike.version?
+    @current_user&.strava_integration&.synced? && @current_user.strava_integration.athlete_gear.present?
   end
 
   def show_listing_link?(bike, user)
