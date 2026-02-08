@@ -38,24 +38,27 @@ RSpec.describe StravaActivity, type: :model do
 
     it "cycling scope returns cycling activities" do
       ride = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "Ride")
+      mtb = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "MountainBikeRide")
+      gravel = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "GravelRide")
       virtual = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "VirtualRide")
       ebike = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "EBikeRide")
+      emtb = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "EMountainBikeRide")
       run = FactoryBot.create(:strava_activity, strava_integration: si, :run)
-      expect(StravaActivity.cycling).to include(ride, virtual, ebike)
+      expect(StravaActivity.cycling).to include(ride, mtb, gravel, virtual, ebike, emtb)
       expect(StravaActivity.cycling).not_to include(run)
     end
   end
 
   describe "cycling?" do
-    it "returns true for cycling types" do
-      %w[Ride VirtualRide EBikeRide Handcycle Velomobile].each do |type|
+    it "returns true for all cycling sport types" do
+      %w[Ride MountainBikeRide GravelRide EBikeRide EMountainBikeRide VirtualRide Handcycle Velomobile].each do |type|
         sa = FactoryBot.build(:strava_activity, activity_type: type)
         expect(sa.cycling?).to be_truthy
       end
     end
 
     it "returns false for non-cycling types" do
-      %w[Run Swim Walk Hike].each do |type|
+      %w[Run Swim Walk Hike TrailRun].each do |type|
         sa = FactoryBot.build(:strava_activity, activity_type: type)
         expect(sa.cycling?).to be_falsey
       end

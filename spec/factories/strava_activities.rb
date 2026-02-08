@@ -40,5 +40,20 @@ FactoryBot.define do
       title { "Zwift Session" }
       activity_type { "VirtualRide" }
     end
+
+    trait :mountain_bike_ride do
+      title { "Trail Ride" }
+      activity_type { "MountainBikeRide" }
+    end
+
+    trait :gravel_ride do
+      title { "Gravel Grinder" }
+      activity_type { "GravelRide" }
+    end
+
+    trait :ebike_ride do
+      title { "E-Bike Commute" }
+      activity_type { "EBikeRide" }
+    end
   end
 end

@@ -160,7 +160,7 @@ class Integrations::StravaConnection
           distance: summary["distance"],
           year: start_date&.year,
           gear_id: summary["gear_id"],
-          activity_type: summary["type"],
+          activity_type: summary["sport_type"] || summary["type"],
           start_date: start_date,
           start_latitude: latlng&.first,
           start_longitude: latlng&.last

@@ -1,5 +1,14 @@
 class StravaActivity < ApplicationRecord
-  CYCLING_TYPES = %w[Ride VirtualRide EBikeRide Handcycle Velomobile].freeze
+  CYCLING_TYPES = %w[
+    Ride
+    MountainBikeRide
+    GravelRide
+    EBikeRide
+    EMountainBikeRide
+    VirtualRide
+    Handcycle
+    Velomobile
+  ].freeze
 
   belongs_to :strava_integration
 
