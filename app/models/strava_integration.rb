@@ -51,4 +51,30 @@ class StravaIntegration < ApplicationRecord
     athlete_gear.select { |g| g["primary"] == true || g["resource_state"].present? }
       .map { |g| g["id"] }.compact
   end
+
+  def update_from_athlete_and_stats(athlete, stats)
+    activity_count = if stats
+      (stats.dig("all_ride_totals", "count") || 0) +
+        (stats.dig("all_run_totals", "count") || 0) +
+        (stats.dig("all_swim_totals", "count") || 0)
+    end
+
+    update(
+      athlete_id: athlete["id"].to_s,
+      athlete_activity_count: activity_count,
+      athlete_gear: extract_gear(athlete)
+    )
+  end
+
+  def finish_sync!
+    update(status: :synced, activities_downloaded_count: strava_activities.count)
+  end
+
+  private
+
+  def extract_gear(athlete)
+    bikes = athlete["bikes"] || []
+    shoes = athlete["shoes"] || []
+    (bikes + shoes).map { |g| g.slice("id", "name", "primary", "distance", "resource_state") }
+  end
 end

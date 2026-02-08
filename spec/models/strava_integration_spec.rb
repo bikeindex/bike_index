@@ -113,4 +113,45 @@ RSpec.describe StravaIntegration, type: :model do
       expect(si.gear_names).to eq(["My Road Bike"])
     end
   end
+
+  describe "update_from_athlete_and_stats" do
+    let(:si) { FactoryBot.create(:strava_integration) }
+    let(:athlete) do
+      {"id" => 12345678,
+       "bikes" => [{"id" => "b1234", "name" => "My Road Bike", "primary" => true, "distance" => 50000.0, "resource_state" => 2}],
+       "shoes" => [{"id" => "g9012", "name" => "Running Shoes", "primary" => true, "distance" => 10000.0, "resource_state" => 2}]}
+    end
+    let(:stats) do
+      {"all_ride_totals" => {"count" => 100},
+       "all_run_totals" => {"count" => 40},
+       "all_swim_totals" => {"count" => 10}}
+    end
+
+    it "updates athlete_id, activity_count, and gear" do
+      si.update_from_athlete_and_stats(athlete, stats)
+      si.reload
+      expect(si.athlete_id).to eq("12345678")
+      expect(si.athlete_activity_count).to eq(150)
+      expect(si.athlete_gear.size).to eq(2)
+      expect(si.athlete_gear.first["name"]).to eq("My Road Bike")
+    end
+
+    it "handles nil stats" do
+      si.update_from_athlete_and_stats(athlete, nil)
+      si.reload
+      expect(si.athlete_id).to eq("12345678")
+      expect(si.athlete_activity_count).to be_nil
+    end
+  end
+
+  describe "finish_sync!" do
+    it "sets status to synced and updates count" do
+      si = FactoryBot.create(:strava_integration, status: :syncing)
+      FactoryBot.create(:strava_activity, strava_integration: si)
+      si.finish_sync!
+      si.reload
+      expect(si.status).to eq("synced")
+      expect(si.activities_downloaded_count).to eq(1)
+    end
+  end
 end

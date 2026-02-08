@@ -3,25 +3,31 @@
 # Table name: strava_activities
 # Database name: primary
 #
-#  id                    :bigint           not null, primary key
-#  activity_type         :string
-#  description           :text
-#  distance              :float
-#  gear_name             :string
-#  location_city         :string
-#  location_country      :string
-#  location_state        :string
-#  photos                :jsonb
-#  start_date            :datetime
-#  start_latitude        :float
-#  start_longitude       :float
-#  title                 :string
-#  year                  :integer
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#  gear_id               :string
-#  strava_id             :string           not null
-#  strava_integration_id :bigint           not null
+#  id                          :bigint           not null, primary key
+#  activity_type               :string
+#  description                 :text
+#  distance_meters             :float
+#  gear_name                   :string
+#  kudos_count                 :integer
+#  location_city               :string
+#  location_country            :string
+#  location_state              :string
+#  moving_time_seconds         :integer
+#  muted                       :boolean          default(FALSE)
+#  photos                      :jsonb
+#  private                     :boolean          default(FALSE)
+#  sport_type                  :string
+#  start_date                  :datetime
+#  start_latitude              :float
+#  start_longitude             :float
+#  title                       :string
+#  total_elevation_gain_meters :float
+#  year                        :integer
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  gear_id                     :string
+#  strava_id                   :string           not null
+#  strava_integration_id       :bigint           not null
 #
 # Indexes
 #
@@ -52,12 +58,63 @@ class StravaActivity < ApplicationRecord
   end
 
   def distance_miles
-    return nil if distance.blank?
-    (distance / 1609.344).round(2)
+    return nil if distance_meters.blank?
+    (distance_meters / 1609.344).round(2)
   end
 
   def distance_km
-    return nil if distance.blank?
-    (distance / 1000.0).round(2)
+    return nil if distance_meters.blank?
+    (distance_meters / 1000.0).round(2)
+  end
+
+  def self.create_or_update_from_summary(strava_integration, summary)
+    start_date = begin
+      Time.parse(summary["start_date"])
+    rescue
+      nil
+    end
+    latlng = summary["start_latlng"]
+
+    strava_integration.strava_activities.find_or_initialize_by(strava_id: summary["id"].to_s).tap do |activity|
+      activity.assign_attributes(
+        title: summary["name"],
+        distance_meters: summary["distance"],
+        moving_time_seconds: summary["moving_time"],
+        total_elevation_gain_meters: summary["total_elevation_gain"],
+        sport_type: summary["sport_type"],
+        private: summary["private"],
+        kudos_count: summary["kudos_count"],
+        year: start_date&.year,
+        gear_id: summary["gear_id"],
+        activity_type: summary["sport_type"] || summary["type"],
+        start_date:,
+        start_latitude: latlng&.first,
+        start_longitude: latlng&.last
+      )
+      activity.save!
+    end
+  end
+
+  def update_from_detail(detail)
+    update(
+      description: detail["description"],
+      photos: extract_photos(detail),
+      location_city: detail["location_city"],
+      location_state: detail["location_state"],
+      location_country: detail["location_country"],
+      gear_name: detail.dig("gear", "name"),
+      muted: detail["muted"],
+      kudos_count: detail["kudos_count"]
+    )
+  end
+
+  private
+
+  def extract_photos(detail)
+    photos_data = detail.dig("photos", "primary")
+    return [] unless photos_data
+
+    urls = photos_data["urls"] || {}
+    [{id: photos_data["unique_id"], urls:}]
   end
 end

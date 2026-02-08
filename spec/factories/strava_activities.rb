@@ -5,7 +5,7 @@ FactoryBot.define do
     strava_integration
     sequence(:strava_id) { |n| "activity_#{n}" }
     title { "Morning Ride" }
-    distance { 25000.0 }
+    distance_meters { 25000.0 }
     year { 2025 }
     activity_type { "Ride" }
     start_date { Time.current - 1.day }
@@ -33,7 +33,7 @@ FactoryBot.define do
     trait :run do
       title { "Morning Run" }
       activity_type { "Run" }
-      distance { 5000.0 }
+      distance_meters { 5000.0 }
     end
 
     trait :virtual_ride do

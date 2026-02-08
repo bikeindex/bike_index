@@ -4,10 +4,15 @@ class StravaIntegrationSyncJob < ApplicationJob
   def perform(strava_integration_id)
     return if skip_job?
 
-    strava_integration = StravaIntegration.find_by(id: strava_integration_id)
-    return unless strava_integration
+    si = StravaIntegration.find_by(id: strava_integration_id)
+    return unless si
 
-    Integrations::Strava.fetch_athlete_and_update(strava_integration)
-    Integrations::Strava.sync_all_activities(strava_integration)
+    athlete = Integrations::Strava.fetch_athlete(si)
+    return unless athlete
+    stats = Integrations::Strava.fetch_athlete_stats(si, athlete["id"])
+    si.update_from_athlete_and_stats(athlete, stats)
+    si.update(status: :syncing)
+
+    StravaActivityPageSyncJob.perform_in(StravaActivityPageSyncJob::RATE_LIMIT_DELAY, si.id, 1)
   end
 end

@@ -66,26 +66,90 @@ RSpec.describe StravaActivity, type: :model do
   end
 
   describe "distance_miles" do
-    it "returns nil if distance is nil" do
-      sa = FactoryBot.build(:strava_activity, distance: nil)
+    it "returns nil if distance_meters is nil" do
+      sa = FactoryBot.build(:strava_activity, distance_meters: nil)
       expect(sa.distance_miles).to be_nil
     end
 
     it "converts meters to miles" do
-      sa = FactoryBot.build(:strava_activity, distance: 1609.344)
+      sa = FactoryBot.build(:strava_activity, distance_meters: 1609.344)
       expect(sa.distance_miles).to eq(1.0)
     end
   end
 
   describe "distance_km" do
-    it "returns nil if distance is nil" do
-      sa = FactoryBot.build(:strava_activity, distance: nil)
+    it "returns nil if distance_meters is nil" do
+      sa = FactoryBot.build(:strava_activity, distance_meters: nil)
       expect(sa.distance_km).to be_nil
     end
 
     it "converts meters to kilometers" do
-      sa = FactoryBot.build(:strava_activity, distance: 5000.0)
+      sa = FactoryBot.build(:strava_activity, distance_meters: 5000.0)
       expect(sa.distance_km).to eq(5.0)
+    end
+  end
+
+  describe "create_or_update_from_summary" do
+    let(:si) { FactoryBot.create(:strava_integration) }
+    let(:summary) do
+      {"id" => 9876543, "name" => "Morning Ride", "distance" => 25000.0,
+       "moving_time" => 3600, "total_elevation_gain" => 200.0,
+       "sport_type" => "Ride", "type" => "Ride",
+       "start_date" => "2025-06-15T08:00:00Z",
+       "start_latlng" => [37.7749, -122.4194],
+       "gear_id" => "b1234", "private" => false, "kudos_count" => 10}
+    end
+
+    it "creates a new activity from summary" do
+      activity = StravaActivity.create_or_update_from_summary(si, summary)
+      expect(activity).to be_persisted
+      expect(activity.strava_id).to eq("9876543")
+      expect(activity.title).to eq("Morning Ride")
+      expect(activity.distance_meters).to eq(25000.0)
+      expect(activity.moving_time_seconds).to eq(3600)
+      expect(activity.total_elevation_gain_meters).to eq(200.0)
+      expect(activity.sport_type).to eq("Ride")
+      expect(activity.activity_type).to eq("Ride")
+      expect(activity.kudos_count).to eq(10)
+      expect(activity.start_latitude).to eq(37.7749)
+    end
+
+    it "updates an existing activity" do
+      FactoryBot.create(:strava_activity, strava_integration: si, strava_id: "9876543", title: "Old Title")
+      activity = StravaActivity.create_or_update_from_summary(si, summary)
+      expect(activity.title).to eq("Morning Ride")
+      expect(si.strava_activities.count).to eq(1)
+    end
+  end
+
+  describe "update_from_detail" do
+    let(:activity) { FactoryBot.create(:strava_activity) }
+    let(:detail) do
+      {"description" => "Great ride",
+       "location_city" => "San Francisco",
+       "location_state" => "California",
+       "location_country" => "United States",
+       "gear" => {"name" => "My Road Bike"},
+       "muted" => false,
+       "kudos_count" => 10,
+       "photos" => {"primary" => {"unique_id" => "photo_123", "urls" => {"600" => "https://example.com/photo.jpg"}}}}
+    end
+
+    it "updates the activity with detail fields" do
+      activity.update_from_detail(detail)
+      activity.reload
+      expect(activity.description).to eq("Great ride")
+      expect(activity.location_city).to eq("San Francisco")
+      expect(activity.gear_name).to eq("My Road Bike")
+      expect(activity.kudos_count).to eq(10)
+      expect(activity.photos.first["id"]).to eq("photo_123")
+    end
+
+    it "handles detail without photos" do
+      detail["photos"] = {"primary" => nil}
+      activity.update_from_detail(detail)
+      activity.reload
+      expect(activity.photos).to eq([])
     end
   end
 end

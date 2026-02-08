@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3519,7 +3518,13 @@ CREATE TABLE public.strava_activities (
     strava_id character varying NOT NULL,
     title character varying,
     description text,
-    distance double precision,
+    distance_meters double precision,
+    moving_time_seconds integer,
+    total_elevation_gain_meters double precision,
+    sport_type character varying,
+    private boolean DEFAULT false,
+    muted boolean DEFAULT false,
+    kudos_count integer,
     year integer,
     gear_id character varying,
     gear_name character varying,

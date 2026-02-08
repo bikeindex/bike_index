@@ -5,7 +5,13 @@ class CreateStravaActivities < ActiveRecord::Migration[8.0]
       t.string :strava_id, null: false
       t.string :title
       t.text :description
-      t.float :distance
+      t.float :distance_meters
+      t.integer :moving_time_seconds
+      t.float :total_elevation_gain_meters
+      t.string :sport_type
+      t.boolean :private, default: false
+      t.boolean :muted, default: false
+      t.integer :kudos_count
       t.integer :year
       t.string :gear_id
       t.string :gear_name

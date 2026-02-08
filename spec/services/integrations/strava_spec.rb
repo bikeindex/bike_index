@@ -9,8 +9,6 @@ RSpec.describe Integrations::Strava, type: :service do
       athlete_id: "12345678")
   end
 
-  before { allow(described_class).to receive(:sleep) }
-
   describe ".authorization_url" do
     it "builds the correct authorization URL" do
       url = described_class.authorization_url
@@ -33,137 +31,43 @@ RSpec.describe Integrations::Strava, type: :service do
     end
   end
 
-  describe ".fetch_athlete_and_update" do
-    it "fetches athlete profile and updates integration" do
+  describe ".fetch_athlete" do
+    it "returns athlete data" do
       VCR.use_cassette("strava-get_athlete", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_athlete_stats", match_requests_on: [:path]) do
-          described_class.fetch_athlete_and_update(strava_integration)
-
-          strava_integration.reload
-          expect(strava_integration.athlete_id).to eq("12345678")
-          expect(strava_integration.athlete_activity_count).to eq(150)
-          expect(strava_integration.athlete_gear).to be_present
-          expect(strava_integration.athlete_gear.find { |g| g["name"] == "My Road Bike" }).to be_present
-          expect(strava_integration.athlete_gear.find { |g| g["name"] == "My Mountain Bike" }).to be_present
-        end
+        result = described_class.fetch_athlete(strava_integration)
+        expect(result["id"]).to eq(12345678)
+        expect(result["bikes"]).to be_present
       end
     end
   end
 
-  describe ".sync_all_activities" do
-    it "downloads activities and saves them" do
-      VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
-          VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            expect {
-              described_class.sync_all_activities(strava_integration)
-            }.to change(StravaActivity, :count).by(3)
-          end
-        end
-      end
-    end
-
-    it "fetches detailed info for cycling activities" do
-      VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
-          VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            described_class.sync_all_activities(strava_integration)
-
-            ride = strava_integration.strava_activities.find_by(strava_id: "9876543")
-            expect(ride.title).to eq("Morning Ride")
-            expect(ride.description).to eq("Beautiful morning ride through Golden Gate Park. Perfect weather and great views.")
-            expect(ride.location_city).to eq("San Francisco")
-            expect(ride.location_state).to eq("California")
-            expect(ride.gear_name).to eq("My Road Bike")
-            expect(ride.photos).to be_present
-          end
-        end
-      end
-    end
-
-    it "does not fetch details for non-cycling activities" do
-      VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
-          VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            described_class.sync_all_activities(strava_integration)
-
-            run = strava_integration.strava_activities.find_by(strava_id: "9876544")
-            expect(run.title).to eq("Evening Run")
-            expect(run.activity_type).to eq("Run")
-            expect(run.description).to be_nil
-            expect(run.location_city).to be_nil
-          end
-        end
-      end
-    end
-
-    it "updates status to synced on completion" do
-      VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
-          VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            described_class.sync_all_activities(strava_integration)
-            expect(strava_integration.reload.status).to eq("synced")
-          end
-        end
-      end
-    end
-
-    it "tracks download progress" do
-      VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
-          VCR.use_cassette("strava-get_activity_virtual_ride", match_requests_on: [:path]) do
-            described_class.sync_all_activities(strava_integration)
-            expect(strava_integration.reload.activities_downloaded_count).to eq(3)
-          end
-        end
+  describe ".fetch_athlete_stats" do
+    it "returns athlete stats" do
+      VCR.use_cassette("strava-get_athlete_stats", match_requests_on: [:path]) do
+        result = described_class.fetch_athlete_stats(strava_integration, "12345678")
+        expect(result.dig("all_ride_totals", "count")).to eq(100)
       end
     end
   end
 
-  describe ".sync_new_activities" do
-    let!(:existing_activity) do
-      FactoryBot.create(:strava_activity,
-        strava_integration: strava_integration,
-        strava_id: "9876543",
-        title: "Morning Ride",
-        activity_type: "Ride",
-        start_date: Time.parse("2025-06-15T08:00:00Z"))
-    end
-
-    it "fetches only activities after the most recent stored activity" do
-      VCR.use_cassette("strava-list_new_activities", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_activity_afternoon_ride", match_requests_on: [:path]) do
-          expect {
-            described_class.sync_new_activities(strava_integration)
-          }.to change(StravaActivity, :count).by(1)
-
-          new_activity = strava_integration.strava_activities.find_by(strava_id: "9876600")
-          expect(new_activity.title).to eq("Afternoon Ride")
-          expect(new_activity.activity_type).to eq("Ride")
-          expect(new_activity.distance).to eq(32000.0)
-        end
+  describe ".list_activities" do
+    it "returns activities for a page" do
+      VCR.use_cassette("strava-list_activities", match_requests_on: [:path]) do
+        result = described_class.list_activities(strava_integration, page: 1, per_page: 200)
+        expect(result).to be_an(Array)
+        expect(result.size).to eq(3)
+        expect(result.first["name"]).to eq("Morning Ride")
       end
     end
+  end
 
-    it "fetches details for new cycling activities" do
-      VCR.use_cassette("strava-list_new_activities", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_activity_afternoon_ride", match_requests_on: [:path]) do
-          described_class.sync_new_activities(strava_integration)
-
-          new_activity = strava_integration.strava_activities.find_by(strava_id: "9876600")
-          expect(new_activity.description).to eq("Quick spin through the park after work.")
-          expect(new_activity.location_city).to eq("San Francisco")
-          expect(new_activity.gear_name).to eq("My Road Bike")
-        end
-      end
-    end
-
-    it "updates activities_downloaded_count" do
-      VCR.use_cassette("strava-list_new_activities", match_requests_on: [:path]) do
-        VCR.use_cassette("strava-get_activity_afternoon_ride", match_requests_on: [:path]) do
-          described_class.sync_new_activities(strava_integration)
-          expect(strava_integration.reload.activities_downloaded_count).to eq(2)
-        end
+  describe ".fetch_activity" do
+    it "returns activity detail" do
+      VCR.use_cassette("strava-get_activity_ride", match_requests_on: [:path]) do
+        result = described_class.fetch_activity(strava_integration, "9876543")
+        expect(result["name"]).to eq("Morning Ride")
+        expect(result["description"]).to be_present
+        expect(result["location_city"]).to eq("San Francisco")
       end
     end
   end
