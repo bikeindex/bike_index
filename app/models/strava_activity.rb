@@ -9,13 +9,11 @@
 #  distance_meters             :float
 #  gear_name                   :string
 #  kudos_count                 :integer
-#  location_city               :string
-#  location_country            :string
-#  location_state              :string
 #  moving_time_seconds         :integer
 #  muted                       :boolean          default(FALSE)
 #  photos                      :jsonb
 #  private                     :boolean          default(FALSE)
+#  segment_locations           :jsonb
 #  sport_type                  :string
 #  start_date                  :datetime
 #  start_latitude              :float
@@ -99,9 +97,7 @@ class StravaActivity < ApplicationRecord
     update(
       description: detail["description"],
       photos: extract_photos(detail),
-      location_city: detail["location_city"],
-      location_state: detail["location_state"],
-      location_country: detail["location_country"],
+      segment_locations: extract_segment_locations(detail),
       gear_name: detail.dig("gear", "name"),
       muted: detail["muted"],
       kudos_count: detail["kudos_count"]
@@ -116,5 +112,16 @@ class StravaActivity < ApplicationRecord
 
     urls = photos_data["urls"] || {}
     [{id: photos_data["unique_id"], urls:}]
+  end
+
+  def extract_segment_locations(detail)
+    segments = detail["segment_efforts"]
+    return {} if segments.blank?
+
+    {
+      cities: segments.filter_map { |se| se.dig("segment", "city").presence }.uniq,
+      states: segments.filter_map { |se| se.dig("segment", "state").presence }.uniq,
+      countries: segments.filter_map { |se| se.dig("segment", "country").presence }.uniq
+    }
   end
 end

@@ -18,9 +18,7 @@ class CreateStravaActivities < ActiveRecord::Migration[8.0]
       t.jsonb :photos, default: []
       t.float :start_latitude
       t.float :start_longitude
-      t.string :location_city
-      t.string :location_state
-      t.string :location_country
+      t.jsonb :segment_locations, default: {}
       t.string :activity_type
       t.datetime :start_date
 

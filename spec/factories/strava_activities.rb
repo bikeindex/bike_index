@@ -13,9 +13,7 @@ FactoryBot.define do
     trait :with_location do
       start_latitude { 37.7749 }
       start_longitude { -122.4194 }
-      location_city { "San Francisco" }
-      location_state { "California" }
-      location_country { "United States" }
+      segment_locations { {"cities" => ["San Francisco"], "states" => ["California"], "countries" => ["United States"]} }
     end
 
     trait :with_gear do

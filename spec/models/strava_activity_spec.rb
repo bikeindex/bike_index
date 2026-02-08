@@ -126,12 +126,13 @@ RSpec.describe StravaActivity, type: :model do
     let(:activity) { FactoryBot.create(:strava_activity) }
     let(:detail) do
       {"description" => "Great ride",
-       "location_city" => "San Francisco",
-       "location_state" => "California",
-       "location_country" => "United States",
        "gear" => {"name" => "My Road Bike"},
        "muted" => false,
        "kudos_count" => 10,
+       "segment_efforts" => [
+         {"segment" => {"city" => "San Francisco", "state" => "California", "country" => "United States"}},
+         {"segment" => {"city" => "Mill Valley", "state" => "California", "country" => "United States"}}
+       ],
        "photos" => {"primary" => {"unique_id" => "photo_123", "urls" => {"600" => "https://example.com/photo.jpg"}}}}
     end
 
@@ -139,10 +140,21 @@ RSpec.describe StravaActivity, type: :model do
       activity.update_from_detail(detail)
       activity.reload
       expect(activity.description).to eq("Great ride")
-      expect(activity.location_city).to eq("San Francisco")
       expect(activity.gear_name).to eq("My Road Bike")
       expect(activity.kudos_count).to eq(10)
       expect(activity.photos.first["id"]).to eq("photo_123")
+      expect(activity.segment_locations).to eq(
+        "cities" => ["San Francisco", "Mill Valley"],
+        "states" => ["California"],
+        "countries" => ["United States"]
+      )
+    end
+
+    it "handles detail without segment efforts" do
+      detail.delete("segment_efforts")
+      activity.update_from_detail(detail)
+      activity.reload
+      expect(activity.segment_locations).to eq({})
     end
 
     it "handles detail without photos" do

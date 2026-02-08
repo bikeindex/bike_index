@@ -33,6 +33,8 @@ RSpec.describe StravaActivityDetailSyncJob, type: :job do
         expect(activity.kudos_count).to eq(17)
         expect(activity.photos).to be_present
         expect(activity.photos.first["id"]).to eq("8A14E2BB-A5E5-47E2-A36C-379B307E8AE7")
+        expect(activity.segment_locations["cities"]).to include("San Francisco")
+        expect(activity.segment_locations["states"]).to include("California")
       end
     end
 
