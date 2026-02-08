@@ -115,7 +115,7 @@ module BikeEditable
 
   def show_strava_gear_link?
     return false if @bike.version?
-    @current_user&.strava_integration&.synced? && @current_user.strava_integration.athlete_gear.present?
+    @current_user&.strava_integration&.show_gear_link? || false
   end
 
   def show_listing_link?(bike, user)

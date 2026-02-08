@@ -43,7 +43,7 @@ RSpec.describe StravaActivity, type: :model do
       virtual = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "VirtualRide")
       ebike = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "EBikeRide")
       emtb = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "EMountainBikeRide")
-      run = FactoryBot.create(:strava_activity, strava_integration: si, :run)
+      run = FactoryBot.create(:strava_activity, :run, strava_integration: si)
       expect(StravaActivity.cycling).to include(ride, mtb, gravel, virtual, ebike, emtb)
       expect(StravaActivity.cycling).not_to include(run)
     end

@@ -1,6 +1,8 @@
 class Integrations::StravaConnection
   BASE_URL = "https://www.strava.com"
   API_URL = "https://www.strava.com/api/v3"
+  STRAVA_KEY = ENV["STRAVA_KEY"]
+  STRAVA_SECRET = ENV["STRAVA_SECRET"]
   ACTIVITIES_PER_PAGE = 200
   # Strava rate limits: 100 requests per 15 minutes, 1000 per day
   REQUEST_DELAY = 1.5
@@ -11,8 +13,8 @@ class Integrations::StravaConnection
       conn = oauth_connection
       resp = conn.post("oauth/token") do |req|
         req.body = {
-          client_id: ENV["STRAVA_KEY"],
-          client_secret: ENV["STRAVA_SECRET"],
+          client_id: STRAVA_KEY,
+          client_secret: STRAVA_SECRET,
           code: code,
           grant_type: "authorization_code"
         }
@@ -21,11 +23,11 @@ class Integrations::StravaConnection
       resp.body
     end
 
-    def authorization_url(redirect_uri)
+    def authorization_url
       params = {
-        client_id: ENV["STRAVA_KEY"],
+        client_id: STRAVA_KEY,
         response_type: "code",
-        redirect_uri: redirect_uri,
+        redirect_uri: Rails.application.routes.url_helpers.callback_strava_integration_url,
         scope: "read,activity:read_all",
         approval_prompt: "auto"
       }
@@ -35,10 +37,10 @@ class Integrations::StravaConnection
     # Fetch athlete profile and update integration with activity count and gear
     def fetch_athlete_and_update(strava_integration)
       ensure_valid_token!(strava_integration)
-      athlete = get(strava_integration, "/athlete")
+      athlete = get(strava_integration, "athlete")
       return false unless athlete
 
-      stats = get(strava_integration, "/athletes/#{athlete["id"]}/stats")
+      stats = get(strava_integration, "athletes/#{athlete["id"]}/stats")
 
       activity_count = if stats
         (stats.dig("all_ride_totals", "count") || 0) +
@@ -63,7 +65,7 @@ class Integrations::StravaConnection
       downloaded = 0
 
       loop do
-        activities = get(strava_integration, "/athlete/activities", per_page: ACTIVITIES_PER_PAGE, page: page)
+        activities = get(strava_integration, "athlete/activities", per_page: ACTIVITIES_PER_PAGE, page: page)
         break if activities.blank? || !activities.is_a?(Array)
 
         activities.each do |summary|
@@ -101,7 +103,7 @@ class Integrations::StravaConnection
         params = {per_page: ACTIVITIES_PER_PAGE, page: page}
         params[:after] = after_epoch if after_epoch.present?
 
-        activities = get(strava_integration, "/athlete/activities", **params)
+        activities = get(strava_integration, "athlete/activities", **params)
         break if activities.blank? || !activities.is_a?(Array)
 
         activities.each do |summary|
@@ -134,7 +136,7 @@ class Integrations::StravaConnection
     def fetch_cycling_activity_details_for(strava_integration, activity_ids)
       StravaActivity.where(id: activity_ids).find_each do |activity|
         ensure_valid_token!(strava_integration)
-        detail = get(strava_integration, "/activities/#{activity.strava_id}")
+        detail = get(strava_integration, "activities/#{activity.strava_id}")
         next unless detail
 
         activity.update(
@@ -151,7 +153,11 @@ class Integrations::StravaConnection
     end
 
     def save_activity_from_summary(strava_integration, summary)
-      start_date = Time.parse(summary["start_date"]) rescue nil
+      start_date = begin
+        Time.parse(summary["start_date"])
+      rescue
+        nil
+      end
       latlng = summary["start_latlng"]
 
       strava_integration.strava_activities.find_or_initialize_by(strava_id: summary["id"].to_s).tap do |activity|
@@ -189,8 +195,8 @@ class Integrations::StravaConnection
       conn = oauth_connection
       resp = conn.post("oauth/token") do |req|
         req.body = {
-          client_id: ENV["STRAVA_KEY"],
-          client_secret: ENV["STRAVA_SECRET"],
+          client_id: STRAVA_KEY,
+          client_secret: STRAVA_SECRET,
           grant_type: "refresh_token",
           refresh_token: strava_integration.refresh_token
         }

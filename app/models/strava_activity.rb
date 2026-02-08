@@ -1,3 +1,37 @@
+# == Schema Information
+#
+# Table name: strava_activities
+# Database name: primary
+#
+#  id                    :bigint           not null, primary key
+#  activity_type         :string
+#  description           :text
+#  distance              :float
+#  gear_name             :string
+#  location_city         :string
+#  location_country      :string
+#  location_state        :string
+#  photos                :jsonb
+#  start_date            :datetime
+#  start_latitude        :float
+#  start_longitude       :float
+#  title                 :string
+#  year                  :integer
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  gear_id               :string
+#  strava_id             :string           not null
+#  strava_integration_id :bigint           not null
+#
+# Indexes
+#
+#  index_strava_activities_on_strava_integration_id                (strava_integration_id)
+#  index_strava_activities_on_strava_integration_id_and_strava_id  (strava_integration_id,strava_id) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (strava_integration_id => strava_integrations.id)
+#
 class StravaActivity < ApplicationRecord
   CYCLING_TYPES = %w[
     Ride

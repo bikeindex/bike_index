@@ -13,7 +13,7 @@ RSpec.describe Integrations::StravaConnection, type: :service do
 
   describe ".authorization_url" do
     it "builds the correct authorization URL" do
-      url = described_class.authorization_url("https://bikeindex.org/strava/callback")
+      url = described_class.authorization_url
       expect(url).to include("https://www.strava.com/oauth/authorize")
       expect(url).to include("response_type=code")
       expect(url).to include("scope=read%2Cactivity%3Aread_all")

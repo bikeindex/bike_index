@@ -5,8 +5,7 @@ class StravaIntegrationsController < ApplicationController
   before_action :find_strava_integration, only: %i[destroy sync_status]
 
   def new
-    redirect_uri = callback_strava_integration_url
-    redirect_to Integrations::StravaConnection.authorization_url(redirect_uri), allow_other_host: true
+    redirect_to Integrations::StravaConnection.authorization_url, allow_other_host: true
   end
 
   def callback
