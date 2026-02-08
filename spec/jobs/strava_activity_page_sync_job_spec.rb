@@ -5,7 +5,7 @@ RSpec.describe StravaActivityPageSyncJob, type: :job do
   let(:strava_integration) do
     FactoryBot.create(:strava_integration,
       token_expires_at: Time.current + 6.hours,
-      athlete_id: "2430215")
+      athlete_id: ENV["STRAVA_TEST_USER_ID"])
   end
 
   it "is the correct queue" do
