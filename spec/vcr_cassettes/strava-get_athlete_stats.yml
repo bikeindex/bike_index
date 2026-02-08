@@ -1,0 +1,23 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/athletes/12345678/stats
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: '{"biggest_ride_distance":120000.0,"biggest_climb_elevation_gain":1500.0,"recent_ride_totals":{"count":10,"distance":250000.0,"moving_time":36000,"elapsed_time":40000,"elevation_gain":3000.0},"recent_run_totals":{"count":5,"distance":25000.0,"moving_time":9000,"elapsed_time":10000,"elevation_gain":200.0},"recent_swim_totals":{"count":2,"distance":3000.0,"moving_time":3600,"elapsed_time":4000,"elevation_gain":0.0},"ytd_ride_totals":{"count":50,"distance":1250000,"moving_time":180000,"elapsed_time":200000,"elevation_gain":15000},"ytd_run_totals":{"count":20,"distance":100000,"moving_time":36000,"elapsed_time":40000,"elevation_gain":1000},"ytd_swim_totals":{"count":5,"distance":7500,"moving_time":5400,"elapsed_time":6000,"elevation_gain":0},"all_ride_totals":{"count":100,"distance":2500000,"moving_time":360000,"elapsed_time":400000,"elevation_gain":30000},"all_run_totals":{"count":40,"distance":200000,"moving_time":72000,"elapsed_time":80000,"elevation_gain":2000},"all_swim_totals":{"count":10,"distance":15000,"moving_time":10800,"elapsed_time":12000,"elevation_gain":0}}'
+  recorded_at: Sun, 08 Feb 2026 12:00:02 GMT
+recorded_with: VCR 6.0.0

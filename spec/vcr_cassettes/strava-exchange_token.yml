@@ -1,0 +1,25 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://www.strava.com/oauth/token
+    body:
+      encoding: UTF-8
+      string: client_id=test_strava_key&client_secret=test_strava_secret&code=test_auth_code&grant_type=authorization_code
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: '{"token_type":"Bearer","expires_at":1749999999,"expires_in":21600,"refresh_token":"strava_refresh_token_abc","access_token":"strava_access_token_xyz","athlete":{"id":12345678,"username":"testathlete","firstname":"Test","lastname":"User","city":"San Francisco","state":"California","country":"United States"}}'
+  recorded_at: Sun, 08 Feb 2026 12:00:00 GMT
+recorded_with: VCR 6.0.0
