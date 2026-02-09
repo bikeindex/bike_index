@@ -12,9 +12,10 @@ RSpec.describe StravaIntegrationsController, type: :request do
     context "logged in" do
       include_context :request_spec_logged_in_as_user
 
-      it "redirects to Strava authorization" do
+      it "redirects to Strava authorization with state parameter" do
         get "/strava_integration/new"
         expect(response).to redirect_to(/strava\.com\/oauth\/authorize/)
+        expect(response.location).to include("state=")
       end
     end
   end
@@ -30,6 +31,12 @@ RSpec.describe StravaIntegrationsController, type: :request do
     context "logged in" do
       include_context :request_spec_logged_in_as_user
 
+      # Initiate OAuth flow via `new` to set session state, return the state param
+      def initiate_oauth_flow
+        get "/strava_integration/new"
+        CGI.parse(URI.parse(response.location).query)["state"].first
+      end
+
       context "with error param" do
         it "redirects with error flash" do
           get "/strava_integration/callback", params: {error: "access_denied"}
@@ -38,11 +45,30 @@ RSpec.describe StravaIntegrationsController, type: :request do
         end
       end
 
-      context "with valid code" do
+      context "with missing state" do
+        it "redirects with error flash" do
+          initiate_oauth_flow
+          get "/strava_integration/callback", params: {code: "test_auth_code"}
+          expect(response).to redirect_to(my_account_path)
+          expect(flash[:error]).to match(/invalid oauth state/i)
+        end
+      end
+
+      context "with mismatched state" do
+        it "redirects with error flash" do
+          initiate_oauth_flow
+          get "/strava_integration/callback", params: {code: "test_auth_code", state: "wrong"}
+          expect(response).to redirect_to(my_account_path)
+          expect(flash[:error]).to match(/invalid oauth state/i)
+        end
+      end
+
+      context "with valid code and state" do
         it "creates strava integration and enqueues sync job" do
+          oauth_state = initiate_oauth_flow
           VCR.use_cassette("strava-exchange_token") do
             expect {
-              get "/strava_integration/callback", params: {code: "test_auth_code"}
+              get "/strava_integration/callback", params: {code: "test_auth_code", state: oauth_state}
             }.to change(StravaIntegration, :count).by(1)
               .and change(StravaJobs::InitialSync.jobs, :size).by(1)
 
@@ -61,9 +87,10 @@ RSpec.describe StravaIntegrationsController, type: :request do
           let!(:existing) { FactoryBot.create(:strava_integration, user: current_user) }
 
           it "updates existing integration" do
+            oauth_state = initiate_oauth_flow
             VCR.use_cassette("strava-exchange_token") do
               expect {
-                get "/strava_integration/callback", params: {code: "test_auth_code"}
+                get "/strava_integration/callback", params: {code: "test_auth_code", state: oauth_state}
               }.not_to change(StravaIntegration, :count)
 
               expect(existing.reload.athlete_id).to eq("2430215")
@@ -74,8 +101,9 @@ RSpec.describe StravaIntegrationsController, type: :request do
 
       context "with invalid code" do
         it "redirects with error flash" do
+          oauth_state = initiate_oauth_flow
           VCR.use_cassette("strava-exchange_token_failure") do
-            get "/strava_integration/callback", params: {code: "bad_code"}
+            get "/strava_integration/callback", params: {code: "bad_code", state: oauth_state}
             expect(response).to redirect_to(my_account_path)
             expect(flash[:error]).to match(/unable to connect/i)
           end

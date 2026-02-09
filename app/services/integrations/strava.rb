@@ -19,13 +19,14 @@ class Integrations::Strava
       resp.body
     end
 
-    def authorization_url
+    def authorization_url(state:)
       params = {
         client_id: STRAVA_KEY,
         response_type: "code",
         redirect_uri: Rails.application.routes.url_helpers.callback_strava_integration_url,
         scope: "read,activity:read_all",
-        approval_prompt: "auto"
+        approval_prompt: "auto",
+        state:
       }
       "#{BASE_URL}/oauth/authorize?#{params.to_query}"
     end

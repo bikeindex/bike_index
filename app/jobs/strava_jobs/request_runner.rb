@@ -6,66 +6,49 @@ module StravaJobs
 
     sidekiq_options queue: "low_priority", retry: false
 
-    def self.frequency
-      16.seconds
-    end
-
-    def self.execute(request, strava_integration)
-      response = case request.request_type
-      when "fetch_athlete"
-        Integrations::Strava.fetch_athlete(strava_integration)
-      when "fetch_athlete_stats"
-        Integrations::Strava.fetch_athlete_stats(strava_integration, request.parameters["athlete_id"])
-      when "list_activities"
-        params = request.parameters.symbolize_keys.slice(:per_page, :before, :after)
-        Integrations::Strava.list_activities(strava_integration, **params)
-      when "fetch_activity"
-        Integrations::Strava.fetch_activity(strava_integration, request.parameters["strava_id"])
-      end
-
-      if response.success?
-        request.update(response_status: :success)
-        response.body
-      elsif response.status == 429
-        request.update(response_status: :rate_limited)
-        nil
-      elsif response.status == 401
-        request.update(response_status: :token_refresh_failed)
-        nil
-      else
-        request.update(response_status: :error)
-        raise "Strava API error #{response.status}: #{response.body}"
-      end
-    end
-
-    def self.handle_response(request, strava_integration, response)
-      case request.request_type
-      when "fetch_athlete" then handle_fetch_athlete(strava_integration, response)
-      when "fetch_athlete_stats" then handle_fetch_athlete_stats(request, strava_integration, response)
-      when "list_activities" then handle_list_activities(request, strava_integration, response)
-      when "fetch_activity" then handle_fetch_activity(request, strava_integration, response)
-      end
-    end
-
-    def perform(strava_request_id = nil)
-      return enqueue_next_request unless strava_request_id.present?
-
-      request = StravaRequest.find_by(id: strava_request_id)
-      return unless request
-      return if request.requested_at.present?
-
-      strava_integration = StravaIntegration.find_by(id: request.strava_integration_id)
-      unless strava_integration
-        request.update(requested_at: Time.current, response_status: :error)
-        return
-      end
-
-      request.update(requested_at: Time.current)
-      response = self.class.execute(request, strava_integration)
-      self.class.handle_response(request, strava_integration, response) if response
-    end
-
     class << self
+      def frequency
+        16.seconds
+      end
+
+      def execute(request, strava_integration)
+        response = case request.request_type
+        when "fetch_athlete"
+          Integrations::Strava.fetch_athlete(strava_integration)
+        when "fetch_athlete_stats"
+          Integrations::Strava.fetch_athlete_stats(strava_integration, request.parameters["athlete_id"])
+        when "list_activities"
+          params = request.parameters.symbolize_keys.slice(:per_page, :before, :after)
+          Integrations::Strava.list_activities(strava_integration, **params)
+        when "fetch_activity"
+          Integrations::Strava.fetch_activity(strava_integration, request.parameters["strava_id"])
+        end
+
+        if response.success?
+          request.update(response_status: :success)
+          response.body
+        elsif response.status == 429
+          request.update(response_status: :rate_limited)
+          StravaRequest.create_follow_up(strava_integration, request.request_type, request.endpoint, **request.parameters.symbolize_keys)
+          nil
+        elsif response.status == 401
+          request.update(response_status: :token_refresh_failed)
+          nil
+        else
+          request.update(response_status: :error)
+          raise "Strava API error #{response.status}: #{response.body}"
+        end
+      end
+
+      def handle_response(request, strava_integration, response)
+        case request.request_type
+        when "fetch_athlete" then handle_fetch_athlete(strava_integration, response)
+        when "fetch_athlete_stats" then handle_fetch_athlete_stats(request, strava_integration, response)
+        when "list_activities" then handle_list_activities(request, strava_integration, response)
+        when "fetch_activity" then handle_fetch_activity(request, strava_integration, response)
+        end
+      end
+
       private
 
       def handle_fetch_athlete(strava_integration, athlete)
@@ -129,6 +112,25 @@ module StravaJobs
             strava_id: strava_id.to_s, strava_activity_id: id)
         end
       end
+
+    end
+
+    def perform(strava_request_id = nil)
+      return enqueue_next_request unless strava_request_id.present?
+
+      request = StravaRequest.find_by(id: strava_request_id)
+      return unless request
+      return if request.requested_at.present?
+
+      strava_integration = StravaIntegration.find_by(id: request.strava_integration_id)
+      unless strava_integration
+        request.update(requested_at: Time.current, response_status: :error)
+        return
+      end
+
+      request.update(requested_at: Time.current)
+      response = self.class.execute(request, strava_integration)
+      self.class.handle_response(request, strava_integration, response) if response
     end
 
     private

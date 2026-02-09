@@ -175,14 +175,19 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         )
       end
 
-      it "sets response_status to rate_limited" do
+      it "sets response_status to rate_limited and creates a retry request" do
         VCR.use_cassette("strava-rate_limited") do
-          instance.perform(request.id)
+          expect { instance.perform(request.id) }.to change(StravaRequest, :count).by(1)
         end
 
         request.reload
         expect(request.requested_at).to be_present
         expect(request.response_status).to eq("rate_limited")
+
+        retry_request = StravaRequest.last
+        expect(retry_request.request_type).to eq(request.request_type)
+        expect(retry_request.endpoint).to eq(request.endpoint)
+        expect(retry_request.requested_at).to be_nil
       end
     end
 

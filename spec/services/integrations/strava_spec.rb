@@ -8,12 +8,13 @@ RSpec.describe Integrations::Strava, type: :service do
   end
 
   describe ".authorization_url" do
-    it "builds the correct authorization URL" do
-      url = described_class.authorization_url
+    it "builds the correct authorization URL with state" do
+      url = described_class.authorization_url(state: "test_state")
       expect(url).to include("https://www.strava.com/oauth/authorize")
       expect(url).to include("response_type=code")
       expect(url).to include("scope=read%2Cactivity%3Aread_all")
       expect(url).to include("redirect_uri=")
+      expect(url).to include("state=test_state")
     end
   end
 
@@ -59,7 +60,7 @@ RSpec.describe Integrations::Strava, type: :service do
   describe ".list_activities" do
     it "returns activities for a page" do
       VCR.use_cassette("strava-list_activities") do
-        result = described_class.list_activities(strava_integration, page: 1, per_page: 1)
+        result = described_class.list_activities(strava_integration, per_page: 1)
         expect(result).to be_an(Array)
         expect(result.size).to eq(1)
         expect(result.first["sport_type"]).to eq("EBikeRide")

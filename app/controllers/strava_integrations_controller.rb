@@ -5,12 +5,20 @@ class StravaIntegrationsController < ApplicationController
   before_action :find_strava_integration, only: %i[destroy sync_status]
 
   def new
-    redirect_to Integrations::Strava.authorization_url, allow_other_host: true
+    state = SecureRandom.hex(24)
+    session[:strava_oauth_state] = state
+    redirect_to Integrations::Strava.authorization_url(state:), allow_other_host: true
   end
 
   def callback
     if params[:error].present?
       flash[:error] = "Strava authorization was denied."
+      redirect_to my_account_path
+      return
+    end
+
+    unless params[:state].present? && ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, session.delete(:strava_oauth_state).to_s)
+      flash[:error] = "Invalid OAuth state. Please try again."
       redirect_to my_account_path
       return
     end
