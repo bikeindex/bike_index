@@ -49,11 +49,11 @@ RSpec.describe StravaIntegrationsController, type: :request do
             expect(response).to redirect_to(my_account_path)
             expect(flash[:success]).to match(/connected/i)
 
-            si = current_user.reload.strava_integration
-            expect(si.access_token).to be_present
-            expect(si.refresh_token).to be_present
-            expect(si.athlete_id).to eq("2430215")
-            expect(si.status).to eq("pending")
+            strava_integration = current_user.reload.strava_integration
+            expect(strava_integration.access_token).to be_present
+            expect(strava_integration.refresh_token).to be_present
+            expect(strava_integration.athlete_id).to eq("2430215")
+            expect(strava_integration.status).to eq("pending")
           end
         end
 

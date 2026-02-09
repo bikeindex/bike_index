@@ -19,25 +19,25 @@ RSpec.describe StravaRequest, type: :model do
     end
 
     it "requires endpoint" do
-      si = FactoryBot.create(:strava_integration)
-      request = StravaRequest.new(strava_integration_id: si.id, request_type: :fetch_athlete)
+      strava_integration = FactoryBot.create(:strava_integration)
+      request = StravaRequest.new(strava_integration_id: strava_integration.id, request_type: :fetch_athlete)
       expect(request).not_to be_valid
       expect(request.errors[:endpoint]).to be_present
     end
   end
 
   describe ".next_pending" do
-    let(:si) { FactoryBot.create(:strava_integration) }
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
     it "returns oldest unprocessed request" do
-      older = FactoryBot.create(:strava_request, strava_integration: si, created_at: 2.minutes.ago)
-      FactoryBot.create(:strava_request, strava_integration: si, created_at: 1.minute.ago)
+      older = FactoryBot.create(:strava_request, strava_integration:, created_at: 2.minutes.ago)
+      FactoryBot.create(:strava_request, strava_integration:, created_at: 1.minute.ago)
       expect(StravaRequest.next_pending).to eq(older)
     end
 
     it "excludes processed requests" do
-      FactoryBot.create(:strava_request, :processed, strava_integration: si)
-      pending_req = FactoryBot.create(:strava_request, strava_integration: si)
+      FactoryBot.create(:strava_request, :processed, strava_integration:)
+      pending_req = FactoryBot.create(:strava_request, strava_integration:)
       expect(StravaRequest.next_pending).to eq(pending_req)
     end
 

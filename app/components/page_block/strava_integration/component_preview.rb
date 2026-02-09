@@ -26,11 +26,11 @@ module PageBlock::StravaIntegration
 
     def user_with_strava(status)
       user = lookbook_user
-      si = user.strava_integration || user.build_strava_integration(
+      strava_integration = user.strava_integration || user.build_strava_integration(
         access_token: "preview_token",
         refresh_token: "preview_refresh"
       )
-      si.assign_attributes(
+      strava_integration.assign_attributes(
         status: status,
         athlete_activity_count: 150,
         activities_downloaded_count: (status == :syncing) ? 50 : 150,

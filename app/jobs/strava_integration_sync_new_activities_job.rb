@@ -10,15 +10,15 @@ class StravaIntegrationSyncNewActivitiesJob < ScheduledJob
   def perform(strava_integration_id = nil)
     return enqueue_workers unless strava_integration_id.present?
 
-    si = StravaIntegration.find_by(id: strava_integration_id)
-    return unless si&.synced?
+    strava_integration = StravaIntegration.find_by(id: strava_integration_id)
+    return unless strava_integration&.synced?
 
-    latest = si.strava_activities.order(start_date: :desc).first
+    latest = strava_integration.strava_activities.order(start_date: :desc).first
     after_epoch = latest&.start_date&.to_i
 
     StravaRequest.create!(
-      user_id: si.user_id,
-      strava_integration_id: si.id,
+      user_id: strava_integration.user_id,
+      strava_integration_id: strava_integration.id,
       request_type: :list_activities,
       endpoint: "athlete/activities",
       parameters: {page: 1, per_page: 200, after: after_epoch}.compact

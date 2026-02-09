@@ -4,12 +4,12 @@ class StravaIntegrationSyncJob < ApplicationJob
   def perform(strava_integration_id)
     return if skip_job?
 
-    si = StravaIntegration.find_by(id: strava_integration_id)
-    return unless si
+    strava_integration = StravaIntegration.find_by(id: strava_integration_id)
+    return unless strava_integration
 
     StravaRequest.create!(
-      user_id: si.user_id,
-      strava_integration_id: si.id,
+      user_id: strava_integration.user_id,
+      strava_integration_id: strava_integration.id,
       request_type: :fetch_athlete,
       endpoint: "athlete"
     )

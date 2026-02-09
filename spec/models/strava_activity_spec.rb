@@ -9,18 +9,18 @@ RSpec.describe StravaActivity, type: :model do
     end
 
     it "requires unique strava_id per integration" do
-      si = FactoryBot.create(:strava_integration)
-      FactoryBot.create(:strava_activity, strava_integration: si, strava_id: "123")
-      sa = FactoryBot.build(:strava_activity, strava_integration: si, strava_id: "123")
+      strava_integration = FactoryBot.create(:strava_integration)
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "123")
+      sa = FactoryBot.build(:strava_activity, strava_integration:, strava_id: "123")
       expect(sa).not_to be_valid
       expect(sa.errors[:strava_id]).to be_present
     end
 
     it "allows same strava_id for different integrations" do
-      si1 = FactoryBot.create(:strava_integration)
-      si2 = FactoryBot.create(:strava_integration)
-      FactoryBot.create(:strava_activity, strava_integration: si1, strava_id: "123")
-      sa = FactoryBot.build(:strava_activity, strava_integration: si2, strava_id: "123")
+      strava_integration1 = FactoryBot.create(:strava_integration)
+      strava_integration2 = FactoryBot.create(:strava_integration)
+      FactoryBot.create(:strava_activity, strava_integration: strava_integration1, strava_id: "123")
+      sa = FactoryBot.build(:strava_activity, strava_integration: strava_integration2, strava_id: "123")
       expect(sa).to be_valid
     end
   end
@@ -34,16 +34,16 @@ RSpec.describe StravaActivity, type: :model do
   end
 
   describe "scopes" do
-    let(:si) { FactoryBot.create(:strava_integration) }
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
     it "cycling scope returns cycling activities" do
-      ride = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "Ride")
-      mtb = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "MountainBikeRide")
-      gravel = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "GravelRide")
-      virtual = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "VirtualRide")
-      ebike = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "EBikeRide")
-      emtb = FactoryBot.create(:strava_activity, strava_integration: si, activity_type: "EMountainBikeRide")
-      run = FactoryBot.create(:strava_activity, :run, strava_integration: si)
+      ride = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride")
+      mtb = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "MountainBikeRide")
+      gravel = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "GravelRide")
+      virtual = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "VirtualRide")
+      ebike = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "EBikeRide")
+      emtb = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "EMountainBikeRide")
+      run = FactoryBot.create(:strava_activity, :run, strava_integration:)
       expect(StravaActivity.cycling).to include(ride, mtb, gravel, virtual, ebike, emtb)
       expect(StravaActivity.cycling).not_to include(run)
     end
@@ -90,7 +90,7 @@ RSpec.describe StravaActivity, type: :model do
   end
 
   describe "create_or_update_from_summary" do
-    let(:si) { FactoryBot.create(:strava_integration) }
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
     let(:summary) do
       {"id" => 9876543, "name" => "Morning Ride", "distance" => 25000.0,
        "moving_time" => 3600, "total_elevation_gain" => 200.0,
@@ -100,7 +100,7 @@ RSpec.describe StravaActivity, type: :model do
     end
 
     it "creates a new activity from summary" do
-      activity = StravaActivity.create_or_update_from_summary(si, summary)
+      activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)
       expect(activity).to be_persisted
       expect(activity.strava_id).to eq("9876543")
       expect(activity.title).to eq("Morning Ride")
@@ -114,21 +114,21 @@ RSpec.describe StravaActivity, type: :model do
 
     context "with gear association" do
       let!(:gear_association) do
-        FactoryBot.create(:strava_gear_association, strava_integration: si, strava_gear_id: "b1234")
+        FactoryBot.create(:strava_gear_association, strava_integration:, strava_gear_id: "b1234")
       end
 
       it "updates gear association total distance" do
-        StravaActivity.create_or_update_from_summary(si, summary)
+        StravaActivity.create_or_update_from_summary(strava_integration, summary)
         gear_association.reload
         expect(gear_association.total_distance_kilometers).to eq(25)
       end
     end
 
     it "updates an existing activity" do
-      FactoryBot.create(:strava_activity, strava_integration: si, strava_id: "9876543", title: "Old Title")
-      activity = StravaActivity.create_or_update_from_summary(si, summary)
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543", title: "Old Title")
+      activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)
       expect(activity.title).to eq("Morning Ride")
-      expect(si.strava_activities.count).to eq(1)
+      expect(strava_integration.strava_activities.count).to eq(1)
     end
   end
 
