@@ -20,6 +20,10 @@ http_interactions:
     headers:
       Content-Type:
       - application/json; charset=utf-8
+      X-RateLimit-Limit:
+      - 100,1000
+      X-RateLimit-Usage:
+      - 42,350
     body:
       encoding: UTF-8
       string: '{"message":"Internal Server Error"}'

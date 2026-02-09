@@ -6,6 +6,7 @@
 #  id                    :bigint           not null, primary key
 #  endpoint              :string           not null
 #  parameters            :jsonb
+#  rate_limit            :jsonb
 #  request_type          :integer          not null
 #  requested_at          :datetime
 #  response_status       :integer          default("pending"), not null

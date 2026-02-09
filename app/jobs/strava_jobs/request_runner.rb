@@ -20,18 +20,20 @@ module StravaJobs
           Integrations::Strava.fetch_activity(strava_integration, request.parameters["strava_id"])
         end
 
+        rate_limit = parse_rate_limit(response.headers)
+
         if response.success?
-          request.update(response_status: :success)
+          request.update(response_status: :success, rate_limit:)
           response.body
         elsif response.status == 429
-          request.update(response_status: :rate_limited)
+          request.update(response_status: :rate_limited, rate_limit:)
           StravaRequest.create_follow_up(strava_integration, request.request_type, request.endpoint, **request.parameters.symbolize_keys)
           nil
         elsif response.status == 401
-          request.update(response_status: :token_refresh_failed)
+          request.update(response_status: :token_refresh_failed, rate_limit:)
           nil
         else
-          request.update(response_status: :error)
+          request.update(response_status: :error, rate_limit:)
           raise "Strava API error #{response.status}: #{response.body}"
         end
       end
@@ -71,6 +73,15 @@ module StravaJobs
 
         remaining = StravaRequest.unprocessed.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
         strava_integration.finish_sync! if remaining.none?
+      end
+
+      def parse_rate_limit(headers)
+        limit = headers["X-RateLimit-Limit"]
+        usage = headers["X-RateLimit-Usage"]
+        return unless limit.present? || usage.present?
+        short_limit, long_limit = limit&.split(",")&.map(&:to_i)
+        short_usage, long_usage = usage&.split(",")&.map(&:to_i)
+        {short_limit:, short_usage:, long_limit:, long_usage:}.compact
       end
 
       def enqueue_detail_requests(request, strava_integration)
