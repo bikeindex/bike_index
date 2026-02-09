@@ -147,7 +147,7 @@
           = link_to t(".add_a_lock"), new_lock_url, class: "btn btn-primary-offset btn-lg"
         %h3
           = t(".next")
-        .inner.last-item
+        .inner.last-item{class: "tw:space-y-2 tw:[&_p]:mb-0 tw:[&_.lock-group]:mb-0"}
           - if @bikes.present?
             .lock-group
               .image-column
@@ -173,9 +173,8 @@
                 %strong
                   = t(".tell_us_more_about_yourself")
                 = link_to t(".update_your_profile"), edit_my_account_url
-
-      - if Flipper.enabled?(:strava_integration, current_user)
-        = render(PageBlock::StravaIntegration::Component.new(user: current_user))
+          - if Flipper.enabled?(:strava_integration, current_user)
+            = render(PageBlock::StravaIntegration::Component.new(user: current_user))
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal1") do

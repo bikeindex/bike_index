@@ -1,61 +1,54 @@
-<div class="side-box mt-4">
-  <h3 class="first-item"><%= translation(".strava_integration") %></h3>
+<div class="tw:mt-1 tw:space-y-0.5 tw:[&_p]:mb-2!">
+  <p><strong><%= translation(".strava_integration") %></strong></p>
 
-  <div class="inner">
-    <% if connected? %>
-      <% if syncing? %>
-        <p><strong><%= translation(".syncing_activities") %></strong></p>
-        <p class="strava-download-count">
-          <%= translation(".downloaded_count", count: downloaded_count, total: total_count) %>
-        </p>
-        <div class="progress mb-2">
-          <div
-            class="progress-bar"
-            role="progressbar"
-            style="width: <%= progress_percent %>%"
-            aria-valuenow="<%= progress_percent %>"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            <%= progress_percent %>%
-          </div>
-        </div>
-        <p class="small less-strong">
-          <%= translation(".sync_running_in_background") %>
-        </p>
+  <% if connected? %>
+    <% if syncing? %>
+      <p class="tw:leading-tight">
+        <%= translation(".syncing_activities") %>
+
+        <span id="strava-download-count" class="">
+          <%= progress_percent %>% (<%= number_display(downloaded_count) %> /
+          <%= number_display(total_count) %>)
+          <%= translation(".downloaded") %>
+        </span>
+      </p>
+      <p class="small less-strong tw:leading-tight">
+        <%= translation(".sync_running_in_background") %>
+      </p>
+      <% if @strava_integration.persisted? %>
         <div
           data-controller="strava-sync-status"
           data-strava-sync-status-url-value="<%= helpers.sync_status_strava_integration_path %>"
         ></div>
-      <% elsif synced? %>
-        <p><strong><%= translation(".connected_to_strava") %></strong></p>
-        <p><%= translation(".activities_synced", count: downloaded_count) %></p>
-        <% if gear_list.present? %>
-          <p><strong><%= translation(".your_strava_gear") %></strong></p>
-          <ul class="list-unstyled">
-            <% gear_list.each do |gear| %>
-              <li><%= gear["name"] %></li>
-            <% end %>
-          </ul>
-        <% end %>
-      <% elsif error? %>
-        <p class="text-danger">
-          <strong><%= translation(".sync_error") %></strong>
-        </p>
-        <p><%= translation(".sync_error_description") %></p>
-      <% else %>
-        <p><%= translation(".strava_connected_pending") %></p>
       <% end %>
-      <%= link_to translation(".disconnect_strava"),
-            helpers.strava_integration_path,
-            method: :delete,
-            class: "btn btn-sm btn-outline-danger mt-2",
-            data: { confirm: translation(".disconnect_confirm") } %>
+    <% elsif synced? %>
+      <p><strong><%= translation(".connected_to_strava") %></strong></p>
+      <p><%= translation(".activities_synced", count: downloaded_count) %></p>
+      <% if gear_list.present? %>
+        <p><strong><%= translation(".your_strava_gear") %></strong></p>
+        <ul class="list-unstyled">
+          <% gear_list.each do |gear| %>
+            <li><%= gear["name"] %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% elsif error? %>
+      <p class="text-danger">
+        <strong><%= translation(".sync_error") %></strong>
+      </p>
+      <p><%= translation(".sync_error_description") %></p>
     <% else %>
-      <p><%= translation(".integrate_your_bikes_with_strava") %></p>
-      <%= link_to helpers.new_strava_integration_path, class: "btn btn-primary" do %>
-        <%= translation(".connect_with_strava") %>
-      <% end %>
+      <p><%= translation(".strava_connected_pending") %></p>
     <% end %>
-  </div>
+    <%= link_to translation(".disconnect_strava"),
+          helpers.strava_integration_path,
+          method: :delete,
+          class: "btn btn-sm btn-outline-danger tw:mt-4",
+          data: { confirm: translation(".disconnect_confirm") } %>
+  <% else %>
+    <p><%= translation(".integrate_your_bikes_with_strava") %></p>
+    <%= link_to helpers.new_strava_integration_path, class: "btn btn-primary" do %>
+      <%= translation(".connect_with_strava") %>
+    <% end %>
+  <% end %>
 </div>

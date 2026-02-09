@@ -3,35 +3,35 @@
 module PageBlock::StravaIntegration
   class ComponentPreview < ApplicationComponentPreview
     def not_connected
-      render(PageBlock::StravaIntegration::Component.new(user: user_without_strava))
+      render(Component.new(user: built_user))
     end
 
     def syncing
-      render(PageBlock::StravaIntegration::Component.new(user: user_with_strava(:syncing)))
+      render(Component.new(user: user_with_strava(:syncing)))
     end
 
     def synced
-      render(PageBlock::StravaIntegration::Component.new(user: user_with_strava(:synced)))
+      render(Component.new(user: user_with_strava(:synced)))
     end
 
     def error
-      render(PageBlock::StravaIntegration::Component.new(user: user_with_strava(:error)))
+      render(Component.new(user: user_with_strava(:error)))
     end
 
     private
 
-    def user_without_strava
-      lookbook_user
+    def built_user
+      User.new(name: "Preview User", email: "preview@example.com")
     end
 
     def user_with_strava(status)
-      user = lookbook_user
-      strava_integration = user.strava_integration || user.build_strava_integration(
+      user = built_user
+      integration = user.build_strava_integration(
         access_token: "preview_token",
         refresh_token: "preview_refresh"
       )
-      strava_integration.assign_attributes(
-        status: status,
+      integration.assign_attributes(
+        status:,
         athlete_activity_count: 150,
         activities_downloaded_count: (status == :syncing) ? 50 : 150,
         athlete_gear: [{"name" => "My Road Bike"}, {"name" => "My Mountain Bike"}]

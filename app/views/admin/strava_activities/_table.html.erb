@@ -17,50 +17,80 @@
         <%= sortable "distance_meters", "Distance", render_sortable: render_sortable %>
       </th>
 
+      <th>Gear</th>
+
       <th>User</th>
     </thead>
 
     <tbody>
-      <% collection.each do |activity| %>
+      <% collection.each do |strava_activity| %>
         <tr>
           <td>
             <div class="less-strong-hold">
               <span class="localizeTime">
-                <%= l activity.created_at, format: :convert_time %>
+                <%= l strava_activity.created_at, format: :convert_time %>
               </span>
 
               <% if display_dev_info? %>
                 <span class="less-strong-right d-none d-md-block only-dev-visible">
-                  <%= activity.id %>
+                  <%= strava_activity.id %>
                 </span>
               <% end %>
             </div>
           </td>
 
           <td>
-            <% if activity.start_date.present? %>
+            <% if strava_activity.start_date.present? %>
               <span class="localizeTime">
-                <%= l activity.start_date, format: :convert_time %>
+                <%= l strava_activity.start_date, format: :convert_time %>
               </span>
             <% end %>
           </td>
 
-          <td><span title="<%= activity.title %>"><%= activity.title&.truncate(70) %></span></td>
-
           <td>
-            <% if activity.cycling? %>
-              <span class="text-success"><%= activity.activity_type %></span>
-            <% else %>
-              <small><%= activity.activity_type %></small>
+            <span title="<%= strava_activity.title %>">
+              <%= strava_activity.title&.truncate(70) %>
+            </span>
+
+            <%= link_to "↗", "https://www.strava.com/activities/#{strava_activity.strava_id}", target: "_blank", class: "small", title: "View on Strava" %>
+
+            <% if strava_activity.description.present? %>
+              <span
+                class="small less-strong tw:block"
+                title="<%= strava_activity.description %>"
+              >
+                <%= strava_activity.description&.truncate(70) %>
+              </span>
             <% end %>
           </td>
 
           <td>
-            <small><%= activity.distance_miles&.then { "#{it} mi" } %></small>
+            <% if strava_activity.cycling? %>
+              <span class="text-success">
+                <%= strava_activity.activity_type %>
+              </span>
+            <% else %>
+              <small><%= strava_activity.activity_type %></small>
+            <% end %>
+          </td>
+
+          <td><%= number_display(strava_activity.distance_miles.round) %></td>
+
+          <td>
+            <% if strava_activity.gear_id.present? %>
+              <% gear_info = strava_activity.strava_integration.athlete_gear&.find { |g| g["id"] == strava_activity.gear_id } %>
+              <small>
+                <%= gear_info&.dig("name") || strava_activity.gear_id %>
+              </small>
+              <% gear_assoc = strava_activity.strava_integration.strava_gear_associations.find { |ga| ga.strava_gear_id == strava_activity.gear_id } %>
+              <% if gear_assoc.present? %>
+                <%= link_to "BI", bike_path(gear_assoc.item), class: "small text-success", title: gear_assoc.item.title_string %>
+              <% end %>
+            <% end %>
           </td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: activity.strava_integration.user, user_id: activity.strava_integration.user_id, render_search: render_sortable) %>
+            <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id)) %>
           </td>
         </tr>
       <% end %>

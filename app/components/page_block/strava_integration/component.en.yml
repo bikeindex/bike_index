@@ -12,7 +12,7 @@ en:
           Are you sure you want to disconnect Strava? This will remove all synced
           activities.
         disconnect_strava: Disconnect Strava
-        downloaded_count: "%{count} of %{total} activities downloaded"
+        downloaded: downloaded
         integrate_your_bikes_with_strava: Integrate your bikes with Strava and sync
           your riding activities.
         strava_connected_pending: Connected to Strava. Sync will begin shortly.

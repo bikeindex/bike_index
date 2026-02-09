@@ -41,7 +41,11 @@
 
           <td><small><%= strava_request.request_type&.humanize %></small></td>
 
-          <td><small><%= strava_request.endpoint&.truncate(30) %></small></td>
+          <td>
+            <code title="strava_request.endpoint">
+              <%= strava_request.endpoint&.truncate(30) %>
+            </code>
+          </td>
 
           <td>
             <% if strava_request.success? %>
@@ -57,10 +61,16 @@
             <% end %>
           </td>
 
-          <td><small><%= strava_request.parameters&.to_json if strava_request.parameters.present? %></small></td>
+          <td>
+            <small>
+              <%= strava_request.parameters&.to_json if strava_request.parameters.present? %>
+            </small>
+          </td>
 
           <td>
-            <small><%= pretty_print_json(strava_request.rate_limit) if strava_request.rate_limit.present? %></small>
+            <small>
+              <%= pretty_print_json(strava_request.rate_limit) if strava_request.rate_limit.present? %>
+            </small>
           </td>
 
           <td>
