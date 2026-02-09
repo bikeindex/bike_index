@@ -47,6 +47,7 @@ class StravaActivity < ApplicationRecord
   validates :strava_id, uniqueness: {scope: :strava_integration_id}
 
   scope :cycling, -> { where(activity_type: CYCLING_TYPES) }
+  scope :enriched, -> { where.not(segment_locations: nil) }
 
   class << self
     def create_or_update_from_summary(strava_integration, summary)
@@ -103,6 +104,10 @@ class StravaActivity < ApplicationRecord
 
   def cycling?
     CYCLING_TYPES.include?(activity_type)
+  end
+
+  def enriched?
+    !segment_locations.nil?
   end
 
   def distance_miles

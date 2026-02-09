@@ -35,14 +35,4 @@ class StravaRequest < AnalyticsRecord
   def self.next_pending
     unprocessed.first
   end
-
-  def self.create_follow_up(strava_integration, request_type, endpoint, **params)
-    create!(
-      user_id: strava_integration.user_id,
-      strava_integration_id: strava_integration.id,
-      request_type:,
-      endpoint:,
-      parameters: params
-    )
-  end
 end

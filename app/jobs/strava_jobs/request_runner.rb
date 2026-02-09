@@ -27,7 +27,8 @@ module StravaJobs
           response.body
         elsif response.status == 429
           request.update(response_status: :rate_limited, rate_limit:)
-          StravaRequest.create_follow_up(strava_integration, request.request_type, request.endpoint, **request.parameters.symbolize_keys)
+          StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
+            request_type: request.request_type, endpoint: request.endpoint, parameters: request.parameters.symbolize_keys)
           nil
         elsif response.status == 401
           request.update(response_status: :token_refresh_failed, rate_limit:)
@@ -68,7 +69,8 @@ module StravaJobs
           params = {per_page: ACTIVITIES_PER_PAGE}
           params[:before] = before_epoch if before_epoch
           params[:after] = request.parameters["after"] if request.parameters["after"]
-          StravaRequest.create_follow_up(strava_integration, :list_activities, "athlete/activities", **params)
+          StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
+            request_type: :list_activities, endpoint: "athlete/activities", parameters: params)
         else
           enqueue_detail_requests(request, strava_integration)
         end
@@ -85,10 +87,7 @@ module StravaJobs
       end
 
       def enqueue_detail_requests(request, strava_integration)
-        after_epoch = request.parameters["after"]
-        scope = strava_integration.strava_activities.cycling
-        scope = scope.where("start_date > ?", Time.at(after_epoch.to_i)) if after_epoch
-        activity_ids = scope.pluck(:id, :strava_id)
+        activity_ids = strava_integration.strava_activities.cycling.where(segment_locations: nil).pluck(:id, :strava_id)
 
         if activity_ids.empty?
           strava_integration.finish_sync!
@@ -96,8 +95,9 @@ module StravaJobs
         end
 
         activity_ids.each do |id, strava_id|
-          StravaRequest.create_follow_up(strava_integration, :fetch_activity, "activities/#{strava_id}",
-            strava_id: strava_id.to_s, strava_activity_id: id)
+          StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
+            request_type: :fetch_activity, endpoint: "activities/#{strava_id}",
+            parameters: {strava_id: strava_id.to_s, strava_activity_id: id})
         end
       end
     end

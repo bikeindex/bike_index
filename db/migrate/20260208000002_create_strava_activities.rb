@@ -14,8 +14,8 @@ class CreateStravaActivities < ActiveRecord::Migration[8.0]
       t.integer :kudos_count
       t.integer :year
       t.string :gear_id
-      t.jsonb :photos, default: []
-      t.jsonb :segment_locations, default: {}
+      t.jsonb :photos
+      t.jsonb :segment_locations
       t.string :activity_type
       t.datetime :start_date
 

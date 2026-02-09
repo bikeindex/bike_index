@@ -22,8 +22,9 @@ module StravaJobs
       strava_integration.update_from_athlete_and_stats(athlete, stats)
       strava_integration.update(status: :syncing)
 
-      StravaRequest.create_follow_up(strava_integration, :list_activities, "athlete/activities",
-        per_page: RequestRunner::ACTIVITIES_PER_PAGE)
+      StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
+        request_type: :list_activities, endpoint: "athlete/activities",
+        parameters: {per_page: RequestRunner::ACTIVITIES_PER_PAGE})
     end
 
     private

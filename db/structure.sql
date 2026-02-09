@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3527,8 +3528,8 @@ CREATE TABLE public.strava_activities (
     kudos_count integer,
     year integer,
     gear_id character varying,
-    photos jsonb DEFAULT '[]'::jsonb,
-    segment_locations jsonb DEFAULT '{}'::jsonb,
+    photos jsonb,
+    segment_locations jsonb,
     activity_type character varying,
     start_date timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
