@@ -14,6 +14,7 @@
 #
 #  index_normalized_serial_segments_on_bike_id                  (bike_id)
 #  index_normalized_serial_segments_on_duplicate_bike_group_id  (duplicate_bike_group_id)
+#  index_normalized_serial_segments_on_segment                  (segment)
 #
 class NormalizedSerialSegment < ApplicationRecord
   MINIMUM_LENGTH_FOR_DUPLICATE_GROUP = 5

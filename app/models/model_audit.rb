@@ -106,7 +106,7 @@ class ModelAudit < ApplicationRecord
       manufacturer_id ||= bike&.manufacturer_id
       mnfg_name ||= bike&.mnfg_name || Manufacturer.find_by_id(manufacturer_id)&.short_name
       # Always match by mnfg_name, to fix things if it previously was manufacturer_other
-      bikes = Bike.unscoped.where("mnfg_name ILIKE ?", mnfg_name)
+      bikes = Bike.unscoped.where("LOWER(mnfg_name) = LOWER(?)", mnfg_name)
       if manufacturer_id != Manufacturer.other.id
         bikes = bikes.or(Bike.unscoped.where(manufacturer_id: manufacturer_id))
       end
@@ -138,9 +138,9 @@ class ModelAudit < ApplicationRecord
     def matching_bikes_for_frame_model(bikes, manufacturer_id:, frame_model:)
       if unknown_model?(frame_model, manufacturer_id: manufacturer_id)
         bikes = bikes.motorized unless Manufacturer.find_by_id(manufacturer_id)&.motorized_only
-        bikes.where(frame_model: nil).or(bikes.where("frame_model ILIKE ANY (array[?])", UNKNOWN_STRINGS))
+        bikes.where(frame_model: nil).or(bikes.where("LOWER(frame_model) = ANY (array[?])", UNKNOWN_STRINGS.map(&:downcase)))
       else
-        bikes.where("frame_model ILIKE ?", frame_model)
+        bikes.where("LOWER(frame_model) = LOWER(?)", frame_model)
       end
     end
 
