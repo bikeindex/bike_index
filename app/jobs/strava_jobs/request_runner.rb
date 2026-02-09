@@ -49,10 +49,15 @@ module StravaJobs
       def parse_rate_limit(headers)
         limit = headers["X-RateLimit-Limit"]
         usage = headers["X-RateLimit-Usage"]
+        read_limit = headers["X-ReadRateLimit-Limit"]
+        read_usage = headers["X-ReadRateLimit-Usage"]
         return unless limit.present? || usage.present?
         short_limit, long_limit = limit&.split(",")&.map(&:to_i)
         short_usage, long_usage = usage&.split(",")&.map(&:to_i)
-        {short_limit:, short_usage:, long_limit:, long_usage:}.compact
+        read_short_limit, read_long_limit = read_limit&.split(",")&.map(&:to_i)
+        read_short_usage, read_long_usage = read_usage&.split(",")&.map(&:to_i)
+        {short_limit:, short_usage:, long_limit:, long_usage:,
+         read_short_limit:, read_short_usage:, read_long_limit:, read_long_usage:}.compact
       end
 
       private

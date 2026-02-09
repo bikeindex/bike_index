@@ -24,6 +24,10 @@ http_interactions:
       - "100,1000"
       X-RateLimit-Usage:
       - "101,350"
+      X-ReadRateLimit-Limit:
+      - "100,1000"
+      X-ReadRateLimit-Usage:
+      - "101,350"
     body:
       encoding: UTF-8
       string: '{"message":"Rate Limit Exceeded","errors":[{"resource":"Application","field":"rate limit","code":"exceeded"}]}'

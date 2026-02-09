@@ -123,7 +123,8 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         request.reload
         expect(request.requested_at).to be_present
         expect(request.response_status).to eq("rate_limited")
-        expect(request.rate_limit).to eq({"short_limit" => 100, "short_usage" => 101, "long_limit" => 1000, "long_usage" => 350})
+        expect(request.rate_limit).to eq({"short_limit" => 100, "short_usage" => 101, "long_limit" => 1000, "long_usage" => 350,
+          "read_short_limit" => 100, "read_short_usage" => 101, "read_long_limit" => 1000, "read_long_usage" => 350})
 
         retry_request = StravaRequest.last
         expect(retry_request.request_type).to eq(request.request_type)
