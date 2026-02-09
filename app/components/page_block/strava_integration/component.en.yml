@@ -3,6 +3,9 @@ en:
   components:
     page_block:
       strava_integration:
+        activities_synced:
+          one: "%{count} activity synced"
+          other: "%{count} activities synced"
         connect_with_strava: Connect with Strava
         connected_to_strava: Connected to Strava
         disconnect_confirm: >-

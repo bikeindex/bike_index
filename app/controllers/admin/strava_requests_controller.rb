@@ -28,16 +28,16 @@ class Admin::StravaRequestsController < Admin::BaseController
   def matching_strava_requests
     strava_requests = StravaRequest.all
 
-    if params[:search_strava_integration_id].present?
-      strava_requests = strava_requests.where(strava_integration_id: params[:search_strava_integration_id])
-    end
-
     if params[:search_request_type].present?
       strava_requests = strava_requests.where(request_type: params[:search_request_type])
     end
 
     if params[:search_response_status].present?
       strava_requests = strava_requests.where(response_status: params[:search_response_status])
+    end
+
+    if params[:user_id].present?
+      strava_requests = strava_requests.where(user_id: user_subject&.id || params[:user_id])
     end
 
     strava_requests.where(created_at: @time_range)

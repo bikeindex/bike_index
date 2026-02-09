@@ -15,11 +15,15 @@
         <%= sortable "response_status", "Status", render_sortable: render_sortable %>
       </th>
 
+      <th>Params</th>
+      <th>Rate limit</th>
       <th>Requested at</th>
 
       <th>
         <%= sortable "strava_integration_id", "Integration", render_sortable: render_sortable %>
       </th>
+
+      <th>User</th>
     </thead>
 
     <tbody>
@@ -57,6 +61,12 @@
             <% end %>
           </td>
 
+          <td><small><%= strava_request.parameters&.to_json if strava_request.parameters.present? %></small></td>
+
+          <td>
+            <small><%= pretty_print_json(strava_request.rate_limit) if strava_request.rate_limit.present? %></small>
+          </td>
+
           <td>
             <% if strava_request.requested_at.present? %>
               <span class="localizeTime">
@@ -68,6 +78,10 @@
           <td>
             <%= link_to strava_request.strava_integration_id,
                   admin_strava_integration_path(strava_request.strava_integration_id) %>
+          </td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: strava_request.user, user_id: strava_request.user_id, render_search: render_sortable) %>
           </td>
         </tr>
       <% end %>
