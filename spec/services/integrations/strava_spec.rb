@@ -40,9 +40,10 @@ RSpec.describe Integrations::Strava, type: :service do
   describe ".fetch_athlete" do
     it "returns athlete data" do
       VCR.use_cassette("strava-get_athlete") do
-        result = described_class.fetch_athlete(strava_integration)
-        expect(result["id"]).to eq(2430215)
-        expect(result["username"]).to eq("sethherr")
+        response = described_class.fetch_athlete(strava_integration)
+        expect(response).to be_a(Faraday::Response)
+        expect(response.body["id"]).to eq(2430215)
+        expect(response.body["username"]).to eq("sethherr")
       end
     end
   end
@@ -50,9 +51,9 @@ RSpec.describe Integrations::Strava, type: :service do
   describe ".fetch_athlete_stats" do
     it "returns athlete stats" do
       VCR.use_cassette("strava-get_athlete_stats") do
-        result = described_class.fetch_athlete_stats(strava_integration, ENV["STRAVA_TEST_USER_ID"])
-        expect(result["all_ride_totals"]["count"]).to eq(1655)
-        expect(result["all_run_totals"]["count"]).to eq(162)
+        response = described_class.fetch_athlete_stats(strava_integration, ENV["STRAVA_TEST_USER_ID"])
+        expect(response.body["all_ride_totals"]["count"]).to eq(1655)
+        expect(response.body["all_run_totals"]["count"]).to eq(162)
       end
     end
   end
@@ -60,10 +61,10 @@ RSpec.describe Integrations::Strava, type: :service do
   describe ".list_activities" do
     it "returns activities for a page" do
       VCR.use_cassette("strava-list_activities") do
-        result = described_class.list_activities(strava_integration, per_page: 1)
-        expect(result).to be_an(Array)
-        expect(result.size).to eq(1)
-        expect(result.first["sport_type"]).to eq("EBikeRide")
+        response = described_class.list_activities(strava_integration, per_page: 1)
+        expect(response.body).to be_an(Array)
+        expect(response.body.size).to eq(1)
+        expect(response.body.first["sport_type"]).to eq("EBikeRide")
       end
     end
   end
@@ -71,11 +72,11 @@ RSpec.describe Integrations::Strava, type: :service do
   describe ".fetch_activity" do
     it "returns activity detail with description, gear, and photos" do
       VCR.use_cassette("strava-get_activity") do
-        result = described_class.fetch_activity(strava_integration, "17323701543")
-        expect(result["id"]).to eq(17323701543)
-        expect(result["description"]).to be_present
-        expect(result["gear"]["name"]).to eq("Yuba longtail")
-        expect(result["photos"]["primary"]).to be_present
+        response = described_class.fetch_activity(strava_integration, "17323701543")
+        expect(response.body["id"]).to eq(17323701543)
+        expect(response.body["description"]).to be_present
+        expect(response.body["gear"]["name"]).to eq("Yuba longtail")
+        expect(response.body["photos"]["primary"]).to be_present
       end
     end
   end

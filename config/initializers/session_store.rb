@@ -1,4 +1,10 @@
-domain = Rails.env.production? ? "bikeindex.org" : "localhost"
+domain = if Rails.env.production?
+  "bikeindex.org"
+elsif Rails.env.test?
+  nil
+else
+  "localhost"
+end
 
 # Include port in session key to prevent collisions across Conductor workspaces
 key = if Rails.env.production?
