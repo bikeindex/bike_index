@@ -3566,9 +3566,9 @@ CREATE TABLE public.strava_gear_associations (
     item_id bigint NOT NULL,
     strava_gear_id character varying NOT NULL,
     strava_gear_name character varying,
+    total_distance_kilometers integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    total_distance_kilometers integer
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -7413,7 +7413,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260209001208'),
 ('20260208000003'),
 ('20260208000002'),
 ('20260208000001'),
