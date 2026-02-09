@@ -18,10 +18,6 @@
       </th>
 
       <th>User</th>
-
-      <th>
-        <%= sortable "strava_integration_id", "Integration", render_sortable: render_sortable %>
-      </th>
     </thead>
 
     <tbody>
@@ -49,7 +45,7 @@
             <% end %>
           </td>
 
-          <td><small><%= activity.title&.truncate(30) %></small></td>
+          <td><span title="<%= activity.title %>"><%= activity.title&.truncate(70) %></span></td>
 
           <td>
             <% if activity.cycling? %>
@@ -65,11 +61,6 @@
 
           <td>
             <%= render Admin::UserCell::Component.new(user: activity.strava_integration.user, user_id: activity.strava_integration.user_id, render_search: render_sortable) %>
-          </td>
-
-          <td>
-            <%= link_to activity.strava_integration_id,
-                  admin_strava_integration_path(activity.strava_integration_id) %>
           </td>
         </tr>
       <% end %>

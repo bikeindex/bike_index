@@ -39,9 +39,9 @@ class Integrations::Strava
       get(strava_integration, "athletes/#{athlete_id}/stats")
     end
 
-    def list_activities(strava_integration, per_page:, before: nil, after: nil)
+    def list_activities(strava_integration, per_page:, page: nil, after: nil)
       params = {per_page:}
-      params[:before] = before if before.present?
+      params[:page] = page if page.present?
       params[:after] = after if after.present?
       get(strava_integration, "athlete/activities", **params)
     end

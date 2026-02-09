@@ -14,7 +14,7 @@ module StravaJobs
       def execute(request, strava_integration)
         response = case request.request_type
         when "list_activities"
-          params = request.parameters.symbolize_keys.slice(:per_page, :before, :after)
+          params = request.parameters.symbolize_keys.slice(:per_page, :page, :after)
           Integrations::Strava.list_activities(strava_integration, **params)
         when "fetch_activity"
           Integrations::Strava.fetch_activity(strava_integration, request.parameters["strava_id"])
@@ -69,10 +69,8 @@ module StravaJobs
         strava_integration.update(activities_downloaded_count: strava_integration.strava_activities.count)
 
         if activities.size >= ACTIVITIES_PER_PAGE
-          oldest_start = activities.filter_map { |a| a["start_date"] }.min
-          before_epoch = oldest_start ? Time.parse(oldest_start).to_i : nil
-          params = {per_page: ACTIVITIES_PER_PAGE}
-          params[:before] = before_epoch if before_epoch
+          current_page = request.parameters["page"] || 1
+          params = {per_page: ACTIVITIES_PER_PAGE, page: current_page + 1}
           params[:after] = request.parameters["after"] if request.parameters["after"]
           StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
             request_type: :list_activities, endpoint: "athlete/activities", parameters: params)

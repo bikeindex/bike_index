@@ -20,7 +20,9 @@ module AdminHelper
       {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
       {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true},
       {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true},
-      {title: "Dev: IP Location", path: admin_ip_location_path, match_controller: false}
+      {title: "Dev: IP Location", path: admin_ip_location_path, match_controller: false},
+      {title: "Dev: Strava Requests", path: admin_strava_requests_path, match_controller: true},
+      {title: "Dev: Strava Activities", path: admin_strava_activities_path, match_controller: true}
     ]
   end
 
@@ -77,6 +79,7 @@ module AdminHelper
       {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
       {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
       {title: "Config: Primary Activities", path: admin_primary_activities_path, match_controller: true},
+      {title: "Strava Integrations", path: admin_strava_integrations_path, match_controller: true},
       {title: "Exit Admin", path: root_path, match_controller: false}
     ] + dev_nav_select_links).sort_by { |a| a[:title] }
   end

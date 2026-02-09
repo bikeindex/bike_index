@@ -38,6 +38,7 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
       follow_up = requests.find_by(request_type: :list_activities)
       expect(follow_up).to be_present
       expect(follow_up.parameters["per_page"]).to eq(200)
+      expect(follow_up.parameters["page"]).to eq(1)
     end
 
     it "does nothing when integration not found" do

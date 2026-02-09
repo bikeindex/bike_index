@@ -25,6 +25,7 @@ class StravaRequest < AnalyticsRecord
   RESPONSE_STATUS_ENUM = {pending: 0, success: 1, error: 2, rate_limited: 3, token_refresh_failed: 4}.freeze
 
   belongs_to :user
+  belongs_to :strava_integration
 
   enum :request_type, REQUEST_TYPE_ENUM
   enum :response_status, RESPONSE_STATUS_ENUM

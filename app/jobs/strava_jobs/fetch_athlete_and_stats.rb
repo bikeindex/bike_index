@@ -24,7 +24,7 @@ module StravaJobs
 
       StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
         request_type: :list_activities, endpoint: "athlete/activities",
-        parameters: {per_page: RequestRunner::ACTIVITIES_PER_PAGE})
+        parameters: {per_page: RequestRunner::ACTIVITIES_PER_PAGE, page: 1})
     end
 
     private
