@@ -5607,6 +5607,13 @@ CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks U
 
 
 --
+-- Name: index_b_params_on_created_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (created_bike_id);
+
+
+--
 -- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6447,6 +6454,13 @@ CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON publ
 
 
 --
+-- Name: index_normalized_serial_segments_on_segment; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_normalized_serial_segments_on_segment ON public.normalized_serial_segments USING btree (segment);
+
+
+--
 -- Name: index_notifications_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7197,6 +7211,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260209031725'),
 ('20260206174653'),
 ('20260205050421'),
 ('20260204180206'),
