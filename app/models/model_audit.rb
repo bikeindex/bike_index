@@ -138,9 +138,9 @@ class ModelAudit < ApplicationRecord
     def matching_bikes_for_frame_model(bikes, manufacturer_id:, frame_model:)
       if unknown_model?(frame_model, manufacturer_id: manufacturer_id)
         bikes = bikes.motorized unless Manufacturer.find_by_id(manufacturer_id)&.motorized_only
-        bikes.where(frame_model: nil).or(bikes.where("LOWER(frame_model) = ANY (array[?])", UNKNOWN_STRINGS.map(&:downcase)))
+        bikes.where(frame_model: nil).or(bikes.where("LEFT(LOWER(frame_model), 255) = ANY (array[?])", UNKNOWN_STRINGS.map(&:downcase)))
       else
-        bikes.where("LOWER(frame_model) = LOWER(?)", frame_model)
+        bikes.where("LEFT(LOWER(frame_model), 255) = LEFT(LOWER(?), 255)", frame_model)
       end
     end
 
