@@ -13,10 +13,6 @@ module StravaJobs
 
       def execute(request, strava_integration)
         response = case request.request_type
-        when "fetch_athlete"
-          Integrations::Strava.fetch_athlete(strava_integration)
-        when "fetch_athlete_stats"
-          Integrations::Strava.fetch_athlete_stats(strava_integration, request.parameters["athlete_id"])
         when "list_activities"
           params = request.parameters.symbolize_keys.slice(:per_page, :before, :after)
           Integrations::Strava.list_activities(strava_integration, **params)
@@ -42,31 +38,12 @@ module StravaJobs
 
       def handle_response(request, strava_integration, response)
         case request.request_type
-        when "fetch_athlete" then handle_fetch_athlete(strava_integration, response)
-        when "fetch_athlete_stats" then handle_fetch_athlete_stats(request, strava_integration, response)
         when "list_activities" then handle_list_activities(request, strava_integration, response)
         when "fetch_activity" then handle_fetch_activity(request, strava_integration, response)
         end
       end
 
       private
-
-      def handle_fetch_athlete(strava_integration, athlete)
-        StravaRequest.create_follow_up(strava_integration, :fetch_athlete_stats,
-          "athletes/#{athlete["id"]}/stats",
-          athlete_id: athlete["id"].to_s, athlete_data: athlete.slice("id", "bikes", "shoes"))
-      end
-
-      def handle_fetch_athlete_stats(request, strava_integration, stats)
-        athlete_data = request.parameters["athlete_data"] || {}
-        athlete = {"id" => request.parameters["athlete_id"]}.merge(athlete_data)
-        strava_integration.update_from_athlete_and_stats(athlete, stats)
-        strava_integration.update(status: :syncing)
-
-        params = {per_page: ACTIVITIES_PER_PAGE}
-        params[:after] = request.parameters["after"] if request.parameters["after"]
-        StravaRequest.create_follow_up(strava_integration, :list_activities, "athlete/activities", **params)
-      end
 
       def handle_list_activities(request, strava_integration, activities)
         return strava_integration.finish_sync! if !activities.is_a?(Array) || activities.blank?
