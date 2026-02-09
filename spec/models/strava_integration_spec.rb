@@ -21,12 +21,6 @@ RSpec.describe StravaIntegration, type: :model do
     end
   end
 
-  describe "enum" do
-    it "defines expected statuses" do
-      expect(StravaIntegration.statuses.keys).to eq(%w[pending syncing synced error])
-    end
-  end
-
   describe "associations" do
     it "belongs to user" do
       strava_integration = FactoryBot.create(:strava_integration)

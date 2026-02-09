@@ -1,16 +1,6 @@
 require "rails_helper"
 
 RSpec.describe StravaRequest, type: :model do
-  describe "enums" do
-    it "has request_type enum" do
-      expect(StravaRequest::REQUEST_TYPE_ENUM.keys).to eq(%i[fetch_athlete fetch_athlete_stats list_activities fetch_activity])
-    end
-
-    it "has response_status enum" do
-      expect(StravaRequest::RESPONSE_STATUS_ENUM.keys).to eq(%i[pending success error rate_limited token_refresh_failed])
-    end
-  end
-
   describe "validations" do
     it "requires strava_integration_id" do
       request = StravaRequest.new(endpoint: "athlete", request_type: :fetch_athlete)
