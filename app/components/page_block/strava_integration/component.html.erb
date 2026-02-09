@@ -1,9 +1,9 @@
-<div class="tw:mt-1 tw:space-y-0.5 tw:[&_p]:mb-2!">
-  <p><strong><%= translation(".strava_integration") %></strong></p>
+<div class="tw:mt-1 tw:space-y-0.5 tw:[&_p]:mb-2! tw:leading-tight">
+  <p><%= strava_icon(16) %> <strong><%= translation(".strava_integration") %></strong></p>
 
   <% if connected? %>
     <% if syncing? %>
-      <p class="tw:leading-tight">
+      <p class="">
         <%= translation(".syncing_activities") %>
 
         <span id="strava-download-count" class="">
@@ -12,7 +12,7 @@
           <%= translation(".downloaded") %>
         </span>
       </p>
-      <p class="small less-strong tw:leading-tight">
+      <p class="small less-strong">
         <%= translation(".sync_running_in_background") %>
       </p>
       <% if @strava_integration.persisted? %>
@@ -47,8 +47,8 @@
           data: { confirm: translation(".disconnect_confirm") } %>
   <% else %>
     <p><%= translation(".integrate_your_bikes_with_strava") %></p>
-    <%= link_to helpers.new_strava_integration_path, class: "btn btn-primary" do %>
-      <%= translation(".connect_with_strava") %>
+    <%= link_to helpers.new_strava_integration_path, class: "btn btn-sm tw:bg-[#FC4C02] tw:border-[#FC4C02] tw:text-white tw:hover:bg-[#e04400]" do %>
+      <%= strava_icon(14, color: "#fff") %> <%= translation(".connect_with_strava") %>
     <% end %>
   <% end %>
 </div>

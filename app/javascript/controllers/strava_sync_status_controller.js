@@ -34,17 +34,10 @@ export default class extends Controller {
   }
 
   updateProgress (data) {
-    const progressBar = this.element.closest('.side-box')?.querySelector('.progress-bar')
-    if (progressBar) {
-      progressBar.style.width = `${data.progress_percent}%`
-      progressBar.textContent = `${data.progress_percent}%`
-      progressBar.setAttribute('aria-valuenow', data.progress_percent)
-    }
-
-    // Update the downloaded count text
-    const countEl = this.element.closest('.side-box')?.querySelector('.strava-download-count')
+    const countEl = document.getElementById('strava-download-count')
     if (countEl) {
-      countEl.textContent = `${data.activities_downloaded_count} of ${data.athlete_activity_count || '?'} activities downloaded`
+      const total = data.athlete_activity_count || '?'
+      countEl.textContent = `${data.progress_percent}% (${data.activities_downloaded_count} / ${total}) downloaded`
     }
   }
 }

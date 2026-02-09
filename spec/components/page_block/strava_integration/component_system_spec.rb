@@ -22,8 +22,8 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :system do
     it "renders syncing progress" do
       visit(preview_path)
       expect(page).to have_content "Syncing activities..."
-      expect(page).to have_content "50 of 150 activities downloaded"
-      expect(page).to have_css ".progress-bar"
+      expect(page).to have_content "50 / 150"
+      expect(page).to have_content "downloaded"
     end
   end
 

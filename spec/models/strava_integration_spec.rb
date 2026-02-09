@@ -34,12 +34,31 @@ RSpec.describe StravaIntegration, type: :model do
       expect(strava_integration.strava_activities).to include(activity)
     end
 
-    it "destroys strava_activities when destroyed" do
-      strava_integration = FactoryBot.create(:strava_integration)
+    it "soft deletes, marks disconnected, destroys activities and gear associations but not requests" do
+      strava_integration = FactoryBot.create(:strava_integration, status: :synced)
       FactoryBot.create(:strava_activity, strava_integration:)
+      FactoryBot.create(:strava_gear_association, strava_integration:)
+      FactoryBot.create(:strava_request, strava_integration:)
+
       expect {
         strava_integration.destroy
       }.to change(StravaActivity, :count).by(-1)
+        .and change(StravaGearAssociation, :count).by(-1)
+        .and change(StravaRequest, :count).by(0)
+
+      expect(strava_integration.deleted_at).to be_present
+      expect(StravaIntegration.count).to eq 0
+      expect(StravaIntegration.with_deleted.count).to eq 1
+      expect(StravaIntegration.with_deleted.first.status).to eq "disconnected"
+    end
+
+    it "allows a new integration for the same user after soft delete" do
+      strava_integration = FactoryBot.create(:strava_integration)
+      user = strava_integration.user
+      strava_integration.destroy
+
+      new_integration = FactoryBot.build(:strava_integration, user:)
+      expect(new_integration).to be_valid
     end
   end
 

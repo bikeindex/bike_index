@@ -3607,7 +3607,8 @@ CREATE TABLE public.strava_integrations (
     activities_downloaded_count integer DEFAULT 0 NOT NULL,
     status integer DEFAULT 0 NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -7160,10 +7161,17 @@ CREATE INDEX index_strava_gear_associations_on_strava_integration_id ON public.s
 
 
 --
+-- Name: index_strava_integrations_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_integrations_on_deleted_at ON public.strava_integrations USING btree (deleted_at);
+
+
+--
 -- Name: index_strava_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integrations USING btree (user_id);
+CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integrations USING btree (user_id) WHERE (deleted_at IS NULL);
 
 
 --
@@ -7434,6 +7442,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260209170413'),
 ('20260209032356'),
 ('20260209031725'),
 ('20260208000003'),

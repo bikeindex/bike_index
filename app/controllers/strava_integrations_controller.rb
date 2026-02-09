@@ -30,13 +30,11 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    strava_integration = current_user.strava_integration || current_user.build_strava_integration
-    strava_integration.update!(
+    strava_integration = current_user.create_strava_integration!(
       access_token: token_data["access_token"],
       refresh_token: token_data["refresh_token"],
       token_expires_at: Time.at(token_data["expires_at"]),
-      athlete_id: token_data.dig("athlete", "id")&.to_s,
-      status: :pending
+      athlete_id: token_data.dig("athlete", "id")&.to_s
     )
 
     StravaJobs::FetchAthleteAndStats.perform_async(strava_integration.id)

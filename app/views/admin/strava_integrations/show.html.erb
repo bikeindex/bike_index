@@ -28,10 +28,8 @@
 
           <td>
             <% if @strava_integration.synced? %>
-              <span class="text-success">
-                <%= @strava_integration.status %>
-              </span>
-            <% elsif @strava_integration.error? %>
+              <span class="text-success"><%= @strava_integration.status %></span>
+            <% elsif @strava_integration.error? || @strava_integration.disconnected? %>
               <span class="text-danger"><%= @strava_integration.status %></span>
             <% else %>
               <%= @strava_integration.status %>
@@ -53,6 +51,18 @@
             </span>
           </td>
         </tr>
+
+        <% if @strava_integration.deleted_at.present? %>
+          <tr class="small">
+            <td>Deleted</td>
+
+            <td>
+              <span class="localizeTime preciseTime text-danger">
+                <%= l @strava_integration.deleted_at, format: :convert_time %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   </div>

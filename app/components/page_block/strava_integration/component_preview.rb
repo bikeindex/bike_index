@@ -2,21 +2,27 @@
 
 module PageBlock::StravaIntegration
   class ComponentPreview < ApplicationComponentPreview
+    # @group Status Variants
+    # @display legacy_stylesheet true
     def not_connected
       render(Component.new(user: built_user))
     end
 
+    # @display legacy_stylesheet true
     def syncing
       render(Component.new(user: user_with_strava(:syncing)))
     end
 
+    # @display legacy_stylesheet true
     def synced
       render(Component.new(user: user_with_strava(:synced)))
     end
 
+    # @display legacy_stylesheet true
     def error
       render(Component.new(user: user_with_strava(:error)))
     end
+    # @endgroup
 
     private
 

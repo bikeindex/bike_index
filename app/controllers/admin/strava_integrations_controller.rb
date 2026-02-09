@@ -10,7 +10,7 @@ class Admin::StravaIntegrationsController < Admin::BaseController
   end
 
   def show
-    @strava_integration = StravaIntegration.find(params[:id])
+    @strava_integration = StravaIntegration.unscoped.find(params[:id])
   end
 
   helper_method :matching_strava_integrations
@@ -30,7 +30,7 @@ class Admin::StravaIntegrationsController < Admin::BaseController
   end
 
   def matching_strava_integrations
-    strava_integrations = StravaIntegration.all
+    strava_integrations = StravaIntegration.unscoped
 
     if params[:user_id].present?
       strava_integrations = strava_integrations.where(user_id: user_subject&.id || params[:user_id])

@@ -8,6 +8,7 @@
 #  activities_downloaded_count :integer          default(0), not null
 #  athlete_activity_count      :integer
 #  athlete_gear                :jsonb
+#  deleted_at                  :datetime
 #  refresh_token               :text             not null
 #  status                      :integer          default("pending"), not null
 #  token_expires_at            :datetime
@@ -18,10 +19,13 @@
 #
 # Indexes
 #
-#  index_strava_integrations_on_user_id  (user_id) UNIQUE
+#  index_strava_integrations_on_deleted_at  (deleted_at)
+#  index_strava_integrations_on_user_id     (user_id) UNIQUE WHERE (deleted_at IS NULL)
 #
 class StravaIntegration < ApplicationRecord
-  STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3}.freeze
+  STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3, disconnected: 4}.freeze
+
+  acts_as_paranoid
 
   belongs_to :user
   has_many :strava_activities, dependent: :destroy
@@ -31,6 +35,8 @@ class StravaIntegration < ApplicationRecord
 
   validates :access_token, presence: true
   validates :refresh_token, presence: true
+
+  before_destroy :mark_disconnected
 
   def sync_progress_percent
     return 0 if athlete_activity_count.blank? || athlete_activity_count.zero?
@@ -76,5 +82,9 @@ class StravaIntegration < ApplicationRecord
     bikes = athlete["bikes"] || []
     shoes = athlete["shoes"] || []
     (bikes + shoes).map { |g| g.slice("id", "name", "primary", "distance", "resource_state") }
+  end
+
+  def mark_disconnected
+    update_columns(status: self.class.statuses[:disconnected])
   end
 end
