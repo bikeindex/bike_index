@@ -1,5 +1,8 @@
-<div class="tw:mt-1 tw:space-y-0.5 tw:[&_p]:mb-2! tw:leading-tight">
-  <p><%= strava_icon(16) %> <strong><%= translation(".strava_integration") %></strong></p>
+<div class="tw:mt-1 tw:space-y-0.5 tw:leading-tight tw:[&_p]:mb-2!">
+  <p>
+    <%= strava_icon(16) %>
+    <strong><%= translation(".strava_integration") %></strong>
+  </p>
 
   <% if connected? %>
     <% if syncing? %>
@@ -8,8 +11,7 @@
 
         <span id="strava-download-count" class="">
           <%= progress_percent %>% (<%= number_display(downloaded_count) %> /
-          <%= number_display(total_count) %>)
-          <%= translation(".downloaded") %>
+          <%= number_display(total_count) %>) <%= translation(".downloaded") %>
         </span>
       </p>
       <p class="small less-strong">
@@ -48,7 +50,8 @@
   <% else %>
     <p><%= translation(".integrate_your_bikes_with_strava") %></p>
     <%= link_to helpers.new_strava_integration_path, class: "btn btn-sm tw:bg-[#FC4C02] tw:border-[#FC4C02] tw:text-white tw:hover:bg-[#e04400]" do %>
-      <%= strava_icon(14, color: "#fff") %> <%= translation(".connect_with_strava") %>
+      <%= strava_icon(14, color: "#fff") %>
+      <%= translation(".connect_with_strava") %>
     <% end %>
   <% end %>
 </div>
