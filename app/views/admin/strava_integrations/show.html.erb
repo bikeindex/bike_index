@@ -1,0 +1,101 @@
+<div class="admin-subnav">
+  <div class="col-md-12">
+    <h1>Strava Integration</h1>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <% if display_dev_info? %>
+          <tr>
+            <td class="only-dev-visible">ID</td>
+            <td><code><%= @strava_integration.id %></code></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>User</td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: @strava_integration.user, user_id: @strava_integration.user_id) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Status</td>
+
+          <td>
+            <% if @strava_integration.synced? %>
+              <span class="text-success">
+                <%= @strava_integration.status %>
+              </span>
+            <% elsif @strava_integration.error? %>
+              <span class="text-danger"><%= @strava_integration.status %></span>
+            <% else %>
+              <%= @strava_integration.status %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Athlete ID</td>
+          <td><%= @strava_integration.athlete_id %></td>
+        </tr>
+
+        <tr class="small">
+          <td>Created</td>
+
+          <td>
+            <span class="localizeTime preciseTime">
+              <%= l @strava_integration.created_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Activities</td>
+
+          <td>
+            <%= link_to @strava_integration.activities_downloaded_count,
+                  admin_strava_activities_path(search_strava_integration_id: @strava_integration.id) %>
+
+            <% if @strava_integration.athlete_activity_count %>
+              /
+              <%= @strava_integration.athlete_activity_count %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Sync Progress</td>
+          <td><%= @strava_integration.sync_progress_percent %>%</td>
+        </tr>
+
+        <tr>
+          <td>Gear</td>
+
+          <td>
+            <%= @strava_integration.gear_names.join(", ").presence || "None" %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Requests</td>
+
+          <td>
+            <%= link_to "View requests",
+                  admin_strava_requests_path(search_strava_integration_id: @strava_integration.id) %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
