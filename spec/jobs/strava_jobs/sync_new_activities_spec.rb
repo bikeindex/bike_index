@@ -39,7 +39,6 @@ RSpec.describe StravaJobs::SyncNewActivities, type: :job do
       request = StravaRequest.where(request_type: :list_activities).first
       expect(request.requested_at).to be_present
       expect(request.response_status).to eq("success")
-      expect(request.parameters["page"]).to eq(1)
       expect(request.parameters["per_page"]).to eq(200)
       expect(request.parameters["after"]).to eq(existing_activity.start_date.to_i)
     end

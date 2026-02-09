@@ -47,16 +47,30 @@ class StravaRequest < AnalyticsRecord
   end
 
   def execute(strava_integration)
-    case request_type
+    response = case request_type
     when "fetch_athlete"
       Integrations::Strava.fetch_athlete(strava_integration)
     when "fetch_athlete_stats"
       Integrations::Strava.fetch_athlete_stats(strava_integration, parameters["athlete_id"])
     when "list_activities"
-      params = parameters.symbolize_keys.slice(:page, :per_page, :after)
+      params = parameters.symbolize_keys.slice(:per_page, :before, :after)
       Integrations::Strava.list_activities(strava_integration, **params)
     when "fetch_activity"
       Integrations::Strava.fetch_activity(strava_integration, parameters["strava_id"])
+    end
+
+    if response.success?
+      update(response_status: :success)
+      response.body
+    elsif response.status == 429
+      update(response_status: :rate_limited)
+      nil
+    elsif response.status == 401
+      update(response_status: :token_refresh_failed)
+      nil
+    else
+      update(response_status: :error)
+      raise "Strava API error #{response.status}: #{response.body}"
     end
   end
 
@@ -83,7 +97,7 @@ class StravaRequest < AnalyticsRecord
     strava_integration.update_from_athlete_and_stats(athlete, stats)
     strava_integration.update(status: :syncing)
 
-    params = {page: 1, per_page: ACTIVITIES_PER_PAGE}
+    params = {per_page: ACTIVITIES_PER_PAGE}
     params[:after] = parameters["after"] if parameters["after"]
     self.class.create_follow_up(strava_integration, :list_activities, "athlete/activities", **params)
   end
@@ -95,8 +109,10 @@ class StravaRequest < AnalyticsRecord
     strava_integration.update(activities_downloaded_count: strava_integration.strava_activities.count)
 
     if activities.size >= ACTIVITIES_PER_PAGE
-      page = (parameters["page"] || 1).to_i + 1
-      params = {page:, per_page: ACTIVITIES_PER_PAGE}
+      oldest_start = activities.filter_map { |a| a["start_date"] }.min
+      before_epoch = oldest_start ? Time.parse(oldest_start).to_i : nil
+      params = {per_page: ACTIVITIES_PER_PAGE}
+      params[:before] = before_epoch if before_epoch
       params[:after] = parameters["after"] if parameters["after"]
       self.class.create_follow_up(strava_integration, :list_activities, "athlete/activities", **params)
     else

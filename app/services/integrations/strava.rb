@@ -38,8 +38,9 @@ class Integrations::Strava
       get(strava_integration, "athletes/#{athlete_id}/stats")
     end
 
-    def list_activities(strava_integration, page:, per_page:, after: nil)
-      params = {per_page:, page:}
+    def list_activities(strava_integration, per_page:, before: nil, after: nil)
+      params = {per_page:}
+      params[:before] = before if before.present?
       params[:after] = after if after.present?
       get(strava_integration, "athlete/activities", **params)
     end
@@ -74,11 +75,9 @@ class Integrations::Strava
 
     def get(strava_integration, path, params = {})
       ensure_valid_token!(strava_integration)
-      resp = api_connection(strava_integration).get(path) do |req|
+      api_connection(strava_integration).get(path) do |req|
         req.params = params
       end
-      return nil unless resp.success?
-      resp.body
     end
 
     def api_connection(strava_integration)

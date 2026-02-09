@@ -22,7 +22,7 @@ module StravaJobs
         strava_integration_id: strava_integration.id,
         request_type: :list_activities,
         endpoint: "athlete/activities",
-        parameters: {page: 1, per_page: 200, after: after_epoch}.compact
+        parameters: {per_page: 200, after: after_epoch}.compact
       )
       StravaJobs::RequestRunner.new.perform(request.id)
     end

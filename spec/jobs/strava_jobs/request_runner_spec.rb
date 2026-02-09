@@ -95,7 +95,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
 
         follow_up = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :list_activities).first
         expect(follow_up).to be_present
-        expect(follow_up.parameters["page"]).to eq(1)
+        expect(follow_up.parameters["per_page"]).to eq(200)
       end
     end
 
@@ -110,7 +110,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
           strava_integration_id: strava_integration.id,
           request_type: :list_activities,
           endpoint: "athlete/activities",
-          parameters: {page: 1, per_page: 200}
+          parameters: {per_page: 200}
         )
       end
 
@@ -158,6 +158,81 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(request.response_status).to eq("success")
         strava_integration.reload
         expect(strava_integration.status).to eq("synced")
+      end
+    end
+
+    context "with rate limited response" do
+      let(:strava_integration) do
+        FactoryBot.create(:strava_integration,
+          athlete_id: ENV["STRAVA_TEST_USER_ID"])
+      end
+      let!(:request) do
+        StravaRequest.create!(
+          user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_athlete,
+          endpoint: "athlete"
+        )
+      end
+
+      it "sets response_status to rate_limited" do
+        VCR.use_cassette("strava-rate_limited") do
+          instance.perform(request.id)
+        end
+
+        request.reload
+        expect(request.requested_at).to be_present
+        expect(request.response_status).to eq("rate_limited")
+      end
+    end
+
+    context "with unauthorized response" do
+      let(:strava_integration) do
+        FactoryBot.create(:strava_integration,
+          athlete_id: ENV["STRAVA_TEST_USER_ID"])
+      end
+      let!(:request) do
+        StravaRequest.create!(
+          user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_athlete,
+          endpoint: "athlete"
+        )
+      end
+
+      it "sets response_status to token_refresh_failed" do
+        VCR.use_cassette("strava-unauthorized") do
+          instance.perform(request.id)
+        end
+
+        request.reload
+        expect(request.requested_at).to be_present
+        expect(request.response_status).to eq("token_refresh_failed")
+      end
+    end
+
+    context "with server error response" do
+      let(:strava_integration) do
+        FactoryBot.create(:strava_integration,
+          athlete_id: ENV["STRAVA_TEST_USER_ID"])
+      end
+      let!(:request) do
+        StravaRequest.create!(
+          user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_athlete,
+          endpoint: "athlete"
+        )
+      end
+
+      it "raises and sets response_status to error" do
+        VCR.use_cassette("strava-server_error") do
+          expect { instance.perform(request.id) }.to raise_error(/Strava API error 500/)
+        end
+
+        request.reload
+        expect(request.requested_at).to be_present
+        expect(request.response_status).to eq("error")
       end
     end
 

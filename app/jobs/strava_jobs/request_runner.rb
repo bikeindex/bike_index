@@ -5,7 +5,7 @@ module StravaJobs
     sidekiq_options queue: "low_priority", retry: false
 
     def self.frequency
-      10.seconds
+      16.seconds
     end
 
     def perform(strava_request_id = nil)
@@ -23,13 +23,7 @@ module StravaJobs
 
       request.update(requested_at: Time.current)
       response = request.execute(strava_integration)
-
-      if response
-        request.update(response_status: :success)
-        request.handle_response(strava_integration, response)
-      else
-        request.update(response_status: :error)
-      end
+      request.handle_response(strava_integration, response) if response
     end
 
     private
