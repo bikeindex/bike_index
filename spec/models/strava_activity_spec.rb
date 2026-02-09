@@ -96,7 +96,6 @@ RSpec.describe StravaActivity, type: :model do
        "moving_time" => 3600, "total_elevation_gain" => 200.0,
        "sport_type" => "Ride", "type" => "Ride",
        "start_date" => "2025-06-15T08:00:00Z",
-       "start_latlng" => [37.7749, -122.4194],
        "gear_id" => "b1234", "private" => false, "kudos_count" => 10}
     end
 
@@ -111,7 +110,18 @@ RSpec.describe StravaActivity, type: :model do
       expect(activity.sport_type).to eq("Ride")
       expect(activity.activity_type).to eq("Ride")
       expect(activity.kudos_count).to eq(10)
-      expect(activity.start_latitude).to eq(37.7749)
+    end
+
+    context "with gear association" do
+      let!(:gear_association) do
+        FactoryBot.create(:strava_gear_association, strava_integration: si, strava_gear_id: "b1234")
+      end
+
+      it "updates gear association total distance" do
+        StravaActivity.create_or_update_from_summary(si, summary)
+        gear_association.reload
+        expect(gear_association.total_distance_kilometers).to eq(25)
+      end
     end
 
     it "updates an existing activity" do
@@ -140,7 +150,6 @@ RSpec.describe StravaActivity, type: :model do
       activity.update_from_detail(detail)
       activity.reload
       expect(activity.description).to eq("Great ride")
-      expect(activity.gear_name).to eq("My Road Bike")
       expect(activity.kudos_count).to eq(10)
       expect(activity.photos.first["id"]).to eq("photo_123")
       expect(activity.segment_locations).to eq(

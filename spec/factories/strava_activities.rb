@@ -11,14 +11,11 @@ FactoryBot.define do
     start_date { Time.current - 1.day }
 
     trait :with_location do
-      start_latitude { 37.7749 }
-      start_longitude { -122.4194 }
       segment_locations { {"cities" => ["San Francisco"], "states" => ["California"], "countries" => ["United States"]} }
     end
 
     trait :with_gear do
       gear_id { "b1234" }
-      gear_name { "My Road Bike" }
     end
 
     trait :with_details do

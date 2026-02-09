@@ -3527,10 +3527,7 @@ CREATE TABLE public.strava_activities (
     kudos_count integer,
     year integer,
     gear_id character varying,
-    gear_name character varying,
     photos jsonb DEFAULT '[]'::jsonb,
-    start_latitude double precision,
-    start_longitude double precision,
     segment_locations jsonb DEFAULT '{}'::jsonb,
     activity_type character varying,
     start_date timestamp(6) without time zone,
@@ -3570,7 +3567,8 @@ CREATE TABLE public.strava_gear_associations (
     strava_gear_id character varying NOT NULL,
     strava_gear_name character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    total_distance_kilometers integer
 );
 
 
@@ -7415,6 +7413,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260209001208'),
 ('20260208000003'),
 ('20260208000002'),
 ('20260208000001'),

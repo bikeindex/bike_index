@@ -5,6 +5,7 @@ class CreateStravaGearAssociations < ActiveRecord::Migration[8.0]
       t.references :item, polymorphic: true, null: false
       t.string :strava_gear_id, null: false
       t.string :strava_gear_name
+      t.integer :total_distance_kilometers
       t.timestamps
     end
 

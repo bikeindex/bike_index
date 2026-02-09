@@ -57,6 +57,25 @@ RSpec.describe StravaGearAssociation, type: :model do
     end
   end
 
+  describe "#update_total_distance!" do
+    it "sums distance_meters from matching activities" do
+      ga = FactoryBot.create(:strava_gear_association, strava_gear_id: "b1234")
+      si = ga.strava_integration
+      FactoryBot.create(:strava_activity, strava_integration: si, gear_id: "b1234", distance_meters: 10000.0)
+      FactoryBot.create(:strava_activity, strava_integration: si, gear_id: "b1234", distance_meters: 15000.0)
+      FactoryBot.create(:strava_activity, strava_integration: si, gear_id: "b9999", distance_meters: 5000.0)
+
+      ga.update_total_distance!
+      expect(ga.total_distance_kilometers).to eq(25)
+    end
+
+    it "sets zero when no matching activities" do
+      ga = FactoryBot.create(:strava_gear_association, strava_gear_id: "b1234")
+      ga.update_total_distance!
+      expect(ga.total_distance_kilometers).to eq(0)
+    end
+  end
+
   describe "dependent destroy" do
     it "is destroyed when bike is destroyed" do
       strava_gear_association = FactoryBot.create(:strava_gear_association)
