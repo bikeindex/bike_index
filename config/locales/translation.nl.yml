@@ -5952,6 +5952,12 @@ nl:
       result_view_select:
         bike_box_view: Bekijk als lijst
         thumbnail_view: Bekijken als miniaturen
+      form_organized:
+        doesnt_look_like_serial: Dit lijkt geen serienummer. Serienummers bestaan
+          meestal uit 6 of meer letters en cijfers en bevinden zich onder de trapas.
+        search_for_serial_number: Zoek naar framenummer
+        search_owner_email: Zoek eigenaar e-mail
+        submit: Voorleggen
     legacy_form_well:
       address_record:
         address: Adres
@@ -5964,6 +5970,8 @@ nl:
         your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
         address_no_street: Adres
         street_2: Straatadres regel 2 (optioneel)
+        address_or_intersection: Adres of kruispunt
+        where_was_it_status: Waar was het %{bike_status}?
       address_record_with_default:
         edit_my_account_path: bewerken op mijn account
         use_account_address: Gebruik accountadres

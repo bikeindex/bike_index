@@ -1,3 +1,10 @@
+# Assign REDIS_URL before loading action cable
+if ENV.fetch("REDIS_URL", "").empty?
+  # NOTE: DEV_PORT is set in bin/dev
+  redis_db = (ENV["DEV_PORT"].to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
+  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
+end
+
 require_relative "boot"
 
 require "rails"
@@ -23,10 +30,6 @@ Bundler.require(*Rails.groups)
 module Bikeindex
   class Application < Rails::Application
     config.redis_default_url = ENV["REDIS_URL"]
-    # If in test, add the TEST_ENV_NUMBER to the redis
-    if config.redis_default_url.blank? && Rails.env.test? && ENV["TEST_ENV_NUMBER"].present?
-      config.redis_default_url = "redis://localhost:6379/#{ENV["TEST_ENV_NUMBER"]&.to_i || 0}"
-    end
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
 
     config.load_defaults 8.0

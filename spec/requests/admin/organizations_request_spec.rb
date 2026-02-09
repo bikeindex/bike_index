@@ -34,6 +34,18 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response.status).to eq 404
       end
     end
+    context "with location" do
+      let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, name: "Main Office") }
+      it "renders location with address" do
+        expect(location.address_record).to be_present
+        get "#{base_url}/#{organization.to_param}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("Main Office")
+        # AddressDisplay component renders with HTML spans, so check for address parts
+        expect(response.body).to include("1300 W 14th Pl")
+        expect(response.body).to include("Chicago")
+      end
+    end
   end
 
   describe "edit" do
@@ -79,7 +91,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     let(:state) { FactoryBot.create(:state) }
     let(:country) { state.country }
     let(:parent_organization) { FactoryBot.create(:organization) }
-    let(:location1) { FactoryBot.create(:location, organization: organization, street: "old street", name: "cool name") }
+    let(:location1) { FactoryBot.create(:location, organization:, name: "cool name") }
     let(:update) do
       {
         name: "new name thing stuff",
@@ -97,38 +109,34 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           "0" => {
             id: location1.id,
             name: "First shop",
-            zipcode: "2222222",
-            city: "First city",
-            state_id: state.id,
-            country_id: country.id,
-            street: "some street 2",
             phone: "7272772727272",
             email: "stuff@goooo.com",
-            latitude: 22_222,
-            longitude: 11_111,
-            organization_id: 844,
             publicly_visible: false,
             impound_location: true,
             default_impound_location: false,
-            _destroy: 0
+            _destroy: 0,
+            address_record_attributes: {
+              postal_code: "2222222",
+              city: "First city",
+              region_record_id: state.id,
+              country_id: country.id,
+              street: "some street 2"
+            }
           },
           Time.current.to_i.to_s => {
-            created_at: Time.current.to_f.to_s,
             name: "Second shop",
-            zipcode: "12243444",
-            city: "cool city",
-            state_id: state.id,
-            country_id: country.id,
-            street: "some street 2",
             phone: "7272772727272",
             email: "stuff@goooo.com",
-            latitude: 22_222,
-            longitude: 11_111,
-            organization_id: 844,
-            shown: false,
             publicly_visible: true,
             impound_location: true,
-            default_impound_location: true
+            default_impound_location: true,
+            address_record_attributes: {
+              postal_code: "12243444",
+              city: "cool city",
+              region_record_id: state.id,
+              country_id: country.id,
+              street: "some street 2"
+            }
           }
         }
       }
@@ -155,22 +163,25 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       # Existing location is updated
       location1.reload
       expect(location1.organization).to eq organization
-      location1_update = update[:locations_attributes]["0"]
-      expect(location1).to match_hash_indifferently location1_update.except(:latitude, :longitude, :organization_id, :created_at, :_destroy)
-      # verify address_record is created from legacy fields
+      expect(location1.name).to eq "First shop"
+      expect(location1.phone).to eq "7272772727272"
+      expect(location1.email).to eq "stuff@goooo.com"
+      expect(location1.publicly_visible).to be_falsey
+      expect(location1.impound_location).to be_truthy
       expect(location1.address_record).to have_attributes(street: "some street 2", city: "First city",
         postal_code: "2222222", region_record_id: state.id, country_id: country.id)
 
-      # still existing location
+      # second location
       location2 = organization.locations.last
-      location2_update = update[:locations_attributes][update[:locations_attributes].keys.last]
-      expect(location2).to match_hash_indifferently location2_update.except(:latitude, :longitude, :organization_id, :created_at)
-      # verify address_record is created from legacy fields
+      expect(location2.name).to eq "Second shop"
+      expect(location2.publicly_visible).to be_truthy
+      expect(location2.impound_location).to be_truthy
+      expect(location2.default_impound_location).to be_truthy
       expect(location2.address_record).to have_attributes(street: "some street 2", city: "cool city",
         postal_code: "12243444", region_record_id: state.id, country_id: country.id)
     end
     context "with address_record_attributes" do
-      let(:location1) { FactoryBot.create(:location, organization:, name: "Original") }
+      let(:location1) { FactoryBot.create(:location, :with_address_record, organization:, name: "Original") }
       it "updates address_record via nested attributes" do
         expect(location1.address_record).to be_present
         original_address_record_id = location1.address_record.id

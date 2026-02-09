@@ -68,16 +68,13 @@ class BikeServices::Creator
     timezone
     year
   ].freeze
-  PERMITTED_IMPOUND_ATTRS = %i[
-    city
-    country
-    display_id
-    impounded_at_with_timezone
-    impounded_description
-    state
-    street
-    timezone
-    zipcode
+  PERMITTED_IMPOUND_ATTRS = [
+    :display_id,
+    :impounded_at,
+    :impounded_at_with_timezone,
+    :impounded_description,
+    :timezone,
+    address_record_attributes: (AddressRecord.permitted_params + [:id])
   ].freeze
   # TODO: Remove this once backfill is finished - #2922
   ADDRESS_ATTRS = %i[city country_id state_id street zipcode]

@@ -107,11 +107,11 @@
       %h3= t(".abandoned_title", bike_type: @bike.type_titleize, impound_kind: impound_record.kind)
 
       .row
-        - if impound_record.latitude.present?
+        - if impound_record.latitude_public.present?
           = render partial: "stolen_map", locals: { mapping_record: impound_record }
         .col-md-4
           = render(UI::DefinitionList::Container::Component.new) do
-            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.address))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.formatted_address_string))
             = render(UI::DefinitionList::Row::Component.new(label: @bike.status_found? ? t(".found_at") : t(".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone]))
             = render(UI::DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: impound_record.impounded_description))
 

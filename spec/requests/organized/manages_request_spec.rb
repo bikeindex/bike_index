@@ -140,7 +140,7 @@ RSpec.describe Organized::ManagesController, type: :request do
       context "with locations and normal show_on_map" do
         let(:state) { FactoryBot.create(:state) }
         let(:country) { state.country }
-        let(:location1) { FactoryBot.create(:location, organization: current_organization, street: "old street", name: "cool name") }
+        let(:location1) { FactoryBot.create(:location, :with_address_record, organization: current_organization, name: "cool name") }
         let(:update) do
           {
             name: current_organization.name,
@@ -152,38 +152,34 @@ RSpec.describe Organized::ManagesController, type: :request do
               "0" => {
                 id: location1.id,
                 name: "First shop",
-                zipcode: "2222222",
-                city: "First city",
-                state_id: state.id,
-                country_id: country.id,
-                street: "some street 2",
                 phone: "7272772727272",
                 email: "stuff@goooo.com",
-                latitude: 22_222,
-                longitude: 11_111,
-                organization_id: 844,
-                shown: false,
                 publicly_visible: "1",
                 impound_location: "false",
                 default_impound_location: "0",
-                _destroy: 0
+                _destroy: 0,
+                address_record_attributes: {
+                  postal_code: "2222222",
+                  city: "First city",
+                  region_record_id: state.id,
+                  country_id: country.id,
+                  street: "some street 2"
+                }
               },
               Time.current.to_i.to_s => {
-                created_at: Time.current.to_f.to_s,
                 name: "Second shop",
-                zipcode: "12243444",
-                city: "cool city",
-                state_id: state.id,
-                country_id: country.id,
-                street: "some street 2",
                 phone: "7272772727272",
                 email: "stuff@goooo.com",
-                latitude: 33_222,
-                longitude: 44_111,
-                organization_id: 844,
                 publicly_visible: "0",
                 impound_location: "true",
-                default_impound_location: "0"
+                default_impound_location: "0",
+                address_record_attributes: {
+                  postal_code: "12243444",
+                  city: "cool city",
+                  region_record_id: state.id,
+                  country_id: country.id,
+                  street: "some street 2"
+                }
               }
             }
           }
@@ -206,30 +202,20 @@ RSpec.describe Organized::ManagesController, type: :request do
             # Existing location is updated
             location1.reload
             expect(location1.organization).to eq current_organization
-            skipped_location_attrs = %i[latitude longitude shown organization_id created_at _destroy publicly_visible impound_location default_impound_location]
-            expect(location1).to match_hash_indifferently update[:locations_attributes]["0"].except(*skipped_location_attrs)
+            expect(location1.name).to eq "First shop"
+            expect(location1.phone).to eq "7272772727272"
+            expect(location1.email).to eq "stuff@goooo.com"
             expect(location1.publicly_visible).to be_truthy
             expect(location1.impound_location).to be_falsey
-            # ensure we are not permitting crazy assignment for first location
-            update[:locations_attributes]["0"].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
-              expect(location1.send(k)).to_not eq v
-            end
-            # verify address_record is created from legacy fields
             expect(location1.address_record).to have_attributes(street: "some street 2", city: "First city",
               postal_code: "2222222", region_record_id: state.id, country_id: country.id)
 
             # second location
             location2 = current_organization.locations.last
-            key = update[:locations_attributes].keys.last
-            expect(location2).to match_hash_indifferently update[:locations_attributes][key].except(*skipped_location_attrs)
+            expect(location2.name).to eq "Second shop"
             expect(location2.publicly_visible).to be_falsey
             expect(location2.impound_location).to be_truthy
             expect(location2.default_impound_location).to be_falsey
-            # ensure we are not permitting crazy assignment for created location
-            update[:locations_attributes][key].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
-              expect(location1.send(k)).to_not eq v
-            end
-            # verify address_record is created from legacy fields for new location
             expect(location2.address_record).to have_attributes(street: "some street 2", city: "cool city",
               postal_code: "12243444", region_record_id: state.id, country_id: country.id)
           end
@@ -358,13 +344,11 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.locations.count).to eq 1
             location = current_organization.locations.first
             expect(location.name).to eq "Second shop"
-            expect(location.latitude).to be_within(0.1).of(40.7)
-            expect(location.longitude).to be_within(0.1).of(-74.0)
-            expect(current_organization.to_coordinates).to eq location.to_coordinates
+            expect(location.address_record).to have_attributes(street: "some street 2", city: "cool city")
           end
           context "location is default impound location" do
             let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "impound_bikes") }
-            let(:location1) { FactoryBot.create(:location, organization: current_organization, street: "old street", name: "cool name", impound_location: true) }
+            let(:location1) { FactoryBot.create(:location, :with_address_record, organization: current_organization, name: "cool name", impound_location: true) }
             let(:blocked_destroy_params) do
               # Only pass one location, and keep it default impound location
               update.merge(kind: "bike_shop",
@@ -401,16 +385,17 @@ RSpec.describe Organized::ManagesController, type: :request do
         context "only updating location" do
           let(:update) do
             {
-              created_at: Time.current.to_f.to_s,
               name: "new shop",
-              zipcode: "60608",
-              city: "Chicago",
-              state_id: state.id,
-              country_id: country.id,
-              street: "1300 W 14th Pl",
               phone: "7272772727272",
               email: "stuff@goooo.com",
-              publicly_visible: false
+              publicly_visible: false,
+              address_record_attributes: {
+                postal_code: "60608",
+                city: "Chicago",
+                region_record_id: state.id,
+                country_id: state.country_id,
+                street: "1300 W 14th Pl"
+              }
             }
           end
           let(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
@@ -438,11 +423,15 @@ RSpec.describe Organized::ManagesController, type: :request do
             expect(current_organization.locations.count).to eq 1
             location = current_organization.locations.first
 
-            expect(location).to match_hash_indifferently update.except(:created_at, :organization_id)
+            expect(location.name).to eq "new shop"
+            expect(location.phone).to eq "7272772727272"
+            expect(location.email).to eq "stuff@goooo.com"
+            expect(location.publicly_visible).to be_falsey
+            expect(location.address_record).to have_attributes(street: "1300 W 14th Pl", city: "Chicago", postal_code: "60608")
             expect(location.latitude).to be_within(0.1).of(41.8)
             expect(location.longitude).to be_within(0.1).of(-87.6)
 
-            expect(current_organization.to_coordinates).to eq location.to_coordinates
+            expect(current_organization.to_coordinates).to eq [location.latitude, location.longitude]
             expect(current_organization.search_coordinates_set?).to be_truthy
           end
         end

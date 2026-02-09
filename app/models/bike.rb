@@ -87,6 +87,8 @@
 #  index_bikes_on_example                    (example) WHERE (example IS NOT NULL)
 #  index_bikes_on_latitude_and_longitude     (latitude,longitude)
 #  index_bikes_on_listing_order              (listing_order)
+#  index_bikes_on_lower_frame_model          (lower(frame_model))
+#  index_bikes_on_lower_mnfg_name            (lower((mnfg_name)::text))
 #  index_bikes_on_manufacturer_id            (manufacturer_id)
 #  index_bikes_on_model_audit_id             (model_audit_id) WHERE (model_audit_id IS NOT NULL)
 #  index_bikes_on_paint_id                   (paint_id) WHERE (paint_id IS NOT NULL)
@@ -678,15 +680,6 @@ class Bike < ApplicationRecord
     new_stolen_record
   end
 
-  def build_new_impound_record(new_attrs = {})
-    new_country_id = country_id || creator&.address_record&.country_id || Country.united_states&.id
-    new_impound_record = impound_records
-      .build({country_id: new_country_id, status: "current", user_id: creator_id}.merge(new_attrs))
-    new_impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
-
-    self.current_impound_record = new_impound_record
-  end
-
   def fetch_current_stolen_record
     return current_stolen_record if defined?(manual_csr)
 
@@ -724,12 +717,12 @@ class Bike < ApplicationRecord
     return false if addy["street"].blank? || addy["city"].blank?
     return true if creation_organization&.default_location.blank?
 
-    creation_organization.default_location.address_hash != addy
+    creation_organization.default_location.address_hash_legacy != addy
   end
 
   # NOTE! This will return different hashes - legacy hashes for stolen & impound
   def address_hash
-    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
+    current_stolen_record&.address_hash || current_impound_record&.address_hash_legacy ||
       address_record&.address_hash
   end
 
@@ -926,10 +919,12 @@ class Bike < ApplicationRecord
     return if @deleted_address_record_id.blank?
 
     deleted_addy = AddressRecord.find_by_id(@deleted_address_record_id)
-    deleted_addy.destroy if deleted_addy.bike? && deleted_addy.bike_id == id
+    deleted_addy.destroy if deleted_addy&.bike? && deleted_addy.bike_id == id
   end
 
   def fetch_current_impound_record
+    return current_impound_record if current_impound_record.present? && current_impound_record.current?
+
     self.current_impound_record = impound_records.current.last
   end
 

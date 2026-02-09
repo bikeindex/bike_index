@@ -10,25 +10,25 @@ FactoryBot.define do
 
     trait :in_nyc do
       after(:create) do |org|
-        FactoryBot.create(:location_nyc, organization: org)
+        FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: org)
       end
     end
 
     trait :in_chicago do
       after(:create) do |org|
-        FactoryBot.create(:location_chicago, organization: org)
+        FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: org)
       end
     end
 
     trait :in_los_angeles do
       after(:create) do |org|
-        FactoryBot.create(:location_los_angeles, organization: org)
+        FactoryBot.create(:location, :with_address_record, address_in: :los_angeles, organization: org)
       end
     end
 
     trait :in_edmonton do
       after(:create) do |org|
-        FactoryBot.create(:location_edmonton, organization: org)
+        FactoryBot.create(:location, :with_address_record, address_in: :edmonton, organization: org)
       end
     end
 

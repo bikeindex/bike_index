@@ -114,8 +114,7 @@ class OrganizationsController < ApplicationController
   end
 
   def locations_attributes
-    %i[name zipcode city state_id country_id street phone publicly_visible] +
-      [address_record_attributes: AddressRecord.permitted_params + [:id]]
+    %i[name phone publicly_visible] + [address_record_attributes: AddressRecord.permitted_params + [:id]]
   end
 
   def find_organization

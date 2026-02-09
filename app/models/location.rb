@@ -4,7 +4,6 @@
 # Database name: primary
 #
 #  id                       :integer          not null, primary key
-#  city                     :string(255)
 #  default_impound_location :boolean          default(FALSE)
 #  deleted_at               :datetime
 #  email                    :string(255)
@@ -12,26 +11,21 @@
 #  latitude                 :float
 #  longitude                :float
 #  name                     :string(255)
-#  neighborhood             :string
 #  not_publicly_visible     :boolean          default(FALSE)
 #  phone                    :string(255)
 #  shown                    :boolean          default(FALSE)
-#  street                   :string(255)
-#  zipcode                  :string(255)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  address_record_id        :bigint
-#  country_id               :integer
 #  organization_id          :integer
-#  state_id                 :integer
 #
 # Indexes
 #
 #  index_locations_on_address_record_id  (address_record_id)
 #
 class Location < ApplicationRecord
-  include Geocodeable
   include AddressRecorded
+  include AddressRecordedWithinBoundingBox
 
   acts_as_paranoid
 
@@ -43,7 +37,6 @@ class Location < ApplicationRecord
   validates :name, presence: true
   validate :organization_present
 
-  scope :by_state, -> { order(:state_id) }
   scope :shown, -> { where(shown: true) }
   scope :publicly_visible, -> { shown.where(not_publicly_visible: false) }
   scope :impound_locations, -> { where(impound_location: true) }
@@ -51,7 +44,6 @@ class Location < ApplicationRecord
   # scope :international, where("country_id IS NOT #{Country.united_states_id}")
 
   before_validation :set_calculated_attributes
-  before_validation :sync_address_record_from_legacy_fields
   after_commit :update_associations
   before_destroy :ensure_destroy_permitted!
 
@@ -66,10 +58,6 @@ class Location < ApplicationRecord
     Location.where(organization_id: organization_id).where.not(id: id)
   end
 
-  def address
-    Geocodeable.address(self, country: %i[name])
-  end
-
   # Override AddressRecorded delegation to fall back to legacy fields
   def address_present?
     return address_record.address_present? if address_record?
@@ -77,19 +65,16 @@ class Location < ApplicationRecord
     [street, city, zipcode].any?(&:present?)
   end
 
-  def find_or_build_address_record
+  def find_or_build_address_record(current_country_id: nil)
     return address_record if address_record?
 
-    if street.present? || city.present?
-      build_address_record(AddressRecord.attrs_from_legacy(self).merge(kind: :organization, organization_id:))
-    else
-      d_address_record = AddressRecord.where(organization_id:).order(:id).first
-      return AddressRecord.new if d_address_record.blank?
+    current_country_id ||= Country.united_states_id
+    d_address_record = AddressRecord.where(organization_id:).order(:id).first
+    return AddressRecord.new(country_id: current_country_id) if d_address_record.blank?
 
-      AddressRecord.new(country_id: d_address_record.country_id,
-        region_record_id: d_address_record.region_record_id,
-        region_string: d_address_record.region_string)
-    end
+    AddressRecord.new(country_id: d_address_record.country_id || current_country_id,
+      region_record_id: d_address_record.region_record_id,
+      region_string: d_address_record.region_string)
   end
 
   def org_location_id
@@ -115,6 +100,12 @@ class Location < ApplicationRecord
     end
     self.phone = Phonifyer.phonify(phone)
     self.shown = calculated_shown
+    self.latitude = address_record&.latitude
+    self.longitude = address_record&.longitude
+    if address_record.present?
+      address_record.organization_id = organization_id
+      address_record.kind = :organization
+    end
   end
 
   def update_associations
@@ -150,20 +141,6 @@ class Location < ApplicationRecord
     return if organization.present? || organization_id.present?
 
     errors.add(:organization, :blank)
-  end
-
-  def sync_address_record_from_legacy_fields
-    return if skip_update || city.blank? && street.blank?
-    # Don't overwrite if address_record was explicitly set via nested attributes
-    return if address_record.present? && address_record.changed?
-
-    # Skip geocoding on address_record - Location handles geocoding via Geocodeable
-    legacy_attrs = AddressRecord.attrs_from_legacy(self).merge(skip_geocoding: true)
-    if address_record.present?
-      address_record.attributes = legacy_attrs
-    else
-      self.address_record = AddressRecord.new(legacy_attrs.merge(kind: :organization, organization_id:))
-    end
   end
 
   def calculated_shown

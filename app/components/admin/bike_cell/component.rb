@@ -4,7 +4,14 @@ module Admin::BikeCell
   class Component < ApplicationComponent
     include SortableHelper
 
-    def initialize(bike: nil, bike_id: nil, bike_link_path: nil, search_url: nil, render_search: nil)
+    def initialize(
+      bike: nil,
+      bike_id: nil,
+      bike_link_path: nil,
+      search_url: nil,
+      render_search: nil,
+      skip_status: false
+    )
       @bike = bike
       @bike_id = bike_id || bike&.id
       @bike = Bike.unscoped.find_by(id: @bike_id) if @bike.blank? && @bike_id.present?
@@ -13,6 +20,11 @@ module Admin::BikeCell
       @bike_link_path_arg = bike_link_path
       @passed_search_url = search_url
       @render_search = (bike_id.present? && render_search.nil?) ? @search_url.present? : render_search
+      @skip_status = skip_status
+    end
+
+    def render?
+      @bike.present? || @bike_id.present?
     end
 
     private
@@ -32,8 +44,23 @@ module Admin::BikeCell
 
     def bike_content
       content_tag(:span) do
-        concat(content_tag(:small, "📷")) if @bike.thumb_path.present?
-        concat(" #{@bike.title_string}")
+        concat(content_tag(:small, "📷 ")) if @bike.thumb_path.present?
+        concat(@bike.frame_colors.to_sentence)
+        concat(" ")
+        concat(content_tag(:strong, @bike.mnfg_name))
+        if @bike.frame_model.present?
+          concat(" ")
+          concat(content_tag(:em, @bike.frame_model_truncated))
+        end
+        concat(content_tag(:small, " #{@bike.type}")) unless @bike.cycle_type == "bike"
+        if @bike.unregistered_parking_notification?
+          concat(content_tag(:em, " unregistered", class: "small text-warning"))
+        elsif @bike.creation_description.present?
+          concat(", ")
+          concat(content_tag(:small, class: "less-strong") do
+            content_tag(:span, @bike.creation_description, title: BikeServices::Displayer.origin_title(@bike.creation_description))
+          end)
+        end
       end
     end
   end

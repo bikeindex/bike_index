@@ -48,7 +48,7 @@ RSpec.describe InfoController, type: :request do
   end
 
   describe "static pages" do
-    pages = %w[about protect_your_bike where serials image_resources resources security
+    pages = %w[about protect_your_bike serials image_resources resources security
       dev_and_design donate terms vendor_terms privacy lightspeed]
     context "no user" do
       pages.each do |page|
@@ -84,6 +84,18 @@ RSpec.describe InfoController, type: :request do
           end
         end
       end
+    end
+  end
+
+  describe "where" do
+    let!(:organization1) { FactoryBot.create(:organization, :in_nyc, show_on_map: true) }
+    let!(:organization2) { FactoryBot.create(:organization, :in_chicago, show_on_map: false) }
+    let!(:organization3) { FactoryBot.create(:organization, :in_edmonton, show_on_map: true) }
+    it "renders" do
+      get "/where"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:where)
+      expect(assigns(:organizations).pluck(:id)).to match_array([organization1.id, organization3.id])
     end
   end
 

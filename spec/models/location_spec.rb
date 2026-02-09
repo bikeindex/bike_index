@@ -1,26 +1,68 @@
 require "rails_helper"
 
 RSpec.describe Location, type: :model do
-  it_behaves_like "geocodeable"
   it_behaves_like "address_recorded"
+  it_behaves_like "address_recorded_within_bounding_box"
 
   describe "set_calculated_attributes" do
     it "strips the non-digit numbers from the phone input" do
       location = FactoryBot.create(:location, phone: "773.83ddp+83(887)")
       expect(location.phone).to eq("77383ddp+83887")
     end
+
+    it "sets address_record organization_id and kind with nested attributes" do
+      organization = FactoryBot.create(:organization)
+      location = organization.locations.create!(
+        name: "Main Office",
+        address_record_attributes: {
+          street: "123 Main St",
+          city: "Chicago",
+          country_id: Country.united_states_id,
+          skip_geocoding: true
+        }
+      )
+      expect(location.address_record).to be_present
+      expect(location.address_record.organization_id).to eq organization.id
+      expect(location.address_record.kind).to eq "organization"
+      expect(location.address_record.city).to eq "Chicago"
+    end
   end
 
-  describe "address" do
-    it "creates an address, ignoring blank fields" do
-      c = Country.create(name: "Neverland", iso: "NEV")
-      s = State.create(country_id: c.id, name: "BullShit", abbreviation: "BS")
+  describe "factory" do
+    let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :edmonton) }
+    it "is correct" do
+      expect(location).to be_valid
+      expect(location.address_record.kind).to eq "organization"
+      expect(location.address_record.city).to eq "Edmonton"
+      expect(location.address_record.region_string).to eq "AB"
+      expect(location.address_record.country.id).to eq Country.canada.id
+      expect(location.address_record.street).to eq "9330 Groat Rd NW"
+    end
+    context "with passed address_record" do
+      let(:address_record) { FactoryBot.create(:address_record, :edmonton, kind: :organization, street: "9320 Groat Rd NW") }
+      let(:location) { FactoryBot.create(:location, address_record:) }
+      it "is correct" do
+        expect(location).to be_valid
+        expect(location.address_record.kind).to eq "organization"
+        expect(location.address_record.city).to eq "Edmonton"
+        expect(location.address_record.region_string).to eq "AB"
+        expect(location.address_record.country.id).to eq Country.canada.id
+        expect(location.address_record.street).to eq "9320 Groat Rd NW"
+      end
+    end
+  end
 
-      location = Location.create(street: "300 Blossom Hill Dr", city: "Lancaster", state_id: s.id, zipcode: "17601", country_id: c.id)
-      expect(location.address).to eq("300 Blossom Hill Dr, Lancaster, BS 17601, Neverland")
+  describe "formatted_address_string" do
+    it "returns address from address_record, ignoring blank fields" do
+      country = Country.create(name: "Neverland", iso: "NEV")
+      state = State.create(country_id: country.id, name: "BullShit", abbreviation: "BS")
+      address_record = AddressRecord.create(street: "300 Blossom Hill Dr", city: "Lancaster", region_record_id: state.id, postal_code: "17601", country_id: country.id, skip_geocoding: true)
+      location = FactoryBot.create(:location, address_record:)
 
-      location.update(street: " ")
-      expect(location.address).to eq("Lancaster, BS 17601, Neverland")
+      expect(location.formatted_address_string(visible_attribute: :street, render_country: true)).to eq("300 Blossom Hill Dr, Lancaster, BS 17601, Neverland")
+
+      address_record.update(street: nil)
+      expect(location.formatted_address_string(visible_attribute: :street, render_country: true)).to eq("Lancaster, BS 17601, Neverland")
     end
   end
 
@@ -28,6 +70,30 @@ RSpec.describe Location, type: :model do
     it "creates a unique id that references the organization" do
       location = FactoryBot.create(:location)
       expect(location.org_location_id).to eq("#{location.organization_id}_#{location.id}")
+    end
+  end
+
+  describe "find_or_build_address_record" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:location) { FactoryBot.create(:location, organization:, address_record: nil) }
+
+    context "when no organization address_record exists" do
+      it "returns a new AddressRecord with current_country_id" do
+        result = location.find_or_build_address_record(current_country_id: Country.united_states_id)
+        expect(result).to be_a_new(AddressRecord)
+        expect(result.country_id).to eq Country.united_states_id
+      end
+    end
+
+    context "when organization has an existing address_record" do
+      let!(:existing_address_record) { FactoryBot.create(:address_record, organization:) }
+
+      it "returns a new AddressRecord with values from the existing record" do
+        result = location.find_or_build_address_record(current_country_id: 999)
+        expect(result).to be_a_new(AddressRecord)
+        expect(result.country_id).to eq existing_address_record.country_id
+        expect(result.region_record_id).to eq existing_address_record.region_record_id
+      end
     end
   end
 

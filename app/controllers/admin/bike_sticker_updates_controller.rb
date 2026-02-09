@@ -48,6 +48,9 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
     else
       @search_creator_kind = "all"
     end
+    if params[:user_id].present?
+      bike_sticker_updates = bike_sticker_updates.where(user_id: user_subject&.id || params[:user_id])
+    end
 
     if params[:search_bike_sticker_id].present?
       @searched_bike_stickers = BikeSticker.where(id: params[:search_bike_sticker_id])

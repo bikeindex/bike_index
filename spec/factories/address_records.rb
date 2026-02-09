@@ -69,9 +69,11 @@ FactoryBot.define do
       latitude { 53.5069377 }
       longitude { -113.5508765 }
       street { "9330 Groat Rd NW" }
-      postal_code { "AB T6G 2B3" }
+      postal_code { "T6G 2B3" }
       city { "Edmonton" }
-      region_record { FactoryBot.create(:state_alberta) }
+      region_string { "AB" }
+      region_record { nil }
+      # region_record { FactoryBot.create(:state_alberta) }
       country { Country.canada }
     end
   end

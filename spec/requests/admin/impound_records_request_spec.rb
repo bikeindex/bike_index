@@ -20,6 +20,12 @@ RSpec.describe Admin::ImpoundRecordsController, type: :request do
       get "#{base_url}/pkey-#{impound_record.id}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
+      expect(assigns(:impound_record).id).to eq impound_record.id
+      # It works with just the bare ID too
+      get "#{base_url}/#{impound_record.id}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(assigns(:impound_record).id).to eq impound_record.id
     end
   end
 end

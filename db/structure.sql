@@ -1707,18 +1707,12 @@ CREATE TABLE public.impound_records (
     status integer DEFAULT 0,
     location_id bigint,
     impounded_at timestamp without time zone,
-    latitude double precision,
-    longitude double precision,
-    street text,
-    zipcode text,
-    city text,
-    neighborhood text,
-    country_id bigint,
-    state_id bigint,
     display_id character varying,
     display_id_prefix character varying,
     impounded_description text,
-    unregistered_bike boolean DEFAULT false
+    unregistered_bike boolean DEFAULT false,
+    address_record_id bigint,
+    impounded_from_address_record_id bigint
 );
 
 
@@ -1909,13 +1903,7 @@ CREATE TABLE public.locations (
     not_publicly_visible boolean DEFAULT false,
     impound_location boolean DEFAULT false,
     default_impound_location boolean DEFAULT false,
-    address_record_id bigint,
-    state_id integer,
-    country_id integer,
-    zipcode character varying,
-    street character varying,
-    neighborhood character varying,
-    city character varying
+    address_record_id bigint
 );
 
 
@@ -5619,6 +5607,13 @@ CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks U
 
 
 --
+-- Name: index_b_params_on_created_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (created_bike_id);
+
+
+--
 -- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5868,6 +5863,20 @@ CREATE INDEX index_bikes_on_latitude_and_longitude ON public.bikes USING btree (
 --
 
 CREATE INDEX index_bikes_on_listing_order ON public.bikes USING btree (listing_order DESC);
+
+
+--
+-- Name: index_bikes_on_lower_frame_model; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_lower_frame_model ON public.bikes USING btree (lower(frame_model));
+
+
+--
+-- Name: index_bikes_on_lower_mnfg_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_lower_mnfg_name ON public.bikes USING btree (lower((mnfg_name)::text));
 
 
 --
@@ -6214,6 +6223,13 @@ CREATE INDEX index_impound_record_updates_on_user_id ON public.impound_record_up
 
 
 --
+-- Name: index_impound_records_on_address_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_address_record_id ON public.impound_records USING btree (address_record_id);
+
+
+--
 -- Name: index_impound_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6221,10 +6237,10 @@ CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING bt
 
 
 --
--- Name: index_impound_records_on_country_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_impound_records_on_impounded_from_address_record_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_impound_records_on_country_id ON public.impound_records USING btree (country_id);
+CREATE INDEX index_impound_records_on_impounded_from_address_record_id ON public.impound_records USING btree (impounded_from_address_record_id) WHERE (impounded_from_address_record_id IS NOT NULL);
 
 
 --
@@ -6239,13 +6255,6 @@ CREATE INDEX index_impound_records_on_location_id ON public.impound_records USIN
 --
 
 CREATE INDEX index_impound_records_on_organization_id ON public.impound_records USING btree (organization_id);
-
-
---
--- Name: index_impound_records_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_impound_records_on_state_id ON public.impound_records USING btree (state_id);
 
 
 --
@@ -6456,6 +6465,13 @@ CREATE INDEX index_normalized_serial_segments_on_bike_id ON public.normalized_se
 --
 
 CREATE INDEX index_normalized_serial_segments_on_duplicate_bike_group_id ON public.normalized_serial_segments USING btree (duplicate_bike_group_id);
+
+
+--
+-- Name: index_normalized_serial_segments_on_segment; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_normalized_serial_segments_on_segment ON public.normalized_serial_segments USING btree (segment);
 
 
 --
@@ -7096,10 +7112,24 @@ CREATE INDEX index_users_on_auth_token ON public.users USING btree (auth_token);
 
 
 --
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email ON public.users USING btree (email) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_token_for_password_reset ON public.users USING btree (token_for_password_reset);
+
+
+--
+-- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_username ON public.users USING btree (username) WHERE (deleted_at IS NULL);
 
 
 --
@@ -7195,6 +7225,15 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260209032356'),
+('20260209031725'),
+('20260206174653'),
+('20260205050421'),
+('20260204180206'),
+('20260204054435'),
+('20260204050421'),
+('20260130170531'),
+('20260130162732'),
 ('20260129220857'),
 ('20260129122352'),
 ('20260129122350'),

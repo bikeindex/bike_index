@@ -4651,6 +4651,11 @@ it:
       result_view_select:
         bike_box_view:
         thumbnail_view:
+      form_organized:
+        doesnt_look_like_serial:
+        search_for_serial_number:
+        search_owner_email:
+        submit:
     legacy_form_well:
       address_record:
         address:
@@ -4663,6 +4668,8 @@ it:
         your_full_address_is_required:
         address_no_street: Indirizzo
         street_2:
+        address_or_intersection:
+        where_was_it_status:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:
