@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe StravaIntegrationSyncNewActivitiesJob, type: :job do
+RSpec.describe StravaJobs::SyncNewActivities, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
 
@@ -31,18 +31,17 @@ RSpec.describe StravaIntegrationSyncNewActivitiesJob, type: :job do
         start_date: Time.parse("2025-06-15T08:00:00Z"))
     end
 
-    it "creates a list_activities request with after_epoch" do
-      expect {
+    it "creates a list_activities request and runs it inline" do
+      VCR.use_cassette("strava-list_activities") do
         instance.perform(strava_integration.id)
-      }.to change(StravaRequest, :count).by(1)
+      end
 
-      request = StravaRequest.last
-      expect(request.request_type).to eq("list_activities")
-      expect(request.endpoint).to eq("athlete/activities")
+      request = StravaRequest.where(request_type: :list_activities).first
+      expect(request.requested_at).to be_present
+      expect(request.response_status).to eq("success")
       expect(request.parameters["page"]).to eq(1)
       expect(request.parameters["per_page"]).to eq(200)
       expect(request.parameters["after"]).to eq(existing_activity.start_date.to_i)
-      expect(StravaRequestRunnerJob.jobs.size).to eq(1)
     end
 
     it "skips non-synced integrations" do

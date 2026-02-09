@@ -44,7 +44,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
             expect {
               get "/strava_integration/callback", params: {code: "test_auth_code"}
             }.to change(StravaIntegration, :count).by(1)
-              .and change(StravaIntegrationSyncJob.jobs, :size).by(1)
+              .and change(StravaJobs::InitialSync.jobs, :size).by(1)
 
             expect(response).to redirect_to(my_account_path)
             expect(flash[:success]).to match(/connected/i)

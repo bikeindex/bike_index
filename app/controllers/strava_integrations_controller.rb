@@ -31,7 +31,7 @@ class StravaIntegrationsController < ApplicationController
       status: :pending
     )
 
-    StravaIntegrationSyncJob.perform_async(strava_integration.id)
+    StravaJobs::InitialSync.perform_async(strava_integration.id)
 
     flash[:success] = "Strava connected! Your activities are being synced."
     redirect_to my_account_path

@@ -1,21 +1,45 @@
 require "rails_helper"
 
-RSpec.describe StravaRequestRunnerJob, type: :job do
+RSpec.describe StravaJobs::RequestRunner, type: :job do
+  include_context :scheduled_job
+  include_examples :scheduled_job_tests
+
   let(:instance) { described_class.new }
 
-  it "is the correct queue" do
+  it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
+    expect(described_class.frequency).to eq(10.seconds)
   end
 
-  describe "perform" do
+  describe "perform with no args (enqueue_next_request)" do
     it "does nothing when no pending requests" do
       instance.perform
+      expect(described_class.jobs.size).to eq(0)
     end
 
+    context "with a pending request" do
+      let(:strava_integration) { FactoryBot.create(:strava_integration) }
+      let!(:request) do
+        StravaRequest.create!(
+          user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_athlete,
+          endpoint: "athlete"
+        )
+      end
+
+      it "enqueues a job with the request id" do
+        instance.perform
+        expect(described_class.jobs.size).to eq(1)
+        expect(described_class.jobs.first["args"]).to eq([request.id])
+      end
+    end
+  end
+
+  describe "perform with strava_request_id" do
     context "with fetch_athlete request" do
       let(:strava_integration) do
         FactoryBot.create(:strava_integration,
-          token_expires_at: Time.current + 6.hours,
           athlete_id: ENV["STRAVA_TEST_USER_ID"])
       end
       let!(:request) do
@@ -29,7 +53,7 @@ RSpec.describe StravaRequestRunnerJob, type: :job do
 
       it "calls fetch_athlete and creates fetch_athlete_stats follow-up" do
         VCR.use_cassette("strava-get_athlete") do
-          instance.perform
+          instance.perform(request.id)
         end
 
         request.reload
@@ -39,14 +63,12 @@ RSpec.describe StravaRequestRunnerJob, type: :job do
         follow_up = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_athlete_stats).first
         expect(follow_up).to be_present
         expect(follow_up.parameters["athlete_id"]).to eq("2430215")
-        expect(described_class.jobs.size).to eq(1)
       end
     end
 
     context "with fetch_athlete_stats request" do
       let(:strava_integration) do
         FactoryBot.create(:strava_integration,
-          token_expires_at: Time.current + 6.hours,
           athlete_id: ENV["STRAVA_TEST_USER_ID"])
       end
       let!(:request) do
@@ -61,7 +83,7 @@ RSpec.describe StravaRequestRunnerJob, type: :job do
 
       it "updates integration and creates list_activities follow-up" do
         VCR.use_cassette("strava-get_athlete_stats") do
-          instance.perform
+          instance.perform(request.id)
         end
 
         request.reload
@@ -80,7 +102,6 @@ RSpec.describe StravaRequestRunnerJob, type: :job do
     context "with list_activities request" do
       let(:strava_integration) do
         FactoryBot.create(:strava_integration, :syncing,
-          token_expires_at: Time.current + 6.hours,
           athlete_id: ENV["STRAVA_TEST_USER_ID"])
       end
       let!(:request) do
@@ -95,7 +116,7 @@ RSpec.describe StravaRequestRunnerJob, type: :job do
 
       it "creates activities and enqueues detail requests for cycling activities" do
         VCR.use_cassette("strava-list_activities") do
-          instance.perform
+          instance.perform(request.id)
         end
 
         request.reload
@@ -111,7 +132,6 @@ RSpec.describe StravaRequestRunnerJob, type: :job do
     context "with fetch_activity request" do
       let(:strava_integration) do
         FactoryBot.create(:strava_integration, :syncing,
-          token_expires_at: Time.current + 6.hours,
           athlete_id: ENV["STRAVA_TEST_USER_ID"])
       end
       let!(:activity) do
@@ -131,7 +151,7 @@ RSpec.describe StravaRequestRunnerJob, type: :job do
 
       it "updates activity details and finishes sync when last" do
         VCR.use_cassette("strava-get_activity") do
-          instance.perform
+          instance.perform(request.id)
         end
 
         request.reload
@@ -152,11 +172,29 @@ RSpec.describe StravaRequestRunnerJob, type: :job do
       end
 
       it "marks request as error" do
-        instance.perform
+        instance.perform(request.id)
 
         request.reload
         expect(request.requested_at).to be_present
         expect(request.response_status).to eq("error")
+      end
+    end
+
+    context "with already processed request" do
+      let(:strava_integration) { FactoryBot.create(:strava_integration) }
+      let!(:request) do
+        StravaRequest.create!(
+          user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_athlete,
+          endpoint: "athlete",
+          requested_at: Time.current,
+          response_status: :success
+        )
+      end
+
+      it "skips the request" do
+        instance.perform(request.id)
       end
     end
   end
