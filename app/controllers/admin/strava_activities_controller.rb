@@ -4,7 +4,7 @@ class Admin::StravaActivitiesController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(:countish,
-      matching_strava_activities.includes(:strava_integration).reorder(sortable_opts),
+      matching_strava_activities.includes(strava_integration: :user).reorder(sortable_opts),
       limit: @per_page,
       page: permitted_page)
   end
@@ -27,6 +27,10 @@ class Admin::StravaActivitiesController < Admin::BaseController
 
   def matching_strava_activities
     strava_activities = StravaActivity.all
+
+    if params[:user_id].present?
+      strava_activities = strava_activities.joins(:strava_integration).where(strava_integrations: {user_id: user_subject&.id || params[:user_id]})
+    end
 
     if params[:search_strava_integration_id].present?
       strava_activities = strava_activities.where(strava_integration_id: params[:search_strava_integration_id])
