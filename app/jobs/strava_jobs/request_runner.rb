@@ -45,6 +45,15 @@ module StravaJobs
         end
       end
 
+      def parse_rate_limit(headers)
+        limit = headers["X-RateLimit-Limit"]
+        usage = headers["X-RateLimit-Usage"]
+        return unless limit.present? || usage.present?
+        short_limit, long_limit = limit&.split(",")&.map(&:to_i)
+        short_usage, long_usage = usage&.split(",")&.map(&:to_i)
+        {short_limit:, short_usage:, long_limit:, long_usage:}.compact
+      end
+
       private
 
       def handle_list_activities(request, strava_integration, activities)
@@ -75,15 +84,6 @@ module StravaJobs
         strava_integration.finish_sync! if remaining.none?
       end
 
-      def parse_rate_limit(headers)
-        limit = headers["X-RateLimit-Limit"]
-        usage = headers["X-RateLimit-Usage"]
-        return unless limit.present? || usage.present?
-        short_limit, long_limit = limit&.split(",")&.map(&:to_i)
-        short_usage, long_usage = usage&.split(",")&.map(&:to_i)
-        {short_limit:, short_usage:, long_limit:, long_usage:}.compact
-      end
-
       def enqueue_detail_requests(request, strava_integration)
         after_epoch = request.parameters["after"]
         scope = strava_integration.strava_activities.cycling
@@ -100,7 +100,6 @@ module StravaJobs
             strava_id: strava_id.to_s, strava_activity_id: id)
         end
       end
-
     end
 
     def perform(strava_request_id = nil)

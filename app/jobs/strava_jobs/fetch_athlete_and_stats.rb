@@ -8,11 +8,15 @@ module StravaJobs
       strava_integration = StravaIntegration.find_by(id: strava_integration_id)
       return unless strava_integration
 
-      athlete_response = Integrations::Strava.fetch_athlete(strava_integration)
+      athlete_response = execute_request(strava_integration, :fetch_athlete, "athlete") {
+        Integrations::Strava.fetch_athlete(strava_integration)
+      }
       return unless athlete_response.success?
       athlete = athlete_response.body
 
-      stats_response = Integrations::Strava.fetch_athlete_stats(strava_integration, athlete["id"].to_s)
+      stats_response = execute_request(strava_integration, :fetch_athlete_stats, "athletes/#{athlete["id"]}/stats") {
+        Integrations::Strava.fetch_athlete_stats(strava_integration, athlete["id"].to_s)
+      }
       stats = stats_response.success? ? stats_response.body : nil
 
       strava_integration.update_from_athlete_and_stats(athlete, stats)
@@ -20,6 +24,22 @@ module StravaJobs
 
       StravaRequest.create_follow_up(strava_integration, :list_activities, "athlete/activities",
         per_page: RequestRunner::ACTIVITIES_PER_PAGE)
+    end
+
+    private
+
+    def execute_request(strava_integration, request_type, endpoint)
+      request = StravaRequest.create!(
+        user_id: strava_integration.user_id,
+        strava_integration_id: strava_integration.id,
+        request_type:, endpoint:, requested_at: Time.current
+      )
+      response = yield
+      request.update!(
+        response_status: response.success? ? :success : :error,
+        rate_limit: RequestRunner.parse_rate_limit(response.headers)
+      )
+      response
     end
   end
 end

@@ -24,7 +24,18 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
       expect(strava_integration.status).to eq("syncing")
       expect(strava_integration.athlete_activity_count).to eq(1817)
 
-      follow_up = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :list_activities).first
+      requests = StravaRequest.where(strava_integration_id: strava_integration.id).order(:created_at)
+      athlete_request = requests.find_by(request_type: :fetch_athlete)
+      expect(athlete_request.endpoint).to eq("athlete")
+      expect(athlete_request.response_status).to eq("success")
+      expect(athlete_request.requested_at).to be_present
+
+      stats_request = requests.find_by(request_type: :fetch_athlete_stats)
+      expect(stats_request.endpoint).to start_with("athletes/")
+      expect(stats_request.response_status).to eq("success")
+      expect(stats_request.requested_at).to be_present
+
+      follow_up = requests.find_by(request_type: :list_activities)
       expect(follow_up).to be_present
       expect(follow_up.parameters["per_page"]).to eq(200)
     end
