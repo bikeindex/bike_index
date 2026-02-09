@@ -3,7 +3,9 @@ en:
   components:
     search:
       form_organized:
-        search_owner_email: Search owner email
+        doesnt_look_like_serial: >-
+          This doesn't look like a serial number. Serials are usually 6+ letters and
+          numbers, located under the bottom bracket.
         search_for_serial_number: Search for serial number
+        search_owner_email: Search owner email
         submit: submit
-        doesnt_look_like_serial: "This doesn't look like a serial number. Serials are usually 6+ letters and numbers, located under the bottom bracket."

@@ -16,6 +16,7 @@
         <%= label_tag :search_email,
           translation(".search_owner_email"),
           class: "twlabel tw:sr-only" %>
+
         <%= text_field_tag :search_email,
           @interpreted_params[:search_email],
           placeholder: translation(".search_owner_email"),

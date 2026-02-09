@@ -5794,6 +5794,12 @@ nb:
       result_view_select:
         bike_box_view: Vis som liste
         thumbnail_view: Vis som miniatyrbilder
+      form_organized:
+        doesnt_look_like_serial: Dette ser ikke ut som et serienummer. Serienumre
+          er vanligvis 6+ bokstaver og tall, plassert under kranklageret.
+        search_for_serial_number: Søk etter serienummer
+        search_owner_email: Søk etter eierens e-postadresse
+        submit: sende inn
     legacy_form_well:
       address_record:
         address: gateadresse

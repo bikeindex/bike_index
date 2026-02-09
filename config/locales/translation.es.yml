@@ -4569,6 +4569,11 @@ es:
       result_view_select:
         bike_box_view:
         thumbnail_view:
+      form_organized:
+        doesnt_look_like_serial:
+        search_for_serial_number:
+        search_owner_email:
+        submit:
     legacy_form_well:
       address_record:
         address:
