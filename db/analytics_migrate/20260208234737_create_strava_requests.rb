@@ -8,6 +8,7 @@ class CreateStravaRequests < ActiveRecord::Migration[6.1]
       t.jsonb :parameters, default: {}
       t.datetime :requested_at
       t.integer :response_status, default: 0, null: false
+      t.jsonb :rate_limit
 
       t.timestamps
     end
