@@ -33,6 +33,6 @@ RSpec.describe Org::ImpoundRecordsIndex::Component, type: :component do
 
   it "renders" do
     expect(component).to have_css("form")
-    expect(component).to have_content("0 matching impound records")
+    expect(component).to have_content(/0\s+matching impound records/)
   end
 end
