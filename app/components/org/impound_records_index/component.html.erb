@@ -4,7 +4,7 @@
 
 <div class="row mt-4 mb-4">
   <div class="col-sm-9">
-    <%= pluralize(number_with_delimiter(@pagy.count), "matching impound record") %>
+    <%= number_with_delimiter(@pagy.count) %> <%= translation(".matching_impound_record", count: @pagy.count) %>
     <em><%= helpers.humanized_time_range(@time_range) %></em>
 
     <div class="dropdown d-inline-block ml-2">
@@ -47,9 +47,9 @@
       </a>
 
       <div class="dropdown-menu">
-        <%= link_to "All bikes", organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: "dropdown-item #{@search_unregisteredness == 'all' ? 'active' : ''}" %>
-        <%= link_to "Only unregistered", organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: "dropdown-item #{@search_unregisteredness == 'only_unregistered' ? 'active' : ''}" %>
-        <%= link_to "Only user registered", organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: "dropdown-item #{@search_unregisteredness == 'only_registered' ? 'active' : ''}" %>
+        <%= link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: "dropdown-item #{@search_unregisteredness == 'all' ? 'active' : ''}" %>
+        <%= link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: "dropdown-item #{@search_unregisteredness == 'only_unregistered' ? 'active' : ''}" %>
+        <%= link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: "dropdown-item #{@search_unregisteredness == 'only_registered' ? 'active' : ''}" %>
       </div>
     </div>
   </div>
@@ -64,7 +64,7 @@
         data-toggle="collapse"
         data-target="#makeMultiUpdate"
       >
-        update multiple records
+        <%= translation(".update_multiple_records").downcase %>
       </a>
     </div>
   </div>
@@ -79,9 +79,9 @@
           <div class="card-block">
             <div class="card-title">
               <h3 class="uncap">
-                Update multiple records
+                <%= translation(".update_multiple_records") %>
                 <br>
-                <em class="small less-strong"> For table rows with checks </em>
+                <em class="small less-strong"> <%= translation(".for_table_rows_with_checks") %> </em>
               </h3>
             </div>
 
@@ -110,17 +110,17 @@
                       kind_transferred_to_new_owner mb-2
                     "
                   >
-                    <%= f.email_field :transfer_email, placeholder: "New owner email", class: "form-control" %>
+                    <%= f.email_field :transfer_email, placeholder: translation(".new_owner_email"), class: "form-control" %>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="col-xs-12">
-                    <%= f.text_area :notes, placeholder: "Internal note", class: "form-control" %>
+                    <%= f.text_area :notes, placeholder: translation(".internal_note"), class: "form-control" %>
                   </div>
 
                   <div class="col-xs-12 mt-2">
-                    <%= submit_tag "Update impound record", class: "btn btn-success btn-md-lg" %>
+                    <%= submit_tag translation(".update_impound_record"), class: "btn btn-success btn-md-lg" %>
                   </div>
                 </div>
               </div>

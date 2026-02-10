@@ -1623,6 +1623,21 @@ en:
         activities_synced:
           one: activity synced
           other: activities synced
+    org:
+      impound_records_index:
+        matching_impound_record:
+          one: matching impound record
+          other: matching impound records
+        all_bikes: All bikes
+        only_unregistered: Only unregistered
+        only_user_registered: Only user registered
+        update_multiple_records: Update multiple records
+        for_table_rows_with_checks: For table rows with checks
+        new_owner_email: New owner email
+        internal_note: Internal note
+        update_impound_record: Update impound record
+        all_statuses: All statuses
+        status_records: "%{status} records"
     ui:
       definition_list:
         row:
@@ -4637,6 +4652,10 @@ en:
         registrations: Registrations
         sent_to: Sent to
         sent_to_a_new_owner: "(sent to a new owner)"
+    impound_records:
+      index:
+        impound_records: Impound Records
+        render_chart: Render chart
     exports:
       index:
         bikes_in_export: Registrations in export

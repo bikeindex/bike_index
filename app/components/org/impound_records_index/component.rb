@@ -36,9 +36,9 @@ module Org::ImpoundRecordsIndex
       if @search_status != "current" && ImpoundRecord.statuses.include?(@search_status)
         ImpoundRecord.statuses_humanized[@search_status.to_sym]
       elsif @search_status == "all"
-        "All statuses"
+        translation(".all_statuses")
       else
-        "#{@search_status.titleize} records"
+        translation(".status_records", status: @search_status.titleize)
       end
     end
 
@@ -46,17 +46,17 @@ module Org::ImpoundRecordsIndex
       if status != "current" && ImpoundRecord.statuses.include?(status)
         ImpoundRecord.statuses_humanized[status.to_sym]
       elsif status == "all"
-        "All statuses"
+        translation(".all_statuses")
       else
-        "#{status.titleize} records"
+        translation(".status_records", status: status.titleize)
       end
     end
 
     def unregisteredness_dropdown_text
       case @search_unregisteredness
-      when "only_registered" then "Only user registered"
-      when "only_unregistered" then "Only unregistered"
-      else "All bikes"
+      when "only_registered" then translation(".only_user_registered")
+      when "only_unregistered" then translation(".only_unregistered")
+      else translation(".all_bikes")
       end
     end
   end

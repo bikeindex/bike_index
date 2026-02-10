@@ -1,8 +1,6 @@
-<%# TODO: add translations %>
-
 <div class="organized-page-header mb-4">
   <h1 class="uncap">
-    Impound Records
+    <%= t(".impound_records") %>
   </h1>
 </div>
 
@@ -15,7 +13,7 @@
     class="btn btn-sm less-strong btn-outline-secondary <%= 'active' if @render_chart %>"
     href="<%= organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)) %>"
   >
-    Render chart
+    <%= t(".render_chart") %>
   </a>
 </div>
 
