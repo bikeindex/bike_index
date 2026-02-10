@@ -7,8 +7,12 @@ class BikeServices::Displayer
   class << self
     # This is just a quick hack, will improve
     def vehicle_search?(params_and_interpreted_params)
-      (%i[propulsion_type cycle_type] & params_and_interpreted_params.keys).any? ||
+      return true if (%i[propulsion_type cycle_type] & params_and_interpreted_params.keys).any? ||
         params_and_interpreted_params[:search_model_audit_id].present?
+
+      # Vehicle or propulsion type query items
+      (params_and_interpreted_params[:query_items] || [])
+        .any? { it.start_with?("v_", "p_") }
     end
 
     # user arg because all methods have it
@@ -106,6 +110,22 @@ class BikeServices::Displayer
         end
       end
       single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
+    end
+
+    def origin_title(creation_description)
+      return nil unless creation_description.present?
+
+      extended_description = {
+        "web" => "Registered with self registration process",
+        "org reg" => "Registered by internal, organization member form",
+        "landing page" => "Registration began with incomplete registration, via organization landing page",
+        "bulk reg" => "Registered by spreadsheet import"
+      }
+      if %w[Lightspeed Ascend].include?(creation_description)
+        "Automatically registered by bike shop point of sale (#{creation_description} POS)"
+      else
+        extended_description[creation_description] || "Registered via #{creation_description}"
+      end
     end
 
     private

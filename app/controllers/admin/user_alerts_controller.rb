@@ -3,7 +3,7 @@ class Admin::UserAlertsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @user_alerts = pagy(matching_user_alerts.order(sort_column => sort_direction), limit: @per_page, page: permitted_page)
+    @pagy, @user_alerts = pagy(:countish, matching_user_alerts.order(sort_column => sort_direction), limit: @per_page, page: permitted_page)
     @render_kind_counts = Binxtils::InputNormalizer.boolean(params[:search_kind_counts])
   end
 
@@ -30,8 +30,7 @@ class Admin::UserAlertsController < Admin::BaseController
       @activeness = "all"
     end
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      user_alerts = user_alerts.where(user_id: @user.id) if @user.present?
+      user_alerts = user_alerts.where(user_id: user_subject&.id || params[:user_id])
     end
     if params[:search_bike_id].present?
       @bike = Bike.unscoped.find(params[:search_bike_id])

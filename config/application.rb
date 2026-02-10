@@ -1,3 +1,10 @@
+# Assign REDIS_URL before loading action cable
+if ENV.fetch("REDIS_URL", "").empty?
+  # NOTE: DEV_PORT is set in bin/dev
+  redis_db = (ENV["DEV_PORT"].to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
+  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_db}"
+end
+
 require_relative "boot"
 
 require "rails"
@@ -23,13 +30,13 @@ Bundler.require(*Rails.groups)
 module Bikeindex
   class Application < Rails::Application
     config.redis_default_url = ENV["REDIS_URL"]
-    # If in test, add the TEST_ENV_NUMBER to the redis
-    if config.redis_default_url.blank? && Rails.env.test? && ENV["TEST_ENV_NUMBER"].present?
-      config.redis_default_url = "redis://localhost:6379/#{ENV["TEST_ENV_NUMBER"]&.to_i || 0}"
-    end
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
 
     config.load_defaults 8.0
+
+    # Clear Rails default security headers - secure_headers gem manages these instead
+    # (secure_headers has a bug where it tries to delete lowercase keys but Rails uses mixed case)
+    config.action_dispatch.default_headers.clear
 
     # directly using Sidekiq is preferred, but some things (e.g. active_storage) use active job
     config.active_job.queue_adapter = :sidekiq
@@ -76,13 +83,16 @@ module Bikeindex
 
     # Enable instrumentation for ViewComponents (used by rack-mini-profiler)
     config.view_component.instrumentation_enabled = true
-    config.view_component.use_deprecated_instrumentation_name = false # Stop annoying deprecation message
-    # ^ remove after upgrading to ViewComponent 4
-    config.default_preview_layout = "component_preview"
-    config.view_component.preview_paths << "#{Rails.root}/app/components/"
+    config.view_component.default_preview_layout = "component_preview"
     # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
     initializer "app_assets", after: "importmap.assets" do
       Rails.application.config.assets.paths << Rails.root.join("app")
+    end
+    # Add app/components to view paths for component preview templates
+    initializer "append_component_views", after: :set_autoload_paths do
+      ActiveSupport.on_load(:action_controller) do
+        prepend_view_path Rails.root.join("app/components")
+      end
     end
     config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
     config.lookbook.preview_display_options = {theme: ["light", "dark"]} # Add dynamic 'theme' display option

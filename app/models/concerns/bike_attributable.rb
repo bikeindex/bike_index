@@ -12,7 +12,7 @@ module BikeAttributable
     belongs_to :front_gear_type
     belongs_to :primary_activity
 
-    has_many :public_images, as: :imageable, dependent: :destroy
+    has_many :public_images, as: :imageable
     has_many :components
     has_many :ctypes, -> { distinct }, through: :components
     has_many :cgroups, -> { distinct }, through: :ctypes

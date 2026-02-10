@@ -2,20 +2,17 @@ class ApplicationController < ActionController::Base
   include ControllerHelpers
   include SetPeriod
   include Turbo::Redirection
-  include Pagy::Backend
+  include Pagy::Method
 
   protect_from_forgery
 
   around_action :set_locale
   rescue_from Money::Bank::UnknownRate, with: :localization_failure
+  rescue_from Pagy::RangeError, with: :redirect_to_last_page
 
-  ensure_security_headers(csp: false,
-    hsts: "max-age=#{20.years.to_i}",
-    x_frame_options: "SAMEORIGIN",
-    x_content_type_options: "nosniff",
-    x_xss_protection: false,
-    x_download_options: false,
-    x_permitted_cross_domain_policies: false)
+  def allow_x_frame
+    SecureHeaders.opt_out_of_header(request, :x_frame_options)
+  end
 
   def handle_unverified_request
     flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])
@@ -48,18 +45,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-
-  def permitted_per_page(default: 25, max: 100)
-    per_page = params[:per_page]&.to_i
-    per_page = (per_page.present? && per_page > 0) ? per_page : default
-    per_page.clamp(1, max)
-  end
-
-  def permitted_page(max: nil)
-    page = params[:page]&.to_i || 1
-    page = 1 if page < 1
-    max.present? ? page.clamp(1, max) : page
-  end
 
   def permitted_org_bike_search_params
     @stolenness ||= params["stolenness"].present? ? params["stolenness"] : "all"
@@ -126,5 +111,11 @@ class ApplicationController < ActionController::Base
     flash[:error] = "#{locale} localization is unavailable. Please try again later."
     params.delete(:locale)
     redirect_to root_url
+  end
+
+  # Redirect to last valid page when page is out of range
+  # Replicates the old pagy overflow: :last_page behavior
+  def redirect_to_last_page(exception)
+    redirect_to url_for(page: exception.pagy.last), allow_other_host: false
   end
 end

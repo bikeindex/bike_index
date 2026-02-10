@@ -94,7 +94,7 @@ class StolenRecord < ApplicationRecord
   belongs_to :organization_stolen_message
 
   has_many :impound_claims
-  has_many :tweets
+  has_many :social_posts
   has_many :theft_alerts
   has_many :notifications, as: :notifiable
   has_many :theft_surveys, -> { theft_survey }, as: :notifiable, class_name: "Notification"
@@ -180,6 +180,7 @@ class StolenRecord < ApplicationRecord
       end
     end
 
+    # TODO: This should probably be handled on the frontend - so users can set weird values if they really want to
     def corrected_date_stolen(date = nil)
       date = Binxtils::TimeParser.parse(date) || Time.current
       year = date.year
@@ -394,7 +395,7 @@ class StolenRecord < ApplicationRecord
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
     enqueue_worker(@alert_location_changed)
-    ::Callbacks::AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
+    CallbackJob::AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
   end
 
   private

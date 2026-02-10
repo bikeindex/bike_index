@@ -6,7 +6,7 @@ class Admin::ImpoundRecordsController < Admin::BaseController
   def index
     params[:page] || 1
     @per_page = permitted_per_page(default: 50)
-    @pagy, @impound_records = pagy(matching_impound_records.includes(:user, :organization, :bike, :impound_claims)
+    @pagy, @impound_records = pagy(:countish, matching_impound_records.includes(:user, :organization, :bike, :impound_claims)
       .order("impound_records.#{sort_column}" + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
@@ -47,12 +47,19 @@ class Admin::ImpoundRecordsController < Admin::BaseController
     if params[:search_bike_id].present?
       impound_records = impound_records.where(bike_id: params[:search_bike_id])
     end
+    if params[:user_id].present?
+      impound_records = impound_records.where(user_id: user_subject&.id || params[:user_id])
+    end
     impound_records = impound_records.where(organization_id: current_organization.id) if current_organization.present?
     impound_records.where(created_at: @time_range)
   end
 
   def find_impound_record
-    @impound_record = ImpoundRecord.friendly_find(params[:id])
+    @impound_record = if params[:id].match?(/\A\d+\z/)
+      ImpoundRecord.find(params[:id])
+    else
+      ImpoundRecord.friendly_find!(params[:id])
+    end
     @bike = @impound_record.bike
   end
 end

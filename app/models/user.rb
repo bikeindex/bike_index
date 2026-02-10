@@ -10,6 +10,7 @@
 #  auth_token                         :string(255)
 #  avatar                             :string(255)
 #  banned                             :boolean          default(FALSE), not null
+#  can_send_many_marketplace_messages :boolean          default(FALSE), not null
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
@@ -57,7 +58,9 @@
 #
 #  index_users_on_address_record_id         (address_record_id)
 #  index_users_on_auth_token                (auth_token)
+#  index_users_on_email                     (email) WHERE (deleted_at IS NULL)
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
+#  index_users_on_username                  (username) WHERE (deleted_at IS NULL)
 #
 class User < ApplicationRecord
   include FeatureFlaggable
@@ -88,7 +91,7 @@ class User < ApplicationRecord
   has_many :impound_records
   has_many :integrations, dependent: :destroy
   has_many :locks, dependent: :destroy
-  has_many :marketplace_listings
+  has_many :marketplace_listings, foreign_key: :seller_id
   has_many :marketplace_messages_received, class_name: "MarketplaceMessage", foreign_key: :receiver_id
   has_many :marketplace_messages_sent, class_name: "MarketplaceMessage", foreign_key: :sender_id
   has_many :memberships
@@ -121,7 +124,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :user_ban
 
-  validates_uniqueness_of :username, case_sensitive: false
+  validates_uniqueness_of :username
 
   validates :password,
     presence: true,
@@ -139,7 +142,7 @@ class User < ApplicationRecord
   validate :preferred_language_is_an_available_locale
 
   validates_presence_of :email
-  validates_uniqueness_of :email, case_sensitive: false
+  validates_uniqueness_of :email
 
   before_validation :set_calculated_attributes
   validate :ensure_unique_email
@@ -177,6 +180,8 @@ class User < ApplicationRecord
     end
 
     def username_friendly_find(str)
+      return if str.blank?
+
       if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
         where(id: str).first
       else
@@ -185,7 +190,7 @@ class User < ApplicationRecord
     end
 
     def friendly_find(str)
-      fuzzy_email_find(str) || username_friendly_find(str)
+      username_friendly_find(str) || fuzzy_email_find(str)
     end
 
     def friendly_find_id(str)
@@ -193,14 +198,14 @@ class User < ApplicationRecord
     end
 
     def admin_text_search(str)
-      q = "%#{str.to_s.strip}%"
+      q = "%#{str.to_s.strip.downcase}%"
       unscoped.includes(:user_emails)
-        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
+        .where("users.name ILIKE ? OR users.email LIKE ? OR user_emails.email LIKE ?", q, q, q)
         .distinct.references(:user_emails)
     end
 
     def matching_domain(str)
-      where("users.email ILIKE ?", "%#{str.to_s.strip}")
+      where("users.email LIKE ?", "%#{str.to_s.strip.downcase}")
     end
 
     def search_phone(str)
@@ -262,11 +267,11 @@ class User < ApplicationRecord
 
   # Performed inline
   def perform_create_jobs
-    ::Callbacks::AfterUserCreateJob.new.perform(id, "new", user: self)
+    CallbackJob::AfterUserCreateJob.new.perform(id, "new", user: self)
   end
 
   def perform_user_update_jobs
-    ::Callbacks::AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
+    CallbackJob::AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
   end
 
   def superuser?(controller_name: nil, action_name: nil)
@@ -410,32 +415,32 @@ class User < ApplicationRecord
     self.confirmed = true
     save
     reload
-    ::Callbacks::AfterUserCreateJob.new.perform(id, "confirmed", user: self)
+    CallbackJob::AfterUserCreateJob.new.perform(id, "confirmed", user: self)
     true
   end
 
-  def role(organization)
-    m = OrganizationRole.where(user_id: id, organization_id: organization.id).first
+  def role(org_or_id)
+    m = OrganizationRole.where(user_id: id, organization_id: org_id(org_or_id)).first
     m&.role
   end
 
-  def member_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).limit(1).any?
+  def member_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).limit(1).any?
 
     superuser? && !no_superuser_override
   end
 
-  def member_bike_edit_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).not_member_no_bike_edit.limit(1).any?
+  def member_bike_edit_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).not_member_no_bike_edit.limit(1).any?
 
     superuser? && !no_superuser_override
   end
 
-  def admin_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).admin.limit(1).any?
+  def admin_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).admin.limit(1).any?
 
     superuser? && !no_superuser_override
   end
@@ -572,7 +577,7 @@ class User < ApplicationRecord
   protected
 
   def generate_username_confirmation_and_auth
-    usrname = username || SecureRandom.urlsafe_base64
+    usrname = Slugifyer.slugify(username || SecureRandom.urlsafe_base64)
     while User.where(username: usrname).where.not(id: id).exists?
       usrname = SecureRandom.urlsafe_base64
     end
@@ -584,6 +589,10 @@ class User < ApplicationRecord
 
   private
 
+  def org_id(org_or_id)
+    org_or_id.is_a?(Organization) ? org_or_id.id : org_or_id
+  end
+
   def short_username
     username&.truncate(11)
   end
@@ -592,8 +601,8 @@ class User < ApplicationRecord
     auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
   end
 
-  def claimed_organization_roles_for(organization_id)
-    OrganizationRole.claimed.where(user_id: id, organization_id: organization_id)
+  def claimed_organization_roles_for(org_or_id)
+    OrganizationRole.claimed.where(user_id: id, organization_id: org_id(org_or_id))
   end
 
   def preferred_language_is_an_available_locale

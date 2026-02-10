@@ -5,8 +5,15 @@ module LegacyFormWell::AddressRecord
     STATIC_FIELDS_OPTIONS = %i[shown hidden]
 
     # NOTE: Keep in mind this renders for the embed and embed_extended views (which don't have tailwind styles)
-    def initialize(form_builder:, organization: nil, not_related_fields: false,
-      static_fields: false, current_country_id: nil, embed_layout: false, no_street: nil, street_2: false)
+    def initialize(form_builder:,
+      organization: nil,
+      not_related_fields: false,
+      static_fields: false,
+      current_country_id: nil,
+      embed_layout: false,
+      bike_status: nil, # stolen, impounded, etc
+      no_street: nil,
+      street_2: false)
       @builder = form_builder
       @organization = organization
 
@@ -17,6 +24,7 @@ module LegacyFormWell::AddressRecord
       @initial_country_id = @builder.object.country_id
       @static_fields = STATIC_FIELDS_OPTIONS.include?(static_fields) ? static_fields : false
       @embed_layout = Binxtils::InputNormalizer.boolean(embed_layout)
+      @bike_status = translated_status(bike_status)
 
       @wrapper_class = if @embed_layout
         "input-group"
@@ -60,6 +68,8 @@ module LegacyFormWell::AddressRecord
     end
 
     def address_label
+      return translation(:where_was_it_status, bike_status: @bike_status) if @bike_status.present?
+
       txt = @organization&.registration_field_labels&.dig("reg_address")
       return txt.html_safe if txt.present?
 
@@ -67,11 +77,26 @@ module LegacyFormWell::AddressRecord
     end
 
     def street_placeholder
-      translation(@organization&.school? ? :address_school : :address)
+      if @bike_status.present?
+        translation(:address_or_intersection)
+      else
+        translation(@organization&.school? ? :address_school : :address)
+      end
     end
 
     def address_required?
+      return true if @bike_status.present?
+
       @organization&.enabled?("require_reg_address")
+    end
+
+    def translated_status(bike_status)
+      return nil if bike_status.blank?
+
+      humanized_status = Bike.status_humanized(bike_status)
+      # it makes more sense to show "where was it found" than impounded
+      humanized_status = "found" if humanized_status == "impounded"
+      Bike.status_humanized_translated(humanized_status)
     end
   end
 end

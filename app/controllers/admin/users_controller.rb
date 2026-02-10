@@ -6,7 +6,7 @@ class Admin::UsersController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page
-    @pagy, @users = pagy(matching_users.reorder("users.#{sort_column} #{sort_direction}")
+    @pagy, @users = pagy(:countish, matching_users.reorder("users.#{sort_column} #{sort_direction}")
       .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :organization_roles, :ambassador_tasks, :email_bans_active),
       limit: @per_page, page: permitted_page)
   end
@@ -38,9 +38,9 @@ class Admin::UsersController < Admin::BaseController
       end
       @user.username = params[:user][:username]
       @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
+      @user.can_send_many_marketplace_messages = params[:user][:can_send_many_marketplace_messages]
       @user.phone = params[:user][:phone]
       if @user.save
-        @user.update_auth_token("auth_token") if @user.banned? # Force reauthentication for the user
         @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
         redirect_to admin_users_url, notice: "User Updated"
       else
@@ -72,7 +72,7 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def find_user
-    @user = User.unscoped.username_friendly_find(params[:id])
+    @user = User.unscoped.friendly_find(params[:id])
     raise ActiveRecord::RecordNotFound unless @user.present?
   end
 

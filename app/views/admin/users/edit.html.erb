@@ -1,0 +1,219 @@
+<%= render(Admin::UserShow::Component.new(user: @user, bikes: @bikes, bikes_count: @bikescount)) %>
+
+<hr class="mt-4">
+
+<h4>Edit</h4>
+
+<%= form_for @user, url: admin_user_path, method: :patch do |f| %>
+  <%= render(UI::AlertForErrors::Component.new(object: @user)) %>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="form-group">
+        <%= f.label :name %>
+        <%= f.text_field :name, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group">
+        <%= f.label :email %>
+        <%= f.email_field :email, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <%= f.label :username %>
+        <%= f.text_field :username, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group">
+        <%= f.label :secondary_emails %>
+        <%= text_area_tag :secondary_emails, @user.secondary_emails.join(", "), disabled: true, rows: 1, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <%= f.label :phone %>
+        <%= f.text_field :phone, class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+      <div class="form-group">
+        <div class="form-check">
+          <%= f.check_box :confirmed, disabled: @user.confirmed, class: "form-check-input" %>
+          <%= f.label :confirmed, class: "form-check-label" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-check form-check-inline">
+          <%= f.check_box :can_send_many_stolen_notifications, class: "form-check-input" %>
+          <%= f.label :can_send_many_stolen_notifications, class: "form-check-label" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-check form-check-inline">
+          <%= f.check_box :can_send_many_marketplace_messages, class: "form-check-input" %>
+          <%= f.label :can_send_many_marketplace_messages, class: "form-check-label" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+      <div class="form-group">
+        <div class="form-check form-check-inline">
+          <%= f.check_box :superuser, class: "form-check-input" %>
+          <%= f.label :superuser, class: "form-check-label" %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <% if display_dev_info? %>
+          <div class="form-check form-check-inline only-dev-visible">
+            <%= f.check_box :developer, class: "form-check-input" %>
+            <%= f.label :developer, class: "form-check-label" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-6">
+      <div class="form-group">
+        <%= f.submit 'Save', class: 'btn btn-success' %>
+      </div>
+    </div>
+
+    <div class="col-6 pt-2">
+      <div class="form-group">
+        <div class="form-check">
+          <%= f.check_box :banned, class: "form-check-input" %>
+          <%= f.label :banned, class: "form-check-label" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% unless @user.user_ban&.reason.present? %>
+    <% @user.build_user_ban unless @user.user_ban.present? %>
+    <%= f.fields_for :user_ban do |user_ban| %>
+      <div class="row collapse" id="userBanFields">
+        <div class="col-md-8 offset-md-2 mt-3">
+          <div class="card bg-light">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h4>Ban information</h4>
+                </div>
+
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <% opt_vals = UserBan.reasons.map { |b| [b.humanize, b] } %>
+                    <%= user_ban.select :reason, options_for_select(opt_vals), {prompt: "Reason for ban"}, class: 'form-control userBanReasonSelect' %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <%= user_ban.label :description, "Description/notes" %>
+                <%= user_ban.text_area :description, class: "form-control" %>
+              </div>
+
+              <p><em class="small"> Banning a user will: </em></p>
+
+              <ul>
+                <li>
+                  Log them out and prevent them from logging back in
+                </li>
+
+                <li>
+                  (soft) delete all their bikes - which will remove all their
+                  marketplace listings
+                </li>
+
+                <li>
+                  Show any user they were messaging with a message telling them
+                  that they're banned
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if @user.present? %>
+  <hr style="margin-top: 60px;">
+  <div class="mt-4 mb-4 row">
+    <div class="col-sm-6 mb-4">
+      <%= link_to "Delete #{@user.email}!", admin_user_url(@user.id, method: :delete), data: { confirm: "Are you sure? Generally it's better to delete than ban" }, class: "btn btn-danger less-strong" %>
+    </div>
+
+    <div class="col-sm-6 mb-4">
+      <div class="text-right">
+        <a
+          class="gray-link"
+          href="#forceMergeEmail"
+          data-toggle="collapse"
+          data-target="#forceMergeEmail"
+        >
+          Force merge with another email
+        </a>
+      </div>
+
+      <div id="forceMergeEmail" class="collapse mt-2">
+        <div class="card">
+          <div class="card-body">
+            <p>
+              Add another email to this user.
+            </p>
+
+            <p>
+              <span class="text-danger">WARNING</span> this does not send a
+              confirmation email or check that they have access to the email
+              you merge with.
+            </p>
+
+            <p>
+              <span class="text-warning">
+                We can <strong>not</strong> undo this.
+              </span>
+            </p>
+
+            <%= form_for @user, url: admin_user_path, method: :patch do |f| %>
+              <div class="row mt-2">
+                <div class="col-md-8">
+                  <div class="form-group">
+                    <%= email_field_tag :force_merge_email, "", placeholder: "Email to merge", class: "form-control" %>
+
+                    <small class="less-strong">
+                      Email must be another user account on Bike Index
+                    </small>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <%= f.submit "Merge", class: 'btn btn-outline-danger' %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

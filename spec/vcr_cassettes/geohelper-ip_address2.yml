@@ -19,15 +19,15 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Sun, 05 Oct 2025 17:25:26 GMT
+      - Thu, 05 Feb 2026 17:43:56 GMT
       Content-Type:
       - text/plain; charset=ISO-8859-1
       Content-Length:
-      - '36'
+      - '41'
       Connection:
       - keep-alive
       Cf-Ray:
-      - 989e9e4a19d6cf13-SJC
+      - 9c9436839ab4c8de-SJC
       Access-Control-Allow-Origin:
       - "*"
       Cache-Control:
@@ -44,6 +44,6 @@ http_interactions:
       - h3=":443"; ma=86400
     body:
       encoding: UTF-8
-      string: US,CA,Pacifica,37.619600,-122.481600
-  recorded_at: Sun, 05 Oct 2025 17:25:26 GMT
+      string: US,CA,San Francisco,37.750600,-122.412100
+  recorded_at: Thu, 05 Feb 2026 17:43:56 GMT
 recorded_with: VCR 6.3.1

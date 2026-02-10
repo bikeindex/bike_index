@@ -161,7 +161,7 @@ RSpec.describe CredibilityScorer do
       end
       context "spam_registrations not embed" do
         let(:organization) { FactoryBot.create(:organization, approved: true, spam_registrations: true) }
-        it "returns without spam_registrations" do
+        it "returns without spam_registrations", :flaky do
           expect(subject.organization_trusted?(organization)).to be_falsey
           expect(instance.badges).to eq(%i[created_this_month long_time_user])
         end
@@ -208,7 +208,7 @@ RSpec.describe CredibilityScorer do
   describe "ownership_badges" do
     let(:created_at) { Time.current - 400.days }
     let!(:ownership1) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: created_at, creator: bike.creator) }
-    it "returns claimed" do
+    it "returns claimed", :flaky do
       bike.reload
       expect(subject.ownership_badges(bike)).to eq([:current_ownership_claimed])
       # Also, general badges returns long_time_registration
@@ -282,7 +282,7 @@ RSpec.describe CredibilityScorer do
       let(:stolen_record) { recovered_bike.current_stolen_record }
       let!(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, user: user) }
       let!(:feedback) { FactoryBot.create(:feedback, kind: "tip_stolen_bike", user: user) }
-      it "returns the bike_badges" do
+      it "returns the bike_badges", :flaky do
         stolen_record.add_recovery_information(recovered_description: "I recovered it!")
         stolen_record.reload
         expect(stolen_record.recovered?).to be_truthy

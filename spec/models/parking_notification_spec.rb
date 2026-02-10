@@ -170,30 +170,102 @@ RSpec.describe ParkingNotification, type: :model do
   describe "calculated_unregistered_parking_notification" do
     let(:parking_notification1) { FactoryBot.create(:parking_notification_unregistered, kind: "parked_incorrectly_notification") }
     let(:organization) { parking_notification1.organization }
-    let!(:bike) { parking_notification1.bike }
-    it "sets the impound record" do
-      bike.reload
+    let!(:bike) { Bike.unscoped.find(parking_notification1.bike_id) }
+    let(:user) { parking_notification1.user }
+
+    it "user_hidden: false if transferred" do
       expect(bike.status).to eq "unregistered_parking_notification"
       expect(bike.user_hidden).to be_truthy
+      expect(bike.current_ownership).to be_present
+      expect(bike.current_impound_record&.id).to be_nil
+      expect(bike.current_parking_notification&.id).to eq parking_notification1.id
+
       expect(parking_notification1.unregistered_bike?).to be_truthy
       expect(parking_notification1.resolved_at).to be_blank
-      Sidekiq::Job.clear_all
-      parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
-      expect(parking_notification2.unregistered_bike?).to be_truthy
-      expect(parking_notification2.resolved_at).to be_within(1).of Time.current
-      Sidekiq::Testing.inline! do
-        parking_notification2.process_notification
-      end
-      bike.reload
-      parking_notification2.reload
-      expect(parking_notification2.impound_record).to be_present
-      expect(parking_notification2.resolved_at).to be_present # The job sets the resolved at
-      expect(bike.status).to eq "status_impounded"
-      expect(parking_notification2.unregistered_bike?).to be_truthy
-      expect(bike.user_hidden).to be_falsey
-
-      expect(parking_notification1.reload.resolved_at).to be_present
       expect(parking_notification1.retrieved_kind).to be_blank
+
+      # Transfer ownership:
+      expect do
+        BikeServices::Updator.new(user:, bike:, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json)
+          .update_available_attributes
+      end.to change(ImpoundRecordUpdate, :count).by(0)
+        .and change(ParkingNotification, :count).by(0)
+
+      expect(bike.reload.status).to eq "status_with_owner"
+      expect(bike.user_hidden).to be_falsey
+      expect(bike.current_impound_record&.id).to be_nil
+      expect(bike.current_parking_notification&.id).to be_nil
+
+      expect(parking_notification1.reload.unregistered_bike?).to be_truthy
+      expect(parking_notification1.resolved_at).to be_within(2).of Time.current
+      expect(parking_notification1.retrieved_kind).to eq "ownership_transfer"
+      expect(parking_notification1.retrieved_by_id).to eq user.id
+      expect(parking_notification1.status).to eq "retrieved"
+
+      # verify that processing doesn't update the bike again
+      updated_at = Time.current - 101
+      bike.update_column :updated_at, updated_at
+      parking_notification1.update(updated_at: Time.current)
+      expect(bike.reload.updated_at).to be_within(1).of updated_at
+    end
+
+    context "when a repeat notification impounds" do
+      it "creates an impound record", :flaky do
+        bike.reload
+        expect(bike.status).to eq "unregistered_parking_notification"
+        expect(bike.user_hidden).to be_truthy
+        expect(parking_notification1.unregistered_bike?).to be_truthy
+        expect(parking_notification1.resolved_at).to be_blank
+
+        Sidekiq::Job.clear_all
+        parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
+        expect(parking_notification2.unregistered_bike?).to be_truthy
+        expect(parking_notification2.resolved_at).to be_within(1).of Time.current
+        Sidekiq::Testing.inline! do
+          parking_notification2.send(:process_notification)
+        end
+        bike.reload
+        parking_notification2.reload
+        expect(parking_notification2.impound_record).to be_present
+        expect(parking_notification2.resolved_at).to be_present # The job sets the resolved at
+        expect(bike.status).to eq "status_impounded"
+        expect(parking_notification2.unregistered_bike?).to be_truthy
+        expect(parking_notification2.status).to eq "impounded"
+        expect(parking_notification2.retrieved_kind).to be_nil
+        expect(bike.user_hidden).to be_falsey
+        expect(bike.current_impound_record&.id).to eq parking_notification2.impound_record_id
+        expect(bike.current_parking_notification&.id).to be_nil
+
+        expect(parking_notification1.reload.resolved_at).to be_within(2).of Time.current
+        expect(parking_notification1.retrieved_kind).to be_blank
+
+        Sidekiq::Job.clear_all
+        # Transfer ownership:
+        expect do
+          BikeServices::Updator.new(user:, bike:, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json)
+            .update_available_attributes
+        end.to change(ImpoundRecordUpdate, :count).by(1)
+          .and change(ParkingNotification, :count).by(0)
+          .and change(ProcessImpoundUpdatesJob.jobs, :count).by(1)
+        ProcessImpoundUpdatesJob.drain
+        expect(ProcessImpoundUpdatesJob.jobs.count).to eq 0 # verify that we aren't endlessly looping
+
+        expect(bike.reload.status).to eq "status_with_owner"
+        expect(bike.user_hidden).to be_falsey
+        expect(bike.current_impound_record&.id).to be_nil
+        expect(bike.current_parking_notification&.id).to be_nil
+
+        expect(parking_notification1.reload.unregistered_bike?).to be_truthy
+        expect(parking_notification1.resolved_at).to be_within(5).of Time.current
+        expect(parking_notification1.status).to eq "replaced"
+        expect(parking_notification1.retrieved_kind).to be_nil
+        expect(parking_notification1.retrieved_by_id).to be_nil
+
+        expect(parking_notification2.reload.status).to eq "impounded_retrieved"
+        # Decided to leave it nil because it isn't directly retrieved
+        expect(parking_notification2.retrieved_kind).to be_nil
+        expect(parking_notification2.retrieved_by_id).to be_nil
+      end
     end
   end
 

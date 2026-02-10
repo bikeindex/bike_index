@@ -36,55 +36,55 @@
         = render(PageBlock::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing))
 
     -# Basic bike details
-    = render(DefinitionList::Container::Component.new(multi_columns: true)) do
+    = render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do
       - unless @bike.version?
-        = render(DefinitionList::Row::Component.new(label: t(".serial"))) do
+        = render(UI::DefinitionList::Row::Component.new(label: t(".serial"))) do
           = render_serial_display(@bike, current_user)
         - unless @bike.serial_hidden?
-          = render(DefinitionList::Row::Component.new(label: t(".other_serial"), value: @bike.extra_registration_number))
+          = render(UI::DefinitionList::Row::Component.new(label: t(".other_serial"), value: @bike.extra_registration_number))
       - unless @bike.type == "bike"
-        = render(DefinitionList::Row::Component.new(label: t(".vehicle_type"), value: @bike.cycle_type_name))
+        = render(UI::DefinitionList::Row::Component.new(label: t(".vehicle_type"), value: @bike.cycle_type_name))
       - unless @bike.propulsion_type == "foot-pedal"
-        = render(DefinitionList::Row::Component.new(label: t(".propulsion_type"), value: @bike.propulsion_type))
-      = render(DefinitionList::Row::Component.new(label: t(".primary_activity"), value: @bike.primary_activity&.display_name))
+        = render(UI::DefinitionList::Row::Component.new(label: t(".propulsion_type"), value: @bike.propulsion_type))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".primary_activity"), value: @bike.primary_activity&.display_name))
 
       -# We want to display the whole manufacturer name here, not just the
       -# simple name. So only use mnfg_name if it's other (which sanitizes)
       - manufacturer_name = @bike.manufacturer&.other? ? @bike.mnfg_name : @bike.manufacturer&.name
-      = render(DefinitionList::Row::Component.new(label: t(".manufacturer"), value: manufacturer_name))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".manufacturer"), value: manufacturer_name))
 
-      = render(DefinitionList::Row::Component.new(label: t(".name"), value: @bike.name))
-      = render(DefinitionList::Row::Component.new(label: t(".model"), value: @bike.frame_model))
-      = render(DefinitionList::Row::Component.new(label: t(".year"), value: @bike.year))
-      = render(DefinitionList::Row::Component.new(label: t(".primary_colors"), value: @bike.frame_colors.to_sentence))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".name"), value: @bike.name))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".model"), value: @bike.frame_model))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".year"), value: @bike.year))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".primary_colors"), value: @bike.frame_colors.to_sentence))
       - if BikeServices::Displayer.paint_description?(@bike)
-        = render(DefinitionList::Row::Component.new(label: t(".paint_description"), value: @bike.paint_description))
-      = render(DefinitionList::Row::Component.new(label: t(".frame_size"), value: @bike.frame_size&.upcase))
-      = render(DefinitionList::Row::Component.new(label: t(".frame_material"), value: @bike.frame_material_name))
-      = render(DefinitionList::Row::Component.new(label: t(".handlebar_type"), value: @bike.handlebar_type_name))
+        = render(UI::DefinitionList::Row::Component.new(label: t(".paint_description"), value: @bike.paint_description))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".frame_size"), value: @bike.frame_size&.upcase))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".frame_material"), value: @bike.frame_material_name))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".handlebar_type"), value: @bike.handlebar_type_name))
       -# wheels
       - if @bike.front_wheel_size_id.present?
         - same_width = @bike.front_tire_narrow.nil? || @bike.front_tire_narrow == @bike.rear_tire_narrow
         - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id && same_width
-          = render(DefinitionList::Row::Component.new(label: t(".wheel_diameter"), value: @bike.front_wheel_size&.name))
+          = render(UI::DefinitionList::Row::Component.new(label: t(".wheel_diameter"), value: @bike.front_wheel_size&.name))
           - unless @bike.front_tire_narrow.nil? # required because the translation counts as a value :/
-            = render(DefinitionList::Row::Component.new(label: t(".tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
         - else
-          = render(DefinitionList::Row::Component.new(label: t(".front_wheel_diameter"), value: @bike.front_wheel_size&.name))
+          = render(UI::DefinitionList::Row::Component.new(label: t(".front_wheel_diameter"), value: @bike.front_wheel_size&.name))
           - unless @bike.front_tire_narrow.nil? # required because the translation counts as a value :/
-            = render(DefinitionList::Row::Component.new(label: t(".front_tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
-          = render(DefinitionList::Row::Component.new(label: t(".rear_wheel_diameter"), value: @bike.rear_wheel_size&.name))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".front_tire_width"), value: t(".tire_width_narrow_#{@bike.front_tire_narrow}")))
+          = render(UI::DefinitionList::Row::Component.new(label: t(".rear_wheel_diameter"), value: @bike.rear_wheel_size&.name))
           - unless @bike.rear_tire_narrow.nil? # required because the translation counts as a value :/
-            = render(DefinitionList::Row::Component.new(label: t(".rear_tire_width"), value: t(".tire_width_narrow_#{@bike.rear_tire_narrow}")))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".rear_tire_width"), value: t(".tire_width_narrow_#{@bike.rear_tire_narrow}")))
       -# Drivetrain
       - if @bike.fixed_gear?
-        = render(DefinitionList::Row::Component.new(label: t(".drivetrain"), value: t(".drivetrain_fixed")))
+        = render(UI::DefinitionList::Row::Component.new(label: t(".drivetrain"), value: t(".drivetrain_fixed")))
       - else
-        = render(DefinitionList::Row::Component.new(label: t(".drivetrain"), value: @bike.drivetrain_attributes))
-        = render(DefinitionList::Row::Component.new(label: t(".drivetrain_front"), value: @bike.front_gear_type&.name))
-        = render(DefinitionList::Row::Component.new(label: t(".drivetrain_rear"), value: @bike.rear_gear_type&.name))
+        = render(UI::DefinitionList::Row::Component.new(label: t(".drivetrain"), value: @bike.drivetrain_attributes))
+        = render(UI::DefinitionList::Row::Component.new(label: t(".drivetrain_front"), value: @bike.front_gear_type&.name))
+        = render(UI::DefinitionList::Row::Component.new(label: t(".drivetrain_rear"), value: @bike.rear_gear_type&.name))
       -# description
-      = render(DefinitionList::Row::Component.new(label: t(".distinguishing_features"), full_width: true, value: @bike.description))
+      = render(UI::DefinitionList::Row::Component.new(label: t(".distinguishing_features"), full_width: true, value: @bike.description))
 
     - if @bike.status_stolen? && @stolen_record.present?
       %h3
@@ -93,27 +93,27 @@
         - if @bike.current_stolen_record.latitude.present?
           = render partial: "stolen_map", locals: { mapping_record: @stolen_record }
         .col-md-4
-          = render(DefinitionList::Container::Component.new) do
-            = render(DefinitionList::Row::Component.new(label: t(".location"), value: @stolen_record.address(country: [:skip_default])))
-            = render(DefinitionList::Row::Component.new(label: t(".locking_description"), value: @stolen_record.locking_description))
-            = render(DefinitionList::Row::Component.new(label: t(".locking_circumvented"), value: @stolen_record.lock_defeat_description))
-            = render(DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone]))
-            = render(DefinitionList::Row::Component.new(label: t(".police_report"), value: @stolen_record.police_report_number))
-            = render(DefinitionList::Row::Component.new(label: t(".department_city"), value: @stolen_record.police_report_department))
-            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: @stolen_record.theft_description))
+          = render(UI::DefinitionList::Container::Component.new) do
+            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: @stolen_record.address(country: [:skip_default])))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".locking_description"), value: @stolen_record.locking_description))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".locking_circumvented"), value: @stolen_record.lock_defeat_description))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone]))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".police_report"), value: @stolen_record.police_report_number))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".department_city"), value: @stolen_record.police_report_department))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: @stolen_record.theft_description))
 
     - elsif !@bike.version? && @bike.current_impound_record.present?
       - impound_record = @bike.current_impound_record
       %h3= t(".abandoned_title", bike_type: @bike.type_titleize, impound_kind: impound_record.kind)
 
       .row
-        - if impound_record.latitude.present?
+        - if impound_record.latitude_public.present?
           = render partial: "stolen_map", locals: { mapping_record: impound_record }
         .col-md-4
-          = render(DefinitionList::Container::Component.new) do
-            = render(DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.address))
-            = render(DefinitionList::Row::Component.new(label: @bike.status_found? ? t(".found_at") : t(".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone]))
-            = render(DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: impound_record.impounded_description))
+          = render(UI::DefinitionList::Container::Component.new) do
+            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: impound_record.formatted_address_string))
+            = render(UI::DefinitionList::Row::Component.new(label: @bike.status_found? ? t(".found_at") : t(".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone]))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: impound_record.impounded_description))
 
 
   -# I think it's more performant to make the query once for all the components and then run through them all for each cgroup
@@ -124,7 +124,7 @@
       - next unless cgroup_components.any?
 
       %h3.mt-4.mb-3= cgroup.name
-      = render(DefinitionList::Container::Component.new(multi_columns: true)) do
+      = render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do
         - cgroup_components.each do |component|
           - next if component.cgroup_id != cgroup.id
 
@@ -148,5 +148,5 @@
           - value << "(#{component.mnfg_name})" if component.mnfg_name.present?
           - value = value.any? ? value.join(" ") : t(".component_no_info")
 
-          = render(DefinitionList::Row::Component.new(label:, value: ))
+          = render(UI::DefinitionList::Row::Component.new(label:, value: ))
 

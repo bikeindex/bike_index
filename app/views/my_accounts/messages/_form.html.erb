@@ -1,30 +1,36 @@
 <%# requires marketplace_message local %>
 
-<div class="tw:px-4">
-  <h2 class="tw:mt-6 tw:text-xl tw:font-bold">
-    <%= marketplace_message.initial_message? ? t(".new_message") : t(".reply_to_message") %>
-  </h2>
+<h2 class="tw:mt-6 tw:text-xl tw:font-bold">
+  <%= marketplace_message.initial_message? ? t(".new_message") : t(".reply_to_message") %>
+</h2>
 
-  <%= form_with(model: marketplace_message, url: my_account_messages_path, method: :post, local: true, class: "") do |f| %>
-    <%= render(AlertForErrors::Component.new(object: marketplace_message, name: t(".message"), dismissable: true)) %>
+<%= form_with(model: marketplace_message, url: my_account_messages_path, method: :post, local: true, class: "") do |f| %>
+  <%= render(UI::AlertForErrors::Component.new(object: marketplace_message, name: t(".message"), dismissable: true)) %>
 
-    <%= f.hidden_field :initial_record_id %>
-    <%= f.hidden_field :marketplace_listing_id %>
+  <%= f.hidden_field :initial_record_id %>
+  <%= f.hidden_field :marketplace_listing_id %>
 
-    <% if marketplace_message.initial_message? %>
-      <div class="tw:mb-3">
-        <%= f.label :subject, class: "twlabel" %>
-        <%= f.text_field :subject, maxlength: 180, required: true, class: "twinput" %>
-      </div>
-    <% end %>
-
-    <div class="tw:mt-3">
-      <%= f.label :body, class: "twlabel tw:sr-only" %>
-      <%= f.text_area :body, rows: 5, placeholder: t(".body_placeholder"), required: true, class: "twinput" %>
-    </div>
-
-    <div class="tw:mt-3 tw:flex tw:items-center tw:justify-end">
-      <%= f.submit t(".send_message"), class: "twbtn-green" %>
+  <% if marketplace_message.initial_message? %>
+    <div class="tw:mb-3">
+      <%= f.label :subject, class: "twlabel" %>
+      <%= f.text_field :subject, maxlength: 180, required: true, class: "twinput" %>
     </div>
   <% end %>
-</div>
+
+  <div class="tw:mt-3">
+    <%= f.label :body, class: "twlabel tw:sr-only" %>
+    <%= f.text_area :body, rows: 5, placeholder: t(".body_placeholder"), required: true, class: "twinput" %>
+  </div>
+
+  <div class="tw:mt-3 tw:flex tw:items-center tw:justify-end tw:gap-4">
+    <% listing_status = marketplace_message.marketplace_listing&.status %>
+
+    <% if MarketplaceListing::ENDED_STATUSES.include?(listing_status&.to_sym) %>
+      <em class="less-strong">
+        <%= t(".already_sold", item_type: marketplace_message.marketplace_listing.item_type_display.downcase, listing_status:) %>
+      </em>
+    <% end %>
+
+    <%= f.submit t(".send_message"), class: "twbtn-green" %>
+  </div>
+<% end %>

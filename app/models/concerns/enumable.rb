@@ -42,26 +42,49 @@ module Enumable
       return str.slug if str.instance_of?(self)
       return str if str.is_a?(Symbol) && self::SLUGS.key?(str)
 
-      str = str.to_s.downcase.strip if str.is_a?(String) || str.is_a?(Symbol)
+      str = str.to_s.downcase.strip.tr("_", "-") if str.is_a?(String) || str.is_a?(Symbol)
       if str.is_a?(Integer) || str.match?(/\A\d+\z/)
         str = str.to_i if str.is_a?(String)
         matching_sym = self::SLUGS.key(str)
         return matching_sym if matching_sym.present?
       end
       slug = (slugs & [str]).first
-      slug ||= self::NAMES.detect do |k, v|
-        v_down = v.downcase
-        (
-          [k.to_s, v_down] + v_down.delete(")").split("(").map(&:strip) +
-          v_down.strip.split(" or ")
-        ).include?(str)
-      end&.first
+      slug ||= names_and_secondary_names.detect { |names| names.include?(str) }&.first
+      if slug.blank? && str[/\(/].present?
+        str = str.split("(").first.strip
+        slug = names_and_secondary_names.detect { |names| names.include?(str) }&.first
+      end
       slug&.to_sym
     end
 
     def friendly_find(str)
       matching_sym = find_sym(str)
       matching_sym.present? ? new(matching_sym) : nil
+    end
+
+    private
+
+    def names_and_secondary_names
+      @names_and_secondary_names ||= self::NAMES.map do |k, v|
+        v_down = v.downcase
+        secondary_names = v_down[/\(/].present? ? secondary_names_for(v_down) : []
+
+        ([k.to_s, v_down] + secondary_names).uniq
+      end
+    end
+
+    def ignored_secondaries
+      ["etc"].freeze
+    end
+
+    def secondary_names_for(name_downcase)
+      return [] unless name_downcase[/\(/].present?
+      primary, *secondaries = name_downcase.delete(")").split("(").map(&:strip)
+      secondaries = secondaries.map do |str|
+        str.split(",").map { it.gsub("e.g.", "").strip }
+      end.flatten - ignored_secondaries
+
+      [primary] + secondaries
     end
   end
 

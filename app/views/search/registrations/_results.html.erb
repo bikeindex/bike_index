@@ -34,11 +34,11 @@
   <%= turbo_frame_tag :search_registrations_similar_serials_frame,
     src: similar_serials_search_registrations_path(@interpreted_params),
     loading: :lazy do %>
-    <%= render LoadingSpinner::Component.new(text: t(".search_for_similar")) %>
+    <%= render UI::LoadingSpinner::Component.new(text: t(".search_for_similar")) %>
   <% end %>
   <%= turbo_frame_tag :search_registrations_serials_containing_frame,
     src: serials_containing_search_registrations_path(@interpreted_params),
     loading: :lazy do %>
-    <%= render LoadingSpinner::Component.new(text: t(".search_for_containing")) %>
+    <%= render UI::LoadingSpinner::Component.new(text: t(".search_for_containing")) %>
   <% end %>
 <% end %>

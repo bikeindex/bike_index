@@ -1,0 +1,94 @@
+<%# locals: (collection:, render_sortable: false, skip_marketplace_listing: false, truncate_length: 100) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th>
+        <%= sortable "amount_cents", "amount", render_sortable: render_sortable %>
+      </th>
+
+      <% unless skip_marketplace_listing %>
+        <th>
+          <%= sortable "marketplace_listing", render_sortable: render_sortable %>
+        </th>
+      <% end %>
+
+      <th>
+        Body
+      </th>
+
+      <th><%= sortable "kind", "From", render_sortable: render_sortable %></th>
+
+      <th>
+        <small>
+          <%= sortable "messages_prior_count", "Prior&nbsp;#".html_safe, render_sortable: render_sortable %>
+        </small>
+      </th>
+
+      <th><%= sortable "sender_id", render_sortable: render_sortable %></th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |marketplace_message| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <%= link_to admin_marketplace_message_path(marketplace_message), class: "convertTime" do %>
+                <%= l marketplace_message.created_at, format: :convert_time %>
+              <% end %>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= marketplace_message.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td>
+            <small>
+              <%= amount_display(marketplace_message.marketplace_listing, currency_name_suffix: :if_not_default) %>
+            </small>
+          </td>
+
+          <% unless skip_marketplace_listing %>
+            <td>
+              <%= render Admin::BikeCell::Component.new(bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), search_url: url_for(sortable_search_params.merge(search_marketplace_listing_id: marketplace_message.marketplace_listing_id)), render_search: render_sortable) %>
+            </td>
+          <% end %>
+
+          <td>
+            <% if marketplace_message.blocked? %>
+              <small class="tw:text-red-500">
+                Message blocked!
+                <%= marketplace_message.blocked_reason&.to_s&.humanize %>
+              </small>
+            <% end %>
+
+            <span title="<%= marketplace_message.body %>">
+              <%= marketplace_message.body.truncate(truncate_length) %>
+            </span>
+          </td>
+
+          <td>
+            <span class="<%= 'less-strong' if marketplace_message.sender_buyer? %>">
+              <%= marketplace_message.kind_humanized %>
+            </span>
+          </td>
+
+          <td>
+            <%= number_display(marketplace_message.messages_prior_count) %>
+          </td>
+
+          <td>
+            <% cache(marketplace_message.sender) do %>
+              <%= render Admin::UserCell::Component.new(user: marketplace_message.sender, render_search: render_sortable) %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

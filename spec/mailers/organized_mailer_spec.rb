@@ -178,7 +178,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect_render_supporters(false, mail)
           # Transferred registration
           BikeServices::Updator.new(user: user, bike: bike, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json).update_available_attributes
-          ::Callbacks::AfterBikeSaveJob.new.perform(bike.id, true, true)
+          CallbackJob::AfterBikeSaveJob.new.perform(bike.id, true, true)
           ownership2 = bike.reload.current_ownership
           expect(ownership2.id).to_not eq ownership.id
           expect(ownership.reload.current).to be_falsey
@@ -355,6 +355,25 @@ RSpec.describe OrganizedMailer, type: :mailer do
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.body.encoded).to match "map" # includes location
           expect(mail.reply_to).to eq(["example@email.com"])
+        end
+      end
+      context "with impound_record location" do
+        let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: organization, name: "Main Impound Lot") }
+        let(:impound_record) { FactoryBot.create(:impound_record, organization: organization, location: location) }
+        let(:parking_notification) do
+          FactoryBot.create(:parking_notification_organized,
+            organization: organization,
+            kind: "impound_notification",
+            impound_record: impound_record)
+        end
+        it "renders email with location address" do
+          expect(location.address_record).to be_present
+          expect(parking_notification.impound_record.location).to eq location
+          expect(mail.body.encoded).to match "Main Impound Lot"
+          # AddressDisplay component renders with HTML spans, so check for address parts
+          expect(mail.body.encoded).to match "1300 W 14th Pl"
+          expect(mail.body.encoded).to match "Chicago"
+          expect(mail.body.encoded).to match "IL 60608"
         end
       end
     end

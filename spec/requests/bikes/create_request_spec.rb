@@ -135,7 +135,7 @@ RSpec.describe "BikesController#create", type: :request do
     context "successful creation" do
       include_context :geocoder_real
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"], search_radius_miles: search_radius_miles) }
-      let!(:organization_default_location) { FactoryBot.create(:location_chicago, organization: organization) }
+      let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: organization) }
       let(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
       let(:organization_stolen_message_attrs) { {is_enabled: true, kind: "area", body: "Something cool", search_radius_miles: search_radius_miles} }
       let(:search_radius_miles) { 5 }
@@ -182,7 +182,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(organization_stolen_message.reload.stolen_records.count).to eq 1
       end
       context "outside of area" do
-        let!(:organization_default_location) { FactoryBot.create(:location_nyc, organization: organization) }
+        let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization) }
         it "doesn't assign organization_stolen_message" do
           expect(organization_stolen_message.reload.longitude).to be_within(2).of(-74)
           expect(organization_stolen_message.reload.search_radius_miles).to eq 5
@@ -224,7 +224,20 @@ RSpec.describe "BikesController#create", type: :request do
     let(:bike_params) { basic_bike_params }
     context "impound_record" do
       include_context :geocoder_real
-      let(:impound_params) { chicago_stolen_params.merge(impounded_at_with_timezone: (Time.current - 1.day).utc, timezone: "UTC", impounded_description: "Cool description") }
+      let(:impound_params) do
+        {
+          impounded_at_with_timezone: (Time.current - 1.day).utc,
+          timezone: "UTC",
+          impounded_description: "Cool description",
+          address_record_attributes: {
+            country_id: country.id,
+            street: "2459 West Division Street",
+            city: "Chicago",
+            postal_code: "60622",
+            region_record_id: state.id
+          }
+        }
+      end
       it "creates a new ownership and impound_record" do
         VCR.use_cassette("bikes_controller-create-impound-chicago", match_requests_on: [:method]) do
           expect {
@@ -245,7 +258,14 @@ RSpec.describe "BikesController#create", type: :request do
           impound_record = ImpoundRecord.where(bike_id: new_bike.id).first
           expect(new_bike.current_impound_record&.id).to eq impound_record.id
           expect(impound_record.kind).to eq "found"
-          expect(impound_record).to match_hash_indifferently impound_params.except(:impounded_at_with_timezone, :timezone)
+          expect(impound_record.impounded_description).to eq "Cool description"
+          expect(impound_record.address_record).to be_present
+          expect(impound_record.impounded_from_address_record_id).to eq impound_record.address_record_id
+          expect(impound_record.address_record).to have_attributes(
+            street: "2459 West Division Street",
+            city: "Chicago",
+            kind: "impounded_from"
+          )
           expect(impound_record.impounded_at.to_i).to be_within(1).of(Time.current.yesterday.to_i)
           expect(impound_record.send(:calculated_unregistered_bike?)).to be_truthy
           expect(impound_record.unregistered_bike?).to be_truthy
@@ -268,8 +288,11 @@ RSpec.describe "BikesController#create", type: :request do
             bike = assigns(:bike)
             expect(bike).to match_hash_indifferently bike_params.except(:manufacturer_id, :phone)
             expect(bike.status).to eq "status_impounded"
-            # we retain the stolen record attrs, test that they are assigned correctly too
-            expect(bike.impound_records.first).to match_hash_indifferently impound_params.except(:impounded_at_with_timezone, :timezone)
+            # we retain the impound record attrs, test that they are assigned correctly too
+            impound_record = bike.impound_records.first
+            expect(impound_record.impounded_description).to eq "Cool description"
+            expect(impound_record.address_record).to be_present
+            expect(impound_record.address_record.street).to eq "2459 West Division Street"
           end
         end
       end
@@ -322,7 +345,7 @@ RSpec.describe "BikesController#create", type: :request do
       expect(ownership.registration_info).to eq({"organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1"})
       # It registers with the organization address
       expect(BikeServices::CalculateLocation.registration_address_source(new_bike)).to eq "initial_creation"
-      address_attrs = {city: "Los Angeles", country_id: Country.united_states_id, region_record_id: organization.state_id, kind: "ownership", latitude: nil, longitude: nil, postal_code: nil}
+      address_attrs = {city: "Los Angeles", country_id: Country.united_states_id, region_record_id: organization.default_address_record.region_record_id, kind: "ownership", latitude: nil, longitude: nil, postal_code: nil}
       expect(new_bike.address_record).to match_hash_indifferently(address_attrs)
       # Because the address is the same as the organization
       expect(new_bike.valid_mailing_address?).to be_falsey

@@ -70,7 +70,7 @@ RSpec.describe UpdateMailchimpDatumJob, type: :job do
           MailchimpValue.create(kind: "tag", slug: "Not org creator", mailchimp_id: "1882022", list: "organization")
           MailchimpValue.create(kind: "tag", slug: "Weird new tag", mailchimp_id: "1892850", list: "individual")
         end
-        let!(:location) { FactoryBot.create(:location_los_angeles, organization: organization) }
+        let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :los_angeles, organization: organization) }
         let(:merge_address_fields) { {"O_CITY" => "Los Angeles", "O_STATE" => "CA", "O_COUNTRY" => "US"} }
         let(:target_tags) { ["In Bike Index", "in_bike_index", "weird other tag"] }
         let!(:payment) { FactoryBot.create(:payment, user: user, kind: "donation") }

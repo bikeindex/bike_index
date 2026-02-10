@@ -9,7 +9,7 @@ class Admin::EmailDomainsController < Admin::BaseController
   def index
     @per_page = permitted_per_page
 
-    @pagy, @email_domains = pagy(ordered_email_domains, limit: @per_page, page: permitted_page)
+    @pagy, @email_domains = pagy(:countish, ordered_email_domains, limit: @per_page, page: permitted_page)
   end
 
   def new

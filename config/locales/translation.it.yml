@@ -1123,6 +1123,9 @@ it:
       hour: Ora
       minute: Minuto
       second: Secondi
+    relative:
+      future:
+      past:
   helpers:
     select:
       prompt: Seleziona...
@@ -1145,6 +1148,7 @@ it:
       hidden_for_unauthorized_users:
       made_without_serial:
       unknown:
+      deleted:
     organization_helper:
       address:
       address_school:
@@ -1873,7 +1877,6 @@ it:
       select_other:
       serial_help:
       serial_help_content_html:
-      sticker_id_html:
       student_id:
       this_is_a:
       traditional_bike:
@@ -1885,6 +1888,9 @@ it:
       was_made_before_1970: È stato prodotto prima del 1970
       without_serial_html:
       without_serial_number_html:
+      model: Modello
+      optional:
+      sticker_id:
     organization_stolen_message:
       report_link_text: a questo link
       report_the_theft_to_the_organization_html:
@@ -2369,6 +2375,8 @@ it:
         create:
           can_not_send_message:
           message_sent:
+        show:
+          sorry_that_is_you:
       marketplace_listings:
         ensure_user_allowed_to_edit!:
           you_dont_own_that:
@@ -3569,10 +3577,9 @@ it:
         new_message:
         reply_to_message:
         send_message:
+        already_sold:
       index:
         marketplace_messages:
-      show:
-        can_not_send_new_message:
   news:
     index:
       bike_index_blog:
@@ -3894,15 +3901,10 @@ it:
     manages:
       location_fields:
         address:
-        choose_country:
-        city:
         location_name:
         name: Nome
         phone_number:
         remove:
-        state:
-        street:
-        zipcode:
       locations:
         add_location:
         bike_index_partner_map:
@@ -4038,41 +4040,6 @@ it:
     finished_owned_registration:
       subject:
     finished_registration:
-      html:
-        a_correctly_locked_bike:
-        a_donation_will_prioritize_html:
-        before_locking_check:
-        bike_register_with_bike_index:
-        bike_register_with_bike_index_and_org:
-        bike_type_thieves_are_jerks:
-        cable_locks_should_never_be_used:
-        claim_the_bike_type:
-        confirm_this_bike_type:
-        correctly_locking_a_bike:
-        donating:
-        give_us_a_heads_up:
-        hopefully_you_find_the_bike_html:
-        hopefully_you_find_the_owner_html:
-        mark_recovered_link_html:
-        mark_your_bike_recovered:
-        org_added_a_bike_html:
-        org_sent_a_bike_html:
-        pink_power_ulocks_tm:
-        please_consider_donating_html:
-        prioritize_your_listing:
-        protect_your_bike_by_following_these_lock:
-        protecting_your_bike_here:
-        read_more_about_protecting_html:
-        recovered_bike_type:
-        secure_both_wheels_either_with_two_ulocks:
-        sign_up_on_bikeindexorg_to_claim_your_bik:
-        stolen_bike_type:
-        thanks_for_adding_this_bike_type_you_found:
-        use_a_ulock:
-        welcome_to_bike_index:
-        were_sorry_your_bike_type_was_stolen:
-        you_added_a_bike_type_on_bike_index:
-        youre_almost_done_registering:
       subject:
     finished_stolen_registration:
       subject:
@@ -4684,6 +4651,11 @@ it:
       result_view_select:
         bike_box_view:
         thumbnail_view:
+      form_organized:
+        doesnt_look_like_serial:
+        search_for_serial_number:
+        search_owner_email:
+        submit:
     legacy_form_well:
       address_record:
         address:
@@ -4696,27 +4668,22 @@ it:
         your_full_address_is_required:
         address_no_street: Indirizzo
         street_2:
+        address_or_intersection:
+        where_was_it_status:
       address_record_with_default:
         edit_my_account_path:
         use_account_address:
-    definition_list:
-      row:
-        no_value:
-    alert_for_errors:
-      errors_prevented_this_from_being_saved:
-    messages:
-      thread:
-        from:
-        me:
-        to:
-      thread_show:
-        subject: Oggetto
     search_results:
       bike_box:
         location: Luogo
         posted_at:
         primary_colors: Colori primari
         serial: Seriale
+        deleted:
+        ended_at:
+        not_applicable:
+        price:
+        removed_from:
       vehicle_thumbnail:
         registered_not_stolen:
       container:
@@ -4796,3 +4763,87 @@ it:
         community_groups: Gruppi comunitari
         schools: Scuole
         theft_victims: Vittime di furto
+      new_sale_form:
+        record_sale:
+        sold_for:
+        transfer_to_html:
+    emails:
+      partials:
+        bike_box:
+          bike_photo:
+          color: Colore
+          color_may_be_incorrect:
+          found:
+          make:
+          serial:
+          stolen_at:
+          stolen_from:
+      finished_registration:
+        a_correctly_locked_bike:
+        a_donation_will_prioritize_prefix:
+        a_donation_will_prioritize_suffix:
+        before_locking_check:
+        bike_register_with_bike_index:
+        bike_register_with_bike_index_and_org:
+        bike_type_thieves_are_jerks:
+        cable_locks_should_never_be_used:
+        claim_the_bike_type:
+        confirm_this_bike_type:
+        correctly_locking_a_bike:
+        donating:
+        give_us_a_heads_up:
+        hopefully_you_find_the_bike:
+        hopefully_you_find_the_owner_prefix:
+        hopefully_you_find_the_owner_suffix:
+        mark_your_bike_recovered:
+        org_added_a_bike:
+        org_sent_a_bike:
+        pink_power_ulocks_tm:
+        please_consider_prefix:
+        please_consider_suffix:
+        prioritize_your_listing:
+        protect_your_bike_by_following_these_lock:
+        protecting_your_bike_here:
+        read_more_about_prefix:
+        recovered_bike_type:
+        secure_both_wheels_either_with_two_ulocks:
+        sign_up_on_bikeindexorg_to_claim_your_bik:
+        stolen_bike_type:
+        thanks_for_adding_this_bike_type_you_found:
+        use_a_ulock:
+        welcome_to_bike_index:
+        were_sorry_your_bike_type_was_stolen:
+        when_you_do:
+        you_added_a_bike_type_on_bike_index:
+        youre_almost_done_registering:
+    messages:
+      thread_show:
+        can_not_send_new_message:
+        sold_to:
+        banned_message:
+        deleted_message:
+      thread_show_message:
+        me:
+        subject: Oggetto
+        to: a
+        to_me:
+        you_to:
+      threads_index:
+        from: Da
+        me:
+        to: A
+    ui:
+      definition_list:
+        row:
+          no_value:
+      alert_for_errors:
+        errors_prevented_this_from_being_saved:
+    org:
+      location_address_fields:
+        address: Indirizzo
+        choose_country:
+        city: Città
+        postal_code: Codice postale
+        region:
+        state: Stato
+        street: Via

@@ -3,9 +3,8 @@
 module Admin::UserCell
   class ComponentPreview < ApplicationComponentPreview
     # @group User Cell Variants
-
     def default
-      render(Admin::UserCell::Component.new(user:))
+      render(Admin::UserCell::Component.new(user: lookbook_user))
     end
 
     def missing_user
@@ -17,17 +16,11 @@ module Admin::UserCell
     end
 
     def with_search
-      render(Admin::UserCell::Component.new(user:, render_search: true))
+      render(Admin::UserCell::Component.new(user: lookbook_user, render_search: true))
     end
 
     def without_search
-      render(Admin::UserCell::Component.new(user:, render_search: false))
-    end
-
-    private
-
-    def user
-      User.find_by_id(88)
+      render(Admin::UserCell::Component.new(user: lookbook_user, render_search: false))
     end
   end
 end

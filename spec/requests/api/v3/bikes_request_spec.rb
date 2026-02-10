@@ -208,7 +208,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "transferred", authorized_bike_id: nil} }
         it "returns target" do
           ownership = bike.current_ownership
-          BikeServices::Updator.new(user: ownership.user, bike: bike, permitted_params: {bike: {owner_email: "newemail@example.com"}}.as_json).update_ownership
+          BikeServices::OwnershipTransferer.find_or_create(bike, updator: ownership.user, new_owner_email: "newemail@example.com")
           expect(ownership.reload.current).to be_falsey
           expect(bike.reload.current_ownership.id).to_not eq ownership.id
           expect(bike.reload.owner_email).to eq "newemail@example.com"
@@ -280,6 +280,8 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.phone).to eq phone
         expect(bike.current_ownership.phone_registration?).to be_truthy
         expect(bike.current_ownership.calculated_send_email).to be_falsey
+        expect(bike.current_ownership.doorkeeper_app_id).to eq doorkeeper_app.id
+        expect(bike.current_ownership.ios_version).to be_nil
       end
       context "matching phone bike already registered" do
         let(:bike) { FactoryBot.create(:bike, :phone_registration, owner_email: phone, serial_number: phone_bike[:serial], manufacturer: manufacturer) }
@@ -365,7 +367,7 @@ RSpec.describe "Bikes API V3", type: :request do
             rear_tire_narrow: false,
             frame_material: "aluminum"
           )
-          FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
+          ownership = FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
 
           bike_attrs = {
             serial: bike1.serial_number,
@@ -381,20 +383,26 @@ RSpec.describe "Bikes API V3", type: :request do
             bike_sticker: bike_sticker.code.downcase,
             cycle_type_name: "cargo tricycle (front storage)"
           }
-          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
-          bike2 = json_result["bike"]
-          expect(bike2["id"]).to eq(bike1.id)
-          expect(bike2["serial"]).to eq(bike1.serial_display)
-          expect(bike2["year"]).to eq(new_year)
-          expect(bike2["frame_colors"].first).to eq(new_color.name)
-          expect(bike2["type_of_cycle"]).to eq("Cargo Tricycle (front storage)")
-          expect(bike2["manufacturer_id"]).to eq(old_manufacturer.id)
-          expect(bike2["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
-          expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
-          expect(bike2["rear_tire_narrow"]).to eq(true)
-          expect(bike2["frame_material_slug"]).to eq("steel")
-          expect(bike2["cycle_type_slug"]).to eq "cargo-trike"
-          expect(bike2["propulsion_type_slug"]).to eq "hand-pedal"
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json,
+            headers: json_headers.merge("X-Requested-With" => "app-ios-1.6.2")
+          bike_response = json_result["bike"]
+          expect(bike_response["id"]).to eq(bike1.id)
+          expect(bike_response["serial"]).to eq(bike1.serial_display)
+          expect(bike_response["year"]).to eq(new_year)
+          expect(bike_response["frame_colors"].first).to eq(new_color.name)
+          expect(bike_response["type_of_cycle"]).to eq("Cargo Tricycle (trike with front storage, e.g. Christiania bike)")
+          expect(bike_response["manufacturer_id"]).to eq(old_manufacturer.id)
+          expect(bike_response["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
+          expect(bike_response["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
+          expect(bike_response["rear_tire_narrow"]).to eq(true)
+          expect(bike_response["frame_material_slug"]).to eq("steel")
+          expect(bike_response["cycle_type_slug"]).to eq "cargo-trike"
+          expect(bike_response["propulsion_type_slug"]).to eq "hand-pedal"
+
+          expect(bike1.reload.ownerships.count).to eq 1
+          expect(bike1.current_ownership&.id).to eq ownership.id
+          expect(ownership.reload.doorkeeper_app_id).to be_nil
+          expect(ownership.ios_version).to be_blank
 
           bike_sticker.reload
           expect(bike_sticker.claimed?).to be_truthy
@@ -626,7 +634,7 @@ RSpec.describe "Bikes API V3", type: :request do
           component_type: "wheel"
         }
       ]
-      bike_attrs.merge!(components: components,
+      this_bike_attrs = bike_attrs.merge(components: components,
         front_gear_type_slug: front_gear_type.slug,
         handlebar_type_slug: handlebar_type_slug,
         is_for_sale: true,
@@ -635,20 +643,21 @@ RSpec.describe "Bikes API V3", type: :request do
         is_new: true,
         extra_registration_number: "serial:#{bike_attrs[:serial]}",
         is_pos: true,
+        cycle_type: "e-skateboard", # CycleType secondary name (not the name or symbol)
         bike_sticker: bike_sticker.code.downcase,
         external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
         description: "<svg/onload=alert(document.cookie)>")
       expect {
-        post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+        post "/api/v3/bikes?access_token=#{token.token}", params: this_bike_attrs.to_json, headers: json_headers
       }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
       expect(response.code).to eq("201")
       result = json_result["bike"]
-      expect(result["serial"]).to eq(bike_attrs[:serial])
-      expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
+      expect(result["serial"]).to eq(this_bike_attrs[:serial])
+      expect(result["manufacturer_name"]).to eq(this_bike_attrs[:manufacturer])
       bike = Bike.find(result["id"])
       expect(bike.example).to be_falsey
       expect(bike.is_for_sale).to be_truthy
-      expect(bike.frame_material).to eq(bike_attrs[:frame_material])
+      expect(bike.frame_material).to eq(this_bike_attrs[:frame_material])
       expect(bike.serial_unknown?).to be_falsey
       expect(bike.serial_normalized).to eq "69 N0N EXAMP1E"
       expect(bike.components.count).to eq(3)
@@ -771,7 +780,8 @@ RSpec.describe "Bikes API V3", type: :request do
           police_report_department: "New York"
         }
         expect {
-          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json, headers: json_headers
+          post "/api/v3/bikes?access_token=#{token.token}", params: bike_attrs.to_json,
+            headers: json_headers.merge("X-IOS-VERSION" => "1.6.9")
         }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
         expect(json_result).to include("bike")
         expect(json_result["bike"]["serial"]).to eq "Unknown"
@@ -788,6 +798,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike_organization.can_edit_claimed).to be_truthy
         expect(bike.current_ownership.origin).to eq "api_v3"
         expect(bike.current_ownership.organization).to eq organization
+        expect(bike.current_ownership.ios_version).to eq "1.6.9"
         expect(bike.current_stolen_record_id).to be_present
         expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
         expect(bike.current_stolen_record.phone).to eq("1234567890")
@@ -934,7 +945,7 @@ RSpec.describe "Bikes API V3", type: :request do
           # (needs to use a new token)
           put "/api/v3/bikes/#{bike.id}?access_token=#{v2_access_token.token}",
             params: {owner_email: "newperson@stuff.com"}.to_json,
-            headers: json_headers
+            headers: json_headers.merge("X-REQUESTED-WITH" => "app-ios-1.6.9")
 
           expect(response.status).to eq(200)
           expect(bike.ownerships.count).to eq 2
@@ -946,6 +957,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(ownership2.new_registration?).to be_truthy
           expect(ownership2.organization_pre_registration?).to be_falsey
           expect(ownership2.organization_id).to eq organization.id
+          expect(ownership2.ios_version).to eq "1.6.9"
 
           mail2 = ActionMailer::Base.deliveries.last
           expect(mail2.subject).to eq("Confirm your #{organization.name} Bike Index registration")
@@ -1320,9 +1332,11 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike.authorized?(og_creator))
           expect(bike.claimed?).to be_falsey
           expect(bike.current_ownership.claimed?).to be_falsey
+          expect(bike.current_ownership.doorkeeper_app_id).to be_blank
           expect(bike_organization.can_edit_claimed).to be_truthy
           expect {
-            put url, params: {owner_email: "newuser@EXAMPLE.com "}.to_json, headers: json_headers
+            put url, params: {owner_email: "newuser@EXAMPLE.com "}.to_json,
+              headers: json_headers.merge("X-REQUESTED-WITH" => "app-ios-1.6.9")
           }.to change(Ownership, :count).by(1)
           expect(response.code).to eq("200")
           expect(response.headers["Content-Type"].match("json")).to be_present
@@ -1341,6 +1355,9 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(current_ownership.creator_id).to eq user.id
           expect(current_ownership.owner_email).to eq new_email
           expect(current_ownership.organization_id).to eq organization.id
+          expect(current_ownership.initial?).to be_falsey
+          expect(current_ownership.doorkeeper_app_id).to eq doorkeeper_app.id
+          expect(current_ownership.registration_info).to eq({"ios_version" => "1.6.9"})
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Confirm your #{organization.name} Bike Index registration")

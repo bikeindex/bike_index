@@ -3,8 +3,8 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-  mount Sidekiq::Web => "/sidekiq", :constraints => AdminRestriction
-  mount PgHero::Engine, at: "/pghero", constraints: AdminRestriction
+  mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
+  mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
 
   use_doorkeeper do
     controllers applications: "oauth/applications"
@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
+      get :shop_display_qr
     end
   end
 
@@ -82,6 +83,7 @@ Rails.application.routes.draw do
   end
 
   resources :ownerships, only: %i[show]
+  resources :sales, only: %i[new create]
 
   resources :stolen_notifications, only: %i[create new]
 
@@ -182,7 +184,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index", as: :root
     resources :ambassador_tasks, except: :show
-    resources :ambassador_task_assignments, only: [:index]
+    resources :ambassador_task_assignments, only: %i[index]
     resources :exchange_rates, only: %i[index new create edit update destroy]
 
     resources :external_registry_bikes, only: %i[index show]
@@ -232,12 +234,14 @@ Rails.application.routes.draw do
 
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
-      mailchimp_data marketplace_listings model_attestations model_audits
+      mailchimp_data model_attestations model_audits
       notifications organization_statuses parking_notifications
-      stripe_prices stripe_subscriptions user_alerts user_registration_organizations
+      stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
     ].each { resources it, only: %i[index] }
 
-    resources :marketplace_messages, only: %i[index show]
+    %i[
+      b_params bike_versions feedbacks marketplace_listings marketplace_messages sales
+    ].each { resources it, only: %i[index show] }
 
     resources :bike_stickers do
       collection { get :reassign }
@@ -268,11 +272,9 @@ Rails.application.routes.draw do
         get :variable
       end
     end
-    resources :b_params, only: %i[index show]
-    resources :feedbacks, only: %i[index show]
-    resources :ownerships, only: %i[edit update index]
-    resources :tweets
-    resources :twitter_accounts, except: %i[new] do
+    resources :ownerships, only: %i[show edit update index]
+    resources :social_posts
+    resources :social_accounts, except: %i[new] do
       member { get :check_credentials }
     end
 
@@ -288,7 +290,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show edit update destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
-      :constraints => AdminRestriction,
+      :constraints => DeveloperRestriction,
       :as => :feature_flags
   end
 

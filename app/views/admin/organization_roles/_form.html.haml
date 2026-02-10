@@ -7,7 +7,7 @@
           %br
           It would be better to delete and re-add
     = form_for [:admin, @organization_role] do |f|
-      = render(AlertForErrors::Component.new(object: @organization_role))
+      = render(UI::AlertForErrors::Component.new(object: @organization_role))
 
       .form-group.fancy-select.unfancy
         = f.label :organization

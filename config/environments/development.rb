@@ -39,7 +39,7 @@ Rails.application.configure do
   end
 
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = {host: "localhost", port: 3042}
+  config.action_mailer.default_url_options = {host: "localhost", port: ENV.fetch("DEV_PORT", 3042).to_i}
   routes.default_url_options = config.action_mailer.default_url_options
   if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
     config.action_mailer.perform_deliveries = false

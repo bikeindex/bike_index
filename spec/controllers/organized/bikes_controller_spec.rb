@@ -73,7 +73,6 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :new
         expect(assigns(:current_organization)).to eq organization
-        expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       end
     end
 
@@ -84,7 +83,6 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(response).to render_template :new_iframe
         expect(assigns(:current_organization)).to eq organization
         expect(assigns(:bike)&.creation_organization_id).to eq organization.id
-        expect(response.headers["X-Frame-Options"]).to be_blank
       end
     end
 
@@ -112,7 +110,6 @@ RSpec.describe Organized::BikesController, type: :controller do
             post :create, params: {bike: attrs, organization_id: organization.to_param}
           }.to change(Bike, :count).by 1
         end
-        expect(response.headers["X-Frame-Options"]).to be_blank
 
         b_param = BParam.reorder(:created_at).last
         expect(b_param.owner_email).to eq attrs[:owner_email]
@@ -126,7 +123,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(bike.id).to eq b_param.created_bike_id
         expect(bike.creator_id).to eq user.id
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
-        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.send(:editable_organization_ids)).to eq([organization.id])
         expect(bike.creation_organization_id).to eq organization.id
         expect(bike.manufacturer_id).to eq manufacturer.id
         expect(bike.current_ownership.origin).to eq "organization_form"

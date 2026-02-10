@@ -1,0 +1,120 @@
+<%# require inline CSS setting because of caching %>
+<% skip_item ||= false %>
+
+<% if skip_item %>
+  <style>.item-cell {display: none !important;}</style>
+<% end %>
+
+<% unless display_dev_info? %>
+  <style>.only-dev-visible {display: none !important;}</style>
+<% end %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th class="only-dev-visible small">
+        <%= sortable "updated_at", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "status", render_sortable: render_sortable %></th>
+      <th><%= sortable "published_at", render_sortable: render_sortable %></th>
+      <th><%= sortable "end_at", render_sortable: render_sortable %></th>
+      <th class="item-cell">Item</th>
+
+      <th>
+        <%= sortable "amount_cents", "amount", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "condition", render_sortable: render_sortable %></th>
+      <th>City</th>
+      <th><%= sortable "seller_id", render_sortable: render_sortable %></th>
+      <th><%= sortable "buyer_id", render_sortable: render_sortable %></th>
+      <th><small>messages #</small></th>
+    </thead>
+
+    <tbody
+      data-controller="update-cached-sortable-links"
+      data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
+    >
+      <% collection.each do |marketplace_listing| %>
+        <% cache(["admin_marketplace_listing", marketplace_listing]) do %>
+          <tr>
+            <td>
+              <div class="less-strong-hold">
+                <%= link_to l(marketplace_listing.created_at, format: :convert_time), admin_marketplace_listing_path(marketplace_listing), class: "localizeTime" %>
+
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= marketplace_listing.id %>
+                </span>
+              </div>
+            </td>
+
+            <td class="only-dev-visible">
+              <small class="localizeTime">
+                <%= l marketplace_listing.updated_at, format: :convert_time %>
+              </small>
+            </td>
+
+            <td>
+              <%= render Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+            </td>
+
+            <td>
+              <% if marketplace_listing.published_at.present? %>
+                <span class="localizeTime">
+                  <%= l marketplace_listing.published_at, format: :convert_time %>
+                </span>
+              <% end %>
+            </td>
+
+            <td>
+              <% if marketplace_listing.end_at.present? %>
+                <span class="localizeTime">
+                  <%= l marketplace_listing.end_at, format: :convert_time %>
+                </span>
+              <% end %>
+            </td>
+
+            <td class="item-cell">
+              <%= render Admin::BikeCell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)) %>
+            </td>
+
+            <td>
+              <%= amount_display(marketplace_listing, currency_name_suffix: :if_not_default) %>
+            </td>
+
+            <td><%= marketplace_listing.condition %></td>
+
+            <td>
+              <%= render Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
+            </td>
+
+            <td>
+              <%= cache(marketplace_listing.seller) do %>
+                <%= render Admin::UserCell::Component.new(user: marketplace_listing.seller, render_search: true) %>
+              <% end %>
+            </td>
+
+            <td>
+              <% if marketplace_listing.buyer_id.present? %>
+                <%= cache(marketplace_listing.buyer_id) do %>
+                  <%= render Admin::UserCell::Component.new(user: marketplace_listing.buyer_id, render_search: true) %>
+                <% end %>
+              <% end %>
+            </td>
+
+            <td>
+              <%= cache(marketplace_listing) do %>
+                <small>
+                  <%= number_display(marketplace_listing.marketplace_messages.count) %>
+                </small>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

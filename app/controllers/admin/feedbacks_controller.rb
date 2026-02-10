@@ -4,7 +4,7 @@ class Admin::FeedbacksController < Admin::BaseController
   def index
     params[:page] || 1
     @per_page = permitted_per_page(default: 50)
-    @pagy, @feedbacks = pagy(available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}"),
+    @pagy, @feedbacks = pagy(:countish, available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}"),
       limit: @per_page, page: permitted_page)
     @render_kind_counts = Binxtils::InputNormalizer.boolean(params[:search_kind_counts])
   end
@@ -37,8 +37,7 @@ class Admin::FeedbacksController < Admin::BaseController
       @search_kind = "all"
     end
     if params[:user_id].present?
-      @user = User.friendly_find(params[:user_id])
-      feedbacks = feedbacks.where(user_id: @user.id) if @user.present?
+      feedbacks = feedbacks.where(user_id: user_subject&.id || params[:user_id])
     end
     if params[:search_email].present?
       feedbacks = feedbacks.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%")

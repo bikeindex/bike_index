@@ -4,7 +4,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 10)
     @pagy, @logged_searches =
-      pagy(matching_logged_searches
+      pagy(:countish, matching_logged_searches
         .reorder("logged_searches.#{sort_column} #{sort_direction}")
         .includes(:organization, :user), limit: @per_page, page: permitted_page)
   end
@@ -55,7 +55,7 @@ class Admin::LoggedSearchesController < Admin::BaseController
       logged_searches = logged_searches.where(ip_address: params[:search_ip_address])
     end
     if params[:user_id].present?
-      logged_searches = logged_searches.where(user_id: params[:user_id])
+      logged_searches = logged_searches.where(user_id: user_subject&.id || params[:user_id])
     end
     if params[:organization_id].present?
       logged_searches = logged_searches.where(organization_id: params[:organization_id])

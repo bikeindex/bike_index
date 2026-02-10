@@ -1,0 +1,85 @@
+<header class="with-subtitle">
+  <h1 class="header-font-uncap">
+    Your applications
+    <% if current_user.superuser? %>
+      <em class="less-strong ml-2 small">
+        view <%= link_to "all applications", url_for(search_all: true) %>
+      </em>
+    <% end %>
+  </h1>
+
+  <p>
+    <%= link_to 'New Application', new_oauth_application_path, class: 'btn btn-primary btn-lg' %>
+  </p>
+</header>
+
+<h3 class="header-font-uncap">
+  <%= number_with_delimiter(@applications.count) %>
+  <%= "application".pluralize(@applications.count) %> created
+</h3>
+
+<div class="full-screen-table">
+  <table class="table table-striped margined">
+    <thead>
+      <tr>
+        <th>Created</th>
+        <th>Name</th>
+        <th>Callback URL</th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @applications.each do |application| %>
+        <tr id="application_<%= application.id %>">
+          <td>
+            <span class="convertTime">
+              <%= l application.created_at, format: :convert_time %>
+            </span>
+
+            <% if display_dev_info? %>
+              <span class="only-dev-visible"><%= application.id %></span>
+            <% end %>
+          </td>
+
+          <td>
+            <%= application.name %>
+
+            <% if application.can_send_stolen_notifications? %>
+              <span class="text-warning">
+                Has permission to send stolen notifications
+              </span>
+            <% end %>
+          </td>
+
+          <td>
+            <pre class="small"><%= application.redirect_uri.gsub(/\s+/, "\n") %></pre>
+          </td>
+
+          <td>
+            <%= link_to "View", oauth_application_url(application), class: 'btn btn-default' %>
+          </td>
+
+          <td>
+            <%= link_to 'Edit', edit_oauth_application_url(application), class: 'btn btn-primary' %>
+          </td>
+
+          <td><%= render 'delete_form', application: application %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<h3 class="mt-4 mb-5 header-font-alt text-center">
+  Documentation on the API is available at
+  <%= link_to "/documentation", documentation_index_url %>
+</h3>
+
+<script>
+  $(document).ready(function() {
+    $(".doorkeeper-container").addClass("container-fluid").removeClass("doorkeeper-container");
+  });
+</script>

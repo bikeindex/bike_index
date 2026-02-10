@@ -8,7 +8,7 @@ class MyAccountsController < ApplicationController
   def show
     @locks_active_tab = params[:active_tab] == "locks"
     @per_page = permitted_per_page
-    @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page, page: permitted_page)
+    @pagy, @bikes = pagy(:countish, current_user.bikes.reorder(updated_at: :desc), limit: @per_page, page: permitted_page)
     @locks = current_user.locks.reorder(created_at: :desc)
   end
 
@@ -51,7 +51,7 @@ class MyAccountsController < ApplicationController
 
   def destroy
     if current_user.deletable?
-      Users::DeleteJob.new.perform(current_user.id, user: current_user)
+      current_user.destroy
       remove_session
       redirect_to goodbye_url, notice: "Account deleted!"
     else
@@ -113,7 +113,7 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue ::Callbacks::AfterUserChangeJob
+    @user.update(updated_at: Time.current) # Bump user to enqueue CallbackJob::AfterUserChangeJob
     @user
   end
 
@@ -128,7 +128,7 @@ class MyAccountsController < ApplicationController
         user.address_set_manually = true
         user.address_record = address_record.reload
         # Updates the user association, user needs to be assigned
-        ::Callbacks::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
+        CallbackJob::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
       end
     end
     user.update(pparams)

@@ -3,24 +3,26 @@
 # Table name: b_params
 # Database name: primary
 #
-#  id              :integer          not null, primary key
-#  bike_errors     :text
-#  bike_title      :string(255)
-#  email           :string
-#  id_token        :text
-#  image           :string(255)
-#  image_processed :boolean          default(FALSE)
-#  image_tmp       :string(255)
-#  origin          :string
-#  params          :jsonb
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  created_bike_id :integer
-#  creator_id      :integer
-#  organization_id :integer
+#  id                :integer          not null, primary key
+#  bike_errors       :text
+#  bike_title        :string(255)
+#  email             :string
+#  id_token          :text
+#  image             :string(255)
+#  image_processed   :boolean          default(FALSE)
+#  image_tmp         :string(255)
+#  origin            :string
+#  params            :jsonb
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  created_bike_id   :integer
+#  creator_id        :integer
+#  doorkeeper_app_id :bigint
+#  organization_id   :integer
 #
 # Indexes
 #
+#  index_b_params_on_created_bike_id  (created_bike_id)
 #  index_b_params_on_organization_id  (organization_id)
 #
 
@@ -33,6 +35,7 @@ class BParam < ApplicationRecord
     bike_sticker
     city
     country_id
+    ios_version
     organization_affiliation
     phone
     postal_code
@@ -59,6 +62,7 @@ class BParam < ApplicationRecord
     cycle_type_slug
     front_gear_type_slug
     handlebar_type_slug
+    ios_version
     is_bulk
     is_new
     is_pos
@@ -309,12 +313,12 @@ class BParam < ApplicationRecord
   end
 
   def impound_attrs
-    s_attrs = params["impound_record"] || {}
+    i_attrs = params["impound_record"] || {}
     nested_params = params.dig("bike", "impound_records_attributes")
     if nested_params&.values&.first.is_a?(Hash)
-      s_attrs = nested_params.values.reject(&:blank?).last
+      i_attrs = nested_params.values.reject(&:blank?).last
     end
-    s_attrs
+    i_attrs # WARNING! DOES NOT WHITELIST. Permitted in BikeServices::Builder
   end
 
   # registration_info_attrs is assigned to ownership. Update to use address_record_attributes in #2922

@@ -6,7 +6,7 @@
 
 - all_snippet_kinds = current_organization.mail_snippets.where(kind: MailSnippet.organization_snippets_in_all).pluck(:kind)
 - if all_snippet_kinds.any?
-  = render(Alert::Component.new(kind: :info, margin_classes: 'tw:mt-4 mb-4')) do
+  = render(UI::Alert::Component.new(kind: :info, margin_classes: 'tw:mt-4 mb-4')) do
     All of your emails include your custom #{all_snippet_kinds.map { MailSnippet.kind_humanized(_1)&.downcase }.to_sentence}.
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border

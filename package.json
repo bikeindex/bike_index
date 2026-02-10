@@ -1,8 +1,8 @@
 {
   "name": "bike_index-webapp",
   "devDependencies": {
-    "@herb-tools/formatter": "^0.8.2",
-    "@herb-tools/linter": "^0.8.2",
+    "@herb-tools/formatter": "^0.8.7",
+    "@herb-tools/linter": "^0.8.7",
     "standard": "*"
   },
   "scripts": {

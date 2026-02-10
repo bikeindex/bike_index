@@ -1,8 +1,0 @@
----
-en:
-  components:
-    messages:
-      thread:
-        from: From
-        me: me
-        to: To

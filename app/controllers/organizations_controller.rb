@@ -1,6 +1,6 @@
 class OrganizationsController < ApplicationController
-  before_action :set_bparam, only: [:embed, :embed_extended]
-  skip_before_action :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
+  before_action :set_bparam, only: %i[embed embed_extended]
+  before_action :allow_x_frame, only: %i[embed embed_extended embed_create_success]
 
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
@@ -63,6 +63,18 @@ class OrganizationsController < ApplicationController
     render layout: "embed_layout"
   end
 
+  def shop_display_qr
+    find_organization
+    redirect_to(format: "png") && return unless request.format == "png"
+
+    respond_to do |format|
+      format.png do
+        qrcode = RQRCode::QRCode.new(embed_organization_url(@organization, non_stolen: true, shop_display: true))
+        render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
+      end
+    end
+  end
+
   protected
 
   def set_bparam
@@ -97,12 +109,12 @@ class OrganizationsController < ApplicationController
     approved_kind = params.dig(:organization, :kind)
     approved_kind = "other" unless Organization.user_creatable_kinds.include?(approved_kind)
     params.require(:organization)
-      .permit(:name, :website, locations_attributes: permitted_locations_params)
+      .permit(:name, :website, locations_attributes:)
       .merge(auto_user_id: current_user.id, kind: approved_kind)
   end
 
-  def permitted_locations_params
-    %i[name zipcode city state_id country_id street phone publicly_visible]
+  def locations_attributes
+    %i[name phone publicly_visible] + [address_record_attributes: AddressRecord.permitted_params + [:id]]
   end
 
   def find_organization

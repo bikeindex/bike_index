@@ -4,7 +4,6 @@
 # Database name: primary
 #
 #  id                       :integer          not null, primary key
-#  city                     :string(255)
 #  default_impound_location :boolean          default(FALSE)
 #  deleted_at               :datetime
 #  email                    :string(255)
@@ -12,20 +11,21 @@
 #  latitude                 :float
 #  longitude                :float
 #  name                     :string(255)
-#  neighborhood             :string
 #  not_publicly_visible     :boolean          default(FALSE)
 #  phone                    :string(255)
 #  shown                    :boolean          default(FALSE)
-#  street                   :string(255)
-#  zipcode                  :string(255)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
-#  country_id               :integer
+#  address_record_id        :bigint
 #  organization_id          :integer
-#  state_id                 :integer
+#
+# Indexes
+#
+#  index_locations_on_address_record_id  (address_record_id)
 #
 class Location < ApplicationRecord
-  include Geocodeable
+  include AddressRecorded
+  include AddressRecordedWithinBoundingBox
 
   acts_as_paranoid
 
@@ -34,9 +34,9 @@ class Location < ApplicationRecord
   has_many :bikes
   has_many :impound_records
 
-  validates :name, :city, :country, :organization, presence: true
+  validates :name, presence: true
+  validate :organization_present
 
-  scope :by_state, -> { order(:state_id) }
   scope :shown, -> { where(shown: true) }
   scope :publicly_visible, -> { shown.where(not_publicly_visible: false) }
   scope :impound_locations, -> { where(impound_location: true) }
@@ -58,8 +58,23 @@ class Location < ApplicationRecord
     Location.where(organization_id: organization_id).where.not(id: id)
   end
 
-  def address
-    Geocodeable.address(self, country: %i[name])
+  # Override AddressRecorded delegation to fall back to legacy fields
+  def address_present?
+    return address_record.address_present? if address_record?
+
+    [street, city, zipcode].any?(&:present?)
+  end
+
+  def find_or_build_address_record(current_country_id: nil)
+    return address_record if address_record?
+
+    current_country_id ||= Country.united_states_id
+    d_address_record = AddressRecord.where(organization_id:).order(:id).first
+    return AddressRecord.new(country_id: current_country_id) if d_address_record.blank?
+
+    AddressRecord.new(country_id: d_address_record.country_id || current_country_id,
+      region_record_id: d_address_record.region_record_id,
+      region_string: d_address_record.region_string)
   end
 
   def org_location_id
@@ -85,6 +100,12 @@ class Location < ApplicationRecord
     end
     self.phone = Phonifyer.phonify(phone)
     self.shown = calculated_shown
+    self.latitude = address_record&.latitude
+    self.longitude = address_record&.longitude
+    if address_record.present?
+      address_record.organization_id = organization_id
+      address_record.kind = :organization
+    end
   end
 
   def update_associations
@@ -115,6 +136,12 @@ class Location < ApplicationRecord
   end
 
   private
+
+  def organization_present
+    return if organization.present? || organization_id.present?
+
+    errors.add(:organization, :blank)
+  end
 
   def calculated_shown
     return false if not_publicly_visible

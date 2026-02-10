@@ -39,6 +39,59 @@ RSpec.describe ApplicationComponentHelper, type: :helper do
     end
   end
 
+  describe "amount_display" do
+    subject(:result) { helper.amount_display(payment, currency_name_suffix:) }
+
+    let(:currency_name_suffix) { false }
+    let(:payment) { Payment.new(amount_cents: 150000) }
+    let(:basic_target) { "<span><span title=\"USD\">$</span><span class=\"\">1,500</span></span>" }
+    before do
+      helper.extend(ControllerHelpers)
+      allow(view).to receive(:current_currency) { Currency.default }
+    end
+
+    it "displays amount with currency symbol" do
+      expect(result).to eq basic_target
+    end
+
+    context "with currency_name_suffix: true" do
+      let(:currency_name_suffix) { true }
+
+      it "includes currency name" do
+        expect(result).to eq '<span><span title="USD">$</span><span class="">1,500</span><span class="tw:text-[66%]"> USD</span></span>'
+
+        expect(helper.amount_display(payment, currency_name_suffix: :if_not_default)).to eq basic_target
+      end
+    end
+
+    context "with different currency" do
+      let(:payment) { Payment.new(amount_cents: 25000, currency: "EUR") }
+      let(:currency_name_suffix) { true }
+      let(:target) { '<span><span title="EUR">€</span><span class="">250</span><span class="tw:text-[66%]"> EUR</span></span>' }
+
+      it "displays the correct currency" do
+        expect(result).to eq target
+        expect(helper.amount_display(payment, currency_name_suffix: :if_not_default)).to eq target
+      end
+    end
+
+    context "with zero amount" do
+      let(:payment) { Payment.new(amount_cents: 0) }
+
+      it "applies less-less-strong class to zero" do
+        expect(result).to eq '<span><span title="USD">$</span><span class="less-less-strong">0</span></span>'
+      end
+    end
+
+    context "with nil amount" do
+      let(:payment) { Payment.new(amount_cents: nil) }
+
+      it "applies less-less-strong class to zero" do
+        expect(result).to be_nil
+      end
+    end
+  end
+
   describe "phone_link and phone_display" do
     it "displays phone with an area code and country code" do
       expect(phone_display("999 999 9999")).to eq("999-999-9999")

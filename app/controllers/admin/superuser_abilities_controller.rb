@@ -5,7 +5,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @superuser_abilities = pagy(searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
+    @pagy, @superuser_abilities = pagy(:countish, searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
       .includes(:user), limit: @per_page, page: permitted_page)
   end
 
@@ -52,7 +52,7 @@ class Admin::SuperuserAbilitiesController < Admin::BaseController
       @kind = "all"
     end
     if params[:user_id].present?
-      superuser_abilities = superuser_abilities.where(user_id: params[:user_id])
+      superuser_abilities = superuser_abilities.where(user_id: user_subject&.id || params[:user_id])
     end
 
     @time_range_column = sort_column if %w[updated_at].include?(sort_column)

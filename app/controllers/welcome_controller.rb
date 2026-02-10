@@ -2,7 +2,7 @@ class WelcomeController < ApplicationController
   before_action :force_html_response
   before_action :authenticate_user_for_welcome_controller, only: [:choose_registration]
   # Allow iframes on the index URL because safari is an asshole, and doesn't honor our iframe options
-  skip_before_action :set_x_frame_options_header, only: [:bike_creation_graph, :index]
+  before_action :allow_x_frame, only: [:bike_creation_graph, :index]
 
   def index
     @recovery_displays = RecoveryDisplay.limit(10)
@@ -27,7 +27,7 @@ class WelcomeController < ApplicationController
   def recovery_stories
     @per_page = permitted_per_page(default: 50)
 
-    @pagy, @recovery_displays = pagy(RecoveryDisplay, limit: @per_page, page: permitted_page)
+    @pagy, @recovery_displays = pagy(:countish, RecoveryDisplay, limit: @per_page, page: permitted_page)
     @slice1, @slice2 = list_halves(@recovery_displays)
 
     flash[:notice] = translation(:no_stories_to_display) if @recovery_displays.empty?

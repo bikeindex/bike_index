@@ -195,7 +195,7 @@ RSpec.describe Binxtils::TimeZoneParser do
       # Verify that tzinfo.name still returns the correct thing
       expect(ActiveSupport::TimeZone["America/New_York"].tzinfo.name).to eq "America/New_York"
       expect(described_class.send(:prioritized_zones_matching_offset, time, time.utc_offset).map(&:name))
-        .to eq(["Eastern Time (US & Canada)", "Indiana (East)", "Caracas", "Georgetown", "La Paz", "Puerto Rico", "Santiago"])
+        .to eq(["Eastern Time (US & Canada)", "Indiana (East)", "Caracas", "Georgetown", "La Paz", "Puerto Rico", "Santiago", "Asuncion"])
     end
   end
 

@@ -47,6 +47,9 @@ RSpec.describe Admin::UsersController, type: :request do
         og_auth_token = user_subject.auth_token
         expect(user_subject.banned?).to be_falsey
         current_user.reload
+        bike = FactoryBot.create(:bike, :with_primary_activity, :with_ownership_claimed, user: user_subject)
+        marketplace_listing = FactoryBot.create(:marketplace_listing, :for_sale, item: bike)
+        expect(marketplace_listing).to be_valid
         Sidekiq::Job.clear_all
         patch "#{base_url}/#{user_subject.id}", params: {
           user: {
@@ -56,6 +59,7 @@ RSpec.describe Admin::UsersController, type: :request do
             superuser: true,
             developer: "1",
             can_send_many_stolen_notifications: true,
+            can_send_many_marketplace_messages: true,
             banned: true,
             phone: "9876543210",
             user_ban_attributes: {
@@ -69,6 +73,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.superuser).to be_truthy
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
+        expect(user_subject.can_send_many_marketplace_messages).to be_truthy
         expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
         user_ban = user_subject.user_ban
@@ -78,10 +83,14 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_ban.description).to eq "something here"
         # Bump the auth token, because we want to sign out the user
         expect(user_subject.auth_token).to_not eq og_auth_token
-        expect(::Callbacks::AfterUserChangeJob.jobs.count).to be > 0
-        ::Callbacks::AfterUserChangeJob.new.perform(user_subject.id)
+        expect(CallbackJob::AfterUserChangeJob.jobs.count).to be > 0
+        CallbackJob::AfterUserChangeJob.new.perform(user_subject.id)
+        expect(BikeDeleterJob.jobs.count).to be > 0
+        BikeDeleterJob.drain
+        expect(bike.reload.deleted_at).to be_within(1).of Time.current
         expect(user_subject.superuser_abilities.count).to eq 1
         expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
+        expect(marketplace_listing.reload.status).to eq "removed"
       end
     end
     context "developer" do
@@ -95,6 +104,7 @@ RSpec.describe Admin::UsersController, type: :request do
             email: user_subject.email,
             superuser: false,
             can_send_many_stolen_notifications: true,
+            can_send_many_marketplace_messages: true,
             banned: false
           }
         }

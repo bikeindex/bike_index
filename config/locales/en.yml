@@ -709,16 +709,17 @@ en:
         bike: Bike
         cargo: Cargo Bike (front storage)
         cargo_rear: Cargo Bike Rear (e.g. longtail)
-        cargo_trike: Cargo Tricycle (front storage)
-        cargo_trike_rear: Cargo Tricycle (rear storage)
-        e_motorcycle: e-Motorcycle/e-Dirtbike (no pedals)
+        cargo_trike: Cargo Tricycle (trike with front storage, e.g. Christiania bike)
+        cargo_trike_rear: Cargo Tricycle (trike with rear storage)
+        e_motorcycle: e-Motorcycle (e-Dirt bike, e-bike with no pedals)
         e_scooter: e-Scooter
         elliptical: Elliptical bike
         non_e_scooter: Scooter (not electric)
         non_e_skateboard: Skateboard (not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
-        personal_mobility: e-Skateboard (e-Unicycle, Personal mobility device, etc)
+        personal_mobility: e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle,
+          etc)
         recumbent: Recumbent
         stroller: Stroller
         tall_bike: Tall Bike (multiple frames fused together)
@@ -1137,8 +1138,10 @@ en:
       it_probably_has_a_serial_number: It probably has a serial number.
       manufacturer: Manufacturer
       missing_serial: Missing serial
+      model: Model
       model_year: Model year
       nevermind: Nevermind
+      optional: optional
       or: or
       other_manufacturer: Other manufacturer
       our_serial_page: our serial page
@@ -1155,7 +1158,7 @@ en:
         Every bike has a unique serial number, it's how they are identified. To learn
         more or see some examples, go to %{serial_page_link} <small>(opens in a separate
         window)</small>.
-      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      sticker_id: Sticker id
       student_id: Student ID
       this_is_a: This is a
       traditional_bike: Traditional bicycle
@@ -1594,6 +1597,23 @@ en:
       wide: Wide
       wide_help: "> 38mm (1.5in)"
       wide_title: Tires that are at least 39mm (1.5 inches) wide
+  components:
+    emails:
+      partials:
+        bike_box:
+          bike_photo: Bike photo
+          color: Color
+          color_may_be_incorrect: Color may be incorrect because it was set during
+            POS import
+          found: 'Found:'
+          make: 'Make:'
+          serial: 'Serial:'
+          stolen_at: 'Stolen at:'
+          stolen_from: 'Stolen from:'
+    ui:
+      definition_list:
+        row:
+          no_value: none
   controllers:
     application:
       handle_unverified_request:
@@ -1744,8 +1764,13 @@ en:
           unable_to_update: 'Unable to save %{item_type}: %{errors}'
       messages:
         create:
-          can_not_send_message: Sorry, you can't send a message to that listing
+          can_not_send_message: >-
+            Sorry, you can't send a message to that listing. Contact gavin@bikeindex.org
+            if you have questions.
           message_sent: Message sent
+        show:
+          sorry_that_is_you: That's your listing! You can't start a new message to
+            yourself.
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
@@ -2349,6 +2374,7 @@ en:
       warning: Warning
   helpers:
     bike_helper:
+      deleted: Deleted
       hidden: hidden
       hidden_because_status: because %{bike_type} is %{status}
       hidden_for_unauthorized_users: hidden for unauthorized users
@@ -4026,6 +4052,7 @@ en:
       save_changes: Save changes
     messages:
       form:
+        already_sold: 'heads up: this %{item_type} has been %{listing_status}'
         body_placeholder: Add some message text
         message: message
         new_message: New message
@@ -4033,8 +4060,6 @@ en:
         send_message: Send message
       index:
         marketplace_messages: Marketplace messages
-      show:
-        can_not_send_new_message: Sorry, you can't send a new message.
     password:
       better_password: better
       for_password_update: For password update
@@ -4643,15 +4668,10 @@ en:
     manages:
       location_fields:
         address: Address
-        choose_country: Choose country
-        city: City
         location_name: Location name
         name: Name
         phone_number: Phone number
         remove: Remove location
-        state: State
-        street: Street
-        zipcode: Postal code
       locations:
         add_location: Add location
         bike_index_partner_map: Bike Index partner map
@@ -4809,59 +4829,6 @@ en:
     finished_owned_registration:
       subject: "%{organization_name}Bike Index registration successful"
     finished_registration:
-      html:
-        a_correctly_locked_bike: >-
-          A correctly locked bike. The frame is locked to the bike rack and both wheels
-          are secured.
-        a_donation_will_prioritize_html: >-
-          A donation will %{prioritize_link} and help us get your bike back to you.
-          We're a 501(c)(3) nonprofit and depend on donations to operate
-        before_locking_check: Before locking, check that what you are locking to can't
-          be easily removed.
-        bike_register_with_bike_index: Congrats on registering your %{bike_type} with
-          Bike Index
-        bike_register_with_bike_index_and_org: Congrats on registering your %{bike_type}
-          with Bike Index and %{org_name}
-        bike_type_thieves_are_jerks: "%{bike_type} thieves are jerks."
-        cable_locks_should_never_be_used: Cable locks should never be used as a primary
-          means of locking a bike in a city.
-        claim_the_bike_type: Claim the %{bike_type}
-        confirm_this_bike_type: Confirm this %{bike_type}
-        correctly_locking_a_bike: Image of a correctly locked a bike
-        donating: donating
-        give_us_a_heads_up: Give us a heads up
-        hopefully_you_find_the_bike_html: Hopefully you find the %{bike_type} soon.
-        hopefully_you_find_the_owner_html: Hopefully you find the owner soon. %{edit_bike_link}
-          when you do!
-        mark_recovered_link_html: "%{mark_recovered_link} when you do!"
-        mark_your_bike_recovered: Mark your bike recovered
-        org_added_a_bike_html: "<strong>%{org_name}</strong> added a %{bike_type}
-          on Bike Index for you"
-        org_sent_a_bike_html: "<strong>%{org_name}</strong> sent you a %{bike_type}
-          on Bike Index"
-        pink_power_ulocks_tm: Pink Power U-Locks are a registered trademark of Bike
-          Index, NFP
-        please_consider_donating_html: Please consider %{donating_link} to Bike Index!
-        prioritize_your_listing: prioritize your listing
-        protect_your_bike_by_following_these_lock: Protect your bike by following
-          these locking guidelines.
-        protecting_your_bike_here: protecting your bike here
-        read_more_about_protecting_html: Read more about %{link}.
-        recovered_bike_type: recovered/found %{bike_type}
-        secure_both_wheels_either_with_two_ulocks: >-
-          Secure both wheels - either with two U-locks, or one U-lock and one heavy
-          duty cable.
-        sign_up_on_bikeindexorg_to_claim_your_bik: >-
-          Sign up on BikeIndex.org to claim your %{bike_type} and edit it, upload
-          photos and make sure you never lose track of your trusty steed!
-        stolen_bike_type: stolen %{bike_type}
-        thanks_for_adding_this_bike_type_you_found: Thanks for adding this %{bike_type}
-          you found to Bike Index
-        use_a_ulock: Use a U-Lock.
-        welcome_to_bike_index: Welcome to Bike Index
-        were_sorry_your_bike_type_was_stolen: We're sorry your %{bike_type} was stolen.
-        you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
-        youre_almost_done_registering: You're almost done registering
       subject: Confirm your %{organization_name}Bike Index registration
     finished_stolen_registration:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index

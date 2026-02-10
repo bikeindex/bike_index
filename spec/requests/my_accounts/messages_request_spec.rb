@@ -65,9 +65,10 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
 
       context "current_user: seller" do
         let(:current_user) { marketplace_listing.seller }
-        it "404s" do
+        it "redirects" do
           get show_url
-          expect(response.status).to eq(404)
+          expect(response).to redirect_to(bike_path(marketplace_listing.item_id))
+          expect(flash[:notice]).to be_present
         end
 
         context "with existing marketplace_message" do
@@ -75,7 +76,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
           it "renders" do
             expect(marketplace_message.reload.receiver_id).to eq current_user.id
             get show_url
-            expect(response.status).to eq(404)
+            expect(response).to redirect_to(bike_path(marketplace_listing.item_id))
 
             get "#{base_url}/#{marketplace_message.id}"
             expect(response.status).to eq(200)
@@ -89,7 +90,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
             it "renders" do
               expect(marketplace_message.reload.receiver_id).to eq current_user.id
               get show_url
-              expect(response.status).to eq(404)
+              expect(response).to redirect_to(bike_path(marketplace_listing.item_id))
 
               get "#{base_url}/#{marketplace_message.id}"
               expect(response.status).to eq(200)
@@ -189,18 +190,30 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       expect(Email::MarketplaceMessageJob.jobs.count).to eq 1
       Email::MarketplaceMessageJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
+      expect(marketplace_message.notifications.count).to eq 1
+      expect(marketplace_message.notifications.first.delivery_status).to eq "delivery_success"
 
+      follow_up_params = new_params.merge(initial_record_id: marketplace_message.id, body: "More thanks")
       Sidekiq::Testing.inline! do
         expect do
-          post base_url, params: {marketplace_message: new_params.merge(initial_record_id: marketplace_message.id)}
+          post base_url, params: {marketplace_message: follow_up_params}
           expect(flash[:success]).to be_present
         end.to change(MarketplaceMessage, :count).by(1)
           .and change(ActionMailer::Base.deliveries, :count).by 1
       end
 
       expect(MarketplaceMessage.last).to match_hash_indifferently({initial_record_id: marketplace_message.id,
-        sender_id: current_user.id, receiver_id: marketplace_listing.seller_id, body: new_params[:body],
+        sender_id: current_user.id, receiver_id: marketplace_listing.seller_id, body: follow_up_params[:body],
         subject: "Re: #{new_params[:subject]}", marketplace_listing_id: marketplace_listing.id})
+
+      # Sending repeats doesn't create duplicates
+      Sidekiq::Testing.inline! do
+        expect do
+          post base_url, params: {marketplace_message: follow_up_params}
+          post base_url, params: {marketplace_message: follow_up_params}
+          post base_url, params: {marketplace_message: follow_up_params}
+        end.to change(MarketplaceMessage, :count).by 0
+      end
     end
 
     context "invalid post" do
@@ -245,12 +258,11 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       it "sends a message" do
         ActionMailer::Base.deliveries = []
 
-        Sidekiq::Testing.inline! do
-          expect do
-            post base_url, params: {marketplace_message: reply_params}
-            expect(flash[:success]).to be_present
-          end.to change(MarketplaceMessage, :count).by 1
-        end
+        expect do
+          post base_url, params: {marketplace_message: reply_params}
+          expect(flash[:success]).to be_present
+        end.to change(MarketplaceMessage, :count).by(1)
+          .and change(Email::MarketplaceMessageJob.jobs, :count).by(1)
 
         new_marketplace_message = MarketplaceMessage.last
         expect(new_marketplace_message).to match_hash_indifferently(reply_params.except(:subject))
@@ -258,7 +270,43 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
         expect(new_marketplace_message.sender_id).to eq current_user.id
         expect(new_marketplace_message.receiver_id).to eq marketplace_message.sender_id
 
-        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+        expect(Email::MarketplaceMessageJob.jobs.map { |j| j["args"] }.flatten).to include(marketplace_message.id)
+        Email::MarketplaceMessageJob.drain
+        expect(ActionMailer::Base.deliveries.blank?).to be_falsey
+        expect(marketplace_message.reload.notifications.first.delivery_status).to eq "delivery_success"
+      end
+    end
+
+    context "likely_spam" do
+      let!(:prior_messages) do
+        3.times { FactoryBot.create(:marketplace_message, sender: current_user, skip_processing: true) }
+      end
+
+      it "creates message and sends blocked email to admin" do
+        expect(MarketplaceMessage.where(sender_id: current_user.id).distinct_threads.count).to eq 3
+        # Ensure marketplace_listing is created before clearing jobs
+        expect(marketplace_listing).to be_present
+
+        Sidekiq::Worker.clear_all
+        ActionMailer::Base.deliveries = []
+
+        expect {
+          post base_url, params: {marketplace_message: new_params}
+          expect(flash[:success]).to be_present
+        }.to change(MarketplaceMessage, :count).by(1)
+
+        new_message = MarketplaceMessage.last
+        expect(new_message.likely_spam?).to be_truthy
+        expect(Email::MarketplaceMessageJob.jobs.count).to eq 1
+
+        Email::MarketplaceMessageJob.drain
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        expect(new_message.notifications.count).to eq 1
+        expect(new_message.notifications.first.kind).to eq "marketplace_message_blocked"
+
+        mail = ActionMailer::Base.deliveries.last
+        expect(mail.subject).to match(/blocked/i)
+        expect(mail.to).to eq(["contact@bikeindex.org"])
       end
     end
   end

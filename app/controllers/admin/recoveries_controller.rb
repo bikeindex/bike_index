@@ -5,7 +5,7 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @recoveries = pagy(available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
+    @pagy, @recoveries = pagy(:countish, available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
       .includes(:bike), limit: @per_page, page: permitted_page)
   end
 

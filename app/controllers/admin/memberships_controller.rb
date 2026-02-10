@@ -7,11 +7,10 @@ class Admin::MembershipsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(
+    @pagy, @collection = pagy(:countish,
       matching_memberships.includes(:user, :creator, :stripe_subscriptions).reorder("memberships.#{sort_column} #{sort_direction}"),
       limit: @per_page,
-      page: permitted_page
-    )
+      page: permitted_page)
   end
 
   def new
@@ -19,7 +18,7 @@ class Admin::MembershipsController < Admin::BaseController
     @membership.set_calculated_attributes # Sets start_at and level
 
     if params[:user_id].present?
-      user = User.find_by(id: params[:user_id])
+      user = User.friendly_find(params[:user_id])
       @membership.user_email = user.email if user.present?
     end
   end
@@ -112,8 +111,7 @@ class Admin::MembershipsController < Admin::BaseController
     memberships = memberships.send(@manager) if @manager.present?
 
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      memberships = memberships.where(user_id: @user.id) if @user.present?
+      memberships = memberships.where(user_id: user_subject&.id || params[:user_id])
     end
 
     @time_range_column = sort_column if %w[start_at end_at updated_at].include?(sort_column)

@@ -43,11 +43,9 @@
               %small.only-dev-visible= impound_claim.impound_record.id
 
         %td
-          - if impound_claim.bike_claimed.present?
-            = link_to organized_bike_text(impound_claim.bike_claimed), admin_bike_path(impound_claim.bike_claimed)
+          = render Admin::BikeCell::Component.new(bike: impound_claim.bike_claimed, bike_id: impound_claim.bike_claimed_id)
         %td
-          - if impound_claim.bike_submitting.present?
-            = link_to organized_bike_text(impound_claim.bike_submitting), admin_bike_path(impound_claim.bike_submitting)
+          = render Admin::BikeCell::Component.new(bike: impound_claim.bike_submitting, bike_id: impound_claim.bike_submitting_id)
         %td
           %em
             = status_display(impound_claim.status_humanized)

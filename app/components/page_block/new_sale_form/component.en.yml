@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    page_block:
+      new_sale_form:
+        record_sale: Record sale
+        sold_for: Amount sold for
+        transfer_to_html: >-
+          This will transfer the registration to %{buyer_html} and close the marketplace
+          listing.

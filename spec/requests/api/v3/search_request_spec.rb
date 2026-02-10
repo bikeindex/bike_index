@@ -8,12 +8,27 @@ RSpec.describe "Search API V3", type: :request do
     let!(:bike2) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer) }
     let(:query_params) { {query_items: [manufacturer.search_id]} }
     context "with per_page" do
+      let(:link_headers) do
+        "<http://www.example.com/api/v3/search?page=1&per_page=50000&stolenness=all>; rel=\"first\", " \
+        "<http://www.example.com/api/v3/search?page=1&per_page=50000&stolenness=all>; rel=\"prev\", " \
+        "<http://www.example.com/api/v3/search?page=1&per_page=50000&stolenness=all>; rel=\"last\", " \
+        "<http://www.example.com/api/v3/search?page&per_page=50000&stolenness=all>; rel=\"next\""
+      end
       it "returns matching bikes, defaults to stolen" do
         expect(Bike.count).to eq 2
         get "/api/v3/search", params: query_params.merge(per_page: 1, format: :json)
         expect(response.header["Total"]).to eq("1")
         result = JSON.parse(response.body)
         expect(result["bikes"][0]["id"]).to eq bike2.id
+        expect(response.headers["Per-Page"]).to eq("1")
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+
+        # Outside permitted page params
+        get "/api/v3/search", params: {stolenness: "all", page: 500, per_page: 50_000}, headers: json_headers
+        expect(response.headers["Total"]).to eq("2")
+        expect(response.headers["Per-Page"]).to eq("100")
+        expect(response.headers["Link"]).to eq link_headers
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       end

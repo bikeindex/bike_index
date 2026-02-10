@@ -3,4 +3,10 @@ en:
   components:
     messages:
       thread_show:
-        subject: Subject
+        banned_message: We're sorry, but that user has been banned and can't receive
+          new messages.
+        can_not_send_new_message: Sorry, you can't send a new message.
+        deleted_message: >-
+          We're sorry, but that user has deleted their account and can't receive new
+          messages.
+        sold_to: Mark %{item_type} sold to

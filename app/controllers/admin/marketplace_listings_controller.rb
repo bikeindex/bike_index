@@ -3,12 +3,16 @@ class Admin::MarketplaceListingsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @collection = pagy(
+    @pagy, @collection = pagy(:countish,
       matching_marketplace_listings.includes(:seller, :item, :buyer, :address_record)
         .reorder("marketplace_listings.#{sort_column} #{sort_direction}"),
       limit: @per_page,
-      page: permitted_page
-    )
+      page: permitted_page)
+  end
+
+  def show
+    @marketplace_listing = MarketplaceListing.find(params[:id])
+    @marketplace_messages = @marketplace_listing.marketplace_messages.order(id: :desc).limit(25)
   end
 
   helper_method :matching_marketplace_listings, :searchable_statuses
@@ -17,6 +21,10 @@ class Admin::MarketplaceListingsController < Admin::BaseController
 
   def sortable_columns
     %w[created_at updated_at published_at end_at item_id amount_cents condition status seller_id buyer_id]
+  end
+
+  def earliest_period_date
+    Time.at(1746075600) # 2025-05-01 00:00 - first message sent this month
   end
 
   def searchable_statuses
@@ -35,7 +43,7 @@ class Admin::MarketplaceListingsController < Admin::BaseController
     end
 
     if params[:user_id].present?
-      marketplace_listings = marketplace_listings.for_user(params[:user_id])
+      marketplace_listings = marketplace_listings.for_user(user_subject&.id || params[:user_id])
     end
 
     @time_range_column = sort_column if %w[updated_at published_at end_at].include?(sort_column)

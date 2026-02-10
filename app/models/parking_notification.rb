@@ -54,7 +54,7 @@ class ParkingNotification < ActiveRecord::Base
 
   KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
-  RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2}.freeze
+  RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
   MAX_PER_PAGE = 250
 
   mount_uploader :image, ImageUploaderBackgrounded
@@ -284,10 +284,11 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def set_location_from_organization
-    self.country_id = organization&.country&.id
-    self.city = organization&.city
-    self.zipcode = organization&.zipcode
-    self.state_id = organization&.state&.id
+    org_address = organization&.default_address_record
+    self.country_id = org_address&.country_id
+    self.city = org_address&.city
+    self.zipcode = org_address&.postal_code
+    self.state_id = org_address&.region_record_id
   end
 
   def set_calculated_attributes
@@ -311,13 +312,6 @@ class ParkingNotification < ActiveRecord::Base
     end
   end
 
-  def location_present
-    # in case geocoder is failing (which happens sometimes), permit if either is present
-    return true if latitude.present? && longitude.present? || address.present?
-
-    errors.add(:address, :address_required)
-  end
-
   def subject
     return mail_snippet.subject if mail_snippet&.subject.present?
 
@@ -328,14 +322,6 @@ class ParkingNotification < ActiveRecord::Base
     elsif impounded?
       "Your #{bike&.type || "Bike"} was impounded"
     end
-  end
-
-  def process_notification
-    return true if skip_update
-
-    # Update the bike immediately, inline
-    bike&.update(updated_at: Time.current)
-    ProcessParkingNotificationJob.perform_async(id)
   end
 
   # new_attrs needs to include kind and user_id. It can include additional attrs if they matter
@@ -355,6 +341,21 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   private
+
+  def location_present
+    # in case geocoder is failing (which happens sometimes), permit if either is present
+    return true if latitude.present? && longitude.present? || address.present?
+
+    errors.add(:address, :address_required)
+  end
+
+  def process_notification
+    return true if skip_update
+
+    # Update the bike immediately, inline, if current or if status changed
+    bike&.update(updated_at: Time.current) if current? || saved_change_to_status?
+    ProcessParkingNotificationJob.perform_async(id)
+  end
 
   def calculated_repeat_number
     return 0 unless repeat_record?

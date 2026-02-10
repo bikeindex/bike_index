@@ -18,18 +18,20 @@
 #  updated_at                 :datetime         not null
 #  bike_id                    :bigint
 #  country_id                 :bigint
+#  organization_id            :bigint
 #  region_record_id           :bigint
 #  user_id                    :bigint
 #
 # Indexes
 #
-#  index_address_records_on_bike_id           (bike_id)
+#  index_address_records_on_bike_id           (bike_id) WHERE (bike_id IS NOT NULL)
 #  index_address_records_on_country_id        (country_id)
+#  index_address_records_on_organization_id   (organization_id) WHERE (organization_id IS NOT NULL)
 #  index_address_records_on_region_record_id  (region_record_id)
-#  index_address_records_on_user_id           (user_id)
+#  index_address_records_on_user_id           (user_id) WHERE (user_id IS NOT NULL)
 #
 class AddressRecord < ApplicationRecord
-  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3}.freeze
+  KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, organization: 4, impounded_from: 5}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze
   RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
   ADDRESS_ATTRS = %i[street street_2 city region_record_id postal_code country_id latitude longitude]
@@ -38,7 +40,8 @@ class AddressRecord < ApplicationRecord
   enum :publicly_visible_attribute, PUBLICLY_VISIBLE_ATTRIBUTE_ENUM
 
   belongs_to :user
-  belongs_to :bike # TODO: Make this polymorphic?
+  belongs_to :bike
+  belongs_to :organization
   belongs_to :country
   belongs_to :region_record, class_name: "State"
 
@@ -96,13 +99,13 @@ class AddressRecord < ApplicationRecord
       (kind == "organization") ? :street : :postal_code
     end
 
-    def permitted_visible_attribute(string_or_sym, default: :postal_code)
+    def permitted_visible_attribute(string_or_sym, default: nil)
       if string_or_sym.present?
         target_attr = string_or_sym&.to_sym
         return target_attr if PUBLICLY_VISIBLE_ATTRIBUTE_ENUM.key?(target_attr)
       end
 
-      default.to_sym
+      (default.presence || :postal_code).to_sym
     end
   end
 
@@ -174,7 +177,7 @@ class AddressRecord < ApplicationRecord
 
   def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
     f_hash = address_hash(visible_attribute:, render_country:, current_country_id:, current_country_iso:)
-    arr = f_hash.values_at(:street, :city)
+    arr = f_hash.values_at(:street, :street_2, :city)
     arr << f_hash.values_at(:region, :postal_code).reject(&:blank?).join(" ") # region and postal code don't have a comma
     (arr << f_hash[:country]).reject(&:blank?).join(", ")
   end
@@ -198,13 +201,17 @@ class AddressRecord < ApplicationRecord
     user&.address_record_id == id
   end
 
+  def metric_units?
+    Country.metric_units?(country_id)
+  end
+
   private
 
   def update_associations
-    # Bikes and ownerships handle address assignment separately
-    return if skip_callback_job || bike? || ownership?
+    # Bikes & ownerships handle address assignment separately
+    return if skip_callback_job || %w[bike ownership].include?(kind)
 
-    ::Callbacks::AddressRecordUpdateAssociationsJob.perform_async(id)
+    CallbackJob::AddressRecordUpdateAssociationsJob.perform_async(id)
   end
 
   def should_be_geocoded?

@@ -20,6 +20,7 @@
 #  address_record_id :bigint
 #  buyer_id          :bigint
 #  item_id           :bigint
+#  sale_id           :bigint
 #  seller_id         :bigint
 #
 # Indexes
@@ -27,12 +28,14 @@
 #  index_marketplace_listings_on_address_record_id  (address_record_id)
 #  index_marketplace_listings_on_buyer_id           (buyer_id)
 #  index_marketplace_listings_on_item               (item_type,item_id)
+#  index_marketplace_listings_on_sale_id            (sale_id)
 #  index_marketplace_listings_on_seller_id          (seller_id)
 #
 class MarketplaceListing < ApplicationRecord
   STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
   CONDITION_ENUM = {new_in_box: 0, excellent: 1, good: 2, poor: 3, salvage: 4}.freeze
-  CURRENT_STATUSES = %i[draft for_sale]
+  CURRENT_STATUSES = %i[draft for_sale].freeze
+  ENDED_STATUSES = STATUS_ENUM.keys - CURRENT_STATUSES
 
   include AddressRecorded
   include AddressRecordedWithinBoundingBox
@@ -46,6 +49,7 @@ class MarketplaceListing < ApplicationRecord
   belongs_to :buyer, class_name: "User"
   belongs_to :item, polymorphic: true
   belongs_to :address_record
+  belongs_to :sale
 
   has_many :marketplace_messages
 
@@ -184,9 +188,11 @@ class MarketplaceListing < ApplicationRecord
   end
 
   def bike_ownership
-    return nil unless item_type == "Bike"
-
-    item.ownerships.order(:created_at).claimed.where("claimed_at < ?", created_at).last
+    if item_type == "BikeVersion"
+      item.bike&.ownerships&.claimed_at(created_at)
+    elsif item_type == "Bike"
+      item.ownerships.claimed_at(created_at)
+    end
   end
 
   def price_firm?

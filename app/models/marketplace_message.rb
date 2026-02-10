@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id                     :bigint           not null, primary key
+#  blocked                :boolean          default(FALSE), not null
 #  body                   :text
 #  kind                   :integer
 #  messages_prior_count   :integer
@@ -26,6 +27,8 @@ class MarketplaceMessage < ApplicationRecord
   # enum because eventually may have notifications about sale or alerts about suspicious behavior
   KIND_ENUM = {sender_buyer: 0, sender_seller: 1}.freeze
   BUYER_SELLER_MESSAGE_KINDS = %w[sender_buyer sender_seller]
+  SPAM_LIMIT_WEEK = 15
+  SPAM_LIMIT_DAY = 3
 
   enum :kind, KIND_ENUM
 
@@ -35,6 +38,7 @@ class MarketplaceMessage < ApplicationRecord
   belongs_to :initial_record, class_name: "MarketplaceMessage"
 
   has_many :notifications, as: :notifiable
+  has_one :sale
 
   validates_presence_of :marketplace_listing_id, :sender_id, :receiver_id, :subject, :body
   validate :users_match_initial_record, if: -> { buyer_seller_message? }
@@ -44,6 +48,7 @@ class MarketplaceMessage < ApplicationRecord
 
   attr_accessor :skip_processing
 
+  scope :blocked, -> { where(blocked: true) }
   scope :initial_message, -> { where("id = initial_record_id") }
   scope :reply_message, -> { where.not("id = initial_record_id") }
   scope :buyer_seller_message, -> { where(kind: BUYER_SELLER_MESSAGE_KINDS) }
@@ -65,7 +70,7 @@ class MarketplaceMessage < ApplicationRecord
       where(sender_id: user_id).or(where(receiver_id: user_id))
     end
 
-    def decoded_marketplace_listing_id(user:, id:)
+    def decoded_marketplace_listing_id(id:, user: nil)
       # marketplace_listing_id can be encoded as "ml_#{id}"
       return unless id.is_a?(String) && id.start_with?(/ml_/i)
 
@@ -85,7 +90,8 @@ class MarketplaceMessage < ApplicationRecord
 
     # TODO: permit sending message only X days after sale/removal, only to new owner post sale, etc.
     def can_send_message?(marketplace_listing:, user: nil, marketplace_message: nil)
-      can_see_messages?(user:, marketplace_listing:, marketplace_message:)
+      can_see_messages?(user:, marketplace_listing:, marketplace_message:) &&
+        users_present_and_unbanned?(marketplace_message:, marketplace_listing:)
     end
 
     def can_see_messages?(marketplace_listing:, user: nil, marketplace_message: nil)
@@ -115,6 +121,20 @@ class MarketplaceMessage < ApplicationRecord
       str&.to_s&.gsub("sender_", "")
     end
 
+    def likely_spam?(user:, marketplace_listing:, marketplace_message: nil)
+      return false if user.blank? || user.can_send_many_marketplace_messages || user.superuser
+
+      sent_messages = MarketplaceMessage.where(sender_id: user.id)
+      sent_messages = sent_messages.where(id: ...marketplace_message.id) if marketplace_message.present?
+      return false if marketplace_listing&.id.present? &&
+        sent_messages.where(marketplace_listing_id: marketplace_listing.id).any?
+
+      time = marketplace_message&.created_at || Time.current
+      threads_past_week = sent_messages.where(created_at: (time - 1.week)..time).distinct_threads
+      threads_past_week.count >= SPAM_LIMIT_WEEK ||
+        threads_past_week.where(created_at: (time - 1.day)..time).count >= SPAM_LIMIT_DAY
+    end
+
     private
 
     # This returns either an ActiveRecord::Collection or false
@@ -139,11 +159,29 @@ class MarketplaceMessage < ApplicationRecord
         matches.any? ? matches : false
       end
     end
+
+    def users_present_and_unbanned?(marketplace_message:, marketplace_listing:)
+      # Assume the first message is ok
+      return true if marketplace_message&.id.blank?
+
+      marketplace_message.sender.present? && !marketplace_message.sender.banned? &&
+        marketplace_message.receiver.present? && !marketplace_message.receiver.banned?
+    end
   end
 
   # Should be called before creation
+  # NOTE: This calls validations on this instance
   def can_send?
     self.class.can_send_message?(user: sender, marketplace_listing:, marketplace_message: self)
+  end
+
+  def likely_spam?
+    self.class.likely_spam?(user: sender, marketplace_listing:, marketplace_message: self)
+  end
+
+  # Should be called before creation
+  def ignored_duplicate?
+    reply_message? && duplicate_of.present?
   end
 
   def buyer_seller_message?
@@ -153,7 +191,13 @@ class MarketplaceMessage < ApplicationRecord
   def buyer_id
     return unless buyer_seller_message?
 
-    sender_buyer? ? sender_id : buyer_id
+    sender_buyer? ? sender_id : receiver_id
+  end
+
+  def buyer_name
+    return unless buyer_seller_message?
+
+    (sender_buyer? ? sender : receiver)&.marketplace_message_name
   end
 
   # TODO: do we need all these other_user methods?
@@ -223,6 +267,10 @@ class MarketplaceMessage < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
+  def blocked_reason
+    :likely_spam # Currently the only reason! But there could be more in the future
+  end
+
   private
 
   def users_match_initial_record
@@ -236,11 +284,13 @@ class MarketplaceMessage < ApplicationRecord
   def set_calculated_attributes
     self.kind ||= (sender_id == seller_id) ? "sender_seller" : "sender_buyer"
     if reply_message?
-      self.subject = I18n.t("re", original_subject: initial_record.subject,
+      self.subject = I18n.t("re", original_subject: initial_record&.subject,
         scope: %i[activerecord errors messages])
     end
     self.initial_record ||= self
+    self.marketplace_listing_id ||= initial_record&.marketplace_listing_id
     self.messages_prior_count ||= messages_prior.count
+    self.body = Binxtils::InputNormalizer.string(body)
     self.receiver_id = if initial_message?
       seller_id
     else
@@ -252,5 +302,12 @@ class MarketplaceMessage < ApplicationRecord
     return if skip_processing
 
     Email::MarketplaceMessageJob.perform_async(id)
+  end
+
+  def duplicate_of
+    duplicates = self.class.where(initial_record_id:, sender_id:, receiver_id:, body:)
+      .order(:id)
+
+    id.blank? ? duplicates.first : duplicates.where("id < ?", id).first
   end
 end

@@ -23,7 +23,7 @@ RSpec.describe Autocomplete::Loader do
       info = subject.info
       # IDK, db0 seems to cause problems
       expect(info.keys - [:db0]).to match_array(%i[category_keys cache_keys used_memory used_memory_peak])
-      expect(info[:category_keys]).to eq 4128
+      expect(info[:category_keys]).to eq 3976
       expect(info[:cache_keys]).to eq 0
     end
 
@@ -163,6 +163,32 @@ RSpec.describe Autocomplete::Loader do
       prefix = "#{Autocomplete.category_key("frame_mnfg")}brom"
       prefixed_result = RedisPool.conn { |r| r.zrange(prefix, 0, -1) }
       expect(prefixed_result[0]).to eq("brompton bicycle")
+    end
+    context "cycle_type" do
+      let(:item_hash) do
+        {
+          id: 18, text: "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)",
+          category: "cycle_type", priority: 920,
+          data: {priority: 920, slug: :"personal-mobility", search_id: "v_18"}
+        }
+      end
+      let(:item) { subject.send(:clean_hash, item_hash) }
+      let(:target) { item_hash.except(:data).merge(item_hash[:data]) }
+      let(:item_term) { "e personal mobility epamd e skateboard segway e unicycle etc" }
+      it "adds an item, adds prefix scopes, adds category" do
+        expect(Autocomplete.normalize(item_hash[:text])).to eq item_term
+        expect(item[:term]).to eq item_term
+
+        subject.clear_redis
+        subject.send(:store_item, item)
+
+        result = RedisPool.conn { |r| r.hget(Autocomplete.items_data_key, item_term) }
+        expect(JSON.parse(result)).to match_hash_indifferently target
+
+        prefix = "#{Autocomplete.category_key("cycle_type")}skat"
+        prefixed_result = RedisPool.conn { |r| r.zrange(prefix, 0, -1) }
+        expect(prefixed_result[0]).to eq item_term
+      end
     end
   end
 

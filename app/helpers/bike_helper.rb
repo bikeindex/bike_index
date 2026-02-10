@@ -45,6 +45,7 @@ module BikeHelper
 
   def bike_title_html(bike, include_status: false)
     content_tag(:span) do
+      concat(deleted_span) if bike.deleted?
       if include_status && bike_status_span(bike).present?
         concat(bike_status_span(bike))
         concat(" ")
@@ -60,5 +61,12 @@ module BikeHelper
 
   def bike_placeholder_image_path
     image_path("revised/bike_photo_placeholder.svg")
+  end
+
+  private
+
+  def deleted_span
+    content_tag(:strong, "#{I18n.t("deleted", scope: %i[helpers bike_helper])} ",
+      class: "tw:text-red-500")
   end
 end

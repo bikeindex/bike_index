@@ -151,7 +151,7 @@ RSpec.describe MarketplaceMessage, type: :model do
   end
 
   describe "can_send_message?" do
-    let(:user) { FactoryBot.create(:user) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, status:) }
     let(:seller) { marketplace_listing.seller }
     let(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: user) }
@@ -241,12 +241,13 @@ RSpec.describe MarketplaceMessage, type: :model do
     context "with built reply" do
       let(:initial_record) { FactoryBot.create(:marketplace_message, marketplace_listing:, sender: initial_sender) }
       let(:initial_sender) { user }
-      let(:marketplace_message) { FactoryBot.build(:marketplace_message, marketplace_listing:, sender: user, initial_record:) }
+      let(:marketplace_message) { FactoryBot.build(:marketplace_message, sender: user, initial_record:, marketplace_listing: nil) }
       it "is truthy" do
         expect(initial_record).to be_valid
         expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_truthy
         expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message: initial_record)).to be_truthy
         expect(marketplace_message).to be_valid
+        expect(marketplace_message.marketplace_listing_id).to eq initial_record.marketplace_listing_id
         expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
         expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_truthy
       end
@@ -260,6 +261,57 @@ RSpec.describe MarketplaceMessage, type: :model do
 
           expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:, marketplace_message:)).to be_falsey
           expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:, marketplace_message:)).to be_falsey
+        end
+      end
+    end
+
+    context "likely_spam?" do
+      let!(:marketplace_message1) { FactoryBot.create(:marketplace_message, sender: user, created_at: Time.current - 250) }
+      let!(:marketplace_message2) { FactoryBot.create(:marketplace_message, sender: user, created_at: Time.current - 190) }
+      let!(:marketplace_message3) { FactoryBot.create(:marketplace_message, sender: user, created_at:) }
+      let(:created_at) { Time.current - 10.minutes }
+      it "is likely_spam" do
+        expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_truthy
+        expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+        expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
+      end
+
+      context "with a message to the same listing" do
+        let!(:marketplace_message3) do
+          FactoryBot.create(:marketplace_message, sender: user, created_at:,
+            initial_record: marketplace_message2,
+            marketplace_listing: marketplace_message2.marketplace_listing)
+        end
+        it "is valid" do
+          expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
+
+          expect(marketplace_message.save).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+        end
+      end
+      context "with message yesterday" do
+        let(:created_at) { Time.current - 25.hours }
+        it "is valid" do
+          expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
+
+          expect(marketplace_message.save).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
+        end
+      end
+
+      context "with user with can_send_many_marketplace_messages" do
+        let(:user) { FactoryBot.create(:user_confirmed, can_send_many_marketplace_messages: true) }
+        it "is valid" do
+          expect(MarketplaceMessage.send(:likely_spam?, user:, marketplace_listing:)).to be_falsey
+          expect(MarketplaceMessage.can_see_messages?(user:, marketplace_listing:)).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user:, marketplace_listing:)).to be_truthy
+
+          expect(marketplace_message.save).to be_truthy
+          expect(MarketplaceMessage.can_send_message?(user: seller, marketplace_listing:, marketplace_message:)).to be_truthy
         end
       end
     end
@@ -287,6 +339,25 @@ RSpec.describe MarketplaceMessage, type: :model do
         expect(marketplace_message.other_user(12)).to eq([nil, :sender])
         expect(marketplace_message.other_user_display_and_id(receiver)).to eq(["(user removed)", 11])
       end
+    end
+  end
+
+  describe "duplicate_of" do
+    let(:marketplace_message_2) { FactoryBot.create(:marketplace_message_reply, body:) }
+    let(:marketplace_message_1) { marketplace_message_2.initial_record }
+    let(:body) { "Thank you" }
+
+    it "returns true for a duplicate" do
+      expect(marketplace_message_1.ignored_duplicate?).to be_falsey
+      expect(marketplace_message_2.ignored_duplicate?).to be_falsey
+      expect(marketplace_message_2).to be_valid
+      duplicate = MarketplaceMessage.new(sender_id: marketplace_message_2.sender_id, body: "#{body} ", initial_record_id: marketplace_message_1.id)
+      expect(duplicate.can_send?).to be_truthy
+
+      expect(duplicate.send(:duplicate_of)&.id).to eq marketplace_message_2.id
+      expect(duplicate.ignored_duplicate?).to be_truthy
+      expect(duplicate.save).to be_truthy
+      expect(duplicate.body).to eq body
     end
   end
 end

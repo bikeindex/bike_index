@@ -4,7 +4,7 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
   def index
     @per_page = permitted_per_page
     @pagy, @bike_sticker_updates =
-      pagy(matching_bike_sticker_updates
+      pagy(:countish, matching_bike_sticker_updates
         .reorder("bike_sticker_updates.#{sort_column} #{sort_direction}")
         .includes(:organization, :user, :bike), limit: @per_page, page: permitted_page)
   end
@@ -47,6 +47,9 @@ class Admin::BikeStickerUpdatesController < Admin::BaseController
       bike_sticker_updates = bike_sticker_updates.where(creator_kind: @search_creator_kind)
     else
       @search_creator_kind = "all"
+    end
+    if params[:user_id].present?
+      bike_sticker_updates = bike_sticker_updates.where(user_id: user_subject&.id || params[:user_id])
     end
 
     if params[:search_bike_sticker_id].present?

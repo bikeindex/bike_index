@@ -70,7 +70,7 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if police_report_present
       %span.checklist-text
-        - bike_link = link_to(t(".your_police_report"), edit_bike_url(id: @bike.to_param, edit_template: "theft_details"))
+        - bike_link = link_to(t(".your_police_report"), edit_bike_url(id: @bike.to_param, edit_template: "theft_details", anchor: 'policeReportNumber'))
         = t(".add_bike_link_to_your_theft_report_html", bike_link: bike_link)
       %ul
         %li{ class: submitted_to_police_services ? "completed-item" : "" }

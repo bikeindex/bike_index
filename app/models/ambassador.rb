@@ -10,6 +10,7 @@
 #  auth_token                         :string(255)
 #  avatar                             :string(255)
 #  banned                             :boolean          default(FALSE), not null
+#  can_send_many_marketplace_messages :boolean          default(FALSE), not null
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
@@ -57,7 +58,9 @@
 #
 #  index_users_on_address_record_id         (address_record_id)
 #  index_users_on_auth_token                (auth_token)
+#  index_users_on_email                     (email) WHERE (deleted_at IS NULL)
 #  index_users_on_token_for_password_reset  (token_for_password_reset)
+#  index_users_on_username                  (username) WHERE (deleted_at IS NULL)
 #
 class Ambassador < User
   default_scope -> { ambassadors }

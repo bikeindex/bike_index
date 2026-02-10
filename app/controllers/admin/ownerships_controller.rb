@@ -5,8 +5,12 @@ class Admin::OwnershipsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @ownerships = pagy(matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
+    @pagy, @ownerships = pagy(:countish, matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
       .includes(:bike, :organization, :creator, :user), limit: @per_page, page: permitted_page)
+  end
+
+  def show
+    redirect_to edit_admin_ownership_path
   end
 
   def edit

@@ -16,8 +16,7 @@
     <% end %>
 
     <% if render_for_sale_info? %>
-      <%= @current_event_record.currency_symbol %>
-      <%= number_display(@current_event_record.amount) %>
+      <%= amount_display(@event_record) %>
     <% elsif render_event_date? %>
       <span class="localizeTime">
         <%= l occurred_at_with_fallback, format: :convert_time %>

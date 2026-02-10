@@ -1,0 +1,77 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th>Name</th>
+
+      <th>
+        <%= sortable "bike_id", "Bike", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "owner_id", "Owner", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "visibility", render_sortable: render_sortable %></th>
+
+      <th>Details</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |bike_version| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <%= link_to admin_bike_version_path(bike_version), class: "localizeTime" do %>
+                <%= l bike_version.created_at, format: :convert_time %>
+              <% end %>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= bike_version.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td><small><%= bike_version.name&.truncate(30) %></small></td>
+
+          <td>
+            <%= render Admin::BikeCell::Component.new(bike: bike_version.bike, bike_id: bike_version.bike_id) %>
+          </td>
+
+          <td>
+            <% cache(bike_version.owner) do %>
+              <%= render Admin::UserCell::Component.new(user: bike_version.owner, render_search: render_sortable) %>
+            <% end %>
+          </td>
+
+          <td>
+            <% if bike_version.user_hidden? %>
+              <span class="less-strong">hidden</span>
+            <% elsif bike_version.all_visible? %>
+              <span class="text-success">visible</span>
+            <% else %>
+              <small><%= bike_version.visibility&.humanize %></small>
+            <% end %>
+          </td>
+
+          <td>
+            <small>
+              <%= bike_version.mnfg_name %>
+
+              <% if bike_version.year.present? %>
+                (
+                <%= bike_version.year %>
+                )
+              <% end %>
+            </small>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

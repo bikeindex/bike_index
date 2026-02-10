@@ -5,12 +5,12 @@ RSpec.shared_examples "address_recorded" do
   let(:instance) { FactoryBot.create(model_sym, address_record:, latitude: nil, longitude: nil) }
   let(:address_record) { FactoryBot.create(:address_record) }
 
-  describe "Callbacks::AddressRecordUpdateAssociationsJob updates" do
-    let(:job) { Callbacks::AddressRecordUpdateAssociationsJob }
+  describe "CallbackJob::AddressRecordUpdateAssociationsJob updates" do
+    let(:job) { CallbackJob::AddressRecordUpdateAssociationsJob }
 
     it "is updated from the job" do
       # bikes handling is via BikeServices::CalculateLocation
-      unless subject.instance_of?(Bike)
+      unless subject.instance_of?(Bike) || subject.instance_of?(ImpoundRecord)
         expect(address_record).to be_valid
 
         expect do

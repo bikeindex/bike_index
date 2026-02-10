@@ -1,0 +1,128 @@
+<div class="admin-subnav">
+  <div class="col-md-12">
+    <h1>Bike Version</h1>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <% if display_dev_info? %>
+          <tr>
+            <td class="only-dev-visible">ID</td>
+            <td><code><%= @bike_version.id %></code></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Name</td>
+          <td><%= @bike_version.name %></td>
+        </tr>
+
+        <tr>
+          <td>Owner</td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: @bike_version.owner, user_id: @bike_version.owner_id) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Visibility</td>
+
+          <td>
+            <% visibility_class = "text-success" if @bike_version.all_visible? %>
+            <% visibility_class = "less-strong" if @bike_version.user_hidden? %>
+
+            <span class="<%= visibility_class %>">
+              <%= @bike_version.visibility&.humanize %>
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Bike</td>
+
+          <td>
+            <%= render Admin::BikeCell::Component.new(bike: @bike, bike_id: @bike_version.bike_id) %>
+          </td>
+        </tr>
+
+        <tr class="small">
+          <td>Created</td>
+
+          <td>
+            <span class="localizeTime preciseTime">
+              <%= l @bike_version.created_at, format: :convert_time %>
+            </span>
+          </td>
+        </tr>
+
+        <% if @bike_version.deleted_at.present? %>
+          <tr class="small">
+            <td><span class="text-danger">Deleted</span></td>
+
+            <td>
+              <span class="localizeTime preciseTime">
+                <%= l @bike_version.deleted_at, format: :convert_time %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Manufacturer</td>
+          <td><%= @bike_version.mnfg_name %></td>
+        </tr>
+
+        <tr>
+          <td>Frame model</td>
+          <td><%= @bike_version.frame_model %></td>
+        </tr>
+
+        <tr>
+          <td>Year</td>
+          <td><%= @bike_version.year %></td>
+        </tr>
+
+        <tr>
+          <td>Colors</td>
+          <td><%= @bike_version.frame_colors.join(", ") %></td>
+        </tr>
+
+        <tr>
+          <td>Cycle type</td>
+          <td><%= @bike_version.cycle_type_name %></td>
+        </tr>
+
+        <% if @bike_version.description.present? %>
+          <tr>
+            <td>Description</td>
+            <td><%= truncate(@bike_version.description, length: 200) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @bike_version.public_images.any? %>
+  <div class="mt-4">
+    <h3>Images</h3>
+
+    <div class="row">
+      <% @bike_version.public_images.each do |image| %>
+        <div class="col-md-3">
+          <%= image_tag image.image_url(:medium), class: "img-fluid" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

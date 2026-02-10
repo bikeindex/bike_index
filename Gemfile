@@ -12,7 +12,6 @@ gem "csv"
 gem "observer"
 gem "prime"
 gem "openssl" # stuff breaks without this, 2025-10
-# Maybe ^ can be removed after 3.4 upgrade? Added to silence deprecation warnings
 
 gem "rails"
 
@@ -28,7 +27,7 @@ gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
 gem "rack-throttle" # Rate limiting
-gem "secure_headers", "~> 2.5.0"
+gem "secure_headers", "~> 7.0"
 
 # Speed, performance, etc
 gem "fast_blank"
@@ -65,7 +64,7 @@ gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # b
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
-gem "rqrcode", "0.10.1" # QR Code image generator
+gem "rqrcode", "3.2.0" # QR Code image generator
 
 # Functionality extensions
 gem "binxtils", path: "gems/binxtils" # Bike Index utility gem
@@ -132,6 +131,7 @@ group :development do
   gem "hotwire-livereload", "~> 1.4.1" # See #2759 for reasoning on version
   gem "terminal-notifier"
   gem "annotaterb" # Add comments with the attributes to Rails Model
+  gem "benchmark"
 end
 
 group :development, :test do

@@ -42,7 +42,7 @@ RSpec.describe PublicImage, type: :model do
       it "does not enqueue after_bike_save_worker" do
         expect {
           public_image.enqueue_after_commit_jobs
-        }.to change(::Callbacks::AfterBikeSaveJob.jobs, :size).by(0)
+        }.to change(CallbackJob::AfterBikeSaveJob.jobs, :size).by(0)
       end
     end
     context "bike" do
@@ -51,7 +51,7 @@ RSpec.describe PublicImage, type: :model do
         expect {
           expect {
             public_image.enqueue_after_commit_jobs
-          }.to change(::Callbacks::AfterBikeSaveJob.jobs, :size).by(1)
+          }.to change(CallbackJob::AfterBikeSaveJob.jobs, :size).by(1)
         }.to_not change(Images::ExternalUrlStoreJob.jobs, :size)
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe PublicImage, type: :model do
           expect {
             expect {
               expect(public_image.save).to be_truthy
-            }.to change(::Callbacks::AfterBikeSaveJob.jobs, :size).by(1)
+            }.to change(CallbackJob::AfterBikeSaveJob.jobs, :size).by(1)
           }.to_not change(Images::ExternalUrlStoreJob.jobs, :size)
         end
       end

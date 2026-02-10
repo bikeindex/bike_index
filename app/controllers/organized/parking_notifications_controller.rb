@@ -40,7 +40,7 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+          pagy, records = pagy(:countish, matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
             .includes(:user, :bike, :impound_record), limit: @per_page, page: permitted_page)
           # This was already set up, so I left it when upgrading to pagy
           set_pagination_headers(pagy, @per_page)
@@ -113,7 +113,7 @@ module Organized
         notifications = notifications.search_bounding_box(*@search_bounding_box)
       end
       if params[:user_id].present?
-        notifications = notifications.where(user_id: params[:user_id])
+        notifications = notifications.where(user_id: user_subject&.id || params[:user_id])
       end
       notifications = notifications.where(kind: @search_kind) unless @search_kind == "all"
       if @search_unregistered == "only_unregistered"

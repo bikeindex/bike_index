@@ -12,7 +12,7 @@ class Admin::OrganizationsController < Admin::BaseController
       matching_organizations
         .reorder("organizations.#{sort_column} #{sort_direction}")
     end
-    @pagy, @organizations = pagy(organizations, limit: @per_page, page: permitted_page)
+    @pagy, @organizations = pagy(:countish, organizations, limit: @per_page, page: permitted_page)
   end
 
   def show
@@ -20,7 +20,7 @@ class Admin::OrganizationsController < Admin::BaseController
     @deleted_organization_roles = @organization.deleted? || Binxtils::InputNormalizer.boolean(params[:deleted_organization_roles])
     bikes = @organization.bikes.reorder("created_at desc")
     @bikes_count = bikes.size
-    @pagy, @bikes = pagy(bikes, limit: 10, page: permitted_page)
+    @pagy, @bikes = pagy(:countish, bikes, limit: 10, page: permitted_page)
   end
 
   def show_deleted
@@ -118,7 +118,7 @@ class Admin::OrganizationsController < Admin::BaseController
         :slug,
         :spam_registrations,
         :website,
-        [locations_attributes: permitted_locations_params]
+        [locations_attributes:]
       ).merge(kind: approved_kind)
       .merge(registration_field_labels: registration_field_labels_val)
   end
@@ -189,9 +189,9 @@ class Admin::OrganizationsController < Admin::BaseController
       .map { |k, v| [k.gsub("reg_label-", ""), v.strip] }.to_h
   end
 
-  def permitted_locations_params
-    %i[name zipcode city state_id _destroy id country_id street phone email publicly_visible
-      impound_location default_impound_location]
+  def locations_attributes
+    %i[name _destroy id phone email publicly_visible impound_location default_impound_location] +
+      [address_record_attributes: AddressRecord.permitted_params + [:id]]
   end
 
   def update_organization_stolen_message

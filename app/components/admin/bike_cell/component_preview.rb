@@ -19,6 +19,10 @@ module Admin::BikeCell
       render(Admin::BikeCell::Component.new(bike_id: 99999999))
     end
 
+    def deleted_bike
+      render(Admin::BikeCell::Component.new(bike_id: 195))
+    end
+
     def with_search_link
       render(Admin::BikeCell::Component.new(
         bike:,

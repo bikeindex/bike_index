@@ -8,17 +8,16 @@ class Admin::BikesController < Admin::BaseController
   def index
     @per_page = permitted_per_page(default: 100)
 
-    @pagy, @bikes = pagy(available_bikes.includes(:creation_organization, :current_ownership, :paint)
+    @pagy, @bikes = pagy(:countish, available_bikes.includes(:creation_organization, :current_ownership, :paint)
       .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
   def missing_manufacturer
     @per_page = permitted_per_page(default: 100)
-    @pagy, @bikes = pagy(
+    @pagy, @bikes = pagy(:countish,
       missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
       limit: @per_page,
-      page: permitted_page
-    )
+      page: permitted_page)
   end
 
   def update_manufacturers
@@ -46,7 +45,7 @@ class Admin::BikesController < Admin::BaseController
     end
     @per_page = permitted_per_page
     @duplicate_groups_count = duplicate_groups.size
-    @pagy, @duplicate_groups = pagy(duplicate_groups, limit: @per_page, page: permitted_page)
+    @pagy, @duplicate_groups = pagy(:countish, duplicate_groups, limit: @per_page, page: permitted_page)
   end
 
   def ignore_duplicate_toggle
@@ -65,12 +64,8 @@ class Admin::BikesController < Admin::BaseController
     if params[:id] == "multi_delete"
       bike_ids = defined?(params[:bikes_selected].keys) ? params[:bikes_selected].keys : params[:bikes_selected]
       if bike_ids.any?
-        bike_ids.each do |id|
-          Bike.unscoped.find(id).destroy!
-          ::Callbacks::AfterBikeSaveJob.perform_async(id)
-        end
-        # Lazy pluralize hack
-        flash[:success] = "#{bike_ids.count} #{(bike_ids.count == 1) ? "bike" : "bikes"} deleted!"
+        bike_ids.each { |id| BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
+        flash[:success] = "#{bike_ids.count} #{"bike".pluralize(bike_ids.count)} deleted!"
       else
         flash[:error] = "No bikes selected to delete!"
       end
@@ -95,9 +90,13 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def update
-    updator = BikeServices::Updator.new(user: current_user, bike: @bike, params:)
-    updator.update_ownership
-    updator.update_stolen_record
+    update_params = permitted_parameters.except(:stolen_records_attributes)
+    BikeServices::OwnershipTransferer.find_or_create(@bike, updator: current_user,
+      new_owner_email: update_params.delete("owner_email"),
+      skip_email: update_params.delete("skip_email"))
+
+    BikeServices::StolenRecordUpdator.new(bike: @bike, params:).update_records
+
     if params[:mark_recovered_reason].present?
       @bike.current_stolen_record.add_recovery_information(
         recovered_description: params[:mark_recovered_reason],
@@ -106,7 +105,7 @@ class Admin::BikesController < Admin::BaseController
         recovering_user_id: current_user.id
       )
     end
-    if @bike.update(permitted_parameters.except(:stolen_records_attributes))
+    if @bike.update(update_params)
       @bike.create_normalized_serial_segments
       return if return_to_if_present
 
@@ -143,8 +142,7 @@ class Admin::BikesController < Admin::BaseController
 
   def destroy_bike
     find_bike
-    @bike.destroy
-    ::Callbacks::AfterBikeSaveJob.perform_async(@bike.id)
+    BikeDeleterJob.new.perform(@bike.id, false, current_user.id)
     flash[:success] = "Bike deleted!"
     redirect_to admin_bikes_url
   end
@@ -154,14 +152,13 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def matching_bikes
-    if params[:user_id].present?
-      @user = User.friendly_find(params[:user_id])
-      bikes = @user.bikes
+    bikes = if params[:user_id].present?
+      user_subject&.bikes
     elsif params[:search_phone].present?
-      bikes = Bike.search_phone(params[:search_phone])
+      Bike.search_phone(params[:search_phone])
     else
       # This unscopes, so it doesn't work with anything above
-      bikes = Bike.unscoped
+      Bike.unscoped
     end
     if params[:search_manufacturer].present?
       @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer])
@@ -186,7 +183,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.motorized if @motorized
 
     # Get a query error if both are passed
-    if params[:search_email].present? && @user.blank?
+    if params[:search_email].present? && user_subject.blank?
       @search_email = params[:search_email]
       bikes = bikes.admin_text_search(@search_email)
     elsif params[:search_domain].present?
@@ -202,6 +199,11 @@ class Admin::BikesController < Admin::BaseController
     if params[:search_model_audit_id].present?
       @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
       bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
+    end
+
+    if params[:search_doorkeeper_app_id].present?
+      @doorkeeper_app = Doorkeeper::Application.find_by_id(params[:search_doorkeeper_app_id])
+      bikes = bikes.includes(:ownerships).where(ownerships: {doorkeeper_app_id: params[:search_doorkeeper_app_id]})
     end
 
     if params[:primary_activity].present?

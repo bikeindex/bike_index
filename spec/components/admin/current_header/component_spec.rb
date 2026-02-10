@@ -17,13 +17,13 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
 
     context "with user_id param" do
       context "when user exists" do
-        let(:user) { FactoryBot.create(:user, name: "Test User") }
-        let(:params) { {user_id: user.id} }
-        let(:options) { {params:, user:, viewing: "Activity"} }
+        let(:user_subject) { FactoryBot.create(:user, name: "Test User") }
+        let(:params) { {user_id: user_subject.id} }
+        let(:options) { {params:, user_subject:, viewing: "Activity"} }
 
         it "renders user information with link" do
           expect(component.text).to match(/Activities\s+for/)
-          expect(component.text).to include(user.display_name)
+          expect(component.text).to include(user_subject.display_name)
           expect(component).to have_css("a", text: "view for all users")
         end
       end

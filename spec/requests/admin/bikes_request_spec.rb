@@ -144,16 +144,12 @@ RSpec.describe Admin::BikesController, type: :request do
     end
 
     context "success" do
-      let(:bike) { FactoryBot.create(:stolen_bike) }
+      let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership) }
       let(:organization) { FactoryBot.create(:organization) }
-      it "updates the bike and calls update_ownership and serial_normalizer" do
-        expect_any_instance_of(BikeServices::Updator).to receive(:update_ownership)
-        expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
-        stolen_record = bike.fetch_current_stolen_record
-        expect(stolen_record).to be_present
-        expect(stolen_record.is_a?(StolenRecord)).to be_truthy
-        bike_attributes = {
+      let(:bike_attributes) do
+        {
           serial_number: "new thing and stuff",
+          owner_email: "new@example.com",
           bike_organization_ids: ["", organization.id.to_s],
           made_without_serial: "0",
           stolen_records_attributes: {
@@ -163,12 +159,24 @@ RSpec.describe Admin::BikesController, type: :request do
             }
           }
         }
+      end
+      it "updates the bike and updates ownership and serial_normalizer" do
+        expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
+        stolen_record = bike.fetch_current_stolen_record
+        expect(stolen_record).to be_present
+        expect(stolen_record.is_a?(StolenRecord)).to be_truthy
+        current_ownership_id = bike.reload.current_ownership&.id
+        expect(bike.updator_id).to be_nil
+
         put "#{base_url}/#{bike.id}", params: {bike: bike_attributes}
         expect(flash[:success]).to be_present
         expect(response).to redirect_to(:edit_admin_bike)
-        bike.reload
+        expect(bike.reload.current_ownership_id).to_not eq current_ownership_id
         expect(bike.serial_number).to eq bike_attributes[:serial_number]
         expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
+        expect(bike.owner_email).to eq "new@example.com"
+        expect(bike.updated_by_user_at).to be_within(2).of Time.current
+        expect(bike.updator_id).to eq current_user.id
         stolen_record.reload
         expect(stolen_record.street).to eq "Cortland and Ashland"
         expect(stolen_record.city).to eq "Chicago"
@@ -239,7 +247,7 @@ RSpec.describe Admin::BikesController, type: :request do
       }.to change(Bike, :count).by(-1)
       expect(response).to redirect_to(:admin_bikes)
       expect(flash[:success]).to match(/deleted/i)
-      expect(::Callbacks::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
+      expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
     end
     context "get_destroy" do
       it "destroys" do
@@ -249,24 +257,22 @@ RSpec.describe Admin::BikesController, type: :request do
         }.to change(Bike, :count).by(-1)
         expect(response).to redirect_to(:admin_bikes)
         expect(flash[:success]).to match(/deleted/i)
-        expect(::Callbacks::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
+        expect(CallbackJob::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
       end
     end
     context "multi_destroy" do
-      it "destroys the all", :flaky do
+      it "enqueues BikeDeleterJob for each bike" do
         bike1 = FactoryBot.create(:bike)
         bike2 = FactoryBot.create(:bike, example: true)
         bike3 = FactoryBot.create(:bike)
         expect(Bike.pluck(:id)).to eq([bike1.id, bike3.id])
-        expect {
-          get "#{base_url}/multi_delete/get_destroy", params: {
-            id: "multi_destroy",
-            bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
-          }
-        }.to change(Bike, :count).by(-1)
-        expect(flash[:success]).to be_present
-        expect(Bike.pluck(:id)).to eq([bike3.id])
-        expect(Bike.unscoped.where.not(deleted_at: nil).pluck(:id)).to match_array([bike1.id, bike2.id])
+        get "#{base_url}/multi_delete/get_destroy", params: {
+          id: "multi_destroy",
+          bikes_selected: {bike1.id => bike1.id, bike2.id => bike2.id}
+        }
+        expect(flash[:success]).to eq "2 bikes deleted!"
+        expect(BikeDeleterJob).to have_enqueued_sidekiq_job(bike1.id, false, current_user.id)
+        expect(BikeDeleterJob).to have_enqueued_sidekiq_job(bike2.id, false, current_user.id)
       end
     end
   end

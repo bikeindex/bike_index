@@ -428,4 +428,20 @@ module ControllerHelpers
       .map { |u| u.downcase.split("\s") }.flatten.map(&:strip)
     (valid_redirect_urls.any? { |u| u.start_with?(redirect_site) }) ? redirect_site : nil
   end
+
+  def permitted_per_page(default: 25, max: 100)
+    per_page = params[:per_page]&.to_i
+    per_page = (per_page.present? && per_page > 0) ? per_page : default
+    per_page.clamp(1, max)
+  end
+
+  def permitted_page(max: nil)
+    page = params[:page]&.to_i || 1
+    page = 1 if page < 1
+    max.present? ? page.clamp(1, max) : page
+  end
+
+  def user_subject
+    @user_subject ||= User.unscoped.friendly_find(params[:user_id])
+  end
 end

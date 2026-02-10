@@ -1124,6 +1124,9 @@ nl:
       hour: uur
       minute: minuut
       second: seconde
+    relative:
+      future: in %{time}
+      past: "%{time} geleden"
   helpers:
     select:
       prompt: Maak een keuze
@@ -1146,6 +1149,7 @@ nl:
       hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
       made_without_serial: gemaakt zonder serie
       unknown: Onbekend
+      deleted: Verwijderd
     organization_helper:
       address: Adres
       address_school: Postadres van de campus
@@ -1869,7 +1873,6 @@ nl:
       unsure_or_unknown: Onzeker of onbekend
       was_made_before_1970: Werd vóór 1970 gemaakt
       manufacturer: Fabrikant
-      sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
       student_id: Student-ID
       owner_email: E-mailadres eigenaar
       register_with: Registreer bij %{organization_name}
@@ -1888,6 +1891,9 @@ nl:
       very_very_few_bikes_html: 'Er zijn heel <em>weinig</em> %{type_html} gemaakt
         zonder serienummers. Tenzij dit %{type_html}:'
       electric_motorized: Elektrisch (gemotoriseerd)
+      model: Model
+      optional: optioneel
+      sticker_id: Sticker-ID
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
@@ -2439,6 +2445,9 @@ nl:
         create:
           can_not_send_message: Helaas kunt u geen bericht naar deze advertentie sturen
           message_sent: Bericht verzonden
+        show:
+          sorry_that_is_you: Dat is jouw advertentie! Je kunt geen nieuw bericht naar
+            jezelf sturen.
       marketplace_listings:
         ensure_user_allowed_to_edit!:
           you_dont_own_that: Oh nee! Het lijkt erop dat je die %{item_type} niet hebt.
@@ -4558,15 +4567,10 @@ nl:
     manages:
       location_fields:
         address: Adres
-        choose_country: Kies land
-        city: City
         location_name: Locatie naam
         name: Naam
         phone_number: Telefoonnummer
         remove: Locatie verwijderen
-        state: Staat
-        street: Straat
-        zipcode: Postcode
       locations:
         add_location: Locatie toevoegen
         bike_index_partner_map: Bike Index-partnerkaart
@@ -4612,59 +4616,6 @@ nl:
     finished_owned_registration:
       subject: "%{organization_name} Registratie van fietsindex succesvol"
     finished_registration:
-      html:
-        a_correctly_locked_bike: Een correct vergrendelde fiets. Het frame is vergrendeld
-          aan het fietsenrek en beide wielen zijn vastgezet.
-        a_donation_will_prioritize_html: Een donatie zal %{prioritize_link} en ons
-          helpen uw fiets bij u terug te krijgen. We zijn een 501 (c) (3) non-profit
-          en zijn afhankelijk van donaties om te opereren
-        before_locking_check: Controleer voordat u vergrendelt, dat wat u vergrendelt,
-          niet eenvoudig kan worden verwijderd.
-        cable_locks_should_never_be_used: Kabelsloten mogen nooit worden gebruikt
-          als primair middel om een fiets in een stad te vergrendelen.
-        correctly_locking_a_bike: Een fiets correct vergrendelen
-        donating: doneren
-        give_us_a_heads_up: Geef ons een waarschuwing
-        hopefully_you_find_the_owner_html: Hopelijk vind je snel de eigenaar. %{edit_bike_link}
-          wanneer u dat doet!
-        mark_recovered_link_html: "%{mark_recovered_link} wanneer u dat doet!"
-        mark_your_bike_recovered: Markeer je fiets als hersteld
-        org_added_a_bike_html: "<strong>%{org_name}</strong> heeft voor jou een %{bike_type}
-          toegevoegd op Bike Index"
-        org_sent_a_bike_html: "<strong>%{org_name}</strong> heeft u een <strong>%{bike_type}</strong>
-          gestuurd op Bike Index"
-        pink_power_ulocks_tm: Pink Power U-Locks zijn een geregistreerd handelsmerk
-          van Bike Index, NFP
-        please_consider_donating_html: Overweeg %{donating_link} naar Bike Index!
-        prioritize_your_listing: geef prioriteit aan uw vermelding
-        protect_your_bike_by_following_these_lock: Bescherm uw fiets door deze vergrendelingsrichtlijnen
-          te volgen.
-        protecting_your_bike_here: hier je fiets beschermen
-        read_more_about_protecting_html: Lees meer over %{link}.
-        secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - hetzij
-          met twee U-sloten, of één U-slot en één zware kabel.
-        use_a_ulock: Gebruik een U-Lock.
-        welcome_to_bike_index: Welkom bij Bike Index
-        you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
-          Bike Index
-        youre_almost_done_registering: Je bent bijna klaar met registreren
-        bike_type_thieves_are_jerks: "%{bike_type} dieven zijn klootzakken."
-        claim_the_bike_type: Claim de %{bike_type}
-        confirm_this_bike_type: Bevestig dit %{bike_type}
-        recovered_bike_type: hersteld / gevonden %{bike_type}
-        stolen_bike_type: gestolen %{bike_type}
-        thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
-          deze %{bike_type} die je aan Bike Index hebt gevonden
-        were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
-          gestolen.
-        bike_register_with_bike_index: Gefeliciteerd met het registreren van uw %{bike_type}
-          bij Bike Index
-        bike_register_with_bike_index_and_org: Gefeliciteerd met het registreren van
-          uw %{bike_type} bij Bike Index en %{org_name}
-        hopefully_you_find_the_bike_html: Hopelijk vindt u de %{bike_type} binnenkort.
-        sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
-          je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor
-          te zorgen dat je nooit je vertrouwde ros uit het oog verliest!
       subject: Bevestig uw %{organization_name} Bike Index-registratie
     finished_stolen_registration:
       subject: Bevestig uw %{organization_name} gestolen %{bike_type} op Bike Index
@@ -5677,10 +5628,9 @@ nl:
         new_message: Nieuw bericht
         reply_to_message: Reageer op bericht
         send_message: Verstuur bericht
+        already_sold: 'Let op: dit %{item_type} is %{listing_status} geweest.'
       index:
         marketplace_messages: Marktplaatsberichten
-      show:
-        can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -6002,6 +5952,12 @@ nl:
       result_view_select:
         bike_box_view: Bekijk als lijst
         thumbnail_view: Bekijken als miniaturen
+      form_organized:
+        doesnt_look_like_serial: Dit lijkt geen serienummer. Serienummers bestaan
+          meestal uit 6 of meer letters en cijfers en bevinden zich onder de trapas.
+        search_for_serial_number: Zoek naar framenummer
+        search_owner_email: Zoek eigenaar e-mail
+        submit: Voorleggen
     legacy_form_well:
       address_record:
         address: Adres
@@ -6014,28 +5970,22 @@ nl:
         your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
         address_no_street: Adres
         street_2: Straatadres regel 2 (optioneel)
+        address_or_intersection: Adres of kruispunt
+        where_was_it_status: Waar was het %{bike_status}?
       address_record_with_default:
         edit_my_account_path: bewerken op mijn account
         use_account_address: Gebruik accountadres
-    definition_list:
-      row:
-        no_value: geen
-    alert_for_errors:
-      errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-        dit %{object_name} wordt opgeslagen:"
-    messages:
-      thread:
-        from: uit
-        me: mij
-        to: Naar
-      thread_show:
-        subject: Onderwerp
     search_results:
       bike_box:
         location: Plaats
         posted_at: Genoteerd
         primary_colors: Primaire kleuren
         serial: Serie
+        deleted: Verwijderd
+        ended_at: Einde
+        not_applicable: Niet van toepassing
+        price: Prijs
+        removed_from: Verwijderd uit de fietsindex
       vehicle_thumbnail:
         registered_not_stolen: geregistreerd, niet gestolen
       container:
@@ -6128,3 +6078,107 @@ nl:
         community_groups: Community's
         schools: scholen
         theft_victims: Slachtoffers van diefstal
+      new_sale_form:
+        record_sale: Recordverkoop
+        sold_for: Verkoopbedrag voor
+        transfer_to_html: Hierdoor wordt de registratie overgedragen naar %{buyer_html}
+          en de vermelding op de marktplaats gesloten.
+    emails:
+      partials:
+        bike_box:
+          bike_photo: Fietsfoto
+          color: Kleur
+          color_may_be_incorrect: De kleur kan onjuist zijn omdat deze tijdens de
+            POS-import is ingesteld.
+          found: 'gevonden:'
+          make: 'Maken:'
+          serial: 'Serial:'
+          stolen_at: 'Gestolen bij:'
+          stolen_from: 'Gestolen van:'
+      finished_registration:
+        a_correctly_locked_bike: Een correct vergrendelde fiets. Het frame is vergrendeld
+          aan het fietsenrek en beide wielen zijn vastgezet.
+        a_donation_will_prioritize_prefix: Een donatie zal
+        a_donation_will_prioritize_suffix: En help ons uw fiets terug te bezorgen.
+          Wij zijn een 501(c)(3) non-profitorganisatie en zijn afhankelijk van donaties
+          om te kunnen functioneren.
+        before_locking_check: Controleer voordat u vergrendelt, dat wat u vergrendelt,
+          niet eenvoudig kan worden verwijderd.
+        bike_register_with_bike_index: Gefeliciteerd met het registreren van uw %{bike_type}
+          bij Bike Index
+        bike_register_with_bike_index_and_org: Gefeliciteerd met het registreren van
+          uw %{bike_type} bij Bike Index en %{org_name}
+        bike_type_thieves_are_jerks: "%{bike_type} dieven zijn klootzakken."
+        cable_locks_should_never_be_used: Kabelsloten mogen nooit worden gebruikt
+          als primair middel om een fiets in een stad te vergrendelen.
+        claim_the_bike_type: Claim de %{bike_type}
+        confirm_this_bike_type: Bevestig dit %{bike_type}
+        correctly_locking_a_bike: Een fiets correct vergrendelen
+        donating: doneren
+        give_us_a_heads_up: Geef ons een waarschuwing
+        hopefully_you_find_the_bike: Hopelijk vindt u de %{bike_type} binnenkort.
+        hopefully_you_find_the_owner_prefix: Hopelijk vind je de eigenaar snel.
+        hopefully_you_find_the_owner_suffix: wanneer je dat doet!
+        mark_your_bike_recovered: Markeer je fiets als hersteld
+        org_added_a_bike: Ik heb een %{bike_type} toegevoegd aan Bike Index voor jou.
+        org_sent_a_bike: Ik heb je een %{bike_type} gestuurd via Bike Index
+        pink_power_ulocks_tm: Pink Power U-Locks zijn een geregistreerd handelsmerk
+          van Bike Index, NFP
+        please_consider_prefix: Houd hier rekening mee.
+        please_consider_suffix: Welkom bij Bike Index!
+        prioritize_your_listing: geef prioriteit aan uw vermelding
+        protect_your_bike_by_following_these_lock: Bescherm uw fiets door deze vergrendelingsrichtlijnen
+          te volgen.
+        protecting_your_bike_here: hier je fiets beschermen
+        read_more_about_prefix: Lees meer over
+        recovered_bike_type: hersteld / gevonden %{bike_type}
+        secure_both_wheels_either_with_two_ulocks: Beveilig beide wielen - hetzij
+          met twee U-sloten, of één U-slot en één zware kabel.
+        sign_up_on_bikeindexorg_to_claim_your_bik: Meld je aan op BikeIndex.org om
+          je %{bike_type} te claimen en te bewerken, foto's te uploaden en ervoor
+          te zorgen dat je nooit je vertrouwde ros uit het oog verliest!
+        stolen_bike_type: gestolen %{bike_type}
+        thanks_for_adding_this_bike_type_you_found: Bedankt voor het toevoegen van
+          deze %{bike_type} die je aan Bike Index hebt gevonden
+        use_a_ulock: Gebruik een U-Lock.
+        welcome_to_bike_index: Welkom bij Bike Index
+        were_sorry_your_bike_type_was_stolen: Het spijt ons dat uw %{bike_type} is
+          gestolen.
+        when_you_do: wanneer je dat doet!
+        you_added_a_bike_type_on_bike_index: U heeft een %{bike_type} toegevoegd op
+          Bike Index
+        youre_almost_done_registering: Je bent bijna klaar met registreren!
+    messages:
+      thread_show:
+        can_not_send_new_message: Helaas, u kunt geen nieuw bericht versturen.
+        sold_to: Mark %{item_type} verkocht aan
+        banned_message: Het spijt ons, maar die gebruiker is geblokkeerd en kan geen
+          nieuwe berichten meer ontvangen.
+        deleted_message: Het spijt ons, maar die gebruiker heeft zijn account verwijderd
+          en kan geen nieuwe berichten meer ontvangen.
+      thread_show_message:
+        me: Mij
+        subject: Onderwerp
+        to: Naar
+        to_me: voor mij
+        you_to: jij naar
+      threads_index:
+        from: uit
+        me: mij
+        to: Naar
+    ui:
+      definition_list:
+        row:
+          no_value: geen
+      alert_for_errors:
+        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+          dit %{object_name} wordt opgeslagen:"
+    org:
+      location_address_fields:
+        address: Adres
+        choose_country: Kies land
+        city: City
+        postal_code: Postcode
+        region: Regio / Provincie
+        state: Staat
+        street: Straat

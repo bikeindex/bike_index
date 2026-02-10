@@ -35,10 +35,9 @@
             .less-strong-hold
               %a.convertTime{ href: edit_admin_ownership_url(ownership.id) }
                 = l ownership.created_at, format: :convert_time
-              - if display_dev_info?
-                &nbsp;
-                %span.less-strong-right.d-none.d-md-block.only-dev-visible
-                  = ownership.id
+              &nbsp;
+              %code.less-strong-right.d-none.d-md-block
+                = ownership.id
           %td
             %small.convertTime
               = l ownership.updated_at, format: :convert_time

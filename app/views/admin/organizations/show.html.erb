@@ -1,0 +1,694 @@
+<%= render partial: "/admin/organizations/display_header", locals: {current_action: "", show_custom_layouts: true, organization_view_path: organization_root_path(organization_id: @organization.to_param), show_edit: true} %>
+
+<% if OrganizationDisplayer.law_enforcement_missing_verified_features?(@organization) %>
+  <div class="alert alert-info">
+    This is a law enforcement organization without unstolen notifications. To
+    enable unstolen notifications,
+    <%= link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i) %>
+    and enable "Law Enforcement functionality" in it
+  </div>
+<% end %>
+
+<div class="row">
+  <div class="col-md-6">
+    <table class="table-list">
+      <% if display_dev_info? %>
+        <tr class="small only-dev-visible">
+          <td>ID</td>
+          <td><%= @organization.id %></td>
+        </tr>
+      <% end %>
+
+      <tr>
+        <td>Short Name</td>
+
+        <td>
+          <%= @organization.short_name %>
+
+          <% if CredibilityScorer.organization_trusted?(@organization) %>
+            <span class="badge badge-success ml-2">Trusted credibility</span>
+          <% elsif CredibilityScorer.organization_suspicious?(@organization) %>
+            <span class="badge badge-warning ml-2">Suspicious credibility</span>
+          <% end %>
+
+          <% if @organization.spam_registrations %>
+            <small class="ml-1 text-danger">high spam registrations</small>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Map</td>
+
+        <td>
+          <% unless @organization.approved %>
+            <strong>Not approved</strong>
+            <small>therefor hidden</small>
+            <em>Would be</em>
+          <% end %>
+
+          <% if @organization.show_on_map %>
+            <span class="less-strong">Shown on map</span>
+          <% else %>
+            <strong>Not Shown</strong>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Kind</td>
+
+        <td>
+          <%= @organization.kind_humanized %>
+
+          <% if @organization.enabled?("official_manufacturer") %>
+            <% unless @organization.kind == "bike_manufacturer" %>
+              <span class="text-warning">
+                Kind should be "Bike Manufacturer"
+              </span>
+            <% end %>
+            <br>
+            <% if @organization.manufacturer_id.present? %>
+              <strong><%= @organization.manufacturer.name %></strong>
+              <em class="less-strong">Manufacturer official account of</em>
+            <% else %>
+              <strong class="text-danger">No Manufacturer assigned</strong>
+              <span class="less-strong">
+                <%= link_to "edit organization", edit_admin_organization_path(@organization) %>
+                to add
+              </span>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Slug</td>
+
+        <td>
+          <%= @organization.slug %> |
+          <%= link_to "embed", embed_registrations_url(organization_id: @organization.to_param) %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Created</td>
+
+        <td>
+          <span class="convertTime preciseTime">
+            <%= l @organization.created_at, format: :convert_time %>
+          </span>
+
+          <small class="convertTimezone"></small>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Updated</td>
+
+        <td>
+          <span class="convertTime preciseTime">
+            <%= l @organization.updated_at, format: :convert_time %>
+          </span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table-list">
+      <tr>
+        <td>Auto user email</td>
+
+        <td>
+          <%= @organization.auto_user.email if @organization.auto_user.present? %>
+        </td>
+      </tr>
+
+      <% if display_dev_info? %>
+        <tr class="small">
+          <td class="only-dev-visible">API V1 token</td>
+
+          <td class="only-dev-visible">
+            <div id="stupidLegacyToken" style="overflow-x: scroll;">
+              <code class="small"><%= @organization.access_token %></code>
+            </div>
+          </td>
+        </tr>
+        <tr class="small">
+          <td class="only-dev-visible">User Reg all bikes?</td>
+
+          <td class="only-dev-visible">
+            <%= @organization.user_registration_all_bikes? %>
+          </td>
+        </tr>
+      <% end %>
+
+      <tr>
+        <td>Users</td>
+
+        <td>
+          <%= link_to @organization.users.count, admin_users_path(organization_id: @organization.to_param) %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Sent Invites</td>
+
+        <td>
+          <%= number_with_delimiter @organization.sent_invitation_count %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Remaining invites</td>
+
+        <td>
+          <% if @organization.restrict_invitations? %>
+            <%= number_with_delimiter @organization.remaining_invitation_count %>
+          <% else %>
+            <em>permitted domain, no invite restrictions</em>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Website</td>
+
+        <td>
+          <%= @organization.website %>
+
+          <% if @organization.website.present? %>
+            <%= link_to @organization.website, class: "strong" do %>
+              &#128279;
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+
+      <tr>
+        <td>POS integration:</td>
+
+        <td>
+          <% if @organization.no_pos? %>
+            <em class="small less-strong">no integration</em>
+          <% elsif @organization.ascend_or_broken_ascend? %>
+            <%= link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param) %>
+            <small>
+              Ascend name: <em><%= @organization.ascend_name %></em>
+            </small>
+          <% elsif @organization.broken_pos? %>
+            <span class="text-danger">POS Integration broken!</span>
+            <%= @organization.pos_kind.humanize %>
+          <% elsif @organization.does_not_need_pos? %>
+            <small class="less-strong">Does not need POS integration</small>
+          <% end %>
+
+          <% if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any? %>
+            <%= link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}" %>
+          <% end %>
+
+          <% if display_dev_info? && @organization.manual_pos_kind.present? %>
+            <small class="only-dev-visible d-inline-block ml-2">
+              <em class="less-strong">manual POS kind set:</em>
+              <%= @organization.manual_pos_kind %>
+            </small>
+          <% end %>
+
+          <% if !@organization.no_pos? || @organization.opted_into_theft_survey_2023 %>
+            <small class="ml-3">
+              <span class="less-strong">theft survey?</span>
+              <%= @organization.opted_into_theft_survey_2023 %>
+            </small>
+          <% end %>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <p>
+      <% if @organization.invoices.count > 0 %>
+        <strong><%= @organization.invoices.active.count %> active</strong>
+        and
+      <% end %>
+
+      <em class="less-strong">
+        <%= link_to "#{pluralize(@organization.invoices.count, 'invoice')} total", admin_organization_invoices_path(organization_id: @organization) %>
+      </em>
+
+      <% if OrganizationDisplayer.subscription_expired_alert?(@organization) %>
+        <span
+          class="text-danger"
+          title="the subscription expired message will be shown to them in their portal"
+        >
+          Subscription expired
+        </span>
+      <% end %>
+    </p>
+
+    <% if @organization.parent_organization.present? %>
+      <p>
+        Parent
+        <strong class="em">
+          <%= @organization.parent_organization.short_name %>
+        </strong>
+        has
+        <%= link_to admin_organization_invoices_path(organization_id: @organization.parent_organization.to_param) do %>
+          <%= pluralize(@organization.parent_organization.invoices.count, "invoice") %>
+        <% end %>
+        <small class="less-strong">
+          which may add features to this organization
+        </small>
+      </p>
+    <% end %>
+
+    <%= render partial: "/admin/organizations/invoices/table", locals: {invoices: @organization.invoices.order(id: :desc).limit(3), skip_discount_due: true} %>
+  </div>
+
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Paid</td>
+
+          <td>
+            <% if @organization.paid? %>
+              <strong>True</strong>
+            <% else %>
+              <% if LandingPages::ORGANIZATIONS.include?(@organization.slug) %>
+                <p class="text-danger">
+                  IS NOT MARKED PAID BUT HAS A LANDING PAGE
+                </p>
+              <% elsif @organization.paid_previously? %>
+                <strong class="text-warning">Previously paid!</strong>
+              <% else %>
+                False
+              <% end %>
+            <% end %>
+
+            <em class="small less-strong">
+              Set this via
+              <%= link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param) %>
+            </em>
+          </td>
+        </tr>
+
+        <% if @organization.paid? %>
+          <tr>
+            <td>Bike Search</td>
+
+            <td>
+              <% if @organization.enabled?("bike_search") %>
+                Yes
+              <% else %>
+                <small class="less-strong">no</small>
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <td>Templates</td>
+
+            <td>
+              <% if @organization.mail_snippets.any? %>
+                <%= @organization.mail_snippets.pluck(:kind).to_sentence %>
+              <% else %>
+                <small class="less-strong">none</small>
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <td>Landing Page</td>
+
+            <td>
+              <% if @organization.landing_html.present? %>
+                <% if LandingPages::ORGANIZATIONS.include?(@organization.slug) %>
+                  <%= link_to 'public landing page', "#{ENV['BASE_URL']}/#{@organization.slug}" %>
+                <% else %>
+                  landing page is not public -
+                  <%= link_to 'landing page', organization_landing_path(organization_id: @organization.to_param) %>
+                <% end %>
+              <% else %>
+                <small class="less-strong">no</small>
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <td>Additional Fields</td>
+
+            <td>
+              <% additional_fields = @organization.additional_registration_fields.map { |i| OrganizationFeature.reg_field_to_bike_attrs(i)&.titleize(keep_id_suffix: true) } %>
+
+              <% if additional_fields.none? %>
+                <small class="less-strong">none</small>
+              <% else %>
+                <small><%= additional_fields.join(", ") %></small>
+                <br>
+                <% if @organization.registration_field_labels.values.none? %>
+                  <em class="small less-strong">No custom labels</em>
+                <% else %>
+                  <em class="small less-strong">Custom Labels:</em>
+                  <ul class="small mb-0">
+                    <% @organization.registration_field_labels.each do |field, label| %>
+                      <li>
+                        <strong>
+                          <%= OrganizationFeature.reg_field_to_bike_attrs(field).titleize(keep_id_suffix: true) %>:
+                        </strong>
+
+                        <%= label %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+          <% if @organization.enabled?("hot_sheet") %>
+            <tr>
+              <td>Hot Sheet</td>
+
+              <td>
+                <% if @organization.hot_sheet_on? %>
+                  Enabled
+                  <em class="less-strong">
+                    <%= "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count) %>
+                  </em>
+                <% else %>
+                  <small class="less-strong">not enabled</small>
+                <% end %>
+
+                <small>
+                  <%= link_to "configuration", edit_organization_hot_sheet_path(organization_id: @organization.to_param) %>
+                </small>
+              </td>
+            </tr>
+          <% end %>
+          <% if @organization.enabled?("organization_stolen_message") %>
+            <% organization_stolen_message = OrganizationStolenMessage.for(@organization) %>
+            <tr>
+              <td>Stolen Message</td>
+
+              <td>
+                <% if organization_stolen_message.is_enabled %>
+                  <%= link_to "Enabled", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param) %>
+                <% elsif organization_stolen_message.body.present? %>
+                  has content, not enabled
+                <% else %>
+                  <small class="less-strong">no</small>
+                <% end %>
+
+                <% if organization_stolen_message.report_url.present? %>
+                  <small>Report URL present</small>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          <tr>
+            <td>Stickers</td>
+
+            <td>
+              <% if @organization.enabled?("bike_stickers") %>
+                <%= link_to admin_bike_stickers_path(organization_id: @organization.to_param) do %>
+                  <%= number_display(@organization.bike_stickers.count) %>
+                  stickers
+                <% end %>
+              <% else %>
+                <small class="less-strong">no</small>
+              <% end %>
+            </td>
+          </tr>
+          <% if @organization.enabled?("graduated_notifications") %>
+            <tr>
+              <td>Graduated bikes</td>
+
+              <td>
+                <% if @organization.deliver_graduated_notifications? %>
+                  Delivering notifications
+                  <small>
+                    <%= @organization.graduated_notification_interval_days %>
+                    day interval
+                  </small>
+                <% else %>
+                  <em class="text-warning">Not delivering</em>
+                  <small>notification interval is not set</small>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          <tr>
+            <td>Enabled features</td>
+
+            <td class="small">
+              <%= safe_join(@organization.enabled_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ") %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @organization.parent_organization.present? %>
+          <% associated_orgs = true %>
+          <tr>
+            <td>Child of</td>
+
+            <td>
+              <%= link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization) %>
+
+              <small class="less-strong d-block">
+                Parent organization should be part of the same organization. Use
+                "regional" feature otherwise
+              </small>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @organization.parent? %>
+          <% associated_orgs = true %>
+          <tr>
+            <td>Child organizations</td>
+
+            <td>
+              <ul style="font-size: 80%; margin-bottom: 0.5rem;">
+                <% @organization.child_organizations.each do |org| %>
+                  <li><%= link_to org.name, admin_organization_url(org) %></li>
+                <% end %>
+              </ul>
+
+              <small class="less-strong d-block">
+                Parent organization should be part of the same organization. Use
+                "regional" feature otherwise
+              </small>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @organization.regional? %>
+          <% associated_orgs = true %>
+          <tr>
+            <td>Regional Sub-Organizations</td>
+
+            <td>
+              <ul style="font-size: 80%; margin-bottom: 0.5rem;">
+                <% @organization.nearby_organizations.each do |suborg| %>
+                  <li>
+                    <%= link_to suborg.name, admin_organization_path(suborg) %>
+                  </li>
+                <% end %>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>Regional address</td>
+
+            <td>
+              <%= render UI::AddressDisplay::Component.new(address_record: @organization.default_address_record, visible_attribute: :street, kind: :single_line) %>
+            </td>
+          </tr>
+          <tr>
+            <td>Search radius</td>
+
+            <td>
+              <%= @organization.search_radius_display %>
+
+              <small class="less-strong">
+                This controls which organizations are regional sub organizations
+              </small>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if @organization.regional_parents.any? %>
+          <% associated_orgs = true %>
+          <tr>
+            <td>Regional overview organization</td>
+
+            <td>
+              <% if @organization.regional_parents.count == 1 %>
+                <% regional_parent = @organization.regional_parents.first %>
+                <%= link_to regional_parent.name, admin_organization_path(regional_parent) %>
+              <% else %>
+                <ul style="font-size: 80%; margin-bottom: 0.5rem;">
+                  <% @organization.regional_parents.each do |regional_parent| %>
+                    <li>
+                      <%= link_to regional_parent.name, admin_organization_path(regional_parent) %>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+
+              <small class="less-strong d-block">
+                Search radius includes this organization
+              </small>
+            </td>
+          </tr>
+        <% end %>
+
+        <% unless associated_orgs %>
+          <tr>
+            <td>Associated orgs</td>
+
+            <td>
+              <em class="small less-strong">No associated organizations</em>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-sm-6">
+    <h2>
+      <%= number_with_delimiter(@bikes_count) %>
+      <%= "Bike".pluralize(@bikes_count) %>
+
+      <em class="small">
+        <%= link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param) %>
+      </em>
+    </h2>
+  </div>
+
+  <div class="col-sm-6 text-right">
+    <%= link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param), class: "gray-link mt-3 d-inline-block" %>
+  </div>
+</div>
+
+<%= render partial: "/admin/bikes/table", locals: { bikes: @bikes } %>
+
+<% organization_roles = @deleted_organization_roles ? @organization.organization_roles.deleted.reorder(deleted_at: :asc) : @organization.organization_roles.reorder(created_at: :asc) %>
+
+<div class="row mt-4">
+  <div class="col-6">
+    <h4>
+      <%= number_with_delimiter(organization_roles.count) %>
+
+      <% if @deleted_organization_roles %>
+        <span class="text-danger">Deleted</span>
+      <% end %>
+
+      <%= "OrganizationRole".pluralize(organization_roles.count) %>
+
+      <small>
+        <% if @deleted_organization_roles %>
+          <small>
+            <%= number_with_delimiter(organization_roles.claimed.count) %>
+            claimed
+          </small>
+          <% unless @organization.deleted? %>
+            -
+            <small class="less-strong">
+              <%= link_to admin_organization_path(@organization, deleted_organization_roles: false), class: "gray-link" do %>
+                <%= number_with_delimiter(@organization.organization_roles.count) %>
+                 <strong>NOT</strong> deleted organization role
+              <% end %>
+            </small>
+          <% end %>
+        <% else %>
+          <small>
+            <%= number_with_delimiter(@organization.organization_roles.claimed.count) %>
+            claimed
+          </small>
+          -
+          <small class="less-strong">
+            <%= link_to admin_organization_path(@organization, deleted_organization_roles: true), class: "gray-link" do %>
+              <%= number_with_delimiter(@organization.organization_roles.deleted.count) %>
+              deleted
+            <% end %>
+          </small>
+          <small>
+            <%= link_to "new organization role", new_admin_organization_role_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3" %>
+          </small>
+        <% end %>
+      </small>
+    </h4>
+  </div>
+
+  <div class="col-6 text-right">
+    <%= link_to "View all organization_roles", admin_organization_roles_path(organization_id: @organization.to_param) %>
+  </div>
+</div>
+
+<% if organization_roles.count > 0 %>
+  <%= render partial: "/admin/organization_roles/table", locals: { organization_roles: organization_roles.limit(25), skip_organization: true, render_deleted: @deleted_organization_roles} %>
+<% end %>
+
+<hr class="mt-4">
+
+<h4>Locations</h4>
+
+<% if @locations.any? %>
+  <% if @locations.count > 1 %>
+    <h4 class="mt-4"><%= pluralize(@locations.count, "Location") %></h4>
+  <% end %>
+  <div class="row">
+    <% @locations.each do |location| %>
+      <div class="col-lg-4 col-sm-6 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <% if display_dev_info? %>
+              <p>
+                ID: <code class="only-dev-visible"><%= location.id %></code>
+              </p>
+            <% end %>
+
+            <% if location.impound_location %>
+              <strong>
+                <% if location.default_impound_location %>
+                  <span class="text-info">Default</span>
+                <% end %>
+                Impound location
+              </strong>
+            <% elsif !location.shown && @organization.allowed_show? %>
+              <strong class="text-warning">
+                Location is not visible! Try updating the organization
+              </strong>
+            <% end %>
+
+            <p>Name: <%= location.name %></p>
+            <p>Phone: <%= phone_display(location.phone) %></p>
+
+            <p>
+              Address:
+              <%= render(UI::AddressDisplay::Component.new(address_record: location.address_record, visible_attribute: :street)) %>
+            </p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="row">
+  <div class="col-6">
+    <%= link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success" %>
+  </div>
+
+  <div class="col-6 text-right">
+    <% if @organization.deleted? %>
+      <%= link_to "Un-Delete organization", admin_recover_organization_path(id: @organization.id), data: {confirm: "Are you sure?"}, class: "btn btn-outline-warning" %>
+    <% else %>
+      <%= link_to "Delete", admin_organization_url(@organization), method: :delete, data: {confirm: "Are you sure?"}, class: "btn btn-danger" %>
+    <% end %>
+  </div>
+</div>

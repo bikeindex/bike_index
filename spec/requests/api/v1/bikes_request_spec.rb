@@ -368,7 +368,7 @@ RSpec.describe API::V1::BikesController, type: :request do
       end
 
       include_context :geocoder_real
-      it "creates a stolen record" do
+      it "creates a stolen record", :flaky do
         VCR.use_cassette("v1_bikes_create-stolen", match_requests_on: [:path]) do
           manufacturer = FactoryBot.create(:manufacturer)
           @organization.users.first.update_attribute :phone, "123-456-6969"

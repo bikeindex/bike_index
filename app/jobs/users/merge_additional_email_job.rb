@@ -7,7 +7,7 @@ class Users::MergeAdditionalEmailJob < ApplicationJob
 
     old_user = find_old_user(user_email.email, user_email.user_id)
     merge_old_user(user_email, old_user) if old_user.present?
-    ::Callbacks::AfterUserCreateJob.new.perform(user_email.user_id, "merged", user: user_email.user, email: user_email.email)
+    CallbackJob::AfterUserCreateJob.new.perform(user_email.user_id, "merged", user: user_email.user, email: user_email.email)
   end
 
   def merge_old_user(user_email, old_user)
@@ -32,6 +32,9 @@ class Users::MergeAdditionalEmailJob < ApplicationJob
 
     BikeVersion.unscoped.where(owner_id: old_user.id).each { |i| i.update(owner_id: user_id) }
     Doorkeeper::Application.where(owner_id: old_user.id).each { |i| i.update_attribute(:owner_id, user_id) }
+    ImpoundRecord.where(user_id: old_user.id).each { |i| i.update_attribute(:user_id, user_id) }
+    GraduatedNotification.where(user_id: old_user.id).each { |i| i.update_attribute(:user_id, user_id) }
+    ParkingNotification.where(user_id: old_user.id).each { |i| i.update_attribute(:user_id, user_id) }
     CustomerContact.where(user_id: old_user.id).each { |i| i.update_attribute(:user_id, user_id) }
     CustomerContact.where(creator_id: old_user.id).each { |i| i.update_attribute(:creator_id, user_id) }
     update_address_records(user_id, old_user.id)
@@ -43,8 +46,6 @@ class Users::MergeAdditionalEmailJob < ApplicationJob
 
     # No index, so update all
     BikeSticker.where(user_id: old_user.id).update_all(user_id:)
-    GraduatedNotification.where(user_id: old_user.id).update_all(user_id:)
-    ParkingNotification.where(user_id: old_user.id).update_all(user_id:)
 
     if user_email.user.stripe_id.blank? && old_user.stripe_id.present?
       user_email.user.update(stripe_id: old_user.stripe_id)

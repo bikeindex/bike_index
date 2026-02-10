@@ -3,7 +3,7 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @user_registration_organizations = pagy(matching_user_registration_organizations
+    @pagy, @user_registration_organizations = pagy(:countish, matching_user_registration_organizations
       .reorder("user_registration_organizations.#{sort_column} #{sort_direction}")
       .includes(:user, :organization), limit: @per_page, page: permitted_page)
     @render_org_counts = Binxtils::InputNormalizer.boolean(params[:search_org_counts])
@@ -24,8 +24,7 @@ class Admin::UserRegistrationOrganizationsController < Admin::BaseController
   def matching_user_registration_organizations
     user_registration_organizations = UserRegistrationOrganization
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      user_registration_organizations = user_registration_organizations.where(user_id: @user.id)
+      user_registration_organizations = user_registration_organizations.where(user_id: user_subject&.id || params[:user_id])
     end
     if current_organization.present?
       user_registration_organizations = user_registration_organizations.where(organization_id: current_organization.id)

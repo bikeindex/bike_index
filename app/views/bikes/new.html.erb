@@ -151,7 +151,10 @@
           </div>
 
           <div class="form-group row fancy-select unfancy unnested-field">
-            <%= f.label :year, t(".model_year"), class: 'form-well-label' %>
+            <%= f.label :year, class: 'form-well-label' do %>
+              <%= t(".model_year") %>
+              <small class="less-strong"><%= t(".optional") %></small>
+            <% end %>
 
             <div class="form-well-input">
               <% years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] } %>
@@ -167,7 +170,10 @@
           </div>
 
           <div class="form-group row unnested-field">
-            <%= f.label :frame_model, class: 'form-well-label' %>
+            <%= f.label :frame_model, class: 'form-well-label' do %>
+              <%= t(".model") %>
+              <small class="less-strong"><%= t(".optional") %></small>
+            <% end %>
 
             <div class="form-well-input">
               <%= f.text_field :frame_model, class: 'form-control' %>
@@ -199,11 +205,13 @@
 
           <% if @bike.status_impounded? %>
             <%= fields_for @bike.impound_records.last do |irecord| %>
-              <%= render partial: '/bikes_edit/bike_fields/stolen_location', locals: {srecord: irecord} %>
-            <% end %>
-          <% end %>
+              <% irecord.object.address_record = f.object.find_or_build_address_record(country_id: current_country_id) %>
 
-          <% if BikeServices::Builder.include_address_record?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user) %>
+              <%= irecord.fields_for :address_record do |address_form| %>
+                <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status: @bike.status)) %>
+              <% end %>
+            <% end %>
+          <% elsif BikeServices::Builder.include_address_record?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user) %>
             <%= f.fields_for :address_record do |address_form| %>
               <%= render(LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @bike.creation_organization, street_2: true)) %>
             <% end %>
@@ -263,7 +271,10 @@
 
           <% if include_field_reg_bike_sticker?(@organization, current_user, true) %>
             <div class="form-group row unnested-field no-divider-row">
-              <%= f.label :bike_sticker, t(".sticker_id_html"), class: "form-well-label" %>
+              <%= f.label :bike_sticker, class: "form-well-label" do %>
+                <%= t(".sticker_id") %>
+                <small class="less-strong"><%= t(".optional") %></small>
+              <% end %>
 
               <div class="form-well-input">
                 <%= f.text_field :bike_sticker,

@@ -114,7 +114,7 @@ class PropulsionType
     def motorized_autocomplete_hash
       {
         id: 10,
-        text: "E-Vehicles",
+        text: "E-Vehicles (electric vehicles)",
         priority: 980,
         category: "propulsion",
         data: {priority: 980, slug: :motorized, search_id: "p_10"}

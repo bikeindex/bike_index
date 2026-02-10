@@ -7,11 +7,16 @@ class MyAccounts::MessagesController < ApplicationController
     params[:page] || 1
     @per_page = permitted_per_page(default: 50)
     @marketplace_messages = matching_marketplace_messages
-    @pagy, @marketplace_messages = pagy(matching_marketplace_messages
+    @pagy, @marketplace_messages = pagy(:countish, matching_marketplace_messages
       .includes(:marketplace_listing, :sender, :receiver, :initial_record), limit: @per_page, page: permitted_page)
   end
 
   def show
+    if new_message_to_self?
+      flash[:notice] = translation(:sorry_that_is_you)
+      redirect_back(fallback_location: bike_path(@marketplace_listing.item_id)) && return
+    end
+
     @marketplace_messages = matching_marketplace_thread
     @initial_record = @marketplace_messages.first
 
@@ -40,7 +45,7 @@ class MyAccounts::MessagesController < ApplicationController
     if !@marketplace_message.can_send?
       flash[:error] = translation(:can_not_send_message)
       render :show
-    elsif @marketplace_message.save
+    elsif @marketplace_message.ignored_duplicate? || @marketplace_message.save
       flash[:success] = translation(:message_sent)
       redirect_to my_account_messages_path
     else
@@ -76,5 +81,13 @@ class MyAccounts::MessagesController < ApplicationController
 
   def matching_marketplace_messages
     MarketplaceMessage.threads_for_user(current_user)
+  end
+
+  def new_message_to_self?
+    marketplace_listing_id = MarketplaceMessage.decoded_marketplace_listing_id(id: params[:id])
+    return false if marketplace_listing_id.blank?
+
+    @marketplace_listing = MarketplaceListing.find_by_id(marketplace_listing_id)
+    @marketplace_listing&.seller_id == current_user.id
   end
 end

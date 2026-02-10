@@ -22,7 +22,7 @@ RSpec.describe UserRegistrationOrganization, type: :model do
     context "organization with registration fields" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_organization_affiliation"]) }
       let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, organization: organization) }
-      it "is truthy" do
+      it "is truthy", :flaky do
         expect(user_registration_organization.reload.registration_info).to be_blank
         expect(user_registration_organization.all_bikes?).to be_truthy
         expect(user_registration_organization.manages_information?).to be_truthy

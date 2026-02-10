@@ -4,7 +4,7 @@ module AddressRecorded
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :address_record
+    belongs_to :address_record, autosave: true
     accepts_nested_attributes_for :address_record
 
     delegate :address_present?, :address_hash, :formatted_address_string,

@@ -1,0 +1,21 @@
+<%= render(UI::Card::Component.new) do %>
+  <%= form_for @sale, builder: BikeIndexFormBuilder, url: sales_path, method: :post do |f| %>
+    <%= f.hidden_field :marketplace_message_id %>
+
+    <%= f.label :amount, translation(:sold_for), class: 'twlabel' %>
+
+    <div class="form-well-input input-group">
+      <div class="input-group-addon"><%= @currency.symbol %></div>
+      <%= f.number_field :amount, min: 0, class: 'form-control' %>
+    </div>
+
+    <div class="tw:mt-12">
+      <%= f.submit translation(:record_sale), class: "twbtn-blue twbtn-lg tw:mr-2" %>
+
+      <span class="tw:text-sm tw:italic">
+        <% buyer_html = content_tag(:strong, buyer_name) %>
+        <%= translation(:transfer_to_html, buyer_html:).html_safe %>
+      </span>
+    </div>
+  <% end %>
+<% end %>

@@ -5,7 +5,7 @@ class Admin::PaymentsController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page(default: 50)
-    @pagy, @payments = pagy(matching_payments.includes(:user, :organization, :invoice)
+    @pagy, @payments = pagy(:countish, matching_payments.includes(:user, :organization, :invoice)
       .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
   end
 
@@ -116,8 +116,7 @@ class Admin::PaymentsController < Admin::BaseController
       matching_payments = matching_payments.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%")
     end
     if params[:user_id].present?
-      @user = User.unscoped.friendly_find(params[:user_id])
-      matching_payments = matching_payments.where(user_id: @user.id) if @user.present?
+      matching_payments = matching_payments.where(user_id: user_subject&.id || params[:user_id])
     end
     @matching_payments = matching_payments.where(created_at: @time_range)
   end

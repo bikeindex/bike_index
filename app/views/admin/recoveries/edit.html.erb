@@ -74,7 +74,7 @@
   <hr class="mt-5 mb-4">
 
   <%= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" }, html: { class: "form form-horizontal" }) do |f| %>
-    <%= render(AlertForErrors::Component.new(name: "Recovery", object: @recovery)) %>
+    <%= render(UI::AlertForErrors::Component.new(name: "Recovery", object: @recovery)) %>
 
     <div class="row mt-4">
       <div class="col-md-6">

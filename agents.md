@@ -6,7 +6,7 @@ Bike Index is a Rails webapp
 
 Start the dev server with `bin/dev`
 
-This will start a dev server at [http://localhost:3042](http://localhost:3042)
+This will start a dev server at [http://localhost:3042](http://localhost:3042) (or the configured `DEV_PORT`)
 
 ## Code style
 
@@ -31,16 +31,6 @@ This project uses Rspec for tests. All business logic should be tested.
 - Avoid testing private methods
 - Avoid mocking objects
 
-### Running Tests
-
-Run tests with turbo_tests:
-
-```bash
-bin/turbo_tests
-# Or, to run just specific tests
-bin/turbo_tests {FILE OR FOLDER}
-```
-
 ## Frontend Development
 
 This project uses Stimulus.js for JavaScript interactivity and Tailwind CSS for styling. There are scss styles and coffeescript files, but they are deprecated.
@@ -51,6 +41,7 @@ The `bin/dev` command handles building and updating tailwind and JS.
 - Form fields should use the `twinput` class
 - labels should use the `twlabel` class
 - basic links should use the `twlink` class
+- every number should be rendered with number_display(number)
 
 This project also uses the ViewComponent gem to render components.
 
@@ -58,6 +49,13 @@ This project also uses the ViewComponent gem to render components.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`
 - View components must initialize with keyword arguments
 - In view components, prefer instance variables to attr_accessor
+- In ViewComponent templates, use `helpers.` prefix for view helpers (e.g. `helpers.column_chart`, `helpers.time_ago_in_words`)
+
+## Architecture notes
+
+- **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
+- **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
+- **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
 
 # Initial setup
 

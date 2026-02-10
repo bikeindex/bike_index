@@ -82,11 +82,18 @@ module API
         end
 
         def creation_state_params
+          ios_version = if headers["X-REQUESTED-WITH"]&.match?("app-ios-")
+            headers["X-REQUESTED-WITH"].gsub("app-ios-", "")
+          end
+          # Previous ios version header - replaced in ios version 1.6.2
+          # fallback can be removed when there are no longer new registrations being created with it
+          ios_version ||= headers["X-IOS-VERSION"]&.to_s
           {
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
-            is_new: params[:is_new]
-          }.as_json
+            is_new: params[:is_new],
+            ios_version:
+          }.compact.as_json
         end
 
         def find_bike
@@ -252,13 +259,14 @@ module API
           end
         end
         post "/" do
-          declared_p = declared(params, include_missing: false)
+          declared_p = declared(params, include_missing: false).merge(creation_state_params).as_json
           add_duplicate = declared_p.delete("add_duplicate")
           # It's required so that the bike can be updated if there is a match
           found_bike = owner_duplicate_bike unless add_duplicate
           # if a matching bike exists and can be updated by the submitter, update instead of creating a new one
           if found_bike.present? && found_bike.authorized?(current_user)
-            b_param = BParam.new(creator_id: creation_user_id, params: declared_p.as_json, origin: origin_api_version)
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p,
+              origin: origin_api_version, doorkeeper_app_id: doorkeeper_application.id)
             b_param.clean_params
             @bike = found_bike
             authorize_bike_for_user
@@ -284,10 +292,10 @@ module API
             end
 
             status :found
-            return created_bike_serialized(@bike.reload, false)
+            next created_bike_serialized(@bike.reload, false)
           end
           b_param = BParam.new(creator_id: creation_user_id, origin: origin_api_version,
-            params: declared_p.merge(creation_state_params).as_json)
+            params: declared_p, doorkeeper_app_id: doorkeeper_application.id)
           b_param.save
           bike = BikeServices::Creator.new.create_bike(b_param)
 
@@ -319,14 +327,15 @@ module API
           end
         end
         put ":id" do
-          declared_p = declared(params, include_missing: false)
+          declared_p = declared(params, include_missing: false).merge(creation_state_params).as_json
           find_bike
           authorize_bike_for_user
-          b_param = BParam.new(params: declared_p.as_json, origin: origin_api_version)
+          b_param = BParam.new(params: declared_p, origin: origin_api_version)
           b_param.clean_params
           @bike.load_external_images(b_param.params["bike"]["external_image_urls"]) if b_param.params.dig("bike", "external_image_urls").present?
           begin
-            BikeServices::Updator.new(user: current_user, bike: @bike, permitted_params: b_param.params).update_available_attributes
+            BikeServices::Updator.new(user: current_user, bike: @bike, permitted_params: b_param.params,
+              doorkeeper_app_id: doorkeeper_application.id).update_available_attributes
           rescue => e
             error!("Unable to update bike: #{e}", 401)
           end

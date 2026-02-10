@@ -11,7 +11,7 @@ module Organized
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
-      @pagy, @graduated_notifications = pagy(available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
+      @pagy, @graduated_notifications = pagy(:countish, available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
         .includes(:user, :bike, :secondary_notifications), limit: @per_page, page: permitted_page)
     end
 
@@ -65,9 +65,7 @@ module Organized
         a_graduated_notifications = a_graduated_notifications.where(bike_id: bikes.pluck(:id))
       end
       if params[:user_id].present?
-        @user = User.find_by_id(params[:user_id])
-        # Don't use @user to lookup, so even if user isn't found, we still search the id
-        a_graduated_notifications = a_graduated_notifications.where(user_id: params[:user_id])
+        a_graduated_notifications = a_graduated_notifications.where(user_id: user_subject&.id || params[:user_id])
       elsif params[:search_email].present?
         email = EmailNormalizer.normalize(params[:search_email])
         a_graduated_notifications = a_graduated_notifications.where("email ILIKE ?", "%#{email}%")

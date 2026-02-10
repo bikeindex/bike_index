@@ -210,7 +210,7 @@ class Payment < ApplicationRecord
     if stripe? && paid? && email.present? && !theft_alert?
       Email::ReceiptJob.perform_async(id)
     end
-    return true unless invoice.present?
+    return if invoice.blank?
 
     invoice.update(updated_at: Time.current) # Manually trigger invoice update
   end

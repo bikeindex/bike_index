@@ -68,16 +68,13 @@ class BikeServices::Creator
     timezone
     year
   ].freeze
-  PERMITTED_IMPOUND_ATTRS = %i[
-    city
-    country
-    display_id
-    impounded_at_with_timezone
-    impounded_description
-    state
-    street
-    timezone
-    zipcode
+  PERMITTED_IMPOUND_ATTRS = [
+    :display_id,
+    :impounded_at,
+    :impounded_at_with_timezone,
+    :impounded_description,
+    :timezone,
+    address_record_attributes: (AddressRecord.permitted_params + [:id])
   ].freeze
   # TODO: Remove this once backfill is finished - #2922
   ADDRESS_ATTRS = %i[city country_id state_id street zipcode]
@@ -199,7 +196,7 @@ class BikeServices::Creator
     if SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
       bike.update(likely_spam: true)
     end
-    ::Callbacks::AfterBikeSaveJob.perform_async(bike.id)
+    CallbackJob::AfterBikeSaveJob.perform_async(bike.id)
     if b_param.bike_sticker_code.present? && bike.creation_organization.present?
       bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
       bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
@@ -234,6 +231,7 @@ class BikeServices::Creator
       pos_kind: b_param.pos_kind,
       origin: b_param.origin,
       status: b_param.status,
+      doorkeeper_app_id: b_param.doorkeeper_app_id,
       bulk_import_id: b_param.params["bulk_import_id"],
       creator_id: b_param.creator_id,
       can_edit_claimed: bike.creation_organization_id.present?,

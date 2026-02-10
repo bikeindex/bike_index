@@ -78,25 +78,27 @@
 #
 # Indexes
 #
-#  index_bikes_on_address_record_id          (address_record_id)
-#  index_bikes_on_current_impound_record_id  (current_impound_record_id)
+#  index_bikes_on_address_record_id          (address_record_id) WHERE (address_record_id IS NOT NULL)
+#  index_bikes_on_creation_organization_id   (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
+#  index_bikes_on_current_impound_record_id  (current_impound_record_id) WHERE (current_impound_record_id IS NOT NULL)
 #  index_bikes_on_current_ownership_id       (current_ownership_id)
-#  index_bikes_on_current_stolen_record_id   (current_stolen_record_id)
-#  index_bikes_on_deleted_at                 (deleted_at)
-#  index_bikes_on_example                    (example)
+#  index_bikes_on_current_stolen_record_id   (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)
+#  index_bikes_on_deleted_at                 (deleted_at) WHERE (deleted_at IS NOT NULL)
+#  index_bikes_on_example                    (example) WHERE (example IS NOT NULL)
 #  index_bikes_on_latitude_and_longitude     (latitude,longitude)
 #  index_bikes_on_listing_order              (listing_order)
+#  index_bikes_on_lower_frame_model          (lower(frame_model))
+#  index_bikes_on_lower_mnfg_name            (lower((mnfg_name)::text))
 #  index_bikes_on_manufacturer_id            (manufacturer_id)
-#  index_bikes_on_model_audit_id             (model_audit_id)
-#  index_bikes_on_organization_id            (creation_organization_id)
-#  index_bikes_on_paint_id                   (paint_id)
-#  index_bikes_on_primary_activity_id        (primary_activity_id)
+#  index_bikes_on_model_audit_id             (model_audit_id) WHERE (model_audit_id IS NOT NULL)
+#  index_bikes_on_paint_id                   (paint_id) WHERE (paint_id IS NOT NULL)
+#  index_bikes_on_primary_activity_id        (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
 #  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)
-#  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id)
+#  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
 #  index_bikes_on_state_id                   (state_id)
 #  index_bikes_on_status                     (status)
-#  index_bikes_on_tertiary_frame_color_id    (tertiary_frame_color_id)
-#  index_bikes_on_user_hidden                (user_hidden)
+#  index_bikes_on_tertiary_frame_color_id    (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
+#  index_bikes_on_user_hidden                (user_hidden) WHERE (user_hidden IS NOT NULL)
 #
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
@@ -176,7 +178,7 @@ class Bike < ApplicationRecord
     :image, :image_cache, :b_param_id, :embeded, :embeded_extended, :paint_name,
     :bike_image_cache, :send_email, :skip_email, :marked_user_hidden, :marked_user_unhidden,
     :b_param_id_token, :parking_notification_kind, :skip_status_update, :manual_csr,
-    :bike_sticker
+    :bike_sticker, :delete_address_record
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
@@ -221,6 +223,7 @@ class Bike < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :enqueue_duplicate_bike_finder_worker, on: :destroy
+  after_commit :remove_address_record_if_deleted
 
   pg_search_scope :pg_search, against: {
     serial_number: "A",
@@ -501,7 +504,7 @@ class Bike < ApplicationRecord
 
   def serial_display(u = nil)
     if serial_hidden?
-      # show the serial to the user, even if authorization_requires_organization?
+      # show the serial to the user, even if authorization_requires_impound_organization?
       return "Hidden" unless can_see_hidden_serial?(u)
     end
     return serial_number.humanize if no_serial?
@@ -553,28 +556,20 @@ class Bike < ApplicationRecord
     current_ownership&.blank? || current_ownership == first_ownership
   end
 
-  def editable_organizations
-    # Only the impound organization can edit it if it's impounded
-    return Organization.where(id: current_impound_record.organization_id) if current_impound_record.present?
-    return organizations if first_ownership? && organized? && !claimed?
-
-    can_edit_claimed_organizations
-  end
-
   def authorized_by_organization?(u: nil, org: nil)
-    editable_organization_ids = editable_organizations.pluck(:id)
-    return false unless editable_organization_ids.any?
-    return true unless u.present? || org.present?
+    editable_org_ids = editable_organization_ids
+    return false if editable_org_ids.none? || u.blank? && org.blank?
+
     # We have either a org or a user - if no user, we only need to check org
-    return editable_organization_ids.include?(org.id) if u.blank?
+    return editable_org_ids.include?(org.id) if u.blank?
 
     unless current_impound_record.present?
       return false if claimable_by?(u) || u == owner # authorized by owner, not organization
     end
     # Ensure the user is part of the organization and the organization can edit if passed both
-    return u.member_bike_edit_of?(org) && editable_organization_ids.include?(org.id) if org.present?
+    return u.member_bike_edit_of?(org) && editable_org_ids.include?(org.id) if org.present?
 
-    editable_organizations.any? { |o| u.member_bike_edit_of?(o) }
+    editable_org_ids.any? { |o_id| u.member_bike_edit_of?(o_id, no_superuser_override: true) }
   end
 
   def first_owner_email
@@ -591,11 +586,11 @@ class Bike < ApplicationRecord
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?
 
-    # authorization requires organization if impounded or marked abandoned by an organization
-    unless authorization_requires_organization?
-      # Since it doesn't require an organization, authorize by user
+    unless authorization_requires_impound_organization?
+      # Doesn't require an organization, authorize by user (but if not, check org below)
       return true if passed_user == owner || claimable_by?(passed_user)
     end
+
     authorized_by_organization?(u: passed_user)
   end
 
@@ -685,15 +680,6 @@ class Bike < ApplicationRecord
     new_stolen_record
   end
 
-  def build_new_impound_record(new_attrs = {})
-    new_country_id = country_id || creator&.address_record&.country_id || Country.united_states&.id
-    new_impound_record = impound_records
-      .build({country_id: new_country_id, status: "current", user_id: creator_id}.merge(new_attrs))
-    new_impound_record.impounded_at ||= Time.current # in case a blank value was passed in new_attrs
-
-    self.current_impound_record = new_impound_record
-  end
-
   def fetch_current_stolen_record
     return current_stolen_record if defined?(manual_csr)
 
@@ -721,6 +707,101 @@ class Bike < ApplicationRecord
       .each(&:destroy)
   end
 
+  def create_normalized_serial_segments
+    SerialNormalizer.new(serial: serial_number).save_segments(id)
+  end
+
+  def valid_mailing_address?
+    addy = registration_address
+    return false if addy.blank? || addy.values.all?(&:blank?)
+    return false if addy["street"].blank? || addy["city"].blank?
+    return true if creation_organization&.default_location.blank?
+
+    creation_organization.default_location.address_hash_legacy != addy
+  end
+
+  # NOTE! This will return different hashes - legacy hashes for stolen & impound
+  def address_hash
+    current_stolen_record&.address_hash || current_impound_record&.address_hash_legacy ||
+      address_record&.address_hash
+  end
+
+  def registration_address(unmemoize = false, address_record_id: false)
+    # unmemoize is necessary during save, because things may have changed
+    return @registration_address if !unmemoize && defined?(@registration_address)
+
+    @registration_address =
+      BikeServices::CalculateLocation.registration_address_hash(self, address_record_id:)
+  end
+
+  def external_image_urls
+    b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
+  end
+
+  def load_external_images(urls = nil)
+    (urls || external_image_urls).reject(&:blank?).each do |url|
+      next if public_images.where(external_image_url: url).present?
+
+      public_images.create(external_image_url: url)
+    end
+  end
+
+  # Called in BikeServices::Creator, so that the serial and email can be used for dupe finding
+  def set_calculated_unassociated_attributes
+    clean_frame_size
+    self.manufacturer_id = Manufacturer.other.id if manufacturer_id == 0
+    self.manufacturer_other = Binxtils::InputNormalizer.string(manufacturer_other)
+    self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
+    self.frame_model = Binxtils::InputNormalizer.string(frame_model)
+    self.owner_email = normalized_email
+    normalize_serial_number
+    set_paints
+    self.name = Binxtils::InputNormalizer.string(name)
+    self.extra_registration_number = Binxtils::InputNormalizer.string(extra_registration_number)
+    if extra_registration_number.present?
+      serial_sanitized = Binxtils::InputNormalizer.regex_escape(serial_number)
+      if serial_sanitized.present? && extra_registration_number.match?(/(serial.)?#{serial_sanitized}/i)
+        self.extra_registration_number = nil
+      end
+    end
+  end
+
+  def set_calculated_attributes
+    set_calculated_unassociated_attributes
+    fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
+    fetch_current_impound_record # Used by a bunch of things, but this method is private
+    self.occurred_at = calculated_occurred_at
+    self.current_ownership = calculated_current_ownership
+    self.attributes = BikeServices::CalculateLocation.stored_location_attrs(self)
+    self.listing_order = calculated_listing_order
+    self.status = calculated_status unless skip_status_update
+    self.updated_by_user_at ||= created_at
+    set_user_hidden
+    # Requires special handling, so the correct address records are deleted
+    if delete_address_record && address_record_id.present?
+      @deleted_address_record_id = address_record_id
+      self.address_record_id = nil
+      self.address_set_manually = false
+    end
+
+    # cache_bike
+    self.all_description = cached_description_and_stolen_description
+    self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
+    self.cached_data = cached_data_array.join(" ")
+  end
+
+  # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
+  def calculated_status
+    return "status_impounded" if current_impound_record.present?
+    return "unregistered_parking_notification" if status == "unregistered_parking_notification"
+    return "status_abandoned" if status_abandoned? || parking_notifications.active.appears_abandoned_notification.any?
+    return "status_stolen" if current_stolen_record.present?
+
+    "status_with_owner"
+  end
+
+  private
+
   def validated_organization_id(organization_id)
     return nil unless organization_id.present?
 
@@ -730,41 +811,6 @@ class Bike < ApplicationRecord
     not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike])
     errors.add(:organizations, "#{organization_id} #{not_found}")
     nil
-  end
-
-  def set_user_hidden
-    return true unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
-
-    if marked_user_hidden.present? && Binxtils::InputNormalizer.boolean(marked_user_hidden)
-      self.user_hidden = true
-      current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
-    elsif marked_user_unhidden.present? && Binxtils::InputNormalizer.boolean(marked_user_unhidden)
-      self.user_hidden = false
-      current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
-    end
-  end
-
-  def normalize_serial_number
-    self.serial_number = if made_without_serial?
-      "made_without_serial"
-    else
-      SerialNormalizer.unknown_and_absent_corrected(serial_number)
-    end
-
-    if %w[made_without_serial unknown].include?(serial_number)
-      self.made_without_serial = serial_number == "made_without_serial"
-      self.serial_normalized = nil
-      self.serial_normalized_no_space = nil
-    else
-      self.made_without_serial = false
-      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
-      self.serial_normalized_no_space = SerialNormalizer.no_space(serial_normalized)
-    end
-    true
-  end
-
-  def create_normalized_serial_segments
-    SerialNormalizer.new(serial: serial_number).save_segments(id)
   end
 
   def clean_frame_size
@@ -824,95 +870,61 @@ class Bike < ApplicationRecord
     self.paint_id = paint.id
   end
 
-  def valid_mailing_address?
-    addy = registration_address
-    return false if addy.blank? || addy.values.all?(&:blank?)
-    return false if addy["street"].blank? || addy["city"].blank?
-    return true if creation_organization&.default_location.blank?
+  def normalize_serial_number
+    self.serial_number = if made_without_serial?
+      "made_without_serial"
+    else
+      SerialNormalizer.unknown_and_absent_corrected(serial_number)
+    end
 
-    creation_organization.default_location.address_hash != addy
+    if %w[made_without_serial unknown].include?(serial_number)
+      self.made_without_serial = serial_number == "made_without_serial"
+      self.serial_normalized = nil
+      self.serial_normalized_no_space = nil
+    else
+      self.made_without_serial = false
+      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+      self.serial_normalized_no_space = SerialNormalizer.no_space(serial_normalized)
+    end
+    true
   end
 
-  # NOTE! This will return different hashes - legacy hashes for stolen & impound
-  def address_hash
-    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
-      address_record&.address_hash
-  end
+  def set_user_hidden
+    return unless current_ownership.present? # If ownership isn't present (eg during creation), nothing to do
 
-  def registration_address(unmemoize = false, address_record_id: false)
-    # unmemoize is necessary during save, because things may have changed
-    return @registration_address if !unmemoize && defined?(@registration_address)
-
-    @registration_address =
-      BikeServices::CalculateLocation.registration_address_hash(self, address_record_id:)
-  end
-
-  def external_image_urls
-    b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
-  end
-
-  def load_external_images(urls = nil)
-    (urls || external_image_urls).reject(&:blank?).each do |url|
-      next if public_images.where(external_image_url: url).present?
-
-      public_images.create(external_image_url: url)
+    if Binxtils::InputNormalizer.boolean(marked_user_hidden)
+      self.user_hidden = true
+      current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
+    elsif Binxtils::InputNormalizer.boolean(marked_user_unhidden)
+      self.user_hidden = false
+      current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
   end
 
-  # Called in BikeServices::Creator, so that the serial and email can be used for dupe finding
-  def set_calculated_unassociated_attributes
-    clean_frame_size
-    self.manufacturer_id = Manufacturer.other.id if manufacturer_id == 0
-    self.manufacturer_other = Binxtils::InputNormalizer.string(manufacturer_other)
-    self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
-    self.frame_model = Binxtils::InputNormalizer.string(frame_model)
-    self.owner_email = normalized_email
-    normalize_serial_number
-    set_paints
-    self.name = Binxtils::InputNormalizer.string(name)
-    self.extra_registration_number = Binxtils::InputNormalizer.string(extra_registration_number)
-    if extra_registration_number.present?
-      serial_sanitized = Binxtils::InputNormalizer.regex_escape(serial_number)
-      if serial_sanitized.present? && extra_registration_number.match?(/(serial.)?#{serial_sanitized}/i)
-        self.extra_registration_number = nil
-      end
+  def editable_organization_ids
+    if current_impound_record.present?
+      # equivalent to authorization_requires_impound_organization?
+      return current_impound_record.organized? ? [current_impound_record.organization_id] : []
     end
-  end
+    return bike_organizations.pluck(:organization_id) if first_ownership? && organized? && !claimed?
 
-  def set_calculated_attributes
-    set_calculated_unassociated_attributes
-    fetch_current_stolen_record # grab the current stolen record first, it's used by a bunch of things
-    fetch_current_impound_record # Used by a bunch of things, but this method is private
-    self.occurred_at = calculated_occurred_at
-    self.current_ownership = calculated_current_ownership
-    self.attributes = BikeServices::CalculateLocation.stored_location_attrs(self)
-    self.listing_order = calculated_listing_order
-    self.status = calculated_status unless skip_status_update
-    self.updated_by_user_at ||= created_at
-    set_user_hidden
-    # cache_bike
-    self.all_description = cached_description_and_stolen_description
-    self.thumb_path = public_images.limit(1)&.first&.image_url(:small)
-    self.cached_data = cached_data_array.join(" ")
-  end
-
-  # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
-  def calculated_status
-    return "status_impounded" if current_impound_record.present?
-    return "unregistered_parking_notification" if status == "unregistered_parking_notification"
-    return "status_abandoned" if status_abandoned? || parking_notifications.active.appears_abandoned_notification.any?
-    return "status_stolen" if current_stolen_record.present?
-
-    "status_with_owner"
+    can_edit_claimed_organizations.pluck(:id)
   end
 
   def enqueue_duplicate_bike_finder_worker
     DuplicateBikeFinderJob.perform_async(id)
   end
 
-  private
+  def remove_address_record_if_deleted
+    return if @deleted_address_record_id.blank?
+
+    deleted_addy = AddressRecord.find_by_id(@deleted_address_record_id)
+    deleted_addy.destroy if deleted_addy&.bike? && deleted_addy.bike_id == id
+  end
 
   def fetch_current_impound_record
+    return current_impound_record if current_impound_record.present? && current_impound_record.current?
+
     self.current_impound_record = impound_records.current.last
   end
 
@@ -923,7 +935,7 @@ class Bike < ApplicationRecord
     (cml.present? && cml.for_sale?) ? cml : nil
   end
 
-  def authorization_requires_organization?
+  def authorization_requires_impound_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
   end

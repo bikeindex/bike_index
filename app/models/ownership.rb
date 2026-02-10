@@ -26,9 +26,11 @@
 #  bike_id                       :integer
 #  bulk_import_id                :bigint
 #  creator_id                    :integer
+#  doorkeeper_app_id             :bigint
 #  impound_record_id             :bigint
 #  organization_id               :bigint
 #  previous_ownership_id         :bigint
+#  sale_id                       :bigint
 #  user_id                       :integer
 #
 # Indexes
@@ -37,8 +39,10 @@
 #  index_ownerships_on_bike_id            (bike_id)
 #  index_ownerships_on_bulk_import_id     (bulk_import_id)
 #  index_ownerships_on_creator_id         (creator_id)
+#  index_ownerships_on_doorkeeper_app_id  (doorkeeper_app_id)
 #  index_ownerships_on_impound_record_id  (impound_record_id)
 #  index_ownerships_on_organization_id    (organization_id)
+#  index_ownerships_on_sale_id            (sale_id)
 #  index_ownerships_on_user_id            (user_id)
 #
 class Ownership < ApplicationRecord
@@ -76,6 +80,10 @@ class Ownership < ApplicationRecord
   belongs_to :organization
   belongs_to :bulk_import
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
+  belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application", counter_cache: true, touch: true
+  belongs_to :sale
+
+  has_one :sale_sold_in, class_name: "Sale" # Mainly to distinguish from the belongs_to :sale
 
   has_many :notifications, as: :notifiable
 
@@ -96,18 +104,28 @@ class Ownership < ApplicationRecord
   scope :with_reg_info_location, -> { where("(registration_info -> 'city') IS NOT NULL") }
 
   before_validation :set_calculated_attributes
-  after_commit :send_notification_and_update_other_ownerships, on: :create
+  after_commit :send_notification_and_update_associations, on: :create
 
   attr_accessor :creator_email, :user_email, :can_edit_claimed
 
-  def self.origins
-    ORIGIN_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def origins
+      ORIGIN_ENUM.keys.map(&:to_s)
+    end
 
-  def self.origin_humanized(str)
-    return nil unless str.present?
+    def origin_humanized(str)
+      return nil unless str.present?
 
-    str.titleize.downcase
+      str.titleize.downcase
+    end
+
+    def current_at(time)
+      where("created_at < ?", time).order(created_at: :desc).first
+    end
+
+    def claimed_at(time)
+      where("claimed_at < ?", time).order(created_at: :desc).first
+    end
   end
 
   def bike
@@ -117,6 +135,10 @@ class Ownership < ApplicationRecord
 
   def bike_scoped
     Bike.find_by_id(bike_id)
+  end
+
+  def bike_type
+    bike&.type || CycleType::DEFAULT.downcase # match BikeAttributable#type case
   end
 
   def initial?
@@ -139,7 +161,9 @@ class Ownership < ApplicationRecord
   end
 
   def new_registration?
-    return true if initial? || impound_record_id.present?
+    return true if initial?
+
+    return impound_record.unregistered_bike? if impound_record.present?
 
     previous_ownership.present? && previous_ownership.organization_pre_registration?
   end
@@ -269,7 +293,7 @@ class Ownership < ApplicationRecord
     id.present? ? ownerships.where("id < ?", id) : ownerships
   end
 
-  def send_notification_and_update_other_ownerships
+  def send_notification_and_update_associations
     # TODO: post #2110 doing this - I'm not sure if it's a good idea...
     if current && id.present?
       bike&.update_column :current_ownership_id, id

@@ -17,7 +17,7 @@
         = link_to "Location count tables", tables_admin_graphs_path(location_count: true), class: location_count ? "nav-link active" : "nav-link"
       - @graph_kinds.each do |kind|
         - kind_path = admin_organization_statuses_path(sortable_params.merge(Admin::OrganizationStatusesController::WITH_POS_GRAPH_PARAMS)) if kind == "pos_integrations"
-        - kind_path ||= admin_graphs_path(sortable_params.merge(search_kind: kind))
+        - kind_path ||= admin_graphs_path(sortable_params.merge(search_kind: kind, period: "week"))
         %li.nav-item
           = link_to kind.humanize, kind_path, class: @kind == kind ? " nav-link active" : "nav-link"
 

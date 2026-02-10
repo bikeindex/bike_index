@@ -61,7 +61,7 @@
                     = notification_text.truncate(100)
             %td.user-cell
               - if notification.user_id.present?
-                = render Admin::UserCell::Component.new(user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable, render_search: true)
+                = render Admin::UserCell::Component.new(user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable)
               - else
                 = notification.message_channel_target
                 %small.less-strong no user

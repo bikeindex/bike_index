@@ -70,6 +70,54 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
         custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
         expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
+
+        expect {
+          get base_url, params: {stolenness: "impounded", create_export: true}
+        }.to change(Export, :count).by 0
+        expect(flash[:error]).to match(/no match/)
+        expect(response).to redirect_to(new_organization_export_url(organization_id: current_organization.id, only_custom_bike_ids: true, custom_bike_ids: ""))
+
+        expect {
+          get base_url, params: {search_stickers: "none", create_export: true}
+        }.to change(Export, :count).by 0
+        expect(flash).to be_blank
+        redirected_to = response.redirect_url
+        expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
+        custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
+        expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
+      end
+      context "without search params" do
+        let(:params_blank) do
+          {
+            period: nil, organization_id: current_organization.id, search_email: nil, serial: nil,
+            end_time: nil, start_time: nil, user_id: nil, search_bike_id: nil, render_chart: false,
+            search_marketplace_listing_id: nil, search_status: nil, search_kind: nil, search_ignored: nil,
+            stolenness: "all", search_stickers: nil, search_address: nil, search_secondary: nil,
+            sort: "id", sort_direction: "desc", create_export: true
+          }
+        end
+        it "redirects to export new" do
+          expect {
+            get base_url, params: params_blank.merge(search_stickers: "all")
+          }.to change(Export, :count).by 0
+          expect(flash[:error]).to match(/no bikes selected/i)
+          expect(response).to redirect_to new_organization_export_url(organization_id: current_organization.id)
+
+          expect {
+            get base_url, params: params_blank.merge(period: "year")
+          }.to change(Export, :count).by 0
+          expect(flash[:error]).to match(/no bikes selected/i)
+
+          redirected_to = response.redirect_url
+          expect(redirected_to.gsub(/end_at=\d+&?/, "").gsub(/start_at=\d+&?/, "").gsub(/\?\z/, ""))
+            .to eq new_organization_export_url(organization_id: current_organization.id)
+
+          start_at = redirected_to.match(/start_at=(\d+)/)[1]
+          expect(start_at.to_i).to be_within(5).of((Time.current.beginning_of_day - 1.year).to_i)
+
+          end_at = redirected_to.match(/end_at=(\d+)/)[1]
+          expect(end_at.to_i).to be_within(5).of(Time.current.to_i)
+        end
       end
       context "directly create export", :flaky do
         it "directly creates" do
@@ -142,6 +190,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:unregistered_parking_notification)).to be_falsey
         expect(response).to render_template(:new)
+        expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       end
       context "parking_notification" do
         it "renders with unregistered_parking_notification" do
@@ -168,6 +217,7 @@ RSpec.describe Organized::BikesController, type: :request do
       get "#{base_url}/new_iframe", params: {parking_notification: 1}
       expect(response.status).to eq(200)
       expect(response).to render_template(:new_iframe)
+      expect(response.headers["X-Frame-Options"]).to be_blank
     end
     context "without current_organization" do
       include_context :request_spec_logged_in_as_user
@@ -231,6 +281,7 @@ RSpec.describe Organized::BikesController, type: :request do
             post base_url, params: {bike: bike_params.merge(image: test_photo), parking_notification: parking_notification}
             expect(flash[:success]).to match(/tricycle/i)
             expect(response).to redirect_to new_iframe_organization_bikes_path(organization_id: current_organization.to_param)
+            expect(response.headers["X-Frame-Options"]).to be_blank
           }.to change(Ownership, :count).by 1
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end

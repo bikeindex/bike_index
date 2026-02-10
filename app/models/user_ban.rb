@@ -22,7 +22,8 @@ class UserBan < ApplicationRecord
     abuse: 0,
     extortion: 1,
     known_criminal: 2,
-    bad_actor: 3
+    bad_actor: 3,
+    spamming: 4
   }.freeze
 
   acts_as_paranoid
@@ -34,7 +35,18 @@ class UserBan < ApplicationRecord
 
   validates_presence_of :reason, :user_id
 
+  after_commit :update_user_on_create, on: :create
+
   def self.reasons
     REASON_ENUM.keys.map(&:to_s)
+  end
+
+  def update_user_on_create
+    return if id.blank?
+
+    # Sign them out
+    user.update_auth_token("auth_token")
+    # Delete their bikes
+    user.bike_ids(true).each { BikeDeleterJob.perform_async(it, false, creator_id) }
   end
 end

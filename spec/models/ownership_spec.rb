@@ -199,7 +199,7 @@ RSpec.describe Ownership, type: :model do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: email) }
       let!(:ownership1) { bike.ownerships.first }
       let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
-      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike, unregistered_bike: true) }
       let(:new_email) { "impound_user@stuff.com" }
       it "is new_registration" do
         expect(bike.reload.claimed?).to be_truthy
@@ -696,6 +696,12 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.address_record).to have_attributes target_attrs
         expect(ownership.address_record.to_coordinates.map(&:round)).to eq([41, -78])
         expect(ownership.bike.valid_mailing_address?).to be_truthy
+        ownership.bike.update(address_record_id: ownership.address_record_id)
+        expect(AddressRecord.count).to eq 1
+
+        expect { ownership.bike.update(delete_address_record: true) }.to_not change(AddressRecord, :count)
+        expect(ownership.bike.reload.address_record_id).to be_nil
+        expect(ownership.reload.address_record).to have_attributes target_attrs
       end
     end
 
@@ -735,6 +741,21 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.address_record.to_coordinates.map(&:round)).to eq([54, -113])
         end
       end
+    end
+  end
+
+  describe "doorkeeper_app counter_cache" do
+    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
+    let(:ownership) { FactoryBot.create(:ownership, doorkeeper_app:) }
+    it "updates the counter_cache on create" do
+      expect(Doorkeeper::Application.count).to eq 0
+      expect(doorkeeper_app).to be_valid
+      doorkeeper_app.update_column :updated_at, Time.current - 1.day
+      expect(doorkeeper_app.ownerships_count).to eq 0
+      expect(ownership.reload.doorkeeper_app_id).to eq doorkeeper_app.id
+      expect(doorkeeper_app.reload.ownerships_count).to eq 1
+      expect(doorkeeper_app.updated_at).to be_within(1).of Time.current
+      expect(Doorkeeper::Application.count).to eq 1
     end
   end
 end

@@ -72,9 +72,10 @@
     on Bike Index
 
   .clear-org-buttons
-    - location = [@organization.city]
-    - location += [@organization.country&.name] unless @organization.country&.united_states?
-    = link_to "Search Stolen Bikes near #{@organization.city}", bikes_url(stolenness: "proximity", distance: 100, location: location.reject(&:blank?).join(", ")), class: "org-button"
+    - org_address = @organization.default_address_record
+    - location = [org_address&.city]
+    - location += [org_address&.country&.name] unless org_address&.country&.united_states?
+    = link_to "Search Stolen Bikes near #{org_address&.city}", bikes_url(stolenness: "proximity", distance: 100, location: location.reject(&:blank?).join(", ")), class: "org-button"
 
   %p.hot-sheet-notification-change
     %small.less-strong

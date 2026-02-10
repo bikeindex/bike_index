@@ -18,6 +18,18 @@
     </h5>
 
     <ul class="attr-list">
+      <% if @bike.deleted? %>
+        <li>
+          <strong class="attr-title">
+            <%= translation(".removed_from") %>:
+          </strong>
+
+          <span class="localizeTime">
+            <%= l @bike.deleted_at, format: :convert_time %>
+          </span>
+        </li>
+      <% end %>
+
       <li>
         <strong class="attr-title"><%= translation(".serial") %>:</strong>
         <%# current_user is only present if not cached %>
@@ -31,13 +43,11 @@
       <ul class="attr-list">
         <% if render_for_sale_info? %>
           <li>
-            <%= bike_status_span(@bike) %>:
-            <%= @current_event_record.currency_symbol %>
-            <%= number_display(@current_event_record.amount) %>
-            <small><%= @current_event_record.currency_name %></small>
+            <%= price_span %>:
+            <%= amount_display(@event_record, currency_name_suffix: true) %>
           </li>
           <%= attr_list_item(
-            @current_event_record.formatted_address_string,
+            @event_record.formatted_address_string,
             translation(".location"),
           ) %>
           <li>
@@ -45,17 +55,32 @@
               <%= translation(".posted_at") %>:
             </strong>
 
-            <span class="localizeTime">
-              <%= l @current_event_record.published_at, format: :convert_time %>
-            </span>
+            <% if @event_record.published_at.present? %>
+              <span class="localizeTime">
+                <%= l @event_record.published_at, format: :convert_time %>
+              </span>
+            <% else %>
+              <%= translation(".not_applicable") %>
+            <% end %>
           </li>
+          <% if @event_record.end_at.present? %>
+            <li>
+              <strong class="attr-title">
+                <%= translation(".ended_at") %>:
+              </strong>
+
+              <span class="localizeTime">
+                <%= l @event_record.end_at, format: :convert_time %>
+              </span>
+            </li>
+          <% end %>
         <% else %>
           <li>
             <%= bike_status_span(@bike) %>:
             <span class="localizeTime"><%= l occurred_at_with_fallback, format: :convert_time %></span>
           </li>
           <%= attr_list_item(
-            @current_event_record.address(country: [:iso]),
+            address_string,
             translation(".location"),
           ) %>
         <% end %>

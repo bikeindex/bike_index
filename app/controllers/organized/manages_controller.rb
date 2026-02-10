@@ -50,7 +50,7 @@ module Organized
     def permitted_parameters
       params.require(:organization).permit(:name, :website, :embedable_user_email, :short_name,
         :avatar, :lightspeed_register_with_phone, :direct_unclaimed_notifications, permitted_kind,
-        show_on_map_if_permitted, locations_attributes: permitted_locations_params)
+        show_on_map_if_permitted, locations_attributes:)
     end
 
     def permitted_kind
@@ -64,9 +64,9 @@ module Organized
       current_organization.lock_show_on_map ? [] : [:show_on_map]
     end
 
-    def permitted_locations_params
-      %i[name zipcode city state_id country_id street phone email id _destroy publicly_visible
-        impound_location default_impound_location]
+    def locations_attributes
+      %i[name phone email id _destroy publicly_visible impound_location default_impound_location] +
+        [address_record_attributes: AddressRecord.permitted_params + [:id]]
     end
 
     def notify_admins(type)

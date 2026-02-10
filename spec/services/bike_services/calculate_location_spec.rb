@@ -131,7 +131,7 @@ RSpec.describe BikeServices::CalculateLocation do
           expect(bike.address_set_manually).to be_falsey
           expect(described_class.registration_address_source(bike)).to be_blank
           expect(bike.status).to eq "status_stolen"
-          expect(bike.send(:authorization_requires_organization?)).to be_falsey
+          expect(bike.send(:authorization_requires_impound_organization?)).to be_falsey
         end
       end
     end
@@ -142,8 +142,8 @@ RSpec.describe BikeServices::CalculateLocation do
 
       it "takes location from the creation org" do
         expect(bike.reload.address_record_id).to be_blank
-        expect(bike.latitude).to eq organization.latitude
-        expect(bike.longitude).to eq organization.longitude
+        expect(bike.latitude).to eq organization.default_location.latitude
+        expect(bike.longitude).to eq organization.default_location.longitude
       end
     end
 
