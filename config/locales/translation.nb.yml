@@ -2332,6 +2332,17 @@ nb:
       draft: Utkast
       for_sale: Til salgs
       publicly_listed: "(børsnotert)"
+    strava_gear:
+      connect_bike_to_strava_gear: Koble denne sykkelen til en av Strava-syklene dine
+        for å spore hvilken sykkel du sykler på.
+      connect_strava: Koble til Strava på kontosiden din
+      currently_connected: 'For øyeblikket koblet til:'
+      none_selected: "-- Ingen --"
+      save_strava_gear: Lagre Strava-utstyr
+      strava_bike: Strava-sykkel
+      strava_gear: Strava-utstyr
+      strava_not_connected: Strava-kontoen din er ikke tilkoblet eller synkroniseringen
+        er ikke fullført.
   controllers:
     application:
       handle_unverified_request:
@@ -2370,6 +2381,7 @@ nb:
         remove_or_transfer: Overfør, skjul eller slett
         marketplace_list: Liste til salgs
         marketplace_on_sale: Oppdater markedsplassoppføring
+        strava_gear: Strava-utstyr
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: Det %{bike_type} er ikke gjort krav på ennå.
           Hvis det er din %{bike_type}, registrer deg og du vil kunne redigere den!
@@ -5924,6 +5936,27 @@ nb:
         sold_for: Beløp solgt for
         transfer_to_html: Dette vil overføre registreringen til %{buyer_html} og lukke
           markedsplassen.
+      strava_integration:
+        activities_synced:
+          one: "%{count} aktivitet synkronisert"
+          other: "%{count} aktiviteter synkronisert"
+        connect_with_strava: Koble til Strava
+        connected_to_strava: Koblet til Strava
+        disconnect_confirm: Er du sikker på at du vil koble fra Strava? Dette vil
+          fjerne alle synkroniserte aktiviteter.
+        disconnect_strava: Koble fra Strava
+        downloaded: nedlastet
+        integrate_your_bikes_with_strava: Integrer syklene dine med Strava og synkroniser
+          sykkelaktivitetene dine.
+        strava_bikes_connected: Strava-sykler koblet til Bike Index-sykler
+        strava_connected_pending: Koblet til Strava. Synkroniseringen starter snart.
+        strava_integration: Strava-integrasjon
+        sync_error: Synkroniseringsfeil
+        sync_error_description: Det oppsto en feil under synkronisering av Strava-aktivitetene
+          dine. Prøv å koble fra og koble til på nytt.
+        sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne siden
+          oppdateres automatisk.
+        syncing_activities: Synkroniserer aktiviteter ...
     emails:
       partials:
         bike_box:
