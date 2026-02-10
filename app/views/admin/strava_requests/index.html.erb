@@ -65,7 +65,7 @@
   <% end %>
 <% end %>
 
-<%= render partial: "/shared/admin/index_skeleton", locals: {index_title:, nav_header_list_items:, rendered_chart:} %>
+<%= render(Admin::IndexSkeleton::Component.new(index_title:, nav_header_list_items:, rendered_chart:)) %>
 
 <style>
   .full-screen-table pre { margin-bottom: 0; }
