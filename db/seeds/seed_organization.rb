@@ -33,7 +33,19 @@ feature_name_and_slugs = [
   {name: "Law Enforcement functionality", feature_slugs: ["unstolen_notifications", "additional_registrations_information", "hot_sheet", "show_recoveries", "credibility_badges", "organization_stolen_message"]},
   {name: "Registration field: Student ID", feature_slugs: ["reg_student_id"]},
   {name: "Registration field: Student ID - REQUIRED", feature_slugs: ["reg_student_id", "require_reg_student_id"]},
-  {name: "E-Vehicle Model Audits", feature_slugs: ["model_audits"]}
+  {name: "E-Vehicle Model Audits", feature_slugs: ["model_audits"]},
+  {name: "Ongoing programming costs for standard system", feature_slugs: []},
+  {name: "Co-branded flyer", feature_slugs: []},
+  {name: "One-time export email", feature_slugs: []},
+  {name: "Co-branded email campaign", feature_slugs: []},
+  {name: "Social media ad campaign", feature_slugs: []},
+  {name: "Product review", feature_slugs: []},
+  {name: "Ad space", feature_slugs: []},
+  {name: "Import existing bikes", feature_slugs: []},
+  {name: "Landing Page: Add Custom field(s)", feature_slugs: []},
+  {name: "Bike Stickers: Sticker order", feature_slugs: []},
+  {name: "Registration field: Address - REQUIRED", feature_slugs: ["reg_address", "require_reg_address"]},
+  {name: "Registration field: True/False question", feature_slugs: []}
 ]
 feature_ids = []
 
