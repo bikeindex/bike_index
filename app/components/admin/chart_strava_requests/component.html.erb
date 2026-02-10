@@ -1,5 +1,5 @@
 <h4 class="mt-4">By response status</h4>
-<%= helpers.column_chart status_series, stacked: true, thousands: ",", colors: status_colors %>
+<%= render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true)) %>
 
 <h4 class="mt-4">By request type</h4>
-<%= helpers.column_chart type_series, stacked: true, thousands: ",", colors: type_colors %>
+<%= render(UI::Chart::Component.new(series: type_series, time_range: @time_range, stacked: true)) %>

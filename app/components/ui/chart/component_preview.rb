@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+module UI::Chart
+  class ComponentPreview < ApplicationComponentPreview
+    def bikes_by_status
+      time_range = 1.week.ago..Time.current
+      chart = UI::Chart::Component.new(series: [], time_range:)
+      series = Bike::STATUS_ENUM.keys.filter_map.with_index do |status, i|
+        scoped = Bike.where(status:, created_at: time_range)
+        next if scoped.limit(1).blank?
+        {name: Bike.status_humanized(status), data: chart.time_range_counts(collection: scoped), color: UI::Chart::Component::COLORS[i]}
+      end
+      series = [{name: "No bikes", data: {}}] if series.empty?
+      render(UI::Chart::Component.new(series:, time_range:, stacked: true))
+    end
+  end
+end
