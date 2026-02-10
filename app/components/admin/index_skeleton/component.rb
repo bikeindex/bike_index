@@ -3,7 +3,6 @@
 module Admin::IndexSkeleton
   class Component < ApplicationComponent
     include SortableHelper
-    include GraphingHelper
 
     def initialize(
       collection: nil,
@@ -58,10 +57,8 @@ module Admin::IndexSkeleton
     end
 
     def default_chart
-      helpers.column_chart(
-        time_range_counts(collection: @chart_collection, column: @time_range_column),
-        stacked: true, thousands: ","
-      )
+      data = UI::Chart::Component.time_range_counts(collection: @chart_collection, time_range: @time_range, column: @time_range_column)
+      render(UI::Chart::Component.new(series: [{name: viewing, data:}], time_range: @time_range))
     end
 
     def current_header_component

@@ -6,9 +6,23 @@ RSpec.describe UI::Chart::Component, type: :component do
   let(:time_range) { 1.week.ago..Time.current }
   let(:instance) { described_class.new(series: [{name: "Test", data: {}}], time_range:) }
 
-  it "renders" do
+  it "renders with default colors" do
     component = render_inline(instance)
-    expect(component).to be_present
+    script_content = component.css("script").text
+    expect(script_content).to be_present
+    described_class::COLORS.each do |color|
+      expect(script_content).to include(color)
+    end
+  end
+
+  context "with custom colors" do
+    let(:custom_colors) { %w[#111111 #222222] }
+    let(:instance) { described_class.new(series: [{name: "Test", data: {}}], time_range:, colors: custom_colors) }
+    it "renders with custom colors" do
+      script_content = render_inline(instance).css("script").text
+      custom_colors.each { |color| expect(script_content).to include(color) }
+      expect(script_content).not_to include(described_class::COLORS.last)
+    end
   end
 
   context "with payment" do
