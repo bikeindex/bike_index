@@ -61,7 +61,7 @@ RSpec.describe Organized::BikesController, type: :request do
         }
       end
       let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: current_organization, manufacturer: bike.manufacturer) }
-      it "creates export", :flaky do
+      it "creates export" do
         expect {
           get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
         }.to change(Export, :count).by 0
@@ -77,6 +77,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(flash[:error]).to match(/no match/)
         expect(response).to redirect_to(new_organization_export_url(organization_id: current_organization.id, only_custom_bike_ids: true, custom_bike_ids: ""))
 
+        reset! # Clear stale flash from session cookie
         expect {
           get base_url, params: {search_stickers: "none", create_export: true}
         }.to change(Export, :count).by 0
