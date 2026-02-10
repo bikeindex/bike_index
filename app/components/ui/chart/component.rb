@@ -4,7 +4,7 @@ module UI::Chart
   class Component < ApplicationComponent
     include ActionView::Helpers::TextHelper
 
-    COLORS = %w[#0E8A16 #1D76DB #FBCA04 #D93F0B #5319E7 #B60205 #006B75].freeze
+    COLORS = %w[#2563EB #DC2626 #D97706 #7C3AED #059669 #DB2777 #475569].freeze
 
     class << self
       def time_range_counts(collection:, time_range:, column: "created_at")
