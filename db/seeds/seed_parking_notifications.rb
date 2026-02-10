@@ -3,8 +3,8 @@ hogwarts = Organization.find_by_name("Hogwarts")
 member = User.find_by_email("member@example.com")
 user = User.find_by_email("user@example.com")
 
-if hogwarts.blank? || member.blank? || user.blank?
-  puts "Skipping parking notification seeds (missing Hogwarts org or test users)"
+if hogwarts.blank? || member.blank? || user.blank? || Manufacturer.none?
+  puts "Skipping parking notification seeds (missing Hogwarts org, test users, or manufacturers)"
 else
   # Make member a member of Hogwarts if not already
   unless OrganizationRole.where(organization: hogwarts, user: member).exists?

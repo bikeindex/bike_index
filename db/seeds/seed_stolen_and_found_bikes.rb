@@ -1,8 +1,8 @@
 # Seed stolen bikes in San Francisco and Oakland, and found bikes
 user = User.find_by_email("user@example.com")
 
-if user.blank?
-  puts "Skipping stolen/found bike seeds (missing user@example.com)"
+if user.blank? || Manufacturer.none?
+  puts "Skipping stolen/found bike seeds (missing user@example.com or manufacturers)"
 else
   us = Country.united_states
   ca_state = State.find_by_abbreviation("CA")
