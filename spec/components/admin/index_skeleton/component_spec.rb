@@ -3,20 +3,19 @@
 require "rails_helper"
 
 RSpec.describe Admin::IndexSkeleton::Component, type: :component do
-  let(:instance) { described_class.new(**default_options.merge(options)) }
-  let(:default_options) do
-    {
-      collection: Bike.none, render_chart: false, pagy: nil,
-      per_page: 25, time_range: nil, period: "all",
-      current_organization: nil, params: {},
-      table_view: "<div>table</div>".html_safe
-    }
-  end
-  let(:options) { {} }
+  let(:instance) { described_class.new(**options) }
+  # Always provide table_view to avoid needing a _table partial in tests
+  let(:options) { {table_view: "<div>table</div>".html_safe} }
 
   def render_component
     with_request_url("/admin") do
       ctrl = vc_test_controller
+      ctrl.instance_variable_set(:@render_chart, false)
+      ctrl.instance_variable_set(:@collection, Bike.none)
+      ctrl.instance_variable_set(:@pagy, nil)
+      ctrl.instance_variable_set(:@per_page, 25)
+      ctrl.instance_variable_set(:@time_range, nil)
+      ctrl.instance_variable_set(:@period, "all")
       ctrl.instance_variable_set(:@start_time, Time.current - 1.year)
       ctrl.instance_variable_set(:@end_time, Time.current)
       render_inline(instance)

@@ -6,28 +6,17 @@ module Admin::IndexSkeleton
     include GraphingHelper
 
     def initialize(
-      collection:,
-      render_chart:,
-      pagy:,
-      per_page:,
-      time_range:,
-      period:,
-      current_organization:,
-      params:,
+      collection: nil,
       viewing: nil,
       index_title: nil,
       nav_header_list_items: nil,
       skip_charting: false,
       rendered_chart: nil,
       render_sortable: true,
-      time_range_column: "created_at",
+      time_range_column: nil,
       admin_search_form: nil,
       table_view: nil,
-      chart_collection: nil,
-      user_subject: nil,
-      bike: nil,
-      marketplace_listing: nil,
-      primary_activity: nil
+      chart_collection: nil
     )
       @collection = collection
       @viewing = viewing
@@ -36,21 +25,26 @@ module Admin::IndexSkeleton
       @skip_charting = skip_charting
       @rendered_chart = rendered_chart
       @render_sortable = render_sortable
-      @time_range_column = time_range_column
+      @time_range_column_override = time_range_column
       @admin_search_form = admin_search_form
       @table_view = table_view
       @chart_collection = chart_collection
-      @render_chart = render_chart
-      @pagy = pagy
-      @per_page = per_page
-      @time_range = time_range
-      @period = period
-      @user_subject = user_subject
-      @bike = bike
-      @marketplace_listing = marketplace_listing
-      @primary_activity = primary_activity
-      @current_organization = current_organization
-      @params = params
+    end
+
+    def before_render
+      @collection ||= controller.instance_variable_get(:@collection)
+      @render_chart = controller.instance_variable_get(:@render_chart)
+      @pagy = controller.instance_variable_get(:@pagy)
+      @per_page = controller.instance_variable_get(:@per_page)
+      @time_range = controller.instance_variable_get(:@time_range)
+      @period = controller.instance_variable_get(:@period)
+      @time_range_column = @time_range_column_override || controller.instance_variable_get(:@time_range_column) || "created_at"
+      @user_subject = controller.instance_variable_get(:@user_subject)
+      @bike = controller.instance_variable_get(:@bike)
+      @marketplace_listing = controller.instance_variable_get(:@marketplace_listing)
+      @primary_activity = controller.instance_variable_get(:@primary_activity)
+      @current_organization = helpers.respond_to?(:current_organization) ? helpers.current_organization : nil
+      @params = helpers.params
     end
 
     private
