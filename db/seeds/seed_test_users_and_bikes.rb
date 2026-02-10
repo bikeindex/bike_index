@@ -28,16 +28,19 @@ puts "Users added successfully\n"
 @user = User.find_by_email("user@example.com")
 @member = User.find_by_email("member@example.com")
 @org = Organization.first
+manufacturer_ids = Manufacturer.frame_makers.pluck(:id)
+wheel_size_ids = WheelSize.pluck(:id)
+color_ids = Color.pluck(:id)
 50.times do
   bike = Bike.new(
     cycle_type: :bike,
     propulsion_type: "foot-pedal",
-    manufacturer_id: (rand(Manufacturer.frame_makers.count) - 1),
+    manufacturer_id: manufacturer_ids.sample,
     rear_tire_narrow: true,
     handlebar_type: HandlebarType.slugs.first,
-    rear_wheel_size_id: (rand(WheelSize.count) - 1),
-    front_wheel_size_id: (rand(WheelSize.count) - 1),
-    primary_frame_color_id: (rand(Color.count) - 1),
+    rear_wheel_size_id: wheel_size_ids.sample,
+    front_wheel_size_id: wheel_size_ids.sample,
+    primary_frame_color_id: color_ids.sample,
     creator: @user,
     owner_email: @user.email
   )
