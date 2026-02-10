@@ -38,4 +38,4 @@
 
 - table_view = render partial: "table", locals: {collection: @email_domains, render_sortable: true}
 
-= render partial: "/shared/admin/index_skeleton", locals: {collection: @email_domains, nav_header_list_items:, admin_search_form:, chart_collection: @render_chart && matching_email_domains}
+= render(Admin::IndexSkeleton::Component.new(collection: @email_domains, nav_header_list_items:, admin_search_form:, chart_collection: @render_chart && matching_email_domains))
