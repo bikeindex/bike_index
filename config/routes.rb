@@ -69,7 +69,11 @@ Rails.application.routes.draw do
   end
 
   resources :webhooks, only: [] do
-    collection { post :stripe }
+    collection do
+      post :stripe
+      get :strava
+      post :strava
+    end
   end
 
   resources :documentation, only: %i[index] do
