@@ -9,6 +9,13 @@ module UI::Chart
         collection_grouped(collection:, column:, time_range:).count
       end
 
+      def time_range_amounts(collection:, time_range:, column: "created_at", amount_column: "amount_cents", convert_to_dollars: false)
+        result = collection_grouped(collection:, column:, time_range:).sum(amount_column)
+        return result unless convert_to_dollars
+
+        result.transform_values { |v| (v.to_f / 100.00).round(2) }
+      end
+
       private
 
       def collection_grouped(collection:, time_range:, column: "created_at")
