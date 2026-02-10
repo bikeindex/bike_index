@@ -61,7 +61,7 @@ RSpec.describe Organized::BikesController, type: :request do
         }
       end
       let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: current_organization, manufacturer: bike.manufacturer) }
-      it "creates export", :flaky do
+      it "creates export" do
         expect {
           get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
         }.to change(Export, :count).by 0
@@ -70,13 +70,15 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
         custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
         expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
-
+      end
+      it "redirects with error for impounded search" do
         expect {
           get base_url, params: {stolenness: "impounded", create_export: true}
         }.to change(Export, :count).by 0
         expect(flash[:error]).to match(/no match/)
         expect(response).to redirect_to(new_organization_export_url(organization_id: current_organization.id, only_custom_bike_ids: true, custom_bike_ids: ""))
-
+      end
+      it "creates export with sticker search" do
         expect {
           get base_url, params: {search_stickers: "none", create_export: true}
         }.to change(Export, :count).by 0
