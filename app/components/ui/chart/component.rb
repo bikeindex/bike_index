@@ -18,26 +18,21 @@ module UI::Chart
       helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: @colors
     end
 
-    private
-
-    def time_range_counts(collection:, column: "created_at", time_range: nil)
-      collection_grouped(collection:, column:, time_range: time_range || @time_range).count
+    def self.time_range_counts(collection:, time_range:, column: "created_at")
+      collection_grouped(collection:, column:, time_range:).count
     end
 
-    def time_range_amounts(collection:, column: "created_at", amount_column: "amount_cents", time_range: nil, convert_to_dollars: false)
-      result = collection_grouped(collection:, column:, time_range: time_range || @time_range).sum(amount_column)
-
-      return result unless convert_to_dollars
-
-      result.map { |k, v| [k, (v.to_f / 100.00).round(2)] }.to_h
+    def self.collection_grouped(collection:, time_range:, column: "created_at")
+      collection.send(
+        group_by_method(time_range),
+        column,
+        range: time_range,
+        format: group_by_format(time_range)
+      )
     end
 
-    def time_range_length(time_range)
-      time_range.last - time_range.first
-    end
-
-    def group_by_method(time_range)
-      period_s = time_period_s(time_range)
+    def self.group_by_method(time_range)
+      period_s = time_range.last - time_range.first
       if period_s < 3601 # 1.hour + 1 second
         :group_by_minute
       elsif period_s < 5.days
@@ -51,7 +46,8 @@ module UI::Chart
       end
     end
 
-    def group_by_format(time_range, group_period = nil)
+    def self.group_by_format(time_range, group_period = nil)
+      period_s = time_range.last - time_range.first
       group_period ||= group_by_method(time_range)
       if group_period == :group_by_minute
         "%l:%M %p"
@@ -59,11 +55,39 @@ module UI::Chart
         "%a%l %p"
       elsif group_period == :group_by_month
         "%Y-%-m"
-      elsif group_period == :group_by_day && (time_period_s(time_range) < 10.days)
+      elsif group_period == :group_by_day && (period_s < 10.days)
         "%a %-m-%-d"
       else
         "%Y-%-m-%-d"
       end
+    end
+
+    private_class_method :collection_grouped, :group_by_method, :group_by_format
+
+    private
+
+    def time_range_counts(collection:, column: "created_at", time_range: nil)
+      self.class.time_range_counts(collection:, column:, time_range: time_range || @time_range)
+    end
+
+    def time_range_amounts(collection:, column: "created_at", amount_column: "amount_cents", time_range: nil, convert_to_dollars: false)
+      result = self.class.send(:collection_grouped, collection:, column:, time_range: time_range || @time_range).sum(amount_column)
+
+      return result unless convert_to_dollars
+
+      result.map { |k, v| [k, (v.to_f / 100.00).round(2)] }.to_h
+    end
+
+    def time_range_length(time_range)
+      time_range.last - time_range.first
+    end
+
+    def group_by_method(time_range)
+      self.class.send(:group_by_method, time_range)
+    end
+
+    def group_by_format(time_range, group_period = nil)
+      self.class.send(:group_by_format, time_range, group_period)
     end
 
     def humanized_time_range_column(time_range_column, return_value_for_all: false)
@@ -119,16 +143,6 @@ module UI::Chart
       else
         pluralize((seconds / 604800.0).round(1), "weeks")
       end.gsub(".0 ", " ")
-    end
-
-    def collection_grouped(collection:, column: "created_at", time_range: nil)
-      time_range ||= @time_range
-      collection.send(
-        group_by_method(time_range),
-        column,
-        range: time_range,
-        format: group_by_format(time_range)
-      )
     end
 
     def time_period_s(time_range)

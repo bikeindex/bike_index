@@ -17,15 +17,11 @@ module Admin::ChartStravaRequests
       @type_series ||= build_series(StravaRequest::REQUEST_TYPE_ENUM, :request_type)
     end
 
-    def chart
-      @chart ||= UI::Chart::Component.new(series: [], time_range: @time_range)
-    end
-
     def build_series(enum, column)
       enum.filter_map do |key, _|
         scoped = @collection.where(column => key)
         next if scoped.limit(1).blank?
-        {name: key.to_s.humanize, data: chart.send(:time_range_counts, collection: scoped)}
+        {name: key.to_s.humanize, data: UI::Chart::Component.time_range_counts(collection: scoped, time_range: @time_range)}
       end
     end
   end
