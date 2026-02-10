@@ -105,6 +105,7 @@ RSpec.describe StravaIntegration, type: :model do
     let!(:integration_less) { FactoryBot.create(:strava_integration, strava_permissions: "read") }
     let!(:integration_more) { FactoryBot.create(:strava_integration, strava_permissions: "read,activity:read_all,profile:read_all,activity:write") }
     let!(:integration_nil) { FactoryBot.create(:strava_integration, strava_permissions: nil) }
+    let!(:integration_blank) { FactoryBot.create(:strava_integration, strava_permissions: "") }
 
     describe "permissions_default" do
       it "returns integrations with default scope" do
@@ -114,7 +115,7 @@ RSpec.describe StravaIntegration, type: :model do
 
     describe "permissions_less" do
       it "returns integrations with fewer permissions than default" do
-        expect(StravaIntegration.permissions_less).to eq([integration_less])
+        expect(StravaIntegration.permissions_less).to match_array([integration_less, integration_blank, integration_nil])
       end
     end
 
@@ -139,12 +140,13 @@ RSpec.describe StravaIntegration, type: :model do
     describe "permissions_less?" do
       it "returns true for fewer permissions" do
         expect(integration_less.permissions_less?).to be true
+        expect(integration_blank.permissions_less?).to be true
+        expect(integration_nil.permissions_less?).to be true
       end
 
       it "returns false for default or more permissions" do
         expect(integration_default.permissions_less?).to be false
         expect(integration_more.permissions_less?).to be false
-        expect(integration_nil.permissions_less?).to be false
       end
     end
 

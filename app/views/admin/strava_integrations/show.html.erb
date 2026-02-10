@@ -123,7 +123,7 @@
           <td>Permissions</td>
 
           <td>
-            <%= @strava_integration.strava_permissions %>
+            <code><%= @strava_integration.strava_permissions %></code>
 
             <% if @strava_integration.permissions_less? %>
               <%= render UI::Badge::Component.new(text: "less than default", color: :error, size: :sm) %>

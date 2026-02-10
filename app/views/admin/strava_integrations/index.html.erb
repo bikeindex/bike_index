@@ -1,5 +1,5 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown dropleft">
+  <li class="nav-item dropdown dropleft small">
     <a
       class="nav-link dropdown-toggle <%= @search_permissions.present? ? "active" : "" %>"
       href="#"
@@ -9,7 +9,7 @@
       aria-expanded="false"
     >
       <% if @search_permissions.blank? %>
-        All permissions
+        All Strava permissions
       <% else %>
         <%= @search_permissions.humanize %>
       <% end %>
@@ -20,8 +20,8 @@
 
       <div class="dropdown-divider"></div>
 
-      <% %w[default less more].each do |permissions_level| %>
-        <%= link_to permissions_level.humanize, url_for(sortable_search_params.merge(search_permissions: permissions_level)), class: "dropdown-item #{@search_permissions == permissions_level ? 'active' : ''}" %>
+      <% permission_levels.each do |permissions_level| %>
+        <%= link_to "#{permissions_level.humanize} permissions", url_for(sortable_search_params.merge(search_permissions: permissions_level)), class: "dropdown-item tw:text-left #{@search_permissions == permissions_level ? 'active' : ''}" %>
       <% end %>
     </div>
   </li>

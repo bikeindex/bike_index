@@ -15,16 +15,20 @@ class Admin::StravaIntegrationsController < Admin::BaseController
     @strava_integration = StravaIntegration.unscoped.find(params[:id])
   end
 
-  helper_method :matching_strava_integrations
+  helper_method :matching_strava_integrations, :permission_levels
 
   protected
 
   def sortable_columns
-    %w[created_at updated_at deleted_at last_updated_activities_at user_id status activities_downloaded_count]
+    %w[created_at updated_at deleted_at last_updated_activities_at user_id status activities_downloaded_count].freeze
   end
 
   def sortable_opts
     "strava_integrations.#{sort_column} #{sort_direction}"
+  end
+
+  def permission_levels
+    %w[default less more].freeze
   end
 
   def earliest_period_date
@@ -42,8 +46,8 @@ class Admin::StravaIntegrationsController < Admin::BaseController
       strava_integrations = strava_integrations.where(status: params[:search_status])
     end
 
-    @search_permissions = params[:search_permissions].presence
-    if @search_permissions.present? && %w[default less more].include?(@search_permissions)
+    @search_permissions = params[:search_permissions].presence if permission_levels.include?(params[:search_permissions])
+    if @search_permissions.present?
       strava_integrations = strava_integrations.send(:"permissions_#{@search_permissions}")
     end
 
