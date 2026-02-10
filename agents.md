@@ -41,6 +41,7 @@ The `bin/dev` command handles building and updating tailwind and JS.
 - Form fields should use the `twinput` class
 - labels should use the `twlabel` class
 - basic links should use the `twlink` class
+- every number should be rendered with number_display(number)
 
 This project also uses the ViewComponent gem to render components.
 
@@ -53,7 +54,7 @@ This project also uses the ViewComponent gem to render components.
 ## Architecture notes
 
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
-- **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` or `with_deleted` in admin controllers when needed
+- **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
 - **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
 
 # Initial setup

@@ -51,11 +51,11 @@ RSpec.describe StravaIntegration, type: :model do
       expect(strava_integration.deleted_at).to be_present
       expect(StravaIntegration.count).to eq 0
       expect(StravaIntegration.with_deleted.count).to eq 1
-      disconnected = StravaIntegration.with_deleted.first
-      expect(disconnected.status).to eq "disconnected"
-      expect(disconnected.access_token).to eq ""
-      expect(disconnected.refresh_token).to eq ""
-      expect(disconnected.token_expires_at).to be_nil
+      deleted_integration = StravaIntegration.with_deleted.first
+      expect(deleted_integration.access_token).to eq ""
+      expect(deleted_integration.refresh_token).to eq ""
+      expect(deleted_integration.token_expires_at).to be_nil
+      expect(deleted_integration.activities_downloaded_count).to eq 0
     end
 
     it "allows a new integration for the same user after soft delete" do

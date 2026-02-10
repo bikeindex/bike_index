@@ -6,10 +6,10 @@
 
   <% if connected? %>
     <% if syncing? %>
-      <p class="">
+      <p>
         <%= translation(".syncing_activities") %>
 
-        <span id="strava-download-count" class="">
+        <span id="strava-download-count">
           <%= progress_percent %>% (<%= number_display(downloaded_count) %> /
           <%= number_display(total_count) %>) <%= translation(".downloaded") %>
         </span>
@@ -29,11 +29,10 @@
       <% if @strava_integration.strava_gears.any? %>
         <p>
           <strong><%= number_display(@strava_integration.strava_gears.bikes.with_item.count) %></strong>
-          /
-          <%= number_display(@strava_integration.strava_gears.bikes.count) %> <%= translation(:strava_bikes_connected) %>
+          / <%= number_display(@strava_integration.strava_gears.bikes.count) %>
+           <%= translation(:strava_bikes_connected) %>
         </p>
       <% end %>
-
     <% elsif error? %>
       <p class="text-danger">
         <strong><%= translation(".sync_error") %></strong>

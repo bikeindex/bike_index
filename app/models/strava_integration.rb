@@ -26,7 +26,7 @@
 #  index_strava_integrations_on_user_id     (user_id) UNIQUE WHERE (deleted_at IS NULL)
 #
 class StravaIntegration < ApplicationRecord
-  STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3, disconnected: 4}.freeze
+  STATUS_ENUM = {pending: 0, syncing: 1, synced: 2, error: 3}.freeze
 
   acts_as_paranoid
 
@@ -92,14 +92,15 @@ class StravaIntegration < ApplicationRecord
     calculated_downloaded = strava_activities.count
     return if activities_downloaded_count == calculated_downloaded
 
-    unprocessed = StravaRequest.list_activities.unprocessed.where(strava_integration_id: id)
-    if unprocessed.list_activities.none?
+    unprocessed_lists = StravaRequest.list_activities.unprocessed.where(strava_integration_id: id)
+    if unprocessed_lists.none?
       enqueue_detail_requests
       enqueue_gear_requests
     end
 
+    any_unprocessed = StravaRequest.unprocessed.where(strava_integration_id: id)
     update(activities_downloaded_count: calculated_downloaded,
-      status: unprocessed.none? ? :synced : :syncing)
+      status: any_unprocessed.none? ? :synced : :syncing)
   end
 
   private
@@ -127,7 +128,7 @@ class StravaIntegration < ApplicationRecord
   end
 
   def mark_disconnected
-    update_columns(status: self.class.statuses[:disconnected],
-      access_token: "", refresh_token: "", token_expires_at: nil)
+    update_columns(access_token: "", refresh_token: "", token_expires_at: nil,
+      activities_downloaded_count: 0)
   end
 end

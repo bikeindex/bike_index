@@ -19,6 +19,7 @@
       <%= link_to "All types", url_for(sortable_search_params.merge(search_activity_type: nil)), class: "dropdown-item #{@searched_activity_type.present? ? '' : 'active'}" %>
 
       <div class="dropdown-divider"></div>
+
       <% StravaActivity::CYCLING_TYPES.each do |activity_type| %>
         <%= link_to activity_type, url_for(sortable_search_params.merge(search_activity_type: activity_type)), class: "dropdown-item text-success #{@searched_activity_type == activity_type ? 'active' : ''}" %>
       <% end %>

@@ -32,7 +32,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
 
       it "enqueues up to BATCH_SIZE requests" do
-        requests = 12.times.map do
+        12.times.map do
           StravaRequest.create!(user_id: strava_integration.user_id,
             strava_integration_id: strava_integration.id, request_type: :fetch_activity,
             parameters: {strava_id: "123", strava_activity_id: 1})

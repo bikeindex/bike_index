@@ -98,8 +98,10 @@ RSpec.describe StravaIntegrationsController, type: :request do
               }.to change(StravaIntegration, :count).by(0)
                 .and change(StravaIntegration.with_deleted, :count).by(1)
 
-              expect(existing.reload.deleted_at).to be_present
-              expect(existing.status).to eq("disconnected")
+              existing.reload
+              expect(existing.deleted_at).to be_present
+              expect(existing.access_token).to eq("")
+              expect(existing.refresh_token).to eq("")
 
               new_integration = current_user.reload.strava_integration
               expect(new_integration.id).not_to eq(existing.id)

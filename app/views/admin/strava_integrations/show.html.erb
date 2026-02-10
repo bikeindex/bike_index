@@ -87,7 +87,7 @@
               <span class="text-success">
                 <%= @strava_integration.status %>
               </span>
-            <% elsif @strava_integration.error? || @strava_integration.disconnected? %>
+            <% elsif @strava_integration.error? %>
               <span class="text-danger"><%= @strava_integration.status %></span>
             <% else %>
               <small><%= @strava_integration.status %></small>
@@ -191,7 +191,8 @@
 
               <td>
                 <% if gear.total_distance_kilometers.present? %>
-                  <%= number_display(gear.total_distance_kilometers) %> km
+                  <%= number_display(gear.total_distance_kilometers) %>
+                  km
                 <% end %>
               </td>
 

@@ -63,7 +63,7 @@
             <%# duplicated in strava_integrations/show %>
             <% if strava_integration.synced? %>
               <span class="text-success"><%= strava_integration.status %></span>
-            <% elsif strava_integration.error? || strava_integration.disconnected? %>
+            <% elsif strava_integration.error? %>
               <span class="text-danger"><%= strava_integration.status %></span>
             <% else %>
               <small><%= strava_integration.status %></small>

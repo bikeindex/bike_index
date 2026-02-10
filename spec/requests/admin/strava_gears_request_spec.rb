@@ -18,7 +18,7 @@ RSpec.describe Admin::StravaGearsController, type: :request do
 
     context "with search_strava_integration_id" do
       it "filters by strava_integration_id" do
-        other_gear = FactoryBot.create(:strava_gear)
+        FactoryBot.create(:strava_gear)
         get base_url, params: {search_strava_integration_id: strava_gear.strava_integration_id}
         expect(assigns(:collection).pluck(:id)).to eq([strava_gear.id])
       end

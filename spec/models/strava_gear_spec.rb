@@ -147,7 +147,7 @@ RSpec.describe StravaGear, type: :model do
 
     it "creates a new gear record when not found" do
       gear_data = {"id" => "b9999", "name" => "New Bike", "gear_type" => "bike",
-        "resource_state" => 2, "distance" => 10000.0}
+                   "resource_state" => 2, "distance" => 10000.0}
       expect { StravaGear.update_from_strava(strava_integration, gear_data) }
         .to change(StravaGear, :count).by(1)
       strava_gear = strava_integration.strava_gears.find_by(strava_gear_id: "b9999")
@@ -169,7 +169,7 @@ RSpec.describe StravaGear, type: :model do
 
     it "does not set last_updated_from_strava_at for summary data" do
       gear_data = {"id" => "b1234", "name" => "Bike", "gear_type" => "bike",
-        "resource_state" => 2, "distance" => 5000.0}
+                   "resource_state" => 2, "distance" => 5000.0}
       strava_gear = StravaGear.update_from_strava(strava_integration, gear_data)
       expect(strava_gear.last_updated_from_strava_at).to be_nil
     end
