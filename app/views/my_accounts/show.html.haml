@@ -94,6 +94,10 @@
                           %li
                             - marketplace_translation = bike.is_for_sale ? t(".update_marketplace_listing") : t(".list_for_sale")
                             = link_to marketplace_translation, edit_bike_path(bike, edit_template: "marketplace"), class: "less-strong"
+                          - if bike.strava_gear.present?
+                            %li
+                              = inline_svg_tag("logos/strava.svg", size: "12px", style: "vertical-align: middle; display: inline-block;")
+                              %span.less-strong= bike.strava_gear.strava_gear_display_name
                           %li
                             = link_to t(".mark_stolen", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong"
                         - if bike.user_hidden

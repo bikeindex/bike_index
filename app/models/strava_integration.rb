@@ -99,9 +99,8 @@ class StravaIntegration < ApplicationRecord
       strava_gears.find_each(&:update_total_distance!)
     end
 
-    any_unprocessed = StravaRequest.unprocessed.where(strava_integration_id: id)
     update(activities_downloaded_count: calculated_downloaded,
-      status: any_unprocessed.none? ? :synced : :syncing)
+      status: unprocessed_lists.none? ? :synced : :syncing)
   end
 
   private

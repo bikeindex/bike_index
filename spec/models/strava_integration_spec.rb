@@ -252,11 +252,11 @@ RSpec.describe StravaIntegration, type: :model do
       expect(strava_integration.activities_downloaded_count).to eq(1)
     end
 
-    it "stays syncing and enqueues detail requests when cycling activities are not enriched" do
+    it "enqueues detail requests when cycling activities are not enriched" do
       FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", segment_locations: nil)
       strava_integration.update_sync_status
       strava_integration.reload
-      expect(strava_integration.status).to eq("syncing")
+      expect(strava_integration.status).to eq("synced")
       expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity).count).to eq(1)
     end
 
@@ -271,7 +271,7 @@ RSpec.describe StravaIntegration, type: :model do
       expect(strava_gear.reload.total_distance_kilometers).to eq(25)
       # Un-enriched gear gets a fetch_gear request
       expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_gear).count).to eq(1)
-      expect(strava_integration.reload.status).to eq("syncing")
+      expect(strava_integration.reload.status).to eq("synced")
     end
 
     it "does not create duplicate detail requests when called twice" do

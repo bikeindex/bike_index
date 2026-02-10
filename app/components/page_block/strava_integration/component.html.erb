@@ -54,10 +54,8 @@
           data: { confirm: translation(".disconnect_confirm") } %>
   <% else %>
     <p><%= translation(".integrate_your_bikes_with_strava") %></p>
-    <%# requires ! because of bootstrap %>
-    <%= link_to helpers.new_strava_integration_path, class: "twbtn tw:py-1.5 tw:bg-[#FC4C02]! tw:border-[#FC4C02]! tw:text-white! tw:hover:bg-[#e04400]!" do %>
-      <%= strava_icon(14, color: "#fff") %>
-      <%= translation(".connect_with_strava") %>
+    <%= link_to helpers.new_strava_integration_path do %>
+      <%= helpers.image_tag("logos/btn_strava_connect.svg", alt: translation(".connect_with_strava")) %>
     <% end %>
   <% end %>
 </div>

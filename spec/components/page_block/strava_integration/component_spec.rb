@@ -11,8 +11,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :component do
     it "renders connect button" do
       expect(component).to have_text("Strava Integration")
       expect(component).to have_text("Integrate your bikes with Strava")
-      expect(component).to have_css("a.twbtn")
-      expect(component).to have_text("Connect with Strava")
+      expect(component).to have_css("img[src*='btn_strava_connect']")
     end
 
     it "does not render disconnect button" do

@@ -41,10 +41,10 @@ module PageBlock::StravaIntegration
       @strava_integration.athlete_activity_count || "?"
     end
 
-    def strava_icon(size, color: "#FC4C02")
-      tag.svg(xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", width: size, height: size, style: "vertical-align: middle; display: inline-block;") do
-        tag.path(d: "M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169", fill: color)
-      end
+    def strava_icon(size, color: nil)
+      style = "vertical-align: middle; display: inline-block;"
+      svg = helpers.inline_svg_tag("logos/strava.svg", size: "#{size}px", style:)
+      color ? svg.gsub("#FC4C02", color).html_safe : svg
     end
   end
 end
