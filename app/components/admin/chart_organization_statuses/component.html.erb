@@ -1,0 +1,41 @@
+<table
+  class="
+    table table-striped table-bordered table-sm without-exterior-border
+    tw:mb-8
+  "
+>
+  <thead class="small-header">
+    <tr>
+      <% if show_with_pos_counts? %>
+        <th>Active POS at start</th>
+        <th>Active POS at end</th>
+      <% else %>
+        <th>Matching statuses at start</th>
+        <th>Matching statuses at end</th>
+      <% end %>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>
+        <%= number_display(start_count) %>
+      </td>
+      <td>
+        <%= number_display(end_count) %>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<% unless @ended %>
+  <h4 class="mt-4">POS kinds <code>start_at</code></h4>
+  <%= helpers.column_chart pos_kinds_start_counts, stacked: true, thousands: ",", colors: start_colors %>
+<% end %>
+
+<% unless @current %>
+  <h4 class="mt-4">POS kinds <code>end_at</code></h4>
+  <%= helpers.column_chart pos_kinds_end_counts, stacked: true, thousands: ",", colors: end_colors %>
+<% end %>
+
+<div class="tw:mt-10"></div>
