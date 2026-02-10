@@ -1,7 +1,12 @@
-<div class="tw:flex tw:flex-row tw:items-baseline tw:flex-wrap">
+<div class="tw:flex tw:flex-row tw:flex-wrap tw:items-baseline">
   <h1>Organization Statuses</h1>
 
-  <ul class="tw:flex tw:flex-row tw:flex-wrap tw:items-baseline tw:gap-1 tw:ml-auto tw:list-none tw:mb-0">
+  <ul
+    class="
+      tw:mb-0 tw:ml-auto tw:flex tw:list-none tw:flex-row tw:flex-wrap
+      tw:items-baseline tw:gap-1
+    "
+  >
     <li class="nav-item">
       <a
         class="nav-link dropdown-toggle <%= @kind != "all" ? "active" : "" %>"
@@ -17,17 +22,21 @@
           <%= Organization.kind_humanized(@kind) %>
         <% end %>
       </a>
+
       <div class="dropdown-menu">
         <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == "all" ? "active" : ""}" %>
         <% not_bike_shop_active = @kind == "not_bike_shop" %>
         <%= link_to "NOT bike shops", url_for(sortable_search_params.merge(search_kind: not_bike_shop_active ? "" : "not_bike_shop")), class: "dropdown-item #{not_bike_shop_active ? "active" : ""}" %>
+
         <div class="dropdown-divider"></div>
+
         <% Organization.kinds.each do |kind| %>
           <% kind_active = @kind == kind %>
           <%= link_to Organization.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? "active" : ""}" %>
         <% end %>
       </div>
     </li>
+
     <li class="nav-item">
       <a
         class="nav-link dropdown-toggle <%= @pos_kind != "all" ? "active" : "" %>"
@@ -39,28 +48,36 @@
       >
         <%= humanize_pos_kind(@pos_kind) %>
       </a>
+
       <div class="dropdown-menu">
         <%= link_to humanize_pos_kind("all"), url_for(sortable_search_params.merge(search_pos_kind: nil)), class: "dropdown-item #{@pos_kind == "all" ? "active" : ""}" %>
+
         <% grouped_pos_kinds.each do |pos_kind| %>
           <% pos_kind_active = @pos_kind == pos_kind %>
           <%= link_to humanize_pos_kind(pos_kind), url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), class: "dropdown-item #{pos_kind_active ? "active" : ""}" %>
         <% end %>
+
         <div class="dropdown-divider"></div>
+
         <% Organization.pos_kinds.each do |pos_kind| %>
           <% pos_kind_active = @pos_kind == pos_kind %>
           <%= link_to pos_kind.humanize, url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), class: "dropdown-item #{pos_kind_active ? "active" : ""}" %>
         <% end %>
       </div>
     </li>
+
     <li class="nav-item">
       <%= link_to "current", url_for(sortable_search_params.merge(search_current: !@current)), class: "nav-link #{@current ? "active" : ""}" %>
     </li>
+
     <li class="nav-item">
       <%= link_to "deleted", url_for(sortable_search_params.merge(search_deleted: !@deleted)), class: "nav-link #{@deleted ? "active" : ""}" %>
     </li>
+
     <li class="nav-item">
       <%= link_to "ended", url_for(sortable_search_params.merge(search_ended: !@ended)), class: "nav-link #{@ended ? "active" : ""}" %>
     </li>
+
     <li class="nav-item">
       <%= link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? "active" : ""}" %>
     </li>
@@ -86,9 +103,7 @@
   <% end %>
 <% end %>
 
-<div class="mt-2">
-  <%= render partial: "/shared/period_select" %>
-</div>
+<div class="mt-2"><%= render partial: "/shared/period_select" %></div>
 
 <div class="mt-4"></div>
 
@@ -100,16 +115,22 @@
   <table class="table table-striped table-bordered table-sm without-exterior-border">
     <thead class="small-header">
       <th><%= sortable "start_at" %></th>
+
       <% if show_created_at %>
         <th class="small"><%= sortable "created_at" %></th>
       <% end %>
+
       <th><%= sortable "end_at" %></th>
       <th>Duration</th>
       <th><%= sortable "organization_id" %></th>
       <th><%= sortable "pos_kind", "POS kind" %></th>
       <th><%= sortable "kind" %></th>
-      <th class="small"><%= sortable "organization_deleted_at", "Deleted" %></th>
+
+      <th class="small">
+        <%= sortable "organization_deleted_at", "Deleted" %>
+      </th>
     </thead>
+
     <tbody>
       <% @organization_statuses.each do |organization_status| %>
         <tr>
@@ -117,15 +138,22 @@
             <span class="convertTime preciseTime">
               <%= l organization_status.start_at, format: :convert_time %>
             </span>
+
             <% if display_dev_info? %>
-              <code class="small only-dev-visible"><%= organization_status.id %></code>
+              <code class="small only-dev-visible">
+                <%= organization_status.id %>
+              </code>
             <% end %>
           </td>
+
           <% if show_created_at %>
             <td class="small">
-              <span class="convertTime"><%= l organization_status.created_at, format: :convert_time %></span>
+              <span class="convertTime">
+                <%= l organization_status.created_at, format: :convert_time %>
+              </span>
             </td>
           <% end %>
+
           <td>
             <% if organization_status.end_at.present? %>
               <span class="convertTime preciseTime">
@@ -133,24 +161,28 @@
               </span>
             <% end %>
           </td>
+
           <td>
             <% if organization_status.end_at.present? %>
               <%= period_in_words(organization_status.end_at - organization_status.start_at) %>
             <% end %>
           </td>
+
           <td>
             <%= render Admin::OrganizationCell::Component.new(organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
           </td>
+
           <td>
             <% status_class = organization_status.pos_kind.match?(/broken/) ? "text-danger" : "" %>
             <% status_class = "less-strong" if organization_status.pos_kind == "no_pos" %>
+
             <span class="<%= status_class %>">
               <%= organization_status.pos_kind&.humanize %>
             </span>
           </td>
-          <td>
-            <%= Organization.kind_humanized(organization_status.kind) %>
-          </td>
+
+          <td><%= Organization.kind_humanized(organization_status.kind) %></td>
+
           <td>
             <% if organization_status.organization_deleted_at.present? %>
               <span class="convertTime preciseTime text-danger">

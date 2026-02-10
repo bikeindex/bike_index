@@ -1,4 +1,4 @@
-<div class="tw:flex tw:flex-row tw:items-baseline tw:flex-wrap">
+<div class="tw:flex tw:flex-row tw:flex-wrap tw:items-baseline">
   <h1>
     <% if @index_title.present? %>
       <%= @index_title %>
@@ -8,7 +8,12 @@
     <% end %>
   </h1>
 
-  <ul class="tw:flex tw:flex-row tw:flex-wrap tw:items-baseline tw:gap-1 tw:ml-auto tw:list-none tw:mb-0">
+  <ul
+    class="
+      tw:mb-0 tw:ml-auto tw:flex tw:list-none tw:flex-row tw:flex-wrap
+      tw:items-baseline tw:gap-1
+    "
+  >
     <%= @nav_header_list_items %>
 
     <% unless @skip_charting %>
