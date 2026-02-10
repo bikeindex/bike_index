@@ -346,10 +346,8 @@ RSpec.describe Bikes::EditsController, type: :request do
   end
 
   context "strava_gear template" do
-    let!(:strava_integration) do
-      FactoryBot.create(:strava_integration, :synced, user: current_user,
-        athlete_gear: [{"id" => "b12345", "name" => "My Road Bike", "resource_state" => 2}])
-    end
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
+    let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b12345", strava_gear_name: "My Road Bike") }
 
     it "renders strava_gear edit page" do
       get "#{base_url}/strava_gear"

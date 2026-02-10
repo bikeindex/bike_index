@@ -34,8 +34,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :system do
       visit(preview_path)
       expect(page).to have_content "Connected to Strava"
       expect(page).to have_content "150 activities synced"
-      expect(page).to have_content "My Road Bike"
-      expect(page).to have_content "My Mountain Bike"
+      expect(page).to have_content "Strava bikes connected"
       expect(page).to have_link "Disconnect Strava"
     end
   end

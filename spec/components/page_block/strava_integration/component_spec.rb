@@ -62,14 +62,13 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :component do
       end
 
       it "renders gear list" do
-        expect(component).to have_text("Your Strava gear")
-        expect(component).to have_text("My Road Bike")
+        expect(component).to have_text("Strava bikes connected")
       end
     end
 
     it "does not render gear section without gear" do
       expect(component).to have_text("Connected to Strava")
-      expect(component).not_to have_text("Your Strava gear")
+      expect(component).not_to have_text("Strava bikes connected")
     end
 
     it "renders disconnect button" do
