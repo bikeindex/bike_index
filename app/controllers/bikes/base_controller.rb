@@ -100,7 +100,7 @@ class Bikes::BaseController < ApplicationController
 
   def assign_strava_gear
     strava_integration = current_user&.strava_integration
-    unless strava_integration&.synced?
+    unless strava_integration&.show_gear_link?
       flash[:error] = "No synced Strava integration found."
       return
     end

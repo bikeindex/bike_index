@@ -1,0 +1,54 @@
+<% strava_integration = current_user.strava_integration %>
+<% if strava_integration&.show_gear_link? && strava_integration.strava_gears.bikes.any? %>
+  <div class="form-wrap secondary-form-wrap">
+    <div class="form-well-form-header">
+      <h3><%= t("bikes_edit.strava_gear.strava_gear") %></h3>
+    </div>
+
+    <div class="related-fields">
+      <p class="mb-3"><%= t("bikes_edit.strava_gear.connect_bike_to_strava_gear") %></p>
+
+      <% if strava_integration.syncing? %>
+        <div class="alert alert-info mb-3">
+          <%= t("bikes_edit.strava_gear.sync_not_finished") %>
+        </div>
+      <% end %>
+      <% bike_gear = @bike.strava_gear %>
+      <div class="form-group row unnested-field">
+        <label class="form-well-label"><%= t("bikes_edit.strava_gear.strava_bike") %></label>
+
+        <div class="form-well-input">
+          <select class="form-control" name="strava_gear_id">
+            <option value="" <%= "selected" if bike_gear.blank? %>><%= t("bikes_edit.strava_gear.none_selected") %></option>
+
+            <% strava_integration.strava_gears.bikes.each do |gear| %>
+              <option
+                value="<%= gear.strava_gear_id %>"
+                <%= "selected" if bike_gear&.strava_gear_id == gear.strava_gear_id %>
+              >
+                <%= gear.strava_gear_name %>
+
+                <% if gear.strava_distance_km.present? %>
+                  (<%= gear.strava_distance_km %> km)
+                <% end %>
+              </option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+      <% if bike_gear.present? %>
+        <div class="mt-3 p-3 bg-light rounded">
+          <p class="mb-1">
+            <strong><%= t("bikes_edit.strava_gear.currently_connected") %></strong>
+          </p>
+
+          <p class="mb-0"><%= bike_gear.strava_gear_display_name %></p>
+        </div>
+      <% end %>
+      <div class="mt-3">
+        <%= hidden_field_tag :edit_template, "versions" %>
+        <%= submit_tag t("bikes_edit.strava_gear.save_strava_gear"), class: 'btn btn-lg btn-primary' %>
+      </div>
+    </div>
+  </div>
+<% end %>

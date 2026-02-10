@@ -1673,6 +1673,7 @@ en:
         strava_gear: Strava Gear
         theft_details: Theft details
         versions: Versions
+        versions_and_strava: Versions and Strava
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign

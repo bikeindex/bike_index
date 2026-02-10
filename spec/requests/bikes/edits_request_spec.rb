@@ -349,22 +349,19 @@ RSpec.describe Bikes::EditsController, type: :request do
     let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
     let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b12345", strava_gear_name: "My Road Bike") }
 
-    it "renders strava_gear edit page" do
+    it "renders versions template with strava gear fields" do
       get "#{base_url}/strava_gear"
       expect(response.code).to eq("200")
-      expect(response).to render_template(:strava_gear)
+      expect(response).to render_template(:versions)
+      expect(response.body).to include("My Road Bike")
     end
 
-    context "without strava integration" do
-      before do
-        strava_integration.destroy
-        current_user.reload
-      end
-
-      it "redirects to default edit template" do
-        get "#{base_url}/strava_gear"
-        expect(response).to redirect_to(edit_bike_url(bike, edit_template: "bike_details"))
-      end
+    it "renders versions template without strava when not connected" do
+      strava_integration.destroy
+      current_user.reload
+      get "#{base_url}/strava_gear"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:versions)
     end
   end
 end

@@ -489,7 +489,7 @@ RSpec.describe "BikesController#update", type: :request do
 
     it "connects bike to strava gear" do
       expect(bike.strava_gear).to be_nil
-      patch base_url, params: {strava_gear_id: "b12345", edit_template: "strava_gear"}
+      patch base_url, params: {strava_gear_id: "b12345", edit_template: "versions"}
       expect(flash[:success]).to match(/My Road Bike/)
 
       bike.reload
@@ -501,7 +501,7 @@ RSpec.describe "BikesController#update", type: :request do
     it "updates existing strava gear connection" do
       road_bike_gear.update(item: bike)
 
-      patch base_url, params: {strava_gear_id: "b67890", edit_template: "strava_gear"}
+      patch base_url, params: {strava_gear_id: "b67890", edit_template: "versions"}
       expect(flash[:success]).to match(/My MTB/)
 
       bike.reload
@@ -513,7 +513,7 @@ RSpec.describe "BikesController#update", type: :request do
       road_bike_gear.update(item: bike)
 
       expect {
-        patch base_url, params: {strava_gear_id: "", edit_template: "strava_gear"}
+        patch base_url, params: {strava_gear_id: "", edit_template: "versions"}
       }.not_to change(StravaGear, :count)
 
       expect(flash[:success]).to match(/disconnected/)
@@ -527,13 +527,13 @@ RSpec.describe "BikesController#update", type: :request do
       end
 
       it "shows error" do
-        patch base_url, params: {strava_gear_id: "b12345", edit_template: "strava_gear"}
+        patch base_url, params: {strava_gear_id: "b12345", edit_template: "versions"}
         expect(flash[:error]).to match(/No synced Strava/)
       end
     end
 
     it "shows error for invalid gear id" do
-      patch base_url, params: {strava_gear_id: "b99999", edit_template: "strava_gear"}
+      patch base_url, params: {strava_gear_id: "b99999", edit_template: "versions"}
       expect(flash[:error]).to match(/not found/)
     end
   end
