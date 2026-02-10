@@ -29,4 +29,4 @@
 
 <% table_view = render(partial: "table", locals: {collection: @collection, render_sortable: true}) %>
 
-<%= render partial: "/shared/admin/index_skeleton", locals: {nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_strava_gears} %>
+<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_strava_gears)) %>

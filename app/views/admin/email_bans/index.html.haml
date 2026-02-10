@@ -1,1 +1,1 @@
-= render partial: "/shared/admin/index_skeleton", locals: {chart_collection: @render_chart && matching_email_bans}
+= render(Admin::IndexSkeleton::Component.new(chart_collection: @render_chart && matching_email_bans))
