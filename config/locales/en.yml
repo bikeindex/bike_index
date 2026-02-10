@@ -1553,6 +1553,8 @@ en:
       save_strava_gear: Save Strava Gear
       strava_bike: Strava Bike
       strava_gear: Strava Gear
+      sync_not_finished: Strava sync hasn't finished yet, so not all bikes may be
+        listed.
       strava_not_connected: Your Strava account is not connected or has not finished
         syncing.
     theft_details:

@@ -53,7 +53,7 @@ class StravaIntegration < ApplicationRecord
   end
 
   def show_gear_link?
-    synced? && strava_gears.any?
+    (synced? || syncing?) && strava_gears.any?
   end
 
   def cycling_gear_ids

@@ -18,7 +18,12 @@
 
             <% strava_integration = current_user.strava_integration %>
 
-            <% if strava_integration&.synced? && strava_integration.strava_gears.bikes.any? %>
+            <% if strava_integration&.show_gear_link? && strava_integration.strava_gears.bikes.any? %>
+              <% if strava_integration.syncing? %>
+                <div class="alert alert-info mb-3">
+                  <%= t(".sync_not_finished") %>
+                </div>
+              <% end %>
               <% bike_gear = @bike.strava_gear %>
               <div class="form-group row unnested-field">
                 <label class="form-well-label"><%= t(".strava_bike") %></label>
