@@ -24,4 +24,4 @@ en:
         sync_running_in_background: Sync is running in the background. This page will
           update automatically.
         syncing_activities: Syncing activities...
-        your_strava_gear: 'Your Strava gear:'
+        strava_bikes_connected: Strava bikes connected to Bike Index bikes

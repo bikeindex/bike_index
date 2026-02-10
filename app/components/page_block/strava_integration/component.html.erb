@@ -1,4 +1,4 @@
-<div class="tw:mt-1 tw:space-y-0.5 tw:leading-tight tw:[&_p]:mb-2!">
+<div class="tw:mt-1 tw:space-y-0.5 tw:leading-snug tw:[&_p]:mb-2!">
   <p>
     <%= strava_icon(16) %>
     <strong><%= translation(".strava_integration") %></strong>
@@ -26,14 +26,14 @@
     <% elsif synced? %>
       <p><strong><%= translation(".connected_to_strava") %></strong></p>
       <p><%= translation(".activities_synced", count: downloaded_count) %></p>
-      <% if gear_list.any? %>
-        <p><strong><%= translation(".your_strava_gear") %></strong></p>
-        <ul class="list-unstyled">
-          <% gear_list.each do |gear| %>
-            <li><%= gear.strava_gear_display_name %></li>
-          <% end %>
-        </ul>
+      <% if @strava_integration.strava_gears.any? %>
+        <p>
+          <strong><%= number_display(@strava_integration.strava_gears.bikes.with_item.count) %></strong>
+          /
+          <%= number_display(@strava_integration.strava_gears.bikes.count) %> <%= translation(:strava_bikes_connected) %>
+        </p>
       <% end %>
+
     <% elsif error? %>
       <p class="text-danger">
         <strong><%= translation(".sync_error") %></strong>

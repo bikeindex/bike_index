@@ -92,7 +92,7 @@ class StravaIntegration < ApplicationRecord
     calculated_downloaded = strava_activities.count
     return if activities_downloaded_count == calculated_downloaded
 
-    unprocessed = StravaRequest.unprocessed.where(strava_integration_id: id)
+    unprocessed = StravaRequest.list_activities.unprocessed.where(strava_integration_id: id)
     if unprocessed.list_activities.none?
       enqueue_detail_requests
       enqueue_gear_requests

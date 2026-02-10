@@ -41,6 +41,7 @@ class StravaGear < ApplicationRecord
   scope :shoes, -> { where(gear_type: :shoe) }
   scope :enriched, -> { where("strava_data->>'resource_state' = '3'") }
   scope :un_enriched, -> { where("strava_data IS NULL OR strava_data->>'resource_state' != '3'") }
+  scope :with_item, -> { where.not(item_id: nil) }
 
   def self.update_from_strava(strava_integration, gear_data)
     strava_gear = strava_integration.strava_gears.find_or_initialize_by(strava_gear_id: gear_data["id"])

@@ -36,8 +36,8 @@ export default class extends Controller {
   updateProgress (data) {
     const countEl = document.getElementById('strava-download-count')
     if (countEl) {
-      const total = data.athlete_activity_count || '?'
-      countEl.textContent = `${data.progress_percent}% (${data.activities_downloaded_count} / ${total}) downloaded`
+      const fmt = (n) => n == null ? '?' : n.toLocaleString()
+      countEl.textContent = `${data.progress_percent}% (${fmt(data.activities_downloaded_count)} / ${fmt(data.athlete_activity_count)}) downloaded`
     }
   }
 }
