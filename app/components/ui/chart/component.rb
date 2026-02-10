@@ -11,12 +11,14 @@ module UI::Chart
       @time_range = time_range
       @stacked = stacked
       @thousands = thousands
-      @colors = colors
+      @colors = colors || COLORS
     end
 
     def call
-      helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: colors
+      helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: @colors
     end
+
+    private
 
     def time_range_counts(collection:, column: "created_at", time_range: nil)
       collection_grouped(collection:, column:, time_range: time_range || @time_range).count
@@ -117,28 +119,6 @@ module UI::Chart
       else
         pluralize((seconds / 604800.0).round(1), "weeks")
       end.gsub(".0 ", " ")
-    end
-
-    def organization_dashboard_bikes_graph_data
-      org_registrations = {
-        name: "Organization registrations created",
-        data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at")
-      }
-      return [org_registrations] unless current_organization.regional?
-
-      [
-        org_registrations,
-        {
-          name: "Self registrations created",
-          data: time_range_counts(collection: @bikes_not_in_organizations, column: "bikes.created_at")
-        }
-      ]
-    end
-
-    private
-
-    def colors
-      @colors || @series.map.with_index { |s, i| s[:color] || COLORS[i % COLORS.length] }
     end
 
     def collection_grouped(collection:, column: "created_at", time_range: nil)

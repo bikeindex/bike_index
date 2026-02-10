@@ -5,10 +5,10 @@ module UI::Chart
     def bikes_by_status
       time_range = 1.week.ago..Time.current
       chart = UI::Chart::Component.new(series: [], time_range:)
-      series = Bike::STATUS_ENUM.keys.filter_map.with_index do |status, i|
+      series = Bike::STATUS_ENUM.keys.filter_map do |status|
         scoped = Bike.where(status:, created_at: time_range)
         next if scoped.limit(1).blank?
-        {name: Bike.status_humanized(status), data: chart.time_range_counts(collection: scoped), color: UI::Chart::Component::COLORS[i]}
+        {name: Bike.status_humanized(status), data: chart.send(:time_range_counts, collection: scoped)}
       end
       series = [{name: "No bikes", data: {}}] if series.empty?
       render(UI::Chart::Component.new(series:, time_range:, stacked: true))

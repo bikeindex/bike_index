@@ -21,14 +21,14 @@ RSpec.describe UI::Chart::Component, type: :component do
     describe "time_range_counts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 1, " 1:18 PM" => 0, " 1:19 PM" => 0} }
       it "returns the thing with want" do
-        expect(instance.time_range_counts(collection: Payment.all)).to eq target_counts
+        expect(instance.send(:time_range_counts, collection: Payment.all)).to eq target_counts
       end
     end
 
     describe "time_range_amounts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 10.01, " 1:18 PM" => 0, " 1:19 PM" => 0} }
       it "returns the thing with want" do
-        expect(instance.time_range_amounts(collection: Payment.all, convert_to_dollars: true)).to eq target_counts
+        expect(instance.send(:time_range_amounts, collection: Payment.all, convert_to_dollars: true)).to eq target_counts
       end
     end
   end
@@ -36,27 +36,27 @@ RSpec.describe UI::Chart::Component, type: :component do
   describe "group_by_method" do
     context "hourly" do
       it "returns group_by_minute" do
-        expect(instance.group_by_method((Time.current - 1.hour)..Time.current)).to eq :group_by_minute
+        expect(instance.send(:group_by_method, (Time.current - 1.hour)..Time.current)).to eq :group_by_minute
       end
     end
     context "daily" do
       it "returns group_by_hour" do
-        expect(instance.group_by_method((Time.current - 1.day)..Time.current)).to eq :group_by_hour
+        expect(instance.send(:group_by_method, (Time.current - 1.day)..Time.current)).to eq :group_by_hour
       end
     end
     context "weekly" do
       it "returns group_by_day" do
-        expect(instance.group_by_method((Time.current - 6.days)..Time.current)).to eq :group_by_day
+        expect(instance.send(:group_by_method, (Time.current - 6.days)..Time.current)).to eq :group_by_day
       end
     end
     context "6 months" do
       it "returns group_by_week" do
-        expect(instance.group_by_method((Time.current - 6.months)..Time.current)).to eq :group_by_week
+        expect(instance.send(:group_by_method, (Time.current - 6.months)..Time.current)).to eq :group_by_week
       end
     end
     context "2 years" do
       it "returns group_by_month" do
-        expect(instance.group_by_method((Time.current - 2.years)..Time.current)).to eq :group_by_month
+        expect(instance.send(:group_by_method, (Time.current - 2.years)..Time.current)).to eq :group_by_month
       end
     end
   end
@@ -67,65 +67,65 @@ RSpec.describe UI::Chart::Component, type: :component do
     context "1 hour" do
       let(:start_time) { end_time - 1.hour }
       it "is hour:minute pm" do
-        expect(end_time.in_time_zone("America/New_York").strftime(instance.group_by_format(format_time_range))).to eq " 7:01 PM"
+        expect(end_time.in_time_zone("America/New_York").strftime(instance.send(:group_by_format, format_time_range))).to eq " 7:01 PM"
       end
     end
     context "2 days" do
       let(:start_time) { end_time - 47.hours }
       it "is weekday hour pm" do
-        expect(end_time.in_time_zone("America/New_York").strftime(instance.group_by_format(format_time_range))).to eq "Sun 7 PM"
+        expect(end_time.in_time_zone("America/New_York").strftime(instance.send(:group_by_format, format_time_range))).to eq "Sun 7 PM"
       end
     end
     context "3 days" do
       let(:start_time) { end_time - 3.days }
       it "is weekday hour pm" do
-        expect(end_time.in_time_zone("America/New_York").strftime(instance.group_by_format(format_time_range))).to eq "Sun 7 PM"
+        expect(end_time.in_time_zone("America/New_York").strftime(instance.send(:group_by_format, format_time_range))).to eq "Sun 7 PM"
       end
     end
     context "6 days" do
       let(:start_time) { end_time - 6.days }
       it "is weekday date" do
-        expect(end_time.in_time_zone("America/New_York").strftime(instance.group_by_format(format_time_range))).to eq "Sun 1-5"
+        expect(end_time.in_time_zone("America/New_York").strftime(instance.send(:group_by_format, format_time_range))).to eq "Sun 1-5"
       end
     end
     context "10 days" do
       let(:start_time) { end_time - 10.days }
       it "is date" do
-        expect(end_time.in_time_zone("America/New_York").strftime(instance.group_by_format(format_time_range))).to eq "2020-1-5"
+        expect(end_time.in_time_zone("America/New_York").strftime(instance.send(:group_by_format, format_time_range))).to eq "2020-1-5"
       end
     end
     context "6 months" do
       let(:start_time) { end_time - 6.months }
       it "is date" do
-        expect(end_time.in_time_zone("America/New_York").strftime(instance.group_by_format(format_time_range))).to eq "2020-1-5"
+        expect(end_time.in_time_zone("America/New_York").strftime(instance.send(:group_by_format, format_time_range))).to eq "2020-1-5"
       end
     end
     context "13 months" do
       let(:start_time) { end_time - 13.months }
       it "is year-month" do
-        expect(end_time.strftime(instance.group_by_format(format_time_range))).to eq "2020-1"
+        expect(end_time.strftime(instance.send(:group_by_format, format_time_range))).to eq "2020-1"
       end
     end
   end
 
   describe "humanized_time_range_column" do
     it "humanizes created_at" do
-      expect(instance.humanized_time_range_column("created_at")).to eq "created"
+      expect(instance.send(:humanized_time_range_column, "created_at")).to eq "created"
       instance.instance_variable_set(:@period, "all")
-      expect(instance.humanized_time_range_column("created_at")).to be_blank
-      expect(instance.humanized_time_range_column("created_at", return_value_for_all: true)).to eq "created"
+      expect(instance.send(:humanized_time_range_column, "created_at")).to be_blank
+      expect(instance.send(:humanized_time_range_column, "created_at", return_value_for_all: true)).to eq "created"
     end
     it "humanizes start_at and end_at" do
-      expect(instance.humanized_time_range_column("start_at")).to eq "starts"
-      expect(instance.humanized_time_range_column("end_at")).to eq "ends"
-      expect(instance.humanized_time_range_column("subscription_start_at")).to eq "subscription starts"
-      expect(instance.humanized_time_range_column("subscription_end_at")).to eq "subscription ends"
+      expect(instance.send(:humanized_time_range_column, "start_at")).to eq "starts"
+      expect(instance.send(:humanized_time_range_column, "end_at")).to eq "ends"
+      expect(instance.send(:humanized_time_range_column, "subscription_start_at")).to eq "subscription starts"
+      expect(instance.send(:humanized_time_range_column, "subscription_end_at")).to eq "subscription ends"
     end
     it "humanizes needs_renewal_at" do
-      expect(instance.humanized_time_range_column("needs_renewal_at")).to eq "need renewal"
+      expect(instance.send(:humanized_time_range_column, "needs_renewal_at")).to eq "need renewal"
     end
     it "humanizes request_at" do
-      expect(instance.humanized_time_range_column("request_at")).to eq "requested"
+      expect(instance.send(:humanized_time_range_column, "request_at")).to eq "requested"
     end
   end
 
@@ -133,24 +133,24 @@ RSpec.describe UI::Chart::Component, type: :component do
     context "standard time range" do
       it "returns period" do
         instance.instance_variable_set(:@period, "week")
-        expect(instance.humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the past week"
+        expect(instance.send(:humanized_time_range, (Time.current - 1.week)..Time.current)).to eq "in the past week"
       end
       context "all" do
         it "returns period" do
           instance.instance_variable_set(:@period, "all")
-          expect(instance.humanized_time_range((Time.current - 1.week)..Time.current)).to be_blank
+          expect(instance.send(:humanized_time_range, (Time.current - 1.week)..Time.current)).to be_blank
         end
       end
       context "next_week" do
         it "returns period" do
           instance.instance_variable_set(:@period, "next_week")
-          expect(instance.humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next week"
+          expect(instance.send(:humanized_time_range, (Time.current - 1.week)..Time.current)).to eq "in the next week"
         end
       end
       context "next_month" do
         it "returns period" do
           instance.instance_variable_set(:@period, "next_month")
-          expect(instance.humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next month"
+          expect(instance.send(:humanized_time_range, (Time.current - 1.week)..Time.current)).to eq "in the next month"
         end
       end
     end
@@ -171,7 +171,7 @@ RSpec.describe UI::Chart::Component, type: :component do
           ]
         end
         it "returns with preciseTimeSeconds" do
-          expect(instance.humanized_time_range(custom_time_range)).to eq "<span>" + target_html.join + "</span>"
+          expect(instance.send(:humanized_time_range, custom_time_range)).to eq "<span>" + target_html.join + "</span>"
         end
       end
 
@@ -186,13 +186,13 @@ RSpec.describe UI::Chart::Component, type: :component do
           ]
         end
         it "returns time in precise time" do
-          expect(instance.humanized_time_range(custom_time_range)).to eq "<span>" + target_html.join + "</span>"
+          expect(instance.send(:humanized_time_range, custom_time_range)).to eq "<span>" + target_html.join + "</span>"
         end
         context "ending now" do
           let(:end_time) { Time.current - 1.minute }
           let(:current_target_html) { target_html.slice(0, 2) + ["</em> to <em>now</em>"] }
           it "returns time in precise time" do
-            expect(instance.humanized_time_range(custom_time_range)).to eq "<span>" + current_target_html.join + "</span>"
+            expect(instance.send(:humanized_time_range, custom_time_range)).to eq "<span>" + current_target_html.join + "</span>"
           end
         end
       end
@@ -208,7 +208,7 @@ RSpec.describe UI::Chart::Component, type: :component do
           ]
         end
         it "returns with preciseTimeSeconds" do
-          expect(instance.humanized_time_range(custom_time_range)).to eq "<span>" + target_html.join + "</span>"
+          expect(instance.send(:humanized_time_range, custom_time_range)).to eq "<span>" + target_html.join + "</span>"
         end
       end
     end
@@ -216,28 +216,28 @@ RSpec.describe UI::Chart::Component, type: :component do
 
   describe "period_in_words" do
     it "returns seconds" do
-      expect(instance.period_in_words("32")).to eq "32 seconds"
-      expect(instance.period_in_words(-32)).to eq "32 seconds"
+      expect(instance.send(:period_in_words, "32")).to eq "32 seconds"
+      expect(instance.send(:period_in_words, -32)).to eq "32 seconds"
     end
     context "hour" do
       it "returns hours" do
-        expect(instance.period_in_words(3_600)).to eq "1 hour"
-        expect(instance.period_in_words(5_400)).to eq "1.5 hours"
+        expect(instance.send(:period_in_words, 3_600)).to eq "1 hour"
+        expect(instance.send(:period_in_words, 5_400)).to eq "1.5 hours"
       end
     end
     context "days" do
       it "returns days" do
-        expect(instance.period_in_words(100800)).to eq "1.2 days"
+        expect(instance.send(:period_in_words, 100800)).to eq "1.2 days"
       end
     end
     context "weeks" do
       it "returns weeks" do
-        expect(instance.period_in_words(24.days)).to eq "3.4 weeks"
+        expect(instance.send(:period_in_words, 24.days)).to eq "3.4 weeks"
       end
     end
     context "years" do
       it "returns years" do
-        expect(instance.period_in_words(839.days)).to eq "2.3 years"
+        expect(instance.send(:period_in_words, 839.days)).to eq "2.3 years"
       end
     end
   end

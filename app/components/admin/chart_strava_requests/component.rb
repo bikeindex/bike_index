@@ -2,8 +2,6 @@
 
 module Admin::ChartStravaRequests
   class Component < ApplicationComponent
-    COLORS = UI::Chart::Component::COLORS
-
     def initialize(collection:, time_range:)
       @collection = collection
       @time_range = time_range
@@ -24,10 +22,10 @@ module Admin::ChartStravaRequests
     end
 
     def build_series(enum, column)
-      enum.filter_map.with_index do |(key, _), i|
+      enum.filter_map do |key, _|
         scoped = @collection.where(column => key)
         next if scoped.limit(1).blank?
-        {name: key.to_s.humanize, data: chart.time_range_counts(collection: scoped), color: COLORS[i]}
+        {name: key.to_s.humanize, data: chart.send(:time_range_counts, collection: scoped)}
       end
     end
   end
