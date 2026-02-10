@@ -1549,7 +1549,6 @@ en:
         track which bike you're riding.
       connect_strava: Connect Strava on your account page
       currently_connected: 'Currently connected to:'
-      no_bikes_in_strava: No bikes found in your Strava account.
       none_selected: "-- None --"
       save_strava_gear: Save Strava Gear
       strava_bike: Strava Bike
