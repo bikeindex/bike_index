@@ -42,6 +42,11 @@ class Admin::StravaIntegrationsController < Admin::BaseController
       strava_integrations = strava_integrations.where(status: params[:search_status])
     end
 
+    @search_permissions = params[:search_permissions].presence
+    if @search_permissions.present? && %w[default less more].include?(@search_permissions)
+      strava_integrations = strava_integrations.send(:"permissions_#{@search_permissions}")
+    end
+
     @time_range_column = sort_column if %w[updated_at deleted_at last_updated_activities_at].include?(sort_column)
     @time_range_column ||= "created_at"
     strava_integrations.where(@time_range_column => @time_range)

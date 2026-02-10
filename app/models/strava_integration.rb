@@ -38,10 +38,32 @@ class StravaIntegration < ApplicationRecord
 
   enum :status, STATUS_ENUM
 
+  scope :permissions_default, -> { where(strava_permissions: Integrations::StravaClient::DEFAULT_SCOPE) }
+  scope :permissions_less, -> {
+    default_count = Integrations::StravaClient::DEFAULT_SCOPE.count(",")
+    where.not(strava_permissions: [nil, ""]).where("LENGTH(strava_permissions) - LENGTH(REPLACE(strava_permissions, ',', '')) < ?", default_count)
+  }
+  scope :permissions_more, -> {
+    default_count = Integrations::StravaClient::DEFAULT_SCOPE.count(",")
+    where.not(strava_permissions: [nil, ""]).where("LENGTH(strava_permissions) - LENGTH(REPLACE(strava_permissions, ',', '')) > ?", default_count)
+  }
+
   validates :access_token, presence: true, unless: :deleted_at?
   validates :refresh_token, presence: true, unless: :deleted_at?
 
   before_destroy :mark_disconnected
+
+  def permissions_default?
+    strava_permissions == Integrations::StravaClient::DEFAULT_SCOPE
+  end
+
+  def permissions_less?
+    strava_permissions.present? && strava_permissions.split(",").length < Integrations::StravaClient::DEFAULT_SCOPE.split(",").length
+  end
+
+  def permissions_more?
+    strava_permissions.present? && strava_permissions.split(",").length > Integrations::StravaClient::DEFAULT_SCOPE.split(",").length
+  end
 
   def sync_progress_percent
     return 0 if athlete_activity_count.blank? || athlete_activity_count.zero?

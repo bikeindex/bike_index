@@ -99,6 +99,68 @@ RSpec.describe StravaIntegration, type: :model do
     end
   end
 
+  describe "permissions scopes and methods" do
+    let(:default_scope) { Integrations::StravaClient::DEFAULT_SCOPE }
+    let!(:integration_default) { FactoryBot.create(:strava_integration, strava_permissions: default_scope) }
+    let!(:integration_less) { FactoryBot.create(:strava_integration, strava_permissions: "read") }
+    let!(:integration_more) { FactoryBot.create(:strava_integration, strava_permissions: "read,activity:read_all,profile:read_all,activity:write") }
+    let!(:integration_nil) { FactoryBot.create(:strava_integration, strava_permissions: nil) }
+
+    describe "permissions_default" do
+      it "returns integrations with default scope" do
+        expect(StravaIntegration.permissions_default).to eq([integration_default])
+      end
+    end
+
+    describe "permissions_less" do
+      it "returns integrations with fewer permissions than default" do
+        expect(StravaIntegration.permissions_less).to eq([integration_less])
+      end
+    end
+
+    describe "permissions_more" do
+      it "returns integrations with more permissions than default" do
+        expect(StravaIntegration.permissions_more).to eq([integration_more])
+      end
+    end
+
+    describe "permissions_default?" do
+      it "returns true for default scope" do
+        expect(integration_default.permissions_default?).to be true
+      end
+
+      it "returns false for non-default scope" do
+        expect(integration_less.permissions_default?).to be false
+        expect(integration_more.permissions_default?).to be false
+        expect(integration_nil.permissions_default?).to be false
+      end
+    end
+
+    describe "permissions_less?" do
+      it "returns true for fewer permissions" do
+        expect(integration_less.permissions_less?).to be true
+      end
+
+      it "returns false for default or more permissions" do
+        expect(integration_default.permissions_less?).to be false
+        expect(integration_more.permissions_less?).to be false
+        expect(integration_nil.permissions_less?).to be false
+      end
+    end
+
+    describe "permissions_more?" do
+      it "returns true for more permissions" do
+        expect(integration_more.permissions_more?).to be true
+      end
+
+      it "returns false for default or fewer permissions" do
+        expect(integration_default.permissions_more?).to be false
+        expect(integration_less.permissions_more?).to be false
+        expect(integration_nil.permissions_more?).to be false
+      end
+    end
+  end
+
   describe "sync_progress_percent" do
     it "returns 0 when athlete_activity_count is nil" do
       strava_integration = FactoryBot.build(:strava_integration, athlete_activity_count: nil)
