@@ -18,56 +18,45 @@
 
             <% strava_integration = current_user.strava_integration %>
 
-            <% if strava_integration&.synced? && strava_integration.athlete_gear.present? %>
-              <% bike_gear = @bike.strava_gear_association %>
-              <% bikes_from_strava = strava_integration.athlete_gear.select { |g| g["resource_state"].present? } %>
-              <% if bikes_from_strava.any? %>
-                <div class="form-group row unnested-field">
-                  <label class="form-well-label">
-                    <%= t(".strava_bike") %>
-                  </label>
+            <% if strava_integration&.synced? && strava_integration.strava_gears.bikes.any? %>
+              <% bike_gear = @bike.strava_gear %>
+              <div class="form-group row unnested-field">
+                <label class="form-well-label"><%= t(".strava_bike") %></label>
 
-                  <div class="form-well-input">
-                    <select class="form-control" name="strava_gear_id">
-                      <option value="" <%= "selected" if bike_gear.blank? %>><%= t(".none_selected") %></option>
+                <div class="form-well-input">
+                  <select class="form-control" name="strava_gear_id">
+                    <option value="" <%= "selected" if bike_gear.blank? %>><%= t(".none_selected") %></option>
 
-                      <% bikes_from_strava.each do |gear| %>
-                        <option
-                          value="<%= gear["id"] %>"
-                          <%= "selected" if bike_gear&.strava_gear_id == gear["id"] %>
-                        >
-                          <%= gear["name"] %>
+                    <% strava_integration.strava_gears.bikes.each do |gear| %>
+                      <option
+                        value="<%= gear.strava_gear_id %>"
+                        <%= "selected" if bike_gear&.strava_gear_id == gear.strava_gear_id %>
+                      >
+                        <%= gear.strava_gear_name %>
 
-                          <% if gear["distance"].present? %>
-                            (
-                            <%= (gear["distance"].to_f / 1000).round(0) %>
-                            km)
-                          <% end %>
-                        </option>
-                      <% end %>
-                    </select>
-                  </div>
+                        <% if gear.strava_distance_km.present? %>
+                          (
+                          <%= gear.strava_distance_km %>
+                          km)
+                        <% end %>
+                      </option>
+                    <% end %>
+                  </select>
                 </div>
-                <% if bike_gear.present? %>
-                  <div class="mt-3 p-3 bg-light rounded">
-                    <p class="mb-1">
-                      <strong><%= t(".currently_connected") %></strong>
-                    </p>
+              </div>
+              <% if bike_gear.present? %>
+                <div class="mt-3 p-3 bg-light rounded">
+                  <p class="mb-1">
+                    <strong><%= t(".currently_connected") %></strong>
+                  </p>
 
-                    <p class="mb-0">
-                      <%= bike_gear.strava_gear_display_name %>
-                    </p>
-                  </div>
-                <% end %>
-                <div class="mt-3">
-                  <%= hidden_field_tag :edit_template, @edit_template %>
-                  <%= submit_tag t(".save_strava_gear"), class: 'btn btn-lg btn-primary' %>
-                </div>
-              <% else %>
-                <div class="alert alert-info">
-                  <%= t(".no_bikes_in_strava") %>
+                  <p class="mb-0"><%= bike_gear.strava_gear_display_name %></p>
                 </div>
               <% end %>
+              <div class="mt-3">
+                <%= hidden_field_tag :edit_template, @edit_template %>
+                <%= submit_tag t(".save_strava_gear"), class: 'btn btn-lg btn-primary' %>
+              </div>
             <% else %>
               <div class="alert alert-warning">
                 <%= t(".strava_not_connected") %>

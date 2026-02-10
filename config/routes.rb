@@ -241,7 +241,7 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_statuses parking_notifications strava_activities strava_requests
+      notifications organization_statuses parking_notifications strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
     ].each { resources it, only: %i[index] }
 

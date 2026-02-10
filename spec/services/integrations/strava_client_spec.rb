@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
-RSpec.describe Integrations::Strava, type: :service do
+RSpec.describe Integrations::StravaClient, type: :service do
   let(:strava_integration) do
     FactoryBot.create(:strava_integration,
       token_expires_at: Time.current + 6.hours,
@@ -51,7 +53,7 @@ RSpec.describe Integrations::Strava, type: :service do
   describe ".fetch_athlete_stats" do
     it "returns athlete stats" do
       VCR.use_cassette("strava-get_athlete_stats") do
-        response = described_class.fetch_athlete_stats(strava_integration, ENV["STRAVA_TEST_USER_ID"])
+        response = described_class.fetch_athlete_stats(strava_integration)
         expect(response.body["all_ride_totals"]["count"]).to eq(1655)
         expect(response.body["all_run_totals"]["count"]).to eq(162)
       end
@@ -77,6 +79,18 @@ RSpec.describe Integrations::Strava, type: :service do
         expect(response.body["description"]).to be_present
         expect(response.body["gear"]["name"]).to eq("Yuba longtail")
         expect(response.body["photos"]["primary"]).to be_present
+      end
+    end
+  end
+
+  describe ".fetch_gear" do
+    it "returns gear detail with resource_state 3" do
+      VCR.use_cassette("strava-get_gear") do
+        response = described_class.fetch_gear(strava_integration, "b12345")
+        expect(response.body["id"]).to eq("b12345")
+        expect(response.body["resource_state"]).to eq(3)
+        expect(response.body["name"]).to eq("Yuba longtail")
+        expect(response.body["frame_type"]).to be_present
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe Admin::StravaIntegrationsController, type: :request do
@@ -20,6 +22,16 @@ RSpec.describe Admin::StravaIntegrationsController, type: :request do
       get "#{base_url}/#{strava_integration.id}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
+    end
+
+    context "with strava gear" do
+      let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:) }
+
+      it "renders gear table" do
+        get "#{base_url}/#{strava_integration.id}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include(strava_gear.strava_gear_display_name)
+      end
     end
   end
 end

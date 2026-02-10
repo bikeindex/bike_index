@@ -9,15 +9,14 @@
         <%= sortable "request_type", "Type", render_sortable: render_sortable %>
       </th>
 
-      <th>Endpoint</th>
-
       <th>
         <%= sortable "response_status", "Status", render_sortable: render_sortable %>
       </th>
 
       <th>Params</th>
       <th>Rate limit</th>
-      <th>Requested at</th>
+      <th><%= sortable "requested_at", render_sortable: render_sortable %></th>
+      <th><%= sortable "updated_at", render_sortable: render_sortable %></th>
 
       <th>User</th>
     </thead>
@@ -42,12 +41,6 @@
           <td><small><%= strava_request.request_type&.humanize %></small></td>
 
           <td>
-            <code title="strava_request.endpoint">
-              <%= strava_request.endpoint&.truncate(30) %>
-            </code>
-          </td>
-
-          <td>
             <% if strava_request.success? %>
               <span class="text-success">
                 <%= strava_request.response_status %>
@@ -56,7 +49,7 @@
               <small><%= strava_request.response_status %></small>
             <% else %>
               <span class="text-danger">
-                <%= strava_request.response_status %>
+                <%= strava_request.response_status.humanize %>
               </span>
             <% end %>
           </td>
@@ -68,21 +61,25 @@
           </td>
 
           <td>
-            <small>
-              <%= pretty_print_json(strava_request.rate_limit) if strava_request.rate_limit.present? %>
-            </small>
+            <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: strava_request.rate_limit) %>
           </td>
 
           <td>
             <% if strava_request.requested_at.present? %>
-              <span class="localizeTime">
+              <small class="localizeTime">
                 <%= l strava_request.requested_at, format: :convert_time %>
-              </span>
+              </small>
             <% end %>
           </td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: strava_request.user, user_id: strava_request.user_id, render_search: render_sortable) %>
+            <small class="localizeTime">
+              <%= l strava_request.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: strava_request.user, user_id: strava_request.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_request.strava_integration_id)) %>
           </td>
         </tr>
       <% end %>

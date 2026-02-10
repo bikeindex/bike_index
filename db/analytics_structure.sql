@@ -131,7 +131,6 @@ CREATE TABLE public.strava_requests (
     user_id bigint,
     strava_integration_id bigint NOT NULL,
     request_type integer NOT NULL,
-    endpoint character varying NOT NULL,
     parameters jsonb DEFAULT '{}'::jsonb,
     requested_at timestamp without time zone,
     response_status integer DEFAULT 0 NOT NULL,

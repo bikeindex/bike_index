@@ -19,7 +19,7 @@ export default class extends Controller {
     })
       .then(response => response.json())
       .then(data => {
-        if (data.status === 'syncing') {
+        if (data.status === 'syncing' || data.status === 'pending') {
           this.updateProgress(data)
           this.timer = setTimeout(() => this.poll(), 5000)
         } else if (data.status === 'synced' || data.status === 'error') {

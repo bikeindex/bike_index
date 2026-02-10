@@ -477,51 +477,47 @@ RSpec.describe "BikesController#update", type: :request do
   end
 
   context "setting strava_gear" do
-    let!(:strava_integration) do
-      FactoryBot.create(:strava_integration, :synced, user: current_user,
-        athlete_gear: [
-          {"id" => "b12345", "name" => "My Road Bike", "resource_state" => 2},
-          {"id" => "b67890", "name" => "My MTB", "resource_state" => 2}
-        ])
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
+    let!(:road_bike_gear) do
+      FactoryBot.create(:strava_gear, strava_integration:,
+        strava_gear_id: "b12345", strava_gear_name: "My Road Bike", gear_type: "bike")
+    end
+    let!(:mtb_gear) do
+      FactoryBot.create(:strava_gear, strava_integration:,
+        strava_gear_id: "b67890", strava_gear_name: "My MTB", gear_type: "bike")
     end
 
     it "connects bike to strava gear" do
-      expect(bike.strava_gear_association).to be_nil
+      expect(bike.strava_gear).to be_nil
       patch base_url, params: {strava_gear_id: "b12345", edit_template: "strava_gear"}
       expect(flash[:success]).to match(/My Road Bike/)
 
       bike.reload
-      expect(bike.strava_gear_association).to be_present
-      expect(bike.strava_gear_association.strava_gear_id).to eq("b12345")
-      expect(bike.strava_gear_association.strava_gear_name).to eq("My Road Bike")
+      expect(bike.strava_gear).to be_present
+      expect(bike.strava_gear.strava_gear_id).to eq("b12345")
+      expect(bike.strava_gear.strava_gear_name).to eq("My Road Bike")
     end
 
     it "updates existing strava gear connection" do
-      FactoryBot.create(:strava_gear_association,
-        item: bike,
-        strava_integration: strava_integration,
-        strava_gear_id: "b12345",
-        strava_gear_name: "My Road Bike")
+      road_bike_gear.update(item: bike)
 
       patch base_url, params: {strava_gear_id: "b67890", edit_template: "strava_gear"}
       expect(flash[:success]).to match(/My MTB/)
 
       bike.reload
-      expect(bike.strava_gear_association.strava_gear_id).to eq("b67890")
+      expect(bike.strava_gear.strava_gear_id).to eq("b67890")
+      expect(road_bike_gear.reload.item).to be_nil
     end
 
     it "disconnects strava gear when blank value" do
-      FactoryBot.create(:strava_gear_association,
-        item: bike,
-        strava_integration: strava_integration,
-        strava_gear_id: "b12345",
-        strava_gear_name: "My Road Bike")
+      road_bike_gear.update(item: bike)
 
       expect {
         patch base_url, params: {strava_gear_id: "", edit_template: "strava_gear"}
-      }.to change(StravaGearAssociation, :count).by(-1)
+      }.not_to change(StravaGear, :count)
 
       expect(flash[:success]).to match(/disconnected/)
+      expect(road_bike_gear.reload.item).to be_nil
     end
 
     context "without strava integration" do

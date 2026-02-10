@@ -32,16 +32,15 @@ module PageBlock::StravaIntegration
 
     def user_with_strava(status)
       user = built_user
-      integration = user.build_strava_integration(
+      strava_integration = user.build_strava_integration(
         access_token: "preview_token",
-        refresh_token: "preview_refresh"
-      )
-      integration.assign_attributes(
+        refresh_token: "preview_refresh",
         status:,
         athlete_activity_count: 150,
-        activities_downloaded_count: (status == :syncing) ? 50 : 150,
-        athlete_gear: [{"name" => "My Road Bike"}, {"name" => "My Mountain Bike"}]
+        activities_downloaded_count: (status == :syncing) ? 50 : 150
       )
+      strava_integration.strava_gears.build(strava_gear_id: "b1", strava_gear_name: "My Road Bike", gear_type: "bike")
+      strava_integration.strava_gears.build(strava_gear_id: "b2", strava_gear_name: "My Mountain Bike", gear_type: "bike")
       user
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::StravaRequestsController < Admin::BaseController
   include SortableTable
 
@@ -14,7 +16,7 @@ class Admin::StravaRequestsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at request_type response_status strava_integration_id]
+    %w[created_at updated_at requested_at request_type response_status strava_integration_id]
   end
 
   def sortable_opts
@@ -40,6 +42,8 @@ class Admin::StravaRequestsController < Admin::BaseController
       strava_requests = strava_requests.where(user_id: user_subject&.id || params[:user_id])
     end
 
-    strava_requests.where(created_at: @time_range)
+    @time_range_column = sort_column if %w[updated_at requested_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+    strava_requests.where(@time_range_column => @time_range)
   end
 end

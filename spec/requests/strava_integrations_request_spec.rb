@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe StravaIntegrationsController, type: :request do
@@ -68,7 +70,8 @@ RSpec.describe StravaIntegrationsController, type: :request do
           oauth_state = initiate_oauth_flow
           VCR.use_cassette("strava-exchange_token") do
             expect {
-              get "/strava_integration/callback", params: {code: "test_auth_code", state: oauth_state}
+              get "/strava_integration/callback",
+                params: {code: "test_auth_code", state: oauth_state, scope: "read,activity:read_all,profile:read_all"}
             }.to change(StravaIntegration, :count).by(1)
               .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(1)
 
@@ -80,20 +83,27 @@ RSpec.describe StravaIntegrationsController, type: :request do
             expect(strava_integration.refresh_token).to be_present
             expect(strava_integration.athlete_id).to eq("2430215")
             expect(strava_integration.status).to eq("pending")
+            expect(strava_integration.strava_permissions).to eq Integrations::StravaClient::DEFAULT_SCOPE
           end
         end
 
         context "user already has strava integration" do
           let!(:existing) { FactoryBot.create(:strava_integration, user: current_user) }
 
-          it "updates existing integration" do
+          it "disconnects old integration and creates new one" do
             oauth_state = initiate_oauth_flow
             VCR.use_cassette("strava-exchange_token") do
               expect {
                 get "/strava_integration/callback", params: {code: "test_auth_code", state: oauth_state}
-              }.not_to change(StravaIntegration, :count)
+              }.to change(StravaIntegration, :count).by(0)
+                .and change(StravaIntegration.with_deleted, :count).by(1)
 
-              expect(existing.reload.athlete_id).to eq("2430215")
+              expect(existing.reload.deleted_at).to be_present
+              expect(existing.status).to eq("disconnected")
+
+              new_integration = current_user.reload.strava_integration
+              expect(new_integration.id).not_to eq(existing.id)
+              expect(new_integration.athlete_id).to eq("2430215")
             end
           end
         end

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class Admin::StravaActivitiesController < Admin::BaseController
   include SortableTable
 
   def index
     @per_page = permitted_per_page(default: 50)
     @pagy, @collection = pagy(:countish,
-      matching_strava_activities.includes(strava_integration: [:user, :strava_gear_associations]).reorder(sortable_opts),
+      matching_strava_activities.includes(strava_integration: %i[user strava_gears]).reorder(sortable_opts),
       limit: @per_page,
       page: permitted_page)
   end
@@ -14,7 +16,7 @@ class Admin::StravaActivitiesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at start_date activity_type distance_meters strava_integration_id]
+    %w[created_at updated_at start_date activity_type distance_meters strava_integration_id]
   end
 
   def sortable_opts
@@ -22,6 +24,7 @@ class Admin::StravaActivitiesController < Admin::BaseController
   end
 
   def earliest_period_date
+    return Time.at(1262304000) if sort_column == "start_date" # 2010-01-01
     Time.at(1738368000) # 2025-02-01
   end
 
@@ -36,10 +39,13 @@ class Admin::StravaActivitiesController < Admin::BaseController
       strava_activities = strava_activities.where(strava_integration_id: params[:search_strava_integration_id])
     end
 
-    if params[:search_activity_type].present?
-      strava_activities = strava_activities.where(activity_type: params[:search_activity_type])
+    @searched_activity_type = params[:search_activity_type]
+    if @searched_activity_type.present?
+      strava_activities = strava_activities.where(activity_type: @searched_activity_type)
     end
 
-    strava_activities.where(created_at: @time_range)
+    @time_range_column = sort_column if %w[updated_at start_date].include?(sort_column)
+    @time_range_column ||= "created_at"
+    strava_activities.where(@time_range_column => @time_range)
   end
 end

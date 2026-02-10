@@ -48,6 +48,13 @@ This project also uses the ViewComponent gem to render components.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`
 - View components must initialize with keyword arguments
 - In view components, prefer instance variables to attr_accessor
+- In ViewComponent templates, use `helpers.` prefix for view helpers (e.g. `helpers.column_chart`, `helpers.time_ago_in_words`)
+
+## Architecture notes
+
+- **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
+- **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` or `with_deleted` in admin controllers when needed
+- **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
 
 # Initial setup
 

@@ -107,27 +107,23 @@ class Bikes::BaseController < ApplicationController
 
     strava_gear_id = params[:strava_gear_id]
     if strava_gear_id.blank?
-      @bike.strava_gear_association&.destroy
+      @bike.strava_gear&.update(item: nil)
       flash[:success] = "Strava gear disconnected."
       return
     end
 
-    gear = strava_integration.athlete_gear&.find { |g| g["id"] == strava_gear_id }
-    unless gear
+    strava_gear = strava_integration.strava_gears.find_by(strava_gear_id:)
+    unless strava_gear
       flash[:error] = "Strava gear not found."
       return
     end
 
-    association = @bike.strava_gear_association || @bike.build_strava_gear_association
-    association.assign_attributes(
-      strava_integration: strava_integration,
-      strava_gear_id: strava_gear_id,
-      strava_gear_name: gear["name"]
-    )
-    if association.save
-      flash[:success] = "Bike connected to Strava gear: #{gear["name"]}"
+    @bike.strava_gear&.update(item: nil)
+    strava_gear.item = @bike
+    if strava_gear.save
+      flash[:success] = "Bike connected to Strava gear: #{strava_gear.strava_gear_display_name}"
     else
-      flash[:error] = association.errors.full_messages.join(", ")
+      flash[:error] = strava_gear.errors.full_messages.join(", ")
     end
   end
 

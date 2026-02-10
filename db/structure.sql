@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -3531,6 +3532,7 @@ CREATE TABLE public.strava_activities (
     segment_locations jsonb,
     activity_type character varying,
     start_date timestamp(6) without time zone,
+    activity_timezone character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -3556,27 +3558,30 @@ ALTER SEQUENCE public.strava_activities_id_seq OWNED BY public.strava_activities
 
 
 --
--- Name: strava_gear_associations; Type: TABLE; Schema: public; Owner: -
+-- Name: strava_gears; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.strava_gear_associations (
+CREATE TABLE public.strava_gears (
     id bigint NOT NULL,
     strava_integration_id bigint NOT NULL,
-    item_type character varying NOT NULL,
-    item_id bigint NOT NULL,
+    item_type character varying,
+    item_id bigint,
     strava_gear_id character varying NOT NULL,
     strava_gear_name character varying,
+    gear_type integer,
     total_distance_kilometers integer,
+    strava_data jsonb,
+    last_updated_from_strava_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
 
 --
--- Name: strava_gear_associations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: strava_gears_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.strava_gear_associations_id_seq
+CREATE SEQUENCE public.strava_gears_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3585,10 +3590,10 @@ CREATE SEQUENCE public.strava_gear_associations_id_seq
 
 
 --
--- Name: strava_gear_associations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: strava_gears_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.strava_gear_associations_id_seq OWNED BY public.strava_gear_associations.id;
+ALTER SEQUENCE public.strava_gears_id_seq OWNED BY public.strava_gears.id;
 
 
 --
@@ -3601,14 +3606,15 @@ CREATE TABLE public.strava_integrations (
     access_token text NOT NULL,
     refresh_token text NOT NULL,
     token_expires_at timestamp(6) without time zone,
+    strava_permissions character varying,
     athlete_id character varying,
     athlete_activity_count integer,
-    athlete_gear jsonb DEFAULT '[]'::jsonb,
     activities_downloaded_count integer DEFAULT 0 NOT NULL,
     status integer DEFAULT 0 NOT NULL,
+    last_updated_activities_at timestamp(6) without time zone,
+    deleted_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    deleted_at timestamp(6) without time zone
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -4762,10 +4768,10 @@ ALTER TABLE ONLY public.strava_activities ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- Name: strava_gear_associations id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: strava_gears id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.strava_gear_associations ALTER COLUMN id SET DEFAULT nextval('public.strava_gear_associations_id_seq'::regclass);
+ALTER TABLE ONLY public.strava_gears ALTER COLUMN id SET DEFAULT nextval('public.strava_gears_id_seq'::regclass);
 
 
 --
@@ -5571,11 +5577,11 @@ ALTER TABLE ONLY public.strava_activities
 
 
 --
--- Name: strava_gear_associations strava_gear_associations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: strava_gears strava_gears_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.strava_gear_associations
-    ADD CONSTRAINT strava_gear_associations_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.strava_gears
+    ADD CONSTRAINT strava_gears_pkey PRIMARY KEY (id);
 
 
 --
@@ -5688,13 +5694,6 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
-
-
---
--- Name: idx_on_strava_integration_id_strava_gear_id_37c80b184d; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_on_strava_integration_id_strava_gear_id_37c80b184d ON public.strava_gear_associations USING btree (strava_integration_id, strava_gear_id);
 
 
 --
@@ -7140,24 +7139,24 @@ CREATE UNIQUE INDEX index_strava_activities_on_strava_integration_id_and_strava_
 
 
 --
--- Name: index_strava_gear_associations_on_item; Type: INDEX; Schema: public; Owner: -
+-- Name: index_strava_gears_on_item_type_and_item_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_strava_gear_associations_on_item ON public.strava_gear_associations USING btree (item_type, item_id);
-
-
---
--- Name: index_strava_gear_associations_on_item_type_and_item_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_strava_gear_associations_on_item_type_and_item_id ON public.strava_gear_associations USING btree (item_type, item_id);
+CREATE UNIQUE INDEX index_strava_gears_on_item_type_and_item_id ON public.strava_gears USING btree (item_type, item_id) WHERE (item_id IS NOT NULL);
 
 
 --
--- Name: index_strava_gear_associations_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_strava_gears_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_strava_gear_associations_on_strava_integration_id ON public.strava_gear_associations USING btree (strava_integration_id);
+CREATE INDEX index_strava_gears_on_strava_integration_id ON public.strava_gears USING btree (strava_integration_id);
+
+
+--
+-- Name: index_strava_gears_on_strava_integration_id_and_strava_gear_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_strava_gears_on_strava_integration_id_and_strava_gear_id ON public.strava_gears USING btree (strava_integration_id, strava_gear_id);
 
 
 --
@@ -7442,7 +7441,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260209164045'),
 ('20260209164044'),
 ('20260209164043'),
 ('20260209164042'),

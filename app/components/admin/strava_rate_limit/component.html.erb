@@ -1,3 +1,13 @@
-<div>
-  Admin::StravaRateLimit::Component component
+<div class="tw:inline-block tw:leading-tight" title="<%= @rate_limit_json %>">
+  <small>
+    <%= number_display(short_available) %>/<%= number_display(short_limit) %>
+    short
+  </small>
+
+  <br>
+
+  <small>
+    <%= number_display(daily_available) %>/<%= number_display(daily_limit) %>
+    daily
+  </small>
 </div>

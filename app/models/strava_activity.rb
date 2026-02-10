@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: strava_activities
 # Database name: primary
 #
 #  id                          :bigint           not null, primary key
+#  activity_timezone           :string
 #  activity_type               :string
 #  description                 :text
 #  distance_meters             :float
@@ -48,8 +51,14 @@ class StravaActivity < ApplicationRecord
 
   scope :cycling, -> { where(activity_type: CYCLING_TYPES) }
   scope :enriched, -> { where.not(segment_locations: nil) }
+  scope :un_enriched, -> { where(segment_locations: nil) }
+  scope :activities_to_enrich, -> { cycling.un_enriched }
 
   class << self
+    def activity_types
+      @activity_types ||= distinct.pluck(:activity_type).compact.sort
+    end
+
     def create_or_update_from_summary(strava_integration, summary)
       attrs = summary_attributes(summary)
       activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: summary["id"].to_s)
@@ -78,8 +87,13 @@ class StravaActivity < ApplicationRecord
         {}
       end
 
-      {description: detail["description"], photos:, segment_locations:,
-       muted: detail["muted"], kudos_count: detail["kudos_count"]}
+      {
+        description: detail["description"],
+        photos:,
+        segment_locations:,
+        muted: detail["muted"],
+        kudos_count: detail["kudos_count"]
+      }
     end
 
     private
@@ -97,6 +111,7 @@ class StravaActivity < ApplicationRecord
         year: start_date&.year,
         gear_id: summary["gear_id"],
         activity_type: summary["sport_type"] || summary["type"],
+        activity_timezone: summary["timezone"],
         start_date:
       }
     end
@@ -108,6 +123,11 @@ class StravaActivity < ApplicationRecord
 
   def enriched?
     !segment_locations.nil?
+  end
+
+  def calculated_gear_name
+    return nil if gear_id.blank?
+    strava_integration.strava_gears.find_by(strava_gear_id: gear_id)&.strava_gear_name || gear_id
   end
 
   def distance_miles
@@ -128,7 +148,7 @@ class StravaActivity < ApplicationRecord
   def update_gear_association_distance!
     return if gear_id.blank?
 
-    strava_integration.strava_gear_associations.where(strava_gear_id: gear_id).find_each do |ga|
+    strava_integration.strava_gears.where(strava_gear_id: gear_id).find_each do |ga|
       ga.update_total_distance!
     end
   end

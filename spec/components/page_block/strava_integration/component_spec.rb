@@ -11,7 +11,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :component do
     it "renders connect button" do
       expect(component).to have_text("Strava Integration")
       expect(component).to have_text("Integrate your bikes with Strava")
-      expect(component).to have_css("a.btn-primary")
+      expect(component).to have_css("a.twbtn")
       expect(component).to have_text("Connect with Strava")
     end
 
@@ -34,8 +34,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :component do
 
     it "renders progress bar and download count" do
       expect(component).to have_text("Syncing activities")
-      expect(component).to have_text("50 of 150 activities downloaded")
-      expect(component).to have_css(".progress-bar")
+      expect(component).to have_css("#strava-download-count")
       expect(component).to have_text("Sync is running in the background")
     end
 
@@ -56,24 +55,25 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :component do
       expect(component).to have_text("150 activities synced")
     end
 
-    it "renders gear list" do
-      expect(component).to have_text("Your Strava gear")
-      expect(component).to have_text("My Road Bike")
+    context "with gear" do
+      let!(:strava_gear) do
+        FactoryBot.create(:strava_gear, strava_integration:,
+          strava_gear_id: "b1234", strava_gear_name: "My Road Bike")
+      end
+
+      it "renders gear list" do
+        expect(component).to have_text("Your Strava gear")
+        expect(component).to have_text("My Road Bike")
+      end
+    end
+
+    it "does not render gear section without gear" do
+      expect(component).to have_text("Connected to Strava")
+      expect(component).not_to have_text("Your Strava gear")
     end
 
     it "renders disconnect button" do
       expect(component).to have_text("Disconnect Strava")
-    end
-  end
-
-  context "connected - synced without gear" do
-    let!(:strava_integration) do
-      FactoryBot.create(:strava_integration, :synced, user: user, athlete_gear: [])
-    end
-
-    it "does not render gear section" do
-      expect(component).to have_text("Connected to Strava")
-      expect(component).not_to have_text("Your Strava gear")
     end
   end
 

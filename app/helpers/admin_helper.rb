@@ -22,7 +22,8 @@ module AdminHelper
       {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true},
       {title: "Dev: IP Location", path: admin_ip_location_path, match_controller: false},
       {title: "Dev: Strava Requests", path: admin_strava_requests_path, match_controller: true},
-      {title: "Dev: Strava Activities", path: admin_strava_activities_path, match_controller: true}
+      {title: "Dev: Strava Activities", path: admin_strava_activities_path, match_controller: true},
+      {title: "Dev: Strava Gear", path: admin_strava_gears_path, match_controller: true}
     ]
   end
 

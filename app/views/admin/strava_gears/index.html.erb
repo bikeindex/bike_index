@@ -1,0 +1,32 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= @searched_gear_type.present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @searched_gear_type.blank? %>
+        All types
+      <% else %>
+        <%= @searched_gear_type %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All types", url_for(sortable_search_params.merge(search_gear_type: nil)), class: "dropdown-item #{@searched_gear_type.present? ? '' : 'active'}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% StravaGear::GEAR_TYPE_ENUM.each_key do |gear_type| %>
+        <%= link_to gear_type.to_s.titleize, url_for(sortable_search_params.merge(search_gear_type: gear_type)), class: "dropdown-item #{@searched_gear_type == gear_type.to_s ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<% table_view = render(partial: "table", locals: {collection: @collection, render_sortable: true}) %>
+
+<%= render partial: "/shared/admin/index_skeleton", locals: {nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_strava_gears} %>

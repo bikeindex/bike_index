@@ -26,11 +26,11 @@
     <% elsif synced? %>
       <p><strong><%= translation(".connected_to_strava") %></strong></p>
       <p><%= translation(".activities_synced", count: downloaded_count) %></p>
-      <% if gear_list.present? %>
+      <% if gear_list.any? %>
         <p><strong><%= translation(".your_strava_gear") %></strong></p>
         <ul class="list-unstyled">
           <% gear_list.each do |gear| %>
-            <li><%= gear["name"] %></li>
+            <li><%= gear.strava_gear_display_name %></li>
           <% end %>
         </ul>
       <% end %>
@@ -39,8 +39,14 @@
         <strong><%= translation(".sync_error") %></strong>
       </p>
       <p><%= translation(".sync_error_description") %></p>
-    <% else %>
+    <% elsif pending? %>
       <p><%= translation(".strava_connected_pending") %></p>
+      <% if @strava_integration.persisted? %>
+        <div
+          data-controller="strava-sync-status"
+          data-strava-sync-status-url-value="<%= helpers.sync_status_strava_integration_path %>"
+        ></div>
+      <% end %>
     <% end %>
     <%= link_to translation(".disconnect_strava"),
           helpers.strava_integration_path,
@@ -49,7 +55,8 @@
           data: { confirm: translation(".disconnect_confirm") } %>
   <% else %>
     <p><%= translation(".integrate_your_bikes_with_strava") %></p>
-    <%= link_to helpers.new_strava_integration_path, class: "btn btn-sm tw:bg-[#FC4C02] tw:border-[#FC4C02] tw:text-white tw:hover:bg-[#e04400]" do %>
+    <%# requires ! because of bootstrap %>
+    <%= link_to helpers.new_strava_integration_path, class: "twbtn tw:py-1.5 tw:bg-[#FC4C02]! tw:border-[#FC4C02]! tw:text-white! tw:hover:bg-[#e04400]!" do %>
       <%= strava_icon(14, color: "#fff") %>
       <%= translation(".connect_with_strava") %>
     <% end %>

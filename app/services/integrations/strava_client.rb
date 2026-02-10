@@ -1,8 +1,12 @@
-class Integrations::Strava
+# frozen_string_literal: true
+
+class Integrations::StravaClient
   BASE_URL = "https://www.strava.com"
   API_URL = "https://www.strava.com/api/v3"
+  DEFAULT_SCOPE = "read,activity:read_all,profile:read_all"
   STRAVA_KEY = ENV["STRAVA_KEY"]
   STRAVA_SECRET = ENV["STRAVA_SECRET"]
+  ACTIVITIES_PER_PAGE = 200
 
   class << self
     def exchange_token(code)
@@ -19,12 +23,12 @@ class Integrations::Strava
       resp.body
     end
 
-    def authorization_url(state:)
+    def authorization_url(state:, scope: nil)
       params = {
         client_id: STRAVA_KEY,
         response_type: "code",
         redirect_uri: Rails.application.routes.url_helpers.callback_strava_integration_url,
-        scope: "read,activity:read_all",
+        scope: scope || DEFAULT_SCOPE,
         approval_prompt: "auto",
         state:
       }
@@ -35,11 +39,11 @@ class Integrations::Strava
       get(strava_integration, "athlete")
     end
 
-    def fetch_athlete_stats(strava_integration, athlete_id)
-      get(strava_integration, "athletes/#{athlete_id}/stats")
+    def fetch_athlete_stats(strava_integration)
+      get(strava_integration, "athletes/#{strava_integration.athlete_id}/stats")
     end
 
-    def list_activities(strava_integration, per_page:, page: nil, after: nil)
+    def list_activities(strava_integration, per_page: ACTIVITIES_PER_PAGE, page: nil, after: nil)
       params = {per_page:}
       params[:page] = page if page.present?
       params[:after] = after if after.present?
@@ -48,6 +52,10 @@ class Integrations::Strava
 
     def fetch_activity(strava_integration, strava_id)
       get(strava_integration, "activities/#{strava_id}")
+    end
+
+    def fetch_gear(strava_integration, strava_gear_id)
+      get(strava_integration, "gear/#{strava_gear_id}")
     end
 
     def ensure_valid_token!(strava_integration)

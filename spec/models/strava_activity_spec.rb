@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe StravaActivity, type: :model do
@@ -114,7 +116,7 @@ RSpec.describe StravaActivity, type: :model do
 
     context "with gear association" do
       let!(:gear_association) do
-        FactoryBot.create(:strava_gear_association, strava_integration:, strava_gear_id: "b1234")
+        FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234")
       end
 
       it "updates gear association total distance" do

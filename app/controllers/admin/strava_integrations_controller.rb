@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Admin::StravaIntegrationsController < Admin::BaseController
   include SortableTable
 
@@ -18,7 +20,7 @@ class Admin::StravaIntegrationsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at user_id status activities_downloaded_count]
+    %w[created_at updated_at deleted_at last_updated_activities_at user_id status activities_downloaded_count]
   end
 
   def sortable_opts
@@ -40,6 +42,8 @@ class Admin::StravaIntegrationsController < Admin::BaseController
       strava_integrations = strava_integrations.where(status: params[:search_status])
     end
 
-    strava_integrations.where(created_at: @time_range)
+    @time_range_column = sort_column if %w[updated_at deleted_at last_updated_activities_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+    strava_integrations.where(@time_range_column => @time_range)
   end
 end

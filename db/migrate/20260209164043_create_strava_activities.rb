@@ -18,6 +18,7 @@ class CreateStravaActivities < ActiveRecord::Migration[8.0]
       t.jsonb :segment_locations
       t.string :activity_type
       t.datetime :start_date
+      t.string :activity_timezone
 
       t.timestamps
     end

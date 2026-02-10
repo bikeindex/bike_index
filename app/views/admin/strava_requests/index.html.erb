@@ -1,3 +1,8 @@
+<% index_title = capture do %>
+  Manage Strava Requests
+  <span class="tw:text-base">current rate limit <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: StravaRequest.estimated_current_rate_limit) %></span>
+<% end %>
+
 <% nav_header_list_items = capture do %>
   <li class="nav-item dropdown">
     <a
@@ -54,7 +59,13 @@
   </li>
 <% end %>
 
-<%= render partial: "/shared/admin/index_skeleton", locals: {nav_header_list_items:, chart_collection: @render_chart && matching_strava_requests} %>
+<% rendered_chart = capture do %>
+  <% if @render_chart %>
+    <%= render(Admin::ChartStravaRequests::Component.new(collection: matching_strava_requests, time_range: @time_range)) %>
+  <% end %>
+<% end %>
+
+<%= render partial: "/shared/admin/index_skeleton", locals: {index_title:, nav_header_list_items:, rendered_chart:} %>
 
 <style>
   .full-screen-table pre { margin-bottom: 0; }

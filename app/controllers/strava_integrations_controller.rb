@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StravaIntegrationsController < ApplicationController
   include Sessionable
 
@@ -7,7 +9,7 @@ class StravaIntegrationsController < ApplicationController
   def new
     state = SecureRandom.hex(24)
     session[:strava_oauth_state] = state
-    redirect_to Integrations::Strava.authorization_url(state:), allow_other_host: true
+    redirect_to Integrations::StravaClient.authorization_url(state:), allow_other_host: true
   end
 
   def callback
@@ -23,18 +25,20 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    token_data = Integrations::Strava.exchange_token(params[:code])
+    token_data = Integrations::StravaClient.exchange_token(params[:code])
     if token_data.blank?
       flash[:error] = "Unable to connect to Strava. Please try again."
       redirect_to my_account_path
       return
     end
 
+    current_user.strava_integration&.destroy
     strava_integration = current_user.create_strava_integration!(
       access_token: token_data["access_token"],
       refresh_token: token_data["refresh_token"],
       token_expires_at: Time.at(token_data["expires_at"]),
-      athlete_id: token_data.dig("athlete", "id")&.to_s
+      athlete_id: token_data.dig("athlete", "id")&.to_s,
+      strava_permissions: params[:scope]
     )
 
     StravaJobs::FetchAthleteAndStats.perform_async(strava_integration.id)

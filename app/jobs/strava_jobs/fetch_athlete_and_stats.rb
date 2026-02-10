@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module StravaJobs
   class FetchAthleteAndStats < ApplicationJob
-    sidekiq_options queue: "low_priority", retry: 3
+    sidekiq_options queue: "low_priority", retry: 5
 
     def perform(strava_integration_id)
       return if skip_job?
@@ -8,38 +10,40 @@ module StravaJobs
       strava_integration = StravaIntegration.find_by(id: strava_integration_id)
       return unless strava_integration
 
-      athlete_response = execute_request(strava_integration, :fetch_athlete, "athlete") {
-        Integrations::Strava.fetch_athlete(strava_integration)
+      athlete_response = execute_request(strava_integration, :fetch_athlete) {
+        Integrations::StravaClient.fetch_athlete(strava_integration)
       }
       return unless athlete_response.success?
       athlete = athlete_response.body
 
-      stats_response = execute_request(strava_integration, :fetch_athlete_stats, "athletes/#{athlete["id"]}/stats") {
-        Integrations::Strava.fetch_athlete_stats(strava_integration, athlete["id"].to_s)
+      stats_response = execute_request(strava_integration, :fetch_athlete_stats) {
+        Integrations::StravaClient.fetch_athlete_stats(strava_integration)
       }
-      stats = stats_response.success? ? stats_response.body : nil
+      strava_integration.update_from_athlete_and_stats(athlete, stats_response.success? ? stats_response.body : nil)
 
-      strava_integration.update_from_athlete_and_stats(athlete, stats)
-      strava_integration.update(status: :syncing)
+      total_pages = if strava_integration.athlete_activity_count.to_i > 0
+        (strava_integration.athlete_activity_count.to_f / Integrations::StravaClient::ACTIVITIES_PER_PAGE).ceil
+      else
+        1
+      end
 
-      StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
-        request_type: :list_activities, endpoint: "athlete/activities",
-        parameters: {per_page: RequestRunner::ACTIVITIES_PER_PAGE, page: 1})
+      total_pages.times do |i|
+        StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
+          request_type: :list_activities, parameters: {page: i + 1})
+      end
     end
 
     private
 
-    def execute_request(strava_integration, request_type, endpoint)
+    def execute_request(strava_integration, request_type)
       request = StravaRequest.create!(
         user_id: strava_integration.user_id,
         strava_integration_id: strava_integration.id,
-        request_type:, endpoint:, requested_at: Time.current
+        request_type:,
+        requested_at: Time.current
       )
       response = yield
-      request.update!(
-        response_status: response.success? ? :success : :error,
-        rate_limit: RequestRunner.parse_rate_limit(response.headers)
-      )
+      request.update_from_response(response)
       response
     end
   end

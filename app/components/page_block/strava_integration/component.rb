@@ -42,7 +42,7 @@ module PageBlock::StravaIntegration
     end
 
     def gear_list
-      @strava_integration.athlete_gear || []
+      @strava_integration.strava_gears
     end
 
     def strava_icon(size, color: "#FC4C02")

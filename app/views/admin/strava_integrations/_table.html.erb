@@ -6,6 +6,12 @@
       <th><%= sortable "created_at", render_sortable: render_sortable %></th>
 
       <th>
+        <small>
+          <%= sortable "updated_at", render_sortable: render_sortable %>
+        </small>
+      </th>
+
+      <th>
         <%= sortable "user_id", "User", render_sortable: render_sortable %>
       </th>
 
@@ -18,6 +24,12 @@
       </th>
 
       <th>Gear</th>
+
+      <th>
+        <%= sortable "last_updated_activities_at", "Activities updated", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "deleted_at", render_sortable: render_sortable %></th>
     </thead>
 
     <tbody>
@@ -38,10 +50,17 @@
           </td>
 
           <td>
+            <small class="localizeTime">
+              <%= l strava_integration.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td>
             <%= render Admin::UserCell::Component.new(user: strava_integration.user, user_id: strava_integration.user_id, render_search: render_sortable) %>
           </td>
 
           <td>
+            <%# duplicated in strava_integrations/show %>
             <% if strava_integration.synced? %>
               <span class="text-success"><%= strava_integration.status %></span>
             <% elsif strava_integration.error? || strava_integration.disconnected? %>
@@ -59,6 +78,22 @@
             <small>
               <%= strava_integration.gear_names.join(", ").truncate(40) %>
             </small>
+          </td>
+
+          <td>
+            <% if strava_integration.last_updated_activities_at.present? %>
+              <small class="localizeTime">
+                <%= l strava_integration.last_updated_activities_at, format: :convert_time %>
+              </small>
+            <% end %>
+          </td>
+
+          <td>
+            <% if strava_integration.deleted_at.present? %>
+              <small class="localizeTime text-danger">
+                <%= l strava_integration.deleted_at, format: :convert_time %>
+              </small>
+            <% end %>
           </td>
         </tr>
       <% end %>

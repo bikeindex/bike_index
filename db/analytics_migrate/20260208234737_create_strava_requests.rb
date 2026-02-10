@@ -4,7 +4,6 @@ class CreateStravaRequests < ActiveRecord::Migration[6.1]
       t.references :user
       t.bigint :strava_integration_id, null: false
       t.integer :request_type, null: false
-      t.string :endpoint, null: false
       t.jsonb :parameters, default: {}
       t.datetime :requested_at
       t.integer :response_status, default: 0, null: false
