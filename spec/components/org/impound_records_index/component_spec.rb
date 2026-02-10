@@ -10,10 +10,12 @@ RSpec.describe Org::ImpoundRecordsIndex::Component, type: :component do
       vc_test_controller.instance_variable_set(:@selected_query_items_options, [])
       vc_test_controller.instance_variable_set(:@interpreted_params, {})
       vc_test_controller.instance_variable_set(:@period, "year")
-      # SortableTable helper methods
-      vc_test_controller.class.helper_method :sort_column, :sort_direction unless vc_test_controller.respond_to?(:sort_column)
-      vc_test_controller.define_singleton_method(:sort_column) { "created_at" }
-      vc_test_controller.define_singleton_method(:sort_direction) { "desc" }
+      # SortableTable helper methods - must be on the class (not singleton) to avoid polluting other specs
+      unless vc_test_controller.class.method_defined?(:sort_column)
+        vc_test_controller.class.define_method(:sort_column) { "created_at" }
+        vc_test_controller.class.define_method(:sort_direction) { "desc" }
+        vc_test_controller.class.helper_method :sort_column, :sort_direction
+      end
       render_inline(instance)
     end
   end
