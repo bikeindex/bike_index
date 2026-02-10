@@ -68,10 +68,6 @@ module UI::Chart
 
     private
 
-    def time_range_counts(collection:, column: "created_at", time_range: nil)
-      self.class.time_range_counts(collection:, column:, time_range: time_range || @time_range)
-    end
-
     def time_range_amounts(collection:, column: "created_at", amount_column: "amount_cents", time_range: nil, convert_to_dollars: false)
       result = self.class.send(:collection_grouped, collection:, column:, time_range: time_range || @time_range).sum(amount_column)
 
