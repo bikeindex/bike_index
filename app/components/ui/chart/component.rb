@@ -6,11 +6,16 @@ module UI::Chart
 
     COLORS = %w[#0E8A16 #1D76DB #FBCA04 #D93F0B #5319E7 #B60205 #006B75].freeze
 
-    def initialize(series:, time_range:, stacked: false, thousands: ",")
+    def initialize(series:, time_range:, stacked: false, thousands: ",", colors: nil)
       @series = series
       @time_range = time_range
       @stacked = stacked
       @thousands = thousands
+      @colors = colors
+    end
+
+    def call
+      helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: colors
     end
 
     def time_range_counts(collection:, column: "created_at", time_range: nil)
@@ -133,7 +138,7 @@ module UI::Chart
     private
 
     def colors
-      @series.filter_map { |s| s[:color] }
+      @colors || @series.map.with_index { |s, i| s[:color] || COLORS[i % COLORS.length] }
     end
 
     def collection_grouped(collection:, column: "created_at", time_range: nil)
