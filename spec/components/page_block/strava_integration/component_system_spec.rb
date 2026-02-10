@@ -10,7 +10,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :system do
 
     it "renders connect button" do
       visit(preview_path)
-      expect(page).to have_content "Strava Integration"
+      expect(page).not_to have_content "Integration"
       expect(page).to have_content "Integrate your bikes with Strava"
       expect(page).to have_link "Connect with Strava"
     end
@@ -33,7 +33,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :system do
     it "renders synced state with gear" do
       visit(preview_path)
       expect(page).to have_content "Connected to Strava"
-      expect(page).to have_content "150 activities synced"
+      expect(page).to have_content(/150\s+activities synced/)
       expect(page).to have_content "Strava bikes connected"
       expect(page).to have_link "Disconnect Strava"
     end
