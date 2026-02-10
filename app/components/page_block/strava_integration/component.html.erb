@@ -1,7 +1,6 @@
 <div class="tw:mt-1 tw:space-y-0.5 tw:leading-snug tw:[&_p]:mb-2!">
-  <p><%= strava_icon %> <strong>Integration</strong></p>
-
   <% if connected? %>
+    <p><%= strava_icon %> <strong>Integration</strong></p>
     <% if syncing? %>
       <p>
         <%= translation(".syncing_activities") %>
@@ -55,7 +54,7 @@
   <% else %>
     <p><%= translation(".integrate_your_bikes_with_strava") %></p>
     <%= link_to helpers.new_strava_integration_path do %>
-      <%= helpers.image_tag("logos/btn_strava_connect.svg", alt: translation(".connect_with_strava")) %>
+      <%= helpers.image_tag("logos/btn_strava_connect.svg", alt: translation(".connect_with_strava"), style: "height: 32px; width: auto;") %>
     <% end %>
   <% end %>
 </div>

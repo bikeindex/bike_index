@@ -9,8 +9,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :component do
 
   context "not connected" do
     it "renders connect button" do
-      expect(component).to have_text("Integration")
-      expect(component).to have_css("svg title", text: "Strava")
+      expect(component).not_to have_text("Integration")
       expect(component).to have_text("Integrate your bikes with Strava")
       expect(component).to have_css("img[src*='btn_strava_connect']")
     end
@@ -52,7 +51,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :component do
 
     it "renders connected status and activity count" do
       expect(component).to have_text("Connected to Strava")
-      expect(component).to have_text("150 activities synced")
+      expect(component).to have_text(/150\s+activities synced/)
     end
 
     context "with gear" do
