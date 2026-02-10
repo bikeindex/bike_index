@@ -61,6 +61,6 @@
 
 
 
-= render_admin_index_skeleton(collection: @mail_snippets, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_mail_snippets)
+= render(Admin::IndexSkeleton::Component.new(collection: @mail_snippets, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_mail_snippets))
 
 

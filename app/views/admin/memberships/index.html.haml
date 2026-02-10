@@ -37,6 +37,6 @@
 
 - table_view = render partial: "/admin/memberships/table", locals: {memberships: @collection, render_sortable: true}
 
-= render_admin_index_skeleton(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_memberships)
+= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_memberships))
 
 

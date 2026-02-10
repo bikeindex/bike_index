@@ -183,11 +183,11 @@
   </div>
 <% end %>
 
-<%= render_admin_index_skeleton(
+<%= render(Admin::IndexSkeleton::Component.new(
   collection: @organization_statuses,
   viewing: "Organization Statuses",
   index_title: "Organization Statuses",
   nav_header_list_items:,
   rendered_chart:,
   table_view:
-) %>
+)) %>

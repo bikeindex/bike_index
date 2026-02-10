@@ -1,1 +1,1 @@
-= render_admin_index_skeleton(chart_collection: @render_chart && matching_stripe_subscriptions)
+= render(Admin::IndexSkeleton::Component.new(chart_collection: @render_chart && matching_stripe_subscriptions))

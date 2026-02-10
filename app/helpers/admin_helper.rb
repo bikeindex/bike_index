@@ -166,10 +166,6 @@ module AdminHelper
     theft_alert.recovered? ? text_class + " small" : text_class
   end
 
-  def render_admin_index_skeleton(**options)
-    render(Admin::IndexSkeleton::Component.new(**options))
-  end
-
   def render_admin_pagination_with_count(collection:, count: nil, skip_total: false, skip_today: false, skip_pagination: false, humanized_time_range_column_override: nil, viewing: nil)
     render(Admin::PaginationWithCount::Component.new(
       collection:,

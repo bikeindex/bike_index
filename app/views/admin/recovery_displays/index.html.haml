@@ -9,5 +9,5 @@
     %li.nav-item
       = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "nav-link less-strong"
 
-  = render_admin_index_skeleton(chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays)
+  = render(Admin::IndexSkeleton::Component.new(chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays))
 
