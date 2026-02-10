@@ -22,7 +22,7 @@
 #  index_strava_requests_on_user_id                                 (user_id)
 #
 class StravaRequest < AnalyticsRecord
-  REQUEST_TYPE_ENUM = {fetch_athlete: 0, fetch_athlete_stats: 1, list_activities: 2, fetch_activity: 3, fetch_gear: 4}.freeze
+  REQUEST_TYPE_ENUM = {fetch_athlete: 0, fetch_athlete_stats: 1, list_activities: 2, fetch_activity: 3, fetch_gear: 4, incoming_webhook: 5}.freeze
   RESPONSE_STATUS_ENUM = {pending: 0, success: 1, error: 2, rate_limited: 3, token_refresh_failed: 4, integration_deleted: 5}.freeze
 
   belongs_to :user
@@ -33,8 +33,8 @@ class StravaRequest < AnalyticsRecord
 
   validates :strava_integration_id, presence: true
 
-  # Priority: list_activities (2) → fetch_gear (4) → fetch_activity (3)
-  PRIORITY_ORDER = [2, 4, 3, 0, 1].freeze
+  # Priority: incoming_webhook (5) → list_activities (2) → fetch_gear (4) → fetch_activity (3)
+  PRIORITY_ORDER = [5, 2, 4, 3, 0, 1].freeze
 
   scope :unprocessed, -> { where(requested_at: nil).where.not(response_status: :integration_deleted).order(:id) }
   scope :priority_ordered, -> {
