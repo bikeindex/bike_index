@@ -58,11 +58,13 @@ module Sessionable
       httponly: true,
       value: [user.id, user.auth_token]
     }
-    # Match session_store.rb domain config so auth cookie is sent on redirects
     if Rails.env.production?
       c.merge(secure: true)
-    else
+    elsif Rails.env.development?
+      # Match session_store.rb domain config so auth cookie is sent on redirects
       c.merge(domain: "localhost")
+    else
+      c
     end
   end
 

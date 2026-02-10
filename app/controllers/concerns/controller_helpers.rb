@@ -357,10 +357,10 @@ module ControllerHelpers
     cookies.delete(auth_cookie_key)
   end
 
-  # Include port in auth cookie key to prevent collisions across workspaces,
+  # Include port in auth cookie key to prevent collisions across dev workspaces,
   # matching the session store key pattern in config/initializers/session_store.rb
   def auth_cookie_key
-    @auth_cookie_key ||= Rails.env.production? ? :auth : :"auth_#{ENV.fetch("DEV_PORT", 3042)}"
+    @auth_cookie_key ||= Rails.env.development? ? :"auth_#{ENV.fetch("DEV_PORT", 3042)}" : :auth
   end
 
   def require_member!
