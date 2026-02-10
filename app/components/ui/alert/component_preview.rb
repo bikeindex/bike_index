@@ -19,6 +19,7 @@ module UI::Alert
     def success(kind: :success)
       render(UI::Alert::Component.new(text: default_text, kind:))
     end
+    # @endgroup
 
     # @group Dismissable Variants
     # @param kind "The kind of alert"
@@ -37,6 +38,7 @@ module UI::Alert
     def dismissable_success(kind: :success)
       render(UI::Alert::Component.new(text: default_text, kind:, dismissable: true))
     end
+    # @endgroup
 
     private
 
