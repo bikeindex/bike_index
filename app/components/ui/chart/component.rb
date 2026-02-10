@@ -6,6 +6,54 @@ module UI::Chart
 
     COLORS = %w[#0E8A16 #1D76DB #FBCA04 #D93F0B #5319E7 #B60205 #006B75].freeze
 
+    class << self
+      def time_range_counts(collection:, time_range:, column: "created_at")
+        collection_grouped(collection:, column:, time_range:).count
+      end
+
+      private
+
+      def collection_grouped(collection:, time_range:, column: "created_at")
+        collection.send(
+          group_by_method(time_range),
+          column,
+          range: time_range,
+          format: group_by_format(time_range)
+        )
+      end
+
+      def group_by_method(time_range)
+        period_s = time_range.last - time_range.first
+        if period_s < 3601 # 1.hour + 1 second
+          :group_by_minute
+        elsif period_s < 5.days
+          :group_by_hour
+        elsif period_s < 5_000_000 # around 60 days
+          :group_by_day
+        elsif period_s < 31449600 # 364 days (52 weeks)
+          :group_by_week
+        else
+          :group_by_month
+        end
+      end
+
+      def group_by_format(time_range, group_period = nil)
+        period_s = time_range.last - time_range.first
+        group_period ||= group_by_method(time_range)
+        if group_period == :group_by_minute
+          "%l:%M %p"
+        elsif group_period == :group_by_hour
+          "%a%l %p"
+        elsif group_period == :group_by_month
+          "%Y-%-m"
+        elsif group_period == :group_by_day && (period_s < 10.days)
+          "%a %-m-%-d"
+        else
+          "%Y-%-m-%-d"
+        end
+      end
+    end
+
     def initialize(series:, time_range:, stacked: false, thousands: ",", colors: nil)
       @series = series
       @time_range = time_range
@@ -17,52 +65,6 @@ module UI::Chart
     def call
       helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: @colors
     end
-
-    def self.time_range_counts(collection:, time_range:, column: "created_at")
-      collection_grouped(collection:, column:, time_range:).count
-    end
-
-    def self.collection_grouped(collection:, time_range:, column: "created_at")
-      collection.send(
-        group_by_method(time_range),
-        column,
-        range: time_range,
-        format: group_by_format(time_range)
-      )
-    end
-
-    def self.group_by_method(time_range)
-      period_s = time_range.last - time_range.first
-      if period_s < 3601 # 1.hour + 1 second
-        :group_by_minute
-      elsif period_s < 5.days
-        :group_by_hour
-      elsif period_s < 5_000_000 # around 60 days
-        :group_by_day
-      elsif period_s < 31449600 # 364 days (52 weeks)
-        :group_by_week
-      else
-        :group_by_month
-      end
-    end
-
-    def self.group_by_format(time_range, group_period = nil)
-      period_s = time_range.last - time_range.first
-      group_period ||= group_by_method(time_range)
-      if group_period == :group_by_minute
-        "%l:%M %p"
-      elsif group_period == :group_by_hour
-        "%a%l %p"
-      elsif group_period == :group_by_month
-        "%Y-%-m"
-      elsif group_period == :group_by_day && (period_s < 10.days)
-        "%a %-m-%-d"
-      else
-        "%Y-%-m-%-d"
-      end
-    end
-
-    private_class_method :collection_grouped, :group_by_method, :group_by_format
 
     private
 
