@@ -327,11 +327,11 @@ module ControllerHelpers
 
   def current_user
     # always reassign if nil - this value changes during sign in and removing ivars is scary
-    @current_user ||= User.confirmed.from_auth(cookies.signed[:auth])
+    @current_user ||= User.confirmed.from_auth(cookies.signed[auth_cookie_key])
   end
 
   def unconfirmed_current_user
-    @unconfirmed_current_user ||= User.unconfirmed.from_auth(cookies.signed[:auth])
+    @unconfirmed_current_user ||= User.unconfirmed.from_auth(cookies.signed[auth_cookie_key])
   end
 
   # Because we need to show unconfirmed users logout - and we should show them what they're missing in general
@@ -354,7 +354,13 @@ module ControllerHelpers
 
   def remove_session
     session.keys.each { |k| session.delete(k) } # Get rid of everything we've been storing
-    cookies.delete(:auth)
+    cookies.delete(auth_cookie_key)
+  end
+
+  # Include port in auth cookie key to prevent collisions across workspaces,
+  # matching the session store key pattern in config/initializers/session_store.rb
+  def auth_cookie_key
+    @auth_cookie_key ||= Rails.env.production? ? :auth : :"auth_#{ENV.fetch("DEV_PORT", 3042)}"
   end
 
   def require_member!
