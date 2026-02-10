@@ -2257,6 +2257,12 @@ it:
       draft:
       for_sale:
       publicly_listed:
+    strava_gear:
+      connect_bike_to_strava_gear:
+      none_selected:
+      strava_bike:
+      strava_gear:
+      sync_not_finished:
   controllers:
     application:
       handle_unverified_request:
@@ -2292,6 +2298,8 @@ it:
         remove_or_transfer:
         marketplace_list:
         marketplace_on_sale:
+        strava_gear:
+        versions_and_strava:
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet:
         bike_impounded:
@@ -4767,6 +4775,23 @@ it:
         record_sale:
         sold_for:
         transfer_to_html:
+      strava_integration:
+        activities_synced:
+          one:
+          other:
+        connect_with_strava:
+        connected_to_strava:
+        disconnect_confirm:
+        disconnect_strava:
+        downloaded:
+        integrate_your_bikes_with_strava:
+        strava_bikes_connected:
+        strava_connected_pending:
+        strava_integration:
+        sync_error:
+        sync_error_description:
+        sync_running_in_background:
+        syncing_activities:
     emails:
       partials:
         bike_box:

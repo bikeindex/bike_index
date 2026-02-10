@@ -1,0 +1,5 @@
+<h4 class="mt-4">By response status</h4>
+<%= helpers.column_chart status_series, stacked: true, thousands: ",", colors: status_colors %>
+
+<h4 class="mt-4">By request type</h4>
+<%= helpers.column_chart type_series, stacked: true, thousands: ",", colors: type_colors %>

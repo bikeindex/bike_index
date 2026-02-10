@@ -3509,6 +3509,134 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 
 --
+-- Name: strava_activities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.strava_activities (
+    id bigint NOT NULL,
+    strava_integration_id bigint NOT NULL,
+    strava_id character varying NOT NULL,
+    title character varying,
+    description text,
+    distance_meters double precision,
+    moving_time_seconds integer,
+    total_elevation_gain_meters double precision,
+    sport_type character varying,
+    private boolean DEFAULT false,
+    muted boolean DEFAULT false,
+    kudos_count integer,
+    year integer,
+    gear_id character varying,
+    photos jsonb,
+    segment_locations jsonb,
+    activity_type character varying,
+    start_date timestamp(6) without time zone,
+    activity_timezone character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: strava_activities_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.strava_activities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: strava_activities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.strava_activities_id_seq OWNED BY public.strava_activities.id;
+
+
+--
+-- Name: strava_gears; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.strava_gears (
+    id bigint NOT NULL,
+    strava_integration_id bigint NOT NULL,
+    item_type character varying,
+    item_id bigint,
+    strava_gear_id character varying NOT NULL,
+    strava_gear_name character varying,
+    gear_type integer,
+    total_distance_kilometers integer,
+    strava_data jsonb,
+    last_updated_from_strava_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: strava_gears_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.strava_gears_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: strava_gears_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.strava_gears_id_seq OWNED BY public.strava_gears.id;
+
+
+--
+-- Name: strava_integrations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.strava_integrations (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    access_token text NOT NULL,
+    refresh_token text NOT NULL,
+    token_expires_at timestamp(6) without time zone,
+    strava_permissions character varying,
+    athlete_id character varying,
+    athlete_activity_count integer,
+    activities_downloaded_count integer DEFAULT 0 NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    last_updated_activities_at timestamp(6) without time zone,
+    deleted_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: strava_integrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.strava_integrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: strava_integrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.strava_integrations_id_seq OWNED BY public.strava_integrations.id;
+
+
+--
 -- Name: stripe_events; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4632,6 +4760,27 @@ ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: strava_activities id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.strava_activities ALTER COLUMN id SET DEFAULT nextval('public.strava_activities_id_seq'::regclass);
+
+
+--
+-- Name: strava_gears id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.strava_gears ALTER COLUMN id SET DEFAULT nextval('public.strava_gears_id_seq'::regclass);
+
+
+--
+-- Name: strava_integrations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.strava_integrations ALTER COLUMN id SET DEFAULT nextval('public.strava_integrations_id_seq'::regclass);
+
+
+--
 -- Name: stripe_events id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5419,6 +5568,30 @@ ALTER TABLE ONLY public.stolen_notifications
 
 
 --
+-- Name: strava_activities strava_activities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.strava_activities
+    ADD CONSTRAINT strava_activities_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: strava_gears strava_gears_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.strava_gears
+    ADD CONSTRAINT strava_gears_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: strava_integrations strava_integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.strava_integrations
+    ADD CONSTRAINT strava_integrations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: stripe_events stripe_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5863,13 +6036,6 @@ CREATE INDEX index_bikes_on_latitude_and_longitude ON public.bikes USING btree (
 --
 
 CREATE INDEX index_bikes_on_listing_order ON public.bikes USING btree (listing_order DESC);
-
-
---
--- Name: index_bikes_on_lower_frame_model; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_lower_frame_model ON public.bikes USING btree (lower(frame_model));
 
 
 --
@@ -6958,6 +7124,55 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
+-- Name: index_strava_activities_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_activities_on_strava_integration_id ON public.strava_activities USING btree (strava_integration_id);
+
+
+--
+-- Name: index_strava_activities_on_strava_integration_id_and_strava_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_strava_activities_on_strava_integration_id_and_strava_id ON public.strava_activities USING btree (strava_integration_id, strava_id);
+
+
+--
+-- Name: index_strava_gears_on_item_type_and_item_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_strava_gears_on_item_type_and_item_id ON public.strava_gears USING btree (item_type, item_id) WHERE (item_id IS NOT NULL);
+
+
+--
+-- Name: index_strava_gears_on_strava_integration_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_gears_on_strava_integration_id ON public.strava_gears USING btree (strava_integration_id);
+
+
+--
+-- Name: index_strava_gears_on_strava_integration_id_and_strava_gear_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_strava_gears_on_strava_integration_id_and_strava_gear_id ON public.strava_gears USING btree (strava_integration_id, strava_gear_id);
+
+
+--
+-- Name: index_strava_integrations_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_integrations_on_deleted_at ON public.strava_integrations USING btree (deleted_at);
+
+
+--
+-- Name: index_strava_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integrations USING btree (user_id) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7225,6 +7440,9 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260209164044'),
+('20260209164043'),
+('20260209164042'),
 ('20260209032356'),
 ('20260209031725'),
 ('20260206174653'),

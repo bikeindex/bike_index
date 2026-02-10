@@ -1,0 +1,136 @@
+<%= form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f| %>
+  <% if params[:return_to].present? %>
+    <%= hidden_field_tag :return_to, params[:return_to] %>
+  <% end %>
+
+  <div class="form-well-container container edit-bike-page- <%= @edit_template %>">
+    <div class="row">
+      <%= render partial: '/bikes_edit/primary_menu' %>
+
+      <div class="col-md-8 form-well">
+        <div class="form-wrap" id="edit_bike_organizations">
+          <div class="form-well-form-header-always-visible">
+            <h3>Versions</h3>
+          </div>
+
+          <div class="col-xs-12">
+            <p>
+              Store and manage snapshots of your <%= @bike.type %> at specific
+              times
+            </p>
+          </div>
+
+          <% if @bike_versions.present? && @bike_versions.any? %>
+            <div class="related-fields no-divider-row-wrap">
+              <div class="form-group row">
+                <label class="form-well-label less-strong">
+                  <%= @bike_og.type.titleize %> Registration
+                </label>
+
+                <div class="form-well-input-static-full-width">
+                  <% if @bike.id == @bike_og.id && !@bike.version? %>
+                    <span
+                      class="text-muted text-normal-weight"
+                      style="text-decoration: underline;"
+                    >
+                      <%= bike_title_html(@bike_og) %>
+                    </span>
+                    <em class="text-muted less-strong">currently editing</em>
+                  <% else %>
+                    <%= link_to bike_title_html(@bike_og), edit_bike_path(@bike_og), class: "text-normal-weight" %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+            <div class="related-fields no-divider-row-wrap">
+              <% @bike_versions.each_with_index do |bike_version, index| %>
+                <div class="form-group row">
+                  <label class="form-well-label less-strong">
+                    <%= index == 0 ? "Versions" : "&nbsp;".html_safe %>
+                  </label>
+
+                  <div class="form-well-input-static-full-width <%= 'mt-1' if index == 0 %>">
+                    <% if bike_version.id == @bike.id && @bike.version? %>
+                      <span
+                        class="text-muted"
+                        style="text-decoration: underline;"
+                      >
+                        <%= bike_version.display_name %>
+                      </span>
+                      <em class="text-muted less-strong">currently editing</em>
+                    <% else %>
+                      <%= link_to bike_version.display_name, edit_bike_version_path(bike_version) %>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <div class="add-additional-fields-block no-divider-row">
+            <%= link_to bike_versions_path(bike_id: @bike_og.id), method: :create, class: "add_fields", role: "button" do %>
+              <span class="context-display-help">+</span> Create a new version
+            <% end %>
+          </div>
+        </div>
+
+        <% strava_integration = current_user.strava_integration %>
+
+        <% if strava_integration&.show_gear_link? %>
+          <div class="form-wrap secondary-form-wrap">
+            <div class="form-well-form-header-always-visible">
+              <h3><%= t("bikes_edit.strava_gear.strava_gear") %></h3>
+            </div>
+
+            <div class="col-xs-12">
+              <p class="mb-3">
+                <%= t("bikes_edit.strava_gear.connect_bike_to_strava_gear") %>
+              </p>
+
+              <% if strava_integration.syncing? %>
+                <div class="alert alert-info mb-3">
+                  <%= t("bikes_edit.strava_gear.sync_not_finished") %>
+                </div>
+              <% end %>
+            </div>
+
+            <div class="related-fields fancy-select unfancy">
+              <% bike_gear = @bike.strava_gear %>
+
+              <div class="form-group row unnested-field">
+                <label class="form-well-label">
+                  <%= t("bikes_edit.strava_gear.strava_bike") %>
+                </label>
+
+                <div class="form-well-input">
+                  <select class="form-control" name="strava_gear_id">
+                    <option value="" <%= "selected" if bike_gear.blank? %>>
+                      <%= t("bikes_edit.strava_gear.none_selected") %>
+                    </option>
+
+                    <% strava_integration.strava_gears.bikes.each do |gear| %>
+                      <option
+                        value="<%= gear.strava_gear_id %>"
+                        <%= "selected" if bike_gear&.strava_gear_id == gear.strava_gear_id %>
+                      >
+                        <%= gear.strava_gear_name %>
+
+                        <% if gear.total_distance_miles.present? %>
+                          (
+                          <%= number_with_delimiter(gear.total_distance_miles) %>
+                          miles)
+                        <% end %>
+                      </option>
+                    <% end %>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <%= render "/shared/form_well_footer_save" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

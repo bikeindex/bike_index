@@ -78,7 +78,11 @@ module BikeEditable
         translation(:remove_or_transfer, scope: t_scope)
       end
 
-      h[:versions] = translation(:versions, scope: t_scope)
+      h[:versions] = if !@bike.version? && @current_user&.strava_integration&.show_gear_link?
+        translation(:versions_and_strava, scope: t_scope)
+      else
+        translation(:versions, scope: t_scope)
+      end
       unless @bike.status_stolen_or_impounded? || @bike.version?
         h[:report_stolen] = translation(:report_stolen, scope: t_scope)
       end
@@ -92,6 +96,7 @@ module BikeEditable
     # If provided an invalid template name, redirect to the default page for a stolen /
     # unstolen bike
     @edit_template = requested_page || @bike.default_edit_template
+    @edit_template = "versions" if @edit_template == "strava_gear"
     valid_requested_page = (edit_templates.keys.map(&:to_s) + ["alert_purchase_confirmation"]).include?(@edit_template)
     unless valid_requested_page && controller_name == edits_controller_name_for(@edit_template)
       edit_redirect_url = if @edit_template == "ownership" && params[:owner_email].present? # Preserve older functionality
