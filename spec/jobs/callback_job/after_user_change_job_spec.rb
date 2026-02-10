@@ -81,6 +81,21 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
         expect(user.phone).to eq phone
       end
     end
+    context "another user has the same phone" do
+      let!(:other_user_phone) { FactoryBot.create(:user_phone, phone: phone) }
+      it "still creates a user_phone for this user" do
+        expect(other_user_phone.user_id).to_not eq user.id
+        user.reload
+        Sidekiq::Job.clear_all
+        Sidekiq::Testing.inline! do
+          expect {
+            instance.perform(user.id)
+          }.to change(UserPhone, :count).by 1
+        end
+        user_phone = user.user_phones.last
+        expect(user_phone.phone).to eq phone
+      end
+    end
   end
 
   # Currently, universal superuser_abilities follow

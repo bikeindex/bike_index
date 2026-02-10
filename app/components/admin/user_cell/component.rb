@@ -4,11 +4,19 @@ module Admin::UserCell
   class Component < ApplicationComponent
     include SortableHelper
 
-    def initialize(user: nil, user_id: nil, email: nil, search_url: nil, render_search: nil)
+    def initialize(
+      user: nil,
+      user_id: nil,
+      email: nil,
+      user_link_path: nil,
+      search_url: nil,
+      render_search: nil
+    )
       @user = user
       @user_id = user_id || user&.id
       @email = email || user&.email
       @search_url = search_url
+      @user_link_path_arg = user_link_path
       @render_search = render_search.nil? ? @search_url.present? : render_search
     end
 
@@ -17,6 +25,15 @@ module Admin::UserCell
     end
 
     private
+
+    def user_link_path
+      # bike_link_path can be false to not link
+      return if @user_link_path_arg == false
+      return @user_link_path_arg if @user_link_path_arg.present?
+      return admin_user_path(@user_id) if @user_id.present?
+
+      nil
+    end
 
     def email_display
       @email&.truncate(30)
@@ -31,7 +48,7 @@ module Admin::UserCell
     end
 
     def show_user_link?
-      @user.present?
+      user_link_path.present?
     end
 
     def show_email_only?

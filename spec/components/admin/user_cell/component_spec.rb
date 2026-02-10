@@ -73,6 +73,27 @@ RSpec.describe Admin::UserCell::Component, type: :component do
     end
   end
 
+  context "with user_link_path false" do
+    let(:user) { FactoryBot.create(:user, email: "test@example.com") }
+    let(:options) { {user:, user_link_path: false} }
+
+    it "does not render email link" do
+      expect(component.css("a.text-link")).to be_blank
+    end
+  end
+
+  context "with custom user_link_path" do
+    let(:user) { FactoryBot.create(:user, email: "test@example.com") }
+    let(:options) { {user:, user_link_path: "/admin/custom/path"} }
+
+    it "renders email linked to custom path" do
+      link = component.css("a.text-link").first
+      expect(link).to be_present
+      expect(link["href"]).to eq("/admin/custom/path")
+      expect(link.text).to include("test@example.com")
+    end
+  end
+
   context "with render_search false" do
     let(:user) { FactoryBot.create(:user) }
     let(:options) { {user:, render_search: false} }
