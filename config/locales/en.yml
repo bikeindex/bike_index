@@ -1626,8 +1626,8 @@ en:
     page_block:
       strava_integration:
         activities_synced:
-          one: "%{count} activity synced"
-          other: "%{count} activities synced"
+          one: "activity synced"
+          other: "activities synced"
     ui:
       definition_list:
         row:

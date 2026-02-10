@@ -6,6 +6,7 @@ export default class extends Controller {
   static values = { url: String }
 
   connect () {
+    this.initialStatus = null
     this.poll()
   }
 
@@ -19,12 +20,13 @@ export default class extends Controller {
     })
       .then(response => response.json())
       .then(data => {
+        if (this.initialStatus === null) this.initialStatus = data.status
         if (data.status === 'syncing' || data.status === 'pending') {
           this.updateProgress(data)
           this.timer = setTimeout(() => this.poll(), 5000)
         } else if (data.status === 'synced' || data.status === 'error') {
-          // Reload the page to show the final state
-          window.location.reload()
+          // Only reload if status changed from a non-final state
+          if (this.initialStatus !== data.status) window.location.reload()
         }
       })
       .catch(() => {
@@ -36,7 +38,7 @@ export default class extends Controller {
   updateProgress (data) {
     const countEl = document.getElementById('strava-download-count')
     if (countEl) {
-      const fmt = (n) => n == null ? '?' : n.toLocaleString()
+      const fmt = (n) => n == null ? '?' : Number(n).toLocaleString()
       countEl.textContent = `${data.progress_percent}% (${fmt(data.activities_downloaded_count)} / ${fmt(data.athlete_activity_count)}) downloaded`
     }
   }

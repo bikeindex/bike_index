@@ -1,8 +1,5 @@
 <div class="tw:mt-1 tw:space-y-0.5 tw:leading-snug tw:[&_p]:mb-2!">
-  <p>
-    <%= strava_icon(16) %>
-    <strong><%= translation(".strava_integration") %></strong>
-  </p>
+  <p><%= strava_icon %> <strong>Integration</strong></p>
 
   <% if connected? %>
     <% if syncing? %>
@@ -25,7 +22,10 @@
       <% end %>
     <% elsif synced? %>
       <p><strong><%= translation(".connected_to_strava") %></strong></p>
-      <p><%= translation(".activities_synced", count: downloaded_count) %></p>
+      <p>
+        <%= number_display(downloaded_count) %>
+        <%= translation(".activities_synced", count: downloaded_count) %>
+      </p>
       <% if @strava_integration.strava_gears.any? %>
         <p>
           <strong><%= number_display(@strava_integration.strava_gears.bikes.with_item.count) %></strong>
