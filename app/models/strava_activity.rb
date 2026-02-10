@@ -63,7 +63,6 @@ class StravaActivity < ApplicationRecord
       attrs = summary_attributes(summary)
       activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: summary["id"].to_s)
       activity.update!(attrs)
-      activity.update_gear_association_distance!
       activity
     end
 
@@ -142,14 +141,5 @@ class StravaActivity < ApplicationRecord
 
   def update_from_detail(detail)
     update(self.class.detail_attributes(detail))
-    update_gear_association_distance!
-  end
-
-  def update_gear_association_distance!
-    return if gear_id.blank?
-
-    strava_integration.strava_gears.where(strava_gear_id: gear_id).find_each do |ga|
-      ga.update_total_distance!
-    end
   end
 end

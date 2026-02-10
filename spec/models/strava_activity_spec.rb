@@ -114,18 +114,6 @@ RSpec.describe StravaActivity, type: :model do
       expect(activity.kudos_count).to eq(10)
     end
 
-    context "with gear association" do
-      let!(:gear_association) do
-        FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234")
-      end
-
-      it "updates gear association total distance" do
-        StravaActivity.create_or_update_from_summary(strava_integration, summary)
-        gear_association.reload
-        expect(gear_association.total_distance_kilometers).to eq(25)
-      end
-    end
-
     it "updates an existing activity" do
       FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543", title: "Old Title")
       activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)

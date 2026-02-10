@@ -98,6 +98,18 @@ RSpec.describe StravaGear, type: :model do
     end
   end
 
+  describe "#total_distance_miles" do
+    it "converts kilometers to miles" do
+      strava_gear = FactoryBot.build(:strava_gear, total_distance_kilometers: 100)
+      expect(strava_gear.total_distance_miles).to eq(62)
+    end
+
+    it "returns nil when total_distance_kilometers is nil" do
+      strava_gear = FactoryBot.build(:strava_gear, total_distance_kilometers: nil)
+      expect(strava_gear.total_distance_miles).to be_nil
+    end
+  end
+
   describe "#enriched?" do
     it "returns true when resource_state is 3" do
       strava_gear = FactoryBot.build(:strava_gear, strava_data: {"resource_state" => 3})

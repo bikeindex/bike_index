@@ -67,6 +67,11 @@ class StravaGear < ApplicationRecord
     (distance.to_f / 1000).round(0)
   end
 
+  def total_distance_miles
+    return nil if total_distance_kilometers.blank?
+    (total_distance_kilometers * 0.621371).round
+  end
+
   def enriched?
     strava_data&.dig("resource_state") == 3
   end

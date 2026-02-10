@@ -53,7 +53,7 @@ class StravaIntegration < ApplicationRecord
   end
 
   def show_gear_link?
-    (synced? || syncing?) && strava_gears.any?
+    (synced? || syncing?) && strava_gears.bikes.any?
   end
 
   def cycling_gear_ids
@@ -88,14 +88,15 @@ class StravaIntegration < ApplicationRecord
     (unknown_gear_ids + un_enriched_ids).uniq
   end
 
-  def update_sync_status
+  def update_sync_status(force_update: false)
     calculated_downloaded = strava_activities.count
-    return if activities_downloaded_count == calculated_downloaded
+    return if !force_update && activities_downloaded_count == calculated_downloaded
 
     unprocessed_lists = StravaRequest.list_activities.unprocessed.where(strava_integration_id: id)
     if unprocessed_lists.none?
       enqueue_detail_requests
       enqueue_gear_requests
+      strava_gears.find_each(&:update_total_distance!)
     end
 
     any_unprocessed = StravaRequest.unprocessed.where(strava_integration_id: id)

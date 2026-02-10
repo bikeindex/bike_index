@@ -8,7 +8,7 @@
       .col-md-8.form-well
         - unless @bike.version?
           .form-wrap
-            .form-well-form-header
+            .form-well-form-header-always-visible
               %h3= t(".transfer_ownership")
             .col-xs-12
               %p
@@ -37,7 +37,7 @@
 
         - hide_wrapper_class = @bike.version? ? "form-wrap" : "form-wrap secondary-form-wrap"
         %div{class: hide_wrapper_class}
-          .form-well-form-header
+          .form-well-form-header-always-visible
             %h3= t(".hide_registration")
 
           - if @bike.version?
@@ -95,7 +95,7 @@
                         - else
                           = t(".hide_this_bike", bike_type: @bike.type)
         .form-wrap.secondary-form-wrap
-          .form-well-form-header
+          .form-well-form-header-always-visible
             %h3= t(".delete_registration")
           .delete-from-index
             %a{data: { toggle: "modal", target: "#request-delete" } }
