@@ -2219,13 +2219,10 @@ es:
       publicly_listed:
     strava_gear:
       connect_bike_to_strava_gear:
-      connect_strava:
-      currently_connected:
       none_selected:
-      save_strava_gear:
       strava_bike:
       strava_gear:
-      strava_not_connected:
+      sync_not_finished:
   controllers:
     application:
       handle_unverified_request:
@@ -2262,6 +2259,7 @@ es:
         marketplace_list:
         marketplace_on_sale:
         strava_gear:
+        versions_and_strava:
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet:
         bike_impounded:

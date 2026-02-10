@@ -2124,6 +2124,7 @@ nl:
         marketplace_list: Lijst te koop
         marketplace_on_sale: Marktplaatsvermelding bijwerken
         strava_gear: Strava-uitrusting
+        versions_and_strava: Versies en Strava
       create:
         bike_was_added: Bike met succes toegevoegd aan de index!
         bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
@@ -5890,14 +5891,11 @@ nl:
     strava_gear:
       connect_bike_to_strava_gear: Koppel deze fiets aan een van je Strava-fietsen
         om bij te houden op welke fiets je rijdt.
-      connect_strava: Koppel Strava op je accountpagina.
-      currently_connected: 'Momenteel verbonden met:'
       none_selected: "-- Geen --"
-      save_strava_gear: Bespaar op Strava-uitrusting
       strava_bike: Strava-fiets
       strava_gear: Strava-uitrusting
-      strava_not_connected: Je Strava-account is niet verbonden of de synchronisatie
-        is nog niet voltooid.
+      sync_not_finished: De synchronisatie met Strava is nog niet voltooid, dus mogelijk
+        worden niet alle fietsen weergegeven.
   bike_versions:
     index:
       primary_colors: Primaire kleuren

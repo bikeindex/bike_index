@@ -2335,14 +2335,11 @@ nb:
     strava_gear:
       connect_bike_to_strava_gear: Koble denne sykkelen til en av Strava-syklene dine
         for å spore hvilken sykkel du sykler på.
-      connect_strava: Koble til Strava på kontosiden din
-      currently_connected: 'For øyeblikket koblet til:'
       none_selected: "-- Ingen --"
-      save_strava_gear: Lagre Strava-utstyr
       strava_bike: Strava-sykkel
       strava_gear: Strava-utstyr
-      strava_not_connected: Strava-kontoen din er ikke tilkoblet eller synkroniseringen
-        er ikke fullført.
+      sync_not_finished: Strava-synkroniseringen er ikke fullført ennå, så det er
+        ikke sikkert at alle syklene er oppført.
   controllers:
     application:
       handle_unverified_request:
@@ -2382,6 +2379,7 @@ nb:
         marketplace_list: Liste til salgs
         marketplace_on_sale: Oppdater markedsplassoppføring
         strava_gear: Strava-utstyr
+        versions_and_strava: Versjoner og Strava
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: Det %{bike_type} er ikke gjort krav på ennå.
           Hvis det er din %{bike_type}, registrer deg og du vil kunne redigere den!
