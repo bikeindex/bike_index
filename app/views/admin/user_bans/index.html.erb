@@ -4,4 +4,4 @@
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(chart_collection: @render_chart && matching_user_bans, nav_header_list_items:)) %>
+<%= render_admin_index_skeleton(chart_collection: @render_chart && matching_user_bans, nav_header_list_items:) %>
