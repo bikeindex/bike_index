@@ -5110,6 +5110,10 @@ nb:
         member_no_bikes_access: Samme tilgang som medlem, men kan ikke redigere organisasjonssykler
         member_of_organization: Medlem av organisasjonen
         role_type: Rolletype
+    impound_records:
+      index:
+        impound_records: Beslaglegg poster
+        render_chart: Gjengi diagram
   organized_mailer:
     custom_message:
       subject: "%{org_name} - plasseringen av din %{mnfg_name}"
@@ -6052,3 +6056,21 @@ nb:
         region: Region/provins
         state: Stat
         street: gate
+      impound_records_index:
+        matching_impound_record:
+          one: samsvarende beslagsregister
+          other: samsvarende beslaglagte poster
+        all_bikes: Alle sykler
+        all_statuses: Alle statuser
+        for_table_rows_with_checks: For tabellrader med sjekker
+        impound_records: Beslagleggelse av poster
+        internal_note: Intern merknad
+        interpreted_params: Interpreted_params
+        new_owner_email: Ny eier-e-postadresse
+        only_unregistered: Kun uregistrerte
+        only_user_registered: Kun bruker registrert
+        pagy: Pagy
+        per_page: Per_side
+        status_records: "%{status} poster"
+        update_impound_record: Oppdater beslagsregister
+        update_multiple_records: Oppdater flere poster

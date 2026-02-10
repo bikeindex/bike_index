@@ -4,7 +4,9 @@
 
 <div class="row mt-4 mb-4">
   <div class="col-sm-9">
-    <%= number_with_delimiter(@pagy.count) %> <%= translation(".matching_impound_record", count: @pagy.count) %>
+    <%= number_with_delimiter(@pagy.count) %>
+    <%= translation(".matching_impound_record", count: @pagy.count) %>
+
     <em><%= helpers.humanized_time_range(@time_range) %></em>
 
     <div class="dropdown d-inline-block ml-2">
@@ -81,7 +83,10 @@
               <h3 class="uncap">
                 <%= translation(".update_multiple_records") %>
                 <br>
-                <em class="small less-strong"> <%= translation(".for_table_rows_with_checks") %> </em>
+
+                <em class="small less-strong">
+                  <%= translation(".for_table_rows_with_checks") %>
+                </em>
               </h3>
             </div>
 
