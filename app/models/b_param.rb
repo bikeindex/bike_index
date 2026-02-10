@@ -22,6 +22,7 @@
 #
 # Indexes
 #
+#  index_b_params_on_created_bike_id  (created_bike_id)
 #  index_b_params_on_organization_id  (organization_id)
 #
 

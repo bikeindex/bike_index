@@ -1,7 +1,9 @@
 <% collection ||= @collection %>
 <% viewing ||= controller_name.humanize %>
+<% index_title ||= nil %>
 <% nav_header_list_items ||= "" %>
 <% skip_charting ||= false %>
+<% rendered_chart ||= nil %>
 <% render_sortable ||= true %>
 
 <% admin_search_form ||= "" %>
@@ -12,7 +14,14 @@
 
 <div class="admin-subnav">
   <div class="col-md-5">
-    <h1>Manage <%= viewing %></h1>
+    <h1>
+      <% if index_title.present? %>
+        <%= index_title %>
+      <% else %>
+        Manage
+        <%= viewing %>
+      <% end %>
+    </h1>
   </div>
 
   <div class="col-md-7">
@@ -31,8 +40,12 @@
 </div>
 
 <% if !skip_charting && @render_chart %>
-  <%# NOTE: if you want to render_chart, you must include the local: chart_collection %>
-  <%= column_chart time_range_counts(collection: chart_collection, column: time_range_column), stacked: true, thousands: "," %>
+  <% if rendered_chart.nil? %>
+    <%# NOTE: if you want to render_chart, you must include the local: chart_collection %>
+    <%= column_chart time_range_counts(collection: chart_collection, column: time_range_column), stacked: true, thousands: "," %>
+  <% else %>
+    <%= rendered_chart %>
+  <% end %>
 <% end %>
 
 <div class="mt-2 mb-4"><%= render partial: "/shared/period_select" %></div>

@@ -99,7 +99,7 @@ class Paint < ApplicationRecord
     paint_str.gsub!(/golde?n?/, " yellow ")
     paint_str.gsub!(/(\A|\s)crcl(\s|\Z)/, " silver ") # bad abbreviation of charcoal
     paint_str.gsub!("gunmetal", " silver ")
-    paint_str.gsub!(/char(coa?l)?/, " silver ")
+    paint_str.gsub!(/\bchar(coa?l)?\b/, " silver ") # use word boundaries to ensure it doesn't match chartreuse
     paint_str.gsub!("graphite", " silver ")
     paint_str.gsub!("platinum", " silver ")
     paint_str.gsub!("nickel", " silver ")

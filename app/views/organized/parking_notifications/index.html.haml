@@ -98,7 +98,7 @@
   = render partial: "/shared/period_select", locals: { skip_submission: true }
 
   .mt-4
-    = render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_parking_notifications_path(organization_id: current_organization.to_param)}
+    = render(Search::FormOrganized::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params))
 
   .row.mt-4.mb-2
     .col-sm-6

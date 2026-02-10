@@ -1,8 +1,7 @@
 RSpec.shared_context :scheduled_job do
-  let(:redis) { Redis.new }
-
   def clear_scheduled_history
-    redis.expire(ScheduledJobRunner::HISTORY_KEY, 0)
+    RedisPool.conn { |r| r.del(ScheduledJobRunner::HISTORY_KEY) }
+    Sidekiq.redis { |r| r.del(described_class.redis_queue) }
   end
 
   before { Sidekiq::Job.clear_all }

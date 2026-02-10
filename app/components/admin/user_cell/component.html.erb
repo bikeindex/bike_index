@@ -12,7 +12,7 @@
   <% end %>
 
   <% if show_user_link? %>
-    <%= link_to email_display, admin_user_path(@user.to_param), title: @email, class: "text-link" %>
+    <%= link_to email_display, user_link_path, title: @email, class: "text-link" %>
   <% elsif show_email_only? %>
     <span title="<%= @email %>"><%= email_display %></span>
   <% end %>

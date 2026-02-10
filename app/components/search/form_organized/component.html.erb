@@ -1,0 +1,63 @@
+<%= form_with(url: @target_search_path,
+    builder: BikeIndexFormBuilder,
+    method: :get,
+    id: "Search_Form",
+    data: {turbo: false}) do |f| %>
+  <div class="tw:flex tw:flex-nowrap tw:gap-4">
+    <div class="search-fields tw:flex-grow">
+      <%= render(
+        Search::EverythingCombobox::Component.new(
+          selected_query_items_options: @selected_query_items_options,
+          query: @interpreted_params[:query],
+        ),
+      ) %>
+
+      <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2 tw:md:flex-nowrap">
+        <%= label_tag :search_email,
+          translation(".search_owner_email"),
+          class: "twlabel tw:sr-only" %>
+
+        <%= text_field_tag :search_email,
+          @interpreted_params[:search_email],
+          placeholder: translation(".search_owner_email"),
+          class: "twinput tw:flex-1 fieldResetsCounts" %>
+
+        <% if render_serial_field? %>
+          <%= label_tag :serial,
+            translation(".search_for_serial_number"),
+            class: "twlabel tw:sr-only" %>
+          <%= text_field_tag :serial,
+            @interpreted_params[:raw_serial],
+            placeholder: translation(".search_for_serial_number"),
+            class: "twinput tw:flex-1 fieldResetsCounts" %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="tw:w-20">
+      <%= button_tag(type: translation(".submit"),
+          class: "twbtn-blue tw:w-full tw:h-full") do %>
+        <%= helpers.inline_svg_tag "icons/searcher.svg",
+          id: "search-button",
+          class: "tw:text-white",
+          title: "searcher" %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if render_serial_field? && serial_looks_like_not_a_serial? %>
+    <%= render(
+      UI::Alert::Component.new(
+        text: translation(".doesnt_look_like_serial"),
+        kind: :warning,
+        margin_classes: "tw:my-2",
+      ),
+    ) %>
+  <% end %>
+
+  <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
+  <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>
+  <%= hidden_field_tag :search_address, @interpreted_params[:search_address] %>
+  <%= hidden_field_tag :search_secondary, @interpreted_params[:search_secondary] %>
+  <%= hidden_field_tag :search_model_audit_id, @interpreted_params[:search_model_audit_id] %>
+<% end %>
