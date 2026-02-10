@@ -123,9 +123,9 @@ module UI::Chart
       end_html = if time_range.last > Time.current - 5.minutes
         "<em>now</em>"
       else
-        "<em class=\"convertTime #{precision_class}\">#{I18n.l(time_range.last, format: :convert_time)}</em>"
+        "<em class=\"localizeTime #{precision_class}\">#{I18n.l(time_range.last, format: :convert_time)}</em>"
       end
-      "<span>from <em class=\"convertTime #{precision_class}\">#{I18n.l(time_range.first, format: :convert_time)}</em> to #{end_html}</span>"
+      "<span>from <em class=\"localizeTime #{precision_class}\">#{I18n.l(time_range.first, format: :convert_time)}</em> to #{end_html}</span>"
     end
 
     def period_in_words(seconds)

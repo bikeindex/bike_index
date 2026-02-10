@@ -164,9 +164,9 @@ RSpec.describe UI::Chart::Component, type: :component do
         let(:start_time) { end_time - 45.minutes }
         let(:target_html) do
           [
-            'from <em class="convertTime preciseTimeSeconds">',
+            'from <em class="localizeTime preciseTimeSeconds">',
             start_time.strftime("%FT%T%z"),
-            '</em> to <em class="convertTime preciseTimeSeconds">',
+            '</em> to <em class="localizeTime preciseTimeSeconds">',
             end_time.strftime("%FT%T%z") + "</em>"
           ]
         end
@@ -179,9 +179,9 @@ RSpec.describe UI::Chart::Component, type: :component do
         let(:start_time) { end_time - 2.hours }
         let(:target_html) do
           [
-            'from <em class="convertTime preciseTime">',
+            'from <em class="localizeTime preciseTime">',
             start_time.strftime("%FT%T%z"),
-            '</em> to <em class="convertTime preciseTime">',
+            '</em> to <em class="localizeTime preciseTime">',
             end_time.strftime("%FT%T%z") + "</em>"
           ]
         end
@@ -201,9 +201,9 @@ RSpec.describe UI::Chart::Component, type: :component do
         let(:start_time) { end_time - 7.days }
         let(:target_html) do
           [
-            'from <em class="convertTime ">',
+            'from <em class="localizeTime ">',
             start_time.strftime("%FT%T%z"),
-            '</em> to <em class="convertTime ">',
+            '</em> to <em class="localizeTime ">',
             end_time.strftime("%FT%T%z") + "</em>"
           ]
         end
