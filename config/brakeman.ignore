@@ -206,6 +206,29 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "1e07787ed330d3777f0a027118097e8d3fa94e52feb14451302a27a574cb2858",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/strava_request.rb",
+      "line": 41,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"ARRAY_POSITION(ARRAY#{[2, 4, 3, 0, 1]}, request_type), id\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StravaRequest",
+        "method": null
+      },
+      "user_input": "[2, 4, 3, 0, 1]",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
       "fingerprint": "256abbf7d9c0f9ab5f2d308097945c944bccc3c428f6e769bff43d767a43d057",
@@ -1970,5 +1993,5 @@
       "note": ""
     }
   ],
-  "brakeman_version": "8.0.1"
+  "brakeman_version": "8.0.2"
 }

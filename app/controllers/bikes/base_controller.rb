@@ -98,6 +98,35 @@ class Bikes::BaseController < ApplicationController
     end
   end
 
+  def assign_strava_gear
+    strava_integration = current_user&.strava_integration
+    unless strava_integration&.show_gear_link?
+      flash[:error] = "No synced Strava integration found."
+      return
+    end
+
+    strava_gear_id = params[:strava_gear_id]
+    if strava_gear_id.blank?
+      @bike.strava_gear&.update(item: nil)
+      flash[:success] = "Strava gear disconnected."
+      return
+    end
+
+    strava_gear = strava_integration.strava_gears.find_by(strava_gear_id:)
+    unless strava_gear
+      flash[:error] = "Strava gear not found."
+      return
+    end
+
+    @bike.strava_gear&.update(item: nil)
+    strava_gear.item = @bike
+    if strava_gear.save
+      flash[:success] = "Bike connected to Strava gear: #{strava_gear.strava_gear_display_name}"
+    else
+      flash[:error] = strava_gear.errors.full_messages.join(", ")
+    end
+  end
+
   def assign_bike_stickers(bike_sticker)
     bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker)
     unless bike_sticker.present?

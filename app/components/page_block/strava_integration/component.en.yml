@@ -1,0 +1,24 @@
+---
+en:
+  components:
+    page_block:
+      strava_integration:
+        connect_with_strava: Connect with Strava
+        connected_to_strava: Connected to Strava
+        disconnect_confirm: >-
+          Are you sure you want to disconnect Strava? This will remove all synced
+          activities.
+        disconnect_strava: Disconnect Strava
+        downloaded: downloaded
+        integrate_your_bikes_with_strava: Integrate your bikes with Strava and sync
+          your riding activities.
+        strava_bikes_connected: Strava bikes connected to Bike Index bikes
+        strava_connected_pending: Connected to Strava. Sync will begin shortly.
+        strava_integration: Strava Integration
+        sync_error: Sync error
+        sync_error_description: >-
+          There was an error syncing your Strava activities. Please try disconnecting
+          and reconnecting.
+        sync_running_in_background: Sync is running in the background. This page will
+          update automatically.
+        syncing_activities: Syncing activities...

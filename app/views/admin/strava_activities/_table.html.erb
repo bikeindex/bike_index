@@ -1,0 +1,112 @@
+<%# locals: (collection:, render_sortable: false, searched_activity_type: nil) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th class="small">
+        <%= sortable "updated_at", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "start_date", render_sortable: render_sortable %></th>
+
+      <th>Title</th>
+
+      <th>
+        <%= sortable "activity_type", "Type", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "distance_meters", "Distance", render_sortable: render_sortable %>
+      </th>
+
+      <th>Gear</th>
+
+      <th>User</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |strava_activity| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <span class="localizeTime">
+                <%= l strava_activity.created_at, format: :convert_time %>
+              </span>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= strava_activity.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td>
+            <small class="localizeTime">
+              <%= l strava_activity.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td>
+            <% if strava_activity.start_date.present? %>
+              <span class="localizeTime">
+                <%= l strava_activity.start_date, format: :convert_time %>
+              </span>
+            <% end %>
+          </td>
+
+          <td>
+            <% if strava_activity.enriched? %>
+              <%= render UI::Badge::Component.new(text: "E", title: "Enriched", color: :cyan, size: :sm) %>
+            <% end %>
+
+            <span class="tw:mr-1"><%= strava_activity.title %></span>
+
+            <%= link_to link_emoji, "https://www.strava.com/activities/#{strava_activity.strava_id}", title: "View on Strava" %>
+
+            <% if strava_activity.description.present? %>
+              <span
+                class="small less-strong tw:block"
+                title="<%= strava_activity.description %>"
+              >
+                <%= strava_activity.description&.truncate(120) %>
+              </span>
+            <% end %>
+          </td>
+
+          <td>
+            <% if strava_activity.cycling? %>
+              <span class="text-success">
+                <%= strava_activity.activity_type %>
+              </span>
+            <% else %>
+              <small><%= strava_activity.activity_type %></small>
+            <% end %>
+
+            <% unless searched_activity_type.present? %>
+              <%= link_to search_emoji, url_for(sortable_search_params.merge(search_activity_type: strava_activity.activity_type)), class: "display-sortable-link small" %>
+            <% end %>
+          </td>
+
+          <td><%= number_display(strava_activity.distance_miles.round) %></td>
+
+          <td>
+            <% if strava_activity.gear_id.present? %>
+              <small><%= strava_activity.calculated_gear_name %></small>
+              <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_gear_id == strava_activity.gear_id } %>
+              <% if gear_assoc&.item.present? %>
+                <%= link_to "BI", bike_path(gear_assoc.item), class: "small text-success", title: gear_assoc.item.title_string %>
+              <% end %>
+            <% end %>
+          </td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id)) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

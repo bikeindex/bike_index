@@ -2123,6 +2123,8 @@ nl:
         remove_or_transfer: Overdragen, verbergen of verwijderen
         marketplace_list: Lijst te koop
         marketplace_on_sale: Marktplaatsvermelding bijwerken
+        strava_gear: Strava-uitrusting
+        versions_and_strava: Versies en Strava
       create:
         bike_was_added: Bike met succes toegevoegd aan de index!
         bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
@@ -5886,6 +5888,14 @@ nl:
       draft: Voorlopige versie
       for_sale: Te koop
       publicly_listed: "(openbaar genoteerd)"
+    strava_gear:
+      connect_bike_to_strava_gear: Koppel deze fiets aan een van je Strava-fietsen
+        om bij te houden op welke fiets je rijdt.
+      none_selected: "-- Geen --"
+      strava_bike: Strava-fiets
+      strava_gear: Strava-uitrusting
+      sync_not_finished: De synchronisatie met Strava is nog niet voltooid, dus mogelijk
+        worden niet alle fietsen weergegeven.
   bike_versions:
     index:
       primary_colors: Primaire kleuren
@@ -6083,6 +6093,28 @@ nl:
         sold_for: Verkoopbedrag voor
         transfer_to_html: Hierdoor wordt de registratie overgedragen naar %{buyer_html}
           en de vermelding op de marktplaats gesloten.
+      strava_integration:
+        activities_synced:
+          one: "%{count} activiteit gesynchroniseerd"
+          other: "%{count} activiteiten gesynchroniseerd"
+        connect_with_strava: Maak verbinding met Strava
+        connected_to_strava: Gekoppeld aan Strava
+        disconnect_confirm: Weet je zeker dat je de Strava-verbinding wilt verbreken?
+          Hierdoor worden alle gesynchroniseerde activiteiten verwijderd.
+        disconnect_strava: Ontkoppel van Strava
+        downloaded: gedownload
+        integrate_your_bikes_with_strava: Koppel je fietsen aan Strava en synchroniseer
+          je fietsactiviteiten.
+        strava_bikes_connected: Strava-fietsen gekoppeld aan Bike Index-fietsen
+        strava_connected_pending: Verbonden met Strava. De synchronisatie start binnenkort.
+        strava_integration: Strava-integratie
+        sync_error: Synchronisatiefout
+        sync_error_description: Er is een fout opgetreden bij het synchroniseren van
+          je Strava-activiteiten. Probeer de verbinding te verbreken en opnieuw verbinding
+          te maken.
+        sync_running_in_background: De synchronisatie is op de achtergrond bezig.
+          Deze pagina wordt automatisch bijgewerkt.
+        syncing_activities: Activiteiten synchroniseren...
     emails:
       partials:
         bike_box:
