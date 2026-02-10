@@ -208,25 +208,48 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "1e07787ed330d3777f0a027118097e8d3fa94e52feb14451302a27a574cb2858",
+      "fingerprint": "60c3c168d66540de4cdf77d8af1ca9d7957215e4362fb9c6f2263112cbe3c0a7",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/strava_request.rb",
       "line": 41,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"ARRAY_POSITION(ARRAY#{[2, 4, 3, 0, 1]}, request_type), id\")",
+      "code": "Arel.sql(\"ARRAY_POSITION(ARRAY#{[5, 2, 4, 3, 0, 1]}, request_type), id\")",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "StravaRequest",
         "method": null
       },
-      "user_input": "[2, 4, 3, 0, 1]",
+      "user_input": "[5, 2, 4, 3, 0, 1]",
       "confidence": "Medium",
       "cwe_id": [
         89
       ],
       "note": ""
+    },
+    {
+      "warning_type": "HTTP Verb Confusion",
+      "warning_code": 118,
+      "fingerprint": "992e5025f5eb88bbef9ff329f74cdfe005323559a9144475e76f98dea6c02fb8",
+      "check_name": "VerbConfusion",
+      "message": "Potential HTTP verb confusion. `HEAD` is routed like `GET` but `request.get?` will return `false`",
+      "file": "app/controllers/webhooks_controller.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/http_verb_confusion/",
+      "code": "request.get? ? (strava_verify_subscription) : (strava_receive_event)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "WebhooksController",
+        "method": "strava"
+      },
+      "user_input": "request.get?",
+      "confidence": "Weak",
+      "cwe_id": [
+        352
+      ],
+      "note": "HEAD requests falling through to strava_receive_event is harmless - it will just return 200 OK"
     },
     {
       "warning_type": "Cross-Site Scripting",
