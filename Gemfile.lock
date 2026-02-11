@@ -107,7 +107,7 @@ GEM
       uri (>= 0.13.1)
     addressable (2.8.8)
       public_suffix (>= 2.0.2, < 8.0)
-    annotaterb (4.20.0)
+    annotaterb (4.21.0)
       activerecord (>= 6.0.0)
       activesupport (>= 6.0.0)
     api-pagination (7.0.0)

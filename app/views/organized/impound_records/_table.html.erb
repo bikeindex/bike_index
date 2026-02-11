@@ -1,0 +1,157 @@
+<% impound_records ||= @impound_records %>
+<% skip_bike ||= false %>
+<% render_sortable ||= false %>
+<% render_resolved_at ||= false %>
+<% skip_status ||= false %>
+<% skip_location ||= !current_organization.enabled?("impound_bikes_locations") %>
+<% skip_multiselect ||= false %>
+
+<table
+  class="table table-striped table-bordered table-sm without-exterior-border"
+  id="recordsTable"
+>
+  <thead class="small-header hidden-md-down">
+    <th>
+      <% if render_sortable %>
+        <%= sortable "display_id_integer", "ID" %>
+      <% else %>
+        ID
+      <% end %>
+    </th>
+
+    <th>
+      <% if render_sortable %>
+        <%= sortable "created_at" %>
+      <% else %>
+        Created
+      <% end %>
+    </th>
+
+    <th>
+      <% if render_sortable %>
+        <%= sortable "updated_at" %>
+      <% else %>
+        Updated
+      <% end %>
+    </th>
+
+    <% unless skip_location %>
+      <th>
+        <% if render_sortable %>
+          <%= sortable "location_id" %>
+        <% else %>
+          Location
+        <% end %>
+      </th>
+    <% end %>
+
+    <% unless skip_bike %>
+      <th>Bike</th>
+    <% end %>
+
+    <% unless skip_status %>
+      <th>Status</th>
+    <% end %>
+
+    <th>
+      <% if render_sortable %>
+        <%= sortable "user_id", "last updator" %>
+      <% else %>
+        last updator
+      <% end %>
+    </th>
+
+    <% if render_resolved_at %>
+      <th>
+        <% if render_sortable %>
+          <%= sortable "resolved_at" %>
+        <% else %>
+          Resolved
+        <% end %>
+      </th>
+    <% end %>
+
+    <th>
+      Impounded from
+    </th>
+
+    <% unless skip_multiselect %>
+      <th class="multiselect-cell table-cell-check collapse">
+        <a id="selectAllSelector" href="#"><%= check_mark %></a>
+      </th>
+    <% end %>
+  </thead>
+
+  <tbody>
+    <% impound_records.each do |impound_record| %>
+      <tr>
+        <td><%= impound_record.display_id %></td>
+
+        <td>
+          <a
+            class="convertTime preciseTime"
+            href="<%= organization_impound_record_path(impound_record.display_id, organization_id: impound_record.organization_id) %>"
+          >
+            <%= l(impound_record.created_at, format: :convert_time) %>
+          </a>
+        </td>
+
+        <td>
+          <span class="convertTime preciseTime">
+            <%= l(impound_record.updated_at, format: :convert_time) %>
+          </span>
+        </td>
+
+        <% unless skip_location %>
+          <td><small><%= impound_record.location&.name %></small></td>
+        <% end %>
+
+        <% unless skip_bike %>
+          <td>
+            <% if impound_record.bike.present? %>
+              <%= link_to organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id) %>
+              <%# Only show the serial if there is a serial. Because PSU asked for this %>
+              <% if !impound_record.bike.no_serial? %>
+                <small>
+                  <%= render_serial_display(impound_record.bike, current_user) %>
+                </small>
+              <% end %>
+            <% end %>
+          </td>
+        <% end %>
+
+        <% unless skip_status %>
+          <td>
+            <em>
+              <%= status_display(impound_record.status_humanized_short) %>
+            </em>
+          </td>
+        <% end %>
+
+        <td><%= impound_record.user&.display_name&.truncate(20) %></td>
+
+        <% if render_resolved_at %>
+          <td>
+            <% if impound_record.resolved_at.present? %>
+              <span class="convertTime preciseTime">
+                <%= l(impound_record.resolved_at, format: :convert_time) %>
+              </span>
+            <% end %>
+          </td>
+        <% end %>
+
+        <td>
+          <small>
+            <%= render(UI::AddressDisplay::Component.new(address_record: impound_record.impounded_from_address_record, visible_attribute: :street, kind: :single_line)) %>
+          </small>
+        </td>
+
+        <% unless skip_multiselect %>
+          <td class="multiselect-cell table-cell-check collapse <%= impound_record.update_multi_kinds.map { |k| "canupdate-#{k}" }.join(" ") %>">
+            <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id %>
+          </td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

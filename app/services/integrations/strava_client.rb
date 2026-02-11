@@ -58,6 +58,25 @@ class Integrations::StravaClient
       get(strava_integration, "gear/#{strava_gear_id}")
     end
 
+    def create_webhook_subscription(callback_url, verify_token)
+      oauth_connection.post("api/v3/push_subscriptions") do |req|
+        req.body = {client_id: STRAVA_KEY, client_secret: STRAVA_SECRET,
+                    callback_url:, verify_token:}
+      end
+    end
+
+    def view_webhook_subscriptions
+      oauth_connection.get("api/v3/push_subscriptions") do |req|
+        req.params = {client_id: STRAVA_KEY, client_secret: STRAVA_SECRET}
+      end
+    end
+
+    def delete_webhook_subscription(subscription_id)
+      oauth_connection.delete("api/v3/push_subscriptions/#{subscription_id}") do |req|
+        req.body = {client_id: STRAVA_KEY, client_secret: STRAVA_SECRET}
+      end
+    end
+
     def ensure_valid_token!(strava_integration)
       return if strava_integration.token_expires_at.present? && strava_integration.token_expires_at > Time.current
 

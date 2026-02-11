@@ -1618,6 +1618,11 @@ en:
           serial: 'Serial:'
           stolen_at: 'Stolen at:'
           stolen_from: 'Stolen from:'
+    org:
+      impound_records_index:
+        matching_impound_record:
+          one: matching impound record
+          other: matching impound records
     page_block:
       strava_integration:
         activities_synced:
@@ -4676,6 +4681,10 @@ en:
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers
         view_avery_labels: View Avery Labels
+    impound_records:
+      index:
+        impound_records: Impound Records
+        render_chart: Render chart
     manage_impoundings:
       edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings

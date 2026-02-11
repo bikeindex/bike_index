@@ -4612,6 +4612,10 @@ nl:
       edit:
         impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
         save: Opslaan
+    impound_records:
+      index:
+        impound_records: Inbeslagnamegegevens
+        render_chart: Rendergrafiek
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -6214,3 +6218,21 @@ nl:
         region: Regio / Provincie
         state: Staat
         street: Straat
+      impound_records_index:
+        matching_impound_record:
+          one: overeenkomend inbeslagname record
+          other: overeenkomende inbeslagnamegegevens
+        all_bikes: Alle fietsen
+        all_statuses: Alle statussen
+        for_table_rows_with_checks: Voor tabelrijen met controles
+        impound_records: Inbeslagnamegegevens
+        internal_note: Interne notitie
+        interpreted_params: Geïnterpreteerde_parameters
+        new_owner_email: E-mailadres van de nieuwe eigenaar
+        only_unregistered: Alleen niet-geregistreerde
+        only_user_registered: Alleen geregistreerde gebruikers
+        pagy: Pagy
+        per_page: Per pagina
+        status_records: "%{status} records"
+        update_impound_record: Update het inbeslagnameregister
+        update_multiple_records: Meerdere records bijwerken
