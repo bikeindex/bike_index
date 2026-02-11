@@ -35,7 +35,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         12.times.map do
           StravaRequest.create!(user_id: strava_integration.user_id,
             strava_integration_id: strava_integration.id, request_type: :fetch_activity,
-            parameters: {strava_id: "123", strava_activity_id: 1})
+            parameters: {strava_id: "123"})
         end
         instance.perform
         expect(described_class.jobs.size).to eq(described_class::BATCH_SIZE)
@@ -44,7 +44,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       it "enqueues in priority order: list_activities, fetch_gear, fetch_activity" do
         fetch_activity = StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id, request_type: :fetch_activity,
-          parameters: {strava_id: "123", strava_activity_id: 1})
+          parameters: {strava_id: "123"})
         list_activities = StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id, request_type: :list_activities,
           parameters: {page: 1})
@@ -114,7 +114,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,
           request_type: :fetch_activity,
-          parameters: {strava_id: activity.strava_id, strava_activity_id: activity.id})
+          parameters: {strava_id: activity.strava_id})
       end
 
       it "updates activity details and finishes sync when last" do

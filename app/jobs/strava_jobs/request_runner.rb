@@ -29,7 +29,9 @@ module StravaJobs
       end
 
       def handle_response(strava_request, strava_integration, response)
-        if strava_request.list_activities?
+        if strava_request.incoming_webhook?
+          handle_incoming_webhook(strava_request, strava_integration, response)
+        elsif strava_request.list_activities?
           response.each { |summary| StravaActivity.create_or_update_from_summary(strava_integration, summary) }
           if strava_request.parameters["page"] == 1
             strava_integration.update(last_updated_activities_at: Time.current)
@@ -39,12 +41,10 @@ module StravaJobs
               request_type: :list_activities, parameters: {page: strava_request.parameters["page"] + 1})
           end
         elsif strava_request.fetch_activity?
-          strava_activity = strava_integration.strava_activities.find_by(id: strava_request.parameters["strava_activity_id"])
+          strava_activity = strava_integration.strava_activities.find_by(strava_id: strava_request.parameters["strava_id"])
           strava_activity&.update_from_detail(response)
         elsif strava_request.fetch_gear?
           StravaGear.update_from_strava(strava_integration, response)
-        elsif strava_request.incoming_webhook?
-          handle_incoming_webhook(strava_request, strava_integration, response)
         end
         strava_integration.update_sync_status
       end
@@ -76,14 +76,10 @@ module StravaJobs
       end
 
       response = self.class.execute(strava_integration, strava_request.request_type, strava_request.parameters)
-      if response.nil?
-        strava_request.update!(requested_at: Time.current, response_status: :success)
-        self.class.handle_response(strava_request, strava_integration, nil)
-      else
-        strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
-        return unless response.success?
-        self.class.handle_response(strava_request, strava_integration, response.body)
-      end
+      strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
+      return unless strava_request.success?
+
+      self.class.handle_response(strava_request, strava_integration, response&.body)
     end
 
     private

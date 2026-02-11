@@ -47,6 +47,8 @@ class StravaRequest < AnalyticsRecord
     end
 
     def parse_rate_limit(headers)
+      return if headers.blank?
+
       limit = headers["X-RateLimit-Limit"]
       usage = headers["X-RateLimit-Usage"]
       read_limit = headers["X-ReadRateLimit-Limit"]
@@ -114,7 +116,23 @@ class StravaRequest < AnalyticsRecord
   end
 
   def update_from_response(response, re_enqueue_if_rate_limited: false)
-    status = if response.success?
+    update!(requested_at: Time.current,
+      response_status: status_from_response(response),
+      rate_limit: self.class.parse_rate_limit(response&.headers))
+
+    if re_enqueue_if_rate_limited && rate_limited?
+      StravaRequest.create!(user_id:, strava_integration_id:, request_type:, parameters:)
+    elsif error?
+      raise "Strava API error #{response.status}: #{response.body}"
+    end
+  end
+
+  private
+
+  def status_from_response(response)
+    return :success if response.blank? && incoming_webhook? # Not all incoming webhooks make requests
+
+    if response.success?
       :success
     elsif response.status == 429
       :rate_limited
@@ -122,14 +140,6 @@ class StravaRequest < AnalyticsRecord
       :token_refresh_failed
     else
       :error
-    end
-    update!(requested_at: Time.current, response_status: status,
-      rate_limit: self.class.parse_rate_limit(response.headers))
-
-    if re_enqueue_if_rate_limited && rate_limited?
-      StravaRequest.create!(user_id:, strava_integration_id:, request_type:, parameters:)
-    elsif error?
-      raise "Strava API error #{response.status}: #{response.body}"
     end
   end
 end
