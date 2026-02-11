@@ -2,6 +2,7 @@
 
 class WebhooksController < ApplicationController
   STRIPE_WEBHOOK_SECRET = ENV["STRIPE_WEBHOOK_SECRET"].freeze
+  STRAVA_WEBHOOK_VERIFY_TOKEN = Integrations::StravaClient::STRAVA_WEBHOOK_TOKEN
 
   skip_before_action :verify_authenticity_token
 
