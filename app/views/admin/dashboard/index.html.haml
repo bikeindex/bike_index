@@ -14,13 +14,9 @@
 
 = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
-:ruby
-  today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count
-  yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
-  bikes = [
-    { name: 'Registrations', data: Bike.unscoped.current.not_stolen.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: group_by_format(@time_range)).count },
-    { name: 'Stolen', data: Bike.unscoped.current.status_stolen.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: group_by_format(@time_range)).count }
-  ]
+- today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count
+- yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
+- bikes = [{name: "Registrations", data: UI::Chart::Component.time_range_counts(collection: Bike.unscoped.current.not_stolen.where(created_at: @time_range), time_range: @time_range, column: "bikes.created_at")}, {name: "Stolen", data: UI::Chart::Component.time_range_counts(collection: Bike.unscoped.current.status_stolen.where(created_at: @time_range), time_range: @time_range, column: "bikes.created_at")}]
 
 .row.justify-content-end
   .col-auto
@@ -30,7 +26,7 @@
       %em
         (#{number_with_delimiter(yesterday)} yesterday, #{number_with_delimiter(today)} today)
 
-= column_chart bikes, stacked: true, thousands: ","
+= render(UI::Chart::Component.new(series: bikes, time_range: @time_range, stacked: true))
 
 %hr
 
