@@ -26,7 +26,7 @@ module Sessionable
     set_passive_organization(user.default_organization) # Set that organization!
     user.update_last_login(forwarded_ip_address)
     if Binxtils::InputNormalizer.boolean(params.dig(:session, :remember_me))
-      cookies.permanent.signed[AUTH_COOKIE_KEY] = cookie_options(user)
+      cookies.permanent.signed[ControllerHelpers::AUTH_COOKIE_KEY] = cookie_options(user)
     else
       default_session_set(user)
     end
@@ -44,7 +44,7 @@ module Sessionable
   end
 
   def default_session_set(user)
-    cookies.signed[AUTH_COOKIE_KEY] = cookie_options(user)
+    cookies.signed[ControllerHelpers::AUTH_COOKIE_KEY] = cookie_options(user)
   end
 
   def authenticate_user_for_my_accounts_controller
