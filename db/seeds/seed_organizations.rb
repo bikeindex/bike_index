@@ -1,6 +1,6 @@
-# A sample organization to seed
-hogwarts = Organization.find_by_name("Hogwarts") || Organization.create!(name: "Hogwarts")
-invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: Time.current - 1.hour)
+# Seed organizations: Hogwarts, Ike's Bikes, and Cannondale
+
+# --- Organization Features ---
 # This list was created with:
 #   OrganizationFeature.has_feature_slugs.map { |of| of.slice(:name, :feature_slugs) }
 feature_name_and_slugs = [
@@ -47,13 +47,37 @@ feature_name_and_slugs = [
   {name: "Registration field: Address - REQUIRED", feature_slugs: ["reg_address", "require_reg_address"]},
   {name: "Registration field: True/False question", feature_slugs: []}
 ]
+
 feature_ids = []
+official_manufacturer_feature_id = nil
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||
     OrganizationFeature.create(attrs.merge(amount_cents: 500_00))
   feature_ids << org_feature.id
+  official_manufacturer_feature_id = org_feature.id if attrs[:name] == "Official manufacturer organization"
 end
 
-# Give Hogwarts all the features
-invoice.update(organization_feature_ids: feature_ids)
+# --- Hogwarts: all features except official_manufacturer, with is_endless invoice ---
+hogwarts = Organization.find_by_name("Hogwarts") || Organization.create!(name: "Hogwarts")
+hogwarts_invoice = Invoice.create(organization: hogwarts, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
+hogwarts_feature_ids = feature_ids - [official_manufacturer_feature_id]
+hogwarts_invoice.update(organization_feature_ids: hogwarts_feature_ids)
+
+# --- Ike's Bikes ---
+ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
+ikes.save
+OrganizationRole.create(organization_id: ikes.id, user_id: User.find_by_email("member@bikeindex.org").id, role: "admin")
+
+# --- Cannondale ---
+cannondale = Organization.find_by_name("Cannondale") || Organization.create!(name: "Cannondale", manufacturer_id: Manufacturer.find_by_name("Cannondale")&.id)
+cannondale_invoice = Invoice.create(organization: cannondale, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
+cannondale_invoice.update(organization_feature_ids: [official_manufacturer_feature_id].compact)
+
+# Create cannondale user and make admin
+cannondale_user = User.create(name: "Cannondale Admin", email: "cannondale@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true)
+cannondale_user.confirm(cannondale_user.confirmation_token)
+cannondale_user.save
+OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user.id, role: "admin")
+
+puts "Organizations seeded: Hogwarts, Ikes Bike's, Cannondale\n"

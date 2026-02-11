@@ -1,7 +1,7 @@
 # Seed parking notifications around San Francisco for the Hogwarts organization
 hogwarts = Organization.find_by_name("Hogwarts")
-member = User.find_by_email("member@example.com")
-user = User.find_by_email("user@example.com")
+member = User.find_by_email("member@bikeindex.org")
+user = User.find_by_email("user@bikeindex.org")
 
 if hogwarts.blank? || member.blank? || user.blank? || Manufacturer.none?
   puts "Skipping parking notification seeds (missing Hogwarts org, test users, or manufacturers)"
