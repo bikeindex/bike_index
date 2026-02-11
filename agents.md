@@ -50,7 +50,7 @@ This project also uses the ViewComponent gem to render components.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`
 - View components must initialize with keyword arguments
 - In view components, prefer instance variables to attr_accessor
-- In ViewComponent templates, use `helpers.` prefix for view helpers (e.g. `helpers.column_chart`, `helpers.time_ago_in_words`)
+- In ViewComponent templates, use `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`)
 
 ## Architecture notes
 

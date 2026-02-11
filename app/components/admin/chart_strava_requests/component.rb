@@ -7,6 +7,15 @@ module Admin::ChartStravaRequests
       @time_range = time_range
     end
 
+    def call
+      safe_join([
+        tag.h4("By response status", class: "mt-4"),
+        render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true)),
+        tag.h4("By request type", class: "mt-4"),
+        render(UI::Chart::Component.new(series: type_series, time_range: @time_range, stacked: true))
+      ])
+    end
+
     private
 
     def status_series
