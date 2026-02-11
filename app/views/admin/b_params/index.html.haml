@@ -18,10 +18,11 @@
 
 - if @render_chart
   - if @search_completeness == "all"
-    - b_params_data = [{name: "incomplete", data: time_range_counts(collection: matching_b_params.without_bike)},{name: "completed", data: time_range_counts(collection: matching_b_params.with_bike)}]
-    = column_chart b_params_data, stacked: true, thousands: ",", colors: ["#ffc281", "#178813"]
+    - b_params_data = [{name: "incomplete", data: UI::Chart::Component.time_range_counts(collection: matching_b_params.without_bike, time_range: @time_range)},{name: "completed", data: UI::Chart::Component.time_range_counts(collection: matching_b_params.with_bike, time_range: @time_range)}]
+    = render(UI::Chart::Component.new(series: b_params_data, time_range: @time_range, stacked: true, colors: ["#ffc281", "#178813"]))
   - else
-    = column_chart time_range_counts(collection: matching_b_params), stacked: true, thousands: ","
+    - b_params_data = UI::Chart::Component.time_range_counts(collection: matching_b_params, time_range: @time_range)
+    = render(UI::Chart::Component.new(series: b_params_data, time_range: @time_range, stacked: true))
 
 .mt-4
   = render partial: "/shared/period_select"
