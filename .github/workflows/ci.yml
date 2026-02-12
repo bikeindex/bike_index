@@ -105,7 +105,7 @@ jobs:
           bundler-cache: true
       - run: bundle install
       - name: Set up database
-        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
+        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
       - name: Sync translations (only on main by default)
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
       # Install JS dependencies
