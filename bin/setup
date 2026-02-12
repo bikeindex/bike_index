@@ -53,13 +53,15 @@ chdir APP_ROOT do
   # Install JavaScript dependencies
   system('npm install')
 
-  puts "\n== Preparing and seeding database =="
+  puts "\n== Preparing database =="
 
   # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
-  system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed"
+  system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
   system "bin/rake import_manufacturers_csv"
   system "bin/rake import_primary_activities_csv"
-  system "bin/rake seed_test_users_and_bikes"
+
+  puts "\n== Seeding database =="
+  system "bin/rake db:seed"
 
   puts "\n== Preparing test database (including parallelism) =="
   system "bin/rake parallel:prepare"
@@ -67,8 +69,7 @@ chdir APP_ROOT do
   puts "\n== Removing old logs and tempfiles =="
   system! "bin/rails log:clear tmp:clear"
 
-  puts "\n Running update to migrate and prepare typeahead"
-  system "bin/rake dev:seed_counts"
+  puts "\n Running update to prepare typeahead"
   system "bin/rake reset_autocomplete"
 
   puts "\n== Restarting application server =="
