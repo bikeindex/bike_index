@@ -80,4 +80,7 @@ cannondale_user.confirm(cannondale_user.confirmation_token)
 cannondale_user.save
 OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user.id, role: "admin")
 
+# Make sure example organization exists
+Organization.example
+
 puts "Organizations seeded: Hogwarts, Ikes Bike's, Cannondale\n"
