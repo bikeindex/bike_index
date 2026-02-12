@@ -4,11 +4,11 @@
 
   modal_body = capture do %>
   <div class="modal-body">
-    <p><%= t(".greeting", user_name: current_user&.display_name) %></p>
-    <p><%= t(".thank_you") %></p>
-    <p><%= t(".law_enforcement_features") %></p>
+    <p class="tw:mb-2!"><%= t(".greeting", user_name: current_user&.display_name) %></p>
+    <p class="tw:mb-2!"><%= t(".thank_you") %></p>
+    <p class="tw:mb-2!"><%= t(".law_enforcement_features") %></p>
 
-    <ul>
+    <ul class="tw:list-disc tw:ml-4">
       <li>
         <%= link_to t(".contact_bike_owners"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen", target: "_blank" %>
       </li>
