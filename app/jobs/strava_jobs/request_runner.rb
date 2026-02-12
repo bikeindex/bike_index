@@ -69,6 +69,7 @@ module StravaJobs
 
       strava_request = StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || strava_request&.requested_at.present?
+      return strava_request.update(response_status: "skipped") if strava_request.skip_request?
 
       strava_integration = StravaIntegration.find_by(id: strava_request.strava_integration_id)
       unless strava_integration

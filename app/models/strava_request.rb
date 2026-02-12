@@ -22,8 +22,23 @@
 #  index_strava_requests_on_user_id                                 (user_id)
 #
 class StravaRequest < AnalyticsRecord
-  REQUEST_TYPE_ENUM = {fetch_athlete: 0, fetch_athlete_stats: 1, list_activities: 2, fetch_activity: 3, fetch_gear: 4, incoming_webhook: 5}.freeze
-  RESPONSE_STATUS_ENUM = {pending: 0, success: 1, error: 2, rate_limited: 3, token_refresh_failed: 4, integration_deleted: 5}.freeze
+  REQUEST_TYPE_ENUM = {
+    fetch_athlete: 0,
+    fetch_athlete_stats: 1,
+    list_activities: 2,
+    fetch_activity: 3,
+    fetch_gear: 4,
+    incoming_webhook: 5
+  }.freeze
+  RESPONSE_STATUS_ENUM = {
+    pending: 0,
+    success: 1,
+    error: 2,
+    rate_limited: 3,
+    token_refresh_failed: 4,
+    integration_deleted: 5,
+    skipped: 6,
+  }.freeze
 
   belongs_to :user
   belongs_to :strava_integration
@@ -103,6 +118,10 @@ class StravaRequest < AnalyticsRecord
     def limit_for_rate(limit, was_reset)
       was_reset ? 0 : limit
     end
+  end
+
+  def skip_request?
+    false # TODO: Make this skip if it's already been requested - specifically, a proxy
   end
 
   def looks_like_last_page?(per_page: nil)
