@@ -10,7 +10,7 @@ RSpec.describe "bin/setup" do
     output = nil
     status = nil
     Dir.chdir(Rails.root) do
-      output, status = Open3.capture2e("bin/setup")
+      output, status = Open3.capture2e({"RAILS_ENV" => "test"}, "bin/setup")
     end
     expect(status).to be_success, "bin/setup failed with:\n#{output}"
   ensure
