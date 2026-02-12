@@ -106,6 +106,9 @@ jobs:
       - run: bundle install
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
+      - name: Test bin/setup # Test bin/setup - only run on 1 node, knapsack should balance
+        if: matrix.ci_node_index == 0
+        run: bin/setup
       - name: Sync translations (only on main by default)
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
       # Install JS dependencies
