@@ -2,13 +2,18 @@
 
 module Admin::ChartStravaRequests
   class Component < ApplicationComponent
-    include GraphingHelper
-
-    COLORS = %w[#0E8A16 #1D76DB #FBCA04 #D93F0B #5319E7 #B60205 #006B75].freeze
-
     def initialize(collection:, time_range:)
       @collection = collection
       @time_range = time_range
+    end
+
+    def call
+      safe_join([
+        tag.h4("By response status", class: "mt-4"),
+        render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true)),
+        tag.h4("By request type", class: "mt-4"),
+        render(UI::Chart::Component.new(series: type_series, time_range: @time_range, stacked: true))
+      ])
     end
 
     private
@@ -21,19 +26,11 @@ module Admin::ChartStravaRequests
       @type_series ||= build_series(StravaRequest::REQUEST_TYPE_ENUM, :request_type)
     end
 
-    def status_colors
-      status_series.map { |s| s[:color] }
-    end
-
-    def type_colors
-      type_series.map { |s| s[:color] }
-    end
-
     def build_series(enum, column)
-      enum.filter_map.with_index do |(key, _), i|
+      enum.filter_map do |key, _|
         scoped = @collection.where(column => key)
         next if scoped.limit(1).blank?
-        {name: key.to_s.humanize, data: time_range_counts(collection: scoped), color: COLORS[i]}
+        {name: key.to_s.humanize, data: UI::Chart::Component.time_range_counts(collection: scoped, time_range: @time_range)}
       end
     end
   end

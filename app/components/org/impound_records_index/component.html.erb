@@ -1,0 +1,146 @@
+<div class="mt-4">
+  <%= render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_impound_records_path(organization_id: @current_organization.to_param)} %>
+</div>
+
+<div class="row mt-4 mb-4">
+  <div class="col-sm-9">
+    <%= number_with_delimiter(@pagy.count) %>
+    <%= translation(".matching_impound_record", count: @pagy.count) %>
+
+    <em><%= helpers.humanized_time_range(@time_range) %></em>
+
+    <div class="dropdown d-inline-block ml-2">
+      <a
+        class="dropdown-toggle btn btn-outline-primary <%= 'active' unless @search_status == 'current' %>"
+        href="#"
+        role="button"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <%= status_dropdown_text %>
+      </a>
+
+      <div class="dropdown-menu">
+        <% @available_statuses.each do |status| %>
+          <% status_active = @search_status == status %>
+          <% status_link_params = sortable_search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
+
+          <%= link_to display_status_for(status), organization_impound_records_path(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}" %>
+
+          <% if status == "all" %>
+            <%# Add a divider before all %>
+            <div class="dropdown-divider"></div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="dropdown d-inline-block ml-2">
+      <a
+        class="dropdown-toggle btn btn-sm btn-outline-secondary <%= 'active' unless @search_unregisteredness == 'all' %>"
+        href="#"
+        role="button"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <%= unregisteredness_dropdown_text %>
+      </a>
+
+      <div class="dropdown-menu">
+        <%= link_to translation(".all_bikes"), organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), class: "dropdown-item #{@search_unregisteredness == 'all' ? 'active' : ''}" %>
+        <%= link_to translation(".only_unregistered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), class: "dropdown-item #{@search_unregisteredness == 'only_unregistered' ? 'active' : ''}" %>
+        <%= link_to translation(".only_user_registered"), organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), class: "dropdown-item #{@search_unregisteredness == 'only_registered' ? 'active' : ''}" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Hide md-down because the checks don't display on mobile %>
+  <div class="col-lg-3 hidden-md-down">
+    <div class="text-right">
+      <a
+        class="gray-link"
+        id="toggleMultiUpdate"
+        href="#makeMultiUpdate"
+        data-toggle="collapse"
+        data-target="#makeMultiUpdate"
+      >
+        <%= translation(".update_multiple_records").downcase %>
+      </a>
+    </div>
+  </div>
+</div>
+
+<%# Form needs to wrap the table too. Similar to form on parking notification show %>
+<%= form_for ImpoundRecordUpdate.new, url: organization_impound_record_path("multi_update", organization_id: @current_organization), action: "update", method: :patch do |f| %>
+  <div id="makeMultiUpdate" class="collapse">
+    <div class="row">
+      <div class="mt-4 mb-4 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
+        <div class="card">
+          <div class="card-block">
+            <div class="card-title">
+              <h3 class="uncap">
+                <%= translation(".update_multiple_records") %>
+                <br>
+
+                <em class="small less-strong">
+                  <%= translation(".for_table_rows_with_checks") %>
+                </em>
+              </h3>
+            </div>
+
+            <div class="card-body">
+              <div id="impoundRecordUpdateForm">
+                <div class="row">
+                  <div class="col-sm-6 mb-2" id="kindUpdate">
+                    <%= f.select :kind,
+                      options_for_select(kinds_for_select.map { |k, v| [v.titleize, k] }, "retrieved_by_owner"),
+                      {},
+                      class: "form-control" %>
+                  </div>
+
+                  <% if @current_organization.enabled?("impound_bikes_locations") %>
+                    <div class="col-sm-6 collapse collapseKind kind_move_location mb-2">
+                      <%= f.select :location_id,
+                        options_for_select(@current_organization.locations.impound_locations.map { |l| [l.name, l.id] }, @current_organization.default_impound_location&.id),
+                        {},
+                        class: "form-control" %>
+                    </div>
+                  <% end %>
+
+                  <div
+                    class="
+                      col-sm-6 collapse collapseKind
+                      kind_transferred_to_new_owner mb-2
+                    "
+                  >
+                    <%= f.email_field :transfer_email, placeholder: translation(".new_owner_email"), class: "form-control" %>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-xs-12">
+                    <%= f.text_area :notes, placeholder: translation(".internal_note"), class: "form-control" %>
+                  </div>
+
+                  <div class="col-xs-12 mt-2">
+                    <%= submit_tag translation(".update_impound_record"), class: "btn btn-success btn-md-lg" %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="full-screen-table">
+    <%= render partial: "/organized/impound_records/table", locals: { impound_records: @impound_records, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status } %>
+  </div>
+<% end %>
+
+<div class="pt-4 pb-4">
+  <%= render(Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+</div>

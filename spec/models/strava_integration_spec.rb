@@ -99,6 +99,36 @@ RSpec.describe StravaIntegration, type: :model do
     end
   end
 
+  describe "permissions scopes and methods" do
+    let(:default_scope) { Integrations::StravaClient::DEFAULT_SCOPE }
+    let!(:integration_default) { FactoryBot.create(:strava_integration, strava_permissions: default_scope) }
+    let!(:integration_less) { FactoryBot.create(:strava_integration, strava_permissions: "read") }
+    let!(:integration_more) { FactoryBot.create(:strava_integration, strava_permissions: "read,activity:read_all,profile:read_all,activity:write") }
+    let!(:integration_nil) { FactoryBot.create(:strava_integration, strava_permissions: nil) }
+    let!(:integration_blank) { FactoryBot.create(:strava_integration, strava_permissions: "") }
+
+    it "returns expected integrations" do
+      expect(StravaIntegration.permissions_default).to eq([integration_default])
+      expect(StravaIntegration.permissions_less).to match_array([integration_less, integration_blank, integration_nil])
+      expect(StravaIntegration.permissions_more).to eq([integration_more])
+
+      expect(integration_default.permissions_default?).to be true
+      expect(integration_more.permissions_default?).to be false
+      expect(integration_nil.permissions_default?).to be false
+
+      expect(integration_less.permissions_less?).to be true
+      expect(integration_blank.permissions_less?).to be true
+      expect(integration_nil.permissions_less?).to be true
+      expect(integration_default.permissions_less?).to be false
+      expect(integration_more.permissions_less?).to be false
+
+      expect(integration_more.permissions_more?).to be true
+      expect(integration_default.permissions_more?).to be false
+      expect(integration_less.permissions_more?).to be false
+      expect(integration_nil.permissions_more?).to be false
+    end
+  end
+
   describe "sync_progress_percent" do
     it "returns 0 when athlete_activity_count is nil" do
       strava_integration = FactoryBot.build(:strava_integration, athlete_activity_count: nil)

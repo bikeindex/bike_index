@@ -1,1 +1,30 @@
-<%= render(Admin::IndexSkeleton::Component.new(chart_collection: @render_chart && matching_strava_integrations)) %>
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown dropleft small">
+    <a
+      class="nav-link dropdown-toggle <%= @search_permissions.present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @search_permissions.blank? %>
+        All Strava permissions
+      <% else %>
+        <%= @search_permissions.humanize %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All permissions", url_for(sortable_search_params.merge(search_permissions: nil)), class: "dropdown-item #{@search_permissions.blank? ? 'active' : ''}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% permission_levels.each do |permissions_level| %>
+        <%= link_to "#{permissions_level.humanize} permissions", url_for(sortable_search_params.merge(search_permissions: permissions_level)), class: "dropdown-item tw:text-left #{@search_permissions == permissions_level ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, chart_collection: @render_chart && matching_strava_integrations)) %>

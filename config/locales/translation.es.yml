@@ -4003,6 +4003,10 @@ es:
         member_no_bikes_access:
         member_of_organization:
         role_type:
+    impound_records:
+      index:
+        impound_records:
+        render_chart:
   organized_mailer:
     custom_message:
       subject:
@@ -4790,3 +4794,21 @@ es:
         region:
         state:
         street:
+      impound_records_index:
+        matching_impound_record:
+          one:
+          other:
+        all_bikes:
+        all_statuses:
+        for_table_rows_with_checks:
+        impound_records:
+        internal_note:
+        interpreted_params:
+        new_owner_email:
+        only_unregistered:
+        only_user_registered:
+        pagy:
+        per_page:
+        status_records:
+        update_impound_record:
+        update_multiple_records:

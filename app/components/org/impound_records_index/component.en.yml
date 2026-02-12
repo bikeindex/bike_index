@@ -1,0 +1,19 @@
+---
+en:
+  components:
+    org:
+      impound_records_index:
+        all_bikes: All bikes
+        all_statuses: All statuses
+        for_table_rows_with_checks: For table rows with checks
+        impound_records: Impound_records
+        internal_note: Internal note
+        interpreted_params: Interpreted_params
+        new_owner_email: New owner email
+        only_unregistered: Only unregistered
+        only_user_registered: Only user registered
+        pagy: Pagy
+        per_page: Per_page
+        status_records: "%{status} records"
+        update_impound_record: Update impound record
+        update_multiple_records: Update multiple records

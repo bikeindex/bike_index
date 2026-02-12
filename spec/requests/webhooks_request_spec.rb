@@ -133,4 +133,67 @@ RSpec.describe WebhooksController, type: :request do
     #   it "returns 400"
     # end
   end
+
+  describe "strava" do
+    describe "GET strava (subscription verification)" do
+      it "returns hub.challenge with valid verify_token" do
+        get "/webhooks/strava", params: {
+          "hub.mode" => "subscribe",
+          "hub.verify_token" => ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"],
+          "hub.challenge" => "test_challenge_abc"
+        }
+
+        expect(response).to have_http_status(:ok)
+        expect(json_result).to eq({"hub.challenge" => "test_challenge_abc"})
+      end
+
+      it "returns 403 with invalid verify_token" do
+        get "/webhooks/strava", params: {
+          "hub.mode" => "subscribe",
+          "hub.verify_token" => "wrong_token",
+          "hub.challenge" => "test_challenge_abc"
+        }
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    describe "POST strava (event receiver)" do
+      let(:strava_integration) { FactoryBot.create(:strava_integration, :with_athlete) }
+
+      it "creates StravaRequest for activity create event" do
+        expect {
+          post "/webhooks/strava", params: {
+            object_type: "activity",
+            aspect_type: "create",
+            object_id: 12345678987654321,
+            owner_id: strava_integration.athlete_id.to_i,
+            subscription_id: 999
+          }, as: :json
+        }.to change(StravaRequest, :count).by(1)
+
+        expect(response).to have_http_status(:ok)
+        strava_request = StravaRequest.last
+        expect(strava_request.incoming_webhook?).to be true
+        expect(strava_request.strava_integration_id).to eq strava_integration.id
+        expect(strava_request.parameters["object_type"]).to eq "activity"
+        expect(strava_request.parameters["aspect_type"]).to eq "create"
+        expect(strava_request.parameters["object_id"]).to eq 12345678987654321
+      end
+
+      it "returns 200 with unknown owner_id and does not create StravaRequest" do
+        expect {
+          post "/webhooks/strava", params: {
+            object_type: "activity",
+            aspect_type: "create",
+            object_id: 12345678987654321,
+            owner_id: 99999999,
+            subscription_id: 999
+          }, as: :json
+        }.not_to change(StravaRequest, :count)
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
 end

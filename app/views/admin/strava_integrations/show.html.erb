@@ -120,6 +120,20 @@
         </tr>
 
         <tr>
+          <td>Permissions</td>
+
+          <td>
+            <code><%= @strava_integration.strava_permissions %></code>
+
+            <% if @strava_integration.permissions_less? %>
+              <%= render UI::Badge::Component.new(text: "less than default", color: :error, size: :sm) %>
+            <% elsif @strava_integration.permissions_more? %>
+              <%= render UI::Badge::Component.new(text: "more than default", color: :notice, size: :sm) %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
           <td>Gear</td>
 
           <td>
