@@ -26,7 +26,7 @@ module Sessionable
     set_passive_organization(user.default_organization) # Set that organization!
     user.update_last_login(forwarded_ip_address)
     if Binxtils::InputNormalizer.boolean(params.dig(:session, :remember_me))
-      cookies.permanent.signed[:auth] = cookie_options(user)
+      cookies.permanent.signed[ControllerHelpers::AUTH_COOKIE_KEY] = cookie_options(user)
     else
       default_session_set(user)
     end
@@ -44,7 +44,7 @@ module Sessionable
   end
 
   def default_session_set(user)
-    cookies.signed[:auth] = cookie_options(user)
+    cookies.signed[ControllerHelpers::AUTH_COOKIE_KEY] = cookie_options(user)
   end
 
   def authenticate_user_for_my_accounts_controller
@@ -58,8 +58,14 @@ module Sessionable
       httponly: true,
       value: [user.id, user.auth_token]
     }
-    # In development, secure: true breaks the cookie storage. Only add if production
-    Rails.env.production? ? c.merge(secure: true) : c
+    if Rails.env.production?
+      c.merge(secure: true)
+    elsif Rails.env.development?
+      # Match session_store.rb domain config so auth cookie is sent on redirects
+      c.merge(domain: "localhost")
+    else
+      c
+    end
   end
 
   def update_user_authentication_for_new_password

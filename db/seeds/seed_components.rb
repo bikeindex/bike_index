@@ -10,7 +10,6 @@ end
 
 # Seed the component types
 ctypes = [
-  {name: "other", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "unknown", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "water bottle cage", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "stem", secondary_name: "Gooseneck", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
@@ -60,7 +59,16 @@ ctypes = [
   {name: "rack", has_multiple: true, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "seatpost", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
   {name: "fender", has_multiple: true, cgroup_id: Cgroup.find_by_name("Additional parts").id},
-  {name: "aero bars/extensions/bar ends", secondary_name: "Aero bars", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id}
+  {name: "aero bars/extensions/bar ends", secondary_name: "Aero bars", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Ebike battery", has_multiple: false, cgroup_id: Cgroup.find_by_name("Drivetrain and brakes").id},
+  {name: "Ebike motor", has_multiple: false, cgroup_id: Cgroup.find_by_name("Drivetrain and brakes").id},
+  {name: "Pannier", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Frame bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Cargo bike side rails", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Handlebar bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "seat bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Top tube bag", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id},
+  {name: "Child seat", has_multiple: false, cgroup_id: Cgroup.find_by_name("Additional parts").id}
 ]
 ctypes.each do |component_type|
   ct = Ctype.create(name: component_type[:name], cgroup_id: component_type[:cgroup_id])

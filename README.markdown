@@ -33,9 +33,10 @@ _Bike Index also requires some additional libraries. We recommend installing the
 
 Follow [the Getting Started guide](docs/getting-started.markdown) for a complete set up. Or if you're familiar with developing Ruby on Rails applications start with these steps and a local Postgresql installation:
 
-- `bin/setup` sets up the application and seeds:
-  - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `pleaseplease12`)
-  - Gives user@example.com 50 bikes
+- `bin/setup` sets up the application and seeds test organizations, bikes and users:
+  - Three test user accounts: admin@bikeindex.org, member@bikeindex.org, user@bikeindex.org (all have password `pleaseplease12`)
+  - Gives user@bikeindex.org 50 bikes
+  - Give test organization Hogwarts all organization features and some test parking notifications
 
 - `bin/dev` start the server. It starts redis in the background and runs foreman with the [dev procfile](Procfile.dev). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3042, change the appropriate values in [Procfile.dev](Procfile.dev) and [.env](.env)
 
