@@ -1,0 +1,91 @@
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle <%= @activeness != 'all' ? 'active' : '' %>" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <% if @activeness == "all" %>
+        Active and Inactive
+      <% else %>
+        <%= @activeness.titleize %>
+      <% end %>
+    </a>
+    <div class="dropdown-menu">
+      <%= link_to "Active and Inactive", url_for(sortable_search_params.merge(search_activeness: nil)), class: "dropdown-item #{@activeness == 'all' ? 'active' : ''}" %>
+      <%= link_to "Only Active", url_for(sortable_search_params.merge(search_activeness: "active")), class: "dropdown-item #{@activeness == 'active' ? 'active' : ''}" %>
+      <%= link_to "Only Inactive", url_for(sortable_search_params.merge(search_activeness: "inactive")), class: "dropdown-item #{@activeness == 'inactive' ? 'active' : ''}" %>
+      <div class="dropdown-divider"></div>
+      <%= link_to "Resolved", url_for(sortable_search_params.merge(search_activeness: "resolved")), class: "dropdown-item #{@activeness == 'resolved' ? 'active' : ''}" %>
+      <%= link_to "Dismissed", url_for(sortable_search_params.merge(search_activeness: "dismissed")), class: "dropdown-item #{@activeness == 'dismissed' ? 'active' : ''}" %>
+    </div>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle <%= @kind != 'all' ? 'active' : '' %>" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <%= @kind.titleize %> <%= @kind == "all" ? "kinds" : "kind" %>
+    </a>
+    <div class="dropdown-menu">
+      <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == 'all' ? 'active' : ''}" %>
+      <div class="dropdown-divider"></div>
+      <% UserAlert.kinds.each do |kind| %>
+        <%= link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+  <li class="nav-item">
+    <%= link_to "Notified", url_for(sortable_search_params.merge(search_with_notification: !@with_notification)), class: "nav-link #{@with_notification ? 'active' : ''}" %>
+  </li>
+  <li class="nav-item">
+    <%= link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}" %>
+  </li>
+<% end %>
+
+<% rendered_chart = capture do %>
+  <% if @render_kind_counts %>
+    <% series = UserAlert.kinds.map { |k| {name: UserAlert.kind_humanized(k), data: UI::Chart::Component.time_range_counts(collection: matching_user_alerts.where(kind: k), time_range: @time_range, column: @time_range_column)} } %>
+  <% else %>
+    <% series = [{name: "User Alerts", data: UI::Chart::Component.time_range_counts(collection: matching_user_alerts, time_range: @time_range, column: @time_range_column)}] %>
+  <% end %>
+  <%= render(UI::Chart::Component.new(series:, time_range: @time_range, stacked: true)) %>
+<% end %>
+
+<% table_view = capture do %>
+  <% if @render_kind_counts %>
+    <div class="row mt-4 mb-4">
+      <div class="col-md-6 offset-md-3">
+        <div class="card">
+          <div class="card-body">
+            <h3>Kinds</h3>
+            <table class="table-list wide-definition">
+              <tbody>
+                <% UserAlert.kinds.each_with_index do |kind, index| %>
+                  <% count = matching_user_alerts.where(kind: kind).count %>
+                  <% next unless count > 0 %>
+                  <tr>
+                    <td>
+                      <div style="width: 1em; height: 1em; background: <%= UI::Chart::Component::COLORS[index % UI::Chart::Component::COLORS.length] %>; float: right; margin-left: 0.4rem;"></div>
+                      <%= link_to UserAlert.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind)) %>
+                    </td>
+                    <td><%= number_display(count) %></td>
+                  </tr>
+                <% end %>
+                <% nil_count = matching_user_alerts.where(kind: nil).count %>
+                <% if nil_count > 0 %>
+                  <tr>
+                    <td>Nil</td>
+                    <td><%= number_display(nil_count) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @collection, skip_user: @user_subject.present?} %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(
+  index_title: "User Alerts",
+  rendered_chart:,
+  nav_header_list_items:,
+  table_view:
+)) %>

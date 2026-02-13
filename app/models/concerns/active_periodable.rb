@@ -4,20 +4,20 @@ module ActivePeriodable
   extend ActiveSupport::Concern
 
   included do
-    scope :period_started, -> { where("start_at <= ?", Time.current) }
+    scope :period_started, -> { where("#{table_name}.start_at <= ?", Time.current) }
     scope :period_active, -> {
-      period_started.where(end_at: nil).or(period_started.where("end_at > ?", Time.current))
+      period_started.where(end_at: nil).or(period_started.where("#{table_name}.end_at > ?", Time.current))
     }
-    scope :period_not_started, -> { where(start_at: nil).or(where("start_at > ?", Time.current)) }
-    scope :period_inactive, -> { period_not_started.or(where("end_at < ?", Time.current)) }
+    scope :period_not_started, -> { where(start_at: nil).or(where("#{table_name}.start_at > ?", Time.current)) }
+    scope :period_inactive, -> { period_not_started.or(where("#{table_name}.end_at < ?", Time.current)) }
     scope :time_ordered, -> { reorder(:start_at) }
   end
 
   module ClassMethods
     def period_active_at(datetime)
-      active_before = where("start_at <= ?", datetime)
+      active_before = where("#{table_name}.start_at <= ?", datetime)
 
-      active_before.where(end_at: nil).or(active_before.where("end_at > ?", datetime))
+      active_before.where(end_at: nil).or(active_before.where("#{table_name}.end_at > ?", datetime))
     end
   end
 

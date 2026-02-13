@@ -1,4 +1,5 @@
-<%# locals: (render_sortable: false, render_deleted: false) %>
+<%# locals: (collection: nil, render_sortable: false, render_deleted: false) %>
+<% collection ||= @users %>
 
 <% unless render_deleted %>
   <style>.deleted-cell {display: none !important;}</style>
@@ -53,7 +54,7 @@
     </thead>
 
     <tbody>
-      <% @users.each do |user| %>
+      <% collection.each do |user| %>
         <% cache(user) do %>
           <tr>
             <td>
