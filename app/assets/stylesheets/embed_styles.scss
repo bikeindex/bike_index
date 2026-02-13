@@ -359,7 +359,6 @@ a {
 
   padding: 15px 35px 20px 14px;
   margin-bottom: $baseLineHeight;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 
   // background-color: $warningBackground;
   // border: 1px solid $warningBorder;
@@ -372,8 +371,8 @@ a {
 
   &.alert-success {
     background-color: darken($blue, 2%);
-    border: 1px solid darken($blue-lighter, 7%);
-    color: $blueDarker;
+    border: none;
+    color: white;
   }
 }
 

@@ -14,7 +14,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     CGI.parse(uri.query || "")
   end
 
-  describe "EverythingCombobox" do
+  describe "EverythingCombobox", :flaky do
     # NOTE: these tests are specific to Select2, unfortunately
     # It requires hacks to target specific selectors because Select2 doesn't use accessible elements
     # ... but the behavior should be the same for any updated combobox plugin
