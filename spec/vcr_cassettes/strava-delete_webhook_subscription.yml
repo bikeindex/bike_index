@@ -1,0 +1,29 @@
+---
+http_interactions:
+- request:
+    method: delete
+    uri: https://www.strava.com/api/v3/push_subscriptions/123456
+    body:
+      encoding: UTF-8
+      string: client_id=<STRAVA_KEY>&client_secret=<STRAVA_SECRET>
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 204
+      message: No Content
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Sun, 08 Feb 2026 22:46:00 GMT
+recorded_with: VCR 6.3.1

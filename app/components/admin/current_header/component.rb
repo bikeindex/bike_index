@@ -12,6 +12,7 @@ module Admin::CurrentHeader
       search_marketplace_listing_id
       search_membership_id
       user_id
+      search_strava_integration_id
     ].freeze
 
     def initialize(params:, viewing: nil, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
@@ -65,7 +66,7 @@ module Admin::CurrentHeader
     end
 
     def show_membership?
-      @params[:search_membership_id].present?
+      membership_id.present?
     end
 
     def membership_id
@@ -74,6 +75,14 @@ module Admin::CurrentHeader
 
     def show_kind?
       @params[:search_kind].present?
+    end
+
+    def show_strava_integration?
+      strava_integration_id.present?
+    end
+
+    def strava_integration_id
+      @params[:search_strava_integration_id]
     end
 
     def kind_humanized

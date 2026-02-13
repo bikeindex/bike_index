@@ -103,7 +103,7 @@
           </td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id)) %>
+            <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_activity.strava_integration_id))) %>
           </td>
         </tr>
       <% end %>

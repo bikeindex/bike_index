@@ -6,6 +6,7 @@ class Integrations::StravaClient
   DEFAULT_SCOPE = "read,activity:read_all,profile:read_all"
   STRAVA_KEY = ENV["STRAVA_KEY"]
   STRAVA_SECRET = ENV["STRAVA_SECRET"]
+  STRAVA_WEBHOOK_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
   ACTIVITIES_PER_PAGE = 200
 
   class << self
@@ -58,10 +59,14 @@ class Integrations::StravaClient
       get(strava_integration, "gear/#{strava_gear_id}")
     end
 
-    def create_webhook_subscription(callback_url, verify_token)
+    def create_webhook_subscription
       oauth_connection.post("api/v3/push_subscriptions") do |req|
-        req.body = {client_id: STRAVA_KEY, client_secret: STRAVA_SECRET,
-                    callback_url:, verify_token:}
+        req.body = {
+          client_id: STRAVA_KEY,
+          client_secret: STRAVA_SECRET,
+          callback_url: Rails.application.routes.url_helpers.strava_webhooks_url,
+          verify_token: STRAVA_WEBHOOK_TOKEN
+        }
       end
     end
 

@@ -94,4 +94,37 @@ RSpec.describe Integrations::StravaClient, type: :service do
       end
     end
   end
+
+  describe ".create_webhook_subscription" do
+    before { stub_const("Integrations::StravaClient::STRAVA_WEBHOOK_TOKEN", "test_verify_token") }
+
+    it "creates a webhook subscription" do
+      VCR.use_cassette("strava-create_webhook_subscription") do
+        response = described_class.create_webhook_subscription
+        expect(response.status).to eq(201)
+        expect(response.body["id"]).to eq(123456)
+        expect(response.body["callback_url"]).to include("/webhooks/strava")
+      end
+    end
+  end
+
+  describe ".view_webhook_subscriptions" do
+    it "returns existing subscriptions" do
+      VCR.use_cassette("strava-view_webhook_subscriptions") do
+        response = described_class.view_webhook_subscriptions
+        expect(response.status).to eq(200)
+        expect(response.body).to be_an(Array)
+        expect(response.body.first["id"]).to eq(123456)
+      end
+    end
+  end
+
+  describe ".delete_webhook_subscription" do
+    it "deletes a subscription by id" do
+      VCR.use_cassette("strava-delete_webhook_subscription") do
+        response = described_class.delete_webhook_subscription(123456)
+        expect(response.status).to eq(204)
+      end
+    end
+  end
 end

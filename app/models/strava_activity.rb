@@ -53,6 +53,7 @@ class StravaActivity < ApplicationRecord
   scope :enriched, -> { where.not(segment_locations: nil) }
   scope :un_enriched, -> { where(segment_locations: nil) }
   scope :activities_to_enrich, -> { cycling.un_enriched }
+  scope :with_gear, -> { where.not(gear_id: nil) }
 
   class << self
     def activity_types
