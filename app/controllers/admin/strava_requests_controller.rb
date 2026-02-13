@@ -38,6 +38,10 @@ class Admin::StravaRequestsController < Admin::BaseController
       strava_requests = strava_requests.where(response_status: params[:search_response_status])
     end
 
+    if params[:search_strava_integration_id].present?
+      strava_requests = strava_requests.where(strava_integration_id: params[:search_strava_integration_id])
+    end
+
     if params[:user_id].present?
       strava_requests = strava_requests.where(user_id: user_subject&.id || params[:user_id])
     end

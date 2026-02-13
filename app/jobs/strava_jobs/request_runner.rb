@@ -69,11 +69,12 @@ module StravaJobs
 
       strava_request = StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || strava_request&.requested_at.present?
-      return strava_request.update(response_status: "skipped") if strava_request.skip_request?
 
       strava_integration = StravaIntegration.find_by(id: strava_request.strava_integration_id)
-      unless strava_integration
-        return strava_request.update(response_status: :integration_deleted)
+      if strava_integration.blank?
+        return mark_requests_deleted(strava_request)
+      elsif strava_request.skip_request?
+        return strava_request.update(response_status: "skipped")
       end
 
       response = self.class.execute(strava_integration, strava_request.request_type, strava_request.parameters)
@@ -98,6 +99,12 @@ module StravaJobs
       min_headroom = 2 * BATCH_SIZE
       (rate_limit["read_short_limit"].to_i - rate_limit["read_short_usage"].to_i) >= min_headroom &&
         (rate_limit["read_long_limit"].to_i - rate_limit["read_long_usage"].to_i) >= min_headroom
+    end
+
+    def mark_requests_deleted(strava_request)
+      strava_request.update(response_status: :integration_deleted)
+      StravaRequest.pending.where(strava_integration_id: strava_request.strava_integration_id)
+        .each(&:integration_deleted!)
     end
   end
 end

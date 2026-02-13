@@ -39,6 +39,9 @@ class Admin::StravaActivitiesController < Admin::BaseController
       strava_activities = strava_activities.where(strava_integration_id: params[:search_strava_integration_id])
     end
 
+    @with_gear = Binxtils::InputNormalizer.boolean(params[:search_with_gear])
+    strava_activities = strava_activities.with_gear if @with_gear
+
     @searched_activity_type = params[:search_activity_type]
     if @searched_activity_type.present?
       strava_activities = strava_activities.where(activity_type: @searched_activity_type)

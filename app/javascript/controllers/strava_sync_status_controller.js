@@ -38,10 +38,11 @@ export default class extends Controller {
   }
 
   updateProgress (data) {
+    // If initially pending but now syncing, hide the pending text and show the syncing text
     if (this.isPendingValue && data.status === 'syncing') {
       collapse('hide', document.getElementById('strava-pending-message'))
       collapse('show', document.getElementById('strava-syncing-message'))
-      this.isPendingValue = true
+      this.isPendingValue = false
     }
 
     const countEl = document.getElementById('strava-download-count')
