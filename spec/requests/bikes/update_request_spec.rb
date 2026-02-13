@@ -74,6 +74,11 @@ RSpec.describe "BikesController#update", type: :request do
     end
     context "with user without address" do
       let!(:current_user) { FactoryBot.create(:user_confirmed) }
+      let(:update) do
+        {address_record_attributes: {street: "10544 82 Ave NW", postal_code: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, region_record_id: ""},
+         primary_activity_id:}
+      end
+      let(:target_address_record_attributes) { update[:address_record_attributes].slice(:street, :city, :country_id).merge(kind: "bike", postal_code: "AB T6E 2A4", bike_id: bike.id) }
       it "sets the passed address" do
         expect(current_user.to_coordinates).to eq([nil, nil])
         bike.update(updated_at: Time.current)
