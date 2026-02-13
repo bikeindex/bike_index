@@ -1,18 +1,35 @@
 <% nav_header_list_items = capture do %>
   <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle <%= @invalid != invalid_user_options.first ? 'active' : '' %>" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <a
+      class="nav-link dropdown-toggle <%= @invalid != invalid_user_options.first ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
       <%= @invalid.titleize %>
     </a>
+
     <div class="dropdown-menu">
       <% invalid_user_options.each do |kind| %>
         <%= link_to kind.titleize, url_for(sortable_search_params.merge(search_invalid: kind)), class: "dropdown-item #{@invalid == kind ? 'active' : ''}" %>
       <% end %>
     </div>
   </li>
+
   <li class="nav-item dropdown">
     <% access_active = @search_ambassadors || @search_superusers || @search_developers || @search_with_organization %>
     <% clear_access_params = {search_ambassadors: nil, search_superusers: nil, search_developers: nil, search_with_organization: nil} %>
-    <a class="nav-link dropdown-toggle <%= access_active ? 'active' : '' %>" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+    <a
+      class="nav-link dropdown-toggle <%= access_active ? 'active' : '' %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
       <% if @search_ambassadors %>
         Ambassadors
       <% elsif @search_superusers %>
@@ -25,8 +42,10 @@
         Any Access
       <% end %>
     </a>
+
     <div class="dropdown-menu">
       <%= link_to "Any Access", url_for(sortable_search_params.merge(clear_access_params)), class: "dropdown-item #{access_active ? '' : 'active'}" %>
+
       <div class="dropdown-divider"></div>
       <%= link_to "With Organization Role", url_for(sortable_search_params.merge(clear_access_params.merge(search_with_organization: true))), class: "dropdown-item #{@search_with_organization ? 'active' : ''}" %>
       <%= link_to "Ambassadors", url_for(sortable_search_params.merge(clear_access_params.merge(search_ambassadors: true))), class: "dropdown-item #{@search_ambassadors ? 'active' : ''}" %>
@@ -34,6 +53,7 @@
       <%= link_to "Developers", url_for(sortable_search_params.merge(clear_access_params.merge(search_developers: true))), class: "dropdown-item #{@search_developers ? 'active' : ''}" %>
     </div>
   </li>
+
   <li class="nav-item">
     <%= link_to "Un", url_for(sortable_search_params.merge(search_unconfirmed: !@search_unconfirmed, search_confirmed: false)), class: "d-inline-block pr-1 #{@search_unconfirmed ? 'nav-link active' : 'nav-link'}" %>
     /
@@ -59,28 +79,37 @@
     <%= hidden_field_tag :search_invalid, params[:search_invalid] %>
     <%= hidden_field_tag :search_confirmed, params[:search_confirmed] %>
     <%= hidden_field_tag :search_unconfirmed, params[:search_unconfirmed] %>
+
     <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
       <% if display_dev_info? %>
         <div class="mt-2 mr-2 only-dev-visible">
           <%= text_field_tag :search_domain, params[:search_domain], placeholder: "search email domain", class: "form-control" %>
         </div>
       <% end %>
+
       <div class="mt-2 mr-2">
         <%= text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control" %>
       </div>
+
       <div class="mt-2 mr-2">
         <%= text_field_tag :query, params[:query], placeholder: "Find by name or email", class: "form-control" %>
       </div>
+
       <div class="mt-2 mr-2">
         <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
       </div>
     </div>
   <% end %>
+
   <% if @deleted %>
     <div class="row">
       <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
         <div class="alert alert-info mt-1 mb-1">
-          <p>Account deletion was added because it's a requirement for the iOS app store. Right now, admins can't delete users, they must delete themselves.</p>
+          <p>
+            Account deletion was added because it's a requirement for the iOS
+            app store. Right now, admins can't delete users, they must delete
+            themselves.
+          </p>
         </div>
       </div>
     </div>
@@ -89,8 +118,12 @@
 
 <% table_view = capture do %>
   <% show_unconfirmed_count = params[:search_domain].present? && !@search_unconfirmed && !@search_confirmed %>
+
   <% if show_unconfirmed_count %>
-    <strong><%= number_with_delimiter(matching_users.unconfirmed.size) %></strong> unconfirmed users
+    <strong>
+      <%= number_with_delimiter(matching_users.unconfirmed.size) %>
+    </strong>
+    unconfirmed users
   <% end %>
 
   <%= render partial: "/admin/users/table", locals: {collection: @collection, render_sortable: true, render_deleted: @deleted} %>
