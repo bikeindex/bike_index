@@ -1,9 +1,16 @@
-require "rails_helper"
+# frozen_string_literal: true
 
-RSpec.describe Binxtils::TimeParser, type: :service do
+require "spec_helper"
+require_relative "support/match_time_matcher"
+
+RSpec.describe Binxtils::TimeParser do
   let(:subject) { described_class }
-  let(:default_time_zone) { Binxtils::TimeParser::DEFAULT_TIME_ZONE }
-  before { Time.zone = default_time_zone }
+  # Tests use Central Time as the default for consistent behavior
+  let(:default_time_zone) { ActiveSupport::TimeZone["Central Time (US & Canada)"] }
+  before do
+    Binxtils::TimeParser.default_time_zone = default_time_zone
+    Time.zone = default_time_zone
+  end
 
   describe "parse" do
     context "America/Los_Angeles" do
