@@ -17,6 +17,8 @@ RSpec.describe Search::FormOrganized::Component, type: :component do
     expect(component).to have_css("input[name='search_address']", visible: :hidden)
     expect(component).to have_css("input[name='search_secondary']", visible: :hidden)
     expect(component).to have_css("input[name='search_model_audit_id']", visible: :hidden)
+    expect(component).not_to have_css("input[name='search_location']")
+    expect(component).not_to have_css("input[name='search_proximity']")
   end
 
   context "with interpreted_params values" do
@@ -61,6 +63,16 @@ RSpec.describe Search::FormOrganized::Component, type: :component do
 
     it "does not render warning alert" do
       expect(component).not_to have_css("[role='alert']")
+    end
+  end
+
+  context "with location search" do
+    let(:options) { {target_search_path:, interpreted_params:, search_location: "New York", search_proximity: 100} }
+
+    it "renders location search fields" do
+      expect(component).to have_css("form#Search_Form")
+      expect(component).to have_field("search_location", with: "New York")
+      expect(component).to have_field("search_proximity", with: "100")
     end
   end
 end

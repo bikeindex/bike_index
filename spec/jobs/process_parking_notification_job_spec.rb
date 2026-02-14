@@ -66,6 +66,28 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
         expect(parking_notification2.kind).to eq "appears_abandoned_notification"
       end
     end
+    context "impound record sets impounded_from_address_record" do
+      let(:parking_notification3) do
+        FactoryBot.build(:parking_notification,
+          user: user, bike: bike, organization: organization,
+          kind: "impound_notification", initial_record: initial,
+          latitude: 37.7749, longitude: -122.4194,
+          street: "1 Market St", city: "San Francisco", zipcode: "94105",
+          use_entered_address: "1",
+          state_id: State.find_or_create_by(name: "California", abbreviation: "CA", country: Country.united_states).id,
+          country_id: Country.united_states.id)
+      end
+      it "creates impound_record with impounded_from_address_record from parking notification location" do
+        parking_notification3.save
+        Sidekiq::Testing.inline! { subject.drain }
+        parking_notification3.reload
+        impound_record = parking_notification3.impound_record
+        expect(impound_record).to be_present
+        expect(impound_record.impounded_from_address_record).to be_present
+        expect(impound_record.impounded_from_address_record.city).to eq "San Francisco"
+        expect(impound_record.impounded_from_address_record.street).to eq "1 Market St"
+      end
+    end
     context "retrieved" do
       it "updates the other parking_notifications" do
         initial.reload

@@ -55,6 +55,8 @@
     ) %>
   <% end %>
 
+  <%= content %>
+
   <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
   <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>
   <%= hidden_field_tag :search_address, @interpreted_params[:search_address] %>

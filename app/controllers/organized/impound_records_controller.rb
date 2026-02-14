@@ -93,6 +93,12 @@ module Organized
         a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])
       end
 
+      @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity])
+      if params[:search_location].present?
+        bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
+        a_impound_records = a_impound_records.within_bounding_box(bounding_box) if bounding_box.present?
+      end
+
       @available_impound_records = a_impound_records.where(created_at: @time_range)
     end
 
