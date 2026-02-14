@@ -6039,6 +6039,13 @@ CREATE INDEX index_bikes_on_listing_order ON public.bikes USING btree (listing_o
 
 
 --
+-- Name: index_bikes_on_lower_frame_model; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_lower_frame_model ON public.bikes USING btree ("left"(lower(frame_model), 255));
+
+
+--
 -- Name: index_bikes_on_lower_mnfg_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7440,6 +7447,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260214163159'),
 ('20260209164044'),
 ('20260209164043'),
 ('20260209164042'),

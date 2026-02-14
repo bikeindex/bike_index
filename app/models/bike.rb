@@ -87,6 +87,7 @@
 #  index_bikes_on_example                    (example) WHERE (example IS NOT NULL)
 #  index_bikes_on_latitude_and_longitude     (latitude,longitude)
 #  index_bikes_on_listing_order              (listing_order)
+#  index_bikes_on_lower_frame_model          ("left"(lower(frame_model), 255))
 #  index_bikes_on_lower_mnfg_name            (lower((mnfg_name)::text))
 #  index_bikes_on_manufacturer_id            (manufacturer_id)
 #  index_bikes_on_model_audit_id             (model_audit_id) WHERE (model_audit_id IS NOT NULL)
