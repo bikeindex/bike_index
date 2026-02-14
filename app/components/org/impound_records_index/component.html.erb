@@ -1,5 +1,10 @@
 <div class="mt-4">
-  <%= render partial: "/shared/bike_search_form", locals: {include_organized_search_fields: true, search_path: organization_impound_records_path(organization_id: @current_organization.to_param)} %>
+  <%= render(Search::FormOrganized::Component.new(
+    target_search_path: organization_impound_records_path(organization_id: @current_organization.to_param),
+    interpreted_params: @interpreted_params,
+    search_location: params[:search_location],
+    search_proximity: @search_proximity
+  )) %>
 </div>
 
 <div class="row mt-4 mb-4">
