@@ -56,7 +56,7 @@
   <% end %>
 
   <% if render_location_search? %>
-    <div class="tw:mt-2 tw:flex tw:items-center tw:gap-2 tw:justify-end">
+    <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-2">
       <em class="tw:text-sm tw:text-gray-500">within</em>
       <%= number_field_tag :search_proximity, @search_proximity, class: "twinput tw:w-20" %>
       <em class="tw:text-sm tw:text-gray-500">miles of</em>
