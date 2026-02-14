@@ -55,14 +55,7 @@
     ) %>
   <% end %>
 
-  <% if render_location_search? %>
-    <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-2">
-      <em class="tw:text-sm tw:text-gray-500">within</em>
-      <%= number_field_tag :search_proximity, @search_proximity, class: "twinput tw:w-20", step: 0.01 %>
-      <em class="tw:text-sm tw:text-gray-500">miles of</em>
-      <%= text_field_tag :search_location, @search_location, placeholder: "anywhere", class: "twinput tw:flex-1" %>
-    </div>
-  <% end %>
+  <%= content %>
 
   <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
   <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>

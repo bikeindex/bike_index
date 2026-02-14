@@ -1,10 +1,15 @@
 <div class="mt-4">
   <%= render(Search::FormOrganized::Component.new(
     target_search_path: organization_impound_records_path(organization_id: @current_organization.to_param),
-    interpreted_params: @interpreted_params,
-    search_location: params[:search_location],
-    search_proximity: @search_proximity
-  )) %>
+    interpreted_params: @interpreted_params
+  )) do %>
+    <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-2">
+      <em class="tw:text-sm tw:text-gray-500">within</em>
+      <%= number_field_tag :search_proximity, @search_proximity, class: "twinput tw:w-20", step: 0.01 %>
+      <em class="tw:text-sm tw:text-gray-500">miles of</em>
+      <%= text_field_tag :search_location, @search_location, placeholder: "anywhere", class: "twinput tw:flex-1" %>
+    </div>
+  <% end %>
 </div>
 
 <div class="row mt-4 mb-4">

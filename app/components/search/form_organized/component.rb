@@ -2,12 +2,10 @@
 
 module Search::FormOrganized
   class Component < ApplicationComponent
-    def initialize(target_search_path:, interpreted_params:, skip_serial_field: false, search_location: nil, search_proximity: nil)
+    def initialize(target_search_path:, interpreted_params:, skip_serial_field: false)
       @target_search_path = target_search_path
       @interpreted_params = interpreted_params
       @skip_serial_field = skip_serial_field
-      @search_location = search_location
-      @search_proximity = search_proximity
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
     end
 
@@ -15,10 +13,6 @@ module Search::FormOrganized
 
     def render_serial_field?
       !@skip_serial_field
-    end
-
-    def render_location_search?
-      @search_proximity.present?
     end
 
     def serial_looks_like_not_a_serial?

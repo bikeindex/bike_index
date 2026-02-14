@@ -4,7 +4,7 @@ module Org::ImpoundRecordsIndex
   class Component < ApplicationComponent
     include SortableHelper
 
-    def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, time_range:, available_statuses:, current_organization:, search_proximity:, interpreted_params:)
+    def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, time_range:, available_statuses:, current_organization:, search_proximity:, search_location:, interpreted_params:)
       @pagy = pagy
       @impound_records = impound_records
       @search_status = search_status
@@ -13,6 +13,7 @@ module Org::ImpoundRecordsIndex
       @available_statuses = available_statuses
       @current_organization = current_organization
       @search_proximity = search_proximity
+      @search_location = search_location
       @interpreted_params = interpreted_params
     end
 

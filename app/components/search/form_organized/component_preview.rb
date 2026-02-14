@@ -15,10 +15,6 @@ module Search::FormOrganized
       render(Search::FormOrganized::Component.new(**default_options.merge(skip_serial_field: true)))
     end
 
-    def with_location_search
-      render(Search::FormOrganized::Component.new(**default_options.merge(search_location: "New York", search_proximity: 100)))
-    end
-
     private
 
     def target_search_path
