@@ -32,37 +32,53 @@ sf_locations = [
   {latitude: 37.7616, longitude: -122.4346, street: "3100 Mission St", city: "San Francisco", zipcode: "94110"}
 ]
 
-kinds = %w[appears_abandoned_notification parked_incorrectly_notification appears_abandoned_notification parked_incorrectly_notification]
+pn_kinds = %w[appears_abandoned_notification parked_incorrectly_notification appears_abandoned_notification parked_incorrectly_notification]
+
+owner_emails = %w[
+  alice@example.com bob@example.com carol@example.com dave@example.com
+  eve@example.com frank@example.com grace@example.com heidi@example.com
+  ivan@example.com judy@example.com kevin@example.com laura@example.com
+  mike@example.com nora@example.com oscar@example.com
+]
+
+creator = BikeServices::Creator.new
+
+# Helper to create a bike via BikeServices::Creator
+create_bike = lambda {
+  b_param = BParam.create!(
+    creator: user,
+    params: {
+      bike: {
+        cycle_type: "bike",
+        propulsion_type: "foot-pedal",
+        serial_number: (0...10).map { rand(65..90).chr }.join,
+        manufacturer_id: manufacturer_ids.sample.to_s,
+        primary_frame_color_id: color_ids.sample.to_s,
+        rear_tire_narrow: "true",
+        handlebar_type: HandlebarType.slugs.first,
+        owner_email: owner_emails.sample,
+        creation_organization_id: hogwarts.id.to_s
+      }
+    }
+  )
+  b_param.origin = "organization_form"
+  bike = creator.create_bike(b_param)
+  raise "Bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
+  bike
+}
 
 puts "Creating parking notifications in San Francisco..."
-
-# Helper to create a bike for parking notifications
-create_pn_bike = lambda {
-  Bike.create!(
-    cycle_type: :bike,
-    propulsion_type: "foot-pedal",
-    serial_number: (0...10).map { rand(65..90).chr }.join,
-    manufacturer_id: manufacturer_ids.sample || Manufacturer.first.id,
-    primary_frame_color_id: color_ids.sample,
-    rear_tire_narrow: true,
-    handlebar_type: HandlebarType.slugs.first,
-    creator: user,
-    owner_email: user.email
-  ).tap do |bike|
-    Ownership.create!(bike:, creator: user, owner_email: user.email, current: true, skip_email: true)
-  end
-}
 
 # Create 10 initial parking notifications
 initial_notifications = []
 10.times do |i|
   loc = sf_locations[i]
-  bike = create_pn_bike.call
+  bike = create_bike.call
   pn = ParkingNotification.create!(
     bike:,
     user: member,
     organization: hogwarts,
-    kind: kinds[i % kinds.length],
+    kind: pn_kinds[i % pn_kinds.length],
     latitude: loc[:latitude],
     longitude: loc[:longitude],
     street: loc[:street],
@@ -76,7 +92,7 @@ initial_notifications = []
   puts "  Created parking notification ##{i + 1} at #{loc[:street]}"
 end
 
-# Create 2 repeat parking notifications that become impound notifications (creating impound records)
+# Create 2 impound notifications (ProcessParkingNotificationJob creates the impound records)
 2.times do |i|
   initial = initial_notifications[i]
   loc = sf_locations[i]
@@ -93,93 +109,87 @@ end
     zipcode: loc[:zipcode],
     state_id: ca_state&.id,
     country_id: us&.id,
-    message: "Repeat notification - impounding bike from #{loc[:street]}"
+    message: "Repeat notification - impounding bike from #{loc[:street]}",
+    delivery_status: "email_success"
   )
-  # Create the impound record (normally done by ProcessParkingNotificationJob)
-  impound_record = ImpoundRecord.create!(
-    bike_id: initial.bike_id,
-    user: member,
-    organization: hogwarts
-  )
-  pn.update!(impound_record:)
-  initial.update!(resolved_at: Time.current)
-  puts "  Created repeat impound notification ##{i + 1} with ImpoundRecord ##{impound_record.id}"
+  ProcessParkingNotificationJob.new.perform(pn.id)
+  puts "  Created impound notification ##{i + 1} with ImpoundRecord ##{pn.reload.impound_record_id}"
 end
 
-# Create 1 unregistered_parking_notification
+# Create 1 unregistered_parking_notification via BikeServices::Creator
 loc = sf_locations[10]
-unreg_bike = Bike.create!(
-  cycle_type: :bike,
-  propulsion_type: "foot-pedal",
-  serial_number: "unknown",
-  manufacturer_id: manufacturer_ids.sample || Manufacturer.first.id,
-  primary_frame_color_id: color_ids.sample,
-  rear_tire_narrow: true,
-  handlebar_type: HandlebarType.slugs.first,
+unreg_b_param = BParam.create!(
   creator: member,
-  owner_email: member.email,
-  status: "unregistered_parking_notification"
+  params: {
+    bike: {
+      cycle_type: "bike",
+      propulsion_type: "foot-pedal",
+      serial_number: "unknown",
+      manufacturer_id: manufacturer_ids.sample.to_s,
+      primary_frame_color_id: color_ids.sample.to_s,
+      rear_tire_narrow: "true",
+      handlebar_type: HandlebarType.slugs.first,
+      owner_email: member.email,
+      creation_organization_id: hogwarts.id.to_s
+    },
+    parking_notification: {
+      kind: "parked_incorrectly_notification",
+      latitude: loc[:latitude],
+      longitude: loc[:longitude],
+      street: loc[:street],
+      city: loc[:city],
+      zipcode: loc[:zipcode],
+      state_id: ca_state&.id,
+      country_id: us&.id,
+      use_entered_address: "true"
+    }
+  }
 )
-Ownership.create!(bike: unreg_bike, creator: member, owner_email: member.email, current: true, skip_email: true,
-  user_hidden: true, origin: "creator_unregistered_parking_notification")
-unreg_bike.update!(user_hidden: true)
-
-ParkingNotification.create!(
-  bike: unreg_bike,
-  user: member,
-  organization: hogwarts,
-  kind: "parked_incorrectly_notification",
-  latitude: loc[:latitude],
-  longitude: loc[:longitude],
-  street: loc[:street],
-  city: loc[:city],
-  zipcode: loc[:zipcode],
-  state_id: ca_state&.id,
-  country_id: us&.id,
-  message: "Unregistered bike found at #{loc[:street]}",
-  unregistered_bike: true
-)
+unreg_b_param.origin = "organization_form"
+unreg_bike = creator.create_bike(unreg_b_param)
+raise "Unregistered bike creation failed: #{unreg_b_param.bike_errors}" if unreg_bike.errors.any?
 puts "  Created unregistered parking notification at #{loc[:street]}"
 
 puts "Parking notifications seeded successfully!"
 
-# --- 5 impound records with impounded_from addresses ---
-sf_impound_addresses = [
-  {latitude: 37.7749, longitude: -122.4194, street: "1 Market St", city: "San Francisco", postal_code: "94105"},
-  {latitude: 37.7851, longitude: -122.4094, street: "345 Stockton St", city: "San Francisco", postal_code: "94108"},
-  {latitude: 37.7694, longitude: -122.4862, street: "1001 Great Hwy", city: "San Francisco", postal_code: "94121"},
-  {latitude: 37.7599, longitude: -122.4148, street: "2501 Mission St", city: "San Francisco", postal_code: "94110"},
-  {latitude: 37.8024, longitude: -122.4058, street: "Pier 39", city: "San Francisco", postal_code: "94133"}
-]
-
+# --- 5 impound records via BikeServices::Creator with status_impounded ---
 puts "Creating 5 impound records in San Francisco for Hogwarts..."
 
-sf_impound_addresses.each_with_index do |addr, i|
-  bike = create_pn_bike.call
-
-  address_record = AddressRecord.create!(
-    kind: :impounded_from,
-    latitude: addr[:latitude],
-    longitude: addr[:longitude],
-    street: addr[:street],
-    city: addr[:city],
-    postal_code: addr[:postal_code],
-    region_record: ca_state,
-    country: us,
-    organization: hogwarts,
-    bike:,
-    skip_geocoding: true
+5.times do |i|
+  loc = sf_locations[i]
+  b_param = BParam.create!(
+    creator: member,
+    params: {
+      bike: {
+        cycle_type: "bike",
+        propulsion_type: "foot-pedal",
+        serial_number: (0...10).map { rand(65..90).chr }.join,
+        manufacturer_id: manufacturer_ids.sample.to_s,
+        primary_frame_color_id: color_ids.sample.to_s,
+        rear_tire_narrow: "true",
+        handlebar_type: HandlebarType.slugs.first,
+        owner_email: owner_emails.sample,
+        creation_organization_id: hogwarts.id.to_s,
+        status: "status_impounded"
+      },
+      impound_record: {
+        address_record_attributes: {
+          street: loc[:street],
+          city: loc[:city],
+          zipcode: loc[:zipcode],
+          state_id: ca_state&.id.to_s,
+          country_id: us&.id.to_s,
+          latitude: loc[:latitude].to_s,
+          longitude: loc[:longitude].to_s
+        }
+      }
+    }
   )
-
-  impound_record = ImpoundRecord.create!(
-    bike:,
-    user: member,
-    organization: hogwarts,
-    impounded_from_address_record: address_record
-  )
-  bike.update!(current_impound_record: impound_record)
-  puts "  Created impound record ##{i + 1} at #{addr[:street]}, #{addr[:city]}"
+  b_param.origin = "organization_form"
+  bike = creator.create_bike(b_param)
+  raise "Impound bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
+  ProcessImpoundUpdatesJob.new.perform(bike.current_impound_record.id)
+  puts "  Created impound record ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
 end
 
 puts "Impound records seeded successfully!"
-

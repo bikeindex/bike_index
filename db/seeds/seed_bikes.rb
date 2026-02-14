@@ -1,46 +1,54 @@
 # Seed 50 bikes for user@bikeindex.org on the first organization,
 # plus stolen bikes in SF/Oakland and found bikes
 user = User.find_by_email("user@bikeindex.org")
-member = User.find_by_email("member@bikeindex.org")
 org = Organization.first
 manufacturer_ids = Manufacturer.frame_makers.pluck(:id)
 raise "No manufacturers imported - run `rails seed:import_manufacturers` first" if manufacturer_ids.blank?
 
 wheel_size_ids = WheelSize.pluck(:id)
 color_ids = Color.pluck(:id)
+us = Country.united_states
+ca_state = State.find_by_abbreviation("CA")
+
+creator = BikeServices::Creator.new
+
+owner_emails = %w[
+  alice@example.com bob@example.com carol@example.com dave@example.com
+  eve@example.com frank@example.com grace@example.com heidi@example.com
+  ivan@example.com judy@example.com kevin@example.com laura@example.com
+  mike@example.com nora@example.com oscar@example.com
+]
 
 # --- 50 registered bikes ---
 50.times do
-  bike = Bike.new(
-    cycle_type: :bike,
-    propulsion_type: "foot-pedal",
-    manufacturer_id: manufacturer_ids.sample,
-    rear_tire_narrow: true,
-    handlebar_type: HandlebarType.slugs.first,
-    rear_wheel_size_id: wheel_size_ids.sample,
-    front_wheel_size_id: wheel_size_ids.sample,
-    primary_frame_color_id: color_ids.sample,
+  b_param = BParam.create!(
     creator: user,
-    owner_email: user.email
+    params: {
+      bike: {
+        cycle_type: "bike",
+        propulsion_type: "foot-pedal",
+        serial_number: (0...10).map { rand(65..90).chr }.join,
+        manufacturer_id: manufacturer_ids.sample.to_s,
+        primary_frame_color_id: color_ids.sample.to_s,
+        rear_tire_narrow: "true",
+        rear_wheel_size_id: wheel_size_ids.sample.to_s,
+        front_wheel_size_id: wheel_size_ids.sample.to_s,
+        handlebar_type: HandlebarType.slugs.first,
+        owner_email: owner_emails.sample,
+        creation_organization_id: org.id.to_s
+      }
+    }
   )
-  bike.serial_number = (0...10).map { rand(65..90).chr }.join
-  bike.creation_organization_id = org.id
-  if bike.save
-    ownership = Ownership.new(bike_id: bike.id, creator_id: member.id, user_id: user.id, owner_email: user.email, current: true, skip_email: true)
-    unless ownership.save
-      puts "\n Ownership error \n #{ownership.errors.messages}"
-      raise StandardError
-    end
-    puts "New bike made by #{bike.manufacturer.name}"
+  b_param.origin = "organization_form"
+  bike = creator.create_bike(b_param)
+  if bike.errors.any?
+    puts "\n Bike error \n #{b_param.bike_errors}"
   else
-    puts "\n Bike error \n #{bike.errors.messages}"
+    puts "New bike made by #{bike.manufacturer.name}"
   end
 end
 
 # --- 10 stolen bikes in San Francisco and Oakland ---
-us = Country.united_states
-ca_state = State.find_by_abbreviation("CA")
-
 stolen_locations = [
   {latitude: 37.7749, longitude: -122.4194, street: "50 Fremont St", city: "San Francisco", zipcode: "94105"},
   {latitude: 37.7833, longitude: -122.4167, street: "200 Kearny St", city: "San Francisco", zipcode: "94108"},
@@ -57,36 +65,41 @@ stolen_locations = [
 puts "Creating 10 stolen bikes in San Francisco and Oakland..."
 
 stolen_locations.each_with_index do |loc, i|
-  bike = Bike.create!(
-    cycle_type: :bike,
-    propulsion_type: "foot-pedal",
-    serial_number: (0...10).map { rand(65..90).chr }.join,
-    manufacturer_id: manufacturer_ids.sample || Manufacturer.first.id,
-    primary_frame_color_id: color_ids.sample,
-    rear_tire_narrow: true,
-    handlebar_type: HandlebarType.slugs.first,
+  b_param = BParam.create!(
     creator: user,
-    owner_email: user.email
+    params: {
+      bike: {
+        cycle_type: "bike",
+        propulsion_type: "foot-pedal",
+        serial_number: (0...10).map { rand(65..90).chr }.join,
+        manufacturer_id: manufacturer_ids.sample.to_s,
+        primary_frame_color_id: color_ids.sample.to_s,
+        rear_tire_narrow: "true",
+        handlebar_type: HandlebarType.slugs.first,
+        owner_email: owner_emails.sample,
+        status: "status_stolen",
+        date_stolen: (Time.current - rand(1..30).days).to_s
+      },
+      stolen_record: {
+        latitude: loc[:latitude].to_s,
+        longitude: loc[:longitude].to_s,
+        street: loc[:street],
+        city: loc[:city],
+        zipcode: loc[:zipcode],
+        state_id: ca_state&.id.to_s,
+        country_id: us&.id.to_s,
+        theft_description: "Bike was locked on #{loc[:street]} and stolen overnight",
+        locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+        lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+      }
+    }
   )
-  Ownership.create!(bike:, creator: user, owner_email: user.email, current: true, skip_email: true)
-
-  stolen_record = StolenRecord.create!(
-    bike:,
-    date_stolen: Time.current - rand(1..30).days,
-    latitude: loc[:latitude],
-    longitude: loc[:longitude],
-    street: loc[:street],
-    city: loc[:city],
-    zipcode: loc[:zipcode],
-    state_id: ca_state&.id,
-    country_id: us&.id,
-    theft_description: "Bike was locked on #{loc[:street]} and stolen overnight",
-    locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
-    lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample,
-    skip_update: true
-  )
-  bike.update!(current_stolen_record: stolen_record)
-  puts "  Created stolen bike ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
+  bike = creator.create_bike(b_param)
+  if bike.errors.any?
+    puts "\n Stolen bike error \n #{b_param.bike_errors}"
+  else
+    puts "  Created stolen bike ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
+  end
 end
 
 # --- 2 found bikes (impound records without organization) ---
@@ -98,27 +111,40 @@ found_locations = [
 puts "Creating 2 found bikes (1 San Francisco, 1 Oakland)..."
 
 found_locations.each_with_index do |loc, i|
-  bike = Bike.create!(
-    cycle_type: :bike,
-    propulsion_type: "foot-pedal",
-    serial_number: (0...10).map { rand(65..90).chr }.join,
-    manufacturer_id: manufacturer_ids.sample || Manufacturer.first.id,
-    primary_frame_color_id: color_ids.sample,
-    rear_tire_narrow: true,
-    handlebar_type: HandlebarType.slugs.first,
+  b_param = BParam.create!(
     creator: user,
-    owner_email: user.email
+    params: {
+      bike: {
+        cycle_type: "bike",
+        propulsion_type: "foot-pedal",
+        serial_number: (0...10).map { rand(65..90).chr }.join,
+        manufacturer_id: manufacturer_ids.sample.to_s,
+        primary_frame_color_id: color_ids.sample.to_s,
+        rear_tire_narrow: "true",
+        handlebar_type: HandlebarType.slugs.first,
+        owner_email: owner_emails.sample,
+        status: "status_impounded"
+      },
+      impound_record: {
+        address_record_attributes: {
+          street: loc[:street],
+          city: loc[:city],
+          zipcode: loc[:zipcode],
+          state_id: ca_state&.id.to_s,
+          country_id: us&.id.to_s,
+          latitude: loc[:latitude].to_s,
+          longitude: loc[:longitude].to_s
+        }
+      }
+    }
   )
-  Ownership.create!(bike:, creator: user, owner_email: user.email, current: true, skip_email: true)
-
-  impound_record = ImpoundRecord.create!(
-    bike:,
-    user:,
-    skip_update: true
-  )
-  bike.update!(current_impound_record: impound_record)
-  puts "  Created found bike ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
+  bike = creator.create_bike(b_param)
+  if bike.errors.any?
+    puts "\n Found bike error \n #{b_param.bike_errors}"
+  else
+    ProcessImpoundUpdatesJob.new.perform(bike.current_impound_record.id)
+    puts "  Created found bike ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
+  end
 end
 
-Bike.pluck(:id).each { |b| CallbackJob::AfterBikeSaveJob.perform_async(b) }
 puts "Bikes seeded successfully!"
