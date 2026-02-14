@@ -6,7 +6,7 @@ class Admin::UsersController < Admin::BaseController
 
   def index
     @per_page = permitted_per_page
-    @pagy, @users = pagy(:countish, matching_users.reorder("users.#{sort_column} #{sort_direction}")
+    @pagy, @collection = pagy(:countish, matching_users.reorder("users.#{sort_column} #{sort_direction}")
       .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :organization_roles, :ambassador_tasks, :email_bans_active),
       limit: @per_page, page: permitted_page)
   end
@@ -110,6 +110,8 @@ class Admin::UsersController < Admin::BaseController
   def matching_users
     @search_ambassadors = Binxtils::InputNormalizer.boolean(params[:search_ambassadors])
     @search_superusers = Binxtils::InputNormalizer.boolean(params[:search_superusers])
+    @search_developers = Binxtils::InputNormalizer.boolean(params[:search_developers])
+    @search_with_organization = Binxtils::InputNormalizer.boolean(params[:search_with_organization])
     @updated_at = Binxtils::InputNormalizer.boolean(params[:search_updated_at])
     @search_unconfirmed = Binxtils::InputNormalizer.boolean(params[:search_unconfirmed])
     @search_confirmed = @search_unconfirmed ? false : Binxtils::InputNormalizer.boolean(params[:search_confirmed])
@@ -126,6 +128,8 @@ class Admin::UsersController < Admin::BaseController
     users = users.send(invalidness_scope(@invalid))
     users = users.ambassadors if @search_ambassadors
     users = users.superuser_abilities if @search_superusers
+    users = users.where(developer: true) if @search_developers
+    users = users.where(id: OrganizationRole.select(:user_id)) if @search_with_organization
     users = users.unconfirmed if @search_unconfirmed
     users = users.confirmed if @search_confirmed
 
@@ -140,7 +144,7 @@ class Admin::UsersController < Admin::BaseController
     @time_range_column = sort_column if %w[updated_at deleted_at].include?(sort_column)
     @time_range_column = nil if @time_range_column == "deleted_at" && !@search_deleted
     @time_range_column ||= "created_at"
-    users.where(@time_range_column => @time_range)
+    users.where("users.#{@time_range_column}" => @time_range)
   end
 
   def invalidness_scope(invalidness)

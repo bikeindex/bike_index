@@ -1,6 +1,6 @@
 - render_sortable ||= false
 - skip_user ||= false
-- render_deleted ||= false
+- render_deleted = @deleted
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border#recordsTable
@@ -24,7 +24,7 @@
         %th
           = sortable "deleted_at", render_sortable: render_sortable
     %tbody
-      - superuser_abilities.each do |superuser_ability|
+      - collection.each do |superuser_ability|
         %tr
           %td
             %a.convertTime{href: edit_admin_superuser_ability_path(superuser_ability.to_param)}

@@ -21,12 +21,17 @@
 
     <script src="/vendored_assets/application_standalone.js"></script>
 
-    <%= stylesheet_link_tag 'tailwind', "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
     <%# = hotwire_livereload_tags if Rails.env.development? %>
     <%# assets are vendored, lazy solution %>
-    <style>.for-sale-color {color: #2ecc71;} .stolen-color, impounded-color {color: #e74c3c;} .found-color {color: oklch(59.1% 0.293 322.896);} .unregistered-color { color: #f0ad4e};</style>
+    <style>
+      .for-sale-color {color: #2ecc71;}
+      .stolen-color, .impounded-color {color: #e74c3c;}
+      .found-color {color: oklch(59.1% 0.293 322.896);}
+      .unregistered-color { color: #f0ad4e; }
+    </style>
   </head>
 
   <%# manually override body_class in a few situations :/ %>

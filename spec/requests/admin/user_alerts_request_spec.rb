@@ -9,7 +9,7 @@ RSpec.describe Admin::UserAlertsController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(assigns(:user_alerts)).to eq([])
+      expect(assigns(:collection)).to eq([])
     end
   end
 end
