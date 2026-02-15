@@ -12,15 +12,8 @@ ca_state = State.find_by_abbreviation("CA")
 
 creator = BikeServices::Creator.new
 
-owner_emails = %w[
-  alice@example.com bob@example.com carol@example.com dave@example.com
-  eve@example.com frank@example.com grace@example.com heidi@example.com
-  ivan@example.com judy@example.com kevin@example.com laura@example.com
-  mike@example.com nora@example.com oscar@example.com
-]
-
 # --- 50 registered bikes ---
-50.times do
+50.times do |i|
   b_param = BParam.create!(
     creator: user,
     params: {
@@ -34,7 +27,7 @@ owner_emails = %w[
         rear_wheel_size_id: wheel_size_ids.sample.to_s,
         front_wheel_size_id: wheel_size_ids.sample.to_s,
         handlebar_type: HandlebarType.slugs.first,
-        owner_email: owner_emails.sample,
+        owner_email: "testuser+#{i}@bikeindex.org",
         creation_organization_id: org.id.to_s
       }
     }
@@ -76,7 +69,7 @@ stolen_locations.each_with_index do |loc, i|
         primary_frame_color_id: color_ids.sample.to_s,
         rear_tire_narrow: "true",
         handlebar_type: HandlebarType.slugs.first,
-        owner_email: owner_emails.sample,
+        owner_email: "testuser+#{i + 50}@bikeindex.org",
         status: "status_stolen",
         date_stolen: (Time.current - rand(1..30).days).to_s
       },
@@ -98,6 +91,7 @@ stolen_locations.each_with_index do |loc, i|
   if bike.errors.any?
     puts "\n Stolen bike error \n #{b_param.bike_errors}"
   else
+    bike.current_stolen_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
     puts "  Created stolen bike ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
   end
 end
@@ -122,7 +116,7 @@ found_locations.each_with_index do |loc, i|
         primary_frame_color_id: color_ids.sample.to_s,
         rear_tire_narrow: "true",
         handlebar_type: HandlebarType.slugs.first,
-        owner_email: owner_emails.sample,
+        owner_email: "testuser+#{i + 60}@bikeindex.org",
         status: "status_impounded"
       },
       impound_record: {
@@ -131,9 +125,7 @@ found_locations.each_with_index do |loc, i|
           city: loc[:city],
           zipcode: loc[:zipcode],
           state_id: ca_state&.id.to_s,
-          country_id: us&.id.to_s,
-          latitude: loc[:latitude].to_s,
-          longitude: loc[:longitude].to_s
+          country_id: us&.id.to_s
         }
       }
     }
@@ -142,7 +134,9 @@ found_locations.each_with_index do |loc, i|
   if bike.errors.any?
     puts "\n Found bike error \n #{b_param.bike_errors}"
   else
-    ProcessImpoundUpdatesJob.new.perform(bike.current_impound_record.id)
+    impound_record = bike.current_impound_record
+    impound_record.address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
+    ProcessImpoundUpdatesJob.new.perform(impound_record.id)
     puts "  Created found bike ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
   end
 end

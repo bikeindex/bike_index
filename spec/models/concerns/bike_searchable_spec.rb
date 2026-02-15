@@ -144,6 +144,7 @@ RSpec.describe BikeSearchable do
         let(:target) { query_params }
         it "parses serial" do
           expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+          expect(BikeSearchable.location_not_found?(interpreted_params)).to be_falsey
         end
       end
       context "proximity" do
@@ -153,8 +154,9 @@ RSpec.describe BikeSearchable do
             let(:target) { {stolenness: "stolen", location: "anywhere", distance: 69} }
             it "returns a non-proximity search" do
               expect(BikeSearchable.search_location(query_params[:location], ip_address)).to be_nil
-
-              expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+              interpreted_params = BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)
+              expect(interpreted_params).to eq target
+              expect(BikeSearchable.location_not_found?(interpreted_params)).to be_falsey
             end
           end
         end
@@ -164,13 +166,16 @@ RSpec.describe BikeSearchable do
             let(:target) { {stolenness: "proximity", location: "these parts", distance: 1, bounding_box:} }
             it "returns location and distance of 100" do
               expect(BikeSearchable.search_location(query_params[:location], ip_address)).to eq([query_params[:location], nil])
-              expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+              interpreted_params = BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)
+              expect(interpreted_params).to eq target
+              expect(BikeSearchable.location_not_found?(interpreted_params)).to be_truthy
             end
           end
           context "with no distance" do
             let(:target) { {stolenness: "proximity", location: "these parts", distance: 100, bounding_box:} }
             it "returns location and distance of 100" do
               expect(BikeSearchable.searchable_interpreted_params(query_params.except(:distance), ip: ip_address)).to eq target
+              expect(BikeSearchable.location_not_found?(interpreted_params)).to be_truthy
             end
           end
           context "with a broken bounding box" do
@@ -195,6 +200,7 @@ RSpec.describe BikeSearchable do
                 expect(BikeSearchable.search_location(query_params[:location], ip_address)).to eq search_location
 
                 expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
+                expect(BikeSearchable.location_not_found?(interpreted_params)).to be_falsey
               end
             end
           end

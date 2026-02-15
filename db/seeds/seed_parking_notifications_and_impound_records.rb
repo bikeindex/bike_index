@@ -79,15 +79,15 @@ initial_notifications = []
     user: member,
     organization: hogwarts,
     kind: pn_kinds[i % pn_kinds.length],
-    latitude: loc[:latitude],
-    longitude: loc[:longitude],
     street: loc[:street],
     city: loc[:city],
     zipcode: loc[:zipcode],
     state_id: ca_state&.id,
     country_id: us&.id,
+    skip_geocoding: true,
     message: "Bike found #{loc[:street]} - notification ##{i + 1}"
   )
+  pn.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
   initial_notifications << pn
   puts "  Created parking notification ##{i + 1} at #{loc[:street]}"
 end
@@ -102,16 +102,16 @@ end
     organization: hogwarts,
     kind: "impound_notification",
     initial_record_id: initial.id,
-    latitude: loc[:latitude],
-    longitude: loc[:longitude],
     street: loc[:street],
     city: loc[:city],
     zipcode: loc[:zipcode],
     state_id: ca_state&.id,
     country_id: us&.id,
+    skip_geocoding: true,
     message: "Repeat notification - impounding bike from #{loc[:street]}",
     delivery_status: "email_success"
   )
+  pn.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
   ProcessParkingNotificationJob.new.perform(pn.id)
   puts "  Created impound notification ##{i + 1} with ImpoundRecord ##{pn.reload.impound_record_id}"
 end
@@ -134,20 +134,19 @@ unreg_b_param = BParam.create!(
     },
     parking_notification: {
       kind: "parked_incorrectly_notification",
-      latitude: loc[:latitude],
-      longitude: loc[:longitude],
       street: loc[:street],
       city: loc[:city],
       zipcode: loc[:zipcode],
       state_id: ca_state&.id,
       country_id: us&.id,
-      use_entered_address: "true"
+      skip_geocoding: true
     }
   }
 )
 unreg_b_param.origin = "organization_form"
 unreg_bike = creator.create_bike(unreg_b_param)
 raise "Unregistered bike creation failed: #{unreg_b_param.bike_errors}" if unreg_bike.errors.any?
+unreg_bike.parking_notifications.last&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
 puts "  Created unregistered parking notification at #{loc[:street]}"
 
 puts "Parking notifications seeded successfully!"
@@ -178,9 +177,7 @@ puts "Creating 5 impound records in San Francisco for Hogwarts..."
           city: loc[:city],
           zipcode: loc[:zipcode],
           state_id: ca_state&.id.to_s,
-          country_id: us&.id.to_s,
-          latitude: loc[:latitude].to_s,
-          longitude: loc[:longitude].to_s
+          country_id: us&.id.to_s
         }
       }
     }
@@ -188,7 +185,10 @@ puts "Creating 5 impound records in San Francisco for Hogwarts..."
   b_param.origin = "organization_form"
   bike = creator.create_bike(b_param)
   raise "Impound bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
-  ProcessImpoundUpdatesJob.new.perform(bike.current_impound_record.id)
+  impound_record = bike.current_impound_record
+  impound_record.address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
+  impound_record.impounded_from_address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
+  ProcessImpoundUpdatesJob.new.perform(impound_record.id)
   puts "  Created impound record ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
 end
 
