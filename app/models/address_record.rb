@@ -60,7 +60,7 @@ class AddressRecord < ApplicationRecord
 
     def permitted_params
       # user_id and kind should be set manually!
-      %i[city postal_code region_string street street_2 country_id region_record_id skip_geocoding].freeze
+      %i[city postal_code region_string street street_2 country_id region_record_id].freeze
     end
 
     def attrs_to_duplicate(obj)

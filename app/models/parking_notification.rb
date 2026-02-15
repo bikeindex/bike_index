@@ -301,7 +301,6 @@ class ParkingNotification < ActiveRecord::Base
     # generate retrieval token after checking if unregistered_bike
     self.retrieval_link_token ||= SecurityTokenizer.new_token if current? && send_email?
     # We need to geocode on creation, unless all the attributes are present
-    return true if skip_geocoding?
     return true if id.present? && street.present? && latitude.present? && longitude.present?
 
     if !use_entered_address && latitude.present? && longitude.present?
