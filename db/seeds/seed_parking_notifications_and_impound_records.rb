@@ -111,9 +111,11 @@ end
     message: "Repeat notification - impounding bike from #{loc[:street]}",
     delivery_status: "email_success"
   )
-  pn.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
   ProcessParkingNotificationJob.new.perform(pn.id)
-  puts "  Created impound notification ##{i + 1} with ImpoundRecord ##{pn.reload.impound_record_id}"
+  pn.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
+  pn.reload
+  pn.impound_record&.address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
+  puts "  Created impound notification ##{i + 1} with ImpoundRecord ##{pn.impound_record_id}"
 end
 
 # Create 1 unregistered_parking_notification via BikeServices::Creator
@@ -186,9 +188,10 @@ puts "Creating 5 impound records in San Francisco for Hogwarts..."
   bike = creator.create_bike(b_param)
   raise "Impound bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
   impound_record = bike.current_impound_record
+  ProcessImpoundUpdatesJob.new.perform(impound_record.id)
+  impound_record.reload
   impound_record.address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
   impound_record.impounded_from_address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
-  ProcessImpoundUpdatesJob.new.perform(impound_record.id)
   puts "  Created impound record ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
 end
 

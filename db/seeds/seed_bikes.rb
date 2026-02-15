@@ -135,8 +135,9 @@ found_locations.each_with_index do |loc, i|
     puts "\n Found bike error \n #{b_param.bike_errors}"
   else
     impound_record = bike.current_impound_record
-    impound_record.address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
     ProcessImpoundUpdatesJob.new.perform(impound_record.id)
+    impound_record.reload
+    impound_record.address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
     puts "  Created found bike ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
   end
 end
