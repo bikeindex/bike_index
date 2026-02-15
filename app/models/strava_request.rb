@@ -37,7 +37,7 @@ class StravaRequest < AnalyticsRecord
     rate_limited: 3,
     token_refresh_failed: 4,
     integration_deleted: 5,
-    skipped: 6,
+    skipped: 6
   }.freeze
 
   belongs_to :user
