@@ -72,6 +72,10 @@ module BikeSearchable
       end
     end
 
+    def location_search_not_found_location?(interpreted_params)
+      false
+    end
+
     private
 
     def searchable_query_items_query(query_params)
