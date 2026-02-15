@@ -130,6 +130,13 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 expect(assigns(:interpreted_params)).to eq target_interpreted_params
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
                 expect(flash[:info]).to be_blank
+
+                # with below minimum distance
+                get base_url, params: query_params.merge(distance: 0.01), headers: headers, as: :turbo_stream
+                expect(response.status).to eq 200
+                expect(assigns(:interpreted_params)).to eq target_interpreted_params
+                expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
+                expect(flash[:info]).to be_blank
               end
             end
             context "ip passed as parameter" do

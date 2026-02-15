@@ -1924,6 +1924,11 @@ en:
       update:
         image_updated: Image was successfully updated.
     search:
+      marketplace:
+        set_interpreted_params:
+          we_dont_know_location: >-
+            Sorry, we don't know the location "%{location}". Please try a different
+            location to search nearby listings.
       registrations:
         set_interpreted_params:
           we_dont_know_location: >-
