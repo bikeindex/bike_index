@@ -113,7 +113,7 @@ jobs:
       - name: Test bin/setup # Test bin/setup - only run on 1 node, knapsack should balance
         if: matrix.ci_node_index == 0
         run: bin/setup
-      - name: Check translations (full sync on main, lightweight check on PRs)
+      - name: Sync translations (only on main by default)
         if: matrix.ci_node_index == 0
         env:
           GH_TOKEN: ${{ github.token }}
