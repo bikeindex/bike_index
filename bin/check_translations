@@ -23,22 +23,29 @@ fi
 
 output "${CYAN}" "Checking Translations"
 
-# Quit as success if not on the branch to be synced
-if ! git branch --list | grep --silent "^* ${TRANSLATION_BRANCH}$"; then
-  output "${GREEN}" "Skipping: Not on TRANSLATION_BRANCH: ${TRANSLATION_BRANCH}"
-  exit 0
+# Determine if we're on the sync branch (full sync vs lightweight check)
+on_sync_branch=false
+if [ -n "$TRANSLATION_BRANCH" ] && git branch --list | grep --silent "^* ${TRANSLATION_BRANCH}$"; then
+  on_sync_branch=true
 fi
 
-echo bundle exec rake translation:sync_and_purge prepare_translations
-bundle exec rake translation:sync_and_purge prepare_translations
+if [ "$on_sync_branch" = true ] && [ -n "$TRANSLATION_IO_API_KEY" ]; then
+  output "${CYAN}" "Full sync: on ${TRANSLATION_BRANCH} with API key"
+  echo bundle exec rake translation:sync_and_purge prepare_translations
+  bundle exec rake translation:sync_and_purge prepare_translations
 
-output "${YELLOW}" "Stashing translation.io timestamp file"
-set -x
-git stash -- config/locales/.translation_io
-git status --short
-# Reset the migrations, in case of postgres artifacts changing things
-git checkout HEAD db/
-set +x
+  output "${YELLOW}" "Stashing translation.io timestamp file"
+  set -x
+  git stash -- config/locales/.translation_io
+  git status --short
+  # Reset the migrations, in case of postgres artifacts changing things
+  git checkout HEAD db/
+  set +x
+else
+  output "${CYAN}" "Lightweight check: running prepare_translations"
+  echo bundle exec rake prepare_translations
+  bundle exec rake prepare_translations
+fi
 
 if [[ -z "$(git --no-pager diff)" ]]; then
   output "${GREEN}" "No uncommitted translations. Done."
@@ -47,7 +54,7 @@ else
   output "${RED}" "Uncommitted Translations"
   git --no-pager diff
 
-  if [ -n "$CI" ]; then
+  if [ -n "$CI" ] && [ "$on_sync_branch" = true ]; then
     output "${YELLOW}" "On CI — creating translation sync PR"
 
     # Check for existing open translation sync PRs

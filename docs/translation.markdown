@@ -190,15 +190,18 @@ rake task is run. See [PR #1353][pr-1353] for implementation details.
 Pre-Deployment Translation Syncing
 ----------------------------------
 
-When CI runs on main, `bin/check_translations` syncs translations with
-translation.io and checks for changes. If translations are out of sync, CI will
-automatically create a PR (e.g. `translations-sync-20260216120000`) with the
-updates and fail the build.
+`bin/check_translations` runs in CI on every push and pull request. It has two
+modes:
 
-To deploy, merge the translation sync PR and re-run the failed build.
+- **On main** (full sync): syncs with translation.io, then checks for changes.
+  If translations are out of sync, CI automatically creates a PR
+  (e.g. `translations-sync-20260216120000`) with the updates and fails the build.
+  Merge the PR and re-run the failed build to deploy. If a translation sync PR
+  is already open, CI skips creating a duplicate and just fails.
 
-If a translation sync PR is already open, CI will skip creating a duplicate and
-just fail until the existing PR is merged.
+- **On PRs / branches** (lightweight check): runs `prepare_translations` to
+  verify translation files are properly normalized. No API key or GitHub token
+  is required, so this works for fork PRs too.
 
 To manually update the keys on translation.io, run
 `bin/rake translation:sync_and_purge` (requires having an active API key locally).
