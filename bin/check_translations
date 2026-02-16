@@ -29,8 +29,8 @@ if [ -n "$TRANSLATION_BRANCH" ] && git branch --list | grep --silent "^* ${TRANS
   on_sync_branch=true
 fi
 
-if [ "$on_sync_branch" = true ] && [ -n "$TRANSLATION_IO_API_KEY" ]; then
-  output "${CYAN}" "Full sync: on ${TRANSLATION_BRANCH} with API key"
+if [ -n "$TRANSLATION_IO_API_KEY" ]; then
+  output "${CYAN}" "Full sync: pulling from translation.io"
   echo bundle exec rake translation:sync_and_purge prepare_translations
   bundle exec rake translation:sync_and_purge prepare_translations
 
@@ -42,7 +42,7 @@ if [ "$on_sync_branch" = true ] && [ -n "$TRANSLATION_IO_API_KEY" ]; then
   git checkout HEAD db/
   set +x
 else
-  output "${CYAN}" "Lightweight check: running prepare_translations"
+  output "${CYAN}" "Lightweight check: running prepare_translations (no API key)"
   echo bundle exec rake prepare_translations
   bundle exec rake prepare_translations
 fi
