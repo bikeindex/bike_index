@@ -16,7 +16,10 @@ output() {
   printf "\n${1}${2}${NONE}\n\n"
 }
 
-alias git=/usr/local/bin/git
+# Only alias git on macOS (local dev); CI has git on a different path
+if [ -z "$CI" ] && [ -f /usr/local/bin/git ]; then
+  alias git=/usr/local/bin/git
+fi
 
 output "${CYAN}" "Checking Translations"
 
@@ -43,6 +46,36 @@ if [[ -z "$(git --no-pager diff)" ]]; then
 else
   output "${RED}" "Uncommitted Translations"
   git --no-pager diff
+
+  if [ -n "$CI" ]; then
+    output "${YELLOW}" "On CI — creating translation sync PR"
+
+    # Check for existing open translation sync PRs
+    existing_pr=$(gh pr list --head "translations-sync" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+    if [ -n "$existing_pr" ]; then
+      output "${YELLOW}" "Translation sync PR already exists: #${existing_pr} — skipping PR creation"
+      exit 1
+    fi
+
+    branch_name="translations-sync-$(date +%Y%m%d%H%M%S)"
+
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    git checkout -b "$branch_name"
+    git stash pop || true
+    git add config/locales/
+    git commit -m "translations sync"
+    git push origin "$branch_name"
+
+    gh pr create \
+      --title "translations sync" \
+      --body "Automated translation sync from CI. Merge this PR then re-run the failed build." \
+      --base main \
+      --head "$branch_name"
+
+    output "${YELLOW}" "PR created. Build will fail until the PR is merged."
+  fi
 
   exit 1
 fi
