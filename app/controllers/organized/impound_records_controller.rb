@@ -96,10 +96,9 @@ module Organized
         a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])
       end
 
+      @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
+        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
       if params[:search_location].present?
-        # NOTE: Most places we don't pass a minimum distance, because
-        @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
-          min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
         bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
         if bounding_box.present?
           a_impound_records = a_impound_records.within_bounding_box(bounding_box)
