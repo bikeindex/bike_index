@@ -511,11 +511,11 @@ GEM
       nenv (~> 0.1)
       shellany (~> 0.0)
     observer (0.1.2)
-    oj (3.16.13)
+    oj (3.16.15)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
     openssl (4.0.0)
-    ostruct (0.6.1)
+    ostruct (0.6.3)
     pagy (43.2.1)
       json
       yaml
