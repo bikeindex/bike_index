@@ -107,6 +107,11 @@ RSpec.describe "Strava Proxy API", type: :request do
           post base_url, params: {url: "//evil.com/steal", method: "GET", access_token: token.token}
           expect(response.status).to eq 400
         end
+
+        it "rejects path traversal" do
+          post base_url, params: {url: "../../oauth/token", method: "GET", access_token: token.token}
+          expect(response.status).to eq 400
+        end
       end
     end
   end

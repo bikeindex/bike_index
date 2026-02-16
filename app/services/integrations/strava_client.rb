@@ -77,7 +77,7 @@ class Integrations::StravaClient
     end
 
     def proxy_request(strava_integration, path, method: "GET")
-      raise ArgumentError, "Invalid proxy path" if path.blank? || path.match?(%r{://|\A//})
+      raise ArgumentError, "Invalid proxy path" if path.blank? || path.match?(%r{://|\A//|(\A|/)\.\.(/|\z)})
       path = path.delete_prefix("/")
       ensure_valid_token!(strava_integration)
       conn = api_connection(strava_integration)
