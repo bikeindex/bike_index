@@ -60,6 +60,10 @@ chdir APP_ROOT do
   # Install JavaScript dependencies
   system('npm install')
 
+  # Build StravaSearch submodule
+  puts "\n== Building StravaSearch =="
+  system('cd strava_search && npm install --legacy-peer-deps && npx vite build --base /strava_search/ --outDir ../public/strava_search')
+
   puts "\n== Preparing database =="
 
   # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
