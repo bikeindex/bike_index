@@ -195,7 +195,7 @@ translation.io and checks for changes. If translations are out of sync, CI will
 automatically create a PR (e.g. `translations-sync-20260216120000`) with the
 updates and fail the build.
 
-To deploy, merge the translation sync PR and re-run the failed build.
+To deploy, merge the translation sync PR.
 
 If a translation sync PR is already open, CI will skip creating a duplicate and
 just fail until the existing PR is merged.

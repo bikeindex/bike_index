@@ -69,8 +69,8 @@ else
     git push origin "$branch_name"
 
     gh pr create \
-      --title "translations sync" \
-      --body "Automated translation sync from CI. Merge this PR then re-run the failed build." \
+      --title "Automated translations sync from CI" \
+      --body "" \
       --base main \
       --head "$branch_name"
 
