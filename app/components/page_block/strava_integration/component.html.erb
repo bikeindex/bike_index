@@ -1,22 +1,29 @@
 <div class="tw:mt-1 tw:space-y-0.5 tw:leading-snug tw:[&_p]:mb-2!">
   <% if connected? %>
     <p><%= strava_icon %> <strong>Integration</strong></p>
-    <% if syncing? %>
-      <p>
+    <% if syncing? || pending? %>
+      <% if pending? %>
+        <p id="strava-pending-message">
+          <%= translation(".strava_connected_pending") %>
+        </p>
+      <% end %>
+      <p class="<%= pending? ? 'tw:hidden' : '' %>" id="strava-syncing-message">
         <%= translation(".syncing_activities") %>
 
         <span id="strava-download-count">
           <%= progress_percent %>% (<%= number_display(downloaded_count) %> /
           <%= number_display(total_count) %>) <%= translation(".downloaded") %>
         </span>
-      </p>
-      <p class="small less-strong">
-        <%= translation(".sync_running_in_background") %>
+
+        <span class="small less-strong tw:mt-2 tw:block">
+          <%= translation(".sync_running_in_background") %>
+        </span>
       </p>
       <% if @strava_integration.persisted? %>
         <div
           data-controller="strava-sync-status"
-          data-strava-sync-status-url-value="<%= helpers.sync_status_strava_integration_path %>"
+          data-strava-sync-status-url-value="<%= sync_status_strava_integration_path %>"
+          data-strava-sync-status-is-pending-value="<%= pending? %>"
         ></div>
       <% end %>
     <% elsif synced? %>
@@ -37,20 +44,12 @@
         <strong><%= translation(".sync_error") %></strong>
       </p>
       <p><%= translation(".sync_error_description") %></p>
-    <% elsif pending? %>
-      <p><%= translation(".strava_connected_pending") %></p>
-      <% if @strava_integration.persisted? %>
-        <div
-          data-controller="strava-sync-status"
-          data-strava-sync-status-url-value="<%= helpers.sync_status_strava_integration_path %>"
-        ></div>
-      <% end %>
     <% end %>
     <%= link_to translation(".disconnect_strava"),
-          helpers.strava_integration_path,
-          method: :delete,
-          class: "btn btn-sm btn-outline-danger tw:mt-4",
-          data: { confirm: translation(".disconnect_confirm") } %>
+        helpers.strava_integration_path,
+        method: :delete,
+        class: "btn btn-sm btn-outline-danger tw:mt-4",
+        data: { confirm: translation(".disconnect_confirm") } %>
   <% else %>
     <p><%= translation(".integrate_your_bikes_with_strava") %></p>
     <%= link_to helpers.new_strava_integration_path do %>

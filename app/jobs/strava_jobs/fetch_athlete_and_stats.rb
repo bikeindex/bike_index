@@ -30,6 +30,7 @@ module StravaJobs
       total_pages.times do |i|
         StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
           request_type: :list_activities, parameters: {page: i + 1})
+        StravaJobs::RequestRunner.perform_async
       end
     end
 

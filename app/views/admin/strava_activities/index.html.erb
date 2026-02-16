@@ -1,4 +1,6 @@
 <% nav_header_list_items = capture do %>
+  <%= link_to "with gear", url_for(sortable_search_params.merge(search_with_gear: !@with_gear)), class: "nav-link #{@with_gear ? "active" : ""}" %>
+
   <li class="nav-item dropdown dropleft">
     <a
       class="nav-link dropdown-toggle <%= @searched_activity_type.present? ? "active" : "" %>"
