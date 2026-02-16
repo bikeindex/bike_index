@@ -7,7 +7,7 @@
     price_max_amount: @price_max_amount, result_view: @result_view) %>
 </div>
 
-<%= turbo_frame_tag :marketplace_results_frame do %>
+<%= turbo_frame_tag :marketplace_results_frame, data: { turbo_stream: true } do %>
   <% if @render_results %>
     <%= turbo_frame_tag "page_#{@pagy.page}" do %>
       <%= render partial: "marketplace_results" %>

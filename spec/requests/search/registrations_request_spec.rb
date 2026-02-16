@@ -55,7 +55,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
         expect(response).to have_http_status(:success)
 
-        expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_registrations_results_frame\">")
+        expect(response.body).to include("<turbo-stream action=\"update\" target=\"search_registrations_results_frame\">")
         expect(response).to render_template(:index)
         expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
         expect(assigns(:bikes).pluck(:id).sort).to eq target_bike_ids
@@ -129,14 +129,14 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 expect(response.status).to eq 200
                 expect(assigns(:interpreted_params)).to eq target_interpreted_params
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
-                expect(assigns(:search_info)).to be_blank
+                expect(flash[:notice]).to be_blank
 
                 # with below minimum distance
                 get base_url, params: query_params.merge(distance: 0.01), headers: headers, as: :turbo_stream
                 expect(response.status).to eq 200
                 expect(assigns(:interpreted_params)).to eq target_interpreted_params
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
-                expect(assigns(:search_info)).to be_blank
+                expect(flash[:notice]).to be_blank
               end
             end
             context "ip passed as parameter" do
@@ -146,7 +146,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 expect(response.status).to eq 200
                 expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
-                expect(assigns(:search_info)).to be_blank
+                expect(flash[:notice]).to be_blank
               end
             end
             context "no location" do
@@ -156,7 +156,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 expect(response.status).to eq 200
                 expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
-                expect(assigns(:search_info)).to be_blank
+                expect(flash[:notice]).to be_blank
               end
             end
             context "unknown location" do
@@ -165,7 +165,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
               it "includes search_info for unknown location, renders non-proximity" do
                 get base_url, params: query_params, headers: headers, as: :turbo_stream
                 expect(response.status).to eq 200
-                expect(assigns(:search_info)).to match(/location/)
+                expect(flash[:notice]).to match(/location/)
                 expect(query_params[:stolenness]).to eq "proximity"
                 expect(assigns(:interpreted_params)[:stolenness]).to eq "stolen"
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])

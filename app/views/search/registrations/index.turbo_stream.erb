@@ -1,3 +1,9 @@
-<%= turbo_stream.replace :search_registrations_results_frame do %>
+<%= turbo_stream.update :search_registrations_results_frame do %>
   <%= render partial: "results" %>
+<% end %>
+
+<% if flash[:notice].present? %>
+  <%= turbo_stream.prepend "primaryAlertBlock" do %>
+    <%= render partial: "/shared/alert", locals: { body: flash[:notice], type: "notice" } %>
+  <% end %>
 <% end %>

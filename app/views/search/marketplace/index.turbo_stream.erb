@@ -1,3 +1,11 @@
-<%= turbo_frame_tag "page_#{@pagy.page}" do %>
-  <%= render partial: "marketplace_results", formats: [:html] %>
+<%= turbo_stream.update :marketplace_results_frame do %>
+  <%= turbo_frame_tag "page_#{@pagy.page}" do %>
+    <%= render partial: "marketplace_results", formats: [:html] %>
+  <% end %>
+<% end %>
+
+<% if flash[:notice].present? %>
+  <%= turbo_stream.prepend "primaryAlertBlock" do %>
+    <%= render partial: "/shared/alert", locals: { body: flash[:notice], type: "notice" } %>
+  <% end %>
 <% end %>
