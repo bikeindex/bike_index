@@ -15,6 +15,12 @@ redis-server > log/redis.log &
 export DEV_PORT=${CONDUCTOR_PORT:-${DEV_PORT:-3042}}
 export BASE_URL=http://localhost:$DEV_PORT
 
+# Build StravaSearch SPA if enabled
+if [ -n "$BUILD_STRAVA_SEARCH" ]; then
+  echo "== Building StravaSearch =="
+  (cd vendor/strava_search && npm install --legacy-peer-deps && npx vite build --base /strava_search/ --outDir ../../public/strava_search)
+fi
+
 # If there is a development specific environment file
 if test -f .env.development; then
   bundle exec foreman start -f Procfile.dev --env .env.development
