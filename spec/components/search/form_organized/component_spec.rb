@@ -67,7 +67,11 @@ RSpec.describe Search::FormOrganized::Component, type: :component do
   end
 
   context "with location search" do
-    let(:options) { {target_search_path:, interpreted_params:, search_location: "New York", search_proximity: 100} }
+    let(:component) do
+      render_inline(instance) do
+        '<input type="number" name="search_proximity" value="100" step="0.01" class="twinput" /><input type="text" name="search_location" value="New York" class="twinput" />'.html_safe
+      end
+    end
 
     it "renders location search fields" do
       expect(component).to have_css("form#Search_Form")

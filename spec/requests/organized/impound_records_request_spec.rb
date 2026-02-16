@@ -103,10 +103,10 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       context "unknown location" do
         let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] }
 
-        it "includes a flash[:info] for unknown location" do
+        it "includes a flash notice for unknown location" do
           get "#{base_url}?search_location=xkcd_unknown"
           expect(response.status).to eq(200)
-          expect(flash[:info]).to match(/location/)
+          expect(flash[:notice]).to match(/location/)
           expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id, impound_record_la.id])
         end
       end

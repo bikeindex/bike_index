@@ -103,7 +103,7 @@ module Organized
         if bounding_box.present?
           a_impound_records = a_impound_records.within_bounding_box(bounding_box)
         else
-          flash[:info] = translation(:we_dont_know_location, location: params[:search_location])
+          flash.now[:notice] = translation(:we_dont_know_location, location: params[:search_location])
         end
       end
 
