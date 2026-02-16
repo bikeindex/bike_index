@@ -171,6 +171,9 @@ RSpec.describe Search::MarketplaceController, type: :request do
               expect(flash[:info]).to match(/location/)
               expect(assigns(:interpreted_params)[:bounding_box]).to be_blank
               expect(assigns(:bikes).map(&:id)).to match_array([item.id, marketplace_listing_nyc.item_id])
+              # flash is rendered in turbo_stream response
+              expect(response.body).to include("primary-alert-block")
+              expect(response.body).to match(/we don&#39;t know the location/)
             end
           end
         end

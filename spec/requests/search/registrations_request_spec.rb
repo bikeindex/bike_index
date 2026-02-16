@@ -169,6 +169,9 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 expect(query_params[:stolenness]).to eq "proximity"
                 expect(assigns(:interpreted_params)[:stolenness]).to eq "stolen"
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
+                # flash is rendered in turbo_stream response
+                expect(response.body).to include("primary-alert-block")
+                expect(response.body).to match(/we don&#39;t know the location/)
               end
             end
           end

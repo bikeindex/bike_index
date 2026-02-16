@@ -5,7 +5,7 @@
 <%# error   - Messages because you did something wrong. Not faded %>
 <%# notice  - Messages that don't fit in the above categories. Not faded, may have actionable info %>
 
-<div class="bootstrapstyle primary-alert-block">
+<div class="bootstrapstyle primary-alert-block" id="primary-alert-block">
   <% flash.each do |name, msg| %>
     <%= render partial: "/shared/alert", locals: { body: msg, type: name } %>
   <% end %>
