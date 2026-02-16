@@ -3,7 +3,6 @@ module Organized
     include SortableTable
 
     MIN_DISTANCE = 0.01
-    MAX_DISTANCE = 1_000
     DEFAULT_DISTANCE = 1
 
     before_action :find_impound_record, except: [:index]
@@ -98,7 +97,9 @@ module Organized
       end
 
       if params[:search_location].present?
-        @search_proximity = permitted_distance(params[:search_proximity])
+        # NOTE: Most places we don't pass a minimum distance, because
+        @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
+          min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
         bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
         if bounding_box.present?
           a_impound_records = a_impound_records.within_bounding_box(bounding_box)
@@ -121,16 +122,6 @@ module Organized
       params.require(:impound_record_update)
         .permit(:kind, :notes, :location_id, :transfer_email)
         .merge(user_id: current_user.id)
-    end
-
-    # Very similar to GeocodeHelper.permitted_distance - except the default and min are different
-    # in GeocodeHelper, we're making sure that you can't find exactly where a bike was stolen,
-    # but we want to enable exact finding here
-    def permitted_distance(distance = nil)
-      return DEFAULT_DISTANCE if distance.blank? || (distance.is_a?(String) && !distance.match?(/\d/))
-
-      clamped_distance = distance.to_f.clamp(MIN_DISTANCE, MAX_DISTANCE)
-      (clamped_distance % 1 == 0) ? clamped_distance.to_i : clamped_distance
     end
 
     def multi_update_response(ids)

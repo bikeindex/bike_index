@@ -81,10 +81,17 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         get base_url
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id, impound_record_la.id])
+        expect(assigns(:search_proximity)).to be_nil
+
+        get "#{base_url}?search_location=New+York"
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id])
+        expect(assigns(:search_proximity)).to eq 1
 
         get "#{base_url}?search_location=New+York&search_proximity=50"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
+        expect(assigns(:search_proximity)).to eq 50
 
         # with below minimum distance (0.01)
         get "#{base_url}?search_location=New+York&search_proximity=0.001"

@@ -77,6 +77,20 @@ RSpec.describe "Search API V3", type: :request do
         expect(json_result["bikes"][0]["id"]).to eq bike2.id
       end
     end
+    context "proximity" do
+      let(:ip_address) { "23.115.69.69" }
+      let(:headers) { {"HTTP_X_FORWARDED_FOR" => ip_address} }
+      include_context :geocoder_stubbed_bounding_box
+      include_context :geocoder_default_location
+
+      it "clamps below minimum distance" do
+        get "/api/v3/search", params: {stolenness: "proximity", location: "New York", distance: "0.01", format: :json}, headers: headers
+        expect(response.status).to eq 200
+        i_params = BikeSearchable.searchable_interpreted_params({stolenness: "proximity", location: "New York", distance: "1"}, ip: ip_address)
+        expect(i_params[:distance]).to eq 1
+        expect(i_params[:bounding_box]).to eq bounding_box
+      end
+    end
   end
 
   describe "/close_serials" do

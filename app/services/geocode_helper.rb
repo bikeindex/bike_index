@@ -23,7 +23,7 @@ class GeocodeHelper
     def permitted_distance(distance = nil, default_distance: DEFAULT_DISTANCE, min_distance: MIN_DISTANCE)
       return default_distance if distance.blank? || (distance.is_a?(String) && !distance.match?(/\d/))
 
-      clamped_distance = distance.to_f.clamp(MIN_DISTANCE, MAX_DISTANCE)
+      clamped_distance = distance.to_f.clamp(min_distance, MAX_DISTANCE)
       (clamped_distance % 1 == 0) ? clamped_distance.to_i : clamped_distance
     end
 
