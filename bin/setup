@@ -63,7 +63,7 @@ chdir APP_ROOT do
   # Build StravaSearch submodule
   if ENV["BUILD_STRAVA_SEARCH"]
     puts "\n== Building StravaSearch =="
-    system('cd strava_search && npm install --legacy-peer-deps && npx vite build --base /strava_search/ --outDir ../public/strava_search')
+    system('cd vendor/strava_search && npm install --legacy-peer-deps && npx vite build --base /strava_search/ --outDir ../../public/strava_search')
   end
 
   puts "\n== Preparing database =="

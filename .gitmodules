@@ -2,5 +2,5 @@
 	path = app/services/facebook
 	url = git@github.com:sethherr/facebook_ads_integration.git
 [submodule "strava_search"]
-	path = strava_search
+	path = vendor/strava_search
 	url = https://github.com/bikeindex/StravaSearch.git
