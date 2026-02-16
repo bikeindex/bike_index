@@ -3,6 +3,10 @@ name: CI
 on:
   push:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   lint_and_scan:
     runs-on: ubuntu-latest
@@ -110,6 +114,9 @@ jobs:
         if: matrix.ci_node_index == 0
         run: bin/setup
       - name: Sync translations (only on main by default)
+        if: matrix.ci_node_index == 1
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
       # Install JS dependencies
       - name: build assets

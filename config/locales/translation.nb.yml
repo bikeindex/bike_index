@@ -737,10 +737,10 @@ nb:
         phone_for_shops: Telefon for butikker
         phone_for_users: Telefon for brukere
         police_report_department: Anmeldelsens politikontor
-        police_report_number: Politianmeldelsens saksnummer
-        proof_of_ownership: Bevis på eierskap
-        receive_notifications: Motta varsler
-        recovered_at: Dato gjenopprettet
+        police_report_number: 
+        proof_of_ownership: 
+        receive_notifications:
+        recovered_at: 
         recovered_description: Gjenopprettet beskrivelse
         recovery_display_status: Status for gjenoppretting
         recovery_link_token: Gjenopprettingslinktoken
