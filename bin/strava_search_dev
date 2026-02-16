@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ "$BUILD_STRAVA_SEARCH" = "true" ]; then
+  cd vendor/strava_search
+  npm install --legacy-peer-deps
+  npx vite --port 3143
+else
+  echo "Skipping strava_search dev build (set BUILD_STRAVA_SEARCH=true to enable)"
+fi
