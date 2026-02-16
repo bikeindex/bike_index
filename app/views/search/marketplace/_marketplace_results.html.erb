@@ -1,3 +1,7 @@
+<% if @search_info.present? %>
+  <%= render partial: "/shared/alert", locals: { body: @search_info, type: "info" } %>
+<% end %>
+
 <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
   <% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
 

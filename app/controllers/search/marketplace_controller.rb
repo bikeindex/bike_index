@@ -76,7 +76,7 @@ class Search::MarketplaceController < ApplicationController
     end
 
     if @marketplace_scope == "for_sale_proximity" && @interpreted_params[:bounding_box].blank?
-      flash.now[:info] = translation(:we_dont_know_location, location: params[:location])
+      @search_info = translation(:we_dont_know_location, location: params[:location])
     end
 
     @page = permitted_page(max: MAX_INDEX_PAGE)

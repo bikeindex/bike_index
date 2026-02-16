@@ -158,21 +158,19 @@ RSpec.describe Search::MarketplaceController, type: :request do
             expect(response.status).to eq 200
             expect(assigns(:interpreted_params)).to eq interpreted_params_location.merge(distance: 1)
             expect(assigns(:bikes).map(&:id)).to eq([marketplace_listing_nyc.item_id])
-            expect(flash[:info]).to be_blank
+            expect(assigns(:search_info)).to be_blank
           end
 
           context "unknown location" do
             let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] }
 
-            it "includes a flash[:info] for unknown location, renders non-proximity" do
+            it "includes search_info for unknown location, renders non-proximity" do
               expect(marketplace_listing_nyc).to be_present
               get "#{base_url}?marketplace_scope=for_sale_proximity&location=yoU", headers:, as: :turbo_stream
               expect(response.status).to eq 200
-              expect(flash[:info]).to match(/location/)
+              expect(assigns(:search_info)).to match(/location/)
               expect(assigns(:interpreted_params)[:bounding_box]).to be_blank
               expect(assigns(:bikes).map(&:id)).to match_array([item.id, marketplace_listing_nyc.item_id])
-              # flash is rendered in turbo_stream response
-              expect(response.body).to include("primary-alert-block")
               expect(response.body).to match(/we don&#39;t know the location/)
             end
           end

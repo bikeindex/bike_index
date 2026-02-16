@@ -1,9 +1,3 @@
 <%= turbo_frame_tag "page_#{@pagy.page}" do %>
   <%= render partial: "marketplace_results", formats: [:html] %>
 <% end %>
-
-<%= turbo_stream.update "primary-alert-block" do %>
-  <% flash.each do |name, msg| %>
-    <%= render partial: "/shared/alert", locals: { body: msg, type: name } %>
-  <% end %>
-<% end %>
