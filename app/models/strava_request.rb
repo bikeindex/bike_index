@@ -28,7 +28,8 @@ class StravaRequest < AnalyticsRecord
     list_activities: 2,
     fetch_activity: 3,
     fetch_gear: 4,
-    incoming_webhook: 5
+    incoming_webhook: 5,
+    proxy: 6
   }.freeze
   RESPONSE_STATUS_ENUM = {
     pending: 0,

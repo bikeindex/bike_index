@@ -335,6 +335,7 @@ Rails.application.routes.draw do
       get "*a", to: "api_v1#not_found"
     end
     resources :autocomplete, only: %i[index]
+    resources :strava_proxy, only: %i[create]
   end
   mount API::Base => "/api"
 

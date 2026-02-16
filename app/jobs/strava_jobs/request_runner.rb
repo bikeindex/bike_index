@@ -25,6 +25,8 @@ module StravaJobs
           if parameters["object_type"] == "activity" && parameters["aspect_type"] != "delete"
             Integrations::StravaClient.fetch_activity(strava_integration, parameters["object_id"])
           end
+        when "proxy"
+          Integrations::StravaClient.proxy_request(strava_integration, parameters["url"], method: parameters["method"])
         end
       end
 
@@ -45,8 +47,21 @@ module StravaJobs
           strava_activity&.update_from_detail(response)
         elsif strava_request.fetch_gear?
           StravaGear.update_from_strava(strava_integration, response)
+        elsif strava_request.proxy?
+          return handle_proxy_response(strava_integration, response)
         end
         strava_integration.update_sync_status
+      end
+
+      def handle_proxy_response(strava_integration, response)
+        if response.is_a?(Array)
+          response.each { |summary| StravaActivity.create_or_update_from_summary(strava_integration, summary) }
+        elsif response.is_a?(Hash) && response["sport_type"].present?
+          activity = StravaActivity.create_or_update_from_summary(strava_integration, response)
+          activity.update_from_detail(response)
+        elsif response.is_a?(Hash) && response["gear_type"].present?
+          StravaGear.update_from_strava(strava_integration, response)
+        end
       end
 
       def handle_incoming_webhook(strava_request, strava_integration, response)

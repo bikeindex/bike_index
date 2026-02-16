@@ -1,0 +1,63 @@
+# frozen_string_literal: true
+
+module API
+  class StravaProxyController < ApplicationController
+    respond_to :json
+    wrap_parameters false
+    skip_before_action :verify_authenticity_token
+    before_action :cors_preflight_check
+    after_action :cors_set_access_control_headers
+
+    def create
+      access_token = doorkeeper_token
+      return render json: {error: "OAuth token required"}, status: 401 unless access_token&.accessible?
+      return render json: {error: "Unauthorized application"}, status: 403 unless authorized_app?(access_token)
+
+      user = User.find_by(id: access_token.resource_owner_id)
+      return render json: {error: "User not found"}, status: 401 unless user
+
+      strava_integration = user.strava_integration
+      return render json: {error: "No Strava integration"}, status: 404 unless strava_integration
+
+      strava_request = StravaRequest.create!(
+        strava_integration_id: strava_integration.id,
+        user_id: user.id,
+        request_type: :proxy,
+        parameters: {url: permitted_params[:url], method: permitted_params[:method]}
+      )
+
+      strava_response = StravaJobs::RequestRunner.execute(strava_integration, strava_request.request_type, strava_request.parameters)
+      strava_request.update_from_response(strava_response)
+
+      if strava_request.success?
+        StravaJobs::RequestRunner.handle_response(strava_request, strava_integration, strava_response&.body)
+      end
+
+      render_proxy_response(strava_response, strava_request)
+    end
+
+    private
+
+    def doorkeeper_token
+      @doorkeeper_token ||= Doorkeeper::OAuth::Token.authenticate(
+        request, *Doorkeeper.configuration.access_token_methods
+      )
+    end
+
+    def authorized_app?(token)
+      ENV["STRAVA_DOORKEEPER_APP_ID"].present? &&
+        token.application_id.to_s == ENV["STRAVA_DOORKEEPER_APP_ID"]
+    end
+
+    def permitted_params
+      params.permit(:url, :method)
+    end
+
+    def render_proxy_response(strava_response, strava_request)
+      unless strava_request.success?
+        return render json: {error: strava_request.response_status}, status: strava_response&.status || 502
+      end
+      render body: strava_response.body.to_json, content_type: "application/json", status: strava_response.status
+    end
+  end
+end
