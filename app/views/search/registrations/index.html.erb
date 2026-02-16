@@ -7,7 +7,7 @@
     target_frame: :search_registrations_results_frame, interpreted_params: @interpreted_params, result_view: @result_view) %>
 </div>
 
-<%= turbo_frame_tag :search_registrations_results_frame, data: { turbo_stream: true } do %>
+<%= turbo_frame_tag :search_registrations_results_frame do %>
   <% if @render_results %>
     <%= render partial: "results" %>
   <% else %>

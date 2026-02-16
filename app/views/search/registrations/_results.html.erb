@@ -1,6 +1,9 @@
 <div class="container mb-5">
   <div class="row bikes-searched-default">
     <div class="col-md-12">
+      <% if flash[:notice].present? %>
+        <%= render partial: "/shared/alert", locals: { body: flash[:notice], type: "notice" } %>
+      <% end %>
       <% if @bikes.present? %>
         <ul class="bike-boxes">
           <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>

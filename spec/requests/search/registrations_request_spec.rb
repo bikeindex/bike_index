@@ -55,7 +55,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
         expect(response.content_type).to include("text/vnd.turbo-stream.html")
         expect(response).to have_http_status(:success)
 
-        expect(response.body).to include("<turbo-stream action=\"update\" target=\"search_registrations_results_frame\">")
+        expect(response.body).to include("<turbo-stream action=\"replace\" target=\"search_registrations_results_frame\">")
         expect(response).to render_template(:index)
         expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
         expect(assigns(:bikes).pluck(:id).sort).to eq target_bike_ids
