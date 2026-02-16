@@ -2424,6 +2424,10 @@ nl:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
+      impound_records:
+        available_impound_records:
+          we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
+            een andere locatie.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -2470,6 +2474,10 @@ nl:
         set_interpreted_params:
           we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
             een andere locatie om gestolen fietsen in de buurt te zoeken.
+      marketplace:
+        set_interpreted_params:
+          we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
+            een andere locatie om te zoeken naar nabijgelegen locaties.
   customer_mailer:
     additional_email_confirmation:
       html:
