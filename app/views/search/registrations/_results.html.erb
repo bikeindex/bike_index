@@ -1,6 +1,10 @@
 <div class="container mb-5">
   <div class="row bikes-searched-default">
     <div class="col-md-12">
+      <% if flash[:notice].present? %>
+        <%= render(UI::Alert::Component.new(text: flash[:notice], kind: :warning, dismissable: true)) %>
+      <% end %>
+
       <% if @bikes.present? %>
         <ul class="bike-boxes">
           <%= render partial: '/bikes/bike', collection: @bikes, cached: true %>

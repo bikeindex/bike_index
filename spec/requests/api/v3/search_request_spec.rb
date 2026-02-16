@@ -77,6 +77,25 @@ RSpec.describe "Search API V3", type: :request do
         expect(json_result["bikes"][0]["id"]).to eq bike2.id
       end
     end
+    context "proximity" do
+      let(:ip_address) { "23.115.69.69" }
+      let(:headers) { {"HTTP_X_FORWARDED_FOR" => ip_address} }
+      include_context :geocoder_default_location
+
+      it "clamps below minimum distance, finds bike within clamped range" do
+        # Create a stolen bike ~0.5 miles north of the default NYC location
+        stolen_bike = FactoryBot.create(:stolen_bike_in_nyc)
+        nearby_lat = default_location[:latitude] + 0.00725
+        stolen_bike.update_columns(latitude: nearby_lat, longitude: default_location[:longitude])
+        stolen_bike.current_stolen_record.update_columns(latitude: nearby_lat, longitude: default_location[:longitude])
+
+        # distance=0.1 is clamped to 1 mile minimum — bike 0.5 miles away should be found
+        get "/api/v3/search", params: {stolenness: "proximity", location: "New York", distance: "0.1", format: :json}, headers: headers
+        expect(response.status).to eq 200
+        result_ids = json_result["bikes"].map { |b| b["id"] }
+        expect(result_ids).to include(stolen_bike.id)
+      end
+    end
   end
 
   describe "/close_serials" do

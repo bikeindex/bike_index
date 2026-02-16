@@ -2,6 +2,9 @@ module Organized
   class ImpoundRecordsController < Organized::BaseController
     include SortableTable
 
+    MIN_DISTANCE = 0.01
+    DEFAULT_DISTANCE = 1
+
     before_action :find_impound_record, except: [:index]
 
     def index
@@ -91,6 +94,17 @@ module Organized
         a_impound_records = a_impound_records.where(bike_id: bikes.pluck(:id))
       elsif params[:search_bike_id].present?
         a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])
+      end
+
+      @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
+        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
+      if params[:search_location].present?
+        bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
+        if bounding_box.present?
+          a_impound_records = a_impound_records.within_bounding_box(bounding_box)
+        else
+          flash.now[:notice] = translation(:we_dont_know_location, location: params[:search_location])
+        end
       end
 
       @available_impound_records = a_impound_records.where(created_at: @time_range)

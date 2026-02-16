@@ -56,6 +56,61 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record_retrieved.id])
       end
     end
+    context "search_location" do
+      include_context :geocoder_default_location
+      include_context :geocoder_stubbed_bounding_box
+      let!(:location_la) { FactoryBot.create(:location, :with_address_record, address_in: :los_angeles, organization: current_organization, impound_location: true) }
+      let!(:impound_record_nyc) do
+        FactoryBot.create(:impound_record_with_organization,
+          organization: current_organization, user: current_user,
+          location: location_la,
+          impounded_from_address_record: FactoryBot.create(:address_record, :new_york, kind: :impounded_from))
+      end
+      let!(:impound_record_la) do
+        FactoryBot.create(:impound_record_with_organization,
+          organization: current_organization, user: current_user,
+          impounded_from_address_record: FactoryBot.create(:address_record, :los_angeles, kind: :impounded_from))
+      end
+      it "filters by impounded_from_address_record, not current address_record" do
+        impound_record_nyc.reload
+        # impound_record_nyc was impounded from NYC but is stored at LA location
+        expect(impound_record_nyc.impounded_from_address_record.city).to eq "New York"
+        expect(impound_record_nyc.address_record.city).to eq "Los Angeles"
+        expect(impound_record_la.reload.impounded_from_address_record.city).to eq "Los Angeles"
+
+        get base_url
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id, impound_record_la.id])
+        expect(assigns(:search_proximity)).to eq 1
+
+        get "#{base_url}?search_location=New+York"
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id])
+        expect(assigns(:search_proximity)).to eq 1
+
+        get "#{base_url}?search_location=New+York&search_proximity=50"
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
+        expect(assigns(:search_proximity)).to eq 50
+
+        # with below minimum distance (0.01)
+        get "#{base_url}?search_location=New+York&search_proximity=0.001"
+        expect(response.status).to eq(200)
+        expect(assigns(:search_proximity)).to eq(0.01)
+        expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
+      end
+
+      context "unknown location" do
+        let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] }
+
+        it "includes a flash notice for unknown location" do
+          get "#{base_url}?search_location=xkcd_unknown"
+          expect(response.status).to eq(200)
+          expect(flash[:notice]).to match(/location/)
+          expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id, impound_record_la.id])
+        end
+      end
+    end
   end
 
   describe "show" do

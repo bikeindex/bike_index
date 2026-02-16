@@ -22,6 +22,13 @@ chdir APP_ROOT do
       cp env_test, ".env.test"
     end
 
+    # Copy .env.conductor_dev from root repo
+    env_dev = File.join(root, ".env.conductor_dev")
+    if File.exist?(env_dev)
+      puts "Copying .env.conductor_dev from #{root}..."
+      cp env_dev, ".env.development"
+    end
+
     # Symlink storage directory for Active Storage
     root_storage = File.join(root, "storage")
     if Dir.exist?(root_storage)

@@ -18,10 +18,12 @@ class GeocodeHelper
       address_hash_for(lookup_string).slice(:formatted_address)
     end
 
-    def permitted_distance(distance = nil, default_distance: DEFAULT_DISTANCE)
+    # WARNING! min_distance shouldn't be passed in except in organized or admin situations -
+    # or else people will be able to find specific stolen locations
+    def permitted_distance(distance = nil, default_distance: DEFAULT_DISTANCE, min_distance: MIN_DISTANCE)
       return default_distance if distance.blank? || (distance.is_a?(String) && !distance.match?(/\d/))
 
-      clamped_distance = distance.to_f.clamp(MIN_DISTANCE, MAX_DISTANCE)
+      clamped_distance = distance.to_f.clamp(min_distance, MAX_DISTANCE)
       (clamped_distance % 1 == 0) ? clamped_distance.to_i : clamped_distance
     end
 

@@ -42,7 +42,7 @@ class Search::RegistrationsController < ApplicationController
     @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
 
     if params[:stolenness] == "proximity" && @interpreted_params[:stolenness] != "proximity"
-      flash[:info] = translation(:we_dont_know_location, location: params[:location])
+      flash.now[:notice] = translation(:we_dont_know_location, location: params[:location])
     end
 
     @page = permitted_page(max: MAX_INDEX_PAGE)
