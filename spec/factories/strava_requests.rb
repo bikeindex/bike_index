@@ -12,7 +12,6 @@ FactoryBot.define do
 
     trait :fetch_athlete_stats do
       request_type { :fetch_athlete_stats }
-      parameters { {athlete_id: "12345"} }
     end
 
     trait :list_activities do
@@ -22,7 +21,7 @@ FactoryBot.define do
 
     trait :fetch_activity do
       request_type { :fetch_activity }
-      parameters { {strava_id: "12345", strava_activity_id: 1} }
+      parameters { {strava_id: "12345"} }
     end
 
     trait :fetch_gear do

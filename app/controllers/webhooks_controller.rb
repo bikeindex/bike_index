@@ -2,7 +2,7 @@
 
 class WebhooksController < ApplicationController
   STRIPE_WEBHOOK_SECRET = ENV["STRIPE_WEBHOOK_SECRET"].freeze
-  STRAVA_WEBHOOK_VERIFY_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"].freeze
+  STRAVA_WEBHOOK_VERIFY_TOKEN = Integrations::StravaClient::STRAVA_WEBHOOK_TOKEN
 
   skip_before_action :verify_authenticity_token
 
@@ -60,8 +60,8 @@ class WebhooksController < ApplicationController
         strava_integration_id: strava_integration.id,
         user_id: strava_integration.user_id,
         request_type: :incoming_webhook,
-        parameters: params.permit(:object_type, :aspect_type, :object_id, :owner_id, :subscription_id).to_h
-          .merge(updates: params["updates"]&.to_unsafe_h)
+        parameters: params.slice(:object_type, :aspect_type, :object_id, :owner_id,
+          :subscription_id, :updates).as_json
       )
     end
     head :ok

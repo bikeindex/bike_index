@@ -143,10 +143,10 @@ class StravaIntegration < ApplicationRecord
   def enqueue_detail_requests
     already_enqueued = StravaRequest.unprocessed
       .where(strava_integration_id: id, request_type: :fetch_activity)
-      .pluck(Arel.sql("parameters->>'strava_activity_id'")).map(&:to_i)
-    strava_activities.activities_to_enrich.where.not(id: already_enqueued).pluck(:id, :strava_id).each do |strava_activity_id, strava_id|
+      .pluck(Arel.sql("parameters->>'strava_id'"))
+    strava_activities.activities_to_enrich.where.not(strava_id: already_enqueued).pluck(:strava_id).each do |strava_id|
       StravaRequest.create!(user_id:, strava_integration_id: id,
-        request_type: :fetch_activity, parameters: {strava_id: strava_id.to_s, strava_activity_id:})
+        request_type: :fetch_activity, parameters: {strava_id: strava_id.to_s})
     end
   end
 

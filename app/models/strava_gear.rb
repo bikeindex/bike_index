@@ -80,8 +80,12 @@ class StravaGear < ApplicationRecord
     strava_data&.dig("primary") == true
   end
 
+  def calculated_strava_activities
+    strava_integration.strava_activities.where(gear_id: strava_gear_id)
+  end
+
   def update_total_distance!
-    total_meters = strava_integration.strava_activities.where(gear_id: strava_gear_id).sum(:distance_meters)
+    total_meters = calculated_strava_activities.sum(:distance_meters)
     update(total_distance_kilometers: (total_meters / 1000.0).round)
   end
 end

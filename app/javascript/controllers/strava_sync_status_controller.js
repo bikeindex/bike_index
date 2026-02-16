@@ -1,9 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
 
 // Polls the Strava sync status endpoint and updates the progress display
 // Connects to data-controller='strava-sync-status'
 export default class extends Controller {
-  static values = { url: String }
+  static values = { url: String, isPending: Boolean }
 
   connect () {
     this.initialStatus = null
@@ -20,6 +21,7 @@ export default class extends Controller {
     })
       .then(response => response.json())
       .then(data => {
+        console.log(data)
         if (this.initialStatus === null) this.initialStatus = data.status
         if (data.status === 'syncing' || data.status === 'pending') {
           this.updateProgress(data)
@@ -36,6 +38,13 @@ export default class extends Controller {
   }
 
   updateProgress (data) {
+    // If initially pending but now syncing, hide the pending text and show the syncing text
+    if (this.isPendingValue && data.status === 'syncing') {
+      collapse('hide', document.getElementById('strava-pending-message'))
+      collapse('show', document.getElementById('strava-syncing-message'))
+      this.isPendingValue = false
+    }
+
     const countEl = document.getElementById('strava-download-count')
     if (countEl) {
       const fmt = (n) => n == null ? '?' : Number(n).toLocaleString()
