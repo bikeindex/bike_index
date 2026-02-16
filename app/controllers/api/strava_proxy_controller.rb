@@ -2,6 +2,8 @@
 
 module API
   class StravaProxyController < ApplicationController
+    STRAVA_DOORKEEPER_APP_ID = ENV["STRAVA_DOORKEEPER_APP_ID"]
+
     respond_to :json
     wrap_parameters false
     skip_before_action :verify_authenticity_token
@@ -46,8 +48,8 @@ module API
     end
 
     def authorized_app?(token)
-      ENV["STRAVA_DOORKEEPER_APP_ID"].present? &&
-        token.application_id.to_s == ENV["STRAVA_DOORKEEPER_APP_ID"]
+      STRAVA_DOORKEEPER_APP_ID.present? &&
+        token.application_id.to_s == STRAVA_DOORKEEPER_APP_ID
     end
 
     def permitted_params
