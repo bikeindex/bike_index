@@ -430,5 +430,7 @@ Rails.application.routes.draw do
   get "/bikes", to: redirect("search/registrations")
   get "/marketplace", to: redirect("search/marketplace")
 
+  get "strava_search", controller: "strava_search", action: "index"
+
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? # Handle 404s with lograge
 end

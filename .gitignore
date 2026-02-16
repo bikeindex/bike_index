@@ -62,6 +62,7 @@ coverage
 test-results/
 spec/examples.txt
 public/javascripts
+public/strava_search
 
 spec/vcr_cassettes/facebook/*
 
