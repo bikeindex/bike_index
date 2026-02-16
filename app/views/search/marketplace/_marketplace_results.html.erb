@@ -1,6 +1,6 @@
-<% if flash[:notice].present? %>
+<% if flash[:notice].present? && @pagy.page == 1 %>
   <div class="tw:mx-auto tw:max-w-7xl tw:px-4">
-    <%= render partial: "/shared/alert", locals: { body: flash[:notice], type: "notice" } %>
+    <%= render(UI::Alert::Component.new(text: flash[:notice], kind: :warning, dismissable: true)) %>
   </div>
 <% end %>
 
