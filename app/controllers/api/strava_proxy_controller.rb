@@ -7,6 +7,7 @@ module API
     skip_before_action :verify_authenticity_token
     before_action :cors_preflight_check
     after_action :cors_set_access_control_headers
+    rescue_from ArgumentError, with: :render_bad_request
 
     def create
       access_token = doorkeeper_token
@@ -27,7 +28,7 @@ module API
       )
 
       strava_response = StravaJobs::RequestRunner.execute(strava_integration, strava_request.request_type, strava_request.parameters)
-      strava_request.update_from_response(strava_response)
+      strava_request.update_from_response(strava_response, raise_on_error: false)
 
       if strava_request.success?
         StravaJobs::RequestRunner.handle_response(strava_request, strava_integration, strava_response&.body)
@@ -58,6 +59,10 @@ module API
         return render json: {error: strava_request.response_status}, status: strava_response&.status || 502
       end
       render body: strava_response.body.to_json, content_type: "application/json", status: strava_response.status
+    end
+
+    def render_bad_request(exception)
+      render json: {error: exception.message}, status: 400
     end
   end
 end

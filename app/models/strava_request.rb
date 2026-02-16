@@ -135,14 +135,14 @@ class StravaRequest < AnalyticsRecord
     page >= expected_pages
   end
 
-  def update_from_response(response, re_enqueue_if_rate_limited: false)
+  def update_from_response(response, re_enqueue_if_rate_limited: false, raise_on_error: true)
     update!(requested_at: Time.current,
       response_status: status_from_response(response),
       rate_limit: self.class.parse_rate_limit(response&.headers))
 
     if re_enqueue_if_rate_limited && rate_limited?
       StravaRequest.create!(user_id:, strava_integration_id:, request_type:, parameters:)
-    elsif error?
+    elsif error? && raise_on_error
       raise "Strava API error #{response.status}: #{response.body}"
     end
   end

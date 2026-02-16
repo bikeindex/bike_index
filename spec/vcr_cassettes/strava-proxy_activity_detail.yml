@@ -1,0 +1,35 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/activities/456
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      X-RateLimit-Limit:
+      - "600,6000"
+      X-RateLimit-Usage:
+      - "15,125"
+      X-ReadRateLimit-Limit:
+      - "600,6000"
+      X-ReadRateLimit-Usage:
+      - "15,125"
+    body:
+      encoding: UTF-8
+      string: '{"id":456,"name":"Evening Ride","sport_type":"Ride","distance":25000.0,"moving_time":5400,"type":"Ride","calories":800,"description":"Great ride","gear_id":"b1234"}'
+  recorded_at: Sun, 08 Feb 2026 22:46:00 GMT
+recorded_with: VCR 6.3.1

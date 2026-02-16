@@ -47,55 +47,65 @@ RSpec.describe "Strava Proxy API", type: :request do
 
     context "with strava integration" do
       let!(:strava_integration) { FactoryBot.create(:strava_integration, user:) }
-      let(:strava_response_body) { [{"id" => 123, "name" => "Morning Ride", "sport_type" => "Ride"}] }
-      let(:strava_response) do
-        instance_double(Faraday::Response, success?: true, status: 200, body: strava_response_body, headers: {})
-      end
-
-      before do
-        allow(Integrations::StravaClient).to receive(:proxy_request).and_return(strava_response)
-      end
 
       it "proxies the request and returns strava response" do
-        expect {
-          post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
-        }.to change(StravaRequest, :count).by(1)
-        expect(response.status).to eq 200
-        expect(json_result).to eq strava_response_body
-        strava_request = StravaRequest.last
-        expect(strava_request.proxy?).to be_truthy
-        expect(strava_request.success?).to be_truthy
-        expect(strava_request.parameters).to eq("url" => "athlete/activities", "method" => "GET")
-        expect(Integrations::StravaClient).to have_received(:proxy_request)
-          .with(strava_integration, "athlete/activities", method: "GET")
+        VCR.use_cassette("strava-proxy_activities") do
+          expect {
+            post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+          }.to change(StravaRequest, :count).by(1)
+          expect(response.status).to eq 200
+          expect(json_result).to eq [{"id" => 123, "name" => "Morning Ride", "sport_type" => "Ride", "distance" => 25000.0, "moving_time" => 3600, "type" => "Ride"}]
+          strava_request = StravaRequest.last
+          expect(strava_request.proxy?).to be_truthy
+          expect(strava_request.success?).to be_truthy
+          expect(strava_request.parameters).to eq("url" => "athlete/activities", "method" => "GET")
+        end
       end
 
-      context "strava returns an error" do
-        let(:strava_response) do
-          instance_double(Faraday::Response, success?: false, status: 429, body: {"message" => "Rate Limit Exceeded"}, headers: {})
-        end
-
+      context "strava returns rate limit error" do
         it "returns strava error status" do
-          post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
-          expect(response.status).to eq 429
-          expect(json_result[:error]).to eq "rate_limited"
-          expect(StravaRequest.last.rate_limited?).to be_truthy
+          VCR.use_cassette("strava-proxy_rate_limited") do
+            post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            expect(response.status).to eq 429
+            expect(json_result[:error]).to eq "rate_limited"
+            expect(StravaRequest.last.rate_limited?).to be_truthy
+          end
+        end
+      end
+
+      context "strava returns server error" do
+        it "returns strava error status without raising" do
+          VCR.use_cassette("strava-proxy_server_error") do
+            post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            expect(response.status).to eq 500
+            expect(json_result[:error]).to eq "error"
+            expect(StravaRequest.last.error?).to be_truthy
+          end
         end
       end
 
       context "activity detail response" do
-        let(:strava_response_body) { {"id" => 456, "name" => "Evening Ride", "sport_type" => "Ride", "distance" => 25000.0} }
-        let(:strava_response) do
-          instance_double(Faraday::Response, success?: true, status: 200, body: strava_response_body, headers: {})
+        it "stores activity data" do
+          VCR.use_cassette("strava-proxy_activity_detail") do
+            expect {
+              post base_url, params: {url: "activities/456", method: "GET", access_token: token.token}
+            }.to change(StravaActivity, :count).by(1)
+            activity = StravaActivity.last
+            expect(activity.strava_id).to eq "456"
+            expect(activity.title).to eq "Evening Ride"
+          end
+        end
+      end
+
+      context "invalid proxy path" do
+        it "rejects absolute URLs" do
+          post base_url, params: {url: "https://evil.com/steal", method: "GET", access_token: token.token}
+          expect(response.status).to eq 400
         end
 
-        it "stores activity data" do
-          expect {
-            post base_url, params: {url: "activities/456", method: "GET", access_token: token.token}
-          }.to change(StravaActivity, :count).by(1)
-          activity = StravaActivity.last
-          expect(activity.strava_id).to eq "456"
-          expect(activity.title).to eq "Evening Ride"
+        it "rejects protocol-relative URLs" do
+          post base_url, params: {url: "//evil.com/steal", method: "GET", access_token: token.token}
+          expect(response.status).to eq 400
         end
       end
     end
