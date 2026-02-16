@@ -29,7 +29,10 @@ RSpec.describe Org::ImpoundRecordsIndex::Component, type: :component do
       search_unregisteredness: "all",
       time_range: (Time.current - 1.year)..Time.current,
       available_statuses: %w[current all],
-      current_organization: organization
+      current_organization: organization,
+      search_proximity: nil,
+      search_location: nil,
+      interpreted_params: {}
     }
   end
 
