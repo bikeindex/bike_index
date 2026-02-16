@@ -100,7 +100,11 @@ module Organized
       if params[:search_location].present?
         @search_proximity = permitted_distance(params[:search_proximity])
         bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
-        a_impound_records = a_impound_records.within_bounding_box(bounding_box) if bounding_box.present?
+        if bounding_box.present?
+          a_impound_records = a_impound_records.within_bounding_box(bounding_box)
+        else
+          flash[:info] = translation(:we_dont_know_location, location: params[:search_location])
+        end
       end
 
       @available_impound_records = a_impound_records.where(created_at: @time_range)

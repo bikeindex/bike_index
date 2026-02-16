@@ -85,6 +85,23 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         get "#{base_url}?search_location=New+York&search_proximity=50"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
+
+        # with below minimum distance (0.01)
+        get "#{base_url}?search_location=New+York&search_proximity=0.001"
+        expect(response.status).to eq(200)
+        expect(assigns(:search_proximity)).to eq(0.01)
+        expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
+      end
+
+      context "unknown location" do
+        let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] }
+
+        it "includes a flash[:info] for unknown location" do
+          get "#{base_url}?search_location=xkcd_unknown"
+          expect(response.status).to eq(200)
+          expect(flash[:info]).to match(/location/)
+          expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record_nyc.id, impound_record_la.id])
+        end
       end
     end
   end
