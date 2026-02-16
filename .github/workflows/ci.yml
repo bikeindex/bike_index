@@ -114,7 +114,7 @@ jobs:
         if: matrix.ci_node_index == 0
         run: bin/setup
       - name: Sync translations (only on main by default)
-        if: matrix.ci_node_index == 0
+        if: matrix.ci_node_index == 1
         env:
           GH_TOKEN: ${{ github.token }}
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
