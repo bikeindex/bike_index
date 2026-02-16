@@ -63,6 +63,13 @@ chdir APP_ROOT do
   # Build StravaSearch submodule
   if ENV["BUILD_STRAVA_SEARCH"]
     puts "\n== Building StravaSearch =="
+    if ENV["CONDUCTOR_ROOT_PATH"]
+      root_node_modules = File.join(ENV["CONDUCTOR_ROOT_PATH"], "vendor/strava_search/node_modules")
+      if Dir.exist?(root_node_modules)
+        puts "Copying node_modules from #{root_node_modules}..."
+        system("cp -r #{root_node_modules} vendor/strava_search/node_modules")
+      end
+    end
     system('cd vendor/strava_search && npm install --legacy-peer-deps && npx vite build --base /strava_search/ --outDir ../../public/strava_search')
   end
 
