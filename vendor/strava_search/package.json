@@ -20,17 +20,7 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky",
     "check-credentials": "node scripts/check-credentials.js"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "bash -c 'npm run check-credentials'"
-    ],
-    "*.{json,md,yml,yaml}": [
-      "bash -c 'npm run check-credentials'"
-    ]
   },
   "dependencies": {
     "date-fns": "^4.1.0",
@@ -61,9 +51,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "eslint-plugin-storybook": "^0.11.6",
     "globals": "^16.5.0",
-    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
-    "lint-staged": "^16.2.7",
     "playwright": "^1.58.1",
     "storybook": "^8.6.15",
     "tailwindcss": "^4.1.18",

@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# Check for credentials before allowing commit
-npm run check-credentials
-
-# Run lint-staged (non-blocking - shows warnings but doesn't prevent commit)
-npx lint-staged || true

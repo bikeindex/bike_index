@@ -68,9 +68,10 @@ spec/vcr_cassettes/facebook/*
 # Ignore editor temp files
 .idea
 
-# Ignore strava_search build artifacts in vendor (source is committed, built output is in public/)
+# Ignore strava_search build artifacts and local files
 vendor/strava_search/node_modules/
 vendor/strava_search/dist/
+vendor/strava_search/storybook-static/
 
 # Ignore .claude settings
 .claude/
