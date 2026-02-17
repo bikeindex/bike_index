@@ -7,12 +7,10 @@ Rails.application.configure do
   config.log_level = :info
   config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format
   config.lograge.custom_options = lambda do |event|
-    params = event.payload[:params].except("controller", "action", "format", "id")
-    filtered_params = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters).filter(params)
     {
       remote_ip: event.payload[:ip],
       u_id: event.payload[:u_id],
-      params: filtered_params
+      params: event.payload[:params].except("controller", "action", "format", "id")
     }
   end
 
