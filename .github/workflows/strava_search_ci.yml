@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: 'vendor/strava_search/.tool-versions'
+          node-version-file: '.tool-versions'
           cache: 'npm'
           cache-dependency-path: 'vendor/strava_search/package-lock.json'
 
@@ -45,7 +45,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: 'vendor/strava_search/.tool-versions'
+          node-version-file: '.tool-versions'
           cache: 'npm'
           cache-dependency-path: 'vendor/strava_search/package-lock.json'
 
@@ -65,7 +65,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: 'vendor/strava_search/.tool-versions'
+          node-version-file: '.tool-versions'
           cache: 'npm'
           cache-dependency-path: 'vendor/strava_search/package-lock.json'
 
@@ -86,7 +86,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: 'vendor/strava_search/.tool-versions'
+          node-version-file: '.tool-versions'
           cache: 'npm'
           cache-dependency-path: 'vendor/strava_search/package-lock.json'
 
