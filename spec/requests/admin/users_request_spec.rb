@@ -110,7 +110,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.reload.name).to eq("New Name")
         expect(user_subject.email).to eq("newemail@example.com")
         expect(user_subject.confirmed).to be_truthy
-        expect(user_subject.superuser).to be_truthy
+        expect(user_subject.superuser?).to be_truthy
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
         expect(user_subject.can_send_many_marketplace_messages).to be_truthy
@@ -129,7 +129,7 @@ RSpec.describe Admin::UsersController, type: :request do
         BikeDeleterJob.drain
         expect(bike.reload.deleted_at).to be_within(1).of Time.current
         expect(user_subject.superuser_abilities.count).to eq 1
-        expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
+        expect(User.admins.pluck(:id)).to include(user_subject.id)
         expect(marketplace_listing.reload.status).to eq "removed"
       end
     end

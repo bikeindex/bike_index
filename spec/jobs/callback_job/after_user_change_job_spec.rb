@@ -98,63 +98,6 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
     end
   end
 
-  # Currently, universal superuser_abilities follow
-  describe "superuser_abilities" do
-    let(:user) { FactoryBot.create(:user_confirmed) }
-    it "does nothing" do
-      expect(user.superuser).to be_falsey
-      expect(user.superuser_abilities.count).to eq 0
-      instance.perform(user)
-      expect(user.reload.superuser_abilities.count).to eq 0
-    end
-    context "user is superuser" do
-      let(:user) { FactoryBot.create(:superuser) }
-      it "does adds superuser_abilities" do
-        expect(user.superuser).to be_truthy
-        expect(user.superuser_abilities.count).to eq 0
-        instance.perform(user)
-        expect(user.reload.superuser_abilities.count).to eq 1
-        superuser_ability = user.superuser_abilities.first
-        expect(superuser_ability.kind).to eq "universal"
-        # Doing it again doesn't create another one
-        expect { instance.perform(user) }.to_not change(SuperuserAbility, :count)
-        # It removes duplicate abilities
-        SuperuserAbility.create(user: user)
-        expect(user.reload.superuser_abilities.count).to eq 2
-        instance.perform(user)
-        expect(user.reload.superuser_abilities.pluck(:id)).to eq([superuser_ability.id])
-      end
-    end
-    context "user no longer superuser" do
-      it "removes superuser_abilities" do
-        superuser_ability = SuperuserAbility.create(user: user)
-        expect(user.reload.superuser).to be_falsey
-        expect(user.superuser_abilities.count).to eq 1
-        expect(superuser_ability.universal?).to be_truthy
-
-        instance.perform(user)
-
-        expect(user.reload.superuser_abilities.count).to eq 0
-        superuser_ability = SuperuserAbility.unscoped.first
-        expect(superuser_ability.deleted?).to be_truthy
-        expect(superuser_ability.kind).to eq "universal"
-        user.update(superuser: true)
-        instance.perform(user)
-        expect(user.superuser_abilities.count).to eq 1
-        expect(superuser_ability.reload.deleted?).to be_truthy
-      end
-    end
-    context "non-universal superuser_ability" do
-      let!(:superuser_ability) { SuperuserAbility.create(user: user, controller_name: "graphs") }
-      it "doesn't update" do
-        expect(user.reload.superuser).to be_falsey
-        expect(user.superuser_abilities.count).to eq 1
-        instance.perform(user)
-        expect(user.reload.superuser_abilities.count).to eq 1
-      end
-    end
-  end
-
   describe "user_ban" do
     let(:user) { FactoryBot.create(:user) }
     let(:user_ban) { UserBan.create(user: user, reason: :extortion) }
@@ -359,7 +302,7 @@ RSpec.describe CallbackJob::AfterUserChangeJob, type: :job do
       expect(user.alert_slugs).to eq(["theft_alert_without_photo"])
 
       organization_role.destroy
-      user.update(superuser: true)
+      FactoryBot.create(:superuser_ability, user:)
       instance.perform(user.id)
       user.reload
       expect(user.alert_slugs).to eq([])

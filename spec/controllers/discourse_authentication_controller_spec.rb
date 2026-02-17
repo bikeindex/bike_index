@@ -126,7 +126,7 @@ RSpec.describe DiscourseAuthenticationController, type: :controller do
       end
 
       it "grants admin and moderator permissions" do
-        user.update(superuser: true)
+        FactoryBot.create(:superuser_ability, user:)
         target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
         session[:discourse_redirect] = discourse_query_string
 

@@ -68,7 +68,11 @@ RSpec.describe BikesController, type: :controller do
     end
     context "Admin with manually set current_organization" do
       include_context :logged_in_as_superuser
-      let(:user) { FactoryBot.create(:organization_user, superuser: true) }
+      let(:user) do
+        user = FactoryBot.create(:organization_user)
+        FactoryBot.create(:superuser_ability, user:)
+        user
+      end
       it "renders, sets passive_organization_id to be passed organization" do
         expect(user.default_organization).to be_present
         expect(user.default_organization).to_not eq organization
