@@ -1544,6 +1544,14 @@ en:
       were_so_glad: We're so glad you got your %{bike_type} back!
     report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
+    strava_gear:
+      connect_bike_to_strava_gear: Connect this bike to one of your Strava bikes to
+        track which bike you're riding.
+      none_selected: "-- None --"
+      strava_bike: Strava Bike
+      strava_gear: Strava Gear
+      sync_not_finished: Strava sync hasn't finished yet, so not all bikes may be
+        listed.
     theft_details:
       charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
         ad on Facebook.
@@ -1610,6 +1618,16 @@ en:
           serial: 'Serial:'
           stolen_at: 'Stolen at:'
           stolen_from: 'Stolen from:'
+    org:
+      impound_records_index:
+        matching_impound_record:
+          one: matching impound record
+          other: matching impound records
+    page_block:
+      strava_integration:
+        activities_synced:
+          one: activity synced
+          other: activities synced
     ui:
       definition_list:
         row:
@@ -1652,8 +1670,10 @@ en:
         remove_or_transfer: Transfer, Hide or Delete
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
+        strava_gear: Strava Gear
         theft_details: Theft details
         versions: Versions
+        versions_and_strava: Versions and Strava
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
@@ -1843,6 +1863,11 @@ en:
         update:
           bike_stickers_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
+      impound_records:
+        available_impound_records:
+          we_dont_know_location: >-
+            Sorry, we don't know the location "%{location}". Please try a different
+            location.
       manage_impoundings:
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
@@ -1904,6 +1929,11 @@ en:
       update:
         image_updated: Image was successfully updated.
     search:
+      marketplace:
+        set_interpreted_params:
+          we_dont_know_location: >-
+            Sorry, we don't know the location "%{location}". Please try a different
+            location to search nearby listings.
       registrations:
         set_interpreted_params:
           we_dont_know_location: >-
@@ -4661,6 +4691,10 @@ en:
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers
         view_avery_labels: View Avery Labels
+    impound_records:
+      index:
+        impound_records: Impound Records
+        render_chart: Render chart
     manage_impoundings:
       edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings

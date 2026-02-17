@@ -1,0 +1,47 @@
+<div class="admin-subnav tw:mx-0! tw:flex tw:flex-row tw:flex-wrap tw:items-baseline">
+  <h1>
+    <% if @index_title.present? %>
+      <%= @index_title %>
+    <% else %>
+      Manage
+      <%= viewing %>
+    <% end %>
+  </h1>
+
+  <ul
+    class="
+      tw:mb-0 tw:ml-auto tw:flex tw:list-none tw:flex-row tw:flex-wrap
+      tw:items-baseline tw:gap-1
+    "
+  >
+    <%= @nav_header_list_items %>
+
+    <% unless @skip_charting %>
+      <li class="nav-item">
+        <%= link_to "graph", helpers.url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? "active" : ""}" %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<%= render(current_header_component) %>
+
+<% if show_chart? %>
+  <% if @rendered_chart.nil? %>
+    <%= default_chart %>
+  <% else %>
+    <%= @rendered_chart %>
+  <% end %>
+<% end %>
+
+<div class="mt-2 mb-4"><%= render partial: "/shared/period_select" %></div>
+
+<% if @admin_search_form.present? %>
+  <%= @admin_search_form %>
+<% end %>
+
+<%= render(pagination_component) %>
+
+<%= @table_view || default_table_view %>
+
+<%= render(pagination_component(skip_total: true)) %>

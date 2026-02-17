@@ -1,0 +1,58 @@
+# frozen_string_literal: true
+
+class Admin::StravaIntegrationsController < Admin::BaseController
+  include SortableTable
+
+  def index
+    @per_page = permitted_per_page(default: 50)
+    @pagy, @collection = pagy(:countish,
+      matching_strava_integrations.includes(:user).reorder(sortable_opts),
+      limit: @per_page,
+      page: permitted_page)
+  end
+
+  def show
+    @strava_integration = StravaIntegration.unscoped.find(params[:id])
+  end
+
+  helper_method :matching_strava_integrations, :permission_levels
+
+  protected
+
+  def sortable_columns
+    %w[created_at updated_at deleted_at last_updated_activities_at user_id status activities_downloaded_count].freeze
+  end
+
+  def sortable_opts
+    "strava_integrations.#{sort_column} #{sort_direction}"
+  end
+
+  def permission_levels
+    %w[default less more].freeze
+  end
+
+  def earliest_period_date
+    Time.at(1738368000) # 2025-02-01
+  end
+
+  def matching_strava_integrations
+    strava_integrations = StravaIntegration.unscoped
+
+    if params[:user_id].present?
+      strava_integrations = strava_integrations.where(user_id: user_subject&.id || params[:user_id])
+    end
+
+    if params[:search_status].present?
+      strava_integrations = strava_integrations.where(status: params[:search_status])
+    end
+
+    @search_permissions = params[:search_permissions].presence if permission_levels.include?(params[:search_permissions])
+    if @search_permissions.present?
+      strava_integrations = strava_integrations.send(:"permissions_#{@search_permissions}")
+    end
+
+    @time_range_column = sort_column if %w[updated_at deleted_at last_updated_activities_at].include?(sort_column)
+    @time_range_column ||= "created_at"
+    strava_integrations.where(@time_range_column => @time_range)
+  end
+end

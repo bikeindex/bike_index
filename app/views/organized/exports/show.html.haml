@@ -49,10 +49,11 @@
             %a.small.less-strong{ href: "#show_exported_bikes",
                                  'aria-controls' => 'show_exported_bikes',
                                  'data-toggle' => 'collapse' }
-              - if @export&.rows.to_i > 100
-                = t(".show_first_100_bikes_in_export")
-              - else
-                = t(".show_bikes_in_export")
+              - unless @export.only_custom_bike_ids
+                - if @export&.rows.to_i > 100
+                  = t(".show_first_100_bikes_in_export")
+                - else
+                  = t(".show_bikes_in_export")
 
             .collapse#show_exported_bikes
               %ul.exported-link-list

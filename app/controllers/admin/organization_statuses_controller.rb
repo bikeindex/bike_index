@@ -12,7 +12,7 @@ class Admin::OrganizationStatusesController < Admin::BaseController
         .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
   end
 
-  helper_method :matching_organization_statuses_untimed, :matching_organization_statuses, :grouped_pos_kinds
+  helper_method :matching_organization_statuses_untimed, :matching_organization_statuses, :grouped_pos_kinds, :humanize_pos_kind
 
   private
 
@@ -26,6 +26,16 @@ class Admin::OrganizationStatusesController < Admin::BaseController
 
   def grouped_pos_kinds
     %w[not_no_pos broken_pos without_pos with_pos].freeze
+  end
+
+  def humanize_pos_kind(kind)
+    if kind == "all"
+      "All POS kinds"
+    elsif kind == "not_no_pos"
+      "Any POS kind (all but no_pos)"
+    else
+      kind&.humanize
+    end
   end
 
   def permitted_pos_kinds

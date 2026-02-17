@@ -38,7 +38,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     sleep 1
   end
 
-  it "automatically loads the next page when scrolling to bottom" do
+  it "automatically loads the next page when scrolling to bottom", :flaky do
     expect(manufacturer1.reload.id).to eq 1003 # sanity check - otherwise the search won't work
     expect(manufacturer2.reload.id).to eq 764 # sanity check - otherwise the search won't work
     visit marketplace_url

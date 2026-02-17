@@ -2123,6 +2123,8 @@ nl:
         remove_or_transfer: Overdragen, verbergen of verwijderen
         marketplace_list: Lijst te koop
         marketplace_on_sale: Marktplaatsvermelding bijwerken
+        strava_gear: Strava-uitrusting
+        versions_and_strava: Versies en Strava
       create:
         bike_was_added: Bike met succes toegevoegd aan de index!
         bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
@@ -2422,6 +2424,10 @@ nl:
           could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
             van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
+      impound_records:
+        available_impound_records:
+          we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
+            een andere locatie.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -2468,6 +2474,10 @@ nl:
         set_interpreted_params:
           we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
             een andere locatie om gestolen fietsen in de buurt te zoeken.
+      marketplace:
+        set_interpreted_params:
+          we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
+            een andere locatie om te zoeken naar nabijgelegen locaties.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4610,6 +4620,10 @@ nl:
       edit:
         impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
         save: Opslaan
+    impound_records:
+      index:
+        impound_records: Inbeslagnamegegevens
+        render_chart: Rendergrafiek
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -5886,6 +5900,14 @@ nl:
       draft: Voorlopige versie
       for_sale: Te koop
       publicly_listed: "(openbaar genoteerd)"
+    strava_gear:
+      connect_bike_to_strava_gear: Koppel deze fiets aan een van je Strava-fietsen
+        om bij te houden op welke fiets je rijdt.
+      none_selected: "-- Geen --"
+      strava_bike: Strava-fiets
+      strava_gear: Strava-uitrusting
+      sync_not_finished: De synchronisatie met Strava is nog niet voltooid, dus mogelijk
+        worden niet alle fietsen weergegeven.
   bike_versions:
     index:
       primary_colors: Primaire kleuren
@@ -6083,6 +6105,28 @@ nl:
         sold_for: Verkoopbedrag voor
         transfer_to_html: Hierdoor wordt de registratie overgedragen naar %{buyer_html}
           en de vermelding op de marktplaats gesloten.
+      strava_integration:
+        activities_synced:
+          one: "%{count} activiteit gesynchroniseerd"
+          other: "%{count} activiteiten gesynchroniseerd"
+        connect_with_strava: Maak verbinding met Strava
+        connected_to_strava: Gekoppeld aan Strava
+        disconnect_confirm: Weet je zeker dat je de Strava-verbinding wilt verbreken?
+          Hierdoor worden alle gesynchroniseerde activiteiten verwijderd.
+        disconnect_strava: Ontkoppel van Strava
+        downloaded: gedownload
+        integrate_your_bikes_with_strava: Koppel je fietsen aan Strava en synchroniseer
+          je fietsactiviteiten.
+        strava_bikes_connected: Strava-fietsen gekoppeld aan Bike Index-fietsen
+        strava_connected_pending: Verbonden met Strava. De synchronisatie start binnenkort.
+        strava_integration: Strava-integratie
+        sync_error: Synchronisatiefout
+        sync_error_description: Er is een fout opgetreden bij het synchroniseren van
+          je Strava-activiteiten. Probeer de verbinding te verbreken en opnieuw verbinding
+          te maken.
+        sync_running_in_background: De synchronisatie is op de achtergrond bezig.
+          Deze pagina wordt automatisch bijgewerkt.
+        syncing_activities: Activiteiten synchroniseren...
     emails:
       partials:
         bike_box:
@@ -6182,3 +6226,21 @@ nl:
         region: Regio / Provincie
         state: Staat
         street: Straat
+      impound_records_index:
+        matching_impound_record:
+          one: overeenkomend inbeslagname record
+          other: overeenkomende inbeslagnamegegevens
+        all_bikes: Alle fietsen
+        all_statuses: Alle statussen
+        for_table_rows_with_checks: Voor tabelrijen met controles
+        impound_records: Inbeslagnamegegevens
+        internal_note: Interne notitie
+        interpreted_params: Geïnterpreteerde_parameters
+        new_owner_email: E-mailadres van de nieuwe eigenaar
+        only_unregistered: Alleen niet-geregistreerde
+        only_user_registered: Alleen geregistreerde gebruikers
+        pagy: Pagy
+        per_page: Per pagina
+        status_records: "%{status} records"
+        update_impound_record: Update het inbeslagnameregister
+        update_multiple_records: Meerdere records bijwerken

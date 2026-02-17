@@ -87,7 +87,7 @@
 #  index_bikes_on_example                    (example) WHERE (example IS NOT NULL)
 #  index_bikes_on_latitude_and_longitude     (latitude,longitude)
 #  index_bikes_on_listing_order              (listing_order)
-#  index_bikes_on_lower_frame_model          (lower(frame_model))
+#  index_bikes_on_lower_frame_model          ("left"(lower(frame_model), 255))
 #  index_bikes_on_lower_mnfg_name            (lower((mnfg_name)::text))
 #  index_bikes_on_manufacturer_id            (manufacturer_id)
 #  index_bikes_on_model_audit_id             (model_audit_id) WHERE (model_audit_id IS NOT NULL)
@@ -160,6 +160,7 @@ class Bike < ApplicationRecord
   has_many :marketplace_listings, as: :item
 
   has_one :current_marketplace_listing, -> { current }, class_name: "MarketplaceListing", as: :item
+  has_one :strava_gear, as: :item
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records

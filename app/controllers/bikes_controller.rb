@@ -156,6 +156,7 @@ class BikesController < Bikes::BaseController
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
     end
     assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
+    assign_strava_gear if params.key?(:strava_gear_id)
     @bike = @bike.reload
 
     @edit_templates = nil # update templates in case bike state has changed

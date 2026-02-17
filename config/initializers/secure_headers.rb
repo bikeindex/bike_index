@@ -1,5 +1,8 @@
 SecureHeaders::Configuration.default do |config|
   config.csp = SecureHeaders::OPT_OUT
+  # OPT_OUT of cookie flagging — Rails handles httponly/secure/samesite natively,
+  # and SecureHeaders joins Set-Cookie with \n which Puma 7 rejects as illegal.
+  config.cookies = SecureHeaders::OPT_OUT
   config.hsts = "max-age=#{20.years.to_i}"
   config.x_frame_options = "SAMEORIGIN"
   config.x_content_type_options = "nosniff"

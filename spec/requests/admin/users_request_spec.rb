@@ -6,9 +6,49 @@ RSpec.describe Admin::UsersController, type: :request do
   let(:user_subject) { FactoryBot.create(:user) }
 
   describe "index" do
-    it "renders" do
-      expect(user_subject).to be_present
-      get "#{base_url}?query=something" # Test to make sure we're dealing with admin_text_search correctly
+    let!(:ambassador) { FactoryBot.create(:ambassador) }
+    let!(:organization_user) { FactoryBot.create(:organization_user) }
+    let!(:developer) { FactoryBot.create(:developer) }
+    let!(:superuser_ability) { SuperuserAbility.create(user: user_subject) }
+
+    it "renders with all search options" do
+      get "#{base_url}?query=something"
+      expect(response).to render_template :index
+
+      get base_url, params: {search_with_organization: true}
+      expect(assigns(:collection).pluck(:id)).to include(organization_user.id)
+
+      get base_url, params: {search_ambassadors: true}
+      expect(assigns(:collection).pluck(:id)).to eq([ambassador.id])
+
+      get base_url, params: {search_superusers: true}
+      expect(assigns(:collection).pluck(:id)).to eq([user_subject.id])
+
+      get base_url, params: {search_developers: true}
+      expect(assigns(:collection).pluck(:id)).to eq([developer.id])
+
+      get base_url, params: {search_unconfirmed: true}
+      expect(assigns(:collection).pluck(:id)).to include(user_subject.id)
+
+      get base_url, params: {search_confirmed: true}
+      expect(assigns(:collection).pluck(:id)).to include(current_user.id)
+
+      get base_url, params: {search_invalid: "banned_only"}
+      expect(response).to render_template :index
+
+      get base_url, params: {search_invalid: "deleted_only"}
+      expect(response).to render_template :index
+
+      get base_url, params: {search_invalid: "all"}
+      expect(response).to render_template :index
+
+      get base_url, params: {search_phone: "2063339999"}
+      expect(response).to render_template :index
+
+      get base_url, params: {search_domain: "example.com"}
+      expect(response).to render_template :index
+
+      get base_url, params: {render_chart: true}
       expect(response).to render_template :index
     end
   end

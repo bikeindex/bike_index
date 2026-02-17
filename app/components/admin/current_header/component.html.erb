@@ -89,6 +89,15 @@
     </p>
   <% end %>
 
+  <% if show_strava_integration? %>
+    <p>
+      <%= viewing.pluralize %> for
+      <%= link_to "Strava Integration #{strava_integration_id}", admin_strava_integration_path(strava_integration_id), class: "twlink" %>
+      
+      <%= link_to "view for all Strava integrations", url_for(sortable_search_params.merge(search_strava_integration_id: nil)), class: "gray-link tw:text-sm" %>
+    </p>
+  <% end %>
+
   <% if show_kind? %>
     <p>
       <%= viewing.pluralize %> for <strong><%= kind_humanized %></strong>

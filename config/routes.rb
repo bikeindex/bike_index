@@ -69,7 +69,11 @@ Rails.application.routes.draw do
   end
 
   resources :webhooks, only: [] do
-    collection { post :stripe }
+    collection do
+      post :stripe
+      get :strava
+      post :strava
+    end
   end
 
   resources :documentation, only: %i[index] do
@@ -115,6 +119,12 @@ Rails.application.routes.draw do
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
+
+  # Strava integration
+  resource :strava_integration, only: [:new, :destroy] do
+    get :callback, on: :member
+    get :sync_status, on: :member
+  end
   # Legacy - there are places where user_home existed in emails, etc, so keep this
   get "user_home", to: redirect("/my_account")
   get :accept_vendor_terms, to: "users#accept_vendor_terms"
@@ -235,12 +245,12 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_statuses parking_notifications
+      notifications organization_statuses parking_notifications strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
     ].each { resources it, only: %i[index] }
 
     %i[
-      b_params bike_versions feedbacks marketplace_listings marketplace_messages sales
+      b_params bike_versions feedbacks marketplace_listings marketplace_messages sales strava_integrations
     ].each { resources it, only: %i[index show] }
 
     resources :bike_stickers do

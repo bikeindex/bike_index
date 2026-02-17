@@ -6,7 +6,7 @@ Bike Index is a Rails webapp
 
 Start the dev server with `bin/dev`
 
-This will start a dev server at [http://localhost:3042](http://localhost:3042) (or the configured `DEV_PORT`)
+This will start a dev server at [http://localhost:3042](http://localhost:3042) (or the configured `DEV_PORT` or `CONDUCTOR_PORT`)
 
 ## Code style
 
@@ -20,6 +20,7 @@ Ruby is formatted with the standard gem. Run `bin/lint` to automatically format 
 - make methods private if possible
 - Omit named arguments' values from hashes (ie prefer `{x:, y:}` instead of `{x: x, y: y}`)
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
+- prefer un-abbreviated variable names
 
 ## Testing
 
@@ -49,7 +50,7 @@ This project also uses the ViewComponent gem to render components.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`
 - View components must initialize with keyword arguments
 - In view components, prefer instance variables to attr_accessor
-- In ViewComponent templates, use `helpers.` prefix for view helpers (e.g. `helpers.column_chart`, `helpers.time_ago_in_words`)
+- In ViewComponent templates, use `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`)
 
 ## Architecture notes
 

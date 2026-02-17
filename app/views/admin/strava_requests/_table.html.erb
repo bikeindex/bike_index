@@ -1,0 +1,93 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+      <th>
+        <small>
+          <%= sortable "updated_at", render_sortable: render_sortable %>
+        </small>
+      </th>
+
+      <th>
+        <%= sortable "request_type", "Type", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "response_status", "Status", render_sortable: render_sortable %>
+      </th>
+
+      <th>Params</th>
+      <th>Rate limit</th>
+      <th><%= sortable "requested_at", render_sortable: render_sortable %></th>
+
+      <th>User</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |strava_request| %>
+        <tr>
+          <td>
+            <div class="less-strong-hold">
+              <span class="localizeTime">
+                <%= l strava_request.created_at, format: :convert_time %>
+              </span>
+
+              <% if display_dev_info? %>
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= strava_request.id %>
+                </span>
+              <% end %>
+            </div>
+          </td>
+
+          <td>
+            <small class="localizeTime">
+              <%= l strava_request.updated_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td><small><%= strava_request.request_type&.humanize %></small></td>
+
+          <td>
+            <% if strava_request.success? %>
+              <span class="text-success">
+                <%= strava_request.response_status %>
+              </span>
+            <% elsif strava_request.pending? %>
+              <small><%= strava_request.response_status %></small>
+            <% else %>
+              <span class="text-danger">
+                <%= strava_request.response_status.humanize %>
+              </span>
+            <% end %>
+          </td>
+
+          <td>
+            <small>
+              <%= strava_request.parameters&.to_json if strava_request.parameters.present? %>
+            </small>
+          </td>
+
+          <td>
+            <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: strava_request.rate_limit) %>
+          </td>
+
+          <td>
+            <% if strava_request.requested_at.present? %>
+              <small class="localizeTime">
+                <%= l strava_request.requested_at, format: :convert_time %>
+              </small>
+            <% end %>
+          </td>
+
+          <td>
+            <%= render Admin::UserCell::Component.new(user: strava_request.user, user_id: strava_request.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_request.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_request.strava_integration_id))) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

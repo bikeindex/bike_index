@@ -3,6 +3,10 @@ name: CI
 on:
   push:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   lint_and_scan:
     runs-on: ubuntu-latest
@@ -67,8 +71,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ci_node_total: [3]
-        ci_node_index: [0, 1, 2]
+        ci_node_total: [4]
+        ci_node_index: [0, 1, 2, 3]
     env:
       RAILS_ENV: test
       TZ: "America/Chicago"
@@ -105,8 +109,14 @@ jobs:
           bundler-cache: true
       - run: bundle install
       - name: Set up database
-        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed
+        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
+      - name: Test bin/setup # Test bin/setup - only run on 1 node, knapsack should balance
+        if: matrix.ci_node_index == 0
+        run: bin/setup
       - name: Sync translations (only on main by default)
+        if: matrix.ci_node_index == 1
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
       # Install JS dependencies
       - name: build assets

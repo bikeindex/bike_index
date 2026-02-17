@@ -1,0 +1,72 @@
+<% index_title = capture do %>
+  Manage Strava Requests
+  <span class="tw:text-base">current rate limit <%= render Admin::StravaRateLimit::Component.new(rate_limit_json: StravaRequest.estimated_current_rate_limit) %></span>
+<% end %>
+
+<% nav_header_list_items = capture do %>
+  <li class="nav-item dropdown">
+    <a
+      class="nav-link dropdown-toggle <%= params[:search_request_type].present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if params[:search_request_type].blank? %>
+        All types
+      <% else %>
+        <%= params[:search_request_type].humanize %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All types", url_for(sortable_search_params.merge(search_request_type: nil)), class: "dropdown-item #{params[:search_request_type].present? ? '' : 'active'}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% StravaRequest::REQUEST_TYPE_ENUM.each_key do |kind| %>
+        <%= link_to kind.to_s.humanize, url_for(sortable_search_params.merge(search_request_type: kind)), class: "dropdown-item #{params[:search_request_type] == kind.to_s ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown dropleft">
+    <a
+      class="nav-link dropdown-toggle <%= params[:search_response_status].present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if params[:search_response_status].blank? %>
+        All statuses
+      <% else %>
+        <%= params[:search_response_status].humanize %>
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All statuses", url_for(sortable_search_params.merge(search_response_status: nil)), class: "dropdown-item #{params[:search_response_status].present? ? '' : 'active'}" %>
+
+      <div class="dropdown-divider"></div>
+
+      <% StravaRequest::RESPONSE_STATUS_ENUM.each_key do |kind| %>
+        <%= link_to kind.to_s.humanize, url_for(sortable_search_params.merge(search_response_status: kind)), class: "dropdown-item #{params[:search_response_status] == kind.to_s ? 'active' : ''}" %>
+      <% end %>
+    </div>
+  </li>
+<% end %>
+
+<% rendered_chart = capture do %>
+  <% if @render_chart %>
+    <%= render(Admin::ChartStravaRequests::Component.new(collection: matching_strava_requests, time_range: @time_range)) %>
+  <% end %>
+<% end %>
+
+<%= render(Admin::IndexSkeleton::Component.new(index_title:, nav_header_list_items:, rendered_chart:)) %>
+
+<style>
+  .full-screen-table pre { margin-bottom: 0; }
+</style>

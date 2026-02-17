@@ -1,0 +1,31 @@
+<div class="organized-page-header mb-4">
+  <h1 class="uncap"><%= t(".impound_records") %></h1>
+</div>
+
+<% if @render_chart %>
+  <%= column_chart time_range_counts(collection: available_impound_records), stacked: true, thousands: "," %>
+<% end %>
+
+<div class="text-right mb-2 mt-4">
+  <a
+    class="btn btn-sm less-strong btn-outline-secondary <%= 'active' if @render_chart %>"
+    href="<%= organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)) %>"
+  >
+    <%= t(".render_chart") %>
+  </a>
+</div>
+
+<%= render partial: "/shared/period_select" %>
+
+<%= render(Org::ImpoundRecordsIndex::Component.new(
+  pagy: @pagy,
+  impound_records: @impound_records,
+  search_status: @search_status,
+  search_unregisteredness: @search_unregisteredness,
+  time_range: @time_range,
+  available_statuses: available_statuses,
+  current_organization: current_organization,
+  search_proximity: @search_proximity,
+  search_location: params[:search_location],
+  interpreted_params: @interpreted_params
+)) %>

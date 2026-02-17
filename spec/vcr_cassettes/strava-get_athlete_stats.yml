@@ -1,0 +1,75 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/athletes/2430215/stats
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 08 Feb 2026 22:46:40 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '207'
+      Server:
+      - istio-envoy
+      Status:
+      - 200 OK
+      X-Ratelimit-Usage:
+      - '5,24'
+      X-Ratelimit-Limit:
+      - '600,6000'
+      Vary:
+      - Accept, Origin
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - 59db0eec-c79f-4031-b503-d3bea50291c6
+      X-Readratelimit-Limit:
+      - '300,3000'
+      X-Download-Options:
+      - noopen
+      Etag:
+      - W/"a64698e965ce8f1776ae718e20f22c14"
+      X-Frame-Options:
+      - DENY
+      X-Readratelimit-Usage:
+      - '5,24'
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 ff45192c8a60197bff7a054625e1e150.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - hOU17tFSrsth_MVR7eURzlfhuBsOYKlr1T7pgQZ8Bepe8Ds8ix9BIQ==
+    body:
+      encoding: ASCII-8BIT
+      string: '{"biggest_ride_distance":652858.0,"biggest_climb_elevation_gain":1720.0,"recent_ride_totals":{"count":8,"distance":419107.30000000005,"moving_time":75755,"elapsed_time":99396,"elevation_gain":6928.0,"achievement_count":0},"all_ride_totals":{"count":1655,"distance":61455475.20000006,"moving_time":11411609,"elapsed_time":23412380,"elevation_gain":777461.0999999995},"recent_run_totals":{"count":0,"distance":0,"moving_time":0,"elapsed_time":0,"elevation_gain":0,"achievement_count":0},"all_run_totals":{"count":162,"distance":738701.4,"moving_time":262546,"elapsed_time":2037761,"elevation_gain":9725.399999999998},"recent_swim_totals":{"count":0,"distance":0,"moving_time":0,"elapsed_time":0,"elevation_gain":0,"achievement_count":0},"all_swim_totals":{"count":0,"distance":0,"moving_time":0,"elapsed_time":0,"elevation_gain":0},"ytd_ride_totals":{"count":13,"distance":505950,"moving_time":89672.0,"elapsed_time":114987.0,"elevation_gain":7719.0},"ytd_run_totals":{"count":0,"distance":0,"moving_time":0,"elapsed_time":0,"elevation_gain":0},"ytd_swim_totals":{"count":0,"distance":0,"moving_time":0,"elapsed_time":0,"elevation_gain":0}}'
+  recorded_at: Sun, 08 Feb 2026 22:46:39 GMT
+recorded_with: VCR 6.3.1

@@ -1,3 +1,9 @@
+<% if flash[:notice].present? && @pagy.page == 1 %>
+  <div class="tw:mx-auto tw:max-w-7xl tw:px-4">
+    <%= render(UI::Alert::Component.new(text: flash[:notice], kind: :warning, dismissable: true)) %>
+  </div>
+<% end %>
+
 <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
   <% component_class = SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
 

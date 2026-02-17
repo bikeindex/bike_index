@@ -2257,6 +2257,12 @@ it:
       draft:
       for_sale:
       publicly_listed:
+    strava_gear:
+      connect_bike_to_strava_gear:
+      none_selected:
+      strava_bike:
+      strava_gear:
+      sync_not_finished:
   controllers:
     application:
       handle_unverified_request:
@@ -2292,6 +2298,8 @@ it:
         remove_or_transfer:
         marketplace_list:
         marketplace_on_sale:
+        strava_gear:
+        versions_and_strava:
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet:
         bike_impounded:
@@ -2467,6 +2475,9 @@ it:
           cannot_remove_yourself:
         update:
           updated_organization_role:
+      impound_records:
+        available_impound_records:
+          we_dont_know_location:
     ownerships:
       show:
         no_longer_your_bike:
@@ -2552,6 +2563,9 @@ it:
         no_active_membership:
     search:
       registrations:
+        set_interpreted_params:
+          we_dont_know_location:
+      marketplace:
         set_interpreted_params:
           we_dont_know_location:
   customer_mailer:
@@ -4034,6 +4048,10 @@ it:
         member_no_bikes_access:
         member_of_organization:
         role_type:
+    impound_records:
+      index:
+        impound_records:
+        render_chart:
   organized_mailer:
     custom_message:
       subject:
@@ -4767,6 +4785,23 @@ it:
         record_sale:
         sold_for:
         transfer_to_html:
+      strava_integration:
+        activities_synced:
+          one:
+          other:
+        connect_with_strava:
+        connected_to_strava:
+        disconnect_confirm:
+        disconnect_strava:
+        downloaded:
+        integrate_your_bikes_with_strava:
+        strava_bikes_connected:
+        strava_connected_pending:
+        strava_integration:
+        sync_error:
+        sync_error_description:
+        sync_running_in_background:
+        syncing_activities:
     emails:
       partials:
         bike_box:
@@ -4847,3 +4882,21 @@ it:
         region:
         state: Stato
         street: Via
+      impound_records_index:
+        matching_impound_record:
+          one:
+          other:
+        all_bikes:
+        all_statuses:
+        for_table_rows_with_checks:
+        impound_records:
+        internal_note:
+        interpreted_params:
+        new_owner_email:
+        only_unregistered:
+        only_user_registered:
+        pagy:
+        per_page:
+        status_records:
+        update_impound_record:
+        update_multiple_records:

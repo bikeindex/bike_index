@@ -2332,6 +2332,14 @@ nb:
       draft: Utkast
       for_sale: Til salgs
       publicly_listed: "(børsnotert)"
+    strava_gear:
+      connect_bike_to_strava_gear: Koble denne sykkelen til en av Strava-syklene dine
+        for å spore hvilken sykkel du sykler på.
+      none_selected: "-- Ingen --"
+      strava_bike: Strava-sykkel
+      strava_gear: Strava-utstyr
+      sync_not_finished: Strava-synkroniseringen er ikke fullført ennå, så det er
+        ikke sikkert at alle syklene er oppført.
   controllers:
     application:
       handle_unverified_request:
@@ -2370,6 +2378,8 @@ nb:
         remove_or_transfer: Overfør, skjul eller slett
         marketplace_list: Liste til salgs
         marketplace_on_sale: Oppdater markedsplassoppføring
+        strava_gear: Strava-utstyr
+        versions_and_strava: Versjoner og Strava
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: Det %{bike_type} er ikke gjort krav på ennå.
           Hvis det er din %{bike_type}, registrer deg og du vil kunne redigere den!
@@ -2576,6 +2586,10 @@ nb:
             Kontakt oss på support@bikeindex.org hvis dette er problematisk.
         update:
           updated_organization_role: Oppdatert medlemskap for %{user_email}.
+      impound_records:
+        available_impound_records:
+          we_dont_know_location: Beklager, vi vet ikke hvor «%{location}» ligger.
+            Prøv en annen plassering.
     ownerships:
       show:
         no_longer_your_bike: Det pleide å være din %{bike_type}, men er det ikke lenger!
@@ -2690,6 +2704,10 @@ nb:
         set_interpreted_params:
           we_dont_know_location: Beklager, vi kjenner ikke plasseringen "%{location}".
             Prøv et annet sted for å søke etter stjålne sykler i nærheten.
+      marketplace:
+        set_interpreted_params:
+          we_dont_know_location: Beklager, vi vet ikke hvor «%{location}» ligger.
+            Prøv et annet sted for å søke etter oppføringer i nærheten.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5100,6 +5118,10 @@ nb:
         member_no_bikes_access: Samme tilgang som medlem, men kan ikke redigere organisasjonssykler
         member_of_organization: Medlem av organisasjonen
         role_type: Rolletype
+    impound_records:
+      index:
+        impound_records: Beslaglegg poster
+        render_chart: Gjengi diagram
   organized_mailer:
     custom_message:
       subject: "%{org_name} - plasseringen av din %{mnfg_name}"
@@ -5924,6 +5946,27 @@ nb:
         sold_for: Beløp solgt for
         transfer_to_html: Dette vil overføre registreringen til %{buyer_html} og lukke
           markedsplassen.
+      strava_integration:
+        activities_synced:
+          one: "%{count} aktivitet synkronisert"
+          other: "%{count} aktiviteter synkronisert"
+        connect_with_strava: Koble til Strava
+        connected_to_strava: Koblet til Strava
+        disconnect_confirm: Er du sikker på at du vil koble fra Strava? Dette vil
+          fjerne alle synkroniserte aktiviteter.
+        disconnect_strava: Koble fra Strava
+        downloaded: nedlastet
+        integrate_your_bikes_with_strava: Integrer syklene dine med Strava og synkroniser
+          sykkelaktivitetene dine.
+        strava_bikes_connected: Strava-sykler koblet til Bike Index-sykler
+        strava_connected_pending: Koblet til Strava. Synkroniseringen starter snart.
+        strava_integration: Strava-integrasjon
+        sync_error: Synkroniseringsfeil
+        sync_error_description: Det oppsto en feil under synkronisering av Strava-aktivitetene
+          dine. Prøv å koble fra og koble til på nytt.
+        sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne siden
+          oppdateres automatisk.
+        syncing_activities: Synkroniserer aktiviteter ...
     emails:
       partials:
         bike_box:
@@ -6021,3 +6064,21 @@ nb:
         region: Region/provins
         state: Stat
         street: gate
+      impound_records_index:
+        matching_impound_record:
+          one: samsvarende beslagsregister
+          other: samsvarende beslaglagte poster
+        all_bikes: Alle sykler
+        all_statuses: Alle statuser
+        for_table_rows_with_checks: For tabellrader med sjekker
+        impound_records: Beslagleggelse av poster
+        internal_note: Intern merknad
+        interpreted_params: Interpreted_params
+        new_owner_email: Ny eier-e-postadresse
+        only_unregistered: Kun uregistrerte
+        only_user_registered: Kun bruker registrert
+        pagy: Pagy
+        per_page: Per_side
+        status_records: "%{status} poster"
+        update_impound_record: Oppdater beslagsregister
+        update_multiple_records: Oppdater flere poster

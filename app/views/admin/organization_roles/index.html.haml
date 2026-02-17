@@ -9,6 +9,6 @@
 
 - table_view = render partial: "/admin/organization_roles/table", locals: {organization_roles: @collection, render_sortable: true, render_deleted: @deleted_organization_roles}
 
-= render partial: "/shared/admin/index_skeleton", locals: {nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_organization_roles}
+= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_organization_roles))
 
 

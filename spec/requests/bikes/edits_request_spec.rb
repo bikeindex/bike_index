@@ -344,4 +344,24 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(assigns(:bike).id).to eq bike.id
     end
   end
+
+  context "strava_gear template" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
+    let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b12345", strava_gear_name: "My Road Bike") }
+
+    it "renders versions template with strava gear fields" do
+      get "#{base_url}/strava_gear"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:versions)
+      expect(response.body).to include("My Road Bike")
+    end
+
+    it "renders versions template without strava when not connected" do
+      strava_integration.destroy
+      current_user.reload
+      get "#{base_url}/strava_gear"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:versions)
+    end
+  end
 end
