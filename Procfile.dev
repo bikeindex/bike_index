@@ -3,3 +3,4 @@ log: tail -f log/development.log
 hard_worker: bundle exec rerun --background --dir app,db,lib --pattern '{**/*.rb}' --no-notify -- bundle exec sidekiq
 scss: bin/rails dartsass:watch
 css: bin/rails tailwindcss:watch[always]
+strava_search: bin/strava_search_dev
