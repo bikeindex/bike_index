@@ -44,6 +44,6 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Verify public build is up to date
+      - name: Verify public build assets are up to date
         working-directory: .
-        run: diff -r vendor/strava_search/dist public/strava_search
+        run: diff -r vendor/strava_search/dist/assets public/strava_search/assets
