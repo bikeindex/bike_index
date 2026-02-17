@@ -10,7 +10,6 @@ class UserServices::Updator
         AddressRecord.attrs_to_duplicate(address_bike).merge(user_id: user.id, kind: :user)
       )
       if address_bike.address_record.blank?
-        # TODO: I think this can be removed once bike address migration finishes - #2922
         address_bike.update(address_record_id: address_record.id)
       elsif address_bike.address_record? && address_bike.address_record.user_id.blank?
         address_bike.address_record.update(user_id: user.id)

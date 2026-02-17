@@ -76,12 +76,10 @@ class BikeServices::Creator
     :timezone,
     address_record_attributes: (AddressRecord.permitted_params + [:id])
   ].freeze
-  # TODO: Remove this once backfill is finished - #2922
-  ADDRESS_ATTRS = %i[city country_id state_id street zipcode]
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator
   def self.old_attr_accessible
-    (PERMITTED_ATTRS + ADDRESS_ATTRS + [
+    (PERMITTED_ATTRS + [
       stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
       impound_records_attributes: PERMITTED_IMPOUND_ATTRS,
       components_attributes: Component.permitted_attributes,
