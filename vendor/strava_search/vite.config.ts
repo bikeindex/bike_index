@@ -33,5 +33,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     base: '/strava_search/',
+    server: {
+      cors: true,
+    },
   };
 });
