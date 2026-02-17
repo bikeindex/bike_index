@@ -190,13 +190,15 @@ rake task is run. See [PR #1353][pr-1353] for implementation details.
 Pre-Deployment Translation Syncing
 ----------------------------------
 
-When building main, we check for un-synced translations and, if any are found,
-stop the build and open a PR to main with the translation updates.
+When CI runs on main, `bin/check_translations` syncs translations with
+translation.io and checks for changes. If translations are out of sync, CI will
+automatically create a PR (e.g. `translations-sync-20260216120000`) with the
+updates and fail the build.
 
-You'll want to merge this PR (delete the description) to trigger a new build and
-retry deployment on main.
+To deploy, merge the translation sync PR.
 
-(See [#1100](https://github.com/bikeindex/bike_index/pull/1100) for details.)
+If a translation sync PR is already open, CI will skip creating a duplicate and
+just fail until the existing PR is merged.
 
 To manually update the keys on translation.io, run
 `bin/rake translation:sync_and_purge` (requires having an active API key locally).
