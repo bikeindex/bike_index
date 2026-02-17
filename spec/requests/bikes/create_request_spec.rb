@@ -401,7 +401,7 @@ RSpec.describe "BikesController#create", type: :request do
           ownership = new_bike.current_ownership
           expect(ownership.origin).to eq "web"
           expect(ownership.creator_id).to eq current_user.id
-          reg_hash = address_record_attributes
+          reg_hash = address_record_attributes.except(:region_record_id)
             .merge("organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1")
           expect(ownership.registration_info).to match_hash_indifferently reg_hash
 
