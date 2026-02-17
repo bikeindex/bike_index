@@ -43,3 +43,7 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+      - name: Verify public build is up to date
+        working-directory: .
+        run: diff -r vendor/strava_search/dist public/strava_search
