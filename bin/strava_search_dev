@@ -1,0 +1,4 @@
+#!/bin/bash
+cd vendor/strava_search
+npm install --legacy-peer-deps
+npx vite --port 3143

@@ -1863,6 +1863,11 @@ en:
         update:
           bike_stickers_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
+      impound_records:
+        available_impound_records:
+          we_dont_know_location: >-
+            Sorry, we don't know the location "%{location}". Please try a different
+            location.
       manage_impoundings:
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
@@ -1924,6 +1929,11 @@ en:
       update:
         image_updated: Image was successfully updated.
     search:
+      marketplace:
+        set_interpreted_params:
+          we_dont_know_location: >-
+            Sorry, we don't know the location "%{location}". Please try a different
+            location to search nearby listings.
       registrations:
         set_interpreted_params:
           we_dont_know_location: >-

@@ -60,6 +60,13 @@ class ImpoundRecord < ApplicationRecord
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
   scope :registered_bike, -> { where(unregistered_bike: false) }
   scope :with_claims, -> { joins(:impound_claims).where.not(impound_claims: {id: nil}) }
+  scope :within_bounding_box, lambda { |*bounds|
+    sw_lat, sw_lng, ne_lat, ne_lng = bounds.flatten if bounds
+    return none unless sw_lat && sw_lng && ne_lat && ne_lng
+
+    joins(:impounded_from_address_record)
+      .where(address_records: {latitude: sw_lat..ne_lat, longitude: sw_lng..ne_lng})
+  }
 
   attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 

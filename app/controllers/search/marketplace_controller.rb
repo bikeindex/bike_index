@@ -63,6 +63,8 @@ class Search::MarketplaceController < ApplicationController
     else
       GeocodeHelper.bounding_box(location, distance)
     end
+    return {} if bounding_box.empty?
+
     {distance:, location:, bounding_box:}
   end
 
@@ -71,6 +73,10 @@ class Search::MarketplaceController < ApplicationController
     @marketplace_scope = permitted_scopes.include?(params[:marketplace_scope]) ? params[:marketplace_scope] : permitted_scopes.first
     if @marketplace_scope == "for_sale_proximity" || action_name == "counts"
       @interpreted_params.merge!(proximity_hash)
+    end
+
+    if @marketplace_scope == "for_sale_proximity" && @interpreted_params[:bounding_box].blank?
+      flash.now[:notice] = translation(:we_dont_know_location, location: params[:location])
     end
 
     @page = permitted_page(max: MAX_INDEX_PAGE)

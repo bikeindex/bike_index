@@ -2586,6 +2586,10 @@ nb:
             Kontakt oss på support@bikeindex.org hvis dette er problematisk.
         update:
           updated_organization_role: Oppdatert medlemskap for %{user_email}.
+      impound_records:
+        available_impound_records:
+          we_dont_know_location: Beklager, vi vet ikke hvor «%{location}» ligger.
+            Prøv en annen plassering.
     ownerships:
       show:
         no_longer_your_bike: Det pleide å være din %{bike_type}, men er det ikke lenger!
@@ -2700,6 +2704,10 @@ nb:
         set_interpreted_params:
           we_dont_know_location: Beklager, vi kjenner ikke plasseringen "%{location}".
             Prøv et annet sted for å søke etter stjålne sykler i nærheten.
+      marketplace:
+        set_interpreted_params:
+          we_dont_know_location: Beklager, vi vet ikke hvor «%{location}» ligger.
+            Prøv et annet sted for å søke etter oppføringer i nærheten.
   customer_mailer:
     additional_email_confirmation:
       html:

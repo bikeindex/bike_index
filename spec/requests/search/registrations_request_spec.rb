@@ -129,6 +129,14 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 expect(response.status).to eq 200
                 expect(assigns(:interpreted_params)).to eq target_interpreted_params
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
+                expect(flash[:notice]).to be_blank
+
+                # with below minimum distance
+                get base_url, params: query_params.merge(distance: 0.01), headers: headers, as: :turbo_stream
+                expect(response.status).to eq 200
+                expect(assigns(:interpreted_params)).to eq target_interpreted_params
+                expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
+                expect(flash[:notice]).to be_blank
               end
             end
             context "ip passed as parameter" do
@@ -138,6 +146,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 expect(response.status).to eq 200
                 expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
+                expect(flash[:notice]).to be_blank
               end
             end
             context "no location" do
@@ -147,18 +156,20 @@ RSpec.describe Search::RegistrationsController, type: :request do
                 expect(response.status).to eq 200
                 expect(assigns(:interpreted_params)).to eq target_interpreted_params.merge(location: target_location)
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, impounded_bike.id])
+                expect(flash[:notice]).to be_blank
               end
             end
             context "unknown location" do
               # Override bounding box stub in geocoder_default_location shared context
               let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] }
-              it "includes a flash[:info] for unknown location, renders non-proximity" do
+              it "includes search_info for unknown location, renders non-proximity" do
                 get base_url, params: query_params, headers: headers, as: :turbo_stream
                 expect(response.status).to eq 200
-                expect(flash[:info]).to match(/location/)
+                expect(flash[:notice]).to match(/location/)
                 expect(query_params[:stolenness]).to eq "proximity"
                 expect(assigns(:interpreted_params)[:stolenness]).to eq "stolen"
                 expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id, impounded_bike.id])
+                expect(response.body).to match(/we don&#39;t know the location/)
               end
             end
           end
