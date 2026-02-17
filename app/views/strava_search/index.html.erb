@@ -1,15 +1,9 @@
 <% content_for(:header) do %>
-  <% if ENV["BUILD_STRAVA_SEARCH"] == "true" %>
-    <script type="module" src="http://localhost:3143/@vite/client"></script>
-    <script type="module" src="http://localhost:3143/src/main.tsx"></script>
-  <% else %>
-    <% Dir.glob(Rails.root.join("public/strava_search/assets/*")).each do |file| %>
-      <% basename = File.basename(file) %>
-      <% if basename.end_with?(".js") %>
-        <script type="module" crossorigin src="/strava_search/assets/<%= basename %>"></script>
-      <% elsif basename.end_with?(".css") %>
-        <link rel="stylesheet" crossorigin href="/strava_search/assets/<%= basename %>">
-      <% end %>
+  <% @strava_search_assets.each do |asset| %>
+    <% if asset[:type] == :script %>
+      <script type="module" crossorigin src="<%= asset[:src] %>"></script>
+    <% elsif asset[:type] == :stylesheet %>
+      <link rel="stylesheet" crossorigin href="<%= asset[:href] %>">
     <% end %>
   <% end %>
 <% end %>
