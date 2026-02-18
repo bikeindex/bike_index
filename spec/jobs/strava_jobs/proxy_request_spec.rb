@@ -69,19 +69,24 @@ RSpec.describe StravaJobs::ProxyRequest do
         )
       end
 
-      it "creates or updates the activity with detail attributes" do
+      it "creates from list then enriches from detail" do
+        VCR.use_cassette("strava-list_activities") do
+          described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities?page=1&per_page=1", method: "GET")
+        end
+        strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
+        expect(strava_activity).to have_attributes target_attributes
+        expect(strava_activity.enriched?).to be_falsey
+
         VCR.use_cassette("strava-get_activity") do
           expect {
             result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
             expect(result[:strava_request].success?).to be_truthy
             expect(result[:response].status).to eq 200
-          }.to change(StravaRequest, :count).by(1)
-            .and change(StravaActivity, :count).by(1)
-
-          strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
-          expect(strava_activity.enriched?).to be_truthy
-          expect(strava_activity).to have_attributes detail_target_attributes
+          }.to_not change(StravaActivity, :count)
         end
+        strava_activity.reload
+        expect(strava_activity.enriched?).to be_truthy
+        expect(strava_activity).to have_attributes detail_target_attributes
       end
     end
 

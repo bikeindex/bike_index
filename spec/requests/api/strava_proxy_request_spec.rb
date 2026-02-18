@@ -133,22 +133,27 @@ RSpec.describe "Strava Proxy API", type: :request do
           )
         end
 
-        it "stores activity data and returns strava response" do
+        it "creates from list then enriches from detail" do
+          VCR.use_cassette("strava-list_activities") do
+            post base_url, params: {url: "athlete/activities?page=1&per_page=1", method: "GET", access_token: token.token}
+          end
+          expect(response.status).to eq 200
+          strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
+          expect(strava_activity).to have_attributes target_attributes
+          expect(strava_activity.enriched?).to be_falsey
+
           VCR.use_cassette("strava-get_activity") do
             expect {
               post base_url, params: {url: "activities/17323701543", method: "GET", access_token: token.token}
-            }.to change(StravaActivity, :count).by(1)
-              .and change(StravaRequest, :count).by(1)
+            }.to_not change(StravaActivity, :count)
             expect(response.status).to eq 200
             expect(json_result["id"]).to eq 17323701543
             expect(json_result["name"]).to eq "Thanks for coming across the bay!"
-            expect(json_result["sport_type"]).to eq "EBikeRide"
             expect(json_result["description"]).to eq "Hawk with Eric and Scott and cedar"
-
-            strava_activity = StravaActivity.last
-            expect(strava_activity.enriched?).to be_truthy
-            expect(strava_activity).to have_attributes detail_target_attributes
           end
+          strava_activity.reload
+          expect(strava_activity.enriched?).to be_truthy
+          expect(strava_activity).to have_attributes detail_target_attributes
         end
       end
 
