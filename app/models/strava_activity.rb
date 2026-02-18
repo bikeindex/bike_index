@@ -60,37 +60,21 @@ class StravaActivity < ApplicationRecord
       @activity_types ||= distinct.pluck(:activity_type).compact.sort
     end
 
-    def create_or_update_from_summary(strava_integration, summary)
-      attrs = summary_attributes(summary)
-      activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: summary["id"].to_s)
+    # Can be a summary or detail response
+    def create_or_update_from_strava_response(strava_integration, response)
+      attrs = summary_attributes(response).merge(detail_attributes(response))
+      activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: response["id"].to_s)
       activity.update!(attrs)
       activity
     end
 
     def detail_attributes(detail)
-      photos_data = detail.dig("photos", "primary")
-      photos = if photos_data
-        urls = photos_data["urls"] || {}
-        [{id: photos_data["unique_id"], urls:}]
-      else
-        []
-      end
-
-      segments = detail["segment_efforts"]
-      segment_locations = if segments.present?
-        {
-          cities: segments.filter_map { |se| se.dig("segment", "city").presence }.uniq,
-          states: segments.filter_map { |se| se.dig("segment", "state").presence }.uniq,
-          countries: segments.filter_map { |se| se.dig("segment", "country").presence }.uniq
-        }
-      else
-        {}
-      end
+      return {} if (detail.keys & %w[photos segment_efforts description muted kudos_count]).none?
 
       {
         description: detail["description"],
-        photos:,
-        segment_locations:,
+        photos: photos_for(detail.dig("photos", "primary")),
+        segment_locations: segment_locations_for(detail["segment_efforts"]),
         muted: detail["muted"],
         kudos_count: detail["kudos_count"]
       }
@@ -113,6 +97,24 @@ class StravaActivity < ApplicationRecord
         activity_type: summary["sport_type"] || summary["type"],
         activity_timezone: summary["timezone"],
         start_date:
+      }
+    end
+
+    def photos_for(photos_data)
+      return [] if photos_data.blank?
+
+      urls = photos_data["urls"] || {}
+
+      [{id: photos_data["unique_id"], urls:}]
+    end
+
+    def segment_locations_for(segments)
+      return {} if segments.blank?
+
+      {
+        cities: segments.filter_map { |se| se.dig("segment", "city").presence }.uniq,
+        states: segments.filter_map { |se| se.dig("segment", "state").presence }.uniq,
+        countries: segments.filter_map { |se| se.dig("segment", "country").presence }.uniq
       }
     end
   end

@@ -25,8 +25,6 @@ module StravaJobs
           if parameters["object_type"] == "activity" && parameters["aspect_type"] != "delete"
             Integrations::StravaClient.fetch_activity(strava_integration, parameters["object_id"])
           end
-        when "proxy"
-          Integrations::StravaClient.proxy_request(strava_integration, parameters["url"], method: parameters["method"])
         end
       end
 
@@ -34,7 +32,7 @@ module StravaJobs
         if strava_request.incoming_webhook?
           handle_incoming_webhook(strava_request, strava_integration, response)
         elsif strava_request.list_activities?
-          response.each { |summary| StravaActivity.create_or_update_from_summary(strava_integration, summary) }
+          response.each { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary) }
           if strava_request.parameters["page"] == 1
             strava_integration.update(last_updated_activities_at: Time.current)
           end
@@ -47,21 +45,8 @@ module StravaJobs
           strava_activity&.update_from_detail(response)
         elsif strava_request.fetch_gear?
           StravaGear.update_from_strava(strava_integration, response)
-        elsif strava_request.proxy?
-          return handle_proxy_response(strava_integration, response)
         end
         strava_integration.update_sync_status
-      end
-
-      def handle_proxy_response(strava_integration, response)
-        if response.is_a?(Array)
-          response.each { |summary| StravaActivity.create_or_update_from_summary(strava_integration, summary) }
-        elsif response.is_a?(Hash) && response["sport_type"].present?
-          activity = StravaActivity.create_or_update_from_summary(strava_integration, response)
-          activity.update_from_detail(response)
-        elsif response.is_a?(Hash) && response["gear_type"].present?
-          StravaGear.update_from_strava(strava_integration, response)
-        end
       end
 
       def handle_incoming_webhook(strava_request, strava_integration, response)
@@ -70,8 +55,7 @@ module StravaJobs
           if params["aspect_type"] == "delete"
             strava_integration.strava_activities.find_by(strava_id: params["object_id"].to_s)&.destroy
           else
-            activity = StravaActivity.create_or_update_from_summary(strava_integration, response)
-            activity.update_from_detail(response)
+            StravaActivity.create_or_update_from_strava_response(strava_integration, response)
           end
         elsif params["object_type"] == "athlete" && params.dig("updates", "authorized") == "false"
           strava_integration.destroy
@@ -97,6 +81,7 @@ module StravaJobs
       return unless strava_request.success?
 
       self.class.handle_response(strava_request, strava_integration, response&.body)
+      response&.body
     end
 
     private

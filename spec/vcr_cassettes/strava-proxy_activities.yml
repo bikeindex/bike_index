@@ -15,21 +15,51 @@ http_interactions:
       - "*/*"
   response:
     status:
-      code: 200
-      message: OK
+      code: 401
+      message: Unauthorized
     headers:
       Content-Type:
       - application/json; charset=utf-8
-      X-RateLimit-Limit:
-      - "600,6000"
-      X-RateLimit-Usage:
-      - "12,120"
-      X-ReadRateLimit-Limit:
-      - "600,6000"
-      X-ReadRateLimit-Usage:
-      - "12,120"
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Tue, 17 Feb 2026 20:23:36 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '14'
+      Server:
+      - istio-envoy
+      Status:
+      - 401 Unauthorized
+      Cache-Control:
+      - no-cache
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - f8fd1a43-5576-4f08-b66e-dd24d9cd999e
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 caaeba2a924bc96d1c9587af9daa3d38.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - "-FYRGRUVLjQClYmoQ7Dkz1QcMyW1tOytmBjnbc8hYKEUhljmlxp4jg=="
     body:
       encoding: UTF-8
-      string: '[{"id":123,"name":"Morning Ride","sport_type":"Ride","distance":25000.0,"moving_time":3600,"type":"Ride"}]'
-  recorded_at: Sun, 08 Feb 2026 22:46:00 GMT
+      string: '{"message":"Authorization Error","errors":[{"resource":"Athlete","field":"access_token","code":"invalid"}]}'
+  recorded_at: Tue, 17 Feb 2026 20:23:36 GMT
 recorded_with: VCR 6.3.1

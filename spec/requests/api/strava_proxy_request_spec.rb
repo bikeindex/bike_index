@@ -65,7 +65,9 @@ RSpec.describe "Strava Proxy API", type: :request do
       context "strava returns rate limit error" do
         it "returns strava error status" do
           VCR.use_cassette("strava-proxy_rate_limited") do
-            post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            expect do
+              post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            end.to change(StravaRequest, :count).by 1
             expect(response.status).to eq 429
             expect(json_result[:error]).to eq "rate_limited"
             expect(StravaRequest.last.rate_limited?).to be_truthy
@@ -76,7 +78,9 @@ RSpec.describe "Strava Proxy API", type: :request do
       context "strava returns server error" do
         it "returns strava error status without raising" do
           VCR.use_cassette("strava-proxy_server_error") do
-            post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            expect do
+              post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            end.to change(StravaRequest, :count).by 1
             expect(response.status).to eq 500
             expect(json_result[:error]).to eq "error"
             expect(StravaRequest.last.error?).to be_truthy
@@ -85,11 +89,17 @@ RSpec.describe "Strava Proxy API", type: :request do
       end
 
       context "activity detail response" do
+        let(:target_keys) do
+          []
+        end
         it "stores activity data" do
           VCR.use_cassette("strava-proxy_activity_detail") do
             expect {
               post base_url, params: {url: "activities/456", method: "GET", access_token: token.token}
+              expect(json_result.keys.sort).to eq target_keys
+              expect(json_result["ssss"]).to eq "{C{CC"
             }.to change(StravaActivity, :count).by(1)
+              .and change(StravaRequest, :count).by(1)
             activity = StravaActivity.last
             expect(activity.strava_id).to eq "456"
             expect(activity.title).to eq "Evening Ride"
@@ -99,20 +109,30 @@ RSpec.describe "Strava Proxy API", type: :request do
 
       context "invalid proxy path" do
         it "rejects absolute URLs" do
-          post base_url, params: {url: "https://evil.com/steal", method: "GET", access_token: token.token}
+          expect do
+            post base_url, params: {url: "https://evil.com/steal", method: "GET", access_token: token.token}
+          end.to_not change(StravaRequest, :count)
           expect(response.status).to eq 400
         end
 
         it "rejects protocol-relative URLs" do
-          post base_url, params: {url: "//evil.com/steal", method: "GET", access_token: token.token}
+          expect do
+            post base_url, params: {url: "//evil.com/steal", method: "GET", access_token: token.token}
+          end.to_not change(StravaRequest, :count)
           expect(response.status).to eq 400
         end
 
         it "rejects path traversal" do
-          post base_url, params: {url: "../../oauth/token", method: "GET", access_token: token.token}
+          expect do
+            post base_url, params: {url: "../../oauth/token", method: "GET", access_token: token.token}
+          end.to_not change(StravaRequest, :count)
           expect(response.status).to eq 400
         end
       end
     end
   end
 end
+
+
+
+

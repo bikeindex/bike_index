@@ -2,7 +2,7 @@
 
 module API
   class StravaProxyController < ApplicationController
-    STRAVA_DOORKEEPER_APP_ID = ENV["STRAVA_DOORKEEPER_APP_ID"]
+    STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3)
 
     respond_to :json
     wrap_parameters false
@@ -22,21 +22,8 @@ module API
       strava_integration = user.strava_integration
       return render json: {error: "No Strava integration"}, status: 404 unless strava_integration
 
-      strava_request = StravaRequest.create!(
-        strava_integration_id: strava_integration.id,
-        user_id: user.id,
-        request_type: :proxy,
-        parameters: {url: permitted_params[:url], method: permitted_params[:method]}
-      )
-
-      strava_response = StravaJobs::RequestRunner.execute(strava_integration, strava_request.request_type, strava_request.parameters)
-      strava_request.update_from_response(strava_response, raise_on_error: false)
-
-      if strava_request.success?
-        StravaJobs::RequestRunner.handle_response(strava_request, strava_integration, strava_response&.body)
-      end
-
-      render_proxy_response(strava_response, strava_request)
+      StravaJobs::ProxyRequest.create_and_execute(strava_integration:, user:,
+        url: permitted_params[:url], method: permitted_params[:method])
     end
 
     private

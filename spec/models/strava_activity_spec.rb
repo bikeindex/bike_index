@@ -91,7 +91,7 @@ RSpec.describe StravaActivity, type: :model do
     end
   end
 
-  describe "create_or_update_from_summary" do
+  describe "create_or_update_from_strava_response" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
     let(:summary) do
       {"id" => 9876543, "name" => "Morning Ride", "distance" => 25000.0,
@@ -102,7 +102,7 @@ RSpec.describe StravaActivity, type: :model do
     end
 
     it "creates a new activity from summary" do
-      activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)
+      activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
       expect(activity).to be_persisted
       expect(activity.strava_id).to eq("9876543")
       expect(activity.title).to eq("Morning Ride")
@@ -116,7 +116,7 @@ RSpec.describe StravaActivity, type: :model do
 
     it "updates an existing activity" do
       FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543", title: "Old Title")
-      activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)
+      activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
       expect(activity.title).to eq("Morning Ride")
       expect(strava_integration.strava_activities.count).to eq(1)
     end

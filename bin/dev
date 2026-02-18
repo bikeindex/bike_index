@@ -15,8 +15,11 @@ redis-server > log/redis.log &
 export DEV_PORT=${CONDUCTOR_PORT:-${DEV_PORT:-3042}}
 export BASE_URL=http://localhost:$DEV_PORT
 
+# Pass --strava to start the strava_search Vite dev server
 FOREMAN_ARGS="-f Procfile.dev"
-if [ "$BUILD_STRAVA_SEARCH" != "true" ]; then
+if [[ " $* " == *" --strava "* ]]; then
+  export BUILD_STRAVA_SEARCH=true
+else
   FOREMAN_ARGS="$FOREMAN_ARGS -m all=1,strava_search=0"
 fi
 

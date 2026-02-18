@@ -15,21 +15,51 @@ http_interactions:
       - "*/*"
   response:
     status:
-      code: 200
-      message: OK
+      code: 401
+      message: Unauthorized
     headers:
       Content-Type:
       - application/json; charset=utf-8
-      X-RateLimit-Limit:
-      - "600,6000"
-      X-RateLimit-Usage:
-      - "15,125"
-      X-ReadRateLimit-Limit:
-      - "600,6000"
-      X-ReadRateLimit-Usage:
-      - "15,125"
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Tue, 17 Feb 2026 20:23:37 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '16'
+      Server:
+      - istio-envoy
+      Status:
+      - 401 Unauthorized
+      Cache-Control:
+      - no-cache
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - b84de9b6-adbd-4764-af78-8d1caee531ac
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 d86c7af2714c38d7360f926e02497832.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - rU08F5ZOmscIyhb01DTK8HmsoB0jk3H8wRBrrMg8LsK9dOQ3bbM6Ew==
     body:
       encoding: UTF-8
-      string: '{"id":456,"name":"Evening Ride","sport_type":"Ride","distance":25000.0,"moving_time":5400,"type":"Ride","calories":800,"description":"Great ride","gear_id":"b1234"}'
-  recorded_at: Sun, 08 Feb 2026 22:46:00 GMT
+      string: '{"message":"Authorization Error","errors":[{"resource":"Application","field":"","code":"invalid"}]}'
+  recorded_at: Tue, 17 Feb 2026 20:23:37 GMT
 recorded_with: VCR 6.3.1
