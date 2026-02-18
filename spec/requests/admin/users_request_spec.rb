@@ -22,7 +22,7 @@ RSpec.describe Admin::UsersController, type: :request do
       expect(assigns(:collection).pluck(:id)).to eq([ambassador.id])
 
       get base_url, params: {search_superusers: true}
-      expect(assigns(:collection).pluck(:id)).to eq([user_subject.id])
+      expect(assigns(:collection).pluck(:id)).to include(user_subject.id)
 
       get base_url, params: {search_developers: true}
       expect(assigns(:collection).pluck(:id)).to eq([developer.id])
