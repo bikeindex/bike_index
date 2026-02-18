@@ -61,34 +61,25 @@ class StravaActivity < ApplicationRecord
       @activity_types ||= distinct.pluck(:activity_type).compact.sort
     end
 
-    def create_or_update_from_summary(strava_integration, summary)
-      attrs = summary_attributes(summary)
-      activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: summary["id"].to_s)
+    def create_or_update_from_strava_response(strava_integration, response)
+      attrs = summary_attributes(response).merge(detail_attributes(response))
+      activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: response["id"].to_s)
       activity.update!(attrs)
       activity
     end
 
     def detail_attributes(detail)
+      return {} if (detail.keys & %w[segment_efforts description]).none?
+
       photo_url = detail.dig("photos", "primary", "urls", "600")
       photos = {photo_url:, photo_count: detail.dig("photos", "count") || 0}
-
-      segments = detail["segment_efforts"]
-      segment_locations = if segments.present?
-        {
-          cities: segments.filter_map { |se| se.dig("segment", "city").presence }.uniq,
-          states: segments.filter_map { |se| se.dig("segment", "state").presence }.uniq,
-          countries: segments.filter_map { |se| se.dig("segment", "country").presence }.uniq
-        }
-      else
-        {}
-      end
 
       {
         description: detail["description"],
         average_speed: detail["average_speed"],
         suffer_score: detail["suffer_score"],
         photos:,
-        segment_locations:,
+        segment_locations: segment_locations_for(detail["segment_efforts"]),
         kudos_count: detail["kudos_count"],
         strava_data: strava_data_from(detail)
       }
@@ -102,7 +93,6 @@ class StravaActivity < ApplicationRecord
     end
 
     def summary_attributes(summary)
-      start_date = Binxtils::TimeParser.parse(summary["start_date"])
       {
         title: summary["name"],
         distance_meters: summary["distance"],
@@ -115,9 +105,19 @@ class StravaActivity < ApplicationRecord
         suffer_score: summary["suffer_score"],
         gear_id: summary["gear_id"],
         activity_type: summary["sport_type"] || summary["type"],
-        timezone: summary["timezone"],
-        start_date:,
+        timezone: Binxtils::TimeZoneParser.parse(summary["timezone"])&.name,
+        start_date: Binxtils::TimeParser.parse(summary["start_date"]),
         strava_data: strava_data_from(summary)
+      }
+    end
+
+    def segment_locations_for(segments)
+      return {} if segments.blank?
+
+      {
+        cities: segments.filter_map { |se| se.dig("segment", "city").presence }.uniq,
+        states: segments.filter_map { |se| se.dig("segment", "state").presence }.uniq,
+        countries: segments.filter_map { |se| se.dig("segment", "country").presence }.uniq
       }
     end
   end

@@ -1,6 +1,14 @@
 <% content_for(:header) do %>
   <% @strava_search_assets.each do |asset| %>
-    <% if asset[:type] == :script %>
+    <% if asset[:type] == :react_refresh %>
+      <script type="module">
+        import RefreshRuntime from '<%= asset[:src] %>'
+        RefreshRuntime.injectIntoGlobalHook(window)
+        window.$RefreshReg$ = () => {}
+        window.$RefreshSig$ = () => (type) => type
+        window.__vite_plugin_react_preamble_installed__ = true
+      </script>
+    <% elsif asset[:type] == :script %>
       <script type="module" crossorigin src="<%= asset[:src] %>"></script>
     <% elsif asset[:type] == :stylesheet %>
       <link rel="stylesheet" crossorigin href="<%= asset[:href] %>">

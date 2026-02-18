@@ -100,8 +100,9 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_request.response_status).to eq("success")
         expect(strava_integration.strava_activities.count).to be > 0
 
-        activity = strava_integration.strava_activities.first
-        expect(activity).to match_hash_indifferently({
+        strava_activity = strava_integration.strava_activities.first
+        expect(Binxtils::TimeZoneParser.parse("(GMT-08:00) America/Los_Angeles").name).to eq "America/Los_Angeles"
+        expect(strava_activity).to have_attributes({
           strava_id: "17323701543",
           title: "Thanks for coming across the bay!",
           activity_type: "EBikeRide",
@@ -114,15 +115,15 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
           kudos_count: 17,
           gear_id: "b14918050",
           private: false,
-          timezone: "(GMT-08:00) America/Los_Angeles",
-          start_date: "2026-02-07T23:39:36Z",
+          timezone: "America/Los_Angeles",
           strava_data: {
             average_heartrate: 115.0, max_heartrate: 167.0,
             device_name: "Strava App", commute: false,
             average_speed: 4.746, pr_count: 0,
             average_watts: 129.0, device_watts: false
-          }
-        }, match_timezone_key: true)
+          }.as_json
+        })
+        expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
 
         cycling_count = strava_integration.strava_activities.cycling.count
         detail_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
@@ -131,28 +132,17 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     end
 
     context "with fetch_activity request" do
-      let!(:activity) do
+      let!(:strava_activity) do
         FactoryBot.create(:strava_activity, strava_integration:, strava_id: "17323701543")
       end
       let!(:strava_request) do
         StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,
           request_type: :fetch_activity,
-          parameters: {strava_id: activity.strava_id})
+          parameters: {strava_id: strava_activity.strava_id})
       end
-
-      it "updates activity details and finishes sync when last" do
-        VCR.use_cassette("strava-get_activity") do
-          instance.perform(strava_request.id)
-        end
-
-        strava_request.reload
-        expect(strava_request.response_status).to eq("success")
-        strava_integration.reload
-        expect(strava_integration.status).to eq("synced")
-
-        activity.reload
-        expect(activity).to match_hash_indifferently(
+      let(:target_attributes) do
+        {
           description: "Hawk with Eric and Scott and cedar",
           average_speed: 4.746,
           suffer_score: 27.0,
@@ -172,7 +162,21 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
             states: ["California"],
             countries: ["United States", "USA"]
           }
-        )
+        }.as_json
+      end
+
+      it "updates activity details and finishes sync when last" do
+        VCR.use_cassette("strava-get_activity") do
+          instance.perform(strava_request.id)
+        end
+
+        strava_request.reload
+        expect(strava_request.response_status).to eq("success")
+        strava_integration.reload
+        expect(strava_integration.status).to eq("synced")
+
+        expect(strava_activity.reload.enriched?).to be_truthy
+        expect(strava_activity).to have_attributes target_attributes
       end
     end
 

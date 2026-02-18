@@ -3,8 +3,9 @@
 class StravaSearchController < ApplicationController
   def index
     @strava_search_assets = if ENV["BUILD_STRAVA_SEARCH"] == "true"
-      [{type: :script, src: "http://localhost:3143/@vite/client"},
-        {type: :script, src: "http://localhost:3143/src/main.tsx"}]
+      [{type: :script, src: "http://localhost:3143/strava_search/@vite/client"},
+        {type: :react_refresh, src: "http://localhost:3143/strava_search/@react-refresh"},
+        {type: :script, src: "http://localhost:3143/strava_search/src/main.tsx"}]
     else
       Dir.glob(Rails.root.join("public/strava_search/assets/*")).filter_map do |file|
         basename = File.basename(file)

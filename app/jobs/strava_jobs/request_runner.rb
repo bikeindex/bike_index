@@ -32,7 +32,7 @@ module StravaJobs
         if strava_request.incoming_webhook?
           handle_incoming_webhook(strava_request, strava_integration, response)
         elsif strava_request.list_activities?
-          response.each { |summary| StravaActivity.create_or_update_from_summary(strava_integration, summary) }
+          response.each { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary) }
           if strava_request.parameters["page"] == 1
             strava_integration.update(last_updated_activities_at: Time.current)
           end
@@ -55,8 +55,7 @@ module StravaJobs
           if params["aspect_type"] == "delete"
             strava_integration.strava_activities.find_by(strava_id: params["object_id"].to_s)&.destroy
           else
-            activity = StravaActivity.create_or_update_from_summary(strava_integration, response)
-            activity.update_from_detail(response)
+            StravaActivity.create_or_update_from_strava_response(strava_integration, response)
           end
         elsif params["object_type"] == "athlete" && params.dig("updates", "authorized") == "false"
           strava_integration.destroy
@@ -82,6 +81,7 @@ module StravaJobs
       return unless strava_request.success?
 
       self.class.handle_response(strava_request, strava_integration, response&.body)
+      response&.body
     end
 
     private

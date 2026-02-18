@@ -91,25 +91,25 @@ RSpec.describe StravaActivity, type: :model do
     end
   end
 
-  describe "create_or_update_from_summary" do
+  describe "create_or_update_from_strava_response" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
     let(:summary) do
-      {"id" => 9876543, "name" => "Morning Ride", "distance" => 25000.0,
-       "moving_time" => 3600, "total_elevation_gain" => 200.0,
-       "sport_type" => "Ride", "type" => "Ride",
-       "start_date" => "2025-06-15T08:00:00Z",
-       "timezone" => "(GMT-07:00) America/Denver",
-       "gear_id" => "b1234", "private" => false, "kudos_count" => 10,
-       "average_speed" => 6.944, "suffer_score" => 42.0,
-       "average_heartrate" => 145.0, "max_heartrate" => 180.0,
-       "device_name" => "Garmin Edge 530", "commute" => false,
-       "pr_count" => 3, "average_watts" => 200.0, "device_watts" => true}
+      {id: 9876543, name: "Morning Ride", distance: 25000.0,
+       moving_time: 3600, total_elevation_gain: 200.0,
+       sport_type: "Ride", type: "Ride",
+       start_date: "2025-06-15T08:00:00Z",
+       timezone: "(GMT-07:00) America/Denver",
+       gear_id: "b1234", private: false, kudos_count: 10,
+       average_speed: 6.944, suffer_score: 42.0,
+       average_heartrate: 145.0, max_heartrate: 180.0,
+       device_name: "Garmin Edge 530", commute: false,
+       pr_count: 3, average_watts: 200.0, device_watts: true}.as_json
     end
 
     it "creates a new activity from summary" do
-      activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)
-      expect(activity).to be_persisted
-      expect(activity).to match_hash_indifferently({
+      strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
+      expect(strava_activity).to be_persisted
+      expect(strava_activity).to have_attributes({
         strava_id: "9876543",
         title: "Morning Ride",
         distance_meters: 25000.0,
@@ -120,8 +120,7 @@ RSpec.describe StravaActivity, type: :model do
         kudos_count: 10,
         average_speed: 6.944,
         suffer_score: 42.0,
-        start_date: "2025-06-15T08:00:00Z",
-        timezone: "(GMT-07:00) America/Denver",
+        timezone: "America/Denver",
         gear_id: "b1234",
         private: false,
         strava_data: {
@@ -129,14 +128,15 @@ RSpec.describe StravaActivity, type: :model do
           device_name: "Garmin Edge 530", commute: false,
           average_speed: 6.944, pr_count: 3,
           average_watts: 200.0, device_watts: true
-        }
-      }, match_timezone_key: true)
+        }.as_json
+      })
+      expect(strava_activity.start_date).to be_within(1).of Time.at(1749974400)
     end
 
     it "updates an existing activity" do
       FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543", title: "Old Title")
-      activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)
-      expect(activity.title).to eq("Morning Ride")
+      strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
+      expect(strava_activity.title).to eq("Morning Ride")
       expect(strava_integration.strava_activities.count).to eq(1)
     end
   end
@@ -144,19 +144,21 @@ RSpec.describe StravaActivity, type: :model do
   describe "update_from_detail" do
     let(:activity) { FactoryBot.create(:strava_activity) }
     let(:detail) do
-      {"description" => "Great ride",
-       "gear" => {"name" => "My Road Bike"},
-       "kudos_count" => 10,
-       "average_speed" => 5.5, "suffer_score" => 30.0,
-       "average_heartrate" => 140.0, "max_heartrate" => 175.0,
-       "device_name" => "Garmin Edge 530", "commute" => true,
-       "muted" => false, "pr_count" => 2,
-       "average_watts" => 180.0, "device_watts" => true,
-       "segment_efforts" => [
-         {"segment" => {"city" => "San Francisco", "state" => "California", "country" => "United States"}},
-         {"segment" => {"city" => "Mill Valley", "state" => "California", "country" => "United States"}}
-       ],
-       "photos" => {"primary" => {"unique_id" => "photo_123", "urls" => {"600" => "https://example.com/photo.jpg"}}, "count" => 3}}
+      {
+        description: "Great ride",
+        gear: {name: "My Road Bike"},
+        kudos_count: 10,
+        average_speed: 5.5, suffer_score: 30.0,
+        average_heartrate: 140.0, max_heartrate: 175.0,
+        device_name: "Garmin Edge 530", commute: true,
+        muted: false, pr_count: 2,
+        average_watts: 180.0, device_watts: true,
+        segment_efforts: [
+          {segment: {city: "San Francisco", state: "California", country: "United States"}},
+          {segment: {city: "Mill Valley", state: "California", country: "United States"}}
+        ],
+        photos: {primary: {unique_id: "photo_123", urls: {"600": "https://example.com/photo.jpg"}}, count: 3}
+      }.as_json
     end
 
     it "updates the activity with detail fields" do

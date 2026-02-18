@@ -159,18 +159,21 @@ class RspecHashMatcher
   end
 end
 
-RSpec::Matchers.define :match_hash_indifferently do |expected, options = {}|
+# TODO: figure out how to pass options
+RSpec::Matchers.define :match_hash_indifferently do |expected|
   match do |actual|
-    match_errors = RspecHashMatcher.recursive_match_hashes_errors(expected, actual, options:)
+    match_errors = RspecHashMatcher.recursive_match_hashes_errors(expected, actual)
+
+    # If there are any match errors, it didn't match!
     match_errors == []
   end
 
   failure_message do |actual|
     # Redefine expected  'actual' to be what we're actually comparing against for the diff
     # Symbolize keys because in general, expected has symbolized keys and it improves the diff
-    @actual = RspecHashMatcher.indifferent_hash(actual, expected, options[:match_timezone_key]).deep_symbolize_keys
+    @actual = RspecHashMatcher.indifferent_hash(actual, expected).deep_symbolize_keys
 
-    match_errors = RspecHashMatcher.recursive_match_hashes_errors(expected, actual, options:)
+    match_errors = RspecHashMatcher.recursive_match_hashes_errors(expected, actual)
     RspecHashMatcher.match_errors_message(match_errors)
   end
 

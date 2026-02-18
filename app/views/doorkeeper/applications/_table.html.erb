@@ -62,6 +62,10 @@
                 </span>
               </div>
 
+              <% if application.is_internal %>
+                <%= render(UI::Badge::Component.new(text: "Internal", color: :notice, size: :sm)) %>
+              <% end %>
+
               <% if application.can_send_stolen_notifications? %>
                 <span class="text-warning">
                   Has permission to send stolen notifications
