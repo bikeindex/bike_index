@@ -163,7 +163,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
         it "updates and sets the data" do
           expect(theft_alert).to be_valid
           expect(theft_alert.id).to be_present
-          expect(theft_alert.facebook_data).to have_attributes facebook_data
+          expect(theft_alert.facebook_data).to match_hash_indifferently facebook_data
           expect(theft_alert.reload.reach).to be_blank
           VCR.use_cassette("facebook/ads_integration-update_facebook_data", match_requests_on: [:method]) do
             instance.update_facebook_data(theft_alert)
@@ -174,7 +174,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
             expect(theft_alert.facebook_data["spend_cents"].to_i).to eq 911
             expect(theft_alert.amount_cents_facebook_spent).to eq 911
             expect(theft_alert.reach).to eq 6526
-            expect(theft_alert.engagement).to have_attributes target_engagement
+            expect(theft_alert.engagement).to match_hash_indifferently target_engagement
           end
         end
         context "ad completed running finished ad" do
@@ -183,7 +183,7 @@ if !ENV["CI"] && facebook_imported && Facebook::AdsIntegration::TOKEN.present?
           it "updates and sets the data" do
             expect(theft_alert).to be_valid
             expect(theft_alert.id).to be_present
-            expect(theft_alert.facebook_data).to have_attributes facebook_data
+            expect(theft_alert.facebook_data).to match_hash_indifferently facebook_data
             expect(theft_alert.reload.reach).to be_blank
             VCR.use_cassette("facebook/ads_integration-update_facebook_data-2", match_requests_on: [:method]) do
               instance.update_facebook_data(theft_alert)

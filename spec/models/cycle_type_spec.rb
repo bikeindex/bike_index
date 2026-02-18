@@ -150,7 +150,7 @@ RSpec.describe CycleType, type: :model do
         .map { |k, v| [k.tr("_", "-"), v] }.to_h
     end
     it "has the same names as english translations" do
-      expect(cycle_type_translations.except("traditional-bike")).to have_attributes CycleType::NAMES
+      expect(cycle_type_translations.except("traditional-bike")).to match_hash_indifferently CycleType::NAMES
     end
   end
 
@@ -256,7 +256,7 @@ RSpec.describe CycleType, type: :model do
     end
     let(:cycle_type) { CycleType.find(0) }
     it "is target" do
-      expect(cycle_type.autocomplete_hash).to have_attributes target
+      expect(cycle_type.autocomplete_hash).to match_hash_indifferently target
       target_result_hash = target.except(:data).merge(target[:data])
       expect(cycle_type.autocomplete_result_hash).to eq target_result_hash.as_json
     end

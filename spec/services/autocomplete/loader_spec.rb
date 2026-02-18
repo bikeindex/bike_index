@@ -100,7 +100,7 @@ RSpec.describe Autocomplete::Loader do
         }
       end
       it "returns the result" do
-        expect(subject.send(:clean_hash, input)).to have_attributes target
+        expect(subject.send(:clean_hash, input)).to match_hash_indifferently target
       end
     end
 
@@ -108,7 +108,7 @@ RSpec.describe Autocomplete::Loader do
       let(:input) { {id: 12, text: "Yellow or Gold", category: "colors", priority: 1000, data: {priority: 1000, display: "#fff44b", search_id: "c_12"}} }
       let(:target) { {category: "colors", priority: 1000.0, term: "yellow or gold", data: {text: "Yellow or Gold", category: "colors", priority: 1000, display: "#fff44b", search_id: "c_12", id: 12}} }
       it "returns the result" do
-        expect(subject.send(:clean_hash, input)).to have_attributes target
+        expect(subject.send(:clean_hash, input)).to match_hash_indifferently target
       end
     end
   end
@@ -158,7 +158,7 @@ RSpec.describe Autocomplete::Loader do
       subject.send(:store_item, item)
 
       result = RedisPool.conn { |r| r.hget(Autocomplete.items_data_key, "brompton bicycle") }
-      expect(JSON.parse(result)).to have_attributes target
+      expect(JSON.parse(result)).to match_hash_indifferently target
 
       prefix = "#{Autocomplete.category_key("frame_mnfg")}brom"
       prefixed_result = RedisPool.conn { |r| r.zrange(prefix, 0, -1) }
@@ -183,7 +183,7 @@ RSpec.describe Autocomplete::Loader do
         subject.send(:store_item, item)
 
         result = RedisPool.conn { |r| r.hget(Autocomplete.items_data_key, item_term) }
-        expect(JSON.parse(result)).to have_attributes target
+        expect(JSON.parse(result)).to match_hash_indifferently target
 
         prefix = "#{Autocomplete.category_key("cycle_type")}skat"
         prefixed_result = RedisPool.conn { |r| r.zrange(prefix, 0, -1) }
@@ -204,7 +204,7 @@ RSpec.describe Autocomplete::Loader do
         expect(count).to eq category_count_for_1_item
 
         result = RedisPool.conn { |r| r.hget(Autocomplete.items_data_key, normalized_name) }
-        expect(JSON.parse(result)).to have_attributes target_color
+        expect(JSON.parse(result)).to match_hash_indifferently target_color
 
         prefix = "#{Autocomplete.category_key("colors")}col"
         prefixed_result = RedisPool.conn { |r| r.zrange(prefix, 0, -1) }
@@ -237,7 +237,7 @@ RSpec.describe Autocomplete::Loader do
         end
         expect(item_json.count).to eq 1
         item = JSON.parse(item_json.first)
-        expect(item).to have_attributes target_manufacturer
+        expect(item).to match_hash_indifferently target_manufacturer
       end
     end
   end

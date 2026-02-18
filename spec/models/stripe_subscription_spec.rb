@@ -102,7 +102,7 @@ RSpec.describe StripeSubscription, type: :model do
         expect(membership_existing.admin_managed?).to be_truthy
         expect(stripe_subscription.reload.active?).to be_truthy
         expect(stripe_subscription.membership_id).to be_present
-        expect(stripe_subscription.membership).to have_attributes target_attrs
+        expect(stripe_subscription.membership).to match_hash_indifferently target_attrs
       end
 
       context "with stripe_subscription ended" do
@@ -134,7 +134,7 @@ RSpec.describe StripeSubscription, type: :model do
         stripe_subscription.update_membership!
         expect(stripe_subscription.reload.active?).to be_falsey
         expect(stripe_subscription.membership_id).to be_present
-        expect(stripe_subscription.membership).to have_attributes target_attrs
+        expect(stripe_subscription.membership).to match_hash_indifferently target_attrs
       end
 
       context "with existing membership" do
@@ -148,7 +148,7 @@ RSpec.describe StripeSubscription, type: :model do
           stripe_subscription.update_membership!
           expect(stripe_subscription.reload.active?).to be_falsey
           expect(stripe_subscription.membership_id).to eq membership.id
-          expect(membership.reload).to have_attributes target_attrs
+          expect(membership.reload).to match_hash_indifferently target_attrs
         end
       end
     end

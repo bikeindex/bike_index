@@ -120,7 +120,7 @@ RSpec.describe "Organization API V3", type: :request do
           }.to change(Organization, :count).by 1
           expect(response).to be_created
           expect(response.code).to eq("201")
-          expect(json_result["organization"]).to have_attributes target_response
+          expect(json_result["organization"]).to match_hash_indifferently target_response
         end
         describe "with no ALLOWED_WRITE_ORGANIZATIONS" do
           it "creates an organization" do

@@ -70,7 +70,7 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
       expect(sale.item_type).to eq "BikeVersion"
 
       new_ownership = sale.new_ownership
-      expect(new_ownership).to have_attributes new_ownership_attrs
+      expect(new_ownership).to match_hash_indifferently new_ownership_attrs
 
       expect(bike.reload.is_for_sale).to be_falsey
       expect(bike.current_ownership.id).to eq new_ownership.id
@@ -114,7 +114,7 @@ RSpec.describe CallbackJob::AfterSaleCreateJob, type: :job do
         expect(sale.new_ownership&.id).to eq new_ownership.id
         expect(sale.created_after_transfer?).to be_truthy
 
-        expect(new_ownership.reload).to have_attributes new_ownership_attrs.except(:creator_id)
+        expect(new_ownership.reload).to match_hash_indifferently new_ownership_attrs.except(:creator_id)
       end
 
       context "with a different owner" do

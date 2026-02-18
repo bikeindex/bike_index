@@ -85,7 +85,7 @@ RSpec.describe MembershipsController, type: :request do
         }.to change(StripeSubscription, :count).by 1
         expect(Membership.count).to eq 0
         stripe_subscription = StripeSubscription.last
-        expect(stripe_subscription).to have_attributes target_stripe_subscription
+        expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription
         expect(stripe_subscription.payments.count).to eq 1
         expect(response).to redirect_to(/https:..checkout.stripe.com/)
       end
@@ -103,7 +103,7 @@ RSpec.describe MembershipsController, type: :request do
           }.to change(StripeSubscription, :count).by 1
           expect(Membership.count).to eq 0
           stripe_subscription = StripeSubscription.last
-          expect(stripe_subscription).to have_attributes target_stripe_subscription.merge(user_id: current_user.id)
+          expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
           expect(stripe_subscription.payments.count).to eq 1
           expect(response).to redirect_to(/https:..checkout.stripe.com/)
           # Verify that no emails are created
@@ -127,7 +127,7 @@ RSpec.describe MembershipsController, type: :request do
             }.to change(StripeSubscription, :count).by 1
             expect(Membership.count).to eq 0
             stripe_subscription = StripeSubscription.last
-            expect(stripe_subscription).to have_attributes target_stripe_yearly
+            expect(stripe_subscription).to match_hash_indifferently target_stripe_yearly
             expect(stripe_subscription.payments.count).to eq 1
             expect(response).to redirect_to(/https:..checkout.stripe.com/)
             # Verify that no emails are created
@@ -147,7 +147,7 @@ RSpec.describe MembershipsController, type: :request do
             }.to change(StripeSubscription, :count).by 1
             expect(Membership.count).to eq 0
             stripe_subscription = StripeSubscription.last
-            expect(stripe_subscription).to have_attributes target_stripe_subscription.merge(user_id: current_user.id)
+            expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription.merge(user_id: current_user.id)
             expect(stripe_subscription.payments.count).to eq 1
             expect(response).to redirect_to(/https:..checkout.stripe.com/)
           end

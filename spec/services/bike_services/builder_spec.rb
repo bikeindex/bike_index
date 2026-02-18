@@ -191,7 +191,7 @@ RSpec.describe BikeServices::Builder do
           expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
           expect(BParam.address_record_attributes(b_param.bike)).to be_blank
           expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
-          expect(bike.address_record).to have_attributes target_attributes
+          expect(bike.address_record).to match_hash_indifferently target_attributes
         end
         context "with b_param with address_record_attributes" do
           let(:b_param_organization) { Organization.new } # this is ignored, because it's in b_param
@@ -215,7 +215,7 @@ RSpec.describe BikeServices::Builder do
             expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
             expect(BParam.address_record_attributes(b_param.bike)).to be_present
             expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
-            expect(bike.address_record).to have_attributes b_param_params[:bike][:address_record_attributes]
+            expect(bike.address_record).to match_hash_indifferently b_param_params[:bike][:address_record_attributes]
           end
         end
 

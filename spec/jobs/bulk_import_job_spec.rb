@@ -232,7 +232,7 @@ RSpec.describe BulkImportJob, type: :job do
           # Previously, was actually geocoding things - but that didn't seem to help people.
           # But then we switched back and are geocoding things again with address_record
           expect(bike1.address_record.attributes.slice(*target_address.keys.map(&:to_s)))
-            .to have_attributes target_address
+            .to match_hash_indifferently target_address
           expect(BikeServices::CalculateLocation.registration_address_source(bike1)).to eq "initial_creation"
           # IDK why this is failing, post address_record for ownerships - PR #2912
           expect(bike1.current_ownership.address_record.to_coordinates.compact.count).to eq 2
@@ -418,14 +418,14 @@ RSpec.describe BulkImportJob, type: :job do
             bike1 = bulk_import.bikes.reorder(:created_at).first
             expect(bike1.current_ownership.origin).to eq "bulk_import_worker"
             expect(bike1.current_ownership.status).to eq "status_impounded"
-            expect(bike1).to have_attributes bike1_target
+            expect(bike1).to match_hash_indifferently bike1_target
             expect(bike1.created_by_notification_or_impounding?).to be_truthy
             bike1_impound_record = bike1.current_impound_record
-            expect(bike1_impound_record).to have_attributes impound_record1_target
+            expect(bike1_impound_record).to match_hash_indifferently impound_record1_target
             expect(bike1_impound_record.impounded_at).to be_within(1.day).of Time.parse("2020-12-30")
             expect(bike1_impound_record.address_record.latitude).to be_within(0.01).of 37.881
             expect(bike1.to_coordinates).to eq bike1_impound_record.address_record.to_coordinates
-            expect(bike1_impound_record.address_record).to have_attributes impound_record1_address_target
+            expect(bike1_impound_record.address_record).to match_hash_indifferently impound_record1_address_target
             expect(bike1_impound_record.impounded_from_address_record_id).to eq bike1_impound_record.address_record_id
 
             expect(bike1.bike_stickers.pluck(:id)).to eq([bike_sticker.id])
@@ -443,7 +443,7 @@ RSpec.describe BulkImportJob, type: :job do
 
             bike2 = bulk_import.bikes.reorder(:created_at).last
             expect(bike2.reload.id).to_not eq bike1.id
-            expect(bike2).to have_attributes bike2_target
+            expect(bike2).to match_hash_indifferently bike2_target
             expect(bike2.public_images.count).to eq 1 # Commented out because it's broken with VCR
             expect(bike2.current_ownership.origin).to eq "bulk_import_worker"
             expect(bike2.current_ownership.status).to eq "status_impounded"
@@ -451,16 +451,16 @@ RSpec.describe BulkImportJob, type: :job do
             bike2_impound_record = bike2.current_impound_record
             expect(ImpoundRecord.count).to eq 2
 
-            expect(bike2_impound_record).to have_attributes impound_record2_target
+            expect(bike2_impound_record).to match_hash_indifferently impound_record2_target
             expect(bike2_impound_record.impounded_at).to be_within(1.day).of Time.parse("2021-01-01")
             expect(bike2_impound_record.address_record.latitude).to be_within(0.01).of 37.8053
             expect(bike2.to_coordinates).to eq bike2_impound_record.address_record.to_coordinates
-            expect(bike2_impound_record.address_record).to have_attributes impound_record2_address_target
+            expect(bike2_impound_record.address_record).to match_hash_indifferently impound_record2_address_target
             expect(bike2_impound_record.impounded_from_address_record_id).to eq bike2_impound_record.address_record_id
 
             # TODO: These should actually use the geocoder corrected attributes:
-            # expect(bike1_impound_record.address_record).to have_attributes impound_record1_address_target_corrected
-            # expect(bike2_impound_record.address_record).to have_attributes impound_record2_address_target_corrected
+            # expect(bike1_impound_record.address_record).to match_hash_indifferently impound_record1_address_target_corrected
+            # expect(bike2_impound_record.address_record).to match_hash_indifferently impound_record2_address_target_corrected
           end
         end
       end

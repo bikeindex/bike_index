@@ -268,7 +268,7 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user.phone).to eq "3223232"
         expect(user.address_set_manually).to be_truthy
 
-        expect(address_record).to have_attributes target_address_record_attrs
+        expect(address_record).to match_hash_indifferently target_address_record_attrs
 
         expect(user.address_record_id).to eq address_record.id
         expect(user.latitude).to eq default_location[:latitude]
@@ -656,7 +656,7 @@ RSpec.describe MyAccountsController, type: :request do
             target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
             expect(bike3.registration_info).to eq target_bike3_info
 
-            expect(current_user.reload.address_record).to have_attributes default_location_address_record_attrs.merge(kind: "user")
+            expect(current_user.reload.address_record).to match_hash_indifferently default_location_address_record_attrs.merge(kind: "user")
 
             expect(current_user.address_hash_legacy)
               .to eq default_location_registration_address.merge("country" => "United States", "street_2" => nil)

@@ -182,7 +182,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
       it "renders" do
         get "#{base_url}/counts"
         expect(response.status).to eq 200
-        expect(json_result).to have_attributes({for_sale: 1, for_sale_proximity: 0})
+        expect(json_result).to match_hash_indifferently({for_sale: 1, for_sale_proximity: 0})
       end
 
       context "with listings" do
@@ -197,21 +197,21 @@ RSpec.describe Search::MarketplaceController, type: :request do
           VCR.use_cassette("search_marketplace-counts") do
             get "#{base_url}/counts?location=davis%2C+ca"
             expect(response.status).to eq 200
-            expect(json_result).to have_attributes target_result
+            expect(json_result).to match_hash_indifferently target_result
 
             # same result if marketplace_scope for_sale
             get "#{base_url}/counts?location=davis%2C+ca&marketplace_scope=for_sale"
             expect(response.status).to eq 200
-            expect(json_result).to have_attributes target_result
+            expect(json_result).to match_hash_indifferently target_result
             # same result if marketplace_scope for_sale_proximity
             get "#{base_url}/counts?location=davis%2C+ca&marketplace_scope=for_sale_proximity"
             expect(response.status).to eq 200
-            expect(json_result).to have_attributes target_result
+            expect(json_result).to match_hash_indifferently target_result
 
             # If searched for a propulsion_type, just return those matches
             get "#{base_url}/counts?location=davis%2C+ca&marketplace_scope=for_sale_proximity&query_items%5B%5D=p_10"
             expect(response.status).to eq 200
-            expect(json_result).to have_attributes({for_sale: 1, for_sale_proximity: 1})
+            expect(json_result).to match_hash_indifferently({for_sale: 1, for_sale_proximity: 1})
           end
         end
       end

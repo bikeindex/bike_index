@@ -56,7 +56,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       location_key = local_storage.find { |k, _| k.match?(/location/i) }&.first
       distance_key = local_storage.find { |k, _| k.match?(/distance/i) }&.first
       # pp local_storage
-      expect(local_storage).to have_attributes({location_key => location, distance_key => distance})
+      expect(local_storage).to match_hash_indifferently({location_key => location, distance_key => distance})
     end
 
     it "submits when enter is pressed twice" do
@@ -102,7 +102,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       # For some reason query doesn't show up
       expect(page_query_params(current_url).except("query"))
-        .to have_attributes(target_params.except(:query))
+        .to match_hash_indifferently(target_params.except(:query))
 
       # TODO: test for entering location: you, location: anywhere
     end

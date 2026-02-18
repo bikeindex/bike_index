@@ -26,7 +26,7 @@ RSpec.describe UserServices::Updator do
       expect(bike.current_ownership.address_record).to be_present
       expect(bike.current_ownership.address_record.country_id).to eq Country.united_states_id
       expect(bike.address_record.address_hash(visible_attribute: :street).except(:country))
-        .to have_attributes target_address_hash
+        .to match_hash_indifferently target_address_hash
       expect(bike.address_record.kind).to eq "ownership"
       expect(bike.address_record.user_id).to be_blank
       expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
@@ -125,7 +125,7 @@ RSpec.describe UserServices::Updator do
         expect(bike.current_ownership.reload.user_id).to eq user.id
         bike.update(updated_at: Time.current)
         expect(BikeServices::CalculateLocation.registration_address_source(bike.reload)).to eq "bike_update"
-        expect(bike.address_hash_legacy).to have_attributes legacy_hash
+        expect(bike.address_hash_legacy).to match_hash_indifferently legacy_hash
 
         described_class.assign_address_from_bikes(user, save_user: true)
 

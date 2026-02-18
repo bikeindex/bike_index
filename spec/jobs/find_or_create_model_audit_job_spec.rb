@@ -79,7 +79,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
       }.to change(ModelAudit, :count).by 1
       new_model_audit = bike1.reload.model_audit
       expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
-      expect(new_model_audit).to have_attributes basic_target_attributes
+      expect(new_model_audit).to match_hash_indifferently basic_target_attributes
       # Organization model audits are created by UpdateModelAuditJob
       expect(new_model_audit.organization_model_audits.count).to eq 0
       expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
@@ -97,7 +97,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
         }.to change(ModelAudit, :count).by 1
         new_model_audit = bike1.reload.model_audit
         expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
-        expect(new_model_audit).to have_attributes basic_target_attributes.merge(frame_model: nil, cycle_type: :bike)
+        expect(new_model_audit).to match_hash_indifferently basic_target_attributes.merge(frame_model: nil, cycle_type: :bike)
         # Organization model audits are created by UpdateModelAuditJob
         expect(new_model_audit.organization_model_audits.count).to eq 0
         expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
@@ -113,7 +113,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
           new_model_audit = bike1.reload.model_audit
           expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
           # NOTE: this uses the cycle_type of bike2
-          expect(new_model_audit).to have_attributes basic_target_attributes.merge(frame_model: nil, propulsion_type: "pedal-assist")
+          expect(new_model_audit).to match_hash_indifferently basic_target_attributes.merge(frame_model: nil, propulsion_type: "pedal-assist")
           expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
         end
         context "frame model is a model_bare_vehicle_type" do
@@ -128,7 +128,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
             expect { instance.perform(bike1.id) }.to change(ModelAudit, :count).by 1
             new_model_audit = bike1.reload.model_audit
             expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
-            expect(new_model_audit).to have_attributes basic_target_attributes.merge(frame_model: nil, cycle_type: "bike")
+            expect(new_model_audit).to match_hash_indifferently basic_target_attributes.merge(frame_model: nil, cycle_type: "bike")
             # Organization model audits are created by UpdateModelAuditJob
             expect(new_model_audit.organization_model_audits.count).to eq 0
             expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
@@ -204,7 +204,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
 
         new_model_audit = bike2.reload.model_audit
         expect(new_model_audit.id).to_not eq model_audit.id
-        expect(new_model_audit).to have_attributes basic_target_attributes.merge(frame_model: "Party MODEL")
+        expect(new_model_audit).to match_hash_indifferently basic_target_attributes.merge(frame_model: "Party MODEL")
         expect(new_model_audit.organization_model_audits.count).to eq 0
         expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to match_array([model_audit.id, new_model_audit.id])
       end
@@ -217,7 +217,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
           instance.perform(bike1.id)
         }.to change(ModelAudit, :count).by 1
         new_model_audit = bike1.reload.model_audit
-        expect(new_model_audit).to have_attributes basic_target_attributes.merge(cycle_type: "bike")
+        expect(new_model_audit).to match_hash_indifferently basic_target_attributes.merge(cycle_type: "bike")
         expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to match_array([12, new_model_audit.id])
       end
     end
@@ -246,7 +246,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
         }.to change(ModelAudit, :count).by 1
         new_model_audit = bike1.reload.model_audit
         expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
-        expect(new_model_audit).to have_attributes basic_target_attributes
+        expect(new_model_audit).to match_hash_indifferently basic_target_attributes
         expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])
       end
     end

@@ -89,24 +89,24 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.authorized?(user)).to be_falsey
         post check_if_registered_url, params: search_params.to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result).to have_attributes target_result
+        expect(json_result).to match_hash_indifferently target_result
 
         post check_if_registered_url, params: required_params.to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result).to have_attributes target_result
+        expect(json_result).to match_hash_indifferently target_result
         # normalized serial match
         post check_if_registered_url, params: required_params.merge(serial: "SNFBT226092sss33").to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result).to have_attributes target_result
+        expect(json_result).to match_hash_indifferently target_result
         # It doesn't match if a different manufacturer
         manufacturer2 = FactoryBot.create(:manufacturer)
         post check_if_registered_url, params: required_params.merge(manufacturer: manufacturer2.name).to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result).to have_attributes unmatched_result
+        expect(json_result).to match_hash_indifferently unmatched_result
         # It matches if passed an unknown manufacturer
         post check_if_registered_url, params: required_params.merge(manufacturer: "some other Manufacturer").to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result).to have_attributes target_result
+        expect(json_result).to match_hash_indifferently target_result
 
         # It matches via user secondary email address
         owner = FactoryBot.create(:user, :confirmed, email: "2@dddd.com")
@@ -114,7 +114,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(owner.reload.confirmed_emails).to match_array(["2@dddd.com", bike.owner_email])
         post check_if_registered_url, params: required_params.merge(email: "2@DDDD.com").to_json, headers: json_headers
         expect(response.code).to eq("201")
-        expect(json_result).to have_attributes target_result
+        expect(json_result).to match_hash_indifferently target_result
       end
       context "bike is authorized" do
         let(:target_result) do
@@ -133,19 +133,19 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike.authorized?(user)).to be_truthy
           post check_if_registered_url, params: search_params.to_json, headers: json_headers
           expect(response.code).to eq("201")
-          expect(json_result).to have_attributes target_result
+          expect(json_result).to match_hash_indifferently target_result
           # Sanity check
           user_email.destroy
           post check_if_registered_url, params: search_params.to_json, headers: json_headers
           expect(response.code).to eq("201")
-          expect(json_result).to have_attributes target_result.merge(can_edit: false, authorized_bike_id: nil)
+          expect(json_result).to match_hash_indifferently target_result.merge(can_edit: false, authorized_bike_id: nil)
           # Test via bike organization
           bike_organization = BikeOrganization.create(bike: bike, organization: organization)
           expect(bike_organization).to be_valid
           expect(bike.reload.authorized?(user)).to be_truthy
           post check_if_registered_url, params: required_params.to_json, headers: json_headers
           expect(response.code).to eq("201")
-          expect(json_result).to have_attributes target_result
+          expect(json_result).to match_hash_indifferently target_result
         end
       end
       context "v2_accessor" do
@@ -175,7 +175,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike.reload.status).to eq "status_stolen"
           post check_if_registered_url, params: search_params.to_json, headers: json_headers
           expect(response.code).to eq("201")
-          expect(json_result).to have_attributes target_result
+          expect(json_result).to match_hash_indifferently target_result
         end
         context "recovered" do
           let(:target_result) { {registered: true, claimed: false, can_edit: false, state: "recovered", authorized_bike_id: nil} }
@@ -183,12 +183,12 @@ RSpec.describe "Bikes API V3", type: :request do
             stolen_record.add_recovery_information(recovered_at: Time.current - 1.week)
             post check_if_registered_url, params: search_params.to_json, headers: json_headers
             expect(response.code).to eq("201")
-            expect(json_result).to have_attributes target_result
+            expect(json_result).to match_hash_indifferently target_result
             # if recovery is more than a year ago, it goes back to being `with_user`
             stolen_record.update(recovered_at: Time.current - 2.years)
             post check_if_registered_url, params: search_params.to_json, headers: json_headers
             expect(response.code).to eq("201")
-            expect(json_result).to have_attributes target_result.merge(state: "with_user")
+            expect(json_result).to match_hash_indifferently target_result.merge(state: "with_user")
           end
         end
       end
@@ -200,7 +200,7 @@ RSpec.describe "Bikes API V3", type: :request do
             expect(bike.reload.status).to eq status
             post check_if_registered_url, params: search_params.to_json, headers: json_headers
             expect(response.code).to eq("201")
-            expect(json_result).to have_attributes target_result
+            expect(json_result).to match_hash_indifferently target_result
           end
         end
       end
@@ -215,7 +215,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike.reload.authorized?(user)).to be_falsey
           post check_if_registered_url, params: search_params.to_json, headers: json_headers
           expect(response.code).to eq("201")
-          expect(json_result).to have_attributes target_result
+          expect(json_result).to match_hash_indifferently target_result
         end
       end
       context "state: removed" do
@@ -224,7 +224,7 @@ RSpec.describe "Bikes API V3", type: :request do
           bike.delete
           post check_if_registered_url, params: search_params.to_json, headers: json_headers
           expect(response.code).to eq("201")
-          expect(json_result).to have_attributes target_result
+          expect(json_result).to match_hash_indifferently target_result
         end
       end
     end

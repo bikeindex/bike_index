@@ -290,7 +290,7 @@ RSpec.describe BikeSearchable do
       it "returns target" do
         result = BikeSearchable.selected_query_items_options({cycle_type: "pedi-cab", stolenness: "all"})
         expect(result.count).to eq 1
-        expect(result.first).to have_attributes target
+        expect(result.first).to match_hash_indifferently target
       end
     end
   end

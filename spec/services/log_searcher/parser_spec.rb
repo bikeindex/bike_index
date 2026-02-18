@@ -14,7 +14,7 @@ RSpec.describe LogSearcher::Parser do
         end
         it "parses" do
           expect(described_class.send(:parse_request_time, log_line)).to eq time
-          expect(described_class.parse_log_line(log_line)).to have_attributes target
+          expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
         end
         context "serials_containing" do
           let(:log_line) { 'I, [2025-04-03T05:18:56.369510 #4024204]  INFO -- : [e9a646ad-991c-4baf-85ef-e3a3eb628d54] {"method":"GET","path":"/search/registrations/serials_containing","format":"html","controller":"Search::RegistrationsController","action":"serials_containing","status":200,"allocations":9562,"duration":751.77,"view":7.45,"db":732.43,"remote_ip":"157.131.200.8","u_id":85,"params":{"distance":"100","location":"San Francisco","raw_serial":"adsfadsfadfadsfasdfasdfasdf","serial":"AD5FAD5FADFAD5FA5DFA5DFA5DF","serial_no_space":"AD5FAD5FADFAD5FA5DFA5DFA5DF","stolenness":"stolen"},"@timestamp":"2025-04-03T05:18:56.369Z","@version":"1","message":"[200] GET /search/registrations/serials_containing (Search::RegistrationsController#serials_containing)"}' }
@@ -26,7 +26,7 @@ RSpec.describe LogSearcher::Parser do
           end
           it "parses" do
             expect(described_class.send(:parse_request_time, log_line)).to eq time
-            expect(described_class.parse_log_line(log_line)).to have_attributes target_containing
+            expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target_containing
           end
         end
       end
@@ -49,7 +49,7 @@ RSpec.describe LogSearcher::Parser do
         end
         it "parses" do
           expect(described_class.send(:parse_request_time, log_line)).to eq request_at
-          expect(described_class.parse_log_line(log_line)).to have_attributes target
+          expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
         end
 
         context "count" do
@@ -70,7 +70,7 @@ RSpec.describe LogSearcher::Parser do
           end
           it "parses" do
             expect(described_class.send(:parse_request_time, log_line)).to eq request_at
-            expect(described_class.parse_log_line(log_line)).to have_attributes target
+            expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
           end
         end
       end
@@ -94,7 +94,7 @@ RSpec.describe LogSearcher::Parser do
         }
       end
       it "parses" do
-        expect(described_class.parse_log_line(log_line)).to have_attributes target
+        expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
       end
     end
     context "organized" do
@@ -117,7 +117,7 @@ RSpec.describe LogSearcher::Parser do
         }
       end
       it "parses" do
-        expect(described_class.parse_log_line(log_line)).to have_attributes target
+        expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
       end
       context "/v3/bikes/check_if_registered" do
         let(:log_line) { 'I, [2023-10-23T00:20:31.0000 #149741]  INFO -- : [7e0645ff-032e-4095-9a75-81afb12b8892] {"status":201,"method":"POST","path":"/api/v3/bikes/check_if_registered","params":{"access_token":"[FILTERED]","serial":"999xxxx","owner_email":"example@bikeindex.org","organization_slug":"hogwarts","manufacturer":"salsa"},"host":"bikeindex.org","remote_ip":"11.222.33.4","format":"json","db":1076.85,"view":15.86000000000013,"duration":1092.71}' }
@@ -138,7 +138,7 @@ RSpec.describe LogSearcher::Parser do
           }
         end
         it "parses" do
-          expect(described_class.parse_log_line(log_line)).to have_attributes target
+          expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
         end
       end
     end
