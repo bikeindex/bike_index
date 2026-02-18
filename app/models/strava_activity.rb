@@ -44,6 +44,25 @@ class StravaActivity < ApplicationRecord
     Handcycle
     Velomobile
   ].freeze
+  PROXY_ATTRS = %i[
+    activity_type
+    average_speed
+    description
+    distance_meters
+    kudos_count
+    moving_time_seconds
+    photos
+    private
+    segment_locations
+    sport_type
+    start_date
+    suffer_score
+    timezone
+    title
+    total_elevation_gain_meters
+    gear_id
+    strava_id
+  ]
 
   belongs_to :strava_integration
 
@@ -149,5 +168,9 @@ class StravaActivity < ApplicationRecord
     attrs = self.class.detail_attributes(detail)
     attrs[:strava_data] = (strava_data || {}).merge(attrs[:strava_data])
     update(attrs)
+  end
+
+  def proxy_serialized
+    slice(*PROXY_ATTRS).merge(strava_data)
   end
 end

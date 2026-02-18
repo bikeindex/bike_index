@@ -141,6 +141,59 @@ RSpec.describe StravaActivity, type: :model do
     end
   end
 
+  describe "proxy_serialized" do
+    it "returns PROXY_ATTRS merged with strava_data" do
+      strava_activity = FactoryBot.create(:strava_activity,
+        strava_id: "123",
+        title: "Morning Ride",
+        activity_type: "Ride",
+        sport_type: "Ride",
+        description: "Great ride",
+        distance_meters: 25000.0,
+        moving_time_seconds: 3600,
+        total_elevation_gain_meters: 200.0,
+        average_speed: 6.944,
+        suffer_score: 42.0,
+        kudos_count: 10,
+        gear_id: "b1234",
+        private: false,
+        timezone: "America/Denver",
+        start_date: "2025-06-15T08:00:00Z",
+        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
+        segment_locations: {cities: ["Denver"], states: ["Colorado"], countries: ["United States"]},
+        strava_data: {average_heartrate: 145.0, max_heartrate: 180.0, device_name: "Garmin Edge 530",
+                      commute: false, average_speed: 6.944, pr_count: 3, average_watts: 200.0, device_watts: true})
+
+      result = strava_activity.proxy_serialized
+      expect(result).to eq({
+        "activity_type" => "Ride",
+        "average_speed" => 6.944,
+        "description" => "Great ride",
+        "distance_meters" => 25000.0,
+        "kudos_count" => 10,
+        "moving_time_seconds" => 3600,
+        "photos" => {"photo_url" => "https://example.com/photo.jpg", "photo_count" => 3},
+        "private" => false,
+        "segment_locations" => {"cities" => ["Denver"], "states" => ["Colorado"], "countries" => ["United States"]},
+        "sport_type" => "Ride",
+        "start_date" => strava_activity.start_date.as_json,
+        "suffer_score" => 42.0,
+        "timezone" => "America/Denver",
+        "title" => "Morning Ride",
+        "total_elevation_gain_meters" => 200.0,
+        "gear_id" => "b1234",
+        "strava_id" => "123",
+        "average_heartrate" => 145.0,
+        "max_heartrate" => 180.0,
+        "device_name" => "Garmin Edge 530",
+        "commute" => false,
+        "pr_count" => 3,
+        "average_watts" => 200.0,
+        "device_watts" => true
+      })
+    end
+  end
+
   describe "update_from_detail" do
     let(:activity) { FactoryBot.create(:strava_activity) }
     let(:detail) do
