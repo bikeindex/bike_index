@@ -100,6 +100,30 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_request.response_status).to eq("success")
         expect(strava_integration.strava_activities.count).to be > 0
 
+        activity = strava_integration.strava_activities.first
+        expect(activity).to match_hash_indifferently({
+          strava_id: "17323701543",
+          title: "Thanks for coming across the bay!",
+          activity_type: "EBikeRide",
+          sport_type: "EBikeRide",
+          distance_meters: 44936.4,
+          moving_time_seconds: 9468,
+          total_elevation_gain_meters: 669.0,
+          average_speed: 4.746,
+          suffer_score: 27.0,
+          kudos_count: 17,
+          gear_id: "b14918050",
+          private: false,
+          timezone: "(GMT-08:00) America/Los_Angeles",
+          start_date: "2026-02-07T23:39:36Z",
+          strava_data: {
+            average_heartrate: 115.0, max_heartrate: 167.0,
+            device_name: "Strava App", commute: false,
+            average_speed: 4.746, pr_count: 0,
+            average_watts: 129.0, device_watts: false
+          }
+        }, match_timezone_key: true)
+
         cycling_count = strava_integration.strava_activities.cycling.count
         detail_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
         expect(detail_requests.count).to eq(cycling_count)
@@ -126,6 +150,29 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_request.response_status).to eq("success")
         strava_integration.reload
         expect(strava_integration.status).to eq("synced")
+
+        activity.reload
+        expect(activity).to match_hash_indifferently(
+          description: "Hawk with Eric and Scott and cedar",
+          average_speed: 4.746,
+          suffer_score: 27.0,
+          kudos_count: 17,
+          photos: {
+            photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+            photo_count: 2
+          },
+          strava_data: {
+            average_heartrate: 115.0, max_heartrate: 167.0,
+            device_name: "Strava App", commute: false,
+            average_speed: 4.746, pr_count: 0,
+            average_watts: 129.0, device_watts: false
+          },
+          segment_locations: {
+            cities: ["San Francisco", "Mill Valley"],
+            states: ["California"],
+            countries: ["United States", "USA"]
+          }
+        )
       end
     end
 
