@@ -71,15 +71,15 @@ RSpec.describe "Strava Proxy API", type: :request do
         }.as_json
       end
 
-      it "proxies the request and returns strava response" do
+      it "proxies the request and returns serialized response" do
         VCR.use_cassette("strava-list_activities") do
           expect {
             post base_url, params: {url: "athlete/activities?page=1&per_page=1", method: "GET", access_token: token.token}
           }.to change(StravaRequest, :count).by(1)
           expect(response.status).to eq 200
           expect(json_result).to be_a(Array)
-          expect(json_result.first["id"]).to eq 17323701543
-          expect(json_result.first["name"]).to eq "Thanks for coming across the bay!"
+          expect(json_result.first["title"]).to eq "Thanks for coming across the bay!"
+          expect(json_result.first["strava_id"]).to eq "17323701543"
           strava_request = StravaRequest.last
           expect(strava_request.proxy?).to be_truthy
           expect(strava_request.success?).to be_truthy
@@ -88,6 +88,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
           expect(strava_activity).to have_attributes target_attributes
           expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
+          expect(json_result).to eq [strava_activity.proxy_serialized.as_json]
         end
       end
 
@@ -147,13 +148,13 @@ RSpec.describe "Strava Proxy API", type: :request do
               post base_url, params: {url: "activities/17323701543", method: "GET", access_token: token.token}
             }.to_not change(StravaActivity, :count)
             expect(response.status).to eq 200
-            expect(json_result["id"]).to eq 17323701543
-            expect(json_result["name"]).to eq "Thanks for coming across the bay!"
+            expect(json_result["title"]).to eq "Thanks for coming across the bay!"
             expect(json_result["description"]).to eq "Hawk with Eric and Scott and cedar"
           end
           strava_activity.reload
           expect(strava_activity.enriched?).to be_truthy
           expect(strava_activity).to have_attributes detail_target_attributes
+          expect(json_result).to eq strava_activity.proxy_serialized.as_json
         end
       end
 

@@ -34,7 +34,8 @@ RSpec.describe StravaJobs::ProxyRequest do
     end
 
     context "activities list" do
-      it "creates strava_request, stores activities, returns response" do
+      it "creates strava_request, stores activities, returns serialized response" do
+        result = nil
         VCR.use_cassette("strava-list_activities") do
           expect {
             result = described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities?page=1&per_page=1", method: "GET")
@@ -49,6 +50,7 @@ RSpec.describe StravaJobs::ProxyRequest do
           strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
           expect(strava_activity).to have_attributes target_attributes
           expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
+          expect(result[:serialized]).to eq [strava_activity.proxy_serialized]
         end
       end
     end
@@ -77,6 +79,7 @@ RSpec.describe StravaJobs::ProxyRequest do
         expect(strava_activity).to have_attributes target_attributes
         expect(strava_activity.enriched?).to be_falsey
 
+        result = nil
         VCR.use_cassette("strava-get_activity") do
           expect {
             result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
@@ -87,6 +90,7 @@ RSpec.describe StravaJobs::ProxyRequest do
         strava_activity.reload
         expect(strava_activity.enriched?).to be_truthy
         expect(strava_activity).to have_attributes detail_target_attributes
+        expect(result[:serialized]).to eq strava_activity.proxy_serialized
       end
     end
 

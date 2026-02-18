@@ -24,7 +24,7 @@ module API
 
       result = StravaJobs::ProxyRequest.create_and_execute(strava_integration:, user:,
         url: permitted_params[:url], method: permitted_params[:method])
-      render_proxy_response(result[:response], result[:strava_request])
+      render_proxy_response(result)
     end
 
     private
@@ -44,11 +44,13 @@ module API
       params.permit(:url, :method)
     end
 
-    def render_proxy_response(strava_response, strava_request)
+    def render_proxy_response(result)
+      strava_request = result[:strava_request]
+      strava_response = result[:response]
       unless strava_request.success?
         return render json: {error: strava_request.response_status}, status: strava_response&.status || 502
       end
-      render body: strava_response.body.to_json, content_type: "application/json", status: strava_response.status
+      render body: result[:serialized].to_json, content_type: "application/json", status: strava_response.status
     end
 
     def render_bad_request(exception)

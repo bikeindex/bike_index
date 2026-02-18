@@ -17,11 +17,11 @@ module StravaJobs
           strava_request.parameters["url"], method: strava_request.parameters["method"])
         strava_request.update_from_response(response, raise_on_error: false)
 
-        if strava_request.success?
+        serialized = if strava_request.success?
           handle_proxy_response(strava_integration, response.body)
         end
 
-        {strava_request:, response:}
+        {strava_request:, response:, serialized:}
       end
 
       private
@@ -32,9 +32,9 @@ module StravaJobs
 
       def handle_proxy_response(strava_integration, body)
         if body.is_a?(Array)
-          body.each { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary) }
+          body.map { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary).proxy_serialized }
         elsif body.is_a?(Hash) && body["sport_type"].present?
-          StravaActivity.create_or_update_from_strava_response(strava_integration, body)
+          StravaActivity.create_or_update_from_strava_response(strava_integration, body).proxy_serialized
         elsif body.is_a?(Hash) && (body["gear_type"].present? || body.key?("frame_type"))
           StravaGear.update_from_strava(strava_integration, body)
         end
