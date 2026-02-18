@@ -38,12 +38,12 @@ RSpec.describe StripeEvent, type: :model do
       end
 
       def expect_stripe_subscription_and_payment_to_match_targets(stripe_subscription, payment)
-        expect(stripe_subscription).to match_hash_indifferently target_subscription
+        expect(stripe_subscription).to have_attributes target_subscription
         expect(stripe_subscription.start_at).to be_within(1).of start_at
         expect(stripe_subscription.stripe_id).to be_present
         expect(stripe_subscription.payments.count).to eq 1
 
-        expect(payment).to match_hash_indifferently target_payment
+        expect(payment).to have_attributes target_payment
         expect(payment.paid_at).to be_present
       end
 
@@ -105,7 +105,7 @@ RSpec.describe StripeEvent, type: :model do
           expect(payment.membership_id).to eq stripe_subscription.membership_id
 
           membership = stripe_subscription.membership
-          expect(membership).to match_hash_indifferently target_membership
+          expect(membership).to have_attributes target_membership
           expect(membership.start_at).to be_within(1).of start_at
         end
 
@@ -185,7 +185,7 @@ RSpec.describe StripeEvent, type: :model do
           end
 
           stripe_subscription = StripeSubscription.last
-          expect(stripe_subscription).to match_hash_indifferently target_subscription
+          expect(stripe_subscription).to have_attributes target_subscription
 
           expect(stripe_subscription.payments.count).to eq 0
           expect(stripe_subscription.membership_id).to be_present

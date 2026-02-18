@@ -313,7 +313,7 @@ RSpec.describe BikeServices::Updator do
 
       expect(bike.reload.description).to eq "something long"
       expect(bike.address_set_manually).to be_truthy
-      expect(bike.address_record).to match_hash_indifferently target_attributes
+      expect(bike.address_record).to have_attributes target_attributes
     end
 
     context "with existing address_record" do
@@ -327,7 +327,7 @@ RSpec.describe BikeServices::Updator do
 
         expect(bike.reload.description).to eq "something long"
         expect(bike.address_set_manually).to be_truthy
-        expect(bike.address_record).to match_hash_indifferently target_attributes
+        expect(bike.address_record).to have_attributes target_attributes
       end
       context "when existing address_record is kind: :ownership" do
         let(:kind) { "ownership" }
@@ -340,7 +340,7 @@ RSpec.describe BikeServices::Updator do
 
           expect(bike.reload.description).to eq "something long"
           expect(bike.address_set_manually).to be_truthy
-          expect(bike.address_record).to match_hash_indifferently target_attributes
+          expect(bike.address_record).to have_attributes target_attributes
 
           expect(address_record.reload.street).to eq "Spuistraat 134afd.Gesch."
         end
@@ -360,7 +360,7 @@ RSpec.describe BikeServices::Updator do
 
         expect(bike.reload.description).to eq "something long"
         expect(bike.address_set_manually).to be_truthy
-        expect(bike.address_record).to match_hash_indifferently target_attributes.except(:region_string)
+        expect(bike.address_record).to have_attributes target_attributes.except(:region_string)
       end
     end
   end
