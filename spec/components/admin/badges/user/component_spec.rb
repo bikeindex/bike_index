@@ -45,7 +45,7 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
         expect(result).to have_css("[title='Promoted alert purchaser']", text: "P")
 
         # If superuser, don't show other stuff
-        user.superuser = true
+        FactoryBot.create(:superuser_ability, user:)
         result_superuser = render_component(user:)
         expect(result_superuser).to have_css("[title='Superuser']", text: "S")
       end

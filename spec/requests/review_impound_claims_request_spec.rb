@@ -30,7 +30,7 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
         get "#{base_url}/#{impound_claim.to_param}"
         expect(response.status).to eq 404
         # unless user is a superuser
-        current_user.update(superuser: true)
+        FactoryBot.create(:superuser_ability, user: current_user)
         get "#{base_url}/#{impound_claim.to_param}"
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)

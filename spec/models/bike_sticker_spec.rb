@@ -486,7 +486,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker2.claimable_by?(user, organization)).to be_truthy # Not authorized by organization tho
         expect(bike_sticker3.claimable_by?(user)).to be_falsey
         # If user is superuser, it's claimable
-        user.update(superuser: true)
+        FactoryBot.create(:superuser_ability, user:)
         expect(bike_sticker3.claimable_by?(user)).to be_truthy
         expect(bike_sticker3.claimable_by?(user, organization)).to be_truthy
       end
