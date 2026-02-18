@@ -93,7 +93,6 @@ class StravaActivity < ApplicationRecord
     end
 
     def summary_attributes(summary)
-      start_date = Binxtils::TimeParser.parse(summary["start_date"])
       {
         title: summary["name"],
         distance_meters: summary["distance"],
@@ -106,8 +105,8 @@ class StravaActivity < ApplicationRecord
         suffer_score: summary["suffer_score"],
         gear_id: summary["gear_id"],
         activity_type: summary["sport_type"] || summary["type"],
-        timezone: Binxtils::TimeZoneParser.parse(summary["timezone"]),
-        start_date:,
+        timezone: Binxtils::TimeZoneParser.parse(summary["timezone"])&.name,
+        start_date: Binxtils::TimeParser.parse(summary["start_date"]),
         strava_data: strava_data_from(summary)
       }
     end
