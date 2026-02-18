@@ -39,7 +39,7 @@ RSpec.describe Sale, type: :model do
       it "returns sale and nil" do
         expect(result.length).to eq 2
         expect(result.last).to be_nil
-        expect(result.first).to match_hash_indifferently target_attrs
+        expect(result.first).to have_attributes target_attrs
         expect(result.first.valid?).to be_truthy
       end
 
@@ -67,7 +67,7 @@ RSpec.describe Sale, type: :model do
 
           expect(result.length).to eq 2
           expect(result.last).to be_nil
-          expect(result.first).to match_hash_indifferently target_attrs
+          expect(result.first).to have_attributes target_attrs
           expect(result.first.valid?).to be_truthy
         end
       end
@@ -85,7 +85,7 @@ RSpec.describe Sale, type: :model do
 
           expect(result.length).to eq 2
           expect(result.last).to be_nil
-          expect(result.first).to match_hash_indifferently target_attrs
+          expect(result.first).to have_attributes target_attrs
           expect(result.first.valid?).to be_truthy
         end
       end
@@ -125,7 +125,7 @@ RSpec.describe Sale, type: :model do
       it "assigns the correct ownership" do
         expect(sale).to be_valid
         sale.save!
-        expect(sale).to match_hash_indifferently target_attrs
+        expect(sale).to have_attributes target_attrs
         expect(sale.marketplace_listing&.id).to eq marketplace_listing.id
       end
 
@@ -136,7 +136,7 @@ RSpec.describe Sale, type: :model do
           expect(marketplace_message_reply.reload.marketplace_listing_id).to eq marketplace_listing.id
           expect(sale).to be_valid
           sale.save!
-          expect(sale).to match_hash_indifferently target_attrs
+          expect(sale).to have_attributes target_attrs
           expect(sale.marketplace_listing&.id).to eq marketplace_listing.id
         end
       end

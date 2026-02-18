@@ -87,7 +87,7 @@ RSpec.describe Bikes::EditsController, type: :request do
     expect(flash).to be_blank
     expect(response).to render_template(:bike_details)
     expect(assigns(:bike).id).to eq bike.id
-    expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates
+    expect(assigns(:edit_templates)).to have_attributes edit_templates
     # Because user is bike#user
     expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     # If passed an unknown template, it renders default template
@@ -121,7 +121,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         expect(flash).to be_blank
         expect(response).to render_template(:bike_details)
         expect(assigns(:bike).id).to eq bike.id
-        expect(assigns(:edit_templates)).to match_hash_indifferently edit_templates.merge(marketplace: "List for sale")
+        expect(assigns(:edit_templates)).to have_attributes edit_templates.merge(marketplace: "List for sale")
         # Because user is bike#user
         expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
         # If passed an unknown template, it renders default template

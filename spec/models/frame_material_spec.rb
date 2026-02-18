@@ -34,7 +34,7 @@ RSpec.describe FrameMaterial, type: :model do
       en_yaml.dig("en", "activerecord", "enums", "frame_material")
     end
     it "has the same names as english translations" do
-      expect(enum_translations).to match_hash_indifferently FrameMaterial::NAMES
+      expect(enum_translations).to have_attributes FrameMaterial::NAMES
     end
   end
 end

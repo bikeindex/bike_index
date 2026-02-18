@@ -120,7 +120,7 @@ RSpec.describe CallbackJob::AfterUserCreateJob, type: :job do
         expect(bike.to_coordinates).to eq([target_address_hash[:latitude], target_address_hash[:longitude]])
         expect(bike.phone).to eq "1112223333"
         expect(BikeServices::CalculateLocation.stored_location_attrs(bike).except("country", "skip_geocoding"))
-          .to match_hash_indifferently target_address_hash.slice(:latitude, :longitude).merge(address_record_id: bike_address_record.id)
+          .to have_attributes target_address_hash.slice(:latitude, :longitude).merge(address_record_id: bike_address_record.id)
 
         expect(user.reload.address_record).to be_blank
         expect(user.phone).to be_blank

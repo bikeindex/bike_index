@@ -210,7 +210,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect(response).to render_template(:new) # Because it redirects since unsuccessful
           expect(assigns(:simple_header)).to be_truthy
           b_param = assigns(:b_param)
-          expect(attrs.except(:creator_id, :cycle_type)).to match_hash_indifferently b_param
+          expect(attrs.except(:creator_id, :cycle_type)).to have_attributes b_param
           expect(b_param.cycle_type).to eq "bike"
           expect(b_param.creator_id).to be_nil
           expect(b_param.origin).to eq "embed_partial"
@@ -251,7 +251,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect_render_without_xframe
           expect(response).to render_template(:create)
           b_param = BParam.last
-          expect(attrs).to match_hash_indifferently b_param
+          expect(attrs).to have_attributes b_param
           expect(b_param.origin).to eq "embed_partial"
           expect(b_param.motorized?).to be_truthy
           expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
@@ -265,7 +265,7 @@ RSpec.describe RegistrationsController, type: :request do
             expect_render_without_xframe
             expect(response).to render_template(:create)
             b_param = BParam.last
-            expect(attrs.except(:cycle_type)).to match_hash_indifferently b_param
+            expect(attrs.except(:cycle_type)).to have_attributes b_param
             expect(b_param.origin).to eq "embed_partial"
             expect(b_param.cycle_type).to eq "bike"
             expect(b_param.motorized?).to be_truthy

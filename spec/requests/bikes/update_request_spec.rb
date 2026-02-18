@@ -67,7 +67,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.address_set_manually).to be_falsey
       # I don't understand why this doesn't create an address record?
       expect(bike.address_record.street).to eq default_location[:street_address]
-      # expect(bike.address_record).to match_hash_indifferently(target_address_record_attributes)
+      # expect(bike.address_record).to have_attributes(target_address_record_attributes)
       expect(bike.updated_by_user_at).to be > (Time.current - 1)
       expect(bike.primary_activity_id).to eq primary_activity_id
       expect(bike.not_updated_by_user?).to be_falsey
@@ -95,9 +95,9 @@ RSpec.describe "BikesController#update", type: :request do
         end
         expect(AddressRecord.pluck(:kind).sort).to eq(%w[bike user])
         bike.reload
-        expect(bike.address_record).to match_hash_indifferently(target_address_record_attributes)
+        expect(bike.address_record).to have_attributes(target_address_record_attributes)
         expect(bike.address_set_manually).to be_truthy
-        expect(bike.registration_address).to match_hash_indifferently(target_address_record_attributes.slice(:latitude, :longitude))
+        expect(bike.registration_address).to have_attributes(target_address_record_attributes.slice(:latitude, :longitude))
         # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
         expect(bike.latitude).to be_within(0.01).of(53.5183351)
         expect(bike.longitude).to be_within(0.01).of(-113.5015663)

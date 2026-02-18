@@ -34,7 +34,7 @@ RSpec.describe HandlebarType, type: :model do
       en_yaml.dig("en", "activerecord", "enums", "handlebar_type")
     end
     it "has the same names as english translations" do
-      expect(enum_translations).to match_hash_indifferently HandlebarType::NAMES
+      expect(enum_translations).to have_attributes HandlebarType::NAMES
     end
   end
 end

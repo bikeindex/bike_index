@@ -115,7 +115,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         # And then test that you can make an authorized request with the token
         get "/api/v3/me", params: {access_token: access_token.token}, headers: {format: :json}
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
-        expect(json_result).to match_hash_indifferently({id: current_user.id.to_s, bike_ids: []})
+        expect(json_result).to have_attributes({id: current_user.id.to_s, bike_ids: []})
         # Then, expire the token
         access_token.update(created_at: Time.current - 3700)
         expect(access_token.reload.expired?).to be_truthy

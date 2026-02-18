@@ -232,18 +232,18 @@ RSpec.describe "Search API V3", type: :request do
         get "/api/v3/search/count", params: query_params.merge(format: :json)
         JSON.parse(response.body)
         expect(response.status).to eq(200)
-        expect(json_result).to match_hash_indifferently target
+        expect(json_result).to have_attributes target
         # Search color
         get "/api/v3/search/count?colors%5B%5D=#{color.id}&stolenness=non&location=edmonton"
         expect(response.status).to eq(200)
-        expect(json_result).to match_hash_indifferently target
+        expect(json_result).to have_attributes target
 
         get "/api/v3/search/count", params: {
           query_items: [manufacturer.search_id], colors: [color.id], format: :json
         }
         JSON.parse(response.body)
         expect(response.status).to eq(200)
-        expect(json_result).to match_hash_indifferently target.merge(non: 0)
+        expect(json_result).to have_attributes target.merge(non: 0)
       end
     end
 
@@ -253,10 +253,10 @@ RSpec.describe "Search API V3", type: :request do
       it "returns successfully" do
         get "/api/v3/search/count", params: {stolenness: "", query_items: [], serial: "", format: :json}
         expect(response.status).to eq(200)
-        expect(json_result).to match_hash_indifferently target
+        expect(json_result).to have_attributes target
         get "/api/v3/search/count", params: {stolenness: "for_sale", format: :json}
         expect(response.status).to eq(200)
-        expect(json_result).to match_hash_indifferently target
+        expect(json_result).to have_attributes target
       end
     end
   end

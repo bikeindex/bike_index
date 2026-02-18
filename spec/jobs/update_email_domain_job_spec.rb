@@ -43,7 +43,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.reload.user_count).to eq 4 # Because users created for email domains
           expect(email_domain.status).to eq "permitted"
           expect(email_domain.tld_matches_subdomains?).to be_falsey
-          expect(email_domain.data.except("spam_score")).to match_hash_indifferently valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
+          expect(email_domain.data.except("spam_score")).to have_attributes valid_data.merge(broader_domain_exists: true, subdomain_count: 1)
           expect(EmailDomain.tld.pluck(:id)).to match_array([email_domain.id, email_domain_bare.id])
           expect(EmailDomain.subdomain.pluck(:id)).to match_array([email_domain_sub.id])
           expect(email_domain.calculated_subdomains.pluck(:id)).to eq([email_domain_sub.id])
@@ -57,7 +57,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           instance.perform(email_domain_bare.id)
           expect(email_domain_bare.reload.no_auto_assign_status?).to be_truthy
           expect(email_domain_bare.status).to eq "permitted"
-          expect(email_domain_bare.data.except("spam_score")).to match_hash_indifferently(valid_data.merge(subdomain_count: 1, no_auto_assign_status: true))
+          expect(email_domain_bare.data.except("spam_score")).to have_attributes(valid_data.merge(subdomain_count: 1, no_auto_assign_status: true))
         end
       end
     end
@@ -77,7 +77,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
         expect(EmailDomain.subdomain.pluck(:id)).to match_array([])
         expect(email_domain.calculated_subdomains.pluck(:id)).to eq([])
         expect(email_domain.should_re_process?).to be_falsey
-        expect(email_domain.data.except("spam_score")).to match_hash_indifferently invalid_data
+        expect(email_domain.data.except("spam_score")).to have_attributes invalid_data
       end
     end
 
@@ -90,7 +90,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 1
           expect(email_domain.ban_blockers.any?).to be_truthy
-          expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
+          expect(email_domain.data.except("spam_score")).to have_attributes target_data
           expect(email_domain.status).to eq "permitted"
           expect(email_domain.spam_score).to be < 3
         end
@@ -105,7 +105,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
             instance.perform(email_domain.id)
             expect(email_domain.reload.user_count).to eq 1
             expect(email_domain.ban_blockers.any?).to be_truthy
-            expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
+            expect(email_domain.data.except("spam_score")).to have_attributes target_data
             expect(email_domain.status).to eq "permitted"
             expect(email_domain.spam_score).to be < 3
           end
@@ -126,7 +126,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.bike_count).to eq 0
 
           expect(email_domain.data.except("sendgrid_validations", "spam_score"))
-            .to match_hash_indifferently valid_data.merge(domain_resolves: false, tld_resolves: false)
+            .to have_attributes valid_data.merge(domain_resolves: false, tld_resolves: false)
           expect(email_domain.data.dig("sendgrid_validations", user2.email).keys.sort).to eq target_sendgrid_keys
           expect(email_domain.spam_score).to be > 9
           expect(email_domain.status).to eq "provisional_ban"
@@ -148,7 +148,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           instance.perform(email_domain.id)
           expect(email_domain.reload.user_count).to eq 1
           expect(email_domain.bike_count).to eq 1
-          expect(email_domain.data.except("spam_score")).to match_hash_indifferently msn_data
+          expect(email_domain.data.except("spam_score")).to have_attributes msn_data
           expect(email_domain.status).to eq "permitted"
           expect(email_domain.ban_blockers.any?).to be_truthy
           expect(email_domain.spam_score).to be >= 4
@@ -176,7 +176,7 @@ RSpec.describe UpdateEmailDomainJob, type: :lib do
           expect(email_domain.reload.user_count).to eq 2
 
           expect(email_domain.ban_blockers.any?).to be_falsey
-          expect(email_domain.data.except("spam_score")).to match_hash_indifferently target_data
+          expect(email_domain.data.except("spam_score")).to have_attributes target_data
           expect(email_domain.status).to eq "provisional_ban"
           expect(described_class).to_not have_enqueued_sidekiq_job
           expect(email_domain.spam_score).to be > 9

@@ -41,7 +41,7 @@ RSpec.describe OrganizationExportJob, type: :job do
         expect(export.progress).to eq "finished"
         generated_line_hash = csv_line_to_hash(export.file.read.split("\n").last, headers: export.written_headers)
         expect(generated_line_hash.keys).to eq bike_row_hash.keys # has to match the order!
-        expect(generated_line_hash).to match_hash_indifferently(bike_row_hash)
+        expect(generated_line_hash).to have_attributes(bike_row_hash)
         # Putting it all together
         expect(export.file.read).to eq(csv_string)
         expect(export.rows).to eq 1
@@ -222,7 +222,7 @@ RSpec.describe OrganizationExportJob, type: :job do
         generated_csv_string = export.file.read
         line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
         expect(line_hash.keys).to eq bike_row_hash.keys # has to match the order!
-        expect(line_hash).to match_hash_indifferently(bike_row_hash)
+        expect(line_hash).to have_attributes(bike_row_hash)
         # written_csv_line = export.written_headers.zip(generated_csv_string.split("\n").last)
         # NOTE: this only seems to fail on the mac version of nokogiri, see PR#2366
         # Ensure we actually match the exact thing with correct escaping
@@ -398,7 +398,7 @@ RSpec.describe OrganizationExportJob, type: :job do
 
             line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
             expect(line_hash.keys).to eq bike_row_hash.keys # again, order is CRITICAL
-            expect(line_hash).to match_hash_indifferently(bike_row_hash)
+            expect(line_hash).to have_attributes(bike_row_hash)
             expect(generated_csv_string).to eq csv_string
           end
         end
@@ -460,7 +460,7 @@ RSpec.describe OrganizationExportJob, type: :job do
 
           line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
           expect(line_hash.keys).to eq target_partial_row.keys # again, order is CRITICAL
-          expect(line_hash).to match_hash_indifferently(target_partial_row)
+          expect(line_hash).to have_attributes(target_partial_row)
 
           target_csv_string = [export.written_headers, target_partial_row.values].map { |r| instance.comma_wrapped_string(r) }.join
           expect(generated_csv_string).to eq target_csv_string
@@ -515,11 +515,11 @@ RSpec.describe OrganizationExportJob, type: :job do
 
             complete_line_hash = csv_line_to_hash(generated_csv_string.split("\n")[1], headers: export.written_headers)
             expect(complete_line_hash.keys).to eq target_complete_row.keys # again, order is CRITICAL
-            expect(complete_line_hash).to match_hash_indifferently(target_complete_row)
+            expect(complete_line_hash).to have_attributes(target_complete_row)
 
             partial_line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
             expect(partial_line_hash.keys).to eq target_partial_row.keys # again, order is CRITICAL
-            expect(partial_line_hash).to match_hash_indifferently(target_partial_row)
+            expect(partial_line_hash).to have_attributes(target_partial_row)
             # Verify cycle_type is EXACTLY the same (including capitalization)
             expect(partial_line_hash[:vehicle_type]).to eq complete_line_hash[:vehicle_type]
 
@@ -575,7 +575,7 @@ RSpec.describe OrganizationExportJob, type: :job do
 
           line_hash = csv_line_to_hash(generated_csv_string.split("\n").last, headers: export.written_headers)
           expect(line_hash.keys).to eq target_impound_row.keys # again, order is CRITICAL
-          expect(line_hash).to match_hash_indifferently(target_impound_row)
+          expect(line_hash).to have_attributes(target_impound_row)
 
           target_csv_string = [export.written_headers, target_impound_row.values].map { |r| instance.comma_wrapped_string(r) }.join
           expect(generated_csv_string).to eq target_csv_string

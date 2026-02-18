@@ -169,7 +169,7 @@ RSpec.describe PropulsionType, type: :model do
     end
     describe "autocomplete_hash" do
       it "is the target" do
-        expect(PropulsionType.send(:motorized_autocomplete_hash)).to match_hash_indifferently motorized_hash
+        expect(PropulsionType.send(:motorized_autocomplete_hash)).to have_attributes motorized_hash
         expect(PropulsionType.autocomplete_hashes.count).to eq 1
       end
     end
@@ -183,7 +183,7 @@ RSpec.describe PropulsionType, type: :model do
         .map { |k, v| [k.tr("_", "-"), v] }.to_h
     end
     it "has the same names as english translations" do
-      expect(enum_translations).to match_hash_indifferently PropulsionType::NAMES
+      expect(enum_translations).to have_attributes PropulsionType::NAMES
     end
   end
 end
