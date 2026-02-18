@@ -47,18 +47,47 @@ RSpec.describe "Strava Proxy API", type: :request do
 
     context "with strava integration" do
       let!(:strava_integration) { FactoryBot.create(:strava_integration, user:) }
+      let(:target_attributes) do
+        {
+          strava_id: "17323701543",
+          title: "Thanks for coming across the bay!",
+          activity_type: "EBikeRide",
+          sport_type: "EBikeRide",
+          distance_meters: 44936.4,
+          moving_time_seconds: 9468,
+          total_elevation_gain_meters: 669.0,
+          average_speed: 4.746,
+          suffer_score: 27.0,
+          kudos_count: 17,
+          gear_id: "b14918050",
+          private: false,
+          timezone: "America/Los_Angeles",
+          strava_data: {
+            average_heartrate: 115.0, max_heartrate: 167.0,
+            device_name: "Strava App", commute: false,
+            average_speed: 4.746, pr_count: 0,
+            average_watts: 129.0, device_watts: false
+          }
+        }.as_json
+      end
 
       it "proxies the request and returns strava response" do
-        VCR.use_cassette("strava-proxy_activities") do
+        VCR.use_cassette("strava-list_activities") do
           expect {
-            post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            post base_url, params: {url: "athlete/activities?page=1&per_page=1", method: "GET", access_token: token.token}
           }.to change(StravaRequest, :count).by(1)
           expect(response.status).to eq 200
-          expect(json_result).to eq [{"id" => 123, "name" => "Morning Ride", "sport_type" => "Ride", "distance" => 25000.0, "moving_time" => 3600, "type" => "Ride"}]
+          expect(json_result).to be_a(Array)
+          expect(json_result.first["id"]).to eq 17323701543
+          expect(json_result.first["name"]).to eq "Thanks for coming across the bay!"
           strava_request = StravaRequest.last
           expect(strava_request.proxy?).to be_truthy
           expect(strava_request.success?).to be_truthy
-          expect(strava_request.parameters).to eq("url" => "athlete/activities", "method" => "GET")
+          expect(strava_request.parameters).to eq("url" => "athlete/activities?page=1&per_page=1", "method" => "GET")
+
+          strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
+          expect(strava_activity).to have_attributes target_attributes
+          expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
         end
       end
 
@@ -89,6 +118,21 @@ RSpec.describe "Strava Proxy API", type: :request do
       end
 
       context "activity detail response" do
+        let(:detail_target_attributes) do
+          target_attributes.merge(
+            "description" => "Hawk with Eric and Scott and cedar",
+            "photos" => {
+              "photo_url" => "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+              "photo_count" => 2
+            },
+            "segment_locations" => {
+              "cities" => ["San Francisco", "Mill Valley"],
+              "states" => ["California"],
+              "countries" => ["United States", "USA"]
+            }
+          )
+        end
+
         it "stores activity data and returns strava response" do
           VCR.use_cassette("strava-get_activity") do
             expect {
@@ -103,31 +147,7 @@ RSpec.describe "Strava Proxy API", type: :request do
 
             strava_activity = StravaActivity.last
             expect(strava_activity.enriched?).to be_truthy
-            expect(strava_activity).to match_hash_indifferently(
-              strava_id: "17323701543",
-              title: "Thanks for coming across the bay!",
-              activity_type: "EBikeRide",
-              sport_type: "EBikeRide",
-              description: "Hawk with Eric and Scott and cedar",
-              average_speed: 4.746,
-              suffer_score: 27.0,
-              kudos_count: 17,
-              photos: {
-                photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
-                photo_count: 2
-              },
-              strava_data: {
-                average_heartrate: 115.0, max_heartrate: 167.0,
-                device_name: "Strava App", commute: false,
-                average_speed: 4.746, pr_count: 0,
-                average_watts: 129.0, device_watts: false
-              },
-              segment_locations: {
-                cities: ["San Francisco", "Mill Valley"],
-                states: ["California"],
-                countries: ["United States", "USA"]
-              }
-            )
+            expect(strava_activity).to have_attributes detail_target_attributes
           end
         end
       end
