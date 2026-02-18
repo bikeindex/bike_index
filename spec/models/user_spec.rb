@@ -188,7 +188,7 @@ RSpec.describe User, type: :model do
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-    let(:admin) { User.new(superuser: true) }
+    let(:admin) { FactoryBot.create(:superuser) }
     it "returns expected values" do
       expect(user.authorized?(bike)).to be_falsey
       expect(user.authorized?(organization)).to be_falsey
@@ -233,9 +233,9 @@ RSpec.describe User, type: :model do
     end
 
     context "with superuser" do
-      let(:user) { FactoryBot.build(:superuser) }
+      let(:user) { FactoryBot.create(:superuser) }
 
-      it "is true for superuser attribute" do
+      it "is truthy" do
         expect(user.superuser?).to be_truthy
         expect(user.superuser?(controller_name: "bikes")).to be_truthy
         expect(user.superuser?(controller_name: "bikes", action_name: "edit")).to be_truthy
@@ -658,7 +658,7 @@ RSpec.describe User, type: :model do
 
   describe "enabled" do
     let(:user) { User.new }
-    let(:superuser) { User.new(superuser: true) }
+    let(:superuser) { FactoryBot.create(:superuser) }
     it "is falsey, truthy for superuser" do
       expect(user.enabled?("unstolen_notifications")).to be_falsey
       expect(superuser.enabled?("unstolen_notifications")).to be_truthy
@@ -669,10 +669,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "unstolen_notifications enabled?" do
-    let(:user) { User.new }
+    let(:user) { FactoryBot.create(:user_confirmed) }
     it "is falsey, truthy for superuser" do
       expect(user.enabled?("unstolen_notifications")).to be_falsey
-      user.superuser = true
+      FactoryBot.create(:superuser_ability, user:)
       expect(user.enabled?("unstolen_notifications")).to be_truthy
     end
 
@@ -880,7 +880,7 @@ RSpec.describe User, type: :model do
   describe "can_create_listing?" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     context "superuser" do
-      let(:user) { User.new(superuser: true) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "returns true" do
         expect(user.can_create_listing?).to be_truthy
       end

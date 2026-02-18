@@ -3523,17 +3523,18 @@ CREATE TABLE public.strava_activities (
     total_elevation_gain_meters double precision,
     sport_type character varying,
     private boolean DEFAULT false,
-    muted boolean DEFAULT false,
     kudos_count integer,
-    year integer,
     gear_id character varying,
     photos jsonb,
     segment_locations jsonb,
     activity_type character varying,
     start_date timestamp(6) without time zone,
-    activity_timezone character varying,
+    timezone character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    average_speed double precision,
+    suffer_score double precision,
+    strava_data jsonb
 );
 
 
@@ -4056,7 +4057,6 @@ CREATE TABLE public.users (
     email character varying(255),
     password text,
     last_login_at timestamp without time zone,
-    superuser boolean DEFAULT false NOT NULL,
     token_for_password_reset text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -7447,6 +7447,8 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260218010402'),
+('20260217170639'),
 ('20260214163159'),
 ('20260209164044'),
 ('20260209164043'),

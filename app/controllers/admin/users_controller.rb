@@ -30,7 +30,11 @@ class Admin::UsersController < Admin::BaseController
     else
       @user.name = params[:user][:name]
       @user.email = params[:user][:email]
-      @user.superuser = params[:user][:superuser]
+      if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
+        @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
+      else
+        @user.superuser_abilities.universal.destroy_all
+      end
       @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
       @user.banned = params[:user][:banned]
       if @user.banned && permitted_ban_parameters[:reason].present?
@@ -127,7 +131,7 @@ class Admin::UsersController < Admin::BaseController
     end
     users = users.send(invalidness_scope(@invalid))
     users = users.ambassadors if @search_ambassadors
-    users = users.superuser_abilities if @search_superusers
+    users = users.admins if @search_superusers
     users = users.where(developer: true) if @search_developers
     users = users.where(id: OrganizationRole.select(:user_id)) if @search_with_organization
     users = users.unconfirmed if @search_unconfirmed

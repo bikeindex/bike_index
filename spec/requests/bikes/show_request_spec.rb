@@ -177,7 +177,11 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
     context "Admin viewing" do
-      let(:current_user) { FactoryBot.create(:organization_admin, superuser: true) }
+      let(:current_user) do
+        user = FactoryBot.create(:organization_admin)
+        FactoryBot.create(:superuser_ability, user:)
+        user
+      end
       let!(:organization) { current_user.default_organization }
       let!(:organization2) { FactoryBot.create(:organization) }
       it "responds with success" do

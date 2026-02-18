@@ -98,20 +98,39 @@ RSpec.describe StravaActivity, type: :model do
        "moving_time" => 3600, "total_elevation_gain" => 200.0,
        "sport_type" => "Ride", "type" => "Ride",
        "start_date" => "2025-06-15T08:00:00Z",
-       "gear_id" => "b1234", "private" => false, "kudos_count" => 10}
+       "timezone" => "(GMT-07:00) America/Denver",
+       "gear_id" => "b1234", "private" => false, "kudos_count" => 10,
+       "average_speed" => 6.944, "suffer_score" => 42.0,
+       "average_heartrate" => 145.0, "max_heartrate" => 180.0,
+       "device_name" => "Garmin Edge 530", "commute" => false,
+       "pr_count" => 3, "average_watts" => 200.0, "device_watts" => true}
     end
 
     it "creates a new activity from summary" do
       activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
       expect(activity).to be_persisted
-      expect(activity.strava_id).to eq("9876543")
-      expect(activity.title).to eq("Morning Ride")
-      expect(activity.distance_meters).to eq(25000.0)
-      expect(activity.moving_time_seconds).to eq(3600)
-      expect(activity.total_elevation_gain_meters).to eq(200.0)
-      expect(activity.sport_type).to eq("Ride")
-      expect(activity.activity_type).to eq("Ride")
-      expect(activity.kudos_count).to eq(10)
+      expect(activity).to match_hash_indifferently({
+        strava_id: "9876543",
+        title: "Morning Ride",
+        distance_meters: 25000.0,
+        moving_time_seconds: 3600,
+        total_elevation_gain_meters: 200.0,
+        sport_type: "Ride",
+        activity_type: "Ride",
+        kudos_count: 10,
+        average_speed: 6.944,
+        suffer_score: 42.0,
+        start_date: "2025-06-15T08:00:00Z",
+        timezone: "(GMT-07:00) America/Denver",
+        gear_id: "b1234",
+        private: false,
+        strava_data: {
+          average_heartrate: 145.0, max_heartrate: 180.0,
+          device_name: "Garmin Edge 530", commute: false,
+          average_speed: 6.944, pr_count: 3,
+          average_watts: 200.0, device_watts: true
+        }
+      }, match_timezone_key: true)
     end
 
     it "updates an existing activity" do
@@ -127,25 +146,40 @@ RSpec.describe StravaActivity, type: :model do
     let(:detail) do
       {"description" => "Great ride",
        "gear" => {"name" => "My Road Bike"},
-       "muted" => false,
        "kudos_count" => 10,
+       "average_speed" => 5.5, "suffer_score" => 30.0,
+       "average_heartrate" => 140.0, "max_heartrate" => 175.0,
+       "device_name" => "Garmin Edge 530", "commute" => true,
+       "muted" => false, "pr_count" => 2,
+       "average_watts" => 180.0, "device_watts" => true,
        "segment_efforts" => [
          {"segment" => {"city" => "San Francisco", "state" => "California", "country" => "United States"}},
          {"segment" => {"city" => "Mill Valley", "state" => "California", "country" => "United States"}}
        ],
-       "photos" => {"primary" => {"unique_id" => "photo_123", "urls" => {"600" => "https://example.com/photo.jpg"}}}}
+       "photos" => {"primary" => {"unique_id" => "photo_123", "urls" => {"600" => "https://example.com/photo.jpg"}}, "count" => 3}}
     end
 
     it "updates the activity with detail fields" do
       activity.update_from_detail(detail)
       activity.reload
-      expect(activity.description).to eq("Great ride")
-      expect(activity.kudos_count).to eq(10)
-      expect(activity.photos.first["id"]).to eq("photo_123")
-      expect(activity.segment_locations).to eq(
-        "cities" => ["San Francisco", "Mill Valley"],
-        "states" => ["California"],
-        "countries" => ["United States"]
+      expect(activity).to match_hash_indifferently(
+        description: "Great ride",
+        kudos_count: 10,
+        average_speed: 5.5,
+        suffer_score: 30.0,
+        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
+        strava_data: {
+          average_heartrate: 140.0, max_heartrate: 175.0,
+          device_name: "Garmin Edge 530", commute: true,
+          muted: false, average_speed: 5.5,
+          pr_count: 2, average_watts: 180.0,
+          device_watts: true
+        },
+        segment_locations: {
+          cities: ["San Francisco", "Mill Valley"],
+          states: ["California"],
+          countries: ["United States"]
+        }
       )
     end
 
@@ -157,10 +191,10 @@ RSpec.describe StravaActivity, type: :model do
     end
 
     it "handles detail without photos" do
-      detail["photos"] = {"primary" => nil}
+      detail["photos"] = {"primary" => nil, "count" => 0}
       activity.update_from_detail(detail)
       activity.reload
-      expect(activity.photos).to eq([])
+      expect(activity).to match_hash_indifferently(photos: {photo_url: nil, photo_count: 0})
     end
   end
 end
