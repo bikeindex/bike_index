@@ -69,6 +69,8 @@ class StravaActivity < ApplicationRecord
     end
 
     def detail_attributes(detail)
+      return {} if (detail.keys & %w[photos segment_efforts description muted kudos_count]).none?
+
       photo_url = detail.dig("photos", "primary", "urls", "600")
       photos = {photo_url:, photo_count: detail.dig("photos", "count") || 0}
 
