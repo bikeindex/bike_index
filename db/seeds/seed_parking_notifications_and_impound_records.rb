@@ -179,7 +179,8 @@ puts "Creating 5 impound records in San Francisco for Hogwarts..."
           city: loc[:city],
           zipcode: loc[:zipcode],
           state_id: ca_state&.id.to_s,
-          country_id: us&.id.to_s
+          country_id: us&.id.to_s,
+          skip_geocoding: true
         }
       }
     }

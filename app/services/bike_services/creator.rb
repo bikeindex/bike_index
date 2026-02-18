@@ -74,7 +74,7 @@ class BikeServices::Creator
     :impounded_at_with_timezone,
     :impounded_description,
     :timezone,
-    address_record_attributes: (AddressRecord.permitted_params + [:id])
+    address_record_attributes: (AddressRecord.permitted_params + [:id, :skip_geocoding])
   ].freeze
   # TODO: Remove this once backfill is finished - #2922
   ADDRESS_ATTRS = %i[city country_id state_id street zipcode]
