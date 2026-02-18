@@ -164,7 +164,7 @@ RSpec.describe StravaActivity, type: :model do
     it "updates the activity with detail fields" do
       activity.update_from_detail(detail)
       activity.reload
-      expect(activity).to match_hash_indifferently(
+      expect(activity).to have_attributes(
         description: "Great ride",
         kudos_count: 10,
         average_speed: 5.5,
@@ -196,7 +196,7 @@ RSpec.describe StravaActivity, type: :model do
       detail["photos"] = {"primary" => nil, "count" => 0}
       activity.update_from_detail(detail)
       activity.reload
-      expect(activity).to match_hash_indifferently(photos: {photo_url: nil, photo_count: 0})
+      expect(activity).to have_attributes(photos: {photo_url: nil, photo_count: 0})
     end
   end
 end

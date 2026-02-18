@@ -296,7 +296,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bike1.status).to eq "status_stolen"
               expect(bike1.created_by_notification_or_impounding?).to be_falsey
               stolen_record1 = bike1.current_stolen_record
-              expect(stolen_record1).to match_hash_indifferently stolen_record_attrs
+              expect(stolen_record1).to have_attributes stolen_record_attrs
               expect(stolen_record1.date_stolen.to_i).to be_within(1).of 1649804400 # 2022-04-12 18:00 CT
               expect(stolen_record1.proof_of_ownership).to be_truthy
               expect(stolen_record1.receive_notifications).to be_truthy
@@ -309,7 +309,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
               expect(bike2.owner_email).to eq "test2@bikeindex.org"
               expect(bike2.status).to eq "status_stolen"
               stolen_record2 = bike2.current_stolen_record
-              expect(stolen_record2).to match_hash_indifferently stolen_record_attrs
+              expect(stolen_record2).to have_attributes stolen_record_attrs
               expect(stolen_record2.date_stolen.to_i).to be_within(1).of 1649804400 # 2022-04-12 18:00 CT
               expect(stolen_record2.proof_of_ownership).to be_truthy
               expect(stolen_record2.receive_notifications).to be_truthy

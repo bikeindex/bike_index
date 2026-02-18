@@ -32,7 +32,7 @@ RSpec.describe Backfills::AddressRecordForceGeocodeJob, type: :job do
       VCR.use_cassette("backfill-address-record-force-geocode") do
         instance.perform(address_record.id)
 
-        expect(address_record.reload).to match_hash_indifferently target_attrs
+        expect(address_record.reload).to have_attributes target_attrs
       end
     end
   end

@@ -40,7 +40,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
         expect(organization.reload.is_paid).to be_truthy
         expect(new_organization.reload.is_paid).to be_truthy
 
-        expect(bike_sticker_update.reload).to match_hash_indifferently initial_update
+        expect(bike_sticker_update.reload).to have_attributes initial_update
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
         expect(bike_sticker.claimed_at).to be_within(1).of sticker_update_at
         expect(bike_sticker.updated_at).to be_within(1).of sticker_update_at
@@ -52,7 +52,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
         expect { instance.perform(bike_sticker_update.id) }.to change(BikeStickerUpdate, :count).by(-1)
 
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 0
-        expect(bike_sticker).to match_hash_indifferently target_initial
+        expect(bike_sticker).to have_attributes target_initial
       end
 
       context "kind: re_claim" do
@@ -79,14 +79,14 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
           }
         end
         it "removes" do
-          expect(bike_sticker_update.reload).to match_hash_indifferently(kind: "re_claim", update_number: 2)
+          expect(bike_sticker_update.reload).to have_attributes(kind: "re_claim", update_number: 2)
           expect(bike_sticker.reload.claimed_at).to be_within(1).of sticker_update_at
           expect(bike_sticker.previous_bike_id).to eq bike2.id
 
           expect { instance.perform(bike_sticker_update.id) }.to change(BikeStickerUpdate, :count).by(-1)
 
           expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
-          expect(bike_sticker).to match_hash_indifferently target_claim
+          expect(bike_sticker).to have_attributes target_claim
         end
 
         context "with a failed claim" do
@@ -95,8 +95,8 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
             bike_sticker.bike_sticker_updates.last
           end
           it "ignores the failed claim" do
-            expect(bike_sticker_update_fail.reload).to match_hash_indifferently(kind: "failed_claim", update_number: 2)
-            expect(bike_sticker_update.reload).to match_hash_indifferently(kind: "re_claim", update_number: 2)
+            expect(bike_sticker_update_fail.reload).to have_attributes(kind: "failed_claim", update_number: 2)
+            expect(bike_sticker_update.reload).to have_attributes(kind: "re_claim", update_number: 2)
 
             expect(bike_sticker.reload.claimed_at).to be_within(1).of sticker_update_at
             expect(bike_sticker.previous_bike_id).to eq bike2.id
@@ -105,7 +105,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
             expect { instance.perform(bike_sticker_update.id) }.to change(BikeStickerUpdate, :count).by(-1)
 
             expect(bike_sticker.reload.bike_sticker_updates.count).to eq 2
-            expect(bike_sticker).to match_hash_indifferently target_claim
+            expect(bike_sticker).to have_attributes target_claim
           end
         end
 
@@ -131,15 +131,15 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
             }
           end
           it "removes but doesn't update the claim" do
-            expect(bike_sticker_update.reload).to match_hash_indifferently(kind: "re_claim", update_number: 2)
-            expect(bike_sticker_update_following.reload).to match_hash_indifferently(kind: "re_claim", update_number: 3, user: user3)
+            expect(bike_sticker_update.reload).to have_attributes(kind: "re_claim", update_number: 2)
+            expect(bike_sticker_update_following.reload).to have_attributes(kind: "re_claim", update_number: 3, user: user3)
 
             expect { instance.perform(bike_sticker_update.id) }.to raise_error(/following claim/i)
 
             # expect { instance.perform(bike_sticker_update.id) }.to change(BikeStickerUpdate, :count).by(-1)
 
             # expect(bike_sticker.reload.bike_sticker_updates.count).to eq 2
-            # expect(bike_sticker).to match_hash_indifferently target_reclaimed
+            # expect(bike_sticker).to have_attributes target_reclaimed
             # expect(bike_sticker_update_following.reload.update_number).to eq 2
           end
         end
@@ -165,8 +165,8 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
             }
           end
           it "calls claim again" do
-            expect(bike_sticker_update.reload).to match_hash_indifferently(kind: "re_claim", update_number: 2)
-            expect(bike_sticker_update_following.reload).to match_hash_indifferently(kind: "failed_claim", update_number: 3, user: user3)
+            expect(bike_sticker_update.reload).to have_attributes(kind: "re_claim", update_number: 2)
+            expect(bike_sticker_update_following.reload).to have_attributes(kind: "failed_claim", update_number: 3, user: user3)
             expect(bike_sticker.previous_bike_id).to eq bike2.id
 
             expect(bike_sticker.reload.claimed_at).to be_within(1).of sticker_update_at
@@ -178,7 +178,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
             # expect { instance.perform(bike_sticker_update.id) }.to change(BikeStickerUpdate, :count).by(-1)
 
             # expect(bike_sticker.reload.bike_sticker_updates.count).to eq 2
-            # expect(bike_sticker).to match_hash_indifferently target_reclaimed
+            # expect(bike_sticker).to have_attributes target_reclaimed
           end
         end
       end
