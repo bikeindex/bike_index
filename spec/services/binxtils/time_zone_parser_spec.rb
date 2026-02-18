@@ -16,6 +16,16 @@ RSpec.describe Binxtils::TimeZoneParser, type: :service do
       end
     end
 
+    context "with offset" do
+      let(:time_zone_str) { "(GMT-07:00) America/Denver" }
+      let(:target_time_zone) { ActiveSupport::TimeZone["America/Denver"] }
+
+      it "returns correct time_zone" do
+        expect(subject.parse(time_zone_str)).to eq target_time_zone
+        expect(subject.parse(time_zone_str).utc_offset).to eq(-25200)
+      end
+    end
+
     context "Chicago" do
       let(:time_zone_str) { "America/Chicago" }
       let(:target_time_zone) { ActiveSupport::TimeZone[time_zone_str] }

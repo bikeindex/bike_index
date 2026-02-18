@@ -77,7 +77,6 @@ module StravaJobs
       end
 
       response = self.class.execute(strava_integration, strava_request.request_type, strava_request.parameters)
-      pp response
       strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
       return unless strava_request.success?
 

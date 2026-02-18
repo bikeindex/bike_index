@@ -7,9 +7,10 @@ module Binxtils
         return nil if time_zone_str.blank?
         return time_zone_str if time_zone_str.is_a?(ActiveSupport::TimeZone) # in case we were given a time_zone obj
 
-        # tzinfo requires non-whitespaced strings, so try that if the normal lookup fails
+        # tzinfo requires non-whitespaced strings.
+        # if the normal lookup fails, remove parens, then remove spaces and convert to underscores
         ActiveSupport::TimeZone[time_zone_str] ||
-          ActiveSupport::TimeZone[time_zone_str.to_s.strip.tr("\s", "_")]
+          ActiveSupport::TimeZone[time_zone_str.to_s.gsub(/\(.*?\)/, "").strip.tr("\s", "_")]
       end
 
       def parse_from_time_string(time_str)
