@@ -21,8 +21,9 @@ RSpec.describe BikeHelper, type: :helper do
         expect(render_serial_display(bike)).to eq target
         expect(render_serial_display(bike, skip_explanation: true)).to eq "<span class=\"less-strong\">hidden</span>"
         expect(render_serial_display(bike, User.new)).to eq target
-        expect(render_serial_display(bike, User.new(superuser: true))).to eq target_authorized
-        expect(render_serial_display(bike, User.new(superuser: true), skip_explanation: true)).to eq "<code class=\"bike-serial\">FFF333</code>"
+        superuser = FactoryBot.create(:superuser)
+        expect(render_serial_display(bike, superuser)).to eq target_authorized
+        expect(render_serial_display(bike, superuser, skip_explanation: true)).to eq "<code class=\"bike-serial\">FFF333</code>"
       end
     end
   end

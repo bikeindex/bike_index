@@ -7,8 +7,6 @@ class CallbackJob::AfterUserChangeJob < ApplicationJob
 
     # Bump updated_at to bust cache
     user.update(updated_at: Time.current, skip_update: true) unless user.deleted?
-    update_superuser_abilities(user)
-
     add_phones_for_verification(user)
 
     associate_feedbacks(user)
@@ -114,20 +112,6 @@ class CallbackJob::AfterUserChangeJob < ApplicationJob
       user.bike_ids.each { |id| BikeDeleterJob.perform_async(id, false, user.id) }
     else
       user.bike_ids.each { |id| CallbackJob::AfterBikeSaveJob.perform_async(id, true, true) }
-    end
-  end
-
-  def update_superuser_abilities(user)
-    universal_abilities = user.superuser_abilities.universal.order(:id)
-    if user.superuser # NOTE: NOT THE METHOD, checking attribute
-      if universal_abilities.count > 1
-        kept_ability = universal_abilities.first
-        universal_abilities.where.not(id: kept_ability.id).destroy_all
-      elsif universal_abilities.none?
-        SuperuserAbility.create(user: user)
-      end
-    elsif universal_abilities.any?
-      universal_abilities.destroy_all
     end
   end
 end

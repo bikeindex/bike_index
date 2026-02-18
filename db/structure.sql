@@ -4056,7 +4056,6 @@ CREATE TABLE public.users (
     email character varying(255),
     password text,
     last_login_at timestamp without time zone,
-    superuser boolean DEFAULT false NOT NULL,
     token_for_password_reset text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -7447,6 +7446,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260217170639'),
 ('20260214163159'),
 ('20260209164044'),
 ('20260209164043'),

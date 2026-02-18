@@ -64,7 +64,7 @@ RSpec.describe Organized::BaseController, type: :request do
         get "/o/#{current_organization.to_param}/dashboard"
         expect(response).to redirect_to(organization_bikes_path)
         # ... but it renders if the current_user is superuser
-        current_user.update(superuser: true)
+        FactoryBot.create(:superuser_ability, user: current_user)
         get "/o/#{current_organization.to_param}/dashboard"
         expect(response).to render_template(:child_and_regional)
       end
