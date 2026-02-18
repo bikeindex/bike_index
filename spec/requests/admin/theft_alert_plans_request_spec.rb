@@ -50,7 +50,7 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         theft_alert_plan = TheftAlertPlan.first
         expect(response).to redirect_to(edit_admin_theft_alert_plan_path(theft_alert_plan))
         expect(flash[:errors]).to be_blank
-        expect(theft_alert_plan).to have_attributes valid_params
+        expect(theft_alert_plan).to match_hash_indifferently valid_params
       end
 
       it "re-renders the edit template with a flash on update failure" do
@@ -78,7 +78,7 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         expect(response).to redirect_to(admin_theft_alert_plans_path)
         expect(flash[:errors]).to be_blank
         theft_alert_plan.reload
-        expect(theft_alert_plan).to have_attributes valid_params
+        expect(theft_alert_plan).to match_hash_indifferently valid_params
       end
 
       it "re-renders the edit template with a flash on update failure" do

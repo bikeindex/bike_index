@@ -123,9 +123,9 @@ RSpec.describe SalesController, type: :request do
           .and change(BikeVersion, :count).by(1)
 
         sale = Sale.order(:id).last
-        expect(sale).to have_attributes target_attrs
+        expect(sale).to match_hash_indifferently target_attrs
         expect(sale.sold_at).to be_within(2).of Time.current
-        expect(sale.new_ownership).to have_attributes new_ownership_attrs
+        expect(sale.new_ownership).to match_hash_indifferently new_ownership_attrs
         expect(sale.buyer&.id).to eq marketplace_message.sender_id
 
         bike_version = item.bike_versions.last
@@ -200,7 +200,7 @@ RSpec.describe SalesController, type: :request do
             .and change(BikeVersion, :count).by(0)
 
           sale = Sale.order(:id).last
-          expect(sale).to have_attributes target_attrs
+          expect(sale).to match_hash_indifferently target_attrs
           expect(sale.sold_at).to be_within(2).of Time.current
           expect(sale.new_ownership).to be_blank
           expect(sale.buyer).to be_blank

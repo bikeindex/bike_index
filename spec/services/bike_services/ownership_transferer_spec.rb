@@ -37,7 +37,7 @@ RSpec.describe BikeServices::OwnershipTransferer do
         expect(initial_ownership.reload.current?).to be_falsey
 
         expect(bike.reload.current_ownership_id).to_not eq initial_ownership.id
-        expect(bike.current_ownership).to have_attributes target_attributes
+        expect(bike.current_ownership).to match_hash_indifferently target_attributes
       end
 
       context "bike has attributes that should be changed" do
@@ -55,7 +55,7 @@ RSpec.describe BikeServices::OwnershipTransferer do
           expect(bike.reload.current_ownership_id).to_not eq initial_ownership.id
           # TODO: is_phone is set by the attribute on bike, which is updated after the ownership is created
           # it doesn't actually matter, since phone regs aren't used, but it's still incorrect :/
-          expect(bike.current_ownership).to have_attributes target_attributes.except(:is_phone)
+          expect(bike.current_ownership).to match_hash_indifferently target_attributes.except(:is_phone)
 
           expect(bike.address_set_manually).to be_falsey
           expect(bike.address_record).to be_blank

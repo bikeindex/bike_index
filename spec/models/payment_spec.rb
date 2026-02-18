@@ -199,7 +199,7 @@ RSpec.describe Payment, type: :model do
       VCR.use_cassette("Payment-update_from_stripe_checkout_session", match_requests_on: [:method]) do
         payment.update_from_stripe!
       end
-      expect(payment.reload).to have_attributes target_attrs
+      expect(payment.reload).to match_hash_indifferently target_attrs
       expect(payment.paid_at).to be_present
       expect(payment.user_id).to be_blank
     end

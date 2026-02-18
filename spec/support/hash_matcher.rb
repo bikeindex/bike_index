@@ -179,18 +179,3 @@ RSpec::Matchers.define :match_hash_indifferently do |expected|
 
   diffable
 end
-
-RSpec::Matchers.define :have_attributes do |expected|
-  match do |actual|
-    match_errors = RspecHashMatcher.recursive_match_hashes_errors(expected, actual)
-    match_errors == []
-  end
-
-  failure_message do |actual|
-    @actual = RspecHashMatcher.indifferent_hash(actual, expected).deep_symbolize_keys
-    match_errors = RspecHashMatcher.recursive_match_hashes_errors(expected, actual)
-    RspecHashMatcher.match_errors_message(match_errors)
-  end
-
-  diffable
-end

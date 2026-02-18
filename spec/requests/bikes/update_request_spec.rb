@@ -95,7 +95,7 @@ RSpec.describe "BikesController#update", type: :request do
         end
         expect(AddressRecord.pluck(:kind).sort).to eq(%w[bike user])
         bike.reload
-        expect(bike.address_record).to have_attributes(target_address_record_attributes)
+        expect(bike.address_record).to match_hash_indifferently(target_address_record_attributes)
         expect(bike.address_set_manually).to be_truthy
         expect(bike.registration_address).to match_hash_indifferently(target_address_record_attributes.slice(:latitude, :longitude))
         # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing

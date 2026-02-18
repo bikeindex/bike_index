@@ -41,7 +41,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
           membership: {level: "plus", user_email: " #{user.email.upcase} "}
         }
       end.to change(Membership, :count).by 1
-      expect(Membership.last).to have_attributes(target_attrs)
+      expect(Membership.last).to match_hash_indifferently(target_attrs)
     end
     context "no matching user" do
       it "doesn't create" do
@@ -62,7 +62,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
           }
         end.to change(Membership, :count).by 1
         membership = Membership.last
-        expect(membership).to have_attributes(target_attrs.except(:start_at).merge(status: "active"))
+        expect(membership).to match_hash_indifferently(target_attrs.except(:start_at).merge(status: "active"))
         expect(membership.start_at).to be_within(5).of Time.current
       end
     end
@@ -115,7 +115,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
           expect(membership.start_at).to be_within(1).of start_at
 
           expect(stripe_subscription.reload.active?).to be_truthy
-          expect(stripe_subscription).to have_attributes target_stripe_subscription_attrs
+          expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription_attrs
           expect(stripe_subscription.payments.count).to eq 0
         end
       end

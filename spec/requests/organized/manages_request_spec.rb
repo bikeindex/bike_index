@@ -127,7 +127,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can (not that much)
-          expect(current_organization).to have_attributes update.slice(:name, :direct_unclaimed_notifications)
+          expect(current_organization).to match_hash_indifferently update.slice(:name, :direct_unclaimed_notifications)
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")

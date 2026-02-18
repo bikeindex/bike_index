@@ -41,7 +41,7 @@ RSpec.describe Email::NewsletterJob, type: :job do
       expect(mail.body.encoded).to match mail_snippet.body
 
       notification = Notification.last
-      expect(notification).to have_attributes(target_notification_attrs)
+      expect(notification).to match_hash_indifferently(target_notification_attrs)
     end
 
     context "with user without notification_newsletters" do
