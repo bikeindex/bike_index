@@ -22,25 +22,49 @@ RSpec.describe StravaJobs::ProxyRequest do
           }.to change(StravaRequest, :count).by(1)
             .and change(StravaActivity, :count).by(1)
 
-          activity = strava_integration.strava_activities.find_by(strava_id: "123")
-          expect(activity.title).to eq "Morning Ride"
-          expect(activity.sport_type).to eq "Ride"
+          strava_activity = strava_integration.strava_activities.find_by(strava_id: "123")
+          expect(strava_activity.title).to eq "Morning Ride"
+          expect(strava_activity.sport_type).to eq "Ride"
         end
       end
     end
 
     context "activity detail" do
-      it "creates or updates the activity" do
-        VCR.use_cassette("strava-proxy_activity_detail") do
+      it "creates or updates the activity with detail attributes" do
+        VCR.use_cassette("strava-get_activity") do
           expect {
-            result = described_class.create_and_execute(strava_integration:, user:, url: "activities/456", method: "GET")
+            result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
             expect(result[:strava_request].success?).to be_truthy
             expect(result[:response].status).to eq 200
           }.to change(StravaRequest, :count).by(1)
             .and change(StravaActivity, :count).by(1)
 
-          activity = strava_integration.strava_activities.find_by(strava_id: "456")
-          expect(activity.title).to eq "Evening Ride"
+          strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
+          expect(strava_activity.enriched?).to be_truthy
+          expect(strava_activity).to match_hash_indifferently(
+            title: "Thanks for coming across the bay!",
+            activity_type: "EBikeRide",
+            sport_type: "EBikeRide",
+            description: "Hawk with Eric and Scott and cedar",
+            average_speed: 4.746,
+            suffer_score: 27.0,
+            kudos_count: 17,
+            photos: {
+              photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+              photo_count: 2
+            },
+            strava_data: {
+              average_heartrate: 115.0, max_heartrate: 167.0,
+              device_name: "Strava App", commute: false,
+              average_speed: 4.746, pr_count: 0,
+              average_watts: 129.0, device_watts: false
+            },
+            segment_locations: {
+              cities: ["San Francisco", "Mill Valley"],
+              states: ["California"],
+              countries: ["United States", "USA"]
+            }
+          )
         end
       end
     end

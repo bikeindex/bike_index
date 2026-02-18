@@ -89,16 +89,45 @@ RSpec.describe "Strava Proxy API", type: :request do
       end
 
       context "activity detail response" do
-        it "stores activity data" do
-          VCR.use_cassette("strava-proxy_activity_detail") do
+        it "stores activity data and returns strava response" do
+          VCR.use_cassette("strava-get_activity") do
             expect {
-              post base_url, params: {url: "activities/456", method: "GET", access_token: token.token}
+              post base_url, params: {url: "activities/17323701543", method: "GET", access_token: token.token}
             }.to change(StravaActivity, :count).by(1)
               .and change(StravaRequest, :count).by(1)
             expect(response.status).to eq 200
-            activity = StravaActivity.last
-            expect(activity.strava_id).to eq "456"
-            expect(activity.title).to eq "Evening Ride"
+            expect(json_result["id"]).to eq 17323701543
+            expect(json_result["name"]).to eq "Thanks for coming across the bay!"
+            expect(json_result["sport_type"]).to eq "EBikeRide"
+            expect(json_result["description"]).to eq "Hawk with Eric and Scott and cedar"
+
+            strava_activity = StravaActivity.last
+            expect(strava_activity.enriched?).to be_truthy
+            expect(strava_activity).to match_hash_indifferently(
+              strava_id: "17323701543",
+              title: "Thanks for coming across the bay!",
+              activity_type: "EBikeRide",
+              sport_type: "EBikeRide",
+              description: "Hawk with Eric and Scott and cedar",
+              average_speed: 4.746,
+              suffer_score: 27.0,
+              kudos_count: 17,
+              photos: {
+                photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+                photo_count: 2
+              },
+              strava_data: {
+                average_heartrate: 115.0, max_heartrate: 167.0,
+                device_name: "Strava App", commute: false,
+                average_speed: 4.746, pr_count: 0,
+                average_watts: 129.0, device_watts: false
+              },
+              segment_locations: {
+                cities: ["San Francisco", "Mill Valley"],
+                states: ["California"],
+                countries: ["United States", "USA"]
+              }
+            )
           end
         end
       end
