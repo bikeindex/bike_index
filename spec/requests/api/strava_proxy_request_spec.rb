@@ -89,17 +89,13 @@ RSpec.describe "Strava Proxy API", type: :request do
       end
 
       context "activity detail response" do
-        let(:target_keys) do
-          []
-        end
         it "stores activity data" do
           VCR.use_cassette("strava-proxy_activity_detail") do
             expect {
               post base_url, params: {url: "activities/456", method: "GET", access_token: token.token}
-              expect(json_result.keys.sort).to eq target_keys
-              expect(json_result["ssss"]).to eq "{C{CC"
             }.to change(StravaActivity, :count).by(1)
               .and change(StravaRequest, :count).by(1)
+            expect(response.status).to eq 200
             activity = StravaActivity.last
             expect(activity.strava_id).to eq "456"
             expect(activity.title).to eq "Evening Ride"
@@ -132,7 +128,3 @@ RSpec.describe "Strava Proxy API", type: :request do
     end
   end
 end
-
-
-
-

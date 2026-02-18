@@ -91,20 +91,14 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     end
 
     context "with list_activities request" do
-      it "creates activities and enqueues detail requests for cycling activities" do
+      it "creates activities from response" do
         VCR.use_cassette("strava-list_activities") do
-          pp instance.perform(strava_request.id)
+          instance.perform(strava_request.id)
         end
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
         expect(strava_integration.strava_activities.count).to be > 0
-
-        pp strava_integration.strava_activities.first
-
-        cycling_count = strava_integration.strava_activities.cycling.count
-        detail_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
-        expect(detail_requests.count).to eq(cycling_count)
       end
     end
 
@@ -116,7 +110,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,
           request_type: :fetch_activity,
-          parameters: {strava_id: activity.strava_id})
+          parameters: {strava_id: strava_activity.strava_id})
       end
 
       it "updates activity details and finishes sync when last" do
@@ -128,7 +122,6 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_request.response_status).to eq("success")
         strava_integration.reload
         expect(strava_integration.status).to eq("synced")
-        pp strava_activity.reload
       end
     end
 

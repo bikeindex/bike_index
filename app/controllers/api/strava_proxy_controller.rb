@@ -22,8 +22,9 @@ module API
       strava_integration = user.strava_integration
       return render json: {error: "No Strava integration"}, status: 404 unless strava_integration
 
-      StravaJobs::ProxyRequest.create_and_execute(strava_integration:, user:,
+      result = StravaJobs::ProxyRequest.create_and_execute(strava_integration:, user:,
         url: permitted_params[:url], method: permitted_params[:method])
+      render_proxy_response(result[:response], result[:strava_request])
     end
 
     private
