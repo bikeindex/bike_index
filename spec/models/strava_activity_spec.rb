@@ -120,7 +120,7 @@ RSpec.describe StravaActivity, type: :model do
         kudos_count: 10,
         average_speed: 6.944,
         suffer_score: 42.0,
-        timezone: "(GMT-07:00) America/Denver",
+        timezone: "America/Denver",
         gear_id: "b1234",
         private: false,
         strava_data: {
