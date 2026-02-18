@@ -101,10 +101,26 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_integration.strava_activities.count).to be > 0
 
         activity = strava_integration.strava_activities.first
-        expect(activity.average_speed).to be_present
-        expect(activity.suffer_score).to be_present
-        expect(activity.strava_data).to be_present
-        expect(activity.strava_data["average_heartrate"]).to be_present
+        expect(activity).to match_hash_indifferently(
+          strava_id: "17323701543",
+          title: "Thanks for coming across the bay!",
+          activity_type: "EBikeRide",
+          sport_type: "EBikeRide",
+          distance_meters: 44936.4,
+          moving_time_seconds: 9468,
+          total_elevation_gain_meters: 669.0,
+          average_speed: 4.746,
+          suffer_score: 27.0,
+          kudos_count: 17,
+          gear_id: "b14918050",
+          private: false,
+          strava_data: {
+            average_heartrate: 115.0, max_heartrate: 167.0,
+            device_name: "Strava App", commute: false,
+            average_speed: 4.746, pr_count: 0,
+            average_watts: 129.0, device_watts: false
+          }
+        )
 
         cycling_count = strava_integration.strava_activities.cycling.count
         detail_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
@@ -134,13 +150,22 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_integration.status).to eq("synced")
 
         activity.reload
-        expect(activity.average_speed).to be_present
-        expect(activity.suffer_score).to be_present
-        expect(activity.photos).to be_a(Hash)
-        expect(activity.photos["photo_count"]).to be >= 0
-        expect(activity.strava_data).to be_present
-        expect(activity.strava_data["average_heartrate"]).to be_present
-        expect(activity.strava_data["device_name"]).to be_present
+        expect(activity).to match_hash_indifferently(
+          description: "Hawk with Eric and Scott and cedar",
+          average_speed: 4.746,
+          suffer_score: 27.0,
+          kudos_count: 17,
+          photos: {
+            photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+            photo_count: 2
+          },
+          strava_data: {
+            average_heartrate: 115.0, max_heartrate: 167.0,
+            device_name: "Strava App", commute: false,
+            average_speed: 4.746, pr_count: 0,
+            average_watts: 129.0, device_watts: false
+          }
+        )
       end
     end
 

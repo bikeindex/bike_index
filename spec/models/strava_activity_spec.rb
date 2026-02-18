@@ -108,22 +108,26 @@ RSpec.describe StravaActivity, type: :model do
     it "creates a new activity from summary" do
       activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)
       expect(activity).to be_persisted
-      expect(activity.strava_id).to eq("9876543")
-      expect(activity.title).to eq("Morning Ride")
-      expect(activity.distance_meters).to eq(25000.0)
-      expect(activity.moving_time_seconds).to eq(3600)
-      expect(activity.total_elevation_gain_meters).to eq(200.0)
-      expect(activity.sport_type).to eq("Ride")
-      expect(activity.activity_type).to eq("Ride")
-      expect(activity.kudos_count).to eq(10)
-      expect(activity.average_speed).to eq(6.944)
-      expect(activity.suffer_score).to eq(42.0)
-      expect(activity.strava_data).to eq(
-        "average_heartrate" => 145.0, "max_heartrate" => 180.0,
-        "device_name" => "Garmin Edge 530", "commute" => false,
-        "average_speed" => 6.944,
-        "pr_count" => 3, "average_watts" => 200.0,
-        "device_watts" => true
+      expect(activity).to match_hash_indifferently(
+        strava_id: "9876543",
+        title: "Morning Ride",
+        distance_meters: 25000.0,
+        moving_time_seconds: 3600,
+        total_elevation_gain_meters: 200.0,
+        sport_type: "Ride",
+        activity_type: "Ride",
+        kudos_count: 10,
+        average_speed: 6.944,
+        suffer_score: 42.0,
+        start_date: "2025-06-15T08:00:00Z",
+        gear_id: "b1234",
+        private: false,
+        strava_data: {
+          average_heartrate: 145.0, max_heartrate: 180.0,
+          device_name: "Garmin Edge 530", commute: false,
+          average_speed: 6.944, pr_count: 3,
+          average_watts: 200.0, device_watts: true
+        }
       )
     end
 
@@ -156,22 +160,24 @@ RSpec.describe StravaActivity, type: :model do
     it "updates the activity with detail fields" do
       activity.update_from_detail(detail)
       activity.reload
-      expect(activity.description).to eq("Great ride")
-      expect(activity.kudos_count).to eq(10)
-      expect(activity.average_speed).to eq(5.5)
-      expect(activity.suffer_score).to eq(30.0)
-      expect(activity.photos).to eq("photo_url" => "https://example.com/photo.jpg", "photo_count" => 3)
-      expect(activity.strava_data).to eq(
-        "average_heartrate" => 140.0, "max_heartrate" => 175.0,
-        "device_name" => "Garmin Edge 530", "commute" => true,
-        "muted" => false, "average_speed" => 5.5,
-        "pr_count" => 2, "average_watts" => 180.0,
-        "device_watts" => true
-      )
-      expect(activity.segment_locations).to eq(
-        "cities" => ["San Francisco", "Mill Valley"],
-        "states" => ["California"],
-        "countries" => ["United States"]
+      expect(activity).to match_hash_indifferently(
+        description: "Great ride",
+        kudos_count: 10,
+        average_speed: 5.5,
+        suffer_score: 30.0,
+        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
+        strava_data: {
+          average_heartrate: 140.0, max_heartrate: 175.0,
+          device_name: "Garmin Edge 530", commute: true,
+          muted: false, average_speed: 5.5,
+          pr_count: 2, average_watts: 180.0,
+          device_watts: true
+        },
+        segment_locations: {
+          cities: ["San Francisco", "Mill Valley"],
+          states: ["California"],
+          countries: ["United States"]
+        }
       )
     end
 
@@ -186,7 +192,7 @@ RSpec.describe StravaActivity, type: :model do
       detail["photos"] = {"primary" => nil, "count" => 0}
       activity.update_from_detail(detail)
       activity.reload
-      expect(activity.photos).to eq("photo_url" => nil, "photo_count" => 0)
+      expect(activity).to match_hash_indifferently(photos: {photo_url: nil, photo_count: 0})
     end
   end
 end
