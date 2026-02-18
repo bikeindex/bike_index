@@ -111,8 +111,8 @@ end
     message: "Repeat notification - impounding bike from #{loc[:street]}",
     delivery_status: "email_success"
   )
-  ProcessParkingNotificationJob.new.perform(pn.id)
   pn.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
+  ProcessParkingNotificationJob.new.perform(pn.id)
   pn.reload
   pn.impound_record&.address_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
   puts "  Created impound notification ##{i + 1} with ImpoundRecord ##{pn.impound_record_id}"
