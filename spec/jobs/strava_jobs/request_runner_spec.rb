@@ -100,6 +100,12 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_request.response_status).to eq("success")
         expect(strava_integration.strava_activities.count).to be > 0
 
+        activity = strava_integration.strava_activities.first
+        expect(activity.average_speed).to be_present
+        expect(activity.suffer_score).to be_present
+        expect(activity.strava_data).to be_present
+        expect(activity.strava_data["average_heartrate"]).to be_present
+
         cycling_count = strava_integration.strava_activities.cycling.count
         detail_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
         expect(detail_requests.count).to eq(cycling_count)
@@ -126,6 +132,15 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_request.response_status).to eq("success")
         strava_integration.reload
         expect(strava_integration.status).to eq("synced")
+
+        activity.reload
+        expect(activity.average_speed).to be_present
+        expect(activity.suffer_score).to be_present
+        expect(activity.photos).to be_a(Hash)
+        expect(activity.photos["photo_count"]).to be >= 0
+        expect(activity.strava_data).to be_present
+        expect(activity.strava_data["average_heartrate"]).to be_present
+        expect(activity.strava_data["device_name"]).to be_present
       end
     end
 

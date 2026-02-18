@@ -6,7 +6,6 @@ FactoryBot.define do
     sequence(:strava_id) { |n| "activity_#{n}" }
     title { "Morning Ride" }
     distance_meters { 25000.0 }
-    year { 2025 }
     activity_type { "Ride" }
     start_date { Time.current - 1.day }
 
@@ -22,7 +21,7 @@ FactoryBot.define do
       with_location
       with_gear
       description { "Great ride through the park" }
-      photos { [{"id" => "photo_123", "urls" => {"600" => "https://example.com/photo.jpg"}}] }
+      photos { {"photo_url" => "https://example.com/photo.jpg", "photo_count" => 1} }
     end
 
     trait :run do

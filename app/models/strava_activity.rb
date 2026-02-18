@@ -6,21 +6,22 @@
 # Database name: primary
 #
 #  id                          :bigint           not null, primary key
-#  activity_timezone           :string
 #  activity_type               :string
+#  average_speed               :float
 #  description                 :text
 #  distance_meters             :float
 #  kudos_count                 :integer
 #  moving_time_seconds         :integer
-#  muted                       :boolean          default(FALSE)
 #  photos                      :jsonb
 #  private                     :boolean          default(FALSE)
 #  segment_locations           :jsonb
 #  sport_type                  :string
 #  start_date                  :datetime
+#  strava_data                 :jsonb
+#  suffer_score                :float
+#  timezone                    :string
 #  title                       :string
 #  total_elevation_gain_meters :float
-#  year                        :integer
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  gear_id                     :string
@@ -68,13 +69,8 @@ class StravaActivity < ApplicationRecord
     end
 
     def detail_attributes(detail)
-      photos_data = detail.dig("photos", "primary")
-      photos = if photos_data
-        urls = photos_data["urls"] || {}
-        [{id: photos_data["unique_id"], urls:}]
-      else
-        []
-      end
+      photo_url = detail.dig("photos", "primary", "urls", "600")
+      photos = {photo_url:, photo_count: detail.dig("photos", "count") || 0}
 
       segments = detail["segment_efforts"]
       segment_locations = if segments.present?
@@ -89,14 +85,21 @@ class StravaActivity < ApplicationRecord
 
       {
         description: detail["description"],
+        average_speed: detail["average_speed"],
+        suffer_score: detail["suffer_score"],
         photos:,
         segment_locations:,
-        muted: detail["muted"],
-        kudos_count: detail["kudos_count"]
+        kudos_count: detail["kudos_count"],
+        strava_data: strava_data_from(detail)
       }
     end
 
     private
+
+    def strava_data_from(data)
+      data.slice("average_heartrate", "max_heartrate", "device_name", "commute",
+        "muted", "average_speed", "pr_count", "average_watts", "device_watts")
+    end
 
     def summary_attributes(summary)
       start_date = Binxtils::TimeParser.parse(summary["start_date"])
@@ -108,11 +111,13 @@ class StravaActivity < ApplicationRecord
         sport_type: summary["sport_type"],
         private: summary["private"],
         kudos_count: summary["kudos_count"],
-        year: start_date&.year,
+        average_speed: summary["average_speed"],
+        suffer_score: summary["suffer_score"],
         gear_id: summary["gear_id"],
         activity_type: summary["sport_type"] || summary["type"],
-        activity_timezone: summary["timezone"],
-        start_date:
+        timezone: summary["timezone"],
+        start_date:,
+        strava_data: strava_data_from(summary)
       }
     end
   end
@@ -141,6 +146,8 @@ class StravaActivity < ApplicationRecord
   end
 
   def update_from_detail(detail)
-    update(self.class.detail_attributes(detail))
+    attrs = self.class.detail_attributes(detail)
+    attrs[:strava_data] = (strava_data || {}).merge(attrs[:strava_data])
+    update(attrs)
   end
 end
