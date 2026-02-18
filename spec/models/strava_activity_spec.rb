@@ -98,6 +98,7 @@ RSpec.describe StravaActivity, type: :model do
        "moving_time" => 3600, "total_elevation_gain" => 200.0,
        "sport_type" => "Ride", "type" => "Ride",
        "start_date" => "2025-06-15T08:00:00Z",
+       "timezone" => "(GMT-07:00) America/Denver",
        "gear_id" => "b1234", "private" => false, "kudos_count" => 10,
        "average_speed" => 6.944, "suffer_score" => 42.0,
        "average_heartrate" => 145.0, "max_heartrate" => 180.0,
@@ -108,7 +109,7 @@ RSpec.describe StravaActivity, type: :model do
     it "creates a new activity from summary" do
       activity = StravaActivity.create_or_update_from_summary(strava_integration, summary)
       expect(activity).to be_persisted
-      expect(activity).to match_hash_indifferently(
+      expect(activity).to match_hash_indifferently({
         strava_id: "9876543",
         title: "Morning Ride",
         distance_meters: 25000.0,
@@ -120,6 +121,7 @@ RSpec.describe StravaActivity, type: :model do
         average_speed: 6.944,
         suffer_score: 42.0,
         start_date: "2025-06-15T08:00:00Z",
+        timezone: "(GMT-07:00) America/Denver",
         gear_id: "b1234",
         private: false,
         strava_data: {
@@ -128,7 +130,7 @@ RSpec.describe StravaActivity, type: :model do
           average_speed: 6.944, pr_count: 3,
           average_watts: 200.0, device_watts: true
         }
-      )
+      }, match_timezone_key: true)
     end
 
     it "updates an existing activity" do

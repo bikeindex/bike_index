@@ -101,7 +101,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         expect(strava_integration.strava_activities.count).to be > 0
 
         activity = strava_integration.strava_activities.first
-        expect(activity).to match_hash_indifferently(
+        expect(activity).to match_hash_indifferently({
           strava_id: "17323701543",
           title: "Thanks for coming across the bay!",
           activity_type: "EBikeRide",
@@ -114,13 +114,15 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
           kudos_count: 17,
           gear_id: "b14918050",
           private: false,
+          timezone: "(GMT-08:00) America/Los_Angeles",
+          start_date: "2026-02-07T23:39:36Z",
           strava_data: {
             average_heartrate: 115.0, max_heartrate: 167.0,
             device_name: "Strava App", commute: false,
             average_speed: 4.746, pr_count: 0,
             average_watts: 129.0, device_watts: false
           }
-        )
+        }, match_timezone_key: true)
 
         cycling_count = strava_integration.strava_activities.cycling.count
         detail_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
@@ -164,6 +166,11 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
             device_name: "Strava App", commute: false,
             average_speed: 4.746, pr_count: 0,
             average_watts: 129.0, device_watts: false
+          },
+          segment_locations: {
+            cities: ["San Francisco", "Mill Valley"],
+            states: ["California"],
+            countries: ["United States", "USA"]
           }
         )
       end
