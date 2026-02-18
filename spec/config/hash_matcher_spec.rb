@@ -4,17 +4,17 @@ require "rails_helper"
 
 # Tests to define what this custom matcher should do
 # file is config/lib because if it was in support it would be required by rails_helper.rb
-RSpec.describe "custom have_attributes and RspecHashMatcher" do
+RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
   let(:options) { RspecHashMatcher::DEFAULT_OPTS }
   context "with two hashes" do
-    describe "have_attributes" do
+    describe "match_hash_indifferently" do
       let(:time) { Time.current }
       let(:hash_1) { {:something => 12, "else" => "party", :time => time} }
       let(:hash_2) { {"something" => 12.0, :else => :party, :time => time + 0.1} }
 
       it "matches indifferently" do
         expect(RspecHashMatcher.recursive_match_hashes_errors(hash_1, hash_2)).to eq([])
-        expect(hash_1).to have_attributes hash_2
+        expect(hash_1).to match_hash_indifferently hash_2
       end
 
       context "with hash_2 missing key" do
@@ -28,7 +28,7 @@ RSpec.describe "custom have_attributes and RspecHashMatcher" do
 
         it "doesn't match" do
           expect(RspecHashMatcher.recursive_match_hashes_errors(hash_1, hash_2)).to eq(target_error)
-          expect(hash_1).not_to have_attributes hash_2
+          expect(hash_1).not_to match_hash_indifferently hash_2
         end
       end
 
@@ -36,7 +36,7 @@ RSpec.describe "custom have_attributes and RspecHashMatcher" do
         let(:hash_1) { hash_2.except(:else) }
 
         it "doesn't match" do
-          expect(hash_1).not_to have_attributes hash_2
+          expect(hash_1).not_to match_hash_indifferently hash_2
         end
       end
 
@@ -45,14 +45,14 @@ RSpec.describe "custom have_attributes and RspecHashMatcher" do
         let(:hash_2) { {"something" => {bar: :foo, foo: :bar}}.as_json }
 
         it "matches" do
-          expect(hash_1).to have_attributes hash_2
+          expect(hash_1).to match_hash_indifferently hash_2
         end
 
         context "with a non match" do
           let(:hash_2) { {"something" => {bar: :foo, foo: :bar, barfoo: :foobar}} }
 
           it "doesn't match" do
-            expect(hash_1).not_to have_attributes hash_2
+            expect(hash_1).not_to match_hash_indifferently hash_2
           end
         end
       end
@@ -62,7 +62,7 @@ RSpec.describe "custom have_attributes and RspecHashMatcher" do
         let(:hash_2) { {bool: true, bool_false: ""} }
 
         it "matches" do
-          expect(hash_1).to have_attributes hash_2
+          expect(hash_1).to match_hash_indifferently hash_2
         end
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe "custom have_attributes and RspecHashMatcher" do
       let(:hash_1) { {updated_at: time.in_time_zone("Amsterdam")} }
       let(:hash_2) { {updated_at: time.utc.to_s, timezone: "UTC"} }
       it "matches" do
-        expect(hash_1).to have_attributes(hash_2)
+        expect(hash_1).to match_hash_indifferently(hash_2)
       end
 
       context "active record obj has timestamp stored" do
@@ -80,7 +80,7 @@ RSpec.describe "custom have_attributes and RspecHashMatcher" do
         let(:obj) { User.new(email: "something@stuff.com", updated_at: time) }
         let(:hash) { {:email => "something@stuff.com", :updated_at => time.to_i, "timezone" => "UTC"} }
         it "matches" do
-          expect(obj).to have_attributes hash
+          expect(obj).to match_hash_indifferently hash
         end
       end
     end
@@ -96,14 +96,14 @@ RSpec.describe "custom have_attributes and RspecHashMatcher" do
     it "matches" do
       expect(RspecHashMatcher.send(:times_match?, invoice.subscription_start_at,
         hash_1[:subscription_start_at])).to be_truthy
-      expect(invoice).to have_attributes(hash_1)
+      expect(invoice).to match_hash_indifferently(hash_1)
     end
 
     context "with non-matching" do
       let(:hash_2) { hash_1.merge(subscription_start_at: time + 3) }
 
       it "does not matches" do
-        expect(invoice).not_to have_attributes(hash_2)
+        expect(invoice).not_to match_hash_indifferently(hash_2)
       end
     end
   end

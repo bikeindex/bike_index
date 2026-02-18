@@ -160,7 +160,7 @@ class RspecHashMatcher
 end
 
 # TODO: figure out how to pass options
-RSpec::Matchers.define :have_attributes do |expected|
+RSpec::Matchers.define :match_hash_indifferently do |expected|
   match do |actual|
     match_errors = RspecHashMatcher.recursive_match_hashes_errors(expected, actual)
 
