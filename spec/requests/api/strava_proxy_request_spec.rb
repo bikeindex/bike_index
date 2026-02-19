@@ -176,74 +176,80 @@ RSpec.describe "Strava Proxy API", type: :request do
         let(:gear_id) { "b11099574" }
         let!(:strava_activity) { FactoryBot.create(:strava_activity, strava_integration:, strava_id:) }
         let(:token_expires_at) { Time.current - 1.hour }
-        # it "returns strava error response" do
-        #   expect(strava_integration.reload.token_expired?).to be_truthy
-        #   og_token = strava_integration.access_token
 
-        #   VCR.use_cassette("strava-proxy_update_activity-insufficient") do
-        #     expect {
-        #       post base_url, params: {url: "activities/#{strava_id}?gear_id=#{gear_id}", method: "PUT", access_token: token.token}
-        #     }.to change(StravaRequest, :count).by(1)
-        #   end
+        it "returns strava error response" do
+          expect(strava_integration.reload.token_expired?).to be_truthy
+          og_token = strava_integration.access_token
 
-        #   expect(response.status).to eq 401
-        #   expect(json_result["message"]).to eq "Authorization Error"
-        #   expect(json_result["errors"]).to be_present
-        #   expect(strava_integration.reload.token_expired?).to be_falsey
-        #   expect(strava_integration.access_token).to_not eq og_token
-        # end
+          VCR.use_cassette("strava-proxy_update_activity-insufficient") do
+            expect {
+              post base_url, params: {
+                url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
+              }
+            }.to change(StravaRequest, :count).by(1)
+          end
 
-        # context "with valid token permissions" do
-        #   let(:token_expires_at) { Time.current + 1.hour }
-        #   let(:target_attributes) do
-        #     {
-        #       strava_id:,
-        #       title: "Thanks for coming across the bay!",
-        #       activity_type: "EBikeRide",
-        #       sport_type: "EBikeRide",
-        #       distance_meters: 44936.4,
-        #       moving_time_seconds: 9468,
-        #       total_elevation_gain_meters: 669.0,
-        #       average_speed: 4.746,
-        #       suffer_score: 27.0,
-        #       kudos_count: 17,
-        #       gear_id:,
-        #       private: false,
-        #       timezone: "America/Los_Angeles",
-        #       strava_data: {
-        #         average_heartrate: 115.0, max_heartrate: 167.0,
-        #         device_name: "Strava App", commute: false,
-        #         average_speed: 4.746, pr_count: 0,
-        #         average_watts: 129.0, device_watts: false, enriched: true
-        #       }
-        #       description: "Hawk with Eric and Scott and cedar",
-        #       photos: {
-        #         photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
-        #         photo_count: 2
-        #       },
-        #       segment_locations: {
-        #         cities: ["San Francisco", "Mill Valley"],
-        #         states: ["California"],
-        #         countries: ["United States", "USA"]
-        #       },
-        #     }.as_json
-        #   end
-        #   it "updates the activity" do
-        #     expect(strava_integration.reload.token_expired?).to be_falsey
-        #     og_token = strava_integration.access_token
+          expect(response.status).to eq 404
+          expect(json_result["message"]).to eq "Resource Not Found"
+          expect(json_result["errors"]).to be_present
+          expect(strava_integration.reload.token_expired?).to be_falsey
+          expect(strava_integration.access_token).to_not eq og_token
+        end
 
-        #     VCR.use_cassette("strava-proxy_update_activity") do
-        #       expect {
-        #         post base_url, params: {url: "activities/#{strava_id}?gear_id=#{gear_id}", method: "PUT", access_token: token.token}
-        #       }.to change(StravaRequest, :count).by(1)
-        #     end
+        context "with valid token permissions" do
+          let(:token_expires_at) { Time.current + 1.hour }
+          let(:target_attributes) do
+            {
+               strava_id:,
+               title: "Extra 10: HIIT Ride with Cody Rigsby",
+               description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
+               distance_meters: 5079.8,
+               moving_time_seconds: 600,
+               total_elevation_gain_meters: 0.0,
+               sport_type: "Ride",
+               private: false,
+               kudos_count: 2,
+               gear_id:,
+               photos: {photo_url: nil, photo_count: 0},
+               segment_locations: {},
+               activity_type: "Ride",
+               timezone: "America/Chicago",
+               average_speed: 8.466,
+               suffer_score: 2.0,
+               strava_data: {
+                commute: false,
+                 enriched: true,
+                 pr_count: 0,
+                 device_name: "Peloton Bike",
+                 device_watts: true,
+                 average_speed: 8.466,
+                 average_watts: 156.0,
+                 max_heartrate: 149.0,
+                 average_heartrate: 136.2
+               }
+            }.as_json
+          end
+          it "updates the activity" do
+            expect(strava_integration.reload.token_expired?).to be_falsey
+            og_token = strava_integration.access_token
 
-        #     expect(response.status).to eq 401
-        #     expect(json_result["message"]).to eq "Authorization Error"
-        #     expect(json_result["errors"]).to be_present
-        #     expect(strava_integration.access_token).to eq og_token
-        #   end
-        # end
+            VCR.use_cassette("strava-proxy_update_activity") do
+              expect {
+                post base_url, params: {
+                  url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
+                }
+              }.to change(StravaRequest, :count).by(1)
+            end
+
+            expect(response.status).to eq 200
+            expect(strava_integration.access_token).to eq og_token
+            strava_activity.reload
+
+            expect(strava_activity.reload).to have_attributes target_attributes
+            expect(strava_activity.start_date).to be_within(1).of Time.at(1771267927)
+            expect(json_result).to eq strava_activity.proxy_serialized.as_json
+          end
+        end
       end
 
       context "invalid proxy path" do

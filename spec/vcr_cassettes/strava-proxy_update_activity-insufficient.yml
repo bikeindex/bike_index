@@ -27,9 +27,9 @@ http_interactions:
       Connection:
       - keep-alive
       Date:
-      - Thu, 19 Feb 2026 22:13:58 GMT
+      - Thu, 19 Feb 2026 23:25:02 GMT
       X-Envoy-Upstream-Service-Time:
-      - '16'
+      - '19'
       Server:
       - istio-envoy
       Status:
@@ -45,11 +45,11 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Request-Id:
-      - 032b69a9-c06b-469a-a59c-27dc238cc2cf
+      - d11a5b68-4e8c-4354-b902-9a4a3d5ac85d
       X-Download-Options:
       - noopen
       Etag:
-      - W/"0cdc9cfed0c7f135e6f6245774d3b7d1"
+      - W/"21bc0adffe4e5af76f7e21dfcc607444"
       X-Frame-Options:
       - DENY
       X-Content-Type-Options:
@@ -57,26 +57,26 @@ http_interactions:
       X-Cache:
       - Miss from cloudfront
       Via:
-      - 1.1 cf4c9e8bf3666077e0e95cf648e88ab8.cloudfront.net (CloudFront)
+      - 1.1 ff45192c8a60197bff7a054625e1e150.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
-      - SFO53-P10
+      - SFO53-P8
       X-Amz-Cf-Id:
-      - aqf6cGWYxAy_Rpwp5FU8Z5S1P7AMwu8oC6Bug3_SrruFAsfUSPDeKw==
+      - W_7l2R9MGaJIXmfySMWFh8lrMKpm69HymPE4p5cIhFcE6ld5ZaOOnQ==
     body:
       encoding: ASCII-8BIT
-      string: '{"token_type":"Bearer","access_token":"065bf162889d96726f8dd2299ddac8e1f0f2285c","expires_at":1771560210,"expires_in":20972,"refresh_token":"<STRAVA_TEST_REFRESH_TOKEN>"}'
-  recorded_at: Thu, 19 Feb 2026 22:13:58 GMT
+      string: '{"token_type":"Bearer","access_token":"065bf162889d96726f8dd2299ddac8e1f0f2285c","expires_at":1771560210,"expires_in":16708,"refresh_token":"<STRAVA_TEST_REFRESH_TOKEN>"}'
+  recorded_at: Thu, 19 Feb 2026 23:25:02 GMT
 - request:
     method: put
-    uri: https://www.strava.com/api/v3/activities/17419209324?gear_id=b11099574
+    uri: https://www.strava.com/api/v3/activities/17419209324
     body:
       encoding: UTF-8
-      string: ''
+      string: '{"gear_id":"b11099574"}'
     headers:
       User-Agent:
       - Faraday v1.10.4
-      Content-Length:
-      - '0'
+      Content-Type:
+      - application/json
       Accept-Encoding:
       - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       Accept:
@@ -93,15 +93,15 @@ http_interactions:
       Connection:
       - keep-alive
       Date:
-      - Thu, 19 Feb 2026 22:13:58 GMT
+      - Thu, 19 Feb 2026 23:25:03 GMT
       X-Envoy-Upstream-Service-Time:
-      - '67'
+      - '46'
       Server:
       - istio-envoy
       Status:
       - 404 Not Found
       X-Ratelimit-Usage:
-      - '2,2'
+      - '1,30'
       X-Ratelimit-Limit:
       - '600,6000'
       Vary:
@@ -115,7 +115,7 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Request-Id:
-      - cb70391d-236e-4944-9a48-c778d2ed0b58
+      - 300e038b-e650-42b4-927d-4d335cf910eb
       X-Readratelimit-Limit:
       - '300,3000'
       X-Download-Options:
@@ -123,20 +123,20 @@ http_interactions:
       X-Frame-Options:
       - DENY
       X-Readratelimit-Usage:
-      - '2,2'
+      - '1,30'
       X-Content-Type-Options:
       - nosniff
       X-Cache:
       - Error from cloudfront
       Via:
-      - 1.1 af63429cca0caf23ac2ab7e13afc8ebc.cloudfront.net (CloudFront)
+      - 1.1 5f63640c4cc5b2c8c3fe465bddc1678c.cloudfront.net (CloudFront)
       X-Amz-Cf-Pop:
-      - SFO53-P10
+      - SFO53-P8
       X-Amz-Cf-Id:
-      - QMPFtJMj5pdLaBlIrzKlj4m2QuiNQpx9J2Sx4yIRs7Tjqo5ZL7Zsvw==
+      - 4dtDF7FFRM2hzUA4Sh7PeaPmJKfD7rEP8itf9vq1tRk-roL4BWY9pw==
     body:
       encoding: ASCII-8BIT
       string: '{"message":"Resource Not Found","errors":[{"resource":"Activity","field":"","code":"not
         found"}]}'
-  recorded_at: Thu, 19 Feb 2026 22:13:58 GMT
+  recorded_at: Thu, 19 Feb 2026 23:25:03 GMT
 recorded_with: VCR 6.3.1

@@ -151,16 +151,25 @@ class StravaActivity < ApplicationRecord
 
   def calculated_gear_name
     return nil if gear_id.blank?
+
     strava_integration.strava_gears.find_by(strava_gear_id: gear_id)&.strava_gear_name || gear_id
+  end
+
+  def start_date_in_zone
+    return nil if start_date.blank? || timezone.blank?
+
+    start_date.in_time_zone(timezone)
   end
 
   def distance_miles
     return nil if distance_meters.blank?
+
     (distance_meters / 1609.344).round(2)
   end
 
   def distance_km
     return nil if distance_meters.blank?
+
     (distance_meters / 1000.0).round(2)
   end
 
@@ -171,6 +180,6 @@ class StravaActivity < ApplicationRecord
   end
 
   def proxy_serialized
-    slice(*PROXY_ATTRS).merge(strava_data)
+    slice(*PROXY_ATTRS).merge(strava_data).merge("start_date_in_zone" => start_date_in_zone)
   end
 end

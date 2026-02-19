@@ -177,6 +177,7 @@ RSpec.describe StravaActivity, type: :model do
         "segment_locations" => {"cities" => ["Denver"], "states" => ["Colorado"], "countries" => ["United States"]},
         "sport_type" => "Ride",
         "start_date" => strava_activity.start_date.as_json,
+        "start_date_in_zone" => strava_activity.start_date_in_zone.as_json,
         "suffer_score" => 42.0,
         "timezone" => "America/Denver",
         "title" => "Morning Ride",
