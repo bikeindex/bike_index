@@ -71,8 +71,8 @@ class StravaActivity < ApplicationRecord
 
   scope :cycling, -> { where(activity_type: CYCLING_TYPES) }
   scope :enriched, -> { where("strava_data->>'enriched' = 'true'") }
-  scope :un_enriched, -> { where("strava_data->>'enriched' = 'false'") }
-  scope :activities_to_enrich, -> { cycling.un_enriched }
+  scope :not_enriched, -> { where("strava_data IS NULL OR NOT strava_data ? 'enriched'") }
+  scope :activities_to_enrich, -> { cycling.not_enriched }
   scope :with_gear, -> { where.not(gear_id: nil) }
 
   class << self
@@ -148,7 +148,6 @@ class StravaActivity < ApplicationRecord
   def enriched?
     strava_data&.dig("enriched") == true
   end
-
 
   def calculated_gear_name
     return nil if gear_id.blank?
