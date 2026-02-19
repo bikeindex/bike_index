@@ -67,7 +67,8 @@ RSpec.describe StravaJobs::ProxyRequest do
             "cities" => ["San Francisco", "Mill Valley"],
             "states" => ["California"],
             "countries" => ["United States", "USA"]
-          }
+          },
+          "strava_data" => target_attributes["strava_data"].merge("enriched" => true)
         )
       end
 

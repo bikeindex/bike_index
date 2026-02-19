@@ -228,7 +228,7 @@ RSpec.describe StravaActivity, type: :model do
           device_name: "Garmin Edge 530", commute: true,
           muted: false, average_speed: 5.5,
           pr_count: 2, average_watts: 180.0,
-          device_watts: true
+          device_watts: true, enriched: true
         },
         segment_locations: {
           cities: ["San Francisco", "Mill Valley"],

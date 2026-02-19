@@ -142,7 +142,8 @@ RSpec.describe "Strava Proxy API", type: :request do
               "cities" => ["San Francisco", "Mill Valley"],
               "states" => ["California"],
               "countries" => ["United States", "USA"]
-            }
+            },
+            "strava_data" => target_attributes.as_json["strava_data"].merge("enriched" => true)
           )
         end
 
@@ -167,6 +168,20 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(strava_activity.enriched?).to be_truthy
           expect(strava_activity).to have_attributes detail_target_attributes
           expect(json_result).to eq strava_activity.proxy_serialized.as_json
+        end
+      end
+
+      context "update activity via PUT" do
+        it "returns strava error response" do
+          VCR.use_cassette("strava-proxy_update_activity") do
+            expect {
+              post base_url, params: {url: "activities/17419209324?gear_id=b11099574", method: "PUT", access_token: token.token}
+            }.to change(StravaRequest, :count).by(1)
+          end
+          expect(response.status).to eq 401
+          expect(json_result["message"]).to eq "Authorization Error"
+          expect(json_result["errors"]).to be_present
+          expect(StravaRequest.last.token_refresh_failed?).to be_truthy
         end
       end
 

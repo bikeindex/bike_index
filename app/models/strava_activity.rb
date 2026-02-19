@@ -70,8 +70,8 @@ class StravaActivity < ApplicationRecord
   validates :strava_id, uniqueness: {scope: :strava_integration_id}
 
   scope :cycling, -> { where(activity_type: CYCLING_TYPES) }
-  scope :enriched, -> { where.not(segment_locations: nil) }
-  scope :un_enriched, -> { where(segment_locations: nil) }
+  scope :enriched, -> { where("strava_data->>'enriched' = 'true'") }
+  scope :un_enriched, -> { where("COALESCE(strava_data->>'enriched', 'false') != 'true'") }
   scope :activities_to_enrich, -> { cycling.un_enriched }
   scope :with_gear, -> { where.not(gear_id: nil) }
 
@@ -100,7 +100,7 @@ class StravaActivity < ApplicationRecord
         photos:,
         segment_locations: segment_locations_for(detail["segment_efforts"]),
         kudos_count: detail["kudos_count"],
-        strava_data: strava_data_from(detail)
+        strava_data: strava_data_from(detail).merge("enriched" => true)
       }
     end
 
@@ -146,7 +146,7 @@ class StravaActivity < ApplicationRecord
   end
 
   def enriched?
-    !segment_locations.nil?
+    strava_data&.dig("enriched") == true
   end
 
   def calculated_gear_name

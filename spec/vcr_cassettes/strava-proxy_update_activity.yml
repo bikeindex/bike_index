@@ -1,0 +1,67 @@
+---
+http_interactions:
+- request:
+    method: put
+    uri: https://www.strava.com/api/v3/activities/17419209324?gear_id=b11099574
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Thu, 19 Feb 2026 21:22:23 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '34'
+      Server:
+      - istio-envoy
+      Status:
+      - 401 Unauthorized
+      Cache-Control:
+      - no-cache
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - 98ec30a4-f794-43cc-976c-75b5834bfbf2
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 d52fd2fab09abcfe30af9217f6f15ef8.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P10
+      X-Amz-Cf-Id:
+      - kgbLKUQvCQ_M53P6eXPzO0mMWfFbT37zIdMwci_7wm1fIPopD9LiuQ==
+    body:
+      encoding: UTF-8
+      string: '{"message":"Authorization Error","errors":[{"resource":"Athlete","field":"access_token","code":"invalid"}]}'
+  recorded_at: Thu, 19 Feb 2026 21:22:23 GMT
+recorded_with: VCR 6.3.1
