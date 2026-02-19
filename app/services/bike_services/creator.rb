@@ -197,18 +197,12 @@ class BikeServices::Creator
       bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
         organization: bike.creation_organization, creator_kind: "creator_bike_creation")
     end
-    # TODO: consolidate into create_parking_notification in #2922
-    if b_param.unregistered_parking_notification?
-      # We skipped setting address, with Builder.default_parking_notification_attrs,
-      # notification will update it
-      ParkingNotification.create!(b_param.parking_notification_params)
-    end
 
     bike.reload
   end
 
   def associate(b_param, bike, ownership)
-    create_parking_notification(b_param, bike) if b_param&.status_abandoned?
+    create_parking_notification(b_param, bike) if b_param&.status_abandoned? || b_param&.unregistered_parking_notification?
     create_bike_organizations(ownership)
     ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
     bike.create_normalized_serial_segments
@@ -257,12 +251,18 @@ class BikeServices::Creator
   end
 
   def create_parking_notification(b_param, bike)
-    parking_notification_attrs = bike.address_hash_legacy
-    parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
-      bike_id: bike.id,
-      user_id: bike.creator.id,
-      organization_id: b_param.creation_organization_id)
-    ParkingNotification.create(parking_notification_attrs)
+    if b_param.unregistered_parking_notification?
+      # We skipped setting address, with Builder.default_parking_notification_attrs,
+      # notification will update it
+      ParkingNotification.create!(b_param.parking_notification_params)
+    else
+      parking_notification_attrs = bike.address_hash_legacy
+      parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
+        bike_id: bike.id,
+        user_id: bike.creator.id,
+        organization_id: b_param.creation_organization_id)
+      ParkingNotification.create(parking_notification_attrs)
+    end
   end
 
   def assign_user_attributes(bike, user = nil)
