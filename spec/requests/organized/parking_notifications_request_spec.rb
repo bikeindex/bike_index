@@ -127,7 +127,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       {
         kind: "appears_abandoned_notification",
         internal_notes: "some details about the abandoned thing",
-        bike_id: bike.to_param,
+        bike_id: bike.id,
         use_entered_address: "false",
         latitude: default_location[:latitude],
         longitude: default_location[:longitude],
@@ -260,7 +260,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           {
             kind: "impound_notification",
             internal_notes: "",
-            bike_id: bike.to_param,
+            bike_id: bike.id,
             use_entered_address: "true",
             latitude: default_location[:latitude],
             longitude: default_location[:longitude],
@@ -270,7 +270,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             street: "300 Lakeside Dr",
             city: "Oakland",
             zipcode: "94612",
-            state_id: state.id.to_s,
+            state_id: state.id,
             country_id: Country.united_states.id
           }
         end

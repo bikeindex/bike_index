@@ -62,7 +62,7 @@ RSpec.describe BikeVersionCreatorJob, type: :job do
         manufacturer_other: "Some other Manufacturer",
         component_model: "party",
         serial_number: "999999FFF",
-        year: "2020"
+        year: 2020
       }
     end
     let(:target_cached_array) do

@@ -263,7 +263,11 @@ RSpec.describe Organized::BulkImportsController, type: :request do
                 bad_attribute: "dddd"
               }
             end
-            let(:stolen_record_attrs) { stolen_record_params.except(:bad_attribute, :date_stolen) }
+            let(:stolen_record_attrs) do
+              stolen_record_params.except(:bad_attribute, :date_stolen, :timezone, :secondary_phone, :state_id)
+                .merge(phone_for_users: true, phone_for_shops: false, phone_for_police: true,
+                  country_id: Country.united_states.id, secondary_phone: nil, state_id: nil)
+            end
             let!(:current_organization) { stolen_organization }
             let!(:color_green) { FactoryBot.create(:color, name: "Green") }
             let!(:color_white) { FactoryBot.create(:color, name: "White") }

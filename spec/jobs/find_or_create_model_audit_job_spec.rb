@@ -62,7 +62,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
     let(:basic_target_attributes) do
       {
         propulsion_type: "pedal-assist-and-throttle",
-        cycle_type: :cargo,
+        cycle_type: "cargo",
         certification_status: nil,
         manufacturer_id: manufacturer.id,
         frame_model: "Party model",
@@ -97,7 +97,7 @@ RSpec.describe FindOrCreateModelAuditJob, type: :job do
         }.to change(ModelAudit, :count).by 1
         new_model_audit = bike1.reload.model_audit
         expect(bike2.reload.model_audit_id).to be_blank # This worker doesn't update other bikes
-        expect(new_model_audit).to have_attributes basic_target_attributes.merge(frame_model: nil, cycle_type: :bike)
+        expect(new_model_audit).to have_attributes basic_target_attributes.merge(frame_model: nil, cycle_type: "bike")
         # Organization model audits are created by UpdateModelAuditJob
         expect(new_model_audit.organization_model_audits.count).to eq 0
         expect(UpdateModelAuditJob.jobs.map { |j| j["args"] }.flatten).to eq([new_model_audit.id])

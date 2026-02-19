@@ -181,7 +181,7 @@ RSpec::Matchers.define :match_hash_indifferently do |expected|
 end
 
 # Instead of doing our own thing, use have_attributes instead
-RSpec::Matchers.define :have_attributes_with_time_within do |expected, time_within: 1|
+RSpec::Matchers.define :have_attributes_with_time_within do |expected, time_within = 1|
   attrs = expected.transform_values do |value|
     value.is_a?(Time) ? be_within(time_within).of(value) : value
   end

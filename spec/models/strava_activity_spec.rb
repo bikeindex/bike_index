@@ -169,18 +169,18 @@ RSpec.describe StravaActivity, type: :model do
         kudos_count: 10,
         average_speed: 5.5,
         suffer_score: 30.0,
-        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
+        photos: {"photo_url" => "https://example.com/photo.jpg", "photo_count" => 3},
         strava_data: {
-          average_heartrate: 140.0, max_heartrate: 175.0,
-          device_name: "Garmin Edge 530", commute: true,
-          muted: false, average_speed: 5.5,
-          pr_count: 2, average_watts: 180.0,
-          device_watts: true
+          "average_heartrate" => 140.0, "max_heartrate" => 175.0,
+          "device_name" => "Garmin Edge 530", "commute" => true,
+          "muted" => false, "average_speed" => 5.5,
+          "pr_count" => 2, "average_watts" => 180.0,
+          "device_watts" => true
         },
         segment_locations: {
-          cities: ["San Francisco", "Mill Valley"],
-          states: ["California"],
-          countries: ["United States"]
+          "cities" => ["San Francisco", "Mill Valley"],
+          "states" => ["California"],
+          "countries" => ["United States"]
         }
       )
     end
@@ -196,7 +196,7 @@ RSpec.describe StravaActivity, type: :model do
       detail["photos"] = {"primary" => nil, "count" => 0}
       activity.update_from_detail(detail)
       activity.reload
-      expect(activity).to have_attributes(photos: {photo_url: nil, photo_count: 0})
+      expect(activity).to have_attributes(photos: {"photo_url" => nil, "photo_count" => 0})
     end
   end
 end

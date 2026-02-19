@@ -253,7 +253,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
     context "seller reply" do
       let(:current_user) { marketplace_listing.seller }
       let!(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:) }
-      let(:reply_params) { new_params.merge(initial_record_id: marketplace_message.id.to_s) }
+      let(:reply_params) { new_params.merge(initial_record_id: marketplace_message.id) }
 
       it "sends a message" do
         ActionMailer::Base.deliveries = []

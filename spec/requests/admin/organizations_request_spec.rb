@@ -287,7 +287,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       let(:update_params) do
         {
           name: "other namE",
-          search_radius_miles: "1222.2",
+          search_radius_miles: 1222.2,
           graduated_notification_interval_days: 4444,
           passwordless_user_domain: "stuff.com"
         }

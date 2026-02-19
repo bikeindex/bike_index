@@ -303,7 +303,7 @@ RSpec.describe BikeServices::Updator do
     let!(:country_id) { Country.canada_id }
     let(:target_attributes) do
       # geocoder default_location coordinates
-      address_record_attributes.except(:id).merge(kind: :bike, latitude: 40.7143528, longitude: -74.0059731)
+      address_record_attributes.except(:id).merge(kind: "bike", latitude: 40.7143528, longitude: -74.0059731)
     end
     it "creates an address_record" do
       expect(bike.reload.ownerships.count).to eq 1

@@ -130,8 +130,7 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
     context "with custom time_within" do
       it "matches with larger tolerance" do
         expect(invoice).to have_attributes_with_time_within(
-          {subscription_start_at: time + 5},
-          time_within: 10
+          {subscription_start_at: time + 5}, 10
         )
       end
     end

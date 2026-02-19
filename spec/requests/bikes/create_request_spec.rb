@@ -13,9 +13,9 @@ RSpec.describe "BikesController#create", type: :request do
     {
       serial_number: "Bike serial",
       manufacturer_id: manufacturer.name,
-      year: "2022",
+      year: 2022,
       frame_model: "Cool frame model",
-      primary_frame_color_id: color.id.to_s,
+      primary_frame_color_id: color.id,
       owner_email: current_user.email
     }
   end
@@ -121,9 +121,9 @@ RSpec.describe "BikesController#create", type: :request do
         serial_number: "example serial",
         manufacturer_id: manufacturer.slug,
         manufacturer_other: "",
-        year: "2016",
+        year: 2016,
         frame_model: extra_long_string,
-        primary_frame_color_id: color.id.to_s,
+        primary_frame_color_id: color.id,
         secondary_frame_color_id: "",
         tertiary_frame_color_id: "",
         owner_email: "something@stuff.com",
@@ -303,15 +303,15 @@ RSpec.describe "BikesController#create", type: :request do
     let(:bike_params) do
       {
         b_param_id_token: "",
-        creation_organization_id: organization.id.to_s,
+        creation_organization_id: organization.id,
         cycle_type: "recumbent",
         serial_number: "141212",
         made_without_serial: false,
         manufacturer_id: manufacturer.slug.to_s,
         manufacturer_other: "",
-        year: "2021",
+        year: 2021,
         frame_model: "purple rain",
-        primary_frame_color_id: "7",
+        primary_frame_color_id: 7,
         secondary_frame_color_id: "",
         tertiary_frame_color_id: "",
         organization_affiliation: "community_member",

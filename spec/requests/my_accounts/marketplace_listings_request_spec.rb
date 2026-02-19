@@ -45,8 +45,9 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
       let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, owner_email: user.email) }
       let(:params) { {marketplace_listing: marketplace_listing_params} }
       let(:target_address_attrs) do
-        address_record_attributes.except(:id)
-          .merge(user_id: user.id, kind: :marketplace_listing, publicly_visible_attribute: :postal_code)
+        address_record_attributes.except(:id, :user_account_address, :region_record_id)
+          .merge(user_id: user.id, kind: "marketplace_listing", publicly_visible_attribute: "postal_code",
+            country_id: Country.canada_id, region_record_id: nil)
       end
 
       def make_update_bike_request(url:, params:, marketplace_listing_change: 1, address_record_change: 1)
@@ -189,10 +190,11 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           }
         end
         let(:target_address_attrs) do
-          address_record_attributes.except(:region_string, :id).merge(kind: "marketplace_listing",
+          address_record_attributes.except(:region_string, :id, :user_account_address).merge(kind: "marketplace_listing",
             latitude: 34.0309258,
             longitude: -118.2380432,
-            publicly_visible_attribute: "postal_code")
+            publicly_visible_attribute: "postal_code",
+            country_id: Country.united_states_id)
         end
         let(:non_negotiable_attrs) { target_marketplace_attrs.merge(amount_cents: 144242, price_negotiable: false) }
         include_context :geocoder_real
