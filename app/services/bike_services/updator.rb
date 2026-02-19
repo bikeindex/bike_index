@@ -112,6 +112,7 @@ class BikeServices::Updator
     impound_record = @bike.current_impound_record
     return unless impound_params.present? && impound_record.present?
 
+    impound_record.timezone = impound_params.delete("timezone") if impound_params["timezone"].present?
     impound_record.update(impound_params)
   end
 
