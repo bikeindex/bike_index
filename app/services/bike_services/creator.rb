@@ -263,6 +263,11 @@ class BikeServices::Creator
         organization_id: b_param.creation_organization_id)
       ParkingNotification.create(parking_notification_attrs)
     end
+    # Reload to pick up changes from ProcessParkingNotificationJob (e.g. user_hidden cleared by impound).
+    # attr_accessors persist through reload, so clear marked_user_hidden for impound notifications
+    # to prevent the subsequent bike.save from overwriting the impound job's user_hidden=false
+    bike.reload
+    bike.marked_user_hidden = nil if bike.current_impound_record.present?
   end
 
   def assign_user_attributes(bike, user = nil)

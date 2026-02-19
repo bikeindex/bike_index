@@ -896,9 +896,11 @@ class Bike < ApplicationRecord
 
     if Binxtils::InputNormalizer.boolean(marked_user_hidden)
       self.user_hidden = true
+      self.marked_user_hidden = nil
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
     elsif Binxtils::InputNormalizer.boolean(marked_user_unhidden)
       self.user_hidden = false
+      self.marked_user_unhidden = nil
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
   end
