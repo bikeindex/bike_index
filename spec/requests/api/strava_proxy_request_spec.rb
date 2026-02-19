@@ -19,7 +19,7 @@ RSpec.describe "Strava Proxy API", type: :request do
 
   context "token from wrong app" do
     it "returns 403" do
-      stub_const("API::StravaProxyController::STRAVA_DOORKEEPER_APP_ID", "99999")
+      stub_const("StravaJobs::RequestProxier::STRAVA_DOORKEEPER_APP_ID", "99999")
       post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
       expect(response.status).to eq 403
       expect(json_result[:error]).to eq "Unauthorized application"
@@ -28,14 +28,14 @@ RSpec.describe "Strava Proxy API", type: :request do
 
   context "STRAVA_DOORKEEPER_APP_ID not set" do
     it "returns 403" do
-      stub_const("API::StravaProxyController::STRAVA_DOORKEEPER_APP_ID", nil)
+      stub_const("StravaJobs::RequestProxier::STRAVA_DOORKEEPER_APP_ID", nil)
       post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
       expect(response.status).to eq 403
     end
   end
 
   context "valid token and app" do
-    before { stub_const("API::StravaProxyController::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
+    before { stub_const("StravaJobs::RequestProxier::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
 
     context "no strava integration" do
       it "returns 404" do
@@ -51,8 +51,7 @@ RSpec.describe "Strava Proxy API", type: :request do
       it "returns 422 with status" do
         post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
         expect(response.status).to eq 422
-        expect(json_result[:error]).to eq "Strava integration not yet synced"
-        expect(json_result[:status]).to eq "syncing"
+        expect(json_result[:error]).to eq "Strava integration not yet synced - status: syncing"
       end
     end
 
