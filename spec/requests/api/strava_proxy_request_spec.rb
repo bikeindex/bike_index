@@ -110,7 +110,8 @@ RSpec.describe "Strava Proxy API", type: :request do
               post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
             end.to change(StravaRequest, :count).by 1
             expect(response.status).to eq 429
-            expect(json_result[:error]).to eq "rate_limited"
+            expect(json_result["message"]).to eq "Rate Limit Exceeded"
+            expect(json_result["errors"]).to be_present
             expect(StravaRequest.last.rate_limited?).to be_truthy
           end
         end
@@ -123,7 +124,7 @@ RSpec.describe "Strava Proxy API", type: :request do
               post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
             end.to change(StravaRequest, :count).by 1
             expect(response.status).to eq 500
-            expect(json_result[:error]).to eq "error"
+            expect(json_result["message"]).to eq "Internal Server Error"
             expect(StravaRequest.last.error?).to be_truthy
           end
         end

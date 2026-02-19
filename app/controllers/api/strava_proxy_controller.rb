@@ -45,13 +45,20 @@ module API
       params.permit(:url, :method)
     end
 
+    SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
+
     def render_proxy_response(result)
       strava_request = result[:strava_request]
       strava_response = result[:response]
       unless strava_request.success?
-        return render json: {error: strava_request.response_status}, status: strava_response&.status || 502
+        return render json: sanitize_response_body(strava_response&.body), status: strava_response&.status || 502
       end
       render body: result[:serialized].to_json, content_type: "application/json", status: strava_response.status
+    end
+
+    def sanitize_response_body(body)
+      return {error: "unknown error"} unless body.is_a?(Hash)
+      body.except(*SENSITIVE_KEYS)
     end
 
     def render_bad_request(exception)
