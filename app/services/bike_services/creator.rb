@@ -254,7 +254,7 @@ class BikeServices::Creator
     if b_param.unregistered_parking_notification?
       # We skipped setting address, with Builder.default_parking_notification_attrs,
       # notification will update it
-      ParkingNotification.create!(b_param.parking_notification_params)
+      ParkingNotification.create!(b_param.parking_notification_params.merge(bike_id: bike.id))
     else
       parking_notification_attrs = bike.address_hash_legacy
       parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
