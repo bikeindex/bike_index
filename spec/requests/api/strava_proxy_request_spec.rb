@@ -45,8 +45,19 @@ RSpec.describe "Strava Proxy API", type: :request do
       end
     end
 
-    context "with strava integration" do
-      let!(:strava_integration) { FactoryBot.create(:strava_integration, user:) }
+    context "with strava integration not yet synced" do
+      let!(:strava_integration) { FactoryBot.create(:strava_integration, user:, status: :syncing) }
+
+      it "returns 422 with status" do
+        post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+        expect(response.status).to eq 422
+        expect(json_result[:error]).to eq "Strava integration not yet synced"
+        expect(json_result[:status]).to eq "syncing"
+      end
+    end
+
+    context "with synced strava integration" do
+      let!(:strava_integration) { FactoryBot.create(:strava_integration, user:, status: :synced) }
       let(:target_attributes) do
         {
           strava_id: "17323701543",
