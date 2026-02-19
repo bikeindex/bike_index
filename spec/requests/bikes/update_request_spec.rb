@@ -460,8 +460,7 @@ RSpec.describe "BikesController#update", type: :request do
         street: "278 Broadway",
         city: "New York"
       )
-      # TODO: uncomment this and fix it - #2922
-      # expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
+      expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
     end
 
     context "updating with new owner email" do
