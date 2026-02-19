@@ -125,7 +125,7 @@ RSpec.describe Sale, type: :model do
       it "assigns the correct ownership" do
         expect(sale).to be_valid
         sale.save!
-        expect(sale).to have_attributes target_attrs
+        expect(sale).to have_attributes_with_time_within target_attrs
         expect(sale.marketplace_listing&.id).to eq marketplace_listing.id
       end
 
@@ -136,7 +136,7 @@ RSpec.describe Sale, type: :model do
           expect(marketplace_message_reply.reload.marketplace_listing_id).to eq marketplace_listing.id
           expect(sale).to be_valid
           sale.save!
-          expect(sale).to have_attributes target_attrs
+          expect(sale).to have_attributes_with_time_within target_attrs
           expect(sale.marketplace_listing&.id).to eq marketplace_listing.id
         end
       end

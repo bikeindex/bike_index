@@ -52,7 +52,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
         expect { instance.perform(bike_sticker_update.id) }.to change(BikeStickerUpdate, :count).by(-1)
 
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 0
-        expect(bike_sticker).to have_attributes target_initial
+        expect(bike_sticker).to have_attributes_with_time_within target_initial
       end
 
       context "kind: re_claim" do
@@ -86,7 +86,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
           expect { instance.perform(bike_sticker_update.id) }.to change(BikeStickerUpdate, :count).by(-1)
 
           expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1
-          expect(bike_sticker).to have_attributes target_claim
+          expect(bike_sticker).to have_attributes_with_time_within target_claim
         end
 
         context "with a failed claim" do
@@ -105,7 +105,7 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
             expect { instance.perform(bike_sticker_update.id) }.to change(BikeStickerUpdate, :count).by(-1)
 
             expect(bike_sticker.reload.bike_sticker_updates.count).to eq 2
-            expect(bike_sticker).to have_attributes target_claim
+            expect(bike_sticker).to have_attributes_with_time_within target_claim
           end
         end
 

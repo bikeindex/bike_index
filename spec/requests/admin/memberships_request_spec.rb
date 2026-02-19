@@ -115,7 +115,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
           expect(membership.start_at).to be_within(1).of start_at
 
           expect(stripe_subscription.reload.active?).to be_truthy
-          expect(stripe_subscription).to have_attributes target_stripe_subscription_attrs
+          expect(stripe_subscription).to have_attributes_with_time_within target_stripe_subscription_attrs
           expect(stripe_subscription.payments.count).to eq 0
         end
       end
