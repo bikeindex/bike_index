@@ -8,6 +8,27 @@ RSpec.describe StravaJobs::ProxyRequester do
   let(:strava_integration) { FactoryBot.create(:strava_integration) }
   let(:user) { strava_integration.user }
 
+  describe ".authorize_user_and_strava_integration" do
+    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
+    let(:access_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
+    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
+
+    it "returns error when strava integration is not synced" do
+      expect(strava_integration.synced?).to be_falsey
+      result = described_class.authorize_user_and_strava_integration(access_token)
+      expect(result[:error]).to match(/not yet synced/)
+      expect(result[:status]).to eq 422
+    end
+
+    it "returns user and strava_integration when valid" do
+      strava_integration.update!(status: :synced)
+      result = described_class.authorize_user_and_strava_integration(access_token)
+      expect(result[:error]).to be_nil
+      expect(result[:user]).to eq user
+      expect(result[:strava_integration]).to eq strava_integration
+    end
+  end
+
   describe ".create_and_execute" do
     let(:target_attributes) do
       {
@@ -122,7 +143,7 @@ RSpec.describe StravaJobs::ProxyRequester do
         VCR.use_cassette("strava-list_activities") do
           result = described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities?page=1&per_page=1")
           expect(result[:strava_request].success?).to be_truthy
-          expect(result[:strava_request].parameters).to eq("url" => "athlete/activities?page=1&per_page=1", "method" => nil)
+          expect(result[:strava_request].parameters).to eq("url" => "athlete/activities?page=1&per_page=1")
         end
       end
     end

@@ -22,17 +22,18 @@ module StravaJobs
         {user:, strava_integration:}
       end
 
-      def create_and_execute(strava_integration:, user:, url:, method: nil)
+      def create_and_execute(strava_integration:, user:, url:, method: nil, body: nil)
         validate_url!(url)
         strava_request = StravaRequest.create!(
           strava_integration:,
           user:,
           request_type: :proxy,
-          parameters: {url:, method:}
+          parameters: {url:, method:, body:}.compact
         )
 
         response = Integrations::StravaClient.proxy_request(strava_integration,
-          strava_request.parameters["url"], method: strava_request.parameters["method"])
+          strava_request.parameters["url"], method: strava_request.parameters["method"],
+          body: strava_request.parameters["body"])
         strava_request.update_from_response(response, raise_on_error: false)
 
         serialized = if strava_request.success?
