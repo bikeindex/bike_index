@@ -35,10 +35,7 @@ class CallbackJob::AddressRecordUpdateAssociationsJob < ApplicationJob
   def update_association(address_record, association)
     association.latitude = address_record.latitude
     association.longitude = address_record.longitude
-    return unless association.changed?
-    # Skip user update callbacks since this is just a coordinate sync
-    association.skip_update = true if association.respond_to?(:skip_update=)
-    association.save
+    association.update(skip_update: true) if association.changed?
   end
 
   def update_from_impound_record(address_record)
