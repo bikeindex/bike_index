@@ -334,7 +334,7 @@ RSpec.describe Organization, type: :model do
         expect(user.enabled?("unstolen_notifications")).to be_truthy
         expect(user.enabled?("bike_stickers")).to be_falsey
         expect(user.enabled?("invalid feature name")).to be_falsey
-        user.superuser = true
+        FactoryBot.create(:superuser_ability, user:)
         expect(user.enabled?("unstolen_notifications")).to be_truthy
         expect(user.enabled?("unstolen_notifications", no_superuser_override: true)).to be_truthy
         expect(user.enabled?(["bike_stickers"])).to be_truthy

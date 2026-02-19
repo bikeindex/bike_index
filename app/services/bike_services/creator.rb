@@ -74,7 +74,7 @@ class BikeServices::Creator
     :impounded_at_with_timezone,
     :impounded_description,
     :timezone,
-    address_record_attributes: (AddressRecord.permitted_params + [:id])
+    address_record_attributes: (AddressRecord.permitted_params + [:id, :skip_geocoding])
   ].freeze
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator

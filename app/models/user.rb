@@ -40,7 +40,6 @@
 #  show_phone                         :boolean          default(TRUE)
 #  show_twitter                       :boolean          default(FALSE), not null
 #  show_website                       :boolean          default(FALSE), not null
-#  superuser                          :boolean          default(FALSE), not null
 #  terms_of_service                   :boolean          default(FALSE), not null
 #  time_single_format                 :boolean          default(FALSE)
 #  title                              :text
@@ -159,7 +158,7 @@ class User < ApplicationRecord
   scope :valid_only, -> { no_email_bans.where(banned: false) }
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
-  scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
+  scope :admins, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
   scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
   scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
@@ -277,8 +276,7 @@ class User < ApplicationRecord
   end
 
   def superuser?(controller_name: nil, action_name: nil)
-    superuser ||
-      superuser_abilities.can_access?(controller_name: controller_name, action_name: action_name)
+    superuser_abilities.can_access?(controller_name:, action_name:)
   end
 
   def developer?

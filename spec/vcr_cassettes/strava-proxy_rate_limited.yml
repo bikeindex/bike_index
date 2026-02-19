@@ -1,0 +1,35 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/athlete/activities
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 429
+      message: Too Many Requests
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      X-RateLimit-Limit:
+      - "100,1000"
+      X-RateLimit-Usage:
+      - "101,350"
+      X-ReadRateLimit-Limit:
+      - "100,1000"
+      X-ReadRateLimit-Usage:
+      - "101,350"
+    body:
+      encoding: UTF-8
+      string: '{"message":"Rate Limit Exceeded","errors":[{"resource":"Application","field":"rate limit","code":"exceeded"}]}'
+  recorded_at: Sun, 08 Feb 2026 22:46:00 GMT
+recorded_with: VCR 6.3.1

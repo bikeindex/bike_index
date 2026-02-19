@@ -431,7 +431,7 @@ RSpec.describe Bike, type: :model do
 
   describe "visible_by?" do
     let(:owner) { User.new }
-    let(:superuser) { User.new(superuser: true) }
+    let(:superuser) { FactoryBot.create(:superuser) }
     let(:bike) { Bike.new }
     let(:bike_user_hidden) { Bike.new(user_hidden: true) }
     let(:bike_deleted) { Bike.new(deleted_at: Time.current) }
@@ -510,19 +510,20 @@ RSpec.describe Bike, type: :model do
     let(:user) { User.new }
     it "does not return anything if there isn't a stolen record or phone number" do
       expect(bike.phoneable_by?).to be_falsey
-      expect(bike.phoneable_by?(User.new(superuser: true))).to be_falsey
+      expect(bike.phoneable_by?(FactoryBot.create(:superuser))).to be_falsey
     end
 
     context "bike has phone number" do
       let(:bike) { Bike.new(phone: "831289423") }
       let(:owner) { User.new(notification_unstolen: true) }
       let(:ownership) { Ownership.new(user: owner, current: true, claimed: true) }
+      let(:superuser) { FactoryBot.create(:superuser) }
       before { allow(bike).to receive(:current_ownership) { ownership } }
 
       it "is phoneable_by superuser" do
-        expect(bike.phoneable_by?(User.new(superuser: true))).to be_truthy
+        expect(bike.phoneable_by?(superuser)).to be_truthy
         owner.notification_unstolen = false
-        expect(bike.phoneable_by?(User.new(superuser: true))).to be_truthy
+        expect(bike.phoneable_by?(superuser)).to be_truthy
       end
 
       context "ambassador" do
@@ -555,8 +556,8 @@ RSpec.describe Bike, type: :model do
       let(:bike) { Bike.new(current_stolen_record: stolen_record) }
 
       it "returns true for superusers, even with everything false" do
-        user.superuser = true
-        expect(bike.phoneable_by?(user)).to be_truthy
+        superuser = FactoryBot.create(:superuser)
+        expect(bike.phoneable_by?(superuser)).to be_truthy
       end
 
       it "returns true if phone_for_everyone" do
@@ -745,7 +746,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:creator) { bike.creator }
     let(:user) { FactoryBot.create(:user) }
-    let(:superuser) { User.new(superuser: true) }
+    let(:superuser) { FactoryBot.create(:superuser) }
 
     context "un-organized" do
       context "no user" do
@@ -1035,7 +1036,7 @@ RSpec.describe Bike, type: :model do
     let(:creator) { FactoryBot.create(:user, email: "notparty@party.com") }
     let(:bike) { FactoryBot.create(:bike, owner_email: owner_email, creator: creator) }
     let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike, owner_email: owner_email, creator: creator) }
-    let(:admin) { User.new(superuser: true) }
+    let(:admin) { FactoryBot.create(:superuser) }
     it "is true" do
       expect(bike.reload.contact_owner_user?).to be_truthy
       expect(bike.contact_owner_email).to eq owner_email

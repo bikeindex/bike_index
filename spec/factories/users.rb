@@ -31,7 +31,7 @@ FactoryBot.define do
       end
       factory :superuser do
         accepted_vendor_terms_of_service { true }
-        superuser { true }
+        after(:create) { |user| FactoryBot.create(:superuser_ability, user:) }
         factory :superuser_developer do
           developer { true }
         end

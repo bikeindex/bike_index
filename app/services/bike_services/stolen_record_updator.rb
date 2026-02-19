@@ -62,6 +62,6 @@ class BikeServices::StolenRecordUpdator
       :country_id, :state_id, :police_report_number, :police_report_department, :estimated_value,
       :theft_description, :locking_description, :lock_defeat_description, :proof_of_ownership,
       :receive_notifications, :phone_for_everyone, :phone_for_users,
-      :phone_for_shops, :phone_for_police)
+      :phone_for_shops, :phone_for_police, :skip_geocoding)
   end
 end
