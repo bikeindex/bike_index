@@ -398,17 +398,13 @@ class Bike < ApplicationRecord
   def find_or_build_address_record(country_id: nil)
     return address_record if address_record?
 
-    existing = AddressRecord.where(kind: :bike, bike_id: id).order(:id).last
-    if existing.present?
-      update(address_record: existing)
-      return existing
+    existing_address_record = AddressRecord.where(kind: :bike, bike_id: id).order(:id).last
+    if existing_address_record.present?
+      update(address_record: existing_address_record)
+      existing_address_record
+    else
+      self.address_record = AddressRecord.new(bike_id: id, kind: :bike, country_id:)
     end
-
-    self.address_record = AddressRecord.new(bike_id: id, kind: :bike, country_id:)
-    address_record.attributes = AddressRecord.attrs_from_legacy(self)
-    save
-    address_record.skip_geocoding = false
-    address_record
   end
 
   def latitude_public
