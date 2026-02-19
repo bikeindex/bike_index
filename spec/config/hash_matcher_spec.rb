@@ -108,6 +108,41 @@ RSpec.describe "custom match_hash_indifferently and RspecHashMatcher" do
     end
   end
 
+  describe "have_attributes_with_time_within" do
+    let(:time) { 1.hour.ago }
+    let(:invoice) do
+      Invoice.new(amount_due_cents: 2_000, subscription_start_at: time + 0.5)
+    end
+
+    it "matches with time within default tolerance" do
+      expect(invoice).to have_attributes_with_time_within(
+        amount_due_cents: 2_000,
+        subscription_start_at: time
+      )
+    end
+
+    it "does not match when time is outside tolerance" do
+      expect(invoice).not_to have_attributes_with_time_within(
+        subscription_start_at: time + 5
+      )
+    end
+
+    context "with custom time_within" do
+      it "matches with larger tolerance" do
+        expect(invoice).to have_attributes_with_time_within(
+          {subscription_start_at: time + 5},
+          time_within: 10
+        )
+      end
+    end
+
+    it "passes non-time values directly to have_attributes" do
+      expect(invoice).not_to have_attributes_with_time_within(
+        amount_due_cents: 9_999
+      )
+    end
+  end
+
   describe "validate_options!" do
     it "noops" do
       expect(RspecHashMatcher.send(:validate_options!, options)).to be_nil

@@ -182,26 +182,18 @@ end
 
 RSpec::Matchers.define :have_attributes_with_time_within do |expected, time_within: 1|
   match do |actual|
-    expected.all? do |key, value|
-      actual_value = actual.send(key)
-      if value.is_a?(Time)
-        actual_value.is_a?(Time) && actual_value.between?(value - time_within, value + time_within)
-      else
-        values_match?(value, actual_value)
-      end
+    attrs = expected.transform_values do |value|
+      value.is_a?(Time) ? be_within(time_within).of(value) : value
     end
+    have_attributes(attrs).matches?(actual)
   end
 
   failure_message do |actual|
-    diffs = expected.filter_map do |key, value|
-      actual_value = actual.send(key)
-      matched = if value.is_a?(Time)
-        actual_value.is_a?(Time) && actual_value.between?(value - time_within, value + time_within)
-      else
-        values_match?(value, actual_value)
-      end
-      "expected #{key}: #{actual_value.inspect} to match #{value.inspect}" unless matched
+    attrs = expected.transform_values do |value|
+      value.is_a?(Time) ? be_within(time_within).of(value) : value
     end
-    diffs.join("\n")
+    matcher = have_attributes(attrs)
+    matcher.matches?(actual)
+    matcher.failure_message
   end
 end
