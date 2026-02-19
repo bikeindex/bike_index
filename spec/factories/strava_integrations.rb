@@ -22,6 +22,11 @@ FactoryBot.define do
       end
     end
 
+    trait :env_tokens do
+      access_token { ENV.fetch("STRAVA_TEST_ACCESS_TOKEN", "TEST-TOKEN") }
+      refresh_token { ENV.fetch("STRAVA_TEST_REFRESH_TOKEN", "TEST-REFRESH-TOKEN") }
+    end
+
     trait :syncing do
       with_athlete
       status { :syncing }

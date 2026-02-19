@@ -1,0 +1,142 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://www.strava.com/oauth/token
+    body:
+      encoding: UTF-8
+      string: client_id=<STRAVA_KEY>&client_secret=<STRAVA_SECRET>&grant_type=refresh_token&refresh_token=<STRAVA_TEST_REFRESH_TOKEN>
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Thu, 19 Feb 2026 22:13:58 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '16'
+      Server:
+      - istio-envoy
+      Status:
+      - 200 OK
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - 032b69a9-c06b-469a-a59c-27dc238cc2cf
+      X-Download-Options:
+      - noopen
+      Etag:
+      - W/"0cdc9cfed0c7f135e6f6245774d3b7d1"
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 cf4c9e8bf3666077e0e95cf648e88ab8.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P10
+      X-Amz-Cf-Id:
+      - aqf6cGWYxAy_Rpwp5FU8Z5S1P7AMwu8oC6Bug3_SrruFAsfUSPDeKw==
+    body:
+      encoding: ASCII-8BIT
+      string: '{"token_type":"Bearer","access_token":"065bf162889d96726f8dd2299ddac8e1f0f2285c","expires_at":1771560210,"expires_in":20972,"refresh_token":"<STRAVA_TEST_REFRESH_TOKEN>"}'
+  recorded_at: Thu, 19 Feb 2026 22:13:58 GMT
+- request:
+    method: put
+    uri: https://www.strava.com/api/v3/activities/17419209324?gear_id=b11099574
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Thu, 19 Feb 2026 22:13:58 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '67'
+      Server:
+      - istio-envoy
+      Status:
+      - 404 Not Found
+      X-Ratelimit-Usage:
+      - '2,2'
+      X-Ratelimit-Limit:
+      - '600,6000'
+      Vary:
+      - Accept, Origin
+      Cache-Control:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - cb70391d-236e-4944-9a48-c778d2ed0b58
+      X-Readratelimit-Limit:
+      - '300,3000'
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Readratelimit-Usage:
+      - '2,2'
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 af63429cca0caf23ac2ab7e13afc8ebc.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P10
+      X-Amz-Cf-Id:
+      - QMPFtJMj5pdLaBlIrzKlj4m2QuiNQpx9J2Sx4yIRs7Tjqo5ZL7Zsvw==
+    body:
+      encoding: ASCII-8BIT
+      string: '{"message":"Resource Not Found","errors":[{"resource":"Activity","field":"","code":"not
+        found"}]}'
+  recorded_at: Thu, 19 Feb 2026 22:13:58 GMT
+recorded_with: VCR 6.3.1

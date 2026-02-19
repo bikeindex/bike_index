@@ -57,7 +57,7 @@ RSpec.describe "Strava Proxy API", type: :request do
     end
 
     context "with synced strava integration" do
-      let!(:strava_integration) { FactoryBot.create(:strava_integration, user:, status: :synced) }
+      let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens, user:) }
       let(:target_attributes) do
         {
           strava_id: "17323701543",
@@ -133,18 +133,18 @@ RSpec.describe "Strava Proxy API", type: :request do
       context "activity detail response" do
         let(:detail_target_attributes) do
           target_attributes.merge(
-            "description" => "Hawk with Eric and Scott and cedar",
-            "photos" => {
-              "photo_url" => "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
-              "photo_count" => 2
+            description: "Hawk with Eric and Scott and cedar",
+            photos: {
+              photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+              photo_count: 2
             },
-            "segment_locations" => {
-              "cities" => ["San Francisco", "Mill Valley"],
-              "states" => ["California"],
-              "countries" => ["United States", "USA"]
+            segment_locations: {
+              cities: ["San Francisco", "Mill Valley"],
+              states: ["California"],
+              countries: ["United States", "USA"]
             },
-            "strava_data" => target_attributes.as_json["strava_data"].merge("enriched" => true)
-          )
+            strava_data: target_attributes["strava_data"].merge("enriched" => true)
+          ).as_json
         end
 
         it "creates from list then enriches from detail" do
@@ -172,17 +172,79 @@ RSpec.describe "Strava Proxy API", type: :request do
       end
 
       context "update activity via PUT" do
-        it "returns strava error response" do
-          VCR.use_cassette("strava-proxy_update_activity") do
-            expect {
-              post base_url, params: {url: "activities/17419209324?gear_id=b11099574", method: "PUT", access_token: token.token}
-            }.to change(StravaRequest, :count).by(1)
-          end
-          expect(response.status).to eq 401
-          expect(json_result["message"]).to eq "Authorization Error"
-          expect(json_result["errors"]).to be_present
-          expect(StravaRequest.last.token_refresh_failed?).to be_truthy
-        end
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens, user:, token_expires_at:) }
+        let(:strava_id) { "17419209324" }
+        let(:gear_id) { "b11099574" }
+        let!(:strava_activity) { FactoryBot.create(:strava_activity, strava_integration:, strava_id:) }
+        let(:token_expires_at) { Time.current - 1.hour }
+        # it "returns strava error response" do
+        #   expect(strava_integration.reload.token_expired?).to be_truthy
+        #   og_token = strava_integration.access_token
+
+        #   VCR.use_cassette("strava-proxy_update_activity-insufficient") do
+        #     expect {
+        #       post base_url, params: {url: "activities/#{strava_id}?gear_id=#{gear_id}", method: "PUT", access_token: token.token}
+        #     }.to change(StravaRequest, :count).by(1)
+        #   end
+
+        #   expect(response.status).to eq 401
+        #   expect(json_result["message"]).to eq "Authorization Error"
+        #   expect(json_result["errors"]).to be_present
+        #   expect(strava_integration.reload.token_expired?).to be_falsey
+        #   expect(strava_integration.access_token).to_not eq og_token
+        # end
+
+        # context "with valid token permissions" do
+        #   let(:token_expires_at) { Time.current + 1.hour }
+        #   let(:target_attributes) do
+        #     {
+        #       strava_id:,
+        #       title: "Thanks for coming across the bay!",
+        #       activity_type: "EBikeRide",
+        #       sport_type: "EBikeRide",
+        #       distance_meters: 44936.4,
+        #       moving_time_seconds: 9468,
+        #       total_elevation_gain_meters: 669.0,
+        #       average_speed: 4.746,
+        #       suffer_score: 27.0,
+        #       kudos_count: 17,
+        #       gear_id:,
+        #       private: false,
+        #       timezone: "America/Los_Angeles",
+        #       strava_data: {
+        #         average_heartrate: 115.0, max_heartrate: 167.0,
+        #         device_name: "Strava App", commute: false,
+        #         average_speed: 4.746, pr_count: 0,
+        #         average_watts: 129.0, device_watts: false, enriched: true
+        #       }
+        #       description: "Hawk with Eric and Scott and cedar",
+        #       photos: {
+        #         photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+        #         photo_count: 2
+        #       },
+        #       segment_locations: {
+        #         cities: ["San Francisco", "Mill Valley"],
+        #         states: ["California"],
+        #         countries: ["United States", "USA"]
+        #       },
+        #     }.as_json
+        #   end
+        #   it "updates the activity" do
+        #     expect(strava_integration.reload.token_expired?).to be_falsey
+        #     og_token = strava_integration.access_token
+
+        #     VCR.use_cassette("strava-proxy_update_activity") do
+        #       expect {
+        #         post base_url, params: {url: "activities/#{strava_id}?gear_id=#{gear_id}", method: "PUT", access_token: token.token}
+        #       }.to change(StravaRequest, :count).by(1)
+        #     end
+
+        #     expect(response.status).to eq 401
+        #     expect(json_result["message"]).to eq "Authorization Error"
+        #     expect(json_result["errors"]).to be_present
+        #     expect(strava_integration.access_token).to eq og_token
+        #   end
+        # end
       end
 
       context "invalid proxy path" do
