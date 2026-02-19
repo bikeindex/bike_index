@@ -2,7 +2,7 @@
 
 # NOTE: This is not actually a job - it's in the StravaJobs namespace to keep everything together
 module StravaJobs
-  class RequestProxier
+  class ProxyRequester
     STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3)
 
     class << self

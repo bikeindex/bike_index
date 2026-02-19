@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe StravaJobs::RequestProxier do
+RSpec.describe StravaJobs::ProxyRequester do
   before { StravaRequest.destroy_all }
 
   let(:strava_integration) { FactoryBot.create(:strava_integration) }
