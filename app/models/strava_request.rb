@@ -38,7 +38,8 @@ class StravaRequest < AnalyticsRecord
     rate_limited: 3,
     token_refresh_failed: 4,
     integration_deleted: 5,
-    skipped: 6
+    skipped: 6,
+    insufficient_token_priveleges: 7
   }.freeze
 
   belongs_to :user
@@ -158,6 +159,8 @@ class StravaRequest < AnalyticsRecord
       :rate_limited
     elsif response.status == 401
       :token_refresh_failed
+    elsif response.status == 403
+      :insufficient_token_priveleges
     else
       :error
     end

@@ -102,33 +102,6 @@ RSpec.describe "Strava Proxy API", type: :request do
         end
       end
 
-      context "strava returns rate limit error" do
-        it "returns strava error status" do
-          VCR.use_cassette("strava-proxy_rate_limited") do
-            expect do
-              post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
-            end.to change(StravaRequest, :count).by 1
-            expect(response.status).to eq 429
-            expect(json_result["message"]).to eq "Rate Limit Exceeded"
-            expect(json_result["errors"]).to be_present
-            expect(StravaRequest.last.rate_limited?).to be_truthy
-          end
-        end
-      end
-
-      context "strava returns server error" do
-        it "returns strava error status without raising" do
-          VCR.use_cassette("strava-proxy_server_error") do
-            expect do
-              post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
-            end.to change(StravaRequest, :count).by 1
-            expect(response.status).to eq 500
-            expect(json_result["message"]).to eq "Internal Server Error"
-            expect(StravaRequest.last.error?).to be_truthy
-          end
-        end
-      end
-
       context "activity detail response" do
         let(:detail_target_attributes) do
           target_attributes.merge(
@@ -176,8 +149,9 @@ RSpec.describe "Strava Proxy API", type: :request do
         let(:gear_id) { "b11099574" }
         let!(:strava_activity) { FactoryBot.create(:strava_activity, strava_integration:, strava_id:) }
         let(:token_expires_at) { Time.current - 1.hour }
+        let(:expected_parameters) { {body: {gear_id: "b11099574"}, method: "PUT", url: "activities/17419209324"} }
 
-        it "returns strava error response" do
+        it "returns insufficient_token_privileges response" do
           expect(strava_integration.reload.token_expired?).to be_truthy
           og_token = strava_integration.access_token
 
@@ -192,6 +166,12 @@ RSpec.describe "Strava Proxy API", type: :request do
           expect(response.status).to eq 404
           expect(json_result["message"]).to eq "Resource Not Found"
           expect(json_result["errors"]).to be_present
+
+          strava_request = StravaRequest.last
+          expect(strava_request.proxy?).to be_truthy
+          expect(strava_request.response_status).to eq "insufficient_token_privileges"
+          expect(strava_request.parameters).to eq expected_parameters.as_json
+
           expect(strava_integration.reload.token_expired?).to be_falsey
           expect(strava_integration.access_token).to_not eq og_token
         end
@@ -243,11 +223,60 @@ RSpec.describe "Strava Proxy API", type: :request do
 
             expect(response.status).to eq 200
             expect(strava_integration.access_token).to eq og_token
-            strava_activity.reload
+
+            strava_request = StravaRequest.last
+            expect(strava_request.proxy?).to be_truthy
+            expect(strava_request.success?).to be_truthy
+            expect(strava_request.parameters).to eq expected_parameters.as_json
 
             expect(strava_activity.reload).to have_attributes target_attributes
             expect(strava_activity.start_date).to be_within(1).of Time.at(1771267927)
             expect(json_result).to eq strava_activity.proxy_serialized.as_json
+          end
+        end
+      end
+
+      context "strava returns rate limit error" do
+        it "returns strava error status" do
+          VCR.use_cassette("strava-proxy_rate_limited") do
+            expect do
+              post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            end.to change(StravaRequest, :count).by 1
+            expect(response.status).to eq 429
+            expect(json_result["message"]).to eq "Rate Limit Exceeded"
+            expect(json_result["errors"]).to be_present
+            expect(StravaRequest.last.rate_limited?).to be_truthy
+          end
+        end
+      end
+
+      context "strava returns not found" do
+        let(:expected_response_body) { {message: "Record Not Found", errors: [{resource: "resource", field: "path", code: "invalid"}]} }
+        it "returns strava error status" do
+          VCR.use_cassette("strava-proxy_not_found") do
+            expect do
+              post base_url, params: {url: "athlete/activitiesasdfasdfsdf", method: "GET", access_token: token.token}
+            end.to change(StravaRequest, :count).by 1
+            expect(response.status).to eq 404
+            expect(json_result).to eq expected_response_body.as_json
+
+            strava_request = StravaRequest.last
+            expect(strava_request.proxy?).to be_truthy
+            expect(strava_request.success?).to be_falsey
+            expect(strava_request.response_status).to eq "error"
+          end
+        end
+      end
+
+      context "strava returns server error" do
+        it "returns strava error status without raising" do
+          VCR.use_cassette("strava-proxy_server_error") do
+            expect do
+              post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+            end.to change(StravaRequest, :count).by 1
+            expect(response.status).to eq 500
+            expect(json_result["message"]).to eq "Internal Server Error"
+            expect(StravaRequest.last.error?).to be_truthy
           end
         end
       end
