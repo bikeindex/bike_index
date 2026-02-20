@@ -179,6 +179,17 @@ class StravaActivity < ApplicationRecord
     update(attrs)
   end
 
+  # Convenience method - probably don't use this except in console
+  def update_from_strava!
+    strava_request = StravaRequest.create!(
+      strava_integration_id:,
+      user_id: strava_integration.user_id,
+      request_type: :fetch_activity,
+      parameters: {strava_id: strava_id.to_s}
+    )
+    StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
+  end
+
   def proxy_serialized
     slice(*PROXY_ATTRS).merge(strava_data).merge("start_date_in_zone" => start_date_in_zone)
   end

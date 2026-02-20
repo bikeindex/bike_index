@@ -142,8 +142,35 @@ RSpec.describe StravaActivity, type: :model do
   end
 
   describe "proxy_serialized" do
+    let(:target) do
+      {
+        activity_type: "Ride",
+        average_speed: 6.944,
+        description: "Great ride",
+        distance_meters: 25000.0,
+        kudos_count: 10,
+        moving_time_seconds: 3600,
+        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
+        private: false,
+        segment_locations: {cities: ["Denver"], states: ["Colorado"], countries: ["United States"]},
+        sport_type: "Ride",
+        suffer_score: 42.0,
+        timezone: "America/Denver",
+        title: "Morning Ride",
+        total_elevation_gain_meters: 200.0,
+        gear_id: "b1234",
+        strava_id: "123",
+        average_heartrate: 145.0,
+        max_heartrate: 180.0,
+        device_name: "Garmin Edge 530",
+        commute: false,
+        pr_count: 3,
+        average_watts: 200.0,
+        device_watts: true
+      }
+    end
     it "returns PROXY_ATTRS merged with strava_data" do
-      strava_activity = FactoryBot.create(:strava_activity,
+      strava_activity = FactoryBot.build(:strava_activity,
         strava_id: "123",
         title: "Morning Ride",
         activity_type: "Ride",
@@ -158,40 +185,15 @@ RSpec.describe StravaActivity, type: :model do
         gear_id: "b1234",
         private: false,
         timezone: "America/Denver",
-        start_date: "2025-06-15T08:00:00Z",
+        start_date: Time.current,
         photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
         segment_locations: {cities: ["Denver"], states: ["Colorado"], countries: ["United States"]},
         strava_data: {average_heartrate: 145.0, max_heartrate: 180.0, device_name: "Garmin Edge 530",
                       commute: false, average_speed: 6.944, pr_count: 3, average_watts: 200.0, device_watts: true})
 
-      result = strava_activity.proxy_serialized
-      expect(result).to eq({
-        "activity_type" => "Ride",
-        "average_speed" => 6.944,
-        "description" => "Great ride",
-        "distance_meters" => 25000.0,
-        "kudos_count" => 10,
-        "moving_time_seconds" => 3600,
-        "photos" => {"photo_url" => "https://example.com/photo.jpg", "photo_count" => 3},
-        "private" => false,
-        "segment_locations" => {"cities" => ["Denver"], "states" => ["Colorado"], "countries" => ["United States"]},
-        "sport_type" => "Ride",
-        "start_date" => strava_activity.start_date.as_json,
-        "start_date_in_zone" => strava_activity.start_date_in_zone.as_json,
-        "suffer_score" => 42.0,
-        "timezone" => "America/Denver",
-        "title" => "Morning Ride",
-        "total_elevation_gain_meters" => 200.0,
-        "gear_id" => "b1234",
-        "strava_id" => "123",
-        "average_heartrate" => 145.0,
-        "max_heartrate" => 180.0,
-        "device_name" => "Garmin Edge 530",
-        "commute" => false,
-        "pr_count" => 3,
-        "average_watts" => 200.0,
-        "device_watts" => true
-      })
+      expect(strava_activity.proxy_serialized.except("start_date", "start_date_in_zone")).to eq target.as_json
+      expect(strava_activity.proxy_serialized["start_date"]).to be_within(1).of Time.current
+      expect(strava_activity.proxy_serialized["start_date_in_zone"].time_zone.name).to eq strava_activity.timezone
     end
   end
 

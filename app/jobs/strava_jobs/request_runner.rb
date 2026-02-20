@@ -63,16 +63,17 @@ module StravaJobs
       end
     end
 
-    def perform(strava_request_id = nil)
+    # keyword args are just for calling inline
+    def perform(strava_request_id = nil, strava_request: nil, no_skip: false)
       return enqueue_next_request unless strava_request_id.present?
 
-      strava_request = StravaRequest.find_by(id: strava_request_id)
+      strava_request ||= StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || strava_request&.requested_at.present?
 
       strava_integration = StravaIntegration.find_by(id: strava_request.strava_integration_id)
       if strava_integration.blank?
         return mark_requests_deleted(strava_request)
-      elsif strava_request.skip_request?
+      elsif strava_request.skip_request? && !no_skip
         return strava_request.update(response_status: "skipped")
       end
 

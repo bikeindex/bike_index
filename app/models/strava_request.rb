@@ -123,7 +123,9 @@ class StravaRequest < AnalyticsRecord
   end
 
   def skip_request?
-    false # TODO: Make this skip if it's already been requested - specifically, a proxy
+    return false unless fetch_activity?
+
+    strava_integration.strava_activities.enriched.exists?(strava_id: parameters["strava_id"])
   end
 
   def looks_like_last_page?(per_page: nil)
