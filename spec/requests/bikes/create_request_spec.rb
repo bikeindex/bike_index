@@ -8,7 +8,7 @@ RSpec.describe "BikesController#create", type: :request do
   let(:color) { Color.black }
   let(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
   let(:country) { state.country }
-  let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug, :manufacturer_id) }
+  let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug, :manufacturer_id, :secondary_frame_color_id, :tertiary_frame_color_id, :manufacturer_other) }
   let(:basic_bike_params) do
     {
       serial_number: "Bike serial",
@@ -213,7 +213,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect(BParam.all.count).to eq 1
         expect(BParam.last.bike_errors.to_s).to match(/manufacturer/i)
         bike = assigns(:bike)
-        expect(bike).to have_attributes bike_params.except(:manufacturer_id, :phone)
+        expect(bike).to have_attributes bike_params.except(:manufacturer_id, :phone, :b_param_id_token, :secondary_frame_color_id, :tertiary_frame_color_id, :manufacturer_other, :date_stolen)
         expect(bike.status).to eq "status_stolen"
         # we retain the stolen record attrs, test that they are assigned correctly too
         expect(bike.stolen_records.first).to have_attributes chicago_stolen_params

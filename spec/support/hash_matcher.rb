@@ -182,10 +182,13 @@ end
 
 # Instead of doing our own thing, use have_attributes instead
 RSpec::Matchers.define :have_attributes_with_time_within do |expected, time_within = 1|
-  attrs = expected.transform_values do |value|
-    value.is_a?(Time) ? be_within(time_within).of(value) : value
+  match do |actual|
+    attrs = expected.transform_values do |value|
+      value.is_a?(Time) ? be_within(time_within).of(value) : value
+    end
+    @have_attrs_matcher = have_attributes(attrs)
+    @have_attrs_matcher.matches?(actual)
   end
 
-  match { |actual| have_attributes(attrs).matches?(actual) }
-  failure_message { have_attributes(attrs).failure_message }
+  failure_message { @have_attrs_matcher.failure_message }
 end
