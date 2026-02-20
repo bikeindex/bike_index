@@ -231,7 +231,7 @@ class User < ApplicationRecord
       update(address_record_id: orphaned_address_record.id)
       orphaned_address_record
     else
-      AddressRecord.new(user_id: id, kind: :user, country_id:)
+      self.address_record = AddressRecord.new(user_id: id, kind: :user, country_id:)
     end
   end
 

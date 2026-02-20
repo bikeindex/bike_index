@@ -611,7 +611,6 @@ CREATE TABLE public.bikes (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     manufacturer_other character varying(255),
-    zipcode character varying(255),
     cached_data text,
     description text,
     owner_email text,
@@ -635,7 +634,6 @@ CREATE TABLE public.bikes (
     pdf character varying(255),
     paint_id integer,
     example boolean DEFAULT false NOT NULL,
-    country_id integer,
     serial_normalized character varying(255),
     stock_photo_url character varying(255),
     current_stolen_record_id integer,
@@ -652,12 +650,9 @@ CREATE TABLE public.bikes (
     cycle_type integer DEFAULT 0,
     propulsion_type integer DEFAULT 0,
     deleted_at timestamp without time zone,
-    city character varying,
     latitude double precision,
     longitude double precision,
     status integer DEFAULT 0,
-    street character varying,
-    state_id bigint,
     address_set_manually boolean DEFAULT false,
     is_phone boolean DEFAULT false,
     current_impound_record_id bigint,
@@ -669,7 +664,6 @@ CREATE TABLE public.bikes (
     likely_spam boolean DEFAULT false,
     serial_segments_migrated_at timestamp without time zone,
     model_audit_id bigint,
-    neighborhood character varying,
     primary_activity_id bigint,
     address_record_id bigint
 );
@@ -6095,13 +6089,6 @@ CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree
 
 
 --
--- Name: index_bikes_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_state_id ON public.bikes USING btree (state_id);
-
-
---
 -- Name: index_bikes_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7447,6 +7434,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260219190342'),
 ('20260218010402'),
 ('20260217170639'),
 ('20260214163159'),

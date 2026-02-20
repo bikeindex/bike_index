@@ -401,7 +401,7 @@ RSpec.describe "BikesController#create", type: :request do
           ownership = new_bike.current_ownership
           expect(ownership.origin).to eq "web"
           expect(ownership.creator_id).to eq current_user.id
-          reg_hash = address_record_attributes
+          reg_hash = address_record_attributes.except(:region_record_id)
             .merge("organization_affiliation_#{organization.id}" => "community_member", "ip_address" => "127.0.0.1")
           expect(ownership.registration_info).to match_hash_indifferently reg_hash
 
@@ -567,53 +567,6 @@ RSpec.describe "BikesController#create", type: :request do
       current_user.reload
       expect(new_bike.owner).to eq current_user # NOTE: not bike user
       expect(current_user.phone).to be_nil # Because the phone doesn't set for the creator
-    end
-
-    # TODO: #2922 remove this test - it is unnecessary once the form is for sure not submitting with the legacy attributes
-    # ... and otherwise it duplicates the above test
-    context "legacy address attributes" do
-      let(:passed_bike_params) do
-        {
-          manufacturer_id: manufacturer.slug,
-          b_param_id_token: b_param.id_token,
-          street: "212 Main St",
-          city: "Chicago",
-          state: "IL",
-          zipcode: "60647",
-          extra_registration_number: " ",
-          organization_affiliation: "student",
-          student_id: "999888",
-          phone: "18887776666"
-        }
-      end
-      it "creates the bike and does the updated address thing" do
-        expect {
-          post base_url, params: {bike: passed_bike_params}
-        }.to change(Bike, :count).by(1)
-        expect(flash[:success]).to be_present
-        new_bike = Bike.last
-        b_param.reload
-        expect(b_param.created_bike_id).to eq new_bike.id
-        expect(new_bike).to match_hash_indifferently testable_bike_params
-        expect(new_bike.manufacturer).to eq manufacturer
-        expect(new_bike.current_ownership.origin).to eq "embed_partial"
-        expect(new_bike.current_ownership.creator).to eq new_bike.creator
-        # Pulled from BParam. Doesn't happen in real life, but :shrug:
-        expect(new_bike.cycle_type).to eq "cargo-rear"
-        expect(new_bike.serial_number).to eq "example serial"
-
-        expect(new_bike.address_record).to match_hash_indifferently target_address
-        expect(new_bike.current_ownership.address_record).to be_present
-        expect(new_bike.extra_registration_number).to be_nil
-        expect(new_bike.organization_affiliation).to eq "student"
-        expect(new_bike.phone).to eq "18887776666"
-        expect(new_bike.student_id).to eq "999888"
-        expect(new_bike.registration_info).to match_hash_indifferently(target_registration_info.except(:region_string, :postal_code))
-
-        current_user.reload
-        expect(new_bike.owner).to eq current_user # NOTE: not bike user
-        expect(current_user.phone).to be_nil # Because the phone doesn't set for the creator
-      end
     end
   end
   context "existing b_param, created bike" do
