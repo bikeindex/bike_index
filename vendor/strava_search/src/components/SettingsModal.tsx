@@ -4,10 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePreferences } from '../contexts/PreferencesContext';
 import { useActivitySync } from '../hooks/useActivitySync';
 import {
-  setStravaCredentials,
-  getStravaCredentials,
-} from '../services/strava';
-import {
   clearAllData,
   getActivitiesForAthlete,
 } from '../services/database';
@@ -23,8 +19,6 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   const { units, setUnits, autoEnrich, setAutoEnrich } = usePreferences();
   const isDev = import.meta.env.DEV;
   const { isSyncing, progress, syncRecent } = useActivitySync();
-  const [clientId, setClientId] = useState(() => getStravaCredentials().clientId);
-  const [clientSecret, setClientSecret] = useState(() => getStravaCredentials().clientSecret);
   const [activityCount, setActivityCount] = useState(0);
   const [enrichedCount, setEnrichedCount] = useState(0);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -40,20 +34,20 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   }, [onClose]);
 
   useEffect(() => {
-    if (athlete) {
+    if (!athlete) return;
+
+    const fetchCounts = () => {
       getActivitiesForAthlete(athlete.id).then((activities) => {
         setActivityCount(activities.length);
-        // Count enriched activities (those with enrichedAt set)
-        const enriched = activities.filter(a => a.enrichedAt).length;
+        const enriched = activities.filter(a => a.enriched).length;
         setEnrichedCount(enriched);
       });
-    }
-  }, [athlete]);
+    };
 
-  const handleSaveCredentials = () => {
-    setStravaCredentials(clientId.trim(), clientSecret.trim());
-    onClose();
-  };
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 2000);
+    return () => clearInterval(interval);
+  }, [athlete]);
 
   const handleClearData = async () => {
     await clearAllData();
@@ -62,7 +56,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1040] p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Settings</h2>
@@ -145,37 +139,6 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
                 }`}
               >
                 Metric (km, m)
-              </button>
-            </div>
-          </div>
-
-          {/* API Credentials */}
-          <div>
-            <h3 className="font-medium text-gray-900 mb-3">Strava API Credentials</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Client ID</label>
-                <input
-                  type="text"
-                  value={clientId}
-                  onChange={(e) => setClientId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Client Secret</label>
-                <input
-                  type="password"
-                  value={clientSecret}
-                  onChange={(e) => setClientSecret(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
-                />
-              </div>
-              <button
-                onClick={handleSaveCredentials}
-                className="w-full py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
-              >
-                Save Credentials
               </button>
             </div>
           </div>

@@ -79,7 +79,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           organization = Organization.last
           expect(organization.kind).to eq(kind)
           unless organization.ambassador? # Ambassadors have special attrs set
-            expect(organization).to match_hash_indifferently create_attributes.except(:kind)
+            expect(organization).to have_attributes create_attributes.except(:kind)
           end
           expect(current_user.organizations.count).to eq 0 # it doesn't assign the user
         end
@@ -287,7 +287,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       let(:update_params) do
         {
           name: "other namE",
-          search_radius_miles: "1222.2",
+          search_radius_miles: 1222.2,
           graduated_notification_interval_days: 4444,
           passwordless_user_domain: "stuff.com"
         }
@@ -301,7 +301,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           organization_stolen_message_search_radius_miles: 44,
           organization_stolen_message_kind: "association"
         }
-        expect(organization.reload).to match_hash_indifferently update_params
+        expect(organization.reload).to have_attributes update_params
         expect(organization_stolen_message.reload.kind).to eq "association"
         expect(organization_stolen_message.search_radius_miles).to eq 44
         # And it works with kilometers too

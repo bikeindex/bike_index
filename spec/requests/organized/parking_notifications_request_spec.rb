@@ -127,7 +127,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       {
         kind: "appears_abandoned_notification",
         internal_notes: "some details about the abandoned thing",
-        bike_id: bike.to_param,
+        bike_id: bike.id,
         use_entered_address: "false",
         latitude: default_location[:latitude],
         longitude: default_location[:longitude],
@@ -198,7 +198,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         }.to change(ParkingNotification, :count).by(1)
         parking_notification = ParkingNotification.last
 
-        expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address)
+        expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address)
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
         expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
@@ -239,7 +239,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.image).to be_present
           expect(parking_notification.image_processing).to be_falsey
 
-          expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address)
+          expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address)
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
@@ -260,7 +260,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           {
             kind: "impound_notification",
             internal_notes: "",
-            bike_id: bike.to_param,
+            bike_id: bike.id,
             use_entered_address: "true",
             latitude: default_location[:latitude],
             longitude: default_location[:longitude],
@@ -270,7 +270,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             street: "300 Lakeside Dr",
             city: "Oakland",
             zipcode: "94612",
-            state_id: state.id.to_s,
+            state_id: state.id,
             country_id: Country.united_states.id
           }
         end
@@ -293,7 +293,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           parking_notification = ParkingNotification.last
 
-          expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address, :is_repeat, :latitude, :longitude)
+          expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address, :is_repeat, :latitude, :longitude)
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.initial_record).to eq parking_notification_initial

@@ -371,6 +371,7 @@ Rails.application.routes.draw do
   %w[stolen_bikes roadmap spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }
 
   get "strava_search", to: "strava_search#index"
+  post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
 
   mount Lookbook::Engine, at: "/lookbook"
 

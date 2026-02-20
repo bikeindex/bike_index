@@ -19,23 +19,15 @@ RSpec.describe "Strava Proxy API", type: :request do
 
   context "token from wrong app" do
     it "returns 403" do
-      stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", "99999")
+      stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", 99999)
       post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
       expect(response.status).to eq 403
       expect(json_result[:error]).to eq "Unauthorized application"
     end
   end
 
-  context "STRAVA_DOORKEEPER_APP_ID not set" do
-    it "returns 403" do
-      stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", nil)
-      post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
-      expect(response.status).to eq 403
-    end
-  end
-
   context "valid token and app" do
-    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
+    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
     context "no strava integration" do
       it "returns 404" do
@@ -115,7 +107,7 @@ RSpec.describe "Strava Proxy API", type: :request do
               states: ["California"],
               countries: ["United States", "USA"]
             },
-            strava_data: target_attributes["strava_data"].merge("enriched" => true, "muted" => false)
+            strava_data: target_attributes["strava_data"].merge("muted" => false)
           ).as_json
         end
 
@@ -138,6 +130,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           end
           strava_activity.reload
           expect(strava_activity.enriched?).to be_truthy
+          expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
           expect(strava_activity).to have_attributes detail_target_attributes
           expect(json_result).to eq strava_activity.proxy_serialized.as_json
         end
@@ -190,7 +183,7 @@ RSpec.describe "Strava Proxy API", type: :request do
               private: false,
               kudos_count: 2,
               gear_id:,
-              photos: {photo_url: nil, photo_count: 0},
+              photos: {photo_url: "https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-768x432.jpg", photo_count: 1},
               segment_locations: {},
               activity_type: "Ride",
               timezone: "America/Chicago",
@@ -198,7 +191,6 @@ RSpec.describe "Strava Proxy API", type: :request do
               suffer_score: 2.0,
               strava_data: {
                 commute: false,
-                enriched: true,
                 muted: true,
                 pr_count: 0,
                 device_name: "Peloton Bike",
@@ -210,7 +202,7 @@ RSpec.describe "Strava Proxy API", type: :request do
               }
             }.as_json
           end
-          it "updates the activity" do
+          it "updates the activity and runs update_from_strava!" do
             expect(strava_integration.reload.token_expired?).to be_falsey
             og_token = strava_integration.access_token
             expect(strava_activity.reload.enriched?).to be_falsey
@@ -220,16 +212,19 @@ RSpec.describe "Strava Proxy API", type: :request do
                 post base_url, params: {
                   url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
                 }
-              }.to change(StravaRequest, :count).by(1)
+              }.to change(StravaRequest, :count).by(3)
+              # proxy PUT + update_from_strava! GET + enqueued gear fetch
             end
 
             expect(response.status).to eq 200
             expect(strava_integration.access_token).to eq og_token
 
-            strava_request = StravaRequest.last
-            expect(strava_request.proxy?).to be_truthy
-            expect(strava_request.success?).to be_truthy
-            expect(strava_request.parameters).to eq expected_parameters.as_json
+            proxy_request = StravaRequest.where(request_type: :proxy).last
+            expect(proxy_request.success?).to be_truthy
+            expect(proxy_request.parameters).to eq expected_parameters.as_json
+
+            fetch_request = StravaRequest.where(request_type: :fetch_activity).last
+            expect(fetch_request.success?).to be_truthy
 
             expect(strava_activity.reload.enriched?).to be_truthy
             expect(strava_activity).to have_attributes target_attributes

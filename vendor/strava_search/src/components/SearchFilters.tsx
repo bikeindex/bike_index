@@ -45,7 +45,7 @@ export function SearchFilters({
     filters.elevationTo !== null ||
     filters.mutedFilter !== 'all' ||
     filters.photoFilter !== 'all' ||
-    filters.visibilityFilter !== 'all';
+    filters.privateFilter !== 'all';
 
   const clearFilters = () => {
     onFiltersChange({
@@ -62,7 +62,7 @@ export function SearchFilters({
       elevationTo: null,
       mutedFilter: 'all',
       photoFilter: 'all',
-      visibilityFilter: 'all',
+      privateFilter: 'all',
     });
   };
 
@@ -231,34 +231,24 @@ export function SearchFilters({
           </div>
           <div className="flex ml-2">
             <button
-              onClick={() => onFiltersChange({ ...filters, visibilityFilter: filters.visibilityFilter === 'everyone' ? 'all' : 'everyone' })}
+              onClick={() => onFiltersChange({ ...filters, privateFilter: filters.privateFilter === 'private' ? 'all' : 'private' })}
               className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
-                filters.visibilityFilter === 'everyone'
-                  ? 'bg-[#fc4c02] text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Public
-            </button>
-            <button
-              onClick={() => onFiltersChange({ ...filters, visibilityFilter: filters.visibilityFilter === 'followers_only' ? 'all' : 'followers_only' })}
-              className={`px-3 py-1 text-sm transition-colors ${
-                filters.visibilityFilter === 'followers_only'
-                  ? 'bg-[#fc4c02] text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Followers
-            </button>
-            <button
-              onClick={() => onFiltersChange({ ...filters, visibilityFilter: filters.visibilityFilter === 'only_me' ? 'all' : 'only_me' })}
-              className={`px-3 py-1 text-sm rounded-r-full transition-colors ${
-                filters.visibilityFilter === 'only_me'
+                filters.privateFilter === 'private'
                   ? 'bg-[#fc4c02] text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               Private
+            </button>
+            <button
+              onClick={() => onFiltersChange({ ...filters, privateFilter: filters.privateFilter === 'not_private' ? 'all' : 'not_private' })}
+              className={`px-3 py-1 text-sm rounded-r-full transition-colors ${
+                filters.privateFilter === 'not_private'
+                  ? 'bg-[#fc4c02] text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Not private
             </button>
           </div>
           <div className="flex ml-2">

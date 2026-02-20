@@ -41,9 +41,9 @@ RSpec.describe Stripe::UpdatePricesJob, type: :job do
 
         expect(StripePrice.monthly.basic.active.count).to eq 3
 
-        expect(StripePrice.monthly.basic.usd.active.first).to match_hash_indifferently target_basic
+        expect(StripePrice.monthly.basic.usd.active.first).to have_attributes target_basic
 
-        expect(stripe_price_existing.reload).to match_hash_indifferently target_existing_updated
+        expect(stripe_price_existing.reload).to have_attributes target_existing_updated
       end
       expect(stripe_price_unknown.reload.active).to be_falsey
     end

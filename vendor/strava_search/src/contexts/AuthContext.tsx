@@ -6,18 +6,16 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import type { StravaAthlete } from '../types/strava';
+import type { StravaAthlete, StoredAuth } from '../types/strava';
 import {
   getAuth,
   clearAuth as clearAuthDb,
+  saveAuth,
   getSyncState,
   type SyncState,
 } from '../services/database';
-import {
-  exchangeCodeForToken,
-  hasStravaCredentials,
-  refreshAccessToken,
-} from '../services/strava';
+import { getConfig, exchangeSessionForToken } from '../services/railsApi';
+import { getAthlete } from '../services/strava';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -25,7 +23,6 @@ interface AuthContextType {
   athlete: StravaAthlete | null;
   syncState: SyncState | null;
   error: string | null;
-  login: () => void;
   logout: () => Promise<void>;
   refreshSyncState: () => Promise<void>;
 }
@@ -50,30 +47,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const auth = await getAuth();
 
-      if (auth) {
-        // Check if token needs refresh
-        if (Date.now() >= auth.expiresAt - 60000) {
-          try {
-            const newAuth = await refreshAccessToken(auth.refreshToken);
-            setAthlete(newAuth.athlete);
-            setIsAuthenticated(true);
+      if (auth && Date.now() < auth.expiresAt - 60000) {
+        // Valid token in IndexedDB
+        setAthlete(auth.athlete);
+        setIsAuthenticated(true);
+        const state = await getSyncState(auth.athlete.id);
+        setSyncState(state || null);
 
-            const state = await getSyncState(newAuth.athlete.id);
-            setSyncState(state || null);
-          } catch {
-            // Refresh failed, clear auth
-            await clearAuthDb();
-            setIsAuthenticated(false);
-            setAthlete(null);
-            setSyncState(null);
-          }
-        } else {
-          setAthlete(auth.athlete);
-          setIsAuthenticated(true);
-
-          const state = await getSyncState(auth.athlete.id);
-          setSyncState(state || null);
+        // Refresh athlete profile in the background if it's missing
+        if (!auth.athlete.profile_medium) {
+          getAthlete().then(async (freshAthlete) => {
+            const updatedAuth = { ...auth, athlete: freshAthlete };
+            await saveAuth(updatedAuth);
+            setAthlete(freshAthlete);
+          }).catch(() => {}); // Silently ignore
         }
+        return;
+      }
+
+      // No valid token — exchange session for a new one
+      const config = getConfig();
+      const tokenResponse = await exchangeSessionForToken();
+      const athleteId = parseInt(config.athleteId, 10);
+
+      const newAuth: StoredAuth = {
+        accessToken: tokenResponse.access_token,
+        refreshToken: '',
+        expiresAt: (tokenResponse.created_at + tokenResponse.expires_in) * 1000,
+        athlete: auth?.athlete || { id: athleteId, username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
+      };
+      await saveAuth(newAuth);
+      setAthlete(newAuth.athlete);
+      setIsAuthenticated(true);
+
+      const state = await getSyncState(newAuth.athlete.id);
+      setSyncState(state || null);
+
+      // Fetch real athlete profile from Strava
+      try {
+        const freshAthlete = await getAthlete();
+        const updatedAuth = { ...newAuth, athlete: freshAthlete };
+        await saveAuth(updatedAuth);
+        setAthlete(freshAthlete);
+      } catch {
+        // Silently ignore — will use placeholder
       }
     } catch (err) {
       console.error('Auth check failed:', err);
@@ -83,58 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Handle OAuth callback
   useEffect(() => {
-    const handleCallback = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const errorParam = urlParams.get('error');
-
-      if (errorParam) {
-        setError(`OAuth error: ${errorParam}`);
-        // Clean up URL
-        window.history.replaceState({}, '', window.location.pathname);
-        setIsLoading(false);
-        return;
-      }
-
-      if (code) {
-        try {
-          const auth = await exchangeCodeForToken(code);
-          setAthlete(auth.athlete);
-          setIsAuthenticated(true);
-          setError(null);
-
-          const state = await getSyncState(auth.athlete.id);
-          setSyncState(state || null);
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Failed to authenticate');
-        } finally {
-          // Clean up URL
-          window.history.replaceState({}, '', window.location.pathname);
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      // No OAuth callback, check existing auth
-      await checkAuth();
-    };
-
-    handleCallback();
+    checkAuth();
   }, [checkAuth]);
-
-  const login = useCallback(() => {
-    if (!hasStravaCredentials()) {
-      setError('Please configure your Strava API credentials first');
-      return;
-    }
-
-    // Import dynamically to avoid circular dependency
-    import('../services/strava').then(({ generateAuthUrl }) => {
-      window.location.href = generateAuthUrl();
-    });
-  }, []);
 
   const logout = useCallback(async () => {
     await clearAuthDb();
@@ -152,7 +120,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         athlete,
         syncState,
         error,
-        login,
         logout,
         refreshSyncState,
       }}

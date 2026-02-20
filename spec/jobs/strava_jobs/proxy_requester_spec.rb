@@ -11,7 +11,7 @@ RSpec.describe StravaJobs::ProxyRequester do
   describe ".authorize_user_and_strava_integration" do
     let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
     let(:access_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
-    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
+    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
     it "returns error when strava integration is not synced" do
       expect(strava_integration.synced?).to be_falsey
@@ -26,6 +26,52 @@ RSpec.describe StravaJobs::ProxyRequester do
       expect(result[:error]).to be_nil
       expect(result[:user]).to eq user
       expect(result[:strava_integration]).to eq strava_integration
+    end
+  end
+
+  describe ".find_or_create_access_token" do
+    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
+    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
+
+    it "returns existing valid token" do
+      existing_token = Doorkeeper::AccessToken.create!(
+        application_id: doorkeeper_app.id,
+        resource_owner_id: user.id,
+        scopes: "public",
+        expires_in: Doorkeeper.configuration.access_token_expires_in
+      )
+
+      expect {
+        result = described_class.find_or_create_access_token(user.id)
+        expect(result.token).to eq existing_token.token
+      }.not_to change(Doorkeeper::AccessToken, :count)
+    end
+
+    it "creates a new token when none exists" do
+      expect {
+        result = described_class.find_or_create_access_token(user.id)
+        expect(result).to be_accessible
+        expect(result.application_id).to eq doorkeeper_app.id
+        expect(result.resource_owner_id).to eq user.id
+      }.to change(Doorkeeper::AccessToken, :count).by(1)
+    end
+
+    it "revokes expired token and creates a new one" do
+      expired_token = Doorkeeper::AccessToken.create!(
+        application_id: doorkeeper_app.id,
+        resource_owner_id: user.id,
+        scopes: "public",
+        expires_in: 3600,
+        created_at: 2.hours.ago
+      )
+
+      expect {
+        result = described_class.find_or_create_access_token(user.id)
+        expect(result.token).not_to eq expired_token.token
+        expect(result).to be_accessible
+      }.to change(Doorkeeper::AccessToken, :count).by(1)
+
+      expect(expired_token.reload.revoked?).to be true
     end
   end
 
@@ -89,7 +135,7 @@ RSpec.describe StravaJobs::ProxyRequester do
             states: ["California"],
             countries: ["United States", "USA"]
           },
-          strava_data: target_attributes["strava_data"].merge("enriched" => true, "muted" => false)
+          strava_data: target_attributes["strava_data"].merge("muted" => false)
         ).as_json
       end
 
@@ -111,6 +157,7 @@ RSpec.describe StravaJobs::ProxyRequester do
         end
         strava_activity.reload
         expect(strava_activity.enriched?).to be_truthy
+        expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
         expect(strava_activity).to have_attributes detail_target_attributes
         expect(result[:serialized]).to eq strava_activity.proxy_serialized
       end

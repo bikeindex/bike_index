@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import { usePreferences } from './contexts/PreferencesContext';
 import { useActivities } from './hooks/useActivities';
@@ -7,16 +7,14 @@ import { Header } from './components/Header';
 import { ErrorBanner } from './components/ErrorBanner';
 import { SearchFilters } from './components/SearchFilters';
 import { ActivityList } from './components/ActivityList';
-import { LoginPage } from './components/LoginPage';
 import { SettingsModal } from './components/SettingsModal';
-import { InitialSyncPrompt } from './components/InitialSyncPrompt';
 import { Loader2 } from 'lucide-react';
 
 function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const { syncState } = useAuth();
   const { autoEnrich } = usePreferences();
-  const { isSyncing, isFetchingFullData, progress, error: syncError, clearError: clearSyncError, fetchFullActivityData } = useActivitySync();
+  const { isSyncing, isFetchingFullData, progress, error: syncError, clearError: clearSyncError, fetchFullActivityData, syncAll } = useActivitySync();
   const {
     activities,
     filteredActivities,
@@ -116,19 +114,15 @@ function Dashboard() {
     return () => clearInterval(interval);
   }, [refreshActivities]);
 
-  // Show initial sync prompt only if no sync has started yet
-  const needsInitialSync = !syncState?.isInitialSyncComplete && !isSyncing && activities.length === 0;
-
-  if (needsInitialSync) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} />
-        {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} />}
-        <InitialSyncPrompt />
-        <SettingsModal isOpen={showSettings} onClose={handleCloseSettings} />
-      </div>
-    );
-  }
+  // Auto-start initial sync if no activities have been downloaded yet
+  // Wait for isLoading to be false so IndexedDB has been checked first
+  const initialSyncTriggered = useRef(false);
+  useEffect(() => {
+    if (!initialSyncTriggered.current && !isLoading && !syncState?.isInitialSyncComplete && !isSyncing && activities.length === 0) {
+      initialSyncTriggered.current = true;
+      syncAll();
+    }
+  }, [isLoading, syncState?.isInitialSyncComplete, isSyncing, activities.length, syncAll]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -170,7 +164,7 @@ function Dashboard() {
 
       {/* Full-page updating overlay */}
       {isUpdating && updateProgress && (
-        <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-[1040]">
           <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
             <div className="flex items-center justify-center mb-4">
               <Loader2 className="w-8 h-8 text-[#fc4c02] animate-spin" />
@@ -196,7 +190,7 @@ function Dashboard() {
 }
 
 export default function App() {
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -204,10 +198,6 @@ export default function App() {
         <Loader2 className="w-8 h-8 text-[#fc4c02] animate-spin" />
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return <LoginPage />;
   }
 
   return <Dashboard />;

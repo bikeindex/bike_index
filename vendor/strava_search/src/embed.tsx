@@ -2,20 +2,13 @@
 /**
  * Embeddable Strava Search Component
  *
- * This module exports the Strava Search app as a mountable component
- * that can be embedded in other React applications or vanilla JS pages.
+ * Requires window.stravaSearchConfig to be set by the host page.
  *
  * Usage in React:
  * ```tsx
  * import { StravaSearch } from 'strava-search/embed';
- *
  * function MyApp() {
- *   return (
- *     <StravaSearch
- *       clientId="your-client-id"
- *       clientSecret="your-client-secret"
- *     />
- *   );
+ *   return <StravaSearch />;
  * }
  * ```
  *
@@ -24,27 +17,18 @@
  * <div id="strava-search-root"></div>
  * <script type="module">
  *   import { mount } from './strava-search-embed.js';
- *
- *   mount(document.getElementById('strava-search-root'), {
- *     clientId: 'your-client-id',
- *     clientSecret: 'your-client-secret',
- *   });
+ *   mount(document.getElementById('strava-search-root'));
  * </script>
  * ```
  */
 
-import { StrictMode, useEffect } from 'react';
+import { StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { AuthProvider } from './contexts/AuthContext';
 import App from './App';
-import { setStravaCredentials } from './services/strava';
 import './index.css';
 
 export interface StravaSearchProps {
-  /** Strava API Client ID */
-  clientId?: string;
-  /** Strava API Client Secret */
-  clientSecret?: string;
   /** Custom class name for the container */
   className?: string;
   /** Custom styles for the container */
@@ -54,19 +38,7 @@ export interface StravaSearchProps {
 /**
  * React component for embedding Strava Search
  */
-export function StravaSearch({
-  clientId,
-  clientSecret,
-  className,
-  style,
-}: StravaSearchProps) {
-  // Set credentials if provided
-  useEffect(() => {
-    if (clientId && clientSecret) {
-      setStravaCredentials(clientId, clientSecret);
-    }
-  }, [clientId, clientSecret]);
-
+export function StravaSearch({ className, style }: StravaSearchProps) {
   return (
     <div className={className} style={style}>
       <AuthProvider>
