@@ -109,7 +109,7 @@ RSpec.describe StravaRequest, type: :model do
 
     it "returns true when activity is already enriched" do
       FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
-        strava_data: {"enriched" => true})
+        enriched_at: Time.current)
       strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       expect(strava_request.skip_request?).to be true
     end
