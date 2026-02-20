@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { SearchFilters, MutedFilter, PhotoFilter, PrivateFilter, CommuteFilter } from '../types/strava';
+import type { SearchFilters, MutedFilter, PhotoFilter, PrivateFilter, CommuteFilter, ViewMode } from '../types/strava';
 
 function filtersToParams(filters: SearchFilters): URLSearchParams {
   const params = new URLSearchParams();
@@ -67,6 +67,9 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.page > 1) {
     params.set('page', filters.page.toString());
   }
+  if (filters.view && filters.view !== 'activities') {
+    params.set('view', filters.view);
+  }
 
   return params;
 }
@@ -102,6 +105,7 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     kudosFrom: kudosFromStr ? parseFloat(kudosFromStr) : null,
     kudosTo: kudosToStr ? parseFloat(kudosToStr) : null,
     page: parseInt(params.get('page') || '1', 10),
+    view: (params.get('view') as ViewMode) || 'activities',
   };
 }
 

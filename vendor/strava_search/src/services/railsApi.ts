@@ -1,7 +1,14 @@
+export interface GearBikeLink {
+  stravaGearId: string;
+  bikeId: number;
+  bikeName: string;
+}
+
 interface StravaSearchConfig {
   tokenEndpoint: string;
   proxyEndpoint: string;
   athleteId: string;
+  gearBikeLinks?: GearBikeLink[];
 }
 
 interface TokenResponse {

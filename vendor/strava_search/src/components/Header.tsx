@@ -2,15 +2,18 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useActivitySync } from '../hooks/useActivitySync';
 import { formatTimeAgo, formatDateTimeTitle } from '../utils/formatters';
-import { RefreshCw, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { RefreshCw, LogOut, User, Settings, ChevronDown, Bike } from 'lucide-react';
+import type { ViewMode } from '../types/strava';
 
 interface HeaderProps {
   onOpenSettings: () => void;
   isFetchingFullData?: boolean;
   fetchProgress?: { status: string } | null;
+  view: ViewMode;
+  onViewChange: (view: ViewMode) => void;
 }
 
-export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingFullData, fetchProgress }: HeaderProps) {
+export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingFullData, fetchProgress, view, onViewChange }: HeaderProps) {
   const { athlete, syncState, logout } = useAuth();
   const { isSyncing, isFetchingFullData: hookIsFetchingFullData, syncRecent, progress: hookProgress } = useActivitySync();
 
@@ -59,7 +62,25 @@ export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingF
                 <span>{progress.status}</span>
               </div>
             ) : (
-              <h1 className="text-xl font-bold">Strava Search</h1>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => onViewChange('activities')}
+                  className={`text-xl font-bold px-2 py-0.5 rounded transition-colors ${
+                    view === 'activities' ? '' : 'text-white/60 hover:text-white/80'
+                  }`}
+                >
+                  Strava Search
+                </button>
+                <button
+                  onClick={() => onViewChange('gear')}
+                  className={`flex items-center gap-1.5 text-sm font-bold px-2 py-0.5 rounded transition-colors ${
+                    view === 'gear' ? 'bg-white/20' : 'text-white/60 hover:text-white/80'
+                  }`}
+                >
+                  <Bike className="w-4 h-4" />
+                  <span className="hidden sm:inline">Gear</span>
+                </button>
+              </div>
             )}
           </div>
 

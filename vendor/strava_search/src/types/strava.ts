@@ -150,6 +150,8 @@ export type PhotoFilter = 'all' | 'with_photo' | 'without_photo';
 export type PrivateFilter = 'all' | 'private' | 'not_private';
 export type CommuteFilter = 'all' | 'commute' | 'not_commute';
 
+export type ViewMode = 'activities' | 'gear';
+
 export interface SearchFilters {
   query: string;
   activityTypes: string[];
@@ -172,6 +174,7 @@ export interface SearchFilters {
   kudosFrom: number | null;
   kudosTo: number | null;
   page: number;
+  view: ViewMode;
 }
 
 export interface UpdatableActivity {

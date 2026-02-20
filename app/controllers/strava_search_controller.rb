@@ -9,10 +9,14 @@ class StravaSearchController < ApplicationController
       return redirect_to new_strava_integration_path
     end
 
+    strava_integration = current_user.strava_integration
     @strava_search_config = {
       tokenEndpoint: strava_search_token_path,
       proxyEndpoint: api_strava_proxy_index_path,
-      athleteId: current_user.strava_integration.athlete_id
+      athleteId: strava_integration.athlete_id,
+      gearBikeLinks: strava_integration.strava_gears.bikes.with_item.includes(:item).map { |sg|
+        {stravaGearId: sg.strava_gear_id, bikeId: sg.item_id, bikeName: sg.item&.display_name}
+      }
     }
     @strava_search_assets = if ENV["BUILD_STRAVA_SEARCH"] == "true"
       [{type: :script, src: "http://localhost:3143/strava_search/@vite/client"},

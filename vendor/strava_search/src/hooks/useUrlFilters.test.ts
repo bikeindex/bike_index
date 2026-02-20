@@ -39,6 +39,7 @@ describe('useUrlFilters', () => {
         kudosFrom: null,
         kudosTo: null,
         page: 1,
+        view: 'activities',
       });
     });
 
@@ -116,6 +117,7 @@ describe('useUrlFilters', () => {
         kudosFrom: null,
         kudosTo: null,
         page: 1,
+        view: 'activities',
       });
     });
 
@@ -190,6 +192,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -222,6 +225,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -254,6 +258,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -287,6 +292,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -319,6 +325,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -351,6 +358,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -384,6 +392,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -417,6 +426,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -449,6 +459,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -482,6 +493,7 @@ describe('useUrlFilters', () => {
           kudosFrom: 5,
           kudosTo: 50,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -516,6 +528,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -548,6 +561,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -590,6 +604,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -616,6 +631,7 @@ describe('useUrlFilters', () => {
           kudosFrom: null,
           kudosTo: null,
           page: 1,
+          view: 'activities',
         });
       });
 
@@ -647,6 +663,7 @@ describe('useUrlFilters', () => {
               sufferScoreTo: null,
               kudosFrom: null,
               kudosTo: null,
+              view: 'activities',
             },
           },
         }));
