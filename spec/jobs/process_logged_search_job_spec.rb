@@ -67,7 +67,7 @@ RSpec.describe ProcessLoggedSearchJob, type: :job do
         instance.perform(logged_search.id)
 
         expect(logged_search.reload.processed?).to be_truthy
-        expect(logged_search).to match_hash_indifferently target_location_attrs
+        expect(logged_search).to have_attributes target_location_attrs
       end
 
       context "maxmind response" do
@@ -90,7 +90,7 @@ RSpec.describe ProcessLoggedSearchJob, type: :job do
           instance.perform(logged_search.id)
 
           expect(logged_search.reload.processed?).to be_truthy
-          expect(logged_search).to match_hash_indifferently target_location_attrs
+          expect(logged_search).to have_attributes target_location_attrs
         end
       end
     end

@@ -41,7 +41,7 @@ RSpec.describe WebhooksController, type: :request do
           stripe_subscription = StripeSubscription.last
           expect(stripe_subscription.start_at).to be_within(1).of Time.at(1740173835) # has to be updated when cassette is updated
           expect(stripe_subscription.end_at).to be_within(1).of Time.at(1742593035)
-          expect(stripe_subscription).to match_hash_indifferently target_stripe_subscription
+          expect(stripe_subscription).to have_attributes target_stripe_subscription
           expect(stripe_subscription.stripe_id).to be_present
           expect(stripe_subscription.membership_id).to be_blank
           expect(stripe_subscription.payments.count).to eq 1
@@ -75,7 +75,7 @@ RSpec.describe WebhooksController, type: :request do
           expect(stripe_event.stripe_id).to be_present
           stripe_subscription = StripeSubscription.last
           expect(stripe_subscription.start_at).to be_within(1).of Time.at(1740173835) # has to be updated when cassette is updated
-          expect(stripe_subscription).to match_hash_indifferently(email: nil, stripe_status: "incomplete")
+          expect(stripe_subscription).to have_attributes(email: nil, stripe_status: "incomplete")
           expect(stripe_subscription.stripe_id).to be_present
           expect(stripe_subscription.membership_id).to be_blank
           expect(stripe_subscription.payments.count).to eq 0

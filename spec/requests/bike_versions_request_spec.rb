@@ -147,7 +147,7 @@ RSpec.describe BikeVersionsController, type: :request do
           end_at: nil)
       }
       expect(flash[:success]).to be_present
-      expect(bike_version.reload).to match_hash_indifferently valid_update_params
+      expect(bike_version.reload).to have_attributes valid_update_params
       expect(bike_version.owner_id).to eq current_user.id
       expect(bike_version.bike_id).to eq og_bike_id
       expect(bike_version.start_at).to be_blank
@@ -167,7 +167,7 @@ RSpec.describe BikeVersionsController, type: :request do
       }
       expect(flash[:success]).to be_present
       expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/accessories")
-      expect(bike_version.reload).to match_hash_indifferently valid_update_params
+      expect(bike_version.reload).to have_attributes valid_update_params
       expect(bike_version.start_at.to_i).to be_within(1).of 1524938400
       expect(bike_version.end_at.to_i).to be_within(1).of 1632852000
     end

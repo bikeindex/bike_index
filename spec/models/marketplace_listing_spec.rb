@@ -53,7 +53,7 @@ RSpec.describe MarketplaceListing, type: :model do
       end
       it "is valid" do
         expect(marketplace_listing.address_record_id).to be_present
-        expect(marketplace_listing.address_record).to match_hash_indifferently target_address_record_attrs
+        expect(marketplace_listing.address_record).to have_attributes target_address_record_attrs
         expect(marketplace_listing.address_record.to_coordinates.map(&:round)).to eq([49, -123])
         expect(marketplace_listing.to_coordinates.map(&:round)).to eq([49, -123])
       end

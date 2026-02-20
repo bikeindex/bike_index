@@ -74,7 +74,7 @@ RSpec.describe Admin::PaymentsController, type: :request do
 
           expect(flash[:success]).to be_present
           expect(subject.reload.membership).to be_present
-          expect(subject.membership).to match_hash_indifferently target_attrs
+          expect(subject.membership).to have_attributes target_attrs
         end
         context "invoice payment" do
           before { subject.update(invoice_id: 42) }
