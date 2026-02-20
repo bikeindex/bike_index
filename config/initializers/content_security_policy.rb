@@ -8,7 +8,7 @@ Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
     policy.font_src :self, "https://fonts.gstatic.com", :data
-    policy.img_src :self, "https://files.bikeindex.org", "https://uploads.bikeindex.org", "https://www.facebook.com", "https://www.googletagmanager.com", "https://pbs.twimg.com", :data
+    policy.img_src :self, "https://files.bikeindex.org", "https://uploads.bikeindex.org", "https://www.facebook.com", "https://www.googletagmanager.com", "https://pbs.twimg.com", "https://syndication.twitter.com", "https://maps.googleapis.com", "https://maps.gstatic.com", :data
     policy.object_src :none
     policy.script_src :self, :unsafe_inline,
       "https://www.googletagmanager.com",
@@ -26,13 +26,16 @@ Rails.application.configure do
     policy.connect_src :self,
       "https://www.google-analytics.com",
       "https://www.googletagmanager.com",
+      "https://www.facebook.com",
+      "https://maps.googleapis.com",
       "https://api.mapbox.com",
       "https://*.tiles.mapbox.com"
     policy.frame_src :self,
       "https://js.stripe.com",
       "https://www.facebook.com",
       "https://www.googletagmanager.com",
-      "https://www.youtube.com"
+      "https://www.youtube.com",
+      "https://platform.twitter.com"
   end
 
   # Report violations without enforcing the policy.
