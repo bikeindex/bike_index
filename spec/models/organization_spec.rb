@@ -22,8 +22,8 @@ RSpec.describe Organization, type: :model do
 
   describe "#nearby_bikes" do
     it "returns bikes within the search radius" do
-      FactoryBot.create(:bike, :in_los_angeles)
-      nyc_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
+      FactoryBot.create(:bike, :with_address_record, address_in: :los_angeles)
+      nyc_bike_ids = FactoryBot.create_list(:bike, 2, :with_address_record, address_in: :new_york).map(&:id)
       stolen_nyc_bike = FactoryBot.create(:stolen_bike_in_nyc)
 
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
@@ -50,7 +50,7 @@ RSpec.describe Organization, type: :model do
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
       nyc_bike3 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: nyc_org3)
 
-      nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+      nonorg_bikes = FactoryBot.create_list(:bike, 2, :with_address_record, address_in: :new_york)
 
       expect(chi_bike1.reload.address_set_manually).to be_truthy
       expect(chi_bike1.to_coordinates).to eq([41.8624488, -87.6591502])

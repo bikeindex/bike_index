@@ -73,7 +73,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
     let(:attrs) { {kind: "association", is_enabled: true, body: "Something cool"} }
     before { organization_stolen_message.update(attrs) }
     let(:organization2) { FactoryBot.create(:organization) }
-    let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, :in_nyc, creation_organization: organization) }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_address_record, address_in: :new_york, creation_organization: organization) }
     let(:stolen_record) { bike.reload.current_stolen_record }
     let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization2) }
     let(:stolen_record2) { bike2.current_stolen_record }

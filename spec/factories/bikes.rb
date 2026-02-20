@@ -10,32 +10,6 @@ FactoryBot.define do
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }
 
-    # Override global location traits - bikes no longer have address columns
-    trait(:in_amsterdam) {
-      latitude { 52.37403 }
-      longitude { 4.88969 }
-    }
-    trait(:in_chicago) {
-      latitude { 41.8624488 }
-      longitude { -87.6591502 }
-    }
-    trait(:in_los_angeles) {
-      latitude { 34.05223 }
-      longitude { -118.24368 }
-    }
-    trait(:in_nyc) {
-      latitude { 40.7143528 }
-      longitude { -74.0059731 }
-    }
-    trait(:in_vancouver) {
-      latitude { 49.253992 }
-      longitude { -123.241084 }
-    }
-    trait(:in_edmonton) {
-      latitude { 53.5069377 }
-      longitude { -113.5508765 }
-    }
-
     trait :with_primary_activity do
       primary_activity { FactoryBot.create(:primary_activity) }
     end
