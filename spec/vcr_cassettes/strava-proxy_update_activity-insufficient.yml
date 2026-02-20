@@ -64,7 +64,7 @@ http_interactions:
       - W_7l2R9MGaJIXmfySMWFh8lrMKpm69HymPE4p5cIhFcE6ld5ZaOOnQ==
     body:
       encoding: ASCII-8BIT
-      string: '{"token_type":"Bearer","access_token":"065bf162889d96726f8dd2299ddac8e1f0f2285c","expires_at":1771560210,"expires_in":16708,"refresh_token":"<STRAVA_TEST_REFRESH_TOKEN>"}'
+      string: '{"token_type":"Bearer","access_token":"065bf162889d96726f8dd2299ddac8e1f0f2285c","expires_at":2082787200,"expires_in":21600,"refresh_token":"<STRAVA_TEST_REFRESH_TOKEN>"}'
   recorded_at: Thu, 19 Feb 2026 23:25:02 GMT
 - request:
     method: put
