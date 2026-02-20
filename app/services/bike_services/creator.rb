@@ -76,12 +76,10 @@ class BikeServices::Creator
     :timezone,
     address_record_attributes: (AddressRecord.permitted_params + [:id, :skip_geocoding])
   ].freeze
-  # TODO: Remove this once backfill is finished - #2922
-  ADDRESS_ATTRS = %i[city country_id state_id street zipcode]
   # Used to be in Bike - but now it's here. Eventually, we should actually do permitted params handling in here
   # ... and have separate permitted params in bikeupdator
   def self.old_attr_accessible
-    (PERMITTED_ATTRS + ADDRESS_ATTRS + [
+    (PERMITTED_ATTRS + [
       stolen_records_attributes: BikeServices::StolenRecordUpdator.old_attr_accessible,
       impound_records_attributes: PERMITTED_IMPOUND_ATTRS,
       components_attributes: Component.permitted_attributes,
@@ -182,9 +180,6 @@ class BikeServices::Creator
   end
 
   def save_bike(b_param, bike)
-    # TODO: Figure out why this needs to be called separately, before save. See PR #2848
-    # Maybe can be removed in #2922
-    bike.attributes = BikeServices::CalculateLocation.stored_location_attrs(bike)
     bike.save
 
     ownership = create_ownership(b_param, bike)
@@ -202,18 +197,12 @@ class BikeServices::Creator
       bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
         organization: bike.creation_organization, creator_kind: "creator_bike_creation")
     end
-    # TODO: consolidate into create_parking_notification in #2922
-    if b_param.unregistered_parking_notification?
-      # We skipped setting address, with Builder.default_parking_notification_attrs,
-      # notification will update it
-      ParkingNotification.create!(b_param.parking_notification_params)
-    end
 
     bike.reload
   end
 
   def associate(b_param, bike, ownership)
-    create_parking_notification(b_param, bike) if b_param&.status_abandoned?
+    create_parking_notification(b_param, bike) if b_param&.status_abandoned? || b_param&.unregistered_parking_notification?
     create_bike_organizations(ownership)
     ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
     bike.create_normalized_serial_segments
@@ -262,12 +251,23 @@ class BikeServices::Creator
   end
 
   def create_parking_notification(b_param, bike)
-    parking_notification_attrs = bike.address_hash_legacy
-    parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
-      bike_id: bike.id,
-      user_id: bike.creator.id,
-      organization_id: b_param.creation_organization_id)
-    ParkingNotification.create(parking_notification_attrs)
+    if b_param.unregistered_parking_notification?
+      # We skipped setting address, with Builder.default_parking_notification_attrs,
+      # notification will update it
+      ParkingNotification.create!(b_param.parking_notification_params.merge(bike_id: bike.id))
+    else
+      parking_notification_attrs = bike.address_hash_legacy
+      parking_notification_attrs.merge!(kind: b_param.bike["parking_notification_kind"],
+        bike_id: bike.id,
+        user_id: bike.creator.id,
+        organization_id: b_param.creation_organization_id)
+      ParkingNotification.create(parking_notification_attrs)
+    end
+    # Reload to pick up changes from ProcessParkingNotificationJob (e.g. user_hidden cleared by impound).
+    # attr_accessors persist through reload, so clear marked_user_hidden for impound notifications
+    # to prevent the subsequent bike.save from overwriting the impound job's user_hidden=false
+    bike.reload
+    bike.marked_user_hidden = nil if bike.current_impound_record.present?
   end
 
   def assign_user_attributes(bike, user = nil)

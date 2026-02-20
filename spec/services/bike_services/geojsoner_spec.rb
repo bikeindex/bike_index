@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe BikeServices::Geojsoner do
   describe "geojson_feature" do
-    let(:bike) { FactoryBot.build(:bike, :in_amsterdam) }
+    let(:bike) { FactoryBot.create(:bike, :with_address_record, address_in: :amsterdam) }
     it "returns nil" do
       expect(bike.to_coordinates).to eq([52.37403, 4.88969])
       expect(described_class.feature(bike)).to be_blank

@@ -39,10 +39,10 @@ RSpec.describe "BikesController#update", type: :request do
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
     let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
     let(:update) do
-      {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: "",
+      {address_record_attributes: {street: "10544 82 Ave NW", postal_code: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id},
        primary_activity_id:}
     end
-    let(:target_address_record_attributes) { update.slice(:street, :city, :country_id).merge(kind: "bike", postal_code: "AB T6E 2A4", bike_id: bike.id) }
+    let(:target_address_record_attributes) { update[:address_record_attributes].merge(kind: "bike", bike_id: bike.id) }
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
@@ -460,8 +460,7 @@ RSpec.describe "BikesController#update", type: :request do
         street: "278 Broadway",
         city: "New York"
       )
-      # TODO: uncomment this and fix it - #2922
-      # expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
+      expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
     end
 
     context "updating with new owner email" do

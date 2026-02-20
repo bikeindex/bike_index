@@ -371,10 +371,11 @@ RSpec.describe BikeServices::Displayer do
           expect(BikeServices::Displayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
-      context "bike street is present" do
-        before { bike.update(street: "444 something") }
+      context "bike address_record street is present" do
+        let!(:address_record) { FactoryBot.create(:address_record, street: "444 something", kind: :bike, bike: bike) }
+        before { bike.update(address_record:) }
         it "is truthy" do
-          expect(bike.reload.street).to eq "444 something"
+          expect(bike.reload.address_record.street).to eq "444 something"
           expect(BikeServices::Displayer.display_edit_address_fields?(bike, user)).to be_truthy
           expect(BikeServices::Displayer.send(:user_edit_bike_address?, bike, user)).to be_truthy
           expect(BikeServices::Displayer.edit_street_address?(bike, user)).to be_truthy
