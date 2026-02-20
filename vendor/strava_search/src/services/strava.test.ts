@@ -10,11 +10,19 @@ vi.mock('./database', () => ({
   clearAuth: vi.fn(),
 }));
 
+const PROXY_ENDPOINT = '/api/strava_proxy';
+
 describe('strava service', () => {
   const originalFetch = global.fetch;
 
   beforeEach(() => {
     global.fetch = vi.fn();
+    // Set up window.stravaSearchConfig for proxy mode
+    window.stravaSearchConfig = {
+      tokenEndpoint: '/strava_search/token',
+      proxyEndpoint: PROXY_ENDPOINT,
+      athleteId: '12345',
+    };
     // Mock authenticated state
     vi.mocked(database.getAuth).mockResolvedValue({
       accessToken: 'test_token',
@@ -27,6 +35,7 @@ describe('strava service', () => {
   afterEach(() => {
     global.fetch = originalFetch;
     vi.resetAllMocks();
+    delete (window as Record<string, unknown>).stravaSearchConfig;
   });
 
   describe('getAthleteStats', () => {
@@ -46,11 +55,13 @@ describe('strava service', () => {
 
       expect(total).toBe(250); // 150 + 75 + 25
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://www.strava.com/api/v3/athletes/12345/stats',
+        PROXY_ENDPOINT,
         expect.objectContaining({
+          method: 'POST',
           headers: expect.objectContaining({
             Authorization: 'Bearer test_token',
           }),
+          body: JSON.stringify({ url: 'athletes/12345/stats', method: 'GET' }),
         })
       );
     });
@@ -89,7 +100,7 @@ describe('strava service', () => {
   describe('updateActivity', () => {
     const babyHawkResponse = babyHawkCassette.interactions[0].response.body;
 
-    // Mock both PUT (update) and GET (fetch full details) calls
+    // Mock both PUT (update) and GET (fetch full details) proxy calls
     const mockPutThenGet = () => {
       (global.fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({
@@ -107,7 +118,7 @@ describe('strava service', () => {
 
       const result = await updateActivity(17145907973, { name: 'Updated Name' });
 
-      // Verify both PUT and GET were called
+      // Verify both proxy calls were made
       expect(global.fetch).toHaveBeenCalledTimes(2);
 
       // Verify enriched fields are present from GET response
@@ -259,10 +270,9 @@ describe('strava service', () => {
       const afterTimestamp = Date.now() - 86400000; // 1 day ago
       await getAllActivities({ after: afterTimestamp });
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining(`after=${Math.floor(afterTimestamp / 1000)}`),
-        expect.anything()
-      );
+      const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+      const body = JSON.parse(call[1].body);
+      expect(body.url).toContain(`after=${Math.floor(afterTimestamp / 1000)}`);
     });
   });
 
