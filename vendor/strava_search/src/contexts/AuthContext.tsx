@@ -15,6 +15,7 @@ import {
   type SyncState,
 } from '../services/database';
 import { getConfig, exchangeSessionForToken } from '../services/railsApi';
+import { getAthlete } from '../services/strava';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -52,6 +53,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(true);
         const state = await getSyncState(auth.athlete.id);
         setSyncState(state || null);
+
+        // Refresh athlete profile in the background if it's missing
+        if (!auth.athlete.profile_medium) {
+          getAthlete().then(async (freshAthlete) => {
+            const updatedAuth = { ...auth, athlete: freshAthlete };
+            await saveAuth(updatedAuth);
+            setAthlete(freshAthlete);
+          }).catch(() => {}); // Silently ignore
+        }
         return;
       }
 
@@ -72,6 +82,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const state = await getSyncState(newAuth.athlete.id);
       setSyncState(state || null);
+
+      // Fetch real athlete profile from Strava
+      try {
+        const freshAthlete = await getAthlete();
+        const updatedAuth = { ...newAuth, athlete: freshAthlete };
+        await saveAuth(updatedAuth);
+        setAthlete(freshAthlete);
+      } catch {
+        // Silently ignore — will use placeholder
+      }
     } catch (err) {
       console.error('Auth check failed:', err);
       setError(err instanceof Error ? err.message : 'Auth check failed');

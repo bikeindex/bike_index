@@ -83,6 +83,8 @@ module StravaJobs
           StravaActivity.create_or_update_from_strava_response(strava_integration, body).proxy_serialized
         elsif body.is_a?(Hash) && (body["gear_type"].present? || body.key?("frame_type"))
           StravaGear.update_from_strava(strava_integration, body)
+        else
+          body
         end
       end
     end

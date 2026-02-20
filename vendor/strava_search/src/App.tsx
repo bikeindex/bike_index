@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import { usePreferences } from './contexts/PreferencesContext';
 import { useActivities } from './hooks/useActivities';
@@ -115,11 +115,14 @@ function Dashboard() {
   }, [refreshActivities]);
 
   // Auto-start initial sync if no activities have been downloaded yet
+  // Wait for isLoading to be false so IndexedDB has been checked first
+  const initialSyncTriggered = useRef(false);
   useEffect(() => {
-    if (!syncState?.isInitialSyncComplete && !isSyncing && activities.length === 0) {
+    if (!initialSyncTriggered.current && !isLoading && !syncState?.isInitialSyncComplete && !isSyncing && activities.length === 0) {
+      initialSyncTriggered.current = true;
       syncAll();
     }
-  }, [syncState?.isInitialSyncComplete, isSyncing, activities.length, syncAll]);
+  }, [isLoading, syncState?.isInitialSyncComplete, isSyncing, activities.length, syncAll]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -161,7 +164,7 @@ function Dashboard() {
 
       {/* Full-page updating overlay */}
       {isUpdating && updateProgress && (
-        <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-[1040]">
           <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
             <div className="flex items-center justify-center mb-4">
               <Loader2 className="w-8 h-8 text-[#fc4c02] animate-spin" />

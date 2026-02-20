@@ -23,7 +23,7 @@ async function refreshToken(): Promise<StoredAuth> {
     accessToken: tokenResponse.access_token,
     refreshToken: '',
     expiresAt: (tokenResponse.created_at + tokenResponse.expires_in) * 1000,
-    athlete: auth?.athlete || { id: 0, username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
+    athlete: auth?.athlete ?? { id: 0, username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
   };
   await saveAuth(newAuth);
   return newAuth;
