@@ -182,7 +182,7 @@ RSpec.describe "Strava Proxy API", type: :request do
               private: false,
               kudos_count: 2,
               gear_id:,
-              photos: {photo_url: nil, photo_count: 0},
+              photos: {photo_url: "https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-768x432.jpg", photo_count: 1},
               segment_locations: {},
               activity_type: "Ride",
               timezone: "America/Chicago",
@@ -202,7 +202,7 @@ RSpec.describe "Strava Proxy API", type: :request do
               }
             }.as_json
           end
-          it "updates the activity" do
+          it "updates the activity and runs update_from_strava!" do
             expect(strava_integration.reload.token_expired?).to be_falsey
             og_token = strava_integration.access_token
             expect(strava_activity.reload.enriched?).to be_falsey
@@ -212,16 +212,18 @@ RSpec.describe "Strava Proxy API", type: :request do
                 post base_url, params: {
                   url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
                 }
-              }.to change(StravaRequest, :count).by(1)
+              }.to change(StravaRequest, :count).by(3) # proxy PUT + update_from_strava! GET + enqueued gear fetch
             end
 
             expect(response.status).to eq 200
             expect(strava_integration.access_token).to eq og_token
 
-            strava_request = StravaRequest.last
-            expect(strava_request.proxy?).to be_truthy
-            expect(strava_request.success?).to be_truthy
-            expect(strava_request.parameters).to eq expected_parameters.as_json
+            proxy_request = StravaRequest.where(request_type: :proxy).last
+            expect(proxy_request.success?).to be_truthy
+            expect(proxy_request.parameters).to eq expected_parameters.as_json
+
+            fetch_request = StravaRequest.where(request_type: :fetch_activity).last
+            expect(fetch_request.success?).to be_truthy
 
             expect(strava_activity.reload.enriched?).to be_truthy
             expect(strava_activity).to have_attributes target_attributes

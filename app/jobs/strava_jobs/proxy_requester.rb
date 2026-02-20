@@ -37,7 +37,7 @@ module StravaJobs
         strava_request.update_from_response(response, raise_on_error: false)
 
         serialized = if strava_request.success?
-          handle_proxy_response(strava_integration, response.body)
+          handle_proxy_response(strava_integration, response.body, method: strava_request.parameters["method"])
         end
 
         {strava_request:, response:, serialized:}
@@ -76,11 +76,16 @@ module StravaJobs
         raise ArgumentError, "Invalid proxy path" if url.blank? || url.match?(%r{://|\A//|(\A|/)\.\.(/|\z)})
       end
 
-      def handle_proxy_response(strava_integration, body)
+      def handle_proxy_response(strava_integration, body, method: nil)
         if body.is_a?(Array)
           body.map { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary).proxy_serialized }
         elsif body.is_a?(Hash) && body["sport_type"].present?
-          StravaActivity.create_or_update_from_strava_response(strava_integration, body).proxy_serialized
+          strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, body)
+          if method.to_s.casecmp?("put")
+            strava_activity.update_from_strava!
+            strava_activity.reload
+          end
+          strava_activity.proxy_serialized
         elsif body.is_a?(Hash) && (body["gear_type"].present? || body.key?("frame_type"))
           StravaGear.update_from_strava(strava_integration, body)
         else

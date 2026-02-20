@@ -180,7 +180,6 @@ class StravaActivity < ApplicationRecord
     (distance_meters / 1000.0).round(2)
   end
 
-  # Convenience method - probably don't use this except in console
   def update_from_strava!
     strava_request = StravaRequest.create!(
       strava_integration_id:,
