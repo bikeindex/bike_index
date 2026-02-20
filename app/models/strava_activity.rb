@@ -44,6 +44,25 @@ class StravaActivity < ApplicationRecord
     Handcycle
     Velomobile
   ].freeze
+  PROXY_ATTRS = %i[
+    activity_type
+    average_speed
+    description
+    distance_meters
+    kudos_count
+    moving_time_seconds
+    photos
+    private
+    segment_locations
+    sport_type
+    start_date
+    suffer_score
+    timezone
+    title
+    total_elevation_gain_meters
+    gear_id
+    strava_id
+  ]
 
   belongs_to :strava_integration
 
@@ -51,9 +70,9 @@ class StravaActivity < ApplicationRecord
   validates :strava_id, uniqueness: {scope: :strava_integration_id}
 
   scope :cycling, -> { where(activity_type: CYCLING_TYPES) }
-  scope :enriched, -> { where.not(segment_locations: nil) }
-  scope :un_enriched, -> { where(segment_locations: nil) }
-  scope :activities_to_enrich, -> { cycling.un_enriched }
+  scope :enriched, -> { where("strava_data->>'enriched' = 'true'") }
+  scope :not_enriched, -> { where("strava_data IS NULL OR NOT strava_data ? 'enriched'") }
+  scope :activities_to_enrich, -> { cycling.not_enriched }
   scope :with_gear, -> { where.not(gear_id: nil) }
 
   class << self
@@ -62,11 +81,17 @@ class StravaActivity < ApplicationRecord
     end
 
     def create_or_update_from_strava_response(strava_integration, response)
-      attrs = summary_attributes(response).merge(detail_attributes(response))
-      activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: response["id"].to_s)
+      attrs = strava_attributes_from(response)
+      activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: response["id"])
       activity.update!(attrs)
       activity
     end
+
+    def strava_attributes_from(response)
+      summary_attributes(response).merge(detail_attributes(response))
+    end
+
+    private
 
     def detail_attributes(detail)
       return {} if (detail.keys & %w[segment_efforts description]).none?
@@ -81,15 +106,15 @@ class StravaActivity < ApplicationRecord
         photos:,
         segment_locations: segment_locations_for(detail["segment_efforts"]),
         kudos_count: detail["kudos_count"],
-        strava_data: strava_data_from(detail)
+        strava_data: strava_data_from(detail).merge("enriched" => true)
       }
     end
 
-    private
-
     def strava_data_from(data)
       data.slice("average_heartrate", "max_heartrate", "device_name", "commute",
-        "muted", "average_speed", "pr_count", "average_watts", "device_watts")
+        "average_speed", "pr_count", "average_watts", "device_watts")
+        .merge("muted" => data["hide_from_home"])
+        .compact
     end
 
     def summary_attributes(summary)
@@ -127,27 +152,45 @@ class StravaActivity < ApplicationRecord
   end
 
   def enriched?
-    !segment_locations.nil?
+    strava_data&.dig("enriched") == true
   end
 
   def calculated_gear_name
     return nil if gear_id.blank?
+
     strava_integration.strava_gears.find_by(strava_gear_id: gear_id)&.strava_gear_name || gear_id
+  end
+
+  def start_date_in_zone
+    return nil if start_date.blank? || timezone.blank?
+
+    start_date.in_time_zone(timezone)
   end
 
   def distance_miles
     return nil if distance_meters.blank?
+
     (distance_meters / 1609.344).round(2)
   end
 
   def distance_km
     return nil if distance_meters.blank?
+
     (distance_meters / 1000.0).round(2)
   end
 
-  def update_from_detail(detail)
-    attrs = self.class.detail_attributes(detail)
-    attrs[:strava_data] = (strava_data || {}).merge(attrs[:strava_data])
-    update(attrs)
+  # Convenience method - probably don't use this except in console
+  def update_from_strava!
+    strava_request = StravaRequest.create!(
+      strava_integration_id:,
+      user_id: strava_integration.user_id,
+      request_type: :fetch_activity,
+      parameters: {strava_id: strava_id.to_s}
+    )
+    StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
+  end
+
+  def proxy_serialized
+    slice(*PROXY_ATTRS).merge(strava_data).merge("start_date_in_zone" => start_date_in_zone)
   end
 end

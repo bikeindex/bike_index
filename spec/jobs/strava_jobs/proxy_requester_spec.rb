@@ -2,11 +2,32 @@
 
 require "rails_helper"
 
-RSpec.describe StravaJobs::ProxyRequest do
+RSpec.describe StravaJobs::ProxyRequester do
   before { StravaRequest.destroy_all }
 
   let(:strava_integration) { FactoryBot.create(:strava_integration) }
   let(:user) { strava_integration.user }
+
+  describe ".authorize_user_and_strava_integration" do
+    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
+    let(:access_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
+    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
+
+    it "returns error when strava integration is not synced" do
+      expect(strava_integration.synced?).to be_falsey
+      result = described_class.authorize_user_and_strava_integration(access_token)
+      expect(result[:error]).to match(/not yet synced/)
+      expect(result[:status]).to eq 422
+    end
+
+    it "returns user and strava_integration when valid" do
+      strava_integration.update!(status: :synced)
+      result = described_class.authorize_user_and_strava_integration(access_token)
+      expect(result[:error]).to be_nil
+      expect(result[:user]).to eq user
+      expect(result[:strava_integration]).to eq strava_integration
+    end
+  end
 
   describe ".create_and_execute" do
     let(:target_attributes) do
@@ -34,7 +55,8 @@ RSpec.describe StravaJobs::ProxyRequest do
     end
 
     context "activities list" do
-      it "creates strava_request, stores activities, returns response" do
+      it "creates strava_request, stores activities, returns serialized response" do
+        result = nil
         VCR.use_cassette("strava-list_activities") do
           expect {
             result = described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities?page=1&per_page=1", method: "GET")
@@ -49,6 +71,7 @@ RSpec.describe StravaJobs::ProxyRequest do
           strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
           expect(strava_activity).to have_attributes target_attributes
           expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
+          expect(result[:serialized]).to eq [strava_activity.proxy_serialized]
         end
       end
     end
@@ -56,17 +79,18 @@ RSpec.describe StravaJobs::ProxyRequest do
     context "activity detail" do
       let(:detail_target_attributes) do
         target_attributes.merge(
-          "description" => "Hawk with Eric and Scott and cedar",
-          "photos" => {
-            "photo_url" => "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
-            "photo_count" => 2
+          description: "Hawk with Eric and Scott and cedar",
+          photos: {
+            photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+            photo_count: 2
           },
-          "segment_locations" => {
-            "cities" => ["San Francisco", "Mill Valley"],
-            "states" => ["California"],
-            "countries" => ["United States", "USA"]
-          }
-        )
+          segment_locations: {
+            cities: ["San Francisco", "Mill Valley"],
+            states: ["California"],
+            countries: ["United States", "USA"]
+          },
+          strava_data: target_attributes["strava_data"].merge("enriched" => true, "muted" => false)
+        ).as_json
       end
 
       it "creates from list then enriches from detail" do
@@ -77,6 +101,7 @@ RSpec.describe StravaJobs::ProxyRequest do
         expect(strava_activity).to have_attributes target_attributes
         expect(strava_activity.enriched?).to be_falsey
 
+        result = nil
         VCR.use_cassette("strava-get_activity") do
           expect {
             result = described_class.create_and_execute(strava_integration:, user:, url: "activities/17323701543", method: "GET")
@@ -87,6 +112,7 @@ RSpec.describe StravaJobs::ProxyRequest do
         strava_activity.reload
         expect(strava_activity.enriched?).to be_truthy
         expect(strava_activity).to have_attributes detail_target_attributes
+        expect(result[:serialized]).to eq strava_activity.proxy_serialized
       end
     end
 
@@ -117,7 +143,7 @@ RSpec.describe StravaJobs::ProxyRequest do
         VCR.use_cassette("strava-list_activities") do
           result = described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities?page=1&per_page=1")
           expect(result[:strava_request].success?).to be_truthy
-          expect(result[:strava_request].parameters).to eq("url" => "athlete/activities?page=1&per_page=1", "method" => nil)
+          expect(result[:strava_request].parameters).to eq("url" => "athlete/activities?page=1&per_page=1")
         end
       end
     end
