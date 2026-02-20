@@ -8,30 +8,6 @@ class StravaSearchController < ApplicationController
       return redirect_to new_strava_integration_path
     end
 
-    strava_app = strava_doorkeeper_app
-
-    # Handle OAuth callback — exchange authorization code for token
-    if params[:code].present?
-      grant = Doorkeeper::AccessGrant.find_by(token: params[:code])
-      if grant && grant.application_id == strava_app.id && !grant.revoked? && !grant.expired?
-        Doorkeeper::AccessToken.create!(
-          application_id: strava_app.id,
-          resource_owner_id: current_user.id,
-          scopes: "public",
-          expires_in: Doorkeeper.configuration.access_token_expires_in
-        )
-        grant.revoke
-      end
-      return redirect_to strava_search_path
-    end
-
-    # No valid token — redirect through OAuth authorize (auto-approves for internal apps)
-    unless find_valid_token(strava_app.id, current_user.id)
-      return redirect_to "/oauth/authorize?client_id=#{strava_app.uid}" \
-        "&redirect_uri=#{CGI.escape(strava_search_url)}" \
-        "&response_type=code&scope=public"
-    end
-
     @strava_search_config = {
       tokenEndpoint: strava_search_token_path,
       proxyEndpoint: api_strava_proxy_index_path,
@@ -62,13 +38,23 @@ class StravaSearchController < ApplicationController
     application_id = StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID
     access_token = find_valid_token(application_id, current_user.id)
 
-    # No valid token — create a new one (user is session-authenticated)
-    access_token ||= Doorkeeper::AccessToken.create!(
-      application_id:,
-      resource_owner_id: current_user.id,
-      scopes: "public",
-      expires_in: Doorkeeper.configuration.access_token_expires_in
-    )
+    # No valid token — refresh the most recent expired one, or create new
+    unless access_token
+      access_token = Doorkeeper::AccessToken
+        .where(application_id:, resource_owner_id: current_user.id, revoked_at: nil)
+        .order(created_at: :desc)
+        .first
+      if access_token
+        access_token.update!(created_at: Time.current, expires_in: Doorkeeper.configuration.access_token_expires_in)
+      else
+        access_token = Doorkeeper::AccessToken.create!(
+          application_id:,
+          resource_owner_id: current_user.id,
+          scopes: "public",
+          expires_in: Doorkeeper.configuration.access_token_expires_in
+        )
+      end
+    end
 
     render json: {
       access_token: access_token.token,
@@ -82,10 +68,6 @@ class StravaSearchController < ApplicationController
 
   def handle_unverified_request
     render json: {error: "CSRF verification failed"}, status: 422
-  end
-
-  def strava_doorkeeper_app
-    Doorkeeper::Application.find(StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID)
   end
 
   def find_valid_token(application_id, resource_owner_id)

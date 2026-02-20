@@ -24,86 +24,19 @@ RSpec.describe StravaSearchController, type: :request do
       context "with strava integration" do
         let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345") }
 
-        it "redirects to OAuth authorize when no valid token exists" do
+        it "renders with config and valid assets" do
           get strava_search_path
-          expect(response).to redirect_to(/\/oauth\/authorize\?client_id=#{strava_app.uid}/)
-          expect(response.location).to include("scope=public")
-          expect(response.location).to include("response_type=code")
-        end
+          expect(response.status).to eq 200
+          expect(response.body).to include('<div id="root">')
+          expect(response.body).to include("stravaSearchConfig")
+          expect(response.body).to include('"athleteId":"12345"')
 
-        context "with valid doorkeeper token" do
-          let!(:access_token) do
-            Doorkeeper::AccessToken.create!(
-              application_id: strava_app.id,
-              resource_owner_id: current_user.id,
-              scopes: "public",
-              expires_in: Doorkeeper.configuration.access_token_expires_in
-            )
-          end
-
-          it "renders with config and valid assets" do
-            get strava_search_path
-            expect(response.status).to eq 200
-            expect(response.body).to include('<div id="root">')
-            expect(response.body).to include("stravaSearchConfig")
-            expect(response.body).to include('"athleteId":"12345"')
-
-            asset_paths = response.body.scan(%r{(?:src|href)="(/strava_search/assets/[^"]+)"}).flatten
-            expect(asset_paths.select { |p| p.end_with?(".js") }).to be_present
-            expect(asset_paths.select { |p| p.end_with?(".css") }).to be_present
-            asset_paths.each do |asset_path|
-              file_path = Rails.root.join("public", asset_path.delete_prefix("/"))
-              expect(File.exist?(file_path)).to eq(true), "Missing built asset: #{asset_path}"
-            end
-          end
-        end
-
-        context "with expired doorkeeper token" do
-          let!(:expired_token) do
-            Doorkeeper::AccessToken.create!(
-              application_id: strava_app.id,
-              resource_owner_id: current_user.id,
-              scopes: "public",
-              expires_in: 3600,
-              created_at: 2.hours.ago
-            )
-          end
-
-          it "redirects to OAuth authorize" do
-            get strava_search_path
-            expect(response).to redirect_to(/\/oauth\/authorize/)
-          end
-        end
-
-        context "OAuth callback with code" do
-          let!(:grant) do
-            Doorkeeper::AccessGrant.create!(
-              application_id: strava_app.id,
-              resource_owner_id: current_user.id,
-              expires_in: 600,
-              redirect_uri: strava_search_url
-            )
-          end
-
-          it "exchanges code for token and redirects to clean URL" do
-            expect {
-              get strava_search_path(code: grant.token)
-            }.to change(Doorkeeper::AccessToken, :count).by(1)
-
-            expect(response).to redirect_to(strava_search_path)
-            expect(grant.reload.revoked?).to be true
-
-            token = Doorkeeper::AccessToken.last
-            expect(token.resource_owner_id).to eq current_user.id
-            expect(token.application_id).to eq strava_app.id
-          end
-
-          it "redirects without creating token for invalid code" do
-            expect {
-              get strava_search_path(code: "invalid_code")
-            }.not_to change(Doorkeeper::AccessToken, :count)
-
-            expect(response).to redirect_to(strava_search_path)
+          asset_paths = response.body.scan(%r{(?:src|href)="(/strava_search/assets/[^"]+)"}).flatten
+          expect(asset_paths.select { |p| p.end_with?(".js") }).to be_present
+          expect(asset_paths.select { |p| p.end_with?(".css") }).to be_present
+          asset_paths.each do |asset_path|
+            file_path = Rails.root.join("public", asset_path.delete_prefix("/"))
+            expect(File.exist?(file_path)).to eq(true), "Missing built asset: #{asset_path}"
           end
         end
       end
@@ -170,8 +103,8 @@ RSpec.describe StravaSearchController, type: :request do
           expect(json_result[:error]).to eq "CSRF verification failed"
         end
 
-        it "creates a new token when existing token is expired" do
-          Doorkeeper::AccessToken.create!(
+        it "refreshes the most recent expired token instead of creating a new one" do
+          expired_token = Doorkeeper::AccessToken.create!(
             application_id: strava_app.id,
             resource_owner_id: current_user.id,
             scopes: "public",
@@ -181,10 +114,11 @@ RSpec.describe StravaSearchController, type: :request do
 
           expect {
             post strava_search_token_path
-          }.to change(Doorkeeper::AccessToken, :count).by(1)
+          }.not_to change(Doorkeeper::AccessToken, :count)
 
           expect(response.status).to eq 200
-          expect(json_result[:access_token]).to be_present
+          expect(json_result[:access_token]).to eq expired_token.token
+          expect(expired_token.reload.created_at).to be_within(2.seconds).of(Time.current)
         end
       end
     end
