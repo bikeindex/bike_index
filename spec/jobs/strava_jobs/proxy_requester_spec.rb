@@ -79,18 +79,18 @@ RSpec.describe StravaJobs::ProxyRequester do
     context "activity detail" do
       let(:detail_target_attributes) do
         target_attributes.merge(
-          "description" => "Hawk with Eric and Scott and cedar",
-          "photos" => {
-            "photo_url" => "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
-            "photo_count" => 2
+          description: "Hawk with Eric and Scott and cedar",
+          photos: {
+            photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+            photo_count: 2
           },
-          "segment_locations" => {
-            "cities" => ["San Francisco", "Mill Valley"],
-            "states" => ["California"],
-            "countries" => ["United States", "USA"]
+          segment_locations: {
+            cities: ["San Francisco", "Mill Valley"],
+            states: ["California"],
+            countries: ["United States", "USA"]
           },
-          "strava_data" => target_attributes["strava_data"].merge("enriched" => true)
-        )
+          strava_data: target_attributes["strava_data"].merge("enriched" => true, "muted" => false)
+        ).as_json
       end
 
       it "creates from list then enriches from detail" do

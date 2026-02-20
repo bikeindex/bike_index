@@ -156,7 +156,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
             device_name: "Strava App", commute: false,
             average_speed: 4.746, pr_count: 0,
             average_watts: 129.0, device_watts: false,
-            enriched: true
+            muted: false, enriched: true
           },
           segment_locations: {
             cities: ["San Francisco", "Mill Valley"],
