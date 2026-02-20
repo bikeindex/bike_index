@@ -135,6 +135,32 @@ describe('useUrlFilters', () => {
       expect(result.current[0].activityTypesExpanded).toBe(false);
       expect(result.current[0].equipmentExpanded).toBe(false);
     });
+
+    it('parses commute filter from URL', () => {
+      window.history.replaceState({}, '', '/?commute=commute');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].commuteFilter).toBe('commute');
+    });
+
+    it('parses suffer score range from URL', () => {
+      window.history.replaceState({}, '', '/?sufferFrom=20&sufferTo=100');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].sufferScoreFrom).toBe(20);
+      expect(result.current[0].sufferScoreTo).toBe(100);
+    });
+
+    it('parses kudos range from URL', () => {
+      window.history.replaceState({}, '', '/?kudosFrom=5&kudosTo=50');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].kudosFrom).toBe(5);
+      expect(result.current[0].kudosTo).toBe(50);
+    });
   });
 
   describe('setFilters', () => {
@@ -363,6 +389,104 @@ describe('useUrlFilters', () => {
 
       expect(window.location.search).toContain('typesClosed=1');
       expect(window.location.search).toContain('gearClosed=1');
+    });
+
+    it('updates URL with commute filter', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          query: '',
+          activityTypes: [],
+            gearIds: [],
+          noEquipment: false,
+          dateFrom: null,
+          dateTo: null,
+          distanceFrom: null,
+          distanceTo: null,
+          elevationFrom: null,
+          elevationTo: null,
+          activityTypesExpanded: true,
+            equipmentExpanded: true,
+          mutedFilter: 'all',
+          photoFilter: 'all',
+          privateFilter: 'all',
+          commuteFilter: 'commute',
+          sufferScoreFrom: null,
+          sufferScoreTo: null,
+          kudosFrom: null,
+          kudosTo: null,
+          page: 1,
+        });
+      });
+
+      expect(window.location.search).toBe('?commute=commute');
+    });
+
+    it('updates URL with suffer score range', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          query: '',
+          activityTypes: [],
+            gearIds: [],
+          noEquipment: false,
+          dateFrom: null,
+          dateTo: null,
+          distanceFrom: null,
+          distanceTo: null,
+          elevationFrom: null,
+          elevationTo: null,
+          activityTypesExpanded: true,
+            equipmentExpanded: true,
+          mutedFilter: 'all',
+          photoFilter: 'all',
+          privateFilter: 'all',
+          commuteFilter: 'all',
+          sufferScoreFrom: 20,
+          sufferScoreTo: 100,
+          kudosFrom: null,
+          kudosTo: null,
+          page: 1,
+        });
+      });
+
+      expect(window.location.search).toContain('sufferFrom=20');
+      expect(window.location.search).toContain('sufferTo=100');
+    });
+
+    it('updates URL with kudos range', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          query: '',
+          activityTypes: [],
+            gearIds: [],
+          noEquipment: false,
+          dateFrom: null,
+          dateTo: null,
+          distanceFrom: null,
+          distanceTo: null,
+          elevationFrom: null,
+          elevationTo: null,
+          activityTypesExpanded: true,
+            equipmentExpanded: true,
+          mutedFilter: 'all',
+          photoFilter: 'all',
+          privateFilter: 'all',
+          commuteFilter: 'all',
+          sufferScoreFrom: null,
+          sufferScoreTo: null,
+          kudosFrom: 5,
+          kudosTo: 50,
+          page: 1,
+        });
+      });
+
+      expect(window.location.search).toContain('kudosFrom=5');
+      expect(window.location.search).toContain('kudosTo=50');
     });
 
     it('clears URL when filters are reset to defaults', () => {

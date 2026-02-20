@@ -576,6 +576,196 @@ describe('useActivities', () => {
       });
     });
 
+    describe('commute filter', () => {
+      it('filters commute activities only', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, commute: true }),
+          createActivity({ id: 2, commute: false }),
+          createActivity({ id: 3, commute: true })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, commuteFilter: 'commute' as const }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([1, 3]);
+      });
+
+      it('filters non-commute activities only', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, commute: true }),
+          createActivity({ id: 2, commute: false }),
+          createActivity({ id: 3, commute: false })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, commuteFilter: 'not_commute' as const }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+
+      it('shows all activities when commute filter is all', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, commute: true }),
+          createActivity({ id: 2, commute: false })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+      });
+    });
+
+    describe('suffer score filter', () => {
+      it('filters by sufferScoreFrom', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, suffer_score: 10 }),
+          createActivity({ id: 2, suffer_score: 50 }),
+          createActivity({ id: 3, suffer_score: 100 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, sufferScoreFrom: 50 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+
+      it('filters by sufferScoreTo', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, suffer_score: 10 }),
+          createActivity({ id: 2, suffer_score: 50 }),
+          createActivity({ id: 3, suffer_score: 100 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, sufferScoreTo: 50 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([1, 2]);
+      });
+
+      it('filters by suffer score range', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, suffer_score: 10 }),
+          createActivity({ id: 2, suffer_score: 50 }),
+          createActivity({ id: 3, suffer_score: 75 }),
+          createActivity({ id: 4, suffer_score: 150 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({
+            ...prev,
+            sufferScoreFrom: 40,
+            sufferScoreTo: 100,
+          }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+
+      it('excludes activities without suffer_score when filter is set', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, suffer_score: 50 }),
+          createActivity({ id: 2, suffer_score: undefined }),
+          createActivity({ id: 3 }) // no suffer_score field
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, sufferScoreFrom: 10 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(1);
+        expect(result.current.filteredActivities[0].id).toBe(1);
+      });
+    });
+
+    describe('kudos count filter', () => {
+      it('filters by kudosFrom', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, kudos_count: 0 }),
+          createActivity({ id: 2, kudos_count: 5 }),
+          createActivity({ id: 3, kudos_count: 20 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, kudosFrom: 5 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+
+      it('filters by kudosTo', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, kudos_count: 0 }),
+          createActivity({ id: 2, kudos_count: 5 }),
+          createActivity({ id: 3, kudos_count: 20 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, kudosTo: 5 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([1, 2]);
+      });
+
+      it('filters by kudos range', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, kudos_count: 0 }),
+          createActivity({ id: 2, kudos_count: 5 }),
+          createActivity({ id: 3, kudos_count: 10 }),
+          createActivity({ id: 4, kudos_count: 25 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({
+            ...prev,
+            kudosFrom: 3,
+            kudosTo: 15,
+          }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+    });
+
     describe('combined filters', () => {
       it('applies multiple filters together', async () => {
         mockActivities.push(
