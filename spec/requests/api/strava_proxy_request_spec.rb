@@ -212,7 +212,8 @@ RSpec.describe "Strava Proxy API", type: :request do
                 post base_url, params: {
                   url: "activities/#{strava_id}", method: "PUT", access_token: token.token, body: {gear_id:}
                 }
-              }.to change(StravaRequest, :count).by(3) # proxy PUT + update_from_strava! GET + enqueued gear fetch
+              }.to change(StravaRequest, :count).by(3)
+              # proxy PUT + update_from_strava! GET + enqueued gear fetch
             end
 
             expect(response.status).to eq 200
