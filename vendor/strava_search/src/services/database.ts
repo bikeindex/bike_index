@@ -2,9 +2,9 @@ import Dexie, { type Table } from 'dexie';
 import type { StravaActivity, StravaGear, StoredAuth } from '../types/strava';
 
 export interface StoredActivity extends StravaActivity {
+  id: number; // parsed from strava_id, used as Dexie primary key
   athleteId: number;
   syncedAt: number;
-  enrichedAt?: number;
 }
 
 export interface StoredGear extends StravaGear {
@@ -28,7 +28,7 @@ class StravaDatabase extends Dexie {
     super('StravaSearchDB');
 
     this.version(1).stores({
-      activities: 'id, athleteId, name, type, sport_type, gear_id, start_date_local, [athleteId+start_date_local]',
+      activities: 'id, athleteId, title, activity_type, sport_type, gear_id, start_date_in_zone, [athleteId+start_date_in_zone]',
       gear: 'id, athleteId',
       auth: 'id',
       syncState: 'athleteId',
@@ -38,9 +38,14 @@ class StravaDatabase extends Dexie {
 
 export const db = new StravaDatabase();
 
+function activityId(activity: StravaActivity): number {
+  return parseInt(activity.strava_id, 10);
+}
+
 export async function saveActivities(activities: StravaActivity[], athleteId: number): Promise<void> {
   const storedActivities: StoredActivity[] = activities.map((activity) => ({
     ...activity,
+    id: activityId(activity),
     athleteId,
     syncedAt: Date.now(),
   }));

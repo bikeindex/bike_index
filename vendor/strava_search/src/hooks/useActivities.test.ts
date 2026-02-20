@@ -40,7 +40,7 @@ const defaultFilters: SearchFilters = {
   equipmentExpanded: true,
   mutedFilter: 'all',
   photoFilter: 'all',
-  visibilityFilter: 'all',
+  privateFilter: 'all',
   page: 1,
 };
 
@@ -73,37 +73,24 @@ vi.mock('../services/strava', () => ({
 function createActivity(overrides: Partial<StoredActivity>): StoredActivity {
   return {
     id: Math.floor(Math.random() * 1000000),
-    name: 'Test Activity',
+    strava_id: '0',
+    title: 'Test Activity',
     description: '',
-    distance: 10000, // 10 km in meters
-    moving_time: 3600,
-    elapsed_time: 3700,
-    total_elevation_gain: 100,
-    type: 'Ride',
+    distance_meters: 10000, // 10 km
+    moving_time_seconds: 3600,
+    total_elevation_gain_meters: 100,
+    activity_type: 'Ride',
     sport_type: 'Ride',
     start_date: '2024-01-15T10:00:00Z',
-    start_date_local: '2024-01-15T02:00:00Z',
-    timezone: '(GMT-08:00) America/Los_Angeles',
-    utc_offset: -28800,
-    achievement_count: 0,
+    start_date_in_zone: '2024-01-15T02:00:00Z',
+    timezone: 'America/Los_Angeles',
     kudos_count: 0,
-    comment_count: 0,
-    athlete_count: 1,
-    photo_count: 0,
-    trainer: false,
     commute: false,
-    manual: false,
     private: false,
-    visibility: 'everyone',
-    flagged: false,
+    muted: false,
+    enriched: true,
     average_speed: 2.78,
-    max_speed: 5.5,
-    has_heartrate: false,
-    heartrate_opt_out: false,
-    display_hide_heartrate_option: false,
     pr_count: 0,
-    total_photo_count: 0,
-    has_kudoed: false,
     athleteId: 12345,
     syncedAt: Date.now(),
     ...overrides,
@@ -122,11 +109,11 @@ describe('useActivities', () => {
 
   describe('filtering', () => {
     describe('text search filter', () => {
-      it('filters by activity name', async () => {
+      it('filters by activity title', async () => {
         mockActivities.push(
-          createActivity({ id: 1, name: 'Morning Run' }),
-          createActivity({ id: 2, name: 'Evening Ride' }),
-          createActivity({ id: 3, name: 'Morning Bike Ride' })
+          createActivity({ id: 1, title: 'Morning Run' }),
+          createActivity({ id: 2, title: 'Evening Ride' }),
+          createActivity({ id: 3, title: 'Morning Bike Ride' })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -142,8 +129,8 @@ describe('useActivities', () => {
 
       it('filters by description', async () => {
         mockActivities.push(
-          createActivity({ id: 1, name: 'Activity 1', description: 'Great workout in the park' }),
-          createActivity({ id: 2, name: 'Activity 2', description: 'Short commute' })
+          createActivity({ id: 1, title: 'Activity 1', description: 'Great workout in the park' }),
+          createActivity({ id: 2, title: 'Activity 2', description: 'Short commute' })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -157,10 +144,10 @@ describe('useActivities', () => {
         expect(result.current.filteredActivities[0].id).toBe(1);
       });
 
-      it('filters by location_city', async () => {
+      it('filters by segment_locations cities', async () => {
         mockActivities.push(
-          createActivity({ id: 1, name: 'Activity 1', location_city: 'San Francisco' }),
-          createActivity({ id: 2, name: 'Activity 2', location_city: 'Los Angeles' })
+          createActivity({ id: 1, title: 'Activity 1', segment_locations: { cities: ['San Francisco'] } }),
+          createActivity({ id: 2, title: 'Activity 2', segment_locations: { cities: ['Los Angeles'] } })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -174,10 +161,10 @@ describe('useActivities', () => {
         expect(result.current.filteredActivities[0].id).toBe(1);
       });
 
-      it('filters by location_state', async () => {
+      it('filters by segment_locations states', async () => {
         mockActivities.push(
-          createActivity({ id: 1, name: 'Activity 1', location_state: 'California' }),
-          createActivity({ id: 2, name: 'Activity 2', location_state: 'Oregon' })
+          createActivity({ id: 1, title: 'Activity 1', segment_locations: { states: ['California'] } }),
+          createActivity({ id: 2, title: 'Activity 2', segment_locations: { states: ['Oregon'] } })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -192,8 +179,8 @@ describe('useActivities', () => {
 
       it('filters by device_name', async () => {
         mockActivities.push(
-          createActivity({ id: 1, name: 'Activity 1', device_name: 'Garmin Edge 530' }),
-          createActivity({ id: 2, name: 'Activity 2', device_name: 'Apple Watch' })
+          createActivity({ id: 1, title: 'Activity 1', device_name: 'Garmin Edge 530' }),
+          createActivity({ id: 2, title: 'Activity 2', device_name: 'Apple Watch' })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -211,11 +198,13 @@ describe('useActivities', () => {
         mockActivities.push(
           createActivity({
             id: 1,
-            name: 'Activity 1',
-            segment_cities: ['Mill Valley', 'Sausalito'],
-            segment_states: ['California'],
+            title: 'Activity 1',
+            segment_locations: {
+              cities: ['Mill Valley', 'Sausalito'],
+              states: ['California'],
+            },
           }),
-          createActivity({ id: 2, name: 'Activity 2' })
+          createActivity({ id: 2, title: 'Activity 2' })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -230,7 +219,7 @@ describe('useActivities', () => {
       });
 
       it('search is case insensitive', async () => {
-        mockActivities.push(createActivity({ id: 1, name: 'MORNING RUN' }));
+        mockActivities.push(createActivity({ id: 1, title: 'MORNING RUN' }));
 
         const { result } = renderHook(() => useActivities());
         await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -368,9 +357,9 @@ describe('useActivities', () => {
     describe('date range filter', () => {
       it('filters by dateFrom', async () => {
         mockActivities.push(
-          createActivity({ id: 1, start_date_local: '2024-01-10T10:00:00Z' }),
-          createActivity({ id: 2, start_date_local: '2024-01-15T10:00:00Z' }),
-          createActivity({ id: 3, start_date_local: '2024-01-20T10:00:00Z' })
+          createActivity({ id: 1, start_date_in_zone: '2024-01-10T10:00:00Z' }),
+          createActivity({ id: 2, start_date_in_zone: '2024-01-15T10:00:00Z' }),
+          createActivity({ id: 3, start_date_in_zone: '2024-01-20T10:00:00Z' })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -387,9 +376,9 @@ describe('useActivities', () => {
       it('filters by dateTo', async () => {
         // Use dates with clear separation to avoid timezone issues
         mockActivities.push(
-          createActivity({ id: 1, start_date_local: '2024-01-05T12:00:00' }),
-          createActivity({ id: 2, start_date_local: '2024-01-10T12:00:00' }),
-          createActivity({ id: 3, start_date_local: '2024-01-20T12:00:00' })
+          createActivity({ id: 1, start_date_in_zone: '2024-01-05T12:00:00' }),
+          createActivity({ id: 2, start_date_in_zone: '2024-01-10T12:00:00' }),
+          createActivity({ id: 3, start_date_in_zone: '2024-01-20T12:00:00' })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -407,10 +396,10 @@ describe('useActivities', () => {
 
       it('filters by date range (both from and to)', async () => {
         mockActivities.push(
-          createActivity({ id: 1, start_date_local: '2024-01-10T10:00:00Z' }),
-          createActivity({ id: 2, start_date_local: '2024-01-15T10:00:00Z' }),
-          createActivity({ id: 3, start_date_local: '2024-01-20T10:00:00Z' }),
-          createActivity({ id: 4, start_date_local: '2024-01-25T10:00:00Z' })
+          createActivity({ id: 1, start_date_in_zone: '2024-01-10T10:00:00Z' }),
+          createActivity({ id: 2, start_date_in_zone: '2024-01-15T10:00:00Z' }),
+          createActivity({ id: 3, start_date_in_zone: '2024-01-20T10:00:00Z' }),
+          createActivity({ id: 4, start_date_in_zone: '2024-01-25T10:00:00Z' })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -432,9 +421,9 @@ describe('useActivities', () => {
     describe('distance range filter (metric)', () => {
       it('filters by distanceFrom (km)', async () => {
         mockActivities.push(
-          createActivity({ id: 1, distance: 5000 }), // 5 km
-          createActivity({ id: 2, distance: 10000 }), // 10 km
-          createActivity({ id: 3, distance: 20000 }) // 20 km
+          createActivity({ id: 1, distance_meters: 5000 }), // 5 km
+          createActivity({ id: 2, distance_meters: 10000 }), // 10 km
+          createActivity({ id: 3, distance_meters: 20000 }) // 20 km
         );
 
         const { result } = renderHook(() => useActivities());
@@ -451,9 +440,9 @@ describe('useActivities', () => {
 
       it('filters by distanceTo (km)', async () => {
         mockActivities.push(
-          createActivity({ id: 1, distance: 5000 }),
-          createActivity({ id: 2, distance: 10000 }),
-          createActivity({ id: 3, distance: 20000 })
+          createActivity({ id: 1, distance_meters: 5000 }),
+          createActivity({ id: 2, distance_meters: 10000 }),
+          createActivity({ id: 3, distance_meters: 20000 })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -469,10 +458,10 @@ describe('useActivities', () => {
 
       it('filters by distance range', async () => {
         mockActivities.push(
-          createActivity({ id: 1, distance: 5000 }),
-          createActivity({ id: 2, distance: 10000 }),
-          createActivity({ id: 3, distance: 15000 }),
-          createActivity({ id: 4, distance: 25000 })
+          createActivity({ id: 1, distance_meters: 5000 }),
+          createActivity({ id: 2, distance_meters: 10000 }),
+          createActivity({ id: 3, distance_meters: 15000 }),
+          createActivity({ id: 4, distance_meters: 25000 })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -491,17 +480,12 @@ describe('useActivities', () => {
       });
     });
 
-    // Note: Imperial unit conversion tests are covered implicitly by the metric tests
-    // since the conversion logic is the same. The usePreferences mock would need
-    // dynamic mocking per test to properly test imperial, which adds complexity.
-    // The key conversion logic (MILES_TO_KM, FEET_TO_METERS) should be unit tested separately.
-
     describe('elevation range filter', () => {
       it('filters by elevationFrom (meters)', async () => {
         mockActivities.push(
-          createActivity({ id: 1, total_elevation_gain: 50 }),
-          createActivity({ id: 2, total_elevation_gain: 100 }),
-          createActivity({ id: 3, total_elevation_gain: 200 })
+          createActivity({ id: 1, total_elevation_gain_meters: 50 }),
+          createActivity({ id: 2, total_elevation_gain_meters: 100 }),
+          createActivity({ id: 3, total_elevation_gain_meters: 200 })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -517,9 +501,9 @@ describe('useActivities', () => {
 
       it('filters by elevationTo (meters)', async () => {
         mockActivities.push(
-          createActivity({ id: 1, total_elevation_gain: 50 }),
-          createActivity({ id: 2, total_elevation_gain: 100 }),
-          createActivity({ id: 3, total_elevation_gain: 200 })
+          createActivity({ id: 1, total_elevation_gain_meters: 50 }),
+          createActivity({ id: 2, total_elevation_gain_meters: 100 }),
+          createActivity({ id: 3, total_elevation_gain_meters: 200 })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -537,9 +521,9 @@ describe('useActivities', () => {
     describe('muted filter', () => {
       it('filters muted activities only', async () => {
         mockActivities.push(
-          createActivity({ id: 1, hide_from_home: true }),
-          createActivity({ id: 2, hide_from_home: false }),
-          createActivity({ id: 3, hide_from_home: undefined })
+          createActivity({ id: 1, muted: true }),
+          createActivity({ id: 2, muted: false }),
+          createActivity({ id: 3, muted: false })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -555,9 +539,9 @@ describe('useActivities', () => {
 
       it('filters not muted activities only', async () => {
         mockActivities.push(
-          createActivity({ id: 1, hide_from_home: true }),
-          createActivity({ id: 2, hide_from_home: false }),
-          createActivity({ id: 3, hide_from_home: undefined })
+          createActivity({ id: 1, muted: true }),
+          createActivity({ id: 2, muted: false }),
+          createActivity({ id: 3, muted: false })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -567,14 +551,13 @@ describe('useActivities', () => {
           result.current.setFilters((prev) => ({ ...prev, mutedFilter: 'not_muted' }));
         });
 
-        // Activities with hide_from_home false or undefined should pass
         expect(result.current.filteredActivities).toHaveLength(2);
       });
 
       it('shows all activities when muted filter is all', async () => {
         mockActivities.push(
-          createActivity({ id: 1, hide_from_home: true }),
-          createActivity({ id: 2, hide_from_home: false })
+          createActivity({ id: 1, muted: true }),
+          createActivity({ id: 2, muted: false })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -593,31 +576,31 @@ describe('useActivities', () => {
         mockActivities.push(
           createActivity({
             id: 1,
-            name: 'Morning Run',
+            title: 'Morning Run',
             sport_type: 'Run',
-            distance: 10000,
-            start_date_local: '2024-01-15T10:00:00Z',
+            distance_meters: 10000,
+            start_date_in_zone: '2024-01-15T10:00:00Z',
           }),
           createActivity({
             id: 2,
-            name: 'Evening Ride',
+            title: 'Evening Ride',
             sport_type: 'Ride',
-            distance: 20000,
-            start_date_local: '2024-01-15T10:00:00Z',
+            distance_meters: 20000,
+            start_date_in_zone: '2024-01-15T10:00:00Z',
           }),
           createActivity({
             id: 3,
-            name: 'Morning Ride',
+            title: 'Morning Ride',
             sport_type: 'Ride',
-            distance: 15000,
-            start_date_local: '2024-01-10T10:00:00Z',
+            distance_meters: 15000,
+            start_date_in_zone: '2024-01-10T10:00:00Z',
           }),
           createActivity({
             id: 4,
-            name: 'Morning Ride Long',
+            title: 'Morning Ride Long',
             sport_type: 'Ride',
-            distance: 25000,
-            start_date_local: '2024-01-15T10:00:00Z',
+            distance_meters: 25000,
+            start_date_in_zone: '2024-01-15T10:00:00Z',
           })
         );
 
@@ -816,22 +799,22 @@ describe('useActivities', () => {
     });
 
     it('still updates activities during silent refresh', async () => {
-      mockActivities.push(createActivity({ id: 1, name: 'Original' }));
+      mockActivities.push(createActivity({ id: 1, title: 'Original' }));
 
       const { result } = renderHook(() => useActivities());
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-      expect(result.current.activities[0].name).toBe('Original');
+      expect(result.current.activities[0].title).toBe('Original');
 
       // Modify the mock data
       mockActivities.length = 0;
-      mockActivities.push(createActivity({ id: 1, name: 'Updated' }));
+      mockActivities.push(createActivity({ id: 1, title: 'Updated' }));
 
       await act(async () => {
         await result.current.refreshActivities(true);
       });
 
-      expect(result.current.activities[0].name).toBe('Updated');
+      expect(result.current.activities[0].title).toBe('Updated');
     });
   });
 });
