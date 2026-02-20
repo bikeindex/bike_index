@@ -7,6 +7,7 @@ export function formatNumber(value: number): string {
 }
 
 export function formatDistance(meters: number, units: UnitSystem = 'metric'): string {
+  if (!meters) return '-';
   if (units === 'imperial') {
     const miles = meters / 1609.344;
     return `${miles.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} mi`;
@@ -20,6 +21,7 @@ export function formatDistance(meters: number, units: UnitSystem = 'metric'): st
 }
 
 export function formatDuration(seconds: number): string {
+  if (!seconds) return '-';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
@@ -34,7 +36,7 @@ export function formatDuration(seconds: number): string {
 }
 
 export function formatPace(metersPerSecond: number, activityType: string, units: UnitSystem = 'metric'): string {
-  if (metersPerSecond === 0) return '-';
+  if (!metersPerSecond) return '-';
 
   // For running/walking, show pace (min/km or min/mi)
   if (['Run', 'Walk', 'Hike', 'VirtualRun', 'TrailRun'].includes(activityType)) {
@@ -60,6 +62,7 @@ export function formatPace(metersPerSecond: number, activityType: string, units:
 }
 
 export function formatSpeed(metersPerSecond: number, units: UnitSystem = 'metric'): string {
+  if (!metersPerSecond) return '-';
   if (units === 'imperial') {
     const mph = metersPerSecond * 2.23694;
     return `${mph.toFixed(1)} mph`;
@@ -69,6 +72,7 @@ export function formatSpeed(metersPerSecond: number, units: UnitSystem = 'metric
 }
 
 export function formatElevation(meters: number, units: UnitSystem = 'metric'): string {
+  if (!meters && meters !== 0) return '-';
   if (units === 'imperial') {
     const feet = meters * 3.28084;
     return `${Math.round(feet).toLocaleString()} ft`;
@@ -77,16 +81,19 @@ export function formatElevation(meters: number, units: UnitSystem = 'metric'): s
 }
 
 export function formatDate(dateString: string): string {
+  if (!dateString) return '';
   const date = parseISO(dateString);
   return format(date, 'MMM d, yyyy');
 }
 
 export function formatDateTime(dateString: string): string {
+  if (!dateString) return '';
   const date = parseISO(dateString);
   return format(date, 'MMM d, yyyy h:mm a');
 }
 
 export function formatDateTimeTitle(dateString: string): string {
+  if (!dateString) return '';
   const date = parseISO(dateString);
 
   // Get timezone abbreviation using Intl API
@@ -100,6 +107,7 @@ export function formatDateTimeTitle(dateString: string): string {
 }
 
 export function formatTimeAgo(dateString: string): string {
+  if (!dateString) return '';
   const date = parseISO(dateString);
   return formatDistanceToNow(date, { addSuffix: true });
 }

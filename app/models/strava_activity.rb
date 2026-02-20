@@ -162,7 +162,8 @@ class StravaActivity < ApplicationRecord
   end
 
   def start_date_in_zone
-    return nil if start_date.blank? || timezone.blank?
+    return nil if start_date.blank?
+    return start_date.utc if timezone.blank?
 
     start_date.in_time_zone(timezone)
   end
