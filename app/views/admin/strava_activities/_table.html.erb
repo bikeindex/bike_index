@@ -11,6 +11,11 @@
 
       <th><%= sortable "start_date", render_sortable: render_sortable %></th>
 
+      <th>
+        <% enriched_display = nil %>
+        <%= sortable "enriched", enriched_display, render_sortable: render_sortable %>
+      </th>
+
       <th>Title</th>
 
       <th>
@@ -61,7 +66,9 @@
             <% if strava_activity.enriched? %>
               <%= render UI::Badge::Component.new(text: "E", title: "Enriched", color: :cyan, size: :sm) %>
             <% end %>
+          </td>
 
+          <td>
             <span class="tw:mr-1"><%= strava_activity.title %></span>
 
             <%= link_to link_emoji, "https://www.strava.com/activities/#{strava_activity.strava_id}", title: "View on Strava" %>

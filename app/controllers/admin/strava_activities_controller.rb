@@ -16,11 +16,15 @@ class Admin::StravaActivitiesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at updated_at start_date activity_type distance_meters strava_integration_id]
+    %w[created_at updated_at start_date activity_type distance_meters strava_integration_id enriched]
   end
 
   def sortable_opts
-    "strava_activities.#{sort_column} #{sort_direction}"
+    if sort_column == "enriched"
+      "strava_activities.strava_data->>'enriched' #{sort_direction}"
+    else
+      "strava_activities.#{sort_column} #{sort_direction}"
+    end
   end
 
   def earliest_period_date

@@ -255,4 +255,38 @@ RSpec.describe StravaActivity, type: :model do
       expect(activity).to match_hash_indifferently(photos: {photo_url: nil, photo_count: 0})
     end
   end
+
+  describe "update_from_strava!" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens) }
+    let(:strava_activity) { StravaActivity.create(strava_integration:, strava_id: "17419209324") }
+    let(:target_attributes) do
+      {
+        gear_id: "b11099574",
+        title: "Extra 10: HIIT Ride with Cody Rigsby",
+        description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
+        photos: {
+          photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+          photo_count: 1
+        },
+        strava_data: {
+          commute: false,
+          enriched: true,
+          pr_count: 0,
+          device_name: "Peloton Bike",
+          device_watts: true,
+          average_speed: 8.466,
+          average_watts: 156.0,
+          max_heartrate: 149.0,
+          average_heartrate: 136.2
+        }
+      }
+    end
+    it "updates from strava" do
+      expect(strava_activity).to be_valid
+      VCR.use_cassette("strava-update_from_strava") do
+        strava_activity.update_from_strava!
+      end
+      expect(strava_activity.reload).to have_attributes target_attributes
+    end
+  end
 end

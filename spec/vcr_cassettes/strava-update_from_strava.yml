@@ -1,0 +1,80 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/activities/17419209324
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 20 Feb 2026 00:56:52 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '208'
+      Server:
+      - istio-envoy
+      Status:
+      - 200 OK
+      X-Ratelimit-Usage:
+      - '1,20'
+      X-Ratelimit-Limit:
+      - '600,6000'
+      Vary:
+      - Accept, Origin
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - ec37adc0-7dc8-408a-9b2d-e1466a02e0ac
+      X-Readratelimit-Limit:
+      - '300,3000'
+      X-Download-Options:
+      - noopen
+      Etag:
+      - W/"c85f414525dc2e6957653704a6dd5a91"
+      X-Frame-Options:
+      - DENY
+      X-Readratelimit-Usage:
+      - '1,20'
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 f87d91065dc3f8a4150aaedb0d948cd8.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - 3h3zgIgJ77byxFH9rndh93rroxTNV9LViC4vYEna7aDirBNWYKNg6w==
+    body:
+      encoding: ASCII-8BIT
+      string: '{"resource_state":3,"athlete":{"id":2430215,"resource_state":1},"name":"Extra
+        10: HIIT Ride with Cody Rigsby","distance":5079.8,"moving_time":600,"elapsed_time":600,"total_elevation_gain":0,"type":"Ride","sport_type":"Ride","workout_type":null,"device_name":"Peloton
+        Bike","id":17419209324,"start_date":"2026-02-16T18:52:07Z","start_date_local":"2026-02-16T12:52:07Z","timezone":"(GMT-06:00)
+        America/Chicago","utc_offset":-21600.0,"location_city":null,"location_state":null,"location_country":null,"achievement_count":0,"kudos_count":2,"comment_count":0,"athlete_count":1,"photo_count":0,"map":{"id":"a17419209324","polyline":"","resource_state":3,"summary_polyline":""},"trainer":true,"commute":false,"manual":false,"private":false,"visibility":"everyone","flagged":false,"gear_id":"b11099574","start_latlng":[],"end_latlng":[],"average_speed":8.466,"max_speed":10.48,"average_cadence":96.7,"average_watts":156.0,"max_watts":270,"weighted_average_watts":166,"device_watts":true,"kilojoules":93.6,"has_heartrate":true,"average_heartrate":136.2,"max_heartrate":149.0,"heartrate_opt_out":false,"display_hide_heartrate_option":true,"elev_high":0.0,"elev_low":0.0,"upload_id":18516241580,"upload_id_str":"18516241580","external_id":"879565c5362d4e349204660f4e15256f.tcx","from_accepted_tag":false,"pr_count":0,"total_photo_count":1,"has_kudoed":false,"suffer_score":2.0,"description":"Total
+        Output: 94 kJ\nLeaderboard Rank: 6,555 / 32,313","calories":117.0,"perceived_exertion":null,"prefer_perceived_exertion":null,"segment_efforts":[],"splits_metric":[{"distance":1007.5,"elapsed_time":120,"elevation_difference":0.0,"moving_time":120,"split":1,"average_speed":8.4,"average_grade_adjusted_speed":8.4,"average_heartrate":124.375,"pace_zone":0},{"distance":999.8,"elapsed_time":109,"elevation_difference":0.0,"moving_time":109,"split":2,"average_speed":9.17,"average_grade_adjusted_speed":9.17,"average_heartrate":138.45871559633028,"pace_zone":0},{"distance":998.9,"elapsed_time":114,"elevation_difference":0.0,"moving_time":114,"split":3,"average_speed":8.76,"average_grade_adjusted_speed":8.76,"average_heartrate":139.5701754385965,"pace_zone":0},{"distance":996.4,"elapsed_time":113,"elevation_difference":0.0,"moving_time":113,"split":4,"average_speed":8.82,"average_grade_adjusted_speed":8.82,"average_heartrate":139.31858407079645,"pace_zone":0},{"distance":999.6,"elapsed_time":128,"elevation_difference":0.0,"moving_time":128,"split":5,"average_speed":7.81,"average_grade_adjusted_speed":7.81,"average_heartrate":140.6640625,"pace_zone":0},{"distance":84.7,"elapsed_time":16,"elevation_difference":0.0,"moving_time":16,"split":6,"average_speed":5.29,"average_grade_adjusted_speed":5.29,"average_heartrate":126.75,"pace_zone":0}],"splits_standard":[{"distance":1613.6,"elapsed_time":187,"elevation_difference":0.0,"moving_time":187,"split":1,"average_speed":8.63,"average_grade_adjusted_speed":8.63,"average_heartrate":128.86096256684493,"pace_zone":0},{"distance":1605.7,"elapsed_time":177,"elevation_difference":0.0,"moving_time":177,"split":2,"average_speed":9.07,"average_grade_adjusted_speed":9.07,"average_heartrate":139.77966101694915,"pace_zone":0},{"distance":1612.4,"elapsed_time":186,"elevation_difference":0.0,"moving_time":186,"split":3,"average_speed":8.67,"average_grade_adjusted_speed":8.67,"average_heartrate":140.59677419354838,"pace_zone":0},{"distance":255.2,"elapsed_time":50,"elevation_difference":0.0,"moving_time":50,"split":4,"average_speed":5.1,"average_grade_adjusted_speed":5.1,"average_heartrate":134.3,"pace_zone":0}],"laps":[{"id":62227287373,"resource_state":2,"name":"Lap
+        1","activity":{"id":17419209324,"visibility":"everyone","resource_state":1},"athlete":{"id":2430215,"resource_state":1},"elapsed_time":600,"moving_time":600,"start_date":"2026-02-16T18:52:07Z","start_date_local":"2026-02-16T12:52:07Z","distance":5086.87,"average_speed":8.48,"max_speed":10.48,"lap_index":1,"split":1,"start_index":0,"end_index":599,"total_elevation_gain":0,"average_cadence":96.7,"device_watts":true,"average_watts":156.0,"average_heartrate":136.2,"max_heartrate":149.0}],"gear":{"id":"b11099574","primary":false,"name":"Peloton","nickname":"Peloton","resource_state":2,"retired":false,"distance":2184837,"converted_distance":1357.6},"photos":{"primary":{"unique_id":"93e6fb15-623f-4bf7-b080-8a1ac314b7d4","urls":{"600":"https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-768x432.jpg","100":"https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-128x72.jpg"},"source":1,"media_type":1},"use_primary_photo":false,"count":1},"stats_visibility":[{"type":"heart_rate","visibility":"everyone"},{"type":"pace","visibility":"everyone"},{"type":"power","visibility":"everyone"},{"type":"speed","visibility":"everyone"},{"type":"calories","visibility":"everyone"}],"hide_from_home":true,"embed_token":"f65017352ee63b88d5941dca4f2c5e1f6b66781f","available_zones":["heartrate","power"]}'
+  recorded_at: Fri, 20 Feb 2026 00:56:52 GMT
+recorded_with: VCR 6.3.1
