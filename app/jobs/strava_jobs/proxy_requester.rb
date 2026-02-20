@@ -3,7 +3,7 @@
 # NOTE: This is not actually a job - it's in the StravaJobs namespace to keep everything together
 module StravaJobs
   class ProxyRequester
-    STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3)
+    STRAVA_DOORKEEPER_APP_ID = ENV.fetch("STRAVA_DOORKEEPER_APP_ID", 3).to_i
 
     class << self
       # returns {user:, strava_integration:} if valid
@@ -69,8 +69,8 @@ module StravaJobs
       private
 
       def authorized_app?(token)
-        STRAVA_DOORKEEPER_APP_ID.present? &&
-          token.application_id.to_s == STRAVA_DOORKEEPER_APP_ID
+        STRAVA_DOORKEEPER_APP_ID > 0 &&
+          token.application_id == STRAVA_DOORKEEPER_APP_ID
       end
 
       def validate_url!(url)

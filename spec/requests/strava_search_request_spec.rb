@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe StravaSearchController, type: :request do
   let(:strava_app) { FactoryBot.create(:doorkeeper_app, is_internal: true) }
 
-  before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id.to_s) }
+  before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id) }
 
   describe "GET /strava_search" do
     it "redirects to login when not signed in" do
