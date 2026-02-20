@@ -29,6 +29,52 @@ RSpec.describe StravaJobs::ProxyRequester do
     end
   end
 
+  describe ".find_or_create_access_token" do
+    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
+    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
+
+    it "returns existing valid token" do
+      existing_token = Doorkeeper::AccessToken.create!(
+        application_id: doorkeeper_app.id,
+        resource_owner_id: user.id,
+        scopes: "public",
+        expires_in: Doorkeeper.configuration.access_token_expires_in
+      )
+
+      expect {
+        result = described_class.find_or_create_access_token(user.id)
+        expect(result.token).to eq existing_token.token
+      }.not_to change(Doorkeeper::AccessToken, :count)
+    end
+
+    it "creates a new token when none exists" do
+      expect {
+        result = described_class.find_or_create_access_token(user.id)
+        expect(result).to be_accessible
+        expect(result.application_id).to eq doorkeeper_app.id
+        expect(result.resource_owner_id).to eq user.id
+      }.to change(Doorkeeper::AccessToken, :count).by(1)
+    end
+
+    it "revokes expired token and creates a new one" do
+      expired_token = Doorkeeper::AccessToken.create!(
+        application_id: doorkeeper_app.id,
+        resource_owner_id: user.id,
+        scopes: "public",
+        expires_in: 3600,
+        created_at: 2.hours.ago
+      )
+
+      expect {
+        result = described_class.find_or_create_access_token(user.id)
+        expect(result.token).not_to eq expired_token.token
+        expect(result).to be_accessible
+      }.to change(Doorkeeper::AccessToken, :count).by(1)
+
+      expect(expired_token.reload.revoked?).to be true
+    end
+  end
+
   describe ".create_and_execute" do
     let(:target_attributes) do
       {
