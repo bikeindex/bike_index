@@ -8,6 +8,14 @@ $mainmenu-open-zindex: 10;
 // Header nav
 .primary-header-nav {
   background: $primary-nav-background;
+  position: relative;
+  z-index: $zindex-navbar-fixed;
+  margin-bottom: 3 * $vertical-height;
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
   ul {
     list-style-type: none;
   }
@@ -327,6 +335,7 @@ $mainmenu-open-zindex: 10;
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .primary-header-nav {
+    margin-bottom: 5 * $vertical-height;
     .hamburgler {
       display: none;
     }
