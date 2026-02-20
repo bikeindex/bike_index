@@ -14,8 +14,7 @@ RSpec.describe StravaSearchController, type: :request do
     end
 
     context "signed in" do
-      let(:user) { FactoryBot.create(:user_confirmed) }
-      before { log_in(user) }
+      include_context :request_spec_logged_in_as_user
 
       it "redirects to strava integration setup when user has no integration" do
         get strava_search_path
@@ -23,7 +22,7 @@ RSpec.describe StravaSearchController, type: :request do
       end
 
       context "with strava integration" do
-        let!(:strava_integration) { FactoryBot.create(:strava_integration, user:, athlete_id: "12345") }
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345") }
 
         it "redirects to OAuth authorize when no valid token exists" do
           get strava_search_path
@@ -36,7 +35,7 @@ RSpec.describe StravaSearchController, type: :request do
           let!(:access_token) do
             Doorkeeper::AccessToken.create!(
               application_id: strava_app.id,
-              resource_owner_id: user.id,
+              resource_owner_id: current_user.id,
               scopes: "public",
               expires_in: Doorkeeper.configuration.access_token_expires_in
             )
@@ -63,7 +62,7 @@ RSpec.describe StravaSearchController, type: :request do
           let!(:expired_token) do
             Doorkeeper::AccessToken.create!(
               application_id: strava_app.id,
-              resource_owner_id: user.id,
+              resource_owner_id: current_user.id,
               scopes: "public",
               expires_in: 3600,
               created_at: 2.hours.ago
@@ -80,7 +79,7 @@ RSpec.describe StravaSearchController, type: :request do
           let!(:grant) do
             Doorkeeper::AccessGrant.create!(
               application_id: strava_app.id,
-              resource_owner_id: user.id,
+              resource_owner_id: current_user.id,
               expires_in: 600,
               redirect_uri: strava_search_url
             )
@@ -95,7 +94,7 @@ RSpec.describe StravaSearchController, type: :request do
             expect(grant.reload.revoked?).to be true
 
             token = Doorkeeper::AccessToken.last
-            expect(token.resource_owner_id).to eq user.id
+            expect(token.resource_owner_id).to eq current_user.id
             expect(token.application_id).to eq strava_app.id
           end
 
@@ -119,8 +118,7 @@ RSpec.describe StravaSearchController, type: :request do
     end
 
     context "signed in" do
-      let(:user) { FactoryBot.create(:user_confirmed) }
-      before { log_in(user) }
+      include_context :request_spec_logged_in_as_user
 
       it "returns 404 when user has no strava integration" do
         post strava_search_token_path
@@ -129,12 +127,12 @@ RSpec.describe StravaSearchController, type: :request do
       end
 
       context "with strava integration" do
-        let!(:strava_integration) { FactoryBot.create(:strava_integration, user:, athlete_id: "12345") }
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345") }
 
         it "returns existing valid token" do
           existing_token = Doorkeeper::AccessToken.create!(
             application_id: strava_app.id,
-            resource_owner_id: user.id,
+            resource_owner_id: current_user.id,
             scopes: "public",
             expires_in: Doorkeeper.configuration.access_token_expires_in
           )
@@ -160,7 +158,7 @@ RSpec.describe StravaSearchController, type: :request do
           expect(json_result[:athlete_id]).to eq "12345"
 
           token = Doorkeeper::AccessToken.last
-          expect(token.resource_owner_id).to eq user.id
+          expect(token.resource_owner_id).to eq current_user.id
           expect(token.application_id).to eq strava_app.id
           expect(token.scopes.to_s).to eq "public"
         end
@@ -168,7 +166,7 @@ RSpec.describe StravaSearchController, type: :request do
         it "creates a new token when existing token is expired" do
           Doorkeeper::AccessToken.create!(
             application_id: strava_app.id,
-            resource_owner_id: user.id,
+            resource_owner_id: current_user.id,
             scopes: "public",
             expires_in: 3600,
             created_at: 2.hours.ago
