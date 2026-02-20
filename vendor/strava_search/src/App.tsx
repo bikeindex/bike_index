@@ -8,14 +8,13 @@ import { ErrorBanner } from './components/ErrorBanner';
 import { SearchFilters } from './components/SearchFilters';
 import { ActivityList } from './components/ActivityList';
 import { SettingsModal } from './components/SettingsModal';
-import { InitialSyncPrompt } from './components/InitialSyncPrompt';
 import { Loader2 } from 'lucide-react';
 
 function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const { syncState } = useAuth();
   const { autoEnrich } = usePreferences();
-  const { isSyncing, isFetchingFullData, progress, error: syncError, clearError: clearSyncError, fetchFullActivityData } = useActivitySync();
+  const { isSyncing, isFetchingFullData, progress, error: syncError, clearError: clearSyncError, fetchFullActivityData, syncAll } = useActivitySync();
   const {
     activities,
     filteredActivities,
@@ -115,19 +114,12 @@ function Dashboard() {
     return () => clearInterval(interval);
   }, [refreshActivities]);
 
-  // Show initial sync prompt only if no sync has started yet
-  const needsInitialSync = !syncState?.isInitialSyncComplete && !isSyncing && activities.length === 0;
-
-  if (needsInitialSync) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} />
-        {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} />}
-        <InitialSyncPrompt />
-        <SettingsModal isOpen={showSettings} onClose={handleCloseSettings} />
-      </div>
-    );
-  }
+  // Auto-start initial sync if no activities have been downloaded yet
+  useEffect(() => {
+    if (!syncState?.isInitialSyncComplete && !isSyncing && activities.length === 0) {
+      syncAll();
+    }
+  }, [syncState?.isInitialSyncComplete, isSyncing, activities.length, syncAll]);
 
   return (
     <div className="min-h-screen bg-gray-50">
