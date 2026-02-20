@@ -7,7 +7,6 @@ import './index.css';
 
 // Load dev tools in development
 if (import.meta.env.DEV) {
-  import('./testing/vcr');
   import('./services/strava').then((strava) => {
     (window as unknown as { strava: typeof strava }).strava = strava;
   });
