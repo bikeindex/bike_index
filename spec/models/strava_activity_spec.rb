@@ -141,62 +141,94 @@ RSpec.describe StravaActivity, type: :model do
     end
   end
 
-  describe "update_from_detail" do
-    let(:activity) { FactoryBot.create(:strava_activity) }
-    let(:detail) do
+  describe "proxy_serialized" do
+    let(:target) do
       {
+        activity_type: "Ride",
+        average_speed: 6.944,
         description: "Great ride",
-        gear: {name: "My Road Bike"},
+        distance_meters: 25000.0,
         kudos_count: 10,
-        average_speed: 5.5, suffer_score: 30.0,
-        average_heartrate: 140.0, max_heartrate: 175.0,
-        device_name: "Garmin Edge 530", commute: true,
-        muted: false, pr_count: 2,
-        average_watts: 180.0, device_watts: true,
-        segment_efforts: [
-          {segment: {city: "San Francisco", state: "California", country: "United States"}},
-          {segment: {city: "Mill Valley", state: "California", country: "United States"}}
-        ],
-        photos: {primary: {unique_id: "photo_123", urls: {"600": "https://example.com/photo.jpg"}}, count: 3}
-      }.as_json
-    end
-
-    it "updates the activity with detail fields" do
-      activity.update_from_detail(detail)
-      activity.reload
-      expect(activity).to match_hash_indifferently(
-        description: "Great ride",
-        kudos_count: 10,
-        average_speed: 5.5,
-        suffer_score: 30.0,
+        moving_time_seconds: 3600,
         photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
-        strava_data: {
-          average_heartrate: 140.0, max_heartrate: 175.0,
-          device_name: "Garmin Edge 530", commute: true,
-          muted: false, average_speed: 5.5,
-          pr_count: 2, average_watts: 180.0,
-          device_watts: true
+        private: false,
+        segment_locations: {cities: ["Denver"], states: ["Colorado"], countries: ["United States"]},
+        sport_type: "Ride",
+        suffer_score: 42.0,
+        timezone: "America/Denver",
+        title: "Morning Ride",
+        total_elevation_gain_meters: 200.0,
+        gear_id: "b1234",
+        strava_id: "123",
+        average_heartrate: 145.0,
+        max_heartrate: 180.0,
+        device_name: "Garmin Edge 530",
+        commute: false,
+        pr_count: 3,
+        average_watts: 200.0,
+        device_watts: true
+      }
+    end
+    it "returns PROXY_ATTRS merged with strava_data" do
+      strava_activity = FactoryBot.build(:strava_activity,
+        strava_id: "123",
+        title: "Morning Ride",
+        activity_type: "Ride",
+        sport_type: "Ride",
+        description: "Great ride",
+        distance_meters: 25000.0,
+        moving_time_seconds: 3600,
+        total_elevation_gain_meters: 200.0,
+        average_speed: 6.944,
+        suffer_score: 42.0,
+        kudos_count: 10,
+        gear_id: "b1234",
+        private: false,
+        timezone: "America/Denver",
+        start_date: Time.current,
+        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
+        segment_locations: {cities: ["Denver"], states: ["Colorado"], countries: ["United States"]},
+        strava_data: {average_heartrate: 145.0, max_heartrate: 180.0, device_name: "Garmin Edge 530",
+                      commute: false, average_speed: 6.944, pr_count: 3, average_watts: 200.0, device_watts: true})
+
+      expect(strava_activity.proxy_serialized.except("start_date", "start_date_in_zone")).to eq target.as_json
+      expect(strava_activity.proxy_serialized["start_date"]).to be_within(1).of Time.current
+      expect(strava_activity.proxy_serialized["start_date_in_zone"].time_zone.name).to eq strava_activity.timezone
+    end
+  end
+
+  describe "update_from_strava!" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens) }
+    let(:strava_activity) { StravaActivity.create(strava_integration:, strava_id: "17419209324") }
+    let(:target_attributes) do
+      {
+        gear_id: "b11099574",
+        title: "Extra 10: HIIT Ride with Cody Rigsby",
+        description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
+        photos: {
+          photo_url: "https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-768x432.jpg",
+          photo_count: 1
         },
-        segment_locations: {
-          cities: ["San Francisco", "Mill Valley"],
-          states: ["California"],
-          countries: ["United States"]
+        strava_data: {
+          commute: false,
+          enriched: true,
+          pr_count: 0,
+          device_name: "Peloton Bike",
+          device_watts: true,
+          average_speed: 8.466,
+          average_watts: 156.0,
+          max_heartrate: 149.0,
+          average_heartrate: 136.2,
+          muted: true
         }
-      )
+      }
     end
-
-    it "handles detail without segment efforts" do
-      detail.delete("segment_efforts")
-      activity.update_from_detail(detail)
-      activity.reload
-      expect(activity.segment_locations).to eq({})
-    end
-
-    it "handles detail without photos" do
-      detail["photos"] = {"primary" => nil, "count" => 0}
-      activity.update_from_detail(detail)
-      activity.reload
-      expect(activity).to match_hash_indifferently(photos: {photo_url: nil, photo_count: 0})
+    it "updates from strava" do
+      expect(strava_activity).to be_valid
+      VCR.use_cassette("strava-update_from_strava") do
+        strava_activity.update_from_strava!
+      end
+      expect(strava_activity.reload).to have_attributes target_attributes.as_json
     end
   end
 end

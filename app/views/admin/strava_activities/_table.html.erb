@@ -11,6 +11,8 @@
 
       <th><%= sortable "start_date", render_sortable: render_sortable %></th>
 
+      <th>Enriched?</th>
+
       <th>Title</th>
 
       <th>
@@ -18,7 +20,9 @@
       </th>
 
       <th>
-        <%= sortable "distance_meters", "Distance", render_sortable: render_sortable %>
+        <small>
+          <%= sortable "distance_meters", "Distance (miles)", render_sortable: render_sortable %>
+        </small>
       </th>
 
       <th>Gear</th>
@@ -57,9 +61,11 @@
             <% end %>
           </td>
 
+          <td><%= check_mark if strava_activity.enriched? %></td>
+
           <td>
-            <% if strava_activity.enriched? %>
-              <%= render UI::Badge::Component.new(text: "E", title: "Enriched", color: :cyan, size: :sm) %>
+            <% if strava_activity.photos&.dig("photo_url").present? %>
+              📷
             <% end %>
 
             <span class="tw:mr-1"><%= strava_activity.title %></span>
