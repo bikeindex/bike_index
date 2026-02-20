@@ -45,9 +45,8 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
       let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, owner_email: user.email) }
       let(:params) { {marketplace_listing: marketplace_listing_params} }
       let(:target_address_attrs) do
-        address_record_attributes.except(:id, :user_account_address, :region_record_id)
-          .merge(user_id: user.id, kind: "marketplace_listing", publicly_visible_attribute: "postal_code",
-            country_id: Country.canada_id, region_record_id: nil)
+        address_record_attributes.except(:id)
+          .merge(user_id: user.id, kind: :marketplace_listing, publicly_visible_attribute: :postal_code)
       end
 
       def make_update_bike_request(url:, params:, marketplace_listing_change: 1, address_record_change: 1)
@@ -74,9 +73,9 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
         expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
 
         marketplace_listing = bike.current_marketplace_listing
-        expect(marketplace_listing).to have_attributes target_marketplace_attrs
+        expect(marketplace_listing).to match_hash_indifferently target_marketplace_attrs
         expect(marketplace_listing.address_record_id).to be_present
-        expect(marketplace_listing.address_record).to have_attributes target_address_attrs
+        expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
       end
 
       context "existing marketplace_listing" do
@@ -99,8 +98,8 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           expect(flash[:success]).to be_present
 
           expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
-          expect(marketplace_listing.reload).to have_attributes target_marketplace_attrs.merge(amount_cents: nil)
-          expect(marketplace_listing.address_record).to have_attributes target_address_attrs.merge(id: address_record.id)
+          expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs.merge(amount_cents: nil)
+          expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs.merge(id: address_record.id)
         end
 
         context "current_user: superuser" do
@@ -117,7 +116,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
 
             expect(bike.reload.primary_activity_id).to eq primary_activity_id
             expect(bike.current_marketplace_listing&.id).to eq marketplace_listing.id
-            expect(marketplace_listing.reload).to have_attributes target_marketplace_attrs.merge(amount_cents: nil)
+            expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs.merge(amount_cents: nil)
             expect(marketplace_listing.address_record_id).to eq user.address_record_id
             # Sanity check - verify that it hasn't been set to the passed parameters
             expect(marketplace_listing.address_record.country_id).to eq Country.united_states_id
@@ -141,7 +140,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
             expect(flash[:success]).to be_present
 
             expect(bike.reload.current_marketplace_listing&.id).to eq marketplace_listing.id
-            expect(marketplace_listing.reload).to have_attributes target_marketplace_attrs.merge(amount_cents: nil)
+            expect(marketplace_listing.reload).to match_hash_indifferently target_marketplace_attrs.merge(amount_cents: nil)
             expect(marketplace_listing.address_record_id).to eq og_marketplace_address_record_id
           end
         end
@@ -159,7 +158,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
 
             make_update_bike_request(url: update_url, params:, marketplace_listing_change: 0, address_record_change: 0)
 
-            expect(marketplace_listing.reload).to have_attributes actual_updated_attrs
+            expect(marketplace_listing.reload).to match_hash_indifferently actual_updated_attrs
             expect(flash[:error]).to be_present
             # sanity check, to make absolutely sure
             expect(marketplace_listing.status).to eq "draft"
@@ -190,11 +189,10 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           }
         end
         let(:target_address_attrs) do
-          address_record_attributes.except(:region_string, :id, :user_account_address).merge(kind: "marketplace_listing",
+          address_record_attributes.except(:region_string, :id).merge(kind: "marketplace_listing",
             latitude: 34.0309258,
             longitude: -118.2380432,
-            publicly_visible_attribute: "postal_code",
-            country_id: Country.united_states_id)
+            publicly_visible_attribute: "postal_code")
         end
         let(:non_negotiable_attrs) { target_marketplace_attrs.merge(amount_cents: 144242, price_negotiable: false) }
         include_context :geocoder_real
@@ -219,9 +217,9 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
 
           marketplace_listing = bike.current_marketplace_listing
           expect(marketplace_listing).to be_present
-          expect(marketplace_listing).to have_attributes non_negotiable_attrs
+          expect(marketplace_listing).to match_hash_indifferently non_negotiable_attrs
           expect(marketplace_listing.address_record_id).to_not eq og_user_address_record_id
-          expect(marketplace_listing.address_record).to have_attributes target_address_attrs
+          expect(marketplace_listing.address_record).to match_hash_indifferently target_address_attrs
           expect(current_user.reload.address_record_id).to eq og_user_address_record_id
 
           expect(bike.reload.primary_activity_id).to eq primary_activity_id
@@ -259,7 +257,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
           marketplace_listing = bike.reload.current_marketplace_listing
           expect(marketplace_listing).to be_present
           expect(marketplace_listing.valid_publishable?).to be_truthy
-          expect(marketplace_listing).to have_attributes target_for_sale_attrs
+          expect(marketplace_listing).to match_hash_indifferently target_for_sale_attrs
 
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "marketplace_listing"
           expect(bike.to_coordinates).to eq user.to_coordinates
@@ -270,7 +268,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
             make_update_bike_request(url: update_url, params:, address_record_change: 0)
 
             expect(flash[:error]).to match "hidden"
-            expect(bike.reload.current_marketplace_listing.reload).to have_attributes target_for_sale_attrs.merge(status: "draft")
+            expect(bike.reload.current_marketplace_listing.reload).to match_hash_indifferently target_for_sale_attrs.merge(status: "draft")
           end
         end
         context "bike is stolen" do
@@ -279,7 +277,7 @@ RSpec.describe MyAccounts::MarketplaceListingsController, type: :request do
             make_update_bike_request(url: update_url, params:, address_record_change: 0)
 
             expect(flash[:error]).to match "stolen"
-            expect(bike.reload.current_marketplace_listing.reload).to have_attributes target_for_sale_attrs.merge(status: "draft")
+            expect(bike.reload.current_marketplace_listing.reload).to match_hash_indifferently target_for_sale_attrs.merge(status: "draft")
           end
         end
       end
