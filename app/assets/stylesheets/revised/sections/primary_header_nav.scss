@@ -1,17 +1,3 @@
-// Padding to deal with header nav.
-// Also set in the landing/organizations scss
-body,
-.organized-left-menu {
-  padding-top: 8 * $vertical-height;
-}
-
-@media (min-width: $grid-breakpoint-lg) {
-  body,
-  .organized-left-menu {
-    padding-top: 12 * $vertical-height;
-  }
-}
-
 $primary-logo-fullsize-height: 84px;
 $primary-logo-padding: 0.5 * $vertical-height;
 $primary-logo-padding-mobile: $vertical-height;
@@ -22,11 +8,6 @@ $mainmenu-open-zindex: 10;
 // Header nav
 .primary-header-nav {
   background: $primary-nav-background;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: $zindex-navbar-fixed;
   ul {
     list-style-type: none;
   }
@@ -98,7 +79,6 @@ $mainmenu-open-zindex: 10;
     display: block;
     margin: 0 0 0 16px;
     padding: $vertical-height 24px 0;
-    transition: padding $mainmenu-transform-speed linear;
 
     a {
       @extend .header-font;
@@ -127,15 +107,6 @@ $mainmenu-open-zindex: 10;
       font-size: 90%;
       font-weight: 800;
       margin-left: 0.2rem;
-    }
-  }
-
-  &.headroom--pinned .current-organization-nav-item,
-  &.headroom--unpinned .current-organization-nav-item {
-    padding: $vertical-height 24px 0;
-
-    a.active::after {
-      bottom: 0;
     }
   }
 
@@ -204,16 +175,6 @@ $mainmenu-open-zindex: 10;
 // Small Screen Styles
 @media (max-width: $grid-breakpoint-lg - 1px) {
   .primary-header-nav {
-    transition: transform $mainmenu-transform-speed linear;
-
-    &.headroom--pinned {
-      transform: translate(0, 0%);
-    }
-
-    &.headroom--unpinned {
-      transform: translate(0, -100%);
-    }
-
     .primary-logo {
       padding: $primary-logo-padding-mobile 0;
     }
@@ -366,25 +327,6 @@ $mainmenu-open-zindex: 10;
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .primary-header-nav {
-    &.headroom--pinned,
-    &.headroom--unpinned {
-      .primary-logo img {
-        height: 48px;
-      }
-
-      .primary-nav-item {
-        padding: $vertical-height 0 0;
-
-        a.active::after {
-          bottom: 0;
-        }
-      }
-    }
-
-    .primary-logo img {
-      transition: height $mainmenu-transform-speed linear;
-    }
-
     .hamburgler {
       display: none;
     }
@@ -392,7 +334,6 @@ $mainmenu-open-zindex: 10;
     .primary-nav-item {
       float: right;
       position: relative;
-      transition: padding $mainmenu-transform-speed linear;
 
       a {
         padding: 8px (0.5 * $grid-gutter-width);
@@ -405,7 +346,6 @@ $mainmenu-open-zindex: 10;
 
       // Only apply to primary nav items, not submenus
       & > a.active::after {
-        transition: bottom $mainmenu-transform-speed linear;
         content: "";
         position: absolute;
         left: 50%;
@@ -473,10 +413,7 @@ $mainmenu-open-zindex: 10;
     }
   }
 
-  // To prevent flashing on initial load, before JS arrives
-  .primary-header-nav,
-  .primary-header-nav.headroom--top,
-  .primary-header-nav.headroom--top.headroom--pinned {
+  .primary-header-nav {
     .primary-logo img {
       height: $primary-logo-fullsize-height - 2 * $primary-logo-padding;
     }
@@ -508,21 +445,8 @@ $mainmenu-open-zindex: 10;
       font-family: "Open Sans";
       font-style: italic;
       text-decoration: none;
-      margin: 11px $vertical-height 0 $vertical-height;
-      transition: margin $mainmenu-transform-speed linear;
+      margin: 18px $vertical-height 0 $vertical-height;
       width: 100px;
-    }
-
-    &.headroom--pinned .nonprofit-subtitle,
-    &.headroom--unpinned .nonprofit-subtitle {
-      margin-top: 11px;
-    }
-
-    // To prevent moving on initial load, before JS arrives
-    .nonprofit-subtitle,
-    &.headroom--top.headroom--pinned .nonprofit-subtitle,
-    &.headroom--top .nonprofit-subtitle {
-      margin-top: 18px;
     }
   }
 }

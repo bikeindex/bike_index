@@ -2,9 +2,6 @@
 //= require external_scripts/application_revised_dependencies.js
 //= require external_scripts/bootstrap.js
 //= require external_scripts/selectize_placeholder_plugin.js
-//= require external_scripts/headroom.js
-//= require external_scripts/jQuery.headroom.js
-
 // This is the only external dependency from a gem:
 //= require chartkick
 //= require Chart.bundle

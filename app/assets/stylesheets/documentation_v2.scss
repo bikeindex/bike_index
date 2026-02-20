@@ -9525,17 +9525,6 @@ input {
   }
 }
 
-/* line 7590, app/assets/stylesheets/documentation_v2.scss */
-#header.headroom--pinned {
-  -webkit-transform: translate(0, 0%);
-  transform: translate(0, 0%);
-}
-
-/* line 7597, app/assets/stylesheets/documentation_v2.scss */
-#header.headroom--unpinned {
-  -webkit-transform: translate(0, -100%);
-  transform: translate(0, -100%);
-}
 
 /* line 7604, app/assets/stylesheets/documentation_v2.scss */
 .swagger-section .content-header a#logo {
