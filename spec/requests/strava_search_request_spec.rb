@@ -18,7 +18,7 @@ RSpec.describe StravaSearchController, type: :request do
 
       it "redirects to strava integration setup when user has no integration" do
         get strava_search_path
-        expect(response).to redirect_to(new_strava_integration_path)
+        expect(response).to redirect_to(new_strava_integration_path(scope: :strava_search))
       end
 
       context "with strava integration" do
