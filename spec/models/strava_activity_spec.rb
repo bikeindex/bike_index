@@ -197,65 +197,6 @@ RSpec.describe StravaActivity, type: :model do
     end
   end
 
-  describe "update_from_detail" do
-    let(:activity) { FactoryBot.create(:strava_activity) }
-    let(:detail) do
-      {
-        description: "Great ride",
-        gear: {name: "My Road Bike"},
-        kudos_count: 10,
-        average_speed: 5.5, suffer_score: 30.0,
-        average_heartrate: 140.0, max_heartrate: 175.0,
-        device_name: "Garmin Edge 530", commute: true,
-        muted: false, pr_count: 2,
-        average_watts: 180.0, device_watts: true,
-        segment_efforts: [
-          {segment: {city: "San Francisco", state: "California", country: "United States"}},
-          {segment: {city: "Mill Valley", state: "California", country: "United States"}}
-        ],
-        photos: {primary: {unique_id: "photo_123", urls: {"600": "https://example.com/photo.jpg"}}, count: 3}
-      }.as_json
-    end
-
-    it "updates the activity with detail fields" do
-      activity.update_from_detail(detail)
-      activity.reload
-      expect(activity).to match_hash_indifferently(
-        description: "Great ride",
-        kudos_count: 10,
-        average_speed: 5.5,
-        suffer_score: 30.0,
-        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
-        strava_data: {
-          average_heartrate: 140.0, max_heartrate: 175.0,
-          device_name: "Garmin Edge 530", commute: true,
-          muted: false, average_speed: 5.5,
-          pr_count: 2, average_watts: 180.0,
-          device_watts: true, enriched: true
-        },
-        segment_locations: {
-          cities: ["San Francisco", "Mill Valley"],
-          states: ["California"],
-          countries: ["United States"]
-        }
-      )
-    end
-
-    it "handles detail without segment efforts" do
-      detail.delete("segment_efforts")
-      activity.update_from_detail(detail)
-      activity.reload
-      expect(activity.segment_locations).to eq({})
-    end
-
-    it "handles detail without photos" do
-      detail["photos"] = {"primary" => nil, "count" => 0}
-      activity.update_from_detail(detail)
-      activity.reload
-      expect(activity).to match_hash_indifferently(photos: {photo_url: nil, photo_count: 0})
-    end
-  end
-
   describe "update_from_strava!" do
     let(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens) }
     let(:strava_activity) { StravaActivity.create(strava_integration:, strava_id: "17419209324") }
@@ -265,7 +206,7 @@ RSpec.describe StravaActivity, type: :model do
         title: "Extra 10: HIIT Ride with Cody Rigsby",
         description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
         photos: {
-          photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
+          photo_url: "https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-768x432.jpg",
           photo_count: 1
         },
         strava_data: {
@@ -277,7 +218,8 @@ RSpec.describe StravaActivity, type: :model do
           average_speed: 8.466,
           average_watts: 156.0,
           max_heartrate: 149.0,
-          average_heartrate: 136.2
+          average_heartrate: 136.2,
+          muted: true
         }
       }
     end
@@ -286,7 +228,7 @@ RSpec.describe StravaActivity, type: :model do
       VCR.use_cassette("strava-update_from_strava") do
         strava_activity.update_from_strava!
       end
-      expect(strava_activity.reload).to have_attributes target_attributes
+      expect(strava_activity.reload).to have_attributes target_attributes.as_json
     end
   end
 end

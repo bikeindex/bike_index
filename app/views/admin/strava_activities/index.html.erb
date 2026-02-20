@@ -3,6 +3,31 @@
 
   <li class="nav-item dropdown dropleft">
     <a
+      class="nav-link dropdown-toggle <%= @searched_enriched.present? ? "active" : "" %>"
+      href="#"
+      role="button"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <% if @searched_enriched == "true" %>
+        Only enriched
+      <% elsif @searched_enriched == "false" %>
+        Only not enriched
+      <% else %>
+        Enriched
+      <% end %>
+    </a>
+
+    <div class="dropdown-menu">
+      <%= link_to "All", url_for(sortable_search_params.merge(search_enriched: nil)), class: "dropdown-item #{@searched_enriched.blank? ? 'active' : ''}" %>
+      <%= link_to "Only enriched", url_for(sortable_search_params.merge(search_enriched: "true")), class: "dropdown-item #{@searched_enriched == 'true' ? 'active' : ''}" %>
+      <%= link_to "Only not enriched", url_for(sortable_search_params.merge(search_enriched: "false")), class: "dropdown-item #{@searched_enriched == 'false' ? 'active' : ''}" %>
+    </div>
+  </li>
+
+  <li class="nav-item dropdown dropleft">
+    <a
       class="nav-link dropdown-toggle <%= @searched_activity_type.present? ? "active" : "" %>"
       href="#"
       role="button"

@@ -212,6 +212,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           it "updates the activity" do
             expect(strava_integration.reload.token_expired?).to be_falsey
             og_token = strava_integration.access_token
+            expect(strava_activity.reload.enriched?).to be_falsey
 
             VCR.use_cassette("strava-proxy_update_activity") do
               expect {
@@ -229,7 +230,8 @@ RSpec.describe "Strava Proxy API", type: :request do
             expect(strava_request.success?).to be_truthy
             expect(strava_request.parameters).to eq expected_parameters.as_json
 
-            expect(strava_activity.reload).to have_attributes target_attributes
+            expect(strava_activity.reload.enriched?).to be_falsey
+            expect(strava_activity).to have_attributes target_attributes
             expect(strava_activity.start_date).to be_within(1).of Time.at(1771267927)
             expect(json_result).to eq strava_activity.proxy_serialized.as_json
           end

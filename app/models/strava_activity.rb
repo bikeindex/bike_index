@@ -81,11 +81,17 @@ class StravaActivity < ApplicationRecord
     end
 
     def create_or_update_from_strava_response(strava_integration, response)
-      attrs = summary_attributes(response).merge(detail_attributes(response))
+      attrs = strava_attributes_from(response)
       activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: response["id"])
       activity.update!(attrs)
       activity
     end
+
+    def strava_attributes_from(response)
+      summary_attributes(response).merge(detail_attributes(response))
+    end
+
+    private
 
     def detail_attributes(detail)
       return {} if (detail.keys & %w[segment_efforts description]).none?
@@ -104,11 +110,11 @@ class StravaActivity < ApplicationRecord
       }
     end
 
-    private
-
     def strava_data_from(data)
       data.slice("average_heartrate", "max_heartrate", "device_name", "commute",
-        "muted", "average_speed", "pr_count", "average_watts", "device_watts")
+        "average_speed", "pr_count", "average_watts", "device_watts")
+        .merge("muted" => data["hide_from_home"])
+        .compact
     end
 
     def summary_attributes(summary)
@@ -171,12 +177,6 @@ class StravaActivity < ApplicationRecord
     return nil if distance_meters.blank?
 
     (distance_meters / 1000.0).round(2)
-  end
-
-  def update_from_detail(detail)
-    attrs = self.class.detail_attributes(detail)
-    attrs[:strava_data] = (strava_data || {}).merge(attrs[:strava_data])
-    update(attrs)
   end
 
   # Convenience method - probably don't use this except in console

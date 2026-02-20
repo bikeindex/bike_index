@@ -41,8 +41,7 @@ module StravaJobs
               request_type: :list_activities, parameters: {page: strava_request.parameters["page"] + 1})
           end
         elsif strava_request.fetch_activity?
-          strava_activity = strava_integration.strava_activities.find_by(strava_id: strava_request.parameters["strava_id"])
-          strava_activity&.update_from_detail(response)
+          StravaActivity.create_or_update_from_strava_response(strava_integration, response)
         elsif strava_request.fetch_gear?
           StravaGear.update_from_strava(strava_integration, response)
         end

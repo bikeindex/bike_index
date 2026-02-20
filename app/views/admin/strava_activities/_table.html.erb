@@ -11,10 +11,7 @@
 
       <th><%= sortable "start_date", render_sortable: render_sortable %></th>
 
-      <th>
-        <% enriched_display = nil %>
-        <%= sortable "enriched", enriched_display, render_sortable: render_sortable %>
-      </th>
+      <th>Enriched?</th>
 
       <th>Title</th>
 
@@ -62,11 +59,7 @@
             <% end %>
           </td>
 
-          <td>
-            <% if strava_activity.enriched? %>
-              <%= render UI::Badge::Component.new(text: "E", title: "Enriched", color: :cyan, size: :sm) %>
-            <% end %>
-          </td>
+          <td><%= check_mark if strava_activity.enriched? %></td>
 
           <td>
             <span class="tw:mr-1"><%= strava_activity.title %></span>
