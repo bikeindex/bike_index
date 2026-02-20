@@ -32,7 +32,6 @@ describe('useUrlFilters', () => {
         equipmentExpanded: true,
         mutedFilter: 'all',
         photoFilter: 'all',
-        visibilityFilter: 'all',
         page: 1,
       });
     });
@@ -104,7 +103,6 @@ describe('useUrlFilters', () => {
         equipmentExpanded: true,
         mutedFilter: 'all',
         photoFilter: 'all',
-        visibilityFilter: 'all',
         page: 1,
       });
     });
@@ -147,7 +145,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -174,7 +171,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -201,7 +197,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -229,7 +224,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -256,7 +250,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -283,7 +276,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -311,7 +303,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: false,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -340,7 +331,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -367,7 +357,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -404,7 +393,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -425,7 +413,6 @@ describe('useUrlFilters', () => {
             equipmentExpanded: true,
           mutedFilter: 'all',
           photoFilter: 'all',
-          visibilityFilter: 'all',
           page: 1,
         });
       });
@@ -452,7 +439,6 @@ describe('useUrlFilters', () => {
               equipmentExpanded: true,
               mutedFilter: 'all',
               photoFilter: 'all',
-              visibilityFilter: 'all',
             },
           },
         }));

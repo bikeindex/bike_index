@@ -70,7 +70,7 @@ export function useActivities(): UseActivitiesResult {
 
       // Sort by date descending
       loadedActivities.sort(
-        (a, b) => new Date(b.start_date_local).getTime() - new Date(a.start_date_local).getTime()
+        (a, b) => new Date(b.start_date_in_zone).getTime() - new Date(a.start_date_in_zone).getTime()
       );
 
       setActivities(loadedActivities);
@@ -107,16 +107,13 @@ export function useActivities(): UseActivitiesResult {
       if (filters.query) {
         const query = filters.query.toLowerCase();
         const searchableText = [
-          activity.name,
+          activity.title,
           activity.description,
-          activity.location_city,
-          activity.location_state,
-          activity.location_country,
           activity.device_name,
           // Include all segment locations for search
-          ...(activity.segment_cities || []),
-          ...(activity.segment_states || []),
-          ...(activity.segment_countries || []),
+          ...(activity.segment_locations?.cities || []),
+          ...(activity.segment_locations?.states || []),
+          ...(activity.segment_locations?.countries || []),
         ]
           .filter(Boolean)
           .join(' ')
@@ -150,7 +147,7 @@ export function useActivities(): UseActivitiesResult {
 
       // Date range filter
       if (filters.dateFrom) {
-        const activityDate = new Date(activity.start_date_local);
+        const activityDate = new Date(activity.start_date_in_zone);
         const fromDate = new Date(filters.dateFrom);
         fromDate.setHours(0, 0, 0, 0);
         if (activityDate < fromDate) {
@@ -159,7 +156,7 @@ export function useActivities(): UseActivitiesResult {
       }
 
       if (filters.dateTo) {
-        const activityDate = new Date(activity.start_date_local);
+        const activityDate = new Date(activity.start_date_in_zone);
         const toDate = new Date(filters.dateTo);
         toDate.setHours(23, 59, 59, 999);
         if (activityDate > toDate) {
@@ -167,9 +164,9 @@ export function useActivities(): UseActivitiesResult {
         }
       }
 
-      // Distance range filter (distanceFrom/distanceTo are in user units, activity.distance is in meters)
+      // Distance range filter
       if (filters.distanceFrom !== null) {
-        const distanceInKm = activity.distance / 1000;
+        const distanceInKm = activity.distance_meters / 1000;
         const filterValueInKm = units === 'imperial' ? filters.distanceFrom * MILES_TO_KM : filters.distanceFrom;
         if (distanceInKm < filterValueInKm) {
           return false;
@@ -177,53 +174,46 @@ export function useActivities(): UseActivitiesResult {
       }
 
       if (filters.distanceTo !== null) {
-        const distanceInKm = activity.distance / 1000;
+        const distanceInKm = activity.distance_meters / 1000;
         const filterValueInKm = units === 'imperial' ? filters.distanceTo * MILES_TO_KM : filters.distanceTo;
         if (distanceInKm > filterValueInKm) {
           return false;
         }
       }
 
-      // Elevation range filter (elevationFrom/elevationTo are in user units, activity.total_elevation_gain is in meters)
+      // Elevation range filter
       if (filters.elevationFrom !== null) {
         const filterValueInMeters = units === 'imperial' ? filters.elevationFrom * FEET_TO_METERS : filters.elevationFrom;
-        if (activity.total_elevation_gain < filterValueInMeters) {
+        if (activity.total_elevation_gain_meters < filterValueInMeters) {
           return false;
         }
       }
 
       if (filters.elevationTo !== null) {
         const filterValueInMeters = units === 'imperial' ? filters.elevationTo * FEET_TO_METERS : filters.elevationTo;
-        if (activity.total_elevation_gain > filterValueInMeters) {
+        if (activity.total_elevation_gain_meters > filterValueInMeters) {
           return false;
         }
       }
 
       // Muted filter
       if (filters.mutedFilter === 'muted') {
-        if (!activity.hide_from_home) {
+        if (!activity.muted) {
           return false;
         }
       } else if (filters.mutedFilter === 'not_muted') {
-        if (activity.hide_from_home) {
+        if (activity.muted) {
           return false;
         }
       }
 
       // Photo filter
       if (filters.photoFilter === 'with_photo') {
-        if ((activity.total_photo_count || 0) === 0) {
+        if ((activity.photos?.photo_count || 0) === 0) {
           return false;
         }
       } else if (filters.photoFilter === 'without_photo') {
-        if ((activity.total_photo_count || 0) > 0) {
-          return false;
-        }
-      }
-
-      // Visibility filter
-      if (filters.visibilityFilter !== 'all') {
-        if (activity.visibility !== filters.visibilityFilter) {
+        if ((activity.photos?.photo_count || 0) > 0) {
           return false;
         }
       }

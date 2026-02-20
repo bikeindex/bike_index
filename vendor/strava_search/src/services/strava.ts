@@ -5,7 +5,6 @@ import {
   type StravaGear,
   type UpdatableActivity,
   type StravaAthlete,
-  deriveLocationFromSegments,
 } from '../types/strava';
 import { saveAuth, getAuth, clearAuth } from './database';
 
@@ -249,8 +248,7 @@ export async function getActivities(
 }
 
 export async function getActivity(id: number): Promise<StravaActivity> {
-  const activity = await apiRequest<StravaActivity>(`/activities/${id}`);
-  return deriveLocationFromSegments(activity);
+  return apiRequest<StravaActivity>(`/activities/${id}`);
 }
 
 export async function updateActivity(
@@ -263,7 +261,7 @@ export async function updateActivity(
     body: JSON.stringify(updates),
   });
 
-  // Fetch full activity details (PUT response doesn't include photos, segment_efforts, etc.)
+  // Fetch full activity details (PUT response doesn't include all fields)
   return getActivity(id);
 }
 

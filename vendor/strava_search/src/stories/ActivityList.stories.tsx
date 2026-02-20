@@ -31,7 +31,6 @@ const defaultFilters: SearchFilters = {
   equipmentExpanded: false,
   mutedFilter: 'all',
   photoFilter: 'all',
-  visibilityFilter: 'all',
   page: 1,
 };
 
@@ -131,7 +130,7 @@ export const WithSelections: Story = {
     activities: mockActivities,
     gear: mockGear,
     isLoading: false,
-    selectedIds: new Set([1001, 1002]),
+    selectedIds: new Set([mockActivities[0].id, mockActivities[1].id]),
     onToggleSelect: () => {},
     onSelectIds: () => {},
     onDeselectAll: () => {},
@@ -148,7 +147,7 @@ export const Updating: Story = {
     activities: mockActivities,
     gear: mockGear,
     isLoading: false,
-    selectedIds: new Set([1001, 1002, 1003]),
+    selectedIds: new Set([mockActivities[0].id, mockActivities[1].id, mockActivities[2].id]),
     onToggleSelect: () => {},
     onSelectIds: () => {},
     onDeselectAll: () => {},
@@ -163,7 +162,8 @@ export const Updating: Story = {
 const manyActivities = Array.from({ length: 75 }, (_, i) => ({
   ...mockActivities[i % mockActivities.length],
   id: 2000 + i,
-  name: `Activity ${i + 1} - ${mockActivities[i % mockActivities.length].name}`,
+  strava_id: (2000 + i).toString(),
+  title: `Activity ${i + 1} - ${mockActivities[i % mockActivities.length].title}`,
 }));
 
 export const ManyActivities: Story = {

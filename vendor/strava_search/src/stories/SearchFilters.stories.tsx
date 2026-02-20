@@ -31,7 +31,7 @@ const defaultFilters: SearchFiltersType = {
   equipmentExpanded: false,
   mutedFilter: 'all',
   photoFilter: 'all',
-  visibilityFilter: 'all',
+
   page: 1,
 };
 
@@ -118,7 +118,7 @@ export const WithMultipleFilters: Story = {
       equipmentExpanded: true,
       mutedFilter: 'all',
       photoFilter: 'all',
-      visibilityFilter: 'all',
+    
       page: 1,
     },
     onFiltersChange: () => {},

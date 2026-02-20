@@ -20,38 +20,25 @@ import type { StravaActivity, StravaGear, StoredAuth } from '../types/strava';
 // Helper to create a mock activity
 function createMockActivity(overrides: Partial<StravaActivity> = {}): StravaActivity {
   return {
-    id: Math.floor(Math.random() * 1000000),
-    name: 'Test Activity',
+    strava_id: String(Math.floor(Math.random() * 1000000)),
+    title: 'Test Activity',
     description: 'Test description',
-    distance: 10000,
-    moving_time: 3600,
-    elapsed_time: 3700,
-    total_elevation_gain: 100,
-    type: 'Ride',
+    activity_type: 'Ride',
     sport_type: 'Ride',
-    start_date: '2024-01-15T10:00:00Z',
-    start_date_local: '2024-01-15T02:00:00Z',
-    timezone: '(GMT-08:00) America/Los_Angeles',
-    utc_offset: -28800,
-    achievement_count: 0,
-    kudos_count: 5,
-    comment_count: 0,
-    athlete_count: 1,
-    photo_count: 0,
-    trainer: false,
-    commute: false,
-    manual: false,
-    private: false,
-    visibility: 'everyone',
-    flagged: false,
+    distance_meters: 10000,
+    moving_time_seconds: 3600,
+    total_elevation_gain_meters: 100,
     average_speed: 2.78,
-    max_speed: 5.5,
-    has_heartrate: false,
-    heartrate_opt_out: false,
-    display_hide_heartrate_option: false,
+    start_date: '2024-01-15T10:00:00Z',
+    start_date_in_zone: '2024-01-15T02:00:00Z',
+    timezone: 'America/Los_Angeles',
+    kudos_count: 5,
+    gear_id: null,
+    private: false,
+    commute: false,
+    muted: false,
+    enriched: false,
     pr_count: 0,
-    total_photo_count: 0,
-    has_kudoed: false,
     ...overrides,
   };
 }
@@ -103,8 +90,8 @@ describe('database service integration tests', () => {
   describe('saveActivities and getActivitiesForAthlete', () => {
     it('saves activities with athleteId and syncedAt timestamp', async () => {
       const activities = [
-        createMockActivity({ id: 1, name: 'Activity 1' }),
-        createMockActivity({ id: 2, name: 'Activity 2' }),
+        createMockActivity({ strava_id: '1', title: 'Activity 1' }),
+        createMockActivity({ strava_id: '2', title: 'Activity 2' }),
       ];
 
       await saveActivities(activities, testAthleteId);
@@ -117,8 +104,8 @@ describe('database service integration tests', () => {
     });
 
     it('returns only activities for the specified athlete', async () => {
-      const activities1 = [createMockActivity({ id: 1, name: 'Athlete 1 Activity' })];
-      const activities2 = [createMockActivity({ id: 2, name: 'Athlete 2 Activity' })];
+      const activities1 = [createMockActivity({ strava_id: '1', title: 'Athlete 1 Activity' })];
+      const activities2 = [createMockActivity({ strava_id: '2', title: 'Athlete 2 Activity' })];
 
       await saveActivities(activities1, testAthleteId);
       await saveActivities(activities2, otherAthleteId);
@@ -127,9 +114,9 @@ describe('database service integration tests', () => {
       const athlete2Activities = await getActivitiesForAthlete(otherAthleteId);
 
       expect(athlete1Activities).toHaveLength(1);
-      expect(athlete1Activities[0].name).toBe('Athlete 1 Activity');
+      expect(athlete1Activities[0].title).toBe('Athlete 1 Activity');
       expect(athlete2Activities).toHaveLength(1);
-      expect(athlete2Activities[0].name).toBe('Athlete 2 Activity');
+      expect(athlete2Activities[0].title).toBe('Athlete 2 Activity');
     });
 
     it('returns empty array when athlete has no activities', async () => {
@@ -138,29 +125,29 @@ describe('database service integration tests', () => {
     });
 
     it('updates existing activities with bulkPut', async () => {
-      const activity = createMockActivity({ id: 100, name: 'Original Name' });
+      const activity = createMockActivity({ strava_id: '100', title: 'Original Name' });
       await saveActivities([activity], testAthleteId);
 
-      const updatedActivity = createMockActivity({ id: 100, name: 'Updated Name' });
+      const updatedActivity = createMockActivity({ strava_id: '100', title: 'Updated Name' });
       await saveActivities([updatedActivity], testAthleteId);
 
       const saved = await getActivitiesForAthlete(testAthleteId);
       expect(saved).toHaveLength(1);
-      expect(saved[0].name).toBe('Updated Name');
+      expect(saved[0].title).toBe('Updated Name');
     });
   });
 
   describe('getActivityById', () => {
     it('returns the correct activity', async () => {
       const activities = [
-        createMockActivity({ id: 100, name: 'Target Activity' }),
-        createMockActivity({ id: 200, name: 'Other Activity' }),
+        createMockActivity({ strava_id: '100', title: 'Target Activity' }),
+        createMockActivity({ strava_id: '200', title: 'Other Activity' }),
       ];
       await saveActivities(activities, testAthleteId);
 
       const activity = await getActivityById(100);
       expect(activity).toBeDefined();
-      expect(activity?.name).toBe('Target Activity');
+      expect(activity?.title).toBe('Target Activity');
     });
 
     it('returns undefined for non-existent activity', async () => {
@@ -171,7 +158,7 @@ describe('database service integration tests', () => {
 
   describe('updateActivityInDb', () => {
     it('updates activity fields and sets syncedAt timestamp', async () => {
-      const activity = createMockActivity({ id: 100, name: 'Original' });
+      const activity = createMockActivity({ strava_id: '100', title: 'Original' });
       await saveActivities([activity], testAthleteId);
 
       const beforeUpdate = await getActivityById(100);
@@ -180,28 +167,28 @@ describe('database service integration tests', () => {
       // Small delay to ensure timestamp changes
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      await updateActivityInDb(100, { name: 'Updated', description: 'New desc' });
+      await updateActivityInDb(100, { title: 'Updated', description: 'New desc' });
 
       const updated = await getActivityById(100);
-      expect(updated?.name).toBe('Updated');
+      expect(updated?.title).toBe('Updated');
       expect(updated?.description).toBe('New desc');
       expect(updated?.syncedAt).toBeGreaterThan(originalSyncedAt!);
     });
 
     it('preserves other fields when updating', async () => {
       const activity = createMockActivity({
-        id: 100,
-        name: 'Original',
-        distance: 5000,
+        strava_id: '100',
+        title: 'Original',
+        distance_meters: 5000,
         kudos_count: 10,
       });
       await saveActivities([activity], testAthleteId);
 
-      await updateActivityInDb(100, { name: 'Updated' });
+      await updateActivityInDb(100, { title: 'Updated' });
 
       const updated = await getActivityById(100);
-      expect(updated?.name).toBe('Updated');
-      expect(updated?.distance).toBe(5000);
+      expect(updated?.title).toBe('Updated');
+      expect(updated?.distance_meters).toBe(5000);
       expect(updated?.kudos_count).toBe(10);
     });
   });
@@ -350,7 +337,7 @@ describe('database service integration tests', () => {
   describe('clearAllData', () => {
     it('clears all tables', async () => {
       // Populate all tables
-      await saveActivities([createMockActivity({ id: 1 })], testAthleteId);
+      await saveActivities([createMockActivity({ strava_id: '1' })], testAthleteId);
       await saveGear([createMockGear({ id: 'g1' })], testAthleteId);
       await saveAuth(createMockAuth(testAthleteId));
       await updateSyncState({
@@ -379,87 +366,71 @@ describe('database service integration tests', () => {
   describe('data integrity', () => {
     it('preserves all activity fields through save/retrieve cycle', async () => {
       const activity = createMockActivity({
-        id: 100,
-        name: 'Full Activity',
+        strava_id: '100',
+        title: 'Full Activity',
         description: 'Description',
-        distance: 50000,
-        moving_time: 7200,
-        total_elevation_gain: 500,
+        distance_meters: 50000,
+        moving_time_seconds: 7200,
+        total_elevation_gain_meters: 500,
         average_speed: 6.94,
-        max_speed: 12.5,
         average_heartrate: 145,
         max_heartrate: 180,
         kudos_count: 25,
         pr_count: 3,
-        calories: 1500,
         gear_id: 'b12345',
-        location_city: 'San Francisco',
-        location_state: 'California',
         device_name: 'Garmin Edge 530',
-        hide_from_home: true,
+        muted: true,
       });
 
       await saveActivities([activity], testAthleteId);
       const retrieved = await getActivityById(100);
 
-      expect(retrieved?.name).toBe('Full Activity');
+      expect(retrieved?.title).toBe('Full Activity');
       expect(retrieved?.description).toBe('Description');
-      expect(retrieved?.distance).toBe(50000);
-      expect(retrieved?.moving_time).toBe(7200);
-      expect(retrieved?.total_elevation_gain).toBe(500);
+      expect(retrieved?.distance_meters).toBe(50000);
+      expect(retrieved?.moving_time_seconds).toBe(7200);
+      expect(retrieved?.total_elevation_gain_meters).toBe(500);
       expect(retrieved?.average_speed).toBe(6.94);
-      expect(retrieved?.max_speed).toBe(12.5);
       expect(retrieved?.average_heartrate).toBe(145);
       expect(retrieved?.max_heartrate).toBe(180);
       expect(retrieved?.kudos_count).toBe(25);
       expect(retrieved?.pr_count).toBe(3);
-      expect(retrieved?.calories).toBe(1500);
       expect(retrieved?.gear_id).toBe('b12345');
-      expect(retrieved?.location_city).toBe('San Francisco');
-      expect(retrieved?.location_state).toBe('California');
       expect(retrieved?.device_name).toBe('Garmin Edge 530');
-      expect(retrieved?.hide_from_home).toBe(true);
+      expect(retrieved?.muted).toBe(true);
     });
 
     it('handles activities with photos', async () => {
       const activity = createMockActivity({
-        id: 100,
-        total_photo_count: 3,
+        strava_id: '100',
         photos: {
-          primary: {
-            unique_id: 'photo123',
-            urls: {
-              '100': 'https://example.com/100.jpg',
-              '600': 'https://example.com/600.jpg',
-            },
-            source: 1,
-            media_type: 1,
-          },
-          use_primary_photo: true,
-          count: 3,
+          photo_url: 'https://example.com/600.jpg',
+          photo_count: 3,
         },
       });
 
       await saveActivities([activity], testAthleteId);
       const retrieved = await getActivityById(100);
 
-      expect(retrieved?.photos?.primary?.unique_id).toBe('photo123');
-      expect(retrieved?.photos?.count).toBe(3);
+      expect(retrieved?.photos?.photo_url).toBe('https://example.com/600.jpg');
+      expect(retrieved?.photos?.photo_count).toBe(3);
     });
 
-    it('handles activities with segment data', async () => {
+    it('handles activities with segment location data', async () => {
       const activity = createMockActivity({
-        id: 100,
-        segment_cities: ['San Francisco', 'Sausalito'],
-        segment_states: ['California'],
-        segment_countries: ['United States'],
+        strava_id: '100',
+        segment_locations: {
+          cities: ['San Francisco', 'Sausalito'],
+          states: ['California'],
+          countries: ['United States'],
+        },
       });
 
       await saveActivities([activity], testAthleteId);
       const retrieved = await getActivityById(100);
 
-      expect(retrieved?.segment_cities).toEqual(['San Francisco', 'Sausalito']);
-      expect(retrieved?.segment_states).toEqual(['California']);
+      expect(retrieved?.segment_locations?.cities).toEqual(['San Francisco', 'Sausalito']);
+      expect(retrieved?.segment_locations?.states).toEqual(['California']);
     });
   });
 });
