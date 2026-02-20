@@ -184,7 +184,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       end.to change(MarketplaceMessage, :count).by 1
 
       marketplace_message = MarketplaceMessage.last
-      expect(marketplace_message).to match_hash_indifferently(new_params.except(:initial_record_id))
+      expect(marketplace_message).to have_attributes(new_params.except(:initial_record_id))
       expect(marketplace_message.sender_id).to eq current_user.id
       expect(marketplace_message.receiver_id).to eq marketplace_listing.seller_id
       expect(Email::MarketplaceMessageJob.jobs.count).to eq 1
@@ -202,7 +202,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
           .and change(ActionMailer::Base.deliveries, :count).by 1
       end
 
-      expect(MarketplaceMessage.last).to match_hash_indifferently({initial_record_id: marketplace_message.id,
+      expect(MarketplaceMessage.last).to have_attributes({initial_record_id: marketplace_message.id,
         sender_id: current_user.id, receiver_id: marketplace_listing.seller_id, body: follow_up_params[:body],
         subject: "Re: #{new_params[:subject]}", marketplace_listing_id: marketplace_listing.id})
 
@@ -253,7 +253,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
     context "seller reply" do
       let(:current_user) { marketplace_listing.seller }
       let!(:marketplace_message) { FactoryBot.create(:marketplace_message, marketplace_listing:) }
-      let(:reply_params) { new_params.merge(initial_record_id: marketplace_message.id.to_s) }
+      let(:reply_params) { new_params.merge(initial_record_id: marketplace_message.id) }
 
       it "sends a message" do
         ActionMailer::Base.deliveries = []
@@ -265,7 +265,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
           .and change(Email::MarketplaceMessageJob.jobs, :count).by(1)
 
         new_marketplace_message = MarketplaceMessage.last
-        expect(new_marketplace_message).to match_hash_indifferently(reply_params.except(:subject))
+        expect(new_marketplace_message).to have_attributes(reply_params.except(:subject))
         expect(new_marketplace_message.subject).to eq "Re: #{marketplace_message.subject}"
         expect(new_marketplace_message.sender_id).to eq current_user.id
         expect(new_marketplace_message.receiver_id).to eq marketplace_message.sender_id

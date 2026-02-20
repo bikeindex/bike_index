@@ -611,7 +611,6 @@ CREATE TABLE public.bikes (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     manufacturer_other character varying(255),
-    zipcode character varying(255),
     cached_data text,
     description text,
     owner_email text,
@@ -635,7 +634,6 @@ CREATE TABLE public.bikes (
     pdf character varying(255),
     paint_id integer,
     example boolean DEFAULT false NOT NULL,
-    country_id integer,
     serial_normalized character varying(255),
     stock_photo_url character varying(255),
     current_stolen_record_id integer,
@@ -652,12 +650,9 @@ CREATE TABLE public.bikes (
     cycle_type integer DEFAULT 0,
     propulsion_type integer DEFAULT 0,
     deleted_at timestamp without time zone,
-    city character varying,
     latitude double precision,
     longitude double precision,
     status integer DEFAULT 0,
-    street character varying,
-    state_id bigint,
     address_set_manually boolean DEFAULT false,
     is_phone boolean DEFAULT false,
     current_impound_record_id bigint,
@@ -669,7 +664,6 @@ CREATE TABLE public.bikes (
     likely_spam boolean DEFAULT false,
     serial_segments_migrated_at timestamp without time zone,
     model_audit_id bigint,
-    neighborhood character varying,
     primary_activity_id bigint,
     address_record_id bigint
 );
@@ -3523,17 +3517,18 @@ CREATE TABLE public.strava_activities (
     total_elevation_gain_meters double precision,
     sport_type character varying,
     private boolean DEFAULT false,
-    muted boolean DEFAULT false,
     kudos_count integer,
-    year integer,
     gear_id character varying,
     photos jsonb,
     segment_locations jsonb,
     activity_type character varying,
     start_date timestamp(6) without time zone,
-    activity_timezone character varying,
+    timezone character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    average_speed double precision,
+    suffer_score double precision,
+    strava_data jsonb
 );
 
 
@@ -4056,7 +4051,6 @@ CREATE TABLE public.users (
     email character varying(255),
     password text,
     last_login_at timestamp without time zone,
-    superuser boolean DEFAULT false NOT NULL,
     token_for_password_reset text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -6095,13 +6089,6 @@ CREATE INDEX index_bikes_on_secondary_frame_color_id ON public.bikes USING btree
 
 
 --
--- Name: index_bikes_on_state_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_state_id ON public.bikes USING btree (state_id);
-
-
---
 -- Name: index_bikes_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7447,6 +7434,9 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260219190342'),
+('20260218010402'),
+('20260217170639'),
 ('20260214163159'),
 ('20260209164044'),
 ('20260209164043'),

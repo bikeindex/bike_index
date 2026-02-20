@@ -8,7 +8,6 @@
 #  all_description             :text
 #  belt_drive                  :boolean          default(FALSE), not null
 #  cached_data                 :text
-#  city                        :string
 #  coaster_brake               :boolean          default(FALSE), not null
 #  credibility_score           :integer
 #  cycle_type                  :integer          default("bike")
@@ -33,7 +32,6 @@
 #  manufacturer_other          :string(255)
 #  mnfg_name                   :string(255)
 #  name                        :string(255)
-#  neighborhood                :string
 #  number_of_seats             :integer
 #  occurred_at                 :datetime
 #  owner_email                 :text
@@ -46,17 +44,14 @@
 #  serial_segments_migrated_at :datetime
 #  status                      :integer          default("status_with_owner")
 #  stock_photo_url             :string(255)
-#  street                      :string
 #  thumb_path                  :text
 #  updated_by_user_at          :datetime
 #  user_hidden                 :boolean          default(FALSE), not null
 #  video_embed                 :text
 #  year                        :integer
-#  zipcode                     :string(255)
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  address_record_id           :bigint
-#  country_id                  :integer
 #  creation_organization_id    :integer
 #  creator_id                  :integer
 #  current_impound_record_id   :bigint
@@ -72,7 +67,6 @@
 #  rear_gear_type_id           :integer
 #  rear_wheel_size_id          :integer
 #  secondary_frame_color_id    :integer
-#  state_id                    :bigint
 #  tertiary_frame_color_id     :integer
 #  updator_id                  :integer
 #
@@ -95,7 +89,6 @@
 #  index_bikes_on_primary_activity_id        (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
 #  index_bikes_on_primary_frame_color_id     (primary_frame_color_id)
 #  index_bikes_on_secondary_frame_color_id   (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
-#  index_bikes_on_state_id                   (state_id)
 #  index_bikes_on_status                     (status)
 #  index_bikes_on_tertiary_frame_color_id    (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
 #  index_bikes_on_user_hidden                (user_hidden) WHERE (user_hidden IS NOT NULL)
@@ -396,7 +389,15 @@ class Bike < ApplicationRecord
   end
 
   def find_or_build_address_record(country_id: nil)
-    Backfills::AddressRecordsForBikesJob.build_or_create_for(self, country_id:)
+    return address_record if address_record?
+
+    existing_address_record = AddressRecord.where(kind: :bike, bike_id: id).order(:id).last
+    if existing_address_record.present?
+      update(address_record: existing_address_record)
+      existing_address_record
+    else
+      self.address_record = AddressRecord.new(bike_id: id, kind: :bike, country_id:)
+    end
   end
 
   def latitude_public
@@ -670,7 +671,7 @@ class Bike < ApplicationRecord
   end
 
   def build_new_stolen_record(new_attrs = {})
-    new_country_id = country_id || creator&.address_record&.country_id || Country.united_states&.id
+    new_country_id = address_record&.country_id || creator&.address_record&.country_id || Country.united_states&.id
     new_stolen_record = stolen_records
       .build({country_id: new_country_id, phone: phone, current: true}.merge(new_attrs))
     new_stolen_record.date_stolen ||= Time.current # in case a blank value was passed in new_attrs
@@ -895,9 +896,11 @@ class Bike < ApplicationRecord
 
     if Binxtils::InputNormalizer.boolean(marked_user_hidden)
       self.user_hidden = true
+      self.marked_user_hidden = nil
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
     elsif Binxtils::InputNormalizer.boolean(marked_user_unhidden)
       self.user_hidden = false
+      self.marked_user_unhidden = nil
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
   end

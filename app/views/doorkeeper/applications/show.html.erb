@@ -12,6 +12,10 @@
   <% end %>
 </div>
 
+<% if @application.is_internal %>
+  <%= render(UI::Alert::Component.new(kind: :notice, text: "This application is internal — users are not prompted to authorize.")) %>
+<% end %>
+
 <div class="row">
   <div class="col-md-8">
     <h4 class="mb-1 uncap" style="font-size: 18px;">

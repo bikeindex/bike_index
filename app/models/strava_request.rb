@@ -28,7 +28,8 @@ class StravaRequest < AnalyticsRecord
     list_activities: 2,
     fetch_activity: 3,
     fetch_gear: 4,
-    incoming_webhook: 5
+    incoming_webhook: 5,
+    proxy: 6
   }.freeze
   RESPONSE_STATUS_ENUM = {
     pending: 0,
@@ -37,7 +38,8 @@ class StravaRequest < AnalyticsRecord
     rate_limited: 3,
     token_refresh_failed: 4,
     integration_deleted: 5,
-    skipped: 6
+    skipped: 6,
+    insufficient_token_privileges: 7
   }.freeze
 
   belongs_to :user
@@ -121,7 +123,9 @@ class StravaRequest < AnalyticsRecord
   end
 
   def skip_request?
-    false # TODO: Make this skip if it's already been requested - specifically, a proxy
+    return false unless fetch_activity?
+
+    strava_integration.strava_activities.enriched.exists?(strava_id: parameters["strava_id"])
   end
 
   def looks_like_last_page?(per_page: nil)
@@ -134,14 +138,14 @@ class StravaRequest < AnalyticsRecord
     page >= expected_pages
   end
 
-  def update_from_response(response, re_enqueue_if_rate_limited: false)
+  def update_from_response(response, re_enqueue_if_rate_limited: false, raise_on_error: true)
     update!(requested_at: Time.current,
       response_status: status_from_response(response),
       rate_limit: self.class.parse_rate_limit(response&.headers))
 
     if re_enqueue_if_rate_limited && rate_limited?
       StravaRequest.create!(user_id:, strava_integration_id:, request_type:, parameters:)
-    elsif error?
+    elsif error? && raise_on_error
       raise "Strava API error #{response.status}: #{response.body}"
     end
   end
@@ -157,8 +161,19 @@ class StravaRequest < AnalyticsRecord
       :rate_limited
     elsif response.status == 401
       :token_refresh_failed
+    elsif insufficient_token_privileges_response?(response)
+      :insufficient_token_privileges
     else
       :error
     end
+  end
+
+  # IDK, sort of a guess - because Strava responds with a 404 :/
+  # looks like errors field is "path" and the code is "invalid" for legit 404s
+  def insufficient_token_privileges_response?(response)
+    return false if response.status != 404
+
+    response_error = response.body["errors"].first
+    response_error&.dig("code") == "not found" && response_error&.dig("field").blank?
   end
 end

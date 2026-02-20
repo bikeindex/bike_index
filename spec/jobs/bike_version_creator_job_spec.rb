@@ -62,7 +62,7 @@ RSpec.describe BikeVersionCreatorJob, type: :job do
         manufacturer_other: "Some other Manufacturer",
         component_model: "party",
         serial_number: "999999FFF",
-        year: "2020"
+        year: 2020
       }
     end
     let(:target_cached_array) do
@@ -133,7 +133,7 @@ RSpec.describe BikeVersionCreatorJob, type: :job do
       expect(version_component1.front).to be_truthy
 
       version_component2 = bike_version.components.where.not(id: version_component1.id).first
-      expect(version_component2).to match_hash_indifferently component_attrs.except(:bike_id)
+      expect(version_component2).to have_attributes component_attrs.except(:bike_id)
     end
   end
   context "with public_images" do

@@ -32,7 +32,7 @@ module StravaJobs
         if strava_request.incoming_webhook?
           handle_incoming_webhook(strava_request, strava_integration, response)
         elsif strava_request.list_activities?
-          response.each { |summary| StravaActivity.create_or_update_from_summary(strava_integration, summary) }
+          response.each { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary) }
           if strava_request.parameters["page"] == 1
             strava_integration.update(last_updated_activities_at: Time.current)
           end
@@ -41,8 +41,7 @@ module StravaJobs
               request_type: :list_activities, parameters: {page: strava_request.parameters["page"] + 1})
           end
         elsif strava_request.fetch_activity?
-          strava_activity = strava_integration.strava_activities.find_by(strava_id: strava_request.parameters["strava_id"])
-          strava_activity&.update_from_detail(response)
+          StravaActivity.create_or_update_from_strava_response(strava_integration, response)
         elsif strava_request.fetch_gear?
           StravaGear.update_from_strava(strava_integration, response)
         end
@@ -55,8 +54,7 @@ module StravaJobs
           if params["aspect_type"] == "delete"
             strava_integration.strava_activities.find_by(strava_id: params["object_id"].to_s)&.destroy
           else
-            activity = StravaActivity.create_or_update_from_summary(strava_integration, response)
-            activity.update_from_detail(response)
+            StravaActivity.create_or_update_from_strava_response(strava_integration, response)
           end
         elsif params["object_type"] == "athlete" && params.dig("updates", "authorized") == "false"
           strava_integration.destroy
@@ -64,16 +62,17 @@ module StravaJobs
       end
     end
 
-    def perform(strava_request_id = nil)
+    # keyword args are just for calling inline
+    def perform(strava_request_id = nil, strava_request: nil, no_skip: false)
       return enqueue_next_request unless strava_request_id.present?
 
-      strava_request = StravaRequest.find_by(id: strava_request_id)
+      strava_request ||= StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || strava_request&.requested_at.present?
 
       strava_integration = StravaIntegration.find_by(id: strava_request.strava_integration_id)
       if strava_integration.blank?
         return mark_requests_deleted(strava_request)
-      elsif strava_request.skip_request?
+      elsif strava_request.skip_request? && !no_skip
         return strava_request.update(response_status: "skipped")
       end
 
@@ -82,6 +81,7 @@ module StravaJobs
       return unless strava_request.success?
 
       self.class.handle_response(strava_request, strava_integration, response&.body)
+      response&.body
     end
 
     private

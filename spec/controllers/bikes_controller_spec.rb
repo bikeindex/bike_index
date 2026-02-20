@@ -68,7 +68,11 @@ RSpec.describe BikesController, type: :controller do
     end
     context "Admin with manually set current_organization" do
       include_context :logged_in_as_superuser
-      let(:user) { FactoryBot.create(:organization_user, superuser: true) }
+      let(:user) do
+        user = FactoryBot.create(:organization_user)
+        FactoryBot.create(:superuser_ability, user:)
+        user
+      end
       it "renders, sets passive_organization_id to be passed organization" do
         expect(user.default_organization).to be_present
         expect(user.default_organization).to_not eq organization
@@ -559,12 +563,14 @@ RSpec.describe BikesController, type: :controller do
         it "registers a bike and uploads an image" do
           Sidekiq::Testing.inline! do
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
-            post :create, params: {persist_email: "", bike: bike_params.merge(image: test_photo)}
+            expect {
+              post :create, params: {persist_email: "", bike: bike_params.merge(image: test_photo)}
+            }.to change(Bike, :count).by(1)
             expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
             Images::AssociatorJob.new.perform
-            bike = Bike.last
+            bike = Bike.reorder(:id).last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
             expect(bike.current_ownership.origin).to eq "embed_extended"
             expect(bike.current_ownership.organization).to eq organization

@@ -21,7 +21,7 @@ RSpec.describe Users::CreateOrUpdateMembershipFromPaymentJob, type: :job do
     expect(payment.reload.membership_id).to be_present
     expect(payment.kind).to eq "donation" # Doesn't update payment kind
 
-    expect(payment.membership).to match_hash_indifferently new_attrs
+    expect(payment.membership).to have_attributes_with_time_within new_attrs
   end
 
   context "when payment already has a membership_id" do
@@ -46,7 +46,7 @@ RSpec.describe Users::CreateOrUpdateMembershipFromPaymentJob, type: :job do
       expect(payment.reload.membership_id).to be_present
       expect(payment.kind).to eq "donation" # Doesn't update payment kind
 
-      expect(payment.membership).to match_hash_indifferently new_attrs.merge(level: "patron", end_at: Time.current + 1.year)
+      expect(payment.membership).to have_attributes_with_time_within new_attrs.merge(level: "patron", end_at: Time.current + 1.year)
     end
   end
 
@@ -70,7 +70,7 @@ RSpec.describe Users::CreateOrUpdateMembershipFromPaymentJob, type: :job do
       expect(payment.reload.membership_id).to eq membership.id
       expect(payment.kind).to eq "donation" # Doesn't update payment kind
 
-      expect(membership.reload).to match_hash_indifferently updated_attrs
+      expect(membership.reload).to have_attributes_with_time_within updated_attrs
     end
 
     context "when the membership ended" do
@@ -84,7 +84,7 @@ RSpec.describe Users::CreateOrUpdateMembershipFromPaymentJob, type: :job do
         expect(payment.reload.membership_id).to_not eq membership.id
         expect(payment.kind).to eq "donation" # Doesn't update payment kind
 
-        expect(payment.membership).to match_hash_indifferently new_attrs
+        expect(payment.membership).to have_attributes_with_time_within new_attrs
       end
     end
   end

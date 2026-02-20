@@ -11,7 +11,7 @@ RSpec.describe Admin::SuperuserAbilitiesController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(assigns(:collection).pluck(:id)).to eq([superuser_ability.id])
+      expect(assigns(:collection).pluck(:id)).to include(superuser_ability.id)
     end
   end
 

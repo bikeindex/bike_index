@@ -76,6 +76,18 @@ class Integrations::StravaClient
       end
     end
 
+    def proxy_request(strava_integration, path, method: "GET", body: nil)
+      raise ArgumentError, "Invalid proxy path" if path.blank? || path.match?(%r{://|\A//|(\A|/)\.\.(/|\z)})
+      path = path.delete_prefix("/")
+      ensure_valid_token!(strava_integration)
+      conn = api_connection(strava_integration)
+      case method.to_s.upcase
+      when "POST" then conn.post(path) { |req| req.body = body if body }
+      when "PUT" then conn.put(path) { |req| req.body = body if body }
+      else conn.get(path)
+      end
+    end
+
     def delete_webhook_subscription(subscription_id)
       oauth_connection.delete("api/v3/push_subscriptions/#{subscription_id}") do |req|
         req.body = {client_id: STRAVA_KEY, client_secret: STRAVA_SECRET}

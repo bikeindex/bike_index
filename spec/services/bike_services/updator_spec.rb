@@ -303,7 +303,7 @@ RSpec.describe BikeServices::Updator do
     let!(:country_id) { Country.canada_id }
     let(:target_attributes) do
       # geocoder default_location coordinates
-      address_record_attributes.except(:id).merge(kind: :bike, latitude: 40.7143528, longitude: -74.0059731)
+      address_record_attributes.except(:id).merge(kind: "bike", latitude: 40.7143528, longitude: -74.0059731)
     end
     it "creates an address_record" do
       expect(bike.reload.ownerships.count).to eq 1
@@ -313,7 +313,7 @@ RSpec.describe BikeServices::Updator do
 
       expect(bike.reload.description).to eq "something long"
       expect(bike.address_set_manually).to be_truthy
-      expect(bike.address_record).to match_hash_indifferently target_attributes
+      expect(bike.address_record).to have_attributes target_attributes
     end
 
     context "with existing address_record" do
@@ -327,7 +327,7 @@ RSpec.describe BikeServices::Updator do
 
         expect(bike.reload.description).to eq "something long"
         expect(bike.address_set_manually).to be_truthy
-        expect(bike.address_record).to match_hash_indifferently target_attributes
+        expect(bike.address_record).to have_attributes target_attributes
       end
       context "when existing address_record is kind: :ownership" do
         let(:kind) { "ownership" }
@@ -340,27 +340,10 @@ RSpec.describe BikeServices::Updator do
 
           expect(bike.reload.description).to eq "something long"
           expect(bike.address_set_manually).to be_truthy
-          expect(bike.address_record).to match_hash_indifferently target_attributes
+          expect(bike.address_record).to have_attributes target_attributes
 
           expect(address_record.reload.street).to eq "Spuistraat 134afd.Gesch."
         end
-      end
-    end
-
-    # TODO: Remove this once backfill is finished - #2922
-    context "legacy location attrs" do
-      let(:bike_params) do
-        {description: "something long", city: "Edmonton", zipcode: "T5P 4W1", country_id:, street: "15007 Stony Plain Rd"}
-      end
-      it "creates an address_record" do
-        expect(bike.reload.ownerships.count).to eq 1
-        expect(bike.user_id).to eq user.id
-        expect(AddressRecord.count).to eq 0
-        expect { update }.to change(AddressRecord, :count).by(1).and change(Ownership, :count).by(0)
-
-        expect(bike.reload.description).to eq "something long"
-        expect(bike.address_set_manually).to be_truthy
-        expect(bike.address_record).to match_hash_indifferently target_attributes.except(:region_string)
       end
     end
   end

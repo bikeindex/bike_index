@@ -220,7 +220,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(bike_attrs[:stolen_record][:date_stolen])
       expect(json_result["bike"]["type_of_cycle"]).to eq "e-Motorcycle (e-Dirt bike, e-bike with no pedals)"
-      bike = Bike.find(json_result["bike"]["id"])
+      bike = Bike.unscoped.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to eq(organization)
       expect(bike.current_ownership.origin).to eq "api_v2"
       expect(bike.current_ownership.organization).to eq organization

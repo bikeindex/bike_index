@@ -152,7 +152,7 @@ RSpec.describe BikeServices::CalculateLocation do
       let(:zipcode) { "10011" }
       let(:address_record) { FactoryBot.create(:address_record, :new_york, street: nil) }
       let(:user) { FactoryBot.create(:user_confirmed, address_record:) }
-      let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user, registration_info: {zipcode: "99999", country: "US", city: city, street: "main main street"}) }
+      let(:ownership) { FactoryBot.create(:ownership, user: user, creator: user, registration_info: {postal_code: "99999", country: "US", city: city, street: "main main street"}) }
       let(:bike) { ownership.bike }
       it "takes location from the creation state" do
         bike.update(updated_at: Time.current)
@@ -164,7 +164,7 @@ RSpec.describe BikeServices::CalculateLocation do
 
         ownership_address_record = bike.current_ownership.address_record
         expect(ownership_address_record[:latitude]).to be_present
-        expect(ownership_address_record).to match_hash_indifferently(kind: "ownership", postal_code: "99999", street: "main main street")
+        expect(ownership_address_record).to have_attributes(kind: "ownership", postal_code: "99999", street: "main main street")
         expect(described_class.registration_address_source(bike)).to eq "initial_creation"
         expect(bike.to_coordinates).to eq ownership_address_record.to_coordinates
         expect(bike.address_record_id).to eq ownership_address_record.id

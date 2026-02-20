@@ -5,7 +5,7 @@ RSpec.describe Search::RegistrationsController, type: :request do
   let(:base_url) { "/search/registrations" }
   let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
   let!(:stolen_bike) { FactoryBot.create(:stolen_bike_in_nyc, serial_number: "345678901") }
-  let!(:impounded_bike) { FactoryBot.create(:impounded_bike, :in_nyc, serial_number: "12345678901") }
+  let!(:impounded_bike) { FactoryBot.create(:impounded_bike, :with_address_record, address_in: :new_york, serial_number: "12345678901") }
   let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles, cycle_type: "e-scooter", serial_number: "9876543210") }
 
   describe "index" do

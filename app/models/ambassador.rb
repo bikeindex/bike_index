@@ -40,7 +40,6 @@
 #  show_phone                         :boolean          default(TRUE)
 #  show_twitter                       :boolean          default(FALSE), not null
 #  show_website                       :boolean          default(FALSE), not null
-#  superuser                          :boolean          default(FALSE), not null
 #  terms_of_service                   :boolean          default(FALSE), not null
 #  time_single_format                 :boolean          default(FALSE)
 #  title                              :text

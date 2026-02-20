@@ -2,7 +2,7 @@
 # Note: you have to seed the users first, or else the bikes don't have anywhere to go.
 
 user_attrs = {
-  admin: {name: "admin", email: "admin@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current, superuser: true, developer: true},
+  admin: {name: "admin", email: "admin@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current, developer: true},
   member: {name: "member", email: "member@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
   user: {name: "user", email: "user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
   api_accessor: {name: "Api Accessor", email: "api@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
@@ -10,9 +10,13 @@ user_attrs = {
 }
 
 user_attrs.values.each do |attributes|
-  new_user = User.create attributes
+  new_user = User.create! attributes
   new_user.confirm(new_user.confirmation_token)
   new_user.save
 end
+
+# Create superuser ability for admin user
+admin = User.find_by(email: "admin@bikeindex.org")
+SuperuserAbility.create!(user: admin)
 
 puts "Users added successfully\n"

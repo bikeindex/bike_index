@@ -371,7 +371,7 @@ RSpec.describe ImpoundRecord, type: :model do
     let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, user:, bike:, organization:) }
     let(:organization_role2) { FactoryBot.create(:organization_role_claimed, user:) }
     let(:organization2) { organization_role2.organization }
-    let(:superuser) { User.new(superuser: true) }
+    let(:superuser) { FactoryBot.create(:superuser) }
     it "is not authorized by bike_user" do
       expect(impound_record.reload.organized?).to be_truthy
       bike.reload
