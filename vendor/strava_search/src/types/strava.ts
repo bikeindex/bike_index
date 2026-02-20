@@ -159,15 +159,6 @@ export function deriveLocationFromSegments(activity: StravaActivity): StravaActi
   };
 }
 
-export interface StravaTokenResponse {
-  token_type: string;
-  expires_at: number;
-  expires_in: number;
-  refresh_token: string;
-  access_token: string;
-  athlete: StravaAthlete;
-}
-
 export interface StoredAuth {
   accessToken: string;
   refreshToken: string;
