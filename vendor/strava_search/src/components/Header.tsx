@@ -125,6 +125,16 @@ export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingF
             )}
           </div>
         </div>
+
+        {/* Mobile sync status row */}
+        {syncState && (
+          <div
+            className="sm:hidden text-xs text-white/70 pt-1"
+            title={formatDateTimeTitle(new Date(syncState.lastSyncedAt).toISOString())}
+          >
+            Last synced: {formatTimeAgo(new Date(syncState.lastSyncedAt).toISOString())}
+          </div>
+        )}
       </div>
     </header>
   );
