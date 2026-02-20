@@ -155,6 +155,7 @@ export const ACTIVITY_TYPES: ActivityType[] = [
 
 export type MutedFilter = 'all' | 'muted' | 'not_muted';
 export type PhotoFilter = 'all' | 'with_photo' | 'without_photo';
+export type PrivateFilter = 'all' | 'private' | 'not_private';
 
 export interface SearchFilters {
   query: string;
@@ -171,6 +172,7 @@ export interface SearchFilters {
   equipmentExpanded: boolean;
   mutedFilter: MutedFilter;
   photoFilter: PhotoFilter;
+  privateFilter: PrivateFilter;
   page: number;
 }
 

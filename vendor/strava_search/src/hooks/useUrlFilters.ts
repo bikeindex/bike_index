@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { SearchFilters, MutedFilter, PhotoFilter } from '../types/strava';
+import type { SearchFilters, MutedFilter, PhotoFilter, PrivateFilter } from '../types/strava';
 
 function filtersToParams(filters: SearchFilters): URLSearchParams {
   const params = new URLSearchParams();
@@ -46,6 +46,9 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.photoFilter && filters.photoFilter !== 'all') {
     params.set('photo', filters.photoFilter);
   }
+  if (filters.privateFilter && filters.privateFilter !== 'all') {
+    params.set('private', filters.privateFilter);
+  }
   if (filters.page > 1) {
     params.set('page', filters.page.toString());
   }
@@ -73,6 +76,7 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     equipmentExpanded: params.get('gearClosed') !== '1',
     mutedFilter: (params.get('muted') as MutedFilter) || 'all',
     photoFilter: (params.get('photo') as PhotoFilter) || 'all',
+    privateFilter: (params.get('private') as PrivateFilter) || 'all',
     page: parseInt(params.get('page') || '1', 10),
   };
 }

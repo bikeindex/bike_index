@@ -31,7 +31,7 @@ const defaultFilters: SearchFiltersType = {
   equipmentExpanded: false,
   mutedFilter: 'all',
   photoFilter: 'all',
-
+  privateFilter: 'all',
   page: 1,
 };
 

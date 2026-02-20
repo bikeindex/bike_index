@@ -40,6 +40,7 @@ const defaultFilters: SearchFilters = {
   equipmentExpanded: true,
   mutedFilter: 'all',
   photoFilter: 'all',
+  privateFilter: 'all',
   page: 1,
 };
 

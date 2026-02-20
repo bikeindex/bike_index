@@ -207,6 +207,17 @@ export function useActivities(): UseActivitiesResult {
         }
       }
 
+      // Private filter
+      if (filters.privateFilter === 'private') {
+        if (!activity.private) {
+          return false;
+        }
+      } else if (filters.privateFilter === 'not_private') {
+        if (activity.private) {
+          return false;
+        }
+      }
+
       // Photo filter
       if (filters.photoFilter === 'with_photo') {
         if ((activity.photos?.photo_count || 0) === 0) {
