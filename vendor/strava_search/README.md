@@ -1,8 +1,6 @@
 # Strava Search
 
-A React SPA for searching, filtering, and bulk-updating your Strava activities. Vendored from [bikeindex/strava_search](https://github.com/bikeindex/strava_search) and served at `/strava_search` inside the Bike Index Rails app.
-
-All data is stored locally in the user's browser (IndexedDB/localStorage).
+A React SPA for searching, filtering, and bulk-updating your Strava activities, via Bike Index's OAuth connection to Strava.
 
 ## Features
 
@@ -35,13 +33,13 @@ npm run typecheck   # type check
 npm run build       # production build (outputs to dist/)
 ```
 
-After changing source, rebuild and copy assets to public:
+After changing source, rebuild and deploy to `public/strava_search/`:
 
 ```bash
-cd vendor/strava_search
-npm run build
-cp -r dist/assets ../../public/strava_search/
+bin/strava_search_build
 ```
+
+This builds, removes old hashed assets, and copies the new ones. Note: `index.html` is NOT copied — the page is served by `StravaSearchController`, which handles auth and injects config. Only JS/CSS assets go in `public/`.
 
 ## Tech Stack
 
