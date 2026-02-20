@@ -39,7 +39,7 @@ class StravaRequest < AnalyticsRecord
     token_refresh_failed: 4,
     integration_deleted: 5,
     skipped: 6,
-    insufficient_token_priveleges: 7
+    insufficient_token_privileges: 7
   }.freeze
 
   belongs_to :user
@@ -159,10 +159,19 @@ class StravaRequest < AnalyticsRecord
       :rate_limited
     elsif response.status == 401
       :token_refresh_failed
-    elsif response.status == 403
-      :insufficient_token_priveleges
+    elsif insufficient_token_privileges_response?(response)
+      :insufficient_token_privileges
     else
       :error
     end
+  end
+
+  # IDK, sort of a guess - because Strava responds with a 404 :/
+  # looks like errors field is "path" and the code is "invalid" for legit 404s
+  def insufficient_token_privileges_response?(response)
+    return false if response.status != 404
+
+    response_error = response.body["errors"].first
+    response_error&.dig("code") == "not found" && response_error&.dig("field").blank?
   end
 end

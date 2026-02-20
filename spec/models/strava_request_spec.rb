@@ -138,8 +138,11 @@ RSpec.describe StravaRequest, type: :model do
         expect(result["short_limit"]).to eq 100
         expect(result["short_usage"]).to eq 0
         expect(result["read_short_usage"]).to eq 0
-        expect(result["long_usage"]).to eq 200
-        expect(result["read_long_usage"]).to eq 200
+        # Skip long usage check if boundary - 2.minutes crossed midnight UTC
+        unless Time.current.utc.beginning_of_day > boundary - 2.minutes
+          expect(result["long_usage"]).to eq 200
+          expect(result["read_long_usage"]).to eq 200
+        end
       end
     end
 

@@ -180,33 +180,33 @@ RSpec.describe "Strava Proxy API", type: :request do
           let(:token_expires_at) { Time.current + 1.hour }
           let(:target_attributes) do
             {
-               strava_id:,
-               title: "Extra 10: HIIT Ride with Cody Rigsby",
-               description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
-               distance_meters: 5079.8,
-               moving_time_seconds: 600,
-               total_elevation_gain_meters: 0.0,
-               sport_type: "Ride",
-               private: false,
-               kudos_count: 2,
-               gear_id:,
-               photos: {photo_url: nil, photo_count: 0},
-               segment_locations: {},
-               activity_type: "Ride",
-               timezone: "America/Chicago",
-               average_speed: 8.466,
-               suffer_score: 2.0,
-               strava_data: {
+              strava_id:,
+              title: "Extra 10: HIIT Ride with Cody Rigsby",
+              description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
+              distance_meters: 5079.8,
+              moving_time_seconds: 600,
+              total_elevation_gain_meters: 0.0,
+              sport_type: "Ride",
+              private: false,
+              kudos_count: 2,
+              gear_id:,
+              photos: {photo_url: nil, photo_count: 0},
+              segment_locations: {},
+              activity_type: "Ride",
+              timezone: "America/Chicago",
+              average_speed: 8.466,
+              suffer_score: 2.0,
+              strava_data: {
                 commute: false,
-                 enriched: true,
-                 pr_count: 0,
-                 device_name: "Peloton Bike",
-                 device_watts: true,
-                 average_speed: 8.466,
-                 average_watts: 156.0,
-                 max_heartrate: 149.0,
-                 average_heartrate: 136.2
-               }
+                enriched: true,
+                pr_count: 0,
+                device_name: "Peloton Bike",
+                device_watts: true,
+                average_speed: 8.466,
+                average_watts: 156.0,
+                max_heartrate: 149.0,
+                average_heartrate: 136.2
+              }
             }.as_json
           end
           it "updates the activity" do
@@ -255,7 +255,7 @@ RSpec.describe "Strava Proxy API", type: :request do
         it "returns strava error status" do
           VCR.use_cassette("strava-proxy_not_found") do
             expect do
-              post base_url, params: {url: "athlete/activitiesasdfasdfsdf", method: "GET", access_token: token.token}
+              post base_url, params: {url: "athlete/activities/3333333", method: "GET", access_token: token.token}
             end.to change(StravaRequest, :count).by 1
             expect(response.status).to eq 404
             expect(json_result).to eq expected_response_body.as_json

@@ -16,7 +16,8 @@ module API
       else
         result = StravaJobs::ProxyRequester.create_and_execute(
           strava_integration: auth_response[:strava_integration], user: auth_response[:user],
-          url: permitted_params[:url], method: permitted_params[:method], body: permitted_params[:body]&.to_h)
+          url: permitted_params[:url], method: permitted_params[:method], body: permitted_params[:body]&.to_h
+        )
 
         if result[:strava_request].success?
           render json: result[:serialized].to_json, status: result[:response].status
