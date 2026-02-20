@@ -59,12 +59,12 @@ class StravaSearchController < ApplicationController
     strava_integration = current_user.strava_integration
     return render json: {error: "No Strava integration"}, status: 404 unless strava_integration
 
-    app_id = StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID
-    access_token = find_valid_token(app_id, current_user.id)
+    application_id = StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID
+    access_token = find_valid_token(application_id, current_user.id)
 
     # No valid token — create a new one (user is session-authenticated)
     access_token ||= Doorkeeper::AccessToken.create!(
-      application_id: app_id,
+      application_id:,
       resource_owner_id: current_user.id,
       scopes: "public",
       expires_in: Doorkeeper.configuration.access_token_expires_in
@@ -79,6 +79,10 @@ class StravaSearchController < ApplicationController
   end
 
   private
+
+  def handle_unverified_request
+    render json: {error: "CSRF verification failed"}, status: 422
+  end
 
   def strava_doorkeeper_app
     Doorkeeper::Application.find(StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID)

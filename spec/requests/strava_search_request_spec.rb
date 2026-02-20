@@ -163,6 +163,13 @@ RSpec.describe StravaSearchController, type: :request do
           expect(token.scopes.to_s).to eq "public"
         end
 
+        it "returns JSON 422 when CSRF token is invalid" do
+          allow_any_instance_of(StravaSearchController).to receive(:verified_request?).and_return(false)
+          post strava_search_token_path
+          expect(response.status).to eq 422
+          expect(json_result[:error]).to eq "CSRF verification failed"
+        end
+
         it "creates a new token when existing token is expired" do
           Doorkeeper::AccessToken.create!(
             application_id: strava_app.id,
