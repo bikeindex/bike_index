@@ -677,7 +677,7 @@ RSpec.describe Ownership, type: :model do
   describe "address_record" do
     let!(:state) { FactoryBot.create(:state, name: "Pennsylvania", abbreviation: "PA") }
     let(:ownership) { FactoryBot.build(:ownership, registration_info:) }
-    let(:pa_info) { {city: "State College", state: "PA", street: "100 W College Ave", zipcode: "16801", organization_affiliation: "student"} }
+    let(:pa_info) { {city: "State College", region_string: "PA", street: "100 W College Ave", postal_code: "16801", organization_affiliation: "student"} }
     let(:registration_info) { pa_info }
     let(:target_attrs) do
       {city: "State College", region_string: nil, street: "100 W College Ave", postal_code: "16801",
@@ -724,7 +724,7 @@ RSpec.describe Ownership, type: :model do
     end
 
     context "edmonton" do
-      let(:registration_info) { {city: "Edmonton", state: "AB", street: "2 Sir Winston Churchill Sq", zipcode: "T5J 2C1", organization_affiliation: "student", country: "canada"} }
+      let(:registration_info) { {city: "Edmonton", region_string: "AB", street: "2 Sir Winston Churchill Sq", postal_code: "T5J 2C1", organization_affiliation: "student", country: "canada"} }
       let(:target_attrs) do
         {city: "Edmonton", region_string: "AB", street: "2 Sir Winston Churchill Sq", postal_code: "T5J 2C1",
          region_record_id: nil, country_id: Country.canada_id}

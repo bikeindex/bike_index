@@ -195,6 +195,7 @@ RSpec.describe BulkImportJob, type: :job do
       end
 
       # TODO: Fix this - something with VCR - #2922
+      # ... But didn't replicate when resolving bike address in #3132
       it "creates the bikes, doesn't have any errors", :flaky do
         expect(Country.united_states).to be_present
         expect(bike_sticker.reload.claimed?).to be_falsey

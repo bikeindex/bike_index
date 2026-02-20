@@ -67,6 +67,9 @@ class MarketplaceListing < ApplicationRecord
 
   delegate :primary_activity, :primary_activity_id, :user, to: :item, allow_nil: true
 
+  # skip_update doesn't do anything yet, added so it can be passed in CallbackJob::AddressRecordUpdateAssociationsJob
+  attr_accessor :skip_update
+
   class << self
     # Only works for bikes currently...
     def find_or_build_current_for(item, condition: :good)
