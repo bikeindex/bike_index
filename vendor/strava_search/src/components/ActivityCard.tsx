@@ -28,8 +28,10 @@ export const ActivityCard = memo(function ActivityCard({
 }: ActivityCardProps) {
   const { units } = usePreferences();
   const activityGear = gear.find((g) => g.id === activity.gear_id);
-  const primaryPhoto = activity.photos?.primary;
-  const photoCount = activity.photos?.count || 0;
+  const photoUrl = activity.photos?.photo_url;
+  const photoCount = activity.photos?.photo_count || 0;
+  const firstCity = activity.segment_locations?.cities?.[0];
+  const firstState = activity.segment_locations?.states?.[0];
 
   return (
     <div
@@ -62,8 +64,8 @@ export const ActivityCard = memo(function ActivityCard({
                   </span>
                 )}
                 <span className="text-xs text-gray-400">
-                  <span title={formatDateTimeTitle(activity.start_date_local)}>
-                    {formatDate(activity.start_date_local)}
+                  <span title={formatDateTimeTitle(activity.start_date_in_zone)}>
+                    {formatDate(activity.start_date_in_zone)}
                   </span>
                   {activity.device_name && (
                     <>
@@ -73,10 +75,10 @@ export const ActivityCard = memo(function ActivityCard({
                       </span>
                     </>
                   )}
-                  {(activity.location_city || activity.location_state) && (
+                  {(firstCity || firstState) && (
                     <>
                       {' · '}
-                      {[activity.location_city, activity.location_state]
+                      {[firstCity, firstState]
                         .filter(Boolean)
                         .join(', ')}
                     </>
@@ -86,12 +88,12 @@ export const ActivityCard = memo(function ActivityCard({
 
               <h3 className="font-semibold text-gray-900 truncate">
                 <a
-                  href={`https://www.strava.com/activities/${activity.id}`}
+                  href={`https://www.strava.com/activities/${activity.strava_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-[#fc4c02]"
                 >
-                  {activity.name}
+                  {activity.title}
                 </a>
               </h3>
 
@@ -108,7 +110,7 @@ export const ActivityCard = memo(function ActivityCard({
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-gray-400" />
             <div>
-              <div className="text-sm font-medium">{formatDistance(activity.distance, units)}</div>
+              <div className="text-sm font-medium">{formatDistance(activity.distance_meters, units)}</div>
               <div className="text-xs text-gray-500">Distance</div>
             </div>
           </div>
@@ -116,7 +118,7 @@ export const ActivityCard = memo(function ActivityCard({
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-gray-400" />
             <div>
-              <div className="text-sm font-medium">{formatDuration(activity.moving_time)}</div>
+              <div className="text-sm font-medium">{formatDuration(activity.moving_time_seconds)}</div>
               <div className="text-xs text-gray-500">Time</div>
             </div>
           </div>
@@ -135,7 +137,7 @@ export const ActivityCard = memo(function ActivityCard({
             <TrendingUp className="w-4 h-4 text-gray-400" />
             <div>
               <div className="text-sm font-medium">
-                {formatElevation(activity.total_elevation_gain, units)}
+                {formatElevation(activity.total_elevation_gain_meters, units)}
               </div>
               <div className="text-xs text-gray-500">Elevation</div>
             </div>
@@ -151,10 +153,6 @@ export const ActivityCard = memo(function ActivityCard({
             </div>
           )}
 
-          {activity.calories && (
-            <span>{Math.round(activity.calories)} cal</span>
-          )}
-
           {activity.kudos_count > 0 && (
             <span>👍 {activity.kudos_count}</span>
           )}
@@ -165,29 +163,27 @@ export const ActivityCard = memo(function ActivityCard({
             </span>
           )}
 
-          {activity.hide_from_home && (
+          {activity.muted && (
             <span title="Not published to Home or Club feeds">Muted</span>
           )}
 
-          {activity.visibility && activity.visibility !== 'everyone' && (
-            <span title={`Visibility: ${activity.visibility}`}>
-              {activity.visibility === 'followers_only' ? '👥 Followers' : '🔒 Private'}
-            </span>
+          {activity.private && (
+            <span title="Private activity">🔒 Private</span>
           )}
         </div>
         </div>
 
         {/* Photo */}
-        {primaryPhoto && (
+        {photoUrl && (
           <a
-            href={`https://www.strava.com/activities/${activity.id}`}
+            href={`https://www.strava.com/activities/${activity.strava_id}`}
             target="_blank"
             rel="noopener noreferrer"
             className="relative flex-shrink-0 self-stretch"
           >
             <img
-              src={primaryPhoto.urls['600']}
-              alt={activity.name}
+              src={photoUrl}
+              alt={activity.title}
               className="w-32 h-full object-cover rounded-r-lg"
             />
             {photoCount > 1 && (

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ActivityCard } from '../components/ActivityCard';
-import { mockActivities, mockGear, babyHawkActivity, babyHawkGear } from './mocks';
+import { mockActivities, mockGear } from './mocks';
 
 const meta = {
   title: 'Components/ActivityCard',
@@ -23,7 +23,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const RunActivity: Story = {
+export const PelotonRide: Story = {
   args: {
     activity: mockActivities[0],
     gear: mockGear,
@@ -32,7 +32,7 @@ export const RunActivity: Story = {
   },
 };
 
-export const RideActivity: Story = {
+export const NordicSki: Story = {
   args: {
     activity: mockActivities[1],
     gear: mockGear,
@@ -41,7 +41,7 @@ export const RideActivity: Story = {
   },
 };
 
-export const VirtualRide: Story = {
+export const EBikeRide: Story = {
   args: {
     activity: mockActivities[2],
     gear: mockGear,
@@ -50,7 +50,7 @@ export const VirtualRide: Story = {
   },
 };
 
-export const SwimActivity: Story = {
+export const LongDistanceRide: Story = {
   args: {
     activity: mockActivities[3],
     gear: mockGear,
@@ -59,7 +59,7 @@ export const SwimActivity: Story = {
   },
 };
 
-export const HikeActivity: Story = {
+export const BerlinRide: Story = {
   args: {
     activity: mockActivities[4],
     gear: mockGear,
@@ -79,7 +79,7 @@ export const Selected: Story = {
 
 export const NoGear: Story = {
   args: {
-    activity: { ...mockActivities[0], gear_id: undefined },
+    activity: mockActivities[1], // Nordic ski has no gear
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
@@ -88,17 +88,8 @@ export const NoGear: Story = {
 
 export const NoHeartRate: Story = {
   args: {
-    activity: { ...mockActivities[0], has_heartrate: false, average_heartrate: undefined },
+    activity: { ...mockActivities[0], average_heartrate: undefined, max_heartrate: undefined },
     gear: mockGear,
-    isSelected: false,
-    onToggleSelect: () => {},
-  },
-};
-
-export const BabyHawk: Story = {
-  args: {
-    activity: babyHawkActivity,
-    gear: [...mockGear, babyHawkGear],
     isSelected: false,
     onToggleSelect: () => {},
   },

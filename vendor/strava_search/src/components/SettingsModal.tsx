@@ -37,8 +37,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
     if (athlete) {
       getActivitiesForAthlete(athlete.id).then((activities) => {
         setActivityCount(activities.length);
-        // Count enriched activities (those with enrichedAt set)
-        const enriched = activities.filter(a => a.enrichedAt).length;
+        const enriched = activities.filter(a => a.enriched).length;
         setEnrichedCount(enriched);
       });
     }

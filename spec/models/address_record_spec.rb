@@ -128,7 +128,7 @@ RSpec.describe AddressRecord, type: :model do
     it "strips and removes blanks" do
       expect(address_record).to be_valid
 
-      expect(address_record.reload).to match_hash_indifferently target_attrs
+      expect(address_record.reload).to have_attributes target_attrs
     end
 
     context "with geocode" do
@@ -149,7 +149,7 @@ RSpec.describe AddressRecord, type: :model do
         VCR.use_cassette("address-record-assignment_geocode") do
           expect(address_record).to be_valid
 
-          expect(address_record.reload).to match_hash_indifferently target_attrs
+          expect(address_record.reload).to have_attributes target_attrs
         end
       end
 
@@ -158,7 +158,7 @@ RSpec.describe AddressRecord, type: :model do
           VCR.use_cassette("address-record-assignment_geocode") do
             expect(address_record).to be_valid
 
-            expect(address_record.reload).to match_hash_indifferently target_attrs
+            expect(address_record.reload).to have_attributes target_attrs
           end
 
           # not wrapped in VCR, so will error if it attempts to geocode
@@ -192,12 +192,12 @@ RSpec.describe AddressRecord, type: :model do
       it "updates with force update" do
         expect(address_record).to be_valid
         # postal_code is formatted by Geocodeable.format_postal_code
-        expect(address_record.reload).to match_hash_indifferently({postal_code: "T4N 4E4", region_string: nil, city: nil})
+        expect(address_record.reload).to have_attributes({postal_code: "T4N 4E4", region_string: nil, city: nil})
 
         VCR.use_cassette("address-record-assignment_geocode-canada") do
           address_record.update(force_geocoding: true)
 
-          expect(address_record.reload).to match_hash_indifferently target_attrs
+          expect(address_record.reload).to have_attributes target_attrs
         end
       end
     end

@@ -185,12 +185,12 @@ export function useActivitySync(): UseActivitySyncResult {
     setIsFetchingFullData(true);
     setError(null);
 
-    // Filter out activities that already have full data (enrichedAt is set when getActivity was called)
+    // Filter out activities that already have enriched data
     const idsToFetch: number[] = [];
     let alreadyEnrichedCount = 0;
     for (const id of activityIds) {
       const activity = await getActivityById(id);
-      if (activity && activity.enrichedAt) {
+      if (activity && activity.enriched) {
         alreadyEnrichedCount++;
       } else if (activity) {
         idsToFetch.push(id);
@@ -214,8 +214,8 @@ export function useActivitySync(): UseActivitySyncResult {
         const activityId = idsToFetch[i];
         try {
           const fullActivity = await getActivity(activityId);
-          // Save with enrichedAt timestamp to mark as enriched
-          await saveActivities([{ ...fullActivity, enrichedAt: Date.now() } as never], athlete.id);
+          // Save with enriched flag
+          await saveActivities([{ ...fullActivity, enriched: true }], athlete.id);
         } catch {
           // Skip failed activities silently
         }

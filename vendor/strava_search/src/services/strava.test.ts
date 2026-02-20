@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { getAthleteStats, updateActivity, getAllActivities } from './strava';
 import * as database from './database';
-import babyHawkCassette from '../testing/cassettes/baby_hawk.json';
 
 // Mock the database module
 vi.mock('./database', () => ({
@@ -98,18 +97,49 @@ describe('strava service', () => {
   });
 
   describe('updateActivity', () => {
-    const babyHawkResponse = babyHawkCassette.interactions[0].response.body;
+    const mockActivityResponse = {
+      strava_id: '17145907973',
+      title: 'Baby hawk',
+      activity_type: 'EBikeRide',
+      sport_type: 'EBikeRide',
+      distance_meters: 50274.8,
+      moving_time_seconds: 9219,
+      total_elevation_gain_meters: 701.0,
+      average_speed: 5.453,
+      start_date: '2025-05-31T17:02:13Z',
+      start_date_in_zone: '2025-05-31T10:02:13',
+      timezone: 'America/Los_Angeles',
+      kudos_count: 12,
+      gear_id: 'b14918050',
+      private: false,
+      commute: false,
+      muted: false,
+      enriched: true,
+      pr_count: 4,
+      device_name: 'Strava App',
+      average_heartrate: 127.5,
+      max_heartrate: 168,
+      photos: {
+        photo_url: 'https://dgtzuqphqg23d.cloudfront.net/example.jpg',
+        photo_count: 4,
+      },
+      segment_locations: {
+        cities: ['Mill Valley', 'San Francisco', 'Sausalito'],
+        states: ['California'],
+        countries: ['United States'],
+      },
+    };
 
     // Mock both PUT (update) and GET (fetch full details) proxy calls
     const mockPutThenGet = () => {
       (global.fetch as ReturnType<typeof vi.fn>)
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve({ id: 17145907973 }), // PUT returns minimal data
+          json: () => Promise.resolve({ strava_id: '17145907973' }), // PUT returns minimal data
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve(babyHawkResponse), // GET returns full data
+          json: () => Promise.resolve(mockActivityResponse), // GET returns full data
         });
     };
 
@@ -123,42 +153,22 @@ describe('strava service', () => {
 
       // Verify enriched fields are present from GET response
       expect(result.device_name).toBe('Strava App');
-      expect(result.hide_from_home).toBe(false);
+      expect(result.muted).toBe(false);
       expect(result.photos).toBeDefined();
-      expect(result.photos?.count).toBe(4);
-      expect(result.photos?.primary?.urls['600']).toContain('cloudfront.net');
+      expect(result.photos?.photo_count).toBe(4);
+      expect(result.photos?.photo_url).toContain('cloudfront.net');
     });
 
-    it('includes segment efforts for location derivation', async () => {
+    it('includes segment locations in response', async () => {
       mockPutThenGet();
 
       const result = await updateActivity(17145907973, { commute: true });
 
-      // Verify segment efforts are present for location derivation
-      expect(result.segment_efforts).toBeDefined();
-      expect(result.segment_efforts?.length).toBeGreaterThan(0);
-
-      // Check that segment locations are derived
-      expect(result.segment_cities).toBeDefined();
-      expect(result.segment_states).toBeDefined();
-      expect(result.segment_countries).toBeDefined();
-
-      // Verify specific locations from baby_hawk cassette
-      expect(result.segment_cities).toContain('Mill Valley');
-      expect(result.segment_cities).toContain('San Francisco');
-      expect(result.segment_cities).toContain('Sausalito');
-      expect(result.segment_states).toContain('California');
-    });
-
-    it('derives primary location from segments when activity location is null', async () => {
-      mockPutThenGet();
-
-      const result = await updateActivity(17145907973, { trainer: false });
-
-      // baby_hawk has null location_city/state/country at activity level
-      // but should derive from segment efforts
-      expect(result.location_city).toBeDefined();
-      expect(result.location_state).toBe('California');
+      expect(result.segment_locations).toBeDefined();
+      expect(result.segment_locations?.cities).toContain('Mill Valley');
+      expect(result.segment_locations?.cities).toContain('San Francisco');
+      expect(result.segment_locations?.cities).toContain('Sausalito');
+      expect(result.segment_locations?.states).toContain('California');
     });
 
     it('preserves all activity fields in response', async () => {
@@ -166,30 +176,26 @@ describe('strava service', () => {
 
       const result = await updateActivity(17145907973, { gear_id: 'b12345' });
 
-      // Verify core activity fields are preserved
-      expect(result.id).toBe(17145907973);
-      expect(result.name).toBe('Baby hawk');
-      expect(result.distance).toBe(50274.8);
-      expect(result.moving_time).toBe(9219);
+      expect(result.strava_id).toBe('17145907973');
+      expect(result.title).toBe('Baby hawk');
+      expect(result.distance_meters).toBe(50274.8);
+      expect(result.moving_time_seconds).toBe(9219);
       expect(result.sport_type).toBe('EBikeRide');
       expect(result.average_heartrate).toBe(127.5);
-      expect(result.total_photo_count).toBe(4);
-      expect(result.calories).toBe(1462);
     });
   });
 
   describe('getAllActivities', () => {
     const createMockActivity = (id: number) => ({
-      id,
-      name: `Activity ${id}`,
-      distance: 10000,
-      moving_time: 3600,
-      elapsed_time: 3700,
-      total_elevation_gain: 100,
-      type: 'Ride',
+      strava_id: String(id),
+      title: `Activity ${id}`,
+      distance_meters: 10000,
+      moving_time_seconds: 3600,
+      total_elevation_gain_meters: 100,
+      activity_type: 'Ride',
       sport_type: 'Ride',
       start_date: '2024-01-15T10:00:00Z',
-      start_date_local: '2024-01-15T02:00:00Z',
+      start_date_in_zone: '2024-01-15T02:00:00Z',
     });
 
     it('calls onBatch callback for each page of activities', async () => {
