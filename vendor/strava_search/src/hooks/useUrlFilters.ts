@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { SearchFilters, MutedFilter, PhotoFilter, PrivateFilter } from '../types/strava';
+import type { SearchFilters, MutedFilter, PhotoFilter, PrivateFilter, CommuteFilter } from '../types/strava';
 
 function filtersToParams(filters: SearchFilters): URLSearchParams {
   const params = new URLSearchParams();
@@ -49,6 +49,21 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.privateFilter && filters.privateFilter !== 'all') {
     params.set('private', filters.privateFilter);
   }
+  if (filters.commuteFilter && filters.commuteFilter !== 'all') {
+    params.set('commute', filters.commuteFilter);
+  }
+  if (filters.sufferScoreFrom !== null && filters.sufferScoreFrom !== undefined) {
+    params.set('sufferFrom', filters.sufferScoreFrom.toString());
+  }
+  if (filters.sufferScoreTo !== null && filters.sufferScoreTo !== undefined) {
+    params.set('sufferTo', filters.sufferScoreTo.toString());
+  }
+  if (filters.kudosFrom !== null && filters.kudosFrom !== undefined) {
+    params.set('kudosFrom', filters.kudosFrom.toString());
+  }
+  if (filters.kudosTo !== null && filters.kudosTo !== undefined) {
+    params.set('kudosTo', filters.kudosTo.toString());
+  }
   if (filters.page > 1) {
     params.set('page', filters.page.toString());
   }
@@ -61,6 +76,10 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
   const distToStr = params.get('distTo');
   const elevFromStr = params.get('elevFrom');
   const elevToStr = params.get('elevTo');
+  const sufferFromStr = params.get('sufferFrom');
+  const sufferToStr = params.get('sufferTo');
+  const kudosFromStr = params.get('kudosFrom');
+  const kudosToStr = params.get('kudosTo');
   return {
     query: params.get('q') || '',
     activityTypes: params.get('types')?.split(',').filter(Boolean) || [],
@@ -77,6 +96,11 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     mutedFilter: (params.get('muted') as MutedFilter) || 'all',
     photoFilter: (params.get('photo') as PhotoFilter) || 'all',
     privateFilter: (params.get('private') as PrivateFilter) || 'all',
+    commuteFilter: (params.get('commute') as CommuteFilter) || 'all',
+    sufferScoreFrom: sufferFromStr ? parseFloat(sufferFromStr) : null,
+    sufferScoreTo: sufferToStr ? parseFloat(sufferToStr) : null,
+    kudosFrom: kudosFromStr ? parseFloat(kudosFromStr) : null,
+    kudosTo: kudosToStr ? parseFloat(kudosToStr) : null,
     page: parseInt(params.get('page') || '1', 10),
   };
 }

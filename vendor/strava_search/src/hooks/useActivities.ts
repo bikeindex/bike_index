@@ -229,6 +229,41 @@ export function useActivities(): UseActivitiesResult {
         }
       }
 
+      // Commute filter
+      if (filters.commuteFilter === 'commute') {
+        if (!activity.commute) {
+          return false;
+        }
+      } else if (filters.commuteFilter === 'not_commute') {
+        if (activity.commute) {
+          return false;
+        }
+      }
+
+      // Suffer score range filter
+      if (filters.sufferScoreFrom !== null) {
+        if (!activity.suffer_score || activity.suffer_score < filters.sufferScoreFrom) {
+          return false;
+        }
+      }
+      if (filters.sufferScoreTo !== null) {
+        if (!activity.suffer_score || activity.suffer_score > filters.sufferScoreTo) {
+          return false;
+        }
+      }
+
+      // Kudos count range filter
+      if (filters.kudosFrom !== null) {
+        if (activity.kudos_count < filters.kudosFrom) {
+          return false;
+        }
+      }
+      if (filters.kudosTo !== null) {
+        if (activity.kudos_count > filters.kudosTo) {
+          return false;
+        }
+      }
+
       return true;
     });
   }, [activities, filters, units]);

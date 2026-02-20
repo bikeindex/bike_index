@@ -83,7 +83,7 @@ export function ActivityList({
 
   if (activities.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
         <p>No activities found</p>
         <p className="text-sm mt-1">
           Try adjusting your filters or sync your activities from Strava
@@ -125,7 +125,7 @@ export function ActivityList({
           <button
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -136,7 +136,7 @@ export function ActivityList({
               <>
                 <button
                   onClick={() => goToPage(1)}
-                  className="px-3 py-1 rounded-lg hover:bg-gray-100"
+                  className="px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   1
                 </button>
@@ -148,7 +148,7 @@ export function ActivityList({
             {currentPage > 1 && (
               <button
                 onClick={() => goToPage(currentPage - 1)}
-                className="px-3 py-1 rounded-lg hover:bg-gray-100"
+                className="px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 {currentPage - 1}
               </button>
@@ -163,7 +163,7 @@ export function ActivityList({
             {currentPage < totalPages && (
               <button
                 onClick={() => goToPage(currentPage + 1)}
-                className="px-3 py-1 rounded-lg hover:bg-gray-100"
+                className="px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 {currentPage + 1}
               </button>
@@ -175,7 +175,7 @@ export function ActivityList({
                 {currentPage < totalPages - 2 && <span className="px-2 text-gray-400">...</span>}
                 <button
                   onClick={() => goToPage(totalPages)}
-                  className="px-3 py-1 rounded-lg hover:bg-gray-100"
+                  className="px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   {totalPages}
                 </button>
@@ -186,12 +186,12 @@ export function ActivityList({
           <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          <span className="ml-4 text-sm text-gray-500">
+          <span className="ml-4 text-sm text-gray-500 dark:text-gray-400">
             Page {formatNumber(currentPage)} of {formatNumber(totalPages)}
           </span>
         </div>

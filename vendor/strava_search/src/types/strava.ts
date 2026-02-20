@@ -148,6 +148,7 @@ export const ACTIVITY_TYPES: ActivityType[] = [
 export type MutedFilter = 'all' | 'muted' | 'not_muted';
 export type PhotoFilter = 'all' | 'with_photo' | 'without_photo';
 export type PrivateFilter = 'all' | 'private' | 'not_private';
+export type CommuteFilter = 'all' | 'commute' | 'not_commute';
 
 export interface SearchFilters {
   query: string;
@@ -165,6 +166,11 @@ export interface SearchFilters {
   mutedFilter: MutedFilter;
   photoFilter: PhotoFilter;
   privateFilter: PrivateFilter;
+  commuteFilter: CommuteFilter;
+  sufferScoreFrom: number | null;
+  sufferScoreTo: number | null;
+  kudosFrom: number | null;
+  kudosTo: number | null;
   page: number;
 }
 

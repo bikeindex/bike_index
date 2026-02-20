@@ -41,6 +41,11 @@ const defaultFilters: SearchFilters = {
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
+  commuteFilter: 'all',
+  sufferScoreFrom: null,
+  sufferScoreTo: null,
+  kudosFrom: null,
+  kudosTo: null,
   page: 1,
 };
 

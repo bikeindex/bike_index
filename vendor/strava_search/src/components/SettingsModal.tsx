@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Trash2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { usePreferences } from '../contexts/PreferencesContext';
+import { usePreferences, type DarkMode } from '../contexts/PreferencesContext';
 import { useActivitySync } from '../hooks/useActivitySync';
 import {
   clearAllData,
@@ -16,7 +16,7 @@ interface SettingsModalProps {
 
 function SettingsModalContent({ onClose }: { onClose: () => void }) {
   const { athlete, syncState, logout } = useAuth();
-  const { units, setUnits, autoEnrich, setAutoEnrich } = usePreferences();
+  const { units, setUnits, autoEnrich, setAutoEnrich, darkMode, setDarkMode } = usePreferences();
   const isDev = import.meta.env.DEV;
   const { isSyncing, progress, syncRecent } = useActivitySync();
   const [activityCount, setActivityCount] = useState(0);
@@ -55,40 +55,46 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
     onClose();
   };
 
+  const darkModeOptions: { value: DarkMode; label: string }[] = [
+    { value: 'light', label: 'Light' },
+    { value: 'dark', label: 'Dark' },
+    { value: 'system', label: 'System' },
+  ];
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1040] p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Settings</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
-            <X className="w-5 h-5" />
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold dark:text-gray-100">Settings</h2>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+            <X className="w-5 h-5 dark:text-gray-400" />
           </button>
         </div>
 
         <div className="p-6 space-y-6">
           {/* Sync section */}
           <div>
-            <h3 className="font-medium text-gray-900 mb-3">Data Sync</h3>
-            <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Data Sync</h3>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Activities stored locally:
                 </span>
-                <span className="font-medium">{formatNumber(activityCount)}</span>
+                <span className="font-medium dark:text-gray-200">{formatNumber(activityCount)}</span>
               </div>
               <div className="flex items-center justify-between mt-0.5">
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Full activity data:
                 </span>
-                <span className="font-medium">{formatNumber(enrichedCount)}</span>
+                <span className="font-medium dark:text-gray-200">{formatNumber(enrichedCount)}</span>
               </div>
               {syncState && (
                 <div className="flex items-center justify-between mt-0.5 mb-4">
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
                     Last synced:
                   </span>
                   <span
-                    className="font-medium"
+                    className="font-medium dark:text-gray-200"
                     title={formatDateTimeTitle(new Date(syncState.lastSyncedAt).toISOString())}
                   >
                     {formatTimeAgo(new Date(syncState.lastSyncedAt).toISOString())}
@@ -116,16 +122,36 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
+          {/* Appearance */}
+          <div>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Appearance</h3>
+            <div className="flex gap-2">
+              {darkModeOptions.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => setDarkMode(value)}
+                  className={`flex-1 py-2 px-4 rounded-lg border transition-colors ${
+                    darkMode === value
+                      ? 'bg-[#fc4c02] text-white border-[#fc4c02]'
+                      : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Units */}
           <div>
-            <h3 className="font-medium text-gray-900 mb-3">Units</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Units</h3>
             <div className="flex gap-2">
               <button
                 onClick={() => setUnits('imperial')}
                 className={`flex-1 py-2 px-4 rounded-lg border transition-colors ${
                   units === 'imperial'
                     ? 'bg-[#fc4c02] text-white border-[#fc4c02]'
-                    : 'border-gray-300 hover:bg-gray-50'
+                    : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300'
                 }`}
               >
                 Imperial (mi, ft)
@@ -135,7 +161,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
                 className={`flex-1 py-2 px-4 rounded-lg border transition-colors ${
                   units === 'metric'
                     ? 'bg-[#fc4c02] text-white border-[#fc4c02]'
-                    : 'border-gray-300 hover:bg-gray-50'
+                    : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300'
                 }`}
               >
                 Metric (km, m)
@@ -146,21 +172,21 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
           {/* Danger zone */}
           <div>
             <h3 className="font-medium text-red-600 mb-3">Danger Zone</h3>
-            <div className="border border-red-200 rounded-lg p-4">
+            <div className="border border-red-200 dark:border-red-800 rounded-lg p-4">
               {showDeleteConfirm ? (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-red-600">
                     <AlertTriangle className="w-5 h-5" />
                     <span className="font-medium">Are you sure?</span>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     This will delete all locally stored data and log you out. Your
                     Strava data will not be affected.
                   </p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setShowDeleteConfirm(false)}
-                      className="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
                     >
                       Cancel
                     </button>
@@ -175,7 +201,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
               ) : (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2 border border-red-300 dark:border-red-700 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
                 >
                   <Trash2 className="w-4 h-4" />
                   Clear All Local Data
@@ -187,11 +213,11 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
 
         {/* Dev configuration - only in dev mode */}
         {isDev && (
-          <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
-            <h3 className="font-medium text-gray-900 mb-3">Dev Configuration</h3>
+          <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-100 dark:border-gray-600">
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Dev Configuration</h3>
             <div className="space-y-3">
               <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
                   Automatically fetch full activity data
                 </span>
                 <button
@@ -199,7 +225,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
                   aria-checked={autoEnrich}
                   onClick={() => setAutoEnrich(!autoEnrich)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    autoEnrich ? 'bg-[#fc4c02]' : 'bg-gray-300'
+                    autoEnrich ? 'bg-[#fc4c02]' : 'bg-gray-300 dark:bg-gray-500'
                   }`}
                 >
                   <span
@@ -209,7 +235,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
                   />
                 </button>
               </label>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 When enabled, fetches detailed data (location, photos, muted status) for each activity during sync. This is slower but provides more complete data.
               </p>
             </div>

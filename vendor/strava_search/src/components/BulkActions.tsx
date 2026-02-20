@@ -18,6 +18,8 @@ interface BulkActionsProps {
   gear: StoredGear[];
 }
 
+const selectClasses = 'w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none';
+
 export function BulkActions({
   selectedCount,
   pageCount,
@@ -93,7 +95,7 @@ export function BulkActions({
         <div className="flex items-center gap-3">
           <button
             onClick={selectedCount > 0 ? onDeselectAll : onSelectAll}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+            className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
           >
             {selectedCount > 0 ? (
               <CheckSquare className="w-5 h-5 text-[#fc4c02]" />
@@ -112,7 +114,7 @@ export function BulkActions({
           {selectedCount > 0 && (
             <button
               onClick={onDeselectAll}
-              className="text-sm text-gray-500 hover:text-gray-700"
+              className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             >
               Clear selection
             </button>
@@ -121,11 +123,11 @@ export function BulkActions({
 
         {/* Top pagination - only show when multiple pages */}
         {totalPages > 1 && (
-          <div className="flex items-center gap-1 text-sm text-gray-600">
+          <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="p-1 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -135,7 +137,7 @@ export function BulkActions({
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="p-1 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -145,7 +147,7 @@ export function BulkActions({
 
       {/* Bulk action buttons - in card, only shown when items selected */}
       {selectedCount > 0 && (
-        <div className="flex flex-wrap items-center gap-2 bg-white rounded-lg shadow-sm p-3">
+        <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3">
           <button
             onClick={() => {
               setEditType('type');
@@ -199,34 +201,34 @@ export function BulkActions({
       {/* Edit Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1040] p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">
+              <h3 className="text-lg font-semibold dark:text-gray-100">
                 {editType === 'type' && 'Change Activity Type'}
                 {editType === 'gear' && 'Change Equipment'}
                 {editType === 'tags' && 'Change Tags'}
               </h3>
               <button
                 onClick={closeModal}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 dark:text-gray-400" />
               </button>
             </div>
 
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               This will update {formatNumber(selectedCount)} selected activit{selectedCount === 1 ? 'y' : 'ies'} on Strava.
             </p>
 
             {editType === 'type' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select new activity type
                 </label>
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
+                  className={selectClasses}
                 >
                   <option value="">Choose a type...</option>
                   {ACTIVITY_TYPES.map((type) => (
@@ -240,13 +242,13 @@ export function BulkActions({
 
             {editType === 'gear' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select equipment
                 </label>
                 <select
                   value={selectedGearId}
                   onChange={(e) => setSelectedGearId(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
+                  className={selectClasses}
                 >
                   <option value="">None (remove equipment)</option>
                   {gear.map((g) => (
@@ -261,7 +263,7 @@ export function BulkActions({
             {editType === 'tags' && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Commute
                   </label>
                   <select
@@ -270,7 +272,7 @@ export function BulkActions({
                       const val = e.target.value;
                       setCommuteValue(val === '' ? null : val === 'true');
                     }}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
+                    className={selectClasses}
                   >
                     <option value="">No change</option>
                     <option value="true">Mark as commute</option>
@@ -279,7 +281,7 @@ export function BulkActions({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Trainer / Indoor
                   </label>
                   <select
@@ -288,7 +290,7 @@ export function BulkActions({
                       const val = e.target.value;
                       setTrainerValue(val === '' ? null : val === 'true');
                     }}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
+                    className={selectClasses}
                   >
                     <option value="">No change</option>
                     <option value="true">Mark as trainer/indoor</option>
@@ -301,7 +303,7 @@ export function BulkActions({
             <div className="flex gap-3 mt-6">
               <button
                 onClick={closeModal}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
               >
                 Cancel
               </button>
