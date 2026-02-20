@@ -10,6 +10,7 @@
 #  average_speed               :float
 #  description                 :text
 #  distance_meters             :float
+#  enriched_at                 :datetime
 #  kudos_count                 :integer
 #  moving_time_seconds         :integer
 #  photos                      :jsonb
@@ -70,8 +71,8 @@ class StravaActivity < ApplicationRecord
   validates :strava_id, uniqueness: {scope: :strava_integration_id}
 
   scope :cycling, -> { where(activity_type: CYCLING_TYPES) }
-  scope :enriched, -> { where("strava_data->>'enriched' = 'true'") }
-  scope :not_enriched, -> { where("strava_data IS NULL OR NOT strava_data ? 'enriched'") }
+  scope :enriched, -> { where.not(enriched_at: nil) }
+  scope :not_enriched, -> { where(enriched_at: nil) }
   scope :activities_to_enrich, -> { cycling.not_enriched }
   scope :with_gear, -> { where.not(gear_id: nil) }
 
@@ -106,7 +107,8 @@ class StravaActivity < ApplicationRecord
         photos:,
         segment_locations: segment_locations_for(detail["segment_efforts"]),
         kudos_count: detail["kudos_count"],
-        strava_data: strava_data_from(detail).merge("enriched" => true)
+        enriched_at: Time.current,
+        strava_data: strava_data_from(detail)
       }
     end
 
@@ -152,7 +154,7 @@ class StravaActivity < ApplicationRecord
   end
 
   def enriched?
-    strava_data&.dig("enriched") == true
+    enriched_at.present?
   end
 
   def calculated_gear_name
