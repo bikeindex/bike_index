@@ -135,7 +135,7 @@ RSpec.describe StravaJobs::ProxyRequester do
             states: ["California"],
             countries: ["United States", "USA"]
           },
-          strava_data: target_attributes["strava_data"].merge("enriched" => true, "muted" => false)
+          strava_data: target_attributes["strava_data"].merge("muted" => false)
         ).as_json
       end
 
@@ -157,6 +157,7 @@ RSpec.describe StravaJobs::ProxyRequester do
         end
         strava_activity.reload
         expect(strava_activity.enriched?).to be_truthy
+        expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
         expect(strava_activity).to have_attributes detail_target_attributes
         expect(result[:serialized]).to eq strava_activity.proxy_serialized
       end

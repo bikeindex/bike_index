@@ -115,7 +115,7 @@ RSpec.describe "Strava Proxy API", type: :request do
               states: ["California"],
               countries: ["United States", "USA"]
             },
-            strava_data: target_attributes["strava_data"].merge("enriched" => true, "muted" => false)
+            strava_data: target_attributes["strava_data"].merge("muted" => false)
           ).as_json
         end
 
@@ -138,6 +138,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           end
           strava_activity.reload
           expect(strava_activity.enriched?).to be_truthy
+          expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
           expect(strava_activity).to have_attributes detail_target_attributes
           expect(json_result).to eq strava_activity.proxy_serialized.as_json
         end
@@ -198,7 +199,6 @@ RSpec.describe "Strava Proxy API", type: :request do
               suffer_score: 2.0,
               strava_data: {
                 commute: false,
-                enriched: true,
                 muted: true,
                 pr_count: 0,
                 device_name: "Peloton Bike",

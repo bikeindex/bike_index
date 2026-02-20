@@ -211,7 +211,6 @@ RSpec.describe StravaActivity, type: :model do
         },
         strava_data: {
           commute: false,
-          enriched: true,
           pr_count: 0,
           device_name: "Peloton Bike",
           device_watts: true,
@@ -228,7 +227,9 @@ RSpec.describe StravaActivity, type: :model do
       VCR.use_cassette("strava-update_from_strava") do
         strava_activity.update_from_strava!
       end
-      expect(strava_activity.reload).to have_attributes target_attributes.as_json
+      strava_activity.reload
+      expect(strava_activity).to have_attributes target_attributes.as_json
+      expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
     end
   end
 end
