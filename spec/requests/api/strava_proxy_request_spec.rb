@@ -26,14 +26,6 @@ RSpec.describe "Strava Proxy API", type: :request do
     end
   end
 
-  context "STRAVA_DOORKEEPER_APP_ID not set" do
-    it "returns 403" do
-      stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", 0)
-      post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
-      expect(response.status).to eq 403
-    end
-  end
-
   context "valid token and app" do
     before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 

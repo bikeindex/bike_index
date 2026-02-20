@@ -69,8 +69,7 @@ module StravaJobs
       private
 
       def authorized_app?(token)
-        STRAVA_DOORKEEPER_APP_ID > 0 &&
-          token.application_id == STRAVA_DOORKEEPER_APP_ID
+        token.application_id == STRAVA_DOORKEEPER_APP_ID
       end
 
       def validate_url!(url)
