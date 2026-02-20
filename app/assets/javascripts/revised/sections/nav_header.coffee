@@ -1,11 +1,6 @@
 class BikeIndex.NavHeader extends BikeIndex
-  headroomOptions:
-    offset: 48
-
   constructor: ->
     @initializeHamburgler()
-    # Instantiate headroom - scroll to hide header
-    $('nav.primary-header-nav').headroom(@headroomOptions)
 
     # Some small screen specific things
     if $(window).width() < 768
@@ -27,7 +22,6 @@ class BikeIndex.NavHeader extends BikeIndex
   initializeHamburgler: ->
     # Add character for displaying the hamburger - doing it here so it isn't rendered for lynx :/
     $("#primary_nav_hamburgler").html("&#9776;")
-    # toggleMenu = @toggleMenu
     $('.hamburgler').click (e) =>
       e.preventDefault()
       $('.hamburgler a').toggleClass('active') # prevent hamburglar flicker back and forth
@@ -39,9 +33,7 @@ class BikeIndex.NavHeader extends BikeIndex
   toggleMenu: (is_open = false)->
     if is_open
       $('.hamburgler a').removeClass('active')
-      $('nav.primary-header-nav')
-        .removeClass('menu-in')
-        .headroom(@headroomOptions)
+      $('nav.primary-header-nav').removeClass('menu-in')
       $('body').removeClass('menu-in')
 
       # $mainmenu-transform-speed in primary_header_nav.scss
@@ -54,9 +46,6 @@ class BikeIndex.NavHeader extends BikeIndex
       $('nav.primary-header-nav').addClass('enabled')
       $('.hamburgler a').addClass('active')
       setTimeout (->
-        $('nav.primary-header-nav')
-          .addClass('menu-in')
-          .headroom('destroy')
-          .removeData('headroom')
+        $('nav.primary-header-nav').addClass('menu-in')
         $('body').addClass('menu-in')
       ), 50 # So that it animates...

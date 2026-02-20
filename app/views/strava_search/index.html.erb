@@ -22,7 +22,7 @@
   window.stravaSearchConfig = <%= @strava_search_config.to_json.html_safe %>;
   document.addEventListener('DOMContentLoaded', function() {
     <%# Update the body padding so that there isn't whitespace at top %>
-    document.body.classList.add('tw:pt-[68px]!', 'tw:lg:pt-[85px]!');
+    document.querySelector('.primary-header-nav').style.marginBottom = '0';
     <%# And remove the whitespace at the bottom of the page too %>
     document.querySelector('.primary-footer').style.marginTop = '0';
   });

@@ -13,7 +13,6 @@
 // Organization landing pages padding (so there can be a background)
 #organized_manage_landing,
 #landing_pages_show {
-  padding-top: 0;
   background-size: 100% auto;
   background-position: center top;
   background-repeat: no-repeat;
@@ -46,8 +45,6 @@
   }
 
   @include media-breakpoint-up(lg) {
-    padding-top: 0;
-
     h1 {
       margin-bottom: 4 * $vertical-height;
     }
