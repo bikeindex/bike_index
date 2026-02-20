@@ -19,6 +19,7 @@
 <div id="root"></div>
 
 <script>
+  window.stravaSearchConfig = <%= @strava_search_config.to_json.html_safe %>;
   document.addEventListener('DOMContentLoaded', function() {
     <%# Update the body padding so that there isn't whitespace at top %>
     document.body.classList.add('tw:pt-[68px]!', 'tw:lg:pt-[85px]!');

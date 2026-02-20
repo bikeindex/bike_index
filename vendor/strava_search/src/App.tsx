@@ -7,7 +7,6 @@ import { Header } from './components/Header';
 import { ErrorBanner } from './components/ErrorBanner';
 import { SearchFilters } from './components/SearchFilters';
 import { ActivityList } from './components/ActivityList';
-import { LoginPage } from './components/LoginPage';
 import { SettingsModal } from './components/SettingsModal';
 import { InitialSyncPrompt } from './components/InitialSyncPrompt';
 import { Loader2 } from 'lucide-react';
@@ -196,7 +195,7 @@ function Dashboard() {
 }
 
 export default function App() {
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -204,10 +203,6 @@ export default function App() {
         <Loader2 className="w-8 h-8 text-[#fc4c02] animate-spin" />
       </div>
     );
-  }
-
-  if (!isAuthenticated) {
-    return <LoginPage />;
   }
 
   return <Dashboard />;

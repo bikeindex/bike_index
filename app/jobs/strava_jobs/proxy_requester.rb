@@ -43,6 +43,29 @@ module StravaJobs
         {strava_request:, response:, serialized:}
       end
 
+      # Returns an existing valid token, or revokes the most recent expired one
+      # and creates a new one (matches Doorkeeper's refresh flow)
+      def find_or_create_access_token(resource_owner_id)
+        application_id = STRAVA_DOORKEEPER_APP_ID
+        access_token = Doorkeeper::AccessToken
+          .where(application_id:, resource_owner_id:)
+          .order(id: :desc)
+          .detect(&:accessible?)
+        return access_token if access_token.present?
+
+        # Revoke and refresh otherwise
+        Doorkeeper::AccessToken
+          .where(application_id:, resource_owner_id:, revoked_at: nil)
+          .order(id: :desc)
+          .first&.revoke
+        Doorkeeper::AccessToken.create!(
+          application_id:,
+          resource_owner_id:,
+          scopes: "public",
+          expires_in: Doorkeeper.configuration.access_token_expires_in
+        )
+      end
+
       private
 
       def authorized_app?(token)
