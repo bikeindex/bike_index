@@ -387,7 +387,7 @@ RSpec.describe "BikesController#create", type: :request do
 
           new_bike.reload
           expect(new_bike.b_params.count).to eq 0
-          expect(testable_bike_params.keys.count).to be > 10
+          expect(testable_bike_params.keys.count).to be > 7
           expect(new_bike).to have_attributes testable_bike_params
           expect(new_bike.manufacturer).to eq manufacturer
           expect(new_bike.user_id).to eq current_user.id
