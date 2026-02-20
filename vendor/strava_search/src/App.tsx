@@ -7,10 +7,7 @@ import { Header } from './components/Header';
 import { ErrorBanner } from './components/ErrorBanner';
 import { SearchFilters } from './components/SearchFilters';
 import { ActivityList } from './components/ActivityList';
-import { GearList } from './components/GearList';
 import { SettingsModal } from './components/SettingsModal';
-import { getConfig } from './services/railsApi';
-import type { ViewMode } from './types/strava';
 import { Loader2 } from 'lucide-react';
 
 function Dashboard() {
@@ -51,23 +48,6 @@ function Dashboard() {
     () => displayedActivityIds.join(','),
     [displayedActivityIds]
   );
-
-  // Compute activity counts per gear for the gear view
-  const activityCountsByGear = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const a of activities) {
-      if (a.gear_id) {
-        counts[a.gear_id] = (counts[a.gear_id] || 0) + 1;
-      }
-    }
-    return counts;
-  }, [activities]);
-
-  const gearBikeLinks = useMemo(() => getConfig().gearBikeLinks || [], []);
-
-  const handleViewChange = useCallback((view: ViewMode) => {
-    setFilters((prev) => ({ ...prev, view, page: 1 }));
-  }, [setFilters]);
 
   // Expose fetchFullActivityData on window for console access
   useEffect(() => {
@@ -166,7 +146,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} view={filters.view} onViewChange={handleViewChange} />
+      <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} />
       {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} />}
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -176,38 +156,28 @@ function Dashboard() {
           </div>
         )}
 
-        {filters.view === 'gear' ? (
-          <GearList
-            gear={gear}
-            gearBikeLinks={gearBikeLinks}
-            activityCountsByGear={activityCountsByGear}
-          />
-        ) : (
-          <>
-            <SearchFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              activityTypes={activityTypes}
-              gear={gear}
-              totalCount={activities.length}
-              filteredCount={filteredActivities.length}
-            />
+        <SearchFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          activityTypes={activityTypes}
+          gear={gear}
+          totalCount={activities.length}
+          filteredCount={filteredActivities.length}
+        />
 
-            <ActivityList
-              activities={filteredActivities}
-              gear={gear}
-              isLoading={isLoading}
-              selectedIds={selectedIds}
-              onToggleSelect={handleToggleSelect}
-              onSelectIds={(ids) => setSelectedIds(new Set(ids))}
-              onDeselectAll={deselectAll}
-              onUpdateSelected={updateSelectedActivities}
-              isUpdating={isUpdating}
-              filters={filters}
-              onFiltersChange={setFilters}
-            />
-          </>
-        )}
+        <ActivityList
+          activities={filteredActivities}
+          gear={gear}
+          isLoading={isLoading}
+          selectedIds={selectedIds}
+          onToggleSelect={handleToggleSelect}
+          onSelectIds={(ids) => setSelectedIds(new Set(ids))}
+          onDeselectAll={deselectAll}
+          onUpdateSelected={updateSelectedActivities}
+          isUpdating={isUpdating}
+          filters={filters}
+          onFiltersChange={setFilters}
+        />
       </main>
 
       <SettingsModal isOpen={showSettings} onClose={handleCloseSettings} />

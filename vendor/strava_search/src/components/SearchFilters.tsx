@@ -1,4 +1,4 @@
-import { Search, X, ChevronDown } from 'lucide-react';
+import { Search, X, ChevronDown, ChevronRight } from 'lucide-react';
 import type { SearchFilters as SearchFiltersType } from '../types/strava';
 import type { StoredGear } from '../services/database';
 import {
@@ -117,9 +117,57 @@ export function SearchFilters({
     });
   };
 
+  const toggleCollapsed = () => {
+    onFiltersChange({ ...filters, filtersCollapsed: !filters.filtersCollapsed });
+  };
+
+  // Count active filters for the collapsed summary
+  const activeFilterCount = [
+    filters.query,
+    filters.activityTypes.length > 0,
+    filters.gearIds.length > 0 || filters.noEquipment,
+    filters.dateFrom || filters.dateTo,
+    filters.distanceFrom !== null || filters.distanceTo !== null,
+    filters.elevationFrom !== null || filters.elevationTo !== null,
+    filters.mutedFilter !== 'all',
+    filters.photoFilter !== 'all',
+    filters.privateFilter !== 'all',
+    filters.commuteFilter !== 'all',
+    filters.sufferScoreFrom !== null || filters.sufferScoreTo !== null,
+    filters.kudosFrom !== null || filters.kudosTo !== null,
+  ].filter(Boolean).length;
+
   return (
   <>
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-4">
+    {/* Collapse/expand header */}
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <button
+        onClick={toggleCollapsed}
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors rounded-lg"
+      >
+        <div className="flex items-center gap-2">
+          {filters.filtersCollapsed ? (
+            <ChevronRight className="w-4 h-4 text-gray-500" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-gray-500" />
+          )}
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters</span>
+          {activeFilterCount > 0 && (
+            <span className="px-2 py-0.5 text-xs bg-[#fc4c02] text-white rounded-full">
+              {activeFilterCount}
+            </span>
+          )}
+        </div>
+        <span className="text-sm text-gray-600 dark:text-gray-400">
+          {filteredCount === totalCount
+            ? `Matching all ${formatNumber(totalCount)} activities`
+            : `Matching ${formatNumber(filteredCount)} of ${formatNumber(totalCount)} activities`}
+        </span>
+      </button>
+
+      {/* Filter content */}
+      {!filters.filtersCollapsed && (
+      <div className="px-4 pb-4 space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
       {/* Search input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -535,22 +583,19 @@ export function SearchFilters({
         })()}
 
       </div>
-    </div>
 
-    {/* Results count and clear */}
-    <div className="flex items-center justify-between px-1 pt-2">
-      <span className="text-sm text-gray-600 dark:text-gray-400">
-        {filteredCount === totalCount
-          ? `Matching all ${formatNumber(totalCount)} activities`
-          : `Matching ${formatNumber(filteredCount)} of ${formatNumber(totalCount)} activities`}
-      </span>
+      {/* Clear all filters link */}
       {hasActiveFilters && (
-        <button
-          onClick={clearFilters}
-          className="text-sm text-[#fc4c02] hover:text-[#e34402] font-medium"
-        >
-          Clear all filters
-        </button>
+        <div className="px-4 pb-3 flex justify-end">
+          <button
+            onClick={clearFilters}
+            className="text-sm text-[#fc4c02] hover:text-[#e34402] font-medium"
+          >
+            Clear all filters
+          </button>
+        </div>
+      )}
+      </div>
       )}
     </div>
   </>
