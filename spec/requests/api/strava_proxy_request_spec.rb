@@ -63,6 +63,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           kudos_count: 17,
           gear_id: "b14918050",
           private: false,
+          enriched_at: nil,
           timezone: "America/Los_Angeles",
           strava_data: {
             average_heartrate: 115.0, max_heartrate: 167.0,
@@ -96,7 +97,7 @@ RSpec.describe "Strava Proxy API", type: :request do
 
       context "activity detail response" do
         let(:detail_target_attributes) do
-          target_attributes.merge(
+          target_attributes.except("enriched_at").merge(
             description: "Hawk with Eric and Scott and cedar",
             photos: {
               photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
@@ -276,6 +277,35 @@ RSpec.describe "Strava Proxy API", type: :request do
             expect(json_result["message"]).to eq "Internal Server Error"
             expect(StravaRequest.last.error?).to be_truthy
           end
+        end
+      end
+
+      context "enriched_since request" do
+        let!(:enriched_activity) do
+          FactoryBot.create(:strava_activity, :enriched, strava_integration:, strava_id: "111")
+        end
+        let!(:old_enriched_activity) do
+          FactoryBot.create(:strava_activity, strava_integration:, strava_id: "222",
+            enriched_at: Time.current - 2.hours)
+        end
+        let!(:unenriched_activity) do
+          FactoryBot.create(:strava_activity, strava_integration:, strava_id: "333")
+        end
+        let(:enriched_since_timestamp) { 1.hour.ago.to_i }
+
+        it "returns only recently enriched activities from local DB" do
+          expect {
+            post base_url, params: {
+              url: "athlete/activities?enriched_since=#{enriched_since_timestamp}",
+              method: "GET", access_token: token.token
+            }
+          }.to_not change(StravaRequest, :count)
+
+          expect(response.status).to eq 200
+          expect(json_result).to be_a(Array)
+          expect(json_result.length).to eq 1
+          expect(json_result.first["strava_id"]).to eq "111"
+          expect(json_result.first["enriched_at"]).to be_present
         end
       end
 

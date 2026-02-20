@@ -50,6 +50,7 @@ class StravaActivity < ApplicationRecord
     average_speed
     description
     distance_meters
+    enriched_at
     kudos_count
     moving_time_seconds
     photos
@@ -193,6 +194,6 @@ class StravaActivity < ApplicationRecord
   end
 
   def proxy_serialized
-    slice(*PROXY_ATTRS).merge(strava_data).merge("start_date_in_zone" => start_date_in_zone)
+    slice(*PROXY_ATTRS).merge(strava_data || {}).merge("start_date_in_zone" => start_date_in_zone)
   end
 end

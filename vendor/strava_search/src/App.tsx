@@ -14,7 +14,7 @@ function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const { syncState } = useAuth();
   const { autoEnrich } = usePreferences();
-  const { isSyncing, isFetchingFullData, progress, error: syncError, clearError: clearSyncError, fetchFullActivityData, syncAll } = useActivitySync();
+  const { isSyncing, isFetchingFullData, progress, error: syncError, clearError: clearSyncError, fetchFullActivityData, syncAll, syncEnriched } = useActivitySync();
   const {
     activities,
     filteredActivities,
@@ -113,6 +113,26 @@ function Dashboard() {
 
     return () => clearInterval(interval);
   }, [refreshActivities]);
+
+  // Auto-sync enriched activities every 30 minutes
+  useEffect(() => {
+    const THIRTY_MINUTES = 30 * 60 * 1000;
+
+    const maybeSync = () => {
+      if (isSyncing || isFetchingFullData || !syncState?.isInitialSyncComplete) return;
+      const elapsed = Date.now() - (syncState?.lastSyncedAt ?? 0);
+      if (elapsed >= THIRTY_MINUTES) {
+        syncEnriched();
+      }
+    };
+
+    // Check immediately on mount
+    maybeSync();
+
+    // Check every minute
+    const interval = setInterval(maybeSync, 60 * 1000);
+    return () => clearInterval(interval);
+  }, [isSyncing, isFetchingFullData, syncState?.lastSyncedAt, syncState?.isInitialSyncComplete, syncEnriched]);
 
   // Auto-start initial sync if no activities have been downloaded yet
   // Wait for isLoading to be false so IndexedDB has been checked first

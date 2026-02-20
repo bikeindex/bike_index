@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+cd "$(dirname "$0")/../vendor/strava_search"
+npm run build
+rm -f ../../public/strava_search/assets/index-*.css ../../public/strava_search/assets/index-*.js
+cp dist/assets/* ../../public/strava_search/assets/
+echo "Built and copied assets to public/strava_search/assets/"

@@ -9,6 +9,10 @@ FactoryBot.define do
     activity_type { "Ride" }
     start_date { Time.current - 1.day }
 
+    trait :enriched do
+      enriched_at { Time.current }
+    end
+
     trait :with_location do
       segment_locations { {"cities" => ["San Francisco"], "states" => ["California"], "countries" => ["United States"]} }
     end

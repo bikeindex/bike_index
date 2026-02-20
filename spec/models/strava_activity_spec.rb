@@ -148,6 +148,7 @@ RSpec.describe StravaActivity, type: :model do
         average_speed: 6.944,
         description: "Great ride",
         distance_meters: 25000.0,
+        enriched_at: nil,
         kudos_count: 10,
         moving_time_seconds: 3600,
         photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
