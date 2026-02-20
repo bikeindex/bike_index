@@ -103,7 +103,7 @@ RSpec.describe StravaSearchController, type: :request do
           expect(json_result[:error]).to eq "CSRF verification failed"
         end
 
-        it "refreshes the most recent expired token instead of creating a new one" do
+        it "revokes expired token and creates a new one" do
           expired_token = Doorkeeper::AccessToken.create!(
             application_id: strava_app.id,
             resource_owner_id: current_user.id,
@@ -114,11 +114,12 @@ RSpec.describe StravaSearchController, type: :request do
 
           expect {
             post strava_search_token_path
-          }.not_to change(Doorkeeper::AccessToken, :count)
+          }.to change(Doorkeeper::AccessToken, :count).by(1)
 
           expect(response.status).to eq 200
-          expect(json_result[:access_token]).to eq expired_token.token
-          expect(expired_token.reload.created_at).to be_within(2.seconds).of(Time.current)
+          expect(json_result[:access_token]).to be_present
+          expect(json_result[:access_token]).not_to eq expired_token.token
+          expect(expired_token.reload.revoked?).to be true
         end
       end
     end
