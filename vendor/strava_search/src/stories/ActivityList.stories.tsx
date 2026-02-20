@@ -32,7 +32,13 @@ const defaultFilters: SearchFilters = {
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
+  commuteFilter: 'all',
+  sufferScoreFrom: null,
+  sufferScoreTo: null,
+  kudosFrom: null,
+  kudosTo: null,
   page: 1,
+  filtersCollapsed: false,
 };
 
 const ActivityListWrapper = (args: React.ComponentProps<typeof ActivityList>) => {

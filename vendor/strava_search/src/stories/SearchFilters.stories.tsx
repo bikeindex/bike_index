@@ -32,7 +32,13 @@ const defaultFilters: SearchFiltersType = {
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
+  commuteFilter: 'all',
+  sufferScoreFrom: null,
+  sufferScoreTo: null,
+  kudosFrom: null,
+  kudosTo: null,
   page: 1,
+  filtersCollapsed: false,
 };
 
 const SearchFiltersWrapper = (args: React.ComponentProps<typeof SearchFilters>) => {
@@ -119,7 +125,13 @@ export const WithMultipleFilters: Story = {
       mutedFilter: 'all',
       photoFilter: 'all',
       privateFilter: 'all',
+      commuteFilter: 'all',
+      sufferScoreFrom: null,
+      sufferScoreTo: null,
+      kudosFrom: null,
+      kudosTo: null,
       page: 1,
+      filtersCollapsed: false,
     },
     onFiltersChange: () => {},
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike', 'VirtualRide', 'Walk'],
