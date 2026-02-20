@@ -64,6 +64,10 @@
           <td><%= check_mark if strava_activity.enriched? %></td>
 
           <td>
+            <% if strava_activity.photos&.dig("photo_url").present? %>
+              📷
+            <% end %>
+
             <span class="tw:mr-1"><%= strava_activity.title %></span>
 
             <%= link_to link_emoji, "https://www.strava.com/activities/#{strava_activity.strava_id}", title: "View on Strava" %>
