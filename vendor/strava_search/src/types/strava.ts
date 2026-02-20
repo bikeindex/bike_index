@@ -41,6 +41,7 @@ export interface StravaActivity {
   commute: boolean;
   muted: boolean;
   enriched: boolean;
+  enriched_at?: string | null;
   pr_count: number;
   device_name?: string;
   device_watts?: boolean;

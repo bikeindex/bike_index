@@ -5,6 +5,7 @@ import {
   getAthleteGear,
   getAthleteStats,
   getActivity,
+  fetchEnrichedSince,
 } from '../services/strava';
 import { formatNumber } from '../utils/formatters';
 import {
@@ -30,6 +31,7 @@ interface UseActivitySyncResult {
   clearError: () => void;
   syncAll: () => Promise<void>;
   syncRecent: () => Promise<void>;
+  syncEnriched: () => Promise<void>;
   fetchFullActivityData: (activityIds: number[], isForPage?: boolean) => Promise<void>;
 }
 
@@ -179,6 +181,35 @@ export function useActivitySync(): UseActivitySyncResult {
     }
   }, [athlete, isSyncing, refreshSyncState]);
 
+  const syncEnriched = useCallback(async () => {
+    if (!athlete || isSyncing || isFetchingFullData) return;
+
+    try {
+      const activities = await getActivitiesForAthlete(athlete.id);
+      const maxEnrichedAt = activities.reduce((max, activity) => {
+        if (!activity.enriched_at) return max;
+        const timestamp = Math.floor(new Date(activity.enriched_at).getTime() / 1000);
+        return timestamp > max ? timestamp : max;
+      }, 0);
+
+      const enrichedActivities = await fetchEnrichedSince(maxEnrichedAt);
+      if (enrichedActivities.length > 0) {
+        await saveActivities(
+          enrichedActivities.map(a => ({ ...a, enriched: true })),
+          athlete.id
+        );
+      }
+
+      const currentSyncState = await getSyncState(athlete.id);
+      if (currentSyncState) {
+        await updateSyncState({ ...currentSyncState, lastSyncedAt: Date.now() });
+        await refreshSyncState();
+      }
+    } catch (err) {
+      console.warn('Enriched sync failed:', err instanceof Error ? err.message : err);
+    }
+  }, [athlete, isSyncing, isFetchingFullData, refreshSyncState]);
+
   const fetchFullActivityData = useCallback(async (activityIds: number[], isForPage: boolean = false) => {
     if (!athlete || isSyncing || isFetchingFullData || activityIds.length === 0) return;
 
@@ -246,6 +277,7 @@ export function useActivitySync(): UseActivitySyncResult {
     clearError,
     syncAll,
     syncRecent,
+    syncEnriched,
     fetchFullActivityData,
   };
 }

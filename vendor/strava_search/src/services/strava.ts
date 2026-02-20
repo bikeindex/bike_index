@@ -234,6 +234,10 @@ export async function getAllActivities(
   return allActivities;
 }
 
+export async function fetchEnrichedSince(enrichedSince: number): Promise<StravaActivity[]> {
+  return apiRequest<StravaActivity[]>(`/athlete/activities?enriched_since=${enrichedSince}`);
+}
+
 export async function logout(): Promise<void> {
   await clearAuth();
 }
