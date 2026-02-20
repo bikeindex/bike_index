@@ -156,9 +156,9 @@
             .lock-group
               .image-column
                 - if @bikes.last.status_stolen?
-                  = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f622.png', alt: 'Crying, sad face'
+                  = image_tag 'icons/emoji-crying.png', alt: 'Crying, sad face'
                 - else
-                  = image_tag 'https://abs.twimg.com/emoji/v1/72x72/1f60a.png', alt: 'Happy, Smiling face'
+                  = image_tag 'icons/emoji-smiling.png', alt: 'Happy, Smiling face'
               .col-xs-10
                 %p
                   - if @bikes.count > 0

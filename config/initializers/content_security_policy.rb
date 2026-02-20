@@ -8,7 +8,7 @@ Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
     policy.font_src :self, "https://fonts.gstatic.com", :data
-    policy.img_src :self, "https://files.bikeindex.org", "https://www.facebook.com", :data
+    policy.img_src :self, "https://files.bikeindex.org", "https://uploads.bikeindex.org", "https://www.facebook.com", :data
     policy.object_src :none
     policy.script_src :self, :unsafe_inline,
       "https://www.googletagmanager.com",
@@ -21,7 +21,8 @@ Rails.application.configure do
       "https://api.mapbox.com"
     policy.style_src :self, :unsafe_inline,
       "https://fonts.googleapis.com",
-      "https://api.mapbox.com"
+      "https://api.mapbox.com",
+      "https://cdn.jsdelivr.net"
     policy.connect_src :self,
       "https://www.google-analytics.com",
       "https://www.googletagmanager.com",
