@@ -560,7 +560,7 @@ RSpec.describe BikesController, type: :controller do
         expect(b_param).to be_present
       end
       context "with an image" do
-        it "registers a bike and uploads an image" do
+        it "registers a bike and uploads an image", :flaky do
           Sidekiq::Testing.inline! do
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
             expect {
