@@ -118,7 +118,7 @@ export const WithMultipleFilters: Story = {
       equipmentExpanded: true,
       mutedFilter: 'all',
       photoFilter: 'all',
-    
+      privateFilter: 'all',
       page: 1,
     },
     onFiltersChange: () => {},
