@@ -2,6 +2,7 @@ interface StravaSearchConfig {
   tokenEndpoint: string;
   proxyEndpoint: string;
   athleteId: string;
+  reconnectUrl?: string;
 }
 
 interface TokenResponse {

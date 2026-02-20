@@ -3,12 +3,13 @@ import { useAuth } from './contexts/AuthContext';
 import { usePreferences } from './contexts/PreferencesContext';
 import { useActivities } from './hooks/useActivities';
 import { useActivitySync } from './hooks/useActivitySync';
+import { getConfig } from './services/railsApi';
 import { Header } from './components/Header';
 import { ErrorBanner } from './components/ErrorBanner';
 import { SearchFilters } from './components/SearchFilters';
 import { ActivityList } from './components/ActivityList';
 import { SettingsModal } from './components/SettingsModal';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
 function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
@@ -21,6 +22,7 @@ function Dashboard() {
     gear,
     isLoading,
     error,
+    insufficientPermissions,
     filters,
     setFilters,
     selectedIds,
@@ -32,6 +34,9 @@ function Dashboard() {
     refreshActivities,
     activityTypes,
   } = useActivities();
+
+  const config = getConfig();
+  const reconnectUrl = config.reconnectUrl;
 
   // Calculate displayed activities for current page
   const PAGE_SIZE = 50;
@@ -148,6 +153,23 @@ function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} />
       {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} />}
+
+      {(insufficientPermissions || reconnectUrl) && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+            <p className="text-sm text-amber-800">
+              Strava write permission is required to update activities.{' '}
+              <a
+                href={reconnectUrl || config.tokenEndpoint.replace('/strava_search/token', '/strava_integration/new?scope=strava_search')}
+                className="font-medium underline hover:text-amber-900"
+              >
+                Reconnect Strava with write access
+              </a>
+            </p>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {error && (

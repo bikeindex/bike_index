@@ -6,14 +6,16 @@ class StravaSearchController < ApplicationController
 
   def index
     unless current_user.strava_integration
-      return redirect_to new_strava_integration_path
+      return redirect_to new_strava_integration_path(scope: :strava_search)
     end
 
+    strava_integration = current_user.strava_integration
     @strava_search_config = {
       tokenEndpoint: strava_search_token_path,
       proxyEndpoint: api_strava_proxy_index_path,
-      athleteId: current_user.strava_integration.athlete_id
-    }
+      athleteId: strava_integration.athlete_id,
+      reconnectUrl: strava_integration.has_activity_write? ? nil : new_strava_integration_path(scope: :strava_search)
+    }.compact
     @strava_search_assets = if ENV["BUILD_STRAVA_SEARCH"] == "true"
       [{type: :script, src: "http://localhost:3143/strava_search/@vite/client"},
         {type: :react_refresh, src: "http://localhost:3143/strava_search/@react-refresh"},

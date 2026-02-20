@@ -8,7 +8,7 @@ import {
   type StoredActivity,
   type StoredGear,
 } from '../services/database';
-import { updateActivity as updateActivityApi } from '../services/strava';
+import { updateActivity as updateActivityApi, InsufficientPermissionsError } from '../services/strava';
 import { useUrlFilters } from './useUrlFilters';
 import type { SearchFilters, UpdatableActivity } from '../types/strava';
 
@@ -23,6 +23,7 @@ interface UseActivitiesResult {
   gear: StoredGear[];
   isLoading: boolean;
   error: string | null;
+  insufficientPermissions: boolean;
   filters: SearchFilters;
   setFilters: React.Dispatch<React.SetStateAction<SearchFilters>>;
   selectedIds: Set<number>;
@@ -50,6 +51,7 @@ export function useActivities(): UseActivitiesResult {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState<UpdateProgress | null>(null);
+  const [insufficientPermissions, setInsufficientPermissions] = useState(false);
 
   const loadActivities = useCallback(async (silent = false) => {
     if (!athlete) {
@@ -264,6 +266,8 @@ export function useActivities(): UseActivitiesResult {
       let successCount = 0;
       let current = 0;
 
+      let hitPermissionsError = false;
+
       for (const id of selectedIds) {
         try {
           // Update on Strava
@@ -274,6 +278,11 @@ export function useActivities(): UseActivitiesResult {
 
           successCount++;
         } catch (err) {
+          if (err instanceof InsufficientPermissionsError) {
+            setInsufficientPermissions(true);
+            hitPermissionsError = true;
+            break;
+          }
           errors.push(`Activity ${id}: ${err instanceof Error ? err.message : 'Failed'}`);
         }
 
@@ -288,7 +297,9 @@ export function useActivities(): UseActivitiesResult {
       setUpdateProgress({ current: total, total });
       await loadActivities();
 
-      if (errors.length > 0) {
+      if (hitPermissionsError) {
+        setError('Insufficient Strava permissions to update activities. Please reconnect your Strava account.');
+      } else if (errors.length > 0) {
         setError(`Updated ${successCount}/${selectedIds.size} activities. Errors: ${errors.join(', ')}`);
       }
 
@@ -305,6 +316,7 @@ export function useActivities(): UseActivitiesResult {
     gear,
     isLoading,
     error,
+    insufficientPermissions,
     filters,
     setFilters,
     selectedIds,

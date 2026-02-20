@@ -9,7 +9,8 @@ class StravaIntegrationsController < ApplicationController
   def new
     state = SecureRandom.hex(24)
     session[:strava_oauth_state] = state
-    redirect_to Integrations::StravaClient.authorization_url(state:), allow_other_host: true
+    scope = params[:scope] == "strava_search" ? Integrations::StravaClient::STRAVA_SEARCH_SCOPE : nil
+    redirect_to Integrations::StravaClient.authorization_url(state:, scope:), allow_other_host: true
   end
 
   def callback
