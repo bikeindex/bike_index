@@ -1,0 +1,69 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/athlete/activities/3333333
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 20 Feb 2026 00:16:11 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '15'
+      Server:
+      - istio-envoy
+      Status:
+      - 404 Not Found
+      Cache-Control:
+      - no-store
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Pragma:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - 48051e6f-1d50-42ee-b56b-7a32caf08b0c
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      Expires:
+      - Sat, 01 Jan 2000 00:00:00 GMT
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 744bd06c47c689d0ef4608fa37cf1bcc.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - xS-3hodaerqjx40LsWcVCzTNc0bqrGDlTP-ZjKnLi0b4YQex6EP5pw==
+    body:
+      encoding: ASCII-8BIT
+      string: '{"message":"Record Not Found","errors":[{"resource":"resource","field":"path","code":"invalid"}]}'
+  recorded_at: Fri, 20 Feb 2026 00:16:11 GMT
+recorded_with: VCR 6.3.1

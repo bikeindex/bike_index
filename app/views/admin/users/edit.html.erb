@@ -73,8 +73,8 @@
     <div class="col-lg-3 col-6">
       <div class="form-group">
         <div class="form-check form-check-inline">
-          <%= f.check_box :superuser, class: "form-check-input" %>
-          <%= f.label :superuser, class: "form-check-label" %>
+          <%= check_box_tag "user[superuser]", "1", @user.superuser?, class: "form-check-input", id: "user_superuser" %>
+          <%= label_tag "user_superuser", "superuser", class: "form-check-label" %>
         </div>
       </div>
 

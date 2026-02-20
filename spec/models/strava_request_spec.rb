@@ -93,6 +93,28 @@ RSpec.describe StravaRequest, type: :model do
     end
   end
 
+  describe "skip_request?" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
+
+    it "returns false for non-fetch_activity requests" do
+      strava_request = FactoryBot.create(:strava_request, :list_activities, strava_integration:)
+      expect(strava_request.skip_request?).to be false
+    end
+
+    it "returns false when activity is not enriched" do
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345")
+      strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
+      expect(strava_request.skip_request?).to be false
+    end
+
+    it "returns true when activity is already enriched" do
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
+        strava_data: {"enriched" => true})
+      strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
+      expect(strava_request.skip_request?).to be true
+    end
+  end
+
   describe ".estimated_current_rate_limit" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
     let(:rate_limit) do
@@ -138,8 +160,11 @@ RSpec.describe StravaRequest, type: :model do
         expect(result["short_limit"]).to eq 100
         expect(result["short_usage"]).to eq 0
         expect(result["read_short_usage"]).to eq 0
-        expect(result["long_usage"]).to eq 200
-        expect(result["read_long_usage"]).to eq 200
+        # Skip long usage check if boundary - 2.minutes crossed midnight UTC
+        unless Time.current.utc.beginning_of_day > boundary - 2.minutes
+          expect(result["long_usage"]).to eq 200
+          expect(result["read_long_usage"]).to eq 200
+        end
       end
     end
 

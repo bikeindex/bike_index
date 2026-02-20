@@ -335,6 +335,7 @@ Rails.application.routes.draw do
       get "*a", to: "api_v1#not_found"
     end
     resources :autocomplete, only: %i[index]
+    resources :strava_proxy, only: %i[create]
   end
   mount API::Base => "/api"
 
@@ -368,6 +369,8 @@ Rails.application.routes.draw do
   resources :info, only: %i[show]
 
   %w[stolen_bikes roadmap spokecard how_it_works].freeze.each { |p| get p, to: redirect("/resources") }
+
+  get "strava_search", to: "strava_search#index"
 
   mount Lookbook::Engine, at: "/lookbook"
 

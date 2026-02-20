@@ -69,8 +69,8 @@ RSpec.describe OrganizationExportJob, type: :job do
               street: "102 Washington Pl",
               street_2: "Apt Party",
               city: "State College",
-              state: "PA",
-              zipcode: "16801",
+              region_string: "PA",
+              postal_code: "16801",
               user_name: "Maya Skripal"
             })
         end
@@ -84,8 +84,8 @@ RSpec.describe OrganizationExportJob, type: :job do
             creation_registration_info: {
               street: "",
               city: "State College",
-              state: "PA",
-              zipcode: "16801",
+              region_string: "PA",
+              postal_code: "16801",
               user_name: "George Washington"
             })
         end
@@ -240,9 +240,9 @@ RSpec.describe OrganizationExportJob, type: :job do
       let(:export) { FactoryBot.create(:export_organization, organization: organization, progress: "pending", file: nil, user: user, options: export_options) }
       let(:registration_info) do
         {street: "717 Market St",
-         zipcode: "94103",
+         postal_code: "94103",
          city: "San Francisco",
-         state: "CA",
+         region_string: "CA",
          latitude: 40.7143528,
          longitude: -74.0059731,
          phone: "717.742.3423",
@@ -251,7 +251,7 @@ RSpec.describe OrganizationExportJob, type: :job do
       end
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, extra_registration_number: "cool extra serial", creation_registration_info: registration_info, cycle_type: "cargo", propulsion_type: "pedal-assist") }
       let!(:state) { FactoryBot.create(:state_california) }
-      let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id).merge(street_2: nil).as_json }
+      let(:target_address) { registration_info.except(:phone, :organization_affiliation, :student_id, :region_string, :postal_code).merge(street_2: nil, state: "CA", zipcode: "94103").as_json }
       include_context :geocoder_real # Include to verify that it isn't called except when expected
 
       context "with sticker" do

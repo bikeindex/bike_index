@@ -81,6 +81,7 @@ stolen_locations.each_with_index do |loc, i|
         zipcode: loc[:zipcode],
         state_id: ca_state&.id.to_s,
         country_id: us&.id.to_s,
+        skip_geocoding: true,
         theft_description: "Bike was locked on #{loc[:street]} and stolen overnight",
         locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
         lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
@@ -125,7 +126,8 @@ found_locations.each_with_index do |loc, i|
           city: loc[:city],
           zipcode: loc[:zipcode],
           state_id: ca_state&.id.to_s,
-          country_id: us&.id.to_s
+          country_id: us&.id.to_s,
+          skip_geocoding: true
         }
       }
     }

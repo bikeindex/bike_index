@@ -47,6 +47,13 @@ class Admin::StravaActivitiesController < Admin::BaseController
       strava_activities = strava_activities.where(activity_type: @searched_activity_type)
     end
 
+    @searched_enriched = params[:search_enriched]
+    if @searched_enriched == "true"
+      strava_activities = strava_activities.enriched
+    elsif @searched_enriched == "false"
+      strava_activities = strava_activities.not_enriched
+    end
+
     @time_range_column = sort_column if %w[updated_at start_date].include?(sort_column)
     @time_range_column ||= "created_at"
     strava_activities.where(@time_range_column => @time_range)

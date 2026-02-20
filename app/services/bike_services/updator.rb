@@ -36,9 +36,8 @@ class BikeServices::Updator
     update_api_components if @bike_params["components"].present?
     # Skips a few REGISTRATION_INFO_ATTRS
     update_attrs = @bike_params["bike"].except("stolen_records_attributes", "impound_records_attributes",
-      "address_record_attributes", "ios_version", "is_bulk", "is_new", "is_pos")
-
-    update_attrs.merge!(address_record_attributes(update_attrs, @bike_params["bike"]["address_record_attributes"]))
+      "ios_version", "is_bulk", "is_new", "is_pos")
+    update_attrs.merge!(address_record_attributes(@bike_params["bike"]["address_record_attributes"]))
 
     propulsion_updates = update_attrs.keys & %w[cycle_type cycle_type_name propulsion_type propulsion_type_slug]
     if propulsion_updates.any?
@@ -113,16 +112,12 @@ class BikeServices::Updator
     impound_record = @bike.current_impound_record
     return unless impound_params.present? && impound_record.present?
 
+    impound_record.timezone = impound_params.delete("timezone") if impound_params["timezone"].present?
     impound_record.update(impound_params)
   end
 
-  # TODO: Remove :update_attrs - only need address_record_attributes - once backfill is finished - #2922
-  def address_record_attributes(update_attrs, address_record_attributes)
-    if address_record_attributes.blank?
-      address_record_attributes = update_attrs.slice("city", "country_id", "street")
-        .merge(region_record_id: update_attrs["state_id"], postal_code: update_attrs["zipcode"])
-    end
-    return {} if address_record_attributes.values.reject(&:blank?).none?
+  def address_record_attributes(address_record_attributes)
+    return {} if address_record_attributes.blank? || address_record_attributes.values.reject(&:blank?).none?
 
     address_record_attributes["kind"] = "bike"
     address_record_attributes["bike_id"] = @bike.id

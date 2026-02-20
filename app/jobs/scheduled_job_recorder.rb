@@ -1,6 +1,6 @@
 module ScheduledJobRecorder
-  def perform(*args)
-    return super if args.present?
+  def perform(*args, **kwargs)
+    return super if args.present? || kwargs.present?
 
     record_scheduler_started
     super

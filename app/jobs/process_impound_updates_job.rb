@@ -31,10 +31,11 @@ class ProcessImpoundUpdatesJob < ApplicationJob
     else
       # We want to mark bikes no longer user hidden when they are impounded, so that public impound pages work
       impound_record.reload
+      bike_update_attrs = {updated_at: Time.current}
       if impound_record.unregistered_bike? && impound_record.current?
-        impound_record.bike&.marked_user_unhidden = true
+        bike_update_attrs[:marked_user_unhidden] = true
       end
-      impound_record.bike&.reload&.update(updated_at: Time.current)
+      impound_record.bike&.reload&.update(bike_update_attrs)
     end
   end
 

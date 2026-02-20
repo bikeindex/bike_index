@@ -1,0 +1,214 @@
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useAuth } from './contexts/AuthContext';
+import { usePreferences } from './contexts/PreferencesContext';
+import { useActivities } from './hooks/useActivities';
+import { useActivitySync } from './hooks/useActivitySync';
+import { Header } from './components/Header';
+import { ErrorBanner } from './components/ErrorBanner';
+import { SearchFilters } from './components/SearchFilters';
+import { ActivityList } from './components/ActivityList';
+import { LoginPage } from './components/LoginPage';
+import { SettingsModal } from './components/SettingsModal';
+import { InitialSyncPrompt } from './components/InitialSyncPrompt';
+import { Loader2 } from 'lucide-react';
+
+function Dashboard() {
+  const [showSettings, setShowSettings] = useState(false);
+  const { syncState } = useAuth();
+  const { autoEnrich } = usePreferences();
+  const { isSyncing, isFetchingFullData, progress, error: syncError, clearError: clearSyncError, fetchFullActivityData } = useActivitySync();
+  const {
+    activities,
+    filteredActivities,
+    gear,
+    isLoading,
+    error,
+    filters,
+    setFilters,
+    selectedIds,
+    setSelectedIds,
+    deselectAll,
+    updateSelectedActivities,
+    isUpdating,
+    updateProgress,
+    refreshActivities,
+    activityTypes,
+  } = useActivities();
+
+  // Calculate displayed activities for current page
+  const PAGE_SIZE = 50;
+  const currentPage = filters.page;
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const endIndex = Math.min(startIndex + PAGE_SIZE, filteredActivities.length);
+  const displayedActivityIds = useMemo(
+    () => filteredActivities.slice(startIndex, endIndex).map(a => a.id),
+    [filteredActivities, startIndex, endIndex]
+  );
+
+  // Stable key for the current page's activity IDs (only changes when IDs actually change)
+  const displayedActivityIdsKey = useMemo(
+    () => displayedActivityIds.join(','),
+    [displayedActivityIds]
+  );
+
+  // Expose fetchFullActivityData on window for console access
+  useEffect(() => {
+    (window as unknown as { fetchFullActivityData: (ids?: number[]) => void }).fetchFullActivityData = (ids?: number[]) => {
+      const isForPage = !ids;
+      const activityIds = ids ?? displayedActivityIds;
+      console.log(`Fetching full data for ${activityIds.length} activities${isForPage ? ' on this page' : ''}...`);
+      fetchFullActivityData(activityIds, isForPage);
+    };
+
+    return () => {
+      delete (window as unknown as { fetchFullActivityData?: unknown }).fetchFullActivityData;
+    };
+  }, [displayedActivityIds, fetchFullActivityData]);
+
+  // Auto-fetch full activity data when autoEnrich is enabled (only when page changes)
+  useEffect(() => {
+    if (!autoEnrich || isSyncing || isFetchingFullData || displayedActivityIds.length === 0) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      fetchFullActivityData(displayedActivityIds, true);
+    }, 1500);
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only trigger when the page's activity IDs change
+  }, [autoEnrich, displayedActivityIdsKey]);
+
+  // Refresh activities when settings modal closes (in case of sync)
+  const handleCloseSettings = useCallback(() => {
+    setShowSettings(false);
+    refreshActivities();
+  }, [refreshActivities]);
+
+  const handleToggleSelect = useCallback((id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, [setSelectedIds]);
+
+  // Auto-refresh activities while syncing or fetching full data
+  useEffect(() => {
+    if (isSyncing || isFetchingFullData) {
+      const interval = setInterval(() => {
+        refreshActivities(true); // Silent refresh to avoid page blink
+      }, 2000); // Refresh every 2 seconds during sync/fetch
+      return () => clearInterval(interval);
+    }
+  }, [isSyncing, isFetchingFullData, refreshActivities]);
+
+  // Auto-refresh activities periodically (every 5 minutes)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshActivities(true); // Silent refresh to avoid page blink
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [refreshActivities]);
+
+  // Show initial sync prompt only if no sync has started yet
+  const needsInitialSync = !syncState?.isInitialSyncComplete && !isSyncing && activities.length === 0;
+
+  if (needsInitialSync) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} />
+        {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} />}
+        <InitialSyncPrompt />
+        <SettingsModal isOpen={showSettings} onClose={handleCloseSettings} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} />
+      {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} />}
+
+      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            {error}
+          </div>
+        )}
+
+        <SearchFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          activityTypes={activityTypes}
+          gear={gear}
+          totalCount={activities.length}
+          filteredCount={filteredActivities.length}
+        />
+
+        <ActivityList
+          activities={filteredActivities}
+          gear={gear}
+          isLoading={isLoading}
+          selectedIds={selectedIds}
+          onToggleSelect={handleToggleSelect}
+          onSelectIds={(ids) => setSelectedIds(new Set(ids))}
+          onDeselectAll={deselectAll}
+          onUpdateSelected={updateSelectedActivities}
+          isUpdating={isUpdating}
+          filters={filters}
+          onFiltersChange={setFilters}
+        />
+      </main>
+
+      <SettingsModal isOpen={showSettings} onClose={handleCloseSettings} />
+
+      {/* Full-page updating overlay */}
+      {isUpdating && updateProgress && (
+        <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+            <div className="flex items-center justify-center mb-4">
+              <Loader2 className="w-8 h-8 text-[#fc4c02] animate-spin" />
+            </div>
+            <h2 className="text-xl font-semibold text-center mb-2">Updating Activities</h2>
+            <p className="text-gray-600 text-center mb-6">
+              {updateProgress.current} of {updateProgress.total} activities updated
+            </p>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div
+                className="bg-[#fc4c02] h-3 rounded-full transition-all duration-300"
+                style={{ width: `${(updateProgress.current / updateProgress.total) * 100}%` }}
+              />
+            </div>
+            <p className="text-sm text-gray-500 text-center mt-4">
+              Please wait while your activities are being updated on Strava...
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function App() {
+  const { isLoading, isAuthenticated } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#fc4c02] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  return <Dashboard />;
+}

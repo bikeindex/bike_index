@@ -38,7 +38,7 @@ RSpec.describe BikeServices::Displayer do
 
   describe "display_impound_claim?" do
     let(:bike) { Bike.new }
-    let(:admin) { User.new(superuser: true) }
+    let(:admin) { FactoryBot.create(:superuser) }
     let(:owner) { User.new }
     before { allow(bike).to receive(:owner) { owner } }
     it "is falsey if bike doesn't have impounded" do
@@ -108,7 +108,7 @@ RSpec.describe BikeServices::Displayer do
 
   describe "display_contact_owner?" do
     let(:bike) { Bike.new }
-    let(:admin) { User.new(superuser: true) }
+    let(:admin) { FactoryBot.create(:superuser) }
     let(:owner) { User.new }
     before { allow(bike).to receive(:owner) { owner } }
     it "is falsey if bike doesn't have stolen record" do
@@ -142,7 +142,7 @@ RSpec.describe BikeServices::Displayer do
     it "is falsey" do
       allow(bike).to receive(:owner) { owner }
       expect(BikeServices::Displayer.display_sticker_edit?(bike, owner)).to be_falsey
-      expect(BikeServices::Displayer.display_sticker_edit?(bike, User.new(superuser: true))).to be_truthy
+      expect(BikeServices::Displayer.display_sticker_edit?(bike, FactoryBot.create(:superuser))).to be_truthy
     end
     context "organization is a bike_sticker child" do
       let!(:organization_regional_child) { FactoryBot.create(:organization, :in_nyc) }
@@ -371,10 +371,11 @@ RSpec.describe BikeServices::Displayer do
           expect(BikeServices::Displayer.display_edit_address_fields?(bike, admin)).to be_falsey
         end
       end
-      context "bike street is present" do
-        before { bike.update(street: "444 something") }
+      context "bike address_record street is present" do
+        let!(:address_record) { FactoryBot.create(:address_record, street: "444 something", kind: :bike, bike: bike) }
+        before { bike.update(address_record:) }
         it "is truthy" do
-          expect(bike.reload.street).to eq "444 something"
+          expect(bike.reload.address_record.street).to eq "444 something"
           expect(BikeServices::Displayer.display_edit_address_fields?(bike, user)).to be_truthy
           expect(BikeServices::Displayer.send(:user_edit_bike_address?, bike, user)).to be_truthy
           expect(BikeServices::Displayer.edit_street_address?(bike, user)).to be_truthy
