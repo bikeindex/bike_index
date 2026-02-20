@@ -11,7 +11,7 @@ RSpec.describe StravaJobs::ProxyRequester do
   describe ".authorize_user_and_strava_integration" do
     let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
     let(:access_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
-    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
+    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
     it "returns error when strava integration is not synced" do
       expect(strava_integration.synced?).to be_falsey
@@ -31,7 +31,7 @@ RSpec.describe StravaJobs::ProxyRequester do
 
   describe ".find_or_create_access_token" do
     let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
-    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id.to_s) }
+    before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
     it "returns existing valid token" do
       existing_token = Doorkeeper::AccessToken.create!(

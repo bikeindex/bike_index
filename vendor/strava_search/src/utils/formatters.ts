@@ -77,16 +77,19 @@ export function formatElevation(meters: number, units: UnitSystem = 'metric'): s
 }
 
 export function formatDate(dateString: string): string {
+  if (!dateString) return '';
   const date = parseISO(dateString);
   return format(date, 'MMM d, yyyy');
 }
 
 export function formatDateTime(dateString: string): string {
+  if (!dateString) return '';
   const date = parseISO(dateString);
   return format(date, 'MMM d, yyyy h:mm a');
 }
 
 export function formatDateTimeTitle(dateString: string): string {
+  if (!dateString) return '';
   const date = parseISO(dateString);
 
   // Get timezone abbreviation using Intl API
@@ -100,6 +103,7 @@ export function formatDateTimeTitle(dateString: string): string {
 }
 
 export function formatTimeAgo(dateString: string): string {
+  if (!dateString) return '';
   const date = parseISO(dateString);
   return formatDistanceToNow(date, { addSuffix: true });
 }

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class StravaSearchController < ApplicationController
+  content_security_policy false, only: [:index]
   before_action :store_return_and_authenticate_user, only: [:index]
 
   def index

@@ -67,7 +67,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
 
   const [autoEnrich, setAutoEnrichState] = useState<boolean>(() => {
     const stored = getStoredPreferences();
-    return stored.autoEnrich ?? false;
+    return stored.autoEnrich ?? true;
   });
 
   // Derive units: user preference takes priority, then athlete country, then browser locale
