@@ -83,7 +83,7 @@ gem "aws-sdk-s3", "1.170", require: false # Used by ActiveStorage for Cloudflare
 gem "aws-sdk-core", "3.211" # Required for S3 compatibility, see github.com/rails/rails/issues/54374
 gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
-gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
+gem "facebookbusiness", "0.15.0.2" # For promoted alerts
 gem "down" # used to generate a local tempfile
 gem "faraday_middleware" # Manage faraday request flow
 

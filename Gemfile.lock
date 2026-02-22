@@ -7,18 +7,6 @@ GIT
       rails
 
 GIT
-  remote: https://github.com/facebook/facebook-ruby-business-sdk.git
-  revision: c64b51f862c2359d289a9aea6d317cf1218595aa
-  branch: main
-  specs:
-    facebookbusiness (0.15.0.2)
-      concurrent-ruby (~> 1.1)
-      countries (~> 3.0)
-      faraday (~> 1.0)
-      json (~> 2.2)
-      money (~> 6.13)
-
-GIT
   remote: https://github.com/mailchimp/mailchimp-marketing-ruby.git
   revision: 2cd67937bff16b42d38e0b0a918b4f2014c1a98c
   specs:
@@ -237,6 +225,12 @@ GEM
     erubi (1.13.1)
     excon (0.76.0)
     execjs (2.7.0)
+    facebookbusiness (0.15.0.2)
+      concurrent-ruby (~> 1.1)
+      countries (~> 3.0)
+      faraday (~> 1.0)
+      json (~> 2.2)
+      money (~> 6.13)
     factory_bot (6.2.1)
       activesupport (>= 5.0.0)
     factory_bot_rails (6.2.0)
@@ -890,7 +884,7 @@ DEPENDENCIES
   doorkeeper-i18n
   dotenv-rails
   down
-  facebookbusiness!
+  facebookbusiness (= 0.15.0.2)
   factory_bot_rails
   faraday_middleware
   fast_blank
