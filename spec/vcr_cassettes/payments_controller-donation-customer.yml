@@ -294,9 +294,9 @@ http_interactions:
       User-Agent:
       - Stripe/v1 RubyBindings/13.4.1
       X-Stripe-Client-Telemetry:
-      - '{"last_request_metrics":{"request_id":"req_KiVoyZ7cbnWm0X","request_duration_ms":395}}'
+      - '{"last_request_metrics":{"request_id":"req_mJg5q4DQQpKXWX","request_duration_ms":325}}'
       Idempotency-Key:
-      - e1bba56e-052f-41b2-b5ab-788887a9f2e2
+      - c87763f7-1b87-44a0-8d38-10ee979e2ffc
       Stripe-Version:
       - 2025-01-27.acacia
       Content-Type:
@@ -313,11 +313,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Fri, 30 Jan 2026 18:02:46 GMT
+      - Tue, 24 Feb 2026 18:23:05 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '3876'
+      - '3872'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -336,13 +336,13 @@ http_interactions:
       Content-Security-Policy:
       - base-uri 'none'; default-src 'none'; form-action 'none'; frame-ancestors 'none';
         img-src 'self'; script-src 'self' 'report-sample'; style-src 'self'; worker-src
-        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=e8e3HltZCV9O_yYKdQcA7Cuz4zObHUS71695werSR_L7ohIYWRkGPu6vqMJi48E6S_oyZsB2ovbEUZol
+        'none'; upgrade-insecure-requests; report-uri https://q.stripe.com/csp-violation?q=1BhH5EIvs7_cxwG8cRQTppPStQrNq6ApY3ZoMf2IIf8CHze3Vpyl1V66vf6sNxrVitHPvKTSaQPfUy2e
       Idempotency-Key:
-      - e1bba56e-052f-41b2-b5ab-788887a9f2e2
+      - c87763f7-1b87-44a0-8d38-10ee979e2ffc
       Original-Request:
-      - req_MzMTOKOR472pwK
+      - req_mOAC8gnQeDVgYS
       Request-Id:
-      - req_MzMTOKOR472pwK
+      - req_mOAC8gnQeDVgYS
       Stripe-Should-Retry:
       - 'false'
       Stripe-Version:
@@ -361,7 +361,7 @@ http_interactions:
       encoding: UTF-8
       string: |-
         {
-          "id": "cs_test_a1NCI66Y6S97vd6T9QwwoDevJVe4dEZHbdDcj0QjgQ2jJ6CN4DBr3Fur6u",
+          "id": "cs_test_a1Le1wSHjDlPIz77ploNX6bTt6gGWF70zSqJh3sAiQRlB8Mct2ineFYuzU",
           "object": "checkout.session",
           "adaptive_pricing": {
             "enabled": true
@@ -385,7 +385,7 @@ http_interactions:
             "font_family": "default",
             "icon": {
               "type": "url",
-              "url": "https://stripe-camo.global.ssl.fastly.net/b4482d0007d24b441c7905466ea522c2ee3dcc6a8eff7f58350343a828cf242e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f7374726970652d75706c6f6164732f616363745f324b736e6d3054304742665830767950554978456d65726368616e742d69636f6e2d3436393534342d42696b65496e6465784c6f676f2e706e67/6d65726368616e745f69643d616363745f324b736e6d30543047426658307679505549784526636c69656e743d5041594d454e545f50414745"
+              "url": "https://d1wqzb5bdbcre6.cloudfront.net/b4482d0007d24b441c7905466ea522c2ee3dcc6a8eff7f58350343a828cf242e/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f7374726970652d75706c6f6164732f616363745f324b736e6d3054304742665830767950554978456d65726368616e742d69636f6e2d3436393534342d42696b65496e6465784c6f676f2e706e67/6d65726368616e745f69643d616363745f324b736e6d30543047426658307679505549784526636c69656e743d5041594d454e545f50414745"
             },
             "logo": null
           },
@@ -399,7 +399,7 @@ http_interactions:
           },
           "consent": null,
           "consent_collection": null,
-          "created": 1769796166,
+          "created": 1771957385,
           "currency": "usd",
           "currency_conversion": null,
           "custom_fields": [],
@@ -424,7 +424,7 @@ http_interactions:
           },
           "customer_email": null,
           "discounts": [],
-          "expires_at": 1769882566,
+          "expires_at": 1772043784,
           "invoice": null,
           "invoice_creation": {
             "enabled": false,
@@ -487,8 +487,8 @@ http_interactions:
             "amount_tax": 0
           },
           "ui_mode": "hosted",
-          "url": "https://checkout.stripe.com/c/pay/cs_test_a1NCI66Y6S97vd6T9QwwoDevJVe4dEZHbdDcj0QjgQ2jJ6CN4DBr3Fur6u#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
+          "url": "https://checkout.stripe.com/c/pay/cs_test_a1Le1wSHjDlPIz77ploNX6bTt6gGWF70zSqJh3sAiQRlB8Mct2ineFYuzU#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWl9PQWxNZ19JVkdmZFFcbzV2N0RtMmhLYCcpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
           "wallet_options": null
         }
-  recorded_at: Fri, 30 Jan 2026 18:02:46 GMT
+  recorded_at: Tue, 24 Feb 2026 18:23:05 GMT
 recorded_with: VCR 6.3.1
