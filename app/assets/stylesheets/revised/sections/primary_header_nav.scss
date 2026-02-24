@@ -333,7 +333,8 @@ $mainmenu-open-zindex: 10;
 
 @media (max-width: $grid-breakpoint-sm) {
   .primary-header-nav.menu-in .hamburgler {
-    padding-right: 50%; // Don't break line on small screens
+    padding-right: 70%; // Don't break line on small screens
+    padding-left: 2%;
   }
 }
 
