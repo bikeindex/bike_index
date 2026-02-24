@@ -332,8 +332,11 @@ $mainmenu-open-zindex: 10;
 }
 
 @media (max-width: $grid-breakpoint-sm) {
+  // Cover up the nav item text and lines, so it scrolls under the hamburgler
+  // Don't break line on small screens
+  // NOTE: this isn't perfect - on bigger screens some of the line's visible to the right. good enuff
   .primary-header-nav.menu-in .hamburgler {
-    padding-right: 70%; // Don't break line on small screens
+    padding-right: 70%;
     padding-left: 2%;
   }
 }
