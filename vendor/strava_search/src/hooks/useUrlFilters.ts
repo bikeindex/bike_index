@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { SearchFilters, MutedFilter, PhotoFilter, PrivateFilter, CommuteFilter } from '../types/strava';
+import type { SearchFilters, MutedFilter, PhotoFilter, PrivateFilter, CommuteFilter, TrainerFilter } from '../types/strava';
 
 function filtersToParams(filters: SearchFilters): URLSearchParams {
   const params = new URLSearchParams();
@@ -34,6 +34,9 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.elevationTo !== null && filters.elevationTo !== undefined) {
     params.set('elevTo', filters.elevationTo.toString());
   }
+  if (!filters.filtersExpanded) {
+    params.set('filtersClosed', '1');
+  }
   if (!filters.activityTypesExpanded) {
     params.set('typesClosed', '1');
   }
@@ -51,6 +54,9 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   }
   if (filters.commuteFilter && filters.commuteFilter !== 'all') {
     params.set('commute', filters.commuteFilter);
+  }
+  if (filters.trainerFilter && filters.trainerFilter !== 'all') {
+    params.set('trainer', filters.trainerFilter);
   }
   if (filters.sufferScoreFrom !== null && filters.sufferScoreFrom !== undefined) {
     params.set('sufferFrom', filters.sufferScoreFrom.toString());
@@ -91,12 +97,14 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     distanceTo: distToStr ? parseFloat(distToStr) : null,
     elevationFrom: elevFromStr ? parseFloat(elevFromStr) : null,
     elevationTo: elevToStr ? parseFloat(elevToStr) : null,
+    filtersExpanded: params.get('filtersClosed') !== '1',
     activityTypesExpanded: params.get('typesClosed') !== '1',
     equipmentExpanded: params.get('gearClosed') !== '1',
     mutedFilter: (params.get('muted') as MutedFilter) || 'all',
     photoFilter: (params.get('photo') as PhotoFilter) || 'all',
     privateFilter: (params.get('private') as PrivateFilter) || 'all',
     commuteFilter: (params.get('commute') as CommuteFilter) || 'all',
+    trainerFilter: (params.get('trainer') as TrainerFilter) || 'all',
     sufferScoreFrom: sufferFromStr ? parseFloat(sufferFromStr) : null,
     sufferScoreTo: sufferToStr ? parseFloat(sufferToStr) : null,
     kudosFrom: kudosFromStr ? parseFloat(kudosFromStr) : null,

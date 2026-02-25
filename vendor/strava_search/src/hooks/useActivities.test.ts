@@ -36,12 +36,14 @@ const defaultFilters: SearchFilters = {
   distanceTo: null,
   elevationFrom: null,
   elevationTo: null,
+  filtersExpanded: true,
   activityTypesExpanded: true,
   equipmentExpanded: true,
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
   commuteFilter: 'all',
+  trainerFilter: 'all',
   sufferScoreFrom: null,
   sufferScoreTo: null,
   kudosFrom: null,
@@ -1010,6 +1012,59 @@ describe('useActivities', () => {
       });
 
       expect(result.current.activities[0].title).toBe('Updated');
+    });
+
+    it('preserves error during silent refresh', async () => {
+      mockActivities.push(createActivity({ id: 1 }));
+
+      const { result } = renderHook(() => useActivities());
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // Simulate an error by making the database throw on a non-silent refresh
+      const { getActivitiesForAthlete } = await import('../services/database');
+      vi.mocked(getActivitiesForAthlete).mockRejectedValueOnce(new Error('Load failed'));
+
+      await act(async () => {
+        await result.current.refreshActivities(false);
+      });
+
+      expect(result.current.error).toBe('Load failed');
+
+      // Restore successful database mock
+      vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([...mockActivities]);
+
+      // Silent refresh should not clear the error
+      await act(async () => {
+        await result.current.refreshActivities(true);
+      });
+
+      expect(result.current.error).toBe('Load failed');
+    });
+
+    it('clears error on non-silent refresh', async () => {
+      mockActivities.push(createActivity({ id: 1 }));
+
+      const { result } = renderHook(() => useActivities());
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // Simulate an error
+      const { getActivitiesForAthlete } = await import('../services/database');
+      vi.mocked(getActivitiesForAthlete).mockRejectedValueOnce(new Error('Load failed'));
+
+      await act(async () => {
+        await result.current.refreshActivities(false);
+      });
+
+      expect(result.current.error).toBe('Load failed');
+
+      // Non-silent refresh should clear the error
+      vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([...mockActivities]);
+
+      await act(async () => {
+        await result.current.refreshActivities(false);
+      });
+
+      expect(result.current.error).toBeNull();
     });
   });
 });

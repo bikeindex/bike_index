@@ -14,6 +14,7 @@ RSpec.describe "Strava Proxy API", type: :request do
       post base_url, params: {url: "athlete/activities", method: "GET"}
       expect(response.status).to eq 401
       expect(json_result[:error]).to eq "OAuth token required"
+      expect(StravaRequest.count).to eq 0
     end
   end
 
@@ -23,6 +24,7 @@ RSpec.describe "Strava Proxy API", type: :request do
       post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
       expect(response.status).to eq 403
       expect(json_result[:error]).to eq "Unauthorized application"
+      expect(StravaRequest.count).to eq 0
     end
   end
 
@@ -34,6 +36,20 @@ RSpec.describe "Strava Proxy API", type: :request do
         post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
         expect(response.status).to eq 404
         expect(json_result[:error]).to eq "No Strava integration"
+        expect(StravaRequest.count).to eq 0
+      end
+    end
+
+    context "with strava integration in error status" do
+      let!(:strava_integration) { FactoryBot.create(:strava_integration, user:, status: :error) }
+
+      it "returns 401 with reauth message and does not create a proxy request" do
+        expect {
+          post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
+        }.to_not change(StravaRequest, :count)
+        expect(response.status).to eq 401
+        expect(json_result[:error]).to eq "Strava authorization failed. Please re-authenticate with Strava."
+        expect(StravaRequest.count).to eq 0
       end
     end
 
@@ -44,6 +60,7 @@ RSpec.describe "Strava Proxy API", type: :request do
         post base_url, params: {url: "athlete/activities", method: "GET", access_token: token.token}
         expect(response.status).to eq 422
         expect(json_result[:error]).to eq "Strava integration not yet synced - status: syncing"
+        expect(StravaRequest.count).to eq 0
       end
     end
 
@@ -67,7 +84,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           timezone: "America/Los_Angeles",
           strava_data: {
             average_heartrate: 115.0, max_heartrate: 167.0,
-            device_name: "Strava App", commute: false,
+            device_name: "Strava App", commute: false, trainer: false,
             average_speed: 4.746, pr_count: 0,
             average_watts: 129.0, device_watts: false
           }
@@ -192,6 +209,7 @@ RSpec.describe "Strava Proxy API", type: :request do
               suffer_score: 2.0,
               strava_data: {
                 commute: false,
+                trainer: true,
                 muted: true,
                 pr_count: 0,
                 device_name: "Peloton Bike",

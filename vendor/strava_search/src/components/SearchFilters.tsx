@@ -50,6 +50,7 @@ export function SearchFilters({
     filters.photoFilter !== 'all' ||
     filters.privateFilter !== 'all' ||
     filters.commuteFilter !== 'all' ||
+    filters.trainerFilter !== 'all' ||
     filters.sufferScoreFrom !== null ||
     filters.sufferScoreTo !== null ||
     filters.kudosFrom !== null ||
@@ -72,11 +73,16 @@ export function SearchFilters({
       photoFilter: 'all',
       privateFilter: 'all',
       commuteFilter: 'all',
+      trainerFilter: 'all',
       sufferScoreFrom: null,
       sufferScoreTo: null,
       kudosFrom: null,
       kudosTo: null,
     });
+  };
+
+  const setFiltersExpanded = (expanded: boolean) => {
+    onFiltersChange({ ...filters, filtersExpanded: expanded });
   };
 
   const setActivityTypesExpanded = (expanded: boolean) => {
@@ -119,7 +125,7 @@ export function SearchFilters({
 
   return (
   <>
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-4">
+    <div className="space-y-4">
       {/* Search input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -140,87 +146,124 @@ export function SearchFilters({
         )}
       </div>
 
-      {/* Filter toggle section */}
+      {/* Filters accordion */}
       <div className="space-y-3">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setFiltersExpanded(!filters.filtersExpanded)}
+            className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Search Activity Properties</span>
+              {(() => {
+                const count = [
+                  filters.dateFrom, filters.dateTo,
+                  filters.distanceFrom !== null, filters.distanceTo !== null,
+                  filters.elevationFrom !== null, filters.elevationTo !== null,
+                  filters.mutedFilter !== 'all', filters.photoFilter !== 'all',
+                  filters.privateFilter !== 'all', filters.commuteFilter !== 'all',
+                  filters.trainerFilter !== 'all',
+                  filters.sufferScoreFrom !== null, filters.sufferScoreTo !== null,
+                  filters.kudosFrom !== null, filters.kudosTo !== null,
+                ].filter(Boolean).length;
+                return count > 0 ? (
+                  <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded-full">{count}</span>
+                ) : null;
+              })()}
+            </div>
+            <ChevronDown
+              className={`w-4 h-4 text-gray-500 transition-transform ${
+                filters.filtersExpanded ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          {filters.filtersExpanded && (
+          <div className="p-3 space-y-3 border-t border-gray-200 dark:border-gray-700">
+
         {/* Date and distance range */}
-        <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center mb-4">
+          <div className="flex gap-x-3">
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>From:</span>
+              <input
+                type="date"
+                value={filters.dateFrom || ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, dateFrom: e.target.value || null })
+                }
+                className={inputClasses}
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>To:</span>
+              <input
+                type="date"
+                value={filters.dateTo || ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, dateTo: e.target.value || null })
+                }
+                className={inputClasses}
+              />
+            </label>
+          </div>
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <span>From:</span>
-            <input
-              type="date"
-              value={filters.dateFrom || ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, dateFrom: e.target.value || null })
-              }
-              className={inputClasses}
-            />
-          </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <span>To:</span>
-            <input
-              type="date"
-              value={filters.dateTo || ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, dateTo: e.target.value || null })
-              }
-              className={inputClasses}
-            />
-          </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 ml-4">
-            <span>Distance:</span>
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={filters.distanceFrom ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, distanceFrom: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder={distanceUnit}
-              className={`w-20 ${inputClasses}`}
-            />
-            <span>to</span>
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={filters.distanceTo ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, distanceTo: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder={distanceUnit}
-              className={`w-20 ${inputClasses}`}
-            />
-            <span className="text-gray-400">{distanceUnit}</span>
-          </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 ml-4">
-            <span>Elevation:</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={filters.elevationFrom ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, elevationFrom: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder={elevationUnit}
-              className={`w-20 ${inputClasses}`}
-            />
-            <span>to</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={filters.elevationTo ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, elevationTo: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder={elevationUnit}
-              className={`w-20 ${inputClasses}`}
-            />
-            <span className="text-gray-400">{elevationUnit}</span>
-          </label>
-          <div className="flex ml-4">
+              <span>Distance (<span title={units === 'imperial' ? 'miles' : 'kilometers'}>{distanceUnit}</span>):</span>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={filters.distanceFrom ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, distanceFrom: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder={distanceUnit}
+                className={`w-16 ${inputClasses}`}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={filters.distanceTo ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, distanceTo: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder={distanceUnit}
+                className={`w-16 ${inputClasses}`}
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>Elevation (<span title={units === 'imperial' ? 'feet' : 'meters'}>{elevationUnit}</span>):</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.elevationFrom ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, elevationFrom: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder={elevationUnit}
+                className={`w-20 ${inputClasses}`}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.elevationTo ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, elevationTo: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder={elevationUnit}
+                className={`w-20 ${inputClasses}`}
+              />
+            </label>
+        </div>
+
+        {/* Toggle filters */}
+        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center mb-4">
+          <div className="flex">
             <button
               onClick={() => onFiltersChange({ ...filters, mutedFilter: filters.mutedFilter === 'muted' ? 'all' : 'muted' })}
               className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
@@ -242,7 +285,7 @@ export function SearchFilters({
               Not muted
             </button>
           </div>
-          <div className="flex ml-2">
+          <div className="flex">
             <button
               onClick={() => onFiltersChange({ ...filters, privateFilter: filters.privateFilter === 'private' ? 'all' : 'private' })}
               className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
@@ -264,7 +307,7 @@ export function SearchFilters({
               Not private
             </button>
           </div>
-          <div className="flex ml-2">
+          <div className="flex">
             <button
               onClick={() => onFiltersChange({ ...filters, photoFilter: filters.photoFilter === 'with_photo' ? 'all' : 'with_photo' })}
               className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
@@ -286,7 +329,7 @@ export function SearchFilters({
               No photo
             </button>
           </div>
-          <div className="flex ml-2">
+          <div className="flex">
             <button
               onClick={() => onFiltersChange({ ...filters, commuteFilter: filters.commuteFilter === 'commute' ? 'all' : 'commute' })}
               className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
@@ -308,62 +351,88 @@ export function SearchFilters({
               Not commute
             </button>
           </div>
+          <div className="flex">
+            <button
+              onClick={() => onFiltersChange({ ...filters, trainerFilter: filters.trainerFilter === 'trainer' ? 'all' : 'trainer' })}
+              className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
+                filters.trainerFilter === 'trainer'
+                  ? 'bg-[#fc4c02] text-white'
+                  : toggleInactive
+              }`}
+            >
+              Trainer
+            </button>
+            <button
+              onClick={() => onFiltersChange({ ...filters, trainerFilter: filters.trainerFilter === 'not_trainer' ? 'all' : 'not_trainer' })}
+              className={`px-3 py-1 text-sm rounded-r-full transition-colors ${
+                filters.trainerFilter === 'not_trainer'
+                  ? 'bg-[#fc4c02] text-white'
+                  : toggleInactive
+              }`}
+            >
+              Not trainer
+            </button>
+          </div>
         </div>
 
-        {/* Suffer score and kudos range */}
-        <div className="flex flex-wrap gap-3 items-center">
+        {/* Relative effort and kudos range */}
+        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <span>Suffer score:</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={filters.sufferScoreFrom ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, sufferScoreFrom: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder="min"
-              className={`w-20 ${inputClasses}`}
-            />
-            <span>to</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={filters.sufferScoreTo ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, sufferScoreTo: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder="max"
-              className={`w-20 ${inputClasses}`}
-            />
-          </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 ml-4">
-            <span>Kudos:</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={filters.kudosFrom ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, kudosFrom: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder="min"
-              className={`w-20 ${inputClasses}`}
-            />
-            <span>to</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={filters.kudosTo ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, kudosTo: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder="max"
-              className={`w-20 ${inputClasses}`}
-            />
-          </label>
+              <span>Relative effort:</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.sufferScoreFrom ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, sufferScoreFrom: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder="min"
+                className={`w-16 ${inputClasses}`}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.sufferScoreTo ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, sufferScoreTo: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder="max"
+                className={`w-16 ${inputClasses}`}
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>Kudos:</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.kudosFrom ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, kudosFrom: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder="min"
+                className={`w-16 ${inputClasses}`}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.kudosTo ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, kudosTo: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder="max"
+                className={`w-16 ${inputClasses}`}
+              />
+            </label>
+        </div>
+
+          </div>
+          )}
         </div>
 
         {/* Activity types accordion */}

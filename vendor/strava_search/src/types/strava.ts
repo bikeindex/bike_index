@@ -38,6 +38,7 @@ export interface StravaActivity {
   suffer_score?: number;
   gear_id?: string | null;
   private: boolean;
+  trainer: boolean;
   commute: boolean;
   muted: boolean;
   enriched: boolean;
@@ -149,6 +150,7 @@ export type MutedFilter = 'all' | 'muted' | 'not_muted';
 export type PhotoFilter = 'all' | 'with_photo' | 'without_photo';
 export type PrivateFilter = 'all' | 'private' | 'not_private';
 export type CommuteFilter = 'all' | 'commute' | 'not_commute';
+export type TrainerFilter = 'all' | 'trainer' | 'not_trainer';
 
 export interface SearchFilters {
   query: string;
@@ -161,12 +163,14 @@ export interface SearchFilters {
   distanceTo: number | null;
   elevationFrom: number | null;
   elevationTo: number | null;
+  filtersExpanded: boolean;
   activityTypesExpanded: boolean;
   equipmentExpanded: boolean;
   mutedFilter: MutedFilter;
   photoFilter: PhotoFilter;
   privateFilter: PrivateFilter;
   commuteFilter: CommuteFilter;
+  trainerFilter: TrainerFilter;
   sufferScoreFrom: number | null;
   sufferScoreTo: number | null;
   kudosFrom: number | null;

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
+@variant dark (&:is(.dark *));
 
 :root {
   --strava-orange: #fc4c02;

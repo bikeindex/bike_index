@@ -21,6 +21,7 @@ function Dashboard() {
     gear,
     isLoading,
     error,
+    clearError,
     filters,
     setFilters,
     selectedIds,
@@ -80,7 +81,7 @@ function Dashboard() {
   // Refresh activities when settings modal closes (in case of sync)
   const handleCloseSettings = useCallback(() => {
     setShowSettings(false);
-    refreshActivities();
+    refreshActivities(true);
   }, [refreshActivities]);
 
   const handleToggleSelect = useCallback((id: number) => {
@@ -147,14 +148,14 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header onOpenSettings={() => setShowSettings(true)} isFetchingFullData={isFetchingFullData} fetchProgress={progress} />
-      {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} />}
+      {(syncError || error) && (
+        <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-2">
+          {syncError && <ErrorBanner message={syncError} onDismiss={clearSyncError} />}
+          {error && <ErrorBanner message={error} onDismiss={clearError} />}
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {error && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400">
-            {error}
-          </div>
-        )}
 
         <SearchFilters
           filters={filters}

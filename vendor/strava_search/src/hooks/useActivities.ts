@@ -23,6 +23,7 @@ interface UseActivitiesResult {
   gear: StoredGear[];
   isLoading: boolean;
   error: string | null;
+  clearError: () => void;
   filters: SearchFilters;
   setFilters: React.Dispatch<React.SetStateAction<SearchFilters>>;
   selectedIds: Set<number>;
@@ -59,8 +60,8 @@ export function useActivities(): UseActivitiesResult {
 
     if (!silent) {
       setIsLoading(true);
+      setError(null);
     }
-    setError(null);
 
     try {
       const [loadedActivities, loadedGear] = await Promise.all([
@@ -240,6 +241,17 @@ export function useActivities(): UseActivitiesResult {
         }
       }
 
+      // Trainer filter
+      if (filters.trainerFilter === 'trainer') {
+        if (!activity.trainer) {
+          return false;
+        }
+      } else if (filters.trainerFilter === 'not_trainer') {
+        if (activity.trainer) {
+          return false;
+        }
+      }
+
       // Suffer score range filter
       if (filters.sufferScoreFrom !== null) {
         if (!activity.suffer_score || activity.suffer_score < filters.sufferScoreFrom) {
@@ -324,7 +336,7 @@ export function useActivities(): UseActivitiesResult {
       await loadActivities();
 
       if (errors.length > 0) {
-        setError(`Updated ${successCount}/${selectedIds.size} activities. Errors: ${errors.join(', ')}`);
+        setError(`Updated ${successCount}/${selectedIds.size} activities.\n${errors.join('\n')}`);
       }
 
       setSelectedIds(new Set());
@@ -340,6 +352,7 @@ export function useActivities(): UseActivitiesResult {
     gear,
     isLoading,
     error,
+    clearError: () => setError(null),
     filters,
     setFilters,
     selectedIds,

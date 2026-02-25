@@ -80,12 +80,7 @@ class Integrations::StravaClient
       raise ArgumentError, "Invalid proxy path" if path.blank? || path.match?(%r{://|\A//|(\A|/)\.\.(/|\z)})
       path = path.delete_prefix("/")
       ensure_valid_token!(strava_integration)
-      conn = api_connection(strava_integration)
-      case method.to_s.upcase
-      when "POST" then conn.post(path) { |req| req.body = body if body }
-      when "PUT" then conn.put(path) { |req| req.body = body if body }
-      else conn.get(path)
-      end
+      execute_proxy_request(strava_integration, path, method:, body:)
     end
 
     def delete_webhook_subscription(subscription_id)
@@ -95,8 +90,14 @@ class Integrations::StravaClient
     end
 
     def ensure_valid_token!(strava_integration)
-      return if strava_integration.token_expires_at.present? && strava_integration.token_expires_at > Time.current
+      return unless strava_integration.token_expired?
 
+      refresh_token!(strava_integration)
+    end
+
+    private
+
+    def refresh_token!(strava_integration)
       conn = oauth_connection
       resp = conn.post("oauth/token") do |req|
         req.body = {
@@ -106,22 +107,52 @@ class Integrations::StravaClient
           refresh_token: strava_integration.refresh_token
         }
       end
-      return unless resp.success?
-
-      data = resp.body
-      strava_integration.update(
-        access_token: data["access_token"],
-        refresh_token: data["refresh_token"],
-        token_expires_at: Time.at(data["expires_at"])
-      )
+      if resp.success?
+        data = resp.body
+        strava_integration.update(
+          access_token: data["access_token"],
+          refresh_token: data["refresh_token"],
+          token_expires_at: Time.at(data["expires_at"])
+        )
+      else
+        strava_integration.update(status: "error")
+        false
+      end
     end
 
-    private
+    def execute_proxy_request(strava_integration, path, method: "GET", body: nil)
+      conn = api_connection(strava_integration)
+      response = case method.to_s.upcase
+      when "POST" then conn.post(path) { |req| req.body = body if body }
+      when "PUT" then conn.put(path) { |req| req.body = body if body }
+      else conn.get(path)
+      end
+      return response unless response.status == 401
+
+      refresh_token!(strava_integration)
+      # Strava Integration failed to refresh the token, so return the original response
+      if strava_integration.error?
+        response
+      else
+        # Try the request again!
+        execute_proxy_request(strava_integration, path, method:, body:)
+      end
+    end
 
     def get(strava_integration, path, params = {})
       ensure_valid_token!(strava_integration)
-      api_connection(strava_integration).get(path) do |req|
+      response = api_connection(strava_integration).get(path) do |req|
         req.params = params
+      end
+      return response unless response.status == 401
+
+      refresh_token!(strava_integration)
+      # Strava Integration failed to refresh the token, so return the original response
+      if strava_integration.error?
+        response
+      else
+        # Try the request again!
+        get(strava_integration, path, params)
       end
     end
 

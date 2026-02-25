@@ -17,6 +17,7 @@ module StravaJobs
 
         strava_integration = user.strava_integration
         return {error: "No Strava integration", status: 404} unless strava_integration
+        return {error: "Strava authorization failed. Please re-authenticate with Strava.", status: 401} if strava_integration.error?
         return {error: "Strava integration not yet synced - status: #{strava_integration.status}", status: 422} unless strava_integration.synced?
 
         {user:, strava_integration:}

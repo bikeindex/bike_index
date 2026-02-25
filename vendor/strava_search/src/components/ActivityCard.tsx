@@ -53,37 +53,39 @@ export const ActivityCard = memo(function ActivityCard({
               />
             </label>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="text-lg">{getActivityIcon(activity.sport_type)}</span>
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  {formatActivityType(activity.sport_type)}
+              <div className="flex items-center gap-y-1 gap-x-4 flex-wrap mb-2">
+                <span className="flex items-center gap-1">
+                  <span className="text-lg leading-none">{getActivityIcon(activity.sport_type)}</span>
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    {formatActivityType(activity.sport_type)}
+                  </span>
                 </span>
                 {activityGear && (
                   <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full">
                     {activityGear.name}
+                    {activity.trainer && (
+                      <span className="text-gray-400 dark:text-gray-500"> · Trainer</span>
+                    )}
                   </span>
                 )}
-                <span className="text-xs text-gray-400">
-                  <span title={formatDateTimeTitle(activity.start_date_in_zone)}>
-                    {formatDate(activity.start_date_in_zone)}
+                {!activityGear && activity.trainer && (
+                  <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded-full">
+                    Trainer
                   </span>
-                  {activity.device_name && (
-                    <>
-                      {' · '}
-                      <span className="italic" title="Recorded by">
-                        {activity.device_name}
-                      </span>
-                    </>
-                  )}
-                  {(firstCity || firstState) && (
-                    <>
-                      {' · '}
-                      {[firstCity, firstState]
-                        .filter(Boolean)
-                        .join(', ')}
-                    </>
-                  )}
+                )}
+                <span className="text-xs text-gray-400" title={formatDateTimeTitle(activity.start_date_in_zone)}>
+                  {formatDate(activity.start_date_in_zone)}
                 </span>
+                {activity.device_name && (
+                  <span className="text-xs text-gray-400 italic" title="Recorded by">
+                    {activity.device_name}
+                  </span>
+                )}
+                {(firstCity || firstState) && (
+                  <span className="text-xs text-gray-400">
+                    {[firstCity, firstState].filter(Boolean).join(', ')}
+                  </span>
+                )}
               </div>
 
               <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
@@ -129,7 +131,9 @@ export const ActivityCard = memo(function ActivityCard({
               <div className="text-sm font-medium dark:text-gray-200">
                 {formatPace(activity.average_speed, activity.sport_type, units)}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">Pace/Speed</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                {['Run', 'Walk', 'Hike', 'VirtualRun', 'TrailRun'].includes(activity.sport_type) ? 'Avg pace' : 'Avg speed'}
+              </div>
             </div>
           </div>
 
@@ -145,12 +149,18 @@ export const ActivityCard = memo(function ActivityCard({
         </div>
 
         {/* Additional info */}
-        <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs text-gray-500 dark:text-gray-400">
           {activity.average_heartrate && (
             <div className="flex items-center gap-1">
               <Heart className="w-3 h-3 text-red-400" />
-              <span>{Math.round(activity.average_heartrate)} bpm avg</span>
+              <span title={activity.max_heartrate ? `Max heartrate: ${Math.round(activity.max_heartrate)} bpm` : undefined}>
+                {Math.round(activity.average_heartrate)} bpm avg
+              </span>
             </div>
+          )}
+
+          {activity.suffer_score != null && activity.suffer_score > 0 && (
+            <span title="Relative effort">effort {activity.suffer_score}</span>
           )}
 
           {activity.kudos_count > 0 && (
@@ -163,16 +173,12 @@ export const ActivityCard = memo(function ActivityCard({
             </span>
           )}
 
-          {activity.suffer_score != null && activity.suffer_score > 0 && (
-            <span>Suffer: {activity.suffer_score}</span>
-          )}
-
           {activity.commute && (
-            <span title="Commute">Commute</span>
+            <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full" title="Commute">Commute</span>
           )}
 
           {activity.muted && (
-            <span title="Not published to Home or Club feeds">Muted</span>
+            <span className="text-gray-300 dark:text-gray-600" title="Not published to Home or Club feeds">Muted</span>
           )}
 
           {activity.private && (
