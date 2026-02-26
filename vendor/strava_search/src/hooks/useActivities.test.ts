@@ -36,11 +36,18 @@ const defaultFilters: SearchFilters = {
   distanceTo: null,
   elevationFrom: null,
   elevationTo: null,
+  filtersExpanded: true,
   activityTypesExpanded: true,
   equipmentExpanded: true,
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
+  commuteFilter: 'all',
+  trainerFilter: 'all',
+  sufferScoreFrom: null,
+  sufferScoreTo: null,
+  kudosFrom: null,
+  kudosTo: null,
   page: 1,
 };
 
@@ -571,6 +578,196 @@ describe('useActivities', () => {
       });
     });
 
+    describe('commute filter', () => {
+      it('filters commute activities only', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, commute: true }),
+          createActivity({ id: 2, commute: false }),
+          createActivity({ id: 3, commute: true })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, commuteFilter: 'commute' as const }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([1, 3]);
+      });
+
+      it('filters non-commute activities only', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, commute: true }),
+          createActivity({ id: 2, commute: false }),
+          createActivity({ id: 3, commute: false })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, commuteFilter: 'not_commute' as const }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+
+      it('shows all activities when commute filter is all', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, commute: true }),
+          createActivity({ id: 2, commute: false })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+      });
+    });
+
+    describe('suffer score filter', () => {
+      it('filters by sufferScoreFrom', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, suffer_score: 10 }),
+          createActivity({ id: 2, suffer_score: 50 }),
+          createActivity({ id: 3, suffer_score: 100 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, sufferScoreFrom: 50 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+
+      it('filters by sufferScoreTo', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, suffer_score: 10 }),
+          createActivity({ id: 2, suffer_score: 50 }),
+          createActivity({ id: 3, suffer_score: 100 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, sufferScoreTo: 50 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([1, 2]);
+      });
+
+      it('filters by suffer score range', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, suffer_score: 10 }),
+          createActivity({ id: 2, suffer_score: 50 }),
+          createActivity({ id: 3, suffer_score: 75 }),
+          createActivity({ id: 4, suffer_score: 150 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({
+            ...prev,
+            sufferScoreFrom: 40,
+            sufferScoreTo: 100,
+          }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+
+      it('excludes activities without suffer_score when filter is set', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, suffer_score: 50 }),
+          createActivity({ id: 2, suffer_score: undefined }),
+          createActivity({ id: 3 }) // no suffer_score field
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, sufferScoreFrom: 10 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(1);
+        expect(result.current.filteredActivities[0].id).toBe(1);
+      });
+    });
+
+    describe('kudos count filter', () => {
+      it('filters by kudosFrom', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, kudos_count: 0 }),
+          createActivity({ id: 2, kudos_count: 5 }),
+          createActivity({ id: 3, kudos_count: 20 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, kudosFrom: 5 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+
+      it('filters by kudosTo', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, kudos_count: 0 }),
+          createActivity({ id: 2, kudos_count: 5 }),
+          createActivity({ id: 3, kudos_count: 20 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, kudosTo: 5 }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([1, 2]);
+      });
+
+      it('filters by kudos range', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, kudos_count: 0 }),
+          createActivity({ id: 2, kudos_count: 5 }),
+          createActivity({ id: 3, kudos_count: 10 }),
+          createActivity({ id: 4, kudos_count: 25 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({
+            ...prev,
+            kudosFrom: 3,
+            kudosTo: 15,
+          }));
+        });
+
+        expect(result.current.filteredActivities).toHaveLength(2);
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+    });
+
     describe('combined filters', () => {
       it('applies multiple filters together', async () => {
         mockActivities.push(
@@ -815,6 +1012,59 @@ describe('useActivities', () => {
       });
 
       expect(result.current.activities[0].title).toBe('Updated');
+    });
+
+    it('preserves error during silent refresh', async () => {
+      mockActivities.push(createActivity({ id: 1 }));
+
+      const { result } = renderHook(() => useActivities());
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // Simulate an error by making the database throw on a non-silent refresh
+      const { getActivitiesForAthlete } = await import('../services/database');
+      vi.mocked(getActivitiesForAthlete).mockRejectedValueOnce(new Error('Load failed'));
+
+      await act(async () => {
+        await result.current.refreshActivities(false);
+      });
+
+      expect(result.current.error).toBe('Load failed');
+
+      // Restore successful database mock
+      vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([...mockActivities]);
+
+      // Silent refresh should not clear the error
+      await act(async () => {
+        await result.current.refreshActivities(true);
+      });
+
+      expect(result.current.error).toBe('Load failed');
+    });
+
+    it('clears error on non-silent refresh', async () => {
+      mockActivities.push(createActivity({ id: 1 }));
+
+      const { result } = renderHook(() => useActivities());
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // Simulate an error
+      const { getActivitiesForAthlete } = await import('../services/database');
+      vi.mocked(getActivitiesForAthlete).mockRejectedValueOnce(new Error('Load failed'));
+
+      await act(async () => {
+        await result.current.refreshActivities(false);
+      });
+
+      expect(result.current.error).toBe('Load failed');
+
+      // Non-silent refresh should clear the error
+      vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([...mockActivities]);
+
+      await act(async () => {
+        await result.current.refreshActivities(false);
+      });
+
+      expect(result.current.error).toBeNull();
     });
   });
 });

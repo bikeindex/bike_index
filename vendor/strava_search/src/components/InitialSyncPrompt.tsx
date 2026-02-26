@@ -10,14 +10,14 @@ export function InitialSyncPrompt() {
         {isSyncing ? (
           <div className="space-y-4">
             <RefreshCw className="w-12 h-12 text-[#fc4c02] animate-spin mx-auto" />
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
               Downloading Your Activities
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               {progress?.status || 'Starting sync...'}
             </p>
             {progress && progress.loaded > 0 && (
-              <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                 <div
                   className="bg-[#fc4c02] h-full transition-all duration-300"
                   style={{
@@ -28,24 +28,24 @@ export function InitialSyncPrompt() {
                 />
               </div>
             )}
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               This may take a few minutes depending on how many activities you have.
             </p>
           </div>
         ) : (
           <div className="space-y-4">
             <Download className="w-12 h-12 text-[#fc4c02] mx-auto" />
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
               Welcome to Strava Search!
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               To get started, we need to download your activities from Strava.
               This is a one-time setup that stores everything locally in your
               browser.
             </p>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
                 {error}
               </div>
             )}
@@ -58,7 +58,7 @@ export function InitialSyncPrompt() {
               Download My Activities
             </button>
 
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Your data is stored only in your browser and never sent to any server
               except Strava's API.
             </p>

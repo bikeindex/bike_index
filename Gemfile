@@ -49,7 +49,7 @@ gem "translation"
 # Redis and Redis dependents
 gem "redis"
 gem "sidekiq" # Background job processing
-gem "connection_pool", "< 3" # temporary - see github.com/mperham/connection_pool/issues/212
+gem "connection_pool", "< 4" # temporary - see github.com/mperham/connection_pool/issues/212
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
 gem "sidekiq-logstash" # Better sidekiq logging
 gem "redlock" # Locking

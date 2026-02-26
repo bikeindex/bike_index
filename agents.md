@@ -31,6 +31,7 @@ This project uses Rspec for tests. All business logic should be tested.
 - Use request specs, not controller specs. Everything making the same request should be in a single test
 - Avoid testing private methods
 - Avoid mocking objects
+  - If making external requests, use VCR. Don't manually write VCR cassettes, record them by running the tests.
 
 ## Frontend Development
 

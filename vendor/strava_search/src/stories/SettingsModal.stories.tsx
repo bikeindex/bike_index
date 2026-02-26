@@ -1,77 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { X, Trash2, AlertTriangle, RefreshCw, Sun, Moon } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { usePreferences, type DarkMode } from '../contexts/PreferencesContext';
-import { useActivitySync } from '../hooks/useActivitySync';
-import {
-  clearAllData,
-  getActivitiesForAthlete,
-} from '../services/database';
 import { formatNumber, formatTimeAgo, formatDateTimeTitle } from '../utils/formatters';
+import { mockSyncState } from './mocks';
+import type { DarkMode } from '../contexts/PreferencesContext';
 
-interface SettingsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+// Presentational Settings Modal for stories (no context dependencies)
+interface SettingsModalStoryProps {
+  activityCount: number;
+  enrichedCount: number;
+  isSyncing: boolean;
+  progressStatus?: string;
+  showDevConfig: boolean;
 }
 
-function SettingsModalContent({ onClose }: { onClose: () => void }) {
-  const { athlete, syncState, logout } = useAuth();
-  const { units, setUnits, autoEnrich, setAutoEnrich, darkMode, setDarkMode } = usePreferences();
-  const isDev = import.meta.env.DEV;
-  const { isSyncing, progress, syncRecent } = useActivitySync();
-  const [activityCount, setActivityCount] = useState(0);
-  const [enrichedCount, setEnrichedCount] = useState(0);
+const darkModeOptions: { value: DarkMode; label: string; icon?: typeof Sun }[] = [
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'dark', label: 'Dark', icon: Moon },
+  { value: 'system', label: 'System' },
+];
+
+function SettingsModalStory({
+  activityCount,
+  enrichedCount,
+  isSyncing,
+  progressStatus,
+  showDevConfig,
+}: SettingsModalStoryProps) {
+  const [units, setUnits] = useState<'imperial' | 'metric'>('imperial');
+  const [darkMode, setDarkMode] = useState<DarkMode>('system');
+  const [autoEnrich, setAutoEnrich] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        // Only close if this is the topmost modal (no other modal overlay is above us)
-        const modals = document.querySelectorAll('[data-modal]');
-        const last = modals[modals.length - 1];
-        if (last?.getAttribute('data-modal') === 'settings') {
-          onClose();
-        }
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
-
-  useEffect(() => {
-    if (!athlete) return;
-
-    const fetchCounts = () => {
-      getActivitiesForAthlete(athlete.id).then((activities) => {
-        setActivityCount(activities.length);
-        const enriched = activities.filter(a => a.enriched).length;
-        setEnrichedCount(enriched);
-      });
-    };
-
-    fetchCounts();
-    const interval = setInterval(fetchCounts, 2000);
-    return () => clearInterval(interval);
-  }, [athlete]);
-
-  const handleClearData = async () => {
-    await clearAllData();
-    await logout();
-    onClose();
-  };
-
-  const darkModeOptions: { value: DarkMode; label: string; icon?: typeof Sun }[] = [
-    { value: 'light', label: 'Light', icon: Sun },
-    { value: 'dark', label: 'Dark', icon: Moon },
-    { value: 'system', label: 'System' },
-  ];
 
   return (
     <div data-modal="settings" className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1040] p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold dark:text-gray-100">Settings</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
             <X className="w-5 h-5 dark:text-gray-400" />
           </button>
         </div>
@@ -93,29 +59,26 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
                 </span>
                 <span className="font-medium dark:text-gray-200">{formatNumber(enrichedCount)}</span>
               </div>
-              {syncState && (
-                <div className="flex items-center justify-between mt-0.5 mb-4">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    Last synced:
-                  </span>
-                  <span
-                    className="font-medium dark:text-gray-200"
-                    title={formatDateTimeTitle(new Date(syncState.lastSyncedAt).toISOString())}
-                  >
-                    {formatTimeAgo(new Date(syncState.lastSyncedAt).toISOString())}
-                  </span>
-                </div>
-              )}
+              <div className="flex items-center justify-between mt-0.5 mb-4">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Last synced:
+                </span>
+                <span
+                  className="font-medium dark:text-gray-200"
+                  title={formatDateTimeTitle(new Date(mockSyncState.lastSyncedAt).toISOString())}
+                >
+                  {formatTimeAgo(new Date(mockSyncState.lastSyncedAt).toISOString())}
+                </span>
+              </div>
 
               <button
-                onClick={syncRecent}
                 disabled={isSyncing}
                 className="w-full py-2 bg-[#fc4c02] text-white rounded-lg hover:bg-[#e34402] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
               >
                 {isSyncing ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    {progress?.status || 'Syncing...'}
+                    {progressStatus || 'Syncing...'}
                   </>
                 ) : (
                   <>
@@ -197,7 +160,6 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
                       Cancel
                     </button>
                     <button
-                      onClick={handleClearData}
                       className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                     >
                       Delete All Data
@@ -217,8 +179,8 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* Dev configuration - only in dev mode */}
-        {isDev && (
+        {/* Dev configuration */}
+        {showDevConfig && (
           <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-100 dark:border-gray-600">
             <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Dev Configuration</h3>
             <div className="space-y-3">
@@ -252,7 +214,42 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  if (!isOpen) return null;
-  return <SettingsModalContent onClose={onClose} />;
-}
+const meta = {
+  title: 'Modals/Settings',
+  component: SettingsModalStory,
+  parameters: {
+    layout: 'fullscreen',
+  },
+  tags: ['autodocs'],
+} satisfies Meta<typeof SettingsModalStory>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
+    activityCount: 1247,
+    enrichedCount: 1180,
+    isSyncing: false,
+    showDevConfig: true,
+  },
+};
+
+export const Syncing: Story = {
+  args: {
+    activityCount: 1247,
+    enrichedCount: 1180,
+    isSyncing: true,
+    progressStatus: '450 of ~1,200 activities synced',
+    showDevConfig: true,
+  },
+};
+
+export const Production: Story = {
+  args: {
+    activityCount: 1247,
+    enrichedCount: 1180,
+    isSyncing: false,
+    showDevConfig: false,
+  },
+};

@@ -14,10 +14,13 @@ RSpec.describe StravaIntegrationsController, type: :request do
     context "logged in" do
       include_context :request_spec_logged_in_as_user
 
-      it "redirects to Strava authorization with state parameter" do
+      it "redirects to Strava authorization with state and DEFAULT_SCOPE" do
         get "/strava_integration/new"
         expect(response).to redirect_to(/strava\.com\/oauth\/authorize/)
-        expect(response.location).to include("state=")
+        location = response.location
+        expect(location).to include("state=")
+        scope_param = CGI.parse(URI.parse(location).query)["scope"].first
+        expect(scope_param).to eq Integrations::StravaClient::DEFAULT_SCOPE
       end
     end
   end

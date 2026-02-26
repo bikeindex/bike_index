@@ -23,7 +23,7 @@ interface UseActivitiesResult {
   gear: StoredGear[];
   isLoading: boolean;
   error: string | null;
-  insufficientPermissions: boolean;
+  clearError: () => void;
   filters: SearchFilters;
   setFilters: React.Dispatch<React.SetStateAction<SearchFilters>>;
   selectedIds: Set<number>;
@@ -61,8 +61,8 @@ export function useActivities(): UseActivitiesResult {
 
     if (!silent) {
       setIsLoading(true);
+      setError(null);
     }
-    setError(null);
 
     try {
       const [loadedActivities, loadedGear] = await Promise.all([
@@ -231,6 +231,52 @@ export function useActivities(): UseActivitiesResult {
         }
       }
 
+      // Commute filter
+      if (filters.commuteFilter === 'commute') {
+        if (!activity.commute) {
+          return false;
+        }
+      } else if (filters.commuteFilter === 'not_commute') {
+        if (activity.commute) {
+          return false;
+        }
+      }
+
+      // Trainer filter
+      if (filters.trainerFilter === 'trainer') {
+        if (!activity.trainer) {
+          return false;
+        }
+      } else if (filters.trainerFilter === 'not_trainer') {
+        if (activity.trainer) {
+          return false;
+        }
+      }
+
+      // Suffer score range filter
+      if (filters.sufferScoreFrom !== null) {
+        if (!activity.suffer_score || activity.suffer_score < filters.sufferScoreFrom) {
+          return false;
+        }
+      }
+      if (filters.sufferScoreTo !== null) {
+        if (!activity.suffer_score || activity.suffer_score > filters.sufferScoreTo) {
+          return false;
+        }
+      }
+
+      // Kudos count range filter
+      if (filters.kudosFrom !== null) {
+        if (activity.kudos_count < filters.kudosFrom) {
+          return false;
+        }
+      }
+      if (filters.kudosTo !== null) {
+        if (activity.kudos_count > filters.kudosTo) {
+          return false;
+        }
+      }
+
       return true;
     });
   }, [activities, filters, units]);
@@ -297,10 +343,8 @@ export function useActivities(): UseActivitiesResult {
       setUpdateProgress({ current: total, total });
       await loadActivities();
 
-      if (hitPermissionsError) {
-        setError('Insufficient Strava permissions to update activities. Please reconnect your Strava account.');
-      } else if (errors.length > 0) {
-        setError(`Updated ${successCount}/${selectedIds.size} activities. Errors: ${errors.join(', ')}`);
+      if (errors.length > 0) {
+        setError(`Updated ${successCount}/${selectedIds.size} activities.\n${errors.join('\n')}`);
       }
 
       setSelectedIds(new Set());
@@ -316,7 +360,7 @@ export function useActivities(): UseActivitiesResult {
     gear,
     isLoading,
     error,
-    insufficientPermissions,
+    clearError: () => setError(null),
     filters,
     setFilters,
     selectedIds,

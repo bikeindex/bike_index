@@ -17,6 +17,7 @@ vi.mock('../services/strava', () => ({
   getAthleteStats: vi.fn(() => Promise.resolve(100)),
   getAllActivities: vi.fn(() => Promise.resolve([])),
   getActivity: vi.fn(() => Promise.resolve({ id: 1, name: 'Test', muted: false })),
+  fetchEnrichedSince: vi.fn(() => Promise.resolve([])),
 }));
 
 vi.mock('../services/database', () => ({
@@ -82,6 +83,50 @@ describe('useActivitySync', () => {
       await waitFor(() => {
         expect(result.current.error).toBeNull();
       });
+    });
+  });
+
+  describe('syncEnriched', () => {
+    it('passes max enriched_at timestamp to fetchEnrichedSince', async () => {
+      const { fetchEnrichedSince } = await import('../services/strava');
+      const { getActivitiesForAthlete } = await import('../services/database');
+
+      const enrichedAt1 = '2026-02-20T10:00:00Z';
+      const enrichedAt2 = '2026-02-22T15:30:00Z';
+      const enrichedAt3 = null;
+
+      vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([
+        { id: 1, enriched_at: enrichedAt1, athleteId: 12345, syncedAt: Date.now() },
+        { id: 2, enriched_at: enrichedAt2, athleteId: 12345, syncedAt: Date.now() },
+        { id: 3, enriched_at: enrichedAt3, athleteId: 12345, syncedAt: Date.now() },
+      ] as never);
+
+      const { result } = renderHook(() => useActivitySync());
+
+      await act(async () => {
+        await result.current.syncEnriched();
+      });
+
+      const expectedTimestamp = Math.floor(new Date(enrichedAt2).getTime() / 1000);
+      expect(fetchEnrichedSince).toHaveBeenCalledWith(expectedTimestamp);
+    });
+
+    it('passes 0 when no activities have enriched_at', async () => {
+      const { fetchEnrichedSince } = await import('../services/strava');
+      const { getActivitiesForAthlete } = await import('../services/database');
+
+      vi.mocked(getActivitiesForAthlete).mockResolvedValueOnce([
+        { id: 1, enriched_at: null, athleteId: 12345, syncedAt: Date.now() },
+        { id: 2, enriched_at: null, athleteId: 12345, syncedAt: Date.now() },
+      ] as never);
+
+      const { result } = renderHook(() => useActivitySync());
+
+      await act(async () => {
+        await result.current.syncEnriched();
+      });
+
+      expect(fetchEnrichedSince).toHaveBeenCalledWith(0);
     });
   });
 
