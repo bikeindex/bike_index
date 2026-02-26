@@ -101,21 +101,78 @@ RSpec.describe StravaIntegrationsController, type: :request do
           end
         end
 
-        context "user already has strava integration" do
-          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user) }
+        context "with strava_search scope" do
+          it "redirects to strava_search" do
+            oauth_state = initiate_oauth_flow
+            VCR.use_cassette("strava-exchange_token") do
+              get "/strava_integration/callback",
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+              expect(response).to redirect_to(strava_search_path)
+              expect(flash[:success]).to match(/connected/i)
+              expect(current_user.reload.strava_integration.strava_permissions).to eq Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+            end
+          end
+        end
 
-          it "disconnects old integration and creates new one" do
+        context "user already has strava integration with same athlete" do
+          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "2430215") }
+
+          it "updates existing integration without creating a new one" do
+            oauth_state = initiate_oauth_flow
+            VCR.use_cassette("strava-exchange_token") do
+              expect {
+                get "/strava_integration/callback",
+                  params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::DEFAULT_SCOPE}
+              }.to change(StravaIntegration, :count).by(0)
+                .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(0)
+
+              expect(response).to redirect_to(my_account_path)
+              expect(flash[:success]).to eq "Strava connected! Updating your activities."
+
+              strava_integration = current_user.reload.strava_integration
+              expect(strava_integration.id).to eq existing.id
+              expect(strava_integration.access_token).to be_present
+              expect(strava_integration.strava_permissions).to eq Integrations::StravaClient::DEFAULT_SCOPE
+            end
+          end
+        end
+
+        context "user already has strava integration with error status" do
+          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "2430215", status: :error) }
+
+          it "destroys existing and creates new integration" do
             oauth_state = initiate_oauth_flow
             VCR.use_cassette("strava-exchange_token") do
               expect {
                 get "/strava_integration/callback", params: {code: "test_auth_code", state: oauth_state}
               }.to change(StravaIntegration, :count).by(0)
                 .and change(StravaIntegration.with_deleted, :count).by(1)
+                .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(1)
 
               existing.reload
               expect(existing.deleted_at).to be_present
-              expect(existing.access_token).to eq("")
-              expect(existing.refresh_token).to eq("")
+
+              new_integration = current_user.reload.strava_integration
+              expect(new_integration.id).not_to eq(existing.id)
+              expect(flash[:success]).to match(/being synced/i)
+            end
+          end
+        end
+
+        context "user already has strava integration with different athlete" do
+          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "9999999") }
+
+          it "destroys existing and creates new integration" do
+            oauth_state = initiate_oauth_flow
+            VCR.use_cassette("strava-exchange_token") do
+              expect {
+                get "/strava_integration/callback", params: {code: "test_auth_code", state: oauth_state}
+              }.to change(StravaIntegration, :count).by(0)
+                .and change(StravaIntegration.with_deleted, :count).by(1)
+                .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(1)
+
+              existing.reload
+              expect(existing.deleted_at).to be_present
 
               new_integration = current_user.reload.strava_integration
               expect(new_integration.id).not_to eq(existing.id)

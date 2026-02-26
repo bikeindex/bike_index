@@ -49,6 +49,8 @@
 
     <div class="dropdown-menu">
       <%= link_to "All statuses", url_for(sortable_search_params.merge(search_response_status: nil)), class: "dropdown-item #{params[:search_response_status].present? ? '' : 'active'}" %>
+      <%= link_to "Pending or successful", url_for(sortable_search_params.merge(search_response_status: "pending_or_success")), class: "dropdown-item #{params[:search_response_status] == 'pending_or_success' ? 'active' : ''}" %>
+      <%= link_to "Not successful", url_for(sortable_search_params.merge(search_response_status: "not_successful")), class: "dropdown-item #{params[:search_response_status] == 'not_successful' ? 'active' : ''}" %>
 
       <div class="dropdown-divider"></div>
 

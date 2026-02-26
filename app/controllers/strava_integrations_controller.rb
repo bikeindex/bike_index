@@ -34,19 +34,15 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    current_user.strava_integration&.destroy
-    strava_integration = current_user.create_strava_integration!(
-      access_token: token_data["access_token"],
-      refresh_token: token_data["refresh_token"],
-      token_expires_at: Time.at(token_data["expires_at"]),
-      athlete_id: token_data.dig("athlete", "id")&.to_s,
-      strava_permissions: params[:scope]
-    )
+    strava_integration = find_or_create_strava_integration(token_data)
 
-    StravaJobs::FetchAthleteAndStats.perform_async(strava_integration.id)
-
-    flash[:success] = "Strava connected! Your activities are being synced."
-    redirect_to my_account_path
+    if strava_integration.previously_new_record?
+      StravaJobs::FetchAthleteAndStats.perform_async(strava_integration.id)
+      flash[:success] = "Strava connected! Your activities are being synced."
+    else
+      flash[:success] = "Strava connected! Updating your activities."
+    end
+    redirect_to strava_integration.has_activity_write? ? strava_search_path : my_account_path
   end
 
   def destroy
@@ -75,6 +71,28 @@ class StravaIntegrationsController < ApplicationController
     unless @strava_integration
       flash[:error] = "No Strava integration found."
       redirect_to my_account_path
+    end
+  end
+
+  def token_attrs(token_data)
+    {
+      access_token: token_data["access_token"],
+      refresh_token: token_data["refresh_token"],
+      token_expires_at: Time.at(token_data["expires_at"]),
+      athlete_id: token_data.dig("athlete", "id")&.to_s,
+      strava_permissions: params[:scope]
+    }
+  end
+
+  def find_or_create_strava_integration(token_data)
+    attrs = token_attrs(token_data)
+    existing_strava_integration = current_user.strava_integration
+    if existing_strava_integration&.athlete_id == attrs[:athlete_id] && !existing_strava_integration.error?
+      existing_strava_integration.update!(attrs)
+      existing_strava_integration
+    else
+      existing_strava_integration&.destroy
+      current_user.create_strava_integration!(attrs)
     end
   end
 end

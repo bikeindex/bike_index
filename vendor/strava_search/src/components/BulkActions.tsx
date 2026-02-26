@@ -16,6 +16,8 @@ interface BulkActionsProps {
   onUpdateSelected: (updates: UpdatableActivity) => Promise<void>;
   isUpdating: boolean;
   gear: StoredGear[];
+  hasActivityWrite: boolean;
+  authUrl: string;
 }
 
 const selectClasses = 'w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none';
@@ -31,8 +33,11 @@ export function BulkActions({
   onUpdateSelected,
   isUpdating,
   gear,
+  hasActivityWrite,
+  authUrl,
 }: BulkActionsProps) {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const goToPage = (page: number) => {
     const validPage = Math.max(1, Math.min(page, totalPages));
@@ -43,6 +48,15 @@ export function BulkActions({
   const [selectedGearId, setSelectedGearId] = useState('');
   const [commuteValue, setCommuteValue] = useState<boolean | null>(null);
   const [trainerValue, setTrainerValue] = useState<boolean | null>(null);
+
+  const openEdit = (type: 'type' | 'gear' | 'commute' | 'trainer') => {
+    if (!hasActivityWrite) {
+      setShowAuthModal(true);
+      return;
+    }
+    setEditType(type);
+    setShowEditModal(true);
+  };
 
   const handleUpdate = async () => {
     // Close modal first so only the full-page progress overlay is visible
@@ -146,10 +160,7 @@ export function BulkActions({
       {selectedCount > 0 && (
         <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3">
           <button
-            onClick={() => {
-              setEditType('type');
-              setShowEditModal(true);
-            }}
+            onClick={() => openEdit('type')}
             disabled={isUpdating}
             className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
@@ -162,10 +173,7 @@ export function BulkActions({
           </button>
 
           <button
-            onClick={() => {
-              setEditType('gear');
-              setShowEditModal(true);
-            }}
+            onClick={() => openEdit('gear')}
             disabled={isUpdating}
             className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
@@ -178,10 +186,7 @@ export function BulkActions({
           </button>
 
           <button
-            onClick={() => {
-              setEditType('commute');
-              setShowEditModal(true);
-            }}
+            onClick={() => openEdit('commute')}
             disabled={isUpdating}
             className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
@@ -194,10 +199,7 @@ export function BulkActions({
           </button>
 
           <button
-            onClick={() => {
-              setEditType('trainer');
-              setShowEditModal(true);
-            }}
+            onClick={() => openEdit('trainer')}
             disabled={isUpdating}
             className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
@@ -208,6 +210,32 @@ export function BulkActions({
             )}
             Trainer/Indoor
           </button>
+        </div>
+      )}
+
+      {/* Authorization Modal */}
+      {showAuthModal && (
+        <div data-modal="auth" className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1040] p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold dark:text-gray-100">Authorization Required</h3>
+              <button
+                onClick={() => setShowAuthModal(false)}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              >
+                <X className="w-5 h-5 dark:text-gray-400" />
+              </button>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              You need to authorize updating Strava Activities
+            </p>
+            <a
+              href={authUrl}
+              className="block w-full px-4 py-2 bg-[#fc4c02] text-white rounded-lg hover:bg-[#e34402] transition-colors text-center"
+            >
+              Authorize
+            </a>
+          </div>
         </div>
       )}
 
