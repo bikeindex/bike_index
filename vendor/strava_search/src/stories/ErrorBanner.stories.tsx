@@ -40,6 +40,10 @@ export const SessionExpired: Story = {
 };
 
 export const MultipleErrors: Story = {
+  args: {
+    message: 'Sync failed.',
+    onDismiss: () => {},
+  },
   decorators: [
     () => (
       <div className="relative min-h-[400px] bg-gray-50 dark:bg-gray-900">

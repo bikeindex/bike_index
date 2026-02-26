@@ -21,11 +21,75 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       X-RateLimit-Limit:
-      - "100,1000"
+      - '100,1000'
       X-RateLimit-Usage:
-      - "42,350"
+      - '42,350'
     body:
       encoding: UTF-8
       string: '{"message":"Authorization Error","errors":[{"resource":"Athlete","field":"access_token","code":"invalid"}]}'
   recorded_at: Sun, 08 Feb 2026 22:46:00 GMT
-recorded_with: VCR 6.3.1
+- request:
+    method: post
+    uri: https://www.strava.com/oauth/token
+    body:
+      encoding: UTF-8
+      string: client_id=<STRAVA_KEY>&client_secret=<STRAVA_SECRET>&grant_type=refresh_token&refresh_token=strava_test_refresh_token_456
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Thu, 26 Feb 2026 02:19:43 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '18'
+      Server:
+      - istio-envoy
+      Status:
+      - 400 Bad Request
+      Cache-Control:
+      - no-cache
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - 35f7d14c-6e94-475e-9b98-cc8b82b44895
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 2aaae4c3e73a4a56fa0cd5cd6e4851e6.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P5
+      X-Amz-Cf-Id:
+      - xk5fqF6zpCjE3QmaRF3J_sP4tpeJZzLMqknfJrSqkuE1iE-Y8gMrGQ==
+    body:
+      encoding: UTF-8
+      string: '{"message":"Bad Request","errors":[{"resource":"RefreshToken","field":"refresh_token","code":"invalid"}]}'
+  recorded_at: Thu, 26 Feb 2026 02:19:43 GMT
+recorded_with: VCR 6.4.0

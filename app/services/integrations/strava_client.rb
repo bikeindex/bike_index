@@ -129,13 +129,12 @@ class Integrations::StravaClient
       end
       return response unless response.status == 401
 
-      refresh_token!(strava_integration)
-      # Strava Integration failed to refresh the token, so return the original response
-      if strava_integration.error?
-        response
-      else
+      if refresh_token!(strava_integration)
         # Try the request again!
         execute_proxy_request(strava_integration, path, method:, body:)
+      else
+        # Strava Integration failed to refresh the token, so return the original response
+        response
       end
     end
 
@@ -146,13 +145,12 @@ class Integrations::StravaClient
       end
       return response unless response.status == 401
 
-      refresh_token!(strava_integration)
-      # Strava Integration failed to refresh the token, so return the original response
-      if strava_integration.error?
-        response
-      else
+      if refresh_token!(strava_integration)
         # Try the request again!
         get(strava_integration, path, params)
+      else
+        # Strava Integration failed to refresh the token, so return the original response
+        response
       end
     end
 

@@ -27,11 +27,18 @@ const defaultFilters: SearchFilters = {
   distanceTo: null,
   elevationFrom: null,
   elevationTo: null,
+  filtersExpanded: true,
   activityTypesExpanded: false,
   equipmentExpanded: false,
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
+  commuteFilter: 'all',
+  trainerFilter: 'all',
+  sufferScoreFrom: null,
+  sufferScoreTo: null,
+  kudosFrom: null,
+  kudosTo: null,
   page: 1,
 };
 
