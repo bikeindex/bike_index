@@ -34,14 +34,21 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.elevationTo !== null && filters.elevationTo !== undefined) {
     params.set('elevTo', filters.elevationTo.toString());
   }
-  if (!filters.filtersExpanded) {
-    params.set('filtersClosed', '1');
+  // Only write panel state when it differs from default (auto-open with filters, closed without)
+  if (filters.filtersExpanded && !hasPropertyFilters(filters)) {
+    params.set('propertiesPanel', 'open');
+  } else if (!filters.filtersExpanded && hasPropertyFilters(filters)) {
+    params.set('propertiesPanel', 'closed');
   }
-  if (!filters.activityTypesExpanded) {
-    params.set('typesClosed', '1');
+  if (filters.activityTypesExpanded && filters.activityTypes.length === 0) {
+    params.set('typesPanel', 'open');
+  } else if (!filters.activityTypesExpanded && filters.activityTypes.length > 0) {
+    params.set('typesPanel', 'closed');
   }
-  if (!filters.equipmentExpanded) {
-    params.set('gearClosed', '1');
+  if (filters.equipmentExpanded && !filters.gearIds.length && !filters.noEquipment) {
+    params.set('gearPanel', 'open');
+  } else if (!filters.equipmentExpanded && (filters.gearIds.length > 0 || filters.noEquipment)) {
+    params.set('gearPanel', 'closed');
   }
   if (filters.mutedFilter && filters.mutedFilter !== 'all') {
     params.set('muted', filters.mutedFilter);
@@ -77,6 +84,19 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   return params;
 }
 
+function hasPropertyFilters(filters: SearchFilters): boolean {
+  return !!(
+    filters.dateFrom || filters.dateTo ||
+    filters.distanceFrom !== null || filters.distanceTo !== null ||
+    filters.elevationFrom !== null || filters.elevationTo !== null ||
+    (filters.mutedFilter !== 'all') || (filters.photoFilter !== 'all') ||
+    (filters.privateFilter !== 'all') || (filters.commuteFilter !== 'all') ||
+    (filters.trainerFilter !== 'all') ||
+    filters.sufferScoreFrom !== null || filters.sufferScoreTo !== null ||
+    filters.kudosFrom !== null || filters.kudosTo !== null
+  );
+}
+
 function paramsToFilters(params: URLSearchParams): SearchFilters {
   const distFromStr = params.get('distFrom');
   const distToStr = params.get('distTo');
@@ -86,6 +106,18 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
   const sufferToStr = params.get('sufferTo');
   const kudosFromStr = params.get('kudosFrom');
   const kudosToStr = params.get('kudosTo');
+
+  // Auto-expand panels when they have active filters, unless explicitly closed
+  const hasTypes = !!params.get('types');
+  const hasGear = !!(params.get('gear') || params.get('noGear'));
+  const hasProps = !!(
+    params.get('from') || params.get('to') ||
+    distFromStr || distToStr || elevFromStr || elevToStr ||
+    params.get('muted') || params.get('photo') || params.get('private') ||
+    params.get('commute') || params.get('trainer') ||
+    sufferFromStr || sufferToStr || kudosFromStr || kudosToStr
+  );
+
   return {
     query: params.get('q') || '',
     activityTypes: params.get('types')?.split(',').filter(Boolean) || [],
@@ -97,9 +129,9 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     distanceTo: distToStr ? parseFloat(distToStr) : null,
     elevationFrom: elevFromStr ? parseFloat(elevFromStr) : null,
     elevationTo: elevToStr ? parseFloat(elevToStr) : null,
-    filtersExpanded: params.get('filtersClosed') !== '1',
-    activityTypesExpanded: params.get('typesClosed') !== '1',
-    equipmentExpanded: params.get('gearClosed') !== '1',
+    filtersExpanded: params.get('propertiesPanel') !== 'closed' && (hasProps || params.get('propertiesPanel') === 'open'),
+    activityTypesExpanded: params.get('typesPanel') !== 'closed' && (hasTypes || params.get('typesPanel') === 'open'),
+    equipmentExpanded: params.get('gearPanel') !== 'closed' && (hasGear || params.get('gearPanel') === 'open'),
     mutedFilter: (params.get('muted') as MutedFilter) || 'all',
     photoFilter: (params.get('photo') as PhotoFilter) || 'all',
     privateFilter: (params.get('private') as PrivateFilter) || 'all',
@@ -131,7 +163,26 @@ export function useUrlFilters(): [SearchFilters, React.Dispatch<React.SetStateAc
         ? `${window.location.pathname}?${params.toString()}`
         : window.location.pathname;
 
-      window.history.pushState({ filters: resolved }, '', newUrl);
+      // Use replaceState for panel-only changes to avoid polluting history
+      const panelOnly = prev.query === resolved.query &&
+        prev.activityTypes.join(',') === resolved.activityTypes.join(',') &&
+        prev.gearIds.join(',') === resolved.gearIds.join(',') &&
+        prev.noEquipment === resolved.noEquipment &&
+        prev.dateFrom === resolved.dateFrom && prev.dateTo === resolved.dateTo &&
+        prev.distanceFrom === resolved.distanceFrom && prev.distanceTo === resolved.distanceTo &&
+        prev.elevationFrom === resolved.elevationFrom && prev.elevationTo === resolved.elevationTo &&
+        prev.mutedFilter === resolved.mutedFilter && prev.photoFilter === resolved.photoFilter &&
+        prev.privateFilter === resolved.privateFilter && prev.commuteFilter === resolved.commuteFilter &&
+        prev.trainerFilter === resolved.trainerFilter &&
+        prev.sufferScoreFrom === resolved.sufferScoreFrom && prev.sufferScoreTo === resolved.sufferScoreTo &&
+        prev.kudosFrom === resolved.kudosFrom && prev.kudosTo === resolved.kudosTo &&
+        prev.page === resolved.page;
+
+      if (panelOnly) {
+        window.history.replaceState({ filters: resolved }, '', newUrl);
+      } else {
+        window.history.pushState({ filters: resolved }, '', newUrl);
+      }
 
       return resolved;
     });
