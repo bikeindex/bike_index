@@ -48,8 +48,8 @@ RSpec.describe StravaIntegrationsController, type: :request do
       include_context :request_spec_logged_in_as_user
 
       # Initiate OAuth flow via `new` to set session state, return the state param
-      def initiate_oauth_flow
-        get "/strava_integration/new"
+      def initiate_oauth_flow(**extra_params)
+        get "/strava_integration/new", params: extra_params
         CGI.parse(URI.parse(response.location).query)["state"].first
       end
 
@@ -110,6 +110,27 @@ RSpec.describe StravaIntegrationsController, type: :request do
               expect(response).to redirect_to(strava_search_path)
               expect(flash[:success]).to match(/connected/i)
               expect(current_user.reload.strava_integration.strava_permissions).to eq Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+            end
+          end
+        end
+
+        context "with return_to" do
+          it "redirects to return_to path after callback" do
+            return_to = "/strava_search?q=morning+run&types=Ride"
+            oauth_state = initiate_oauth_flow(scope: "strava_search", return_to:)
+            VCR.use_cassette("strava-exchange_token") do
+              get "/strava_integration/callback",
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+              expect(response).to redirect_to(return_to)
+            end
+          end
+
+          it "ignores external return_to URLs" do
+            oauth_state = initiate_oauth_flow(scope: "strava_search", return_to: "https://evil.com")
+            VCR.use_cassette("strava-exchange_token") do
+              get "/strava_integration/callback",
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+              expect(response).to redirect_to(strava_search_path)
             end
           end
         end

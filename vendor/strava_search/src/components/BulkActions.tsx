@@ -230,7 +230,7 @@ export function BulkActions({
               You need to authorize updating Strava Activities
             </p>
             <a
-              href={authUrl}
+              href={`${authUrl}&return_to=${encodeURIComponent(window.location.pathname + window.location.search)}`}
               className="block w-full px-4 py-2 bg-[#fc4c02] text-white rounded-lg hover:bg-[#e34402] transition-colors text-center"
             >
               Authorize

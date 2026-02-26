@@ -9,6 +9,7 @@ class StravaIntegrationsController < ApplicationController
   def new
     state = SecureRandom.hex(24)
     session[:strava_oauth_state] = state
+    session[:strava_return_to] = params[:return_to] if params[:return_to]&.start_with?("/")
     # If scope is nil, it uses default scope
     scope = Integrations::StravaClient::STRAVA_SEARCH_SCOPE if params[:scope] == "strava_search"
     redirect_to Integrations::StravaClient.authorization_url(state:, scope:), allow_other_host: true
@@ -21,9 +22,7 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    session_state = session.delete(:strava_oauth_state)
-    unless params[:state].present? && ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, session_state.to_s)
-      Rails.error.report(StandardError.new("Invalid Strava OAuth state"), context: {user_id: current_user.id, param_state: params[:state], session_state:})
+    unless params[:state].present? && session_state_matches?(session.delete(:strava_oauth_state))
       flash[:error] = "Invalid OAuth state. Please try again."
       redirect_to my_account_path
       return
@@ -44,7 +43,8 @@ class StravaIntegrationsController < ApplicationController
     else
       flash[:success] = "Strava connected! Updating your activities."
     end
-    redirect_to strava_integration.has_activity_write? ? strava_search_path : my_account_path
+    return_to = session.delete(:strava_return_to)
+    redirect_to return_to || (strava_integration.has_activity_write? ? strava_search_path : my_account_path)
   end
 
   def destroy
@@ -96,5 +96,12 @@ class StravaIntegrationsController < ApplicationController
       existing_strava_integration&.destroy
       current_user.create_strava_integration!(attrs)
     end
+  end
+
+  def session_state_matches?(session_state)
+    return true if ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, session_state.to_s)
+    Rails.error.report(StandardError.new("Invalid Strava OAuth state"),
+      context: {user_id: current_user.id, param_state: params[:state], session_state:})
+    false
   end
 end
