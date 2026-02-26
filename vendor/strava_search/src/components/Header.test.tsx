@@ -78,6 +78,13 @@ describe('Header', () => {
       expect(screen.getByText('50 of 100 activities synced')).toBeInTheDocument();
     });
 
+    it('renders mobile sync status row when syncState exists', () => {
+      render(<Header onOpenSettings={() => {}} />);
+      // Both desktop (hidden sm:block) and mobile (sm:hidden) sync status elements exist
+      const syncElements = screen.getAllByText(/Last synced:/);
+      expect(syncElements.length).toBe(2);
+    });
+
     it('prefers external isFetchingFullData over hook state', async () => {
       const { useActivitySync } = await import('../hooks/useActivitySync');
       vi.mocked(useActivitySync).mockReturnValue({
