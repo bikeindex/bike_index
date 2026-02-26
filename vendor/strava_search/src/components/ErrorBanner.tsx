@@ -7,9 +7,20 @@ interface ErrorBannerProps {
 
 export function ErrorBanner({ message, onDismiss }: ErrorBannerProps) {
   return (
-    <div className="bg-red-600 text-white px-4 py-3">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        <p className="text-sm font-medium">{message}</p>
+    <div className="max-w-md bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg">
+      <div className="flex items-start justify-between gap-4">
+        <div className="text-sm">
+          {message.includes('\n') ? (
+            <>
+              <p className="font-bold">{message.split('\n')[0]}</p>
+              {message.split('\n').slice(1).map((line, i) => (
+                <p key={i} className="mt-1">{line}</p>
+              ))}
+            </>
+          ) : (
+            <p className="font-medium">{message}</p>
+          )}
+        </div>
         {onDismiss && (
           <button
             onClick={onDismiss}

@@ -115,7 +115,7 @@ class StravaActivity < ApplicationRecord
 
     def strava_data_from(data)
       data.slice("average_heartrate", "max_heartrate", "device_name", "commute",
-        "average_speed", "pr_count", "average_watts", "device_watts")
+        "average_speed", "pr_count", "average_watts", "device_watts", "trainer")
         .merge("muted" => data["hide_from_home"])
         .compact
     end
@@ -183,6 +183,7 @@ class StravaActivity < ApplicationRecord
     (distance_meters / 1000.0).round(2)
   end
 
+  # AKA Enrich the activity
   def update_from_strava!
     strava_request = StravaRequest.create!(
       strava_integration_id:,

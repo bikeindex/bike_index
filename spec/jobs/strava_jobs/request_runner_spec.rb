@@ -120,7 +120,8 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
             average_heartrate: 115.0, max_heartrate: 167.0,
             device_name: "Strava App", commute: false,
             average_speed: 4.746, pr_count: 0,
-            average_watts: 129.0, device_watts: false
+            average_watts: 129.0, device_watts: false,
+            trainer: false
           }.as_json
         })
         expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
@@ -156,7 +157,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
             device_name: "Strava App", commute: false,
             average_speed: 4.746, pr_count: 0,
             average_watts: 129.0, device_watts: false,
-            muted: false
+            muted: false, trainer: false
           },
           segment_locations: {
             cities: ["San Francisco", "Mill Valley"],

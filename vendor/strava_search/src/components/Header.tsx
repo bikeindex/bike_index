@@ -95,10 +95,10 @@ export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingF
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[1040]">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-[1040]">
                     <button
                       onClick={handleSettingsClick}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Settings className="w-4 h-4" />
                       Settings
@@ -106,15 +106,15 @@ export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingF
                     <button
                       onClick={handleSyncClick}
                       disabled={isWorking}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
                     >
                       <RefreshCw className={`w-4 h-4 ${isWorking ? 'animate-spin' : ''}`} />
                       {isWorking ? progress?.status || 'Working...' : 'Sync'}
                     </button>
-                    <hr className="my-1 border-gray-200" />
+                    <hr className="my-1 border-gray-200 dark:border-gray-700" />
                     <button
                       onClick={handleLogoutClick}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <LogOut className="w-4 h-4" />
                       Logout

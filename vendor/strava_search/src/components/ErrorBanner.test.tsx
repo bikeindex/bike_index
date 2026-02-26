@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ErrorBanner } from './ErrorBanner';
 
@@ -26,5 +26,16 @@ describe('ErrorBanner', () => {
     render(<ErrorBanner message="Error message" />);
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('does not dismiss on Escape key', () => {
+    const onDismiss = vi.fn();
+
+    render(<ErrorBanner message="Error message" onDismiss={onDismiss} />);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(screen.getByText('Error message')).toBeInTheDocument();
   });
 });

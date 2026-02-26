@@ -86,6 +86,15 @@ export const NoGear: Story = {
   },
 };
 
+export const Run: Story = {
+  args: {
+    activity: mockActivities[5],
+    gear: mockGear,
+    isSelected: false,
+    onToggleSelect: () => {},
+  },
+};
+
 export const NoHeartRate: Story = {
   args: {
     activity: { ...mockActivities[0], average_heartrate: undefined, max_heartrate: undefined },

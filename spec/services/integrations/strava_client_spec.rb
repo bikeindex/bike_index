@@ -6,8 +6,10 @@ RSpec.describe Integrations::StravaClient, type: :service do
   let(:strava_integration) do
     FactoryBot.create(:strava_integration,
       token_expires_at: Time.current + 6.hours,
+      status:,
       athlete_id: ENV["STRAVA_TEST_USER_ID"])
   end
+  let(:status) { :pending }
 
   describe ".authorization_url" do
     it "builds the correct authorization URL with state" do
@@ -81,6 +83,21 @@ RSpec.describe Integrations::StravaClient, type: :service do
         expect(response.body["photos"]["primary"]).to be_present
       end
     end
+
+    context "with a erroring token" do
+      let(:status) { "synced" }
+      let(:expires_at) { Time.current + 6.hours }
+      it "updates strava_integration to be errored" do
+        VCR.use_cassette("strava-get_activity-401") do
+          expect(strava_integration.reload.status).to eq "synced"
+          expect(strava_integration.token_expires_at).to be_within(5).of expires_at
+          response = described_class.fetch_activity(strava_integration, "17323701543")
+          expect(strava_integration.reload.status).to eq "error"
+          expect(strava_integration.token_expires_at).to be_within(5).of expires_at
+          expect(response.body["errors"]).to eq([{code: "invalid", field: "", resource: "Application"}].as_json)
+        end
+      end
+    end
   end
 
   describe ".fetch_gear" do
@@ -91,6 +108,18 @@ RSpec.describe Integrations::StravaClient, type: :service do
         expect(response.body["resource_state"]).to eq(3)
         expect(response.body["name"]).to eq("Yuba longtail")
         expect(response.body["frame_type"]).to be_present
+      end
+    end
+  end
+
+  describe ".proxy_request" do
+    it "retries with refreshed token on 401 from Strava" do
+      VCR.use_cassette("strava-proxy_request_401_retry") do
+        response = described_class.proxy_request(strava_integration, "athlete")
+        expect(response.status).to eq(200)
+        expect(response.body["id"]).to eq(2430215)
+        strava_integration.reload
+        expect(strava_integration.token_expires_at).to be > Time.current
       end
     end
   end

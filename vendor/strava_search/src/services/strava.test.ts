@@ -1,12 +1,19 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { getAthleteStats, updateActivity, getAllActivities } from './strava';
 import * as database from './database';
+import * as railsApi from './railsApi';
 
 // Mock the database module
 vi.mock('./database', () => ({
   getAuth: vi.fn(),
   saveAuth: vi.fn(),
   clearAuth: vi.fn(),
+}));
+
+// Mock the railsApi module
+vi.mock('./railsApi', () => ({
+  getConfig: vi.fn(),
+  exchangeSessionForToken: vi.fn(),
 }));
 
 const PROXY_ENDPOINT = '/api/strava_proxy';
@@ -16,12 +23,12 @@ describe('strava service', () => {
 
   beforeEach(() => {
     global.fetch = vi.fn();
-    // Set up window.stravaSearchConfig for proxy mode
-    window.stravaSearchConfig = {
+    // Set up config via mocked getConfig
+    vi.mocked(railsApi.getConfig).mockReturnValue({
       tokenEndpoint: '/strava_search/token',
       proxyEndpoint: PROXY_ENDPOINT,
       athleteId: '12345',
-    };
+    });
     // Mock authenticated state
     vi.mocked(database.getAuth).mockResolvedValue({
       accessToken: 'test_token',
@@ -34,7 +41,6 @@ describe('strava service', () => {
   afterEach(() => {
     global.fetch = originalFetch;
     vi.resetAllMocks();
-    delete (window as Record<string, unknown>).stravaSearchConfig;
   });
 
   describe('getAthleteStats', () => {
@@ -182,6 +188,48 @@ describe('strava service', () => {
       expect(result.moving_time_seconds).toBe(9219);
       expect(result.sport_type).toBe('EBikeRide');
       expect(result.average_heartrate).toBe(127.5);
+    });
+
+    it('refreshes auth token and retries on 401', async () => {
+      vi.mocked(railsApi.exchangeSessionForToken).mockResolvedValueOnce({
+        access_token: 'new_token',
+        expires_in: 7200,
+        created_at: Math.floor(Date.now() / 1000),
+        athlete_id: '12345',
+      });
+
+      (global.fetch as ReturnType<typeof vi.fn>)
+        // PUT returns 401
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          text: () => Promise.resolve('Unauthorized'),
+        })
+        // PUT retry with new token succeeds
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ strava_id: '17145907973' }),
+        })
+        // GET full activity succeeds
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(mockActivityResponse),
+        });
+
+      const result = await updateActivity(17145907973, { name: 'Updated Name' });
+
+      // Should have exchanged session for a new token
+      expect(railsApi.exchangeSessionForToken).toHaveBeenCalledTimes(1);
+      // Should have saved the new auth
+      expect(database.saveAuth).toHaveBeenCalled();
+      // 3 fetch calls: original PUT (401), retry PUT, GET full activity
+      expect(global.fetch).toHaveBeenCalledTimes(3);
+      // Retry should use new token
+      const retryCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[1];
+      expect(retryCall[1].headers.Authorization).toBe('Bearer new_token');
+      // Should still return full activity data
+      expect(result.strava_id).toBe('17145907973');
+      expect(result.title).toBe('Baby hawk');
     });
   });
 

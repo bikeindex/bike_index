@@ -102,7 +102,7 @@ RSpec.describe StravaActivity, type: :model do
        gear_id: "b1234", private: false, kudos_count: 10,
        average_speed: 6.944, suffer_score: 42.0,
        average_heartrate: 145.0, max_heartrate: 180.0,
-       device_name: "Garmin Edge 530", commute: false,
+       device_name: "Garmin Edge 530", commute: false, trainer: false,
        pr_count: 3, average_watts: 200.0, device_watts: true}.as_json
     end
 
@@ -125,7 +125,7 @@ RSpec.describe StravaActivity, type: :model do
         private: false,
         strava_data: {
           average_heartrate: 145.0, max_heartrate: 180.0,
-          device_name: "Garmin Edge 530", commute: false,
+          device_name: "Garmin Edge 530", commute: false, trainer: false,
           average_speed: 6.944, pr_count: 3,
           average_watts: 200.0, device_watts: true
         }.as_json
@@ -165,6 +165,7 @@ RSpec.describe StravaActivity, type: :model do
         max_heartrate: 180.0,
         device_name: "Garmin Edge 530",
         commute: false,
+        trainer: false,
         pr_count: 3,
         average_watts: 200.0,
         device_watts: true
@@ -190,7 +191,7 @@ RSpec.describe StravaActivity, type: :model do
         photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
         segment_locations: {cities: ["Denver"], states: ["Colorado"], countries: ["United States"]},
         strava_data: {average_heartrate: 145.0, max_heartrate: 180.0, device_name: "Garmin Edge 530",
-                      commute: false, average_speed: 6.944, pr_count: 3, average_watts: 200.0, device_watts: true})
+                      commute: false, trainer: false, average_speed: 6.944, pr_count: 3, average_watts: 200.0, device_watts: true})
 
       expect(strava_activity.proxy_serialized.except("start_date", "start_date_in_zone")).to eq target.as_json
       expect(strava_activity.proxy_serialized["start_date"]).to be_within(1).of Time.current
@@ -212,6 +213,7 @@ RSpec.describe StravaActivity, type: :model do
         },
         strava_data: {
           commute: false,
+          trainer: true,
           pr_count: 0,
           device_name: "Peloton Bike",
           device_watts: true,

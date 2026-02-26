@@ -20,6 +20,9 @@ interface SearchFiltersProps {
   filteredCount: number;
 }
 
+const toggleInactive = 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600';
+const inputClasses = 'px-2 py-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none';
+
 export function SearchFilters({
   filters,
   onFiltersChange,
@@ -45,7 +48,13 @@ export function SearchFilters({
     filters.elevationTo !== null ||
     filters.mutedFilter !== 'all' ||
     filters.photoFilter !== 'all' ||
-    filters.privateFilter !== 'all';
+    filters.privateFilter !== 'all' ||
+    filters.commuteFilter !== 'all' ||
+    filters.trainerFilter !== 'all' ||
+    filters.sufferScoreFrom !== null ||
+    filters.sufferScoreTo !== null ||
+    filters.kudosFrom !== null ||
+    filters.kudosTo !== null;
 
   const clearFilters = () => {
     onFiltersChange({
@@ -63,7 +72,17 @@ export function SearchFilters({
       mutedFilter: 'all',
       photoFilter: 'all',
       privateFilter: 'all',
+      commuteFilter: 'all',
+      trainerFilter: 'all',
+      sufferScoreFrom: null,
+      sufferScoreTo: null,
+      kudosFrom: null,
+      kudosTo: null,
     });
+  };
+
+  const setFiltersExpanded = (expanded: boolean) => {
+    onFiltersChange({ ...filters, filtersExpanded: expanded });
   };
 
   const setActivityTypesExpanded = (expanded: boolean) => {
@@ -106,7 +125,7 @@ export function SearchFilters({
 
   return (
   <>
-    <div className="bg-white rounded-lg shadow-md p-4 space-y-4">
+    <div className="space-y-4">
       {/* Search input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -115,105 +134,142 @@ export function SearchFilters({
           value={filters.query}
           onChange={(e) => onFiltersChange({ ...filters, query: e.target.value })}
           placeholder="Search by name, description, location, recorded with..."
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
+          className={`w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none`}
         />
         {filters.query && (
           <button
             onClick={() => onFiltersChange({ ...filters, query: '' })}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded"
           >
             <X className="w-4 h-4 text-gray-400" />
           </button>
         )}
       </div>
 
-      {/* Filter toggle section */}
+      {/* Filters accordion */}
       <div className="space-y-3">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setFiltersExpanded(!filters.filtersExpanded)}
+            className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Search Activity Properties</span>
+              {(() => {
+                const count = [
+                  filters.dateFrom, filters.dateTo,
+                  filters.distanceFrom !== null, filters.distanceTo !== null,
+                  filters.elevationFrom !== null, filters.elevationTo !== null,
+                  filters.mutedFilter !== 'all', filters.photoFilter !== 'all',
+                  filters.privateFilter !== 'all', filters.commuteFilter !== 'all',
+                  filters.trainerFilter !== 'all',
+                  filters.sufferScoreFrom !== null, filters.sufferScoreTo !== null,
+                  filters.kudosFrom !== null, filters.kudosTo !== null,
+                ].filter(Boolean).length;
+                return count > 0 ? (
+                  <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded-full">{count}</span>
+                ) : null;
+              })()}
+            </div>
+            <ChevronDown
+              className={`w-4 h-4 text-gray-500 transition-transform ${
+                filters.filtersExpanded ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+
+          {filters.filtersExpanded && (
+          <div className="p-3 space-y-3 border-t border-gray-200 dark:border-gray-700">
+
         {/* Date and distance range */}
-        <div className="flex flex-wrap gap-3 items-center">
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            <span>From:</span>
-            <input
-              type="date"
-              value={filters.dateFrom || ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, dateFrom: e.target.value || null })
-              }
-              className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
-            />
-          </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            <span>To:</span>
-            <input
-              type="date"
-              value={filters.dateTo || ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, dateTo: e.target.value || null })
-              }
-              className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
-            />
-          </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 ml-4">
-            <span>Distance:</span>
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={filters.distanceFrom ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, distanceFrom: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder={distanceUnit}
-              className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
-            />
-            <span>to</span>
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={filters.distanceTo ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, distanceTo: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder={distanceUnit}
-              className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
-            />
-            <span className="text-gray-400">{distanceUnit}</span>
-          </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 ml-4">
-            <span>Elevation:</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={filters.elevationFrom ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, elevationFrom: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder={elevationUnit}
-              className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
-            />
-            <span>to</span>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              value={filters.elevationTo ?? ''}
-              onChange={(e) =>
-                onFiltersChange({ ...filters, elevationTo: e.target.value ? parseFloat(e.target.value) : null })
-              }
-              placeholder={elevationUnit}
-              className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none"
-            />
-            <span className="text-gray-400">{elevationUnit}</span>
-          </label>
-          <div className="flex ml-4">
+        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center mb-4">
+          <div className="flex gap-x-3">
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>From:</span>
+              <input
+                type="date"
+                value={filters.dateFrom || ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, dateFrom: e.target.value || null })
+                }
+                className={inputClasses}
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>To:</span>
+              <input
+                type="date"
+                value={filters.dateTo || ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, dateTo: e.target.value || null })
+                }
+                className={inputClasses}
+              />
+            </label>
+          </div>
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>Distance (<span title={units === 'imperial' ? 'miles' : 'kilometers'}>{distanceUnit}</span>):</span>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={filters.distanceFrom ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, distanceFrom: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder={distanceUnit}
+                className={`w-16 ${inputClasses}`}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value={filters.distanceTo ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, distanceTo: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder={distanceUnit}
+                className={`w-16 ${inputClasses}`}
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>Elevation (<span title={units === 'imperial' ? 'feet' : 'meters'}>{elevationUnit}</span>):</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.elevationFrom ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, elevationFrom: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder={elevationUnit}
+                className={`w-20 ${inputClasses}`}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.elevationTo ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, elevationTo: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder={elevationUnit}
+                className={`w-20 ${inputClasses}`}
+              />
+            </label>
+        </div>
+
+        {/* Toggle filters */}
+        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center mb-4">
+          <div className="flex">
             <button
               onClick={() => onFiltersChange({ ...filters, mutedFilter: filters.mutedFilter === 'muted' ? 'all' : 'muted' })}
               className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
                 filters.mutedFilter === 'muted'
                   ? 'bg-[#fc4c02] text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : toggleInactive
               }`}
             >
               Muted
@@ -223,19 +279,19 @@ export function SearchFilters({
               className={`px-3 py-1 text-sm rounded-r-full transition-colors ${
                 filters.mutedFilter === 'not_muted'
                   ? 'bg-[#fc4c02] text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : toggleInactive
               }`}
             >
               Not muted
             </button>
           </div>
-          <div className="flex ml-2">
+          <div className="flex">
             <button
               onClick={() => onFiltersChange({ ...filters, privateFilter: filters.privateFilter === 'private' ? 'all' : 'private' })}
               className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
                 filters.privateFilter === 'private'
                   ? 'bg-[#fc4c02] text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : toggleInactive
               }`}
             >
               Private
@@ -245,19 +301,19 @@ export function SearchFilters({
               className={`px-3 py-1 text-sm rounded-r-full transition-colors ${
                 filters.privateFilter === 'not_private'
                   ? 'bg-[#fc4c02] text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : toggleInactive
               }`}
             >
               Not private
             </button>
           </div>
-          <div className="flex ml-2">
+          <div className="flex">
             <button
               onClick={() => onFiltersChange({ ...filters, photoFilter: filters.photoFilter === 'with_photo' ? 'all' : 'with_photo' })}
               className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
                 filters.photoFilter === 'with_photo'
                   ? 'bg-[#fc4c02] text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : toggleInactive
               }`}
             >
               With photo
@@ -267,24 +323,128 @@ export function SearchFilters({
               className={`px-3 py-1 text-sm rounded-r-full transition-colors ${
                 filters.photoFilter === 'without_photo'
                   ? 'bg-[#fc4c02] text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : toggleInactive
               }`}
             >
               No photo
             </button>
           </div>
+          <div className="flex">
+            <button
+              onClick={() => onFiltersChange({ ...filters, commuteFilter: filters.commuteFilter === 'commute' ? 'all' : 'commute' })}
+              className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
+                filters.commuteFilter === 'commute'
+                  ? 'bg-[#fc4c02] text-white'
+                  : toggleInactive
+              }`}
+            >
+              Commute
+            </button>
+            <button
+              onClick={() => onFiltersChange({ ...filters, commuteFilter: filters.commuteFilter === 'not_commute' ? 'all' : 'not_commute' })}
+              className={`px-3 py-1 text-sm rounded-r-full transition-colors ${
+                filters.commuteFilter === 'not_commute'
+                  ? 'bg-[#fc4c02] text-white'
+                  : toggleInactive
+              }`}
+            >
+              Not commute
+            </button>
+          </div>
+          <div className="flex">
+            <button
+              onClick={() => onFiltersChange({ ...filters, trainerFilter: filters.trainerFilter === 'trainer' ? 'all' : 'trainer' })}
+              className={`px-3 py-1 text-sm rounded-l-full transition-colors ${
+                filters.trainerFilter === 'trainer'
+                  ? 'bg-[#fc4c02] text-white'
+                  : toggleInactive
+              }`}
+            >
+              Trainer
+            </button>
+            <button
+              onClick={() => onFiltersChange({ ...filters, trainerFilter: filters.trainerFilter === 'not_trainer' ? 'all' : 'not_trainer' })}
+              className={`px-3 py-1 text-sm rounded-r-full transition-colors ${
+                filters.trainerFilter === 'not_trainer'
+                  ? 'bg-[#fc4c02] text-white'
+                  : toggleInactive
+              }`}
+            >
+              Not trainer
+            </button>
+          </div>
+        </div>
+
+        {/* Relative effort and kudos range */}
+        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>Relative effort:</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.sufferScoreFrom ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, sufferScoreFrom: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder="min"
+                className={`w-16 ${inputClasses}`}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.sufferScoreTo ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, sufferScoreTo: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder="max"
+                className={`w-16 ${inputClasses}`}
+              />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <span>Kudos:</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.kudosFrom ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, kudosFrom: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder="min"
+                className={`w-16 ${inputClasses}`}
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={filters.kudosTo ?? ''}
+                onChange={(e) =>
+                  onFiltersChange({ ...filters, kudosTo: e.target.value ? parseFloat(e.target.value) : null })
+                }
+                placeholder="max"
+                className={`w-16 ${inputClasses}`}
+              />
+            </label>
+        </div>
+
+          </div>
+          )}
         </div>
 
         {/* Activity types accordion */}
         {activityTypes.length > 0 && (
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
             {/* Accordion header */}
             <button
               onClick={() => setActivityTypesExpanded(!filters.activityTypesExpanded)}
-              className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Search Activity Types</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Search Activity Types</span>
                 {filters.activityTypes.length > 0 && (
                   <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded-full">
                     {filters.activityTypes.length}
@@ -300,7 +460,7 @@ export function SearchFilters({
 
             {/* Accordion content */}
             {filters.activityTypesExpanded && (
-              <div className="p-3 space-y-4 border-t border-gray-200">
+              <div className="p-3 space-y-4 border-t border-gray-200 dark:border-gray-700">
                 {(() => {
                   const grouped = groupActivityTypes(activityTypes);
                   const groupOrder: ActivityGroup[] = ['foot', 'cycle', 'water', 'winter', 'other'];
@@ -318,7 +478,7 @@ export function SearchFilters({
                           className={`text-sm font-medium px-2 py-0.5 rounded transition-colors ${
                             types.every((t) => filters.activityTypes.includes(t))
                               ? 'bg-[#fc4c02] text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
                           }`}
                         >
                           {groupConfig.icon} {groupConfig.label}
@@ -335,7 +495,7 @@ export function SearchFilters({
                                   ? isGroupFullySelected
                                     ? 'bg-gray-500 text-white'
                                     : 'bg-[#fc4c02] text-white'
-                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                  : toggleInactive
                               }`}
                             >
                               {getActivityIcon(type)} {formatActivityType(type)}
@@ -358,14 +518,14 @@ export function SearchFilters({
           const hasEquipmentFilter = filters.gearIds.length > 0 || filters.noEquipment;
 
           return (
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
               {/* Accordion header */}
               <button
                 onClick={() => setEquipmentExpanded(!filters.equipmentExpanded)}
-                className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">Search Equipment</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Search Equipment</span>
                   {hasEquipmentFilter && (
                     <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded-full">
                       {filters.noEquipment ? 1 : filters.gearIds.length}
@@ -381,7 +541,7 @@ export function SearchFilters({
 
               {/* Accordion content */}
               {filters.equipmentExpanded && (
-                <div className="p-3 space-y-5 border-t border-gray-200">
+                <div className="p-3 space-y-5 border-t border-gray-200 dark:border-gray-700">
                   {/* No equipment option */}
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -389,7 +549,7 @@ export function SearchFilters({
                       className={`px-3 py-1 text-sm rounded-full transition-colors ${
                         filters.noEquipment
                           ? 'bg-[#fc4c02] text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          : toggleInactive
                       }`}
                     >
                       No equipment
@@ -398,7 +558,7 @@ export function SearchFilters({
 
                   {/* Bikes */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-medium text-gray-700">🚴 Bikes</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">🚴 Bikes</span>
                     {bikes.map((g) => (
                       <button
                         key={g.id}
@@ -406,7 +566,7 @@ export function SearchFilters({
                         className={`px-3 py-1 text-sm rounded-full transition-colors ${
                           filters.gearIds.includes(g.id)
                             ? 'bg-[#fc4c02] text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : toggleInactive
                         }`}
                       >
                         {g.name}
@@ -419,7 +579,7 @@ export function SearchFilters({
 
                   {/* Shoes */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-medium text-gray-700">👟 Shoes</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">👟 Shoes</span>
                     {shoes.map((g) => (
                       <button
                         key={g.id}
@@ -427,7 +587,7 @@ export function SearchFilters({
                         className={`px-3 py-1 text-sm rounded-full transition-colors ${
                           filters.gearIds.includes(g.id)
                             ? 'bg-[#fc4c02] text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : toggleInactive
                         }`}
                       >
                         {g.name}
@@ -448,7 +608,7 @@ export function SearchFilters({
 
     {/* Results count and clear */}
     <div className="flex items-center justify-between px-1 pt-2">
-      <span className="text-sm text-gray-600">
+      <span className="text-sm text-gray-600 dark:text-gray-400">
         {filteredCount === totalCount
           ? `Matching all ${formatNumber(totalCount)} activities`
           : `Matching ${formatNumber(filteredCount)} of ${formatNumber(totalCount)} activities`}

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:storybook\"",
-    "dev:vite": "vite",
+    "dev:vite": "vite --port 3143",
     "dev:storybook": "storybook dev -p 6006",
     "build": "tsc -b && vite build",
     "build:lib": "tsc -b && vite build --mode lib",

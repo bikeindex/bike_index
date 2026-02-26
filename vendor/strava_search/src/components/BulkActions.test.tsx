@@ -42,14 +42,16 @@ describe('BulkActions', () => {
     render(<BulkActions {...defaultProps} selectedCount={2} />);
     expect(screen.getByText('Change Type')).toBeInTheDocument();
     expect(screen.getByText('Change Gear')).toBeInTheDocument();
-    expect(screen.getByText('Change Tags')).toBeInTheDocument();
+    expect(screen.getByText('Commute')).toBeInTheDocument();
+    expect(screen.getByText('Trainer/Indoor')).toBeInTheDocument();
   });
 
   it('does not show action buttons when nothing selected', () => {
     render(<BulkActions {...defaultProps} />);
     expect(screen.queryByText('Change Type')).not.toBeInTheDocument();
     expect(screen.queryByText('Change Gear')).not.toBeInTheDocument();
-    expect(screen.queryByText('Change Tags')).not.toBeInTheDocument();
+    expect(screen.queryByText('Commute')).not.toBeInTheDocument();
+    expect(screen.queryByText('Trainer/Indoor')).not.toBeInTheDocument();
   });
 
   it('calls onSelectAll when select all on page is clicked', () => {
@@ -118,22 +120,19 @@ describe('BulkActions', () => {
     });
   });
 
-  describe('Change Tags Modal', () => {
-    it('opens tags modal when Change Tags is clicked', () => {
+  describe('Commute Modal', () => {
+    it('opens commute modal when Commute is clicked', () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Tags'));
-      // Modal title and button both say "Change Tags", so check for modal content instead
-      expect(screen.getByText('Commute')).toBeInTheDocument();
-      expect(screen.getByText('Trainer / Indoor')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Commute'));
+      expect(screen.getByText('Change Commute')).toBeInTheDocument();
     });
 
     it('updates activities with commute tag', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Tags'));
+      fireEvent.click(screen.getByText('Commute'));
 
-      const selects = screen.getAllByRole('combobox');
-      const commuteSelect = selects[0];
-      fireEvent.change(commuteSelect, { target: { value: 'true' } });
+      const select = screen.getByRole('combobox');
+      fireEvent.change(select, { target: { value: 'true' } });
       fireEvent.click(screen.getByText('Update'));
 
       await waitFor(() => {
@@ -141,43 +140,12 @@ describe('BulkActions', () => {
       });
     });
 
-    it('updates activities with trainer tag', async () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Tags'));
-
-      const selects = screen.getAllByRole('combobox');
-      const trainerSelect = selects[1];
-      fireEvent.change(trainerSelect, { target: { value: 'true' } });
-      fireEvent.click(screen.getByText('Update'));
-
-      await waitFor(() => {
-        expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ trainer: true });
-      });
-    });
-
-    it('updates activities with both tags', async () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Tags'));
-
-      const selects = screen.getAllByRole('combobox');
-      fireEvent.change(selects[0], { target: { value: 'true' } });
-      fireEvent.change(selects[1], { target: { value: 'false' } });
-      fireEvent.click(screen.getByText('Update'));
-
-      await waitFor(() => {
-        expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({
-          commute: true,
-          trainer: false
-        });
-      });
-    });
-
     it('removes commute tag when false is selected', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Tags'));
+      fireEvent.click(screen.getByText('Commute'));
 
-      const selects = screen.getAllByRole('combobox');
-      fireEvent.change(selects[0], { target: { value: 'false' } });
+      const select = screen.getByRole('combobox');
+      fireEvent.change(select, { target: { value: 'false' } });
       fireEvent.click(screen.getByText('Update'));
 
       await waitFor(() => {
@@ -185,23 +153,82 @@ describe('BulkActions', () => {
       });
     });
 
-    it('disables update button when no tags are selected', () => {
+    it('disables update button when no value is selected', () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Tags'));
+      fireEvent.click(screen.getByText('Commute'));
 
       const updateButton = screen.getByText('Update');
       expect(updateButton).toBeDisabled();
     });
+  });
 
-    it('enables update button when a tag is selected', () => {
+  describe('Trainer/Indoor Modal', () => {
+    it('opens trainer modal when Trainer/Indoor is clicked', () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Tags'));
+      fireEvent.click(screen.getByText('Trainer/Indoor'));
+      expect(screen.getByText('Change Trainer/Indoor')).toBeInTheDocument();
+    });
 
-      const selects = screen.getAllByRole('combobox');
-      fireEvent.change(selects[0], { target: { value: 'true' } });
+    it('updates activities with trainer tag', async () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      fireEvent.click(screen.getByText('Trainer/Indoor'));
+
+      const select = screen.getByRole('combobox');
+      fireEvent.change(select, { target: { value: 'true' } });
+      fireEvent.click(screen.getByText('Update'));
+
+      await waitFor(() => {
+        expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ trainer: true });
+      });
+    });
+
+    it('removes trainer tag when false is selected', async () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      fireEvent.click(screen.getByText('Trainer/Indoor'));
+
+      const select = screen.getByRole('combobox');
+      fireEvent.change(select, { target: { value: 'false' } });
+      fireEvent.click(screen.getByText('Update'));
+
+      await waitFor(() => {
+        expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ trainer: false });
+      });
+    });
+
+    it('disables update button when no value is selected', () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      fireEvent.click(screen.getByText('Trainer/Indoor'));
 
       const updateButton = screen.getByText('Update');
-      expect(updateButton).not.toBeDisabled();
+      expect(updateButton).toBeDisabled();
+    });
+  });
+
+  describe('Escape key', () => {
+    it('closes modal on Escape', () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      fireEvent.click(screen.getByText('Change Type'));
+      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(screen.queryByText('Change Activity Type')).not.toBeInTheDocument();
+    });
+
+    it('does not close when a different modal is topmost', () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      fireEvent.click(screen.getByText('Change Type'));
+      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
+
+      // Simulate another modal on top
+      const otherModal = document.createElement('div');
+      otherModal.setAttribute('data-modal', 'settings');
+      document.body.appendChild(otherModal);
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+      // Should still be open since bulk-edit is not the topmost modal
+      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
+
+      document.body.removeChild(otherModal);
     });
   });
 
@@ -231,7 +258,8 @@ describe('BulkActions', () => {
     render(<BulkActions {...defaultProps} selectedCount={2} isUpdating={true} />);
     expect(screen.getByText('Change Type').closest('button')).toBeDisabled();
     expect(screen.getByText('Change Gear').closest('button')).toBeDisabled();
-    expect(screen.getByText('Change Tags').closest('button')).toBeDisabled();
+    expect(screen.getByText('Commute').closest('button')).toBeDisabled();
+    expect(screen.getByText('Trainer/Indoor').closest('button')).toBeDisabled();
   });
 
   describe('Top Pagination', () => {
