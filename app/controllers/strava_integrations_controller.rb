@@ -21,7 +21,9 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    unless params[:state].present? && ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, session.delete(:strava_oauth_state).to_s)
+    session_state = session.delete(:strava_oauth_state)
+    unless params[:state].present? && ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, session_state.to_s)
+      Rails.error.report(StandardError.new("Invalid Strava OAuth state"), context: {user_id: current_user.id, param_state: params[:state], session_state:})
       flash[:error] = "Invalid OAuth state. Please try again."
       redirect_to my_account_path
       return
