@@ -58,3 +58,13 @@ export const NoGear: Story = {
 export const SinglePage: Story = {
   args: { ...defaultArgs, pageCount: 25, totalPages: 1 },
 };
+
+export const PermissionsModal: Story = {
+  args: { ...defaultArgs, selectedCount: 5, hasActivityWrite: false },
+  play: async ({ canvasElement }) => {
+    const button = [...canvasElement.querySelectorAll('button')].find(
+      (b) => b.textContent?.includes('Change Type')
+    );
+    button?.click();
+  },
+};

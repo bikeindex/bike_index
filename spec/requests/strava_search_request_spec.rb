@@ -32,6 +32,7 @@ RSpec.describe StravaSearchController, type: :request do
           expect(response.body).to include("stravaSearchConfig")
           expect(response.body).to include('"athleteId":"12345"')
           expect(response.body).to include('"hasActivityWrite":false')
+          expect(response.body).to include('"authUrl":"/strava_integration/new?scope=strava_search"')
 
           asset_paths = response.body.scan(%r{(?:src|href)="(/strava_search/assets/[^"]+)"}).flatten
           expect(asset_paths.select { |p| p.end_with?(".js") }).to be_present
