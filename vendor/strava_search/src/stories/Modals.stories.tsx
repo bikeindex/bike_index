@@ -15,6 +15,8 @@ const defaultArgs = {
   },
   isUpdating: false,
   gear: mockGear,
+  hasActivityWrite: true,
+  authUrl: '/strava_integration/new?scope=strava_search',
 };
 
 const meta = {

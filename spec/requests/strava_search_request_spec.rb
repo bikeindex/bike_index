@@ -18,11 +18,12 @@ RSpec.describe StravaSearchController, type: :request do
 
       it "redirects to strava integration setup when user has no integration" do
         get strava_search_path
-        expect(response).to redirect_to(new_strava_integration_path)
+        expect(response).to redirect_to(new_strava_integration_path(scope: :strava_search))
       end
 
       context "with strava integration" do
-        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345") }
+        let(:strava_permissions) { nil }
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345", strava_permissions:) }
 
         it "renders with config and valid assets" do
           get strava_search_path
@@ -30,6 +31,8 @@ RSpec.describe StravaSearchController, type: :request do
           expect(response.body).to include('<div id="root">')
           expect(response.body).to include("stravaSearchConfig")
           expect(response.body).to include('"athleteId":"12345"')
+          expect(response.body).to include('"hasActivityWrite":false')
+          expect(response.body).to include('"authUrl":"/strava_integration/new?scope=strava_search"')
 
           asset_paths = response.body.scan(%r{(?:src|href)="(/strava_search/assets/[^"]+)"}).flatten
           expect(asset_paths.select { |p| p.end_with?(".js") }).to be_present
@@ -37,6 +40,16 @@ RSpec.describe StravaSearchController, type: :request do
           asset_paths.each do |asset_path|
             file_path = Rails.root.join("public", asset_path.delete_prefix("/"))
             expect(File.exist?(file_path)).to eq(true), "Missing built asset: #{asset_path}"
+          end
+        end
+
+        context "with activity:write permission" do
+          let(:strava_permissions) { Integrations::StravaClient::STRAVA_SEARCH_SCOPE }
+
+          it "renders with hasActivityWrite true" do
+            get strava_search_path
+            expect(response.status).to eq 200
+            expect(response.body).to include('"hasActivityWrite":true')
           end
         end
       end

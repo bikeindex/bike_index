@@ -17,6 +17,8 @@ describe('BulkActions', () => {
       { id: 'b123', name: 'Road Bike', distance: 1000, primary: true, resource_state: 2 },
       { id: 's456', name: 'Running Shoes', distance: 500, primary: false, resource_state: 2 },
     ],
+    hasActivityWrite: true,
+    authUrl: '/strava_integration/new?scope=strava_search',
   };
 
   beforeEach(() => {
@@ -260,6 +262,52 @@ describe('BulkActions', () => {
     expect(screen.getByText('Change Gear').closest('button')).toBeDisabled();
     expect(screen.getByText('Commute').closest('button')).toBeDisabled();
     expect(screen.getByText('Trainer/Indoor').closest('button')).toBeDisabled();
+  });
+
+  describe('Authorization modal', () => {
+    const noWriteProps = { ...defaultProps, selectedCount: 2, hasActivityWrite: false };
+
+    it('shows auth modal instead of edit modal when hasActivityWrite is false', () => {
+      render(<BulkActions {...noWriteProps} />);
+      fireEvent.click(screen.getByText('Change Type'));
+      expect(screen.getByText('You need to authorize updating Strava Activities')).toBeInTheDocument();
+      expect(screen.queryByText('Change Activity Type')).not.toBeInTheDocument();
+    });
+
+    it('shows auth modal for all edit buttons', () => {
+      const { unmount } = render(<BulkActions {...noWriteProps} />);
+      for (const label of ['Change Type', 'Change Gear', 'Commute', 'Trainer/Indoor']) {
+        fireEvent.click(screen.getByText(label));
+        expect(screen.getByText('You need to authorize updating Strava Activities')).toBeInTheDocument();
+        // Close via the X button in the auth modal header
+        const header = screen.getByText('Authorization Required').closest('div')!;
+        fireEvent.click(header.querySelector('button')!);
+      }
+      unmount();
+    });
+
+    it('has an Authorize link to the authUrl', () => {
+      render(<BulkActions {...noWriteProps} />);
+      fireEvent.click(screen.getByText('Change Type'));
+      const authorizeLink = screen.getByText('Authorize');
+      expect(authorizeLink.closest('a')).toHaveAttribute('href', '/strava_integration/new?scope=strava_search');
+    });
+
+    it('closes auth modal when X is clicked', () => {
+      render(<BulkActions {...noWriteProps} />);
+      fireEvent.click(screen.getByText('Change Type'));
+      expect(screen.getByText('Authorization Required')).toBeInTheDocument();
+      const closeButton = screen.getByText('Authorization Required').closest('div')!.querySelector('button')!;
+      fireEvent.click(closeButton);
+      expect(screen.queryByText('Authorization Required')).not.toBeInTheDocument();
+    });
+
+    it('shows edit modal when hasActivityWrite is true', () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      fireEvent.click(screen.getByText('Change Type'));
+      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
+      expect(screen.queryByText('Authorization Required')).not.toBeInTheDocument();
+    });
   });
 
   describe('Top Pagination', () => {

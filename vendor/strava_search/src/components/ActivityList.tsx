@@ -18,6 +18,8 @@ interface ActivityListProps {
   isUpdating: boolean;
   filters: SearchFilters;
   onFiltersChange: (filters: SearchFilters) => void;
+  hasActivityWrite: boolean;
+  authUrl: string;
 }
 
 const PAGE_SIZE = 50;
@@ -34,6 +36,8 @@ export function ActivityList({
   isUpdating,
   filters,
   onFiltersChange,
+  hasActivityWrite,
+  authUrl,
 }: ActivityListProps) {
   const currentPage = filters.page;
   const prevActivitiesLength = useRef(activities.length);
@@ -105,6 +109,8 @@ export function ActivityList({
         onUpdateSelected={onUpdateSelected}
         isUpdating={isUpdating}
         gear={gear}
+        hasActivityWrite={hasActivityWrite}
+        authUrl={authUrl}
       />
 
       <div className="space-y-3">

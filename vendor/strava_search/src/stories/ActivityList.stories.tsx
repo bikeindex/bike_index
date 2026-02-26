@@ -95,74 +95,42 @@ export const Default: Story = {
     isUpdating: false,
     filters: defaultFilters,
     onFiltersChange: () => {},
+    hasActivityWrite: true,
+    authUrl: '/strava_integration/new?scope=strava_search',
   },
 };
 
 export const Loading: Story = {
   render: (args) => <ActivityListWrapper {...args} />,
   args: {
+    ...Default.args,
     activities: [],
-    gear: mockGear,
     isLoading: true,
-    selectedIds: new Set(),
-    onToggleSelect: () => {},
-    onSelectIds: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    filters: defaultFilters,
-    onFiltersChange: () => {},
   },
 };
 
 export const Empty: Story = {
   render: (args) => <ActivityListWrapper {...args} />,
   args: {
+    ...Default.args,
     activities: [],
-    gear: mockGear,
-    isLoading: false,
-    selectedIds: new Set(),
-    onToggleSelect: () => {},
-    onSelectIds: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    filters: defaultFilters,
-    onFiltersChange: () => {},
   },
 };
 
 export const WithSelections: Story = {
   render: (args) => <ActivityListWrapper {...args} />,
   args: {
-    activities: mockActivities,
-    gear: mockGear,
-    isLoading: false,
+    ...Default.args,
     selectedIds: new Set([mockActivities[0].id, mockActivities[1].id]),
-    onToggleSelect: () => {},
-    onSelectIds: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    filters: defaultFilters,
-    onFiltersChange: () => {},
   },
 };
 
 export const Updating: Story = {
   render: (args) => <ActivityListWrapper {...args} />,
   args: {
-    activities: mockActivities,
-    gear: mockGear,
-    isLoading: false,
+    ...Default.args,
     selectedIds: new Set([mockActivities[0].id, mockActivities[1].id, mockActivities[2].id]),
-    onToggleSelect: () => {},
-    onSelectIds: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
     isUpdating: true,
-    filters: defaultFilters,
-    onFiltersChange: () => {},
   },
 };
 
@@ -177,16 +145,7 @@ const manyActivities = Array.from({ length: 75 }, (_, i) => ({
 export const ManyActivities: Story = {
   render: (args) => <ActivityListWrapper {...args} />,
   args: {
+    ...Default.args,
     activities: manyActivities,
-    gear: mockGear,
-    isLoading: false,
-    selectedIds: new Set(),
-    onToggleSelect: () => {},
-    onSelectIds: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    filters: defaultFilters,
-    onFiltersChange: () => {},
   },
 };
