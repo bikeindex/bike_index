@@ -22,6 +22,17 @@ RSpec.describe StravaIntegrationsController, type: :request do
         scope_param = CGI.parse(URI.parse(location).query)["scope"].first
         expect(scope_param).to eq Integrations::StravaClient::DEFAULT_SCOPE
       end
+
+      context "with strava_search scope" do
+        it "redirects with STRAVA_SEARCH_SCOPE" do
+          get "/strava_integration/new", params: {scope: "strava_search"}
+          expect(response).to redirect_to(/strava\.com\/oauth\/authorize/)
+          location = response.location
+          expect(location).to include("state=")
+          scope_param = CGI.parse(URI.parse(location).query)["scope"].first
+          expect(scope_param).to eq Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+        end
+      end
     end
   end
 

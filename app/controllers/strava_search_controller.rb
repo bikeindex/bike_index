@@ -14,8 +14,8 @@ class StravaSearchController < ApplicationController
       tokenEndpoint: strava_search_token_path,
       proxyEndpoint: api_strava_proxy_index_path,
       athleteId: strava_integration.athlete_id,
-      reconnectUrl: strava_integration.has_activity_write? ? nil : new_strava_integration_path(scope: :strava_search)
-    }.compact
+      hasActivityWrite: strava_integration.has_activity_write?
+    }
     @strava_search_assets = if ENV["BUILD_STRAVA_SEARCH"] == "true"
       [{type: :script, src: "http://localhost:3143/strava_search/@vite/client"},
         {type: :react_refresh, src: "http://localhost:3143/strava_search/@react-refresh"},

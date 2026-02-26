@@ -8,13 +8,6 @@ import {
 import { saveAuth, getAuth, clearAuth } from './database';
 import { getConfig, exchangeSessionForToken } from './railsApi';
 
-export class InsufficientPermissionsError extends Error {
-  constructor(message = 'Insufficient Strava permissions. Please reconnect your Strava account to grant write access.') {
-    super(message);
-    this.name = 'InsufficientPermissionsError';
-  }
-}
-
 // Rate limit handling configuration
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000;
@@ -100,11 +93,6 @@ async function apiRequest<T>(
       }
       await clearAuth();
       throw new Error('Session expired. Please log in again.');
-    }
-
-    // Handle insufficient permissions (403) from Strava
-    if (response.status === 403) {
-      throw new InsufficientPermissionsError();
     }
 
     // Handle rate limiting (429) with exponential backoff

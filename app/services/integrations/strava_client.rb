@@ -4,7 +4,7 @@ class Integrations::StravaClient
   BASE_URL = "https://www.strava.com"
   API_URL = "https://www.strava.com/api/v3"
   DEFAULT_SCOPE = "read,activity:read_all,profile:read_all"
-  STRAVA_SEARCH_SCOPE = "read,activity:read_all,profile:read_all,activity:write"
+  STRAVA_SEARCH_SCOPE = "#{DEFAULT_SCOPE},activity:write"
   STRAVA_KEY = ENV["STRAVA_KEY"]
   STRAVA_SECRET = ENV["STRAVA_SECRET"]
   STRAVA_WEBHOOK_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]

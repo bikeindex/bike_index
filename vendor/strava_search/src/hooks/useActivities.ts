@@ -8,7 +8,7 @@ import {
   type StoredActivity,
   type StoredGear,
 } from '../services/database';
-import { updateActivity as updateActivityApi, InsufficientPermissionsError } from '../services/strava';
+import { updateActivity as updateActivityApi } from '../services/strava';
 import { useUrlFilters } from './useUrlFilters';
 import type { SearchFilters, UpdatableActivity } from '../types/strava';
 
@@ -51,7 +51,6 @@ export function useActivities(): UseActivitiesResult {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState<UpdateProgress | null>(null);
-  const [insufficientPermissions, setInsufficientPermissions] = useState(false);
 
   const loadActivities = useCallback(async (silent = false) => {
     if (!athlete) {
@@ -312,8 +311,6 @@ export function useActivities(): UseActivitiesResult {
       let successCount = 0;
       let current = 0;
 
-      let hitPermissionsError = false;
-
       for (const id of selectedIds) {
         try {
           // Update on Strava
@@ -324,11 +321,6 @@ export function useActivities(): UseActivitiesResult {
 
           successCount++;
         } catch (err) {
-          if (err instanceof InsufficientPermissionsError) {
-            setInsufficientPermissions(true);
-            hitPermissionsError = true;
-            break;
-          }
           errors.push(`Activity ${id}: ${err instanceof Error ? err.message : 'Failed'}`);
         }
 
