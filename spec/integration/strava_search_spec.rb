@@ -8,7 +8,7 @@ RSpec.describe "Strava search", :js, type: :system do
     stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id)
 
     user = FactoryBot.create(:user_confirmed)
-    FactoryBot.create(:strava_integration, user:, athlete_id: "12345")
+    FactoryBot.create(:strava_integration, :synced, user:, athlete_id: "12345")
     Doorkeeper::AccessToken.create!(
       application_id: strava_app.id,
       resource_owner_id: user.id,

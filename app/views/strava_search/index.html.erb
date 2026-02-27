@@ -16,9 +16,7 @@
       <% end %>
     <% end %>
   <% end %>
-
   <div id="root"></div>
-
   <script>
     window.stravaSearchConfig = <%= @strava_search_config.to_json.html_safe %>;
     document.addEventListener('DOMContentLoaded', function() {
@@ -32,45 +30,66 @@
   <div class="tw:flex tw:min-h-[60vh] tw:items-center tw:justify-center">
     <div class="tw:w-full tw:max-w-md tw:text-center">
       <% if @strava_integration.error? %>
-        <h2 class="tw:text-xl tw:font-semibold tw:text-red-600 tw:dark:text-red-400">Sync error</h2>
+        <h2 class="tw:text-xl tw:font-semibold tw:text-red-600 tw:dark:text-red-400">
+          Sync error
+        </h2>
         <p class="tw:mt-2 tw:text-gray-600 tw:dark:text-gray-400">
-          There was an error syncing your Strava activities. Please try disconnecting and reconnecting.
+          There was an error syncing your Strava activities. Please try
+          disconnecting and reconnecting.
         </p>
         <%= link_to "Reconnect Strava",
             new_strava_integration_path(scope: :strava_search),
             class: "btn btn-primary tw:mt-4" %>
       <% else %>
         <% if @strava_integration.pending? %>
-          <p class="tw:text-lg tw:text-gray-600 tw:dark:text-gray-300" id="strava-pending-message">
+          <p
+            class="tw:text-lg tw:text-gray-600 tw:dark:text-gray-300"
+            id="strava-pending-message"
+          >
             Connected to Strava. Sync will begin shortly.
           </p>
         <% end %>
-
-        <div class="<%= @strava_integration.pending? ? 'tw:hidden' : '' %>" id="strava-syncing-message">
-          <p class="tw:text-lg tw:text-gray-600 tw:dark:text-gray-300">Syncing activities...</p>
+        <div
+          class="<%= @strava_integration.pending? ? 'tw:hidden' : '' %>"
+          id="strava-syncing-message"
+        >
+          <p class="tw:text-lg tw:text-gray-600 tw:dark:text-gray-300">
+            Syncing activities...
+          </p>
 
           <div class="tw:mx-auto tw:mt-4 tw:w-full tw:max-w-xs">
-            <div class="tw:h-3 tw:overflow-hidden tw:rounded-full tw:bg-gray-200 tw:dark:bg-gray-700">
+            <div
+              class="
+                tw:h-3 tw:overflow-hidden tw:rounded-full tw:bg-gray-200
+                tw:dark:bg-gray-700
+              "
+            >
               <div
                 id="strava-progress-bar"
-                class="tw:h-full tw:rounded-full tw:bg-orange-500 tw:transition-all tw:duration-500"
+                class="
+                  tw:h-full tw:rounded-full tw:bg-orange-500
+                  tw:transition-all tw:duration-500
+                "
                 style="width: <%= @strava_integration.sync_progress_percent %>%"
               ></div>
             </div>
 
-            <p class="tw:mt-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400" id="strava-download-count">
+            <p
+              class="tw:mt-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400"
+              id="strava-download-count"
+            >
               <%= @strava_integration.sync_progress_percent %>%
-              (<%= number_display(@strava_integration.activities_downloaded_count) %> /
+              (<%= number_display(@strava_integration.activities_downloaded_count) %>
+              /
               <%= number_display(@strava_integration.athlete_activity_count || "?") %>)
               downloaded
             </p>
           </div>
         </div>
-
         <%= render UI::LoadingSpinner::Component.new(text: "") %>
-
         <p class="tw:mt-2 tw:text-sm tw:text-gray-400 tw:dark:text-gray-500">
-          Sync is running in the background. This page will update automatically.
+          Sync is running in the background. This page will update
+          automatically.
         </p>
       <% end %>
 
