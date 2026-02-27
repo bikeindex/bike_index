@@ -66,7 +66,7 @@ module Bikeindex
     config.i18n.available_locales = %i[en es it nl nb]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
-    config.middleware.insert_after ActionDispatch::Static, Rack::Deflater
+    config.middleware.use Rack::Deflater
     config.middleware.insert 0, Rack::UTF8Sanitizer
     config.middleware.use Rack::Throttle::Minute,
       max: ENV["MIN_MAX_RATE"].to_i,
