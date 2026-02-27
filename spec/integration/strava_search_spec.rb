@@ -3,6 +3,10 @@
 require "rails_helper"
 
 RSpec.describe "Strava search", :js, type: :system do
+  # Stub external Strava API calls triggered by the React SPA via the proxy
+  before { WebMock::API.stub_request(:any, /strava\.com/).to_return(status: 200, body: "[]", headers: {"Content-Type" => "application/json"}) }
+  after { WebMock.reset! }
+
   it "renders the compiled strava_search SPA" do
     strava_app = FactoryBot.create(:doorkeeper_app, is_internal: true)
     stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", strava_app.id)
@@ -15,9 +19,6 @@ RSpec.describe "Strava search", :js, type: :system do
       scopes: "public",
       expires_in: Doorkeeper.configuration.access_token_expires_in
     )
-
-    # Stub external Strava API calls triggered by the React SPA via the proxy
-    WebMock::API.stub_request(:any, /strava\.com/).to_return(status: 200, body: "[]", headers: {"Content-Type" => "application/json"})
 
     visit new_session_path
     fill_in "Email", with: user.email
