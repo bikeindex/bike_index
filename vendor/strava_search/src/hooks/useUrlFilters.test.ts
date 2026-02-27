@@ -222,6 +222,26 @@ describe('useUrlFilters', () => {
       expect(result.current[0].kudosTo).toBe(50);
       expect(result.current[0].filtersExpanded).toBe(true);
     });
+
+    it('parses country from URL and auto-expands properties panel', () => {
+      window.history.replaceState({}, '', '/?country=United+States');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].country).toBe('United States');
+      expect(result.current[0].filtersExpanded).toBe(true);
+    });
+
+    it('parses country, region, and city from URL', () => {
+      window.history.replaceState({}, '', '/?country=United+States&region=California&city=Oakland');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].country).toBe('United States');
+      expect(result.current[0].region).toBe('California');
+      expect(result.current[0].city).toBe('Oakland');
+      expect(result.current[0].filtersExpanded).toBe(true);
+    });
   });
 
   describe('setFilters', () => {
@@ -847,6 +867,42 @@ describe('useUrlFilters', () => {
       });
 
       expect(window.location.search).toBe('');
+    });
+
+    it('updates URL with location filters', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          ...result.current[0],
+          country: 'United States',
+          region: 'California',
+          city: 'Oakland',
+          filtersExpanded: true,
+        });
+      });
+
+      expect(window.location.search).toContain('country=United+States');
+      expect(window.location.search).toContain('region=California');
+      expect(window.location.search).toContain('city=Oakland');
+    });
+
+    it('omits null location filters from URL', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          ...result.current[0],
+          country: 'France',
+          region: null,
+          city: null,
+          filtersExpanded: true,
+        });
+      });
+
+      expect(window.location.search).toContain('country=France');
+      expect(window.location.search).not.toContain('region');
+      expect(window.location.search).not.toContain('city');
     });
 
     it('supports functional updates', () => {
