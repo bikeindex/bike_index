@@ -118,6 +118,32 @@ async function apiRequest<T>(
   return response.json();
 }
 
+export interface BackendSyncStatus {
+  status: 'pending' | 'syncing' | 'synced' | 'error';
+  activities_downloaded_count: number;
+  athlete_activity_count: number | null;
+  progress_percent: number;
+}
+
+export async function fetchSyncStatus(): Promise<BackendSyncStatus | null> {
+  const accessToken = await getValidAccessToken();
+  const config = getConfig();
+
+  const response = await fetch(config.proxyEndpoint, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ sync_status: true }),
+  });
+
+  if (!response.ok) return null;
+
+  const data = await response.json();
+  return data.sync_status ?? null;
+}
+
 export async function getAthlete(): Promise<StravaAthlete> {
   return apiRequest<StravaAthlete>('/athlete');
 }

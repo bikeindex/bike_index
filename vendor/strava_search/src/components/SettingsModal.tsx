@@ -15,7 +15,7 @@ interface SettingsModalProps {
 }
 
 function SettingsModalContent({ onClose }: { onClose: () => void }) {
-  const { athlete, syncState, logout } = useAuth();
+  const { athlete, syncState } = useAuth();
   const { units, setUnits, autoEnrich, setAutoEnrich, darkMode, setDarkMode } = usePreferences();
   const isDev = import.meta.env.DEV;
   const { isSyncing, progress, syncRecent } = useActivitySync();
@@ -56,8 +56,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
 
   const handleClearData = async () => {
     await clearAllData();
-    await logout();
-    onClose();
+    window.location.reload();
   };
 
   const darkModeOptions: { value: DarkMode; label: string; icon?: typeof Sun }[] = [

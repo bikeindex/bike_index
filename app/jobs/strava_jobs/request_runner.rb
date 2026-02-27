@@ -2,11 +2,11 @@
 
 module StravaJobs
   class RequestRunner < ScheduledJob
-    BATCH_SIZE = 10
+    BATCH_SIZE = 30
 
     prepend ScheduledJobRecorder
 
-    sidekiq_options queue: "low_priority", retry: false
+    sidekiq_options queue: "low_priority", retry: 1
 
     class << self
       def frequency

@@ -16,6 +16,11 @@ module API
         return
       end
 
+      if !auth_response[:strava_integration].synced? || Binxtils::InputNormalizer.boolean(params[:sync_status])
+        render json: StravaJobs::ProxyRequester.sync_status(auth_response[:strava_integration])
+        return
+      end
+
       enriched_since = enriched_since_from_url(permitted_params[:url])
       if enriched_since
         activities = auth_response[:strava_integration].strava_activities
@@ -52,7 +57,7 @@ module API
     end
 
     def permitted_params
-      params.permit(:url, :method, body: {})
+      params.permit(:url, :method, :sync_status, body: {})
     end
 
     SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze

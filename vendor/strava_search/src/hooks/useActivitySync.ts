@@ -3,9 +3,9 @@ import { useAuth } from '../contexts/AuthContext';
 import {
   getAllActivities,
   getAthleteGear,
-  getAthleteStats,
   getActivity,
   fetchEnrichedSince,
+  fetchSyncStatus,
 } from '../services/strava';
 import { formatNumber } from '../utils/formatters';
 import {
@@ -51,38 +51,56 @@ export function useActivitySync(): UseActivitySyncResult {
 
     setIsSyncing(true);
     setError(null);
-    setProgress({ loaded: 0, total: null, status: 'Starting sync...' });
+    setProgress({ loaded: 0, total: null, status: 'Checking sync status...' });
 
     try {
-      // Sync gear first
+      // Wait for backend to finish syncing before fetching via proxy
+      let syncStatus = await fetchSyncStatus();
+      let estimatedTotal: number | null = syncStatus?.athlete_activity_count ?? null;
+
+      const updateProgress = (status: typeof syncStatus) => {
+        if (!status) return;
+        estimatedTotal = status.athlete_activity_count;
+        setProgress({
+          loaded: status.activities_downloaded_count,
+          total: status.athlete_activity_count,
+          status: status.athlete_activity_count
+            ? `${formatNumber(status.activities_downloaded_count)} of ~${formatNumber(status.athlete_activity_count)} activities synced`
+            : `${formatNumber(status.activities_downloaded_count)} activities synced`,
+        });
+      };
+
+      updateProgress(syncStatus);
+
+      while (syncStatus && syncStatus.status !== 'synced' && syncStatus.status !== 'error') {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        syncStatus = await fetchSyncStatus();
+        updateProgress(syncStatus);
+      }
+
+      if (syncStatus?.status === 'error') {
+        setError('Backend sync encountered an error. Some activities may be missing.');
+      }
+
+      // Backend is synced — fetch activities via proxy
+      setProgress({ loaded: 0, total: null, status: 'Loading activities...' });
+
       const gear = await getAthleteGear();
       await saveGear(gear, athlete.id);
-
-      // Get estimated total from athlete stats
-      let estimatedTotal: number | null = null;
-      try {
-        estimatedTotal = await getAthleteStats(athlete.id);
-      } catch {
-        // Stats endpoint may fail, continue without total
-      }
 
       let oldestActivityDate: string | null = null;
       let isFirstBatch = true;
 
-      // Sync all activities - save each batch progressively
       await getAllActivities({
         onBatch: async (batch, totalSoFar) => {
-          // Save this batch immediately
           await saveActivities(batch, athlete.id);
 
-          // Track oldest activity date
           for (const activity of batch) {
             if (!oldestActivityDate || new Date(activity.start_date) < new Date(oldestActivityDate)) {
               oldestActivityDate = activity.start_date;
             }
           }
 
-          // After first batch, mark initial sync as complete so activities appear
           if (isFirstBatch) {
             isFirstBatch = false;
             const syncState: SyncState = {
@@ -98,7 +116,7 @@ export function useActivitySync(): UseActivitySyncResult {
           setProgress({
             loaded: totalSoFar,
             total: estimatedTotal,
-            status: `${formatNumber(totalSoFar)}${estimatedTotal ? ` of ~${formatNumber(estimatedTotal)}` : ''} activities synced`,
+            status: `${formatNumber(totalSoFar)}${estimatedTotal ? ` of ~${formatNumber(estimatedTotal)}` : ''} activities loaded`,
           });
         },
       });
@@ -106,10 +124,9 @@ export function useActivitySync(): UseActivitySyncResult {
       const finalSyncState: SyncState = {
         athleteId: athlete.id,
         lastSyncedAt: Date.now(),
-        oldestActivityDate: oldestActivityDate,
+        oldestActivityDate,
         isInitialSyncComplete: true,
       };
-
       await updateSyncState(finalSyncState);
       await refreshSyncState();
     } catch (err) {
