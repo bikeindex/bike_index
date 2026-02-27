@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { SearchFilters } from '../components/SearchFilters';
-import { mockGear } from './mocks';
+import { mockGear, mockActivities } from './mocks';
 import type { SearchFilters as SearchFiltersType } from '../types/strava';
 
 const meta = {
@@ -191,5 +191,44 @@ export const NoResults: Story = {
     gear: mockGear,
     totalCount: 150,
     filteredCount: 0,
+  },
+};
+
+export const WithLocationFilters: Story = {
+  render: (args) => <SearchFiltersWrapper {...args} />,
+  args: {
+    filters: defaultFilters,
+    onFiltersChange: () => {},
+    activities: mockActivities,
+    activityTypes: ['Run', 'Ride', 'NordicSki', 'VirtualRide', 'EBikeRide'],
+    gear: mockGear,
+    totalCount: mockActivities.length,
+    filteredCount: mockActivities.length,
+  },
+};
+
+export const WithCountrySelected: Story = {
+  render: (args) => <SearchFiltersWrapper {...args} />,
+  args: {
+    filters: { ...defaultFilters, country: 'United States' },
+    onFiltersChange: () => {},
+    activities: mockActivities,
+    activityTypes: ['Run', 'Ride', 'NordicSki', 'VirtualRide', 'EBikeRide'],
+    gear: mockGear,
+    totalCount: mockActivities.length,
+    filteredCount: 4,
+  },
+};
+
+export const WithRegionSelected: Story = {
+  render: (args) => <SearchFiltersWrapper {...args} />,
+  args: {
+    filters: { ...defaultFilters, region: 'California' },
+    onFiltersChange: () => {},
+    activities: mockActivities,
+    activityTypes: ['Run', 'Ride', 'NordicSki', 'VirtualRide', 'EBikeRide'],
+    gear: mockGear,
+    totalCount: mockActivities.length,
+    filteredCount: 2,
   },
 };

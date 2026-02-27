@@ -257,6 +257,48 @@ const berlinRide: StoredActivity = {
   syncedAt: Date.now(),
 };
 
+// Multi-state ride (Indiana + Illinois)
+const dunesTrip: StoredActivity = {
+  id: 630203151,
+  strava_id: '630203151',
+  activity_type: 'Ride',
+  average_speed: 6.154,
+  description: '',
+  distance_meters: 95650.5,
+  kudos_count: 4,
+  moving_time_seconds: 15543,
+  photos: {
+    photo_url: 'https://dgtzuqphqg23d.cloudfront.net/3xxlmNZNWWBLPBEdUPxXaZ0X6acdl6c5D5R6StX5egc-768x576.jpg',
+    photo_count: 2,
+  },
+  private: false,
+  segment_locations: {
+    cities: ['Hobart', 'Merrillville', 'Gary', 'Griffith', 'Highland', 'Hammond', 'Chicago'],
+    states: ['IN', 'Indiana', 'Illinois', 'IL'],
+    countries: ['United States', 'USA'],
+  },
+  sport_type: 'Ride',
+  start_date: '2016-07-04T09:36:55.000-05:00',
+  suffer_score: 113.0,
+  timezone: 'America/Chicago',
+  title: "Dunes trip '16",
+  total_elevation_gain_meters: 28.9,
+  gear_id: null,
+  trainer: false,
+  muted: false,
+  commute: false,
+  enriched: true,
+  pr_count: 6,
+  device_name: undefined,
+  device_watts: true,
+  average_watts: 108.7,
+  max_heartrate: 167.0,
+  average_heartrate: 131.2,
+  start_date_in_zone: '2016-07-04T09:36:55.000-05:00',
+  athleteId: 12345,
+  syncedAt: Date.now(),
+};
+
 export const mockActivities: StoredActivity[] = [
   pelotonRide,
   nordicSki,
@@ -264,6 +306,7 @@ export const mockActivities: StoredActivity[] = [
   rando400k,
   berlinRide,
   morningRun,
+  dunesTrip,
 ];
 
 export const mockAthlete = {

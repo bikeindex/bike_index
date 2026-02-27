@@ -234,5 +234,61 @@ RSpec.describe StravaActivity, type: :model do
       expect(strava_activity).to have_attributes target_attributes.as_json
       expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
     end
+
+    context "dunes trip with multi-state segments" do
+      let(:strava_activity) { StravaActivity.create(strava_integration:, strava_id: "630203151") }
+      let(:target_attributes) do
+        {
+          title: "Dunes trip '16",
+          activity_type: "Ride",
+          sport_type: "Ride",
+          distance_meters: 95650.5,
+          moving_time_seconds: 15543,
+          total_elevation_gain_meters: 28.9,
+          average_speed: 6.154,
+          suffer_score: 113.0,
+          kudos_count: 4,
+          gear_id: nil,
+          private: false,
+          description: "",
+          photos: {
+            photo_url: "https://dgtzuqphqg23d.cloudfront.net/3xxlmNZNWWBLPBEdUPxXaZ0X6acdl6c5D5R6StX5egc-768x576.jpg",
+            photo_count: 2
+          },
+          segment_locations: {
+            cities: ["Hobart", "Merrillville", "Gary", "Griffith", "Highland", "Hammond", "Chicago"],
+            states: ["IN", "Indiana", "Illinois", "IL"],
+            countries: ["United States", "USA"]
+          },
+          strava_data: {
+            commute: false,
+            trainer: false,
+            muted: false,
+            pr_count: 6,
+            device_watts: true,
+            average_speed: 6.154,
+            average_watts: 108.7,
+            max_heartrate: 167.0,
+            average_heartrate: 131.2
+          }
+        }
+      end
+
+      it "updates from strava and returns correct proxy_serialized" do
+        expect(strava_activity).to be_valid
+        VCR.use_cassette("strava-update_from_strava-dunes_trip") do
+          strava_activity.update_from_strava!
+        end
+        strava_activity.reload
+        expect(strava_activity).to have_attributes target_attributes.as_json
+        expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
+
+        proxy = strava_activity.proxy_serialized
+        expect(proxy["segment_locations"]).to eq target_attributes[:segment_locations].as_json
+        expect(proxy["strava_id"]).to eq "630203151"
+        expect(proxy["title"]).to eq "Dunes trip '16"
+        expect(proxy["start_date_in_zone"]).to be_present
+      end
+    end
   end
 end

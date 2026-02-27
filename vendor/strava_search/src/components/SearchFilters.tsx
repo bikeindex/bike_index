@@ -58,14 +58,22 @@ export function SearchFilters({
   }, [activities, filters.country]);
 
   const availableCities = useMemo(() => {
-    const set = new Set<string>();
+    const cityRegions = new Map<string, string>();
     for (const a of activities) {
       if (filters.country && !a.segment_locations?.countries?.includes(filters.country)) continue;
       if (filters.region && !a.segment_locations?.states?.includes(filters.region)) continue;
-      for (const c of a.segment_locations?.cities || []) set.add(c);
+      const states = a.segment_locations?.states || [];
+      // Pick the shortest state name (most likely the abbreviation)
+      const shortState = states.length > 0 ? states.reduce((a, b) => a.length <= b.length ? a : b) : null;
+      for (const c of a.segment_locations?.cities || []) {
+        if (!cityRegions.has(c) && shortState) cityRegions.set(c, shortState);
+      }
     }
-    return Array.from(set).sort();
+    return Array.from(cityRegions.entries())
+      .map(([city, region]) => ({ city, region }))
+      .sort((a, b) => a.city.localeCompare(b.city));
   }, [activities, filters.country, filters.region]);
+
 
   const hasActiveFilters =
     filters.query ||
@@ -494,7 +502,7 @@ export function SearchFilters({
               ))}
             </select>
           </label>
-          {filters.country && availableRegions.length > 0 && (
+          {availableRegions.length > 0 && (
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>Region:</span>
             <select
@@ -516,7 +524,7 @@ export function SearchFilters({
             </select>
           </label>
           )}
-          {filters.country && availableCities.length > 0 && (
+          {availableCities.length > 0 && (
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>City:</span>
             <select
@@ -525,8 +533,8 @@ export function SearchFilters({
               className={selectClasses}
             >
               <option value="">All</option>
-              {availableCities.map((c) => (
-                <option key={c} value={c}>{c}</option>
+              {availableCities.map(({ city, region }) => (
+                <option key={city} value={city}>{city}, {region}</option>
               ))}
             </select>
           </label>
