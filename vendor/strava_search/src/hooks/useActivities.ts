@@ -111,10 +111,6 @@ export function useActivities(): UseActivitiesResult {
           activity.title,
           activity.description,
           activity.device_name,
-          // Include all segment locations for search
-          ...(activity.segment_locations?.cities || []),
-          ...(activity.segment_locations?.states || []),
-          ...(activity.segment_locations?.countries || []),
         ]
           .filter(Boolean)
           .join(' ')

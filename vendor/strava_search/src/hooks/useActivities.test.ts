@@ -161,7 +161,7 @@ describe('useActivities', () => {
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, query: 'san francisco' }));
+          result.current.setFilters((prev) => ({ ...prev, city: 'San Francisco' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);
@@ -178,7 +178,7 @@ describe('useActivities', () => {
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, query: 'california' }));
+          result.current.setFilters((prev) => ({ ...prev, region: 'California' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);
@@ -209,6 +209,7 @@ describe('useActivities', () => {
             segment_locations: {
               cities: ['Mill Valley', 'Sausalito'],
               states: ['California'],
+              countries: ['United States'],
             },
           }),
           createActivity({ id: 2, title: 'Activity 2' })
@@ -218,7 +219,7 @@ describe('useActivities', () => {
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, query: 'sausalito' }));
+          result.current.setFilters((prev) => ({ ...prev, country: 'United States', city: 'Sausalito' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);

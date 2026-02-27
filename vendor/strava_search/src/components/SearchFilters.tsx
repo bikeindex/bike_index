@@ -171,7 +171,7 @@ export function SearchFilters({
           type="text"
           value={filters.query}
           onChange={(e) => onFiltersChange({ ...filters, query: e.target.value })}
-          placeholder="Search by name, description, location, recorded with..."
+          placeholder="Search by name, description, recorded with..."
           className={`w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none`}
         />
         {filters.query && (
