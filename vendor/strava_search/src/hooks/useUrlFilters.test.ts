@@ -171,6 +171,42 @@ describe('useUrlFilters', () => {
       expect(result.current[0].filtersExpanded).toBe(true);
     });
 
+    it('parses trainer filter from URL and auto-expands properties panel', () => {
+      window.history.replaceState({}, '', '/?trainer=trainer');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].trainerFilter).toBe('trainer');
+      expect(result.current[0].filtersExpanded).toBe(true);
+    });
+
+    it('parses muted filter from URL and auto-expands properties panel', () => {
+      window.history.replaceState({}, '', '/?muted=muted');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].mutedFilter).toBe('muted');
+      expect(result.current[0].filtersExpanded).toBe(true);
+    });
+
+    it('parses photo filter from URL and auto-expands properties panel', () => {
+      window.history.replaceState({}, '', '/?photo=has_photo');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].photoFilter).toBe('has_photo');
+      expect(result.current[0].filtersExpanded).toBe(true);
+    });
+
+    it('parses private filter from URL and auto-expands properties panel', () => {
+      window.history.replaceState({}, '', '/?private=private');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].privateFilter).toBe('private');
+      expect(result.current[0].filtersExpanded).toBe(true);
+    });
+
     it('parses kudos range from URL and auto-expands properties panel', () => {
       window.history.replaceState({}, '', '/?kudosFrom=5&kudosTo=50');
 
@@ -605,6 +641,62 @@ describe('useUrlFilters', () => {
       });
 
       expect(window.location.search).toBe('?commute=commute');
+    });
+
+    it('updates URL with trainer filter', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          ...result.current[0],
+          trainerFilter: 'trainer',
+          filtersExpanded: true,
+        });
+      });
+
+      expect(window.location.search).toContain('trainer=trainer');
+    });
+
+    it('updates URL with muted filter', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          ...result.current[0],
+          mutedFilter: 'muted',
+          filtersExpanded: true,
+        });
+      });
+
+      expect(window.location.search).toContain('muted=muted');
+    });
+
+    it('updates URL with photo filter', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          ...result.current[0],
+          photoFilter: 'has_photo',
+          filtersExpanded: true,
+        });
+      });
+
+      expect(window.location.search).toContain('photo=has_photo');
+    });
+
+    it('updates URL with private filter', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({
+          ...result.current[0],
+          privateFilter: 'private',
+          filtersExpanded: true,
+        });
+      });
+
+      expect(window.location.search).toContain('private=private');
     });
 
     it('updates URL with suffer score range', () => {

@@ -157,7 +157,7 @@ function Dashboard() {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 py-6 space-y-6">
 
         <SearchFilters
           filters={filters}

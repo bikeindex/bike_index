@@ -41,7 +41,7 @@ class StravaIntegrationsController < ApplicationController
       StravaJobs::FetchAthleteAndStats.perform_async(strava_integration.id)
       flash[:success] = "Strava connected! Your activities are being synced."
     else
-      flash[:success] = "Strava connected! Updating your activities."
+      flash[:success] = "Strava connection updated!"
     end
     return_to = session.delete(:strava_return_to)
     redirect_to return_to || (strava_integration.has_activity_write? ? strava_search_path : my_account_path)

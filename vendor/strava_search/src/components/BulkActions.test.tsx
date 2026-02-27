@@ -37,23 +37,31 @@ describe('BulkActions', () => {
 
   it('shows selected count when items are selected', () => {
     render(<BulkActions {...defaultProps} selectedCount={3} />);
-    expect(screen.getByText('3 selected')).toBeInTheDocument();
+    expect(screen.getByText('3 selected · Clear')).toBeInTheDocument();
   });
 
-  it('shows action buttons when items are selected', () => {
+  it('shows labeled update fields when items are selected', () => {
     render(<BulkActions {...defaultProps} selectedCount={2} />);
-    expect(screen.getByText('Change Type')).toBeInTheDocument();
-    expect(screen.getByText('Change Gear')).toBeInTheDocument();
+    expect(screen.getByText('Activity Type')).toBeInTheDocument();
+    expect(screen.getByText('Equipment')).toBeInTheDocument();
     expect(screen.getByText('Commute')).toBeInTheDocument();
-    expect(screen.getByText('Trainer/Indoor')).toBeInTheDocument();
+    expect(screen.getByText('Trainer')).toBeInTheDocument();
   });
 
-  it('does not show action buttons when nothing selected', () => {
+  it('all fields default to "No change"', () => {
+    render(<BulkActions {...defaultProps} selectedCount={2} />);
+    expect(screen.getByLabelText('Activity Type')).toHaveValue('');
+    expect(screen.getByLabelText('Equipment')).toHaveValue('');
+    expect(screen.getByLabelText('Commute')).toHaveValue('');
+    expect(screen.getByLabelText('Trainer')).toHaveValue('');
+    // Verify the placeholder text
+    expect(screen.getAllByText('No change')).toHaveLength(4);
+  });
+
+  it('collapses update fields when nothing selected', () => {
     render(<BulkActions {...defaultProps} />);
-    expect(screen.queryByText('Change Type')).not.toBeInTheDocument();
-    expect(screen.queryByText('Change Gear')).not.toBeInTheDocument();
-    expect(screen.queryByText('Commute')).not.toBeInTheDocument();
-    expect(screen.queryByText('Trainer/Indoor')).not.toBeInTheDocument();
+    const animatedContainer = screen.getByLabelText('Activity Type').closest('[class*="transition"]')!;
+    expect(animatedContainer).toHaveStyle({ gridTemplateRows: '0fr' });
   });
 
   it('calls onSelectAll when select all on page is clicked', () => {
@@ -62,251 +70,170 @@ describe('BulkActions', () => {
     expect(defaultProps.onSelectAll).toHaveBeenCalled();
   });
 
-  it('calls onDeselectAll when all are selected and toggle is clicked', () => {
+  it('calls onDeselectAll when selected count is clicked', () => {
     render(<BulkActions {...defaultProps} selectedCount={10} />);
-    fireEvent.click(screen.getByText('10 selected'));
+    fireEvent.click(screen.getByText('10 selected · Clear'));
     expect(defaultProps.onDeselectAll).toHaveBeenCalled();
   });
 
-  describe('Change Type Modal', () => {
-    it('opens type modal when Change Type is clicked', () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Type'));
-      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
+  describe('Update form', () => {
+    it('has a single Update button showing the selected count', () => {
+      render(<BulkActions {...defaultProps} selectedCount={5} />);
+      expect(screen.getByText('Update 5 activities')).toBeInTheDocument();
     });
 
-    it('updates activities with selected type', async () => {
+    it('disables Update button when all fields are "No change"', () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Type'));
+      expect(screen.getByText('Update 2 activities')).toBeDisabled();
+    });
 
-      const select = screen.getByRole('combobox');
-      fireEvent.change(select, { target: { value: 'Run' } });
-      fireEvent.click(screen.getByText('Update'));
+    it('does not call onUpdateSelected when no fields are changed', () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      // Button is disabled, but verify the guard in handleSubmit too
+      expect(screen.getByText('Update 2 activities')).toBeDisabled();
+      expect(defaultProps.onUpdateSelected).not.toHaveBeenCalled();
+    });
+
+    it('enables Update button when a field is changed', () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      fireEvent.change(screen.getByLabelText('Activity Type'), { target: { value: 'Run' } });
+      expect(screen.getByText('Update 2 activities')).not.toBeDisabled();
+    });
+
+    it('submits type change', async () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} />);
+      fireEvent.change(screen.getByLabelText('Activity Type'), { target: { value: 'Run' } });
+      fireEvent.click(screen.getByText('Update 2 activities'));
 
       await waitFor(() => {
         expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ type: 'Run' });
       });
     });
-  });
 
-  describe('Change Gear Modal', () => {
-    it('opens gear modal when Change Gear is clicked', () => {
+    it('submits gear change', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Gear'));
-      expect(screen.getByText('Change Equipment')).toBeInTheDocument();
-    });
-
-    it('updates activities with selected gear', async () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Gear'));
-
-      const select = screen.getByRole('combobox');
-      fireEvent.change(select, { target: { value: 'b123' } });
-      fireEvent.click(screen.getByText('Update'));
+      fireEvent.change(screen.getByLabelText('Equipment'), { target: { value: 'b123' } });
+      fireEvent.click(screen.getByText('Update 2 activities'));
 
       await waitFor(() => {
         expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ gear_id: 'b123' });
       });
     });
 
-    it('removes gear when None is selected', async () => {
+    it('removes gear when "None (remove)" is selected', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Gear'));
-
-      // The default value is already empty (None)
-      fireEvent.click(screen.getByText('Update'));
+      fireEvent.change(screen.getByLabelText('Equipment'), { target: { value: '_none' } });
+      fireEvent.click(screen.getByText('Update 2 activities'));
 
       await waitFor(() => {
         expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ gear_id: '' });
       });
     });
-  });
 
-  describe('Commute Modal', () => {
-    it('opens commute modal when Commute is clicked', () => {
+    it('submits commute change', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Commute'));
-      expect(screen.getByText('Change Commute')).toBeInTheDocument();
-    });
-
-    it('updates activities with commute tag', async () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Commute'));
-
-      const select = screen.getByRole('combobox');
-      fireEvent.change(select, { target: { value: 'true' } });
-      fireEvent.click(screen.getByText('Update'));
+      fireEvent.change(screen.getByLabelText('Commute'), { target: { value: 'true' } });
+      fireEvent.click(screen.getByText('Update 2 activities'));
 
       await waitFor(() => {
         expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ commute: true });
       });
     });
 
-    it('removes commute tag when false is selected', async () => {
+    it('submits trainer change', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Commute'));
-
-      const select = screen.getByRole('combobox');
-      fireEvent.change(select, { target: { value: 'false' } });
-      fireEvent.click(screen.getByText('Update'));
-
-      await waitFor(() => {
-        expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ commute: false });
-      });
-    });
-
-    it('disables update button when no value is selected', () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Commute'));
-
-      const updateButton = screen.getByText('Update');
-      expect(updateButton).toBeDisabled();
-    });
-  });
-
-  describe('Trainer/Indoor Modal', () => {
-    it('opens trainer modal when Trainer/Indoor is clicked', () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Trainer/Indoor'));
-      expect(screen.getByText('Change Trainer/Indoor')).toBeInTheDocument();
-    });
-
-    it('updates activities with trainer tag', async () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Trainer/Indoor'));
-
-      const select = screen.getByRole('combobox');
-      fireEvent.change(select, { target: { value: 'true' } });
-      fireEvent.click(screen.getByText('Update'));
-
-      await waitFor(() => {
-        expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ trainer: true });
-      });
-    });
-
-    it('removes trainer tag when false is selected', async () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Trainer/Indoor'));
-
-      const select = screen.getByRole('combobox');
-      fireEvent.change(select, { target: { value: 'false' } });
-      fireEvent.click(screen.getByText('Update'));
+      fireEvent.change(screen.getByLabelText('Trainer'), { target: { value: 'false' } });
+      fireEvent.click(screen.getByText('Update 2 activities'));
 
       await waitFor(() => {
         expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ trainer: false });
       });
     });
 
-    it('disables update button when no value is selected', () => {
+    it('submits multiple changes at once', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Trainer/Indoor'));
+      fireEvent.change(screen.getByLabelText('Activity Type'), { target: { value: 'Ride' } });
+      fireEvent.change(screen.getByLabelText('Equipment'), { target: { value: 'b123' } });
+      fireEvent.change(screen.getByLabelText('Commute'), { target: { value: 'true' } });
+      fireEvent.click(screen.getByText('Update 2 activities'));
 
-      const updateButton = screen.getByText('Update');
-      expect(updateButton).toBeDisabled();
+      await waitFor(() => {
+        expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({
+          type: 'Ride',
+          gear_id: 'b123',
+          commute: true,
+        });
+      });
     });
-  });
 
-  describe('Escape key', () => {
-    it('closes modal on Escape', () => {
+    it('only includes changed fields in update', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Type'));
-      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
+      // Only change commute, leave everything else as "No change"
+      fireEvent.change(screen.getByLabelText('Commute'), { target: { value: 'false' } });
+      fireEvent.click(screen.getByText('Update 2 activities'));
 
-      fireEvent.keyDown(document, { key: 'Escape' });
-      expect(screen.queryByText('Change Activity Type')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(defaultProps.onUpdateSelected).toHaveBeenCalledWith({ commute: false });
+      });
+      // Should NOT include type, gear_id, or trainer
+      const call = defaultProps.onUpdateSelected.mock.calls[0][0];
+      expect(call).not.toHaveProperty('type');
+      expect(call).not.toHaveProperty('gear_id');
+      expect(call).not.toHaveProperty('trainer');
     });
 
-    it('does not close when a different modal is topmost', () => {
+    it('resets fields after update', async () => {
       render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Type'));
-      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
+      fireEvent.change(screen.getByLabelText('Activity Type'), { target: { value: 'Run' } });
+      fireEvent.click(screen.getByText('Update 2 activities'));
 
-      // Simulate another modal on top
-      const otherModal = document.createElement('div');
-      otherModal.setAttribute('data-modal', 'settings');
-      document.body.appendChild(otherModal);
+      await waitFor(() => {
+        expect(defaultProps.onUpdateSelected).toHaveBeenCalled();
+      });
 
-      fireEvent.keyDown(document, { key: 'Escape' });
-      // Should still be open since bulk-edit is not the topmost modal
-      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
-
-      document.body.removeChild(otherModal);
+      expect(screen.getByLabelText('Activity Type')).toHaveValue('');
     });
-  });
 
-  it('closes modal when Cancel is clicked', () => {
-    render(<BulkActions {...defaultProps} selectedCount={2} />);
-    fireEvent.click(screen.getByText('Change Type'));
-    expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Cancel'));
-    expect(screen.queryByText('Change Activity Type')).not.toBeInTheDocument();
-  });
-
-  it('closes modal immediately when Update is clicked', async () => {
-    render(<BulkActions {...defaultProps} selectedCount={2} />);
-    fireEvent.click(screen.getByText('Change Gear'));
-    expect(screen.getByText('Change Equipment')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Update'));
-
-    // Modal should close immediately, before the update completes
-    await waitFor(() => {
-      expect(screen.queryByText('Change Equipment')).not.toBeInTheDocument();
+    it('disables all fields when isUpdating is true', () => {
+      render(<BulkActions {...defaultProps} selectedCount={2} isUpdating={true} />);
+      expect(screen.getByLabelText('Activity Type')).toBeDisabled();
+      expect(screen.getByLabelText('Equipment')).toBeDisabled();
+      expect(screen.getByLabelText('Commute')).toBeDisabled();
+      expect(screen.getByLabelText('Trainer')).toBeDisabled();
     });
-  });
-
-  it('disables buttons when isUpdating is true', () => {
-    render(<BulkActions {...defaultProps} selectedCount={2} isUpdating={true} />);
-    expect(screen.getByText('Change Type').closest('button')).toBeDisabled();
-    expect(screen.getByText('Change Gear').closest('button')).toBeDisabled();
-    expect(screen.getByText('Commute').closest('button')).toBeDisabled();
-    expect(screen.getByText('Trainer/Indoor').closest('button')).toBeDisabled();
   });
 
   describe('Authorization modal', () => {
     const noWriteProps = { ...defaultProps, selectedCount: 2, hasActivityWrite: false };
 
-    it('shows auth modal instead of edit modal when hasActivityWrite is false', () => {
+    it('shows auth modal immediately when activities are selected without write permission', () => {
       render(<BulkActions {...noWriteProps} />);
-      fireEvent.click(screen.getByText('Change Type'));
-      expect(screen.getByText('You need to authorize updating Strava Activities')).toBeInTheDocument();
-      expect(screen.queryByText('Change Activity Type')).not.toBeInTheDocument();
-    });
-
-    it('shows auth modal for all edit buttons', () => {
-      const { unmount } = render(<BulkActions {...noWriteProps} />);
-      for (const label of ['Change Type', 'Change Gear', 'Commute', 'Trainer/Indoor']) {
-        fireEvent.click(screen.getByText(label));
-        expect(screen.getByText('You need to authorize updating Strava Activities')).toBeInTheDocument();
-        // Close via the X button in the auth modal header
-        const header = screen.getByText('Authorization Required').closest('div')!;
-        fireEvent.click(header.querySelector('button')!);
-      }
-      unmount();
-    });
-
-    it('has an Authorize link to the authUrl', () => {
-      render(<BulkActions {...noWriteProps} />);
-      fireEvent.click(screen.getByText('Change Type'));
-      const authorizeLink = screen.getByText('Authorize');
-      expect(authorizeLink.closest('a')).toHaveAttribute('href', '/strava_integration/new?scope=strava_search');
-    });
-
-    it('closes auth modal when X is clicked', () => {
-      render(<BulkActions {...noWriteProps} />);
-      fireEvent.click(screen.getByText('Change Type'));
       expect(screen.getByText('Authorization Required')).toBeInTheDocument();
+      expect(screen.getByText('You need to authorize updating Strava Activities')).toBeInTheDocument();
+    });
+
+    it('does not show auth modal when nothing is selected', () => {
+      render(<BulkActions {...defaultProps} selectedCount={0} hasActivityWrite={false} />);
+      expect(screen.queryByText('Authorization Required')).not.toBeInTheDocument();
+    });
+
+    it('has an Authorize link in the modal', () => {
+      render(<BulkActions {...noWriteProps} />);
+      const authorizeLink = screen.getByText('Authorize').closest('a');
+      expect(authorizeLink).toHaveAttribute('href', expect.stringContaining('/strava_integration/new?scope=strava_search'));
+    });
+
+    it('calls onDeselectAll when X is clicked', () => {
+      render(<BulkActions {...noWriteProps} />);
       const closeButton = screen.getByText('Authorization Required').closest('div')!.querySelector('button')!;
       fireEvent.click(closeButton);
-      expect(screen.queryByText('Authorization Required')).not.toBeInTheDocument();
+      expect(defaultProps.onDeselectAll).toHaveBeenCalled();
     });
 
-    it('shows edit modal when hasActivityWrite is true', () => {
-      render(<BulkActions {...defaultProps} selectedCount={2} />);
-      fireEvent.click(screen.getByText('Change Type'));
-      expect(screen.getByText('Change Activity Type')).toBeInTheDocument();
-      expect(screen.queryByText('Authorization Required')).not.toBeInTheDocument();
+    it('calls onDeselectAll when Escape is pressed', () => {
+      render(<BulkActions {...noWriteProps} />);
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(defaultProps.onDeselectAll).toHaveBeenCalled();
     });
   });
 
@@ -324,7 +251,6 @@ describe('BulkActions', () => {
     it('calls onPageChange when clicking next', () => {
       render(<BulkActions {...defaultProps} totalPages={3} currentPage={1} />);
       const buttons = screen.getAllByRole('button');
-      // Find the next button (has ChevronRight)
       const nextButton = buttons.find(btn => btn.querySelector('svg.lucide-chevron-right'));
       fireEvent.click(nextButton!);
       expect(defaultProps.onPageChange).toHaveBeenCalledWith(2);
@@ -333,7 +259,6 @@ describe('BulkActions', () => {
     it('calls onPageChange when clicking previous', () => {
       render(<BulkActions {...defaultProps} totalPages={3} currentPage={2} />);
       const buttons = screen.getAllByRole('button');
-      // Find the previous button (has ChevronLeft)
       const prevButton = buttons.find(btn => btn.querySelector('svg.lucide-chevron-left'));
       fireEvent.click(prevButton!);
       expect(defaultProps.onPageChange).toHaveBeenCalledWith(1);

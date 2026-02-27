@@ -148,7 +148,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
                 .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(0)
 
               expect(response).to redirect_to(my_account_path)
-              expect(flash[:success]).to eq "Strava connected! Updating your activities."
+              expect(flash[:success]).to eq "Strava connection updated!"
 
               strava_integration = current_user.reload.strava_integration
               expect(strava_integration.id).to eq existing.id

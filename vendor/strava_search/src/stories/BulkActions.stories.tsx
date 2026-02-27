@@ -21,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultArgs = {
-  selectedCount: 0,
+  selectedCount: 12,
   pageCount: 50,
   totalPages: 3,
   currentPage: 1,
@@ -35,36 +35,10 @@ const defaultArgs = {
   authUrl: '/strava_integration/new?scope=strava_search',
 };
 
-export const NoneSelected: Story = {
+export const Default: Story = {
   args: defaultArgs,
 };
 
-export const SomeSelected: Story = {
-  args: { ...defaultArgs, selectedCount: 12 },
-};
-
-export const AllSelected: Story = {
-  args: { ...defaultArgs, selectedCount: 50, currentPage: 2 },
-};
-
-export const Updating: Story = {
-  args: { ...defaultArgs, selectedCount: 12, isUpdating: true },
-};
-
-export const NoGear: Story = {
-  args: { ...defaultArgs, selectedCount: 5, gear: [] },
-};
-
-export const SinglePage: Story = {
-  args: { ...defaultArgs, pageCount: 25, totalPages: 1 },
-};
-
-export const PermissionsModal: Story = {
-  args: { ...defaultArgs, selectedCount: 5, hasActivityWrite: false },
-  play: async ({ canvasElement }) => {
-    const button = [...canvasElement.querySelectorAll('button')].find(
-      (b) => b.textContent?.includes('Change Type')
-    );
-    button?.click();
-  },
+export const NeedsAuthorization: Story = {
+  args: { ...defaultArgs, hasActivityWrite: false },
 };
