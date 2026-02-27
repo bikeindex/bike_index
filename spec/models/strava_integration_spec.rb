@@ -126,6 +126,12 @@ RSpec.describe StravaIntegration, type: :model do
       expect(integration_default.permissions_more?).to be false
       expect(integration_less.permissions_more?).to be false
       expect(integration_nil.permissions_more?).to be false
+
+      expect(integration_more.has_activity_write?).to be true
+      expect(integration_default.has_activity_write?).to be false
+      expect(integration_less.has_activity_write?).to be false
+      expect(integration_nil.has_activity_write?).to be false
+      expect(integration_blank.has_activity_write?).to be false
     end
   end
 

@@ -41,6 +41,10 @@ class StravaRequest < AnalyticsRecord
     skipped: 6,
     insufficient_token_privileges: 7
   }.freeze
+  PENDING_OR_SUCCESS = %i[success pending].freeze
+  NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
+  # Priority: incoming_webhook (5) → list_activities (2) → fetch_gear (4) → fetch_activity (3)
+  PRIORITY_ORDER = [5, 2, 4, 3, 0, 1].freeze
 
   belongs_to :user
   belongs_to :strava_integration
@@ -50,9 +54,8 @@ class StravaRequest < AnalyticsRecord
 
   validates :strava_integration_id, presence: true
 
-  # Priority: incoming_webhook (5) → list_activities (2) → fetch_gear (4) → fetch_activity (3)
-  PRIORITY_ORDER = [5, 2, 4, 3, 0, 1].freeze
-
+  scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
+  scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
   scope :unprocessed, -> { where(requested_at: nil).where.not(response_status: :integration_deleted).order(:id) }
   scope :priority_ordered, -> {
     reorder(Arel.sql("ARRAY_POSITION(ARRAY#{PRIORITY_ORDER}, request_type), id"))

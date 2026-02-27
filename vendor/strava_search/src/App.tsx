@@ -8,10 +8,12 @@ import { ErrorBanner } from './components/ErrorBanner';
 import { SearchFilters } from './components/SearchFilters';
 import { ActivityList } from './components/ActivityList';
 import { SettingsModal } from './components/SettingsModal';
+import { getConfig } from './services/railsApi';
 import { Loader2 } from 'lucide-react';
 
 function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
+  const config = getConfig();
   const { syncState } = useAuth();
   const { autoEnrich } = usePreferences();
   const { isSyncing, isFetchingFullData, progress, error: syncError, clearError: clearSyncError, fetchFullActivityData, syncAll, syncEnriched } = useActivitySync();
@@ -155,7 +157,7 @@ function Dashboard() {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 py-6 space-y-6">
 
         <SearchFilters
           filters={filters}
@@ -178,6 +180,8 @@ function Dashboard() {
           isUpdating={isUpdating}
           filters={filters}
           onFiltersChange={setFilters}
+          hasActivityWrite={config.hasActivityWrite}
+          authUrl={config.authUrl}
         />
       </main>
 

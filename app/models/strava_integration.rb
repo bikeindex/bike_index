@@ -71,6 +71,10 @@ class StravaIntegration < ApplicationRecord
     strava_permissions.present? && strava_permissions.split(",").length > Integrations::StravaClient::DEFAULT_SCOPE.split(",").length
   end
 
+  def has_activity_write?
+    strava_permissions.present? && strava_permissions.split(",").include?("activity:write")
+  end
+
   def sync_progress_percent
     return 0 if athlete_activity_count.blank? || athlete_activity_count.zero?
     [(activities_downloaded_count.to_f / athlete_activity_count * 100).round, 100].min

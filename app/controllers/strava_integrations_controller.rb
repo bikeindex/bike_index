@@ -9,7 +9,10 @@ class StravaIntegrationsController < ApplicationController
   def new
     state = SecureRandom.hex(24)
     session[:strava_oauth_state] = state
-    redirect_to Integrations::StravaClient.authorization_url(state:), allow_other_host: true
+    session[:strava_return_to] = params[:return_to] if params[:return_to]&.start_with?("/")
+    # If scope is nil, it uses default scope
+    scope = Integrations::StravaClient::STRAVA_SEARCH_SCOPE if params[:scope] == "strava_search"
+    redirect_to Integrations::StravaClient.authorization_url(state:, scope:), allow_other_host: true
   end
 
   def callback
@@ -19,7 +22,7 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    unless params[:state].present? && ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, session.delete(:strava_oauth_state).to_s)
+    unless params[:state].present? && session_state_matches?(session.delete(:strava_oauth_state))
       flash[:error] = "Invalid OAuth state. Please try again."
       redirect_to my_account_path
       return
@@ -32,19 +35,16 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    current_user.strava_integration&.destroy
-    strava_integration = current_user.create_strava_integration!(
-      access_token: token_data["access_token"],
-      refresh_token: token_data["refresh_token"],
-      token_expires_at: Time.at(token_data["expires_at"]),
-      athlete_id: token_data.dig("athlete", "id")&.to_s,
-      strava_permissions: params[:scope]
-    )
+    strava_integration = find_or_create_strava_integration(token_data)
 
-    StravaJobs::FetchAthleteAndStats.perform_async(strava_integration.id)
-
-    flash[:success] = "Strava connected! Your activities are being synced."
-    redirect_to my_account_path
+    if strava_integration.previously_new_record?
+      StravaJobs::FetchAthleteAndStats.perform_async(strava_integration.id)
+      flash[:success] = "Strava connected! Your activities are being synced."
+    else
+      flash[:success] = "Strava connection updated!"
+    end
+    return_to = session.delete(:strava_return_to)
+    redirect_to return_to || (strava_integration.has_activity_write? ? strava_search_path : my_account_path)
   end
 
   def destroy
@@ -74,5 +74,34 @@ class StravaIntegrationsController < ApplicationController
       flash[:error] = "No Strava integration found."
       redirect_to my_account_path
     end
+  end
+
+  def token_attrs(token_data)
+    {
+      access_token: token_data["access_token"],
+      refresh_token: token_data["refresh_token"],
+      token_expires_at: Time.at(token_data["expires_at"]),
+      athlete_id: token_data.dig("athlete", "id")&.to_s,
+      strava_permissions: params[:scope]
+    }
+  end
+
+  def find_or_create_strava_integration(token_data)
+    attrs = token_attrs(token_data)
+    existing_strava_integration = current_user.strava_integration
+    if existing_strava_integration&.athlete_id == attrs[:athlete_id] && !existing_strava_integration.error?
+      existing_strava_integration.update!(attrs)
+      existing_strava_integration
+    else
+      existing_strava_integration&.destroy
+      current_user.create_strava_integration!(attrs)
+    end
+  end
+
+  def session_state_matches?(session_state)
+    return true if ActiveSupport::SecurityUtils.secure_compare(params[:state].to_s, session_state.to_s)
+    Rails.error.report(StandardError.new("Invalid Strava OAuth state"),
+      context: {user_id: current_user.id, param_state: params[:state], session_state:})
+    false
   end
 end

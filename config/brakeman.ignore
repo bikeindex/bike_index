@@ -32,7 +32,7 @@
       "cwe_id": [
         79
       ],
-      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
+      "note": "Admin-only view. ambassador_task.description_html is admin-authored content intentionally rendered as HTML"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -66,7 +66,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Blog.body is admin-authored markdown, intentionally rendered as HTML via HAML :markdown filter"
     },
     {
       "warning_type": "Dangerous Send",
@@ -89,7 +89,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "params[:search_status] validated against available_statuses allowlist before public_send()"
     },
     {
       "warning_type": "Dangerous Send",
@@ -112,7 +112,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "Admin-only. params[:search_status] validated against available_statuses allowlist before public_send()"
     },
     {
       "warning_type": "File Access",
@@ -135,7 +135,7 @@
       "cwe_id": [
         22
       ],
-      "note": ""
+      "note": "File path uses only model timestamps via strftime(), no user-controlled path components"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -169,7 +169,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "status_display_class() returns only hardcoded CSS class names from a case/when allowlist"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -203,7 +203,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "System-generated Doorkeeper OAuth application secret displayed in API documentation code example"
     },
     {
       "warning_type": "SQL Injection",
@@ -226,7 +226,7 @@
       "cwe_id": [
         89
       ],
-      "note": ""
+      "note": "Hardcoded integer array literal, no user input in the SQL string"
     },
     {
       "warning_type": "HTTP Verb Confusion",
@@ -282,7 +282,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "RecoveryDisplay.link is sanitized via Binxtils::InputNormalizer.string() before storage"
     },
     {
       "warning_type": "Redirect",
@@ -305,7 +305,7 @@
       "cwe_id": [
         601
       ],
-      "note": ""
+      "note": "Redirects to Stripe checkout session URL returned by Stripe API, not user-controlled"
     },
     {
       "warning_type": "SQL Injection",
@@ -328,7 +328,7 @@
       "cwe_id": [
         89
       ],
-      "note": ""
+      "note": "sort_direction validated to only allow 'asc' or 'desc' via SortableTable concern"
     },
     {
       "warning_type": "Dangerous Send",
@@ -351,7 +351,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_manager] validated against searchable_managers allowlist before send()"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -385,7 +385,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Export.progress is a computed model attribute. Used in Haml class attribute, not raw HTML output"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -419,7 +419,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "export_progress_class() returns only hardcoded CSS class names (text-danger/text-success/text-warning)"
     },
     {
       "warning_type": "Redirect",
@@ -442,7 +442,7 @@
       "cwe_id": [
         601
       ],
-      "note": ""
+      "note": "Discourse SSO URL validated via HMAC-SHA256 signature verification before redirect"
     },
     {
       "warning_type": "SQL Injection",
@@ -465,7 +465,7 @@
       "cwe_id": [
         89
       ],
-      "note": ""
+      "note": "Interpolates Time.current.beginning_of_day, a Rails-generated value with no user input"
     },
     {
       "warning_type": "SQL Injection",
@@ -488,7 +488,7 @@
       "cwe_id": [
         89
       ],
-      "note": ""
+      "note": "time_range_column is set during component initialization by the developer, not from user params"
     },
     {
       "warning_type": "Dangerous Send",
@@ -511,7 +511,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "Admin-only. params[:search_kind] validated against allowlist before public_send()"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -545,7 +545,7 @@
       "cwe_id": [
         79
       ],
-      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
+      "note": "System-generated Doorkeeper OAuth authorization code displayed in API documentation code example"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -579,7 +579,7 @@
       "cwe_id": [
         79
       ],
-      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
+      "note": "System-generated Doorkeeper OAuth authorization code displayed in API documentation code example"
     },
     {
       "warning_type": "SQL Injection",
@@ -602,7 +602,7 @@
       "cwe_id": [
         89
       ],
-      "note": ""
+      "note": "org_id_for_org() returns a database integer ID, not a user-controlled string"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -636,7 +636,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Blog.body is admin-authored markdown, intentionally rendered as HTML via HAML :markdown filter"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -669,7 +669,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "SocialPost.alignment is validated against VALID_ALIGNMENTS allowlist before storage"
     },
     {
       "warning_type": "Dynamic Render Path",
@@ -703,7 +703,7 @@
       "cwe_id": [
         22
       ],
-      "note": ""
+      "note": "params[:edit_template] validated against edit_templates hash allowlist before render"
     },
     {
       "warning_type": "Dangerous Send",
@@ -726,7 +726,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
+      "note": "Admin-only. params[:search_kind] validated against allowlist before public_send()"
     },
     {
       "warning_type": "Dangerous Send",
@@ -749,7 +749,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: Mark them all (Cross-Site Scripting vulnerabilities in ambassador_tasks/index) as not concerns"
+      "note": "Admin-only. params[:search_kind] validated against allowlist before public_send()"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -793,7 +793,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. stripe_admin_url is a computed URL from stored Stripe ID, not user input"
     },
     {
       "warning_type": "Command Injection",
@@ -816,7 +816,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Command built from hardcoded regex pattern and strftime-formatted time, no user input in command string"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -850,7 +850,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. URL is stored model data from external registry"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -883,7 +883,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "SocialPost.body_html is generated by auto_link_text() which creates safe anchor tags with hardcoded URL patterns"
     },
     {
       "warning_type": "SQL Injection",
@@ -906,7 +906,7 @@
       "cwe_id": [
         89
       ],
-      "note": ""
+      "note": "sort_direction validated to only allow 'asc' or 'desc' via SortableTable concern"
     },
     {
       "warning_type": "Dangerous Send",
@@ -929,7 +929,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_status] validated against available_statuses allowlist before send()"
     },
     {
       "warning_type": "Dangerous Send",
@@ -952,7 +952,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_kind] validated against permitted_search_kinds allowlist before public_send()"
     },
     {
       "warning_type": "Dangerous Send",
@@ -975,7 +975,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_status] validated against searchable_statuses allowlist before send()"
     },
     {
       "warning_type": "Mass Assignment",
@@ -998,7 +998,7 @@
       "cwe_id": [
         915
       ],
-      "note": ""
+      "note": "Admin-only controller. Assigning :role is the intended purpose of this admin action"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1031,7 +1031,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "RecoveryDisplay.quote is sanitized via Binxtils::InputNormalizer.string() before storage"
     },
     {
       "warning_type": "Remote Code Execution",
@@ -1051,7 +1051,7 @@
         565,
         502
       ],
-      "note": ""
+      "note": "Standard Rails migration strategy from Marshal to JSON cookie serialization. :hybrid is the recommended transitional setting"
     },
     {
       "warning_type": "SQL Injection",
@@ -1074,7 +1074,7 @@
       "cwe_id": [
         89
       ],
-      "note": ""
+      "note": "org_id_for_org() returns a database integer ID, not a user-controlled string"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1118,7 +1118,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Latitude is a numeric database field used in Haml attribute, not raw HTML output"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1152,7 +1152,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "status_display_class() returns only hardcoded CSS class names from a case/when allowlist"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1175,7 +1175,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "params[:search_status] validated against available_statuses allowlist before public_send()"
     },
     {
       "warning_type": "Redirect",
@@ -1198,7 +1198,7 @@
       "cwe_id": [
         601
       ],
-      "note": ""
+      "note": "Redirects to Stripe checkout session URL returned by Stripe API, not user-controlled"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1232,7 +1232,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "URL from stored model data in organized view, not user-controlled HTML"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1266,7 +1266,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. file_url is a stored upload path, not user input"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1300,7 +1300,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. facebook_post_url is stored model data, not user input"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1323,7 +1323,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "params[:search_status] validated against allowlist before public_send()"
     },
     {
       "warning_type": "Command Injection",
@@ -1346,7 +1346,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "tmp_file.path is a Ruby Tempfile path generated by the system, not user-controlled"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1380,7 +1380,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1424,7 +1424,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1468,7 +1468,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1491,7 +1491,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_pos_kind] validated against permitted_pos_kinds allowlist before public_send()"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1525,7 +1525,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. stripe_admin_url is a computed URL from stored Stripe ID, not user input"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1569,7 +1569,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. Ternary returns hardcoded CSS class string, not user input"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1592,7 +1592,7 @@
       "cwe_id": [
         77
       ],
-      "note": "@sethherr: All these sends are for allowlisted methods (from https://github.com/bikeindex/bike_index/pull/2560)"
+      "note": "Admin-only. params[:search_status] validated against available_statuses allowlist before public_send()"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1615,7 +1615,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_scope] validated against searchable_scopes allowlist before send()"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1649,7 +1649,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. theft_alert_status_class() returns hardcoded CSS class names"
     },
     {
       "warning_type": "Mass Assignment",
@@ -1672,7 +1672,7 @@
       "cwe_id": [
         915
       ],
-      "note": ""
+      "note": "Legacy v1 API endpoint. add_recovery_information() only reads specific named keys from the hash"
     },
     {
       "warning_type": "Redirect",
@@ -1695,7 +1695,7 @@
       "cwe_id": [
         601
       ],
-      "note": ""
+      "note": "Redirects to Stripe checkout session URL returned by Stripe API, not user-controlled"
     },
     {
       "warning_type": "Command Injection",
@@ -1718,7 +1718,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "image_url is a CarrierWave-generated path from stored upload, not user input"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1752,7 +1752,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Blog.body is admin-authored markdown, intentionally rendered as HTML via HAML :markdown filter"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1786,7 +1786,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "status_display_class() returns only hardcoded CSS class names from a case/when allowlist"
     },
     {
       "warning_type": "SQL Injection",
@@ -1809,7 +1809,7 @@
       "cwe_id": [
         89
       ],
-      "note": ""
+      "note": "sort_direction validated to only allow 'asc' or 'desc' via SortableTable concern"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1832,7 +1832,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_paid_admin] validated against available_paid_admin allowlist before public_send()"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1855,7 +1855,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_status] validated against searchable_statuses allowlist before send()"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1899,7 +1899,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. stripe_admin_url is a computed URL from stored Stripe ID, not user input"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1933,7 +1933,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "Admin-only view. admin_email_domain_spam_color() returns hardcoded CSS color class"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1967,7 +1967,7 @@
       "cwe_id": [
         79
       ],
-      "note": ""
+      "note": "System-generated Doorkeeper OAuth application UID displayed in API documentation code example"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1990,7 +1990,7 @@
       "cwe_id": [
         77
       ],
-      "note": ""
+      "note": "Admin-only. params[:search_kind] validated against permitted_kinds allowlist before public_send()"
     },
     {
       "warning_type": "File Access",
@@ -2013,7 +2013,7 @@
       "cwe_id": [
         22
       ],
-      "note": ""
+      "note": "File path uses only model timestamps via strftime(), no user-controlled path components"
     }
   ],
   "brakeman_version": "8.0.2"

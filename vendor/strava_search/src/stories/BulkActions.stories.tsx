@@ -20,92 +20,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const NoneSelected: Story = {
-  args: {
-    selectedCount: 0,
-    pageCount: 50,
-    totalPages: 3,
-    currentPage: 1,
-    onPageChange: () => {},
-    onSelectAll: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    gear: mockGear,
-  },
+const defaultArgs = {
+  selectedCount: 12,
+  pageCount: 50,
+  totalPages: 3,
+  currentPage: 1,
+  onPageChange: () => {},
+  onSelectAll: () => {},
+  onDeselectAll: () => {},
+  onUpdateSelected: async () => {},
+  isUpdating: false,
+  gear: mockGear,
+  hasActivityWrite: true,
+  authUrl: '/strava_integration/new?scope=strava_search',
 };
 
-export const SomeSelected: Story = {
-  args: {
-    selectedCount: 12,
-    pageCount: 50,
-    totalPages: 3,
-    currentPage: 1,
-    onPageChange: () => {},
-    onSelectAll: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    gear: mockGear,
-  },
+export const Default: Story = {
+  args: defaultArgs,
 };
 
-export const AllSelected: Story = {
-  args: {
-    selectedCount: 50,
-    pageCount: 50,
-    totalPages: 3,
-    currentPage: 2,
-    onPageChange: () => {},
-    onSelectAll: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    gear: mockGear,
-  },
-};
-
-export const Updating: Story = {
-  args: {
-    selectedCount: 12,
-    pageCount: 50,
-    totalPages: 3,
-    currentPage: 1,
-    onPageChange: () => {},
-    onSelectAll: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: true,
-    gear: mockGear,
-  },
-};
-
-export const NoGear: Story = {
-  args: {
-    selectedCount: 5,
-    pageCount: 50,
-    totalPages: 3,
-    currentPage: 1,
-    onPageChange: () => {},
-    onSelectAll: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    gear: [],
-  },
-};
-
-export const SinglePage: Story = {
-  args: {
-    selectedCount: 0,
-    pageCount: 25,
-    totalPages: 1,
-    currentPage: 1,
-    onPageChange: () => {},
-    onSelectAll: () => {},
-    onDeselectAll: () => {},
-    onUpdateSelected: async () => {},
-    isUpdating: false,
-    gear: mockGear,
-  },
+export const NeedsAuthorization: Story = {
+  args: { ...defaultArgs, hasActivityWrite: false },
 };
