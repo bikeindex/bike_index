@@ -36,10 +36,10 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
       expect(stats_request.requested_at).to be_present
 
       list_requests = requests.where(request_type: :list_activities).order(:id)
-      # 1817 activities / 200 per page = 10 pages
-      expect(list_requests.count).to eq(10)
+      # 1817 activities / 200 per page = 10 pages - plus 2 bonus pages
+      expect(list_requests.count).to eq(13)
       expect(list_requests.first.parameters["page"]).to eq(1)
-      expect(list_requests.last.parameters["page"]).to eq(10)
+      expect(list_requests.last.parameters["page"]).to eq(13)
       expect(list_requests.pluck(:requested_at).compact).to be_empty
     end
 

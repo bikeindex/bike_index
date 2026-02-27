@@ -82,7 +82,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
   describe "perform with strava_request_id" do
     let(:strava_integration) do
       FactoryBot.create(:strava_integration, :syncing,
-        athlete_id: ENV["STRAVA_TEST_USER_ID"])
+        athlete_id: ENV["STRAVA_TEST_USER_ID"], athlete_activity_count: 1817)
     end
     let(:strava_request) do
       StravaRequest.create!(user_id: strava_integration.user_id,
@@ -93,7 +93,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     context "with list_activities request" do
       it "creates activities and enqueues detail requests for cycling activities" do
         VCR.use_cassette("strava-list_activities") do
-          instance.perform(strava_request.id)
+          expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by 3
         end
 
         strava_request.reload
@@ -129,6 +129,22 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         cycling_count = strava_integration.strava_activities.cycling.count
         detail_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity)
         expect(detail_requests.count).to eq(cycling_count)
+      end
+      context "with list_activities over pages enabled" do
+        let(:strava_request) do
+          StravaRequest.create(strava_integration_id: strava_integration.id, user_id: strava_integration.user_id,
+            request_type: :list_activities, parameters: {page: 13})
+        end
+        it "is successful but creates no new requests" do
+          expect(strava_request.reload.looks_like_last_page?).to be_truthy
+
+          VCR.use_cassette("strava-list_activities-last_page") do
+            expect { instance.perform(strava_request.id) }
+              .to_not change(StravaRequest, :count)
+          end
+
+          expect(StravaActivity.count).to eq 0
+        end
       end
     end
 

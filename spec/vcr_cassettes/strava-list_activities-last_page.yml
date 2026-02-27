@@ -1,0 +1,129 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/athlete/activities?page=13&per_page=200
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 27 Feb 2026 18:14:41 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '15'
+      Server:
+      - istio-envoy
+      Status:
+      - 401 Unauthorized
+      Cache-Control:
+      - no-cache
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - 3d3df612-a5ae-402c-9087-30289fc15e87
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 0ee093389a19f09b6e5153e309b2fe9a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - ubka8pH7CSnnd3V-SNYWlfQEnv7KTGKJt1lnR0Ylkbk2uIjDRxwEJg==
+    body:
+      encoding: UTF-8
+      string: '{"message":"Authorization Error","errors":[{"resource":"Athlete","field":"access_token","code":"invalid"}]}'
+  recorded_at: Fri, 27 Feb 2026 18:14:41 GMT
+- request:
+    method: post
+    uri: https://www.strava.com/oauth/token
+    body:
+      encoding: UTF-8
+      string: client_id=<STRAVA_KEY>&client_secret=<STRAVA_SECRET>&grant_type=refresh_token&refresh_token=strava_test_refresh_token_456
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 27 Feb 2026 18:14:41 GMT
+      X-Envoy-Upstream-Service-Time:
+      - '19'
+      Server:
+      - istio-envoy
+      Status:
+      - 400 Bad Request
+      Cache-Control:
+      - no-cache
+      Vary:
+      - Accept, Origin
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Request-Id:
+      - a6db6ee7-f162-4cd6-9614-0294619a2e6d
+      X-Download-Options:
+      - noopen
+      X-Frame-Options:
+      - DENY
+      X-Content-Type-Options:
+      - nosniff
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 0ee093389a19f09b6e5153e309b2fe9a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - SFO53-P8
+      X-Amz-Cf-Id:
+      - DumqzxQttgwoHke5wvv_O8r6qfKQ0tmUjE41__7x2nzeqCVKQbHGAA==
+    body:
+      encoding: UTF-8
+      string: '{"message":"Bad Request","errors":[{"resource":"RefreshToken","field":"refresh_token","code":"invalid"}]}'
+  recorded_at: Fri, 27 Feb 2026 18:14:41 GMT
+recorded_with: VCR 6.4.0
