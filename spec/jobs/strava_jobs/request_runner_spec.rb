@@ -11,7 +11,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
 
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
-    expect(described_class.frequency).to eq(16.seconds)
+    expect(described_class.frequency).to eq(8.seconds)
   end
 
   describe "perform with no args (enqueue_next_request)" do
@@ -32,7 +32,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
 
       it "enqueues up to BATCH_SIZE requests" do
-        12.times.map do
+        35.times.map do
           StravaRequest.create!(user_id: strava_integration.user_id,
             strava_integration_id: strava_integration.id, request_type: :fetch_activity,
             parameters: {strava_id: "123"})

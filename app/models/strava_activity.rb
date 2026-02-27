@@ -45,6 +45,11 @@ class StravaActivity < ApplicationRecord
     Handcycle
     Velomobile
   ].freeze
+  SUMMARY_COLUMNS = %i[
+    title distance_meters moving_time_seconds total_elevation_gain_meters
+    sport_type private kudos_count average_speed suffer_score gear_id
+    activity_type timezone start_date strava_data
+  ].freeze
   PROXY_ATTRS = %i[
     activity_type
     average_speed
@@ -87,6 +92,22 @@ class StravaActivity < ApplicationRecord
       activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: response["id"])
       activity.update!(attrs)
       activity
+    end
+
+    def bulk_upsert_from_responses(strava_integration, responses)
+      return if responses.blank?
+
+      now = Time.current
+      records = responses.map do |response|
+        summary_attributes(response).merge(
+          strava_integration_id: strava_integration.id,
+          strava_id: response["id"].to_s,
+          created_at: now,
+          updated_at: now
+        )
+      end
+
+      upsert_all(records, unique_by: %i[strava_integration_id strava_id], update_only: SUMMARY_COLUMNS)
     end
 
     def strava_attributes_from(response)

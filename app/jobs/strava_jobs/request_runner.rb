@@ -2,7 +2,8 @@
 
 module StravaJobs
   class RequestRunner < ScheduledJob
-    BATCH_SIZE = 10
+    BATCH_SIZE = 30
+    RATE_LIMIT_HEADROOM = 20
 
     prepend ScheduledJobRecorder
 
@@ -10,7 +11,7 @@ module StravaJobs
 
     class << self
       def frequency
-        16.seconds
+        8.seconds
       end
 
       def execute(strava_integration, strava_request_type, parameters)
@@ -32,7 +33,7 @@ module StravaJobs
         if strava_request.incoming_webhook?
           handle_incoming_webhook(strava_request, strava_integration, response)
         elsif strava_request.list_activities?
-          response.each { |summary| StravaActivity.create_or_update_from_strava_response(strava_integration, summary) }
+          StravaActivity.bulk_upsert_from_responses(strava_integration, response)
           if strava_request.parameters["page"] == 1
             strava_integration.update(last_updated_activities_at: Time.current)
           end
@@ -96,9 +97,8 @@ module StravaJobs
 
     def rate_limit_allows_batch?
       rate_limit = StravaRequest.estimated_current_rate_limit
-      min_headroom = 2 * BATCH_SIZE
-      (rate_limit["read_short_limit"].to_i - rate_limit["read_short_usage"].to_i) >= min_headroom &&
-        (rate_limit["read_long_limit"].to_i - rate_limit["read_long_usage"].to_i) >= min_headroom
+      (rate_limit["read_short_limit"].to_i - rate_limit["read_short_usage"].to_i) >= RATE_LIMIT_HEADROOM &&
+        (rate_limit["read_long_limit"].to_i - rate_limit["read_long_usage"].to_i) >= RATE_LIMIT_HEADROOM
     end
 
     def mark_requests_deleted(strava_request)

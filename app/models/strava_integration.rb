@@ -142,21 +142,36 @@ class StravaIntegration < ApplicationRecord
       .where(strava_integration_id: id, request_type: :fetch_gear)
       .pluck(Arel.sql("parameters->>'strava_gear_id'"))
 
-    gear_ids_to_request.each do |strava_gear_id|
-      next if already_enqueued.include?(strava_gear_id)
-      StravaRequest.create!(user_id:, strava_integration_id: id,
-        request_type: :fetch_gear, parameters: {strava_gear_id:})
-    end
+    gear_ids = gear_ids_to_request.reject { |gid| already_enqueued.include?(gid) }
+    return if gear_ids.empty?
+
+    now = Time.current
+    StravaRequest.insert_all(gear_ids.map { |strava_gear_id|
+      {user_id:, strava_integration_id: id,
+       request_type: StravaRequest::REQUEST_TYPE_ENUM[:fetch_gear],
+       response_status: StravaRequest::RESPONSE_STATUS_ENUM[:pending],
+       parameters: {strava_gear_id:},
+       created_at: now, updated_at: now}
+    })
   end
 
   def enqueue_detail_requests
     already_enqueued = StravaRequest.unprocessed
       .where(strava_integration_id: id, request_type: :fetch_activity)
       .pluck(Arel.sql("parameters->>'strava_id'"))
-    strava_activities.activities_to_enrich.where.not(strava_id: already_enqueued).pluck(:strava_id).each do |strava_id|
-      StravaRequest.create!(user_id:, strava_integration_id: id,
-        request_type: :fetch_activity, parameters: {strava_id: strava_id.to_s})
-    end
+
+    strava_ids = strava_activities.activities_to_enrich
+      .where.not(strava_id: already_enqueued).pluck(:strava_id)
+    return if strava_ids.empty?
+
+    now = Time.current
+    StravaRequest.insert_all(strava_ids.map { |strava_id|
+      {user_id:, strava_integration_id: id,
+       request_type: StravaRequest::REQUEST_TYPE_ENUM[:fetch_activity],
+       response_status: StravaRequest::RESPONSE_STATUS_ENUM[:pending],
+       parameters: {strava_id: strava_id.to_s},
+       created_at: now, updated_at: now}
+    })
   end
 
   def mark_disconnected
