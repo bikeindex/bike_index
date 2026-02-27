@@ -13,11 +13,14 @@ RSpec.describe StravaJobs::ProxyRequester do
     let(:access_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
     before { stub_const("StravaJobs::ProxyRequester::STRAVA_DOORKEEPER_APP_ID", doorkeeper_app.id) }
 
-    it "returns error when strava integration is not synced" do
+    it "returns sync_status when strava integration is not synced" do
       expect(strava_integration.synced?).to be_falsey
       result = described_class.authorize_user_and_strava_integration(access_token)
-      expect(result[:error]).to match(/not yet synced/)
-      expect(result[:status]).to eq 422
+      expect(result[:error]).to be_nil
+      expect(result[:user]).to be_nil
+      expect(result[:sync_status][:status]).to eq "pending"
+      expect(result[:sync_status]).to have_key(:activities_downloaded_count)
+      expect(result[:sync_status]).to have_key(:progress_percent)
     end
 
     it "returns user and strava_integration when valid" do

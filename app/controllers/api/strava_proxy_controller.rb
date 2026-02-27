@@ -17,7 +17,7 @@ module API
       end
 
       if auth_response[:sync_status].present?
-        render json: {sync_status: auth_response[:sync_status]}
+        render json: auth_response
         return
       end
 
