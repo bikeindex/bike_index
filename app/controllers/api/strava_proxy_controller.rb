@@ -21,6 +21,11 @@ module API
         return
       end
 
+      if params[:sync_status]
+        render json: {sync_status: {status: "synced"}}
+        return
+      end
+
       enriched_since = enriched_since_from_url(permitted_params[:url])
       if enriched_since
         activities = auth_response[:strava_integration].strava_activities

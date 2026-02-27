@@ -135,7 +135,7 @@ export async function fetchSyncStatus(): Promise<BackendSyncStatus | null> {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ url: 'athlete', method: 'GET' }),
+    body: JSON.stringify({ sync_status: true }),
   });
 
   if (!response.ok) return null;
