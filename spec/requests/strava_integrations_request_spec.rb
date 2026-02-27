@@ -48,8 +48,8 @@ RSpec.describe StravaIntegrationsController, type: :request do
       include_context :request_spec_logged_in_as_user
 
       # Initiate OAuth flow via `new` to set session state, return the state param
-      def initiate_oauth_flow
-        get "/strava_integration/new"
+      def initiate_oauth_flow(**extra_params)
+        get "/strava_integration/new", params: extra_params
         CGI.parse(URI.parse(response.location).query)["state"].first
       end
 
@@ -114,6 +114,27 @@ RSpec.describe StravaIntegrationsController, type: :request do
           end
         end
 
+        context "with return_to" do
+          it "redirects to return_to path after callback" do
+            return_to = "/strava_search?q=morning+run&types=Ride"
+            oauth_state = initiate_oauth_flow(scope: "strava_search", return_to:)
+            VCR.use_cassette("strava-exchange_token") do
+              get "/strava_integration/callback",
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+              expect(response).to redirect_to(return_to)
+            end
+          end
+
+          it "ignores external return_to URLs" do
+            oauth_state = initiate_oauth_flow(scope: "strava_search", return_to: "https://evil.com")
+            VCR.use_cassette("strava-exchange_token") do
+              get "/strava_integration/callback",
+                params: {code: "test_auth_code", state: oauth_state, scope: Integrations::StravaClient::STRAVA_SEARCH_SCOPE}
+              expect(response).to redirect_to(strava_search_path)
+            end
+          end
+        end
+
         context "user already has strava integration with same athlete" do
           let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "2430215") }
 
@@ -127,7 +148,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
                 .and change(StravaJobs::FetchAthleteAndStats.jobs, :size).by(0)
 
               expect(response).to redirect_to(my_account_path)
-              expect(flash[:success]).to eq "Strava connected! Updating your activities."
+              expect(flash[:success]).to eq "Strava connection updated!"
 
               strava_integration = current_user.reload.strava_integration
               expect(strava_integration.id).to eq existing.id
