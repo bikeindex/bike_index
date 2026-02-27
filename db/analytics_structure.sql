@@ -136,7 +136,8 @@ CREATE TABLE public.strava_requests (
     response_status integer DEFAULT 0 NOT NULL,
     rate_limit jsonb,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    priority bigint DEFAULT 0 NOT NULL
 );
 
 
@@ -283,6 +284,7 @@ CREATE INDEX index_strava_requests_on_user_id ON public.strava_requests USING bt
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260227165150'),
 ('20260208234737'),
 ('20240702144929'),
 ('20231209193453'),

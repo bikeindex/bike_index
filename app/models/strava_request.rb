@@ -7,6 +7,7 @@
 #
 #  id                    :bigint           not null, primary key
 #  parameters            :jsonb
+#  priority              :bigint           default(0), not null
 #  rate_limit            :jsonb
 #  request_type          :integer          not null
 #  requested_at          :datetime
@@ -45,6 +46,8 @@ class StravaRequest < AnalyticsRecord
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
   # Priority: incoming_webhook (5) → list_activities (2) → fetch_gear (4) → fetch_activity (3)
   PRIORITY_ORDER = [5, 2, 4, 3, 0, 1].freeze
+  PRIORITY_MAP = PRIORITY_ORDER.each_with_index.to_h.freeze
+  PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000
 
   belongs_to :user
   belongs_to :strava_integration
@@ -54,12 +57,12 @@ class StravaRequest < AnalyticsRecord
 
   validates :strava_integration_id, presence: true
 
+  before_validation :set_priority, on: :create
+
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
   scope :unprocessed, -> { where(requested_at: nil).where.not(response_status: :integration_deleted).order(:id) }
-  scope :priority_ordered, -> {
-    reorder(Arel.sql("ARRAY_POSITION(ARRAY#{PRIORITY_ORDER}, request_type), id"))
-  }
+  scope :priority_ordered, -> { reorder(:priority) }
 
   class << self
     def next_pending(limit = 1)
@@ -167,6 +170,16 @@ class StravaRequest < AnalyticsRecord
     else
       :error
     end
+  end
+
+  def set_priority
+    level = PRIORITY_MAP.fetch(REQUEST_TYPE_ENUM[request_type.to_sym], PRIORITY_ORDER.length)
+    secondary = if fetch_activity?
+      PRIORITY_LEVEL_MULTIPLIER - (parameters["strava_id"].to_i / 1000)
+    else
+      Time.current.to_i / 10
+    end
+    self.priority = level * PRIORITY_LEVEL_MULTIPLIER + secondary
   end
 
   # IDK, sort of a guess - because Strava responds with a 404 :/
