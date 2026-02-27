@@ -10,6 +10,7 @@ import type { StravaAthlete, StoredAuth } from '../types/strava';
 import {
   getAuth,
   clearAuth as clearAuthDb,
+  clearAllData,
   saveAuth,
   getSyncState,
   type SyncState,
@@ -45,7 +46,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = useCallback(async () => {
     try {
-      const auth = await getAuth();
+      let auth = await getAuth();
+      const config = getConfig();
+      const configAthleteId = parseInt(config.athleteId, 10);
+
+      // Clear all data if stored athlete doesn't match the signed-in user
+      if (auth && auth.athlete.id !== configAthleteId) {
+        await clearAllData();
+        auth = undefined;
+      }
 
       if (auth && Date.now() < auth.expiresAt - 60000) {
         // Valid token in IndexedDB
@@ -66,15 +75,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // No valid token — exchange session for a new one
-      const config = getConfig();
       const tokenResponse = await exchangeSessionForToken();
-      const athleteId = parseInt(config.athleteId, 10);
 
       const newAuth: StoredAuth = {
         accessToken: tokenResponse.access_token,
         refreshToken: '',
         expiresAt: (tokenResponse.created_at + tokenResponse.expires_in) * 1000,
-        athlete: auth?.athlete || { id: athleteId, username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
+        athlete: auth?.athlete || { id: configAthleteId, username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
       };
       await saveAuth(newAuth);
       setAthlete(newAuth.athlete);

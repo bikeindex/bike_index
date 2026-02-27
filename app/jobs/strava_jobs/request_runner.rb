@@ -6,7 +6,7 @@ module StravaJobs
 
     prepend ScheduledJobRecorder
 
-    sidekiq_options queue: "low_priority", retry: false
+    sidekiq_options queue: "low_priority", retry: 1
 
     class << self
       def frequency
