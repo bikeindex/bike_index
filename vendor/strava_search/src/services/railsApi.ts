@@ -1,8 +1,6 @@
 interface StravaSearchConfig {
   tokenEndpoint: string;
   proxyEndpoint: string;
-  syncStatusEndpoint: string;
-  activitiesEndpoint: string;
   athleteId: string;
   hasActivityWrite: boolean;
   authUrl: string;
@@ -36,36 +34,16 @@ export interface BackendSyncStatus {
   progress_percent: number;
 }
 
-import type { StravaActivity, StravaGear } from '../types/strava';
-
-export interface BackendActivitiesResponse {
-  activities: StravaActivity[];
-  gear: StravaGear[];
+export async function fetchSyncStatus(): Promise<BackendSyncStatus | null> {
+  const tokenResponse = await exchangeSessionForToken();
+  return tokenResponse.sync_status ?? null;
 }
 
-export async function fetchSyncStatus(): Promise<BackendSyncStatus> {
-  const config = getConfig();
-  const response = await fetch(config.syncStatusEndpoint, {
-    credentials: 'same-origin',
-  });
-  if (!response.ok) {
-    throw new Error(`Sync status check failed: ${response.status}`);
-  }
-  return response.json();
+interface TokenResponseWithSync extends TokenResponse {
+  sync_status?: BackendSyncStatus;
 }
 
-export async function fetchActivitiesFromBackend(): Promise<BackendActivitiesResponse> {
-  const config = getConfig();
-  const response = await fetch(config.activitiesEndpoint, {
-    credentials: 'same-origin',
-  });
-  if (!response.ok) {
-    throw new Error(`Activities fetch failed: ${response.status}`);
-  }
-  return response.json();
-}
-
-export async function exchangeSessionForToken(): Promise<TokenResponse> {
+export async function exchangeSessionForToken(): Promise<TokenResponseWithSync> {
   const config = getConfig();
   const response = await fetch(config.tokenEndpoint, {
     method: 'POST',

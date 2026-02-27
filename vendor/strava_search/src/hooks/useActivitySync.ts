@@ -6,7 +6,7 @@ import {
   getActivity,
   fetchEnrichedSince,
 } from '../services/strava';
-import { fetchSyncStatus, fetchActivitiesFromBackend } from '../services/railsApi';
+import { fetchSyncStatus } from '../services/railsApi';
 import { formatNumber } from '../utils/formatters';
 import {
   saveActivities,
@@ -54,9 +54,13 @@ export function useActivitySync(): UseActivitySyncResult {
     setProgress({ loaded: 0, total: null, status: 'Checking sync status...' });
 
     try {
+      // Wait for backend to finish syncing before fetching via proxy
       let syncStatus = await fetchSyncStatus();
+      let estimatedTotal: number | null = syncStatus?.athlete_activity_count ?? null;
 
       const updateProgress = (status: typeof syncStatus) => {
+        if (!status) return;
+        estimatedTotal = status.athlete_activity_count;
         setProgress({
           loaded: status.activities_downloaded_count,
           total: status.athlete_activity_count,
@@ -68,46 +72,59 @@ export function useActivitySync(): UseActivitySyncResult {
 
       updateProgress(syncStatus);
 
-      // Load activities from the backend database
-      const loadActivities = async () => {
-        const data = await fetchActivitiesFromBackend();
-        if (data.activities.length > 0) {
-          await saveActivities(data.activities, athlete.id);
-        }
-        if (data.gear.length > 0) {
-          await saveGear(data.gear, athlete.id);
-        }
-
-        // Mark initial sync complete after first load so activities appear
-        const syncState: SyncState = {
-          athleteId: athlete.id,
-          lastSyncedAt: Date.now(),
-          oldestActivityDate: null,
-          isInitialSyncComplete: true,
-        };
-        await updateSyncState(syncState);
-        await refreshSyncState();
-      };
-
-      await loadActivities();
-
-      // Poll until backend sync is complete
-      while (syncStatus.status !== 'synced' && syncStatus.status !== 'error') {
+      while (syncStatus && syncStatus.status !== 'synced' && syncStatus.status !== 'error') {
         await new Promise(resolve => setTimeout(resolve, 3000));
         syncStatus = await fetchSyncStatus();
         updateProgress(syncStatus);
-        await loadActivities();
       }
 
-      if (syncStatus.status === 'error') {
+      if (syncStatus?.status === 'error') {
         setError('Backend sync encountered an error. Some activities may be missing.');
       }
 
-      // Final state update
+      // Backend is synced — fetch activities via proxy
+      setProgress({ loaded: 0, total: null, status: 'Loading activities...' });
+
+      const gear = await getAthleteGear();
+      await saveGear(gear, athlete.id);
+
+      let oldestActivityDate: string | null = null;
+      let isFirstBatch = true;
+
+      await getAllActivities({
+        onBatch: async (batch, totalSoFar) => {
+          await saveActivities(batch, athlete.id);
+
+          for (const activity of batch) {
+            if (!oldestActivityDate || new Date(activity.start_date) < new Date(oldestActivityDate)) {
+              oldestActivityDate = activity.start_date;
+            }
+          }
+
+          if (isFirstBatch) {
+            isFirstBatch = false;
+            const syncState: SyncState = {
+              athleteId: athlete.id,
+              lastSyncedAt: Date.now(),
+              oldestActivityDate: null,
+              isInitialSyncComplete: true,
+            };
+            await updateSyncState(syncState);
+            await refreshSyncState();
+          }
+
+          setProgress({
+            loaded: totalSoFar,
+            total: estimatedTotal,
+            status: `${formatNumber(totalSoFar)}${estimatedTotal ? ` of ~${formatNumber(estimatedTotal)}` : ''} activities loaded`,
+          });
+        },
+      });
+
       const finalSyncState: SyncState = {
         athleteId: athlete.id,
         lastSyncedAt: Date.now(),
-        oldestActivityDate: null,
+        oldestActivityDate,
         isInitialSyncComplete: true,
       };
       await updateSyncState(finalSyncState);
