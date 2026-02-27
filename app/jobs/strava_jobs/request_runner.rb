@@ -2,7 +2,7 @@
 
 module StravaJobs
   class RequestRunner < ScheduledJob
-    BATCH_SIZE = 10
+    BATCH_SIZE = 30
 
     prepend ScheduledJobRecorder
 
