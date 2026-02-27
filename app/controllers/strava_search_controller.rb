@@ -41,23 +41,12 @@ class StravaSearchController < ApplicationController
 
     access_token = StravaJobs::ProxyRequester.find_or_create_access_token(current_user.id)
 
-    result = {
+    render json: {
       access_token: access_token.token,
       expires_in: access_token.expires_in,
       created_at: access_token.created_at.to_i,
       athlete_id: strava_integration.athlete_id
     }
-
-    unless strava_integration.synced?
-      result[:sync_status] = {
-        status: strava_integration.status,
-        activities_downloaded_count: strava_integration.activities_downloaded_count,
-        athlete_activity_count: strava_integration.athlete_activity_count,
-        progress_percent: strava_integration.sync_progress_percent
-      }
-    end
-
-    render json: result
   end
 
   private

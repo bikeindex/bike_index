@@ -27,23 +27,7 @@ function getCsrfToken(): string {
   return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 }
 
-export interface BackendSyncStatus {
-  status: 'pending' | 'syncing' | 'synced' | 'error';
-  activities_downloaded_count: number;
-  athlete_activity_count: number | null;
-  progress_percent: number;
-}
-
-export async function fetchSyncStatus(): Promise<BackendSyncStatus | null> {
-  const tokenResponse = await exchangeSessionForToken();
-  return tokenResponse.sync_status ?? null;
-}
-
-interface TokenResponseWithSync extends TokenResponse {
-  sync_status?: BackendSyncStatus;
-}
-
-export async function exchangeSessionForToken(): Promise<TokenResponseWithSync> {
+export async function exchangeSessionForToken(): Promise<TokenResponse> {
   const config = getConfig();
   const response = await fetch(config.tokenEndpoint, {
     method: 'POST',

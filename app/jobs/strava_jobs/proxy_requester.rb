@@ -18,9 +18,17 @@ module StravaJobs
         strava_integration = user.strava_integration
         return {error: "No Strava integration", status: 404} unless strava_integration
         return {error: "Strava authorization failed. Please re-authenticate with Strava.", status: 401} if strava_integration.error?
-        return {error: "Strava integration not yet synced - status: #{strava_integration.status}", status: 422} unless strava_integration.synced?
 
-        {user:, strava_integration:}
+        result = {user:, strava_integration:}
+        unless strava_integration.synced?
+          result[:sync_status] = {
+            status: strava_integration.status,
+            activities_downloaded_count: strava_integration.activities_downloaded_count,
+            athlete_activity_count: strava_integration.athlete_activity_count,
+            progress_percent: strava_integration.sync_progress_percent
+          }
+        end
+        result
       end
 
       def create_and_execute(strava_integration:, user:, url:, method: nil, body: nil)

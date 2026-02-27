@@ -134,36 +134,6 @@ RSpec.describe StravaSearchController, type: :request do
           expect(json_result[:access_token]).not_to eq expired_token.token
           expect(expired_token.reload.revoked?).to be true
         end
-
-        it "includes sync_status when integration is not synced" do
-          post strava_search_token_path
-          expect(response.status).to eq 200
-          expect(json_result[:access_token]).to be_present
-          expect(json_result[:sync_status][:status]).to eq "pending"
-        end
-
-        context "with syncing integration" do
-          let!(:strava_integration) { FactoryBot.create(:strava_integration, :syncing, user: current_user, athlete_id: "12345") }
-
-          it "includes sync_status with progress" do
-            post strava_search_token_path
-            expect(response.status).to eq 200
-            expect(json_result[:sync_status][:status]).to eq "syncing"
-            expect(json_result[:sync_status][:activities_downloaded_count]).to eq 50
-            expect(json_result[:sync_status][:athlete_activity_count]).to eq 150
-            expect(json_result[:sync_status][:progress_percent]).to eq 33
-          end
-        end
-
-        context "with synced integration" do
-          let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user, athlete_id: "12345") }
-
-          it "omits sync_status" do
-            post strava_search_token_path
-            expect(response.status).to eq 200
-            expect(json_result).not_to have_key(:sync_status)
-          end
-        end
       end
     end
   end

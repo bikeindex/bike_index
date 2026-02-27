@@ -5,8 +5,8 @@ import {
   getAthleteGear,
   getActivity,
   fetchEnrichedSince,
+  fetchSyncStatus,
 } from '../services/strava';
-import { fetchSyncStatus } from '../services/railsApi';
 import { formatNumber } from '../utils/formatters';
 import {
   saveActivities,
