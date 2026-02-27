@@ -47,6 +47,7 @@ class StravaRequest < AnalyticsRecord
   # Priority: incoming_webhook (5) → list_activities (2) → fetch_gear (4) → fetch_activity (3)
   PRIORITY_ORDER = [5, 2, 4, 3, 0, 1].freeze
   PRIORITY_MAP = PRIORITY_ORDER.each_with_index.to_h.freeze
+  PRIORITY_LEVEL_MULTIPLIER = 100_000_000_000
 
   belongs_to :user
   belongs_to :strava_integration
@@ -175,7 +176,12 @@ class StravaRequest < AnalyticsRecord
 
   def set_priority
     level = PRIORITY_MAP.fetch(REQUEST_TYPE_ENUM[request_type.to_sym], PRIORITY_ORDER.length)
-    self.priority = level * 10_000_000_000 + Time.current.to_i
+    secondary = if fetch_activity?
+      PRIORITY_LEVEL_MULTIPLIER - parameters["strava_id"].to_i
+    else
+      Time.current.to_i
+    end
+    self.priority = level * PRIORITY_LEVEL_MULTIPLIER + secondary
   end
 
   # IDK, sort of a guess - because Strava responds with a 404 :/
