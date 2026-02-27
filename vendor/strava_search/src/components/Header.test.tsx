@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Header } from './Header';
 
-const mockLogout = vi.fn();
 const mockSyncRecent = vi.fn();
 const mockAthlete = { id: 12345, firstname: 'Test', lastname: 'User', profile_medium: '' };
 const mockSyncState = { athleteId: 12345, lastSyncedAt: Date.now(), isInitialSyncComplete: true, oldestActivityDate: null };
@@ -11,7 +10,6 @@ vi.mock('../contexts/AuthContext', () => ({
   useAuth: vi.fn(() => ({
     athlete: mockAthlete,
     syncState: mockSyncState,
-    logout: mockLogout,
   })),
 }));
 
@@ -127,7 +125,6 @@ describe('Header', () => {
 
       expect(screen.getByText('Settings')).toBeInTheDocument();
       expect(screen.getByText('Sync')).toBeInTheDocument();
-      expect(screen.getByText('Logout')).toBeInTheDocument();
     });
 
     it('closes dropdown when avatar button is clicked again', () => {
@@ -184,13 +181,12 @@ describe('Header', () => {
       expect(syncRecent).toHaveBeenCalled();
     });
 
-    it('calls logout when Logout is clicked', () => {
+    it('does not show logout in dropdown', () => {
       render(<Header onOpenSettings={() => {}} />);
 
       fireEvent.click(screen.getByRole('button'));
-      fireEvent.click(screen.getByText('Logout'));
 
-      expect(mockLogout).toHaveBeenCalled();
+      expect(screen.queryByText('Logout')).not.toBeInTheDocument();
     });
 
     it('disables Sync button when working', async () => {
@@ -228,7 +224,6 @@ describe('Header', () => {
       vi.mocked(useAuth).mockReturnValue({
         athlete: { ...mockAthlete, profile_medium: 'https://example.com/avatar.jpg' },
         syncState: mockSyncState,
-        logout: mockLogout,
       } as ReturnType<typeof useAuth>);
 
       render(<Header onOpenSettings={() => {}} />);

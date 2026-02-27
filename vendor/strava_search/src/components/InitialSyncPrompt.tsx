@@ -30,7 +30,7 @@ export function InitialSyncOverlay({ loaded, total, status }: InitialSyncOverlay
           </div>
         )}
         <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-4">
-          Your activities will appear as they are downloaded.
+          Your activities will appear after they are downloaded.
         </p>
       </div>
     </div>

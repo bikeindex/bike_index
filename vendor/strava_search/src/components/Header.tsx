@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useActivitySync } from '../hooks/useActivitySync';
 import { formatTimeAgo, formatDateTimeTitle } from '../utils/formatters';
-import { RefreshCw, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { RefreshCw, User, Settings, ChevronDown } from 'lucide-react';
 
 interface HeaderProps {
   onOpenSettings: () => void;
@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingFullData, fetchProgress }: HeaderProps) {
-  const { athlete, syncState, logout } = useAuth();
+  const { athlete, syncState } = useAuth();
   const { isSyncing, isFetchingFullData: hookIsFetchingFullData, syncRecent, progress: hookProgress } = useActivitySync();
 
   // Use external state if provided (from Dashboard), otherwise use hook state
@@ -41,11 +41,6 @@ export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingF
   const handleSyncClick = () => {
     setIsDropdownOpen(false);
     syncRecent();
-  };
-
-  const handleLogoutClick = () => {
-    setIsDropdownOpen(false);
-    logout();
   };
 
   return (
@@ -110,14 +105,6 @@ export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingF
                     >
                       <RefreshCw className={`w-4 h-4 ${isWorking ? 'animate-spin' : ''}`} />
                       {isWorking ? progress?.status || 'Working...' : 'Sync'}
-                    </button>
-                    <hr className="my-1 border-gray-200 dark:border-gray-700" />
-                    <button
-                      onClick={handleLogoutClick}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Logout
                     </button>
                   </div>
                 )}
