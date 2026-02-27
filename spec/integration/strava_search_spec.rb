@@ -17,7 +17,7 @@ RSpec.describe "Strava search", :js, type: :system do
     )
 
     # Stub external Strava API calls triggered by the React SPA via the proxy
-    stub_request(:any, /strava\.com/).to_return(status: 200, body: "[]", headers: {"Content-Type" => "application/json"})
+    WebMock::API.stub_request(:any, /strava\.com/).to_return(status: 200, body: "[]", headers: {"Content-Type" => "application/json"})
 
     visit new_session_path
     fill_in "Email", with: user.email
