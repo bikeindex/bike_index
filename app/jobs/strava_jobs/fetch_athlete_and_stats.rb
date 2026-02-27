@@ -4,6 +4,15 @@ module StravaJobs
   class FetchAthleteAndStats < ApplicationJob
     sidekiq_options queue: "low_priority", retry: 5
 
+    def self.total_pages(activity_count)
+      if (activity_count || 0).to_i > 0
+        a_count = (activity_count.to_f / Integrations::StravaClient::ACTIVITIES_PER_PAGE).ceil
+        a_count + (a_count / 4.0).round
+      else
+        2
+      end
+    end
+
     def perform(strava_integration_id)
       return if skip_job?
 
@@ -21,13 +30,7 @@ module StravaJobs
       }
       strava_integration.update_from_athlete_and_stats(athlete, stats_response.success? ? stats_response.body : nil)
 
-      total_pages = if strava_integration.athlete_activity_count.to_i > 0
-        (strava_integration.athlete_activity_count.to_f / Integrations::StravaClient::ACTIVITIES_PER_PAGE).ceil
-      else
-        1
-      end
-
-      total_pages.times do |i|
+      self.class.total_pages(strava_integration.athlete_activity_count).times do |i|
         StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
           request_type: :list_activities, parameters: {page: i + 1})
         StravaJobs::RequestRunner.perform_async

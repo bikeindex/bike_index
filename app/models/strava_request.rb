@@ -134,10 +134,8 @@ class StravaRequest < AnalyticsRecord
   def looks_like_last_page?(per_page: nil)
     return false unless list_activities?
 
-    per_page ||= Integrations::StravaClient::ACTIVITIES_PER_PAGE
     page = parameters["page"]&.to_i || 1
-    expected_pages = (strava_integration.athlete_activity_count.to_i > 0) ?
-      (strava_integration.athlete_activity_count.to_f / per_page).ceil : 1
+    expected_pages = StravaJobs::FetchAthleteAndStats.total_pages(strava_integration.athlete_activity_count)
     page >= expected_pages
   end
 
