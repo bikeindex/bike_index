@@ -23,7 +23,7 @@ RSpec.describe StravaSearchController, type: :request do
 
       context "with strava integration" do
         let(:strava_permissions) { nil }
-        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345", strava_permissions:) }
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user, athlete_id: "12345", strava_permissions:) }
 
         it "renders with config and valid assets" do
           get strava_search_path
@@ -50,6 +50,43 @@ RSpec.describe StravaSearchController, type: :request do
             get strava_search_path
             expect(response.status).to eq 200
             expect(response.body).to include('"hasActivityWrite":true')
+          end
+        end
+
+        context "with pending status" do
+          let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "12345", status: :pending) }
+
+          it "renders sync progress display" do
+            get strava_search_path
+            expect(response.status).to eq 200
+            expect(response.body).to_not include('<div id="root">')
+            expect(response.body).to include("Sync will begin shortly")
+            expect(response.body).to include("strava-sync-status")
+          end
+        end
+
+        context "with syncing status" do
+          let!(:strava_integration) { FactoryBot.create(:strava_integration, :syncing, user: current_user, athlete_id: "12345") }
+
+          it "renders sync progress with percentage" do
+            get strava_search_path
+            expect(response.status).to eq 200
+            expect(response.body).to_not include('<div id="root">')
+            expect(response.body).to include("Syncing activities")
+            expect(response.body).to include("strava-progress-bar")
+            expect(response.body).to include("strava-sync-status")
+          end
+        end
+
+        context "with error status" do
+          let!(:strava_integration) { FactoryBot.create(:strava_integration, :error, user: current_user, athlete_id: "12345") }
+
+          it "renders error message" do
+            get strava_search_path
+            expect(response.status).to eq 200
+            expect(response.body).to_not include('<div id="root">')
+            expect(response.body).to include("Sync error")
+            expect(response.body).to include("Reconnect Strava")
           end
         end
       end

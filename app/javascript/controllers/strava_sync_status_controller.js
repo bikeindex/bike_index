@@ -50,5 +50,10 @@ export default class extends Controller {
       const fmt = (n) => n == null ? '?' : Number(n).toLocaleString()
       countEl.textContent = `${data.progress_percent}% (${fmt(data.activities_downloaded_count)} / ${fmt(data.athlete_activity_count)}) downloaded`
     }
+
+    const progressBar = document.getElementById('strava-progress-bar')
+    if (progressBar) {
+      progressBar.style.width = `${data.progress_percent}%`
+    }
   }
 }

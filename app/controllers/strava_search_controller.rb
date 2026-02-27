@@ -9,12 +9,12 @@ class StravaSearchController < ApplicationController
       return redirect_to new_strava_integration_path(scope: :strava_search)
     end
 
-    strava_integration = current_user.strava_integration
+    @strava_integration = current_user.strava_integration
     @strava_search_config = {
       tokenEndpoint: strava_search_token_path,
       proxyEndpoint: api_strava_proxy_index_path,
-      athleteId: strava_integration.athlete_id,
-      hasActivityWrite: strava_integration.has_activity_write?,
+      athleteId: @strava_integration.athlete_id,
+      hasActivityWrite: @strava_integration.has_activity_write?,
       authUrl: new_strava_integration_path(scope: :strava_search)
     }
     @strava_search_assets = if ENV["BUILD_STRAVA_SEARCH"] == "true"

@@ -1,29 +1,84 @@
-<% content_for(:header) do %>
-  <% @strava_search_assets.each do |asset| %>
-    <% if asset[:type] == :react_refresh %>
-      <script type="module">
-        import RefreshRuntime from '<%= asset[:src] %>'
-        RefreshRuntime.injectIntoGlobalHook(window)
-        window.$RefreshReg$ = () => {}
-        window.$RefreshSig$ = () => (type) => type
-        window.__vite_plugin_react_preamble_installed__ = true
-      </script>
-    <% elsif asset[:type] == :script %>
-      <script type="module" crossorigin src="<%= asset[:src] %>"></script>
-    <% elsif asset[:type] == :stylesheet %>
-      <link rel="stylesheet" crossorigin href="<%= asset[:href] %>">
+<% if @strava_integration.synced? %>
+  <% content_for(:header) do %>
+    <% @strava_search_assets.each do |asset| %>
+      <% if asset[:type] == :react_refresh %>
+        <script type="module">
+          import RefreshRuntime from '<%= asset[:src] %>'
+          RefreshRuntime.injectIntoGlobalHook(window)
+          window.$RefreshReg$ = () => {}
+          window.$RefreshSig$ = () => (type) => type
+          window.__vite_plugin_react_preamble_installed__ = true
+        </script>
+      <% elsif asset[:type] == :script %>
+        <script type="module" crossorigin src="<%= asset[:src] %>"></script>
+      <% elsif asset[:type] == :stylesheet %>
+        <link rel="stylesheet" crossorigin href="<%= asset[:href] %>">
+      <% end %>
     <% end %>
   <% end %>
+
+  <div id="root"></div>
+
+  <script>
+    window.stravaSearchConfig = <%= @strava_search_config.to_json.html_safe %>;
+    document.addEventListener('DOMContentLoaded', function() {
+      <%# Update the body padding so that there isn't whitespace at top %>
+      document.querySelector('.primary-header-nav').style.marginBottom = '0';
+      <%# And remove the whitespace at the bottom of the page too %>
+      document.querySelector('.primary-footer').style.marginTop = '0';
+    });
+  </script>
+<% else %>
+  <div class="tw:flex tw:min-h-[60vh] tw:items-center tw:justify-center">
+    <div class="tw:w-full tw:max-w-md tw:text-center">
+      <% if @strava_integration.error? %>
+        <h2 class="tw:text-xl tw:font-semibold tw:text-red-600 tw:dark:text-red-400">Sync error</h2>
+        <p class="tw:mt-2 tw:text-gray-600 tw:dark:text-gray-400">
+          There was an error syncing your Strava activities. Please try disconnecting and reconnecting.
+        </p>
+        <%= link_to "Reconnect Strava",
+            new_strava_integration_path(scope: :strava_search),
+            class: "btn btn-primary tw:mt-4" %>
+      <% else %>
+        <% if @strava_integration.pending? %>
+          <p class="tw:text-lg tw:text-gray-600 tw:dark:text-gray-300" id="strava-pending-message">
+            Connected to Strava. Sync will begin shortly.
+          </p>
+        <% end %>
+
+        <div class="<%= @strava_integration.pending? ? 'tw:hidden' : '' %>" id="strava-syncing-message">
+          <p class="tw:text-lg tw:text-gray-600 tw:dark:text-gray-300">Syncing activities...</p>
+
+          <div class="tw:mx-auto tw:mt-4 tw:w-full tw:max-w-xs">
+            <div class="tw:h-3 tw:overflow-hidden tw:rounded-full tw:bg-gray-200 tw:dark:bg-gray-700">
+              <div
+                id="strava-progress-bar"
+                class="tw:h-full tw:rounded-full tw:bg-orange-500 tw:transition-all tw:duration-500"
+                style="width: <%= @strava_integration.sync_progress_percent %>%"
+              ></div>
+            </div>
+
+            <p class="tw:mt-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400" id="strava-download-count">
+              <%= @strava_integration.sync_progress_percent %>%
+              (<%= number_display(@strava_integration.activities_downloaded_count) %> /
+              <%= number_display(@strava_integration.athlete_activity_count || "?") %>)
+              downloaded
+            </p>
+          </div>
+        </div>
+
+        <%= render UI::LoadingSpinner::Component.new(text: "") %>
+
+        <p class="tw:mt-2 tw:text-sm tw:text-gray-400 tw:dark:text-gray-500">
+          Sync is running in the background. This page will update automatically.
+        </p>
+      <% end %>
+
+      <div
+        data-controller="strava-sync-status"
+        data-strava-sync-status-url-value="<%= sync_status_strava_integration_path %>"
+        data-strava-sync-status-is-pending-value="<%= @strava_integration.pending? %>"
+      ></div>
+    </div>
+  </div>
 <% end %>
-
-<div id="root"></div>
-
-<script>
-  window.stravaSearchConfig = <%= @strava_search_config.to_json.html_safe %>;
-  document.addEventListener('DOMContentLoaded', function() {
-    <%# Update the body padding so that there isn't whitespace at top %>
-    document.querySelector('.primary-header-nav').style.marginBottom = '0';
-    <%# And remove the whitespace at the bottom of the page too %>
-    document.querySelector('.primary-footer').style.marginTop = '0';
-  });
-</script>
