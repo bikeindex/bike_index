@@ -7,7 +7,7 @@
 #
 #  id                    :bigint           not null, primary key
 #  parameters            :jsonb
-#  priority              :integer          default(0), not null
+#  priority              :bigint           default(0), not null
 #  rate_limit            :jsonb
 #  request_type          :integer          not null
 #  requested_at          :datetime
@@ -61,7 +61,7 @@ class StravaRequest < AnalyticsRecord
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
   scope :unprocessed, -> { where(requested_at: nil).where.not(response_status: :integration_deleted).order(:id) }
-  scope :priority_ordered, -> { reorder(:priority, :id) }
+  scope :priority_ordered, -> { reorder(:priority) }
 
   class << self
     def next_pending(limit = 1)
@@ -174,7 +174,8 @@ class StravaRequest < AnalyticsRecord
   end
 
   def set_priority
-    self.priority = PRIORITY_MAP.fetch(REQUEST_TYPE_ENUM[request_type.to_sym], PRIORITY_ORDER.length)
+    level = PRIORITY_MAP.fetch(REQUEST_TYPE_ENUM[request_type.to_sym], PRIORITY_ORDER.length)
+    self.priority = level * 10_000_000_000 + Time.current.to_i
   end
 
   # IDK, sort of a guess - because Strava responds with a 404 :/
