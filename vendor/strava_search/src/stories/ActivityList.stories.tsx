@@ -39,6 +39,9 @@ const defaultFilters: SearchFilters = {
   sufferScoreTo: null,
   kudosFrom: null,
   kudosTo: null,
+  country: null,
+  region: null,
+  city: null,
   page: 1,
 };
 

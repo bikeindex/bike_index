@@ -175,6 +175,9 @@ export interface SearchFilters {
   sufferScoreTo: number | null;
   kudosFrom: number | null;
   kudosTo: number | null;
+  country: string | null;
+  region: string | null;
+  city: string | null;
   page: number;
 }
 

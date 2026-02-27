@@ -162,6 +162,7 @@ function Dashboard() {
         <SearchFilters
           filters={filters}
           onFiltersChange={setFilters}
+          activities={activities}
           activityTypes={activityTypes}
           gear={gear}
           totalCount={activities.length}

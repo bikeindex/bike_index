@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { Search, X, ChevronDown } from 'lucide-react';
-import type { SearchFilters as SearchFiltersType } from '../types/strava';
+import type { SearchFilters as SearchFiltersType, StravaActivity } from '../types/strava';
 import type { StoredGear } from '../services/database';
 import {
   getActivityIcon,
@@ -14,6 +15,7 @@ import { usePreferences } from '../contexts/PreferencesContext';
 interface SearchFiltersProps {
   filters: SearchFiltersType;
   onFiltersChange: (filters: SearchFiltersType) => void;
+  activities: StravaActivity[];
   activityTypes: string[];
   gear: StoredGear[];
   totalCount: number;
@@ -26,6 +28,7 @@ const inputClasses = 'px-2 py-1 border border-gray-300 dark:border-gray-600 dark
 export function SearchFilters({
   filters,
   onFiltersChange,
+  activities,
   activityTypes,
   gear,
   totalCount,
@@ -34,6 +37,35 @@ export function SearchFilters({
   const { units } = usePreferences();
   const distanceUnit = units === 'imperial' ? 'mi' : 'km';
   const elevationUnit = units === 'imperial' ? 'ft' : 'm';
+
+  const selectClasses = `${inputClasses} cursor-pointer`;
+
+  const allCountries = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of activities) {
+      for (const c of a.segment_locations?.countries || []) set.add(c);
+    }
+    return Array.from(set).sort();
+  }, [activities]);
+
+  const availableRegions = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of activities) {
+      if (filters.country && !a.segment_locations?.countries?.includes(filters.country)) continue;
+      for (const s of a.segment_locations?.states || []) set.add(s);
+    }
+    return Array.from(set).sort();
+  }, [activities, filters.country]);
+
+  const availableCities = useMemo(() => {
+    const set = new Set<string>();
+    for (const a of activities) {
+      if (filters.country && !a.segment_locations?.countries?.includes(filters.country)) continue;
+      if (filters.region && !a.segment_locations?.states?.includes(filters.region)) continue;
+      for (const c of a.segment_locations?.cities || []) set.add(c);
+    }
+    return Array.from(set).sort();
+  }, [activities, filters.country, filters.region]);
 
   const hasActiveFilters =
     filters.query ||
@@ -54,7 +86,10 @@ export function SearchFilters({
     filters.sufferScoreFrom !== null ||
     filters.sufferScoreTo !== null ||
     filters.kudosFrom !== null ||
-    filters.kudosTo !== null;
+    filters.kudosTo !== null ||
+    filters.country !== null ||
+    filters.region !== null ||
+    filters.city !== null;
 
   const clearFilters = () => {
     onFiltersChange({
@@ -78,6 +113,9 @@ export function SearchFilters({
       sufferScoreTo: null,
       kudosFrom: null,
       kudosTo: null,
+      country: null,
+      region: null,
+      city: null,
     });
   };
 
@@ -165,6 +203,7 @@ export function SearchFilters({
                   filters.trainerFilter !== 'all',
                   filters.sufferScoreFrom !== null, filters.sufferScoreTo !== null,
                   filters.kudosFrom !== null, filters.kudosTo !== null,
+                  !!filters.country, !!filters.region, !!filters.city,
                 ].filter(Boolean).length;
                 return count > 0 ? (
                   <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded-full">{count}</span>
@@ -430,6 +469,70 @@ export function SearchFilters({
               />
             </label>
         </div>
+
+        {/* Location filters */}
+        {allCountries.length > 0 && (
+        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <span>Country:</span>
+            <select
+              value={filters.country || ''}
+              onChange={(e) => {
+                const country = e.target.value || null;
+                onFiltersChange({
+                  ...filters,
+                  country,
+                  region: country === filters.country ? filters.region : null,
+                  city: country === filters.country ? filters.city : null,
+                });
+              }}
+              className={selectClasses}
+            >
+              <option value="">All</option>
+              {allCountries.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </label>
+          {filters.country && availableRegions.length > 0 && (
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <span>Region:</span>
+            <select
+              value={filters.region || ''}
+              onChange={(e) => {
+                const region = e.target.value || null;
+                onFiltersChange({
+                  ...filters,
+                  region,
+                  city: region === filters.region ? filters.city : null,
+                });
+              }}
+              className={selectClasses}
+            >
+              <option value="">All</option>
+              {availableRegions.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </label>
+          )}
+          {filters.country && availableCities.length > 0 && (
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <span>City:</span>
+            <select
+              value={filters.city || ''}
+              onChange={(e) => onFiltersChange({ ...filters, city: e.target.value || null })}
+              className={selectClasses}
+            >
+              <option value="">All</option>
+              {availableCities.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </label>
+          )}
+        </div>
+        )}
 
           </div>
           )}

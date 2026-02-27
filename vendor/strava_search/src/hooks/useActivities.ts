@@ -264,6 +264,23 @@ export function useActivities(): UseActivitiesResult {
         }
       }
 
+      // Location filters
+      if (filters.country) {
+        if (!activity.segment_locations?.countries?.includes(filters.country)) {
+          return false;
+        }
+      }
+      if (filters.region) {
+        if (!activity.segment_locations?.states?.includes(filters.region)) {
+          return false;
+        }
+      }
+      if (filters.city) {
+        if (!activity.segment_locations?.cities?.includes(filters.city)) {
+          return false;
+        }
+      }
+
       // Kudos count range filter
       if (filters.kudosFrom !== null) {
         if (activity.kudos_count < filters.kudosFrom) {

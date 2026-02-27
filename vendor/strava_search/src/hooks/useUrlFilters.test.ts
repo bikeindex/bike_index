@@ -40,6 +40,9 @@ describe('useUrlFilters', () => {
         sufferScoreTo: null,
         kudosFrom: null,
         kudosTo: null,
+        country: null,
+        region: null,
+        city: null,
         page: 1,
       });
     });
@@ -117,6 +120,9 @@ describe('useUrlFilters', () => {
         sufferScoreTo: null,
         kudosFrom: null,
         kudosTo: null,
+        country: null,
+        region: null,
+        city: null,
         page: 1,
       });
     });
@@ -246,6 +252,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -280,6 +289,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -314,6 +326,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -349,6 +364,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -383,6 +401,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -417,6 +438,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -452,6 +476,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -486,6 +513,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -522,6 +552,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -600,6 +633,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -636,6 +672,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -726,6 +765,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: 100,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -797,6 +839,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -831,6 +876,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -875,6 +923,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });
@@ -903,6 +954,9 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          country: null,
+          region: null,
+          city: null,
           page: 1,
         });
       });

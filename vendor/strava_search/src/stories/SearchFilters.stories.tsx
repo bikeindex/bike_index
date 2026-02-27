@@ -39,6 +39,9 @@ const defaultFilters: SearchFiltersType = {
   sufferScoreTo: null,
   kudosFrom: null,
   kudosTo: null,
+  country: null,
+  region: null,
+  city: null,
   page: 1,
 };
 
@@ -52,6 +55,7 @@ export const Default: Story = {
   args: {
     filters: defaultFilters,
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike', 'VirtualRide', 'Walk'],
     gear: mockGear,
     totalCount: 150,
@@ -64,6 +68,7 @@ export const WithSearchQuery: Story = {
   args: {
     filters: { ...defaultFilters, query: 'morning run' },
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike', 'VirtualRide', 'Walk'],
     gear: mockGear,
     totalCount: 150,
@@ -76,6 +81,7 @@ export const WithActivityTypeFilter: Story = {
   args: {
     filters: { ...defaultFilters, activityTypes: ['Run', 'Hike'] },
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike', 'VirtualRide', 'Walk'],
     gear: mockGear,
     totalCount: 150,
@@ -88,6 +94,7 @@ export const WithDateRange: Story = {
   args: {
     filters: { ...defaultFilters, dateFrom: '2024-01-01', dateTo: '2024-01-31' },
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike', 'VirtualRide', 'Walk'],
     gear: mockGear,
     totalCount: 150,
@@ -100,6 +107,7 @@ export const WithGearFilter: Story = {
   args: {
     filters: { ...defaultFilters, gearIds: ['b12345'] },
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike', 'VirtualRide', 'Walk'],
     gear: mockGear,
     totalCount: 150,
@@ -133,9 +141,13 @@ export const WithMultipleFilters: Story = {
       sufferScoreTo: null,
       kudosFrom: null,
       kudosTo: null,
+      country: null,
+      region: null,
+      city: null,
       page: 1,
     },
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike', 'VirtualRide', 'Walk'],
     gear: mockGear,
     totalCount: 150,
@@ -148,6 +160,7 @@ export const WithNoEquipmentFilter: Story = {
   args: {
     filters: { ...defaultFilters, noEquipment: true },
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike', 'VirtualRide', 'Walk'],
     gear: mockGear,
     totalCount: 150,
@@ -160,6 +173,7 @@ export const NoGear: Story = {
   args: {
     filters: defaultFilters,
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim'],
     gear: [],
     totalCount: 50,
@@ -172,6 +186,7 @@ export const NoResults: Story = {
   args: {
     filters: { ...defaultFilters, query: 'nonexistent activity' },
     onFiltersChange: () => {},
+    activities: [],
     activityTypes: ['Run', 'Ride', 'Swim', 'Hike'],
     gear: mockGear,
     totalCount: 150,

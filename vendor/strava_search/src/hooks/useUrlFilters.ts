@@ -77,6 +77,15 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.kudosTo !== null && filters.kudosTo !== undefined) {
     params.set('kudosTo', filters.kudosTo.toString());
   }
+  if (filters.country) {
+    params.set('country', filters.country);
+  }
+  if (filters.region) {
+    params.set('region', filters.region);
+  }
+  if (filters.city) {
+    params.set('city', filters.city);
+  }
   if (filters.page > 1) {
     params.set('page', filters.page.toString());
   }
@@ -93,7 +102,8 @@ function hasPropertyFilters(filters: SearchFilters): boolean {
     (filters.privateFilter !== 'all') || (filters.commuteFilter !== 'all') ||
     (filters.trainerFilter !== 'all') ||
     filters.sufferScoreFrom !== null || filters.sufferScoreTo !== null ||
-    filters.kudosFrom !== null || filters.kudosTo !== null
+    filters.kudosFrom !== null || filters.kudosTo !== null ||
+    filters.country || filters.region || filters.city
   );
 }
 
@@ -115,7 +125,8 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     distFromStr || distToStr || elevFromStr || elevToStr ||
     params.get('muted') || params.get('photo') || params.get('private') ||
     params.get('commute') || params.get('trainer') ||
-    sufferFromStr || sufferToStr || kudosFromStr || kudosToStr
+    sufferFromStr || sufferToStr || kudosFromStr || kudosToStr ||
+    params.get('country') || params.get('region') || params.get('city')
   );
 
   return {
@@ -141,6 +152,9 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     sufferScoreTo: sufferToStr ? parseFloat(sufferToStr) : null,
     kudosFrom: kudosFromStr ? parseFloat(kudosFromStr) : null,
     kudosTo: kudosToStr ? parseFloat(kudosToStr) : null,
+    country: params.get('country') || null,
+    region: params.get('region') || null,
+    city: params.get('city') || null,
     page: parseInt(params.get('page') || '1', 10),
   };
 }
@@ -176,6 +190,7 @@ export function useUrlFilters(): [SearchFilters, React.Dispatch<React.SetStateAc
         prev.trainerFilter === resolved.trainerFilter &&
         prev.sufferScoreFrom === resolved.sufferScoreFrom && prev.sufferScoreTo === resolved.sufferScoreTo &&
         prev.kudosFrom === resolved.kudosFrom && prev.kudosTo === resolved.kudosTo &&
+        prev.country === resolved.country && prev.region === resolved.region && prev.city === resolved.city &&
         prev.page === resolved.page;
 
       if (panelOnly) {
