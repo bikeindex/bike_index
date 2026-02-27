@@ -137,4 +137,92 @@ RSpec.describe StravaSearchController, type: :request do
       end
     end
   end
+
+  describe "GET /strava_search/sync_status" do
+    it "returns 401 when not signed in" do
+      get strava_search_sync_status_path
+      expect(response.status).to eq 401
+      expect(json_result[:error]).to eq "Authentication required"
+    end
+
+    context "signed in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "returns 404 when user has no strava integration" do
+        get strava_search_sync_status_path
+        expect(response.status).to eq 404
+        expect(json_result[:error]).to eq "No Strava integration"
+      end
+
+      context "with syncing strava integration" do
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, :syncing, user: current_user) }
+
+        it "returns sync status" do
+          get strava_search_sync_status_path
+          expect(response.status).to eq 200
+          expect(json_result[:status]).to eq "syncing"
+          expect(json_result[:activities_downloaded_count]).to eq 50
+          expect(json_result[:athlete_activity_count]).to eq 150
+          expect(json_result[:progress_percent]).to eq 33
+        end
+      end
+
+      context "with synced strava integration" do
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
+
+        it "returns synced status" do
+          get strava_search_sync_status_path
+          expect(response.status).to eq 200
+          expect(json_result[:status]).to eq "synced"
+          expect(json_result[:progress_percent]).to eq 100
+        end
+      end
+    end
+  end
+
+  describe "GET /strava_search/activities" do
+    it "returns 401 when not signed in" do
+      get strava_search_activities_path
+      expect(response.status).to eq 401
+      expect(json_result[:error]).to eq "Authentication required"
+    end
+
+    context "signed in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "returns 404 when user has no strava integration" do
+        get strava_search_activities_path
+        expect(response.status).to eq 404
+        expect(json_result[:error]).to eq "No Strava integration"
+      end
+
+      context "with strava integration" do
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, :with_gear, :syncing, user: current_user) }
+        let!(:strava_activity) { FactoryBot.create(:strava_activity, strava_integration:) }
+
+        it "returns activities and gear" do
+          get strava_search_activities_path
+          expect(response.status).to eq 200
+          expect(json_result[:activities]).to be_an Array
+          expect(json_result[:activities].length).to eq 1
+          expect(json_result[:activities].first[:strava_id]).to eq strava_activity.strava_id
+          expect(json_result[:gear]).to be_an Array
+          expect(json_result[:gear].length).to eq 1
+          expect(json_result[:gear].first[:id]).to eq "b1234"
+          expect(json_result[:gear].first[:name]).to eq "My Road Bike"
+        end
+      end
+
+      context "with no activities" do
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, user: current_user) }
+
+        it "returns empty arrays" do
+          get strava_search_activities_path
+          expect(response.status).to eq 200
+          expect(json_result[:activities]).to eq []
+          expect(json_result[:gear]).to eq []
+        end
+      end
+    end
+  end
 end

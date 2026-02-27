@@ -8,6 +8,7 @@ import { ErrorBanner } from './components/ErrorBanner';
 import { SearchFilters } from './components/SearchFilters';
 import { ActivityList } from './components/ActivityList';
 import { SettingsModal } from './components/SettingsModal';
+import { InitialSyncOverlay } from './components/InitialSyncPrompt';
 import { getConfig } from './services/railsApi';
 import { Loader2 } from 'lucide-react';
 
@@ -186,6 +187,15 @@ function Dashboard() {
       </main>
 
       <SettingsModal isOpen={showSettings} onClose={handleCloseSettings} />
+
+      {/* Initial sync overlay - shown before any activities have loaded */}
+      {isSyncing && !syncState?.isInitialSyncComplete && progress && (
+        <InitialSyncOverlay
+          loaded={progress.loaded}
+          total={progress.total}
+          status={progress.status}
+        />
+      )}
 
       {/* Full-page updating overlay */}
       {isUpdating && updateProgress && (

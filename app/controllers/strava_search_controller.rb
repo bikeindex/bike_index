@@ -13,6 +13,8 @@ class StravaSearchController < ApplicationController
     @strava_search_config = {
       tokenEndpoint: strava_search_token_path,
       proxyEndpoint: api_strava_proxy_index_path,
+      syncStatusEndpoint: strava_search_sync_status_path,
+      activitiesEndpoint: strava_search_activities_path,
       athleteId: strava_integration.athlete_id,
       hasActivityWrite: strava_integration.has_activity_write?,
       authUrl: new_strava_integration_path(scope: :strava_search)
@@ -49,7 +51,43 @@ class StravaSearchController < ApplicationController
     }
   end
 
+  def sync_status
+    return render json: {error: "Authentication required"}, status: 401 unless current_user
+
+    strava_integration = current_user.strava_integration
+    return render json: {error: "No Strava integration"}, status: 404 unless strava_integration
+
+    render json: {
+      status: strava_integration.status,
+      activities_downloaded_count: strava_integration.activities_downloaded_count,
+      athlete_activity_count: strava_integration.athlete_activity_count,
+      progress_percent: strava_integration.sync_progress_percent
+    }
+  end
+
+  def activities
+    return render json: {error: "Authentication required"}, status: 401 unless current_user
+
+    strava_integration = current_user.strava_integration
+    return render json: {error: "No Strava integration"}, status: 404 unless strava_integration
+
+    render json: {
+      activities: strava_integration.strava_activities.map(&:proxy_serialized),
+      gear: strava_integration.strava_gears.map { |g| gear_json(g) }
+    }
+  end
+
   private
+
+  def gear_json(gear)
+    {
+      id: gear.strava_gear_id,
+      name: gear.strava_gear_name,
+      primary: gear.primary?,
+      distance: (gear.strava_data&.dig("distance") || 0).to_f,
+      resource_state: gear.strava_data&.dig("resource_state") || 2
+    }
+  end
 
   def handle_unverified_request
     render json: {error: "CSRF verification failed"}, status: 422

@@ -372,6 +372,8 @@ Rails.application.routes.draw do
 
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
+  get "strava_search/sync_status", to: "strava_search#sync_status", as: :strava_search_sync_status
+  get "strava_search/activities", to: "strava_search#activities", as: :strava_search_activities
 
   mount Lookbook::Engine, at: "/lookbook"
 
