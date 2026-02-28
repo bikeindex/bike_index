@@ -261,19 +261,21 @@ export function useActivities(): UseActivitiesResult {
       }
 
       // Location filters
-      if (filters.country) {
-        if (!activity.segment_locations?.countries?.includes(filters.country)) {
-          return false;
-        }
-      }
-      if (filters.region) {
-        if (!activity.segment_locations?.states?.includes(filters.region)) {
-          return false;
-        }
-      }
-      if (filters.city) {
-        if (!activity.segment_locations?.cities?.includes(filters.city)) {
-          return false;
+      if (filters.country || filters.region || filters.city) {
+        const locations = activity.segment_locations?.locations;
+        if (locations) {
+          const match = locations.some((loc) =>
+            (!filters.country || loc.country === filters.country) &&
+            (!filters.region || loc.region === filters.region) &&
+            (!filters.city || loc.city === filters.city)
+          );
+          if (!match) return false;
+        } else {
+          // Legacy flat arrays — no locations means no match
+          const hasLegacy = activity.segment_locations?.cities?.length || activity.segment_locations?.states?.length;
+          if (!hasLegacy) return false;
+          if (filters.region && !activity.segment_locations?.states?.includes(filters.region)) return false;
+          if (filters.city && !activity.segment_locations?.cities?.includes(filters.city)) return false;
         }
       }
 

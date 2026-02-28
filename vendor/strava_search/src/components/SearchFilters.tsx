@@ -40,39 +40,50 @@ export function SearchFilters({
 
   const selectClasses = `${inputClasses} cursor-pointer`;
 
+  // Extract all location tuples from activities, with legacy fallback
+  const allLocations = useMemo(() => {
+    return activities.flatMap((a) => {
+      const locs = a.segment_locations?.locations;
+      if (locs) return locs;
+      // Legacy: flat arrays with no city→region mapping
+      const cities = a.segment_locations?.cities || [];
+      const regions = a.segment_locations?.states || [];
+      if (cities.length === 0 && regions.length === 0) return [];
+      // Best-effort: create tuples from cities with the shortest region name
+      const shortRegion = regions.length > 0 ? regions.reduce((x, y) => x.length <= y.length ? x : y) : undefined;
+      return cities.map((city) => ({ city, region: shortRegion }));
+    });
+  }, [activities]);
+
   const allCountries = useMemo(() => {
     const set = new Set<string>();
-    for (const a of activities) {
-      for (const c of a.segment_locations?.countries || []) set.add(c);
+    for (const loc of allLocations) {
+      if (loc.country) set.add(loc.country);
     }
     return Array.from(set).sort();
-  }, [activities]);
+  }, [allLocations]);
 
   const availableRegions = useMemo(() => {
     const set = new Set<string>();
-    for (const a of activities) {
-      if (filters.country && !a.segment_locations?.countries?.includes(filters.country)) continue;
-      for (const s of a.segment_locations?.states || []) set.add(s);
+    for (const loc of allLocations) {
+      if (filters.country && loc.country !== filters.country) continue;
+      if (loc.region) set.add(loc.region);
     }
     return Array.from(set).sort();
-  }, [activities, filters.country]);
+  }, [allLocations, filters.country]);
 
   const availableCities = useMemo(() => {
     const cityRegions = new Map<string, string>();
-    for (const a of activities) {
-      if (filters.country && !a.segment_locations?.countries?.includes(filters.country)) continue;
-      if (filters.region && !a.segment_locations?.states?.includes(filters.region)) continue;
-      const states = a.segment_locations?.states || [];
-      // Pick the shortest state name (most likely the abbreviation)
-      const shortState = states.length > 0 ? states.reduce((a, b) => a.length <= b.length ? a : b) : null;
-      for (const c of a.segment_locations?.cities || []) {
-        if (!cityRegions.has(c) && shortState) cityRegions.set(c, shortState);
-      }
+    for (const loc of allLocations) {
+      if (!loc.city) continue;
+      if (filters.country && loc.country !== filters.country) continue;
+      if (filters.region && loc.region !== filters.region) continue;
+      if (!cityRegions.has(loc.city) && loc.region) cityRegions.set(loc.city, loc.region);
     }
     return Array.from(cityRegions.entries())
       .map(([city, region]) => ({ city, region }))
       .sort((a, b) => a.city.localeCompare(b.city));
-  }, [activities, filters.country, filters.region]);
+  }, [allLocations, filters.country, filters.region]);
 
 
   const hasActiveFilters =

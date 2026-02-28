@@ -153,7 +153,7 @@ RSpec.describe StravaActivity, type: :model do
         moving_time_seconds: 3600,
         photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
         private: false,
-        segment_locations: {cities: ["Denver"], states: ["Colorado"], countries: ["United States"]},
+        segment_locations: {locations: [{city: "Denver", region: "Colorado", country: "United States"}]},
         sport_type: "Ride",
         suffer_score: 42.0,
         timezone: "America/Denver",
@@ -189,7 +189,7 @@ RSpec.describe StravaActivity, type: :model do
         timezone: "America/Denver",
         start_date: Time.current,
         photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
-        segment_locations: {cities: ["Denver"], states: ["Colorado"], countries: ["United States"]},
+        segment_locations: {locations: [{city: "Denver", region: "Colorado", country: "United States"}]},
         strava_data: {average_heartrate: 145.0, max_heartrate: 180.0, device_name: "Garmin Edge 530",
                       commute: false, trainer: false, average_speed: 6.944, pr_count: 3, average_watts: 200.0, device_watts: true})
 
@@ -200,6 +200,11 @@ RSpec.describe StravaActivity, type: :model do
   end
 
   describe "update_from_strava!" do
+    before do
+      FactoryBot.create(:state_california)
+      FactoryBot.create(:state_indiana)
+      FactoryBot.create(:state_illinois)
+    end
     let(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens) }
     let(:strava_activity) { StravaActivity.create(strava_integration:, strava_id: "17419209324") }
     let(:target_attributes) do
@@ -256,9 +261,17 @@ RSpec.describe StravaActivity, type: :model do
             photo_count: 2
           },
           segment_locations: {
-            cities: ["Hobart", "Merrillville", "Gary", "Griffith", "Highland", "Hammond", "Chicago"],
-            states: ["IN", "Indiana", "Illinois", "IL"],
-            countries: ["United States", "USA"]
+            locations: [
+              {city: "Hobart", region: "IN", country: "US"},
+              {city: "Merrillville", region: "IN", country: "US"},
+              {city: "Gary", region: "IN", country: "US"},
+              {city: "Griffith", region: "IN", country: "US"},
+              {city: "Highland", region: "IN", country: "US"},
+              {city: "Hammond", region: "IN", country: "US"},
+              {city: "Chicago", region: "IL", country: "US"}
+            ],
+            regions: {"Illinois" => "IL", "Indiana" => "IN"},
+            countries: {"United States" => "US"}
           },
           strava_data: {
             commute: false,

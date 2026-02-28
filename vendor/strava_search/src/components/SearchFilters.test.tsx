@@ -83,18 +83,18 @@ describe('SearchFilters', () => {
       const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(countrySelect.options).map((o) => o.text);
       expect(options).toContain('Germany');
-      expect(options).toContain('United States');
-      expect(options).toContain('USA');
+      expect(options).toContain('US');
     });
 
     it('lists regions from activities', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
       const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(regionSelect.options).map((o) => o.text);
-      expect(options).toContain('California');
       expect(options).toContain('CA');
+      expect(options).toContain('IN');
+      expect(options).toContain('IL');
       expect(options).toContain('Berlin');
-      expect(options).toContain('Brandenburg');
+      expect(options).toContain('BB');
     });
 
     it('displays cities with abbreviated region name', () => {
@@ -103,9 +103,8 @@ describe('SearchFilters', () => {
       const options = Array.from(citySelect.options).map((o) => o.text);
       expect(options).toContain('Truckee, CA');
       expect(options).toContain('San Francisco, CA');
-      expect(options).toContain('Berlin, BB');
-      // Dunes trip has states ["IN", "Indiana", "Illinois", "IL"] - picks shortest ("IN")
-      expect(options).toContain('Chicago, IN');
+      expect(options).toContain('Berlin, Berlin');
+      expect(options).toContain('Chicago, IL');
       expect(options).toContain('Gary, IN');
     });
 
@@ -120,8 +119,8 @@ describe('SearchFilters', () => {
       const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(regionSelect.options).map((o) => o.text);
       expect(options).toContain('Berlin');
-      expect(options).toContain('Brandenburg');
-      expect(options).not.toContain('California');
+      expect(options).toContain('BB');
+      expect(options).not.toContain('CA');
     });
 
     it('filters cities when region is selected', () => {
@@ -134,8 +133,9 @@ describe('SearchFilters', () => {
       );
       const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(citySelect.options).map((o) => o.text);
-      expect(options).toContain('Berlin, BB');
-      expect(options).toContain('Mitte, BB');
+      expect(options).toContain('Berlin, Berlin');
+      expect(options).toContain('Mitte, Berlin');
+      expect(options).toContain('Pankow, Berlin');
       expect(options).not.toContain('Truckee, CA');
     });
 
@@ -152,7 +152,7 @@ describe('SearchFilters', () => {
       render(
         <SearchFilters
           {...defaultProps}
-          filters={{ ...defaultFilters, country: 'United States', region: 'California', city: 'Truckee' }}
+          filters={{ ...defaultFilters, country: 'US', region: 'CA', city: 'Truckee' }}
           onFiltersChange={onFiltersChange}
         />,
       );
@@ -167,7 +167,7 @@ describe('SearchFilters', () => {
       render(
         <SearchFilters
           {...defaultProps}
-          filters={{ ...defaultFilters, region: 'California', city: 'Truckee' }}
+          filters={{ ...defaultFilters, region: 'CA', city: 'Truckee' }}
           onFiltersChange={onFiltersChange}
         />,
       );
@@ -181,9 +181,9 @@ describe('SearchFilters', () => {
     it('allows selecting region without country', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
       const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      fireEvent.change(regionSelect, { target: { value: 'California' } });
+      fireEvent.change(regionSelect, { target: { value: 'CA' } });
       expect(onFiltersChange).toHaveBeenCalledWith(
-        expect.objectContaining({ country: null, region: 'California' }),
+        expect.objectContaining({ country: null, region: 'CA' }),
       );
     });
 

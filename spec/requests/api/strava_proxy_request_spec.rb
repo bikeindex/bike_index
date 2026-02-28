@@ -79,6 +79,7 @@ RSpec.describe "Strava Proxy API", type: :request do
     end
 
     context "with synced strava integration" do
+      before { FactoryBot.create(:state_california) }
       let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens, user:) }
       let(:target_attributes) do
         {
@@ -130,14 +131,19 @@ RSpec.describe "Strava Proxy API", type: :request do
         let(:detail_target_attributes) do
           target_attributes.except("enriched_at").merge(
             description: "Hawk with Eric and Scott and cedar",
+            kudos_count: 22,
             photos: {
               photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
               photo_count: 2
             },
             segment_locations: {
-              cities: ["San Francisco", "Mill Valley"],
-              states: ["California"],
-              countries: ["United States", "USA"]
+              locations: [
+                {city: "San Francisco", region: "CA", country: "US"},
+                {region: "CA", country: "US"},
+                {city: "Mill Valley", region: "CA", country: "US"}
+              ],
+              regions: {"California" => "CA"},
+              countries: {"United States" => "US"}
             },
             strava_data: target_attributes["strava_data"].merge("muted" => false)
           ).as_json

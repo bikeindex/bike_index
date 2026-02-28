@@ -54,9 +54,12 @@ export interface StravaActivity {
     photo_count: number;
   };
   segment_locations?: {
+    locations?: Array<{ city?: string; region?: string; country?: string }>;
+    regions?: Record<string, string>;
+    countries?: Record<string, string>;
+    // Legacy flat arrays (for activities not yet re-enriched)
     cities?: string[];
     states?: string[];
-    countries?: string[];
   };
 }
 

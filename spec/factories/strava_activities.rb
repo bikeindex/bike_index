@@ -14,7 +14,7 @@ FactoryBot.define do
     end
 
     trait :with_location do
-      segment_locations { {"cities" => ["San Francisco"], "states" => ["California"], "countries" => ["United States"]} }
+      segment_locations { {"locations" => [{"city" => "San Francisco", "region" => "California", "country" => "United States"}]} }
     end
 
     trait :with_gear do

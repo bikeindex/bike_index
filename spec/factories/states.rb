@@ -28,6 +28,12 @@ FactoryBot.define do
       name { "California" }
     end
 
+    factory :state_indiana, traits: [:find_or_create] do
+      abbreviation { "IN" }
+      country { Country.united_states }
+      name { "Indiana" }
+    end
+
     factory :state_alberta, traits: [:find_or_create] do
       abbreviation { "AB" }
       country { Country.canada }

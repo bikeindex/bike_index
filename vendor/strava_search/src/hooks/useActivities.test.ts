@@ -156,8 +156,8 @@ describe('useActivities', () => {
 
       it('filters by segment_locations cities', async () => {
         mockActivities.push(
-          createActivity({ id: 1, title: 'Activity 1', segment_locations: { cities: ['San Francisco'] } }),
-          createActivity({ id: 2, title: 'Activity 2', segment_locations: { cities: ['Los Angeles'] } })
+          createActivity({ id: 1, title: 'Activity 1', segment_locations: { locations: [{ city: 'San Francisco', region: 'CA', country: 'US' }] } }),
+          createActivity({ id: 2, title: 'Activity 2', segment_locations: { locations: [{ city: 'Los Angeles', region: 'CA', country: 'US' }] } })
         );
 
         const { result } = renderHook(() => useActivities());
@@ -171,17 +171,17 @@ describe('useActivities', () => {
         expect(result.current.filteredActivities[0].id).toBe(1);
       });
 
-      it('filters by segment_locations states', async () => {
+      it('filters by segment_locations regions', async () => {
         mockActivities.push(
-          createActivity({ id: 1, title: 'Activity 1', segment_locations: { states: ['California'] } }),
-          createActivity({ id: 2, title: 'Activity 2', segment_locations: { states: ['Oregon'] } })
+          createActivity({ id: 1, title: 'Activity 1', segment_locations: { locations: [{ region: 'CA', country: 'US' }] } }),
+          createActivity({ id: 2, title: 'Activity 2', segment_locations: { locations: [{ region: 'OR', country: 'US' }] } })
         );
 
         const { result } = renderHook(() => useActivities());
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, region: 'California' }));
+          result.current.setFilters((prev) => ({ ...prev, region: 'CA' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);
@@ -210,9 +210,10 @@ describe('useActivities', () => {
             id: 1,
             title: 'Activity 1',
             segment_locations: {
-              cities: ['Mill Valley', 'Sausalito'],
-              states: ['California'],
-              countries: ['United States'],
+              locations: [
+                { city: 'Mill Valley', region: 'CA', country: 'US' },
+                { city: 'Sausalito', region: 'CA', country: 'US' },
+              ],
             },
           }),
           createActivity({ id: 2, title: 'Activity 2' })
@@ -222,7 +223,7 @@ describe('useActivities', () => {
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, country: 'United States', city: 'Sausalito' }));
+          result.current.setFilters((prev) => ({ ...prev, country: 'US', city: 'Sausalito' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);
@@ -775,16 +776,16 @@ describe('useActivities', () => {
     describe('location filter', () => {
       it('filters by country', async () => {
         mockActivities.push(
-          createActivity({ id: 1, segment_locations: { countries: ['United States'], states: ['California'], cities: ['Oakland'] } }),
-          createActivity({ id: 2, segment_locations: { countries: ['France'], states: ['Île-de-France'], cities: ['Paris'] } }),
-          createActivity({ id: 3, segment_locations: { countries: ['United States'], states: ['Oregon'], cities: ['Portland'] } })
+          createActivity({ id: 1, segment_locations: { locations: [{ city: 'Oakland', region: 'CA', country: 'US' }] } }),
+          createActivity({ id: 2, segment_locations: { locations: [{ city: 'Paris', region: 'Île-de-France', country: 'FR' }] } }),
+          createActivity({ id: 3, segment_locations: { locations: [{ city: 'Portland', region: 'OR', country: 'US' }] } })
         );
 
         const { result } = renderHook(() => useActivities());
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, country: 'United States' }));
+          result.current.setFilters((prev) => ({ ...prev, country: 'US' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(2);
@@ -793,16 +794,16 @@ describe('useActivities', () => {
 
       it('filters by country and region', async () => {
         mockActivities.push(
-          createActivity({ id: 1, segment_locations: { countries: ['United States'], states: ['California'], cities: ['Oakland'] } }),
-          createActivity({ id: 2, segment_locations: { countries: ['United States'], states: ['Oregon'], cities: ['Portland'] } }),
-          createActivity({ id: 3, segment_locations: { countries: ['France'], states: ['Île-de-France'], cities: ['Paris'] } })
+          createActivity({ id: 1, segment_locations: { locations: [{ city: 'Oakland', region: 'CA', country: 'US' }] } }),
+          createActivity({ id: 2, segment_locations: { locations: [{ city: 'Portland', region: 'OR', country: 'US' }] } }),
+          createActivity({ id: 3, segment_locations: { locations: [{ city: 'Paris', region: 'Île-de-France', country: 'FR' }] } })
         );
 
         const { result } = renderHook(() => useActivities());
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, country: 'United States', region: 'California' }));
+          result.current.setFilters((prev) => ({ ...prev, country: 'US', region: 'CA' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);
@@ -811,16 +812,16 @@ describe('useActivities', () => {
 
       it('filters by country, region, and city', async () => {
         mockActivities.push(
-          createActivity({ id: 1, segment_locations: { countries: ['United States'], states: ['California'], cities: ['Oakland'] } }),
-          createActivity({ id: 2, segment_locations: { countries: ['United States'], states: ['California'], cities: ['San Francisco'] } }),
-          createActivity({ id: 3, segment_locations: { countries: ['United States'], states: ['Oregon'], cities: ['Portland'] } })
+          createActivity({ id: 1, segment_locations: { locations: [{ city: 'Oakland', region: 'CA', country: 'US' }] } }),
+          createActivity({ id: 2, segment_locations: { locations: [{ city: 'San Francisco', region: 'CA', country: 'US' }] } }),
+          createActivity({ id: 3, segment_locations: { locations: [{ city: 'Portland', region: 'OR', country: 'US' }] } })
         );
 
         const { result } = renderHook(() => useActivities());
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, country: 'United States', region: 'California', city: 'Oakland' }));
+          result.current.setFilters((prev) => ({ ...prev, country: 'US', region: 'CA', city: 'Oakland' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);
@@ -829,7 +830,7 @@ describe('useActivities', () => {
 
       it('excludes activities without segment_locations', async () => {
         mockActivities.push(
-          createActivity({ id: 1, segment_locations: { countries: ['United States'] } }),
+          createActivity({ id: 1, segment_locations: { locations: [{ country: 'US' }] } }),
           createActivity({ id: 2 }), // no segment_locations
           createActivity({ id: 3, segment_locations: {} }) // empty segment_locations
         );
@@ -838,7 +839,7 @@ describe('useActivities', () => {
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, country: 'United States' }));
+          result.current.setFilters((prev) => ({ ...prev, country: 'US' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);
@@ -847,15 +848,15 @@ describe('useActivities', () => {
 
       it('matches activities with multiple locations', async () => {
         mockActivities.push(
-          createActivity({ id: 1, segment_locations: { countries: ['United States'], states: ['California', 'Nevada'], cities: ['Truckee', 'Reno'] } }),
-          createActivity({ id: 2, segment_locations: { countries: ['United States'], states: ['Oregon'], cities: ['Portland'] } })
+          createActivity({ id: 1, segment_locations: { locations: [{ city: 'Truckee', region: 'CA', country: 'US' }, { city: 'Reno', region: 'NV', country: 'US' }] } }),
+          createActivity({ id: 2, segment_locations: { locations: [{ city: 'Portland', region: 'OR', country: 'US' }] } })
         );
 
         const { result } = renderHook(() => useActivities());
         await waitFor(() => expect(result.current.isLoading).toBe(false));
 
         act(() => {
-          result.current.setFilters((prev) => ({ ...prev, country: 'United States', region: 'Nevada' }));
+          result.current.setFilters((prev) => ({ ...prev, country: 'US', region: 'NV' }));
         });
 
         expect(result.current.filteredActivities).toHaveLength(1);
