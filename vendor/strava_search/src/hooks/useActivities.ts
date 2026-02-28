@@ -263,22 +263,13 @@ export function useActivities(): UseActivitiesResult {
       // Location filters
       if (filters.country || filters.region || filters.city) {
         const locations = activity.segment_locations?.locations;
-        if (locations) {
-          const match = locations.some((loc) =>
-            (!filters.country || loc.country === filters.country) &&
-            (!filters.region || loc.region === filters.region) &&
-            (!filters.city || loc.city === filters.city)
-          );
-          if (!match) return false;
-        } else {
-          // Legacy flat arrays — countries may be string[] at runtime
-          const legacyCountries = activity.segment_locations?.countries;
-          const hasLegacy = activity.segment_locations?.cities?.length || activity.segment_locations?.states?.length || (Array.isArray(legacyCountries) && legacyCountries.length > 0);
-          if (!hasLegacy) return false;
-          if (filters.country && !(Array.isArray(legacyCountries) && legacyCountries.includes(filters.country))) return false;
-          if (filters.region && !activity.segment_locations?.states?.includes(filters.region)) return false;
-          if (filters.city && !activity.segment_locations?.cities?.includes(filters.city)) return false;
-        }
+        if (!locations?.length) return false;
+        const match = locations.some((loc) =>
+          (!filters.country || loc.country === filters.country) &&
+          (!filters.region || loc.region === filters.region) &&
+          (!filters.city || loc.city === filters.city)
+        );
+        if (!match) return false;
       }
 
       // Kudos count range filter

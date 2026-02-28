@@ -31,8 +31,8 @@ export const ActivityCard = memo(function ActivityCard({
   const photoUrl = activity.photos?.photo_url;
   const photoCount = activity.photos?.photo_count || 0;
   const firstLocation = activity.segment_locations?.locations?.[0];
-  const firstCity = firstLocation?.city || activity.segment_locations?.cities?.[0];
-  const firstRegion = firstLocation?.region || activity.segment_locations?.states?.[0];
+  const firstCity = firstLocation?.city;
+  const firstRegion = firstLocation?.region;
 
   return (
     <div

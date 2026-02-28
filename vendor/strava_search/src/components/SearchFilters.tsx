@@ -40,23 +40,8 @@ export function SearchFilters({
 
   const selectClasses = `${inputClasses} cursor-pointer`;
 
-  // Extract all location tuples from activities, with legacy fallback
   const allLocations = useMemo(() => {
-    return activities.flatMap((a) => {
-      const locs = a.segment_locations?.locations;
-      if (locs) return locs;
-      // Legacy: flat arrays with no city→region mapping
-      const cities = a.segment_locations?.cities || [];
-      const regions = a.segment_locations?.states || [];
-      const countries = a.segment_locations?.countries;
-      // countries may be a string[] (legacy) or Record<string, string> (new) at runtime
-      const countryValue = Array.isArray(countries) ? countries[0] : undefined;
-      if (cities.length === 0 && regions.length === 0 && !countryValue) return [];
-      // Best-effort: create tuples from cities with the shortest region name
-      const shortRegion = regions.length > 0 ? regions.reduce((x, y) => x.length <= y.length ? x : y) : undefined;
-      if (cities.length === 0) return [{ region: shortRegion, country: countryValue }];
-      return cities.map((city) => ({ city, region: shortRegion, country: countryValue }));
-    });
+    return activities.flatMap((a) => a.segment_locations?.locations || []);
   }, [activities]);
 
   const allCountries = useMemo(() => {

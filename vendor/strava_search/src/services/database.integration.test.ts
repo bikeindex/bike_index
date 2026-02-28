@@ -420,17 +420,22 @@ describe('database service integration tests', () => {
       const activity = createMockActivity({
         strava_id: '100',
         segment_locations: {
-          cities: ['San Francisco', 'Sausalito'],
-          states: ['California'],
-          countries: ['United States'],
+          locations: [
+            { city: 'San Francisco', region: 'CA', country: 'US' },
+            { city: 'Sausalito', region: 'CA', country: 'US' },
+          ],
+          regions: { California: 'CA' },
+          countries: { 'United States': 'US' },
         },
       });
 
       await saveActivities([activity], testAthleteId);
       const retrieved = await getActivityById(100);
 
-      expect(retrieved?.segment_locations?.cities).toEqual(['San Francisco', 'Sausalito']);
-      expect(retrieved?.segment_locations?.states).toEqual(['California']);
+      expect(retrieved?.segment_locations?.locations).toEqual([
+        { city: 'San Francisco', region: 'CA', country: 'US' },
+        { city: 'Sausalito', region: 'CA', country: 'US' },
+      ]);
     });
   });
 });
