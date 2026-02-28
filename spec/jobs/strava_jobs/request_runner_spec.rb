@@ -149,6 +149,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     end
 
     context "with fetch_activity request" do
+      before { FactoryBot.create(:state_california) }
       let!(:strava_activity) do
         FactoryBot.create(:strava_activity, strava_integration:, strava_id: "17323701543")
       end
@@ -163,7 +164,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
           description: "Hawk with Eric and Scott and cedar",
           average_speed: 4.746,
           suffer_score: 27.0,
-          kudos_count: 17,
+          kudos_count: 22,
           photos: {
             photo_url: "https://dgtzuqphqg23d.cloudfront.net/AdftI2Cg62i6LQOs6W5N3iX67FhZCCr6-F0BdwkwUvw-768x576.jpg",
             photo_count: 2
@@ -176,9 +177,13 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
             muted: false, trainer: false
           },
           segment_locations: {
-            cities: ["San Francisco", "Mill Valley"],
-            states: ["California"],
-            countries: ["United States", "USA"]
+            locations: [
+              {city: "San Francisco", region: "CA", country: "US"},
+              {region: "CA", country: "US"},
+              {city: "Mill Valley", region: "CA", country: "US"}
+            ],
+            regions: {"California" => "CA"},
+            countries: {"United States" => "US"}
           }
         }.as_json
       end
