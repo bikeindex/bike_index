@@ -64,7 +64,7 @@ describe('SearchFilters', () => {
     it('does not show location selects when no activities have locations', () => {
       const activitiesWithoutLocations = mockActivities.map((a) => ({
         ...a,
-        segment_locations: {},
+        segment_locations: undefined,
       }));
       render(
         <SearchFilters

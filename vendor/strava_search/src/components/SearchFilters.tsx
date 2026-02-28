@@ -48,10 +48,14 @@ export function SearchFilters({
       // Legacy: flat arrays with no city→region mapping
       const cities = a.segment_locations?.cities || [];
       const regions = a.segment_locations?.states || [];
-      if (cities.length === 0 && regions.length === 0) return [];
+      const countries = a.segment_locations?.countries;
+      // countries may be a string[] (legacy) or Record<string, string> (new) at runtime
+      const countryValue = Array.isArray(countries) ? countries[0] : undefined;
+      if (cities.length === 0 && regions.length === 0 && !countryValue) return [];
       // Best-effort: create tuples from cities with the shortest region name
       const shortRegion = regions.length > 0 ? regions.reduce((x, y) => x.length <= y.length ? x : y) : undefined;
-      return cities.map((city) => ({ city, region: shortRegion }));
+      if (cities.length === 0) return [{ region: shortRegion, country: countryValue }];
+      return cities.map((city) => ({ city, region: shortRegion, country: countryValue }));
     });
   }, [activities]);
 
@@ -490,7 +494,7 @@ export function SearchFilters({
         </div>
 
         {/* Location filters */}
-        {allCountries.length > 0 && (
+        {allLocations.length > 0 && (
         <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>Country:</span>
