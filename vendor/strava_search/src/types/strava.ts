@@ -54,9 +54,9 @@ export interface StravaActivity {
     photo_count: number;
   };
   segment_locations?: {
-    cities?: string[];
-    states?: string[];
-    countries?: string[];
+    locations?: Array<{ city?: string; region?: string; country?: string }>;
+    regions?: Record<string, string>;
+    countries?: Record<string, string>;
   };
 }
 
@@ -175,6 +175,9 @@ export interface SearchFilters {
   sufferScoreTo: number | null;
   kudosFrom: number | null;
   kudosTo: number | null;
+  country: string | null;
+  region: string | null;
+  city: string | null;
   page: number;
 }
 

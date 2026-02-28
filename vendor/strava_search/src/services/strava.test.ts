@@ -130,9 +130,13 @@ describe('strava service', () => {
         photo_count: 4,
       },
       segment_locations: {
-        cities: ['Mill Valley', 'San Francisco', 'Sausalito'],
-        states: ['California'],
-        countries: ['United States'],
+        locations: [
+          { city: 'Mill Valley', region: 'CA', country: 'US' },
+          { city: 'San Francisco', region: 'CA', country: 'US' },
+          { city: 'Sausalito', region: 'CA', country: 'US' },
+        ],
+        regions: { California: 'CA' },
+        countries: { 'United States': 'US' },
       },
     };
 
@@ -171,10 +175,11 @@ describe('strava service', () => {
       const result = await updateActivity(17145907973, { commute: true });
 
       expect(result.segment_locations).toBeDefined();
-      expect(result.segment_locations?.cities).toContain('Mill Valley');
-      expect(result.segment_locations?.cities).toContain('San Francisco');
-      expect(result.segment_locations?.cities).toContain('Sausalito');
-      expect(result.segment_locations?.states).toContain('California');
+      expect(result.segment_locations?.locations).toEqual([
+        { city: 'Mill Valley', region: 'CA', country: 'US' },
+        { city: 'San Francisco', region: 'CA', country: 'US' },
+        { city: 'Sausalito', region: 'CA', country: 'US' },
+      ]);
     });
 
     it('preserves all activity fields in response', async () => {

@@ -111,10 +111,6 @@ export function useActivities(): UseActivitiesResult {
           activity.title,
           activity.description,
           activity.device_name,
-          // Include all segment locations for search
-          ...(activity.segment_locations?.cities || []),
-          ...(activity.segment_locations?.states || []),
-          ...(activity.segment_locations?.countries || []),
         ]
           .filter(Boolean)
           .join(' ')
@@ -262,6 +258,18 @@ export function useActivities(): UseActivitiesResult {
         if (!activity.suffer_score || activity.suffer_score > filters.sufferScoreTo) {
           return false;
         }
+      }
+
+      // Location filters
+      if (filters.country || filters.region || filters.city) {
+        const locations = activity.segment_locations?.locations;
+        if (!locations?.length) return false;
+        const match = locations.some((loc) =>
+          (!filters.country || loc.country === filters.country) &&
+          (!filters.region || loc.region === filters.region) &&
+          (!filters.city || loc.city === filters.city)
+        );
+        if (!match) return false;
       }
 
       // Kudos count range filter

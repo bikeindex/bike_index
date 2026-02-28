@@ -30,8 +30,9 @@ export const ActivityCard = memo(function ActivityCard({
   const activityGear = gear.find((g) => g.id === activity.gear_id);
   const photoUrl = activity.photos?.photo_url;
   const photoCount = activity.photos?.photo_count || 0;
-  const firstCity = activity.segment_locations?.cities?.[0];
-  const firstState = activity.segment_locations?.states?.[0];
+  const firstLocation = activity.segment_locations?.locations?.[0];
+  const firstCity = firstLocation?.city;
+  const firstRegion = firstLocation?.region;
 
   return (
     <div
@@ -90,9 +91,9 @@ export const ActivityCard = memo(function ActivityCard({
                 {activity.device_name}
               </span>
             )}
-            {(firstCity || firstState) && (
+            {(firstCity || firstRegion) && (
               <span className="text-xs text-gray-400">
-                {[firstCity, firstState].filter(Boolean).join(', ')}
+                {[firstCity, firstRegion].filter(Boolean).join(', ')}
               </span>
             )}
             {activity.kudos_count > 0 && (

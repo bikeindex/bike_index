@@ -88,7 +88,11 @@ const nordicSki: StoredActivity = {
   moving_time_seconds: 11601,
   photos: { photo_url: 'https://dgtzuqphqg23d.cloudfront.net/zouHSrTVXEI4Fjerx9pPZbIy8VHmWP-ow18jQvDne8Y-576x768.jpg', photo_count: 4 },
   private: false,
-  segment_locations: { cities: ['Truckee'], states: ['California', 'CA'], countries: ['United States', 'USA'] },
+  segment_locations: {
+    locations: [{ city: 'Truckee', region: 'CA', country: 'US' }],
+    regions: { California: 'CA' },
+    countries: { 'United States': 'US' },
+  },
   sport_type: 'NordicSki',
   start_date: '2025-01-11T12:18:07.000-06:00',
   suffer_score: 42.0,
@@ -192,9 +196,18 @@ const rando400k: StoredActivity = {
   photos: { photo_url: 'https://dgtzuqphqg23d.cloudfront.net/0SgqbcquDtSD-kfNajfYoVFsI6_t9hyEFOatt10W7XM-768x576.jpg', photo_count: 4 },
   private: false,
   segment_locations: {
-    cities: ['San Francisco', 'Mill Valley', 'Sausalito', 'Corte Madera', 'Larkspur', 'Kentfield', 'Ross', 'San Anselmo', 'Fairfax', 'Woodacre', 'San Geronimo', 'Nicasio', 'Novato', 'Northwest Marin', 'Petaluma', 'Bodega', 'Occidental', 'Monte Rio', 'Guerneville', 'Forestville', 'Healdsburg', 'Geyserville', 'Cloverdale', 'Mendocino County, CA, USA', 'Yorkville', 'Hopland', 'Santa Rosa', 'Larkfield-Wikiup', 'Fulton', 'Cotati', 'Penngrove'],
-    states: ['CA', 'California'],
-    countries: ['United States', 'USA'],
+    locations: [
+      { city: 'San Francisco', region: 'CA', country: 'US' },
+      { city: 'Mill Valley', region: 'CA', country: 'US' },
+      { city: 'Sausalito', region: 'CA', country: 'US' },
+      { city: 'Petaluma', region: 'CA', country: 'US' },
+      { city: 'Healdsburg', region: 'CA', country: 'US' },
+      { city: 'Cloverdale', region: 'CA', country: 'US' },
+      { city: 'Hopland', region: 'CA', country: 'US' },
+      { city: 'Santa Rosa', region: 'CA', country: 'US' },
+    ],
+    regions: { California: 'CA' },
+    countries: { 'United States': 'US' },
   },
   sport_type: 'Ride',
   start_date: '2022-04-02T08:36:43.000-05:00',
@@ -231,9 +244,15 @@ const berlinRide: StoredActivity = {
   photos: { photo_url: 'https://dgtzuqphqg23d.cloudfront.net/5rczkHpi-h8JVUmK_QeuhjVl3JLe_oyrLQw_ZNq7g6E-576x768.jpg', photo_count: 1 },
   private: false,
   segment_locations: {
-    cities: ['Berlin', 'Mitte', 'Pankow', 'Mühlenbecker Land', 'Birkenwerder', 'Wandlitz'],
-    states: ['Berlin', 'Brandenburg', 'BB'],
-    countries: ['Germany'],
+    locations: [
+      { city: 'Berlin', region: 'Berlin', country: 'Germany' },
+      { city: 'Mitte', region: 'Berlin', country: 'Germany' },
+      { city: 'Pankow', region: 'Berlin', country: 'Germany' },
+      { city: 'Mühlenbecker Land', region: 'BB', country: 'Germany' },
+      { city: 'Birkenwerder', region: 'BB', country: 'Germany' },
+      { city: 'Wandlitz', region: 'BB', country: 'Germany' },
+    ],
+    regions: { Brandenburg: 'BB' },
   },
   sport_type: 'Ride',
   start_date: '2023-08-18T23:50:01.000-05:00',
@@ -257,6 +276,56 @@ const berlinRide: StoredActivity = {
   syncedAt: Date.now(),
 };
 
+// Multi-state ride (Indiana + Illinois)
+const dunesTrip: StoredActivity = {
+  id: 630203151,
+  strava_id: '630203151',
+  activity_type: 'Ride',
+  average_speed: 6.154,
+  description: '',
+  distance_meters: 95650.5,
+  kudos_count: 4,
+  moving_time_seconds: 15543,
+  photos: {
+    photo_url: 'https://dgtzuqphqg23d.cloudfront.net/3xxlmNZNWWBLPBEdUPxXaZ0X6acdl6c5D5R6StX5egc-768x576.jpg',
+    photo_count: 2,
+  },
+  private: false,
+  segment_locations: {
+    locations: [
+      { city: 'Hobart', region: 'IN', country: 'US' },
+      { city: 'Merrillville', region: 'IN', country: 'US' },
+      { city: 'Gary', region: 'IN', country: 'US' },
+      { city: 'Griffith', region: 'IN', country: 'US' },
+      { city: 'Highland', region: 'IN', country: 'US' },
+      { city: 'Hammond', region: 'IN', country: 'US' },
+      { city: 'Chicago', region: 'IL', country: 'US' },
+    ],
+    regions: { Indiana: 'IN', Illinois: 'IL' },
+    countries: { 'United States': 'US' },
+  },
+  sport_type: 'Ride',
+  start_date: '2016-07-04T09:36:55.000-05:00',
+  suffer_score: 113.0,
+  timezone: 'America/Chicago',
+  title: "Dunes trip '16",
+  total_elevation_gain_meters: 28.9,
+  gear_id: null,
+  trainer: false,
+  muted: false,
+  commute: false,
+  enriched: true,
+  pr_count: 6,
+  device_name: undefined,
+  device_watts: true,
+  average_watts: 108.7,
+  max_heartrate: 167.0,
+  average_heartrate: 131.2,
+  start_date_in_zone: '2016-07-04T09:36:55.000-05:00',
+  athleteId: 12345,
+  syncedAt: Date.now(),
+};
+
 export const mockActivities: StoredActivity[] = [
   pelotonRide,
   nordicSki,
@@ -264,6 +333,7 @@ export const mockActivities: StoredActivity[] = [
   rando400k,
   berlinRide,
   morningRun,
+  dunesTrip,
 ];
 
 export const mockAthlete = {
