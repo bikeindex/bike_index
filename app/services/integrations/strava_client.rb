@@ -9,6 +9,7 @@ class Integrations::StravaClient
   STRAVA_SECRET = ENV["STRAVA_SECRET"]
   STRAVA_WEBHOOK_TOKEN = ENV["STRAVA_WEBHOOK_VERIFY_TOKEN"]
   ACTIVITIES_PER_PAGE = 200
+  BULK_ENQUEUE_SIZE = ENV.fetch("STRAVA_BULK_ENQUEUE_SIZE", 40).to_i
 
   class << self
     def exchange_token(code)

@@ -295,15 +295,15 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
                        "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id})
       end
 
-      it "fetches activity and creates StravaActivity" do
-        VCR.use_cassette("strava-get_activity") do
-          expect { instance.perform(strava_request.id) }.to change(StravaActivity, :count).by(1)
-        end
+      it "creates a fetch_activity StravaRequest instead of fetching immediately" do
+        expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
-        activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
-        expect(activity).to be_present
+
+        fetch_request = StravaRequest.where(request_type: :fetch_activity).last
+        expect(fetch_request.strava_integration_id).to eq(strava_integration.id)
+        expect(fetch_request.parameters["strava_id"]).to eq("17323701543")
       end
     end
 
@@ -319,15 +319,15 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
                        "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id})
       end
 
-      it "fetches activity and updates existing StravaActivity" do
-        VCR.use_cassette("strava-get_activity") do
-          expect { instance.perform(strava_request.id) }.not_to change(StravaActivity, :count)
-        end
+      it "creates a fetch_activity StravaRequest instead of fetching immediately" do
+        expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
-        existing_activity.reload
-        expect(existing_activity.title).to be_present
+
+        fetch_request = StravaRequest.where(request_type: :fetch_activity).last
+        expect(fetch_request.strava_integration_id).to eq(strava_integration.id)
+        expect(fetch_request.parameters["strava_id"]).to eq("17323701543")
       end
     end
 
