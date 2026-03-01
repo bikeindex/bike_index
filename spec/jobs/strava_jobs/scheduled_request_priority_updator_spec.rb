@@ -11,7 +11,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
 
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
-    expect(described_class.frequency).to eq(1.hour)
+    expect(described_class.frequency).to eq(50.minutes)
   end
 
   describe "perform with no args" do

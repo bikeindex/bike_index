@@ -7,7 +7,7 @@ module StravaJobs
     sidekiq_options queue: "low_priority", retry: 1
 
     def self.frequency
-      1.hour
+      50.minutes
     end
 
     def perform(strava_integration_id = nil)
