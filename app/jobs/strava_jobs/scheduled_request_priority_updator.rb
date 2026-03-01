@@ -10,11 +10,15 @@ module StravaJobs
       1.hour
     end
 
-    def perform
+    def perform(strava_integration_id = nil)
+      if strava_integration_id.present?
+        return update_priorities_for_integration(strava_integration_id)
+      end
+
       StravaRequest.unprocessed
         .distinct
         .pluck(:strava_integration_id)
-        .each { |integration_id| update_priorities_for_integration(integration_id) }
+        .each { |integration_id| self.class.perform_async(integration_id) }
     end
 
     private

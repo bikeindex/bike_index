@@ -14,21 +14,54 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     expect(described_class.frequency).to eq(1.hour)
   end
 
-  describe "perform" do
+  describe "perform with no args" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
     it "does nothing when no pending requests" do
       instance.perform
+      expect(described_class.jobs.size).to eq(0)
     end
 
-    context "with pending requests and no proxy requests" do
+    it "enqueues integration ids that have pending requests" do
+      StravaRequest.create!(user_id: strava_integration.user_id,
+        strava_integration_id: strava_integration.id,
+        request_type: :fetch_activity, parameters: {strava_id: "123"})
+
+      instance.perform
+      expect(described_class.jobs.size).to eq(1)
+      expect(described_class.jobs.first["args"]).to eq([strava_integration.id])
+    end
+
+    context "with multiple integrations" do
+      let(:strava_integration2) { FactoryBot.create(:strava_integration) }
+
+      it "enqueues each integration independently" do
+        StravaRequest.create!(user_id: strava_integration.user_id,
+          strava_integration_id: strava_integration.id,
+          request_type: :fetch_activity, parameters: {strava_id: "1"})
+        StravaRequest.create!(user_id: strava_integration2.user_id,
+          strava_integration_id: strava_integration2.id,
+          request_type: :fetch_activity, parameters: {strava_id: "2"})
+
+        instance.perform
+        expect(described_class.jobs.size).to eq(2)
+        enqueued_args = described_class.jobs.map { |j| j["args"].first }
+        expect(enqueued_args).to match_array([strava_integration.id, strava_integration2.id])
+      end
+    end
+  end
+
+  describe "perform with strava_integration_id" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
+
+    context "with no proxy requests" do
       it "does not change priorities" do
         request = StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,
           request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
 
-        instance.perform
+        instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq(original_priority)
       end
     end
@@ -45,7 +78,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
           request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
 
-        instance.perform
+        instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq((original_priority * 0.25).to_i)
       end
     end
@@ -62,7 +95,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
           request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
 
-        instance.perform
+        instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq((original_priority * 0.5).to_i)
       end
     end
@@ -79,7 +112,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
           request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
 
-        instance.perform
+        instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq((original_priority * 4).to_i)
       end
     end
@@ -96,36 +129,8 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
           request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
 
-        instance.perform
+        instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq(original_priority)
-      end
-    end
-
-    context "with multiple integrations" do
-      let(:strava_integration2) { FactoryBot.create(:strava_integration) }
-
-      it "updates priorities for each integration independently" do
-        StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :proxy, parameters: {url: "/athlete"},
-          requested_at: 30.minutes.ago, response_status: :success)
-
-        request1 = StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :fetch_activity, parameters: {strava_id: "1"})
-        request2 = StravaRequest.create!(user_id: strava_integration2.user_id,
-          strava_integration_id: strava_integration2.id,
-          request_type: :fetch_activity, parameters: {strava_id: "2"})
-
-        original_priority1 = request1.priority
-        original_priority2 = request2.priority
-
-        instance.perform
-
-        # Integration 1 has recent proxy - priority divided by 4
-        expect(request1.reload.priority).to eq((original_priority1 * 0.25).to_i)
-        # Integration 2 has no proxy - priority unchanged
-        expect(request2.reload.priority).to eq(original_priority2)
       end
     end
   end
