@@ -83,7 +83,7 @@ class StravaActivity < ApplicationRecord
     end
 
     def create_or_update_from_strava_response(strava_integration, response)
-      attrs = strava_attributes_from(response)
+      attrs = strava_attributes_from(response).compact
       activity = strava_integration.strava_activities.find_or_initialize_by(strava_id: response["id"])
       activity.update(attrs)
       activity

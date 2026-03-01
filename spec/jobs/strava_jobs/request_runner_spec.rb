@@ -308,7 +308,8 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
 
     context "with incoming_webhook activity update" do
       let!(:existing_activity) do
-        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "17323701543")
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "17323701543",
+          title: "Morning Ride", distance_meters: 25000.0)
       end
       let!(:strava_request) do
         StravaRequest.create!(user_id: strava_integration.user_id,
@@ -318,14 +319,15 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
                        "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id})
       end
 
-      it "calls create_or_update on the existing StravaActivity" do
+      it "does not overwrite existing data" do
         expect { instance.perform(strava_request.id) }.not_to change(StravaActivity, :count)
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
 
-        activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
-        expect(activity).to be_present
+        existing_activity.reload
+        expect(existing_activity.title).to eq("Morning Ride")
+        expect(existing_activity.distance_meters).to eq(25000.0)
       end
     end
 

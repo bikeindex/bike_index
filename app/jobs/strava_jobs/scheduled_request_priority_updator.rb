@@ -22,6 +22,8 @@ module StravaJobs
         .each { |integration_id| self.class.perform_async(integration_id) }
     end
 
+    MAX_PRIORITY = 10_000_000_000
+
     private
 
     def update_priorities_for_integration(integration_id)
@@ -30,7 +32,7 @@ module StravaJobs
 
       StravaRequest.unprocessed
         .where(strava_integration_id: integration_id)
-        .find_each { |request| request.update(priority: (request.priority * multiplier).to_i) }
+        .find_each { |request| request.update(priority: (request.priority * multiplier).to_i.clamp(0, MAX_PRIORITY)) }
     end
 
     def priority_multiplier(integration_id)

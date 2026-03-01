@@ -139,6 +139,21 @@ RSpec.describe StravaActivity, type: :model do
       expect(strava_activity.title).to eq("Morning Ride")
       expect(strava_integration.strava_activities.count).to eq(1)
     end
+
+    context "with id-only response" do
+      let(:existing) do
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543",
+          title: "Morning Ride", distance_meters: 25000.0, sport_type: "Ride")
+      end
+
+      it "does not overwrite existing attributes with nil" do
+        StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => existing.strava_id})
+        existing.reload
+        expect(existing.title).to eq("Morning Ride")
+        expect(existing.distance_meters).to eq(25000.0)
+        expect(existing.sport_type).to eq("Ride")
+      end
+    end
   end
 
   describe "proxy_serialized" do

@@ -91,5 +91,15 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
         expect(request.reload.priority).to eq(original_priority)
       end
     end
+
+    context "priority clamping" do
+      context "with no proxy requests" do
+        it "does not exceed MAX_PRIORITY" do
+          request.update(priority: described_class::MAX_PRIORITY - 1)
+          instance.perform(strava_integration.id)
+          expect(request.reload.priority).to eq(described_class::MAX_PRIORITY)
+        end
+      end
+    end
   end
 end
