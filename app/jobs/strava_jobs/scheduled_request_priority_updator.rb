@@ -16,6 +16,7 @@ module StravaJobs
       end
 
       StravaRequest.unprocessed
+        .reorder(nil)
         .distinct
         .pluck(:strava_integration_id)
         .each { |integration_id| self.class.perform_async(integration_id) }
