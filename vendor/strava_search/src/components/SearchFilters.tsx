@@ -20,6 +20,7 @@ interface SearchFiltersProps {
   gear: StoredGear[];
   totalCount: number;
   filteredCount: number;
+  isLoading?: boolean;
 }
 
 const toggleInactive = 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600';
@@ -33,6 +34,7 @@ export function SearchFilters({
   gear,
   totalCount,
   filteredCount,
+  isLoading,
 }: SearchFiltersProps) {
   const { units } = usePreferences();
   const distanceUnit = units === 'imperial' ? 'mi' : 'km';
@@ -479,7 +481,12 @@ export function SearchFilters({
         </div>
 
         {/* Location filters */}
-        {allLocations.length > 0 && (
+        {(() => {
+          const locationsLoaded = allLocations.length > 0;
+          const showDisabled = !locationsLoaded && isLoading;
+          if (!locationsLoaded && !showDisabled) return null;
+          const disabledClasses = `${selectClasses} opacity-50 cursor-not-allowed`;
+          return (
         <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>Country:</span>
@@ -494,15 +501,16 @@ export function SearchFilters({
                   city: country === filters.country ? filters.city : null,
                 });
               }}
-              className={selectClasses}
+              disabled={showDisabled}
+              className={showDisabled ? disabledClasses : selectClasses}
             >
-              <option value="">All</option>
+              <option value="">{showDisabled ? 'Loading...' : 'All'}</option>
               {allCountries.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </label>
-          {availableRegions.length > 0 && (
+          {(showDisabled || availableRegions.length > 0) && (
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>Region:</span>
             <select
@@ -515,24 +523,26 @@ export function SearchFilters({
                   city: region === filters.region ? filters.city : null,
                 });
               }}
-              className={selectClasses}
+              disabled={showDisabled}
+              className={showDisabled ? disabledClasses : selectClasses}
             >
-              <option value="">All</option>
+              <option value="">{showDisabled ? 'Loading...' : 'All'}</option>
               {availableRegions.map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>
           </label>
           )}
-          {availableCities.length > 0 && (
+          {(showDisabled || availableCities.length > 0) && (
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>City:</span>
             <select
               value={filters.city || ''}
               onChange={(e) => onFiltersChange({ ...filters, city: e.target.value || null })}
-              className={selectClasses}
+              disabled={showDisabled}
+              className={showDisabled ? disabledClasses : selectClasses}
             >
-              <option value="">All</option>
+              <option value="">{showDisabled ? 'Loading...' : 'All'}</option>
               {availableCities.map(({ city, region }) => (
                 <option key={city} value={city}>{city}, {region}</option>
               ))}
@@ -540,7 +550,8 @@ export function SearchFilters({
           </label>
           )}
         </div>
-        )}
+          );
+        })()}
 
           </div>
           )}
