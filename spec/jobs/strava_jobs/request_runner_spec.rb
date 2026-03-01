@@ -295,15 +295,14 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
                        "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id})
       end
 
-      it "creates a fetch_activity StravaRequest instead of fetching immediately" do
-        expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
+      it "creates or updates a StravaActivity" do
+        expect { instance.perform(strava_request.id) }.to change(StravaActivity, :count).by(1)
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
 
-        fetch_request = StravaRequest.where(request_type: :fetch_activity).last
-        expect(fetch_request.strava_integration_id).to eq(strava_integration.id)
-        expect(fetch_request.parameters["strava_id"]).to eq("17323701543")
+        activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
+        expect(activity).to be_present
       end
     end
 
@@ -319,15 +318,14 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
                        "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id})
       end
 
-      it "creates a fetch_activity StravaRequest instead of fetching immediately" do
-        expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
+      it "calls create_or_update on the existing StravaActivity" do
+        expect { instance.perform(strava_request.id) }.not_to change(StravaActivity, :count)
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
 
-        fetch_request = StravaRequest.where(request_type: :fetch_activity).last
-        expect(fetch_request.strava_integration_id).to eq(strava_integration.id)
-        expect(fetch_request.parameters["strava_id"]).to eq("17323701543")
+        activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
+        expect(activity).to be_present
       end
     end
 

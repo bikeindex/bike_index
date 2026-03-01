@@ -52,12 +52,7 @@ module StravaJobs
           if params["aspect_type"] == "delete"
             strava_integration.strava_activities.find_by(strava_id: params["object_id"].to_s)&.destroy
           else
-            StravaRequest.create!(
-              user_id: strava_request.user_id,
-              strava_integration_id: strava_integration.id,
-              request_type: :fetch_activity,
-              parameters: {strava_id: params["object_id"].to_s}
-            )
+            StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => params["object_id"].to_s})
           end
         elsif params["object_type"] == "athlete" && params.dig("updates", "authorized") == "false"
           strava_integration.destroy
