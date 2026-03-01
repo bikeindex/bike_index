@@ -2,7 +2,7 @@
 
 module StravaJobs
   class RequestRunner < ScheduledJob
-    BATCH_SIZE = 30
+    BATCH_SIZE = ENV.fetch("STRAVA_BULK_ENQUEUE_SIZE", 40).to_i
 
     prepend ScheduledJobRecorder
 
@@ -22,9 +22,7 @@ module StravaJobs
         when "fetch_gear"
           Integrations::StravaClient.fetch_gear(strava_integration, parameters["strava_gear_id"])
         when "incoming_webhook"
-          if parameters["object_type"] == "activity" && parameters["aspect_type"] != "delete"
-            Integrations::StravaClient.fetch_activity(strava_integration, parameters["object_id"])
-          end
+          nil # Handled directly in handle_incoming_webhook without an API call
         end
       end
 
@@ -48,13 +46,13 @@ module StravaJobs
         strava_integration.update_sync_status
       end
 
-      def handle_incoming_webhook(strava_request, strava_integration, response)
+      def handle_incoming_webhook(strava_request, strava_integration, _response)
         params = strava_request.parameters
         if params["object_type"] == "activity"
           if params["aspect_type"] == "delete"
             strava_integration.strava_activities.find_by(strava_id: params["object_id"].to_s)&.destroy
           else
-            StravaActivity.create_or_update_from_strava_response(strava_integration, response)
+            StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => params["object_id"].to_s})
           end
         elsif params["object_type"] == "athlete" && params.dig("updates", "authorized") == "false"
           strava_integration.destroy

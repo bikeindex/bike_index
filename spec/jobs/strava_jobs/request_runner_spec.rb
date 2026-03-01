@@ -32,7 +32,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
 
       it "enqueues up to BATCH_SIZE requests" do
-        30.times.map do
+        (described_class::BATCH_SIZE + 10).times.map do
           StravaRequest.create!(user_id: strava_integration.user_id,
             strava_integration_id: strava_integration.id, request_type: :fetch_activity,
             parameters: {strava_id: "123"})
@@ -295,13 +295,12 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
                        "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id})
       end
 
-      it "fetches activity and creates StravaActivity" do
-        VCR.use_cassette("strava-get_activity") do
-          expect { instance.perform(strava_request.id) }.to change(StravaActivity, :count).by(1)
-        end
+      it "creates or updates a StravaActivity" do
+        expect { instance.perform(strava_request.id) }.to change(StravaActivity, :count).by(1)
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
+
         activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
         expect(activity).to be_present
       end
@@ -319,15 +318,14 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
                        "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id})
       end
 
-      it "fetches activity and updates existing StravaActivity" do
-        VCR.use_cassette("strava-get_activity") do
-          expect { instance.perform(strava_request.id) }.not_to change(StravaActivity, :count)
-        end
+      it "calls create_or_update on the existing StravaActivity" do
+        expect { instance.perform(strava_request.id) }.not_to change(StravaActivity, :count)
 
         strava_request.reload
         expect(strava_request.response_status).to eq("success")
-        existing_activity.reload
-        expect(existing_activity.title).to be_present
+
+        activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
+        expect(activity).to be_present
       end
     end
 
