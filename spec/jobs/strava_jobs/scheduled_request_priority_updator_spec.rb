@@ -39,6 +39,10 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
   describe "perform with strava_integration_id" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
     let!(:request) { FactoryBot.create(:strava_request, :fetch_activity, strava_integration:) }
+    let(:proxy_requested_at) { nil }
+    let!(:strava_request_proxy) do
+      proxy_requested_at && FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: proxy_requested_at)
+    end
 
     context "with no proxy requests" do
       it "multiplies priority by 4" do
@@ -49,7 +53,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     end
 
     context "with proxy request less than 1 hour ago" do
-      let!(:proxy) { FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: 30.minutes.ago) }
+      let(:proxy_requested_at) { 30.minutes.ago }
 
       it "divides priority by 4" do
         original_priority = request.priority
@@ -59,7 +63,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     end
 
     context "with proxy request less than 24 hours ago" do
-      let!(:proxy) { FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: 6.hours.ago) }
+      let(:proxy_requested_at) { 6.hours.ago }
 
       it "divides priority by 2" do
         original_priority = request.priority
@@ -69,7 +73,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     end
 
     context "with proxy request more than 1 week ago" do
-      let!(:proxy) { FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: 2.weeks.ago) }
+      let(:proxy_requested_at) { 2.weeks.ago }
 
       it "multiplies priority by 4" do
         original_priority = request.priority
@@ -79,7 +83,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     end
 
     context "with proxy request between 1 day and 1 week ago" do
-      let!(:proxy) { FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: 3.days.ago) }
+      let(:proxy_requested_at) { 3.days.ago }
 
       it "does not change priorities" do
         original_priority = request.priority
