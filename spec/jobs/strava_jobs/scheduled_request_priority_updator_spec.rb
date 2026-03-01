@@ -24,15 +24,10 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
 
     context "with multiple integrations" do
       let(:strava_integration2) { FactoryBot.create(:strava_integration) }
+      let!(:request1) { FactoryBot.create(:strava_request, :fetch_activity, strava_integration:) }
+      let!(:request2) { FactoryBot.create(:strava_request, :fetch_activity, strava_integration: strava_integration2) }
 
       it "enqueues each integration independently" do
-        StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :fetch_activity, parameters: {strava_id: "1"})
-        StravaRequest.create!(user_id: strava_integration2.user_id,
-          strava_integration_id: strava_integration2.id,
-          request_type: :fetch_activity, parameters: {strava_id: "2"})
-
         instance.perform
         expect(described_class.jobs.size).to eq(2)
         enqueued_args = described_class.jobs.map { |j| j["args"].first }
@@ -43,82 +38,51 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
 
   describe "perform with strava_integration_id" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
+    let!(:request) { FactoryBot.create(:strava_request, :fetch_activity, strava_integration:) }
 
     context "with no proxy requests" do
       it "multiplies priority by 4" do
-        request = StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
-
         instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq((original_priority * 4).to_i)
       end
     end
 
     context "with proxy request less than 1 hour ago" do
+      let!(:proxy) { FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: 30.minutes.ago) }
+
       it "divides priority by 4" do
-        StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :proxy, parameters: {url: "/athlete"},
-          requested_at: 30.minutes.ago, response_status: :success)
-
-        request = StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
-
         instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq((original_priority * 0.25).to_i)
       end
     end
 
     context "with proxy request less than 24 hours ago" do
+      let!(:proxy) { FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: 6.hours.ago) }
+
       it "divides priority by 2" do
-        StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :proxy, parameters: {url: "/athlete"},
-          requested_at: 6.hours.ago, response_status: :success)
-
-        request = StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
-
         instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq((original_priority * 0.5).to_i)
       end
     end
 
     context "with proxy request more than 1 week ago" do
+      let!(:proxy) { FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: 2.weeks.ago) }
+
       it "multiplies priority by 4" do
-        StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :proxy, parameters: {url: "/athlete"},
-          requested_at: 2.weeks.ago, response_status: :success)
-
-        request = StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
-
         instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq((original_priority * 4).to_i)
       end
     end
 
     context "with proxy request between 1 day and 1 week ago" do
+      let!(:proxy) { FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: 3.days.ago) }
+
       it "does not change priorities" do
-        StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :proxy, parameters: {url: "/athlete"},
-          requested_at: 3.days.ago, response_status: :success)
-
-        request = StravaRequest.create!(user_id: strava_integration.user_id,
-          strava_integration_id: strava_integration.id,
-          request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
-
         instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq(original_priority)
       end

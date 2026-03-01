@@ -29,6 +29,11 @@ FactoryBot.define do
       parameters { {strava_gear_id: "b12345"} }
     end
 
+    trait :proxy do
+      request_type { :proxy }
+      parameters { {url: "/athlete"} }
+    end
+
     trait :processed do
       requested_at { Time.current }
       response_status { :success }
