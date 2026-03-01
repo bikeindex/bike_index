@@ -146,12 +146,27 @@ RSpec.describe StravaActivity, type: :model do
           title: "Morning Ride", distance_meters: 25000.0, sport_type: "Ride")
       end
 
-      it "does not overwrite existing attributes with nil" do
+      it "does not overwrite existing attributes" do
         StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => existing.strava_id})
         existing.reload
         expect(existing.title).to eq("Morning Ride")
         expect(existing.distance_meters).to eq(25000.0)
         expect(existing.sport_type).to eq("Ride")
+      end
+    end
+
+    context "with explicit nil in response" do
+      let(:existing) do
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543",
+          title: "Morning Ride", distance_meters: 25000.0)
+      end
+
+      it "blanks fields present in the response with nil values" do
+        StravaActivity.create_or_update_from_strava_response(strava_integration,
+          {"id" => existing.strava_id, "name" => nil, "distance" => nil})
+        existing.reload
+        expect(existing.title).to be_nil
+        expect(existing.distance_meters).to be_nil
       end
     end
   end
