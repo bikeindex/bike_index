@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module StravaJobs
-  class ScheduledRequestEnqueuer < ScheduledJob
+  class ScheduledRequestPriorityUpdator < ScheduledJob
     prepend ScheduledJobRecorder
 
     sidekiq_options queue: "low_priority", retry: 1
@@ -14,24 +14,21 @@ module StravaJobs
       StravaRequest.unprocessed
         .distinct
         .pluck(:strava_integration_id)
-        .each { |integration_id| enqueue_for_integration(integration_id) }
+        .each { |integration_id| update_priorities_for_integration(integration_id) }
     end
 
     private
 
-    def enqueue_for_integration(integration_id)
-      batch_size = calculate_batch_size(integration_id)
+    def update_priorities_for_integration(integration_id)
+      multiplier = priority_multiplier(integration_id)
+      return if multiplier == 1
+
       StravaRequest.unprocessed
         .where(strava_integration_id: integration_id)
-        .priority_ordered
-        .limit(batch_size)
-        .pluck(:id)
-        .each { |id| StravaJobs::RequestRunner.perform_async(id) }
+        .find_each { |request| request.update(priority: (request.priority * multiplier).to_i) }
     end
 
-    def calculate_batch_size(integration_id)
-      base = Integrations::StravaClient::BULK_ENQUEUE_SIZE
-
+    def priority_multiplier(integration_id)
       most_recent_proxy = StravaRequest.where(
         strava_integration_id: integration_id,
         request_type: :proxy
@@ -39,17 +36,17 @@ module StravaJobs
         .order(requested_at: :desc)
         .first
 
-      return base unless most_recent_proxy
+      return 1 unless most_recent_proxy
 
       elapsed = Time.current - most_recent_proxy.requested_at
       if elapsed < 1.hour
-        base / 4
+        0.25 # divide by 4
       elsif elapsed < 24.hours
-        base / 2
+        0.5 # divide by 2
       elsif elapsed > 1.week
-        base * 4
+        4 # multiply by 4
       else
-        base
+        1
       end
     end
   end

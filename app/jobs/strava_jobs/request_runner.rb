@@ -2,7 +2,7 @@
 
 module StravaJobs
   class RequestRunner < ScheduledJob
-    BATCH_SIZE = Integrations::StravaClient::BULK_ENQUEUE_SIZE
+    BATCH_SIZE = ENV.fetch("STRAVA_BULK_ENQUEUE_SIZE", 40).to_i
 
     prepend ScheduledJobRecorder
 
