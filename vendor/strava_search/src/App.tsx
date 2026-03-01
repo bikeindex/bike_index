@@ -168,6 +168,7 @@ function Dashboard() {
           gear={gear}
           totalCount={activities.length}
           filteredCount={filteredActivities.length}
+          isLoading={isLoading}
         />
 
         <ActivityList
