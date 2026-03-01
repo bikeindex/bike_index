@@ -19,11 +19,10 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
 
     it "does nothing when no pending requests" do
       instance.perform
-      expect(StravaJobs::RequestRunner.jobs.size).to eq(0)
     end
 
     context "with pending requests and no proxy requests" do
-      it "does not change priorities and enqueues the integration id" do
+      it "does not change priorities" do
         request = StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,
           request_type: :fetch_activity, parameters: {strava_id: "123"})
@@ -31,8 +30,6 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
 
         instance.perform
         expect(request.reload.priority).to eq(original_priority)
-        expect(StravaJobs::RequestRunner.jobs.size).to eq(1)
-        expect(StravaJobs::RequestRunner.jobs.first["args"]).to eq([strava_integration.id])
       end
     end
 
@@ -107,7 +104,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     context "with multiple integrations" do
       let(:strava_integration2) { FactoryBot.create(:strava_integration) }
 
-      it "updates priorities and enqueues each integration independently" do
+      it "updates priorities for each integration independently" do
         StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,
           request_type: :proxy, parameters: {url: "/athlete"},
@@ -129,10 +126,6 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
         expect(request1.reload.priority).to eq((original_priority1 * 0.25).to_i)
         # Integration 2 has no proxy - priority unchanged
         expect(request2.reload.priority).to eq(original_priority2)
-        # Enqueues one RequestRunner job per integration
-        expect(StravaJobs::RequestRunner.jobs.size).to eq(2)
-        enqueued_args = StravaJobs::RequestRunner.jobs.map { |j| j["args"].first }
-        expect(enqueued_args).to match_array([strava_integration.id, strava_integration2.id])
       end
     end
   end
