@@ -40,7 +40,7 @@ module StravaJobs
         .order(requested_at: :desc)
         .first
 
-      return 1 unless most_recent_proxy
+      return 4 unless most_recent_proxy
 
       elapsed = Time.current - most_recent_proxy.requested_at
       if elapsed < 1.hour

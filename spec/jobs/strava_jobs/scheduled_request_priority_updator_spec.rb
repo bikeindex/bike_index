@@ -55,14 +55,14 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
     context "with no proxy requests" do
-      it "does not change priorities" do
+      it "multiplies priority by 4" do
         request = StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id,
           request_type: :fetch_activity, parameters: {strava_id: "123"})
         original_priority = request.priority
 
         instance.perform(strava_integration.id)
-        expect(request.reload.priority).to eq(original_priority)
+        expect(request.reload.priority).to eq((original_priority * 4).to_i)
       end
     end
 
