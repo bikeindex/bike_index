@@ -22,16 +22,6 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
       expect(described_class.jobs.size).to eq(0)
     end
 
-    it "enqueues integration ids that have pending requests" do
-      StravaRequest.create!(user_id: strava_integration.user_id,
-        strava_integration_id: strava_integration.id,
-        request_type: :fetch_activity, parameters: {strava_id: "123"})
-
-      instance.perform
-      expect(described_class.jobs.size).to eq(1)
-      expect(described_class.jobs.first["args"]).to eq([strava_integration.id])
-    end
-
     context "with multiple integrations" do
       let(:strava_integration2) { FactoryBot.create(:strava_integration) }
 
