@@ -14,7 +14,10 @@ module StravaJobs
       StravaRequest.unprocessed
         .distinct
         .pluck(:strava_integration_id)
-        .each { |integration_id| update_priorities_for_integration(integration_id) }
+        .each do |integration_id|
+          update_priorities_for_integration(integration_id)
+          StravaJobs::RequestRunner.perform_async(integration_id)
+        end
     end
 
     private
