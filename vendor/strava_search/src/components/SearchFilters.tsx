@@ -482,10 +482,10 @@ export function SearchFilters({
 
         {/* Location filters */}
         {(() => {
-          const locationsLoaded = allLocations.length > 0;
-          const showDisabled = !locationsLoaded && isLoading;
-          if (!locationsLoaded && !showDisabled) return null;
+          const locationsAvailable = allLocations.length > 0;
+          const disabled = !locationsAvailable;
           const disabledClasses = `${selectClasses} opacity-50 cursor-not-allowed`;
+          const defaultLabel = disabled ? (isLoading ? 'Loading...' : 'N/A') : 'All';
           return (
         <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -501,16 +501,15 @@ export function SearchFilters({
                   city: country === filters.country ? filters.city : null,
                 });
               }}
-              disabled={showDisabled}
-              className={showDisabled ? disabledClasses : selectClasses}
+              disabled={disabled}
+              className={disabled ? disabledClasses : selectClasses}
             >
-              <option value="">{showDisabled ? 'Loading...' : 'All'}</option>
+              <option value="">{defaultLabel}</option>
               {allCountries.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </label>
-          {(showDisabled || availableRegions.length > 0) && (
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>Region:</span>
             <select
@@ -523,32 +522,29 @@ export function SearchFilters({
                   city: region === filters.region ? filters.city : null,
                 });
               }}
-              disabled={showDisabled}
-              className={showDisabled ? disabledClasses : selectClasses}
+              disabled={disabled || availableRegions.length === 0}
+              className={disabled || availableRegions.length === 0 ? disabledClasses : selectClasses}
             >
-              <option value="">{showDisabled ? 'Loading...' : 'All'}</option>
+              <option value="">{defaultLabel}</option>
               {availableRegions.map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>
           </label>
-          )}
-          {(showDisabled || availableCities.length > 0) && (
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>City:</span>
             <select
               value={filters.city || ''}
               onChange={(e) => onFiltersChange({ ...filters, city: e.target.value || null })}
-              disabled={showDisabled}
-              className={showDisabled ? disabledClasses : selectClasses}
+              disabled={disabled || availableCities.length === 0}
+              className={disabled || availableCities.length === 0 ? disabledClasses : selectClasses}
             >
-              <option value="">{showDisabled ? 'Loading...' : 'All'}</option>
+              <option value="">{defaultLabel}</option>
               {availableCities.map(({ city, region }) => (
                 <option key={city} value={city}>{city}, {region}</option>
               ))}
             </select>
           </label>
-          )}
         </div>
           );
         })()}
