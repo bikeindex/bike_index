@@ -45,10 +45,10 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     end
 
     context "with no proxy requests" do
-      it "multiplies priority by 4" do
+      it "multiplies priority by 4, clamped to MAX_PRIORITY" do
         original_priority = request.priority
         instance.perform(strava_integration.id)
-        expect(request.reload.priority).to eq((original_priority * 4).to_i)
+        expect(request.reload.priority).to eq((original_priority * 4).to_i.clamp(0, described_class::MAX_PRIORITY))
       end
     end
 
@@ -75,10 +75,10 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     context "with proxy request more than 1 week ago" do
       let(:proxy_requested_at) { 2.weeks.ago }
 
-      it "multiplies priority by 4" do
+      it "multiplies priority by 4, clamped to MAX_PRIORITY" do
         original_priority = request.priority
         instance.perform(strava_integration.id)
-        expect(request.reload.priority).to eq((original_priority * 4).to_i)
+        expect(request.reload.priority).to eq((original_priority * 4).to_i.clamp(0, described_class::MAX_PRIORITY))
       end
     end
 
