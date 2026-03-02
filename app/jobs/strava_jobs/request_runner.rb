@@ -13,7 +13,23 @@ module StravaJobs
         16.seconds
       end
 
-      def execute(strava_integration, strava_request_type, parameters)
+      def make_request_and_update(strava_integration, strava_request)
+        if strava_request.request_type == "incoming_webhook"
+          return handle_incoming_webhook(strava_request, strava_integration)
+        end
+
+        response = make_request(strava_integration, strava_request.request_type, strava_request.parameters)
+        strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
+
+        if strava_request&.success?
+          handle_response(strava_request, strava_integration, response&.body)
+        end
+        response&.body
+      end
+
+      private
+
+      def make_request(strava_integration, strava_request_type, parameters)
         case strava_request_type
         when "list_activities"
           Integrations::StravaClient.list_activities(strava_integration, **parameters.symbolize_keys)
@@ -21,8 +37,8 @@ module StravaJobs
           Integrations::StravaClient.fetch_activity(strava_integration, parameters["strava_id"])
         when "fetch_gear"
           Integrations::StravaClient.fetch_gear(strava_integration, parameters["strava_gear_id"])
-        when "incoming_webhook"
-          nil # Handled directly in handle_incoming_webhook without an API call
+        else
+          raise "Unknown Request type"
         end
       end
 
@@ -46,17 +62,20 @@ module StravaJobs
         strava_integration.update_sync_status
       end
 
-      def handle_incoming_webhook(strava_request, strava_integration, _response)
-        params = strava_request.parameters
-        if params["object_type"] == "activity"
-          if params["aspect_type"] == "delete"
-            strava_integration.strava_activities.find_by(strava_id: params["object_id"].to_s)&.destroy
+      def handle_incoming_webhook(strava_request, strava_integration)
+        strava_params = strava_request.parameters
+        if strava_params["object_type"] == "activity"
+          if strava_params["aspect_type"] == "delete"
+            strava_integration.strava_activities.find_by(strava_id: strava_params["object_id"].to_s)&.destroy
           else
-            StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => params["object_id"].to_s})
+            StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => strava_params["object_id"].to_s})
           end
-        elsif params["object_type"] == "athlete" && params.dig("updates", "authorized") == "false"
+        elsif strava_params["object_type"] == "athlete" && strava_params.dig("updates", "authorized") == "false"
           strava_integration.destroy
         end
+        strava_request.update!(response_status: :success)
+
+        strava_params
       end
     end
 
@@ -74,12 +93,7 @@ module StravaJobs
         return strava_request.update(response_status: "skipped")
       end
 
-      response = self.class.execute(strava_integration, strava_request.request_type, strava_request.parameters)
-      strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
-      return unless strava_request.success?
-
-      self.class.handle_response(strava_request, strava_integration, response&.body)
-      response&.body
+      self.class.make_request_and_update(strava_integration, strava_request)
     end
 
     private
