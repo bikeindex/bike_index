@@ -161,6 +161,23 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    describe "organized_notes_search" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user1) { FactoryBot.create(:user_confirmed) }
+      let(:user2) { FactoryBot.create(:user_confirmed) }
+      let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user1, creation_organization: organization) }
+      let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user2, creation_organization: organization) }
+      let!(:uro1) { FactoryBot.create(:user_registration_organization, user: user1, organization:, notes: "has a red lock") }
+      let!(:uro2) { FactoryBot.create(:user_registration_organization, user: user2, organization:, notes: "parked on campus") }
+      it "searches notes" do
+        expect(Bike.organized_notes_search("red lock", organization).pluck(:id)).to eq([bike1.id])
+        expect(Bike.organized_notes_search("campus", organization).pluck(:id)).to eq([bike2.id])
+        expect(Bike.organized_notes_search("parked", organization).pluck(:id)).to eq([bike2.id])
+        expect(Bike.organized_notes_search("nonexistent", organization).pluck(:id)).to eq([])
+        expect(Bike.organized_notes_search("", organization).pluck(:id)).to match_array([bike1.id, bike2.id])
+      end
+    end
+
     describe ".possibly_found_with_match" do
       let(:bike1) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
       let(:bike1b) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }

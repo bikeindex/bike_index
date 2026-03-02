@@ -259,6 +259,17 @@ class Bike < ApplicationRecord
         .references(:current_ownership)
     end
 
+    def organized_notes_search(query, organization)
+      return all unless query.present?
+
+      query_string = "%#{query.strip}%"
+      joins(:bike_organizations)
+        .joins("INNER JOIN ownerships ON ownerships.id = bikes.current_ownership_id")
+        .joins("INNER JOIN user_registration_organizations ON user_registration_organizations.organization_id = bike_organizations.organization_id AND user_registration_organizations.user_id = ownerships.user_id AND user_registration_organizations.deleted_at IS NULL")
+        .where(bike_organizations: {organization_id: organization.id})
+        .where("user_registration_organizations.notes ILIKE ?", query_string)
+    end
+
     def admin_text_search(query)
       query.present? ? admin_search(query) : all
     end
