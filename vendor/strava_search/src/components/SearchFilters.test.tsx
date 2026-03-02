@@ -61,7 +61,29 @@ describe('SearchFilters', () => {
       expect(screen.getByText('City:')).toBeInTheDocument();
     });
 
-    it('does not show location selects when no activities have locations', () => {
+    it('shows disabled location selects with Loading placeholder while loading', () => {
+      render(
+        <SearchFilters
+          {...defaultProps}
+          activities={[]}
+          isLoading={true}
+          onFiltersChange={onFiltersChange}
+        />,
+      );
+      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
+      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
+      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
+
+      expect(countrySelect.disabled).toBe(true);
+      expect(regionSelect.disabled).toBe(true);
+      expect(citySelect.disabled).toBe(true);
+
+      expect(countrySelect.options[0].text).toBe('Loading...');
+      expect(regionSelect.options[0].text).toBe('Loading...');
+      expect(citySelect.options[0].text).toBe('Loading...');
+    });
+
+    it('shows disabled location selects with N/A when no location data exists', () => {
       const activitiesWithoutLocations = mockActivities.map((a) => ({
         ...a,
         segment_locations: undefined,
@@ -73,9 +95,17 @@ describe('SearchFilters', () => {
           onFiltersChange={onFiltersChange}
         />,
       );
-      expect(screen.queryByText('Country:')).not.toBeInTheDocument();
-      expect(screen.queryByText('Region:')).not.toBeInTheDocument();
-      expect(screen.queryByText('City:')).not.toBeInTheDocument();
+      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
+      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
+      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
+
+      expect(countrySelect.disabled).toBe(true);
+      expect(regionSelect.disabled).toBe(true);
+      expect(citySelect.disabled).toBe(true);
+
+      expect(countrySelect.options[0].text).toBe('N/A');
+      expect(regionSelect.options[0].text).toBe('N/A');
+      expect(citySelect.options[0].text).toBe('N/A');
     });
 
     it('lists countries from activities', () => {
