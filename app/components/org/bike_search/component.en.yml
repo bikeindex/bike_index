@@ -1,0 +1,21 @@
+---
+en:
+  components:
+    org:
+      bike_search:
+        organization: Organization
+        bikes: Bikes
+        pagy: Pagy
+        interpreted_params: Interpreted_params
+        sortable_search_params: Sortable_search_params
+        per_page: Per_page
+        params: Params
+        search_stickers: Search_stickers
+        search_address: Search_address
+        search_status: Search_status
+        search_query_present: Search_query_present
+        time_range: Time_range
+        stolenness: Stolenness
+        bike_sticker: Bike_sticker
+        model_audit: Model_audit
+        only_show_bikes: Only_show_bikes
