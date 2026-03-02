@@ -20,6 +20,7 @@ interface SearchFiltersProps {
   gear: StoredGear[];
   totalCount: number;
   filteredCount: number;
+  isLoading?: boolean;
 }
 
 const toggleInactive = 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600';
@@ -33,6 +34,7 @@ export function SearchFilters({
   gear,
   totalCount,
   filteredCount,
+  isLoading,
 }: SearchFiltersProps) {
   const { units } = usePreferences();
   const distanceUnit = units === 'imperial' ? 'mi' : 'km';
@@ -479,7 +481,12 @@ export function SearchFilters({
         </div>
 
         {/* Location filters */}
-        {allLocations.length > 0 && (
+        {(() => {
+          const locationsAvailable = allLocations.length > 0;
+          const disabled = !locationsAvailable;
+          const disabledClasses = `${selectClasses} opacity-50 cursor-not-allowed`;
+          const defaultLabel = disabled ? (isLoading ? 'Loading...' : 'N/A') : 'All';
+          return (
         <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>Country:</span>
@@ -494,15 +501,15 @@ export function SearchFilters({
                   city: country === filters.country ? filters.city : null,
                 });
               }}
-              className={selectClasses}
+              disabled={disabled}
+              className={disabled ? disabledClasses : selectClasses}
             >
-              <option value="">All</option>
+              <option value="">{defaultLabel}</option>
               {allCountries.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </label>
-          {availableRegions.length > 0 && (
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>Region:</span>
             <select
@@ -515,32 +522,32 @@ export function SearchFilters({
                   city: region === filters.region ? filters.city : null,
                 });
               }}
-              className={selectClasses}
+              disabled={disabled || availableRegions.length === 0}
+              className={disabled || availableRegions.length === 0 ? disabledClasses : selectClasses}
             >
-              <option value="">All</option>
+              <option value="">{defaultLabel}</option>
               {availableRegions.map((r) => (
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>
           </label>
-          )}
-          {availableCities.length > 0 && (
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span>City:</span>
             <select
               value={filters.city || ''}
               onChange={(e) => onFiltersChange({ ...filters, city: e.target.value || null })}
-              className={selectClasses}
+              disabled={disabled || availableCities.length === 0}
+              className={disabled || availableCities.length === 0 ? disabledClasses : selectClasses}
             >
-              <option value="">All</option>
+              <option value="">{defaultLabel}</option>
               {availableCities.map(({ city, region }) => (
                 <option key={city} value={city}>{city}, {region}</option>
               ))}
             </select>
           </label>
-          )}
         </div>
-        )}
+          );
+        })()}
 
           </div>
           )}
