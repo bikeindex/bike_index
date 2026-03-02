@@ -127,24 +127,10 @@
 
             <% if @strava_integration.permissions_less? %>
               <%= render UI::Badge::Component.new(text: "less than default", color: :error, size: :sm) %>
+            <% elsif @strava_integration.permissions_strava_search_default? %>
+              <%= render UI::Badge::Component.new(text: "Strava Search default", color: :success, size: :sm) %>
             <% elsif @strava_integration.permissions_more? %>
               <%= render UI::Badge::Component.new(text: "more than default", color: :notice, size: :sm) %>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Gear</td>
-
-          <td>
-            <%= @strava_integration.gear_names.join(", ").presence || "None" %>
-            <% unknown_gear = @strava_integration.unknown_gear_ids %>
-
-            <% if unknown_gear.present? %>
-              <small class="tw:block">
-                <span class="text-warning">Unknown gear IDs:</span>
-                <%= unknown_gear.join(", ") %>
-              </small>
             <% end %>
           </td>
         </tr>
@@ -175,12 +161,21 @@
   </div>
 </div>
 
-<% if @strava_integration.strava_gears.any? %>
+<% unknown_gear = @strava_integration.unknown_gear_ids %>
+
+<% if @strava_integration.strava_gears.any? || unknown_gear %>
   <div class="row mt-4">
     <div class="col-md-12">
       <h4>
         <%= link_to admin_strava_gears_path(search_strava_integration_id: @strava_integration.id) do %>
           Strava Gear (<%= @strava_integration.strava_gears.count %>)
+        <% end %>
+
+        <% if unknown_gear.present? %>
+          <small class="tw:mt-2 tw:mb-4 tw:block">
+            <span class="text-warning">Unknown gear IDs:</span>
+            <%= unknown_gear.join(", ") %>
+          </small>
         <% end %>
       </h4>
 

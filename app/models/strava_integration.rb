@@ -61,6 +61,10 @@ class StravaIntegration < ApplicationRecord
     strava_permissions == Integrations::StravaClient::DEFAULT_SCOPE
   end
 
+  def permissions_strava_search_default?
+    strava_permissions == Integrations::StravaClient::STRAVA_SEARCH_SCOPE
+  end
+
   def permissions_less?
     return true if strava_permissions.blank?
 

@@ -120,23 +120,23 @@ class StravaActivity < ApplicationRecord
         .compact
     end
 
+    SUMMARY_KEY_MAP = {
+      "name" => :title, "distance" => :distance_meters, "moving_time" => :moving_time_seconds,
+      "total_elevation_gain" => :total_elevation_gain_meters, "sport_type" => :sport_type,
+      "private" => :private, "kudos_count" => :kudos_count, "average_speed" => :average_speed,
+      "suffer_score" => :suffer_score, "gear_id" => :gear_id
+    }.freeze
+
     def summary_attributes(summary)
-      {
-        title: summary["name"],
-        distance_meters: summary["distance"],
-        moving_time_seconds: summary["moving_time"],
-        total_elevation_gain_meters: summary["total_elevation_gain"],
-        sport_type: summary["sport_type"],
-        private: summary["private"],
-        kudos_count: summary["kudos_count"],
-        average_speed: summary["average_speed"],
-        suffer_score: summary["suffer_score"],
-        gear_id: summary["gear_id"],
-        activity_type: summary["sport_type"] || summary["type"],
-        timezone: Binxtils::TimeZoneParser.parse(summary["timezone"])&.name,
-        start_date: Binxtils::TimeParser.parse(summary["start_date"]),
-        strava_data: strava_data_from(summary)
-      }
+      attrs = SUMMARY_KEY_MAP.each_with_object({}) { |(src, attr), h| h[attr] = summary[src] if summary.key?(src) }
+      if summary.key?("sport_type") || summary.key?("type")
+        attrs[:activity_type] = summary["sport_type"] || summary["type"]
+      end
+      attrs[:timezone] = Binxtils::TimeZoneParser.parse(summary["timezone"])&.name if summary.key?("timezone")
+      attrs[:start_date] = Binxtils::TimeParser.parse(summary["start_date"]) if summary.key?("start_date")
+      strava_data = strava_data_from(summary)
+      attrs[:strava_data] = strava_data if strava_data.present?
+      attrs
     end
 
     def segment_locations_for(segments)
