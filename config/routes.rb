@@ -247,11 +247,11 @@ Rails.application.routes.draw do
       mailchimp_data model_attestations model_audits
       notifications organization_statuses parking_notifications strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
-    ].each { resources it, only: %i[index] }
+    ].each { |r| resources r, only: %i[index] }
 
     %i[
       b_params bike_versions feedbacks marketplace_listings marketplace_messages sales strava_integrations
-    ].each { resources it, only: %i[index show] }
+    ].each { |r| resources r, only: %i[index show] }
 
     resources :bike_stickers do
       collection { get :reassign }

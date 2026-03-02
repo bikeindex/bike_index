@@ -47,6 +47,6 @@ class UserBan < ApplicationRecord
     # Sign them out
     user.update_auth_token("auth_token")
     # Delete their bikes
-    user.bike_ids(true).each { BikeDeleterJob.perform_async(it, false, creator_id) }
+    user.bike_ids(true).each { |bike_id| BikeDeleterJob.perform_async(bike_id, false, creator_id) }
   end
 end

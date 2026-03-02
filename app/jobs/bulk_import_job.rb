@@ -46,7 +46,7 @@ class BulkImportJob < ApplicationJob
       return false if address_parts.count < 3
 
       # if all substrings in region_postal have numbers, they're all (probably) postal_codes
-      region_postal.split(" ").all? { it.match(/\d/) }
+      region_postal.split(" ").all? { |part| part.match(/\d/) }
     end
 
     def region_and_postal(region_postal)

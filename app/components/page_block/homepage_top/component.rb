@@ -7,14 +7,14 @@ module PageBlock::HomepageTop
     def initialize(recoveries_value:, organization_count:, recovery_displays:)
       @recoveries_value = recoveries_value
       @organization_count = organization_count
-      @recovery_displays = recovery_displays.select { it.photo_url.present? }
+      @recovery_displays = recovery_displays.select { |rd| rd.photo_url.present? }
     end
 
     private
 
     def bike_tile_images
-      (0..16).map { it.to_s.rjust(2, "0") }
-        .map { image_url("redesign_2025/bike_tiles/bike-entry_00#{it}.png") }
+      (0..16).map { |n| n.to_s.rjust(2, "0") }
+        .map { |num| image_url("redesign_2025/bike_tiles/bike-entry_00#{num}.png") }
     end
 
     def recoveries_value

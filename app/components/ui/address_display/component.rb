@@ -38,7 +38,7 @@ module UI::AddressDisplay
         @address_hash[:street]&.split(",")&.map(&:strip)
       end.compact
 
-      street_lines.map { content_tag(:span, it + line_separator, class: line_classes) }
+      street_lines.map { |line| content_tag(:span, line + line_separator, class: line_classes) }
     end
 
     def final_line

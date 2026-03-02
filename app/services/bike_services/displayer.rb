@@ -12,7 +12,7 @@ class BikeServices::Displayer
 
       # Vehicle or propulsion type query items
       (params_and_interpreted_params[:query_items] || [])
-        .any? { it.start_with?("v_", "p_") }
+        .any? { |item| item.start_with?("v_", "p_") }
     end
 
     # user arg because all methods have it

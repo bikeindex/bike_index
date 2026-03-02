@@ -53,7 +53,7 @@ class Membership < ApplicationRecord
     end
 
     def levels_ordered
-      levels.keys.map { level_humanized(it) }
+      levels.keys.map { |key| level_humanized(key) }
     end
   end
 

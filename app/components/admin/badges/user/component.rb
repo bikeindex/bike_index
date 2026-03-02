@@ -43,7 +43,7 @@ module Admin::Badges::User
     end
 
     def email_banned_text
-      @email_bans.map { EmailBan.reason_humanized(it.reason) }.join(", ")
+      @email_bans.map { |ban| EmailBan.reason_humanized(ban.reason) }.join(", ")
     end
 
     def compute_tags

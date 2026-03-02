@@ -12,7 +12,7 @@ class Spreadsheets::Manufacturers
 
       CSV.generate do |csv|
         csv << EXPORT_COLUMNS
-        manufacturers.each { csv << row_for(it) }
+        manufacturers.each { |m| csv << row_for(m) }
       end
     end
 
