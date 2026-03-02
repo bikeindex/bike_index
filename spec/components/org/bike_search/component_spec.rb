@@ -4,26 +4,95 @@ require "rails_helper"
 
 RSpec.describe Org::BikeSearch::Component, type: :component do
   let(:instance) { described_class.new(**options) }
-  let(:component) { render_inline(instance) }
-  let(:options) { {organization:, bikes:, pagy:, interpreted_params:, sortable_search_params:, per_page:, params:, search_stickers:, search_address:, search_status:, search_query_present:, time_range:, stolenness:, bike_sticker:, model_audit:, only_show_bikes:} }
-  let(:organization) { nil }
-  let(:bikes) { nil }
-  let(:pagy) { nil }
-  let(:interpreted_params) { nil }
-  let(:sortable_search_params) { nil }
-  let(:per_page) { nil }
-  let(:params) { nil }
-  let(:search_stickers) { nil }
-  let(:search_address) { nil }
-  let(:search_status) { nil }
-  let(:search_query_present) { nil }
-  let(:time_range) { nil }
-  let(:stolenness) { nil }
-  let(:bike_sticker) { nil }
-  let(:model_audit) { nil }
-  let(:only_show_bikes) { nil }
+  let(:component) do
+    # sortable helper requires sort_column and sort_direction from the controller
+    # humanized_time_range requires @period from the controller
+    controller = vc_test_controller
+    controller.class.helper_method :sort_column, :sort_direction unless controller.class.method_defined?(:sort_column)
+    controller.define_singleton_method(:sort_column) { "id" }
+    controller.define_singleton_method(:sort_direction) { "desc" }
+    controller.instance_variable_set(:@period, "all")
+    with_request_url("/o/#{organization.to_param}/bikes") do
+      render_inline(instance)
+    end
+  end
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+  let(:enabled_feature_slugs) { %w[bike_search] }
+  let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+  let(:bikes) { [bike] }
+  let(:pagy) { Pagy::Offset.new(count: 1, page: 1, limit: 10) }
+  let(:options) do
+    {
+      organization:,
+      bikes:,
+      pagy:,
+      per_page: 10,
+      params: {},
+      interpreted_params: {},
+      sortable_search_params: {},
+      search_status: "all",
+      stolenness: "all",
+      time_range: 1.year.ago..Time.current
+    }
+  end
 
-  it "renders" do
-    expect(component).to have_css("div")
+  it "renders table with bikes" do
+    expect(component).to have_css("table.table")
+    expect(component).to have_css("tbody tr", count: 1)
+    expect(component).to have_css(".settings-list")
+  end
+
+  it "renders search form" do
+    expect(component).to have_css("#Search_Form")
+    expect(component).to have_css("hr")
+  end
+
+  it "renders settings panel with column checkboxes" do
+    expect(component).to have_css("#organizedSearchSettings")
+    expect(component).to have_css("input[type='checkbox']")
+  end
+
+  context "with only_show_bikes" do
+    let(:options) { super().merge(only_show_bikes: true) }
+
+    it "renders table without search form" do
+      expect(component).to have_css("table.table")
+      expect(component).not_to have_css("#Search_Form")
+      expect(component).not_to have_css("hr")
+    end
+  end
+
+  context "with bike_stickers enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+
+    it "renders sticker filter buttons" do
+      expect(component).to have_css(".search-sort-btns", text: /Stickers/)
+    end
+  end
+
+  context "with impound_bikes enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+
+    it "renders impound status filter buttons" do
+      expect(component).to have_css(".search-sort-btns", text: /Status/)
+      expect(component).to have_css(".search-sort-btns a", text: /not/)
+    end
+  end
+
+  context "with csv_exports enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+    it "renders export link" do
+      expect(component).to have_link(text: /Create export/)
+    end
+  end
+
+  context "with pagination" do
+    let(:pagy) { Pagy::Offset.new(count: 50, page: 1, limit: 10) }
+
+    it "renders pagination" do
+      expect(component).to have_css(".paginate-container")
+      expect(component).to have_css("select#per_page_select")
+    end
   end
 end

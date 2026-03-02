@@ -3,19 +3,42 @@ en:
   components:
     org:
       bike_search:
-        organization: Organization
-        bikes: Bikes
-        pagy: Pagy
-        interpreted_params: Interpreted_params
-        sortable_search_params: Sortable_search_params
-        per_page: Per_page
-        params: Params
-        search_stickers: Search_stickers
-        search_address: Search_address
-        search_status: Search_status
-        search_query_present: Search_query_present
-        time_range: Time_range
-        stolenness: Stolenness
-        bike_sticker: Bike_sticker
-        model_audit: Model_audit
-        only_show_bikes: Only_show_bikes
+        address: 'Address:'
+        all: All
+        avery: Avery?
+        bike: bike
+        color: Color
+        create_export_of_vehicles: Create export of searched %{cycle_type}
+        email_hidden: email hidden
+        impounded: Impounded
+        link: Link
+        manufacturer: Manufacturer
+        matching_bikes_html: "<strong>%{bikes}</strong> matching"
+        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
+        model: Model
+        only_impounded_vehicles_html: Only <strong>impounded</strong>
+        only_no_address_html: Only <strong>no</strong> address
+        only_no_sticker_html: Only <strong>no</strong> sticker
+        only_not_impounded_html: Only <strong>not</strong> impounded
+        only_stolen_html: Only stolen
+        only_with_address_html: Only <strong>with</strong> address
+        only_with_owner_html: Not stolen or impounded
+        only_with_stickers_html: Only <strong>with</strong> stickers
+        owner_name: Owner name
+        propulsion_type: Propulsion
+        registered: Registered
+        registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
+        sent_to: Sent to
+        settings: settings
+        status: 'Status:'
+        status_cell: Status
+        sticker: Sticker
+        stickers: 'Stickers:'
+        stolen: Stolen
+        stolen_vehicles_html: "<em>stolen</em> %{cycle_type}"
+        updated: Updated
+        vehicle: vehicle
+        vehicle_type: Vehicle type
+        view_all_vehicles: view all %{cycle_type}
+        view_just_stolen_vehicles: view just stolen %{cycle_type}
+        visible_columns: Visible columns

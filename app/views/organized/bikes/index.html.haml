@@ -35,6 +35,6 @@
 .mb-4
 
 - if current_organization.enabled?("bike_search")
-  = render "organized/bikes/search"
+  = render(Org::BikeSearch::Component.new(organization: current_organization, bikes: @bikes, pagy: @pagy, interpreted_params: @interpreted_params, sortable_search_params: sortable_search_params, per_page: @per_page, params: params, search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status, search_query_present: @search_query_present, time_range: @time_range, stolenness: @stolenness, bike_sticker: @bike_sticker, model_audit: @model_audit))
 - else
   = render "organized/bikes/list"

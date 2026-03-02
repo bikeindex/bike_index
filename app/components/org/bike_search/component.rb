@@ -2,9 +2,10 @@
 
 module Org::BikeSearch
   class Component < ApplicationComponent
-    def initialize(organization:, bikes:, pagy:, interpreted_params:, sortable_search_params:,
-      per_page:, params:, search_stickers:, search_address:, search_status:,
-      search_query_present:, time_range:, stolenness:,
+    def initialize(organization:, bikes:, pagy:, per_page:, params:,
+      interpreted_params: {}, sortable_search_params: {},
+      search_stickers: nil, search_address: nil, search_status: "all",
+      search_query_present: false, time_range: nil, stolenness: "all",
       bike_sticker: nil, model_audit: nil, only_show_bikes: false)
       @organization = organization
       @bikes = bikes
@@ -93,7 +94,10 @@ module Org::BikeSearch
     end
 
     def cycle_type
-      @cycle_type ||= BikeServices::Displayer.vehicle_search?(@params.to_h.merge(@interpreted_params)) ? translation(".vehicle") : translation(".bike")
+      @cycle_type ||= begin
+        merged = @params.respond_to?(:to_unsafe_h) ? @params.to_unsafe_h.merge(@interpreted_params) : @params.merge(@interpreted_params)
+        BikeServices::Displayer.vehicle_search?(merged) ? translation(".vehicle") : translation(".bike")
+      end
     end
 
     def search_params

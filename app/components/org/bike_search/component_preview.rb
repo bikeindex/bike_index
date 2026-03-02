@@ -3,7 +3,16 @@
 module Org::BikeSearch
   class ComponentPreview < ApplicationComponentPreview
     def default
-      render(Org::BikeSearch::Component.new(organization:, bikes:, pagy:, interpreted_params:, sortable_search_params:, per_page:, params:, search_stickers:, search_address:, search_status:, search_query_present:, time_range:, stolenness:, bike_sticker:, model_audit:, only_show_bikes:))
+      organization = Organization.first
+      bikes = organization&.bikes&.limit(5) || Bike.none
+      pagy = Pagy::Offset.new(count: bikes.count, page: 1, limit: 10)
+      render(Org::BikeSearch::Component.new(
+        organization:,
+        bikes:,
+        pagy:,
+        per_page: 10,
+        params: {}
+      ))
     end
   end
 end
