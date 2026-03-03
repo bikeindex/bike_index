@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckSquare, Square, Loader2, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckSquare, Square, Loader2, X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import type { StoredGear } from '../services/database';
 import type { UpdatableActivity } from '../types/strava';
 import { ACTIVITY_TYPES } from '../types/strava';
@@ -18,6 +18,9 @@ interface BulkActionsProps {
   gear: StoredGear[];
   hasActivityWrite: boolean;
   authUrl: string;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
 }
 
 const selectBase = 'w-full p-1.5 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded focus:ring-2 focus:ring-[#fc4c02] focus:border-transparent outline-none';
@@ -37,21 +40,30 @@ export function BulkActions({
   gear,
   hasActivityWrite,
   authUrl,
+  isOpen,
+  onOpen,
+  onClose,
 }: BulkActionsProps) {
   const [selectedType, setSelectedType] = useState('');
   const [selectedGearId, setSelectedGearId] = useState('');
   const [commuteValue, setCommuteValue] = useState('');
   const [trainerValue, setTrainerValue] = useState('');
-  const showAuthModal = selectedCount > 0 && !hasActivityWrite;
+  const [panelExpanded, setPanelExpanded] = useState(true);
+  const showAuthModal = isOpen && !hasActivityWrite;
+
+  const handleOpen = () => {
+    setPanelExpanded(true);
+    onOpen();
+  };
 
   useEffect(() => {
     if (!showAuthModal) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onDeselectAll();
+      if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showAuthModal, onDeselectAll]);
+  }, [showAuthModal, onClose]);
 
   const goToPage = (page: number) => {
     const validPage = Math.max(1, Math.min(page, totalPages));
@@ -74,31 +86,27 @@ export function BulkActions({
     setTrainerValue('');
   };
 
+  const handleClose = () => {
+    setPanelExpanded(false);
+    setTimeout(onClose, 200);
+  };
+
   return (
     <>
-      {/* Selection controls */}
+      {/* Top bar with button and pagination */}
       <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-3">
+        {!isOpen ? (
           <button
-            onClick={selectedCount > 0 ? onDeselectAll : onSelectAll}
-            className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            onClick={handleOpen}
+            className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            {selectedCount > 0 ? (
-              <CheckSquare className="w-5 h-5 text-[#fc4c02]" />
-            ) : (
-              <Square className="w-5 h-5" />
-            )}
-            <span>
-              {selectedCount > 0
-                ? `${formatNumber(selectedCount)} selected · Clear`
-                : totalPages > 1
-                  ? `Select all on page (${formatNumber(pageCount)})`
-                  : `Select all (${formatNumber(pageCount)})`}
-            </span>
+            Select activities to update
           </button>
-        </div>
+        ) : (
+          <div />
+        )}
 
-        {/* Top pagination */}
+        {/* Mini pagination */}
         {totalPages > 1 && (
           <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
             <button
@@ -122,93 +130,129 @@ export function BulkActions({
         )}
       </div>
 
-      {/* Update fields - animated expand/collapse */}
-      <div
-        className="grid transition-[grid-template-rows] duration-200 ease-in-out"
-        style={{ gridTemplateRows: selectedCount > 0 ? '1fr' : '0fr' }}
-      >
-        <div className="overflow-hidden">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-3">
-          <div className="grid grid-cols-2 gap-3 max-w-lg">
-            <div>
-              <label htmlFor="bulk-type" className={labelClasses}>Activity Type</label>
-              <select
-                id="bulk-type"
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                disabled={isUpdating}
-                className={selectClasses(!!selectedType)}
-              >
-                <option value="">No change</option>
-                {ACTIVITY_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {formatActivityType(type)}
-                  </option>
-                ))}
-              </select>
+      {/* Update panel - accordion style */}
+      {isOpen && (
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <button
+            onClick={handleClose}
+            className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Update checked activities</span>
             </div>
+            <ChevronDown
+              className={`w-4 h-4 text-gray-500 transition-transform ${panelExpanded ? 'rotate-180' : ''}`}
+            />
+          </button>
 
-            <div>
-              <label htmlFor="bulk-gear" className={labelClasses}>Equipment</label>
-              <select
-                id="bulk-gear"
-                value={selectedGearId}
-                onChange={(e) => setSelectedGearId(e.target.value)}
-                disabled={isUpdating}
-                className={selectClasses(!!selectedGearId)}
-              >
-                <option value="">No change</option>
-                <option value="_none">None (remove)</option>
-                {gear.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div
+            className="grid transition-[grid-template-rows] duration-200 ease-in-out"
+            style={{ gridTemplateRows: panelExpanded ? '1fr' : '0fr' }}
+          >
+            <div className="overflow-hidden">
+              <div className="p-3 space-y-3 border-t border-gray-200 dark:border-gray-700">
+                {/* Select all / deselect all */}
+                <button
+                  onClick={selectedCount > 0 ? onDeselectAll : onSelectAll}
+                  className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                >
+                  {selectedCount > 0 ? (
+                    <CheckSquare className="w-5 h-5 text-[#fc4c02]" />
+                  ) : (
+                    <Square className="w-5 h-5" />
+                  )}
+                  <span>
+                    {selectedCount > 0
+                      ? `${formatNumber(selectedCount)} selected · Clear`
+                      : totalPages > 1
+                        ? `Select all on page (${formatNumber(pageCount)})`
+                        : `Select all (${formatNumber(pageCount)})`}
+                  </span>
+                </button>
 
-            <div>
-              <label htmlFor="bulk-commute" className={labelClasses}>Commute</label>
-              <select
-                id="bulk-commute"
-                value={commuteValue}
-                onChange={(e) => setCommuteValue(e.target.value)}
-                disabled={isUpdating}
-                className={selectClasses(!!commuteValue)}
-              >
-                <option value="">No change</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-              </select>
-            </div>
+                {/* Update fields */}
+                <div className="grid grid-cols-2 gap-3 max-w-lg">
+                  <div>
+                    <label htmlFor="bulk-type" className={labelClasses}>Activity Type</label>
+                    <select
+                      id="bulk-type"
+                      value={selectedType}
+                      onChange={(e) => setSelectedType(e.target.value)}
+                      disabled={isUpdating}
+                      className={selectClasses(!!selectedType)}
+                    >
+                      <option value="">No change</option>
+                      {ACTIVITY_TYPES.map((type) => (
+                        <option key={type} value={type}>
+                          {formatActivityType(type)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-            <div>
-              <label htmlFor="bulk-trainer" className={labelClasses}>Trainer</label>
-              <select
-                id="bulk-trainer"
-                value={trainerValue}
-                onChange={(e) => setTrainerValue(e.target.value)}
-                disabled={isUpdating}
-                className={selectClasses(!!trainerValue)}
-              >
-                <option value="">No change</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-              </select>
+                  <div>
+                    <label htmlFor="bulk-gear" className={labelClasses}>Equipment</label>
+                    <select
+                      id="bulk-gear"
+                      value={selectedGearId}
+                      onChange={(e) => setSelectedGearId(e.target.value)}
+                      disabled={isUpdating}
+                      className={selectClasses(!!selectedGearId)}
+                    >
+                      <option value="">No change</option>
+                      <option value="_none">None (remove)</option>
+                      {gear.map((g) => (
+                        <option key={g.id} value={g.id}>
+                          {g.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="bulk-commute" className={labelClasses}>Commute</label>
+                    <select
+                      id="bulk-commute"
+                      value={commuteValue}
+                      onChange={(e) => setCommuteValue(e.target.value)}
+                      disabled={isUpdating}
+                      className={selectClasses(!!commuteValue)}
+                    >
+                      <option value="">No change</option>
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="bulk-trainer" className={labelClasses}>Trainer</label>
+                    <select
+                      id="bulk-trainer"
+                      value={trainerValue}
+                      onChange={(e) => setTrainerValue(e.target.value)}
+                      disabled={isUpdating}
+                      className={selectClasses(!!trainerValue)}
+                    >
+                      <option value="">No change</option>
+                      <option value="true">Yes</option>
+                      <option value="false">No</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSubmit}
+                  disabled={isUpdating || !hasChanges || selectedCount === 0}
+                  className={`max-w-lg px-4 py-1.5 text-sm bg-[#fc4c02] text-white rounded hover:bg-[#e34402] transition-colors flex items-center justify-center gap-1.5 ${isUpdating || !hasChanges || selectedCount === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {isUpdating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  Update {formatNumber(selectedCount)} activities
+                </button>
+              </div>
             </div>
           </div>
-
-          <button
-            onClick={handleSubmit}
-            disabled={isUpdating || !hasChanges}
-            className={`mt-5 max-w-lg px-4 py-1.5 text-sm bg-[#fc4c02] text-white rounded hover:bg-[#e34402] transition-colors flex items-center justify-center gap-1.5 ${isUpdating || !hasChanges ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {isUpdating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-            Update {formatNumber(selectedCount)} activities
-          </button>
         </div>
-        </div>
-      </div>
+      )}
 
       {/* Authorization Modal */}
       {showAuthModal && (
@@ -217,7 +261,7 @@ export function BulkActions({
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold dark:text-gray-100">Authorization Required</h3>
               <button
-                onClick={onDeselectAll}
+                onClick={onClose}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 <X className="w-5 h-5 dark:text-gray-400" />

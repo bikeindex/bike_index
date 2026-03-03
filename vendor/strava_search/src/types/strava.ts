@@ -165,6 +165,7 @@ export interface SearchFilters {
   filtersExpanded: boolean;
   activityTypesExpanded: boolean;
   equipmentExpanded: boolean;
+  updatePanelExpanded: boolean;
   mutedFilter: MutedFilter;
   photoFilter: PhotoFilter;
   privateFilter: PrivateFilter;
