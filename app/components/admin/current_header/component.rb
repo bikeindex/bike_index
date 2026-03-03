@@ -85,6 +85,12 @@ module Admin::CurrentHeader
       @params[:search_strava_integration_id]
     end
 
+    def strava_integration
+      return @strava_integration if defined?(@strava_integration)
+
+      @strava_integration = StravaIntegration.find_by_id(strava_integration_id)
+    end
+
     def kind_humanized
       @kind_humanized || @params[:search_kind]&.humanize
     end

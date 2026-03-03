@@ -107,11 +107,18 @@ RSpec.describe StravaRequest, type: :model do
       expect(strava_request.skip_request?).to be false
     end
 
-    it "returns true when activity is already enriched" do
+    it "returns true when activity was recently enriched" do
       FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
-        enriched_at: Time.current)
+        enriched_at: 30.minutes.ago)
       strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       expect(strava_request.skip_request?).to be true
+    end
+
+    it "returns false when activity was enriched longer ago than RE_ENRICH_AFTER" do
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
+        enriched_at: 2.hours.ago)
+      strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
+      expect(strava_request.skip_request?).to be false
     end
   end
 

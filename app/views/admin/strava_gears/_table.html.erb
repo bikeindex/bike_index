@@ -1,4 +1,4 @@
-<%# locals: (collection:, render_sortable: false) %>
+<%# locals: (collection:, render_sortable: false, skip_strava_integration: false) %>
 
 <div class="full-screen-table">
   <table class="table table-striped table-bordered table-sm">
@@ -18,7 +18,7 @@
       <th>Gear ID</th>
 
       <th>
-        <%= sortable "total_distance_kilometers", "Distance", render_sortable: render_sortable %>
+        <%= sortable "total_distance_kilometers", "Distance (mi)", render_sortable: render_sortable %>
       </th>
 
       <th>Enriched</th>
@@ -27,7 +27,9 @@
 
       <th>Activities</th>
 
-      <th>User</th>
+      <% unless skip_strava_integration %>
+        <th>User</th>
+      <% end %>
     </thead>
 
     <tbody>
@@ -60,10 +62,7 @@
           <td><code><%= strava_gear.strava_gear_id %></code></td>
 
           <td>
-            <% if strava_gear.total_distance_kilometers.present? %>
-              <%= number_display(strava_gear.total_distance_kilometers) %>
-              km
-            <% end %>
+            <%= number_display(strava_gear.total_distance_miles) %>
           </td>
 
           <td>
@@ -82,9 +81,11 @@
             <%= number_display(strava_gear.calculated_strava_activities.count) %>
           </td>
 
-          <td>
-            <%= render Admin::UserCell::Component.new(user: strava_gear.strava_integration.user, user_id: strava_gear.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_gear.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_gear.strava_integration_id))) %>
-          </td>
+          <% unless skip_strava_integration %>
+            <td>
+              <%= render Admin::UserCell::Component.new(user: strava_gear.strava_integration.user, user_id: strava_gear.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_gear.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_gear.strava_integration_id))) %>
+            </td>
+          <% end %>
         </tr>
       <% end %>
     </tbody>
