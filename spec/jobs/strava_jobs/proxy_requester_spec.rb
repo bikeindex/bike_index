@@ -77,6 +77,26 @@ RSpec.describe StravaJobs::ProxyRequester do
     end
   end
 
+  describe ".parse_url_params" do
+    it "separates path from query params" do
+      path, params = described_class.send(:parse_url_params, "athlete/activities?page=18&per_page=100")
+      expect(path).to eq "athlete/activities"
+      expect(params).to eq("page" => "18", "per_page" => "100")
+    end
+
+    it "returns nil params for URL without query string" do
+      path, params = described_class.send(:parse_url_params, "activities/12345")
+      expect(path).to eq "activities/12345"
+      expect(params).to be_nil
+    end
+
+    it "handles single query param" do
+      path, params = described_class.send(:parse_url_params, "athlete/activities?after=1700000000")
+      expect(path).to eq "athlete/activities"
+      expect(params).to eq("after" => "1700000000")
+    end
+  end
+
   describe ".create_and_execute" do
     before { FactoryBot.create(:state_california) }
     let(:target_attributes) do
@@ -113,7 +133,7 @@ RSpec.describe StravaJobs::ProxyRequester do
             expect(result[:strava_request]).to be_a(StravaRequest)
             expect(result[:strava_request].success?).to be_truthy
             expect(result[:strava_request].proxy?).to be_truthy
-            expect(result[:strava_request].parameters).to eq("url" => "athlete/activities?page=1&per_page=1", "method" => "GET")
+            expect(result[:strava_request].parameters).to eq("url" => "athlete/activities", "method" => "GET", "params" => {"page" => "1", "per_page" => "1"})
             expect(result[:response].status).to eq 200
           }.to change(StravaRequest, :count).by(1)
             .and change(StravaActivity, :count).by(1)
@@ -199,7 +219,7 @@ RSpec.describe StravaJobs::ProxyRequester do
         VCR.use_cassette("strava-list_activities") do
           result = described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities?page=1&per_page=1")
           expect(result[:strava_request].success?).to be_truthy
-          expect(result[:strava_request].parameters).to eq("url" => "athlete/activities?page=1&per_page=1")
+          expect(result[:strava_request].parameters).to eq("url" => "athlete/activities", "params" => {"page" => "1", "per_page" => "1"})
         end
       end
     end

@@ -35,16 +35,17 @@ module StravaJobs
 
       def create_and_execute(strava_integration:, user:, url:, method: nil, body: nil)
         validate_url!(url)
+        path, query_params = parse_url_params(url)
         strava_request = StravaRequest.create!(
           strava_integration:,
           user:,
           request_type: :proxy,
-          parameters: {url:, method:, body:}.compact
+          parameters: {url: path, method:, body:, params: query_params}.compact
         )
 
         response = Integrations::StravaClient.proxy_request(strava_integration,
           strava_request.parameters["url"], method: strava_request.parameters["method"],
-          body: strava_request.parameters["body"])
+          body: strava_request.parameters["body"], params: strava_request.parameters["params"])
         strava_request.update_from_response(response, raise_on_error: false)
 
         serialized = if strava_request.success?
@@ -85,6 +86,12 @@ module StravaJobs
 
       def validate_url!(url)
         raise ArgumentError, "Invalid proxy path" if url.blank? || url.match?(%r{://|\A//|(\A|/)\.\.(/|\z)})
+      end
+
+      def parse_url_params(url)
+        path, query = url.split("?", 2)
+        params = query.present? ? Rack::Utils.parse_query(query) : nil
+        [path, params]
       end
 
       def handle_proxy_response(strava_integration, body, method: nil)
