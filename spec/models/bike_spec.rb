@@ -167,8 +167,8 @@ RSpec.describe Bike, type: :model do
       let(:user2) { FactoryBot.create(:user_confirmed) }
       let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user1, creation_organization: organization) }
       let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user2, creation_organization: organization) }
-      let!(:uro1) { FactoryBot.create(:user_registration_organization, user: user1, organization:, notes: "has a red lock") }
-      let!(:uro2) { FactoryBot.create(:user_registration_organization, user: user2, organization:, notes: "parked on campus") }
+      let!(:user_registration_organization1) { FactoryBot.create(:user_registration_organization, user: user1, organization:, notes: "has a red lock") }
+      let!(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, user: user2, organization:, notes: "parked on campus") }
       it "searches notes" do
         expect(Bike.organized_notes_search("red lock", organization).pluck(:id)).to eq([bike1.id])
         expect(Bike.organized_notes_search("campus", organization).pluck(:id)).to eq([bike2.id])
