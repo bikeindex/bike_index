@@ -1,0 +1,51 @@
+Layout/ClassStructure:
+  Enabled: true
+  ExpectedOrder:
+    - module_inclusion
+    - constants
+    - associations
+    - validations
+    - callbacks
+    - scopes
+    - enums
+    - public_class_methods
+    - initializer
+    - public_methods
+    - protected_methods
+    - private_methods
+  Categories:
+    associations:
+      - has_many
+      - has_one
+      - belongs_to
+      - has_and_belongs_to_many
+      - has_rich_text
+    validations:
+      - validates
+      - validate
+      - validates_presence_of
+      - validates_uniqueness_of
+    callbacks:
+      - before_validation
+      - after_validation
+      - before_save
+      - around_save
+      - after_save
+      - before_create
+      - around_create
+      - after_create
+      - before_update
+      - around_update
+      - after_update
+      - before_destroy
+      - around_destroy
+      - after_destroy
+      - after_commit
+      - after_create_commit
+      - after_update_commit
+      - after_destroy_commit
+    scopes:
+      - scope
+      - default_scope
+    enums:
+      - enum
