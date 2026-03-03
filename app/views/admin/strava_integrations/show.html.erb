@@ -105,7 +105,9 @@
 
             <% if @strava_integration.athlete_activity_count %>
               /
-              <%= number_display(@strava_integration.athlete_activity_count) %>
+              <small title="Strava Athlete Activity count">
+                <%= number_display(@strava_integration.athlete_activity_count) %>
+              </small>
             <% end %>
           </td>
         </tr>
@@ -179,47 +181,14 @@
         <% end %>
       </h4>
 
-      <table class="table table-sm table-striped table-bordered">
-        <thead class="thead-light">
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Gear ID</th>
-            <th>Distance</th>
-            <th>Enriched</th>
-            <th>Linked Bike</th>
-          </tr>
-        </thead>
+      <% {bike: "Bikes", shoe: "Shoes"}.each do |gear_type, gear_type_label| %>
+        <% gears = @strava_integration.strava_gears.select { |g| g.gear_type == gear_type.to_s }.sort_by { |g| g.strava_gear_display_name.downcase } %>
+        <% next if gears.empty? %>
 
-        <tbody>
-          <% @strava_integration.strava_gears.each do |gear| %>
-            <tr>
-              <td><%= gear.strava_gear_display_name %></td>
-              <td><%= gear.gear_type %></td>
-              <td><code><%= gear.strava_gear_id %></code></td>
+        <h5 class="mt-3"><%= gear_type_label %></h5>
 
-              <td>
-                <% if gear.total_distance_kilometers.present? %>
-                  <%= number_display(gear.total_distance_kilometers) %>
-                  km
-                <% end %>
-              </td>
-
-              <td>
-                <% if gear.enriched? %>
-                  <%= render UI::Badge::Component.new(text: "E", title: "Enriched", color: :cyan, size: :sm) %>
-                <% end %>
-              </td>
-
-              <td>
-                <% if gear.item.present? %>
-                  <%= link_to gear.item.title_string, bike_path(gear.item) %>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+        <%= render partial: "admin/strava_gears/table", locals: {collection: gears, skip_strava_integration: true} %>
+      <% end %>
     </div>
   </div>
 <% end %>

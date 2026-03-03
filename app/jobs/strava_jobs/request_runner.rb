@@ -1,18 +1,10 @@
 # frozen_string_literal: true
 
 module StravaJobs
-  class RequestRunner < ScheduledJob
-    BATCH_SIZE = ENV.fetch("STRAVA_BULK_ENQUEUE_SIZE", 40).to_i
-
-    prepend ScheduledJobRecorder
-
+  class RequestRunner < ApplicationJob
     sidekiq_options queue: "low_priority", retry: 1
 
     class << self
-      def frequency
-        16.seconds
-      end
-
       def make_request_and_update(strava_integration, strava_request)
         if strava_request.request_type == "incoming_webhook"
           return handle_incoming_webhook(strava_request, strava_integration)
@@ -80,9 +72,7 @@ module StravaJobs
     end
 
     # keyword args are just for calling inline
-    def perform(strava_request_id = nil, strava_request: nil, no_skip: false)
-      return enqueue_next_request unless strava_request_id.present?
-
+    def perform(strava_request_id, strava_request: nil, no_skip: false)
       strava_request ||= StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || strava_request&.requested_at.present?
 
@@ -90,7 +80,7 @@ module StravaJobs
       if strava_integration.blank?
         return mark_requests_deleted(strava_request)
       elsif strava_request.skip_request? && !no_skip
-        return strava_request.update(response_status: "skipped")
+        return mark_sibling_requests_skipped(strava_request)
       end
 
       self.class.make_request_and_update(strava_integration, strava_request)
@@ -98,25 +88,19 @@ module StravaJobs
 
     private
 
-    def enqueue_next_request
-      return unless rate_limit_allows_batch?
-
-      StravaRequest.next_pending(BATCH_SIZE).pluck(:id).each do |strava_request_id|
-        self.class.perform_async(strava_request_id)
-      end
-    end
-
-    def rate_limit_allows_batch?
-      rate_limit = StravaRequest.estimated_current_rate_limit
-      min_headroom = 2 * BATCH_SIZE
-      (rate_limit["read_short_limit"].to_i - rate_limit["read_short_usage"].to_i) >= min_headroom &&
-        (rate_limit["read_long_limit"].to_i - rate_limit["read_long_usage"].to_i) >= min_headroom
+    def mark_sibling_requests_skipped(strava_request)
+      strava_request.update(response_status: :skipped)
+      StravaRequest.unprocessed
+        .where(strava_integration_id: strava_request.strava_integration_id, request_type: :fetch_activity)
+        .where("parameters->>'strava_id' = ?", strava_request.parameters["strava_id"])
+        .where.not(id: strava_request.id)
+        .find_each { |sibling_request| sibling_request.update(response_status: :skipped) }
     end
 
     def mark_requests_deleted(strava_request)
       strava_request.update(response_status: :integration_deleted)
       StravaRequest.pending.where(strava_integration_id: strava_request.strava_integration_id)
-        .each(&:integration_deleted!)
+        .find_each { strava_request.update(response_status: :integration_deleted) }
     end
   end
 end

@@ -37,7 +37,7 @@ function createMockActivity(overrides: Partial<StravaActivity> = {}): StravaActi
     private: false,
     commute: false,
     muted: false,
-    enriched: false,
+    enriched_at: null,
     pr_count: 0,
     ...overrides,
   };

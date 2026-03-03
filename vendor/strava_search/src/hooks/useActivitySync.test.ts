@@ -135,12 +135,12 @@ describe('useActivitySync', () => {
       const { getActivity } = await import('../services/strava');
       const { getActivityById, saveActivities } = await import('../services/database');
 
-      // Activity 1 already has full data (enriched: true)
-      // Activity 2 does not have full data (enriched: false)
+      // Activity 1 already has full data (enriched_at set)
+      // Activity 2 does not have full data (enriched_at null)
       // Activity 3 does not exist in DB
       vi.mocked(getActivityById)
-        .mockResolvedValueOnce({ id: 1, name: 'Enriched', enriched: true, athleteId: 12345, syncedAt: Date.now() } as never)
-        .mockResolvedValueOnce({ id: 2, name: 'Not enriched', enriched: false, athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: 1, name: 'Enriched', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: 2, name: 'Not enriched', enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never)
         .mockResolvedValueOnce(undefined);
 
       vi.mocked(getActivity).mockResolvedValue({ id: 2, name: 'Full data' } as never);
@@ -161,10 +161,10 @@ describe('useActivitySync', () => {
       const { getActivity } = await import('../services/strava');
       const { getActivityById, saveActivities } = await import('../services/database');
 
-      // All activities already have full data (enriched: true)
+      // All activities already have full data (enriched_at set)
       vi.mocked(getActivityById)
-        .mockResolvedValueOnce({ id: 1, name: 'Enriched 1', enriched: true, athleteId: 12345, syncedAt: Date.now() } as never)
-        .mockResolvedValueOnce({ id: 2, name: 'Enriched 2', enriched: true, athleteId: 12345, syncedAt: Date.now() } as never);
+        .mockResolvedValueOnce({ id: 1, name: 'Enriched 1', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: 2, name: 'Enriched 2', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never);
 
       const { result } = renderHook(() => useActivitySync());
 

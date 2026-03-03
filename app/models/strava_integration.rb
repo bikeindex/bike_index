@@ -130,7 +130,7 @@ class StravaIntegration < ApplicationRecord
 
     unprocessed_lists = StravaRequest.list_activities.unprocessed.where(strava_integration_id: id)
     if unprocessed_lists.none?
-      enqueue_detail_requests
+      enqueue_enrich_activity_requests
       enqueue_gear_requests
       strava_gears.find_each(&:update_total_distance!)
     end
@@ -153,14 +153,16 @@ class StravaIntegration < ApplicationRecord
     end
   end
 
-  def enqueue_detail_requests
+  def enqueue_enrich_activity_requests
     already_enqueued = StravaRequest.unprocessed
       .where(strava_integration_id: id, request_type: :fetch_activity)
       .pluck(Arel.sql("parameters->>'strava_id'"))
-    strava_activities.activities_to_enrich.where.not(strava_id: already_enqueued).pluck(:strava_id).each do |strava_id|
-      StravaRequest.create!(user_id:, strava_integration_id: id,
-        request_type: :fetch_activity, parameters: {strava_id: strava_id.to_s})
-    end
+
+    strava_activities.activities_to_enrich.where.not(strava_id: already_enqueued).pluck(:strava_id)
+      .each do |strava_id|
+        StravaRequest.create!(user_id:, strava_integration_id: id,
+          request_type: :fetch_activity, parameters: {strava_id:})
+      end
   end
 
   def mark_disconnected

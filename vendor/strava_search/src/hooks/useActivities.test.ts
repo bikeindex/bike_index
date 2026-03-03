@@ -98,7 +98,7 @@ function createActivity(overrides: Partial<StoredActivity>): StoredActivity {
     commute: false,
     private: false,
     muted: false,
-    enriched: true,
+    enriched_at: '2026-02-01T00:00:00Z',
     average_speed: 2.78,
     pr_count: 0,
     athleteId: 12345,
