@@ -214,16 +214,16 @@ describe('BulkActions', () => {
   });
 
   describe('Authorization modal', () => {
-    const noWriteProps = { ...defaultProps, isOpen: true, selectedCount: 2, hasActivityWrite: false };
+    const noWriteProps = { ...defaultProps, isOpen: true, hasActivityWrite: false };
 
-    it('shows auth modal immediately when activities are selected without write permission', () => {
+    it('shows auth modal as soon as panel opens without write permission', () => {
       render(<BulkActions {...noWriteProps} />);
       expect(screen.getByText('Authorization Required')).toBeInTheDocument();
       expect(screen.getByText('You need to authorize updating Strava Activities')).toBeInTheDocument();
     });
 
-    it('does not show auth modal when nothing is selected', () => {
-      render(<BulkActions {...defaultProps} isOpen={true} selectedCount={0} hasActivityWrite={false} />);
+    it('does not show auth modal when panel is closed', () => {
+      render(<BulkActions {...defaultProps} isOpen={false} hasActivityWrite={false} />);
       expect(screen.queryByText('Authorization Required')).not.toBeInTheDocument();
     });
 
@@ -233,17 +233,17 @@ describe('BulkActions', () => {
       expect(authorizeLink).toHaveAttribute('href', expect.stringContaining('/strava_integration/new?scope=strava_search'));
     });
 
-    it('calls onDeselectAll when X is clicked', () => {
+    it('calls onClose when X is clicked', () => {
       render(<BulkActions {...noWriteProps} />);
       const closeButton = screen.getByText('Authorization Required').closest('div')!.querySelector('button')!;
       fireEvent.click(closeButton);
-      expect(defaultProps.onDeselectAll).toHaveBeenCalled();
+      expect(defaultProps.onClose).toHaveBeenCalled();
     });
 
-    it('calls onDeselectAll when Escape is pressed', () => {
+    it('calls onClose when Escape is pressed', () => {
       render(<BulkActions {...noWriteProps} />);
       fireEvent.keyDown(document, { key: 'Escape' });
-      expect(defaultProps.onDeselectAll).toHaveBeenCalled();
+      expect(defaultProps.onClose).toHaveBeenCalled();
     });
   });
 

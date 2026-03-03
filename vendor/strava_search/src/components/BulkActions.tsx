@@ -49,7 +49,7 @@ export function BulkActions({
   const [commuteValue, setCommuteValue] = useState('');
   const [trainerValue, setTrainerValue] = useState('');
   const [panelExpanded, setPanelExpanded] = useState(true);
-  const showAuthModal = selectedCount > 0 && !hasActivityWrite;
+  const showAuthModal = isOpen && !hasActivityWrite;
 
   const handleOpen = () => {
     setPanelExpanded(true);
@@ -59,11 +59,11 @@ export function BulkActions({
   useEffect(() => {
     if (!showAuthModal) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onDeselectAll();
+      if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showAuthModal, onDeselectAll]);
+  }, [showAuthModal, onClose]);
 
   const goToPage = (page: number) => {
     const validPage = Math.max(1, Math.min(page, totalPages));
@@ -261,7 +261,7 @@ export function BulkActions({
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold dark:text-gray-100">Authorization Required</h3>
               <button
-                onClick={onDeselectAll}
+                onClick={onClose}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 <X className="w-5 h-5 dark:text-gray-400" />
