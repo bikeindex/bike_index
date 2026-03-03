@@ -11,8 +11,6 @@
 
       <th><%= sortable "start_date", render_sortable: render_sortable %></th>
 
-      <th>Enriched?</th>
-
       <th>Title</th>
 
       <th>
@@ -28,6 +26,12 @@
       <th>Gear</th>
 
       <th>User</th>
+
+      <% if display_dev_info? %>
+        <th class="small only-dev-visible">
+          <%= sortable "enriched_at", render_sortable: render_sortable %>
+        </th>
+      <% end %>
     </thead>
 
     <tbody>
@@ -60,8 +64,6 @@
               </span>
             <% end %>
           </td>
-
-          <td><%= check_mark if strava_activity.enriched? %></td>
 
           <td>
             <% if strava_activity.photos&.dig("photo_url").present? %>
@@ -110,6 +112,14 @@
 
           <td>
             <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_activity.strava_integration_id))) %>
+          </td>
+
+          <td>
+            <% if strava_activity.enriched_at.present? %>
+              <small class="localizeTime">
+                <%= l strava_activity.enriched_at, format: :convert_time %>
+              </small>
+            <% end %>
           </td>
         </tr>
       <% end %>

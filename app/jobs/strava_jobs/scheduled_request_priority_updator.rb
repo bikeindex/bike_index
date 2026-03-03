@@ -13,17 +13,12 @@ module StravaJobs
         50.minutes
       end
 
-      def priority_multiplier(integration_id)
-        most_recent_proxy = StravaRequest.where(
-          strava_integration_id: integration_id,
-          request_type: :proxy
-        ).where.not(requested_at: nil)
-          .order(requested_at: :desc)
-          .first
+      def priority_multiplier(strava_integration_id)
+        most_recent_proxy_at = StravaRequest.where(strava_integration_id:, request_type: :proxy)
+          .where.not(requested_at: nil).maximum(:requested_at)
+        return 1 unless most_recent_proxy_at
 
-        return 4 unless most_recent_proxy
-
-        elapsed = Time.current - most_recent_proxy.requested_at
+        elapsed = Time.current - most_recent_proxy_at
         if elapsed < 1.hour
           0.25 # divide by 4
         elsif elapsed < 24.hours

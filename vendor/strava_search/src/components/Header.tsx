@@ -54,7 +54,7 @@ export function Header({ onOpenSettings, isFetchingFullData: externalIsFetchingF
                 <span>{progress.status}</span>
               </div>
             ) : (
-              <h1 className="text-xl font-bold">Strava Search</h1>
+              <a href={window.location.pathname} className="text-xl font-bold hover:text-white/90">Strava Search</a>
             )}
           </div>
 

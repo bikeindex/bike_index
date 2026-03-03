@@ -44,7 +44,7 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
     const fetchCounts = () => {
       getActivitiesForAthlete(athlete.id).then((activities) => {
         setActivityCount(activities.length);
-        const enriched = activities.filter(a => a.enriched).length;
+        const enriched = activities.filter(a => a.enriched_at).length;
         setEnrichedCount(enriched);
       });
     };

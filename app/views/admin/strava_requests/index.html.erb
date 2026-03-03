@@ -63,7 +63,7 @@
 
 <% rendered_chart = capture do %>
   <% if @render_chart %>
-    <%= render(Admin::ChartStravaRequests::Component.new(collection: matching_strava_requests, time_range: @time_range)) %>
+    <%= render(Admin::ChartStravaRequests::Component.new(collection: matching_strava_requests, time_range: @time_range, time_range_column: @time_range_column, show_integration_chart: params[:search_strava_integration_id].blank?)) %>
   <% end %>
 <% end %>
 

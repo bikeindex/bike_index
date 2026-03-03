@@ -54,11 +54,19 @@ describe('SearchFilters', () => {
   });
 
   describe('location filters', () => {
-    it('shows all three location selects when activities have location data', () => {
+    it('shows all three location selects with placeholder counts', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
       expect(screen.getByText('Country:')).toBeInTheDocument();
       expect(screen.getByText('Region:')).toBeInTheDocument();
       expect(screen.getByText('City:')).toBeInTheDocument();
+
+      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
+      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
+      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
+
+      expect(countrySelect.options[0].text).toBe('All (2 countries)');
+      expect(regionSelect.options[0].text).toBe('All (5 regions)');
+      expect(citySelect.options[0].text).toBe('All (22 cities)');
     });
 
     it('shows disabled location selects with Loading placeholder while loading', () => {
@@ -108,37 +116,37 @@ describe('SearchFilters', () => {
       expect(citySelect.options[0].text).toBe('N/A');
     });
 
-    it('lists countries from activities', () => {
+    it('lists countries with full name and abbreviation', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
       const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(countrySelect.options).map((o) => o.text);
       expect(options).toContain('Germany');
-      expect(options).toContain('US');
+      expect(options).toContain('US (United States)');
     });
 
-    it('lists regions from activities', () => {
+    it('lists regions with country prefix, full name, and abbreviation', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
       const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(regionSelect.options).map((o) => o.text);
-      expect(options).toContain('CA');
-      expect(options).toContain('IN');
-      expect(options).toContain('IL');
-      expect(options).toContain('Berlin');
-      expect(options).toContain('BB');
+      expect(options).toContain('US: CA (California)');
+      expect(options).toContain('US: IN (Indiana)');
+      expect(options).toContain('US: IL (Illinois)');
+      expect(options).toContain('Germany: Berlin');
+      expect(options).toContain('Germany: BB (Brandenburg)');
     });
 
-    it('displays cities with abbreviated region name', () => {
+    it('displays cities with country and region abbreviations', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
       const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(citySelect.options).map((o) => o.text);
-      expect(options).toContain('Truckee, CA');
-      expect(options).toContain('San Francisco, CA');
-      expect(options).toContain('Berlin, Berlin');
-      expect(options).toContain('Chicago, IL');
-      expect(options).toContain('Gary, IN');
+      expect(options).toContain('US, CA: Truckee');
+      expect(options).toContain('US, CA: San Francisco');
+      expect(options).toContain('Germany, Berlin: Berlin');
+      expect(options).toContain('US, IL: Chicago');
+      expect(options).toContain('US, IN: Gary');
     });
 
-    it('filters regions when country is selected', () => {
+    it('filters regions when country is selected and updates placeholder counts', () => {
       render(
         <SearchFilters
           {...defaultProps}
@@ -148,12 +156,16 @@ describe('SearchFilters', () => {
       );
       const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(regionSelect.options).map((o) => o.text);
-      expect(options).toContain('Berlin');
-      expect(options).toContain('BB');
-      expect(options).not.toContain('CA');
+      expect(options).toContain('Germany: Berlin');
+      expect(options).toContain('Germany: BB (Brandenburg)');
+      expect(options).not.toContain('US: CA (California)');
+      expect(regionSelect.options[0].text).toBe('All (2 regions)');
+
+      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
+      expect(citySelect.options[0].text).toBe('All (6 cities)');
     });
 
-    it('filters cities when region is selected', () => {
+    it('filters cities when region is selected and updates placeholder count', () => {
       render(
         <SearchFilters
           {...defaultProps}
@@ -163,10 +175,11 @@ describe('SearchFilters', () => {
       );
       const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
       const options = Array.from(citySelect.options).map((o) => o.text);
-      expect(options).toContain('Berlin, Berlin');
-      expect(options).toContain('Mitte, Berlin');
-      expect(options).toContain('Pankow, Berlin');
-      expect(options).not.toContain('Truckee, CA');
+      expect(options).toContain('Germany, Berlin: Berlin');
+      expect(options).toContain('Germany, Berlin: Mitte');
+      expect(options).toContain('Germany, Berlin: Pankow');
+      expect(options).not.toContain('US, CA: Truckee');
+      expect(citySelect.options[0].text).toBe('All (3 cities)');
     });
 
     it('calls onFiltersChange when country is selected', () => {
@@ -215,6 +228,47 @@ describe('SearchFilters', () => {
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({ country: null, region: 'CA' }),
       );
+    });
+
+    it('handles locations with nil city and no region abbreviation mapping', () => {
+      const kenyaActivity = {
+        ...mockActivities[0],
+        id: 99999,
+        strava_id: '99999',
+        segment_locations: {
+          countries: { Kenya: 'KE' },
+          locations: [
+            { city: 'Sulmac Village', region: 'Nakuru', country: 'KE' },
+            { city: 'Sulmac Village', region: 'Nakuru County', country: 'KE' },
+            { region: 'Nakuru', country: 'KE' },
+          ],
+        },
+      };
+      render(
+        <SearchFilters
+          {...defaultProps}
+          activities={[kenyaActivity]}
+          onFiltersChange={onFiltersChange}
+        />,
+      );
+
+      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
+      const countryOptions = Array.from(countrySelect.options).map((o) => o.text);
+      expect(countryOptions).toContain('KE (Kenya)');
+      expect(countrySelect.options[0].text).toBe('All (1 country)');
+
+      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
+      const regionOptions = Array.from(regionSelect.options).map((o) => o.text);
+      expect(regionOptions).toContain('KE: Nakuru');
+      expect(regionOptions).toContain('KE: Nakuru County');
+      expect(regionSelect.options[0].text).toBe('All (2 regions)');
+
+      // Only one city despite three locations (one has nil city)
+      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
+      const cityOptions = Array.from(citySelect.options).map((o) => o.text);
+      expect(cityOptions).toContain('KE, Nakuru: Sulmac Village');
+      expect(cityOptions).toHaveLength(2); // "All" + 1 city
+      expect(citySelect.options[0].text).toBe('All (1 city)');
     });
 
     it('allows selecting city without country or region', () => {
