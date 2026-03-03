@@ -139,11 +139,6 @@ export function BulkActions({
           >
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Update checked activities</span>
-              {selectedCount > 0 && (
-                <span className="px-2 py-0.5 text-xs bg-gray-500 text-white rounded-full">
-                  {formatNumber(selectedCount)}
-                </span>
-              )}
             </div>
             <ChevronDown
               className={`w-4 h-4 text-gray-500 transition-transform ${panelExpanded ? 'rotate-180' : ''}`}

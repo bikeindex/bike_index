@@ -69,6 +69,16 @@ export const BerlinRide: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: false,
+  },
+};
+
+export const WithSelecting: Story = {
+  args: {
+    activity: mockActivities[0],
+    gear: mockGear,
+    isSelected: false,
+    onToggleSelect: () => {},
     showCheckbox: true,
   },
 };

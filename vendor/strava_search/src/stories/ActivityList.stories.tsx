@@ -30,6 +30,7 @@ const defaultFilters: SearchFilters = {
   filtersExpanded: true,
   activityTypesExpanded: false,
   equipmentExpanded: false,
+  updatePanelExpanded: false,
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
@@ -120,11 +121,20 @@ export const Empty: Story = {
   },
 };
 
-export const WithSelections: Story = {
+export const WithSelectActivities: Story = {
+  render: (args) => <ActivityListWrapper {...args} />,
+  args: {
+    ...Default.args,
+    filters: { ...defaultFilters, updatePanelExpanded: true },
+  },
+};
+
+export const WithSelecting: Story = {
   render: (args) => <ActivityListWrapper {...args} />,
   args: {
     ...Default.args,
     selectedIds: new Set([mockActivities[0].id, mockActivities[1].id]),
+    filters: { ...defaultFilters, updatePanelExpanded: true },
   },
 };
 
@@ -134,6 +144,7 @@ export const Updating: Story = {
     ...Default.args,
     selectedIds: new Set([mockActivities[0].id, mockActivities[1].id, mockActivities[2].id]),
     isUpdating: true,
+    filters: { ...defaultFilters, updatePanelExpanded: true },
   },
 };
 

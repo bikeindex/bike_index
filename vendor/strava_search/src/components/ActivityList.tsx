@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { ActivityCard } from './ActivityCard';
 import { BulkActions } from './BulkActions';
 import type { StoredActivity, StoredGear } from '../services/database';
@@ -39,7 +39,7 @@ export function ActivityList({
   hasActivityWrite,
   authUrl,
 }: ActivityListProps) {
-  const [showUpdatePanel, setShowUpdatePanel] = useState(false);
+  const showUpdatePanel = filters.updatePanelExpanded;
   const currentPage = filters.page;
   const prevActivitiesLength = useRef(activities.length);
 
@@ -79,13 +79,13 @@ export function ActivityList({
   }, [displayedActivities, onSelectIds]);
 
   const openUpdatePanel = useCallback(() => {
-    setShowUpdatePanel(true);
-  }, []);
+    onFiltersChange({ ...filters, updatePanelExpanded: true });
+  }, [filters, onFiltersChange]);
 
   const closeUpdatePanel = useCallback(() => {
-    setShowUpdatePanel(false);
+    onFiltersChange({ ...filters, updatePanelExpanded: false });
     onDeselectAll();
-  }, [onDeselectAll]);
+  }, [filters, onFiltersChange, onDeselectAll]);
 
   if (isLoading) {
     return (

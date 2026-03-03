@@ -60,12 +60,6 @@ describe('BulkActions', () => {
     expect(screen.getByText('3 selected · Clear')).toBeInTheDocument();
   });
 
-  it('shows selected count badge on accordion header', () => {
-    render(<BulkActions {...defaultProps} isOpen={true} selectedCount={3} />);
-    const badge = screen.getByText('3');
-    expect(badge).toHaveClass('rounded-full');
-  });
-
   it('shows labeled update fields when panel is open', () => {
     render(<BulkActions {...defaultProps} isOpen={true} />);
     expect(screen.getByText('Activity Type')).toBeInTheDocument();

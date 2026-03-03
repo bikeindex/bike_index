@@ -39,6 +39,7 @@ const defaultFilters: SearchFilters = {
   filtersExpanded: true,
   activityTypesExpanded: true,
   equipmentExpanded: true,
+  updatePanelExpanded: false,
   mutedFilter: 'all',
   photoFilter: 'all',
   privateFilter: 'all',
