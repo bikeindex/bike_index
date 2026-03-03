@@ -23,7 +23,7 @@ RSpec.describe "Organized bikes search", :js, type: :system do
     expect(page).to have_css("tbody tr", minimum: 2)
 
     fill_in "search_email", with: "alice@example.com"
-    find("button[type]").click
+    find("#search-button").click
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
@@ -40,5 +40,28 @@ RSpec.describe "Organized bikes search", :js, type: :system do
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
+  end
+
+  context "with avery_export enabled" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[bike_search avery_export]) }
+
+    it "toggles avery export column via checkbox" do
+      visit bikes_path
+      expect(page).to have_css("table.table", wait: 10)
+      expect(page).not_to have_css("th.avery_cell")
+
+      # Open settings and check avery — triggers page reload with param
+      click_link "settings"
+      check "avery_cell"
+      expect(page).to have_current_path(/search_avery_export=true/, wait: 10)
+      expect(page).to have_css("th.avery_cell", visible: :all)
+
+      # Settings panel is already open (persisted via localStorage)
+      # Uncheck avery — triggers page reload without param
+      expect(page).to have_field("avery_cell", checked: true, wait: 5)
+      uncheck "avery_cell"
+      expect(page).not_to have_current_path(/search_avery_export/, wait: 10)
+      expect(page).not_to have_css("th.avery_cell")
+    end
   end
 end

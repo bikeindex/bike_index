@@ -26,9 +26,12 @@ export default class extends Controller {
   }
 
   averyToggled (event) {
-    const checked = event.target.checked
     const url = new URL(window.location)
-    url.searchParams.set('search_avery_export', checked)
+    if (event.target.checked) {
+      url.searchParams.set('search_avery_export', 'true')
+    } else {
+      url.searchParams.delete('search_avery_export')
+    }
     window.location = url.toString()
   }
 
@@ -46,6 +49,7 @@ export default class extends Controller {
     }
 
     this.settingsTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) return
       cb.checked = columns.includes(cb.name)
     })
     this.updateVisibleColumns()
@@ -54,6 +58,7 @@ export default class extends Controller {
   updateVisibleColumns () {
     const checked = []
     this.settingsTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) return
       if (cb.checked) checked.push(cb.name)
     })
     localStorage.setItem('orgBikeColumns', JSON.stringify(checked))

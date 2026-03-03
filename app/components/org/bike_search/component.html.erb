@@ -24,8 +24,13 @@
           <div class="col-xs-6 col-md-4">
             <div class="form-group">
               <label>
-                <%= helpers.check_box_tag cell_name, cell_name, false,
-                  data: { action: "change->org--bike-search#columnToggled" } %>
+                <% if cell_name == "avery_cell" %>
+                  <%= helpers.check_box_tag cell_name, cell_name, show_avery_export?,
+                    data: { action: "change->org--bike-search#averyToggled" } %>
+                <% else %>
+                  <%= helpers.check_box_tag cell_name, cell_name, false,
+                    data: { action: "change->org--bike-search#columnToggled" } %>
+                <% end %>
 
                 <%= column_renames[cell_name] %>
               </label>
