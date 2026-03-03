@@ -40,16 +40,17 @@ RSpec.describe StravaRequest, type: :model do
       list_activities = FactoryBot.create(:strava_request, :list_activities, strava_integration:)
       fetch_gear = FactoryBot.create(:strava_request, :fetch_gear, strava_integration:)
 
-      results = StravaRequest.next_pending(10).to_a
-      expect(results).to eq([list_activities, fetch_gear, fetch_activity])
+      results = StravaRequest.next_pending(10).pluck(:id)
+      expect(results).to eq([list_activities.id, fetch_gear.id, fetch_activity.id])
     end
 
     it "orders by id within the same priority" do
       first = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       second = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
+      third = FactoryBot.create(:strava_request, :fetch_activity, priority: 1)
 
-      results = StravaRequest.next_pending(10).to_a
-      expect(results).to eq([first, second])
+      results = StravaRequest.next_pending(10).pluck(:id)
+      expect(results).to eq([third.id, first.id, second.id])
     end
   end
 

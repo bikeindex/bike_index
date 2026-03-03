@@ -57,7 +57,7 @@ class StravaRequest < AnalyticsRecord
 
   validates :strava_integration_id, presence: true
 
-  before_validation :set_priority, on: :create
+  before_validation :set_calculated_attributes, on: :create
 
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
@@ -89,6 +89,11 @@ class StravaRequest < AnalyticsRecord
     def estimated_current_rate_limit
       latest = where.not(rate_limit: nil).order(requested_at: :desc).first
       latest.nil? ? default_rate_limit : rate_limit_from(latest.rate_limit.symbolize_keys, latest.requested_at)
+    end
+
+    def most_recent_proxy_at(strava_integration_id)
+      where(strava_integration_id:, request_type: :proxy)
+        .where.not(requested_at: nil).maximum(:requested_at)
     end
 
     private
@@ -173,14 +178,19 @@ class StravaRequest < AnalyticsRecord
     end
   end
 
-  def set_priority
+  def set_calculated_attributes
+    self.user_id ||= strava_integration.user_id
+    self.priority ||= calculated_priority
+  end
+
+  def calculated_priority
     level = PRIORITY_MAP.fetch(REQUEST_TYPE_ENUM[request_type.to_sym], PRIORITY_ORDER.length)
     secondary = if fetch_activity?
       PRIORITY_LEVEL_MULTIPLIER - (parameters["strava_id"].to_i / 1000)
     else
       Time.current.to_i / 10
     end
-    self.priority = level * PRIORITY_LEVEL_MULTIPLIER + secondary
+    level * PRIORITY_LEVEL_MULTIPLIER + secondary
   end
 
   # IDK, sort of a guess - because Strava responds with a 404 :/
