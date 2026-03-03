@@ -29,6 +29,7 @@ export const PelotonRide: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };
 
@@ -38,6 +39,7 @@ export const NordicSki: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };
 
@@ -47,6 +49,7 @@ export const EBikeRide: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };
 
@@ -56,6 +59,7 @@ export const LongDistanceRide: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };
 
@@ -65,6 +69,7 @@ export const BerlinRide: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };
 
@@ -74,6 +79,7 @@ export const Selected: Story = {
     gear: mockGear,
     isSelected: true,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };
 
@@ -83,6 +89,7 @@ export const NoGear: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };
 
@@ -92,6 +99,7 @@ export const Run: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };
 
@@ -101,5 +109,6 @@ export const NoHeartRate: Story = {
     gear: mockGear,
     isSelected: false,
     onToggleSelect: () => {},
+    showCheckbox: true,
   },
 };

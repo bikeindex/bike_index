@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityCard } from './ActivityCard';
 import { BulkActions } from './BulkActions';
 import type { StoredActivity, StoredGear } from '../services/database';
@@ -39,6 +39,7 @@ export function ActivityList({
   hasActivityWrite,
   authUrl,
 }: ActivityListProps) {
+  const [showUpdatePanel, setShowUpdatePanel] = useState(false);
   const currentPage = filters.page;
   const prevActivitiesLength = useRef(activities.length);
 
@@ -77,6 +78,15 @@ export function ActivityList({
     onSelectIds(displayedActivities.map((a) => a.id));
   }, [displayedActivities, onSelectIds]);
 
+  const openUpdatePanel = useCallback(() => {
+    setShowUpdatePanel(true);
+  }, []);
+
+  const closeUpdatePanel = useCallback(() => {
+    setShowUpdatePanel(false);
+    onDeselectAll();
+  }, [onDeselectAll]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -111,6 +121,9 @@ export function ActivityList({
         gear={gear}
         hasActivityWrite={hasActivityWrite}
         authUrl={authUrl}
+        isOpen={showUpdatePanel}
+        onOpen={openUpdatePanel}
+        onClose={closeUpdatePanel}
       />
 
       <div className="space-y-3">
@@ -121,6 +134,7 @@ export function ActivityList({
             gear={gear}
             isSelected={selectedIds.has(activity.id)}
             onToggleSelect={() => onToggleSelect(activity.id)}
+            showCheckbox={showUpdatePanel}
           />
         ))}
       </div>

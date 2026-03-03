@@ -14,6 +14,8 @@ const meta = {
     onDeselectAll: { action: 'deselectAll' },
     onUpdateSelected: { action: 'updateSelected' },
     onPageChange: { action: 'pageChange' },
+    onOpen: { action: 'open' },
+    onClose: { action: 'close' },
   },
 } satisfies Meta<typeof BulkActions>;
 
@@ -33,6 +35,9 @@ const defaultArgs = {
   gear: mockGear,
   hasActivityWrite: true,
   authUrl: '/strava_integration/new?scope=strava_search',
+  isOpen: true,
+  onOpen: () => {},
+  onClose: () => {},
 };
 
 export const Default: Story = {

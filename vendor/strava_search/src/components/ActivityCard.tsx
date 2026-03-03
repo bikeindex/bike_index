@@ -18,6 +18,7 @@ interface ActivityCardProps {
   gear: StoredGear[];
   isSelected: boolean;
   onToggleSelect: () => void;
+  showCheckbox: boolean;
 }
 
 export const ActivityCard = memo(function ActivityCard({
@@ -25,6 +26,7 @@ export const ActivityCard = memo(function ActivityCard({
   gear,
   isSelected,
   onToggleSelect,
+  showCheckbox,
 }: ActivityCardProps) {
   const { units } = usePreferences();
   const activityGear = gear.find((g) => g.id === activity.gear_id);
@@ -43,15 +45,21 @@ export const ActivityCard = memo(function ActivityCard({
       <div className={`grid ${photoUrl ? 'grid-cols-[1fr_auto]' : ''}`}>
         {/* Header - full width on small, col 1 on sm+ */}
         <div className={`p-4 pb-4 border-b border-gray-100 dark:border-gray-700 ${photoUrl ? 'col-span-2 sm:col-span-1' : ''}`}>
-          <div className="flex items-baseline gap-3 mb-1">
-            <label className="flex items-baseline">
-              <input
-                type="checkbox"
-                checked={isSelected}
-                onChange={onToggleSelect}
-                className="w-4 h-4 text-[#fc4c02] border-gray-300 dark:border-gray-600 rounded focus:ring-[#fc4c02]"
-              />
-            </label>
+          <div className="flex items-baseline mb-1">
+            <div
+              className={`overflow-hidden flex-shrink-0 transition-all duration-300 ease-in-out ${
+                showCheckbox ? 'w-4 opacity-100 mr-3' : 'w-0 opacity-0 mr-0'
+              }`}
+            >
+              <label className="flex items-baseline">
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={onToggleSelect}
+                  className="w-4 h-4 text-[#fc4c02] border-gray-300 dark:border-gray-600 rounded focus:ring-[#fc4c02]"
+                />
+              </label>
+            </div>
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 flex-1 min-w-0 flex items-center gap-1.5">
               <a
                 href={`https://www.strava.com/activities/${activity.strava_id}`}
