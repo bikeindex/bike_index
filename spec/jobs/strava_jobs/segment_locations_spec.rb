@@ -8,8 +8,8 @@ RSpec.describe StravaJobs::SegmentLocations do
   end
   let(:orinda_target) do
     {locations: [{city: "Orinda", region: "CA", country: "US"}],
-    regions: {"California" => "CA"},
-    countries: {"United States" => "US"}}
+     regions: {"California" => "CA"},
+     countries: {"United States" => "US"}}
   end
 
   describe "locations_for" do
@@ -39,7 +39,7 @@ RSpec.describe StravaJobs::SegmentLocations do
       let(:segment_effort_json) { '{"id":3173383414465542036,"resource_state":2,"name":"to elsa we go 🦏","activity":{"id":584057489,"visibility":"everyone","resource_state":1},"athlete":{"id":2430215,"resource_state":1},"elapsed_time":979,"moving_time":840,"start_date":"2016-05-21T14:43:43Z","start_date_local":"2016-05-21T17:43:43Z","distance":3115.3,"start_index":195,"end_index":256,"device_watts":false,"segment":{"id":36019146,"resource_state":2,"name":"to elsa we go 🦏","activity_type":"Ride","distance":3115.3,"average_grade":0.1,"maximum_grade":0.8,"elevation_high":1915.9,"elevation_low":1901.7,"start_latlng":[-0.838308,36.35891],"end_latlng":[-0.826893,36.334255],"elevation_profile":null,"elevation_profiles":null,"climb_category":0,"city":null,"state":"Nakuru","country":"Kenya","private":false,"hazardous":false,"starred":false},"pr_rank":null,"achievements":[],"visibility":"everyone","kom_rank":null,"hidden":false}' }
       let(:target) do
         {locations: [{region: "Nakuru", country: "KE"}],
-        countries: {"Kenya" => "KE"}}
+         countries: {"Kenya" => "KE"}}
       end
 
       it "returns correctly" do

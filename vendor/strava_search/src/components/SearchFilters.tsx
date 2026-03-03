@@ -72,7 +72,7 @@ export function SearchFilters({
       if (loc.country) set.add(loc.country);
     }
     return Array.from(set).sort();
-  }, [allLocations, countryNames]);
+  }, [allLocations]);
 
   const availableRegions = useMemo(() => {
     const regionCountry = new Map<string, string>();
