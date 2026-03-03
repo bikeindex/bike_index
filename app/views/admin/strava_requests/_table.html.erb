@@ -10,9 +10,12 @@
           <%= sortable "updated_at", render_sortable: render_sortable %>
         </small>
       </th>
+
       <% if display_dev_info? %>
         <th>
-          <small class="only-dev-visible"><%= sortable "priority", render_sortable: render_sortable %></small>
+          <small class="only-dev-visible">
+            <%= sortable "priority", render_sortable: render_sortable %>
+          </small>
         </th>
       <% end %>
 
@@ -56,7 +59,9 @@
 
           <% if display_dev_info? %>
             <td>
-              <small title="<%= number_with_delimiter(strava_request.priority) %>">
+              <small
+                title="<%= number_with_delimiter(strava_request.priority) %>"
+              >
                 <%= (strava_request.priority / 100_000_000.0).round(1) %>
               </small>
             </td>
