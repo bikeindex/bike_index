@@ -19,10 +19,9 @@ class HandlebarType
     flat: "Flat or riser"
   }.freeze
 
+  attr_reader :slug, :id
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
   end
-
-  attr_reader :slug, :id
 end

@@ -23,12 +23,12 @@ class RecoveryDisplay < ActiveRecord::Base
   has_one_attached :photo
   has_one_attached :photo_processed
 
-  after_commit :enqueue_photo_processing, if: :persisted?
+  validates_presence_of :quote, :recovered_at
+  validate :quote_not_too_long
 
   attr_accessor :date_input, :remote_photo_url, :skip_callback_job
 
-  validates_presence_of :quote, :recovered_at
-  validate :quote_not_too_long
+  after_commit :enqueue_photo_processing, if: :persisted?
 
   before_validation :set_calculated_attributes
 

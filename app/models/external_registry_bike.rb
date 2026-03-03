@@ -32,6 +32,8 @@
 #  index_external_registry_bikes_on_type               (type)
 #
 class ExternalRegistryBike < ApplicationRecord
+  enum :status, Bike::STATUS_ENUM
+
   belongs_to :country, class_name: "Country"
 
   validates \
@@ -44,8 +46,6 @@ class ExternalRegistryBike < ApplicationRecord
   validates :external_id, uniqueness: {scope: :type}
 
   before_validation :set_calculated_attributes
-
-  enum :status, Bike::STATUS_ENUM
 
   class << self
     def registry_name(str)

@@ -18,10 +18,13 @@
 #
 class NormalizedSerialSegment < ApplicationRecord
   MINIMUM_LENGTH_FOR_DUPLICATE_GROUP = 5
+
   belongs_to :bike
+
+  belongs_to :duplicate_bike_group
+
   validates_presence_of :bike_id
   validates_presence_of :segment
-  belongs_to :duplicate_bike_group
 
   validates_uniqueness_of :segment, scope: [:bike_id]
 

@@ -25,10 +25,10 @@ class OrganizationModelAudit < ApplicationRecord
 
   has_many :model_attestations, through: :model_audit
 
-  before_validation :set_calculated_attributes
-
   validates_presence_of :organization_id
   validates_uniqueness_of :model_audit_id, scope: %i[organization_id], allow_nil: false
+
+  before_validation :set_calculated_attributes
 
   def self.organizations_to_audit
     # We enqueue every single model_audit when it's turned on for an org for the first time

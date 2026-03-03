@@ -2,6 +2,7 @@ class ExternalRegistryClient
   TTL_HOURS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_CACHE_TTL_HOURS", 24).to_i.hours
   TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
 
+  attr_accessor :base_url
   # Search external registries for the provided query string `query`.
   #
   # The set of registries searched can be customized by passing an array of
@@ -28,8 +29,6 @@ class ExternalRegistryClient
 
     ExternalRegistryBike.where(id: results.map(&:id))
   end
-
-  attr_accessor :base_url
 
   def credentials
     @credentials ||=

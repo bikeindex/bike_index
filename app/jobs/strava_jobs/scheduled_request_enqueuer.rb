@@ -2,9 +2,9 @@
 
 module StravaJobs
   class ScheduledRequestEnqueuer < ScheduledJob
-    BATCH_SIZE = ENV.fetch("STRAVA_BULK_ENQUEUE_SIZE", 40).to_i
-
     prepend ScheduledJobRecorder
+
+    BATCH_SIZE = ENV.fetch("STRAVA_BULK_ENQUEUE_SIZE", 40).to_i
 
     sidekiq_options queue: "low_priority"
 

@@ -34,14 +34,14 @@ class PublicImage < ApplicationRecord
 
   belongs_to :imageable, polymorphic: true
 
+  attr_writer :image_cache
+  attr_accessor :skip_update
+
   before_save :set_calculated_attributes
   after_commit :enqueue_after_commit_jobs
 
   default_scope { where(is_private: false).order(:listing_order) }
   scope :bike, -> { where(imageable_type: "Bike") }
-
-  attr_writer :image_cache
-  attr_accessor :skip_update
 
   def default_name
     if bike?

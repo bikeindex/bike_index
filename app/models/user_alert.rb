@@ -32,6 +32,8 @@ class UserAlert < ApplicationRecord
     unassigned_bike_org: 3
   }.freeze
 
+  enum :kind, KIND_ENUM
+
   belongs_to :user
   belongs_to :bike
   belongs_to :user_phone
@@ -41,8 +43,6 @@ class UserAlert < ApplicationRecord
   has_one :notification, as: :notifiable
 
   validates :user_phone_id, uniqueness: {scope: %i[kind user_id]}, allow_blank: true
-
-  enum :kind, KIND_ENUM
 
   before_validation :set_calculated_attributes
 

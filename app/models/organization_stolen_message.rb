@@ -23,12 +23,14 @@
 #  index_organization_stolen_messages_on_updator_id       (updator_id)
 #
 class OrganizationStolenMessage < ApplicationRecord
+  include SearchRadiusMetricable
+
   MAX_BODY_LENGTH = 400
   KIND_ENUM = {area: 0, association: 1}
   MAX_SEARCH_RADIUS = 1000
   DEFAULT_RADIUS_MILES = 10
 
-  include SearchRadiusMetricable
+  enum :kind, KIND_ENUM
 
   belongs_to :organization
 
@@ -36,11 +38,9 @@ class OrganizationStolenMessage < ApplicationRecord
 
   validates :organization_id, presence: true, uniqueness: true
 
-  before_validation :set_calculated_attributes
-
   delegate :search_coordinates, :metric_units?, to: :organization, allow_nil: true
 
-  enum :kind, KIND_ENUM
+  before_validation :set_calculated_attributes
 
   scope :present, -> { where.not(body: nil) }
   scope :enabled, -> { where(is_enabled: true) }

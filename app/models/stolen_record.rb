@@ -88,6 +88,8 @@ class StolenRecord < ApplicationRecord
     "Bike was not locked"
   ].freeze
 
+  enum :recovery_display_status, RECOVERY_DISPLAY_STATUS_ENUM
+
   belongs_to :bike
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
@@ -108,7 +110,7 @@ class StolenRecord < ApplicationRecord
 
   validates_presence_of :date_stolen
 
-  enum :recovery_display_status, RECOVERY_DISPLAY_STATUS_ENUM
+  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
   before_save :set_calculated_attributes
   after_commit :update_associations
@@ -131,8 +133,6 @@ class StolenRecord < ApplicationRecord
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
   scope :without_location, -> { without_street } # References geocodeable without_street, we need to reconcile this
-
-  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
   class << self
     def recovery_display_statuses

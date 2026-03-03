@@ -26,23 +26,23 @@
 class SocialPost < ApplicationRecord
   KIND_ENUM = {stolen_post: 0, imported_post: 1, app_post: 2}.freeze
   VALID_ALIGNMENTS = %w[top-left top-right bottom-left bottom-right].freeze
-  validates :platform_id, uniqueness: true, allow_blank: true
-  has_many :public_images, as: :imageable, dependent: :destroy
 
+  enum :kind, KIND_ENUM
+
+  has_many :public_images, as: :imageable, dependent: :destroy
   belongs_to :social_account
   belongs_to :stolen_record
-
   belongs_to :original_post, class_name: "SocialPost"
   has_many :reposts,
     foreign_key: :original_post_id,
     class_name: "SocialPost",
     dependent: :destroy
 
+  validates :platform_id, uniqueness: true, allow_blank: true
+
   mount_uploader :image, ImageUploader
 
   before_validation :set_calculated_attributes
-
-  enum :kind, KIND_ENUM
 
   scope :repost, -> { where.not(original_post: nil) }
   scope :not_repost, -> { where(original_post: nil) }

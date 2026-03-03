@@ -23,6 +23,8 @@ class HotSheet < ApplicationRecord
 
   validates_presence_of :organization_id, :sheet_date
 
+  delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
+
   scope :email_success, -> { where(delivery_status: "email_success") }
 
   def self.for(organization_or_id, date = nil)
@@ -33,8 +35,6 @@ class HotSheet < ApplicationRecord
       new(organization_id: org_id)
     end
   end
-
-  delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
 
   def current?
     sheet_date.blank?

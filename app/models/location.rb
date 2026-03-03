@@ -37,17 +37,17 @@ class Location < ApplicationRecord
   validates :name, presence: true
   validate :organization_present
 
-  scope :shown, -> { where(shown: true) }
-  scope :publicly_visible, -> { shown.where(not_publicly_visible: false) }
-  scope :impound_locations, -> { where(impound_location: true) }
-  scope :default_impound_locations, -> { impound_locations.where(default_impound_location: true) }
-  # scope :international, where("country_id IS NOT #{Country.united_states_id}")
+  attr_accessor :skip_update
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
   before_destroy :ensure_destroy_permitted!
 
-  attr_accessor :skip_update
+  scope :shown, -> { where(shown: true) }
+  scope :publicly_visible, -> { shown.where(not_publicly_visible: false) }
+  scope :impound_locations, -> { where(impound_location: true) }
+  scope :default_impound_locations, -> { impound_locations.where(default_impound_location: true) }
+  # scope :international, where("country_id IS NOT #{Country.united_states_id}")
 
   # For now, doesn't do anything - but eventually we may switch to slugged locations, so prep for it
   def self.friendly_find(str)

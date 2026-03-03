@@ -32,6 +32,10 @@ class BikeStickerUpdate < ApplicationRecord
   CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_bike_creation: 3, creator_import: 4}.freeze
   ORGANIZATION_KIND_ENUM = {no_organization: 0, primary_organization: 1, regional_organization: 2, other_organization: 3, other_paid_organization: 4}.freeze
 
+  enum :kind, KIND_ENUM
+  enum :creator_kind, CREATOR_KIND_ENUM
+  enum :organization_kind, ORGANIZATION_KIND_ENUM
+
   belongs_to :bike_sticker
   belongs_to :bike
   belongs_to :user
@@ -39,14 +43,10 @@ class BikeStickerUpdate < ApplicationRecord
   belongs_to :export
   belongs_to :bulk_import
 
-  enum :kind, KIND_ENUM
-  enum :creator_kind, CREATOR_KIND_ENUM
-  enum :organization_kind, ORGANIZATION_KIND_ENUM
+  before_save :set_calculated_attributes
 
   scope :successful, -> { where(kind: successful_kinds) }
   scope :unauthorized_organization, -> { where(organization_kind: organization_kinds_unauthorized) }
-
-  before_save :set_calculated_attributes
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)

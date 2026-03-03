@@ -24,15 +24,20 @@ class BulkImport < ApplicationRecord
   TIMEOUT_FAILURE_DELAY = 20.minutes.freeze
   mount_uploader :file, BulkImportUploader
 
+  enum :progress, PROGRESS_ENUM
+  enum :kind, KIND_ENUM
+
   belongs_to :organization
   belongs_to :user
-  validates_presence_of :file, unless: :file_cleaned
-  validate :ensure_valid_file_type
+
   has_many :ownerships
   has_many :bikes, through: :ownerships
 
-  enum :progress, PROGRESS_ENUM
-  enum :kind, KIND_ENUM
+  validates_presence_of :file, unless: :file_cleaned
+  validate :ensure_valid_file_type
+
+  before_save :set_calculated_attributes
+  after_commit :enqueue_job, on: :create
 
   scope :file_errors, -> { where("(import_errors -> 'file') IS NOT NULL") }
   scope :line_errors, -> { where("(import_errors -> 'line') IS NOT NULL") }
@@ -44,9 +49,6 @@ class BulkImport < ApplicationRecord
   scope :no_bikes, -> { where("(import_errors -> 'bikes') IS NOT NULL") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') IS NOT NULL") }
   scope :not_ascend, -> { where.not(kind: "ascend") }
-
-  before_save :set_calculated_attributes
-  after_commit :enqueue_job, on: :create
 
   def self.ascend_api_token
     ENV["ASCEND_API_TOKEN"]

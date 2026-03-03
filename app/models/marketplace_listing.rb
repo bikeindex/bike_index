@@ -32,15 +32,15 @@
 #  index_marketplace_listings_on_seller_id          (seller_id)
 #
 class MarketplaceListing < ApplicationRecord
-  STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
-  CONDITION_ENUM = {new_in_box: 0, excellent: 1, good: 2, poor: 3, salvage: 4}.freeze
-  CURRENT_STATUSES = %i[draft for_sale].freeze
-  ENDED_STATUSES = STATUS_ENUM.keys - CURRENT_STATUSES
-
   include AddressRecorded
   include AddressRecordedWithinBoundingBox
   include Amountable
   include Currencyable
+
+  STATUS_ENUM = {draft: 0, for_sale: 1, sold: 2, removed: 3}.freeze
+  CONDITION_ENUM = {new_in_box: 0, excellent: 1, good: 2, poor: 3, salvage: 4}.freeze
+  CURRENT_STATUSES = %i[draft for_sale].freeze
+  ENDED_STATUSES = STATUS_ENUM.keys - CURRENT_STATUSES
 
   enum :status, STATUS_ENUM
   enum :condition, CONDITION_ENUM
@@ -57,6 +57,9 @@ class MarketplaceListing < ApplicationRecord
   validates_presence_of :seller_id
   validates_presence_of :status
 
+  attr_accessor :skip_update
+  delegate :primary_activity, :primary_activity_id, :user, to: :item, allow_nil: true
+
   before_validation :set_calculated_attributes
   after_commit :update_bike_for_sale
 
@@ -65,10 +68,7 @@ class MarketplaceListing < ApplicationRecord
 
   # validate that there isn't another current listing for an item
 
-  delegate :primary_activity, :primary_activity_id, :user, to: :item, allow_nil: true
-
   # skip_update doesn't do anything yet, added so it can be passed in CallbackJob::AddressRecordUpdateAssociationsJob
-  attr_accessor :skip_update
 
   class << self
     # Only works for bikes currently...

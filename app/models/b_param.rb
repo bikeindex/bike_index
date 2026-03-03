@@ -70,13 +70,16 @@ class BParam < ApplicationRecord
   mount_uploader :image, ImageUploader
   process_in_background :image, CarrierWaveStoreJob
 
+  belongs_to :created_bike, class_name: "Bike"
+  belongs_to :creator, class_name: "User"
+  belongs_to :organization
+
   attr_writer :image_cache
 
   serialize :bike_errors, coder: YAML
 
-  belongs_to :created_bike, class_name: "Bike"
-  belongs_to :creator, class_name: "User"
-  belongs_to :organization
+  before_create :generate_id_token
+  before_save :clean_params
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
@@ -92,8 +95,6 @@ class BParam < ApplicationRecord
   scope :top_level_motorized, -> { bike_params.where("(params -> 'propulsion_type_motorized') IS NOT NULL") }
 
   after_initialize :ensure_valid_params
-  before_create :generate_id_token
-  before_save :clean_params
 
   class << self
     def motorized

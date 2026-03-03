@@ -49,6 +49,12 @@ class TheftAlert < ApplicationRecord
 
   enum :status, STATUS_ENUM
 
+  belongs_to :stolen_record
+  belongs_to :theft_alert_plan
+  belongs_to :payment
+  belongs_to :user
+  has_many :notifications, as: :notifiable
+
   validates :theft_alert_plan,
     :status,
     :user_id,
@@ -56,12 +62,8 @@ class TheftAlert < ApplicationRecord
 
   validate :alert_cannot_begin_in_past_or_after_ends
 
-  belongs_to :stolen_record
-  belongs_to :theft_alert_plan
-  belongs_to :payment
-  belongs_to :user
-
-  has_many :notifications, as: :notifiable
+  delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
+  delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   before_validation :set_calculated_attributes
 
@@ -77,9 +79,6 @@ class TheftAlert < ApplicationRecord
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
   scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
-
-  delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
-  delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   geocoded_by nil
 

@@ -116,6 +116,8 @@ class Bike < ApplicationRecord
     unregistered_parking_notification: 4
   }.freeze
 
+  enum :status, STATUS_ENUM
+
   belongs_to :updator, class_name: "User"
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :current_impound_record, class_name: "ImpoundRecord"
@@ -165,7 +167,6 @@ class Bike < ApplicationRecord
   validates_presence_of :cycle_type
   validates_presence_of :creator, on: :create
   validates_presence_of :manufacturer_id
-
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
@@ -176,13 +177,15 @@ class Bike < ApplicationRecord
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
-  enum :status, STATUS_ENUM
-
   delegate :bulk_import, :claimed?, :creation_description,
     :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,
     :pos_kind, :registration_info, :user, :user_id,
     :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
     to: :current_ownership, allow_nil: true
+
+  before_validation :set_calculated_attributes
+  after_commit :enqueue_duplicate_bike_finder_worker, on: :destroy
+  after_commit :remove_address_record_if_deleted
 
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
   scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
@@ -214,10 +217,6 @@ class Bike < ApplicationRecord
   scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
 
   default_scope -> { default_includes.current.order(listing_order: :desc) }
-
-  before_validation :set_calculated_attributes
-  after_commit :enqueue_duplicate_bike_finder_worker, on: :destroy
-  after_commit :remove_address_record_if_deleted
 
   pg_search_scope :pg_search, against: {
     serial_number: "A",

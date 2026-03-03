@@ -49,11 +49,11 @@ class StravaRequest < AnalyticsRecord
   PRIORITY_MAP = PRIORITY_ORDER.each_with_index.to_h.freeze
   PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000
 
-  belongs_to :user
-  belongs_to :strava_integration
-
   enum :request_type, REQUEST_TYPE_ENUM
   enum :response_status, RESPONSE_STATUS_ENUM
+
+  belongs_to :user
+  belongs_to :strava_integration
 
   validates :strava_integration_id, presence: true
 

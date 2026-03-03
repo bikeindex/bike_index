@@ -51,6 +51,9 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
   end
 
   class << self
+    DATE_REGEX = %r{overgebracht .+ op (?<day>\d{1,2})-(?<month>\d{1,2})-(?<year>\d{4})}
+    LOCATION_REGEX = %r{Locatie gevonden: (.+?)\.}
+    SERIAL_NUMBER_REGEX = %r{framenummer '(?:<strong>)?(.+)(?:</strong>)?'}
     def build_from_api_response(attrs = {})
       is_bike = attrs["Category"] == "fiets"
       return unless is_bike
@@ -87,8 +90,6 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
 
     private
 
-    DATE_REGEX = %r{overgebracht .+ op (?<day>\d{1,2})-(?<month>\d{1,2})-(?<year>\d{4})}
-
     def parse_date_found(description, registration_date)
       match_data = DATE_REGEX.match(description)
       return registration_date.to_datetime if registration_date && !match_data
@@ -98,8 +99,6 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
         .join("-")
         .to_datetime
     end
-
-    LOCATION_REGEX = %r{Locatie gevonden: (.+?)\.}
 
     def parse_location_found(description, storage_location)
       match_data = LOCATION_REGEX.match(description)
@@ -111,8 +110,6 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
         .select(&:present?)
         .join(", ")
     end
-
-    SERIAL_NUMBER_REGEX = %r{framenummer '(?:<strong>)?(.+)(?:</strong>)?'}
 
     def parse_serial_number(description)
       match_data = SERIAL_NUMBER_REGEX.match(description)
