@@ -1,9 +1,6 @@
 parallel: true
 # format: progress
 
-extend_config:
-  - .rubocop_custom.yml
-
 ignore:
   - "public/**/*"
   - "node_modules/**/*"

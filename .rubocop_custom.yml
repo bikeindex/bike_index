@@ -1,3 +1,10 @@
+AllCops:
+  NewCops: disable
+  Exclude:
+    - "public/**/*"
+    - "node_modules/**/*"
+    - "spec/vcr_cassettes/*"
+
 Layout/ClassStructure:
   Enabled: true
   ExpectedOrder:
