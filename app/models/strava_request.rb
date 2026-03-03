@@ -7,7 +7,7 @@
 #
 #  id                    :bigint           not null, primary key
 #  parameters            :jsonb
-#  priority              :bigint           default(0), not null
+#  priority              :bigint           not null
 #  rate_limit            :jsonb
 #  request_type          :integer          not null
 #  requested_at          :datetime
@@ -44,8 +44,6 @@ class StravaRequest < AnalyticsRecord
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
-  # Priority: incoming_webhook (5) → list_activities (2) → fetch_gear (4) → fetch_activity (3)
-  PRIORITY_ORDER = [5, 2, 4, 3, 0, 1].freeze
   PRIORITY_MAP = {
     proxy: 0,
     incoming_webhook: 1,
@@ -55,7 +53,7 @@ class StravaRequest < AnalyticsRecord
     fetch_gear: 4,
     fetch_activity: 5
   }.freeze
-  PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000
+  PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000 # Based on timestamp digits
 
   enum :request_type, REQUEST_TYPE_ENUM
   enum :response_status, RESPONSE_STATUS_ENUM
@@ -192,14 +190,13 @@ class StravaRequest < AnalyticsRecord
   end
 
   def calculated_priority
-    level = PRIORITY_MAP.fetch(REQUEST_TYPE_ENUM[request_type.to_sym], PRIORITY_ORDER.length)
+    level = PRIORITY_MAP[request_type.to_sym] * PRIORITY_LEVEL_MULTIPLIER
 
-    secondary = if fetch_activity?
-      PRIORITY_LEVEL_MULTIPLIER - (parameters["strava_id"].to_i / 1000)
-    else
-      Time.current.to_i / 10
+    if fetch_activity? && parameters["strava_id"].present?
+      level += (parameters["strava_id"].to_i / 1000)
     end
-    level * PRIORITY_LEVEL_MULTIPLIER + secondary
+
+    level + Time.current.to_i / 10
   end
 
   # IDK, sort of a guess - because Strava responds with a 404 :/
