@@ -21,11 +21,11 @@ chdir APP_ROOT do
     puts "Testing lint (will not autofix)"
 
     system!("bundle exec standardrb --no-fix")
-    system!("bundle exec rubocop -c .rubocop_custom.yml --only Layout/ClassStructure")
+    system!("bundle exec rubocop -c .rubocop_custom.yml")
     system!("npm run lint_check")
   else
     system!("bundle exec standardrb --fix")
-    system!("bundle exec rubocop -c .rubocop_custom.yml --only Layout/ClassStructure -A")
+    system!("bundle exec rubocop -c .rubocop_custom.yml -A")
     system!("npm run lint")
   end
 end

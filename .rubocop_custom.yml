@@ -1,5 +1,6 @@
 AllCops:
-  NewCops: disable
+  DisabledByDefault: true
+  SuggestExtensions: false
   Exclude:
     - "public/**/*"
     - "node_modules/**/*"
@@ -10,11 +11,11 @@ Layout/ClassStructure:
   ExpectedOrder:
     - module_inclusion
     - constants
+    - enums
     - associations
     - validations
     - callbacks
     - scopes
-    - enums
     - public_class_methods
     - initializer
     - public_methods
