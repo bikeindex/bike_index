@@ -135,30 +135,6 @@
 
       <em><%= helpers.humanized_time_range(@time_range) %></em>
       <%= settings_button %>
-
-      <% unless skip_view_just_stolen? %>
-        <% if @stolenness == "all" %>
-          <a
-            class="
-              float-right organized-bikes-stolenness-toggle gray-link
-              tw:mx-2
-            "
-            href="<%= helpers.organization_bikes_path(search_params.merge(stolenness: "stolen")) %>"
-            data-stolenness="stolen"
-          >
-            <%= translation(".view_just_stolen_vehicles", cycle_type: cycle_type.pluralize(10)) %>
-          </a>
-        <% else %>
-          <%= translation(".stolen_vehicles_html", cycle_type:) %>
-          <a
-            class="organized-bikes-stolenness-toggle gray-link tw:mx-2"
-            href="<%= helpers.organization_bikes_path(search_params.merge(stolenness: "all")) %>"
-            data-stolenness="all"
-          >
-            <%= translation(".view_all_vehicles", cycle_type:) %>
-          </a>
-        <% end %>
-      <% end %>
     </p>
     <% if @model_audit.present? %>
       <p class="mt-0">

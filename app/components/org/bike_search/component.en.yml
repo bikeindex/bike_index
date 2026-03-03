@@ -35,10 +35,7 @@ en:
         sticker: Sticker
         stickers: 'Stickers:'
         stolen: Stolen
-        stolen_vehicles_html: "<em>stolen</em> %{cycle_type}"
         updated: Updated
         vehicle: vehicle
         vehicle_type: Vehicle type
-        view_all_vehicles: view all %{cycle_type}
-        view_just_stolen_vehicles: view just stolen %{cycle_type}
         visible_columns: Visible columns
