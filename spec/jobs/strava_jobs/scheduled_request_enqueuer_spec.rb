@@ -38,11 +38,11 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
         5.times.map do
           StravaRequest.create!(user_id: strava_integration.user_id,
             strava_integration_id: strava_integration.id, request_type: :fetch_activity,
-            parameters: {strava_id: "123"})
+            parameters: {strava_id: "12300000000"})
         end
         fetch_activity = StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id, request_type: :fetch_activity,
-          parameters: {strava_id: "12300000000"})
+          parameters: {strava_id: "123"})
         list_activities = StravaRequest.create!(user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id, request_type: :list_activities,
           parameters: {page: 1})
@@ -56,6 +56,12 @@ RSpec.describe StravaJobs::ScheduledRequestEnqueuer, type: :job do
 
         expect(StravaJobs::RequestRunner.jobs.map { |j| j["args"].first }[0..2])
           .to eq([list_activities.id, fetch_gear.id, fetch_activity.id])
+
+        # Verify that it doesn't hang
+        described_class.drain
+
+        # Extra verification
+        expect { instance.perform(true) }.to change(described_class.jobs, :count).by 0
       end
 
       context "when rate limited" do

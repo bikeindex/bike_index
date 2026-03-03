@@ -14,8 +14,7 @@ module StravaJobs
       end
 
       def priority_multiplier(strava_integration_id)
-        most_recent_proxy_at = StravaRequest.where(strava_integration_id:, request_type: :proxy)
-          .where.not(requested_at: nil).maximum(:requested_at)
+        most_recent_proxy_at = StravaRequest.most_recent_proxy_at(strava_integration_id)
         return 1 unless most_recent_proxy_at
 
         elapsed = Time.current - most_recent_proxy_at
