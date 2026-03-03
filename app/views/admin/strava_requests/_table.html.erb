@@ -53,9 +53,12 @@
               <%= l strava_request.updated_at, format: :convert_time %>
             </small>
           </td>
+
           <% if display_dev_info? %>
             <td>
-              <small><%= number_display(strava_request.priority) %></small>
+              <small title="<%= number_with_delimiter(strava_request.priority) %>">
+                <%= (strava_request.priority / 100_000_000.0).round(1) %>
+              </small>
             </td>
           <% end %>
 
