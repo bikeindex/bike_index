@@ -29,10 +29,11 @@ class SocialPost < ApplicationRecord
 
   enum :kind, KIND_ENUM
 
-  has_many :public_images, as: :imageable, dependent: :destroy
   belongs_to :social_account
   belongs_to :stolen_record
   belongs_to :original_post, class_name: "SocialPost"
+
+  has_many :public_images, as: :imageable, dependent: :destroy
   has_many :reposts,
     foreign_key: :original_post_id,
     class_name: "SocialPost",

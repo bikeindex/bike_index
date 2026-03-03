@@ -11,7 +11,6 @@ class StravaIntegrationsController < ApplicationController
     session[:strava_oauth_state] = state
     session[:strava_return_to] = params[:return_to] if params[:return_to]&.start_with?("/")
     # If scope is nil, it uses default scope
-
     scope = Integrations::StravaClient::STRAVA_SEARCH_SCOPE if params[:scope] == "strava_search"
     redirect_to Integrations::StravaClient.authorization_url(state:, scope:), allow_other_host: true
   end

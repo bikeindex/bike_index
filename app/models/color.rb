@@ -15,7 +15,6 @@ class Color < ApplicationRecord
   include FriendlyNameFindable
 
   # Added to make it possible to test processing colors. Is just Color.all.pluck(:name)
-
   ALL_NAMES = ["Black", "Blue", "Brown", "Green", "Orange", "Pink", "Purple", "Red",
     "Silver, gray or bare metal", "Stickers tape or other cover-up", "Teal", "White",
     "Yellow or Gold"].freeze

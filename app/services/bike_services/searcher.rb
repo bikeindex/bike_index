@@ -2,6 +2,7 @@
 # Use BikeSearchable instead
 class BikeServices::Searcher
   attr_accessor :params, :location
+
   def initialize(creation_params = {}, reverse_geocode = nil)
     # override reverse_geocode if passed as params
     @params = creation_params.merge(reverse_geocode: reverse_geocode)

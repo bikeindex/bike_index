@@ -63,3 +63,4 @@ Layout/ClassStructure:
       - validate
       - validates_presence_of
       - validates_uniqueness_of
+      - validates_format_of

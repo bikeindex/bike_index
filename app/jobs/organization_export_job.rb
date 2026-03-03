@@ -1,9 +1,8 @@
 class OrganizationExportJob < ApplicationJob
   LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
+  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
 
   sidekiq_options retry: false, queue: "med_priority"
-
-  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
 
   attr_accessor :export # Only necessary for testing
 

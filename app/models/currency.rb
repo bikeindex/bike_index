@@ -23,6 +23,7 @@ class Currency
   }.freeze
 
   attr_reader :slug, :id, :symbol
+
   def self.default
     new(:usd)
   end

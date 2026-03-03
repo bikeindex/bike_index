@@ -44,6 +44,7 @@ class MarketplaceMessage < ApplicationRecord
   validate :users_match_initial_record, if: -> { buyer_seller_message? }
 
   attr_accessor :skip_processing
+
   delegate :seller_id, :seller, :item, :item_id, :item_type,
     to: :marketplace_listing, allow_nil: true
 

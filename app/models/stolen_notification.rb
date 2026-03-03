@@ -31,6 +31,8 @@ class StolenNotification < ApplicationRecord
     unstolen_unclaimed_permitted_direct: 5
   }.freeze
 
+  # Kind enum was added to track how often various types of messages were sent
+  # in #2275 - it isn't currently used for logic, just data analysis
   enum :kind, KIND_ENUM
 
   belongs_to :bike
@@ -44,9 +46,6 @@ class StolenNotification < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_create :notify_receiver
-
-  # Kind enum was added to track how often various types of messages were sent
-  # in #2275 - it isn't currently used for logic, just data analysis
 
   def notify_receiver
     Email::StolenNotificationJob.perform_async(id)

@@ -57,7 +57,10 @@ class MarketplaceListing < ApplicationRecord
   validates_presence_of :seller_id
   validates_presence_of :status
 
+  # skip_update doesn't do anything yet, added so it can be passed in CallbackJob::AddressRecordUpdateAssociationsJob
   attr_accessor :skip_update
+
+  # validate that there isn't another current listing for an item
   delegate :primary_activity, :primary_activity_id, :user, to: :item, allow_nil: true
 
   before_validation :set_calculated_attributes
@@ -65,10 +68,6 @@ class MarketplaceListing < ApplicationRecord
 
   scope :current, -> { where(status: CURRENT_STATUSES) }
   scope :removed_or_sold, -> { where(status: %i[removed sold]) }
-
-  # validate that there isn't another current listing for an item
-
-  # skip_update doesn't do anything yet, added so it can be passed in CallbackJob::AddressRecordUpdateAssociationsJob
 
   class << self
     # Only works for bikes currently...

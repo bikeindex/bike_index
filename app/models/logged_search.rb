@@ -68,8 +68,6 @@ class LoggedSearch < AnalyticsRecord
 
   STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3, for_sale: 4}.freeze
 
-  # TODO: make the belongs to work across tables
-
   enum :endpoint, ENDPOINT_ENUM
   enum :stolenness, STOLENNESS_ENUM, prefix: :stolenness
 

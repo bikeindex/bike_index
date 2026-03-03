@@ -131,22 +131,17 @@ class User < ApplicationRecord
   validates_uniqueness_of :email
   validate :ensure_unique_email
   validates :email, format: {with: EMAIL_REGEX, message: "Email invalid"}
-
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
-  # stripe_id, is_paid_member, paid_organization_role_info
+  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
+  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
 
   mount_uploader :avatar, AvatarUploader
 
   accepts_nested_attributes_for :user_ban
 
-  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
-
-  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
-
-  attr_accessor :skip_update
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update
+  # stripe_id, is_paid_member, paid_organization_role_info
 
   before_validation :set_calculated_attributes
-
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs

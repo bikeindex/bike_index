@@ -29,6 +29,7 @@ class Ctype < ApplicationRecord
   attr_accessor :cgroup_name, :image_cache
 
   before_create :set_calculated_attributes
+
   def self.select_options
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
     translation_scope = [:activerecord, :select_options, name.underscore]

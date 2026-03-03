@@ -32,28 +32,11 @@
 #  index_external_registry_bikes_on_type               (type)
 #
 class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
-  def registry_url
-    "https://verlorenofgevonden.nl"
-  end
-
-  def url
-    [registry_url, "overzicht?search=#{external_id}"].join("/")
-  end
-
-  def image_url
-    return if info_hash["object_id"].blank?
-
-    [registry_url, "assets", "image", info_hash["object_id"]].join("/")
-  end
-
-  def thumb_url
-    image_url
-  end
+  DATE_REGEX = %r{overgebracht .+ op (?<day>\d{1,2})-(?<month>\d{1,2})-(?<year>\d{4})}
+  LOCATION_REGEX = %r{Locatie gevonden: (.+?)\.}
+  SERIAL_NUMBER_REGEX = %r{framenummer '(?:<strong>)?(.+)(?:</strong>)?'}
 
   class << self
-    DATE_REGEX = %r{overgebracht .+ op (?<day>\d{1,2})-(?<month>\d{1,2})-(?<year>\d{4})}
-    LOCATION_REGEX = %r{Locatie gevonden: (.+?)\.}
-    SERIAL_NUMBER_REGEX = %r{framenummer '(?:<strong>)?(.+)(?:</strong>)?'}
     def build_from_api_response(attrs = {})
       is_bike = attrs["Category"] == "fiets"
       return unless is_bike
@@ -117,5 +100,23 @@ class ExternalRegistryBike::VerlorenOfGevondenBike < ExternalRegistryBike
 
       match_data[1]
     end
+  end
+
+  def registry_url
+    "https://verlorenofgevonden.nl"
+  end
+
+  def url
+    [registry_url, "overzicht?search=#{external_id}"].join("/")
+  end
+
+  def image_url
+    return if info_hash["object_id"].blank?
+
+    [registry_url, "assets", "image", info_hash["object_id"]].join("/")
+  end
+
+  def thumb_url
+    image_url
   end
 end

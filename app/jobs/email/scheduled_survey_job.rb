@@ -2,7 +2,6 @@ class Email::ScheduledSurveyJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   sidekiq_options retry: 2
-
   SURVEY_COUNT = (ENV["THEFT_SURVEY_COUNT"] || 200).to_i
 
   def self.frequency

@@ -2,7 +2,17 @@ class ExternalRegistryClient
   TTL_HOURS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_CACHE_TTL_HOURS", 24).to_i.hours
   TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
 
+  class ExternalRegistryClientError < StandardError; end
+
+  class CredentialsNotFoundError < ExternalRegistryClientError
+    def initialize(classname)
+      @message = "Credentials not found for #{classname}"
+      super
+    end
+  end
+
   attr_accessor :base_url
+
   # Search external registries for the provided query string `query`.
   #
   # The set of registries searched can be customized by passing an array of
@@ -52,14 +62,5 @@ class ExternalRegistryClient
       conn.adapter Faraday.default_adapter
       conn.options.timeout = TIMEOUT_SECS
     }
-  end
-
-  class ExternalRegistryClientError < StandardError; end
-
-  class CredentialsNotFoundError < ExternalRegistryClientError
-    def initialize(classname)
-      @message = "Credentials not found for #{classname}"
-      super
-    end
   end
 end

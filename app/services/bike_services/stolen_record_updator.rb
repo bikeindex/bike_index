@@ -1,5 +1,6 @@
 class BikeServices::StolenRecordUpdator
   attr_reader :stolen_params
+
   # Used to be in StolenRecord - but now it's here. Eventually, I'd like to actually do permitted params handling in here
   def self.old_attr_accessible
     # recovery_tweet, recovery_share # We edit this in the admin panel
