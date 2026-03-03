@@ -25,6 +25,8 @@ export default class extends Controller {
     this.updateVisibleColumns()
   }
 
+  // Avery export requires a page reload because the server conditionally
+  // renders avery column cells based on the search_avery_export param
   averyToggled (event) {
     const url = new URL(window.location)
     if (event.target.checked) {
@@ -61,6 +63,7 @@ export default class extends Controller {
       if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) return
       if (cb.checked) checked.push(cb.name)
     })
+    // Store enabled columns so they persist across page loads
     localStorage.setItem('orgBikeColumns', JSON.stringify(checked))
 
     this.element.querySelectorAll('.hiddenColumn').forEach(el => {
