@@ -525,7 +525,7 @@ export function SearchFilters({
           const cityLabel = disabled ? disabledLabel : `All (${availableCities.length} ${availableCities.length === 1 ? 'city' : 'cities'})`;
           return (
         <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0">
             <span>Country:</span>
             <select
               value={filters.country || ''}
@@ -539,7 +539,7 @@ export function SearchFilters({
                 });
               }}
               disabled={disabled}
-              className={disabled ? disabledClasses : selectClasses}
+              className={`${disabled ? disabledClasses : selectClasses} max-w-[200px]`}
             >
               <option value="">{countryLabel}</option>
               {allCountries.map((abbr) => {
@@ -548,7 +548,7 @@ export function SearchFilters({
               })}
             </select>
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0">
             <span>Region:</span>
             <select
               value={filters.region || ''}
@@ -561,7 +561,7 @@ export function SearchFilters({
                 });
               }}
               disabled={disabled || availableRegions.length === 0}
-              className={disabled || availableRegions.length === 0 ? disabledClasses : selectClasses}
+              className={`${disabled || availableRegions.length === 0 ? disabledClasses : selectClasses} max-w-[200px]`}
             >
               <option value="">{regionLabel}</option>
               {availableRegions.map(({ region, label }) => (
@@ -569,13 +569,13 @@ export function SearchFilters({
               ))}
             </select>
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0">
             <span>City:</span>
             <select
               value={filters.city || ''}
               onChange={(e) => onFiltersChange({ ...filters, city: e.target.value || null })}
               disabled={disabled || availableCities.length === 0}
-              className={disabled || availableCities.length === 0 ? disabledClasses : selectClasses}
+              className={`${disabled || availableCities.length === 0 ? disabledClasses : selectClasses} max-w-[200px]`}
             >
               <option value="">{cityLabel}</option>
               {availableCities.map(({ city, label }) => (
