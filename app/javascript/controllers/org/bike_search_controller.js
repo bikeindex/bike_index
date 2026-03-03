@@ -9,10 +9,16 @@ export default class extends Controller {
 
   connect () {
     this.selectStoredVisibleColumns()
+    if (localStorage.getItem('orgBikeSettingsOpen') === 'true') {
+      collapse('show', this.settingsTarget, 0)
+    }
   }
 
   toggleSettings () {
+    const wasHidden = this.settingsTarget.classList.contains('tw:hidden!') ||
+      this.settingsTarget.classList.contains('tw:hidden')
     collapse('toggle', this.settingsTarget)
+    localStorage.setItem('orgBikeSettingsOpen', wasHidden ? 'true' : 'false')
   }
 
   columnToggled () {
@@ -34,7 +40,10 @@ export default class extends Controller {
 
   selectStoredVisibleColumns () {
     const stored = localStorage.getItem('orgBikeColumns')
-    const columns = stored ? JSON.parse(stored) : this.defaultColumnsValue
+    let columns = this.defaultColumnsValue
+    if (stored) {
+      try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgBikeColumns') }
+    }
 
     this.settingsTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
       cb.checked = columns.includes(cb.name)
