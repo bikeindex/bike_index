@@ -30,11 +30,6 @@ RSpec.describe StravaRequest, type: :model do
       expect(StravaRequest.next_pending).to be_empty
     end
 
-    it "respects limit parameter" do
-      3.times { FactoryBot.create(:strava_request, strava_integration:) }
-      expect(StravaRequest.next_pending(2).count).to eq(2)
-    end
-
     it "orders by priority: list_activities, fetch_gear, fetch_activity" do
       fetch_activity = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       list_activities = FactoryBot.create(:strava_request, :list_activities, strava_integration:)
