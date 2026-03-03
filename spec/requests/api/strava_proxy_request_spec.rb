@@ -118,7 +118,7 @@ RSpec.describe "Strava Proxy API", type: :request do
           strava_request = StravaRequest.last
           expect(strava_request.proxy?).to be_truthy
           expect(strava_request.success?).to be_truthy
-          expect(strava_request.parameters).to eq("url" => "athlete/activities", "method" => "GET", "params" => {"page" => "1", "per_page" => "1"})
+          expect(strava_request.parameters).to eq("url" => "athlete/activities?page=1&per_page=1", "method" => "GET")
 
           strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
           expect(strava_activity).to have_attributes target_attributes

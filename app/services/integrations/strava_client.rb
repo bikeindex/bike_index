@@ -77,11 +77,11 @@ class Integrations::StravaClient
       end
     end
 
-    def proxy_request(strava_integration, path, method: "GET", body: nil, params: nil)
+    def proxy_request(strava_integration, path, method: "GET", body: nil)
       raise ArgumentError, "Invalid proxy path" if path.blank? || path.match?(%r{://|\A//|(\A|/)\.\.(/|\z)})
       path = path.delete_prefix("/")
       ensure_valid_token!(strava_integration)
-      execute_proxy_request(strava_integration, path, method:, body:, params:)
+      execute_proxy_request(strava_integration, path, method:, body:)
     end
 
     def delete_webhook_subscription(subscription_id)
@@ -121,18 +121,18 @@ class Integrations::StravaClient
       end
     end
 
-    def execute_proxy_request(strava_integration, path, method: "GET", body: nil, params: nil)
+    def execute_proxy_request(strava_integration, path, method: "GET", body: nil)
       conn = api_connection(strava_integration)
       response = case method.to_s.upcase
       when "POST" then conn.post(path) { |req| req.body = body if body }
       when "PUT" then conn.put(path) { |req| req.body = body if body }
-      else conn.get(path) { |req| req.params = params if params }
+      else conn.get(path)
       end
       return response unless response.status == 401
 
       if refresh_token!(strava_integration)
         # Try the request again!
-        execute_proxy_request(strava_integration, path, method:, body:, params:)
+        execute_proxy_request(strava_integration, path, method:, body:)
       else
         # Strava Integration failed to refresh the token, so return the original response
         response
