@@ -2,6 +2,7 @@
 
 module Org::BikeSearch
   class ComponentPreview < ApplicationComponentPreview
+    # @display legacy_stylesheet true
     def default
       organization = Organization.first
       bikes = organization&.bikes&.limit(5) || Bike.none
@@ -11,7 +12,8 @@ module Org::BikeSearch
         bikes:,
         pagy:,
         per_page: 10,
-        params: {}
+        params: {},
+        time_range: 1.year.ago..Time.current
       ))
     end
   end

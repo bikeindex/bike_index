@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage */
 
@@ -7,8 +8,11 @@ export default class extends Controller {
   static values = { defaultColumns: Array }
 
   connect () {
-    this.element.classList.add('javascriptFunctioning')
     this.selectStoredVisibleColumns()
+  }
+
+  toggleSettings () {
+    collapse('toggle', this.settingsTarget)
   }
 
   columnToggled () {

@@ -14,8 +14,7 @@
 
   <div class="clearfix">
     <div
-      class="collapse settings-list <%= 'in' if settings_default_open? %>"
-      id="organizedSearchSettings"
+      class="settings-list <%= 'tw:hidden!' unless settings_default_open? %>"
       data-org--bike-search-target="settings"
     >
       <h3 class="header-font-alt"><%= translation(".visible_columns") %></h3>
@@ -116,9 +115,8 @@
     <% settings_button = capture do %>
       <a
         class="float-right btn btn-sm btn-outline-primary uncap"
-        href="#organizedSearchSettings"
-        aria-controls="organizedSearchSettings"
-        data-toggle="collapse"
+        href="#"
+        data-action="click->org--bike-search#toggleSettings"
         style="margin-top: 0.1em;"
       >
         <%= translation(".settings") %>

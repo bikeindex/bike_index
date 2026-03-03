@@ -39,7 +39,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   it "renders table with bikes" do
     expect(component).to have_css("table.table")
     expect(component).to have_css("tbody tr", count: 1)
-    expect(component).to have_css(".settings-list")
+    expect(component).to have_css(".settings-list", visible: :all)
   end
 
   it "renders search form" do
@@ -48,8 +48,8 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   end
 
   it "renders settings panel with column checkboxes" do
-    expect(component).to have_css("#organizedSearchSettings")
-    expect(component).to have_css("input[type='checkbox']")
+    expect(component).to have_css(".settings-list.tw\\:hidden\\!", visible: :all)
+    expect(component).to have_css("input[type='checkbox']", visible: :all)
   end
 
   context "with only_show_bikes" do
@@ -66,7 +66,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
 
     it "renders sticker filter buttons" do
-      expect(component).to have_css(".search-sort-btns", text: /Stickers/)
+      expect(component).to have_css(".search-sort-btns", text: /Stickers/, visible: :all)
     end
   end
 
@@ -74,8 +74,8 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
     it "renders impound status filter buttons" do
-      expect(component).to have_css(".search-sort-btns", text: /Status/)
-      expect(component).to have_css(".search-sort-btns a", text: /not/)
+      expect(component).to have_css(".search-sort-btns", text: /Status/, visible: :all)
+      expect(component).to have_css(".search-sort-btns a", text: /not/, visible: :all)
     end
   end
 
@@ -83,7 +83,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
     it "renders export link" do
-      expect(component).to have_link(text: /Create export/)
+      expect(component).to have_link(text: /Create export/, visible: :all)
     end
   end
 
