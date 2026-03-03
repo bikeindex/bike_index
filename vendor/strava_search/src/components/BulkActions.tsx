@@ -51,9 +51,10 @@ export function BulkActions({
   const [panelExpanded, setPanelExpanded] = useState(true);
   const showAuthModal = selectedCount > 0 && !hasActivityWrite;
 
-  useEffect(() => {
-    if (isOpen) setPanelExpanded(true);
-  }, [isOpen]);
+  const handleOpen = () => {
+    setPanelExpanded(true);
+    onOpen();
+  };
 
   useEffect(() => {
     if (!showAuthModal) return;
@@ -96,7 +97,7 @@ export function BulkActions({
       <div className="flex items-center justify-between px-1">
         {!isOpen ? (
           <button
-            onClick={onOpen}
+            onClick={handleOpen}
             className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             Select activities to update
