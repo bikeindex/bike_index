@@ -25,27 +25,26 @@ class Membership < ApplicationRecord
   LEVEL_ENUM = {basic: 0, plus: 1, patron: 2}
   STATUS_ENUM = {pending: 0, active: 1, ended: 2}
 
+  enum :level, LEVEL_ENUM
+  enum :status, STATUS_ENUM
+
   belongs_to :user
   belongs_to :creator, class_name: "User"
 
   has_many :stripe_subscriptions
   has_many :payments
 
-  enum :level, LEVEL_ENUM
-  enum :status, STATUS_ENUM
-
   validate :no_current_stripe_subscription_admin_managed
   validates :user, presence: true, on: :create
+
+  attr_accessor :user_email, :set_interval
+  delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
+    to: :current_stripe_subscription, allow_nil: true
 
   before_validation :set_calculated_attributes
 
   scope :admin_managed, -> { where.not(creator_id: nil) }
   scope :stripe_managed, -> { where(creator_id: nil) }
-
-  delegate :stripe_id, :stripe_portal_session, :stripe_admin_url,
-    to: :current_stripe_subscription, allow_nil: true
-
-  attr_accessor :user_email, :set_interval
 
   class << self
     def level_humanized(str)

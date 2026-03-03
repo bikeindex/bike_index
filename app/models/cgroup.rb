@@ -15,9 +15,9 @@ class Cgroup < ApplicationRecord
   # Note: Cgroup is short for component_group
   include FriendlySlugFindable
 
-  validates_presence_of :name, :priority
-
   has_many :ctypes
+
+  validates_presence_of :name, :priority
 
   scope :commonness, -> { reorder("cgroups.priority ASC, cgroups.name DESC") }
 

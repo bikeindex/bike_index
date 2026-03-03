@@ -43,10 +43,13 @@ class MarketplaceMessage < ApplicationRecord
   validates_presence_of :marketplace_listing_id, :sender_id, :receiver_id, :subject, :body
   validate :users_match_initial_record, if: -> { buyer_seller_message? }
 
+  attr_accessor :skip_processing
+
+  delegate :seller_id, :seller, :item, :item_id, :item_type,
+    to: :marketplace_listing, allow_nil: true
+
   before_validation :set_calculated_attributes
   after_commit :process_notification
-
-  attr_accessor :skip_processing
 
   scope :blocked, -> { where(blocked: true) }
   scope :initial_message, -> { where("id = initial_record_id") }
@@ -60,9 +63,6 @@ class MarketplaceMessage < ApplicationRecord
       .order(messages_table[:initial_record_id].asc, messages_table[:id].desc)
     from(sub_query.as(table_name)).order(id: :desc)
   }
-
-  delegate :seller_id, :seller, :item, :item_id, :item_type,
-    to: :marketplace_listing, allow_nil: true
 
   class << self
     def for_user(user_or_id)

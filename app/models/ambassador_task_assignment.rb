@@ -32,17 +32,17 @@ class AmbassadorTaskAssignment < ApplicationRecord
 
   validates :ambassador_task, uniqueness: {scope: :ambassador}
 
+  delegate :description, :description_html, :title, to: :ambassador_task
+  delegate :name, to: :ambassador, prefix: true, allow_nil: true
+  delegate :name, to: :organization, prefix: true, allow_nil: true
+
+  after_commit :update_associated_user
+
   scope :completed, -> { where.not(completed_at: nil) }
   scope :incomplete, -> { where(completed_at: nil) }
   scope :pending_completion, -> { incomplete.or(where("completed_at > ?", Time.current - 2.hours)) }
   scope :locked_completed, -> { completed.where("completed_at < ?", Time.current - 2.hours) }
   scope :task_ordered, -> { order(ambassador_task_id: :asc) }
-
-  after_commit :update_associated_user
-
-  delegate :description, :description_html, :title, to: :ambassador_task
-  delegate :name, to: :ambassador, prefix: true, allow_nil: true
-  delegate :name, to: :organization, prefix: true, allow_nil: true
 
   # Find completed assignments, filtering and sorting by columns on associated
   # models. The inner join is necessary because our data model permits multiple

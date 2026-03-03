@@ -34,6 +34,9 @@ class Payment < ApplicationRecord
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3, membership_donation: 4}
 
+  enum :payment_method, PAYMENT_METHOD_ENUM
+  enum :kind, KIND_ENUM
+
   belongs_to :user
   belongs_to :organization
   belongs_to :invoice
@@ -44,20 +47,17 @@ class Payment < ApplicationRecord
 
   has_many :notifications, as: :notifiable
 
-  enum :payment_method, PAYMENT_METHOD_ENUM
-  enum :kind, KIND_ENUM
+  validate :email_or_organization_or_stripe_present
+
+  attr_accessor :skip_update
+
+  before_validation :set_calculated_attributes
+  after_commit :update_associations
 
   scope :organizations, -> { where.not(organization_id: nil) }
   scope :non_donation, -> { where.not(kind: "donation") }
   scope :incomplete, -> { where(paid_at: nil) }
   scope :paid, -> { where.not(paid_at: nil) }
-
-  validate :email_or_organization_or_stripe_present
-
-  before_validation :set_calculated_attributes
-  after_commit :update_associations
-
-  attr_accessor :skip_update
 
   class << self
     def payment_methods

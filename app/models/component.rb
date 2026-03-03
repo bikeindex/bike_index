@@ -30,7 +30,14 @@
 class Component < ApplicationRecord
   include ActiveModel::Dirty
 
+  belongs_to :manufacturer
+  belongs_to :ctype
+  belongs_to :bike
+  belongs_to :bike_version
+
   attr_accessor :front_or_rear, :setting_is_stock
+
+  before_save :set_calculated_attributes
 
   def self.permitted_attributes
     %i[id component_model year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
@@ -40,13 +47,6 @@ class Component < ApplicationRecord
   def model_name=(val)
     self.component_model = val
   end
-
-  belongs_to :manufacturer
-  belongs_to :ctype
-  belongs_to :bike
-  belongs_to :bike_version
-
-  before_save :set_calculated_attributes
 
   def version_duplicated_attrs
     {component_model: component_model,

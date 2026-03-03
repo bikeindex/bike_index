@@ -39,6 +39,8 @@ class ImpoundClaim < ApplicationRecord
     retrieved: 5 # After submitted, updated by impound_record_updates
   }.freeze
 
+  enum :status, STATUS_ENUM
+
   belongs_to :impound_record
   belongs_to :stolen_record
   belongs_to :bike_submitting, class_name: "Bike"
@@ -52,18 +54,16 @@ class ImpoundClaim < ApplicationRecord
 
   validates_presence_of :impound_record_id, :user_id
 
+  attr_accessor :skip_update
+
   before_validation :set_calculated_attributes
   after_commit :send_triggered_notifications
-
-  enum :status, STATUS_ENUM
 
   scope :unsubmitted, -> { where(submitted_at: nil) }
   scope :submitted, -> { where.not(submitted_at: nil) }
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
   scope :not_rejected, -> { where.not(status: rejected_statuses) }
-
-  attr_accessor :skip_update
 
   def self.statuses
     STATUS_ENUM.keys.map(&:to_s)

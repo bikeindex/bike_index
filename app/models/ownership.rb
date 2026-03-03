@@ -66,12 +66,9 @@ class Ownership < ApplicationRecord
     sticker: 13
   }.freeze
 
-  validates_presence_of :owner_email
-  validates_presence_of :creator_id
-  validates_presence_of :bike_id
-  validates :owner_email,
-    format: {with: /\A.+@.+\..+\z/, message: "invalid format"},
-    unless: :phone_registration?
+  enum :status, Bike::STATUS_ENUM
+  enum :pos_kind, Organization::POS_KIND_ENUM
+  enum :origin, ORIGIN_ENUM
 
   belongs_to :bike
   belongs_to :user
@@ -82,14 +79,20 @@ class Ownership < ApplicationRecord
   belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
   belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application", counter_cache: true, touch: true
   belongs_to :sale
-
   has_one :sale_sold_in, class_name: "Sale" # Mainly to distinguish from the belongs_to :sale
-
   has_many :notifications, as: :notifiable
 
-  enum :status, Bike::STATUS_ENUM
-  enum :pos_kind, Organization::POS_KIND_ENUM
-  enum :origin, ORIGIN_ENUM
+  validates_presence_of :owner_email
+  validates_presence_of :creator_id
+  validates_presence_of :bike_id
+  validates :owner_email,
+    format: {with: /\A.+@.+\..+\z/, message: "invalid format"},
+    unless: :phone_registration?
+
+  attr_accessor :creator_email, :user_email, :can_edit_claimed
+
+  before_validation :set_calculated_attributes
+  after_commit :send_notification_and_update_associations, on: :create
 
   default_scope { order(:id) }
   scope :current, -> { where(current: true) }
@@ -102,11 +105,6 @@ class Ownership < ApplicationRecord
   scope :self_made, -> { where("user_id = creator_id") }
   scope :not_self_made, -> { where("user_id != creator_id").or(where(user_id: nil)) }
   scope :with_reg_info_location, -> { where("(registration_info -> 'city') IS NOT NULL") }
-
-  before_validation :set_calculated_attributes
-  after_commit :send_notification_and_update_associations, on: :create
-
-  attr_accessor :creator_email, :user_email, :can_edit_claimed
 
   class << self
     def origins

@@ -9,6 +9,7 @@ module API
     after_action :cors_set_access_control_headers
     rescue_from ArgumentError, with: :render_bad_request
 
+    SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
     def create
       auth_response = StravaJobs::ProxyRequester.authorize_user_and_strava_integration(doorkeeper_token)
       if auth_response[:error].present?
@@ -59,8 +60,6 @@ module API
     def permitted_params
       params.permit(:url, :method, :sync_status, body: {})
     end
-
-    SENSITIVE_KEYS = %w[access_token refresh_token token client_secret].freeze
 
     def sanitize_response_body(body)
       return {error: "unknown error"} unless body.is_a?(Hash)

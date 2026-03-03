@@ -27,13 +27,13 @@ class MailchimpValue < ApplicationRecord
     merge_field: 3
   }.freeze
 
+  enum :list, LIST_ENUM
+  enum :kind, KIND_ENUM
+
   validates_presence_of :slug, :list, :kind, :mailchimp_id
   validates_uniqueness_of :mailchimp_id, scope: %i[list kind]
 
   before_validation :set_calculated_attributes
-
-  enum :list, LIST_ENUM
-  enum :kind, KIND_ENUM
 
   def self.lists
     LIST_ENUM.keys.map(&:to_s)

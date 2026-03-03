@@ -23,9 +23,9 @@ class EmailBan < ApplicationRecord
   PERMITTED_DUPLICATE_DOMAINS = %w[bikeindex.org].freeze
   REASON_ENUM = {email_domain: 0, email_duplicate: 1, delivery_failure: 2}.freeze
 
-  belongs_to :user
-
   enum :reason, REASON_ENUM
+
+  belongs_to :user
 
   validates_presence_of :reason
   validate :is_not_duplicate_ban

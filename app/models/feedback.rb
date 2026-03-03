@@ -38,16 +38,16 @@ class Feedback < ApplicationRecord
     lead_for_law_enforcement: 12
   }.freeze
 
-  validates_presence_of :body, :email, :title
+  enum :kind, KIND_ENUM
 
   belongs_to :user
   belongs_to :mailchimp_datum
 
-  before_validation :set_calculated_attributes
-
-  enum :kind, KIND_ENUM
+  validates_presence_of :body, :email, :title
 
   attr_accessor :additional
+
+  before_validation :set_calculated_attributes
 
   after_create :notify_admins
 

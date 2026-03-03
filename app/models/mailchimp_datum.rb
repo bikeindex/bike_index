@@ -30,6 +30,8 @@ class MailchimpDatum < ApplicationRecord
   MANAGED_TAGS = %w[ascend in_bike_index lightspeed member not_org_creator paid paid_previously
     pos_approved].freeze
 
+  enum :status, STATUS_ENUM
+
   belongs_to :user
   has_many :feedbacks
 
@@ -37,12 +39,10 @@ class MailchimpDatum < ApplicationRecord
   validates :user_id, uniqueness: true, allow_blank: true
   validate :ensure_subscription_required, on: :create
 
+  attr_accessor :creator_feedback, :skip_update
+
   before_validation :set_calculated_attributes
   after_commit :update_association_and_mailchimp, if: :persisted?
-
-  enum :status, STATUS_ENUM
-
-  attr_accessor :creator_feedback, :skip_update
 
   scope :no_user, -> { where(user_id: nil) }
   scope :with_user, -> { where.not(user_id: nil).where(user_deleted_at: nil) }
