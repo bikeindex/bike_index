@@ -131,7 +131,8 @@ class StravaRequest < AnalyticsRecord
   def skip_request?
     return false unless fetch_activity?
 
-    strava_integration.strava_activities.enriched.exists?(strava_id: parameters["strava_id"])
+    activity = strava_integration.strava_activities.find_by(strava_id: parameters["strava_id"])
+    activity.present? && !activity.re_enrich?
   end
 
   def looks_like_last_page?(per_page: nil)

@@ -15,7 +15,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
   end
 
   describe "perform with no args" do
-    let(:strava_integration) { FactoryBot.create(:strava_integration) }
+    let!(:strava_integration) { FactoryBot.create(:strava_integration) }
 
     it "does nothing when no pending requests" do
       instance.perform
@@ -45,10 +45,10 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     end
 
     context "with no proxy requests" do
-      it "multiplies priority by 4, clamped to MAX_PRIORITY" do
+      it "doesn't change priority" do
         original_priority = request.priority
         instance.perform(strava_integration.id)
-        expect(request.reload.priority).to eq((original_priority * 4).to_i.clamp(0, described_class::MAX_PRIORITY))
+        expect(request.reload.priority).to eq original_priority
       end
     end
 
@@ -89,16 +89,6 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
         original_priority = request.priority
         instance.perform(strava_integration.id)
         expect(request.reload.priority).to eq(original_priority)
-      end
-    end
-
-    context "priority clamping" do
-      context "with no proxy requests" do
-        it "does not exceed MAX_PRIORITY" do
-          request.update(priority: described_class::MAX_PRIORITY - 1)
-          instance.perform(strava_integration.id)
-          expect(request.reload.priority).to eq(described_class::MAX_PRIORITY)
-        end
       end
     end
   end

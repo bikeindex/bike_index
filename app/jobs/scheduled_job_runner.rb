@@ -54,7 +54,7 @@ class ScheduledJobRunner < ScheduledJob
       StolenBike::DeactivateExpiredTheftAlertJob,
       StolenBike::RemoveOrphanedImagesJob,
       StolenBike::UpdateTheftAlertFacebookJob,
-      StravaJobs::RequestRunner,
+      StravaJobs::ScheduledRequestEnqueuer,
       StravaJobs::ScheduledRequestPriorityUpdator,
       # UnusedOwnershipRemovalJob,
       UpdateCountsJob,

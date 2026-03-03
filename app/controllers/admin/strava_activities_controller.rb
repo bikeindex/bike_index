@@ -16,7 +16,7 @@ class Admin::StravaActivitiesController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at updated_at start_date activity_type distance_meters strava_integration_id]
+    %w[created_at updated_at start_date activity_type distance_meters strava_integration_id enriched_at]
   end
 
   def sortable_opts
@@ -54,7 +54,7 @@ class Admin::StravaActivitiesController < Admin::BaseController
       strava_activities = strava_activities.not_enriched
     end
 
-    @time_range_column = sort_column if %w[updated_at start_date].include?(sort_column)
+    @time_range_column = sort_column if %w[updated_at start_date enriched_at].include?(sort_column)
     @time_range_column ||= "created_at"
     strava_activities.where(@time_range_column => @time_range)
   end

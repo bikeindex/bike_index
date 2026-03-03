@@ -212,7 +212,7 @@ export function useActivitySync(): UseActivitySyncResult {
       const enrichedActivities = await fetchEnrichedSince(maxEnrichedAt);
       if (enrichedActivities.length > 0) {
         await saveActivities(
-          enrichedActivities.map(a => ({ ...a, enriched: true })),
+          enrichedActivities,
           athlete.id
         );
       }
@@ -238,7 +238,7 @@ export function useActivitySync(): UseActivitySyncResult {
     let alreadyEnrichedCount = 0;
     for (const id of activityIds) {
       const activity = await getActivityById(id);
-      if (activity && activity.enriched) {
+      if (activity?.enriched_at) {
         alreadyEnrichedCount++;
       } else if (activity) {
         idsToFetch.push(id);
@@ -262,8 +262,7 @@ export function useActivitySync(): UseActivitySyncResult {
         const activityId = idsToFetch[i];
         try {
           const fullActivity = await getActivity(activityId);
-          // Save with enriched flag
-          await saveActivities([{ ...fullActivity, enriched: true }], athlete.id);
+          await saveActivities([fullActivity], athlete.id);
         } catch {
           // Skip failed activities silently
         }
