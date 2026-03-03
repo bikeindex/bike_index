@@ -574,12 +574,14 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(user_registration_organization.reload.notes).to eq "test notes"
       end
 
-      it "responds with json" do
-        user_registration_organization.reload
-        patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}, as: :json
-        expect(response.status).to eq(200)
-        expect(response.parsed_body["notes"]).to eq "test notes"
-        expect(user_registration_organization.reload.notes).to eq "test notes"
+      context "turbo_stream request" do
+        it "updates notes" do
+          user_registration_organization.reload
+          patch "#{base_url}/#{bike.id}", params: {notes: "test notes"},
+            headers: {"Accept" => "text/vnd.turbo-stream.html"}
+          expect(response).to redirect_to(bike_path(bike))
+          expect(user_registration_organization.reload.notes).to eq "test notes"
+        end
       end
     end
   end

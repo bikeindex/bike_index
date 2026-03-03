@@ -102,10 +102,7 @@ module Organized
 
       user_registration_organization.update(notes: params[:notes])
 
-      respond_to do |format|
-        format.json { render json: {notes: user_registration_organization.notes} }
-        format.html { redirect_to bike_path(bike) }
-      end
+      redirect_to bike_path(bike)
     end
 
     def create

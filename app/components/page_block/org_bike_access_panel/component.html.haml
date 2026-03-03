@@ -197,7 +197,7 @@
                   %tr
                     %td= translation(".notes")
                     %td
-                      = form_with(url: notes_update_url, method: :patch, data: {turbo: false}) do |f|
+                      = form_with(url: notes_update_url, method: :patch) do |f|
                         = f.text_area :notes, value: user_registration_organization&.notes, class: "twinput tw:w-full", rows: 3, name: "notes"
                         .tw:mt-1
                           = f.submit translation(".save_notes"), class: "btn btn-success btn-sm"
