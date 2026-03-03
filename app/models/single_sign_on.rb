@@ -6,6 +6,7 @@ class SingleSignOn
   NONCE_EXPIRY_TIME = 10.minutes
 
   attr_accessor(*ACCESSORS)
+
   attr_accessor :sso_secret, :sso_url
 
   def self.sso_secret

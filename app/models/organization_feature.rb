@@ -76,12 +76,12 @@ class OrganizationFeature < ApplicationRecord
     skip_ownership_email
   ] + BIKE_ACTIONS + REG_FIELDS).freeze
 
+  enum :kind, KIND_ENUM
+
   has_many :invoice_organization_features
   has_many :invoices, through: :invoice_organization_features
 
   validates_uniqueness_of :name
-
-  enum :kind, KIND_ENUM
 
   after_commit :update_invoices
 

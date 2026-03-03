@@ -30,6 +30,9 @@
 class BikeSticker < ApplicationRecord
   KIND_ENUM = {sticker: 0, spokecard: 1}.freeze
   MAX_UNORGANIZED = 20
+
+  enum :kind, KIND_ENUM
+
   belongs_to :bike
   belongs_to :organization
   belongs_to :secondary_organization, class_name: "Organization" # assigning organization
@@ -38,16 +41,14 @@ class BikeSticker < ApplicationRecord
 
   has_many :bike_sticker_updates
 
-  scope :claimed, -> { where.not(bike_id: nil) }
-  scope :unclaimed, -> { where(bike_id: nil) }
-
-  enum :kind, KIND_ENUM
-
   validates_presence_of :code
   validates_uniqueness_of :code, scope: [:organization_id], allow_nil: false
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
+
+  scope :claimed, -> { where.not(bike_id: nil) }
+  scope :unclaimed, -> { where(bike_id: nil) }
 
   def self.normalize_code(str = nil, leading_zeros: false, one_zero: false)
     return nil unless str.present?

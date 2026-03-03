@@ -212,7 +212,7 @@ export function useActivitySync(): UseActivitySyncResult {
       const enrichedActivities = await fetchEnrichedSince(maxEnrichedAt);
       if (enrichedActivities.length > 0) {
         await saveActivities(
-          enrichedActivities.map(a => ({ ...a, enriched: true })),
+          enrichedActivities,
           athlete.id
         );
       }
@@ -223,7 +223,7 @@ export function useActivitySync(): UseActivitySyncResult {
         await refreshSyncState();
       }
     } catch (err) {
-      console.warn('Enriched sync failed:', err instanceof Error ? err.message : err);
+      setError(err instanceof Error ? err.message : 'Enriched sync failed');
     }
   }, [athlete, isSyncing, isFetchingFullData, refreshSyncState]);
 
@@ -238,7 +238,7 @@ export function useActivitySync(): UseActivitySyncResult {
     let alreadyEnrichedCount = 0;
     for (const id of activityIds) {
       const activity = await getActivityById(id);
-      if (activity && activity.enriched) {
+      if (activity?.enriched_at) {
         alreadyEnrichedCount++;
       } else if (activity) {
         idsToFetch.push(id);
@@ -257,15 +257,15 @@ export function useActivitySync(): UseActivitySyncResult {
     const statusPrefix = isForPage ? 'Fetching full data for this page' : 'Fetching full data';
     setProgress({ loaded: 0, total: idsToFetch.length, status: `${statusPrefix}: 0 of ${formatNumber(idsToFetch.length)}` });
 
+    const failedIds: number[] = [];
     try {
       for (let i = 0; i < idsToFetch.length; i++) {
         const activityId = idsToFetch[i];
         try {
           const fullActivity = await getActivity(activityId);
-          // Save with enriched flag
-          await saveActivities([{ ...fullActivity, enriched: true }], athlete.id);
+          await saveActivities([fullActivity], athlete.id);
         } catch {
-          // Skip failed activities silently
+          failedIds.push(activityId);
         }
 
         setProgress({
@@ -278,6 +278,10 @@ export function useActivitySync(): UseActivitySyncResult {
         if (i < idsToFetch.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
+      }
+
+      if (failedIds.length > 0) {
+        setError(`Failed to fetch ${formatNumber(failedIds.length)} of ${formatNumber(idsToFetch.length)} activities`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch full activity data');

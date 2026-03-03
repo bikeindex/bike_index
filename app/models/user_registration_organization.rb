@@ -29,10 +29,10 @@ class UserRegistrationOrganization < ApplicationRecord
 
   validates_presence_of :user_id, :organization_id
 
+  attr_accessor :skip_after_user_change_worker
+
   before_validation :set_calculated_attributes
   after_commit :update_associations, if: :persisted?
-
-  attr_accessor :skip_after_user_change_worker
 
   # Includes deleted, just to be safe
   def self.org_ids_with_uniq_info(user, fields = nil)

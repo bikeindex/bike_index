@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Integrations::ExchangeRateAPIClient
-  attr_accessor :base_iso, :base_url, :cache_key
-
   BASE_URL = ENV.fetch("EXCHANGE_RATE_API_BASE_URL", "https://api.exchangeratesapi.io")
   API_KEY = ENV["EXCHANGE_RATE_API_KEY"]
+
+  attr_accessor :base_iso, :base_url, :cache_key
 
   def initialize(base_iso = "USD")
     self.base_iso = base_iso

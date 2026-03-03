@@ -11,6 +11,14 @@
         </small>
       </th>
 
+      <% if display_dev_info? %>
+        <th>
+          <small class="only-dev-visible">
+            <%= sortable "priority", render_sortable: render_sortable %>
+          </small>
+        </th>
+      <% end %>
+
       <th>
         <%= sortable "request_type", "Type", render_sortable: render_sortable %>
       </th>
@@ -48,6 +56,16 @@
               <%= l strava_request.updated_at, format: :convert_time %>
             </small>
           </td>
+
+          <% if display_dev_info? %>
+            <td>
+              <small
+                title="<%= number_with_delimiter(strava_request.priority) %>"
+              >
+                <%= (strava_request.priority / 100_000_000.0).round(1) %>
+              </small>
+            </td>
+          <% end %>
 
           <td><small><%= strava_request.request_type&.humanize %></small></td>
 

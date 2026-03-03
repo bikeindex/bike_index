@@ -86,6 +86,22 @@ describe('useActivitySync', () => {
     });
   });
 
+  describe('syncRecent error handling', () => {
+    it('sets error when syncRecent fails', async () => {
+      const { getAthleteGear } = await import('../services/strava');
+      vi.mocked(getAthleteGear).mockRejectedValueOnce(new Error('Network error'));
+
+      const { result } = renderHook(() => useActivitySync());
+
+      await act(async () => {
+        await result.current.syncRecent();
+      });
+
+      expect(result.current.error).toBe('Network error');
+      expect(result.current.isSyncing).toBe(false);
+    });
+  });
+
   describe('syncEnriched', () => {
     it('passes max enriched_at timestamp to fetchEnrichedSince', async () => {
       const { fetchEnrichedSince } = await import('../services/strava');
@@ -109,6 +125,19 @@ describe('useActivitySync', () => {
 
       const expectedTimestamp = Math.floor(new Date(enrichedAt2).getTime() / 1000);
       expect(fetchEnrichedSince).toHaveBeenCalledWith(expectedTimestamp);
+    });
+
+    it('sets error when syncEnriched fails', async () => {
+      const { getActivitiesForAthlete } = await import('../services/database');
+      vi.mocked(getActivitiesForAthlete).mockRejectedValueOnce(new Error('Database error'));
+
+      const { result } = renderHook(() => useActivitySync());
+
+      await act(async () => {
+        await result.current.syncEnriched();
+      });
+
+      expect(result.current.error).toBe('Database error');
     });
 
     it('passes 0 when no activities have enriched_at', async () => {
@@ -135,12 +164,12 @@ describe('useActivitySync', () => {
       const { getActivity } = await import('../services/strava');
       const { getActivityById, saveActivities } = await import('../services/database');
 
-      // Activity 1 already has full data (enriched: true)
-      // Activity 2 does not have full data (enriched: false)
+      // Activity 1 already has full data (enriched_at set)
+      // Activity 2 does not have full data (enriched_at null)
       // Activity 3 does not exist in DB
       vi.mocked(getActivityById)
-        .mockResolvedValueOnce({ id: 1, name: 'Enriched', enriched: true, athleteId: 12345, syncedAt: Date.now() } as never)
-        .mockResolvedValueOnce({ id: 2, name: 'Not enriched', enriched: false, athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: 1, name: 'Enriched', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: 2, name: 'Not enriched', enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never)
         .mockResolvedValueOnce(undefined);
 
       vi.mocked(getActivity).mockResolvedValue({ id: 2, name: 'Full data' } as never);
@@ -157,14 +186,38 @@ describe('useActivitySync', () => {
       expect(saveActivities).toHaveBeenCalledTimes(1);
     });
 
+    it('sets error when some activity fetches fail', async () => {
+      const { getActivity } = await import('../services/strava');
+      const { getActivityById } = await import('../services/database');
+
+      vi.mocked(getActivityById)
+        .mockResolvedValueOnce({ id: 1, enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: 2, enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: 3, enriched_at: null, athleteId: 12345, syncedAt: Date.now() } as never);
+
+      vi.mocked(getActivity)
+        .mockResolvedValueOnce({ id: 1 } as never)
+        .mockRejectedValueOnce(new Error('Not found'))
+        .mockRejectedValueOnce(new Error('Server error'));
+
+      const { result } = renderHook(() => useActivitySync());
+
+      await act(async () => {
+        await result.current.fetchFullActivityData([1, 2, 3]);
+      });
+
+      expect(result.current.error).toBe('Failed to fetch 2 of 3 activities');
+      expect(result.current.isFetchingFullData).toBe(false);
+    });
+
     it('does nothing when all activities already have full data', async () => {
       const { getActivity } = await import('../services/strava');
       const { getActivityById, saveActivities } = await import('../services/database');
 
-      // All activities already have full data (enriched: true)
+      // All activities already have full data (enriched_at set)
       vi.mocked(getActivityById)
-        .mockResolvedValueOnce({ id: 1, name: 'Enriched 1', enriched: true, athleteId: 12345, syncedAt: Date.now() } as never)
-        .mockResolvedValueOnce({ id: 2, name: 'Enriched 2', enriched: true, athleteId: 12345, syncedAt: Date.now() } as never);
+        .mockResolvedValueOnce({ id: 1, name: 'Enriched 1', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never)
+        .mockResolvedValueOnce({ id: 2, name: 'Enriched 2', enriched_at: '2026-02-01T00:00:00Z', athleteId: 12345, syncedAt: Date.now() } as never);
 
       const { result } = renderHook(() => useActivitySync());
 

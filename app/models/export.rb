@@ -58,19 +58,20 @@ class Export < ApplicationRecord
 
   mount_uploader :file, ExportUploader
 
-  belongs_to :organization
-  belongs_to :user # Creator of export
   enum :progress, PROGRESS_ENUM
   enum :kind, VALID_KINDS
   enum :file_format, VALID_FILE_FORMATS
+
+  belongs_to :organization
+  belongs_to :user # Creator of export
+
+  attr_accessor :timezone # permit assignment
+  attr_reader :avery_export
 
   before_validation :set_calculated_attributes, on: :create
   before_validation :set_progress
 
   scope :avery, -> { where("(options -> 'avery_export') IS NOT NULL") }
-
-  attr_accessor :timezone # permit assignment
-  attr_reader :avery_export
 
   class << self
     def default_headers

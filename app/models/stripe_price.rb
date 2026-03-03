@@ -22,10 +22,10 @@ class StripePrice < ApplicationRecord
 
   INTERVAL_ENUM = {monthly: 0, yearly: 1}.freeze
 
-  has_many :stripe_subscriptions, foreign_key: "stripe_price_stripe_id", primary_key: "stripe_id"
-
   enum :membership_level, Membership::LEVEL_ENUM
   enum :interval, INTERVAL_ENUM
+
+  has_many :stripe_subscriptions, foreign_key: "stripe_price_stripe_id", primary_key: "stripe_id"
 
   validates :stripe_id, presence: true, uniqueness: true
   validates :currency_enum, presence: true

@@ -46,11 +46,11 @@ class ModelAttestation < ApplicationRecord
 
   mount_uploader :file, PdfUploader
 
-  scope :current, -> { where(replaced: false) }
-  scope :certification_updating, -> { where(kind: certification_update_kinds) }
-
   before_validation :set_calculated_attributes
   after_commit :update_model_audit
+
+  scope :current, -> { where(replaced: false) }
+  scope :certification_updating, -> { where(kind: certification_update_kinds) }
 
   def self.kind_humanized(str)
     return nil if str.blank?

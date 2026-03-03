@@ -1,19 +1,27 @@
 # frozen_string_literal: true
 
 module StravaJobs
-  class RequestRunner < ScheduledJob
-    BATCH_SIZE = 30
-
-    prepend ScheduledJobRecorder
-
+  class RequestRunner < ApplicationJob
     sidekiq_options queue: "low_priority", retry: 1
 
     class << self
-      def frequency
-        16.seconds
+      def make_request_and_update(strava_integration, strava_request)
+        if strava_request.request_type == "incoming_webhook"
+          return handle_incoming_webhook(strava_request, strava_integration)
+        end
+
+        response = make_request(strava_integration, strava_request.request_type, strava_request.parameters)
+        strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
+
+        if strava_request&.success?
+          handle_response(strava_request, strava_integration, response&.body)
+        end
+        response&.body
       end
 
-      def execute(strava_integration, strava_request_type, parameters)
+      private
+
+      def make_request(strava_integration, strava_request_type, parameters)
         case strava_request_type
         when "list_activities"
           Integrations::StravaClient.list_activities(strava_integration, **parameters.symbolize_keys)
@@ -21,10 +29,8 @@ module StravaJobs
           Integrations::StravaClient.fetch_activity(strava_integration, parameters["strava_id"])
         when "fetch_gear"
           Integrations::StravaClient.fetch_gear(strava_integration, parameters["strava_gear_id"])
-        when "incoming_webhook"
-          if parameters["object_type"] == "activity" && parameters["aspect_type"] != "delete"
-            Integrations::StravaClient.fetch_activity(strava_integration, parameters["object_id"])
-          end
+        else
+          raise "Unknown Request type"
         end
       end
 
@@ -48,24 +54,25 @@ module StravaJobs
         strava_integration.update_sync_status
       end
 
-      def handle_incoming_webhook(strava_request, strava_integration, response)
-        params = strava_request.parameters
-        if params["object_type"] == "activity"
-          if params["aspect_type"] == "delete"
-            strava_integration.strava_activities.find_by(strava_id: params["object_id"].to_s)&.destroy
+      def handle_incoming_webhook(strava_request, strava_integration)
+        strava_params = strava_request.parameters
+        if strava_params["object_type"] == "activity"
+          if strava_params["aspect_type"] == "delete"
+            strava_integration.strava_activities.find_by(strava_id: strava_params["object_id"].to_s)&.destroy
           else
-            StravaActivity.create_or_update_from_strava_response(strava_integration, response)
+            StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => strava_params["object_id"].to_s})
           end
-        elsif params["object_type"] == "athlete" && params.dig("updates", "authorized") == "false"
+        elsif strava_params["object_type"] == "athlete" && strava_params.dig("updates", "authorized") == "false"
           strava_integration.destroy
         end
+        strava_request.update!(response_status: :success)
+
+        strava_params
       end
     end
 
     # keyword args are just for calling inline
-    def perform(strava_request_id = nil, strava_request: nil, no_skip: false)
-      return enqueue_next_request unless strava_request_id.present?
-
+    def perform(strava_request_id, strava_request: nil, no_skip: false)
       strava_request ||= StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || strava_request&.requested_at.present?
 
@@ -73,38 +80,27 @@ module StravaJobs
       if strava_integration.blank?
         return mark_requests_deleted(strava_request)
       elsif strava_request.skip_request? && !no_skip
-        return strava_request.update(response_status: "skipped")
+        return mark_sibling_requests_skipped(strava_request)
       end
 
-      response = self.class.execute(strava_integration, strava_request.request_type, strava_request.parameters)
-      strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
-      return unless strava_request.success?
-
-      self.class.handle_response(strava_request, strava_integration, response&.body)
-      response&.body
+      self.class.make_request_and_update(strava_integration, strava_request)
     end
 
     private
 
-    def enqueue_next_request
-      return unless rate_limit_allows_batch?
-
-      StravaRequest.next_pending(BATCH_SIZE).pluck(:id).each do |strava_request_id|
-        self.class.perform_async(strava_request_id)
-      end
-    end
-
-    def rate_limit_allows_batch?
-      rate_limit = StravaRequest.estimated_current_rate_limit
-      min_headroom = 2 * BATCH_SIZE
-      (rate_limit["read_short_limit"].to_i - rate_limit["read_short_usage"].to_i) >= min_headroom &&
-        (rate_limit["read_long_limit"].to_i - rate_limit["read_long_usage"].to_i) >= min_headroom
+    def mark_sibling_requests_skipped(strava_request)
+      strava_request.update(response_status: :skipped)
+      StravaRequest.unprocessed
+        .where(strava_integration_id: strava_request.strava_integration_id, request_type: :fetch_activity)
+        .where("parameters->>'strava_id' = ?", strava_request.parameters["strava_id"])
+        .where.not(id: strava_request.id)
+        .find_each { |sibling_request| sibling_request.update(response_status: :skipped) }
     end
 
     def mark_requests_deleted(strava_request)
       strava_request.update(response_status: :integration_deleted)
       StravaRequest.pending.where(strava_integration_id: strava_request.strava_integration_id)
-        .each(&:integration_deleted!)
+        .find_each { strava_request.update(response_status: :integration_deleted) }
     end
   end
 end

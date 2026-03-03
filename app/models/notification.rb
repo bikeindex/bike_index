@@ -39,15 +39,15 @@ class Notification < ApplicationRecord
 
   UNDELIVERABLE_ERRORS = %w[Postmark::InactiveRecipientError Postmark::InvalidEmailAddressError].freeze
 
+  enum :kind, KIND_ENUM
+  enum :message_channel, MESSAGE_CHANNEL_ENUM
+  enum :delivery_status, DELIVERY_STATUS_ENUM
+
   belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
   before_validation :set_calculated_attributes
-
-  enum :kind, KIND_ENUM
-  enum :message_channel, MESSAGE_CHANNEL_ENUM
-  enum :delivery_status, DELIVERY_STATUS_ENUM
 
   scope :with_bike, -> { where.not(bike_id: nil) }
   scope :without_bike, -> { where(bike_id: nil) }

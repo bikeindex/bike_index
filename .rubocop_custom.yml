@@ -1,0 +1,67 @@
+AllCops:
+  DisabledByDefault: true
+  SuggestExtensions: false
+  Exclude:
+    - "public/**/*"
+    - "node_modules/**/*"
+    - "spec/vcr_cassettes/*"
+    - "vendor/bundle/**/*"
+
+Layout/ClassStructure:
+  Enabled: true
+  ExpectedOrder:
+    - module_inclusion
+    - constants
+    - enums
+    - associations
+    - validations
+    - public_attribute_macros
+    - public_delegate
+    - callbacks
+    - scopes
+    - public_class_methods
+    - initializer
+    - public_methods
+    - protected_methods
+    - private_methods
+  Categories:
+    associations:
+      - has_many
+      - has_one
+      - belongs_to
+      - has_and_belongs_to_many
+      - has_rich_text
+    attribute_macros:
+       - attr_accessor
+       - attr_reader
+       - attr_writer
+    callbacks:
+      - before_validation
+      - after_validation
+      - before_save
+      - around_save
+      - after_save
+      - before_create
+      - around_create
+      - after_create
+      - before_update
+      - around_update
+      - after_update
+      - before_destroy
+      - around_destroy
+      - after_destroy
+      - after_commit
+      - after_create_commit
+      - after_update_commit
+      - after_destroy_commit
+    enums:
+      - enum
+    scopes:
+      - scope
+      - default_scope
+    validations:
+      - validates
+      - validate
+      - validates_presence_of
+      - validates_uniqueness_of
+      - validates_format_of

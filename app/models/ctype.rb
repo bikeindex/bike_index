@@ -28,6 +28,8 @@ class Ctype < ApplicationRecord
 
   attr_accessor :cgroup_name, :image_cache
 
+  before_create :set_calculated_attributes
+
   def self.select_options
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
     translation_scope = [:activerecord, :select_options, name.underscore]
@@ -43,8 +45,6 @@ class Ctype < ApplicationRecord
 
     @other = where(name: "unknown", has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
   end
-
-  before_create :set_calculated_attributes
 
   def set_calculated_attributes
     return true unless cgroup_name.present?

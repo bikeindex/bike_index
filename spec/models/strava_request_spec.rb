@@ -11,6 +11,12 @@ RSpec.describe StravaRequest, type: :model do
     end
   end
 
+  describe "priority" do
+    it "has the same keys for PRIORITY_MAP and REQUEST_TYPE" do
+      expect(StravaRequest::REQUEST_TYPE_ENUM.keys.sort).to eq StravaRequest::PRIORITY_MAP.keys.sort
+    end
+  end
+
   describe ".next_pending" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
@@ -30,26 +36,22 @@ RSpec.describe StravaRequest, type: :model do
       expect(StravaRequest.next_pending).to be_empty
     end
 
-    it "respects limit parameter" do
-      3.times { FactoryBot.create(:strava_request, strava_integration:) }
-      expect(StravaRequest.next_pending(2).count).to eq(2)
-    end
-
     it "orders by priority: list_activities, fetch_gear, fetch_activity" do
       fetch_activity = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       list_activities = FactoryBot.create(:strava_request, :list_activities, strava_integration:)
       fetch_gear = FactoryBot.create(:strava_request, :fetch_gear, strava_integration:)
 
-      results = StravaRequest.next_pending(10).to_a
-      expect(results).to eq([list_activities, fetch_gear, fetch_activity])
+      results = StravaRequest.next_pending(10).pluck(:id)
+      expect(results).to eq([list_activities.id, fetch_gear.id, fetch_activity.id])
     end
 
     it "orders by id within the same priority" do
       first = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       second = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
+      third = FactoryBot.create(:strava_request, :fetch_activity, priority: 1)
 
-      results = StravaRequest.next_pending(10).to_a
-      expect(results).to eq([first, second])
+      results = StravaRequest.next_pending(10).pluck(:id)
+      expect(results).to eq([third.id, first.id, second.id])
     end
   end
 
@@ -107,11 +109,18 @@ RSpec.describe StravaRequest, type: :model do
       expect(strava_request.skip_request?).to be false
     end
 
-    it "returns true when activity is already enriched" do
+    it "returns true when activity was recently enriched" do
       FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
-        enriched_at: Time.current)
+        enriched_at: 30.minutes.ago)
       strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       expect(strava_request.skip_request?).to be true
+    end
+
+    it "returns false when activity was enriched longer ago than RE_ENRICH_AFTER" do
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
+        enriched_at: 2.hours.ago)
+      strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
+      expect(strava_request.skip_request?).to be false
     end
   end
 

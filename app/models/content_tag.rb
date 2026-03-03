@@ -17,10 +17,10 @@ class ContentTag < ApplicationRecord
   has_many :blog_content_tags, dependent: :destroy
   has_many :blogs, through: :blog_content_tags
 
+  before_save :set_calculated_attributes
+
   scope :commonness, -> { order("priority DESC, name ASC") }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
-
-  before_save :set_calculated_attributes
 
   def self.matching_ids(str_or_array)
     return [] if str_or_array.blank?

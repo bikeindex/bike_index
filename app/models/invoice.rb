@@ -41,6 +41,8 @@ class Invoice < ApplicationRecord
 
   validates :organization, presence: true
 
+  attr_accessor :timezone
+
   before_save :set_calculated_attributes
   after_commit :update_organization
 
@@ -57,8 +59,6 @@ class Invoice < ApplicationRecord
   scope :not_endless, -> { where.not(is_endless: true) }
   scope :should_expire, -> { not_endless.where(is_active: true).where("subscription_end_at < ?", Time.current) }
   scope :should_activate, -> { where(is_active: false).where("subscription_start_at < ? AND subscription_end_at > ?", Time.current, Time.current) }
-
-  attr_accessor :timezone
 
   def self.friendly_find(str)
     str = str[/\d+/] if str.is_a?(String)

@@ -32,3 +32,10 @@ production:
       sudo: true
       execute: true
       apply_during: build_only
+
+  last_thing:
+    # Trigger honeybadger deploy hook
+    - command: cd $RAILS_STACK_PATH && bundle exec rake trigger_honeybadger_deploy
+      target: rails
+      execute: true
+      run_on: single_server

@@ -7,7 +7,7 @@
 #
 #  id                    :bigint           not null, primary key
 #  parameters            :jsonb
-#  priority              :bigint           default(0), not null
+#  priority              :bigint           not null
 #  rate_limit            :jsonb
 #  request_type          :integer          not null
 #  requested_at          :datetime
@@ -44,20 +44,26 @@ class StravaRequest < AnalyticsRecord
   }.freeze
   PENDING_OR_SUCCESS = %i[success pending].freeze
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
-  # Priority: incoming_webhook (5) → list_activities (2) → fetch_gear (4) → fetch_activity (3)
-  PRIORITY_ORDER = [5, 2, 4, 3, 0, 1].freeze
-  PRIORITY_MAP = PRIORITY_ORDER.each_with_index.to_h.freeze
-  PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000
-
-  belongs_to :user
-  belongs_to :strava_integration
+  PRIORITY_MAP = {
+    proxy: 0,
+    incoming_webhook: 1,
+    fetch_athlete: 2,
+    fetch_athlete_stats: 2,
+    list_activities: 3,
+    fetch_gear: 4,
+    fetch_activity: 5
+  }.freeze
+  PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000 # Based on timestamp digits
 
   enum :request_type, REQUEST_TYPE_ENUM
   enum :response_status, RESPONSE_STATUS_ENUM
 
+  belongs_to :user
+  belongs_to :strava_integration
+
   validates :strava_integration_id, presence: true
 
-  before_validation :set_priority, on: :create
+  before_validation :set_calculated_attributes, on: :create
 
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
@@ -89,6 +95,11 @@ class StravaRequest < AnalyticsRecord
     def estimated_current_rate_limit
       latest = where.not(rate_limit: nil).order(requested_at: :desc).first
       latest.nil? ? default_rate_limit : rate_limit_from(latest.rate_limit.symbolize_keys, latest.requested_at)
+    end
+
+    def most_recent_proxy_at(strava_integration_id)
+      where(strava_integration_id:, request_type: :proxy)
+        .where.not(requested_at: nil).maximum(:requested_at)
     end
 
     private
@@ -131,7 +142,8 @@ class StravaRequest < AnalyticsRecord
   def skip_request?
     return false unless fetch_activity?
 
-    strava_integration.strava_activities.enriched.exists?(strava_id: parameters["strava_id"])
+    activity = strava_integration.strava_activities.find_by(strava_id: parameters["strava_id"])
+    activity.present? && !activity.re_enrich?
   end
 
   def looks_like_last_page?(per_page: nil)
@@ -172,14 +184,19 @@ class StravaRequest < AnalyticsRecord
     end
   end
 
-  def set_priority
-    level = PRIORITY_MAP.fetch(REQUEST_TYPE_ENUM[request_type.to_sym], PRIORITY_ORDER.length)
-    secondary = if fetch_activity?
-      PRIORITY_LEVEL_MULTIPLIER - (parameters["strava_id"].to_i / 1000)
-    else
-      Time.current.to_i / 10
+  def set_calculated_attributes
+    self.user_id ||= strava_integration&.user_id
+    self.priority ||= calculated_priority
+  end
+
+  def calculated_priority
+    level = PRIORITY_MAP[request_type.to_sym] * PRIORITY_LEVEL_MULTIPLIER
+
+    if fetch_activity? && parameters["strava_id"].present?
+      level += (parameters["strava_id"].to_i / 1000)
     end
-    self.priority = level * PRIORITY_LEVEL_MULTIPLIER + secondary
+
+    level + Time.current.to_i / 10
   end
 
   # IDK, sort of a guess - because Strava responds with a 404 :/

@@ -31,13 +31,18 @@ class StravaIntegration < ApplicationRecord
 
   acts_as_paranoid
 
+  enum :status, STATUS_ENUM
+
   belongs_to :user
 
   has_many :strava_activities, dependent: :destroy
   has_many :strava_gears, dependent: :destroy
   has_many :strava_requests
 
-  enum :status, STATUS_ENUM
+  validates :access_token, presence: true, unless: :deleted_at?
+  validates :refresh_token, presence: true, unless: :deleted_at?
+
+  before_destroy :mark_disconnected
 
   scope :token_expired, -> { where("token_expires_at IS NULL OR token_expires_at < ?", Time.current) }
   scope :permissions_default, -> { where(strava_permissions: Integrations::StravaClient::DEFAULT_SCOPE) }
@@ -48,17 +53,16 @@ class StravaIntegration < ApplicationRecord
     where.not(strava_permissions: [nil, ""]).where("LENGTH(strava_permissions) - LENGTH(REPLACE(strava_permissions, ',', '')) > ?", DEFAULT_SCOPE_COUNT)
   }
 
-  validates :access_token, presence: true, unless: :deleted_at?
-  validates :refresh_token, presence: true, unless: :deleted_at?
-
-  before_destroy :mark_disconnected
-
   def token_expired?
     token_expires_at.nil? || token_expires_at < Time.current
   end
 
   def permissions_default?
     strava_permissions == Integrations::StravaClient::DEFAULT_SCOPE
+  end
+
+  def permissions_strava_search_default?
+    strava_permissions == Integrations::StravaClient::STRAVA_SEARCH_SCOPE
   end
 
   def permissions_less?
@@ -126,7 +130,7 @@ class StravaIntegration < ApplicationRecord
 
     unprocessed_lists = StravaRequest.list_activities.unprocessed.where(strava_integration_id: id)
     if unprocessed_lists.none?
-      enqueue_detail_requests
+      enqueue_enrich_activity_requests
       enqueue_gear_requests
       strava_gears.find_each(&:update_total_distance!)
     end
@@ -149,14 +153,16 @@ class StravaIntegration < ApplicationRecord
     end
   end
 
-  def enqueue_detail_requests
+  def enqueue_enrich_activity_requests
     already_enqueued = StravaRequest.unprocessed
       .where(strava_integration_id: id, request_type: :fetch_activity)
       .pluck(Arel.sql("parameters->>'strava_id'"))
-    strava_activities.activities_to_enrich.where.not(strava_id: already_enqueued).pluck(:strava_id).each do |strava_id|
-      StravaRequest.create!(user_id:, strava_integration_id: id,
-        request_type: :fetch_activity, parameters: {strava_id: strava_id.to_s})
-    end
+
+    strava_activities.activities_to_enrich.where.not(strava_id: already_enqueued).pluck(:strava_id)
+      .each do |strava_id|
+        StravaRequest.create!(user_id:, strava_integration_id: id,
+          request_type: :fetch_activity, parameters: {strava_id:})
+      end
   end
 
   def mark_disconnected

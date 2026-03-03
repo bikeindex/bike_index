@@ -32,6 +32,8 @@ class Blog < ApplicationRecord
 
   KIND_ENUM = {blog: 0, info: 1, listicle: 2}.freeze
 
+  enum :kind, KIND_ENUM
+
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :listicles, dependent: :destroy
@@ -44,12 +46,10 @@ class Blog < ApplicationRecord
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
 
+  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone, :info_kind
+
   before_save :set_calculated_attributes
   before_create :set_title_slug
-
-  enum :kind, KIND_ENUM
-
-  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone, :info_kind
 
   scope :published, -> { where(published: true) }
   default_scope { order("published_at desc") }

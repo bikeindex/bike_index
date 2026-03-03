@@ -25,6 +25,10 @@
 #  index_strava_gears_on_strava_integration_id_and_strava_gear_id  (strava_integration_id,strava_gear_id) UNIQUE
 #
 class StravaGear < ApplicationRecord
+  GEAR_TYPE_ENUM = {bike: 0, shoe: 1}.freeze
+
+  enum :gear_type, GEAR_TYPE_ENUM
+
   belongs_to :strava_integration
   belongs_to :item, polymorphic: true, optional: true
 
@@ -33,9 +37,6 @@ class StravaGear < ApplicationRecord
     uniqueness: {scope: :strava_integration_id}
   validates :item_id, uniqueness: {scope: :item_type, message: "already has a Strava gear association"},
     allow_nil: true
-
-  GEAR_TYPE_ENUM = {bike: 0, shoe: 1}.freeze
-  enum :gear_type, GEAR_TYPE_ENUM
 
   scope :bikes, -> { where(gear_type: :bike) }
   scope :shoes, -> { where(gear_type: :shoe) }

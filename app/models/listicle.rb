@@ -22,9 +22,9 @@ class Listicle < ApplicationRecord
   belongs_to :blog
   mount_uploader :image, ListicleImageUploader
 
-  default_scope { order("list_order ASC") }
-
   before_save :htmlize_content
+
+  default_scope { order("list_order ASC") }
 
   def htmlize_content
     self.body_html = Kramdown::Document.new(body).to_html if body.present?
