@@ -10,7 +10,7 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
   let(:instance) { described_class.new }
 
   it "is the correct queue and frequency" do
-    expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
+    expect(described_class.sidekiq_options["queue"]).to eq "droppable"
     expect(described_class.frequency).to eq(50.minutes)
   end
 

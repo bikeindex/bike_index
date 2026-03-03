@@ -6,7 +6,7 @@ module StravaJobs
 
     MAX_PRIORITY = 10_000_000_000
 
-    sidekiq_options queue: "low_priority", retry: 1
+    sidekiq_options queue: "droppable", retry: 1
 
     class << self
       def frequency
