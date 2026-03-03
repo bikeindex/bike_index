@@ -9,7 +9,6 @@ en:
         bike: bike
         color: Color
         create_export_of_vehicles: Create export of searched %{cycle_type}
-        email_hidden: email hidden
         impounded: Impounded
         link: Link
         manufacturer: Manufacturer

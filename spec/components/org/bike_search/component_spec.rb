@@ -36,20 +36,19 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
     }
   end
 
-  it "renders table with bikes" do
+  it "renders table with bikes, form and checkboxes" do
     expect(component).to have_css("table.table")
     expect(component).to have_css("tbody tr", count: 1)
     expect(component).to have_css(".settings-list", visible: :all)
-  end
-
-  it "renders search form" do
+    # Search form
     expect(component).to have_css("#Search_Form")
     expect(component).to have_css("hr")
-  end
-
-  it "renders settings panel with column checkboxes" do
+    # checboxes
     expect(component).to have_css(".settings-list.tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
+    # pagination
+    expect(component).to have_css(".paginate-container")
+    expect(component).to have_css("select#per_page_select")
   end
 
   context "with only_show_bikes" do
@@ -84,15 +83,6 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
 
     it "renders export link" do
       expect(component).to have_link(text: /Create export/, visible: :all)
-    end
-  end
-
-  context "with pagination" do
-    let(:pagy) { Pagy::Offset.new(count: 50, page: 1, limit: 10) }
-
-    it "renders pagination" do
-      expect(component).to have_css(".paginate-container")
-      expect(component).to have_css("select#per_page_select")
     end
   end
 end
