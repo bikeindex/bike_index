@@ -539,7 +539,7 @@ export function SearchFilters({
                 });
               }}
               disabled={disabled}
-              className={`${disabled ? disabledClasses : selectClasses} max-w-[200px]`}
+              className={`${disabled ? disabledClasses : selectClasses} max-w-[200px] sm:max-w-none`}
             >
               <option value="">{countryLabel}</option>
               {allCountries.map((abbr) => {
@@ -561,7 +561,7 @@ export function SearchFilters({
                 });
               }}
               disabled={disabled || availableRegions.length === 0}
-              className={`${disabled || availableRegions.length === 0 ? disabledClasses : selectClasses} max-w-[200px]`}
+              className={`${disabled || availableRegions.length === 0 ? disabledClasses : selectClasses} max-w-[200px] sm:max-w-none`}
             >
               <option value="">{regionLabel}</option>
               {availableRegions.map(({ region, label }) => (
@@ -575,7 +575,7 @@ export function SearchFilters({
               value={filters.city || ''}
               onChange={(e) => onFiltersChange({ ...filters, city: e.target.value || null })}
               disabled={disabled || availableCities.length === 0}
-              className={`${disabled || availableCities.length === 0 ? disabledClasses : selectClasses} max-w-[200px]`}
+              className={`${disabled || availableCities.length === 0 ? disabledClasses : selectClasses} max-w-[200px] sm:max-w-none`}
             >
               <option value="">{cityLabel}</option>
               {availableCities.map(({ city, label }) => (
