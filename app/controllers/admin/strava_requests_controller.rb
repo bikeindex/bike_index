@@ -16,7 +16,7 @@ class Admin::StravaRequestsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[updated_at created_at requested_at request_type response_status strava_integration_id]
+    %w[updated_at created_at requested_at request_type response_status strava_integration_id priority]
   end
 
   def sortable_opts

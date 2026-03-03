@@ -11,6 +11,12 @@ RSpec.describe StravaRequest, type: :model do
     end
   end
 
+  describe "priority" do
+    it "has the same keys for PRIORITY_MAP and REQUEST_TYPE" do
+      expect(StravaRequest::REQUEST_TYPE_ENUM.keys.sort).to eq StravaRequest::PRIORITY_MAP.keys.sort
+    end
+  end
+
   describe ".next_pending" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 

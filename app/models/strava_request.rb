@@ -46,14 +46,22 @@ class StravaRequest < AnalyticsRecord
   NOT_SUCCESSFUL = (RESPONSE_STATUS_ENUM.keys - PENDING_OR_SUCCESS).freeze
   # Priority: incoming_webhook (5) → list_activities (2) → fetch_gear (4) → fetch_activity (3)
   PRIORITY_ORDER = [5, 2, 4, 3, 0, 1].freeze
-  PRIORITY_MAP = PRIORITY_ORDER.each_with_index.to_h.freeze
+  PRIORITY_MAP = {
+    proxy: 0,
+    incoming_webhook: 1,
+    fetch_athlete: 2,
+    fetch_athlete_stats: 2,
+    list_activities: 3,
+    fetch_gear: 4,
+    fetch_activity: 5
+  }.freeze
   PRIORITY_LEVEL_MULTIPLIER = 1_000_000_000
-
-  belongs_to :user
-  belongs_to :strava_integration
 
   enum :request_type, REQUEST_TYPE_ENUM
   enum :response_status, RESPONSE_STATUS_ENUM
+
+  belongs_to :user
+  belongs_to :strava_integration
 
   validates :strava_integration_id, presence: true
 
@@ -179,12 +187,13 @@ class StravaRequest < AnalyticsRecord
   end
 
   def set_calculated_attributes
-    self.user_id ||= strava_integration.user_id
+    self.user_id ||= strava_integration&.user_id
     self.priority ||= calculated_priority
   end
 
   def calculated_priority
     level = PRIORITY_MAP.fetch(REQUEST_TYPE_ENUM[request_type.to_sym], PRIORITY_ORDER.length)
+
     secondary = if fetch_activity?
       PRIORITY_LEVEL_MULTIPLIER - (parameters["strava_id"].to_i / 1000)
     else
