@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { SearchFilters } from './SearchFilters';
 import { mockGear, mockActivities } from '../stories/mocks';
 import type { SearchFilters as SearchFiltersType } from '../types/strava';
@@ -37,6 +37,15 @@ const defaultFilters: SearchFiltersType = {
   page: 1,
 };
 
+function getDropdownOptions(label: string) {
+  const combobox = screen.getByRole('combobox', { name: label });
+  fireEvent.click(combobox);
+  const listbox = screen.getByRole('listbox', { name: label });
+  const options = within(listbox).getAllByRole('option').map((o) => o.textContent);
+  fireEvent.click(combobox); // close
+  return options;
+}
+
 describe('SearchFilters', () => {
   let onFiltersChange: ReturnType<typeof vi.fn>;
 
@@ -60,13 +69,9 @@ describe('SearchFilters', () => {
       expect(screen.getByText('Region:')).toBeInTheDocument();
       expect(screen.getByText('City:')).toBeInTheDocument();
 
-      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
-      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
-
-      expect(countrySelect.options[0].text).toBe('All (2 countries)');
-      expect(regionSelect.options[0].text).toBe('All (5 regions)');
-      expect(citySelect.options[0].text).toBe('All (22 cities)');
+      expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('All (2 countries)');
+      expect(screen.getByRole('combobox', { name: 'Region' })).toHaveTextContent('All (5 regions)');
+      expect(screen.getByRole('combobox', { name: 'City' })).toHaveTextContent('All (22 cities)');
     });
 
     it('shows disabled location selects with Loading placeholder while loading', () => {
@@ -78,17 +83,17 @@ describe('SearchFilters', () => {
           onFiltersChange={onFiltersChange}
         />,
       );
-      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
-      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
+      const countryCombobox = screen.getByRole('combobox', { name: 'Country' });
+      const regionCombobox = screen.getByRole('combobox', { name: 'Region' });
+      const cityCombobox = screen.getByRole('combobox', { name: 'City' });
 
-      expect(countrySelect.disabled).toBe(true);
-      expect(regionSelect.disabled).toBe(true);
-      expect(citySelect.disabled).toBe(true);
+      expect(countryCombobox).toBeDisabled();
+      expect(regionCombobox).toBeDisabled();
+      expect(cityCombobox).toBeDisabled();
 
-      expect(countrySelect.options[0].text).toBe('Loading...');
-      expect(regionSelect.options[0].text).toBe('Loading...');
-      expect(citySelect.options[0].text).toBe('Loading...');
+      expect(countryCombobox).toHaveTextContent('Loading...');
+      expect(regionCombobox).toHaveTextContent('Loading...');
+      expect(cityCombobox).toHaveTextContent('Loading...');
     });
 
     it('shows disabled location selects with N/A when no location data exists', () => {
@@ -103,31 +108,29 @@ describe('SearchFilters', () => {
           onFiltersChange={onFiltersChange}
         />,
       );
-      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
-      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
+      const countryCombobox = screen.getByRole('combobox', { name: 'Country' });
+      const regionCombobox = screen.getByRole('combobox', { name: 'Region' });
+      const cityCombobox = screen.getByRole('combobox', { name: 'City' });
 
-      expect(countrySelect.disabled).toBe(true);
-      expect(regionSelect.disabled).toBe(true);
-      expect(citySelect.disabled).toBe(true);
+      expect(countryCombobox).toBeDisabled();
+      expect(regionCombobox).toBeDisabled();
+      expect(cityCombobox).toBeDisabled();
 
-      expect(countrySelect.options[0].text).toBe('N/A');
-      expect(regionSelect.options[0].text).toBe('N/A');
-      expect(citySelect.options[0].text).toBe('N/A');
+      expect(countryCombobox).toHaveTextContent('N/A');
+      expect(regionCombobox).toHaveTextContent('N/A');
+      expect(cityCombobox).toHaveTextContent('N/A');
     });
 
     it('lists countries with full name and abbreviation', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
-      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
-      const options = Array.from(countrySelect.options).map((o) => o.text);
+      const options = getDropdownOptions('Country');
       expect(options).toContain('Germany');
       expect(options).toContain('US (United States)');
     });
 
     it('lists regions with country prefix, full name, and abbreviation', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
-      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      const options = Array.from(regionSelect.options).map((o) => o.text);
+      const options = getDropdownOptions('Region');
       expect(options).toContain('US: CA (California)');
       expect(options).toContain('US: IN (Indiana)');
       expect(options).toContain('US: IL (Illinois)');
@@ -137,8 +140,7 @@ describe('SearchFilters', () => {
 
     it('displays cities with country and region abbreviations', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
-      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
-      const options = Array.from(citySelect.options).map((o) => o.text);
+      const options = getDropdownOptions('City');
       expect(options).toContain('US, CA: Truckee');
       expect(options).toContain('US, CA: San Francisco');
       expect(options).toContain('Germany, Berlin: Berlin');
@@ -154,15 +156,15 @@ describe('SearchFilters', () => {
           onFiltersChange={onFiltersChange}
         />,
       );
-      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      const options = Array.from(regionSelect.options).map((o) => o.text);
+      const regionCombobox = screen.getByRole('combobox', { name: 'Region' });
+      expect(regionCombobox).toHaveTextContent('All (2 regions)');
+
+      const options = getDropdownOptions('Region');
       expect(options).toContain('Germany: Berlin');
       expect(options).toContain('Germany: BB (Brandenburg)');
       expect(options).not.toContain('US: CA (California)');
-      expect(regionSelect.options[0].text).toBe('All (2 regions)');
 
-      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
-      expect(citySelect.options[0].text).toBe('All (6 cities)');
+      expect(screen.getByRole('combobox', { name: 'City' })).toHaveTextContent('All (6 cities)');
     });
 
     it('filters cities when region is selected and updates placeholder count', () => {
@@ -173,19 +175,22 @@ describe('SearchFilters', () => {
           onFiltersChange={onFiltersChange}
         />,
       );
-      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
-      const options = Array.from(citySelect.options).map((o) => o.text);
+      const cityCombobox = screen.getByRole('combobox', { name: 'City' });
+      expect(cityCombobox).toHaveTextContent('All (3 cities)');
+
+      const options = getDropdownOptions('City');
       expect(options).toContain('Germany, Berlin: Berlin');
       expect(options).toContain('Germany, Berlin: Mitte');
       expect(options).toContain('Germany, Berlin: Pankow');
       expect(options).not.toContain('US, CA: Truckee');
-      expect(citySelect.options[0].text).toBe('All (3 cities)');
     });
 
     it('calls onFiltersChange when country is selected', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
-      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
-      fireEvent.change(countrySelect, { target: { value: 'Germany' } });
+      const countryCombobox = screen.getByRole('combobox', { name: 'Country' });
+      fireEvent.click(countryCombobox);
+      const listbox = screen.getByRole('listbox', { name: 'Country' });
+      fireEvent.click(within(listbox).getByRole('option', { name: 'Germany' }));
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({ country: 'Germany' }),
       );
@@ -199,8 +204,10 @@ describe('SearchFilters', () => {
           onFiltersChange={onFiltersChange}
         />,
       );
-      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
-      fireEvent.change(countrySelect, { target: { value: 'Germany' } });
+      const countryCombobox = screen.getByRole('combobox', { name: 'Country' });
+      fireEvent.click(countryCombobox);
+      const listbox = screen.getByRole('listbox', { name: 'Country' });
+      fireEvent.click(within(listbox).getByRole('option', { name: 'Germany' }));
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({ country: 'Germany', region: null, city: null }),
       );
@@ -214,8 +221,10 @@ describe('SearchFilters', () => {
           onFiltersChange={onFiltersChange}
         />,
       );
-      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      fireEvent.change(regionSelect, { target: { value: 'Berlin' } });
+      const regionCombobox = screen.getByRole('combobox', { name: 'Region' });
+      fireEvent.click(regionCombobox);
+      const listbox = screen.getByRole('listbox', { name: 'Region' });
+      fireEvent.click(within(listbox).getByRole('option', { name: 'Germany: Berlin' }));
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({ region: 'Berlin', city: null }),
       );
@@ -223,8 +232,10 @@ describe('SearchFilters', () => {
 
     it('allows selecting region without country', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
-      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      fireEvent.change(regionSelect, { target: { value: 'CA' } });
+      const regionCombobox = screen.getByRole('combobox', { name: 'Region' });
+      fireEvent.click(regionCombobox);
+      const listbox = screen.getByRole('listbox', { name: 'Region' });
+      fireEvent.click(within(listbox).getByRole('option', { name: 'US: CA (California)' }));
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({ country: null, region: 'CA' }),
       );
@@ -252,29 +263,28 @@ describe('SearchFilters', () => {
         />,
       );
 
-      const countrySelect = screen.getByText('Country:').nextElementSibling as HTMLSelectElement;
-      const countryOptions = Array.from(countrySelect.options).map((o) => o.text);
+      expect(screen.getByRole('combobox', { name: 'Country' })).toHaveTextContent('All (1 country)');
+      const countryOptions = getDropdownOptions('Country');
       expect(countryOptions).toContain('KE (Kenya)');
-      expect(countrySelect.options[0].text).toBe('All (1 country)');
 
-      const regionSelect = screen.getByText('Region:').nextElementSibling as HTMLSelectElement;
-      const regionOptions = Array.from(regionSelect.options).map((o) => o.text);
+      expect(screen.getByRole('combobox', { name: 'Region' })).toHaveTextContent('All (2 regions)');
+      const regionOptions = getDropdownOptions('Region');
       expect(regionOptions).toContain('KE: Nakuru');
       expect(regionOptions).toContain('KE: Nakuru County');
-      expect(regionSelect.options[0].text).toBe('All (2 regions)');
 
       // Only one city despite three locations (one has nil city)
-      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
-      const cityOptions = Array.from(citySelect.options).map((o) => o.text);
+      expect(screen.getByRole('combobox', { name: 'City' })).toHaveTextContent('All (1 city)');
+      const cityOptions = getDropdownOptions('City');
       expect(cityOptions).toContain('KE, Nakuru: Sulmac Village');
       expect(cityOptions).toHaveLength(2); // "All" + 1 city
-      expect(citySelect.options[0].text).toBe('All (1 city)');
     });
 
     it('allows selecting city without country or region', () => {
       render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
-      const citySelect = screen.getByText('City:').nextElementSibling as HTMLSelectElement;
-      fireEvent.change(citySelect, { target: { value: 'Berlin' } });
+      const cityCombobox = screen.getByRole('combobox', { name: 'City' });
+      fireEvent.click(cityCombobox);
+      const listbox = screen.getByRole('listbox', { name: 'City' });
+      fireEvent.click(within(listbox).getByRole('option', { name: 'Germany, Berlin: Berlin' }));
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({ country: null, region: null, city: 'Berlin' }),
       );

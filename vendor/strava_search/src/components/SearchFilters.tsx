@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { Search, X, ChevronDown } from 'lucide-react';
 import type { SearchFilters as SearchFiltersType, StravaActivity } from '../types/strava';
 import type { StoredGear } from '../services/database';
@@ -21,6 +21,90 @@ interface SearchFiltersProps {
   totalCount: number;
   filteredCount: number;
   isLoading?: boolean;
+}
+
+function LocationSelect({
+  value,
+  onChange,
+  disabled,
+  className,
+  label,
+  placeholder,
+  options,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  disabled: boolean;
+  className: string;
+  label: string;
+  placeholder: string;
+  options: Array<{ value: string; label: string }>;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleMouseDown = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  const selectedLabel = options.find((o) => o.value === value)?.label || placeholder;
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        role="combobox"
+        aria-label={label}
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className={`${className} text-left flex items-center gap-1`}
+      >
+        <span className="truncate">{selectedLabel}</span>
+        <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      {isOpen && (
+        <div role="listbox" aria-label={label} className="absolute left-0 z-50 mt-1 min-w-full max-w-[90vw] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+          <button
+            type="button"
+            role="option"
+            aria-selected={!value}
+            className={`w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 whitespace-normal break-words ${!value ? 'font-medium' : ''}`}
+            onClick={() => { onChange(''); setIsOpen(false); }}
+          >
+            {placeholder}
+          </button>
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              role="option"
+              aria-selected={opt.value === value}
+              className={`w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 whitespace-normal break-words ${opt.value === value ? 'bg-gray-100 dark:bg-gray-700 font-medium' : ''}`}
+              onClick={() => { onChange(opt.value); setIsOpen(false); }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 const toggleInactive = 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600';
@@ -527,10 +611,10 @@ export function SearchFilters({
         <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0">
             <span>Country:</span>
-            <select
+            <LocationSelect
               value={filters.country || ''}
-              onChange={(e) => {
-                const country = e.target.value || null;
+              onChange={(val) => {
+                const country = val || null;
                 onFiltersChange({
                   ...filters,
                   country,
@@ -539,21 +623,21 @@ export function SearchFilters({
                 });
               }}
               disabled={disabled}
+              label="Country"
               className={`${disabled ? disabledClasses : selectClasses} max-w-[200px] sm:max-w-none`}
-            >
-              <option value="">{countryLabel}</option>
-              {allCountries.map((abbr) => {
+              placeholder={countryLabel}
+              options={allCountries.map((abbr) => {
                 const fullName = countryNames.get(abbr);
-                return <option key={abbr} value={abbr}>{fullName ? `${abbr} (${fullName})` : abbr}</option>;
+                return { value: abbr, label: fullName ? `${abbr} (${fullName})` : abbr };
               })}
-            </select>
+            />
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0">
             <span>Region:</span>
-            <select
+            <LocationSelect
               value={filters.region || ''}
-              onChange={(e) => {
-                const region = e.target.value || null;
+              onChange={(val) => {
+                const region = val || null;
                 onFiltersChange({
                   ...filters,
                   region,
@@ -561,27 +645,23 @@ export function SearchFilters({
                 });
               }}
               disabled={disabled || availableRegions.length === 0}
+              label="Region"
               className={`${disabled || availableRegions.length === 0 ? disabledClasses : selectClasses} max-w-[200px] sm:max-w-none`}
-            >
-              <option value="">{regionLabel}</option>
-              {availableRegions.map(({ region, label }) => (
-                <option key={region} value={region}>{label}</option>
-              ))}
-            </select>
+              placeholder={regionLabel}
+              options={availableRegions.map(({ region, label }) => ({ value: region, label }))}
+            />
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0">
             <span>City:</span>
-            <select
+            <LocationSelect
               value={filters.city || ''}
-              onChange={(e) => onFiltersChange({ ...filters, city: e.target.value || null })}
+              onChange={(val) => onFiltersChange({ ...filters, city: val || null })}
               disabled={disabled || availableCities.length === 0}
+              label="City"
               className={`${disabled || availableCities.length === 0 ? disabledClasses : selectClasses} max-w-[200px] sm:max-w-none`}
-            >
-              <option value="">{cityLabel}</option>
-              {availableCities.map(({ city, label }) => (
-                <option key={city} value={city}>{label}</option>
-              ))}
-            </select>
+              placeholder={cityLabel}
+              options={availableCities.map(({ city, label }) => ({ value: city, label }))}
+            />
           </label>
         </div>
           );
