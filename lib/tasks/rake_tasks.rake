@@ -101,6 +101,16 @@ task database_size: :environment do
   puts "\n#{"Total size".ljust(name_col_length)} | #{ActiveRecord::Base.connection.execute(sql)[0]["pg_size_pretty"]}"
 end
 
+desc "Notify Honeybadger of a deploy"
+task trigger_honeybadger_deploy: :environment do
+  Honeybadger.track_deployment(
+    environment: Rails.env,
+    revision: `git rev-parse HEAD`.strip,
+    local_username: `whoami`.strip,
+    repository: "git@github.com:bikeindex/bike_index.git"
+  )
+end
+
 desc "Provide DB vacuum for production environment"
 task database_vacuum: :environment do
   tables = ActiveRecord::Base.connection.tables
