@@ -31,13 +31,18 @@ class StravaIntegration < ApplicationRecord
 
   acts_as_paranoid
 
+  enum :status, STATUS_ENUM
+
   belongs_to :user
 
   has_many :strava_activities, dependent: :destroy
   has_many :strava_gears, dependent: :destroy
   has_many :strava_requests
 
-  enum :status, STATUS_ENUM
+  validates :access_token, presence: true, unless: :deleted_at?
+  validates :refresh_token, presence: true, unless: :deleted_at?
+
+  before_destroy :mark_disconnected
 
   scope :token_expired, -> { where("token_expires_at IS NULL OR token_expires_at < ?", Time.current) }
   scope :permissions_default, -> { where(strava_permissions: Integrations::StravaClient::DEFAULT_SCOPE) }
@@ -47,11 +52,6 @@ class StravaIntegration < ApplicationRecord
   scope :permissions_more, -> {
     where.not(strava_permissions: [nil, ""]).where("LENGTH(strava_permissions) - LENGTH(REPLACE(strava_permissions, ',', '')) > ?", DEFAULT_SCOPE_COUNT)
   }
-
-  validates :access_token, presence: true, unless: :deleted_at?
-  validates :refresh_token, presence: true, unless: :deleted_at?
-
-  before_destroy :mark_disconnected
 
   def token_expired?
     token_expires_at.nil? || token_expires_at < Time.current

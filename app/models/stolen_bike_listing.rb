@@ -48,6 +48,8 @@ class StolenBikeListing < ActiveRecord::Base
 
   GROUP_ENUM = {constru: 0}
 
+  enum :group, GROUP_ENUM
+
   belongs_to :bike
   belongs_to :manufacturer
   belongs_to :primary_frame_color, class_name: "Color"
@@ -58,8 +60,6 @@ class StolenBikeListing < ActiveRecord::Base
   has_many :repeat_listings, class_name: "StolenBikeListing", foreign_key: :initial_listing_id
 
   before_save :set_calculated_attributes
-
-  enum :group, GROUP_ENUM
 
   scope :listing_ordered, -> { reorder(listing_order: :desc) }
   scope :initial, -> { where(initial_listing_id: nil) }

@@ -22,6 +22,8 @@ class Currency
     mxn: "$"
   }.freeze
 
+  attr_reader :slug, :id, :symbol
+
   def self.default
     new(:usd)
   end
@@ -39,8 +41,6 @@ class Currency
     @id = SLUGS[@slug]
     @symbol = SYMBOLS[@slug]
   end
-
-  attr_reader :slug, :id, :symbol
 
   def select_option
     "#{SYMBOLS[slug.to_sym]} (#{self.class.slug_translation(slug)})"

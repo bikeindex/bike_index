@@ -19,6 +19,8 @@ class FrameMaterial
     titanium: "Titanium"
   }.freeze
 
+  attr_reader :slug, :id
+
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
@@ -27,6 +29,4 @@ class FrameMaterial
   def name
     NAMES[slug]
   end
-
-  attr_reader :slug, :id
 end

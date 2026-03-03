@@ -15,12 +15,12 @@
 #  index_states_on_country_id  (country_id)
 #
 class State < ApplicationRecord
-  validates :country, presence: true
-  validates :name, :abbreviation, uniqueness: true, presence: true
-
   belongs_to :country
   has_many :locations
   has_many :stolen_records
+
+  validates :country, presence: true
+  validates :name, :abbreviation, uniqueness: true, presence: true
 
   default_scope { order(:name) }
 

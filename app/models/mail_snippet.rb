@@ -55,25 +55,25 @@ class MailSnippet < ApplicationRecord
     tempo: 19
   }.freeze
 
+  enum :kind, KIND_ENUM
+
   belongs_to :organization
   belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application"
 
   has_many :public_images, as: :imageable, dependent: :destroy
 
-  enum :kind, KIND_ENUM
+  validates_uniqueness_of :organization_id, scope: [:kind], allow_nil: true
+  validates_uniqueness_of :doorkeeper_app_id, scope: [:kind], allow_nil: true
+
+  attr_accessor :skip_update
 
   after_commit :update_associations
 
   before_validation :set_calculated_attributes
 
-  validates_uniqueness_of :organization_id, scope: [:kind], allow_nil: true
-  validates_uniqueness_of :doorkeeper_app_id, scope: [:kind], allow_nil: true
-
   scope :enabled, -> { where(is_enabled: true) }
   scope :with_organizations, -> { where.not(organization_id: nil) }
   scope :without_organizations, -> { where(organization_id: nil) }
-
-  attr_accessor :skip_update
 
   class << self
     def organization_snippets

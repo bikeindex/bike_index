@@ -27,6 +27,9 @@
 #  index_sales_on_seller_id               (seller_id)
 #
 class Sale < ApplicationRecord
+  include Amountable
+  include Currencyable
+
   SOLD_VIA_ENUM = {
     bike_index_marketplace: 0,
     facebook: 1,
@@ -38,12 +41,10 @@ class Sale < ApplicationRecord
     other: 7
   }
 
-  include Amountable
-  include Currencyable
-
   enum :sold_via, SOLD_VIA_ENUM
 
   # TODO: create a bike_version and assign that to the item
+
   belongs_to :item, polymorphic: true
   belongs_to :seller, class_name: "User"
   belongs_to :ownership
@@ -53,6 +54,7 @@ class Sale < ApplicationRecord
   has_one :buyer, through: :new_ownership, class_name: "User", source: :user
 
   # validates_presence_of :item_id
+
   validates_presence_of :seller_id
   validate :seller_is_owner
 

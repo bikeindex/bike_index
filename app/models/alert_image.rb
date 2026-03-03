@@ -19,13 +19,14 @@
 #
 class AlertImage < ApplicationRecord
   belongs_to :stolen_record
+
   validates :stolen_record, presence: true
 
+  attr_writer :image_cache
   delegate :bike, to: :stolen_record, allow_nil: true
 
   mount_uploader :image, AlertImageUploader
   process_in_background :image
-  attr_writer :image_cache
 
   before_destroy -> { image.remove! }
 end

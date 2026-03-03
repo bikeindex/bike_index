@@ -36,6 +36,8 @@ class ImpoundRecordUpdate < ApplicationRecord
     expired: 8
   }.freeze
 
+  enum :kind, KIND_ENUM
+
   belongs_to :impound_record
   belongs_to :impound_claim
   belongs_to :user
@@ -46,16 +48,14 @@ class ImpoundRecordUpdate < ApplicationRecord
   validates_presence_of :transfer_email, if: :transferred_to_new_owner?
   validates_presence_of :location_id, if: :move_location?
 
-  after_commit :update_associations
+  attr_accessor :skip_update
 
-  enum :kind, KIND_ENUM
+  after_commit :update_associations
 
   scope :active, -> { where(kind: active_kinds) }
   scope :resolved, -> { where(kind: resolved_kinds) }
   scope :with_location, -> { where.not(location_id: nil) }
   scope :unprocessed, -> { where(processed: false) } # Means the update worker hasn't taken care of them
-
-  attr_accessor :skip_update
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)

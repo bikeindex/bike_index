@@ -22,6 +22,9 @@ class TheftAlertPlan < ApplicationRecord
   include Amountable
   include Translatable
 
+  has_many :theft_alerts, dependent: :destroy
+  has_many :stolen_records, through: :theft_alerts
+
   validates :name,
     :amount_cents,
     :views,
@@ -29,9 +32,6 @@ class TheftAlertPlan < ApplicationRecord
     presence: true
 
   validates :amount_cents, :duration_days, :views, numericality: {greater_than: 0}
-
-  has_many :theft_alerts, dependent: :destroy
-  has_many :stolen_records, through: :theft_alerts
 
   scope :active, -> { where(active: true) }
   scope :price_ordered_desc, -> { order(amount_cents: :desc) }

@@ -60,6 +60,10 @@ class ParkingNotification < ActiveRecord::Base
   mount_uploader :image, ImageUploaderBackgrounded
   process_in_background :image
 
+  enum :kind, KIND_ENUM
+  enum :status, STATUS_ENUM
+  enum :retrieved_kind, RETRIEVED_KIND_ENUM
+
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
@@ -72,14 +76,10 @@ class ParkingNotification < ActiveRecord::Base
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
 
+  attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update
+
   before_validation :set_calculated_attributes
   after_commit :process_notification
-
-  enum :kind, KIND_ENUM
-  enum :status, STATUS_ENUM
-  enum :retrieved_kind, RETRIEVED_KIND_ENUM
-
-  attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update
 
   scope :active, -> { where(resolved_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }

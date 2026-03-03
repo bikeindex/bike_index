@@ -34,6 +34,8 @@ class ImpoundRecord < ApplicationRecord
   include DefaultCurrencyable
   include AddressRecorded
 
+  enum :status, ImpoundRecordUpdate::KIND_ENUM
+
   belongs_to :bike, touch: true
   belongs_to :user
   belongs_to :organization
@@ -48,10 +50,10 @@ class ImpoundRecord < ApplicationRecord
   validates_presence_of :user_id
   validates_uniqueness_of :bike_id, if: :current?, conditions: -> { current }
 
+  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
+
   before_validation :set_calculated_attributes
   after_commit :update_associations
-
-  enum :status, ImpoundRecordUpdate::KIND_ENUM
 
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
@@ -67,8 +69,6 @@ class ImpoundRecord < ApplicationRecord
     joins(:impounded_from_address_record)
       .where(address_records: {latitude: sw_lat..ne_lat, longitude: sw_lng..ne_lng})
   }
-
-  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
 
   def self.statuses
     ImpoundRecordUpdate::KIND_ENUM.keys.map(&:to_s) - ImpoundRecordUpdate.update_only_kinds

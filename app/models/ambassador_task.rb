@@ -19,9 +19,9 @@ class AmbassadorTask < ApplicationRecord
 
   validates :title, presence: true, uniqueness: true
 
-  scope :task_ordered, -> { order(id: :asc) }
-
   after_create :ensure_assigned_to_all_ambassadors!
+
+  scope :task_ordered, -> { order(id: :asc) }
 
   def description_html
     Kramdown::Document.new(description).to_html

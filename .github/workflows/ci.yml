@@ -26,8 +26,10 @@ jobs:
           cache: 'npm'
       - run: npm install
 
-      - name: Lint Ruby code
+      - name: Lint Ruby code with standard
         run: bundle exec standardrb --no-fix
+      - name: Lint Ruby code with rubocops
+        run: bundle exec rubocop -c .rubocop_custom.yml
       - name: Lint JavaScript code
         if: success() || failure()
         run: npm run js:lint_check

@@ -22,11 +22,11 @@ class Color < ApplicationRecord
   has_many :bikes
   has_many :paints
 
-  default_scope { order(:name) }
-  scope :commonness, -> { order("priority ASC, name ASC") }
-
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
+
+  default_scope { order(:name) }
+  scope :commonness, -> { order("priority ASC, name ASC") }
 
   def self.black
     where(name: "Black", priority: 1, display: "#000").first_or_create

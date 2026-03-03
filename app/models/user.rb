@@ -73,11 +73,6 @@ class User < ApplicationRecord
   acts_as_paranoid
   has_secure_password
 
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
-  # stripe_id, is_paid_member, paid_organization_role_info
-
-  mount_uploader :avatar, AvatarUploader
-
   has_many :ambassador_task_assignments
   has_many :bike_sticker_updates
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
@@ -111,43 +106,42 @@ class User < ApplicationRecord
   has_many :user_emails, dependent: :destroy
   has_many :user_phones
   has_many :user_registration_organizations
-
   has_many :ambassador_tasks, through: :ambassador_task_assignments
   has_many :organizations, through: :organization_roles
   has_many :owned_bikes, through: :ownerships, source: :bike
   has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
   has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
-
   has_one :membership_active, -> { active }, class_name: "Membership"
   has_one :mailchimp_datum
   has_one :strava_integration, dependent: :destroy
   has_one :user_ban
 
-  accepts_nested_attributes_for :user_ban
-
   validates_uniqueness_of :username
-
   validates :password,
     presence: true,
     length: {within: 12..100},
     on: :create
-  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
-
   validates :password,
     confirmation: true,
     length: {within: 12..100},
     allow_blank: true,
     on: :update
-  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
-
   validate :preferred_language_is_an_available_locale
-
   validates_presence_of :email
   validates_uniqueness_of :email
-
-  before_validation :set_calculated_attributes
   validate :ensure_unique_email
   validates :email, format: {with: EMAIL_REGEX, message: "Email invalid"}
+  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
+  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
+
+  mount_uploader :avatar, AvatarUploader
+
+  accepts_nested_attributes_for :user_ban
+
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update
+  # stripe_id, is_paid_member, paid_organization_role_info
+
+  before_validation :set_calculated_attributes
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
@@ -164,8 +158,6 @@ class User < ApplicationRecord
   scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
   scope :donated, -> { joins(:payments).merge(Payment.paid) }
   scope :member, -> { includes(:memberships).merge(Membership.active) }
-
-  attr_accessor :skip_update
 
   class << self
     def fuzzy_email_find(email)

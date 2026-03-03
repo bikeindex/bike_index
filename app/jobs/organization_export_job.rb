@@ -1,7 +1,9 @@
 class OrganizationExportJob < ApplicationJob
   LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
+  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
 
   sidekiq_options retry: false, queue: "med_priority"
+
   attr_accessor :export # Only necessary for testing
 
   def perform(export_id)
@@ -143,8 +145,6 @@ class OrganizationExportJob < ApplicationJob
     @export.options = @export.options.merge(written_headers: @export_headers) # Write the actual headers so we have them
     @export_headers
   end
-
-  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
 
   def value_for_header(header, bike)
     return bike.send(header) if MATCHING_KEYS.include?(header)

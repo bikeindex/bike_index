@@ -81,6 +81,10 @@ class Organization < ApplicationRecord
 
   mount_uploader :avatar, AvatarUploader
 
+  enum :kind, KIND_ENUM
+  enum :pos_kind, POS_KIND_ENUM
+  enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
+
   belongs_to :parent_organization, class_name: "Organization"
   belongs_to :auto_user, class_name: "User"
   belongs_to :manufacturer
@@ -123,15 +127,16 @@ class Organization < ApplicationRecord
   accepts_nested_attributes_for :organization_stolen_message
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  enum :kind, KIND_ENUM
-  enum :pos_kind, POS_KIND_ENUM
-  enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
-
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
+
+  attr_accessor :embedable_user_email, :skip_update
+
+  before_validation :set_calculated_attributes
+  after_commit :update_associations
 
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
@@ -148,12 +153,7 @@ class Organization < ApplicationRecord
   # Regional orgs have to have the organization feature slug AND the search location set
   scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("enabled_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
-  before_validation :set_calculated_attributes
-  after_commit :update_associations
-
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
-
-  attr_accessor :embedable_user_email, :skip_update
 
   class << self
     def kinds
