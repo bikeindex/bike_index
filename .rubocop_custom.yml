@@ -5,6 +5,7 @@ AllCops:
     - "public/**/*"
     - "node_modules/**/*"
     - "spec/vcr_cassettes/*"
+    - "vendor/bundle/**/*"
 
 Layout/ClassStructure:
   Enabled: true
