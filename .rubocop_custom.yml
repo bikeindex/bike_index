@@ -14,6 +14,8 @@ Layout/ClassStructure:
     - enums
     - associations
     - validations
+    - public_attribute_macros
+    - public_delegate
     - callbacks
     - scopes
     - public_class_methods
@@ -28,11 +30,10 @@ Layout/ClassStructure:
       - belongs_to
       - has_and_belongs_to_many
       - has_rich_text
-    validations:
-      - validates
-      - validate
-      - validates_presence_of
-      - validates_uniqueness_of
+    attribute_macros:
+       - attr_accessor
+       - attr_reader
+       - attr_writer
     callbacks:
       - before_validation
       - after_validation
@@ -52,8 +53,13 @@ Layout/ClassStructure:
       - after_create_commit
       - after_update_commit
       - after_destroy_commit
+    enums:
+      - enum
     scopes:
       - scope
       - default_scope
-    enums:
-      - enum
+    validations:
+      - validates
+      - validate
+      - validates_presence_of
+      - validates_uniqueness_of
