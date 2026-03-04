@@ -7,14 +7,24 @@ module Org::BikeSearch
       organization = Organization.first
       bikes = organization&.bikes&.limit(5) || Bike.none
       pagy = Pagy::Offset.new(count: bikes.count, page: 1, limit: 10)
-      render(Org::BikeSearch::Component.new(
+      bike_search = Org::BikeSearch::Component.new(
         organization:,
-        bikes:,
         pagy:,
         per_page: 10,
         params: {},
         time_range: 1.year.ago..Time.current
-      ))
+      )
+      render(bike_search) do
+        bikes.map { |bike|
+          render(Org::BikeSearchRow::Component.new(
+            bike:,
+            organization:,
+            sortable_search_params: {},
+            additional_registration_fields: bike_search.additional_registration_fields,
+            show_avery_export: bike_search.show_avery_export?
+          ))
+        }.join.html_safe
+      end
     end
   end
 end

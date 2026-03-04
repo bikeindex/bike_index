@@ -2,13 +2,12 @@
 
 module Org::BikeSearch
   class Component < ApplicationComponent
-    def initialize(organization:, bikes:, pagy:, per_page:, params:,
+    def initialize(organization:, pagy:, per_page:, params:,
       interpreted_params: {}, sortable_search_params: {},
       search_stickers: nil, search_address: nil, search_status: "all",
       search_query_present: false, time_range: nil, stolenness: "all",
       bike_sticker: nil, model_audit: nil, only_show_bikes: false)
       @organization = organization
-      @bikes = bikes
       @pagy = pagy
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
@@ -23,6 +22,17 @@ module Org::BikeSearch
       @bike_sticker = bike_sticker
       @model_audit = model_audit
       @only_show_bikes = only_show_bikes
+    end
+
+    def additional_registration_fields
+      @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
+    end
+
+    def show_avery_export?
+      return @show_avery_export if defined?(@show_avery_export)
+
+      @show_avery_export = @organization.enabled?("avery_export") &&
+        Binxtils::InputNormalizer.boolean(@params[:search_avery_export])
     end
 
     private
@@ -75,10 +85,6 @@ module Org::BikeSearch
       }
     end
 
-    def additional_registration_fields
-      @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
-    end
-
     def initially_checked_columns
       return @initially_checked_columns if defined?(@initially_checked_columns)
 
@@ -106,13 +112,6 @@ module Org::BikeSearch
         @params[:search_impoundedness].present? || Binxtils::InputNormalizer.boolean(@params[:search_open])
     end
 
-    def show_avery_export?
-      return @show_avery_export if defined?(@show_avery_export)
-
-      @show_avery_export = @organization.enabled?("avery_export") &&
-        Binxtils::InputNormalizer.boolean(@params[:search_avery_export])
-    end
-
     def cycle_type
       @cycle_type ||= begin
         merged = @params.respond_to?(:to_unsafe_h) ? @params.to_unsafe_h.merge(@interpreted_params) : @params.merge(@interpreted_params)
@@ -129,7 +128,7 @@ module Org::BikeSearch
     end
 
     def show_pagination?
-      !@only_show_bikes && @pagy.count > @bikes.count
+      !@only_show_bikes && @pagy.pages > 1
     end
   end
 end

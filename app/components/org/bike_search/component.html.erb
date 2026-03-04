@@ -256,18 +256,7 @@
         </tr>
       </thead>
 
-      <tbody>
-        <% @bikes.each do |bike| %>
-          <%= render(Org::BikeSearchRow::Component.new(
-            bike:,
-            organization: @organization,
-            sortable_search_params: @sortable_search_params,
-            bike_sticker: @bike_sticker,
-            additional_registration_fields:,
-            show_avery_export: show_avery_export?
-          )) %>
-        <% end %>
-      </tbody>
+      <tbody><%= content %></tbody>
     </table>
   </div>
 

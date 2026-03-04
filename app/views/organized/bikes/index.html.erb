@@ -1,0 +1,84 @@
+<% if @bike_sticker.present? %>
+  <% if @bike_sticker.claimed? %>
+    <h2>
+      <a
+        href="<%= edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) %>"
+      >
+        <%= @bike_sticker.kind %>
+        <%= @bike_sticker.pretty_code %>
+      </a>
+
+      <%= t(".is_currently_linked") %>
+    </h2>
+    <p>
+      <% bike_link = link_to(@bike_sticker.bike&.title_string, bike_path(@bike_sticker.bike_id)) %>
+      <%= t(".connected_to_bike_html", bike_link:) %>
+    </p>
+  <% else %>
+    <h2>
+      <a
+        href="<%= edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) %>"
+      >
+        <%= @bike_sticker.kind %>
+        <strong><%= @bike_sticker.pretty_code %></strong>
+      </a>
+
+      <%= t(".isnt_linked_to_a_bike") %>
+    </h2>
+  <% end %>
+  <p>
+    <%= t(".enter_url_of_the_bike_html", bike_sticker_kind: @bike_sticker.kind) %>
+  </p>
+  <%= form_tag bike_sticker_path(id: @bike_sticker.code, organization_id: current_organization.to_param), method: "PUT", class: "row" do %>
+    <div class="col-sm-8 col-lg-10">
+      <div class="form-group">
+        <%= text_field_tag :bike_id, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control" %>
+      </div>
+    </div>
+
+    <div class="col-sm-4 col-lg-2">
+      <%= submit_tag t(".update"), class: "btn btn-success" %>
+    </div>
+  <% end %>
+  <p class="less-strong">
+    <%= t(".search_org_bikes_html", org_name: current_organization.short_name, bike_sticker_kind: @bike_sticker.kind) %>
+  </p>
+  <hr class="mt-4 mb-4 less-strong">
+<% end %>
+
+<%= render partial: "/shared/period_select" %>
+
+<div class="mb-4"></div>
+
+<% if current_organization.enabled?("bike_search") %>
+  <% bike_search = Org::BikeSearch::Component.new(
+    organization: current_organization,
+    pagy: @pagy,
+    interpreted_params: @interpreted_params,
+    sortable_search_params:,
+    per_page: @per_page,
+    params:,
+    search_stickers: @search_stickers,
+    search_address: @search_address,
+    search_status: @search_status,
+    search_query_present: @search_query_present,
+    time_range: @time_range,
+    stolenness: @stolenness,
+    bike_sticker: @bike_sticker,
+    model_audit: @model_audit
+  ) %>
+  <%= render(bike_search) do %>
+    <% @bikes.each do |bike| %>
+      <%= render(Org::BikeSearchRow::Component.new(
+        bike:,
+        organization: current_organization,
+        sortable_search_params:,
+        bike_sticker: @bike_sticker,
+        additional_registration_fields: bike_search.additional_registration_fields,
+        show_avery_export: bike_search.show_avery_export?
+      )) %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= render "organized/bikes/list" %>
+<% end %>
