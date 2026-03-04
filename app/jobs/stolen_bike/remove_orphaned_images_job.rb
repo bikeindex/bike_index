@@ -34,8 +34,6 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
       end
     else
       delete_all_images!(stolen_record_id)
-      delete_alert_images!(stolen_record_id)
-      attachments(stolen_record_id).destroy_all
     end
   end
 
@@ -44,9 +42,8 @@ class StolenBike::RemoveOrphanedImagesJob < ScheduledJob
   def delete_all_images!(stolen_record_id)
     delete_alert_images!(stolen_record_id)
     self.class.blobs_for(stolen_record_id).each { |blob| blob.purge }
-    # raises undefined method `attachment_reflections' if no attachments
-    found_attachments = attachments(stolen_record_id)
-    found_attachments.destroy_all if found_attachments.any?
+    # Use delete_all to skip after_commit callbacks that crash when record is gone
+    attachments(stolen_record_id).delete_all
   end
 
   def delete_alert_images!(stolen_record_id)
