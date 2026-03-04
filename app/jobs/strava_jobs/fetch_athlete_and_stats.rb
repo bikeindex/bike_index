@@ -47,7 +47,7 @@ module StravaJobs
         requested_at: Time.current
       )
       response = yield
-      request.update_from_response(response)
+      request.update_from_response(response, raise_on_error: true)
       response
     end
   end

@@ -200,6 +200,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         strava_request.reload
         expect(strava_request.requested_at).to be_present
         expect(strava_request.response_status).to eq("error")
+        expect(strava_request.parameters).to eq({error_response_status: 500}.as_json)
       end
     end
 

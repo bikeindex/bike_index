@@ -46,7 +46,7 @@ module StravaJobs
         response = Integrations::StravaClient.proxy_request(strava_integration,
           strava_request.parameters["url"], method: strava_request.parameters["method"],
           body: strava_request.parameters["body"])
-        strava_request.update_from_response(response, raise_on_error: false)
+        strava_request.update_from_response(response)
 
         serialized = if strava_request.success?
           handle_proxy_response(strava_integration, response.body, method: strava_request.parameters["method"])

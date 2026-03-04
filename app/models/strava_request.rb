@@ -154,13 +154,16 @@ class StravaRequest < AnalyticsRecord
     page >= expected_pages
   end
 
-  def update_from_response(response, re_enqueue_if_rate_limited: false, raise_on_error: true)
-    update!(requested_at: Time.current,
-      response_status: status_from_response(response),
-      rate_limit: self.class.parse_rate_limit(response&.headers))
+  def update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: false, raise_on_error: false)
+    self.response_status = status_from_response(response)
+    store_error_response(response) if error?
+    update!(requested_at: Time.current, rate_limit: self.class.parse_rate_limit(response&.headers))
 
-    if re_enqueue_if_rate_limited && rate_limited?
-      StravaRequest.create!(user_id:, strava_integration_id:, request_type:, parameters:)
+    if rate_limited? || service_unavailable?(response)
+      return unless re_enqueue_if_rate_limited_or_unavailable
+
+      StravaRequest.create!(user_id:, strava_integration_id:, request_type:,
+        parameters: parameters.except("error_response_status"))
     elsif error? && raise_on_error
       raise "Strava API error #{response.status}: #{response.body}"
     end
@@ -182,6 +185,14 @@ class StravaRequest < AnalyticsRecord
     else
       :error
     end
+  end
+
+  def service_unavailable?(response)
+    response&.status == 503
+  end
+
+  def store_error_response(response)
+    self.parameters = (parameters || {}).merge(error_response_status: response.status)
   end
 
   def set_calculated_attributes

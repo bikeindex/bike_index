@@ -18,7 +18,7 @@ RSpec.describe Admin::StravaRequestsController, type: :request do
 
     context "with search_id" do
       it "returns only the matching request" do
-        other_request = FactoryBot.create(:strava_request)
+        FactoryBot.create(:strava_request)
         get base_url, params: {search_id: strava_request.id}
         expect(response.status).to eq(200)
         expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])

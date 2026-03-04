@@ -11,7 +11,8 @@ module StravaJobs
         end
 
         response = make_request(strava_integration, strava_request.request_type, strava_request.parameters)
-        strava_request.update_from_response(response, re_enqueue_if_rate_limited: true)
+        strava_request.update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: true,
+          raise_on_error: true)
 
         if strava_request&.success?
           handle_response(strava_request, strava_integration, response&.body)
