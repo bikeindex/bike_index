@@ -23,7 +23,6 @@ module StravaJobs
       end
 
       def sync_status(strava_integration)
-        strava_integration.update_sync_status(force_update: true) if strava_integration.synced?
         {
           sync_status: {
             status: strava_integration.status,
