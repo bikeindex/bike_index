@@ -5,13 +5,7 @@ require "rails_helper"
 RSpec.describe Org::BikeSearch::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) do
-    # sortable helper requires sort_column and sort_direction from the controller
-    # humanized_time_range requires @period from the controller
-    controller = vc_test_controller
-    controller.class.helper_method :sort_column, :sort_direction unless controller.class.method_defined?(:sort_column)
-    controller.define_singleton_method(:sort_column) { "id" }
-    controller.define_singleton_method(:sort_direction) { "desc" }
-    controller.instance_variable_set(:@period, "all")
+    # before_render in the component handles sort_column/sort_direction/period setup
     with_request_url("/o/#{organization.to_param}/bikes") do
       render_inline(instance)
     end
@@ -20,7 +14,7 @@ RSpec.describe Org::BikeSearch::Component, type: :component do
   let(:enabled_feature_slugs) { %w[bike_search] }
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   let(:bikes) { [bike] }
-  let(:pagy) { Pagy::Offset.new(count: 1, page: 1, limit: 10) }
+  let(:pagy) { Pagy::Offset.new(count: 25, page: 1, limit: 10) }
   let(:options) do
     {
       organization:,
