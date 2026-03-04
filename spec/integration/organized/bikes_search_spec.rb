@@ -54,7 +54,8 @@ RSpec.describe "Organized bikes search", :js, type: :system do
       click_link "settings"
       check "avery_cell"
       expect(page).to have_current_path(/search_avery_export=true/, wait: 10)
-      expect(page).to have_css("th.avery_cell", visible: :all)
+      # Avery column should be visible (not just in the DOM)
+      expect(page).to have_css("th.avery_cell", visible: true)
 
       # Settings panel is already open (persisted via localStorage)
       # Uncheck avery — triggers page reload without param
