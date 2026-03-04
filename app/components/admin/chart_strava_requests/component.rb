@@ -45,7 +45,7 @@ module Admin::ChartStravaRequests
       if @show_integration_chart
         pie_columns << pie_column("By integration", integration_counts)
       end
-      parts << tag.div(safe_join(pie_columns), class: "tw:grid tw:grid-cols-1 md:tw:grid-cols-#{pie_columns.size} tw:gap-4 tw:mt-4")
+      parts << tag.div(safe_join(pie_columns), class: "tw:grid tw:grid-cols-1 tw:md:grid-cols-#{pie_columns.size} tw:gap-4 tw:mt-4")
 
       safe_join(parts)
     end
@@ -53,7 +53,7 @@ module Admin::ChartStravaRequests
     private
 
     def pie_column(title, data, colors = nil)
-      chart_opts = {library: {plugins: {legend: {position: "bottom"}}}}
+      chart_opts = {thousands: ",", library: {plugins: {legend: {position: "bottom"}}}}
       chart_opts[:colors] = colors if colors
       tag.div(
         safe_join([
