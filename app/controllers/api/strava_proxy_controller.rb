@@ -22,6 +22,11 @@ module API
         return
       end
 
+      if permitted_params[:url]&.match?(/\Aathlete(\/\d+)?\z/)
+        render json: auth_response[:strava_integration].proxy_serialized.to_json
+        return
+      end
+
       enriched_since = enriched_since_from_url(permitted_params[:url])
       if enriched_since
         activities = auth_response[:strava_integration].strava_activities

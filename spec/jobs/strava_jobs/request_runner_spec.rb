@@ -254,18 +254,20 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
     end
 
     context "with request_type: incoming_webhook" do
-      let(:strava_request) do
+      let!(:strava_request) do
         StravaRequest.create!(request_type: :incoming_webhook, user_id: strava_integration.user_id,
           strava_integration_id: strava_integration.id, parameters:)
       end
+      let(:parameters) do
+        {object_type: "activity", aspect_type:, updates:,
+         object_id: "17323701543", owner_id: strava_integration.athlete_id}
+      end
+      let(:aspect_type) { "create" }
+      let(:updates) { {} }
       context "with incoming_webhook activity create" do
-        let(:parameters) do
-          {"object_type" => "activity", "aspect_type" => "create",
-           "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id}
-        end
-
         it "creates or updates a StravaActivity" do
           expect { instance.perform(strava_request.id) }.to change(StravaActivity, :count).by(1)
+            .and change(StravaRequest, :count).by 1
 
           strava_request.reload
           expect(strava_request.response_status).to eq("success")
@@ -276,35 +278,62 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
       end
 
       context "with incoming_webhook activity update" do
-        let!(:existing_activity) do
+        let!(:strava_activity) do
           FactoryBot.create(:strava_activity, strava_integration:, strava_id: "17323701543",
             title: "Morning Ride", distance_meters: 25000.0)
         end
-        let(:parameters) do
-          {"object_type" => "activity", "aspect_type" => "update",
-           "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id}
-        end
+        let(:aspect_type) { "update" }
 
         it "does not overwrite existing data" do
-          expect { instance.perform(strava_request.id) }.not_to change(StravaActivity, :count)
+          expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
+            .and change(StravaActivity, :count).by(0)
+            .and change(StravaJobs::RequestRunner.jobs, :count).by(0)
 
           strava_request.reload
           expect(strava_request.response_status).to eq("success")
+          expect(strava_request.requested_at).to be_nil
+          expect(strava_request.rate_limit).to be_nil
 
-          existing_activity.reload
-          expect(existing_activity.title).to eq("Morning Ride")
-          expect(existing_activity.distance_meters).to eq(25000.0)
+          strava_activity.reload
+          expect(strava_activity.title).to eq("Morning Ride")
+          expect(strava_activity.distance_meters).to eq(25000.0)
+
+          new_strava_request = StravaRequest.last
+          expect(new_strava_request.strava_integration_id).to eq strava_integration.id
+          expect(new_strava_request.response_status).to eq "pending"
+          expect(new_strava_request.request_type).to eq "fetch_activity"
+        end
+
+        context "with update data" do
+          let(:updates) { {title: "New title", private: "false", visibility: "followers_only"} }
+          it "Updates existing data" do
+            expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
+              .and change(StravaActivity, :count).by(0)
+              .and change(StravaJobs::RequestRunner.jobs, :count).by(0)
+
+            strava_request.reload
+            expect(strava_request.response_status).to eq("success")
+            expect(strava_request.requested_at).to be_nil
+            expect(strava_request.rate_limit).to be_nil
+
+            strava_activity.reload
+            expect(strava_activity.title).to eq("New title")
+            expect(strava_activity.distance_meters).to eq(25000.0)
+            expect(strava_activity.strava_data).to be_blank
+
+            new_strava_request = StravaRequest.last
+            expect(new_strava_request.strava_integration_id).to eq strava_integration.id
+            expect(new_strava_request.response_status).to eq "pending"
+            expect(new_strava_request.request_type).to eq "fetch_activity"
+          end
         end
       end
 
       context "with incoming_webhook activity delete" do
-        let!(:existing_activity) do
+        let!(:strava_activity) do
           FactoryBot.create(:strava_activity, strava_integration:, strava_id: "17323701543")
         end
-        let(:parameters) do
-          {"object_type" => "activity", "aspect_type" => "delete",
-           "object_id" => "17323701543", "owner_id" => strava_integration.athlete_id}
-        end
+        let(:aspect_type) { "delete" }
 
         it "destroys the StravaActivity" do
           expect { instance.perform(strava_request.id) }.to change(StravaActivity, :count).by(-1)
@@ -315,19 +344,31 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         end
       end
 
-      context "with incoming_webhook athlete deauth" do
+      context "with incoming_webhook athlete" do
         let(:parameters) do
-          {"object_type" => "athlete", "aspect_type" => "update",
-           "owner_id" => strava_integration.athlete_id, "updates" => {"authorized" => "false"}}
+          {object_type: "athlete", aspect_type: "update",
+           owner_id: strava_integration.athlete_id, updates:}
         end
-
-        it "soft-deletes the integration" do
-          instance.perform(strava_request.id)
+        it "creates a fetch_athlete request" do
+          expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(1)
 
           strava_request.reload
           expect(strava_request.response_status).to eq("success")
-          expect(StravaIntegration.find_by(id: strava_integration.id)).to be_nil
-          expect(StravaIntegration.unscoped.find_by(id: strava_integration.id)).to be_present
+
+          strava_request = StravaRequest.last
+          expect(strava_request.request_type).to eq "fetch_athlete"
+        end
+
+        context "with deauth" do
+          let(:updates) { {authorized: "false"} }
+          it "soft-deletes the integration" do
+            expect { instance.perform(strava_request.id) }.to change(StravaRequest, :count).by(0)
+
+            strava_request.reload
+            expect(strava_request.response_status).to eq("success")
+            expect(StravaIntegration.find_by(id: strava_integration.id)).to be_nil
+            expect(StravaIntegration.unscoped.find_by(id: strava_integration.id)).to be_present
+          end
         end
       end
     end

@@ -57,7 +57,7 @@ RSpec.describe PageBlock::StravaIntegration::Component, type: :component do
     context "with gear" do
       let!(:strava_gear) do
         FactoryBot.create(:strava_gear, strava_integration:,
-          strava_gear_id: "b1234", strava_gear_name: "My Road Bike")
+          strava_gear_id: "b1234", name: "My Road Bike")
       end
 
       it "renders gear list" do

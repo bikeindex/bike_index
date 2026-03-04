@@ -13,6 +13,7 @@
 #  last_updated_activities_at  :datetime
 #  refresh_token               :text             not null
 #  status                      :integer          default("pending"), not null
+#  strava_data                 :jsonb
 #  strava_permissions          :string
 #  token_expires_at            :datetime
 #  created_at                  :datetime         not null
@@ -84,19 +85,16 @@ class StravaIntegration < ApplicationRecord
     [(activities_downloaded_count.to_f / athlete_activity_count * 100).round, 100].min
   end
 
-  def gear_names
-    strava_gears.pluck(:strava_gear_name).compact
-  end
-
   def show_gear_link?
     (synced? || syncing?) && strava_gears.bikes.any?
   end
 
-  def cycling_gear_ids
-    strava_gears.bikes.pluck(:strava_gear_id)
+  def proxy_serialized
+    (strava_data || {}).merge("id" => athlete_id, "bikes" => strava_gears.bikes.map(&:proxy_serialized),
+      "shoes" => strava_gears.shoes.map(&:proxy_serialized))
   end
 
-  def update_from_athlete_and_stats(athlete, stats)
+  def update_from_athlete_and_stats(athlete, stats = nil)
     activity_count = if stats
       (stats.dig("all_ride_totals", "count") || 0) +
         (stats.dig("all_run_totals", "count") || 0) +
@@ -104,6 +102,7 @@ class StravaIntegration < ApplicationRecord
     end
 
     update(
+      strava_data: athlete.except("id"),
       athlete_id: athlete["id"].to_s,
       athlete_activity_count: activity_count,
       status: :syncing
@@ -158,7 +157,7 @@ class StravaIntegration < ApplicationRecord
       .where(strava_integration_id: id, request_type: :fetch_activity)
       .pluck(Arel.sql("parameters->>'strava_id'"))
 
-    strava_activities.activities_to_enrich.where.not(strava_id: already_enqueued).pluck(:strava_id)
+    strava_activities.not_enriched.where.not(strava_id: already_enqueued).pluck(:strava_id)
       .each do |strava_id|
         StravaRequest.create!(user_id:, strava_integration_id: id,
           request_type: :fetch_activity, parameters: {strava_id:})

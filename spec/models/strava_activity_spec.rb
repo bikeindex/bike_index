@@ -263,7 +263,7 @@ RSpec.describe StravaActivity, type: :model do
     it "updates from strava" do
       expect(strava_activity).to be_valid
       VCR.use_cassette("strava-update_from_strava") do
-        strava_activity.update_from_strava!
+        strava_activity.update_from_strava!(run_inline: true)
       end
       strava_activity.reload
       expect(strava_activity).to have_attributes target_attributes.as_json
@@ -320,7 +320,7 @@ RSpec.describe StravaActivity, type: :model do
       it "updates from strava and returns correct proxy_serialized" do
         expect(strava_activity).to be_valid
         VCR.use_cassette("strava-update_from_strava-dunes_trip") do
-          strava_activity.update_from_strava!
+          strava_activity.update_from_strava!(run_inline: true)
         end
         strava_activity.reload
         expect(strava_activity).to have_attributes target_attributes.as_json

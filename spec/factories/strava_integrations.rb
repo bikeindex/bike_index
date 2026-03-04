@@ -17,7 +17,7 @@ FactoryBot.define do
       with_athlete
       after(:create) do |strava_integration|
         FactoryBot.create(:strava_gear, strava_integration:,
-          strava_gear_id: "b1234", strava_gear_name: "My Road Bike", gear_type: "bike",
+          strava_gear_id: "b1234", name: "My Road Bike", gear_type: "bike",
           strava_data: {"id" => "b1234", "name" => "My Road Bike", "primary" => true, "distance" => 50000.0, "resource_state" => 2})
       end
     end

@@ -113,7 +113,7 @@
                         value="<%= gear.strava_gear_id %>"
                         <%= "selected" if bike_gear&.strava_gear_id == gear.strava_gear_id %>
                       >
-                        <%= gear.strava_gear_name %>
+                        <%= gear.name %>
 
                         <% if gear.total_distance_miles.present? %>
                           (

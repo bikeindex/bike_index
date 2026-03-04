@@ -3562,7 +3562,7 @@ CREATE TABLE public.strava_gears (
     item_type character varying,
     item_id bigint,
     strava_gear_id character varying NOT NULL,
-    strava_gear_name character varying,
+    name character varying,
     gear_type integer,
     total_distance_kilometers integer,
     strava_data jsonb,
@@ -3609,7 +3609,8 @@ CREATE TABLE public.strava_integrations (
     last_updated_activities_at timestamp(6) without time zone,
     deleted_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    strava_data jsonb
 );
 
 
@@ -7435,6 +7436,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260304181710'),
 ('20260220053202'),
 ('20260219190342'),
 ('20260218010402'),

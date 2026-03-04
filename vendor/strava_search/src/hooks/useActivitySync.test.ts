@@ -13,8 +13,7 @@ vi.mock('../contexts/AuthContext', () => ({
 }));
 
 vi.mock('../services/strava', () => ({
-  getAthleteGear: vi.fn(() => Promise.resolve([])),
-  getAthleteStats: vi.fn(() => Promise.resolve(100)),
+  getAthlete: vi.fn(() => Promise.resolve({ id: 12345, bikes: [], shoes: [] })),
   getAllActivities: vi.fn(() => Promise.resolve([])),
   getActivity: vi.fn(() => Promise.resolve({ id: 1, name: 'Test', muted: false })),
   fetchEnrichedSince: vi.fn(() => Promise.resolve([])),
@@ -36,8 +35,8 @@ describe('useActivitySync', () => {
 
   describe('error handling', () => {
     it('clears error when clearError is called', async () => {
-      const { getAthleteGear } = await import('../services/strava');
-      vi.mocked(getAthleteGear).mockRejectedValueOnce(new Error('API Error'));
+      const { getAthlete } = await import('../services/strava');
+      vi.mocked(getAthlete).mockRejectedValueOnce(new Error('API Error'));
 
       const { result } = renderHook(() => useActivitySync());
 
@@ -57,10 +56,10 @@ describe('useActivitySync', () => {
     });
 
     it('clears previous error when starting a new sync', async () => {
-      const { getAthleteGear } = await import('../services/strava');
+      const { getAthlete } = await import('../services/strava');
 
       // First call fails
-      vi.mocked(getAthleteGear).mockRejectedValueOnce(new Error('First error'));
+      vi.mocked(getAthlete).mockRejectedValueOnce(new Error('First error'));
 
       const { result } = renderHook(() => useActivitySync());
 
@@ -72,7 +71,7 @@ describe('useActivitySync', () => {
       expect(result.current.error).toBe('First error');
 
       // Second call succeeds
-      vi.mocked(getAthleteGear).mockResolvedValueOnce([]);
+      vi.mocked(getAthlete).mockResolvedValueOnce({ id: 12345, bikes: [], shoes: [] } as never);
 
       // Start another sync - error should be cleared immediately
       act(() => {
@@ -88,8 +87,8 @@ describe('useActivitySync', () => {
 
   describe('syncRecent error handling', () => {
     it('sets error when syncRecent fails', async () => {
-      const { getAthleteGear } = await import('../services/strava');
-      vi.mocked(getAthleteGear).mockRejectedValueOnce(new Error('Network error'));
+      const { getAthlete } = await import('../services/strava');
+      vi.mocked(getAthlete).mockRejectedValueOnce(new Error('Network error'));
 
       const { result } = renderHook(() => useActivitySync());
 

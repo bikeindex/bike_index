@@ -40,14 +40,16 @@ module StravaJobs
     private
 
     def execute_request(strava_integration, request_type)
-      request = StravaRequest.create!(
+      strava_request = StravaRequest.create!(
         user_id: strava_integration.user_id,
         strava_integration_id: strava_integration.id,
         request_type:,
-        requested_at: Time.current
+        requested_at: Time.current,
+        response_status: :success # prevent RequestRunner from running this
       )
       response = yield
-      request.update_from_response(response, raise_on_error: true)
+      strava_request.update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: true,
+        raise_on_error: true)
       response
     end
   end

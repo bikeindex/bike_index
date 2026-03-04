@@ -10,19 +10,15 @@ RSpec.describe Admin::StravaRequestsController, type: :request do
 
   describe "#index" do
     it "responds with ok" do
+      strava_request2 = FactoryBot.create(:strava_request)
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])
-    end
+      expect(assigns(:collection).pluck(:id)).to eq([strava_request2.id, strava_request.id])
 
-    context "with search_id" do
-      it "returns only the matching request" do
-        FactoryBot.create(:strava_request)
-        get base_url, params: {search_id: strava_request.id}
-        expect(response.status).to eq(200)
-        expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])
-      end
+      get base_url, params: {search_id: strava_request.id}
+      expect(response.status).to eq(200)
+      expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])
     end
 
     context "with render_chart" do
