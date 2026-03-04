@@ -23,12 +23,14 @@ module StravaJobs
       end
 
       def sync_status(strava_integration)
+        strava_integration.update_sync_status(force_update: true) if strava_integration.synced?
         {
           sync_status: {
             status: strava_integration.status,
             activities_downloaded_count: strava_integration.activities_downloaded_count,
             athlete_activity_count: strava_integration.athlete_activity_count,
-            progress_percent: strava_integration.sync_progress_percent
+            progress_percent: strava_integration.sync_progress_percent,
+            rate_limited: !ScheduledRequestEnqueuer.rate_limit_allows_batch?
           }
         }
       end
