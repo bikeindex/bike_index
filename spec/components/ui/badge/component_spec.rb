@@ -37,7 +37,9 @@ RSpec.describe UI::Badge::Component, type: :component do
       warning: "tw:bg-amber-300",
       cyan: "tw:bg-cyan-400",
       error: "tw:bg-red-300",
-      gray: "tw:bg-gray-300"
+      gray: "tw:bg-gray-300",
+      rose: "tw:bg-rose-400",
+      orange: "tw:bg-orange-400"
     }.each do |color_name, css_class|
       context "with #{color_name}" do
         let(:color) { color_name }
