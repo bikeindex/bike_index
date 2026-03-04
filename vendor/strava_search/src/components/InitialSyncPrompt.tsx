@@ -8,7 +8,7 @@ interface InitialSyncOverlayProps {
 }
 
 export function InitialSyncOverlay({ loaded, total, status, rateLimited }: InitialSyncOverlayProps) {
-  const progressPercent = total && total > 0 ? (loaded / total) * 100 : null;
+  const progressPercent = total && total > 0 ? Math.min((loaded / total) * 100, 100) : null;
 
   return (
     <div className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-[1040]">

@@ -53,6 +53,14 @@ export const LoadingActivities: Story = {
   },
 };
 
+export const ExceededEstimate: Story = {
+  args: {
+    loaded: 160,
+    total: 160,
+    status: '160 of 160 activities synced',
+  },
+};
+
 export const RateLimited: Story = {
   args: {
     loaded: 0,
