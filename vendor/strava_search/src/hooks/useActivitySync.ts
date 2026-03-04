@@ -21,6 +21,7 @@ interface SyncProgress {
   loaded: number;
   total: number | null;
   status: string;
+  rateLimited?: boolean;
 }
 
 interface UseActivitySyncResult {
@@ -67,6 +68,7 @@ export function useActivitySync(): UseActivitySyncResult {
           status: status.athlete_activity_count
             ? `${formatNumber(status.activities_downloaded_count)} of ~${formatNumber(status.athlete_activity_count)} activities synced`
             : `${formatNumber(status.activities_downloaded_count)} activities synced`,
+          rateLimited: status.rate_limited,
         });
       };
 

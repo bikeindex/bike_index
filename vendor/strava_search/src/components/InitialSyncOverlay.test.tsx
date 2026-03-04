@@ -41,4 +41,16 @@ describe('InitialSyncOverlay', () => {
     const spinner = document.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
   });
+
+  it('shows rate limited message when rateLimited is true', () => {
+    render(<InitialSyncOverlay loaded={50} total={150} status="50 of ~150 activities synced" rateLimited={true} />);
+
+    expect(screen.getByText('Strava rate limit reached — syncing will resume automatically')).toBeInTheDocument();
+  });
+
+  it('does not show rate limited message when rateLimited is false', () => {
+    render(<InitialSyncOverlay loaded={50} total={150} status="50 of ~150 activities synced" rateLimited={false} />);
+
+    expect(screen.queryByText('Strava rate limit reached — syncing will resume automatically')).not.toBeInTheDocument();
+  });
 });

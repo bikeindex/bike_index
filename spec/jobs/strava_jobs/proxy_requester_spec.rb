@@ -28,6 +28,42 @@ RSpec.describe StravaJobs::ProxyRequester do
       expect(result[:sync_status][:status]).to eq "pending"
       expect(result[:sync_status]).to have_key(:activities_downloaded_count)
       expect(result[:sync_status]).to have_key(:progress_percent)
+      expect(result[:sync_status]).to have_key(:rate_limited)
+    end
+
+    it "includes rate_limited based on rate limit headroom" do
+      allow(StravaJobs::ScheduledRequestEnqueuer).to receive(:rate_limit_allows_batch?).and_return(false)
+      result = described_class.sync_status(strava_integration)
+      expect(result[:sync_status][:rate_limited]).to be true
+
+      allow(StravaJobs::ScheduledRequestEnqueuer).to receive(:rate_limit_allows_batch?).and_return(true)
+      result = described_class.sync_status(strava_integration)
+      expect(result[:sync_status][:rate_limited]).to be false
+    end
+
+    context "when integration is synced" do
+      before { strava_integration.update(status: :synced) }
+
+      it "calls update_sync_status to reconcile counts" do
+        expect(strava_integration.synced?).to be true
+        expect(strava_integration).to receive(:update_sync_status).with(force_update: true)
+        described_class.sync_status(strava_integration)
+      end
+
+      it "returns corrected count after reconciliation" do
+        strava_integration.update(activities_downloaded_count: 10, athlete_activity_count: 15)
+        FactoryBot.create_list(:strava_activity, 3, strava_integration:)
+        result = described_class.sync_status(strava_integration)
+        expect(result[:sync_status][:activities_downloaded_count]).to eq 3
+      end
+    end
+
+    context "when integration is not synced" do
+      it "does not call update_sync_status" do
+        expect(strava_integration.synced?).to be false
+        expect(strava_integration).not_to receive(:update_sync_status)
+        described_class.sync_status(strava_integration)
+      end
     end
   end
 

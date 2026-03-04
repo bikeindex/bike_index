@@ -196,6 +196,7 @@ function Dashboard() {
           loaded={progress.loaded}
           total={progress.total}
           status={progress.status}
+          rateLimited={progress.rateLimited}
         />
       )}
 

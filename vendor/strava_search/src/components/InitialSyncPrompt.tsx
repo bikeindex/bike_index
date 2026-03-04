@@ -1,12 +1,13 @@
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
 interface InitialSyncOverlayProps {
   loaded: number;
   total: number | null;
   status: string;
+  rateLimited?: boolean;
 }
 
-export function InitialSyncOverlay({ loaded, total, status }: InitialSyncOverlayProps) {
+export function InitialSyncOverlay({ loaded, total, status, rateLimited }: InitialSyncOverlayProps) {
   const progressPercent = total && total > 0 ? (loaded / total) * 100 : null;
 
   return (
@@ -21,6 +22,14 @@ export function InitialSyncOverlay({ loaded, total, status }: InitialSyncOverlay
         <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
           {status}
         </p>
+        {rateLimited && (
+          <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg px-4 py-3 mb-4">
+            <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+            <p className="text-sm text-amber-700 dark:text-amber-300">
+              Strava rate limit reached — syncing will resume automatically
+            </p>
+          </div>
+        )}
         {(progressPercent !== null || loaded > 0) && (
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
             <div

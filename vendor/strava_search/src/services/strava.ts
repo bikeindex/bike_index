@@ -123,6 +123,7 @@ export interface BackendSyncStatus {
   activities_downloaded_count: number;
   athlete_activity_count: number | null;
   progress_percent: number;
+  rate_limited: boolean;
 }
 
 export async function fetchSyncStatus(): Promise<BackendSyncStatus | null> {
