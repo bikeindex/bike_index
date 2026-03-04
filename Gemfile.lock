@@ -268,8 +268,8 @@ GEM
     faraday_middleware (1.2.1)
       faraday (~> 1.0)
     fast_blank (1.0.1)
-    ffi (1.17.2-arm64-darwin)
-    ffi (1.17.2-x86_64-linux-gnu)
+    ffi (1.17.3-arm64-darwin)
+    ffi (1.17.3-x86_64-linux-gnu)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -302,7 +302,7 @@ GEM
       fog-core
       nokogiri (>= 1.5.11, < 2.0.0)
     foreman (0.86.0)
-    formatador (1.2.1)
+    formatador (1.2.3)
       reline
     forwardable (1.4.0)
     geocoder (1.8.5)
@@ -331,14 +331,13 @@ GEM
       rack
     groupdate (6.7.0)
       activesupport (>= 7.1)
-    guard (2.19.1)
+    guard (2.20.1)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
       logger (~> 1.6)
       lumberjack (>= 1.0.12, < 2.0)
       nenv (~> 0.1)
       notiffany (~> 0.0)
-      ostruct (~> 0.6)
       pry (>= 0.13.0)
       shellany (~> 0.0)
       thor (>= 0.18.1)
@@ -427,7 +426,8 @@ GEM
     letter_opener (1.8.1)
       launchy (>= 2.2, < 3)
     lint_roller (1.1.0)
-    listen (3.9.0)
+    listen (3.10.0)
+      logger
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     locale (2.1.3)
