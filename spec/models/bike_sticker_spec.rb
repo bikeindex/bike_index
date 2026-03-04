@@ -231,6 +231,8 @@ RSpec.describe BikeSticker, type: :model do
         # Things that don't match
         expect(BikeSticker.sticker_code_search("ca12").pluck(:id)).to eq([])
         expect(BikeSticker.sticker_code_search("ca0009").pluck(:id)).to eq([])
+        # More leading zeros than code_number_length should not raise
+        expect(BikeSticker.sticker_code_search("ca00000000112").pluck(:id)).to eq([])
       end
     end
   end
