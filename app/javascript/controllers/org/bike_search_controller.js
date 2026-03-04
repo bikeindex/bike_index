@@ -59,15 +59,24 @@ export default class extends Controller {
 
   updateVisibleColumns () {
     const checked = []
+    const visible = []
     this.settingsTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) return
-      if (cb.checked) checked.push(cb.name)
+      if (cb.dataset.action && cb.dataset.action.includes('averyToggled')) {
+        // Avery state is URL-driven, not stored in localStorage, but still
+        // needs to be in the visible list so the column cells are shown
+        if (cb.checked) visible.push(cb.name)
+        return
+      }
+      if (cb.checked) {
+        checked.push(cb.name)
+        visible.push(cb.name)
+      }
     })
     // Store enabled columns so they persist across page loads
     localStorage.setItem('orgBikeColumns', JSON.stringify(checked))
 
     this.element.querySelectorAll('.hiddenColumn').forEach(el => {
-      const isVisible = checked.some(col => el.classList.contains(col))
+      const isVisible = visible.some(col => el.classList.contains(col))
       el.style.display = isVisible ? '' : 'none'
     })
   }
