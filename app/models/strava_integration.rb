@@ -127,21 +127,21 @@ class StravaIntegration < ApplicationRecord
     calculated_downloaded = strava_activities.count
     return if !force_update && activities_downloaded_count == calculated_downloaded
 
-    unprocessed_lists = StravaRequest.list_activities.unprocessed.where(strava_integration_id: id)
-    if unprocessed_lists.none?
+    pending_lists = StravaRequest.list_activities.pending.where(strava_integration_id: id)
+    if pending_lists.none?
       enqueue_enrich_activity_requests
       enqueue_gear_requests
       strava_gears.find_each(&:update_total_distance!)
     end
 
     update(activities_downloaded_count: calculated_downloaded,
-      status: unprocessed_lists.none? ? :synced : :syncing)
+      status: pending_lists.none? ? :synced : :syncing)
   end
 
   private
 
   def enqueue_gear_requests
-    already_enqueued = StravaRequest.unprocessed
+    already_enqueued = StravaRequest.pending
       .where(strava_integration_id: id, request_type: :fetch_gear)
       .pluck(Arel.sql("parameters->>'strava_gear_id'"))
 
@@ -153,7 +153,7 @@ class StravaIntegration < ApplicationRecord
   end
 
   def enqueue_enrich_activity_requests
-    already_enqueued = StravaRequest.unprocessed
+    already_enqueued = StravaRequest.pending
       .where(strava_integration_id: id, request_type: :fetch_activity)
       .pluck(Arel.sql("parameters->>'strava_id'"))
 

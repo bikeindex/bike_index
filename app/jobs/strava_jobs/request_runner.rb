@@ -102,7 +102,7 @@ module StravaJobs
 
     def mark_sibling_requests_skipped(strava_request)
       strava_request.update(response_status: :skipped)
-      StravaRequest.unprocessed
+      StravaRequest.pending
         .where(strava_integration_id: strava_request.strava_integration_id, request_type: :fetch_activity)
         .where("parameters->>'strava_id' = ?", strava_request.parameters["strava_id"])
         .where.not(id: strava_request.id)

@@ -67,12 +67,11 @@ class StravaRequest < AnalyticsRecord
 
   scope :pending_or_success, -> { where(status: PENDING_OR_SUCCESS) }
   scope :not_successful, -> { where(status: NOT_SUCCESSFUL) }
-  scope :unprocessed, -> { where(requested_at: nil).where.not(response_status: :integration_deleted).order(:id) }
   scope :priority_ordered, -> { reorder(:priority) }
 
   class << self
     def next_pending(limit = 1)
-      unprocessed.priority_ordered.limit(limit)
+      pending.priority_ordered.limit(limit)
     end
 
     def parse_rate_limit(headers)

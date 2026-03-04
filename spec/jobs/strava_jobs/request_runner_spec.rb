@@ -215,7 +215,7 @@ RSpec.describe StravaJobs::RequestRunner, type: :job do
         strava_request.reload
         expect(strava_request.requested_at).to be_nil
         expect(strava_request.response_status).to eq("integration_deleted")
-        expect(StravaRequest.unprocessed).not_to include(strava_request)
+        expect(StravaRequest.pending.pluck(:id)).to eq([])
       end
     end
 
