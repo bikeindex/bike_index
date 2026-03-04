@@ -22,7 +22,7 @@ module StravaJobs
       athlete_response = execute_request(strava_integration, :fetch_athlete) {
         Integrations::StravaClient.fetch_athlete(strava_integration)
       }
-      return unless athlete_response.success?
+      raise unless athlete_response.success?
       athlete = athlete_response.body
 
       stats_response = execute_request(strava_integration, :fetch_athlete_stats) {
@@ -31,9 +31,9 @@ module StravaJobs
       strava_integration.update_from_athlete_and_stats(athlete, stats_response.success? ? stats_response.body : nil)
 
       self.class.total_pages(strava_integration.athlete_activity_count).times do |i|
-        StravaRequest.create!(user_id: strava_integration.user_id, strava_integration_id: strava_integration.id,
-          request_type: :list_activities, parameters: {page: i + 1})
-        StravaJobs::ScheduledRequestEnqueuer.perform_async
+        strava_request = StravaRequest.create!(user_id: strava_integration.user_id, request_type: :list_activities,
+          strava_integration_id: strava_integration.id, parameters: {page: i + 1})
+        StravaJobs::RequestRunner.perform_async(strava_request.id)
       end
     end
 
