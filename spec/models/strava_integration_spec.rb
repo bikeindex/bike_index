@@ -222,7 +222,7 @@ RSpec.describe StravaIntegration, type: :model do
   describe "update_sync_status" do
     let(:strava_integration) { FactoryBot.create(:strava_integration, status: :syncing) }
 
-    it "sets status to synced when no unprocessed requests and all cycling enriched" do
+    it "sets status to synced when no pending requests and all cycling enriched" do
       FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", segment_locations: {})
       strava_integration.update_sync_status
       strava_integration.reload
@@ -230,7 +230,7 @@ RSpec.describe StravaIntegration, type: :model do
       expect(strava_integration.activities_downloaded_count).to eq(1)
     end
 
-    it "stays syncing when unprocessed list_activities requests remain" do
+    it "stays syncing when pending list_activities requests remain" do
       FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", segment_locations: {})
       FactoryBot.create(:strava_request, strava_integration:, request_type: :list_activities)
       strava_integration.update_sync_status

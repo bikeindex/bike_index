@@ -20,7 +20,7 @@ RSpec.describe StravaRequest, type: :model do
   describe ".next_pending" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
-    it "returns oldest unprocessed request" do
+    it "returns oldest pending request" do
       older = FactoryBot.create(:strava_request, strava_integration:, created_at: 2.minutes.ago)
       FactoryBot.create(:strava_request, strava_integration:, created_at: 1.minute.ago)
       expect(StravaRequest.next_pending.first).to eq(older)

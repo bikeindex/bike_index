@@ -34,7 +34,7 @@ module StravaJobs
       if strava_integration_id.present?
         update_priorities_for_integration(strava_integration_id)
       else
-        StravaRequest.unprocessed
+        StravaRequest.pending
           .reorder(nil)
           .distinct
           .pluck(:strava_integration_id)
@@ -48,7 +48,7 @@ module StravaJobs
       multiplier = self.class.priority_multiplier(integration_id)
       return if multiplier == 1
 
-      StravaRequest.unprocessed.where(strava_integration_id: integration_id).find_each do |request|
+      StravaRequest.pending.where(strava_integration_id: integration_id).find_each do |request|
         request.update(priority: (request.priority * multiplier).to_i.clamp(0, MAX_PRIORITY))
       end
     end

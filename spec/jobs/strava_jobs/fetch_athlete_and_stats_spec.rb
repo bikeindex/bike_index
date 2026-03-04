@@ -30,7 +30,10 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
     it "fetches athlete and stats, updates integration, and creates list_activities follow-up" do
       VCR.use_cassette("strava-get_athlete") do
         VCR.use_cassette("strava-get_athlete_stats") do
-          instance.perform(strava_integration.id)
+          expect do
+            instance.perform(strava_integration.id)
+          end.to change(StravaRequest, :count).by(15)
+            .and change(StravaJobs::RequestRunner.jobs, :count).by(13)
         end
       end
 
@@ -50,12 +53,12 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
       expect(stats_request.requested_at).to be_present
 
       list_requests = requests.where(request_type: :list_activities).order(:id)
-
       # 1817 activities / 200 per page = 10 pages - plus 3 bonus pages
       expect(list_requests.count).to eq(13)
       expect(list_requests.first.parameters["page"]).to eq(1)
       expect(list_requests.last.parameters["page"]).to eq(13)
       expect(list_requests.pluck(:requested_at).compact).to be_empty
+      expect(StravaJobs::RequestRunner.jobs.map { |j| j["args"] }.flatten).to eq(list_requests.pluck(:id))
     end
 
     context "with gear" do
@@ -67,7 +70,10 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
       it "includes gear in proxy_serialized" do
         VCR.use_cassette("strava-get_athlete") do
           VCR.use_cassette("strava-get_athlete_stats") do
-            instance.perform(strava_integration.id)
+            expect do
+              instance.perform(strava_integration.id)
+            end.to change(StravaRequest, :count).by(15)
+              .and change(StravaJobs::RequestRunner.jobs, :count).by(13)
           end
         end
         strava_integration.reload
@@ -88,7 +94,10 @@ RSpec.describe StravaJobs::FetchAthleteAndStats, type: :job do
       it "re-enqueues stats, continues with athlete update and list_activities" do
         VCR.use_cassette("strava-get_athlete") do
           VCR.use_cassette("strava-get_athlete_stats_rate_limited") do
-            instance.perform(strava_integration.id)
+            expect do
+              instance.perform(strava_integration.id)
+            end.to change(StravaRequest, :count).by(5)
+              .and change(StravaJobs::RequestRunner.jobs, :count).by(2)
           end
         end
 
