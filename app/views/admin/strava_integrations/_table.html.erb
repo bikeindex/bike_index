@@ -93,7 +93,7 @@
 
           <td>
             <small>
-              <%= strava_integration.gear_names.join(", ").truncate(40) %>
+              <%= strava_integration.strava_gears.pluck(:name).compact.join(", ").truncate(40) %>
             </small>
           </td>
 

@@ -9,8 +9,8 @@
 #  gear_type                   :integer
 #  item_type                   :string
 #  last_updated_from_strava_at :datetime
+#  name                        :string
 #  strava_data                 :jsonb
-#  strava_gear_name            :string
 #  total_distance_kilometers   :integer
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
@@ -49,7 +49,7 @@ class StravaGear < ApplicationRecord
 
     calculated_gear_type = gear_data["gear_type"] || strava_gear.gear_type
     calculated_gear_type ||= gear_data.key?("frame_type") ? :bike : :shoe
-    attrs = {strava_gear_name: gear_data["name"], gear_type: calculated_gear_type, strava_data: gear_data}
+    attrs = {name: gear_data["name"], gear_type: calculated_gear_type, strava_data: gear_data.except("name")}
     if gear_data["resource_state"] == 3
       attrs[:last_updated_from_strava_at] = Time.current
     end
@@ -58,7 +58,7 @@ class StravaGear < ApplicationRecord
   end
 
   def strava_gear_display_name
-    strava_gear_name.presence || strava_gear_id
+    name.presence || strava_gear_id
   end
 
   def strava_distance_km
@@ -79,6 +79,16 @@ class StravaGear < ApplicationRecord
 
   def primary?
     strava_data&.dig("primary") == true
+  end
+
+  def proxy_serialized
+    self.strava_data ||= {}
+    distance = (total_distance_kilometers || 0) * 1000.0
+    if strava_data["distance"].present? && strava_data["distance"] > distance
+      distance = strava_data["distance"]
+    end
+
+    (strava_data || {}).merge("distance" => distance, "name" => name)
   end
 
   def calculated_strava_activities

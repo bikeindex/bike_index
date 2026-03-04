@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import {
   getAllActivities,
-  getAthleteGear,
+  getAthlete,
   getActivity,
   fetchEnrichedSince,
   fetchSyncStatus,
@@ -92,8 +92,8 @@ export function useActivitySync(): UseActivitySyncResult {
       // Backend is synced — fetch activities via proxy
       setProgress({ loaded: 0, total: null, status: 'Loading activities...' });
 
-      const gear = await getAthleteGear();
-      await saveGear(gear, athlete.id);
+      const freshAthlete = await getAthlete();
+      await saveGear([...(freshAthlete.bikes || []), ...(freshAthlete.shoes || [])], athlete.id);
 
       let oldestActivityDate: string | null = null;
       let isFirstBatch = true;
@@ -163,8 +163,8 @@ export function useActivitySync(): UseActivitySyncResult {
       }
 
       // Sync gear
-      const gear = await getAthleteGear();
-      await saveGear(gear, athlete.id);
+      const freshAthlete = await getAthlete();
+      await saveGear([...(freshAthlete.bikes || []), ...(freshAthlete.shoes || [])], athlete.id);
 
       // Get new activities - save each batch progressively
       let newActivityCount = 0;

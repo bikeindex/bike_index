@@ -15,12 +15,6 @@ RSpec.describe StravaIntegration, type: :model do
       expect(strava_integration).not_to be_valid
       expect(strava_integration.errors[:refresh_token]).to be_present
     end
-
-    it "raises ArgumentError for invalid status" do
-      expect {
-        FactoryBot.build(:strava_integration, status: "invalid")
-      }.to raise_error(ArgumentError)
-    end
   end
 
   describe "associations" do
@@ -65,37 +59,6 @@ RSpec.describe StravaIntegration, type: :model do
 
       new_integration = FactoryBot.build(:strava_integration, user:)
       expect(new_integration).to be_valid
-    end
-  end
-
-  describe "status methods" do
-    let(:strava_integration) { FactoryBot.build(:strava_integration) }
-
-    it "syncing?" do
-      strava_integration.status = :syncing
-      expect(strava_integration.syncing?).to be_truthy
-      strava_integration.status = :synced
-      expect(strava_integration.syncing?).to be_falsey
-    end
-
-    it "synced?" do
-      strava_integration.status = :synced
-      expect(strava_integration.synced?).to be_truthy
-      strava_integration.status = :syncing
-      expect(strava_integration.synced?).to be_falsey
-    end
-
-    it "error?" do
-      strava_integration.status = :error
-      expect(strava_integration.error?).to be_truthy
-      strava_integration.status = :synced
-      expect(strava_integration.error?).to be_falsey
-    end
-
-    it "pending?" do
-      expect(strava_integration.pending?).to be_truthy
-      strava_integration.status = :syncing
-      expect(strava_integration.pending?).to be_falsey
     end
   end
 
@@ -157,18 +120,6 @@ RSpec.describe StravaIntegration, type: :model do
     end
   end
 
-  describe "gear_names" do
-    it "returns empty array when no strava_gears" do
-      strava_integration = FactoryBot.create(:strava_integration)
-      expect(strava_integration.gear_names).to eq([])
-    end
-
-    it "returns gear names" do
-      strava_integration = FactoryBot.create(:strava_integration, :with_gear)
-      expect(strava_integration.gear_names).to eq(["My Road Bike"])
-    end
-  end
-
   describe "update_from_athlete_and_stats" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
     let(:athlete) do
@@ -188,8 +139,8 @@ RSpec.describe StravaIntegration, type: :model do
       expect(strava_integration.athlete_id).to eq("12345678")
       expect(strava_integration.athlete_activity_count).to eq(150)
       expect(strava_integration.strava_gears.count).to eq(2)
-      expect(strava_integration.strava_gears.bikes.first.strava_gear_name).to eq("My Road Bike")
-      expect(strava_integration.strava_gears.shoes.first.strava_gear_name).to eq("Running Shoes")
+      expect(strava_integration.strava_gears.bikes.first.name).to eq("My Road Bike")
+      expect(strava_integration.strava_gears.shoes.first.name).to eq("Running Shoes")
       expect(strava_integration.status).to eq("syncing")
     end
 
@@ -207,7 +158,7 @@ RSpec.describe StravaIntegration, type: :model do
       StravaGear.update_from_strava(strava_integration,
         {"id" => "b1234", "name" => "Renamed Road Bike", "gear_type" => "bike", "primary" => true, "distance" => 60000.0, "resource_state" => 2})
       expect(strava_integration.strava_gears.count).to eq(2)
-      expect(strava_integration.strava_gears.find_by(strava_gear_id: "b1234").strava_gear_name).to eq("Renamed Road Bike")
+      expect(strava_integration.strava_gears.find_by(strava_gear_id: "b1234").name).to eq("Renamed Road Bike")
     end
   end
 

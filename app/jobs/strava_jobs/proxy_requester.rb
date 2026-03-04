@@ -46,7 +46,7 @@ module StravaJobs
         response = Integrations::StravaClient.proxy_request(strava_integration,
           strava_request.parameters["url"], method: strava_request.parameters["method"],
           body: strava_request.parameters["body"])
-        strava_request.update_from_response(response, raise_on_error: false)
+        strava_request.update_from_response(response)
 
         serialized = if strava_request.success?
           handle_proxy_response(strava_integration, response.body, method: strava_request.parameters["method"])
@@ -94,7 +94,7 @@ module StravaJobs
         elsif body.is_a?(Hash) && body["sport_type"].present?
           strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, body)
           if method.to_s.casecmp?("put")
-            strava_activity.update_from_strava!
+            strava_activity.update_from_strava!(run_inline: true)
             strava_activity.reload
           end
           strava_activity.proxy_serialized

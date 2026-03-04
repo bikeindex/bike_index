@@ -10,9 +10,14 @@ RSpec.describe Admin::StravaRequestsController, type: :request do
 
   describe "#index" do
     it "responds with ok" do
+      strava_request2 = FactoryBot.create(:strava_request)
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(assigns(:collection).pluck(:id)).to eq([strava_request2.id, strava_request.id])
+
+      get base_url, params: {search_id: strava_request.id}
+      expect(response.status).to eq(200)
       expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])
     end
 

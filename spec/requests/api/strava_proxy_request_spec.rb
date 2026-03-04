@@ -106,24 +106,36 @@ RSpec.describe "Strava Proxy API", type: :request do
         }.as_json
       end
 
-      it "proxies the request and returns serialized response" do
-        VCR.use_cassette("strava-list_activities") do
-          expect {
-            post base_url, params: {url: "athlete/activities?page=1&per_page=1", method: "GET", access_token: token.token}
-          }.to change(StravaRequest, :count).by(1)
-          expect(response.status).to eq 200
-          expect(json_result).to be_a(Array)
-          expect(json_result.first["title"]).to eq "Thanks for coming across the bay!"
-          expect(json_result.first["strava_id"]).to eq "17323701543"
-          strava_request = StravaRequest.last
-          expect(strava_request.proxy?).to be_truthy
-          expect(strava_request.success?).to be_truthy
-          expect(strava_request.parameters).to eq("url" => "athlete/activities?page=1&per_page=1", "method" => "GET")
+      context "list_activities request" do
+        it "proxies the request and returns serialized response" do
+          VCR.use_cassette("strava-list_activities") do
+            expect {
+              post base_url, params: {url: "athlete/activities?page=1&per_page=1", method: "GET", access_token: token.token}
+            }.to change(StravaRequest, :count).by(1)
+            expect(response.status).to eq 200
+            expect(json_result).to be_a(Array)
+            expect(json_result.first["title"]).to eq "Thanks for coming across the bay!"
+            expect(json_result.first["strava_id"]).to eq "17323701543"
+            strava_request = StravaRequest.last
+            expect(strava_request.proxy?).to be_truthy
+            expect(strava_request.success?).to be_truthy
+            expect(strava_request.parameters).to eq("url" => "athlete/activities?page=1&per_page=1", "method" => "GET")
 
-          strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
-          expect(strava_activity).to have_attributes target_attributes
-          expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
-          expect(json_result).to eq [strava_activity.proxy_serialized.as_json]
+            strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
+            expect(strava_activity).to have_attributes target_attributes
+            expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
+            expect(json_result).to eq [strava_activity.proxy_serialized.as_json]
+          end
+        end
+      end
+
+      context "get_athlete request" do
+        it "returns proxy_serialized without creating a strava_request" do
+          expect {
+            post base_url, params: {url: "athlete/2430215", method: "GET", access_token: token.token}
+          }.to_not change(StravaRequest, :count)
+          expect(response.status).to eq 200
+          expect(json_result).to eq strava_integration.proxy_serialized.as_json
         end
       end
 

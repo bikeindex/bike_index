@@ -81,7 +81,6 @@ class StravaActivity < ApplicationRecord
   scope :cycling, -> { where(activity_type: CYCLING_TYPES) }
   scope :enriched, -> { where.not(enriched_at: nil) }
   scope :not_enriched, -> { where(enriched_at: nil) }
-  scope :activities_to_enrich, -> { cycling.not_enriched }
   scope :with_gear, -> { where.not(gear_id: nil) }
 
   class << self
@@ -129,6 +128,7 @@ class StravaActivity < ApplicationRecord
 
     def summary_attributes(summary)
       attrs = SUMMARY_KEY_MAP.each_with_object({}) { |(src, attr), h| h[attr] = summary[src] if summary.key?(src) }
+      attrs["title"] = summary["title"] if summary["title"].present? # The webhook sends this, WTF
       if summary.key?("sport_type") || summary.key?("type")
         attrs[:activity_type] = summary["sport_type"] || summary["type"]
       end
@@ -155,7 +155,7 @@ class StravaActivity < ApplicationRecord
   def calculated_gear_name
     return nil if gear_id.blank?
 
-    strava_integration.strava_gears.find_by(strava_gear_id: gear_id)&.strava_gear_name || gear_id
+    strava_integration.strava_gears.find_by(strava_gear_id: gear_id)&.name || gear_id
   end
 
   def start_date_in_zone
@@ -178,14 +178,16 @@ class StravaActivity < ApplicationRecord
   end
 
   # AKA Enrich the activity
-  def update_from_strava!
+  def update_from_strava!(run_inline: false)
     strava_request = StravaRequest.create!(
       strava_integration_id:,
       user_id: strava_integration.user_id,
       request_type: :fetch_activity,
       parameters: {strava_id: strava_id.to_s}
     )
-    StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
+    if run_inline
+      StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
+    end
   end
 
   def proxy_serialized
