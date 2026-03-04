@@ -16,6 +16,15 @@ RSpec.describe Admin::StravaRequestsController, type: :request do
       expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])
     end
 
+    context "with search_id" do
+      it "returns only the matching request" do
+        other_request = FactoryBot.create(:strava_request)
+        get base_url, params: {search_id: strava_request.id}
+        expect(response.status).to eq(200)
+        expect(assigns(:collection).pluck(:id)).to eq([strava_request.id])
+      end
+    end
+
     context "with render_chart" do
       it "renders chart including integration pie chart" do
         get base_url, params: {render_chart: true, period: "year"}

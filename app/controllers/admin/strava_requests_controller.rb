@@ -30,6 +30,10 @@ class Admin::StravaRequestsController < Admin::BaseController
   def matching_strava_requests
     strava_requests = StravaRequest.all
 
+    if params[:search_id].present?
+      strava_requests = strava_requests.where(id: params[:search_id])
+    end
+
     if params[:search_request_type].present?
       strava_requests = strava_requests.where(request_type: params[:search_request_type])
     end
