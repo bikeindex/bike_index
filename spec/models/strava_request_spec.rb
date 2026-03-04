@@ -129,7 +129,7 @@ RSpec.describe StravaRequest, type: :model do
     let!(:strava_request) { FactoryBot.create(:strava_request, :list_activities, strava_integration:) }
     let(:headers) { {"X-RateLimit-Limit" => "100,1000", "X-RateLimit-Usage" => "10,200"} }
 
-    context "error response" do
+    context "500 response" do
       let(:response) { instance_double(Faraday::Response, success?: false, status: 500, headers:, body: "Internal Server Error") }
 
       it "stores error response in parameters" do
@@ -154,7 +154,7 @@ RSpec.describe StravaRequest, type: :model do
       let(:response) { instance_double(Faraday::Response, success?: false, status: 503, headers:, body: "Service Unavailable") }
       let(:target_parameters) { strava_request.parameters.merge(error_response_status: 503).as_json }
 
-      it "marks as error and re-enqueues a new request" do
+      it "marks as error, doesn't raise and re-enqueues a new request" do
         expect {
           strava_request.update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: true)
         }.to change(StravaRequest, :count).by(1)
