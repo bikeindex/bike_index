@@ -7,6 +7,11 @@ RSpec.describe Org::BikeSearch::Component, :js, type: :system do
   let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[bike_search]) }
   let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
+  before do
+    visit(preview_path)
+    page.execute_script("localStorage.removeItem('orgBikeColumns'); localStorage.removeItem('orgBikeSettingsOpen')")
+  end
+
   it "toggles settings panel visibility" do
     visit(preview_path)
 
