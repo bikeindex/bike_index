@@ -2,7 +2,7 @@
 
 module StravaJobs
   class RequestRunner < ApplicationJob
-    sidekiq_options queue: "low_priority", retry: 1
+    sidekiq_options queue: "droppable", retry: 1
 
     class << self
       def make_request_and_update(strava_integration, strava_request)

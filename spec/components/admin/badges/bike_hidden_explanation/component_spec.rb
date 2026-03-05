@@ -60,4 +60,31 @@ RSpec.describe Admin::Badges::BikeHiddenExplanation::Component, type: :component
       expect(component).not_to have_content "test"
     end
   end
+
+  context "with bike_version" do
+    let(:bike) { BikeVersion.new(visibility:) }
+    let(:visibility) { :visible_not_related }
+
+    it "doesn't render" do
+      expect(component.to_html).not_to include("small")
+    end
+
+    context "with user_hidden" do
+      let(:visibility) { :user_hidden }
+      it "renders" do
+        expect(bike.deleted?).to be_falsey
+        expect(component).to have_css("small")
+        expect(component).to have_content "user hidden"
+      end
+    end
+
+    context "with deleted" do
+      it "renders" do
+        bike.deleted_at = Time.current - 1.minute
+        expect(bike.deleted?).to be_truthy
+        expect(component).to have_css("small")
+        expect(component).to have_content "deleted"
+      end
+    end
+  end
 end
