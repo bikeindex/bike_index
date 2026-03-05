@@ -106,7 +106,7 @@ module StravaJobs
       end
 
       def internal_response!(strava_request)
-        strava_request.update(response_status: :skipped)
+        strava_request.update(response_status: :binx_response)
 
         if athlete_request?(strava_request)
           strava_request.strava_integration.proxy_serialized

@@ -115,28 +115,6 @@ RSpec.describe StravaJobs::ProxyRequester do
       }.as_json
     end
 
-    #   context "activities list" do
-    #     it "creates strava_request, stores activities, returns serialized response" do
-    #       VCR.use_cassette("strava-list_activities") do
-    #         result = nil
-    #         expect {
-    #           result = described_class.create_and_execute(strava_integration:, user:, url: "athlete/activities?page=1&per_page=1", method: "GET")
-    #           expect(result[:strava_request]).to be_a(StravaRequest)
-    #           expect(result[:strava_request].success?).to be_truthy
-    #           expect(result[:strava_request].proxy?).to be_truthy
-    #           expect(result[:strava_request].parameters).to eq("url" => "athlete/activities?page=1&per_page=1")
-    #           expect(result[:response].status).to eq 200
-    #         }.to change(StravaRequest, :count).by(1)
-    #           .and change(StravaActivity, :count).by(1)
-
-    #         strava_activity = strava_integration.strava_activities.find_by(strava_id: "17323701543")
-    #         expect(strava_activity).to have_attributes target_attributes
-    #         expect(strava_activity.start_date).to be_within(1).of Binxtils::TimeParser.parse("2026-02-07T23:39:36Z")
-    #         expect(result[:serialized]).to eq [strava_activity.proxy_serialized]
-    #       end
-    #     end
-    #   end
-
     context "activity detail" do
       let(:detail_target_attributes) do
         target_attributes.merge(
