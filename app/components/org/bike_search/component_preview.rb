@@ -16,13 +16,14 @@ module Org::BikeSearch
       )
       render(bike_search) do
         bikes.map { |bike|
-          render(Org::BikeSearchRow::Component.new(
-            bike:,
-            organization:,
-            sortable_search_params: {},
-            additional_registration_fields: bike_search.additional_registration_fields,
-            show_avery_export: bike_search.show_avery_export?
-          ))
+          content_tag(:tr) do
+            render(Org::BikeSearchRow::Component.new(
+              bike:,
+              organization:,
+              sortable_search_params: {},
+              additional_registration_fields: bike_search.additional_registration_fields
+            ))
+          end
         }.join.html_safe
       end
     end

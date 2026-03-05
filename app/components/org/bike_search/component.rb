@@ -6,7 +6,7 @@ module Org::BikeSearch
       interpreted_params: {}, sortable_search_params: {},
       search_stickers: nil, search_address: nil, search_status: "all",
       search_query_present: false, time_range: nil, stolenness: "all",
-      bike_sticker: nil, model_audit: nil, only_show_bikes: false)
+      bike_sticker: nil, model_audit: nil, only_show_bikes: false, skip_avery: false)
       @organization = organization
       @pagy = pagy
       @interpreted_params = interpreted_params
@@ -22,6 +22,7 @@ module Org::BikeSearch
       @bike_sticker = bike_sticker
       @model_audit = model_audit
       @only_show_bikes = only_show_bikes
+      @skip_avery = skip_avery
     end
 
     def additional_registration_fields
@@ -31,7 +32,7 @@ module Org::BikeSearch
     def show_avery_export?
       return @show_avery_export if defined?(@show_avery_export)
 
-      @show_avery_export = @organization.enabled?("avery_export") &&
+      @show_avery_export = !@skip_avery && @organization.enabled?("avery_export") &&
         Binxtils::InputNormalizer.boolean(@params[:search_avery_export])
     end
 
@@ -102,7 +103,7 @@ module Org::BikeSearch
         cols += %w[url_cell updated_at_cell cycle_type_cell propulsion_type_cell status_cell]
         cols += additional_registration_fields.map { |f| "#{f}_cell" }
         cols += ["impounded_cell"] if @organization.enabled?("impound_bikes")
-        cols += ["avery_cell"] if @organization.enabled?("avery_export")
+        cols += ["avery_cell"] if !@skip_avery && @organization.enabled?("avery_export")
         cols.uniq.sort { |a, b| column_renames[a] <=> column_renames[b] }
       end
     end
