@@ -44,8 +44,16 @@ function storePreferences(prefs: StoredPreferences) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, ...prefs }));
 }
 
-function getDefaultUnits(athleteCountry?: string): UnitSystem {
-  // Default to imperial for US users
+export function getDefaultUnits(measurementPreference?: string, athleteCountry?: string): UnitSystem {
+  // Use Strava athlete's measurement_preference if available
+  if (measurementPreference === 'feet') {
+    return 'imperial';
+  }
+  if (measurementPreference === 'meters') {
+    return 'metric';
+  }
+
+  // Fall back to athlete country
   if (athleteCountry === 'United States') {
     return 'imperial';
   }
@@ -113,8 +121,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     if (userSetUnits) {
       return userSetUnits;
     }
-    return getDefaultUnits(athlete?.country);
-  }, [userSetUnits, athlete?.country]);
+    return getDefaultUnits(athlete?.measurement_preference, athlete?.country);
+  }, [userSetUnits, athlete?.measurement_preference, athlete?.country]);
 
   const setUnits = useCallback((newUnits: UnitSystem) => {
     setUserSetUnits(newUnits);
