@@ -140,10 +140,12 @@
             <% else %>
               <small class="less-strong">no proxy requests</small>
             <% end %>
-            priority multiplier:
-            <code>
-              <%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %>
-            </code>
+            <small class="tw:ml-1">
+              priority multiplier:
+              <code>
+                <%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %>
+              </code>
+            </small>
           </td>
         </tr>
 

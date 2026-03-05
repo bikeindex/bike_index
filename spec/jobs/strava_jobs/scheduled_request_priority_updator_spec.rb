@@ -47,7 +47,12 @@ RSpec.describe StravaJobs::ScheduledRequestPriorityUpdator, type: :job do
     let!(:request) { FactoryBot.create(:strava_request, :fetch_activity, strava_integration:) }
     let(:proxy_requested_at) { nil }
     let!(:strava_request_proxy) do
-      proxy_requested_at && FactoryBot.create(:strava_request, :proxy, :processed, strava_integration:, requested_at: proxy_requested_at)
+      if proxy_requested_at
+        srp = FactoryBot.create(:strava_request, :proxy, response_status: :binx_response,
+          strava_integration:)
+        srp.update_column :updated_at, proxy_requested_at
+        srp
+      end
     end
 
     context "with no proxy requests" do
