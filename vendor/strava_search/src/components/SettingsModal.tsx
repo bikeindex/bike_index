@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Trash2, AlertTriangle, RefreshCw, Sun, Moon } from 'lucide-react';
+import { X, Trash2, RefreshCw, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePreferences, type DarkMode } from '../contexts/PreferencesContext';
 import { useActivitySync } from '../hooks/useActivitySync';
@@ -21,7 +21,6 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
   const { isSyncing, progress, syncRecent } = useActivitySync();
   const [activityCount, setActivityCount] = useState(0);
   const [enrichedCount, setEnrichedCount] = useState(0);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -178,40 +177,13 @@ function SettingsModalContent({ onClose }: { onClose: () => void }) {
           <div>
             <h3 className="font-medium text-red-600 mb-3">Danger Zone</h3>
             <div className="border border-red-200 dark:border-red-800 rounded-lg p-4">
-              {showDeleteConfirm ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-red-600">
-                    <AlertTriangle className="w-5 h-5" />
-                    <span className="font-medium">Are you sure?</span>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    This will delete all locally stored data and log you out. Your
-                    Strava data will not be affected.
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setShowDeleteConfirm(false)}
-                      className="flex-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleClearData}
-                      className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                      Delete All Data
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full py-2 border border-red-300 dark:border-red-700 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Clear All Local Data
-                </button>
-              )}
+              <button
+                onClick={handleClearData}
+                className="w-full py-2 border border-red-300 dark:border-red-700 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear All Local Data
+              </button>
             </div>
           </div>
         </div>

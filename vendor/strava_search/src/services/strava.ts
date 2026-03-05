@@ -150,13 +150,11 @@ export async function getAthlete(): Promise<StravaAthlete> {
 
 export async function getActivities(
   page: number = 1,
-  perPage: number = 100,
   before?: number,
   after?: number
 ): Promise<StravaActivity[]> {
   const params = new URLSearchParams({
     page: page.toString(),
-    per_page: perPage.toString(),
   });
 
   if (before) {
@@ -191,6 +189,31 @@ export interface GetAllActivitiesOptions {
   onProgress?: (loaded: number, total: number | null) => void;
   onBatch?: (activities: StravaActivity[], totalSoFar: number) => Promise<void>;
   after?: number;
+  estimatedTotal?: number | null;
+}
+
+// Backend page size (ACTIVITIES_PER_PAGE in strava_client.rb)
+const BACKEND_PAGE_SIZE = 200;
+
+async function processResults(
+  results: StravaActivity[][],
+  allActivities: StravaActivity[],
+  options: GetAllActivitiesOptions
+): Promise<boolean> {
+  for (const activities of results) {
+    if (activities.length === 0) return true;
+
+    allActivities.push(...activities);
+
+    if (options.onBatch) {
+      await options.onBatch(activities, allActivities.length);
+    }
+
+    if (options.onProgress) {
+      options.onProgress(allActivities.length, null);
+    }
+  }
+  return false;
 }
 
 export async function getAllActivities(
@@ -202,29 +225,26 @@ export async function getAllActivities(
     : onProgressOrOptions || {};
 
   const allActivities: StravaActivity[] = [];
-  let page = 1;
-  const perPage = 100;
 
-  while (true) {
-    const activities = await getActivities(page, perPage, undefined, options.after);
-    allActivities.push(...activities);
+  if (options.estimatedTotal) {
+    // Known total: fetch all pages in parallel
+    const estimatedPages = Math.ceil(options.estimatedTotal / BACKEND_PAGE_SIZE) + 1;
+    const pageNumbers = Array.from({ length: estimatedPages }, (_, i) => i + 1);
 
-    if (options.onBatch && activities.length > 0) {
-      await options.onBatch(activities, allActivities.length);
+    const results = await Promise.all(
+      pageNumbers.map((page) => getActivities(page, undefined, options.after))
+    );
+
+    await processResults(results, allActivities, options);
+  } else {
+    // Unknown total: fetch sequentially
+    let page = 1;
+    while (true) {
+      const activities = await getActivities(page, undefined, options.after);
+      const done = await processResults([activities], allActivities, options);
+      if (done) break;
+      page++;
     }
-
-    if (options.onProgress) {
-      options.onProgress(allActivities.length, null);
-    }
-
-    if (activities.length < perPage) {
-      break;
-    }
-
-    page++;
-
-    // Small delay to avoid rate limiting
-    await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
   return allActivities;

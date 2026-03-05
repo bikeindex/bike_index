@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { X, Trash2, AlertTriangle, RefreshCw, Sun, Moon } from 'lucide-react';
+import { X, Trash2, RefreshCw, Sun, Moon } from 'lucide-react';
 import { formatNumber, formatTimeAgo, formatDateTimeTitle } from '../utils/formatters';
 import { mockSyncState } from './mocks';
 import type { DarkMode } from '../contexts/PreferencesContext';
@@ -30,8 +30,6 @@ function SettingsModalStory({
   const [units, setUnits] = useState<'imperial' | 'metric'>('imperial');
   const [darkMode, setDarkMode] = useState<DarkMode>('system');
   const [autoEnrich, setAutoEnrich] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
   return (
     <div data-modal="settings" className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1040] p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
@@ -142,39 +140,12 @@ function SettingsModalStory({
           <div>
             <h3 className="font-medium text-red-600 mb-3">Danger Zone</h3>
             <div className="border border-red-200 dark:border-red-800 rounded-lg p-4">
-              {showDeleteConfirm ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-red-600">
-                    <AlertTriangle className="w-5 h-5" />
-                    <span className="font-medium">Are you sure?</span>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    This will delete all locally stored data and log you out. Your
-                    Strava data will not be affected.
-                  </p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setShowDeleteConfirm(false)}
-                      className="flex-1 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                      Delete All Data
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full py-2 border border-red-300 dark:border-red-700 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Clear All Local Data
-                </button>
-              )}
+              <button
+                className="w-full py-2 border border-red-300 dark:border-red-700 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Clear All Local Data
+              </button>
             </div>
           </div>
         </div>
