@@ -5,7 +5,7 @@
   <% unless @only_show_bikes %>
     <div class="mb-4">
       <%= render(Search::FormOrganized::Component.new(
-        target_search_path: helpers.organization_bikes_path(organization_id: @organization.to_param),
+        target_search_path: organization_bikes_path(organization_id: @organization.to_param),
         interpreted_params: @interpreted_params
       )) %>
     </div>
@@ -25,10 +25,10 @@
             <div class="form-group">
               <label>
                 <% if cell_name == "avery_cell" %>
-                  <%= helpers.check_box_tag cell_name, cell_name, show_avery_export?,
+                  <%= check_box_tag cell_name, cell_name, show_avery_export?,
                     data: { action: "change->org--bike-search#averyToggled" } %>
                 <% else %>
-                  <%= helpers.check_box_tag cell_name, cell_name, false,
+                  <%= check_box_tag cell_name, cell_name, false,
                     data: { action: "change->org--bike-search#columnToggled" } %>
                 <% end %>
 
@@ -43,16 +43,16 @@
         <p class="search-sort-btns">
           <span class="sort-group-label"><%= translation(".stickers") %></span>
 
-          <%= helpers.link_to translation(".all"),
-            helpers.organization_bikes_path(search_params.merge(search_stickers: nil)),
+          <%= link_to translation(".all"),
+            organization_bikes_path(search_params.merge(search_stickers: nil)),
             class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}" %>
 
-          <%= helpers.link_to helpers.organization_bikes_path(search_params.merge(search_stickers: "with")),
+          <%= link_to organization_bikes_path(search_params.merge(search_stickers: "with")),
             class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do %>
             <%= translation(".only_with_stickers_html") %>
           <% end %>
 
-          <%= helpers.link_to helpers.organization_bikes_path(search_params.merge(search_stickers: "none")),
+          <%= link_to organization_bikes_path(search_params.merge(search_stickers: "none")),
             class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do %>
             <%= translation(".only_no_sticker_html") %>
           <% end %>
@@ -63,16 +63,16 @@
         <p class="search-sort-btns">
           <span class="sort-group-label"><%= translation(".address") %></span>
 
-          <%= helpers.link_to translation(".all"),
-            helpers.organization_bikes_path(search_params.merge(search_address: nil)),
+          <%= link_to translation(".all"),
+            organization_bikes_path(search_params.merge(search_address: nil)),
             class: "btn btn-secondary #{@search_address.blank? ? 'active' : ''}" %>
 
-          <%= helpers.link_to helpers.organization_bikes_path(search_params.merge(search_address: "with_street")),
+          <%= link_to organization_bikes_path(search_params.merge(search_address: "with_street")),
             class: "btn btn-secondary #{@search_address == 'with_street' ? 'active' : ''}" do %>
             <%= translation(".only_with_address_html") %>
           <% end %>
 
-          <%= helpers.link_to helpers.organization_bikes_path(search_params.merge(search_address: "without_street")),
+          <%= link_to organization_bikes_path(search_params.merge(search_address: "without_street")),
             class: "btn btn-secondary #{@search_address == 'without_street' ? 'active' : ''}" do %>
             <%= translation(".only_no_address_html") %>
           <% end %>
@@ -82,27 +82,27 @@
       <p class="search-sort-btns">
         <span class="sort-group-label"><%= translation(".status") %></span>
 
-        <%= helpers.link_to translation(".all"),
-          helpers.organization_bikes_path(search_params.merge(search_status: "all")),
+        <%= link_to translation(".all"),
+          organization_bikes_path(search_params.merge(search_status: "all")),
           class: "btn btn-secondary #{@search_status == 'all' ? 'active' : ''}" %>
 
         <% if @organization.enabled?("impound_bikes") %>
-          <%= helpers.link_to helpers.organization_bikes_path(search_params.merge(search_status: "not_impounded")),
+          <%= link_to organization_bikes_path(search_params.merge(search_status: "not_impounded")),
             class: "btn btn-secondary #{@search_status == 'not_impounded' ? 'active' : ''}" do %>
             <%= translation(".only_not_impounded_html") %>
           <% end %>
-          <%= helpers.link_to helpers.organization_bikes_path(search_params.merge(search_status: "impounded")),
+          <%= link_to organization_bikes_path(search_params.merge(search_status: "impounded")),
             class: "btn btn-secondary #{@search_status == 'impounded' ? 'active' : ''}" do %>
             <%= translation(".only_impounded_vehicles_html") %>
           <% end %>
         <% end %>
 
-        <%= helpers.link_to helpers.organization_bikes_path(search_params.merge(search_status: "with_owner")),
+        <%= link_to organization_bikes_path(search_params.merge(search_status: "with_owner")),
           class: "btn btn-secondary #{@search_status == 'with_owner' ? 'active' : ''}" do %>
           <%= translation(".only_with_owner_html") %>
         <% end %>
 
-        <%= helpers.link_to helpers.organization_bikes_path(search_params.merge(search_status: "stolen")),
+        <%= link_to organization_bikes_path(search_params.merge(search_status: "stolen")),
           class: "btn btn-secondary #{@search_status == 'stolen' ? 'active' : ''}" do %>
           <%= translation(".only_stolen_html") %>
         <% end %>
@@ -110,8 +110,8 @@
 
       <% if @organization.enabled?("csv_exports") && !@only_show_bikes %>
         <p class="search-sort-btns text-right">
-          <%= helpers.link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
-            helpers.organization_bikes_path(search_params.merge(create_export: true)),
+          <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
+            organization_bikes_path(search_params.merge(create_export: true)),
             class: "gray-link" %>
         </p>
       <% end %>
@@ -135,10 +135,10 @@
       <p class="mt-4">
         <% if show_search_query_summary? %>
           <%= translation(".matching_bikes_html",
-            bikes: helpers.pluralize(helpers.number_with_delimiter(@pagy.count), cycle_type)) %>
+            bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type)) %>
         <% else %>
           <%= translation(".registered_bikes_html",
-            bikes: helpers.pluralize(helpers.number_with_delimiter(@pagy.count), cycle_type),
+            bikes: pluralize(number_with_delimiter(@pagy.count), cycle_type),
             org_name: @organization.short_name) %>
         <% end %>
 
@@ -148,10 +148,10 @@
       <% if @model_audit.present? %>
         <p class="mt-0">
           E-Vehicles for audit:
-          <a class="gray-link" href="<%= helpers.organization_model_audit_path(@model_audit.to_param, organization_id: @organization.to_param) %>"><%= helpers.model_audit_display(@model_audit) %></a>
+          <a class="gray-link" href="<%= organization_model_audit_path(@model_audit.to_param, organization_id: @organization.to_param) %>"><%= model_audit_display(@model_audit) %></a>
           &nbsp;
-          <%= helpers.link_to "view matching any audit",
-            helpers.url_for(@sortable_search_params.merge(search_model_audit_id: nil)),
+          <%= link_to "view matching any audit",
+            url_for(@sortable_search_params.merge(search_model_audit_id: nil)),
             class: "gray-link small" %>
         </p>
       <% end %>
@@ -170,11 +170,11 @@
           <th class="hiddenColumn url_cell">URL</th>
 
           <th class="hiddenColumn created_at_cell">
-            <%= helpers.sortable "id", translation(".registered") %>
+            <%= helpers.sortable"id", translation(".registered") %>
           </th>
 
           <th class="hiddenColumn updated_at_cell hidden-xs-down">
-            <%= helpers.sortable "updated_by_user_at", translation(".updated") %>
+            <%= helpers.sortable"updated_by_user_at", translation(".updated") %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down stolen_cell">
@@ -182,19 +182,19 @@
           </th>
 
           <th class="hiddenColumn hidden-xs-down propulsion_type_cell">
-            <%= helpers.sortable "propulsion_type", translation(".propulsion_type") %>
+            <%= helpers.sortable"propulsion_type", translation(".propulsion_type") %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down cycle_type_cell">
-            <%= helpers.sortable "cycle_type", translation(".vehicle_type") %>
+            <%= helpers.sortable"cycle_type", translation(".vehicle_type") %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down manufacturer_cell">
-            <%= helpers.sortable "mnfg_name", translation(".manufacturer") %>
+            <%= helpers.sortable"mnfg_name", translation(".manufacturer") %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down model_cell">
-            <%= helpers.sortable "frame_model", translation(".model") %>
+            <%= helpers.sortable"frame_model", translation(".model") %>
           </th>
 
           <th class="hiddenColumn hidden-xs-down color_cell">
@@ -207,7 +207,7 @@
               <br>
             </small>
 
-            <%= helpers.sortable "owner_email", translation(".sent_to") %>
+            <%= helpers.sortable"owner_email", translation(".sent_to") %>
           </th>
 
           <th class="hiddenColumn creation_description_cell">Source</th>
@@ -267,8 +267,8 @@
       </div>
 
       <div class="col-md-4 text-right">
-        <%= helpers.select_tag :per_page_select,
-          helpers.options_for_select(
+        <%= select_tag :per_page_select,
+          options_for_select(
             [10, 25, 50, 100].map { |i| ["#{i} #{cycle_type.pluralize(10)} per page", i] },
             selected: @per_page
           ),

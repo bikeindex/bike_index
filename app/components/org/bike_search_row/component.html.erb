@@ -5,20 +5,20 @@
 <td class="hiddenColumn created_at_cell">
   <a
     class="convertTime"
-    href="<%= helpers.bike_path(@bike, organization_id: @organization.to_param) %>"
+    href="<%= bike_path(@bike, organization_id: @organization.to_param) %>"
   >
-    <%= helpers.l @bike.created_at, format: :convert_time %>
+    <%= l @bike.created_at, format: :convert_time %>
   </a>
 </td>
 
 <td class="hiddenColumn updated_at_cell hidden-xs-down">
   <small class="convertTime">
-    <%= helpers.l @bike.updated_by_user_fallback, format: :convert_time %>
+    <%= l @bike.updated_by_user_fallback, format: :convert_time %>
   </small>
 </td>
 
 <td class="hiddenColumn hidden-xs-down table-cell-check stolen_cell">
-  <%= helpers.check_mark if @bike.status_stolen? %>
+  <%= check_mark if @bike.status_stolen? %>
 </td>
 
 <td class="hiddenColumn hidden-xs-down propulsion_type_cell">
@@ -52,7 +52,7 @@
   <% if @bike.email_visible_for?(@organization) %>
     <%= @bike.owner_email %>
     <small>
-      <%= helpers.link_to "\u{1F50E}", helpers.url_for(@sortable_search_params.merge(search_email: @bike.owner_email)) %>
+      <%= link_to "\u{1F50E}", url_for(@sortable_search_params.merge(search_email: @bike.owner_email)) %>
     </small>
   <% else %>
     <em class="less-strong"><%= translation(".email_hidden") %></em>
@@ -108,15 +108,15 @@
   <td class="hidden-xs-down sticker_cell">
     <% if @bike_sticker.present? %>
       <small>
-        <%= helpers.link_to translation(".link"),
-          helpers.bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: @bike.id),
+        <%= link_to translation(".link"),
+          bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: @bike.id),
           method: "PUT" %>
       </small>
     <% else %>
       <% @bike.bike_stickers.each_with_index do |bike_sticker, index| %>
         <% if bike_sticker.organization.present? && bike_sticker.organization_id == @organization.id %>
-          <%= helpers.link_to bike_sticker.pretty_code,
-            helpers.edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param),
+          <%= link_to bike_sticker.pretty_code,
+            edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param),
             class: "small" %>
         <% else %>
           <small><%= bike_sticker.pretty_code %></small>
@@ -134,7 +134,7 @@
   <td class="hiddenColumn hidden-xs-down impounded_cell">
     <% if @bike.status_impounded? && @bike.current_impound_record&.created_at&.present? %>
       <small class="convertTime">
-        <%= helpers.l @bike.current_impound_record.created_at, format: :convert_time %>
+        <%= l @bike.current_impound_record.created_at, format: :convert_time %>
       </small>
     <% end %>
   </td>
