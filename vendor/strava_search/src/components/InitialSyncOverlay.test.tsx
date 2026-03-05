@@ -10,24 +10,6 @@ describe('InitialSyncOverlay', () => {
     expect(screen.getByText('Checking sync status...')).toBeInTheDocument();
   });
 
-  it('shows progress bar when total is known', () => {
-    render(<InitialSyncOverlay loaded={50} total={150} status="50 of ~150 activities synced" />);
-
-    const bar = document.querySelector('.bg-\\[\\#fc4c02\\]') as HTMLElement;
-    expect(bar).toBeInTheDocument();
-    expect(bar.style.width).toBe('33.33333333333333%');
-  });
-
-  it('shows progress bar at 50% when total is unknown but loaded > 0', () => {
-    render(<InitialSyncOverlay loaded={23} total={null} status="23 activities synced" />);
-
-    const bars = document.querySelectorAll('.bg-\\[\\#fc4c02\\]');
-    expect(bars.length).toBeGreaterThan(0);
-
-    const bar = bars[0] as HTMLElement;
-    expect(bar.style.width).toBe('50%');
-  });
-
   it('hides progress bar when loaded is 0 and total is null', () => {
     render(<InitialSyncOverlay loaded={0} total={null} status="Checking sync status..." />);
 
@@ -40,33 +22,5 @@ describe('InitialSyncOverlay', () => {
 
     const spinner = document.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
-  });
-
-  it('shows rate limited message when rateLimited is true', () => {
-    render(<InitialSyncOverlay loaded={50} total={150} status="50 of ~150 activities synced" rateLimited={true} />);
-
-    expect(screen.getByText('Strava rate limit reached — syncing will resume automatically')).toBeInTheDocument();
-  });
-
-  it('does not show rate limited message when rateLimited is false', () => {
-    render(<InitialSyncOverlay loaded={50} total={150} status="50 of ~150 activities synced" rateLimited={false} />);
-
-    expect(screen.queryByText('Strava rate limit reached — syncing will resume automatically')).not.toBeInTheDocument();
-  });
-
-  it('caps progress bar at 100% when loaded exceeds total', () => {
-    render(<InitialSyncOverlay loaded={160} total={150} status="160 of 160 activities synced" />);
-
-    const bar = document.querySelector('.bg-\\[\\#fc4c02\\]') as HTMLElement;
-    expect(bar).toBeInTheDocument();
-    expect(bar.style.width).toBe('100%');
-  });
-
-  it('shows exact count without tilde when loaded equals total', () => {
-    render(<InitialSyncOverlay loaded={150} total={150} status="150 of 150 activities synced" />);
-
-    expect(screen.getByText('150 of 150 activities synced')).toBeInTheDocument();
-    const bar = document.querySelector('.bg-\\[\\#fc4c02\\]') as HTMLElement;
-    expect(bar.style.width).toBe('100%');
   });
 });

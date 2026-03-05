@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { RefreshCw, LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { RefreshCw, User, Settings, ChevronDown } from 'lucide-react';
 import { mockAthlete, mockSyncState } from './mocks';
 import { formatTimeAgo, formatDateTimeTitle } from '../utils/formatters';
 
@@ -12,7 +12,6 @@ interface HeaderStoryProps {
   progressStatus?: string;
   onOpenSettings: () => void;
   onSync: () => void;
-  onLogout: () => void;
 }
 
 function HeaderStory({
@@ -22,7 +21,6 @@ function HeaderStory({
   progressStatus,
   onOpenSettings,
   onSync,
-  onLogout,
 }: HeaderStoryProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -34,11 +32,6 @@ function HeaderStory({
   const handleSyncClick = () => {
     setIsDropdownOpen(false);
     onSync();
-  };
-
-  const handleLogoutClick = () => {
-    setIsDropdownOpen(false);
-    onLogout();
   };
 
   return (
@@ -104,14 +97,6 @@ function HeaderStory({
                       <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
                       {isSyncing ? progressStatus || 'Syncing...' : 'Sync'}
                     </button>
-                    <hr className="my-1 border-gray-200" />
-                    <button
-                      onClick={handleLogoutClick}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Logout
-                    </button>
                   </div>
                 )}
               </div>
@@ -133,7 +118,6 @@ const meta = {
   argTypes: {
     onOpenSettings: { action: 'openSettings' },
     onSync: { action: 'sync' },
-    onLogout: { action: 'logout' },
   },
 } satisfies Meta<typeof HeaderStory>;
 
@@ -147,7 +131,6 @@ export const Default: Story = {
     isSyncing: false,
     onOpenSettings: () => {},
     onSync: () => {},
-    onLogout: () => {},
   },
 };
 
@@ -161,7 +144,6 @@ export const WithoutAvatar: Story = {
     isSyncing: false,
     onOpenSettings: () => {},
     onSync: () => {},
-    onLogout: () => {},
   },
 };
 
@@ -173,7 +155,6 @@ export const Syncing: Story = {
     progressStatus: '450 of ~1,200 activities synced',
     onOpenSettings: () => {},
     onSync: () => {},
-    onLogout: () => {},
   },
 };
 
@@ -184,7 +165,6 @@ export const NoSyncState: Story = {
     isSyncing: false,
     onOpenSettings: () => {},
     onSync: () => {},
-    onLogout: () => {},
   },
 };
 
@@ -195,7 +175,6 @@ export const DropdownOpen: Story = {
     isSyncing: false,
     onOpenSettings: () => {},
     onSync: () => {},
-    onLogout: () => {},
   },
   play: async ({ canvasElement }) => {
     // Auto-open the dropdown for this story
@@ -216,7 +195,6 @@ export const SyncRecentChecking: Story = {
     progressStatus: 'Checking for new activities...',
     onOpenSettings: () => {},
     onSync: () => {},
-    onLogout: () => {},
   },
 };
 
@@ -228,7 +206,6 @@ export const DropdownWhileSyncing: Story = {
     progressStatus: '450 of ~1,200 activities synced',
     onOpenSettings: () => {},
     onSync: () => {},
-    onLogout: () => {},
   },
   play: async ({ canvasElement }) => {
     const button = canvasElement.querySelector('button');
@@ -246,6 +223,5 @@ export const FetchingFullDataForPage: Story = {
     progressStatus: 'Fetching full data for this page: 12 of 50',
     onOpenSettings: () => {},
     onSync: () => {},
-    onLogout: () => {},
   },
 };
