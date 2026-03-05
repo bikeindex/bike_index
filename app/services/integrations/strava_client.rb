@@ -42,7 +42,7 @@ class Integrations::StravaClient
     end
 
     def fetch_athlete_stats(strava_integration)
-      get(strava_integration, "athletes/#{strava_integration.strava_id}/stats")
+      get(strava_integration, "athletes/#{strava_integration.athlete_id}/stats")
     end
 
     def list_activities(strava_integration, per_page: ACTIVITIES_PER_PAGE, page: nil, after: nil)
@@ -79,6 +79,7 @@ class Integrations::StravaClient
 
     def proxy_request(strava_integration, path, method: "GET", body: nil)
       raise ArgumentError, "Invalid proxy path" if path.blank? || path.match?(%r{://|\A//|(\A|/)\.\.(/|\z)})
+
       path = path.delete_prefix("/")
       ensure_valid_token!(strava_integration)
       execute_proxy_request(strava_integration, path, method:, body:)

@@ -306,6 +306,24 @@ describe('strava service', () => {
       expect(result).toHaveLength(2);
     });
 
+    it('includes sequential page params in all parallel requests', async () => {
+      const page1 = Array.from({ length: 200 }, (_, i) => createMockActivity(i + 1));
+
+      (global.fetch as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce(mockPageResponse(page1))
+        .mockResolvedValueOnce(mockEmptyResponse());
+
+      await getAllActivities({ estimatedTotal: 200 });
+
+      const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
+      expect(calls).toHaveLength(2);
+
+      for (let i = 0; i < calls.length; i++) {
+        const body = JSON.parse(calls[i][1].body);
+        expect(body.url).toContain(`page=${i + 1}`);
+      }
+    });
+
     it('does not include per_page in any request', async () => {
       const page1 = Array.from({ length: 5 }, (_, i) => createMockActivity(i + 1));
 

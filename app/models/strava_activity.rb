@@ -82,6 +82,7 @@ class StravaActivity < ApplicationRecord
   scope :enriched, -> { where.not(enriched_at: nil) }
   scope :not_enriched, -> { where(enriched_at: nil) }
   scope :with_gear, -> { where.not(gear_id: nil) }
+  scope :strava_ordered, -> { order(Arel.sql("strava_id::bigint DESC")) }
 
   class << self
     def activity_types
