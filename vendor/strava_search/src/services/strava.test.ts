@@ -294,16 +294,19 @@ describe('strava service', () => {
       expect(result).toHaveLength(350);
     });
 
-    it('fetches only 1 page without estimatedTotal', async () => {
-      const activities = [createMockActivity(1), createMockActivity(2)];
+    it('fetches sequentially without estimatedTotal', async () => {
+      const page1 = Array.from({ length: 5 }, (_, i) => createMockActivity(i + 1));
+      const page2 = Array.from({ length: 3 }, (_, i) => createMockActivity(i + 6));
 
       (global.fetch as ReturnType<typeof vi.fn>)
-        .mockResolvedValueOnce(mockPageResponse(activities));
+        .mockResolvedValueOnce(mockPageResponse(page1))
+        .mockResolvedValueOnce(mockPageResponse(page2))
+        .mockResolvedValueOnce(mockEmptyResponse());
 
       const result = await getAllActivities({});
 
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(result).toHaveLength(2);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
+      expect(result).toHaveLength(8);
     });
 
     it('includes sequential page params in all parallel requests', async () => {
@@ -343,7 +346,8 @@ describe('strava service', () => {
       const activities = [createMockActivity(1), createMockActivity(2)];
 
       (global.fetch as ReturnType<typeof vi.fn>)
-        .mockResolvedValueOnce(mockPageResponse(activities));
+        .mockResolvedValueOnce(mockPageResponse(activities))
+        .mockResolvedValueOnce(mockEmptyResponse());
 
       const onProgress = vi.fn();
       const result = await getAllActivities(onProgress);
@@ -367,7 +371,8 @@ describe('strava service', () => {
       const activities = [createMockActivity(1)];
 
       (global.fetch as ReturnType<typeof vi.fn>)
-        .mockResolvedValueOnce(mockPageResponse(activities));
+        .mockResolvedValueOnce(mockPageResponse(activities))
+        .mockResolvedValueOnce(mockEmptyResponse());
 
       const afterTimestamp = Date.now() - 86400000; // 1 day ago
       await getAllActivities({ after: afterTimestamp });

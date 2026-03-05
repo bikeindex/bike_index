@@ -195,28 +195,13 @@ export interface GetAllActivitiesOptions {
 // Backend page size (ACTIVITIES_PER_PAGE in strava_client.rb)
 const BACKEND_PAGE_SIZE = 200;
 
-export async function getAllActivities(
-  onProgressOrOptions?: ((loaded: number, total: number | null) => void) | GetAllActivitiesOptions,
-  after?: number
-): Promise<StravaActivity[]> {
-  const options: GetAllActivitiesOptions = typeof onProgressOrOptions === 'function'
-    ? { onProgress: onProgressOrOptions, after }
-    : onProgressOrOptions || {};
-
-  // Calculate pages to fetch: estimate + 1 extra to detect the end
-  const estimatedPages = options.estimatedTotal
-    ? Math.ceil(options.estimatedTotal / BACKEND_PAGE_SIZE) + 1
-    : 1;
-  const pageNumbers = Array.from({ length: estimatedPages }, (_, i) => i + 1);
-
-  const results = await Promise.all(
-    pageNumbers.map((page) => getActivities(page, undefined, options.after))
-  );
-
-  const allActivities: StravaActivity[] = [];
-
+async function processResults(
+  results: StravaActivity[][],
+  allActivities: StravaActivity[],
+  options: GetAllActivitiesOptions
+): Promise<boolean> {
   for (const activities of results) {
-    if (activities.length === 0) break;
+    if (activities.length === 0) return true;
 
     allActivities.push(...activities);
 
@@ -226,6 +211,39 @@ export async function getAllActivities(
 
     if (options.onProgress) {
       options.onProgress(allActivities.length, null);
+    }
+  }
+  return false;
+}
+
+export async function getAllActivities(
+  onProgressOrOptions?: ((loaded: number, total: number | null) => void) | GetAllActivitiesOptions,
+  after?: number
+): Promise<StravaActivity[]> {
+  const options: GetAllActivitiesOptions = typeof onProgressOrOptions === 'function'
+    ? { onProgress: onProgressOrOptions, after }
+    : onProgressOrOptions || {};
+
+  const allActivities: StravaActivity[] = [];
+
+  if (options.estimatedTotal) {
+    // Known total: fetch all pages in parallel
+    const estimatedPages = Math.ceil(options.estimatedTotal / BACKEND_PAGE_SIZE) + 1;
+    const pageNumbers = Array.from({ length: estimatedPages }, (_, i) => i + 1);
+
+    const results = await Promise.all(
+      pageNumbers.map((page) => getActivities(page, undefined, options.after))
+    );
+
+    await processResults(results, allActivities, options);
+  } else {
+    // Unknown total: fetch sequentially
+    let page = 1;
+    while (true) {
+      const activities = await getActivities(page, undefined, options.after);
+      const done = await processResults([activities], allActivities, options);
+      if (done) break;
+      page++;
     }
   }
 
