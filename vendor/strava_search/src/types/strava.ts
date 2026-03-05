@@ -8,6 +8,7 @@ export interface StravaAthlete {
   country: string;
   profile: string;
   profile_medium: string;
+  measurement_preference?: string;
   bikes?: StravaGear[];
   shoes?: StravaGear[];
 }
