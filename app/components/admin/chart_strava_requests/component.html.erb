@@ -10,7 +10,7 @@
   </div>
 </div>
 
-<div class="tw:md:grid-cols- tw:mt-4 tw:grid tw:grid-cols-1 tw:gap-4 <%= pie_columns.size %>">
+<div class="tw:mt-4 tw:grid tw:grid-cols-1 tw:gap-4 <%= pie_columns.size == 3 ? "tw:md:grid-cols-3" : "tw:md:grid-cols-2" %>">
   <% pie_columns.each do |title, data, colors| %>
     <div>
       <h4><%= title %></h4>
