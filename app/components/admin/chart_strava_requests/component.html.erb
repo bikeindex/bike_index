@@ -1,0 +1,20 @@
+<div class="tw:flex tw:flex-col tw:md:flex-row tw:gap-4 tw:mt-4">
+  <div class="tw:flex-1">
+    <h4>By response status</h4>
+    <%= render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true)) %>
+  </div>
+
+  <div class="tw:flex-1">
+    <h4>By request type</h4>
+    <%= render(UI::Chart::Component.new(series: type_series, time_range: @time_range, stacked: true)) %>
+  </div>
+</div>
+
+<div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-<%= pie_columns.size %> tw:gap-4 tw:mt-4">
+  <% pie_columns.each do |title, data, colors| %>
+    <div>
+      <h4><%= title %></h4>
+      <%= helpers.pie_chart(data, **pie_chart_opts(colors)) %>
+    </div>
+  <% end %>
+</div>
