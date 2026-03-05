@@ -105,7 +105,10 @@ function Dashboard() {
       const interval = setInterval(() => {
         refreshActivities(true); // Silent refresh to avoid page blink
       }, 2000); // Refresh every 2 seconds during sync/fetch
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        refreshActivities(true); // Final refresh when sync/fetch completes
+      };
     }
   }, [isSyncing, isFetchingFullData, refreshActivities]);
 

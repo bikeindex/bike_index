@@ -133,6 +133,7 @@
 
           <td>
             <% most_recent_proxy_at = StravaRequest.most_recent_proxy_at(@strava_integration.id) %>
+
             <% if most_recent_proxy_at.present? %>
               <span class="localizeTime preciseTime">
                 <%= l most_recent_proxy_at, format: :convert_time %>
@@ -140,11 +141,10 @@
             <% else %>
               <small class="less-strong">no proxy requests</small>
             <% end %>
+
             <small class="tw:ml-1">
               priority multiplier:
-              <code>
-                <%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %>
-              </code>
+              <code><%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %></code>
             </small>
           </td>
         </tr>
