@@ -39,8 +39,8 @@ module PageBlock::StravaIntegration
         athlete_activity_count: 150,
         activities_downloaded_count: (status == :syncing) ? 50 : 150
       )
-      strava_integration.strava_gears.build(strava_gear_id: "b1", name: "My Road Bike", gear_type: "bike")
-      strava_integration.strava_gears.build(strava_gear_id: "b2", name: "My Mountain Bike", gear_type: "bike")
+      strava_integration.strava_gears.build(strava_id: "b1", name: "My Road Bike", gear_type: "bike")
+      strava_integration.strava_gears.build(strava_id: "b2", name: "My Mountain Bike", gear_type: "bike")
       user
     end
   end

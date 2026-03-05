@@ -31,36 +31,31 @@ module Admin::ChartStravaRequests
       @show_integration_chart = show_integration_chart
     end
 
-    def call
-      parts = [
-        tag.h4("By response status", class: "mt-4"),
-        render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true)),
-        tag.h4("By request type", class: "mt-4"),
-        render(UI::Chart::Component.new(series: type_series, time_range: @time_range, stacked: true))
-      ]
-
-      pie_columns = []
-      pie_columns << pie_column("Response status", status_pie_counts, status_pie_colors)
-      pie_columns << pie_column("Request type", type_pie_counts, type_pie_colors)
-      if @show_integration_chart
-        pie_columns << pie_column("By integration", integration_counts)
-      end
-      parts << tag.div(safe_join(pie_columns), class: "tw:grid tw:grid-cols-1 tw:md:grid-cols-#{pie_columns.size} tw:gap-4 tw:mt-4")
-
-      safe_join(parts)
-    end
-
     private
 
-    def pie_column(title, data, colors = nil)
-      chart_opts = {thousands: ",", library: {plugins: {legend: {position: "bottom"}}}}
-      chart_opts[:colors] = colors if colors
-      tag.div(
-        safe_join([
-          tag.h4(title),
-          helpers.pie_chart(data, **chart_opts)
-        ])
-      )
+    def status_series
+      @status_series ||= build_series(StravaRequest::RESPONSE_STATUS_ENUM, :response_status)
+    end
+
+    def type_series
+      @type_series ||= build_series(StravaRequest::REQUEST_TYPE_ENUM, :request_type)
+    end
+
+    def pie_columns
+      @pie_columns ||= begin
+        columns = [
+          ["Response status", status_pie_counts, status_pie_colors],
+          ["Request type", type_pie_counts, type_pie_colors]
+        ]
+        columns << ["By integration", integration_counts, nil] if @show_integration_chart
+        columns
+      end
+    end
+
+    def pie_chart_opts(colors)
+      opts = {thousands: ",", library: {plugins: {legend: {position: "bottom"}}}}
+      opts[:colors] = colors if colors
+      opts
     end
 
     def status_pie_counts
@@ -84,14 +79,6 @@ module Admin::ChartStravaRequests
         count = @collection.where(column => key).count
         hash[key.to_s.humanize] = count if count > 0
       end
-    end
-
-    def status_series
-      @status_series ||= build_series(StravaRequest::RESPONSE_STATUS_ENUM, :response_status)
-    end
-
-    def type_series
-      @type_series ||= build_series(StravaRequest::REQUEST_TYPE_ENUM, :request_type)
     end
 
     def build_series(enum, column)

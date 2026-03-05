@@ -133,10 +133,10 @@ RSpec.describe StravaIntegration, type: :model do
        "all_swim_totals" => {"count" => 10}}
     end
 
-    it "updates athlete_id, activity_count, creates gear records, and sets status to syncing" do
+    it "updates strava_id, activity_count, creates gear records, and sets status to syncing" do
       strava_integration.update_from_athlete_and_stats(athlete, stats)
       strava_integration.reload
-      expect(strava_integration.athlete_id).to eq("12345678")
+      expect(strava_integration.strava_id).to eq("12345678")
       expect(strava_integration.athlete_activity_count).to eq(150)
       expect(strava_integration.strava_gears.count).to eq(2)
       expect(strava_integration.strava_gears.bikes.first.name).to eq("My Road Bike")
@@ -147,8 +147,9 @@ RSpec.describe StravaIntegration, type: :model do
     it "handles nil stats" do
       strava_integration.update_from_athlete_and_stats(athlete, nil)
       strava_integration.reload
-      expect(strava_integration.athlete_id).to eq("12345678")
+      expect(strava_integration.strava_id).to eq("12345678")
       expect(strava_integration.athlete_activity_count).to be_nil
+      expect(strava_integration.status).to eq("syncing")
     end
 
     it "upserts existing gear records" do
@@ -158,7 +159,7 @@ RSpec.describe StravaIntegration, type: :model do
       StravaGear.update_from_strava(strava_integration,
         {"id" => "b1234", "name" => "Renamed Road Bike", "gear_type" => "bike", "primary" => true, "distance" => 60000.0, "resource_state" => 2})
       expect(strava_integration.strava_gears.count).to eq(2)
-      expect(strava_integration.strava_gears.find_by(strava_gear_id: "b1234").name).to eq("Renamed Road Bike")
+      expect(strava_integration.strava_gears.find_by(strava_id: "b1234").name).to eq("Renamed Road Bike")
     end
   end
 
@@ -166,9 +167,9 @@ RSpec.describe StravaIntegration, type: :model do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
     it "returns un_enriched gear ids" do
-      FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234",
+      FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234",
         strava_data: {"resource_state" => 2})
-      FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b5678",
+      FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b5678",
         strava_data: {"resource_state" => 3})
       expect(strava_integration.gear_ids_to_request).to eq(["b1234"])
     end
@@ -179,7 +180,7 @@ RSpec.describe StravaIntegration, type: :model do
     end
 
     it "deduplicates ids" do
-      FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234",
+      FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234",
         strava_data: {"resource_state" => 2})
       FactoryBot.create(:strava_activity, strava_integration:, gear_id: "b1234")
       expect(strava_integration.gear_ids_to_request).to eq(["b1234"])
@@ -191,9 +192,9 @@ RSpec.describe StravaIntegration, type: :model do
     before { StravaRequest.destroy_all }
 
     it "creates fetch_gear requests for un_enriched gear" do
-      FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234",
+      FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234",
         strava_data: {"resource_state" => 2})
-      FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b5678",
+      FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b5678",
         strava_data: {"resource_state" => 3})
       strava_integration.send(:enqueue_gear_requests)
       gear_requests = StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_gear)
@@ -210,7 +211,7 @@ RSpec.describe StravaIntegration, type: :model do
     end
 
     it "does not create duplicate requests" do
-      FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234",
+      FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234",
         strava_data: {"resource_state" => 2})
       strava_integration.send(:enqueue_gear_requests)
       strava_integration.send(:enqueue_gear_requests)
@@ -220,63 +221,81 @@ RSpec.describe StravaIntegration, type: :model do
   end
 
   describe "update_sync_status" do
-    let(:strava_integration) { FactoryBot.create(:strava_integration, status: :syncing) }
+    let(:strava_integration) { FactoryBot.create(:strava_integration, status: :pending) }
+    let!(:strava_activity) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", enriched_at:) }
+    let(:enriched_at) { nil }
 
-    it "sets status to synced when no pending requests and all cycling enriched" do
-      FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", segment_locations: {})
-      strava_integration.update_sync_status
-      strava_integration.reload
-      expect(strava_integration.status).to eq("synced")
-      expect(strava_integration.activities_downloaded_count).to eq(1)
+    it "sets status to syncing" do
+      expect(strava_integration.update_sync_status).to be_truthy
+      expect(strava_integration.reload.status).to eq "syncing"
     end
 
-    it "stays syncing when pending list_activities requests remain" do
-      FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", segment_locations: {})
-      FactoryBot.create(:strava_request, strava_integration:, request_type: :list_activities)
-      strava_integration.update_sync_status
-      strava_integration.reload
-      expect(strava_integration.status).to eq("syncing")
-      expect(strava_integration.activities_downloaded_count).to eq(1)
-    end
+    context "with strava_request" do
+      let!(:strava_request) { FactoryBot.create(:strava_request, :list_activities, strava_integration:, response_status: list_activities_status) }
+      let(:list_activities_status) { :pending }
 
-    it "enqueues detail requests when cycling activities are not enriched" do
-      FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", segment_locations: nil)
-      strava_integration.update_sync_status
-      strava_integration.reload
-      expect(strava_integration.status).to eq("synced")
-      expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity).count).to eq(1)
-    end
+      it "sets status to syncing" do
+        expect(strava_integration.reload.send(:calculated_status)).to eq :syncing
+        expect(strava_integration.update_sync_status).to be_truthy
+        expect(strava_integration.reload.status).to eq("syncing")
+        expect(strava_integration.activities_downloaded_count).to eq(1)
+      end
 
-    it "updates gear total distances and enqueues gear requests when list_activities done" do
-      strava_gear = FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b1234",
-        strava_data: {"resource_state" => 3})
-      FactoryBot.create(:strava_gear, strava_integration:, strava_gear_id: "b5678",
-        strava_data: {"resource_state" => 2})
-      FactoryBot.create(:strava_activity, strava_integration:, gear_id: "b1234",
-        activity_type: "Ride", segment_locations: {}, distance_meters: 25000)
-      strava_integration.update_sync_status
-      expect(strava_gear.reload.total_distance_kilometers).to eq(25)
-      # Un-enriched gear gets a fetch_gear request
-      expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_gear).count).to eq(1)
-      expect(strava_integration.reload.status).to eq("synced")
-    end
+      context "with no pending list_activities" do
+        let(:list_activities_status) { :success }
+        it "sets status to syncing" do
+          expect(strava_integration.reload.send(:calculated_status)).to eq :synced
+          expect do
+            expect(strava_integration.update_sync_status).to be_truthy
+          end.to change(StravaRequest, :count).by 1
+          expect(strava_integration.reload.status).to eq("synced")
+          expect(strava_integration.activities_downloaded_count).to eq(1)
+          # it enqueues fetch_activity for the un-enriched activity
+          expect(StravaRequest.last.request_type).to eq "fetch_activity"
 
-    it "does not create duplicate detail requests when called twice" do
-      FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", segment_locations: nil)
-      strava_integration.update_sync_status
-      expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity).count).to eq(1)
-      strava_integration.update_sync_status
-      expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_activity).count).to eq(1)
-    end
+          expect do
+            # Running it again returns nil because it noops - since download count matches
+            expect(strava_integration.update_sync_status).to be_nil
+            # Running it again with force_update returns true, because it
+            expect(strava_integration.update_sync_status(force_update: true)).to be_truthy
+          end.to change(StravaRequest, :count).by 0
+        end
 
-    it "skips when activities_downloaded_count matches unless force_update" do
-      FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", segment_locations: {})
-      strava_integration.update(activities_downloaded_count: 1, status: :syncing)
-      strava_integration.update_sync_status
-      expect(strava_integration.reload.status).to eq("syncing")
+        context "with strava_gear" do
+          let(:enriched_at) { Time.current }
+          let(:strava_gear) do
+            FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234", strava_data: {"resource_state" => 3})
+          end
+          let!(:strava_gear2) do
+            FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b5678",
+              strava_data: {"resource_state" => 2})
+          end
+          let!(:strava_activity2) do
+            FactoryBot.create(:strava_activity, strava_integration:, gear_id: strava_gear.strava_id,
+              activity_type: "Ride", segment_locations: {}, distance_meters: 25000, enriched_at: Time.current - 100)
+          end
 
-      strava_integration.update_sync_status(force_update: true)
-      expect(strava_integration.reload.status).to eq("synced")
+          it "updates gear total distances and enqueues gear requests when list_activities done" do
+            expect(strava_activity.reload.enriched?).to be_truthy
+            expect(strava_integration.gear_ids_to_request).to eq([strava_gear2.strava_id])
+
+            expect do
+              expect(strava_integration.reload.update_sync_status).to be_truthy
+            end.to change(StravaRequest, :count).by 1
+            expect(StravaRequest.last.request_type).to eq "fetch_gear"
+
+            expect(strava_gear.reload.total_distance_kilometers).to eq(25)
+            # Un-enriched gear gets a fetch_gear request
+            expect(StravaRequest.where(strava_integration_id: strava_integration.id, request_type: :fetch_gear).count).to eq(1)
+            expect(strava_integration.reload.status).to eq("synced")
+
+            # Running it again doesn't add updates
+            expect do
+              expect(strava_integration.update_sync_status(force_update: true)).to be_truthy
+            end.to change(StravaRequest, :count).by 0
+          end
+        end
+      end
     end
   end
 end

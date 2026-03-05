@@ -22,11 +22,6 @@ module API
         return
       end
 
-      if permitted_params[:url]&.match?(/\Aathlete(\/\d+)?\z/)
-        render json: auth_response[:strava_integration].proxy_serialized.to_json
-        return
-      end
-
       enriched_since = enriched_since_from_url(permitted_params[:url])
       if enriched_since
         activities = auth_response[:strava_integration].strava_activities
@@ -41,7 +36,9 @@ module API
         url: permitted_params[:url], method: permitted_params[:method], body: permitted_params[:body]&.to_h
       )
 
-      if result[:strava_request].success?
+      if result.key?(:internal_response) # Internal data. Can't use present because it can be an empty array
+        render json: result[:internal_response].to_json
+      elsif result[:strava_request].success?
         render json: result[:serialized].to_json, status: result[:response].status
       else
         render json: sanitize_response_body(result[:response]&.body), status: result[:response]&.status || 502

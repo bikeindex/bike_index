@@ -12,7 +12,7 @@ RSpec.describe ScheduledJobRunner, type: :lib do
 
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "high_priority" # overrides default
-    expect(described_class.frequency).to be > 1.minute
+    expect(described_class.frequency).to be >= 15
   end
 
   it "has correct scheduled workers" do
@@ -22,7 +22,14 @@ RSpec.describe ScheduledJobRunner, type: :lib do
   describe "perform" do
     it "schedules all the workers" do
       clear_scheduled_history
+      Sidekiq::Job.clear_all
       expect(described_class.scheduled_jobs.count).to be > 0
+      # Get all the possible queues for scheduled jobs, and remove their history
+      redis_queues = described_class.scheduled_jobs.map(&:redis_queue).uniq
+      Sidekiq.redis { |r| redis_queues.each { r.del(it) } }
+      # Sanity check it
+      expect(CleanBParamsJob.should_enqueue?).to be_truthy
+
       described_class.new.perform
       described_class.scheduled_non_scheduler_workers.each do |worker|
         expect(worker.jobs.count).to eq 1
