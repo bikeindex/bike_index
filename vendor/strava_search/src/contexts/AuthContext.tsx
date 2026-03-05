@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const configAthleteId = parseInt(config.athleteId, 10);
 
       // Clear all data if stored athlete doesn't match the signed-in user
-      if (auth && auth.athlete.id !== configAthleteId) {
+      if (auth && Number(auth.athlete.id) !== configAthleteId) {
         await clearAllData();
         auth = undefined;
       }
@@ -66,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Refresh athlete profile in the background if it's missing
         if (!auth.athlete.profile_medium) {
           getAthlete().then(async (freshAthlete) => {
+            freshAthlete.id = Number(freshAthlete.id);
             const updatedAuth = { ...auth, athlete: freshAthlete };
             await saveAuth(updatedAuth);
             setAthlete(freshAthlete);
@@ -93,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Fetch real athlete profile from Strava
       try {
         const freshAthlete = await getAthlete();
+        freshAthlete.id = Number(freshAthlete.id);
         const updatedAuth = { ...newAuth, athlete: freshAthlete };
         await saveAuth(updatedAuth);
         setAthlete(freshAthlete);

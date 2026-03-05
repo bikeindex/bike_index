@@ -519,7 +519,7 @@ export function SearchFilters({
           const locationsAvailable = allLocations.length > 0;
           const disabled = !locationsAvailable;
           const disabledClasses = `${selectClasses} opacity-50 cursor-not-allowed`;
-          const disabledLabel = isLoading ? 'Loading...' : 'N/A';
+          const disabledLabel = isLoading ? 'Loading...' : 'No locations loaded';
           const countryLabel = disabled ? disabledLabel : `All (${allCountries.length} ${allCountries.length === 1 ? 'country' : 'countries'})`;
           const regionLabel = disabled ? disabledLabel : `All (${availableRegions.length} ${availableRegions.length === 1 ? 'region' : 'regions'})`;
           const cityLabel = disabled ? disabledLabel : `All (${availableCities.length} ${availableCities.length === 1 ? 'city' : 'cities'})`;

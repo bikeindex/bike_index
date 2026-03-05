@@ -99,7 +99,7 @@ class StravaRequest < AnalyticsRecord
 
     def most_recent_proxy_at(strava_integration_id)
       where(strava_integration_id:, request_type: :proxy)
-        .where.not(requested_at: nil).maximum(:requested_at)
+        .where.not(response_status: :pending).maximum(:updated_at)
     end
 
     private
