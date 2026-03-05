@@ -155,7 +155,7 @@ class StravaActivity < ApplicationRecord
   def calculated_gear_name
     return nil if gear_id.blank?
 
-    strava_integration.strava_gears.find_by(strava_gear_id: gear_id)&.name || gear_id
+    strava_integration.strava_gears.find_by(strava_id: gear_id)&.name || gear_id
   end
 
   def start_date_in_zone

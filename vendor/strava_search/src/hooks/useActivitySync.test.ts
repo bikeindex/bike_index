@@ -17,6 +17,7 @@ vi.mock('../services/strava', () => ({
   getAllActivities: vi.fn(() => Promise.resolve([])),
   getActivity: vi.fn(() => Promise.resolve({ id: 1, name: 'Test', muted: false })),
   fetchEnrichedSince: vi.fn(() => Promise.resolve([])),
+  fetchSyncStatus: vi.fn(() => Promise.resolve({ status: 'synced', activities_downloaded_count: 100, athlete_activity_count: 100, progress_percent: 100, rate_limited: false })),
 }));
 
 vi.mock('../services/database', () => ({
@@ -31,6 +32,29 @@ vi.mock('../services/database', () => ({
 describe('useActivitySync', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe('syncAll', () => {
+    it('passes estimatedTotal to getAllActivities', async () => {
+      const { getAllActivities, fetchSyncStatus } = await import('../services/strava');
+      vi.mocked(fetchSyncStatus).mockResolvedValueOnce({
+        status: 'synced',
+        activities_downloaded_count: 500,
+        athlete_activity_count: 500,
+        progress_percent: 100,
+        rate_limited: false,
+      });
+
+      const { result } = renderHook(() => useActivitySync());
+
+      await act(async () => {
+        await result.current.syncAll();
+      });
+
+      expect(getAllActivities).toHaveBeenCalledWith(
+        expect.objectContaining({ estimatedTotal: 500 })
+      );
+    });
   });
 
   describe('error handling', () => {

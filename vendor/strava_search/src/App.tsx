@@ -191,7 +191,7 @@ function Dashboard() {
       <SettingsModal isOpen={showSettings} onClose={handleCloseSettings} />
 
       {/* Initial sync overlay - shown before any activities have loaded */}
-      {isSyncing && !syncState?.isInitialSyncComplete && progress && (
+      {isSyncing && !syncState?.isInitialSyncComplete && progress && activities.length === 0 && (
         <InitialSyncOverlay
           loaded={progress.loaded}
           total={progress.total}

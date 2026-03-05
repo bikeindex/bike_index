@@ -33,10 +33,22 @@ module Admin::ChartStravaRequests
 
     def call
       parts = [
-        tag.h4("By response status", class: "mt-4"),
-        render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true)),
-        tag.h4("By request type", class: "mt-4"),
-        render(UI::Chart::Component.new(series: type_series, time_range: @time_range, stacked: true))
+        tag.div(class: "tw:flex tw:flex-col tw:md:flex-row tw:gap-4 tw:mt-4") do
+          safe_join([
+            tag.div(class: "tw:flex-1") do
+              safe_join([
+                tag.h4("By response status"),
+                render(UI::Chart::Component.new(series: status_series, time_range: @time_range, stacked: true))
+              ])
+            end,
+            tag.div(class: "tw:flex-1") do
+              safe_join([
+                tag.h4("By request type"),
+                render(UI::Chart::Component.new(series: type_series, time_range: @time_range, stacked: true))
+              ])
+            end
+          ])
+        end
       ]
 
       pie_columns = []

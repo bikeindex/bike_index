@@ -18,7 +18,7 @@
 #  token_expires_at            :datetime
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
-#  athlete_id                  :string
+#  strava_id                   :string
 #  user_id                     :bigint           not null
 #
 # Indexes
@@ -90,7 +90,7 @@ class StravaIntegration < ApplicationRecord
   end
 
   def proxy_serialized
-    (strava_data || {}).merge("id" => athlete_id, "bikes" => strava_gears.bikes.map(&:proxy_serialized),
+    (strava_data || {}).merge("id" => strava_id, "bikes" => strava_gears.bikes.map(&:proxy_serialized),
       "shoes" => strava_gears.shoes.map(&:proxy_serialized))
   end
 
@@ -100,7 +100,7 @@ class StravaIntegration < ApplicationRecord
         (stats.dig("all_run_totals", "count") || 0) +
         (stats.dig("all_swim_totals", "count") || 0)
     end
-    update(strava_data: athlete.except("id"), athlete_id: athlete["id"], status: calculated_status)
+    update(strava_data: athlete.except("id"), strava_id: athlete["id"], status: calculated_status)
 
     bikes = (athlete["bikes"] || []).map { |g| g.merge("gear_type" => "bike") }
     shoes = (athlete["shoes"] || []).map { |g| g.merge("gear_type" => "shoe") }
@@ -121,12 +121,12 @@ class StravaIntegration < ApplicationRecord
   end
 
   def unknown_gear_ids
-    known_ids = strava_gears.pluck(:strava_gear_id)
+    known_ids = strava_gears.pluck(:strava_id)
     strava_activities.where.not(gear_id: [nil, ""] + known_ids).distinct.pluck(:gear_id)
   end
 
   def gear_ids_to_request
-    un_enriched_ids = strava_gears.un_enriched.pluck(:strava_gear_id)
+    un_enriched_ids = strava_gears.un_enriched.pluck(:strava_id)
     (unknown_gear_ids + un_enriched_ids).uniq
   end
 

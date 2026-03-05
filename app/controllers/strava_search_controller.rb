@@ -13,7 +13,7 @@ class StravaSearchController < ApplicationController
     @strava_search_config = {
       tokenEndpoint: strava_search_token_path,
       proxyEndpoint: api_strava_proxy_index_path,
-      athleteId: strava_integration.athlete_id,
+      athleteId: strava_integration.strava_id,
       hasActivityWrite: strava_integration.has_activity_write?,
       authUrl: new_strava_integration_path(scope: :strava_search)
     }
@@ -45,7 +45,7 @@ class StravaSearchController < ApplicationController
       access_token: access_token.token,
       expires_in: access_token.expires_in,
       created_at: access_token.created_at.to_i,
-      athlete_id: strava_integration.athlete_id
+      athlete_id: strava_integration.strava_id
     }
   end
 

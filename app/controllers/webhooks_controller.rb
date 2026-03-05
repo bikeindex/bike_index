@@ -54,7 +54,7 @@ class WebhooksController < ApplicationController
   end
 
   def strava_receive_event
-    strava_integration = StravaIntegration.find_by(athlete_id: params["owner_id"].to_s)
+    strava_integration = StravaIntegration.find_by(strava_id: params["owner_id"].to_s)
     if strava_integration
       StravaRequest.create!(
         strava_integration_id: strava_integration.id,

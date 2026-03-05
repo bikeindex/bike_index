@@ -42,7 +42,7 @@ class Integrations::StravaClient
     end
 
     def fetch_athlete_stats(strava_integration)
-      get(strava_integration, "athletes/#{strava_integration.athlete_id}/stats")
+      get(strava_integration, "athletes/#{strava_integration.strava_id}/stats")
     end
 
     def list_activities(strava_integration, per_page: ACTIVITIES_PER_PAGE, page: nil, after: nil)

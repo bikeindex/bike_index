@@ -99,6 +99,7 @@ export function useActivitySync(): UseActivitySyncResult {
       let isFirstBatch = true;
 
       await getAllActivities({
+        estimatedTotal,
         onBatch: async (batch, totalSoFar) => {
           await saveActivities(batch, athlete.id);
 

@@ -479,11 +479,11 @@ RSpec.describe "BikesController#update", type: :request do
     let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
     let!(:road_bike_gear) do
       FactoryBot.create(:strava_gear, strava_integration:,
-        strava_gear_id: "b12345", name: "My Road Bike", gear_type: "bike")
+        strava_id: "b12345", name: "My Road Bike", gear_type: "bike")
     end
     let!(:mtb_gear) do
       FactoryBot.create(:strava_gear, strava_integration:,
-        strava_gear_id: "b67890", name: "My MTB", gear_type: "bike")
+        strava_id: "b67890", name: "My MTB", gear_type: "bike")
     end
 
     it "connects bike to strava gear" do
@@ -493,7 +493,7 @@ RSpec.describe "BikesController#update", type: :request do
 
       bike.reload
       expect(bike.strava_gear).to be_present
-      expect(bike.strava_gear.strava_gear_id).to eq("b12345")
+      expect(bike.strava_gear.strava_id).to eq("b12345")
       expect(bike.strava_gear.name).to eq("My Road Bike")
     end
 
@@ -504,7 +504,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(flash[:success]).to match(/My MTB/)
 
       bike.reload
-      expect(bike.strava_gear.strava_gear_id).to eq("b67890")
+      expect(bike.strava_gear.strava_id).to eq("b67890")
       expect(road_bike_gear.reload.item).to be_nil
     end
 

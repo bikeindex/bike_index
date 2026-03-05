@@ -11,9 +11,13 @@
         <% if display_dev_info? %>
           <tr>
             <td class="only-dev-visible">ID</td>
+
             <td>
               <code><%= @strava_integration.id %></code>
-              <small class="tw:ml-2 less-strong">Strava Athlete ID: <code><%= @strava_integration.athlete_id %></code></small>
+
+              <small class="less-strong tw:ml-2">
+                Strava ID: <code><%= @strava_integration.strava_id %></code>
+              </small>
             </td>
           </tr>
         <% end %>
@@ -27,8 +31,8 @@
         </tr>
 
         <tr>
-          <td>Athlete ID</td>
-          <td><%= @strava_integration.athlete_id %></td>
+          <td>Strava ID</td>
+          <td><%= @strava_integration.strava_id %></td>
         </tr>
 
         <tr>
