@@ -11,6 +11,14 @@
         </small>
       </th>
 
+      <% if display_dev_info? %>
+        <th>
+          <small class="only-dev-visible">
+            <%= sortable "priority", render_sortable: render_sortable %>
+          </small>
+        </th>
+      <% end %>
+
       <th>
         <%= sortable "request_type", "Type", render_sortable: render_sortable %>
       </th>
@@ -49,20 +57,24 @@
             </small>
           </td>
 
+          <% if display_dev_info? %>
+            <td>
+              <small
+                title="<%= number_with_delimiter(strava_request.priority) %>"
+              >
+                <%= (strava_request.priority / 100_000_000.0).round(1) %>
+              </small>
+            </td>
+          <% end %>
+
           <td><small><%= strava_request.request_type&.humanize %></small></td>
 
           <td>
-            <% if strava_request.success? %>
-              <span class="text-success">
-                <%= strava_request.response_status %>
-              </span>
-            <% elsif strava_request.pending? %>
-              <small><%= strava_request.response_status %></small>
-            <% else %>
-              <span class="text-danger">
-                <%= strava_request.response_status.humanize %>
-              </span>
-            <% end %>
+            <%= render UI::Badge::Component.new(
+              text: strava_request.response_status.humanize,
+              color: Admin::ChartStravaRequests::Component::RESPONSE_STATUS_BADGE_COLORS[strava_request.response_status.to_sym],
+              size: :sm
+            ) %>
           </td>
 
           <td>

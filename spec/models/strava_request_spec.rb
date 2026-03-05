@@ -11,10 +11,16 @@ RSpec.describe StravaRequest, type: :model do
     end
   end
 
+  describe "priority" do
+    it "has the same keys for PRIORITY_MAP and REQUEST_TYPE" do
+      expect(StravaRequest::REQUEST_TYPE_ENUM.keys.sort).to eq StravaRequest::PRIORITY_MAP.keys.sort
+    end
+  end
+
   describe ".next_pending" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
 
-    it "returns oldest unprocessed request" do
+    it "returns oldest pending request" do
       older = FactoryBot.create(:strava_request, strava_integration:, created_at: 2.minutes.ago)
       FactoryBot.create(:strava_request, strava_integration:, created_at: 1.minute.ago)
       expect(StravaRequest.next_pending.first).to eq(older)
@@ -30,26 +36,22 @@ RSpec.describe StravaRequest, type: :model do
       expect(StravaRequest.next_pending).to be_empty
     end
 
-    it "respects limit parameter" do
-      3.times { FactoryBot.create(:strava_request, strava_integration:) }
-      expect(StravaRequest.next_pending(2).count).to eq(2)
-    end
-
     it "orders by priority: list_activities, fetch_gear, fetch_activity" do
       fetch_activity = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       list_activities = FactoryBot.create(:strava_request, :list_activities, strava_integration:)
       fetch_gear = FactoryBot.create(:strava_request, :fetch_gear, strava_integration:)
 
-      results = StravaRequest.next_pending(10).to_a
-      expect(results).to eq([list_activities, fetch_gear, fetch_activity])
+      results = StravaRequest.next_pending(10).pluck(:id)
+      expect(results).to eq([list_activities.id, fetch_gear.id, fetch_activity.id])
     end
 
     it "orders by id within the same priority" do
       first = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       second = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
+      third = FactoryBot.create(:strava_request, :fetch_activity, priority: 1)
 
-      results = StravaRequest.next_pending(10).to_a
-      expect(results).to eq([first, second])
+      results = StravaRequest.next_pending(10).pluck(:id)
+      expect(results).to eq([third.id, first.id, second.id])
     end
   end
 
@@ -107,11 +109,98 @@ RSpec.describe StravaRequest, type: :model do
       expect(strava_request.skip_request?).to be false
     end
 
-    it "returns true when activity is already enriched" do
+    it "returns true when activity was recently enriched" do
       FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
-        enriched_at: Time.current)
+        enriched_at: 30.minutes.ago)
       strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
       expect(strava_request.skip_request?).to be true
+    end
+
+    it "returns false when activity was enriched longer ago than RE_ENRICH_AFTER" do
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "12345",
+        enriched_at: 2.hours.ago)
+      strava_request = FactoryBot.create(:strava_request, :fetch_activity, strava_integration:)
+      expect(strava_request.skip_request?).to be false
+    end
+  end
+
+  describe "update_from_response" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
+    let!(:strava_request) { FactoryBot.create(:strava_request, :list_activities, strava_integration:) }
+    let(:headers) { {"X-RateLimit-Limit" => "100,1000", "X-RateLimit-Usage" => "10,200"} }
+
+    context "500 response" do
+      let(:response) { instance_double(Faraday::Response, success?: false, status: 500, headers:, body: "Internal Server Error") }
+
+      it "stores error response in parameters" do
+        strava_request.update_from_response(response)
+        expect(strava_request.error?).to be true
+        expect(strava_request.parameters).to eq({page: 1, error_response_status: 500}.as_json)
+      end
+
+      context "with raise_on_error" do
+        it "raises and stores the error_response_status" do
+          expect do
+            strava_request.update_from_response(response, raise_on_error: true)
+          end.to raise_error(/Strava API error 500/)
+
+          expect(strava_request.reload.error?).to be true
+          expect(strava_request.parameters).to eq({page: 1, error_response_status: 500}.as_json)
+        end
+      end
+    end
+
+    context "503 service unavailable" do
+      let(:response) { instance_double(Faraday::Response, success?: false, status: 503, headers:, body: "Service Unavailable") }
+      let(:target_parameters) { strava_request.parameters.merge(error_response_status: 503).as_json }
+
+      it "marks as error, doesn't raise and re-enqueues a new request" do
+        expect {
+          strava_request.update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: true)
+        }.to change(StravaRequest, :count).by(1)
+
+        expect(strava_request.reload.error?).to be true
+        expect(strava_request.parameters).to eq target_parameters
+
+        new_request = StravaRequest.last
+        expect(new_request.id).not_to eq strava_request.id
+        expect(new_request.request_type).to eq strava_request.request_type
+        expect(new_request.parameters).not_to have_key("error_response_status")
+      end
+
+      context "without re_enqueue_if_rate_limited_or_unavailable" do
+        it "marks as error but does not re-enqueue" do
+          expect {
+            strava_request.update_from_response(response)
+          }.not_to change(StravaRequest, :count)
+
+          expect(strava_request.error?).to be true
+          expect(strava_request.parameters).to eq target_parameters
+        end
+      end
+    end
+
+    context "successful response" do
+      let(:response) { instance_double(Faraday::Response, success?: true, status: 200, headers:, body: []) }
+
+      it "does not store error_response_status" do
+        strava_request.update_from_response(response)
+        expect(strava_request.success?).to be true
+        expect(strava_request.parameters).not_to have_key("error_response_status")
+      end
+    end
+
+    context "rate limited response with re_enqueue" do
+      let(:response) { instance_double(Faraday::Response, success?: false, status: 429, headers:, body: "Rate limited") }
+
+      it "stores error response and re-enqueues" do
+        expect {
+          strava_request.update_from_response(response, re_enqueue_if_rate_limited_or_unavailable: true)
+        }.to change(StravaRequest, :count).by(1)
+
+        expect(strava_request.rate_limited?).to be true
+        expect(strava_request.parameters.keys).to eq(["page"])
+      end
     end
   end
 

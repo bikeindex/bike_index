@@ -11,7 +11,14 @@
         <% if display_dev_info? %>
           <tr>
             <td class="only-dev-visible">ID</td>
-            <td><code><%= @strava_integration.id %></code></td>
+
+            <td>
+              <code><%= @strava_integration.id %></code>
+
+              <small class="less-strong tw:ml-2">
+                Strava ID: <code><%= @strava_integration.strava_id %></code>
+              </small>
+            </td>
           </tr>
         <% end %>
 
@@ -24,8 +31,8 @@
         </tr>
 
         <tr>
-          <td>Athlete ID</td>
-          <td><%= @strava_integration.athlete_id %></td>
+          <td>Strava ID</td>
+          <td><%= @strava_integration.strava_id %></td>
         </tr>
 
         <tr>
@@ -105,7 +112,9 @@
 
             <% if @strava_integration.athlete_activity_count %>
               /
-              <%= number_display(@strava_integration.athlete_activity_count) %>
+              <small title="Strava Athlete Activity count">
+                <%= number_display(@strava_integration.athlete_activity_count) %>
+              </small>
             <% end %>
           </td>
         </tr>
@@ -115,7 +124,26 @@
 
           <td>
             <%= @strava_integration.sync_progress_percent %>%
-            <span class="less-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.athlete_activity_count) %> enriched</span>
+            <span class="less-strong tw:ml-2"><%= number_display(@strava_integration.strava_activities.enriched.count) %> / <%= number_display(@strava_integration.activities_downloaded_count) %> enriched</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Most recent proxy</td>
+
+          <td>
+            <% most_recent_proxy_at = StravaRequest.most_recent_proxy_at(@strava_integration.id) %>
+            <% if most_recent_proxy_at.present? %>
+              <span class="localizeTime preciseTime">
+                <%= l most_recent_proxy_at, format: :convert_time %>
+              </span>
+            <% else %>
+              <small class="less-strong">no proxy requests</small>
+            <% end %>
+            priority multiplier:
+            <code>
+              <%= StravaJobs::ScheduledRequestPriorityUpdator.priority_multiplier(@strava_integration.id) %>
+            </code>
           </td>
         </tr>
 
@@ -127,24 +155,10 @@
 
             <% if @strava_integration.permissions_less? %>
               <%= render UI::Badge::Component.new(text: "less than default", color: :error, size: :sm) %>
+            <% elsif @strava_integration.permissions_strava_search_default? %>
+              <%= render UI::Badge::Component.new(text: "Strava Search default", color: :success, size: :sm) %>
             <% elsif @strava_integration.permissions_more? %>
               <%= render UI::Badge::Component.new(text: "more than default", color: :notice, size: :sm) %>
-            <% end %>
-          </td>
-        </tr>
-
-        <tr>
-          <td>Gear</td>
-
-          <td>
-            <%= @strava_integration.gear_names.join(", ").presence || "None" %>
-            <% unknown_gear = @strava_integration.unknown_gear_ids %>
-
-            <% if unknown_gear.present? %>
-              <small class="tw:block">
-                <span class="text-warning">Unknown gear IDs:</span>
-                <%= unknown_gear.join(", ") %>
-              </small>
             <% end %>
           </td>
         </tr>
@@ -175,56 +189,32 @@
   </div>
 </div>
 
-<% if @strava_integration.strava_gears.any? %>
+<% unknown_gear = @strava_integration.unknown_gear_ids %>
+
+<% if @strava_integration.strava_gears.any? || unknown_gear %>
   <div class="row mt-4">
     <div class="col-md-12">
       <h4>
         <%= link_to admin_strava_gears_path(search_strava_integration_id: @strava_integration.id) do %>
           Strava Gear (<%= @strava_integration.strava_gears.count %>)
         <% end %>
+
+        <% if unknown_gear.present? %>
+          <small class="tw:mt-2 tw:mb-4 tw:block">
+            <span class="text-warning">Unknown gear IDs:</span>
+            <%= unknown_gear.join(", ") %>
+          </small>
+        <% end %>
       </h4>
 
-      <table class="table table-sm table-striped table-bordered">
-        <thead class="thead-light">
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Gear ID</th>
-            <th>Distance</th>
-            <th>Enriched</th>
-            <th>Linked Bike</th>
-          </tr>
-        </thead>
+      <% {bike: "Bikes", shoe: "Shoes"}.each do |gear_type, gear_type_label| %>
+        <% gears = @strava_integration.strava_gears.select { |g| g.gear_type == gear_type.to_s }.sort_by { |g| g.strava_gear_display_name.downcase } %>
+        <% next if gears.empty? %>
 
-        <tbody>
-          <% @strava_integration.strava_gears.each do |gear| %>
-            <tr>
-              <td><%= gear.strava_gear_display_name %></td>
-              <td><%= gear.gear_type %></td>
-              <td><code><%= gear.strava_gear_id %></code></td>
+        <h5 class="mt-3"><%= gear_type_label %></h5>
 
-              <td>
-                <% if gear.total_distance_kilometers.present? %>
-                  <%= number_display(gear.total_distance_kilometers) %>
-                  km
-                <% end %>
-              </td>
-
-              <td>
-                <% if gear.enriched? %>
-                  <%= render UI::Badge::Component.new(text: "E", title: "Enriched", color: :cyan, size: :sm) %>
-                <% end %>
-              </td>
-
-              <td>
-                <% if gear.item.present? %>
-                  <%= link_to gear.item.title_string, bike_path(gear.item) %>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+        <%= render partial: "admin/strava_gears/table", locals: {collection: gears, skip_strava_integration: true} %>
+      <% end %>
     </div>
   </div>
 <% end %>

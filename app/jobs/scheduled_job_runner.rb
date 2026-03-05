@@ -8,7 +8,7 @@ class ScheduledJobRunner < ScheduledJob
   HISTORY_KEY = "scheduler_history_#{Rails.env}".freeze
 
   def self.frequency
-    5.minutes
+    59
   end
 
   def self.worker_from_string(worker_string)
@@ -54,7 +54,8 @@ class ScheduledJobRunner < ScheduledJob
       StolenBike::DeactivateExpiredTheftAlertJob,
       StolenBike::RemoveOrphanedImagesJob,
       StolenBike::UpdateTheftAlertFacebookJob,
-      StravaJobs::RequestRunner,
+      StravaJobs::ScheduledRequestEnqueuer,
+      StravaJobs::ScheduledRequestPriorityUpdator,
       # UnusedOwnershipRemovalJob,
       UpdateCountsJob,
       UpdateEmailDomainJob,

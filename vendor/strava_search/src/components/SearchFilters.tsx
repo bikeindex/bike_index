@@ -20,6 +20,7 @@ interface SearchFiltersProps {
   gear: StoredGear[];
   totalCount: number;
   filteredCount: number;
+  isLoading?: boolean;
 }
 
 const toggleInactive = 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600';
@@ -33,6 +34,7 @@ export function SearchFilters({
   gear,
   totalCount,
   filteredCount,
+  isLoading,
 }: SearchFiltersProps) {
   const { units } = usePreferences();
   const distanceUnit = units === 'imperial' ? 'mi' : 'km';
@@ -44,6 +46,26 @@ export function SearchFilters({
     return activities.flatMap((a) => a.segment_locations?.locations || []);
   }, [activities]);
 
+  // Reverse lookup maps: abbreviation → full name
+  const { countryNames, regionNames } = useMemo(() => {
+    const countryNames = new Map<string, string>();
+    const regionNames = new Map<string, string>();
+    for (const activity of activities) {
+      const sl = activity.segment_locations;
+      if (sl?.countries) {
+        for (const [fullName, abbr] of Object.entries(sl.countries)) {
+          if (!countryNames.has(abbr)) countryNames.set(abbr, fullName);
+        }
+      }
+      if (sl?.regions) {
+        for (const [fullName, abbr] of Object.entries(sl.regions)) {
+          if (!regionNames.has(abbr)) regionNames.set(abbr, fullName);
+        }
+      }
+    }
+    return { countryNames, regionNames };
+  }, [activities]);
+
   const allCountries = useMemo(() => {
     const set = new Set<string>();
     for (const loc of allLocations) {
@@ -53,25 +75,39 @@ export function SearchFilters({
   }, [allLocations]);
 
   const availableRegions = useMemo(() => {
-    const set = new Set<string>();
+    const regionCountry = new Map<string, string>();
     for (const loc of allLocations) {
       if (filters.country && loc.country !== filters.country) continue;
-      if (loc.region) set.add(loc.region);
+      if (loc.region && !regionCountry.has(loc.region) && loc.country) {
+        regionCountry.set(loc.region, loc.country);
+      }
     }
-    return Array.from(set).sort();
-  }, [allLocations, filters.country]);
+    return Array.from(regionCountry.entries())
+      .map(([region, country]) => {
+        const fullName = regionNames.get(region);
+        const label = fullName ? `${country}: ${region} (${fullName})` : `${country}: ${region}`;
+        return { region, country, label };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [allLocations, filters.country, regionNames]);
 
   const availableCities = useMemo(() => {
-    const cityRegions = new Map<string, string>();
+    const cityEntries = new Map<string, { region?: string; country?: string }>();
     for (const loc of allLocations) {
       if (!loc.city) continue;
       if (filters.country && loc.country !== filters.country) continue;
       if (filters.region && loc.region !== filters.region) continue;
-      if (!cityRegions.has(loc.city) && loc.region) cityRegions.set(loc.city, loc.region);
+      if (!cityEntries.has(loc.city)) {
+        cityEntries.set(loc.city, { region: loc.region, country: loc.country });
+      }
     }
-    return Array.from(cityRegions.entries())
-      .map(([city, region]) => ({ city, region }))
-      .sort((a, b) => a.city.localeCompare(b.city));
+    return Array.from(cityEntries.entries())
+      .map(([city, { region, country }]) => {
+        const parts = [country, region].filter(Boolean).join(', ');
+        const label = parts ? `${parts}: ${city}` : city;
+        return { city, label };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
   }, [allLocations, filters.country, filters.region]);
 
 
@@ -423,7 +459,7 @@ export function SearchFilters({
         </div>
 
         {/* Relative effort and kudos range */}
-        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
+        <div className="flex flex-wrap gap-y-2 gap-x-6 items-center mb-4">
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <span>Relative effort:</span>
               <input
@@ -479,9 +515,17 @@ export function SearchFilters({
         </div>
 
         {/* Location filters */}
-        {allLocations.length > 0 && (
+        {(() => {
+          const locationsAvailable = allLocations.length > 0;
+          const disabled = !locationsAvailable;
+          const disabledClasses = `${selectClasses} opacity-50 cursor-not-allowed`;
+          const disabledLabel = isLoading ? 'Loading...' : 'N/A';
+          const countryLabel = disabled ? disabledLabel : `All (${allCountries.length} ${allCountries.length === 1 ? 'country' : 'countries'})`;
+          const regionLabel = disabled ? disabledLabel : `All (${availableRegions.length} ${availableRegions.length === 1 ? 'region' : 'regions'})`;
+          const cityLabel = disabled ? disabledLabel : `All (${availableCities.length} ${availableCities.length === 1 ? 'city' : 'cities'})`;
+          return (
         <div className="flex flex-wrap gap-y-2 gap-x-6 items-center">
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 w-full md:w-auto">
             <span>Country:</span>
             <select
               value={filters.country || ''}
@@ -494,16 +538,17 @@ export function SearchFilters({
                   city: country === filters.country ? filters.city : null,
                 });
               }}
-              className={selectClasses}
+              disabled={disabled}
+              className={`flex-1 min-w-0 ${disabled ? disabledClasses : selectClasses}`}
             >
-              <option value="">All</option>
-              {allCountries.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
+              <option value="">{countryLabel}</option>
+              {allCountries.map((abbr) => {
+                const fullName = countryNames.get(abbr);
+                return <option key={abbr} value={abbr}>{fullName ? `${abbr} (${fullName})` : abbr}</option>;
+              })}
             </select>
           </label>
-          {availableRegions.length > 0 && (
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 w-full md:w-auto">
             <span>Region:</span>
             <select
               value={filters.region || ''}
@@ -515,32 +560,32 @@ export function SearchFilters({
                   city: region === filters.region ? filters.city : null,
                 });
               }}
-              className={selectClasses}
+              disabled={disabled || availableRegions.length === 0}
+              className={`flex-1 min-w-0 ${disabled || availableRegions.length === 0 ? disabledClasses : selectClasses}`}
             >
-              <option value="">All</option>
-              {availableRegions.map((r) => (
-                <option key={r} value={r}>{r}</option>
+              <option value="">{regionLabel}</option>
+              {availableRegions.map(({ region, label }) => (
+                <option key={region} value={region}>{label}</option>
               ))}
             </select>
           </label>
-          )}
-          {availableCities.length > 0 && (
-          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 w-full md:w-auto">
             <span>City:</span>
             <select
               value={filters.city || ''}
               onChange={(e) => onFiltersChange({ ...filters, city: e.target.value || null })}
-              className={selectClasses}
+              disabled={disabled || availableCities.length === 0}
+              className={`flex-1 min-w-0 ${disabled || availableCities.length === 0 ? disabledClasses : selectClasses}`}
             >
-              <option value="">All</option>
-              {availableCities.map(({ city, region }) => (
-                <option key={city} value={city}>{city}, {region}</option>
+              <option value="">{cityLabel}</option>
+              {availableCities.map(({ city, label }) => (
+                <option key={city} value={city}>{label}</option>
               ))}
             </select>
           </label>
-          )}
         </div>
-        )}
+          );
+        })()}
 
           </div>
           )}

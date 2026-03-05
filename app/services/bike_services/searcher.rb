@@ -1,6 +1,8 @@
 # THIS IS DEPRECATED!!!
 # Use BikeSearchable instead
 class BikeServices::Searcher
+  attr_accessor :params, :location
+
   def initialize(creation_params = {}, reverse_geocode = nil)
     # override reverse_geocode if passed as params
     @params = creation_params.merge(reverse_geocode: reverse_geocode)
@@ -20,8 +22,6 @@ class BikeServices::Searcher
       @normer = SerialNormalizer.new(serial: @params[:serial])
     end
   end
-
-  attr_accessor :params, :location
 
   def interpreted_params(i_params)
     query = (i_params[:query] || "").gsub("%23", "#") # ... ensure string so we can gsub it

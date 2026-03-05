@@ -6,6 +6,8 @@
 
     <%# TODO: Cache this ^ %>
     <%= csrf_meta_tags %>
+    <%= tag.meta name: "honeybadger-api-key", content: ENV["HONEYBADGER_FRONTEND_API_KEY"] %>
+    <%= tag.meta name: "honeybadger-environment", content: Rails.env %>
     <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
 
     <link

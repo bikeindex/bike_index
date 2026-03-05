@@ -19,12 +19,12 @@ class IntegrationAssociationError < StandardError
 end
 
 class Integration < ApplicationRecord
+  belongs_to :user
+
   validates_presence_of :access_token
   validates_presence_of :information
 
   serialize :information, coder: JSON
-
-  belongs_to :user
 
   before_create :associate_with_user
 

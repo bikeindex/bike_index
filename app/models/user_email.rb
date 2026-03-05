@@ -19,13 +19,14 @@
 class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
   belongs_to :old_user, class_name: "User", touch: true
+
   validates_presence_of :user_id, :email
+
+  before_validation :normalize_email
 
   scope :confirmed, -> { where("confirmation_token IS NULL") }
   scope :unconfirmed, -> { where("confirmation_token IS NOT NULL") }
   scope :last_email_errored, -> { where(last_email_errored: true) }
-
-  before_validation :normalize_email
 
   class << self
     def create_confirmed_primary_email(user)

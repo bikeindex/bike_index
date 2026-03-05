@@ -41,4 +41,32 @@ describe('InitialSyncOverlay', () => {
     const spinner = document.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
   });
+
+  it('shows rate limited message when rateLimited is true', () => {
+    render(<InitialSyncOverlay loaded={50} total={150} status="50 of ~150 activities synced" rateLimited={true} />);
+
+    expect(screen.getByText('Strava rate limit reached — syncing will resume automatically')).toBeInTheDocument();
+  });
+
+  it('does not show rate limited message when rateLimited is false', () => {
+    render(<InitialSyncOverlay loaded={50} total={150} status="50 of ~150 activities synced" rateLimited={false} />);
+
+    expect(screen.queryByText('Strava rate limit reached — syncing will resume automatically')).not.toBeInTheDocument();
+  });
+
+  it('caps progress bar at 100% when loaded exceeds total', () => {
+    render(<InitialSyncOverlay loaded={160} total={150} status="160 of 160 activities synced" />);
+
+    const bar = document.querySelector('.bg-\\[\\#fc4c02\\]') as HTMLElement;
+    expect(bar).toBeInTheDocument();
+    expect(bar.style.width).toBe('100%');
+  });
+
+  it('shows exact count without tilde when loaded equals total', () => {
+    render(<InitialSyncOverlay loaded={150} total={150} status="150 of 150 activities synced" />);
+
+    expect(screen.getByText('150 of 150 activities synced')).toBeInTheDocument();
+    const bar = document.querySelector('.bg-\\[\\#fc4c02\\]') as HTMLElement;
+    expect(bar.style.width).toBe('100%');
+  });
 });

@@ -18,10 +18,10 @@
 #  index_organization_statuses_on_organization_id  (organization_id)
 #
 class OrganizationStatus < AnalyticsRecord
-  belongs_to :organization
-
   enum :pos_kind, Organization::POS_KIND_ENUM
   enum :kind, Organization::KIND_ENUM
+
+  belongs_to :organization
 
   has_one :notification, as: :notifiable
 

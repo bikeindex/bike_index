@@ -81,7 +81,7 @@ class StravaIntegrationsController < ApplicationController
       access_token: token_data["access_token"],
       refresh_token: token_data["refresh_token"],
       token_expires_at: Time.at(token_data["expires_at"]),
-      athlete_id: token_data.dig("athlete", "id")&.to_s,
+      strava_id: token_data.dig("athlete", "id")&.to_s,
       strava_permissions: params[:scope]
     }
   end
@@ -89,7 +89,7 @@ class StravaIntegrationsController < ApplicationController
   def find_or_create_strava_integration(token_data)
     attrs = token_attrs(token_data)
     existing_strava_integration = current_user.strava_integration
-    if existing_strava_integration&.athlete_id == attrs[:athlete_id] && !existing_strava_integration.error?
+    if existing_strava_integration&.strava_id == attrs[:strava_id] && !existing_strava_integration.error?
       existing_strava_integration.update!(attrs)
       existing_strava_integration
     else

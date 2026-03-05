@@ -47,11 +47,11 @@ class AddressRecord < ApplicationRecord
 
   has_many :marketplace_listings
 
+  attr_accessor :force_geocoding, :skip_geocoding, :skip_callback_job
+
   before_validation :set_calculated_attributes
   after_validation :address_record_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
   after_commit :update_associations
-
-  attr_accessor :force_geocoding, :skip_geocoding, :skip_callback_job
 
   class << self
     def location_attrs

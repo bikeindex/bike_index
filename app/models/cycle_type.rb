@@ -119,12 +119,12 @@ class CycleType
     end
   end
 
+  attr_reader :slug, :id
+
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
   end
-
-  attr_reader :slug, :id
 
   def priority
     if slug == :bike

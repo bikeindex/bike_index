@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import {
   getAllActivities,
-  getAthleteGear,
+  getAthlete,
   getActivity,
   fetchEnrichedSince,
   fetchSyncStatus,
@@ -21,6 +21,7 @@ interface SyncProgress {
   loaded: number;
   total: number | null;
   status: string;
+  rateLimited?: boolean;
 }
 
 interface UseActivitySyncResult {
@@ -60,13 +61,19 @@ export function useActivitySync(): UseActivitySyncResult {
 
       const updateProgress = (status: typeof syncStatus) => {
         if (!status) return;
-        estimatedTotal = status.athlete_activity_count;
+        const downloaded = status.activities_downloaded_count;
+        const estimate = status.athlete_activity_count;
+        // When downloaded exceeds estimate, the estimate was wrong — show actual count
+        const displayTotal = estimate && downloaded >= estimate ? downloaded : estimate;
+        const isEstimate = estimate !== null && downloaded < estimate;
+        estimatedTotal = displayTotal;
         setProgress({
-          loaded: status.activities_downloaded_count,
-          total: status.athlete_activity_count,
-          status: status.athlete_activity_count
-            ? `${formatNumber(status.activities_downloaded_count)} of ~${formatNumber(status.athlete_activity_count)} activities synced`
-            : `${formatNumber(status.activities_downloaded_count)} activities synced`,
+          loaded: downloaded,
+          total: displayTotal,
+          status: displayTotal
+            ? `${formatNumber(downloaded)} of ${isEstimate ? '~' : ''}${formatNumber(displayTotal)} activities synced`
+            : `${formatNumber(downloaded)} activities synced`,
+          rateLimited: status.rate_limited,
         });
       };
 
@@ -85,8 +92,8 @@ export function useActivitySync(): UseActivitySyncResult {
       // Backend is synced — fetch activities via proxy
       setProgress({ loaded: 0, total: null, status: 'Loading activities...' });
 
-      const gear = await getAthleteGear();
-      await saveGear(gear, athlete.id);
+      const freshAthlete = await getAthlete();
+      await saveGear([...(freshAthlete.bikes || []), ...(freshAthlete.shoes || [])], athlete.id);
 
       let oldestActivityDate: string | null = null;
       let isFirstBatch = true;
@@ -156,8 +163,8 @@ export function useActivitySync(): UseActivitySyncResult {
       }
 
       // Sync gear
-      const gear = await getAthleteGear();
-      await saveGear(gear, athlete.id);
+      const freshAthlete = await getAthlete();
+      await saveGear([...(freshAthlete.bikes || []), ...(freshAthlete.shoes || [])], athlete.id);
 
       // Get new activities - save each batch progressively
       let newActivityCount = 0;
@@ -212,7 +219,7 @@ export function useActivitySync(): UseActivitySyncResult {
       const enrichedActivities = await fetchEnrichedSince(maxEnrichedAt);
       if (enrichedActivities.length > 0) {
         await saveActivities(
-          enrichedActivities.map(a => ({ ...a, enriched: true })),
+          enrichedActivities,
           athlete.id
         );
       }
@@ -223,7 +230,7 @@ export function useActivitySync(): UseActivitySyncResult {
         await refreshSyncState();
       }
     } catch (err) {
-      console.warn('Enriched sync failed:', err instanceof Error ? err.message : err);
+      setError(err instanceof Error ? err.message : 'Enriched sync failed');
     }
   }, [athlete, isSyncing, isFetchingFullData, refreshSyncState]);
 
@@ -238,7 +245,7 @@ export function useActivitySync(): UseActivitySyncResult {
     let alreadyEnrichedCount = 0;
     for (const id of activityIds) {
       const activity = await getActivityById(id);
-      if (activity && activity.enriched) {
+      if (activity?.enriched_at) {
         alreadyEnrichedCount++;
       } else if (activity) {
         idsToFetch.push(id);
@@ -257,15 +264,15 @@ export function useActivitySync(): UseActivitySyncResult {
     const statusPrefix = isForPage ? 'Fetching full data for this page' : 'Fetching full data';
     setProgress({ loaded: 0, total: idsToFetch.length, status: `${statusPrefix}: 0 of ${formatNumber(idsToFetch.length)}` });
 
+    const failedIds: number[] = [];
     try {
       for (let i = 0; i < idsToFetch.length; i++) {
         const activityId = idsToFetch[i];
         try {
           const fullActivity = await getActivity(activityId);
-          // Save with enriched flag
-          await saveActivities([{ ...fullActivity, enriched: true }], athlete.id);
+          await saveActivities([fullActivity], athlete.id);
         } catch {
-          // Skip failed activities silently
+          failedIds.push(activityId);
         }
 
         setProgress({
@@ -278,6 +285,10 @@ export function useActivitySync(): UseActivitySyncResult {
         if (i < idsToFetch.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
+      }
+
+      if (failedIds.length > 0) {
+        setError(`Failed to fetch ${formatNumber(failedIds.length)} of ${formatNumber(idsToFetch.length)} activities`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch full activity data');

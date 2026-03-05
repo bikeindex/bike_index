@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getAthleteStats, updateActivity, getAllActivities } from './strava';
+import { getAthlete, updateActivity, getAllActivities } from './strava';
 import * as database from './database';
 import * as railsApi from './railsApi';
 
@@ -43,62 +43,39 @@ describe('strava service', () => {
     vi.resetAllMocks();
   });
 
-  describe('getAthleteStats', () => {
-    it('returns total count of activities from athlete stats', async () => {
-      const mockStats = {
-        all_ride_totals: { count: 150, distance: 5000, moving_time: 1000, elapsed_time: 1100, elevation_gain: 500 },
-        all_run_totals: { count: 75, distance: 300, moving_time: 500, elapsed_time: 550, elevation_gain: 100 },
-        all_swim_totals: { count: 25, distance: 50, moving_time: 200, elapsed_time: 220, elevation_gain: 0 },
+  describe('getAthlete', () => {
+    it('returns athlete profile with gear', async () => {
+      const mockAthlete = {
+        id: 12345,
+        username: 'testuser',
+        firstname: 'Test',
+        lastname: 'User',
+        city: 'San Francisco',
+        state: 'CA',
+        country: 'US',
+        profile: 'https://example.com/profile.jpg',
+        profile_medium: 'https://example.com/profile_medium.jpg',
+        bikes: [{ id: 'b123', name: 'My Bike', primary: true, distance: 5000, resource_state: 2 }],
+        shoes: [{ id: 's456', name: 'My Shoes', primary: false, distance: 100, resource_state: 2 }],
       };
 
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve(mockStats),
+        json: () => Promise.resolve(mockAthlete),
       });
 
-      const total = await getAthleteStats(12345);
+      const result = await getAthlete();
 
-      expect(total).toBe(250); // 150 + 75 + 25
+      expect(result.id).toBe(12345);
+      expect(result.bikes).toHaveLength(1);
+      expect(result.bikes![0].name).toBe('My Bike');
+      expect(result.shoes).toHaveLength(1);
       expect(global.fetch).toHaveBeenCalledWith(
         PROXY_ENDPOINT,
         expect.objectContaining({
-          method: 'POST',
-          headers: expect.objectContaining({
-            Authorization: 'Bearer test_token',
-          }),
-          body: JSON.stringify({ url: 'athletes/12345/stats', method: 'GET' }),
+          body: JSON.stringify({ url: 'athlete', method: 'GET' }),
         })
       );
-    });
-
-    it('handles missing activity totals gracefully', async () => {
-      const mockStats = {
-        all_ride_totals: { count: 100, distance: 5000, moving_time: 1000, elapsed_time: 1100, elevation_gain: 500 },
-        all_run_totals: null,
-        all_swim_totals: undefined,
-      };
-
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockStats),
-      });
-
-      const total = await getAthleteStats(12345);
-
-      expect(total).toBe(100); // Only ride totals available
-    });
-
-    it('returns 0 when all totals are missing', async () => {
-      const mockStats = {};
-
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockStats),
-      });
-
-      const total = await getAthleteStats(12345);
-
-      expect(total).toBe(0);
     });
   });
 
@@ -120,7 +97,7 @@ describe('strava service', () => {
       private: false,
       commute: false,
       muted: false,
-      enriched: true,
+      enriched_at: '2026-02-01T00:00:00Z',
       pr_count: 4,
       device_name: 'Strava App',
       average_heartrate: 127.5,
@@ -354,10 +331,10 @@ describe('strava service', () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve({ all_ride_totals: { count: 10 } }),
+          json: () => Promise.resolve({ id: 12345, firstname: 'Test' }),
         });
 
-      const resultPromise = getAthleteStats(12345);
+      const resultPromise = getAthlete();
 
       // Advance past the 1s delay for first retry
       await vi.advanceTimersByTimeAsync(1000);
@@ -365,7 +342,7 @@ describe('strava service', () => {
       const result = await resultPromise;
 
       expect(global.fetch).toHaveBeenCalledTimes(2);
-      expect(result).toBe(10);
+      expect(result.id).toBe(12345);
     });
 
     it('respects Retry-After header', async () => {
@@ -380,17 +357,17 @@ describe('strava service', () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve({ all_ride_totals: { count: 5 } }),
+          json: () => Promise.resolve({ id: 12345, firstname: 'Test' }),
         });
 
-      const resultPromise = getAthleteStats(12345);
+      const resultPromise = getAthlete();
 
       // Advance past the 1s Retry-After delay
       await vi.advanceTimersByTimeAsync(1000);
 
       const result = await resultPromise;
 
-      expect(result).toBe(5);
+      expect(result.id).toBe(12345);
     });
 
     it('throws after max retries exceeded', async () => {
@@ -402,7 +379,7 @@ describe('strava service', () => {
       });
 
       let error: Error | null = null;
-      const resultPromise = getAthleteStats(12345).catch((e) => {
+      const resultPromise = getAthlete().catch((e) => {
         error = e;
       });
 

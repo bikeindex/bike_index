@@ -37,17 +37,17 @@ RSpec.describe StravaActivity, type: :model do
 
   describe "scopes" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
+    let!(:ride) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", strava_id: "22") }
+    let!(:mtb) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "MountainBikeRide", strava_id: "221") }
+    let!(:gravel) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "GravelRide", strava_id: "17323701543") }
+    let!(:virtual) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "VirtualRide", strava_id: "22123") }
+    let!(:ebike) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "EBikeRide", strava_id: "9999") }
+    let!(:emtb) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "EMountainBikeRide", strava_id: "222") }
+    let!(:run) { FactoryBot.create(:strava_activity, :run, strava_integration:, strava_id: "999") }
 
     it "cycling scope returns cycling activities" do
-      ride = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride")
-      mtb = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "MountainBikeRide")
-      gravel = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "GravelRide")
-      virtual = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "VirtualRide")
-      ebike = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "EBikeRide")
-      emtb = FactoryBot.create(:strava_activity, strava_integration:, activity_type: "EMountainBikeRide")
-      run = FactoryBot.create(:strava_activity, :run, strava_integration:)
-      expect(StravaActivity.cycling).to include(ride, mtb, gravel, virtual, ebike, emtb)
-      expect(StravaActivity.cycling).not_to include(run)
+      expect(StravaActivity.cycling.pluck(:id).sort).to eq([ride.id, mtb.id, gravel.id, virtual.id, ebike.id, emtb.id].sort)
+      expect(StravaActivity.strava_ordered.pluck(:id)).to eq([gravel.id, virtual.id, ebike.id, run.id, emtb.id, mtb.id, ride.id])
     end
   end
 
@@ -138,6 +138,36 @@ RSpec.describe StravaActivity, type: :model do
       strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
       expect(strava_activity.title).to eq("Morning Ride")
       expect(strava_integration.strava_activities.count).to eq(1)
+    end
+
+    context "with id-only response" do
+      let(:existing) do
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543",
+          title: "Morning Ride", distance_meters: 25000.0, sport_type: "Ride")
+      end
+
+      it "does not overwrite existing attributes" do
+        StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => existing.strava_id})
+        existing.reload
+        expect(existing.title).to eq("Morning Ride")
+        expect(existing.distance_meters).to eq(25000.0)
+        expect(existing.sport_type).to eq("Ride")
+      end
+    end
+
+    context "with explicit nil in response" do
+      let(:existing) do
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543",
+          title: "Morning Ride", distance_meters: 25000.0)
+      end
+
+      it "blanks fields present in the response with nil values" do
+        StravaActivity.create_or_update_from_strava_response(strava_integration,
+          {"id" => existing.strava_id, "name" => nil, "distance" => nil})
+        existing.reload
+        expect(existing.title).to be_nil
+        expect(existing.distance_meters).to be_nil
+      end
     end
   end
 
@@ -233,7 +263,7 @@ RSpec.describe StravaActivity, type: :model do
     it "updates from strava" do
       expect(strava_activity).to be_valid
       VCR.use_cassette("strava-update_from_strava") do
-        strava_activity.update_from_strava!
+        strava_activity.update_from_strava!(run_inline: true)
       end
       strava_activity.reload
       expect(strava_activity).to have_attributes target_attributes.as_json
@@ -290,7 +320,7 @@ RSpec.describe StravaActivity, type: :model do
       it "updates from strava and returns correct proxy_serialized" do
         expect(strava_activity).to be_valid
         VCR.use_cassette("strava-update_from_strava-dunes_trip") do
-          strava_activity.update_from_strava!
+          strava_activity.update_from_strava!(run_inline: true)
         end
         strava_activity.reload
         expect(strava_activity).to have_attributes target_attributes.as_json

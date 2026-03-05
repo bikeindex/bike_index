@@ -65,6 +65,13 @@ class StravaActivity < ApplicationRecord
     gear_id
     strava_id
   ]
+  SUMMARY_KEY_MAP = {
+    "name" => :title, "distance" => :distance_meters, "moving_time" => :moving_time_seconds,
+    "total_elevation_gain" => :total_elevation_gain_meters, "sport_type" => :sport_type,
+    "private" => :private, "kudos_count" => :kudos_count, "average_speed" => :average_speed,
+    "suffer_score" => :suffer_score, "gear_id" => :gear_id
+  }.freeze
+  RE_ENRICH_AFTER = 1.hour
 
   belongs_to :strava_integration
 
@@ -74,8 +81,8 @@ class StravaActivity < ApplicationRecord
   scope :cycling, -> { where(activity_type: CYCLING_TYPES) }
   scope :enriched, -> { where.not(enriched_at: nil) }
   scope :not_enriched, -> { where(enriched_at: nil) }
-  scope :activities_to_enrich, -> { cycling.not_enriched }
   scope :with_gear, -> { where.not(gear_id: nil) }
+  scope :strava_ordered, -> { order(Arel.sql("strava_id::bigint DESC")) }
 
   class << self
     def activity_types
@@ -106,7 +113,7 @@ class StravaActivity < ApplicationRecord
         average_speed: detail["average_speed"],
         suffer_score: detail["suffer_score"],
         photos:,
-        segment_locations: segment_locations_for(detail["segment_efforts"]),
+        segment_locations: StravaJobs::SegmentLocations.locations_for(detail["segment_efforts"]),
         kudos_count: detail["kudos_count"],
         enriched_at: Time.current,
         strava_data: strava_data_from(detail)
@@ -121,74 +128,16 @@ class StravaActivity < ApplicationRecord
     end
 
     def summary_attributes(summary)
-      {
-        title: summary["name"],
-        distance_meters: summary["distance"],
-        moving_time_seconds: summary["moving_time"],
-        total_elevation_gain_meters: summary["total_elevation_gain"],
-        sport_type: summary["sport_type"],
-        private: summary["private"],
-        kudos_count: summary["kudos_count"],
-        average_speed: summary["average_speed"],
-        suffer_score: summary["suffer_score"],
-        gear_id: summary["gear_id"],
-        activity_type: summary["sport_type"] || summary["type"],
-        timezone: Binxtils::TimeZoneParser.parse(summary["timezone"])&.name,
-        start_date: Binxtils::TimeParser.parse(summary["start_date"]),
-        strava_data: strava_data_from(summary)
-      }
-    end
-
-    def segment_locations_for(segments)
-      return {} if segments.blank?
-
-      region_cache = {}
-      country_cache = {}
-
-      locations = segments.filter_map { |se|
-        segment = se["segment"]
-        next if segment.blank?
-        city = segment["city"].presence
-        region_abbr = resolve_region_abbreviation(segment["state"].presence, region_cache)
-        country_abbr = resolve_country_abbreviation(segment["country"].presence, country_cache)
-        location = {city:, region: region_abbr, country: country_abbr}.compact
-        location.presence
-      }.uniq
-
-      regions = region_cache.values.reject { |v| v[:name] == v[:abbreviation] }
-        .to_h { |v| [v[:name], v[:abbreviation]] }
-      countries = country_cache.values.reject { |v| v[:name] == v[:abbreviation] }
-        .to_h { |v| [v[:name], v[:abbreviation]] }
-
-      {locations:, regions: regions.presence, countries: countries.presence}.compact
-    end
-
-    def resolve_region_abbreviation(raw_value, cache)
-      return nil if raw_value.blank?
-      return cache[raw_value][:abbreviation] if cache.key?(raw_value)
-
-      state = State.friendly_find(raw_value)
-      if state
-        cache[raw_value] = {name: state.name, abbreviation: state.abbreviation}
-        state.abbreviation
-      else
-        cache[raw_value] = {name: raw_value, abbreviation: raw_value}
-        raw_value
+      attrs = SUMMARY_KEY_MAP.each_with_object({}) { |(src, attr), h| h[attr] = summary[src] if summary.key?(src) }
+      attrs["title"] = summary["title"] if summary["title"].present? # The webhook sends this, WTF
+      if summary.key?("sport_type") || summary.key?("type")
+        attrs[:activity_type] = summary["sport_type"] || summary["type"]
       end
-    end
-
-    def resolve_country_abbreviation(raw_value, cache)
-      return nil if raw_value.blank?
-      return cache[raw_value][:abbreviation] if cache.key?(raw_value)
-
-      country = Country.friendly_find(raw_value)
-      if country
-        cache[raw_value] = {name: country.name, abbreviation: country.abbreviation}
-        country.abbreviation
-      else
-        cache[raw_value] = {name: raw_value, abbreviation: raw_value}
-        raw_value
-      end
+      attrs[:timezone] = Binxtils::TimeZoneParser.parse(summary["timezone"])&.name if summary.key?("timezone")
+      attrs[:start_date] = Binxtils::TimeParser.parse(summary["start_date"]) if summary.key?("start_date")
+      strava_data = strava_data_from(summary)
+      attrs[:strava_data] = strava_data if strava_data.present?
+      attrs
     end
   end
 
@@ -200,10 +149,14 @@ class StravaActivity < ApplicationRecord
     enriched_at.present?
   end
 
+  def re_enrich?
+    !enriched? || enriched_at < RE_ENRICH_AFTER.ago
+  end
+
   def calculated_gear_name
     return nil if gear_id.blank?
 
-    strava_integration.strava_gears.find_by(strava_gear_id: gear_id)&.strava_gear_name || gear_id
+    strava_integration.strava_gears.find_by(strava_id: gear_id)&.name || gear_id
   end
 
   def start_date_in_zone
@@ -226,14 +179,16 @@ class StravaActivity < ApplicationRecord
   end
 
   # AKA Enrich the activity
-  def update_from_strava!
+  def update_from_strava!(run_inline: false)
     strava_request = StravaRequest.create!(
       strava_integration_id:,
       user_id: strava_integration.user_id,
       request_type: :fetch_activity,
       parameters: {strava_id: strava_id.to_s}
     )
-    StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
+    if run_inline
+      StravaJobs::RequestRunner.new.perform(strava_request.id, strava_request:, no_skip: true)
+    end
   end
 
   def proxy_serialized

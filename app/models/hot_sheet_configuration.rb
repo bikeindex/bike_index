@@ -28,9 +28,9 @@ class HotSheetConfiguration < ApplicationRecord
   validates_presence_of :organization_id, :send_seconds_past_midnight, :search_radius_miles
   validate :ensure_location_if_on
 
-  before_validation :set_calculated_attributes
-
   delegate :search_coordinates, :metric_units?, to: :organization, allow_nil: true
+
+  before_validation :set_calculated_attributes
 
   scope :on, -> { where(is_on: true) }
 

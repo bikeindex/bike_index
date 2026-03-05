@@ -156,6 +156,16 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
 
       expect(Bike.unscoped.find(bike.id).deleted?).to be_truthy
     end
+
+    context "bike already deleted" do
+      it "doesn't error" do
+        impound_record_update.save
+        bike.destroy
+        Sidekiq::Job.clear_all
+        described_class.new.perform(impound_record.id)
+        expect(impound_record_update.reload.processed?).to be_truthy
+      end
+    end
   end
 
   context "transferred_to_new_owner" do

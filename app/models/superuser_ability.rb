@@ -38,11 +38,11 @@ class SuperuserAbility < ApplicationRecord
 
   acts_as_paranoid
 
+  enum :kind, KIND_ENUM
+
   belongs_to :user
 
   before_validation :set_calculated_attributes
-
-  enum :kind, KIND_ENUM
 
   scope :non_universal, -> { where.not(kind: "universal") }
 

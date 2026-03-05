@@ -17,10 +17,10 @@ The SPA is served via a Rails controller using pre-built assets in `public/strav
 To develop with HMR (hot module replacement):
 
 ```bash
-BUILD_STRAVA_SEARCH=true bin/dev
+bin/dev --strava
 ```
 
-This starts the Vite dev server on port 3143 alongside Rails. The Rails view loads assets from the Vite dev server when `BUILD_STRAVA_SEARCH=true`.
+This starts the Vite dev server on port 3143 alongside Rails. The Rails view loads assets from the Vite dev server when `BUILD_STRAVA_SEARCH=true` (which `bin/dev` sets if passed `--strava`).
 
 To run the SPA's own tests/linting:
 

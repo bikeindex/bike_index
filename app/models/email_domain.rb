@@ -48,6 +48,8 @@ class EmailDomain < ApplicationRecord
   validate :domain_is_expected_format
   validate :domain_does_not_match_existing, on: :create
 
+  attr_accessor :skip_processing
+
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker, on: :create
 
@@ -57,8 +59,6 @@ class EmailDomain < ApplicationRecord
   scope :subdomain, -> { where("(data -> 'is_tld')::text = ?", "false") }
   scope :with_bikes, -> { where("COALESCE((data -> 'bike_count')::integer, 0) > 0") }
   scope :no_auto_assign_status, -> { where("(data -> 'no_auto_assign_status')::text =?", "true") }
-
-  attr_accessor :skip_processing
 
   class << self
     def find_or_create_for(email_or_domain, skip_processing: false)

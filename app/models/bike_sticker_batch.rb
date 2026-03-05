@@ -22,9 +22,9 @@ class BikeStickerBatch < ApplicationRecord
   belongs_to :organization
   has_many :bike_stickers
 
-  before_validation :set_calculated_attributes
-
   attr_accessor :initial_code_integer, :stickers_to_create_count
+
+  before_validation :set_calculated_attributes
 
   def min_code_integer
     bike_stickers.minimum(:code_integer) || 0

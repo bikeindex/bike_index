@@ -52,3 +52,29 @@ export const LoadingActivities: Story = {
     status: 'Loading activities...',
   },
 };
+
+export const ExceededEstimate: Story = {
+  args: {
+    loaded: 160,
+    total: 160,
+    status: '160 of 160 activities synced',
+  },
+};
+
+export const RateLimited: Story = {
+  args: {
+    loaded: 0,
+    total: 150,
+    status: 'Checking sync status...',
+    rateLimited: true,
+  },
+};
+
+export const RateLimitedWithProgress: Story = {
+  args: {
+    loaded: 72,
+    total: 150,
+    status: '72 of ~150 activities synced',
+    rateLimited: true,
+  },
+};

@@ -30,19 +30,19 @@ class OrganizationRole < ApplicationRecord
 
   acts_as_paranoid
 
+  enum :role, ROLE_TYPES
+  enum :hot_sheet_notification, HOT_SHEET_NOTIFICATION_ENUM
+
   belongs_to :user
   belongs_to :organization
   belongs_to :sender, class_name: "User"
 
-  enum :role, ROLE_TYPES
-  enum :hot_sheet_notification, HOT_SHEET_NOTIFICATION_ENUM
-
   validates_presence_of :role, :organization_id, :invited_email
+
+  attr_accessor :skip_processing
 
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker
-
-  attr_accessor :skip_processing
 
   scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }

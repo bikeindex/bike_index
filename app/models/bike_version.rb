@@ -75,30 +75,30 @@ class BikeVersion < ApplicationRecord
     user_hidden: 2
   }.freeze
 
+  enum :visibility, VISIBILITY_ENUM
+  enum :status, Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
+
   belongs_to :bike
 
   belongs_to :paint # Not in BikeAttributable because of counter cache
 
   belongs_to :owner, class_name: "User" # Direct association, unlike bike
 
-  enum :visibility, VISIBILITY_ENUM
-  enum :status, Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
+  validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
 
   attr_accessor :timezone
   attr_writer :end_at_shown, :start_at_shown
+
+  delegate :bike_versions,
+    :no_serial?, :serial_number, :serial_unknown, :made_without_serial?,
+    to: :bike, allow_nil: true
+
+  before_validation :set_calculated_attributes
 
   scope :user_hidden, -> { unscoped.user_hidden }
   scope :visible, -> { where.not(visibility: "user_hidden").where(deleted_at: nil) }
 
   default_scope { visible.order(listing_order: :desc) }
-
-  validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
-
-  before_validation :set_calculated_attributes
-
-  delegate :bike_versions,
-    :no_serial?, :serial_number, :serial_unknown, :made_without_serial?,
-    to: :bike, allow_nil: true
 
   pg_search_scope :pg_search, against: {
     cached_data: "B",

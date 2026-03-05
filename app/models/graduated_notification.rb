@@ -37,6 +37,8 @@ class GraduatedNotification < ApplicationRecord
   STATUS_ENUM = {pending: 0, bike_graduated: 1, marked_remaining: 2}.freeze
   PENDING_PERIOD = 24.hours.freeze
 
+  enum :status, STATUS_ENUM
+
   belongs_to :bike
   belongs_to :bike_organization
   belongs_to :user
@@ -49,12 +51,10 @@ class GraduatedNotification < ApplicationRecord
 
   validates_presence_of :bike_id, :organization_id, :bike_organization_id
 
+  attr_accessor :skip_update
+
   before_validation :set_calculated_attributes
   after_commit :update_associated_notifications, if: :persisted?
-
-  enum :status, STATUS_ENUM
-
-  attr_accessor :skip_update
 
   scope :not_most_recent, -> { where(not_most_recent: true) }
   scope :most_recent, -> { where(not_most_recent: false) }

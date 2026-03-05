@@ -1,7 +1,6 @@
 import {
   type StravaActivity,
   type StoredAuth,
-  type StravaGear,
   type UpdatableActivity,
   type StravaAthlete,
 } from '../types/strava';
@@ -123,6 +122,7 @@ export interface BackendSyncStatus {
   activities_downloaded_count: number;
   athlete_activity_count: number | null;
   progress_percent: number;
+  rate_limited: boolean;
 }
 
 export async function fetchSyncStatus(): Promise<BackendSyncStatus | null> {
@@ -146,36 +146,6 @@ export async function fetchSyncStatus(): Promise<BackendSyncStatus | null> {
 
 export async function getAthlete(): Promise<StravaAthlete> {
   return apiRequest<StravaAthlete>('/athlete');
-}
-
-export async function getAthleteGear(): Promise<StravaGear[]> {
-  const athlete = await apiRequest<StravaAthlete & { bikes: StravaGear[]; shoes: StravaGear[] }>(
-    '/athlete'
-  );
-  return [...(athlete.bikes || []), ...(athlete.shoes || [])];
-}
-
-interface ActivityTotals {
-  count: number;
-  distance: number;
-  moving_time: number;
-  elapsed_time: number;
-  elevation_gain: number;
-}
-
-interface AthleteStats {
-  all_ride_totals: ActivityTotals;
-  all_run_totals: ActivityTotals;
-  all_swim_totals: ActivityTotals;
-}
-
-export async function getAthleteStats(athleteId: number): Promise<number> {
-  const stats = await apiRequest<AthleteStats>(`/athletes/${athleteId}/stats`);
-  return (
-    (stats.all_ride_totals?.count || 0) +
-    (stats.all_run_totals?.count || 0) +
-    (stats.all_swim_totals?.count || 0)
-  );
 }
 
 export async function getActivities(

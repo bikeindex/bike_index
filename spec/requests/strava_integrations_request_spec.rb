@@ -95,7 +95,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
             strava_integration = current_user.reload.strava_integration
             expect(strava_integration.access_token).to be_present
             expect(strava_integration.refresh_token).to be_present
-            expect(strava_integration.athlete_id).to eq("2430215")
+            expect(strava_integration.strava_id).to eq("2430215")
             expect(strava_integration.status).to eq("pending")
             expect(strava_integration.strava_permissions).to eq Integrations::StravaClient::DEFAULT_SCOPE
           end
@@ -136,7 +136,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
         end
 
         context "user already has strava integration with same athlete" do
-          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "2430215") }
+          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, strava_id: "2430215") }
 
           it "updates existing integration without creating a new one" do
             oauth_state = initiate_oauth_flow
@@ -159,7 +159,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
         end
 
         context "user already has strava integration with error status" do
-          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "2430215", status: :error) }
+          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, strava_id: "2430215", status: :error) }
 
           it "destroys existing and creates new integration" do
             oauth_state = initiate_oauth_flow
@@ -181,7 +181,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
         end
 
         context "user already has strava integration with different athlete" do
-          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, athlete_id: "9999999") }
+          let!(:existing) { FactoryBot.create(:strava_integration, user: current_user, strava_id: "9999999") }
 
           it "destroys existing and creates new integration" do
             oauth_state = initiate_oauth_flow
@@ -197,7 +197,7 @@ RSpec.describe StravaIntegrationsController, type: :request do
 
               new_integration = current_user.reload.strava_integration
               expect(new_integration.id).not_to eq(existing.id)
-              expect(new_integration.athlete_id).to eq("2430215")
+              expect(new_integration.strava_id).to eq("2430215")
             end
           end
         end

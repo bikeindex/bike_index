@@ -15,11 +15,11 @@ class Country < ApplicationRecord
   UNITED_STATES_ID = Rails.env.test? ? nil : 230
   CANADA_ID = Rails.env.test? ? nil : 38
 
-  validates_presence_of :name
-  validates_uniqueness_of :name, :iso
-
   has_many :stolen_records
   has_many :locations
+
+  validates_presence_of :name
+  validates_uniqueness_of :name, :iso
 
   class << self
     def select_options

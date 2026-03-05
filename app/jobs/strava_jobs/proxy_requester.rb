@@ -28,24 +28,32 @@ module StravaJobs
             status: strava_integration.status,
             activities_downloaded_count: strava_integration.activities_downloaded_count,
             athlete_activity_count: strava_integration.athlete_activity_count,
-            progress_percent: strava_integration.sync_progress_percent
+            progress_percent: strava_integration.sync_progress_percent,
+            rate_limited: !ScheduledRequestEnqueuer.rate_limit_allows_batch?
           }
         }
       end
 
       def create_and_execute(strava_integration:, user:, url:, method: nil, body: nil)
         validate_url!(url)
+        params_method = method&.strip&.upcase
+        params_method = nil if params_method == "GET"
+
         strava_request = StravaRequest.create!(
           strava_integration:,
           user:,
           request_type: :proxy,
-          parameters: {url:, method:, body:}.compact
+          parameters: {url:, method: params_method, body:}.compact
         )
+
+        if internal_request?(strava_request)
+          return {internal_response: internal_response!(strava_request)}
+        end
 
         response = Integrations::StravaClient.proxy_request(strava_integration,
           strava_request.parameters["url"], method: strava_request.parameters["method"],
           body: strava_request.parameters["body"])
-        strava_request.update_from_response(response, raise_on_error: false)
+        strava_request.update_from_response(response)
 
         serialized = if strava_request.success?
           handle_proxy_response(strava_integration, response.body, method: strava_request.parameters["method"])
@@ -79,6 +87,40 @@ module StravaJobs
 
       private
 
+      def athlete_request?(strava_request)
+        return false if strava_request.parameters["method"].present? # Not a GET request
+
+        strava_request.parameters["url"]&.match?(/\Aathlete(\/\d+)?\z/)
+      end
+
+      def list_activities_page(strava_request)
+        return false if strava_request.parameters["method"].present? # Not a GET request
+        return false unless strava_request.parameters["url"]&.match?(/\Aathlete\/activities\?.*page=\d/)
+
+        strava_request.parameters["url"][/\Wpage=(\d+)/, 1].to_i
+      end
+
+      def internal_request?(strava_request)
+        athlete_request?(strava_request) ||
+          list_activities_page(strava_request).present?
+      end
+
+      def internal_response!(strava_request)
+        strava_request.update(response_status: :binx_response)
+
+        if athlete_request?(strava_request)
+          strava_request.strava_integration.proxy_serialized
+        else
+          page = list_activities_page(strava_request) - 1
+          limit = Integrations::StravaClient::ACTIVITIES_PER_PAGE
+
+          strava_activities = StravaActivity.where(strava_integration_id: strava_request.strava_integration_id).strava_ordered
+          return [] if strava_activities.count < page * limit
+
+          strava_activities.offset(page * limit).limit(limit).map(&:proxy_serialized)
+        end
+      end
+
       def authorized_app?(token)
         token.application_id == STRAVA_DOORKEEPER_APP_ID
       end
@@ -93,7 +135,7 @@ module StravaJobs
         elsif body.is_a?(Hash) && body["sport_type"].present?
           strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, body)
           if method.to_s.casecmp?("put")
-            strava_activity.update_from_strava!
+            strava_activity.update_from_strava!(run_inline: true)
             strava_activity.reload
           end
           strava_activity.proxy_serialized
